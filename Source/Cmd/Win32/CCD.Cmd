@@ -67,8 +67,20 @@ IF "%1"=="testfw" GOTO CD_TESTFW
 IF "%1"=="utils" GOTO CD_UTILS
 IF "%1"=="wndutils" GOTO CD_WNDUTILS
 
+IF "%1"=="root" GOTO CD_ROOT
+IF "%1"=="top" GOTO CD_TOP
+
 
 CD %CID_SRCTREE%\Source\AllProjects\%1
+GOTO EXIT
+
+
+:CD_ROOT
+CD %CID_SRCTREE%\
+GOTO EXIT
+
+:CD_TOP
+CD %CID_SRCTREE%\..
 GOTO EXIT
 
 :CD_ALLPROJECTS
