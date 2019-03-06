@@ -1,0 +1,79 @@
+;
+; FILE NAME: CIDIDL_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 07/08/2000
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;   This file and its contents are the property of Charmed Quark Software. It
+;   forms part of the internal implementation of the Charmed Quark Controller
+;   product. It contains proprietary source code and is not to be distributed
+;   publically in any way, shape, or form.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for the CIDIDL compiler program.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kIDLErrs
+    MsgPref=kIDLMsgs
+END CTRL
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    errc_NoError                0       No Error
+
+    ; Code generation messages
+    errcGen_UnknownType         2000    The parameter type '%(1)' is not known
+    errcGen_WriteCHeader        2001    An error occured while generating the client header
+    errcGen_WriteCImpl          2002    An error occured while generating the client implementation
+    errcGen_WriteSHeader        2003    An error occured while generating the server header
+    errcGen_WriteSImpl          2004    An error occured while generating the server implementation
+    errcGen_WriteGHeader        2005    An error occured while generating globals header %(1)
+    errcGen_PollMethRet         2006    A poll method must have a boolean return type. Method=%(1)
+    errcGen_InvalidParmDir      2007    The parameter direction for method %(1) is invalid
+    errcGen_NoGlobalsFac        2008    Globals were found but no globals facility name was set
+
+    ; Input file related errors
+    errcInp_ExpectedElem        4000    Expected element '%(1)', but found '%(2)'
+    errcInp_BadEnumType         4001    '%(1)' is not a valid type for enum %(2)
+    errcInp_BadEnumPattern      4002    The alt pattern for '%(1)' has no replacement token
+    errcInp_InOnly              4003    %(1) parameters must be In only
+    errcInp_BadAltTextSrc       4004    '%(1)' is not a valid alt text source for enum %(2)
+    errcInp_BadTextSrc          4006    '%(1)' is not a valid text source for enum %(2)
+    errcInp_BadFmtType          4007    '%(1)' is not a valid format type for enum %(2)
+    errcInp_BadLoadType         4008    '%(1)' is not a valid load type for enum %(2)
+    errcInp_BadXlatType         4009    '%(1)' is not a valid xlat type for enum %(2)
+    errcInp_IncompTextOpts      4010    %(1) text is referenced but not enabled for enum %(2)
+    errcInp_ValueNotUsed        4013    This type of enum does not use the Value attribute (%(1))
+    errcInp_ValueRequired       4014    The Value attribute is required for this type of enum (%(1))
+    errcInp_NoBaseTypeAllowed   4015    The base type is only allowed for safe style enums (Type=%(1))
+    errcInp_BmpMustBeSigned     4016    Safe bitmapped enums with explicit base type must be unsigned (Type=%(1))
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+;  Message ids
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+    ; General messages
+    midGen_Blurb               15000    \nCharmed Quark Software\nCIDIDL Compiler Version %(1)
+    midGen_NewId               15001    "The new interface id is: "
+    midGen_ErrorPrefix         15002    "  Error: "
+
+END MESSAGES
+

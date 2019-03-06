@@ -1,0 +1,14 @@
+{
+    "MType" : "FldCh",
+    "Data" :
+    {
+        "Mon" : "AG_Lighting",
+        "Fld" : "LGHT#Sw_KidsMain",
+        "Val" : "False",
+        "Level" : 15
+    },
+    "Options" :
+    [
+        1, 2, 3
+    ]
+}

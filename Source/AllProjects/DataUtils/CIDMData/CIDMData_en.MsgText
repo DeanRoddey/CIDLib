@@ -1,0 +1,62 @@
+;
+; FILE NAME: CIDMData.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 11/03/2015
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  This file and its contents are the property of Charmed Quark Software. It
+;  may not be redistributed in any modified form, or as part of any product
+;  other than the original CIDLib C++ Frameworks distribution file. Its
+;  contents may not be compiled into any other product, except when required
+;  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;  product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;  This is the message text file for the facility. From this file are created
+;  the CIDMData_StringIds.Hpp and CIDMData.CIDMsg files.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kMDataErrs
+    MsgPref=kMDataMsgs
+END CTRL
+
+
+; -----------------------------------------------------------------------------
+;  Error ids
+; -----------------------------------------------------------------------------
+ERRORS=
+
+    ; No error
+    errcNoError                    0    No error
+
+    ; Attribute data errors
+    errcAttr_WrongType          200     Attribute '%(1)' was accessed as %(2) when it is a %(3)
+    errcAttr_ValAssign          201     Attribute '%(1)' is type '%(2)' but was set from a '%(3)' source
+
+    ; Chunked file errors
+    errcChFl_ReadFmtError       500     The chunked file format was not valid
+    errcChFl_ChunkNotFound      501     No file chunk with the id '%(1)' was found in this file
+    errcChFl_DupChunk           502     There is already a file chunk with the id '%(1)'
+    errcChFl_MetaKeyNotFound    503     Meta value key '%(1)' was not found
+    errcChFl_MetaKeyAlready     504     Meta value key '%(1)' already exists on this file
+    errcChFl_BadChunkIndex      505     %(1) is not a valid chunk index, count=%(2)
+
+END ERRORS
+
+
+; -----------------------------------------------------------------------------
+;  Message ids
+; -----------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES

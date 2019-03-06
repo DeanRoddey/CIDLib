@@ -1,0 +1,371 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestURL1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.KVPair;
+    MEng.System.Runtime.URL;
+    MEng.User.Tests.TestHelpers;
+EndImports;
+
+Types=
+    VectorOf[KVPair]    KVList;
+EndTypes;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+EndMembers;
+
+Methods=[Private,Final]
+
+    //
+    //  Given a set up URL, get the values out and see if they match what
+    //  we were told to expect.
+    //
+    Method CheckComponents( [In]    URL     TestURL
+                            , [In]  String  UserName
+                            , [In]  String  Password
+                            , [In]  String  Host
+                            , [In]  Card4   PortNum
+                            , [In]  String  Path
+                            , [In]  String  Params
+                            , [In]  String  Fragment
+                            , [In]  String  QParms
+                            , [In]  Card4   LineNum)
+    Begin
+        Locals=
+            String  Val;
+        EndLocals;
+
+        TestURL.GetUserName(Val);
+        If (Val != UserName)
+            m_Helper.PrintErr("UserName was incorrect", m_Output, LineNum);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        TestURL.GetPassword(Val);
+        If (Val != Password)
+            m_Helper.PrintErr("Password was incorrect", m_Output, LineNum);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        TestURL.GetHost(Val);
+        If (Val != Host)
+            m_Helper.PrintErr("Host name was incorrect", m_Output, LineNum);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        TestURL.GetPath(Val);
+        If (Val != Path)
+            m_Helper.PrintErr("URL path was incorrect", m_Output, LineNum);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        TestURL.GetParams(Val);
+        If (Val != Params)
+            m_Helper.PrintErr("URL params was incorrect", m_Output, LineNum);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        // To make it simpler we just compare the QPs as text
+        TestURL.GetQParmsFmt(Val);
+        If (Val != QParms)
+            m_Helper.PrintErr("URL q parms was incorrect", m_Output, LineNum);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        TestURL.GetFragment(Val);
+        If (Val != Fragment)
+            m_Helper.PrintErr("URL fragment was incorrect", m_Output, LineNum);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+    EndMethod;
+
+
+
+    //
+    //  Test the building up of URLs. Note that this call will do any
+    //  required encoding.
+    //
+    Method TestBuildURL()
+    Begin
+        Locals=
+            URL     TestURL;
+            String  OutVal;
+            KVList  QParms;
+            KVPair  QParm;
+        EndLocals;
+
+        // Load up a couple query parms for testing
+        QParm.Set("value", "123");
+        QParms.AddObject(QParm);
+
+        QParm.Set("enable", "");
+        QParms.AddObject(QParm);
+
+
+        // Test #1
+        OutVal := TestURL.BuildURL
+        (
+            URLProtos.HTTP
+            , ""
+            , ""
+            , "www.goober.com"
+            , 0
+            , ""
+            , ""
+            , ""
+        );
+
+        If (OutVal != "http://www.goober.com")
+            m_Helper.PrintErr("BuildURL #1 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test #2
+        OutVal := TestURL.BuildURL
+        (
+            URLProtos.HTTP
+            , ""
+            , ""
+            , "www.goober.com"
+            , 90
+            , ""
+            , ""
+            , ""
+        );
+
+        If (OutVal != "http://www.goober.com:90")
+            m_Helper.PrintErr("BuildURL #2 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test #3
+        OutVal := TestURL.BuildURL
+        (
+            URLProtos.HTTP
+            , "bubba"
+            , "jenny"
+            , "www.goober.com"
+            , 0
+            , "/test"
+            , ""
+            , ""
+        );
+
+        If (OutVal != "http://bubba:jenny@www.goober.com/test")
+            m_Helper.PrintErr("BuildURL #3 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test #4
+        OutVal := TestURL.BuildURL
+        (
+            URLProtos.HTTP
+            , "bubba"
+            , "jenny"
+            , "www.goober.com"
+            , 0
+            , "/test"
+            , ""
+            , "myfrag"
+        );
+
+        If (OutVal != "http://bubba:jenny@www.goober.com/test#myfrag")
+            m_Helper.PrintErr("BuildURL #4 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test #5
+        OutVal := TestURL.BuildURL
+        (
+            URLProtos.HTTPS
+            , "bubba"
+            , ""
+            , "www.goober.com"
+            , 0
+            , "/test"
+            , "1;2"
+            , "myfrag2"
+        );
+
+        If (OutVal != "https://bubba@www.goober.com/test;1;2#myfrag2")
+            m_Helper.PrintErr("BuildURL #5 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test #6
+        OutVal := TestURL.BuildURL2
+        (
+            URLProtos.HTTP
+            , ""
+            , ""
+            , "www.sanity.com"
+            , 0
+            , "/testing"
+            , ""
+            , ""
+            , QParms
+        );
+
+        If (OutVal != "http://www.sanity.com/testing?value=123&enable")
+            m_Helper.PrintErr("BuildURL #6 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test #7
+        OutVal := TestURL.BuildURL2
+        (
+            URLProtos.HTTP
+            , ""
+            , ""
+            , "www.sanity.com"
+            , 8080
+            , "/testing"
+            , ""
+            , "afragment"
+            , QParms
+        );
+
+        If (OutVal != "http://www.sanity.com:8080/testing?value=123&enable#afragment")
+            m_Helper.PrintErr("BuildURL #7 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    // Test the setting up of URLs relative to a base URL
+    Method TestRelativeURL()
+    Begin
+        Locals=
+            URL     TestBase1;
+            URL     TestRel;
+            String  URLText;
+        EndLocals;
+
+        TestBase1.Set("http://www.gargle.com/Test/1", FQTypes.Full);
+
+        //
+        //  First test that a fully qualified URL doesn't take anything from
+        //  the base URL.
+        //
+        TestRel.Set3(TestBase1, "ftp://sample.com/files");
+        TestRel.GetEncoded(URLText);
+        If (URLText != "ftp://sample.com/files")
+            m_Helper.PrintErr("FQ relative URL was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        TestRel.Set3(TestBase1, "2");
+        TestRel.GetEncoded(URLText);
+        If (URLText != "http://www.gargle.com/Test/2")
+            m_Helper.PrintErr("Relative URL was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        TestRel.Set3(TestBase1, "Data?values=yes");
+        TestRel.GetEncoded(URLText);
+        If (URLText != "http://www.gargle.com/Test/Data?values=yes")
+            m_Helper.PrintErr("Relative URL was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+    Method TestURLComponents()
+    Begin
+        Locals=
+            URL     TestURL;
+            String  URLText;
+            String  ProtoVal;
+            String  UserVal;
+            String  HostVal;
+            String  PathVal;
+            String  SuffVal;
+        EndLocals;
+
+        TestURL.Set("http://www.2.com/Test/1#entry", FQTypes.Full);
+        CheckComponents(
+            TestURL
+            , "", "", "www.2.com", 80, "/Test/1", "", "entry", "", $CurLine
+        );
+
+        TestURL.Set("http://www.2.com/Test/2?val1=1&val2&val3=4", FQTypes.Full);
+        CheckComponents(
+            TestURL
+            , "", "", "www.2.com", 80, "/Test/2", "", "", "val1=1&val2&val3=4", $CurLine
+        );
+
+        TestURL.Set("http://www.2.com/Test/1;3;4#entry", FQTypes.Full);
+        CheckComponents(
+            TestURL
+            , "", "", "www.2.com", 80, "/Test/1", "3;4", "entry", "", $CurLine
+        );
+
+        TestURL.Set("sip:angie@somewhere.org", FQTypes.Full);
+        CheckComponents(
+            TestURL
+            , "angie", "", "somewhere.org", 5060, "", "", "", "", $CurLine
+        );
+
+
+        // Test another method that returns partially formatted stuff
+        TestURL.Set("http://x:y@www.2.com/Test/1;3;4?val1=1#entry", FQTypes.Full);
+
+        TestURL.GetEncodedParts(ProtoVal, UserVal, HostVal, PathVal, SuffVal);
+
+        If ((ProtoVal != "http://")
+        ||  (UserVal != "x:y@")
+        ||  (HostVal != "www.2.com")
+        ||  (PathVal != "/Test/1;3;4")
+        ||  (SuffVal != "?val1=1#entry"))
+            m_Helper.PrintErr("Encoded URL parts were wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+EndMethods;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+
+    Method Start() Returns Int4
+    Begin
+        // Invoke some local tests
+        TestBuildURL();
+        TestURLComponents();
+        TestRelativeURL();
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+

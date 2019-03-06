@@ -1,0 +1,20 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.DynType1Inc;
+    ParentClass MEng.Object;
+EndClass;
+
+
+Literals=
+    String  kTypeName("MEng.User.Tests.TestDerivedClass");
+EndLiterals;
+
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+EndMethods;
+
+

@@ -1,0 +1,882 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestString1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Literals=
+    String kTestLit("Literal Value");
+    String kTestMultiLit("The \
+                             Literal Value");
+    Char   kCharLit1('X');
+    Char   kCharLit2('\x0020');
+    Char   kCharLit3('\r');
+    Char   kCharLit4('\x005C');
+    Char   kCharLit5('\\');
+EndLiterals;
+
+Members=[Const]
+    String              m_TestConst;
+EndMembers;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    String              m_Test1;
+    String              m_Test2;
+    String              m_Test3;
+    Card4               m_TestVal;
+    Int4                m_RetVal;
+    Boolean             m_Flag;
+    Char                m_CharVal;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_TestConst("The const value");
+        m_Helper();
+        m_Output();
+        m_Test1();
+        m_Test2("Test 2");
+        m_Test3(1025);
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    // Tests a path to see if it has the expected component values
+    Method TestPath([In]    String  ToTest
+                    , [In]  String  ExpPath
+                    , [In]  String  ExpName
+                    , [In]  String  ExpExt) Returns Boolean
+    Begin
+        Locals=
+            String  TmpVal;
+            String  FullName;
+        EndLocals;
+
+        // Build the full name part
+        FullName := ExpName;
+        If (!ExpExt.IsEmpty())
+            FullName.AppendChar('.');
+            FullName.Append(ExpExt);
+        EndIf;
+
+        // Validate the path
+        If (ExpPath.IsEmpty())
+            If (ToTest.HasPath())
+                m_Helper.PrintErr("Got unexpected path", m_Output, $CurLine);
+                Return False;
+            EndIf;
+        Else
+            If (!ToTest.HasPath() || !ToTest.GetPath(TmpVal) || (TmpVal != ExpPath))
+                m_Helper.PrintErr("Expected path was not found", m_Output, $CurLine);
+                Return False;
+            EndIf;
+        EndIf;
+
+        // Validate the name.ext
+        If (FullName.IsEmpty())
+            If (ToTest.HasName())
+                m_Helper.PrintErr("Got unexpected name", m_Output, $CurLine);
+                Return False;
+            EndIf;
+        Else
+            If (!ToTest.HasName() || !ToTest.GetNameExt(TmpVal) || (TmpVal != FullName))
+                m_Helper.PrintErr("Expected name was not found", m_Output, $CurLine);
+                Return False;
+            EndIf;
+        EndIf;
+
+        // Validate the ext
+        If (ExpExt.IsEmpty())
+            If (ToTest.HasExt())
+                m_Helper.PrintErr("Got unexpected extension", m_Output, $CurLine);
+                Return False;
+            EndIf;
+        Else
+            If (!ToTest.HasExt() || !ToTest.GetExt(TmpVal) || (TmpVal != ExpExt))
+                m_Helper.PrintErr("Expected extension was not found", m_Output, $CurLine);
+                Return False;
+            EndIf;
+        EndIf;
+        Return True;
+    EndMethod;
+
+
+    // Tests that source/target being the same gets caught
+    Method TestSrcTarSame() Returns Boolean
+    Begin
+        Locals=
+            Boolean GotIt;
+            String  Src("Some Text");
+        EndLocals;
+
+        // Just try a few methods as a sanity check
+        GotIt := False;
+        Try
+            Src.ExtractSubStr(0, 2, Src);
+        EndTry;
+
+        Catch
+            GotIt := True;
+        EndCatch;
+
+        If (!GotIt)
+            Return False;
+        EndIf;
+
+        GotIt := False;
+        Try
+            Src.ExtractUpTo(0, ' ', Src);
+        EndTry;
+
+        Catch
+            GotIt := True;
+        EndCatch;
+
+        If (!GotIt)
+            Return False;
+        EndIf;
+
+        Return True;
+    EndMethod;
+
+
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            Boolean GotIt;
+            Card4   C4Val;
+            Card8   C8Val;
+            Float4  F4Val;
+            Float8  F8Val;
+            Int4    I4Val;
+        EndLocals;
+
+        // Test the construction of the literals
+        If ((kTestLit != "Literal Value")
+        ||  (kTestMultiLit != "The Literal Value")
+        ||  (kCharLit1 != 'X')
+        ||  (kCharLit2 != ' ')
+        ||  (kCharLit3 != '\r'))
+            m_Helper.PrintErr("Literal value was invalid", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Check that the initializers set the values correctly
+        If (!m_Test1.IsEmpty())
+            m_Helper.PrintErr("Initial m_Test1 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test2 != "Test 2")
+            m_Helper.PrintErr("Initial m_Test2 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test1 = m_Test2)
+            m_Helper.PrintErr("Initial values were equal", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test3.GetAlloc() != 1025)
+            m_Helper.PrintErr("The initial buffer allocation was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Check basic setting of the value
+        m_Test1 := "The const value";
+        If (m_Test1 != "The const value")
+            m_Helper.PrintErr("Set of value with literal failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test1 != m_TestConst)
+            m_Helper.PrintErr("Test value not equal to const value", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := m_Test2;
+        If (m_Test1 != m_Test2)
+            m_Helper.PrintErr("Copy created unequal values", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        If (!m_Test1.IsEmpty())
+            m_Helper.PrintErr("Clear() did not clear string", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Check string length reporting
+        If (m_TestConst.GetLength() != 15)
+            m_Helper.PrintErr("GetLength reported back length", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Make sure that we catch index errors
+        m_Test1.Clear();
+        m_Flag := False;
+        Try
+            m_Test1.GetAt(0);
+        EndTry;
+
+        Catch
+            If ($Exception.Check(StringErrors.BadIndex))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Check appending and formatted appending
+        m_Test1.Clear();
+        m_Test1.AppendChar('A');
+        m_Test1.Append("BC");
+        m_TestVal := 5;
+        m_Test1.AppendFmt(m_TestVal);
+        If (m_Test1 != "ABC5")
+            m_Helper.PrintErr("Appends failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendCard1(16, Radices.Octal);
+        If (m_Test1 != "20")
+            m_Helper.PrintErr("AppendCard1 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendCard2(1024, Radices.Hex);
+        If (m_Test1 != "400")
+            m_Helper.PrintErr("AppendCard2 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendCard4(32, Radices.Hex);
+        If (m_Test1 != "20")
+            m_Helper.PrintErr("AppendCard4 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendFloat4(28.1234, 3);
+        If (m_Test1 != "28.123")
+            m_Helper.PrintErr("AppendFloat4 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendFloat4(43, 1);
+        If (m_Test1 != "43.0")
+            m_Helper.PrintErr("AppendFloat4 integral failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendFloat8(8.1234, 2);
+        If (m_Test1 != "8.12")
+            m_Helper.PrintErr("AppendFloat8 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendFloat8(88, 3);
+        If (m_Test1 != "88.000")
+            m_Helper.PrintErr("AppendFloat8 integral failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendInt1(-123, Radices.Dec);
+        If (m_Test1 != "-123")
+            m_Helper.PrintErr("AppendInt1 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendInt2(-1234, Radices.Dec);
+        If (m_Test1 != "-1234")
+            m_Helper.PrintErr("AppendInt2 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test1.AppendInt2(-0x3FA, Radices.Hex);
+        If (m_Test1 != "-3FA")
+            m_Helper.PrintErr("AppendInt2 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test the cut functionality
+        m_Test1 := "12345";
+        m_Test1.Cut(1, 1);
+        If (m_Test1 != "1345")
+            m_Helper.PrintErr("Cut failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Cut(2, Card4.kMaxValue);
+        If (m_Test1 != "13")
+            m_Helper.PrintErr("Cut failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test the substring extraction stuff
+        m_TestConst.ExtractSubStr(0, m_TestConst.GetLength(), m_Test1);
+        If (m_Test1 != m_TestConst)
+            m_Helper.PrintErr("Full substring extract failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Clear();
+        m_Test2.Clear();
+        Try
+            GotIt := False;
+            m_Test1.ExtractSubStr(0, 2, m_Test2);
+        EndTry;
+
+        Catch
+            GotIt := True;
+        EndCatch;
+
+        If (!GotIt || !m_Test2.IsEmpty())
+            m_Helper.PrintErr("Failed to catch illegal substr extract", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        Try
+            GotIt := False;
+            m_Test1.ExtractSubStr(0, 0, m_Test2);
+        EndTry;
+
+        Catch
+            GotIt := True;
+        EndCatch;
+
+        If (!GotIt || !m_Test2.IsEmpty())
+            m_Helper.PrintErr("Failed to catch illegal substr extract", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test with a starting position at the end of the source string
+//        m_Test1 := "123456";
+//        m_Test1.ExtractSubStr(6, 6, m_Test2);
+
+        // Test the cap method
+        m_Test1 := "12345";
+        m_Test1.CapAt(3);
+        If (m_Test1 != "123")
+            m_Helper.PrintErr("CapAt failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure we can cap at the end
+        m_Test1.CapAt(3);
+        If (m_Test1 != "123")
+            m_Helper.PrintErr("CapAt failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test binary conversion methods
+        m_Test1 := "123";
+        If (m_Test1.ToCard4() != 123)
+            m_Helper.PrintErr("ToCard4 conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "0x123";
+        If (m_Test1.ToCard4() != 0x123)
+            m_Helper.PrintErr("ToCard4 conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "410";
+        If (m_Test1.ToCard4R(Radices.Hex) != 0x410)
+            m_Helper.PrintErr("ToCard4R conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.ToCard4Ex(Radices.Dec, C4Val)
+        ||  (C4Val != 410))
+            m_Helper.PrintErr("Card4Ex conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "313";
+        If (m_Test1.ToCard8() != 313)
+            m_Helper.PrintErr("ToCard8 conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "520";
+        If (m_Test1.ToCard8R(Radices.Hex) != 0x520)
+            m_Helper.PrintErr("ToCard8R conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.ToCard8Ex(Radices.Dec, C8Val)
+        ||  (C8Val != 520#C8))
+            m_Helper.PrintErr("Card8Ex conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        m_Test1 := "23.45";
+        If (m_Test1.ToFloat4() != 23.45)
+            m_Helper.PrintErr("ToFloat4 conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.ToFloat4Ex(F4Val)
+        ||  (F4Val != 23.45))
+            m_Helper.PrintErr("ToFloat4Ex conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        m_Test1 := "123.45";
+        If (m_Test1.ToFloat8() != 123.45)
+            m_Helper.PrintErr("ToFloat8 conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.ToFloat8Ex(F8Val)
+        ||  (F8Val != 123.45))
+            m_Helper.PrintErr("ToFloat8Ex conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "-123";
+        If (m_Test1.ToInt4() != -123)
+            m_Helper.PrintErr("ToInt4 conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "0123";
+        If (m_Test1.ToInt4R(Radices.Octal) != 0123)
+            m_Helper.PrintErr("ToInt4R conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.ToInt4Ex(Radices.Octal, I4Val)
+        ||  (I4Val != 0123))
+            m_Helper.PrintErr("Int4Ex conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        m_Flag := False;
+        Try
+            m_Test1 := "-123";
+            m_Test1.ToCard4();
+        EndTry;
+
+        Catch
+            If ($Exception.Check(StringErrors.CantConvert))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch conversion error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "A123B";
+        If (m_Test1.ExtractCard4(1, 3) != 123)
+            m_Helper.PrintErr("Substring Card4 extract failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "A123B";
+        If (m_Test1.ExtractCard8(1, 3) != 123)
+            m_Helper.PrintErr("Substring Card8 extract failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "A123B";
+        If (m_Test1.ExtractInt4(1, 3) != 123)
+            m_Helper.PrintErr("Substring Int4 extract failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "A123.4B";
+        If (m_Test1.ExtractFloat8(1, 5) != 123.4)
+            m_Helper.PrintErr("Substring Float8 extract failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "123";
+        If (m_Test1.ExtractCard4(0, 3) != 123)
+            m_Helper.PrintErr("Substring Card4 extract failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "123";
+        If (m_Test1.ExtractInt4(0, 3) != 123)
+            m_Helper.PrintErr("Substring extract Int4  failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "123.4";
+        If (m_Test1.ExtractFloat8(0, 5) != 123.4)
+            m_Helper.PrintErr("Substring Float8 extract failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "0xABC";
+        If (m_Test1.ExtractCard4R(0, 5, Radices.Hex) != 0xABC)
+            m_Helper.PrintErr("Hex substring binary convert failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "57";
+        If (m_Test1.ExtractCard4R(0, 2, Radices.Octal) != 057)
+            m_Helper.PrintErr("Octa substring binary convert failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "E57I";
+        If (m_Test1.ExtractCard8R(1, 2, Radices.Octal) != 057)
+            m_Helper.PrintErr("Substring Card8 extract failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "-5F";
+        If (m_Test1.ExtractInt4R(0, 3, Radices.Hex) != -0x5F)
+            m_Helper.PrintErr("Hex substring binary convert failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure that escaping works
+        m_Test1 := "\t\t\t";
+        If (m_Test1.GetLength() != 3)
+            m_Helper.PrintErr("String escapement failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "\t\t\t\\";
+        If (m_Test1.GetLength() != 4)
+            m_Helper.PrintErr("String escapement failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "\x\y\z";
+        If (m_Test1.GetLength() != 6)
+            m_Helper.PrintErr("String escapement failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "\"";
+        If (m_Test1.GetLength() != 1)
+            m_Helper.PrintErr("String escapement failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the stripping methods
+        m_Test1 := " 1 ";
+        m_Test1.StripWhitespace();
+        If (m_Test1 != "1")
+            m_Helper.PrintErr("Whitespace strip failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "A1A";
+        m_Test1.StripChars("A");
+        If (m_Test1 != "1")
+            m_Helper.PrintErr("Char strip failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := " 1 2  3 4 5\n\t";
+        m_Test1.StripChars2(" \n\t", m_Test1.kComplete);
+        If (m_Test1 != "12345")
+            m_Helper.PrintErr("Char strip 2 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := " 1  2 \t  3  4  5\n\t";
+        m_Test1.StripChars2(" \n\t", m_Test1.kFull);
+        If (m_Test1 != "1 2 3 4 5")
+            m_Helper.PrintErr("Char strip 2 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the insert methods
+        m_Test1 := "13";
+        m_Test1.InsertCharAt('2', 1);
+        If (m_Test1 != "123")
+            m_Helper.PrintErr("Char insert failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "14";
+        m_Test1.InsertStrAt("23", 1);
+        If (m_Test1 != "1234")
+            m_Helper.PrintErr("String insert failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Do some character type testing
+        m_CharVal := 'A';
+        If (!m_CharVal.IsOfType(CharTypes.ASCIIAlpha)
+        ||  !m_CharVal.IsOfType(CharTypes.ASCIIAlphaNum)
+        ||  !m_CharVal.IsOfType(CharTypes.Alpha)
+        ||  !m_CharVal.IsOfType(CharTypes.AlphaNum)
+        ||  !m_CharVal.IsOfType(CharTypes.HexDigit))
+            m_Helper.PrintErr("Type check failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_CharVal := 'a';
+        If (!m_CharVal.IsOfType(CharTypes.ASCIIAlpha)
+        ||  m_CharVal.IsOfType(CharTypes.Whitespace))
+            m_Helper.PrintErr("Type check failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_CharVal := '4';
+        If (m_CharVal.IsOfType(CharTypes.ASCIIAlpha)
+        ||  m_CharVal.IsOfType(CharTypes.Alpha)
+        ||  m_CharVal.IsOfType(CharTypes.Whitespace))
+            m_Helper.PrintErr("Type check failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_CharVal := '0';
+        If (!m_CharVal.IsOfType(CharTypes.ASCIIAlphaNum)
+        ||  !m_CharVal.IsOfType(CharTypes.AlphaNum)
+        ||  !m_CharVal.IsOfType(CharTypes.HexDigit)
+        ||  !m_CharVal.IsOfType(CharTypes.Digit))
+            m_Helper.PrintErr("Type check failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the extract up to method
+        m_Test1 := "12345,ABC";
+        m_TestVal := m_Test1.ExtractUpTo(0, ',', m_Test2);
+        If ((m_Test2 != "12345") || (m_TestVal != 6))
+            m_Helper.PrintErr("Extract up to failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_TestVal := m_Test1.ExtractUpTo(m_TestVal, ',', m_Test2);
+        If ((m_Test2 != "ABC") || (m_TestVal != m_Test1.GetLength()))
+            m_Helper.PrintErr("Extract up to failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+//        m_TestVal := m_Test1.ExtractUpTo(m_TestVal, ',', m_Test2);
+//        If ((m_Test2 != "12345,ABC") || (m_TestVal != m_Test1.GetLength()))
+//            m_Helper.PrintErr("Extract up to failed", m_Output, $CurLine);
+//            m_RetVal := -1;
+//        EndIf;
+
+        // Test some token and character replacement stuff
+        m_Test1 := "This is %(1) test";
+        m_Test1.ReplaceToken('1', "a");
+        If (m_Test1 != "This is a test")
+            m_Helper.PrintErr("Token replacement failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.ReplaceChar('s', 'z');
+        If (m_Test1 != "Thiz iz a tezt")
+            m_Helper.PrintErr("Char replacement failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the field formatter
+        m_Test1.FmtToField(1, 4, HorzJustify.Right, '0');
+        If (m_Test1 != "0001")
+            m_Helper.PrintErr("FmtToField failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.FmtToField("12", 4, HorzJustify.Left, '*');
+        If (m_Test1 != "12**")
+            m_Helper.PrintErr("FmtToField failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.FmtToField("BC", 4, HorzJustify.Center, ' ');
+        If (m_Test1 != " BC ")
+            m_Helper.PrintErr("FmtToField failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the split method
+        m_Test1 := "First Half = Second Half";
+        If (!m_Test1.Split(m_Test2, '=', True))
+            m_Helper.PrintErr("Split failed to find divider", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_Test1 != "First Half") || (m_Test2 != "Second Half"))
+            m_Helper.PrintErr("Split returned wrong results", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "First Half = Second Half";
+        If (m_Test1.Split(m_Test2, '!', True))
+            m_Helper.PrintErr("Split failed to report missing divider", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := "First Half=";
+        If (!m_Test1.Split(m_Test2, '=', True))
+            m_Helper.PrintErr("Split failed to find divider", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_Test1 != "First Half") || !m_Test2.IsEmpty())
+            m_Helper.PrintErr("Split returned wrong results", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test some path related stuff
+        If (!TestPath("\\MyPath\\MySubDir\\MyFile.Txt", "\\MyPath\\MySubDir\\", "MyFile", "Txt"))
+            m_RetVal := -1;
+        EndIf;
+
+        If (!TestPath("MyFile.Txt", "", "MyFile", "Txt"))
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the character and sub-string searching stuff
+        m_Test1 := "12345678901234";
+        If (!m_Test1.FindFirstChar('5', m_TestVal, True) || (m_TestVal != 4))
+            m_Helper.PrintErr("First char search failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.FindNextChar('4', m_TestVal, True) || (m_TestVal != 13))
+            m_Helper.PrintErr("Next char search failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.FindLastChar('4', m_TestVal, True) || (m_TestVal != 13))
+            m_Helper.PrintErr("Last char search failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.FindLastChar('0', m_TestVal, True) || (m_TestVal != 9))
+            m_Helper.PrintErr("Last char search failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.FindSubStr("345", m_TestVal, True) || (m_TestVal != 2))
+            m_Helper.PrintErr("Substr search failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do some character tests
+        m_CharVal := '\r';
+        If (m_CharVal.GetOrdinal() != 13)
+            m_Helper.PrintErr("Char literal failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_CharVal := 'A';
+        If (m_CharVal.GetOrdinal() != 0x41)
+            m_Helper.PrintErr("Char literal failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do a reallocation and get the allocation size again
+        m_Test3.Reallocate(2048, False);
+        If (m_Test3.GetAlloc() != 2048)
+            m_Helper.PrintErr("Reallocation failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test that it catchs a too large allocation
+        Try
+            m_Flag := False;
+            m_Test3.Reallocate(0xFFFFFFFF, True);
+        EndTry;
+
+        Catch
+            If ($Exception.Check(StringErrors.TooLarge))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Didn't catch too large reallocation", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test multi-line immediate string constants
+        m_Test3.Clear();
+        m_Test3 += "\\\"";
+
+        m_Test3 := "This is a  \
+                        test ";
+        If (m_Test3 != "This is a  test ")
+            m_Helper.PrintErr("Two line literal failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test3 := "This is \
+              a  \
+                        test ";
+        If (m_Test3 != "This is a  test ")
+            m_Helper.PrintErr("Three line literal failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the special types of char constants
+        m_Test3.Clear();
+        m_Test3.AppendChar('\x005C');
+        m_Test3.AppendChar('\x0020');
+        m_Test3.AppendChar('\x0061');
+        m_Test3.AppendChar('\\');
+        If (m_Test3 != "\\ a\\")
+            m_Helper.PrintErr("Special case char literal failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And the char literals
+        m_Test3.Clear();
+        m_Test3.AppendChar(kCharLit1);
+        m_Test3.AppendChar(kCharLit2);
+        m_Test3.AppendChar(kCharLit3);
+        m_Test3.AppendChar(kCharLit4);
+        m_Test3.AppendChar(kCharLit5);
+        If (m_Test3 != "X \r\\\\")
+            m_Helper.PrintErr("Special case char literal failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test that we catch source/target string being the same
+        If (!TestSrcTarSame())
+            m_Helper.PrintErr("Failed to catch src/tar string being the same", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;

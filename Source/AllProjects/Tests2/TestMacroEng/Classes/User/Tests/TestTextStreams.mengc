@@ -1,0 +1,271 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestTextStreams;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.FileSystem;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.StringInStream;
+    MEng.System.Runtime.StringOutStream;
+    MEng.System.Runtime.FileInStream;
+    MEng.System.Runtime.FileOutStream;
+
+    MEng.System.Runtime.MemBuf;
+EndImports;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    String              m_Text;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    //
+    //  These test the stream by accessing it before it might be fully
+    //  initialized, such as file streams that have to be opened before use.
+    //
+    Method TestUnopenInAccess([ InOut] TextInStream InTest
+                                , [In] String       TypeName) Returns Boolean
+    Begin
+        Locals=
+            Boolean GotErr;
+            String  TmpLn;
+        EndLocals;
+
+        GotErr := False;
+        Try
+            InTest.GetLine(TmpLn);
+        EndTry;
+
+        Catch
+            GotErr := True;
+        EndCatch;
+
+        If (!GotErr)
+            m_Helper.PrintErr("Failed to catch access before init", m_Output, $CurLine);
+        EndIf;
+        Return GotErr;
+    EndMethod;
+
+    Method TestUnopenOutAccess( [InOut] TextOutStream   OutTest
+                                , [In]  String          TypeName) Returns Boolean
+    Begin
+        Locals=
+            Boolean GotErr;
+        EndLocals;
+
+        GotErr := False;
+        Try
+            OutTest.NewLn();
+        EndTry;
+
+        Catch
+            GotErr := True;
+        EndCatch;
+
+        If (!GotErr)
+            m_Helper.PrintErr("Failed to catch access before init", m_Output, $CurLine);
+        EndIf;
+        Return GotErr;
+    EndMethod;
+
+    //
+    //  This guy will do generic texts on input and output streams. We take
+    //  them via the base classes so we can accept all the variants. We
+    //  write stuff out to the output stream and then read it back in
+    //  through the input stream, to make sure we got it.
+    //
+    Method TestStream(  [InOut]     TextOutStream   OutTest
+                        , [InOut]   TextInStream    InTest) Returns Boolean
+    Begin
+        Locals=
+            String  CurLine;
+        EndLocals;
+
+        //  Format one each of the fundamental types
+        OutTest.Reset();
+        OutTest.FmtCard1(111);
+        OutTest.FmtStr(" ");
+        OutTest.FmtCard2(222);
+        OutTest.FmtStr(" ");
+        OutTest.FmtCard4(444);
+        OutTest.FmtStr(" ");
+        OutTest.FmtCard8(8433);
+        OutTest.FmtStr(" ");
+        OutTest.FmtInt1(-1);
+        OutTest.FmtStr(" ");
+        OutTest.FmtInt2(-3);
+        OutTest.FmtStr(" ");
+        OutTest.FmtInt4(-4);
+        OutTest.Flush();
+
+        InTest.Reset();
+        InTest.GetLine(CurLine);
+
+        If (CurLine != "111 222 444 8433 -1 -3 -4")
+            m_Helper.PrintErr("Basic text out stream formatting failed", m_Output, $CurLine);
+            Return False;
+        EndIf;
+
+    EndMethod;
+
+
+    //
+    //  Creates file in and out streams and runs some tests on them. Returns
+    //  True if successful.
+    //
+    Method TestFileStreams() Returns Boolean
+    Begin
+        Locals=
+            FileInStream    FileIn;
+            FileOutStream   FileOut;
+            FileSystem      FileSys;
+        EndLocals;
+
+        // Try to access the file streams before opening
+        If (!TestUnopenInAccess(FileIn, "in-file stream"))
+            Return False;
+        EndIf;
+
+        If (!TestUnopenOutAccess(FileOut, "out-file stream"))
+            Return False;
+        EndIf;
+
+        // Make sure the path exists
+        If (!FileSys.DirExists("\\FileTests", True))
+            FileSys.MakePath("\\FileTests");
+        EndIf;
+
+        FileOut.Open("\\FileTests\\TestData.Txt", CreateActs.CreateAlways);
+        FileIn.Open("\\FileTests\\TestData.Txt");
+
+        // Do the basic I/O test
+        TestStream(FileOut, FileIn);
+
+        Return True;
+    EndMethod;
+
+
+    //
+    //  Creates string in and out streams and runs some tests on them. Returns
+    //  True if successful.
+    //
+    Method TestStringStreams() Returns Boolean
+    Begin
+        Locals=
+            StringOutStream   StrOut;
+
+            // This creates a 'linked' stream that shares the same string
+            StringInStream    StrIn(StrOut);
+        EndLocals;
+
+        // Do the basic I/O test
+        TestStream(StrOut, StrIn);
+
+        Return True;
+    EndMethod;
+
+
+    //
+    //  We test the three modes of error handling when internalizing data
+    //  into our internal format. We only ahve to test one scenario since
+    //  the underlying C++ stuff is already tested elsewhere. Here we
+    //  just need to make sure that the wrapperage is correct so that we
+    //  get the parms in and out correctly.
+    //
+    //  We have a file out there that has the contents "AB CD" with a bad
+    //  character in that gap, bad for the encoding we'll test with anyway.
+    //
+    Method TestTextConvert() Returns Boolean
+    Begin
+        Locals=
+            Boolean         CaughtIt;
+            FileInStream    StrmIn("USASCII");
+            String          IntStr;
+        EndLocals;
+
+        StrmIn.Open("\\XcodeTests\\BadASCII.Txt");
+
+        // Test the throw mode, which should fail immediately
+        StrmIn.SetErrAction(InErrActs.Throw);
+        CaughtIt := False;
+        Try
+            StrmIn.GetLine(IntStr);
+        EndTry;
+
+        Catch
+            CaughtIt := True;
+        EndCatch;
+
+        If (!CaughtIt)
+            m_Helper.PrintErr("Throw mode failed to catch bad src text", m_Output, $CurLine);
+            Return False;
+        EndIf;
+
+        // Reset it and test the replacement character mode
+        StrmIn.Reset();
+        StrmIn.SetErrAction(InErrActs.RepChar);
+        StrmIn.SetRepChar('%');
+        CaughtIt := False;
+        Try
+            StrmIn.GetLine(IntStr);
+        EndTry;
+
+        Catch
+            CaughtIt := True;
+        EndCatch;
+
+        If (CaughtIt)
+            m_Helper.PrintErr("Replace mode still failed", m_Output, $CurLine);
+            Return False;
+        EndIf;
+
+        // And the result should be known
+        If (IntStr != "AB%CD")
+            m_Helper.PrintErr("Replace mode created wrong results", m_Output, $CurLine);
+            Return False;
+        EndIf;
+
+        Return True;
+    EndMethod;
+
+
+    //
+    //  Just invokes all the local tests
+    //
+    Method Start() Returns Int4
+    Begin
+
+        // Test the file variant
+        If (!TestFileStreams())
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the string variant
+        If (!TestStringStreams())
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Make sure the wrapperage around the text conversion aspects
+        //  of streams works correctly.
+        //
+        If (!TestTextConvert())
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  -   This is used to generate some constants that are used in our metadata
+  -   and might need to be used by non-C++ apps.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Types>
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+
+
+

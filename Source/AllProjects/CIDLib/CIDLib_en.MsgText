@@ -1,0 +1,863 @@
+;
+; FILE NAME: CIDLib_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 06/28/97
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the English message and error text and ids for this
+;  facility. From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kCIDErrs
+    MsgPref=kCIDMsgs
+END CTRL
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    ; No error occured
+    errcNoError                 0       No error occured
+
+    ; General Errors
+    errcGen_BadEnumValue        1       %(1) is not a valid value for enumeration %(2)
+    errcGen_IndexError          2       %(1) is not a valid index for the %(2) object. Count=%(3)
+    errcGen_UnknownFmtVersion   3       %(1) is not a valid format version in a '%(2)' object
+    errcGen_BadCreateAct        4       %(1) is not a valid create action for a %(2) object, name=%(3)
+    errcGen_BadEnumText         5       '%(1)' is not a valid text value for enumeration %(2)
+    errcGen_BadEnumAltNum       6       %(1) is not a valid alt numeric value for enumeration %(2)
+
+    ; TArea errors
+    errcArea_BehindOrg          128     The new right/top side (%(1)) is below the origin (%(2))
+    errcArea_Range              129     %(1) is not a valid %(2) value for an area
+    errcArea_BadScaling         130     Area scaling values must be greater than 0.0. Got: %(1)/%(2)
+    errcArea_UnderOverflow      131     The operation caused a(n) %(1) field to over/underflow
+    errcArea_BadFormat          132     Could not parse area object from passed text
+
+    ; TAudio errors
+    errcAudio_DoCue             150     Could not generate the audio cue
+    errcAudio_PlayWav           151     Could not play the wav file: %(1)
+    errcAudio_MuteSystem        152     Could not mute the system audio
+    errcAudio_SetSystemVol      153     Could not set the system volume
+    errcAudio_QuerySystemVol    154     Could not query the system volume
+    errcAudio_EnumDevices       155     Could not enumerate audio devices
+
+    ; Backup file mgr errors
+    errcBMgr_NotSet             170     The backup file manager was not set up before use
+    errcBMgr_HasNoNamePart      171     The target file given for backup management has no name component (%(1))
+    errcBMgr_BadCount           172     The backup manager count must be from 1 to %(1)
+    errcBMgr_CantDelMaxBak      173     Could not delete the last backup file (%(1))
+    errcBMgr_CantDemote         174     Could not demote backup file '%(1)' to '%(2)'
+    errcBMgr_CantDemoteCur      175     Could not demote current file '%(1)' to backup '%(2)'
+    errcBMgr_CantSaveCur        176     Could not save current file '%(1)', because target '%(2)' cannot be overwritten
+    errcBMgr_CantRenameCur      177     Could not save current file '%(1)', because it could not be renamed to '%(2)'
+    errcBMgr_CantPromote        178     Could not promote first backup file '%(1)' to the current file '%(2)'
+    errcBMgr_BadStartInd        179     %(1) is not a valid backup file index. Count=%(2)
+
+    ; TBitSeq errors
+    errcBitSeq_NoMoreBits       220     Could not read %(1) bits from sequence, only %(2) are left
+    errcBitSeq_BadBitCount      221     The bit count (%(1)) was greater than the %(2) bits available
+    errcBitSeq_WriteOverflow    222     A write operation overflowed the bit sequence
+    errcBitSeq_ReadOverflow     223     A read operation went beyond the bits currently in the sequence
+    errcBitSeq_BadReadReset     224     Could not reset read position to %(1) because it exeeds the bits written (%(2))
+    errcBitSeq_BadCompLen       225     The compare count (%(1)) is greater than one or both of the sequence lengths (%(2),%(3))
+    errcBitSeq_BadCapAt         226     Cannot cap bit sequence at %(1), the write offset is %(2)
+
+    ; TBitset errors
+    errcBitset_DifferentSizes   250     The two bitsets have different sizes
+    errcBitset_NotReady         251     The bitset size has not been allocated yet
+    errcBitset_ZeroSize         252     The bitset size cannot be zero
+    errcBitset_TargetBufSize    253     The target buffer size %(1) is too small to hold the bitset bytes %(2)
+    errcBitset_SrcBufSize       254     The source buffer size %(1) is not the same size as the bitset buffer %(2)
+
+    ; Class/RTTI errors
+    errcClass_BadHash           512     Streamed in name but hash it bad, text=%(1)
+
+    ; Color errors
+    errcClr_RGBRange            540     RGB color components must be from 0 to 255
+    errcClr_BadHSVSaturation    541     HSV saturations must be from 0.0 to 1.0, but got %(1)
+    errcClr_BadHSVValue         542     HSV values must be from 0.0 to 1.0, but got %(1)
+    errcClr_BadHSVHue           543     HSV hue must be greater than 0.0, but got %(1)
+    errcClr_BadBrightnessPer    544     The brightness percent must be 0.0 to 1.0, but got %(1)
+
+    ; Collection errors
+    errcCol_SameNode            768     Both collection nodes are the same node
+    errcCol_NotEnoughNodes      769     There must be at least 2 nodes in the collection
+    errcCol_NullHead            770     The linked list head pointer was nul
+    errcCol_NodeNotFound        771     Node is not a member of the collection
+    errcCol_TooManyNodes        772     The maximum collection node count has been exceeded. Max=%(1)
+    errcCol_NewMaxTooSmall      773     The new max node count, %(1), is less than the current number of nodes: %(2)
+    errcCol_CursorNotValid      774     The %(1) cursor is not pointing to a valid node of its collection
+    errcCol_IsEmpty             775     The %(1) collection is empty
+    errcCol_NotMyCursor         776     The passed %(1) cursor does not belong to this %(2) collection
+    errcCol_DuplicateKey        777     The key '%(1)' is already represented in the %(2) collection
+    errcCol_KeyNotFound         778     The key '%(1)' was not found in the %(2) collection
+    errcCol_StaleCursor         779     The %(1) cursor is out of sync with its target collection
+    errcCol_DuplicateElem       780     Set collections cannot contain duplicate elements
+    errcCol_InvalidInsert       781     Invalid insert. Either new node is already a memory, or after node is not a member
+    errcCol_NotMemberNode       782     The passed node is not a member of the collection
+    errcCol_AlreadyMemberNode   783     The passed node is already a member of the collection
+    errcCol_BadNode             784     The passed node is null or an illegal node for this operation
+    errcCol_NewSizeTooSmall     785     The new allocation size, %(1), is less than the current allocation size: %(2)
+    errcCol_NotSupported        786     The %(1) operation not supported for %(2) collections
+    errcCol_BadPath             787     The path '%(1)' is not well formed
+    errcCol_MustBeNonTerminal   788     The node '%(1)' is not a non-terminal node
+    errcCol_MustBeTerminal      789     The node '%(1)' is not a terminal node
+    errcCol_BadNodeName         790     The node name '%(1)' cannot contain any slashes
+    errcCol_NamedNodeNotFound   791     The node name '%(1)' was not found in the tree
+    errcCol_DepthUnderflow      792     The cursor depth tracking underflowed
+    errcCol_DupTreeNode         793     %(1) is a duplicate tree node
+    errcCol_MustProvideKey      794     Keyed collections cannot be added to via the base objAdd() method
+    errcCol_ChangedKey          795     A keyed collection does not allow the key to be modified during element update
+    errcCol_BadStoredCount      796     Got a bad element count when streaming in the %(1) collection
+    errcCol_ZeroSize            797     Zero is not a valid max size for a collection
+    errcCol_InitBeyondMax       798     The initial collection alloc %(1) is greater than the max of %(2)
+    errcCol_CantExpand          799     The collection cannot be expanded to %(1) elements. Max=%(2)
+    errcCol_CurBeyondAlloc      800     The current size (%(1)) is larger than the current allocation (%(2)) on the %(3) collection
+    errcCol_NeitherNonAdopt     801     One of the collections involved must be non-adopting
+    errcCol_NulNodeAdded        802     A null node was added to a by reference collection
+    errcCol_MustBeAdopting      803     The passed collection must be adopting
+    errcCol_CantAdopt           804     The passed collection cannot be adopting
+    errcCol_SrcTooBig           805     The source collection has too many elements (%(1)) to fit. Target max is %(2)
+    errcCol_CantKeepOld         806     Can't keep old elements, new size (%(1)) < current allocation (%(2))
+    errcCol_NotInBlockMode      807     The collection is not currently in block mode
+    errcCol_InBlockMode         808     The collection is already in block mode
+    errcCol_AlreadyPub          809     Publishing is already enabled for this collection
+    errcCol_Unsupported         810     This collection does not support the %(1) operation
+    errcCol_NotReady            811     The %(1) cursor has not been set up yet
+    errcCol_MustClearFirst      812     The target collection must be clared first
+    errcCol_Full                813     The '%(1)' is is full, no more items can be added
+
+    ; Console errors
+    errcCon_TextReadError       891     Could not read a text line from the console object
+    errcCon_TextWriteError      892     Could not write text line to console
+    errcCon_Open                893     Could not open the console (or file if redirected)
+    errcCon_QueryAtEnd          894     Could not determine if console is at end of readable data
+    errcCon_QueryPosition       995     Could not query %(1) console position
+    errcCon_SeekError           996     Could not do a seek on the console
+    errcCon_SenseFmt            997     Could not auto sense the text format of the console
+    errcCon_ClearScr            998     Could not clean the console screen
+    errcCon_QueryCurLine        999     Could not query the current cursor vertical position
+    errcCon_QueryVertLines      1000    Could not query the console vertical line size
+    errcCon_ReadNext            1001    Could not read the next character from the console
+
+    ; Data source errors
+    errcDSrc_Timeout            1025    Failed to read %(1) bytes from data source, got %(2)
+    errcDSrc_NotInitilized      1026    The data source has not been initialized
+    errcDSrc_NotTerminated      1027    The data source was not terminated before destruction
+    errcDSrc_AlreadyInit        1028    The data source is already initialized
+    errcDSrc_JanDataNotSet      1029    The data source janitor has a null pointer
+
+    ; Debug mode errors
+    errcDbg_AssertFailed        1050    An assertion failed
+
+    ; Directory change monitoring errors
+    errcDirCh_Start             1160    Could not start directory monitoring. Path=%(1)
+    errcDirCh_Read              1161    Failed to read directory changes. Path=%(1)
+    errcDirCh_Stop              1162    Could not stop directory monitoring. Path=%(1)
+    errcDirCh_AlreadyPublished  1163    The publishing directory change monitor is already runniung. Topic=%(1)
+    errcDirCh_PublishError      1164    An error occurred while publishing directory change msgs
+    errcDirCh_NotReady          1165    This directory monitoring object is not currently initialized
+    errcDirCh_Already           1166    This directory monitoring object is already initialized
+    errcDirCh_ThreadError       1167    An error occurred in the directory monitoring thread
+
+    ; Directory iteration errors
+    errcDIter_FindFailure       1075    The file search operation failed. Search spec=%(1)
+
+    ; MDuplicable errors
+    errcDup_NulSrc              1100    The source to duplicate to cannot be null. Target type=%(1)
+
+    ; Environment errors
+    errcEnv_FindError           1215    An error occured finding key %(1) in the environment
+    errcEnv_KeyNotFound         1216    '%(1)' is not a key in the environment
+    errcEnv_KeyAlreadyExists    1217    '%(1)' is already a key in the environment
+    errcEnv_AddError            1218    Could not add key '%(1)'
+    errcEnv_UpdateError         1219    Could not update key '%(1)'
+    errcEnv_Inherit             1220    An error occured while updating from process environment
+    errcEnv_AddOrUpdateError    1221    An error occured while trying to add or update key '%(1)'
+    errcEnv_UpdateLibPath       1222    Could not add to the system library path
+    errcEnv_UpdateExePath       1223    Could not add to the system executable path
+
+    ; Event semaphore errors
+    errcEv_Create               1280    Could not create the event, name=%(1)
+    errcEv_Open                 1281    Could not open the event, name=%(1)
+    errcEv_Close                1282    Could not close the event, name=%(1)
+    errcEv_Reset                1284    Could not reset the event, name=%(1)
+    errcEv_Trigger              1285    Could not trigger the event, name=%(1)
+    errcEv_Timeout              1286    Timed out waiting for the event to trigger, name=%(1)
+    errcEv_Wait                 1287    The wait for the event failed for reasons other than timeout, name=%(1)
+    errcEv_Pulse                1288    Could not pulse the event, name=%(1)
+    errcEv_MultiWait            1289    The multi-event wait failed
+    errcEv_MultiTimeout         1290    The multi-event wait timed out
+    errcEv_OpenOrCreate         1291    Could not create or open the event object, name=%(1)
+    errcEv_AlreadyExists        1292    The named event already exists, name=%(1)
+
+    ; Expandable buffer errors
+    errcExpb_NoData             1300    No data is available in the expandable buffer
+
+    ; External process errors
+    errcExtP_CantStart          1344    Could not start external process: %(1)
+    errcExtP_GetPriority        1345    Could not query priority of process
+    errcExtP_SetPriority        1346    Could not set priority of process
+    errcExtP_Kill               1347    Could not kill process
+    errcExtP_WaitFor            1348    Could not wait for process
+    errcExtP_TestState          1349    Could not test running state of process
+    errcExtP_Timeout            1350    Timed out waiting for death of process
+    errcExtP_EmptyPath          1351    The passed path is empty
+    errcExtP_NotWhileRunning    1352    Not legal while external process is running
+    errcExtP_NotRunning         1353    Process is not running
+    errcExtP_QueryTimes         1354    Could not query process running times
+    errcExtP_WaitInit           1355    Error occured while waiting for external process init to complete
+    errcExtP_TimeoutInit        1356    Timed out waiting for external process init to complete
+    errcExtP_Attach             1357    Attachment to the external process failed
+    errcExtP_QueryFullPath      1358    Could not query the full path of external process
+
+    ; TFundData errors
+    errcFData_BadExtData        1378    The externalized data was invalid when streamed in
+
+    ; File and file system errors
+    errcFile_NoOpenSearch       1408    There must be an open search, call bStartSearch() first
+    errcFile_PathFormat         1409    Invalid path format!
+    errcFile_MustBeDir          1410    %(1) must be a directory
+    errcFile_Close              1411    Could not close the file, name=%(1)
+    errcFile_Seek               1412    Could not move the file pointer, name=%(1)
+    errcFile_QuerySize          1413    Could not query the size of the file, name=%(1)
+    errcFile_Open               1414    Could not open the file, name=%(1)
+    errcFile_Read               1415    Buffer read failed. Buffer size=%(1), name=%(2)
+    errcFile_Write              1416    Buffer write failed. Buffer size=%(1), name=%(2)
+    errcFile_PathSearch         1417    Path search failed. Spec=%(1); Path=%(2)
+    errcFile_DirCreation        1418    Directory creation failed on directory %(1)
+    errcFile_Delete             1419    Could not delete file %(1)
+    errcFile_PathDelete         1420    Path delete failed, starting path was %(1)
+    errcFile_PathCompletion     1421    Query of full path failed, partial path was %(1)
+    errcFile_VolumeQuery        1422    Could not query the volume of path: %(1)
+    errcFile_Rename             1423    File rename operation failed. Source name=%(1), Destination name=%(2)
+    errcFile_AlreadyOpen        1424    File %(1) is already open
+    errcFile_NotAllData         1425    Could not %(1) all requested bytes. Requested=%(2), Actual=%(3)
+    errcFile_BadFindBuf         1426    The passed find buffer must represent a non-special directory, from a previous 'find first' or 'find next' operation.
+    errcFile_QueryCurDir        1427    Could not query the current directory of the process
+    errcFile_RemoveDir          1428    Could not remove directory '%(1)'
+    errcFile_Copy               1429    Could not copy file %(1) to %(2)
+    errcFile_FindInPath         1430    Did not find the file %(1) in the passed path
+    errcFile_VolumeListQuery    1431    Could not query list of available volumes
+    errcFile_Search             1432    An error occured during a file search. Spec=%(1)
+    errcFile_Truncate           1433    An error occured while trying to truncate the file %(1)
+    errcFile_NotThatManyBytes   1434    The passed buffer does not have as many bytes available (%(1)) as requested (%(2))
+    errcFile_SetFileName        1435    Could not set the name on the file object. Name=%(1)
+    errcFile_QueryTime          1436    Could not query the file time. Name=%(1)
+    errcFile_SetTime            1437    Could not set the file time. Name=%(1)
+    errcFile_CheckExists        1438    An error occured while checking for existence of file/dir %(1)
+    errcFile_CloseDirSearch     1439    Could not close the directory search handle
+    errcFile_RelTooDeep         1440    The relative path part is too deeply nested for the base path
+    errcFile_SetCurrentDir      1441    Could not set the current directory to '%(1)'
+    errcFile_PathCreation       1442    Path creation failed on path %(1)
+    errcFile_MountQuery         1443    Could not query mount info for volume '%(1)'
+    errcFile_SetPerms           1444    Could not set file permissions on: %(1)
+    errcFile_Flush              1445    Could not flush file '%(1)' out to disk
+    errcFile_ReplaceFile        1446    Could not replace file. Original='%(1)', New='%(2)'
+    errcFile_Normalize          1447    Could not normalize the path '%(1)'
+    errcFile_IOTimeout          1448    The file read/write did not complete in the given timeout period. Name=%(1)
+    errcFile_CreateTmpFlName    1449    Could not create temporary file name
+    errcFile_CompleteDelete     1450    Path '%(1)' could not be completed
+    errcFile_GetTmpPath         1451    Could not query system temporary directory
+    errcFile_NotADir            1452    The path does not point to a directory
+    errcFile_RemPathAcc         1453    Remote path access could not be established using the provided credentials
+
+    ; String parser errors
+    errcLex_MaxTokens           1460    There is a maximum of %(1) predefined tokens
+    errcLex_TokenLength         1461    Stream token (%(1)) is too long, must be either 1 or 2 chars
+    errcLex_UngetFull           1462    The unget stack is full
+
+    ; Locale errors
+    errcLoc_CantQuery           1570    Cannot query the locale information
+    errcLoc_MoneyFormat         1571    Could not format the TMoney object to text
+    errcLoc_NumericFormat       1572    Could not format the numeric object value to text
+
+    ; Locker errors
+    errcLock_NotLocked          1600    The lockable object is not locked
+    errcLock_AlreadyLocked      1601    The lockable object is already locked
+
+    ; Logger errors
+    errcLgr_AlreadyInitialized  1660    The logger object is already initialized, it cannot be done again.
+    errcLgr_NoInputFile         1661    An input file cannot be used as a logging file
+
+    ; Memory buffer errors
+    errcMBuf_BufOverflow        1920    Operation would overflow buffer high bound %(1)
+    errcMBuf_BadState           1921    The object state is bad because %(1)
+    errcMBuf_CannotExpand       1922    The buffer cannot be expanded to %(1) bytes. Max size is %(2)
+    errcMBuf_ZeroSize           1923    Zero is not a valid size for a memory buffer
+    errcMBuf_FreeSys            1924    Could not free the system memory buffer
+    errcMBuf_Commit             1925    Could not commit new bytes in buffer. Old size=%(1), New size=%(2)
+    errcMBuf_AllocSys           1926    Could not allocate system memory buffer. Size=%(1)
+    errcMBuf_AllocShared        1927    Could not allocate shared memory buffer. Size=%(1), Name=%(2)
+    errcMBuf_FreeShared         1928    Could not free the shared memory buffer, Name=%(1)
+    errcMBuf_DupShared          1929    Could not duplicate the shared memory buffer. Name=%(1)
+    errcMBuf_SyncView           1930    Could not sync the shared memory to the current committed view
+    errcMBuf_SubsetTooBig       1931    The buffer subset (%(1)) is larger than the current buffer size (%(2))
+    errcMBuf_BufferNotReady     1932    The buffer has not been allocated yet, so it cannot be accessed
+    errcMBuf_BeyondTop          1933    The start index (%(1)) is beyond the stated byte count (%(2))
+    errcMBuf_RangeTop           1934    The start index+Count (%(1)/%(2)) is beyond the stated byte count (%(3))
+
+    ; Media changer errors
+    errcMChg_NotReady           1950    The media changer has not been opened yet
+    errcMChg_EnumError          1951    An error occured while enumerating media changers
+    errcMChg_MoveOpFailed       1952    The %(1) operation failed on media changer %(2). Src=%(3), Tar=%(4)
+    errcMChg_GetStatus          1953    The status of changer (%(1)) could not be obtained
+    errcMChg_AlreadyOpen        1954    Media changer %(1) is already opened.
+    errcMChg_Close              1955    An error occured while closing changer %(1)
+    errcMChg_Open               1956    An error occured while trying to open changer #%(1)
+    errcMChg_Find               1957    Could not find media changer #%(1)
+
+    ; Facility errors
+    errcMod_LoadByName          1980    Could not load module by name, or some underlying DLLs are missing. Name=%(1)
+    errcMod_ResQuerySize        1981    Could not query the size of resource with id %(1).%(2), from %(3)
+    errcMod_QueryByName         1982    An error occured while querying the module by name. Name=%(1)
+    errcMod_BadLogInfoFmt       1983    The logger info (CID_LOCALLOG= or /LocalLog=) was badly formatted
+    errcMod_ErrOpenLgr          1984    The indicated target text file logger could not be opened
+    errcMod_GetFuncPtr          1985    Could not load function: %(1)
+    errcMod_QueryModPath        1986    Could not load the path for module: %(1)
+    errcMod_CantBuildName       1987    Could not build the platform name for module: %(1)
+    errcMod_BadVersionStr       1988    A version string must be in the form "MM.mm", but got '%(1)'
+    errcMod_BadVersionStr2      1988    A version string must be in the form "MM.mm.rr", but got '%(1)'
+    errcMod_NoResFile           1889    Could not find resource file: %(1)
+    errcMod_ResNotFound         1990    Found not find resource %(1).%(2)
+    errcMod_CantFindFac         1991    Could not find facility named '%(1)'
+    errcMod_OnlyBaseName        1992    This module ctor only takes the base facility name
+
+    ; Mutex semaphore errors
+    errcMtx_Create              2048    Could not create the mutex object, name=%(1)
+    errcMtx_Open                2049    Could not open the mutex object, name=%(1)
+    errcMtx_Close               2050    Could not close the mutex object, name=%(1)
+    errcMtx_Timeout             2051    Timed out waiting for mutex object, name=%(1)
+    errcMtx_LockError           2052    An error other than timeout occured while locking the mutex object, name=%(1)
+    errcMtx_Unlock              2053    Could not unlock the mutex object, name=%(1)
+    errcMtx_OpenOrCreate        2055    Could not create or open the mutex object, name=%(1)
+    errcMtx_AlreadyExists       2056    The named mutex already exists, name=%(1)
+
+    ; Named value map errors
+    errcNVM_ItemExists          2200    Named map value item '%(1)' already exists
+    errcNVM_ItemNotFound        2201    Named map value item '%(1)' was not found
+    errcNVM_SubKeyExists        2202    Named map value subkey '%(1).%(2)' already exists
+    errcNVM_SubKeyNotFound      2203    Named map value subkey '%(1).%(2)' was not found
+
+    ; Point areas
+    errcPoint_BadScaling        2368    Point scaling values must be from 0.0 to 1.0
+    errcPoint_Range             2369    %(1) is not a valid value for a point coordinate
+    errcPoint_CantPack          2370    The values are too large to pack into a TCard4
+
+    ; Process and thread errors
+    errcPrc_ThreadStartFailed   2432    Thread '%(1)' start failed
+    errcPrc_Timeout             2433    Timed out waiting for operation to complete on thread '%(1)'
+    errcPrc_TooManyThreads      2434    The maximum number of threads was exceeded. Max=%(1)
+    errcPrc_ThreadCount         2435    Thread count of %(1) < actual threads, %(2)
+    errcPrc_ThreadCount_0       2436    The thread count is 0
+    errcPrc_NotThisThread       2437    Calling thread is not this thread '%(2)'
+    errcPrc_BadPrioLevel        2438    Bad priority level %(1), clipped it to %(2)
+    errcPrc_BadPrioOffset       2439    %(1) is an invalid priority offset
+    errcPrc_NotRunning          2440    Thread '%(1)' is not running
+    errcPrc_NotWhileRunning     2441    You cannot %(1) while thread is running
+    errcPrc_NoProcessOverride   2442    TThread::Process() must be overridden
+    errcPrc_CannotAddAt         2443    Thread slot %(1) is filled, cannot add there
+    errcPrc_NoSyncRequest       2444    There was no outstanding thread sync to release on thread '%(1)'
+    errcPrc_NotSyncReq          2445    Calling thread was not the sync requester %(2)
+    errcPrc_SyncWithSelf        2446    Thread '%(1)' tried to sync with itself. It will go blind.
+    errcPrc_AlreadySynced       2447    Thread '%(1)' already has an outstanding sync request, but thread %(2) is trying to sync with it also
+    errcPrc_SetProcessPriority  2448    Could not set the process priority class
+    errcPrc_ExitProcess         2449    Process exit failed
+    errcPrc_QueryThreadPrio     2450    Could not query the priority of thread '%(1)'
+    errcPrc_SetThreadPrio       2451    Could not set the priority of thread ''%(1)'
+    errcPrc_ThreadWait          2452    Error occured while waiting for death of thread '%(1)'
+    errcPrc_QueryExitCode       2453    An error occured while querying exit code of %(1) '%(2)'
+    errcPrc_AlreadyExists       2454    There is already a thread with the name '%(1)'
+    errcPrc_AlreadyRunning      2455    Thread '%(1)' is already running
+    errcPrc_Running             2456    An error occured while querying the running state of thread %(1)
+    errcPrc_WaitForSelf         2457    A thread cannot wait for its own death
+    errcPrc_NotSetup            2458    The thread was default constructed and is not set up yet
+    errcPrc_GetPerThread        2459    Could not get the per-thread data.
+    errcPrc_SetPerThread        2459    Could not set the per-thread data.
+    errcPrc_InitThreadForce     2460    Failed to force initialization thread into thread list
+    errcPrc_GetProcHandle       2461    Could not get the current process' handle
+    errcPrc_GetThreadHandle     2462    Could not get the thread handle
+    errcPrc_InactiveHandle      2463    The passed thread or process handle is cleared (when an active handle was expected)
+    errcPrc_Adopt               2464    Attempt to adopt an existing thread failed
+    errcPrc_InvalidTID          2465    The passed thread id was kCIDlib::tidInvalid, which is not valid here
+    errcPrc_Block               2466    Thread '%(1)' could not block itself
+    errcPrc_Unblock             2467    Thread '%(1)' could not be unblocked
+    errcPrc_ThreadNameNotFound  2468    Thread name '%(1)' was not found in the thread list
+    errcPrc_ThreadIdNotFound    2469    Thread id '%(1)' was not found in the thread list
+    errcPrc_TimeOnSync          2470    Timed out waiting for thread %(1) to sync
+    errcPrc_ReleaseErr          2471    Error waiting for released thread %(1) to signal
+    errcPrc_NullThreadObj       2472    A thread was started on a null thread object
+    errcPrc_SetSingleInstInfo   2473    Error while settings single process instance information
+    errcPrc_StillRunning        2474    Thread '%(1)' is still running at destruction, trying to stop it...
+    errcPrc_CantStop            2475    Thread '%(1)' could not be stopped. Fatal error, restarting process!
+
+    ; Pub/sub errors
+    errcPubSub_IdNotFound       2901    No %(1) found with id %(2)
+    errcPubSub_WrongTopicId     2902    The subscription at id %(1) is not subsribed to topic '%(2)'
+    errcPubSub_TopicExists      2903    This topic already exists
+    errcPubSub_NullImpl         2904    The %(1) implementation object cannot be null
+    errcPubSub_MsgCast          2905    The Pub/Sub msg is of type %(1), it cannot be cast to %(2)
+    errcPubSub_TopicNotFound    2906    The topic does not currently exist
+    errcPubSub_NotReady         2907    The pub/sub %(1) has not been filled in yet
+    errcPubSub_NoEvent          2909    There is no event associated with subscription
+    errcPubSub_SubQFull         2910    The subscription queue was full, msg dropped
+
+    ; TRange errors
+    errcRange_BadMinMax         2816    The max (%(1)) cannot be less than the min (%(2))
+    errcRange_InvalidValue      2817    The current value (%(1)) is greater than the total minus the visible (%(2)-%(3))
+    errcRange_PercentValue      2818    %(1) is outside the valid range of %(2) to %(3). Cannot calculate the percent
+
+    ; MRefCounted errors
+    errcRefCnt_AlreadyZero      2950    The reference count is already zero
+
+    ; RTTI errors
+    errcRTTI_BadCast            2930    Cannot cast a %(1) object to a %(2) object.
+    errcRTTI_NulSrc             2931    The source to cast cannot be null. Target type=%(1)
+
+    ; Resource name error
+    errcRscN_Initialize         2975    Could not initialize the resource name object
+    errcRscN_SetName            2976    Could not set the resource name object's name members (%(1)/%(2)/%(3))
+    errcRscN_QueryNameParts     2978    Could not query the resource name object's name parts
+    errcRscN_GenRealName        2979    Could not generate the platform resource name string
+
+    ; Semaphore errors
+    errcSem_Create              3072    Could not create the semaphore object, name=%(1)
+    errcSem_Open                3073    Could not open the semaphore object, name=%(1)
+    errcSem_Close               3074    Could not close the semaphore object, name=%(1)
+    errcSem_Timeout             3075    Timed out waiting to enter semaphore object, name=%(1)
+    errcSem_Enter               3076    An error other than timeout occured while entering the semaphore object, name=%(1)
+    errcSem_Exit                3077    Could not exit the semaphore object, name=%(1)
+    errcSem_OpenOrCreate        3079    Could not create or open the semaphore object, name=%(1)
+    errcSem_AlreadyExists       3080    The named semaphore already exists, name=%(1)
+
+    ; Signal related errors
+    errcSig_CantRemoveHandler   3100    The signal handler could not be removed
+
+    ; Size errors
+    errcSize_UnderOverflow      3150    The operation caused an under/overflow of one or both of the size fields
+    errcSize_CantPack           3151    The values are too big to pack into a TCard4
+    errcSize_BadFormat          3152    Could not parse size object from passed text
+
+    ; Speech related errors
+    errcSpeech_SpeakFailed      3160    Text to speech operation failed
+    errcSpeech_WaitTillDone     3161    Failed to wait for text to speech to complete
+    errcSpeech_QueryVoices      3162    Could not query available text to speech voices
+    errcSpeech_SetVoice         3163    Could not set text to speech voice (%(1))
+    errcSpeech_SpeakToFileFailed 3164   Text to file operation failed
+    errcSpeech_QueryOutputs     3165    Could not query the list of speech outputs
+    errcSpeech_SetOutput        3166    Could not set speech output (%(1))
+
+    ; Simple pool errors
+    errcSPool_NotReservedElem   3175    The passed object is not a reserved element of the '%(1)' pool
+    errcSPool_PoolIsFull        3176    The '%(1)' pool is full and cannot be expanded any further
+    errcSPool_CouldNotReserve   3177    No element of the '%(1)' pool was accepted, and no new ones can be created
+
+    ; Persistent state errors
+    errcState_CantOpenStateFile 3200    Could not open the peristent state file '%(1)'
+    errcState_BadPerByteCount   3201    Persistent state file '%(1)' had a bad byte count
+    errcState_BadPerStateSum    3202    Persistent state file '%(1)' had a bad check sum
+    errcState_BadStateFile      3203    Persistent state file '%(1)' could not be parsed, trying next backup
+    errcState_NoGoodFile        3204    Persistent state file '%(1)' and all its backups were bad
+    errcState_MakeNewStateFile  3205    Could not create a new temporary persistent state file
+    errcState_CantStreamOut     3210    The persistent state data could not be streamed out
+    errcState_CantStreamIn      3211    The persistent state data could not be streamed in
+
+    ; String errors
+    errcStr_CountOverLen        3250    The count given '%(1)' is greater than the source string's length '%(2)'
+    errcStr_MaxTokenSize        3251    The tokenizer can only return tokens up to %(1) characters long. Token was %(2) chars long.
+    errcStr_NullTarget          3252    The target raw string buffer is a null pointer
+    errcStr_StartPastEnd        3253    The start index '%(1)' is >= the end index '%(2)'
+    errcStr_TokenNotFound       3254    No tokens found for token number %(1)
+    errcStr_FormatToken         3255    Format of string replacement token failed
+    errcStr_Reallocate          3256    The buffer could not be reallocated because %(1)
+    errcStr_StoredBad           3257    The streamed in string had more chars '%(1)' than the buffer size '%(2)' or the max size '%(3)'
+    errcStr_FormatFld           3258    Format of string into field failed
+    errcStr_Load                3259    Error loading string id %(1) from facility %(2)
+    errcStr_SourceInDest        3260    The source buffer address is within the destination buffer address
+    errcStr_InvalidToken        3261    Invalid token in string
+    errcStr_CannotBeNul         3262    The character parameter cannot be kCIDLib::chNull
+    errcStr_TextConvert         3263    Could not convert '%(1)' to binary value of type '%(2)'
+    errcStr_SourceModified      3264    The source string being used was modified, results are undefined
+    errcStr_TokenizerError      3265    An internal string tokenizer error occured.
+    errcStr_Range               3266    The start index '%(1)' plus the length '%(2)' would exceed the current length '%(3)'
+    errcStr_NullSrc             3267    The source pointer cannot be null
+    errcStr_FormatBin           3268    Could not format binary value into string
+    errcStr_BadHexChar          3269    %(1) is not a valid hexadecimal Unicode code point
+    errcStr_NotValidUnicode     3270    The string is not a valid Unicode string
+
+    ; String tokenizer errors
+    errcSTok_NullSource         3320    The string to tokenize cannot be a null pointer
+
+    ; Stream errors
+    errcStrm_InvalidRelSeek     3350    Relative seek of %(1) would exceed the end of stream, or violates some sink/source semantic
+    errcStrm_NotOfLastId        3351    The next type id read (%(1)) was not the same as class just loaded (Id=%(2), Class=%(3))
+    errcStrm_NotDerivedClass    3352    Class read (Type=%(1)) is not of or derived from %(2)
+    errcStrm_BadNameCount       3353    The read in class name had 0 buffer chars, probably the data is corrupt or streamed in incorrectly.
+    errcStrm_BadStoredHash      3354    The stored hash %(1) did not match the calculated one %(2) for the type name
+    errcStrm_InvalidName        3355    The class object did not contain a valid class name, probably default constructed
+    errcStrm_ImplAlreadySet     3356    The stream implementation is already set for this %(1) stream
+    errcStrm_NoImplementation   3357    There is no stream implementation object for this %(1) stream
+    errcStrm_CreateImpl         3358    Could not create the %(1) implementation object
+    errcStrm_EndOfStream        3359    Tried to read at the logical end of the stream
+    errcStrm_BadRecordType      3360    %(1) is not a valid poly streamer record type
+    errcStrm_TypeIdNotInList    3361    The id %(1) was not in the smart streamer's list of types
+    errcStrm_ResetNotSupported  3362    The reset optionis not support on %(1) streams
+    errcStrm_BadEnd             3363    The logical stream end passed (%(1)) was larger than the available data (%(2))
+    errcStrm_OddByteCount       3364    The string stream impl object got a r/w request for an odd number of bytes (%(1))
+    errcStrm_WrongStdFileType   3365    The stream type conflicts with the chosen standard file
+    errcStrm_PartialCacheWrite  3366    Only flushed %(1) bytes from the output stream cache
+    errcStrm_CacheIndexErr      3367    The cache index should be zero before refresh
+    errcStrm_NotAllData         3368    Could not read or write all requested bytes. Got: %(1), Req: %(2)
+    errcStrm_WrongMarker        3369    Expected a %(1) stream marker, but found byte %(2)
+    errcStrm_BadMarker          3370    The value read in (%(1)) was not a valid stream marker
+    errcStrm_UnknownMarker      3371    Unknown stream marker. Value=%(1)
+    errcStrm_PosOverflow        3372    This stream is over 4GB in size, so use c8CurPos() instead of c4CurPos()
+    errcStrm_ConvertChOut       3373    Could not convert text to UTF8 format for streaming
+    errcStrm_ConvertChIn        3374    Could not convert text from streamed UTF8 format
+    errcStrm_BadChunkInd        3375    While streaming, expected chunk index %(1), but got %(2)
+    errcStrm_GotZeroChunkSize   3376    Got zero sized chunk while streaming in
+    errcStrm_NoChunkIndTerm     3377    The final chunk index marker was not found while streaming in
+    errcStrm_BadNewEnd          3378    The new forced end index (%(1)) is beyond the source buffer size (%(2))
+    errcStrm_ZeroBufSize        3379    The stream's storage size cannot be zero
+    errcStrm_BadCharBytes       3380    The flattened char bytes (%(1)) was greater than max UTF-8 bytes
+    errcStrm_NotAllBytesEaten   3381    Not all received UTF-8 bytes (%(1)) were eaten during unflattening
+    errcStrm_ImplDataSzErr      3382    The current stream impl data size is less than current position
+    errcStrm_FileTextInit       3383    This text file stream has not been opened yet
+
+    ; System info errors
+    errcSysI_QueryUserName      3450    Could not get the current user name
+    errcSysI_QueryAvailMem      3451    Could not query the available physical memory
+    errcSysI_BadStdParm         3452    '%(1)' is not valid for the %(2) command line parameter
+    errcSysI_ParseCmdLine       3453    The command line could not be parsed
+    errcSysI_GetCmdLineParm     3454    Could not get command line parameter %(1)
+    errcSysI_RemoveCmdLineParm  3455    Could not remove command line parameter %(1)
+    errcSysI_QuerySpecialPath   3456    Could not get special path
+    errcSysInfo_BadArgIndex     3457    %(1) is not a valid command line argument index. Count=%(2)
+
+    ; Text converter errors
+    errcTCvt_Unrepresentable    3600    '%(1)' is not representable in the encoding '%(2)'
+    errcTCvt_BadSource          3601    The source data (being internalized) is badly formed for encoding %(1)
+
+    ; TTime errors
+    errcTime_BadDetails         4000    The provided time details do not make a valid time stamp
+    errcTime_AsDate             4001    Could not extract the date information from the time object
+    errcTime_AsTime             4002    Could not extract the time information from time object
+    errcTime_UnknownSpecialTime 4003    %(1) is not a valid ESpecialTimes value
+    errcTime_SetTo              4004    Could not set this time object to %(1)
+    errcTime_AsJulian           4005    Could not extract the Julian date from time object
+    errcTime_GetWeekDay         4006    Could not extract the week day field from time object
+    errcTime_Underflow          4007    The operation would cause an underflow of the timestamp value
+    errcTime_BadRiseSetCalc     4008    The sunrise/sunset calculation generated invalid results
+    errcTime_UTCToLocal         4009    Could not covert from UTC to local time
+    errcTime_LocalToUTC         4010    Could not covert from local time to UTC time
+    errcTime_MissingToken       4011    Token #%(1) was not found while parsing time string
+    errcTime_BadTimeFmt         4012    An error occured while parsing time string token #%(1)
+    errcTime_GetTZInfo          4013    An error occurred while getting time zone information
+    errcTime_Expand             4014    The time stamp could not be expanded out to full details
+    errcTime_ForwardFailed      4015    Could not move the time stamp forward by %(1) %(2)
+
+    ; Type registry errors
+    errcTReg_InvalidHash        4400    The hash of the class object %(1) is out of range
+    errcTReg_InvalidName        4401    The class name cannot be an empty string or null
+    errcTReg_NotFound           4402    The class name %(1) was not in the type registry
+
+    ; Text stream errors
+    errcTStrm_StrmAlreadySet    4500    The binary stream is already set for this %(1) text stream
+    errcTStrm_WriteFailed       4501    Could not write transcoded text to the underlying binary stream
+    errcTStrm_FormatFor         4502    Failed when formatting a fundamental value to write to the text stream
+    errcTStrm_BadSpecial        4503    %(1) is not a valid value for the TTextOutStream::ESpecial enum
+    errcTStrm_InputRange        4504    Input value '%(1)' too big for %(2) target value
+    errcTStrm_TooManySpareBytes 4505    Conversion of text buffer left over too many spare bytes
+
+    ; Unique name errors
+    errcUName_BadText           6800    The unique name text does not have the required '1' token. Text=%(1)
+
+    ; USB errors
+    errcUSB_FindHIDDevice       6850    An error occured while trying to find an HID device
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+; Messages ids
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+    ; Strings for the EAudioCues enum values
+    midACue_Alert              14000    Alert
+    midACue_Bell               14001    Bell
+    midACue_Click              14002    Click
+    midACue_Chime              14003    Chime
+    midACue_Error              14004    Error
+    midACue_HiPulse            14005    HiPulse
+    midACue_Information        14006    Information
+    midACue_LoPulse            14007    LoPulse
+    midACue_MedPulse           14008    MedPulse
+    midACue_Question           14009    Question
+    midACue_Rising             14010    Rising
+    midACue_Sinking            14011    Sinking
+    midACue_Warning            14011    Sinking
+
+    ; Strings used by the CIDLib_Class.Cpp file
+    midClass_InvalidName       14100    TClass: Invalid class name (
+
+    ; Strings for the EDirs enum values
+    midDir_Left                14200    Left
+    midDir_Right               14201    Right
+    midDir_Up                  14202    Up
+    midDir_Down                14203    Down
+
+    ; Strings for the EErrClasses enum values
+    midErrC_OutResource        14300    Out Of Resource
+    midErrC_TempSituation      14301    Temp Situation
+    midErrC_Authority          14302    Authority
+    midErrC_Internal           14303    Internal
+    midErrC_HardwareError      14304    Hardware Error
+    midErrC_SystemError        14305    System Error
+    midErrC_AppError           14306    App Error
+    midErrC_BadParms           14307    Bad Parms
+    midErrC_Locked             14308    Locked
+    midErrC_Media              14309    Media
+    midErrC_Already            14310    Already
+    midErrC_Unknown            14311    Unknown
+    midErrC_CantDo             14312    Cannot Do
+    midErrC_TimeOut            14313    Timeout
+    midErrC_DynamicType        14314    Dynamic Type
+    midErrC_TypeMatch          14315    Type Match
+    midErrC_Format             14316    Data Format
+    midErrC_UserInput          14317    User Input
+    midErrC_NotReady           14318    Not Ready
+    midErrC_ObjState           14319    Object State
+    midErrC_NotSupported       14320    Not Supported
+    midErrC_AppStatus          14321    App Status
+    midErrC_NotFound           14322    Not Found
+    midErrC_Protocol           14323    Protocol Error
+    midErrC_Range              14324    Range
+    midErrC_Duplicate          14325    Duplicate
+    midErrC_Config             14326    Configuration
+    midErrC_Index              14327    Index Error
+    midErrC_NotAllRead         14328    Not All Data Read
+    midErrC_NotAllWritten      14329    Not All Data Written
+    midErrC_LostConnection     14330    Lost Connection
+    midErrC_Overflow           14331    Overflow
+    midErrC_Underflow          14332    Underflow
+    midErrC_InitFailed         14333    Initialization Failed
+    midErrC_OutOfSync          14334    Out Of Sync
+    midErrC_XmitFailed         14335    Transmit Failed
+    midErrC_ReceiveFailed      14336    Receive Failed
+    midErrC_NoReply            14337    No Reply
+    midErrC_Assert             14338    Assert Failed
+    midErrC_InUse              14339    In Use
+    midErrC_Term               14340    Termination
+    midErrC_Init               14341    Initialization
+    midErrC_Shutdown           14342    Shutdown Error
+    midErrC_RejectedConn       14343    Rejected Connection
+    midErrC_Busy               14344    Busy
+    midErrC_Nak                14345    Nak Reply
+
+    ;
+    ;   General use and common message text. Some of these are used as
+    ;   as the text for formatted enum values, for those that have very
+    ;   simple values with common names.
+    ;
+    midGen_Id                  14600    ID:
+    midGen_Handle              14601    Handle
+    midGen_Name                14602    Name
+    midGen_False               14603    False
+    midGen_True                14604    True
+    midGen_destructobj         14605    destruct object
+    midGen_constructobj        14606    construct object
+    midGen_origin              14607    origin
+    midGen_size                14608    size
+    midGen_horizontal          14609    horizontal
+    midGen_vertical            14610    vertical
+    midGen_current             14611    current
+    midGen_logicalend          14612    logical end
+    midGen_physicalend         14613    physical end
+    midGen_truncation          14614    truncation
+    midGen_Error               14615    Error
+    midGen_KrnlError           14616    Kernel Error
+    midGen_HostError           14617    Host Error
+    midGen_read                14618    read
+    midGen_write               14619    write
+    midGen_Type                14620    Type
+    midGen_Elements            14621    Elements
+    midGen_Value               14622    Value
+    midGen_Min                 14623    Min
+    midGen_Max                 14624    Max
+    midGen_Pattern             14625    Pattern
+    midGen_NotApplicable       14626    N/A
+    midGen_RepTrunIfExists     14627    Replace/truncate if exists
+    midGen_Radians             14628    Radians
+    midGen_Degrees             14629    Degrees
+    midGen_Left                14630    Left
+    midGen_Center              14631    Center
+    midGen_Right               14632    Right
+    midGen_Locked              14633    Locked
+    midGen_Unlocked            14634    Unlocked
+    midGen_Shared              14635    Shared
+    midGen_Unshared            14636    Unshared
+    midGen_None                14637    None
+    midGen_On                  14638    On
+    midGen_Off                 14639    Off
+    midGen_Top                 14640    Top
+    midGen_Bottom              14641    Bottom
+    midGen_Visible             14642    Visible
+    midGen_Invisible           14643    Invisible
+    midGen_Zeros               14644    Zeros
+    midGen_Spaces              14645    Spaces
+    midGen_Ignore              14646    Ignore
+    midGen_Inclusive           14647    Inclusive
+    midGen_NonInclusive        14648    Non Inclusive
+    midGen_First               14649    First
+    midGen_Last                14650    Last
+    midGen_Big                 14651    Big
+    midGen_Little              14652    Little
+    midGen_Default             14653    Default
+    midGen_Unknown             14654    Unknown
+    midGen_Auto                14655    Auto
+    midGen_quadrant            14656    quadrant
+    midGen_Kinda               14657    Kinda
+    midGen_Metric              14658    Metric
+    midGen_US                  14659    US
+
+    ; Language names
+    midLang_Afrikaans          15250    Afrikaans
+    midLang_Albanian           15251    Albanian
+    midLang_Arabic             15252    Arabic
+    midLang_Basque             15253    Basque
+    midLang_Belarusian         15254    Belarusian
+    midLang_Bulgarian          15255    Bulgarian
+    midLang_Catalan            15256    Catalan
+    midLang_Chinese            15257    Chinese
+    midLang_Croatian           15258    Croatian
+    midLang_Czech              15259    Czech
+    midLang_Danish             15260    Danish
+    midLang_Dutch              15261    Dutch
+    midLang_English            15262    English
+    midLang_Farsi              15263    Farsi
+    midLang_Finnish            15264    Finnish
+    midLang_French             15265    French
+    midLang_German             15266    German
+    midLang_Greek              15267    Greek
+    midLang_Hebrew             15268    Hebrew
+    midLang_Hungarian          15269    Hungarian
+    midLang_Icelandic          15270    Icelandic
+    midLang_Indonesian         15271    Indonesian
+    midLang_Italian            15272    Italian
+    midLang_Japanese           15273    Japanese
+    midLang_Korean             15274    Korean
+    midLang_Latvian            15275    Latvian
+    midLang_Lithuanian         15276    Lithuanian
+    midLang_Norwegian          15277    Norwegian
+    midLang_Polish             15278    Polish
+    midLang_Portuguese         15279    Portuguese
+    midLang_Romanian           15280    Romanian
+    midLang_Russian            15281    Russian
+    midLang_Serbian            15282    Serbian
+    midLang_Slovak             15283    Slovak
+    midLang_Slovenian          15284    Slovenian
+    midLang_Spanish            15285    Spanish
+    midLang_Swedish            15286    Swedish
+    midLang_Turkish            15287    Turkish
+    midLang_Ukrainian          15288    Ukrainian
+    midLang_Vietnamese         15289    Vietnamese
+
+    ; Strings used by the CIDLib_Memory.Cpp file
+    midMem_MaxSizeIs           15350    the max size is 0
+    midMem_InitSizeIs          15351    the initial size is 0
+    midMem_ExpandIncIs         15352    the expand increment is 0
+    midMem_SizeVsMaxSize       15353    The size (%(1)) is > than the max size (%(2))
+    midMem_ExpandIncSz         15354    The expand increment (%(1)), is > than the size (%(2))
+
+    ; Strings used by the CIDLib_Module.Cpp file
+    midMod_DefStrLoad          15400    Could not load string with requested id. Id=%(1), Err=%(2)
+    midMod_RecursiveErr        15401    A recursive logging error occured. See the error log.
+    midMod_ExceptDuringLog     15402    An exception occured while trying to log a message
+
+    ; Strings for the EPathParts enum values
+    midPath_Volume             15500    Volume
+    midPath_Path               15501    Path
+    midPath_Extension          15502    Extension
+    midPath_Name               15503    Name
+
+    ; Strings for the EPrioLevels and EPrioClasses enum values
+    midPrio_Lowest             15600    Lowest
+    midPrio_BelowNormal        15601    Below Normal
+    midPrio_Normal             15602    Normal
+    midPrio_AboveNormal        15603    Above Normal
+    midPrio_Highest            15604    Highest
+    midPrio_Idle               15605    Idle
+    midPrio_Regular            15606    Regular
+    midPrio_Critical           15607    Critical
+    midPrio_FgnServer          15608    FgnServer
+
+    ; Strings used by the CIDLib_String.Cpp file
+    midStr_CantPreserve        16200    the new size < current but bPreserve is true
+    midStr_NewSizePastMax      16201    the new size is > the maximum string size
+
+    ; Strings used by the CIDLib_MemoryStreamImpl.Cpp file
+    midMStrmI_IndexPastBuf     16225    Index is beyond buffer max size
+
+    ; Strings for the ESysExcepts enum values
+    midSysE_BreakPoint         16290    Break Point
+    midSysE_DataAlignment      16291    Data Alignment
+    midSysE_DenormalFloat      16292    Denormal Float
+    midSysE_FloatDivByZero     16293    Float Div By Zero
+    midSysE_InexactResult      16294    Inexact Result
+    midSysE_FloatInvalidOp     16295    Float Invalid Op
+    midSysE_FloatOverflow      16296    Float Overflow
+    midSysE_FloatStack         16297    Float Stack
+    midSysE_FloatUnderflow     16298    Float Underflow
+    midSysE_IntDivByZero       16299    Int Div By Zero
+    midSysE_IntOverflow        16300    Int Overflow
+    midSysE_PageLoadFailed     16301    Page Load Failed
+    midSysE_ReadAccess         16302    Read Access
+    midSysE_StackOverflow      16303    Stack Overflow
+    midSysE_WriteAccess        16304    Write Access
+
+    ; Strings used by the CIDLib_Thread.Cpp file
+    midThrd_UnhandledRTE       16500    Unhandled runtime error. See ErrorInf file
+    midThrd_ExcpWhileLogging   16501    Exception occured while dealing with unhandled exception!
+    midThrd_ClippedPrio        16502    The value was clipped to valid range
+    midThrd_SelfPrioMode       16503    This thread is in SelfPrio mode
+    midThrd_Thread             16504    thread
+    midThrd_ThreadEq           16506    Thread=
+    midThrd_RunningEq          16507    , Running="
+    midThrd_IdEq               16508    , Id=%(1)"
+    midThrd_MultipleCalls      16509    CIDLib_MakePrimary cannot be called multiple times!
+    midThrd_BlockSelf          16510    A thread can only block itself
+
+    ; Strings used by the CIDLib_Time.Cpp file
+    midTm_CurrentTime          16550    Current Time
+    midTm_CurrentDate          16551    Current Date
+
+    ; Strings used by disk volume code
+    midVol_Unknown             16600    Unknown
+    midVol_35Floppy            16601    3.5" Floppy
+    midVol_525Floppy           16602    5.25" Floppy
+    midVol_Removable           16603    Removable Disk
+    midVol_Fixed               16604    Fixed Disk
+    midVol_Remote              16605    Remote Drive
+    midVol_CD                  16606    Compact Disk
+    midVol_RAMDisk             16607    RAMDisk
+    midVol_Share               16608    Share
+
+END MESSAGES
+

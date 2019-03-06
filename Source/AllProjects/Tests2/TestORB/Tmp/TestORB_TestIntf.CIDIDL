@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+        <CIDIDL:Constants>
+            <CIDIDL:Constant CIDIDL:Name="bVal" CIDIDL:Type="TBoolean" CIDIDL:Value="True">
+                <CIDIDL:DocText>
+                    This is the documentation for this constant.
+                    It can have multiple lines of course, for formatting.
+                        - And lines can be indented and that will be kept
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="c4Val" CIDIDL:Type="TCard4" CIDIDL:Value="139"/>
+            <CIDIDL:Constant CIDIDL:Name="i2Val" CIDIDL:Type="TInt2" CIDIDL:Value="-39"/>
+            <CIDIDL:Constant CIDIDL:Name="strVal" CIDIDL:Type="TString" CIDIDL:Value="This is a test"/>
+        </CIDIDL:Constants>
+
+        <CIDIDL:Types>
+            <CIDIDL:Enum CIDIDL:Name="EDays" CIDIDL:Xlat="Inline">
+                <CIDIDL:DocText>
+                    This is the documentation for this enum.
+                    It can have multiple lines of course, for formatting.
+                        - And lines can be indented and that will be kept
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Sunday" CIDIDL:Text="Sunday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Monday" CIDIDL:Text="Monday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Tuesday" CIDIDL:Text="Tuesday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Wednesday" CIDIDL:Text="Wednesday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Thursday" CIDIDL:Text="Thursday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Friday" CIDIDL:Text="Friday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Saturday" CIDIDL:Text="Saturday"/>
+            </CIDIDL:Enum>
+
+            <CIDIDL:Enum    CIDIDL:Name="EDirections" CIDIDL:Xlat="Inline">
+                <CIDIDL:EnumVal CIDIDL:Name="EDir_Up" CIDIDL:Text="Up"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDir_Down" CIDIDL:Text="Down"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDir_Left" CIDIDL:Text="Left"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDir_Right" CIDIDL:Text="Right"/>
+            </CIDIDL:Enum>
+
+            <CIDIDL:Enum CIDIDL:Name="EFlags" CIDIDL:Type="Bmp">
+                <CIDIDL:EnumVal CIDIDL:Name="EFlag_TranBgn" CIDIDL:Value="0x0001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EFlag_FlyoverEmph" CIDIDL:Value="0x0002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EFlag_Border" CIDIDL:Value="0x0004"/>
+            </CIDIDL:Enum>
+        </CIDIDL:Types>
+    </CIDIDL:Globals>
+
+    <CIDIDL:ClassIntf   CIDIDL:Name="TestOrbIntf"
+                        CIDIDL:InterfaceId="1799C1BE4E47BA7E-19344A2250A462D2">
+
+        <CIDIDL:Constants>
+            <CIDIDL:Constant CIDIDL:Name="bVal" CIDIDL:Type="TBoolean" CIDIDL:Value="True">
+                <CIDIDL:DocText>
+                    This is the documentation for this constant.
+                    It can have multiple lines of course, for formatting.
+                        - And lines can be indented and that will be kept
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="c4Val" CIDIDL:Type="TCard4" CIDIDL:Value="139"/>
+            <CIDIDL:Constant CIDIDL:Name="i2Val" CIDIDL:Type="TInt2" CIDIDL:Value="-39"/>
+            <CIDIDL:Constant CIDIDL:Name="strVal" CIDIDL:Type="TString" CIDIDL:Value="This is a test"/>
+        </CIDIDL:Constants>
+
+        <CIDIDL:Types>
+            <CIDIDL:Enum CIDIDL:Name="EDays" CIDIDL:Xlat="Inline">
+                <CIDIDL:DocText>
+                    This is the documentation for this enum.
+                    It can have multiple lines of course, for formatting.
+                        - And lines can be indented and that will be kept
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Sunday" CIDIDL:Text="Sunday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Monday" CIDIDL:Text="Monday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Tuesday" CIDIDL:Text="Tuesday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Wednesday" CIDIDL:Text="Wednesday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Thursday" CIDIDL:Text="Thursday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Friday" CIDIDL:Text="Friday"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDay_Saturday" CIDIDL:Text="Saturday"/>
+            </CIDIDL:Enum>
+
+            <CIDIDL:Enum    CIDIDL:Name="EDirections" CIDIDL:Xlat="Inline">
+                <CIDIDL:EnumVal CIDIDL:Name="EDir_Up" CIDIDL:Text="Up"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDir_Down" CIDIDL:Text="Down"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDir_Left" CIDIDL:Text="Left"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EDir_Right" CIDIDL:Text="Right"/>
+            </CIDIDL:Enum>
+
+            <CIDIDL:Enum CIDIDL:Name="EFlags" CIDIDL:Type="Bmp">
+                <CIDIDL:EnumVal CIDIDL:Name="EFlag_TranBgn" CIDIDL:Value="0x0001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EFlag_FlyoverEmph" CIDIDL:Value="0x0002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EFlag_Border" CIDIDL:Value="0x0004"/>
+            </CIDIDL:Enum>
+        </CIDIDL:Types>
+
+        <CIDIDL:Methods>
+            <!--
+              - Called to reset any state on the server side, which is required
+              - if we run the client multiple times while the server stays up.
+              -->
+            <CIDIDL:Method CIDIDL:Name="Reset">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+            </CIDIDL:Method>
+
+            <!-- A simple API to return the input bumped up -->
+            <CIDIDL:Method CIDIDL:Name="c4BumpIt">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="c4Input" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <!-- This one returns a known exception -->
+            <CIDIDL:Method CIDIDL:Name="ExceptTest">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+            </CIDIDL:Method>
+
+            <!-- Test method name overloading -->
+            <CIDIDL:Method CIDIDL:Name="ExceptTest">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="c4Dummy" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <!-- This one has lots of parameters, in and out -->
+            <CIDIDL:Method CIDIDL:Name="bParamTest">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="c4In" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4Out" CIDIDL:Dir="Out">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="f8In" CIDIDL:Dir="In">
+                    <CIDIDL:TFloat8/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="f8Out" CIDIDL:Dir="Out">
+                    <CIDIDL:TFloat8/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strIn" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strOut" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strInOut" CIDIDL:Dir="InOut">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bIn" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bOut" CIDIDL:Dir="Out">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strFailReason" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <!-- Send some objects parameters in this one -->
+            <CIDIDL:Method CIDIDL:Name="bObjParamTest">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="areaInOut" CIDIDL:Dir="InOut">
+                    <CIDIDL:Object CIDIDL:Type="TArea"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="ptInOut" CIDIDL:Dir="InOut">
+                    <CIDIDL:Object CIDIDL:Type="TPoint"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="vecInOut" CIDIDL:Dir="InOut">
+                    <CIDIDL:Object CIDIDL:Type="T3DVector"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strFailReason" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <!-- Test bag collection parameters -->
+            <CIDIDL:Method CIDIDL:Name="bBagParamTest">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colIn" CIDIDL:Dir="In">
+                    <CIDIDL:TBag CIDIDL:ElemType="TArea"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colOut" CIDIDL:Dir="Out">
+                    <CIDIDL:TBag CIDIDL:ElemType="TPoint"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strFailReason" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <!-- Test vector collection parameters -->
+            <CIDIDL:Method CIDIDL:Name="bVectorParamTest">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colInOut" CIDIDL:Dir="InOut">
+                    <CIDIDL:TVector CIDIDL:ElemType="TString"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strFailReason" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <!-- This one sends back and forth a large binary buffer -->
+            <CIDIDL:Method CIDIDL:Name="BulkTest">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="mbufOut" CIDIDL:Dir="InOut">
+                    <CIDIDL:THeapBuf/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <!-- This one tests the 'poll method' type of call -->
+            <CIDIDL:PollMethod CIDIDL:Name="bPollData">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="areaRet" CIDIDL:Dir="Out">
+                    <CIDIDL:Object CIDIDL:Type="TArea"/>
+                </CIDIDL:Param>
+            </CIDIDL:PollMethod>
+
+        </CIDIDL:Methods>
+    </CIDIDL:ClassIntf>
+
+</CIDIDL:Interface>
+

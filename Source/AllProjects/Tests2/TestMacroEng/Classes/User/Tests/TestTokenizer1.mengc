@@ -1,0 +1,146 @@
+//
+//  Since we are wrapping a C++ class here that already has it's own
+//  tests, we don't have to test out huge numbers of variations. What
+//  we are mainly concerned with here is that all of the methods are
+//  correctly wrapped. The C++ level tests bang on the actual tokenizing
+//  functionality.
+//
+Class=[Final]
+    ClassPath MEng.User.Tests.TestTokenizer1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.StringTokenizer;
+EndImports;
+
+Types=
+    VectorOf[MEng.String]   StrVec;
+EndTypes;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    TestHelpers         m_Helper;
+    StringTokenizer     m_Tok;
+    String              m_Str1;
+    String              m_Str2;
+    String              m_Str3;
+    Card4               m_Index;
+    StrVec              m_List;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        m_Str1 := "Test1,   Test2   , Test3   ,Test4  ";
+        m_Tok.Set(m_Str1, StringTokenizer.kDefWhitespace + ",");
+
+        // Check that the initializers set the values correctly
+        If (!m_Tok.MoreTokens())
+            m_Helper.PrintErr("No tokens initially available", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And make sure we get the right tokens
+        m_Index := 0;
+        While (m_Index < 4)
+            If (!m_Tok.GetNextToken(m_Str2))
+                m_Helper.PrintErr("Failed to get expected token", m_Output, $CurLine);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+
+            m_Str3 := "Test";
+            m_Str3.AppendFmt(m_Index + 1);
+            If (m_Str3 != m_Str2)
+                m_Helper.PrintErr("Got the wrong token text", m_Output, $CurLine);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+
+            m_Index++;
+        EndWhile;
+
+        // Test the command line parser
+        m_Str1 := "Parm1 'Parm2 Value' Parm3";
+        m_Tok.ParseCmdLine(m_Str1, m_List);
+
+        If (m_List.GetElemCount() != 3)
+            m_Helper.PrintErr("Got no command line parms", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure we got the expected stuff
+        If ((m_List[0] != "Parm1")
+        ||  (m_List[1] != "Parm2 Value")
+        ||  (m_List[2] != "Parm3"))
+            m_Helper.PrintErr("Got incorrect parm values", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And test the one shot tokenizing
+        m_Str1 := "Tok1, Tok2, Tok3";
+        m_Tok.Tokenize(m_Str1, ", ", m_List);
+        If (m_List.GetElemCount() != 3)
+            m_Helper.PrintErr("Got incorrect tokenize count", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_List[0] != "Tok1")
+        ||  (m_List[1] != "Tok2")
+        ||  (m_List[2] != "Tok3"))
+            m_Helper.PrintErr("Got incorrect tokenize values", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the parsing of a comma separated list of quoted values
+        If (!m_Tok.ParseQuotedCommaList("\"Value 1\", \"Value2\"", m_List, m_Index)
+        ||  (m_List.GetElemCount() != 2)
+        ||  (m_List[0] != "Value 1")
+        ||  (m_List[1] != "Value2"))
+            m_Helper.PrintErr("Got incorrect quoted comma list values", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Tok.ParseCSVLine("\"Value 1\", Value2, \"Value 3\"", m_List, m_Index)
+        ||  (m_List.GetElemCount() != 3)
+        ||  (m_List[0] != "Value 1")
+        ||  (m_List[1] != "Value2")
+        ||  (m_List[2] != "Value 3"))
+            m_Helper.PrintErr("Got incorrect CSV values", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the building a comma separated list of quoted values
+        m_Str1.Clear();
+        m_Tok.BuildQuotedCommaList("Value 1", m_Str1);
+        m_Tok.BuildQuotedCommaList("Value 2", m_Str1);
+        m_Tok.BuildQuotedCommaList("Value 3", m_Str1);
+        m_Tok.BuildQuotedCommaList("\"", m_Str1);
+
+        If (!m_Tok.ParseQuotedCommaList(m_Str1, m_List, m_Index)
+        ||  (m_List.GetElemCount() != 4)
+        ||  (m_List[0] != "Value 1")
+        ||  (m_List[1] != "Value 2")
+        ||  (m_List[2] != "Value 3")
+        ||  (m_List[3] != "\""))
+            m_Helper.PrintErr("Got incorrect result from quoted comma list", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+

@@ -1,0 +1,48 @@
+;
+; FILE NAME: CIDAdvGraph_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 05/19/2015
+;
+; COPYRIGHT: 2015..2015, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This is the message text file for this facility.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kAdvGrErrs
+    MsgPref=kAdvGrMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; DX Resource oriented errors
+    errcRes_Create      2000    Could not create the %(1) resource
+    errcRes_Get         2001    Could not get the %(1) resource
+
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+
+END MESSAGES
+

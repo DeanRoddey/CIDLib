@@ -1,0 +1,298 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestEnum1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Types=
+    // Declare some test enums
+    Enum=TestEnum
+        Value1 : "Text for value 1";
+        Value2 : "Text for value 2";
+        Value3 : "Text for value 3";
+        Value4 : "Text for value 4";
+    EndEnum;
+
+    Enum=TestEnum2
+        Value1 : "Text for value 1";
+        Value2 : "Text for value 2";
+        Value3 : "Text for value 3";
+        Value4 : "Text for value 4";
+    EndEnum;
+
+    Enum=TestEnum3
+        V1 : "T1";
+        V2 : "T2";
+        V3 : "T3";
+        V4 : "T4";
+    EndEnum;
+EndTypes;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    TestEnum            m_Test1;
+    TestEnum            m_Test2;
+    TestEnum3           m_Test3;
+    Boolean             m_Flag;
+EndMembers;
+
+
+
+Methods=[Private,Final]
+
+    //
+    //  These methods test our ability to deal with the text and name
+    //  info of enums polymorphically via the base class.
+    //
+    Method PolyEnumName([InOut] MEng.Enum   TestEnum
+                        , [In]  Card4       OrdinalVal
+                        , [Out] String      Name)
+    Begin
+        TestEnum.SetOrdinal(OrdinalVal);
+        Name := TestEnum.GetName();
+    EndMethod;
+
+    Method PolyEnumText([InOut] MEng.Enum   TestEnum
+                        , [In]  Card4       OrdinalVal
+                        , [Out] String      Value)
+    Begin
+        TestEnum.SetOrdinal(OrdinalVal);
+        Value := TestEnum.GetText();
+    EndMethod;
+
+    Method PolyListFmt( [In]    MEng.Enum       TestEnum
+                        , [In]  MEng.Boolean    UseName
+                        , [Out] MEng.String     ToFill)
+    Begin
+        TestEnum.FormatList(ToFill, "Pref:", ',', UseName);
+    EndMethod;
+
+EndMethods;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+        m_Test2(TestEnum.Value4);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            TestEnum2   TestVal2;
+            String      TmpStr;
+        EndLocals;
+
+        // Make sure the constructors did the right thing
+        If (m_Test1 != TestEnum.Value1)
+            m_Helper.PrintErr("Test1 enum did not contruct correctly", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test2 != TestEnum.Value4)
+            m_Helper.PrintErr("Test2 enum did not contruct correctly", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Set one from the other and test for equality
+        m_Test1 := m_Test2;
+        If (m_Test1 != m_Test2)
+            m_Helper.PrintErr("Copy didn't create equal objects", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure that the ordinal count is correct
+        If (TestVal2.GetOrdinalCount() != 4)
+            m_Helper.PrintErr("Ordinal count is not correct", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Reset test2 and use it to validate the ForEach() mechanism. Set
+        //  test1 to a value other than the first, to insure that the ForEach
+        //  resets it corredctly. This also tests the Inc method.
+        //
+        m_Test2.SetToMin();
+        m_Test1.SetToMax();
+        ForEach(m_Test1)
+            If (m_Test1 != m_Test2)
+                m_Helper.PrintErr("ForEach iteration failed", m_Output, $CurLine);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+            m_Test2++;
+        EndForEach;
+
+        // Make sure we throw on a bad ordinal set
+        m_Flag := False;
+        Try
+            m_Test1.SetOrdinal(4);
+        EndTry;
+
+        Catch
+            If ($Exception.Check(EnumErrors.BadOrdinal))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Didn't catch bad ordinal set", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Set it via a valid ordinal and check the result
+        m_Test1.SetOrdinal(3);
+        If (m_Test1 != TestEnum.Value4)
+            m_Helper.PrintErr("Set via ordinal failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Set it via the name and text
+        m_Test1.FromName("Value1");
+        If (m_Test1 != TestEnum.Value1)
+            m_Helper.PrintErr("Set via name text failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.FromText("Text for value 2");
+        If (m_Test1 != TestEnum.Value2)
+            m_Helper.PrintErr("Set via value text failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do name and text lookups with text that won't be found
+        m_Flag := False;
+        Try
+            m_Test1.FromName("BadName");
+        EndTry;
+
+        Catch
+            If ($Exception.Check(EnumErrors.NameNotFound))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Didn't catch bad set by name", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Flag := False;
+        Try
+            m_Test1.FromText("BadText");
+        EndTry;
+
+        Catch
+            If ($Exception.Check(EnumErrors.TextNotFound))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Didn't catch bad set by text", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Test the exception friendly mapping, fonrst on some that should
+        //  map correctly.
+        //
+        If (!m_Test1.MapFromText("Value3", True, TestEnum.Value2))
+            m_Helper.PrintErr("MapFromText returned wrong result", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test1 != TestEnum.Value3)
+            m_Helper.PrintErr("MapFromText failed on name", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test1.MapFromText("Text for value 4", False, TestEnum.Value2))
+            m_Helper.PrintErr("MapFromText returned wrong result", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+        If (m_Test1 != TestEnum.Value4)
+            m_Helper.PrintErr("MapFromText failed on text", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And now some that should fail and return the default
+        If (m_Test1.MapFromText("Bubba", True, TestEnum.Value2))
+            m_Helper.PrintErr("MapFromText returned wrong result", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test1 != TestEnum.Value2)
+            m_Helper.PrintErr("MapFromText failed on def name", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test1.MapFromText("Text for 4", False, TestEnum.Value1))
+            m_Helper.PrintErr("MapFromText returned wrong result", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+        If (m_Test1 != TestEnum.Value1)
+            m_Helper.PrintErr("MapFromText failed on def text", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        //
+        //  Test some polymorphic access
+        //
+        PolyEnumName(TestVal2, 2, TmpStr);
+        If (TmpStr != "Value3")
+            m_Helper.PrintErr("Polymorphic name access failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        PolyEnumText(TestVal2, 2, TmpStr);
+        If (TmpStr != "Text for value 3")
+            m_Helper.PrintErr("Polymorphic text access failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Just in case, flush any unflushed output
+        m_Output.Flush();
+
+        //
+        //  Test the formatting stuff. We need to test both name and text
+        //  formatting, and mono and polymorphically formatting.
+        //
+        m_Test3.FormatList(TmpStr, "Pref:", ',', True);
+        If (TmpStr != "Pref: V1, V2, V3, V4")
+            m_Helper.PrintErr("Monomorphic name list format failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test3.FormatList(TmpStr, "Pref:", '*', False);
+        If (TmpStr != "Pref: T1* T2* T3* T4")
+            m_Helper.PrintErr("Monomorphic text list format failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        PolyListFmt(m_Test3, True, TmpStr);
+        If (TmpStr != "Pref: V1, V2, V3, V4")
+            m_Helper.PrintErr("Polymorphic name list format failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        PolyListFmt(m_Test3, False, TmpStr);
+        If (TmpStr != "Pref: T1, T2, T3, T4")
+            m_Helper.PrintErr("Polymorphic text list format failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+

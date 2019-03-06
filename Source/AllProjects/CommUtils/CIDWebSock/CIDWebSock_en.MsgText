@@ -1,0 +1,48 @@
+;
+; FILE NAME: CIDWebSock_En.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 05/24/2017
+;
+; COPYRIGHT: $_CIDLib_CopyRight_$
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kWSockErrs
+    MsgPref=kWSockMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;   Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    errcWSock_ExceptCB              6000    An exception propogated out of handler callback %(1)
+    errcWSock_CantStart             6001    The WebSockets thread object is already running or has completed
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;   Messages
+; ----------------------------------------------------------------------------
+
+MESSAGES=
+
+    midStatus_WebSockExcept        15000    An exception occured while servicing websocket client, closing session
+
+END MESSAGES

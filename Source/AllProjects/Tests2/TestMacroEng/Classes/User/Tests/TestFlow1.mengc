@@ -1,0 +1,509 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestFlow1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Types=
+    Enum=TestEnum
+        Value1 : "Text for value 1";
+        Value2 : "Text for value 2";
+        Value3 : "Text for value 3";
+        Value4 : "Text for value 4";
+        Value5 : "Text for value 5";
+    EndEnum;
+EndTypes;
+
+Literals=
+    Card4   kCase1(1);
+    Card4   kCase2(2);
+    Card4   kCase3(3);
+    Card4   kCase4(4);
+EndLiterals;
+
+Members=[Const]
+    Card4               m_CCard1;
+    Card4               m_CCard2;
+    String              m_CText1;
+    String              m_CText2;
+EndMembers;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    TestHelpers         m_Helper;
+    Boolean             m_Flag;
+    Card4               m_Card;
+    Card4               m_Index;
+    String              m_Text;
+    TestEnum            m_EnumInd;
+    TestEnum            m_EnumTest;
+    Char                m_Char;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_CCard1(9113);
+        m_CCard2(0x4144);
+        m_CText1("Test string 1");
+        m_CText2("Test string 2");
+        m_Output();
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    // Used in the testing of logical op short circuiting
+    Method SideFx([In] Boolean ToRet, [Out] Card4 Update) Returns Boolean
+    Begin
+        Update++;
+        Return ToRet;
+    EndMethod;
+
+
+    // Used to test switch case fall through
+    Method TestFallThrough([In] Card4 CaseVal) Returns Card4
+    Begin
+        Locals=
+            Card4   RetVal(0);
+        EndLocals;
+
+        Switch(CaseVal)
+            Case 0 :
+                RetVal++;
+            EndCase;
+
+            FTCase 1 :
+                RetVal++;
+            EndCase;
+
+            FTCase 2 :
+                RetVal++;
+            EndCase;
+
+            Case 3 :
+                RetVal++;
+            EndCase;
+
+            Default :
+                RetVal++;
+            EndCase;
+        EndSwitch;
+        Return RetVal;
+    EndMethod;
+
+
+    Method Start() Returns Int4
+    Begin
+       // Check the If variants
+        m_Flag := False;
+        If (m_CCard1 = 9113)
+            m_Flag := True;
+        Else
+            m_Flag := False;
+        EndIf;
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to take true branch", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Flag := False;
+        If (m_CCard1 != 9113)
+            m_Flag := False;
+        Else
+            m_Flag := True;
+        EndIf;
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to take false branch", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_CCard1 = 1)
+            m_Helper.PrintErr("If failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_CCard1 = 9113)
+            // Do nothing, test empty block
+        Else
+            m_Helper.PrintErr("If failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_CCard1 != 9113)
+            m_Helper.PrintErr("If failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        Else
+            // Do nothing, test empty block
+        EndIf;
+
+        If ((m_CCard1 != 9113) || (m_CCard2 != 0x4144))
+            m_Helper.PrintErr("If failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        Else
+            // Do nothing, test empty block
+        EndIf;
+
+        If ((m_CCard1 = 9113) && (m_CCard2 = 0x4144))
+            // Do nothing, test empty block
+        Else
+            m_Helper.PrintErr("If failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_CCard1 = 1)
+            m_Helper.PrintErr("If failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        ElseIf (m_CCard1 = 2)
+            m_Helper.PrintErr("ElseIf failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        ElseIf (m_CCard1 != 9113)
+            m_Helper.PrintErr("ElseIf failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        ElseIf ((m_CCard1 != 9113) && (m_CCard2 != 0x4133))
+            m_Helper.PrintErr("ElseIf failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Next let's do some 'short circuit' tests, which make sure that
+        //  OR/AND operators in compound only execute as many parts of the
+        //  state as are required to know how the opertion is going to come
+        //  out. We use a local method with purposeful side effects to
+        //  test this. It adds one to a passed value, so we know how many
+        //  times it's called. We pass it a boolean which it just turns
+        //  around and returns, so we can control what it will return in
+        //  each call.
+        //
+        m_Card := 0;
+        If (This.SideFx(True, m_Card) || This.SideFx(True, m_Card))
+            // We should get here with a value of 1
+            If (m_Card != 1)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        Else
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card := 0;
+        If (SideFx(False, m_Card) || SideFx(True, m_Card))
+            // We should get here with a value of 2
+            If (m_Card != 2)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        Else
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card := 0;
+        If (This.SideFx(True, m_Card) && SideFx(True, m_Card))
+            // We should get here with a value of 2
+            If (m_Card != 2)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        Else
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card := 0;
+        If (SideFx(False, m_Card) || This.SideFx(True, m_Card))
+            // We should get here with a value of 2
+            If (m_Card != 2)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        Else
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card := 0;
+        If (SideFx(False, m_Card) && SideFx(True, m_Card))
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        Else
+            // We should get here with a value of 1
+            If (m_Card != 1)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndIf;
+
+        m_Card := 0;
+        If (This.SideFx(False, m_Card) || This.SideFx(False, m_Card))
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        Else
+            // We should get here with a value of 2
+            If (m_Card != 2)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndIf;
+
+        m_Card := 0;
+        If (SideFx(False, m_Card) || SideFx(False, m_Card) && SideFx(True, m_Card))
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        Else
+            // We should get here with a value of 2
+            If (m_Card != 2)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndIf;
+
+        m_Card := 0;
+        If (SideFx(False, m_Card) || SideFx(True, m_Card) && SideFx(True, m_Card))
+            // We should get here with a value of 3
+            If (m_Card != 3)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        Else
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card := 0;
+        If (SideFx(True, m_Card)
+        &&  (SideFx(True, m_Card) || SideFx(False, m_Card)))
+            // We should get here with a value of 2
+            If (m_Card != 2)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        Else
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card := 0;
+        If (SideFx(True, m_Card)
+        &&  (SideFx(False, m_Card) || SideFx(True, m_Card)))
+            // We should get here with a value of 3
+            If (m_Card != 3)
+                m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        Else
+            m_Helper.PrintErr("Short circuit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        //
+        //  Test the switch statement, by throwing a sequence of values at
+        //  it and making sure we get to the correct case.
+        //
+        m_Index := 0;
+        While (m_Index < 8)
+            m_Card := 9999;
+            Switch(m_Index)
+
+                Case 0 :
+                    m_Card := 0;
+                EndCase;
+
+                Case 1 :
+                    m_Card := 1;
+                EndCase;
+
+                Case 2 :
+                    m_Card := 2;
+                EndCase;
+
+                Case 3 :
+                    m_Card := 3;
+                EndCase;
+
+                Case 4 :
+                    m_Card := 4;
+                EndCase;
+
+                Case 5 :
+                    m_Card := 5;
+                EndCase;
+
+                Case 6 :
+                    m_Card := 6;
+                EndCase;
+
+                Default :
+                    m_Card := 7;
+                EndCase;
+
+            EndSwitch;
+
+            If (m_Card != m_Index)
+                m_Helper.PrintErr("Switch failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            m_Index++;
+        EndWhile;
+        m_Output.Flush();
+
+
+        // And do a quick test with a char switch type
+        m_Char := 'A';
+        m_Card := 0;
+        Switch(m_Char)
+
+            Case 'A' :
+                m_Card := 1;
+            EndCase;
+
+            Case 'B' :
+                m_Card := 2;
+            EndCase;
+
+            Case 'C' :
+                m_Card := 3;
+            EndCase;
+
+            Default :
+                m_Card := 4;
+            EndCase;
+
+        EndSwitch;
+
+        If (m_Card != 1)
+            m_Helper.PrintErr("Char switch failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        //
+        //  Do another switch, but using an enumerated type as the switch
+        //  value. And test the ForEach for enumerations as well.
+        //
+        ForEach(m_EnumInd)
+            m_EnumTest := TestEnum.Value1;
+            Switch(m_EnumInd)
+                Case TestEnum.Value1 :
+                    m_EnumTest := TestEnum.Value1;
+                EndCase;
+
+                Case TestEnum.Value2 :
+                    m_EnumTest := TestEnum.Value2;
+                EndCase;
+
+                Case TestEnum.Value3 :
+                    m_EnumTest := TestEnum.Value3;
+                EndCase;
+
+                Case TestEnum.Value4 :
+                    m_EnumTest := TestEnum.Value4;
+                EndCase;
+
+                Default :
+                    m_EnumTest := TestEnum.Value5;
+                EndCase;
+            EndSwitch;
+
+            If (m_EnumInd != m_EnumTest)
+                m_Helper.PrintErr("Switch failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndForEach;
+        m_Output.Flush();
+
+        //
+        //  Test the ability for multiple case values to be used for a
+        //  single block.
+        //
+        m_Index := 0;
+        m_Card := 0;
+        While (m_Index < 8)
+            Switch(m_Index)
+
+                Case 0, 1, 2, 3 :
+                    m_Card += 1;
+                EndCase;
+
+                Case 4, 5, 6 :
+                    m_Card += 2;
+                EndCase;
+
+                Case 7 :
+                    m_Card += 3;
+                EndCase;
+
+                Default :
+                    m_Card += 1000;
+                EndCase;
+
+            EndSwitch;
+
+            m_Index++;
+        EndWhile;
+        If (m_Card != 13)
+            m_Helper.PrintErr("Switch failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+        m_Output.Flush();
+
+        // Test named literals as case values
+        m_Card := 0;
+        m_Index := 1;
+        While (m_Index < 5)
+            Switch(m_Index)
+
+                Case kCase1 :
+                    m_Card++;
+                EndCase;
+
+                Case kCase2 :
+                    m_Card++;
+                EndCase;
+
+                Case kCase3, kCase4 :
+                    m_Card++;
+                EndCase;
+
+                Default :
+                    m_Card++;
+                EndCase;
+            EndSwitch;
+            m_Index++;
+        EndWhile;
+        If (m_Card != 4)
+            m_Helper.PrintErr("Switch failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+        m_Output.Flush();
+
+        // Test a null while loop
+        m_Card := 10;
+        m_Index := 0;
+        While (m_Card < m_Index)
+        EndWhile;
+
+        // Test some switch fall through scenarios
+        If ((TestFallThrough(0) != 1)
+        ||  (TestFallThrough(1) != 3)
+        ||  (TestFallThrough(2) != 2)
+        ||  (TestFallThrough(3) != 1)
+        ||  (TestFallThrough(4) != 1))
+            m_Helper.PrintErr("Switch fall-through failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

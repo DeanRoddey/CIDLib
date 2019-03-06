@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - Generates some public types and constants
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Constants>
+
+            <CIDIDL:Constant CIDIDL:Name="strVal_MapPref"
+                             CIDIDL:Type="TString" CIDIDL:Value="Map_">
+                <CIDIDL:DocText>
+                    These are just some special values we look for in the grammar
+                    content.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strRule_TopRule"
+                             CIDIDL:Type="TString" CIDIDL:Value="TopRule"/>
+            <CIDIDL:Constant CIDIDL:Name="strPath_Root"
+                             CIDIDL:Type="TString" CIDIDL:Value="/"/>
+
+        </CIDIDL:Constants>
+
+        <CIDIDL:Types>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>

@@ -1,0 +1,111 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestLiterals;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Literals=
+    Char                kChar('A');
+    Char                kChar2('\x005C');
+    Card4               kCard4(813);
+    String              kString("String Value");
+    Boolean             kBool(False);
+    Int2                kInt2(-15);
+EndLiterals;
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    Int4                m_RetVal;
+    Card4               m_Card4;
+    String              m_String;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        // Check that the literals initialized correctly
+        If (kCard4 != 813)
+            m_Helper.PrintErr("Initial kCard4 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (kString != "String Value")
+            m_Helper.PrintErr("Initial kString value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (kBool)
+            m_Helper.PrintErr("Initial kBool value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (kInt2 != -15)
+            m_Helper.PrintErr("Initial kInt2 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (kChar != 'A')
+            m_Helper.PrintErr("Initial kChar value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (kChar2 != '\\')
+            m_Helper.PrintErr("Initial kChar value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do some interactions with objects
+        m_Card4 := kCard4;
+        If (m_Card4 != kCard4)
+            m_Helper.PrintErr("Literal assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_String := kString;
+        If (m_String != kString)
+            m_Helper.PrintErr("Literal assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Check access of a literal of another class
+        If (m_Helper.kTestLit)
+            m_Helper.PrintErr("External literal initial value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Helper.kTestLit2 != 831)
+            m_Helper.PrintErr("External literal initial value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And via the class name instead of via an instance
+        If (TestHelpers.kTestLit)
+            m_Helper.PrintErr("External literal initial value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (TestHelpers.kTestLit_Underscored != 1)
+            m_Helper.PrintErr("External literal value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+
+

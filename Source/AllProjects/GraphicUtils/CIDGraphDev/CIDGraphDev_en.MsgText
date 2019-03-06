@@ -1,0 +1,189 @@
+;
+; FILE NAME: CIDWnd_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 11/23/1996
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This is the message text file for this facility.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kGrDevErrs
+    MsgPref=kGrDevMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; General errors
+    errcGen_NoNullParent        1       The parent or owner window cannot be null
+
+    ; Bitmap errors
+    errcBmp_LoadFromModule      200     Could not load bitmap with id %(1) from module %(2)
+    errcBmp_CopyFailed          201     The copy of the bitmap failed
+    errcBmp_AssignFailed        202     The assignment of the bitmap failed
+    errcBmp_NoPalette           203     Cannot query the palette because the bitmap does not have one
+    errcBmp_CreateFailed        204     Creation of the bitmap object failed
+    errcBmp_Delete              205     Could not delete the bitmap handle
+    errcBmp_QueryInfo           206     Could not query the bitmap information from the system
+    errcBmp_StateMismatch       207     The bitmap info queried from the system did not match that previously gathered
+    errcBmp_LoadSysBitmap       208     Could not load system bitmap %(1)
+    errcBmp_UnknownCompression  209     %(1) is not a known bitmap compression id
+    errcBmp_InvalidHandle       210     The passed bitmap handle is not valid
+    errcBmp_CreateCompat        211     Could not create a device compatible bitmap. Size=%(1)
+    errcBmp_GetBits             212     Could not query bitmap bits into provided pixel array
+    errcBmp_Not32Bit            213     Only 32 bit bitmaps can be alpha blended
+    errcBmp_NoDirectAccess      214     This bitmap does not allow for direct pixel access
+    errcBmp_BadDepth            215     %(1) is not a valid image bit depth
+    errcBmp_NoPalColors         216     The image is palette based but no palette colors were provided
+
+    ; Clipboard errors
+    errcClip_OpenFailed         350     Could not open the clipboard, must be opened by another window
+    errcClip_Close              351     Could not close the clipboard
+    errcClip_UnsupportedFormat  352     '%(1)' is not a supported clipboard format
+    errcClip_CantRegisterType   353     Could not register CIDLib clipboard format '%(1)'
+    errcClip_Clear              354     Could not clear clipboard
+    errcClip_FormatNotAvail     355     The requested format was not on the clipboard
+    errcClip_CantAlloc          356     Could not allocate global memory to store clipboard data in
+    errcClip_CantStoreMem       357     The copied clipboard data could not be stored
+    errcClip_CantStoreHandle    358     The handle to the clipboard data could not be stored
+    errcClip_CantGetCBData      359     The clipboard seemed to hold the correct format data, but getting it failed
+
+    ; Graphics device related errors
+    errcDev_Select              500     Could not select %(1) into device
+    errcDev_NotSelected         501     The %(1) was not selected into any device
+    errcDev_AlreadySelected     502     The %(1) was already selected into a device
+    errcDev_DtorWhileSelected   503     The %(1) object cannot be selected while seleted into a device
+    errcDev_CantCreate          504     Could not create the %(1) object
+    errcDev_DeselectWrongObj    505     The previously selected %(1) device was not this device
+    errcDev_PolyLine            506     Could not draw a poly line. Vertex count=%(1)
+    errcDev_GetBounds           507     Could not get bounding area information from the graphics device
+    errcDev_QueryTextExtent     508     Could not query the text extent for the string
+    errcDev_BeginPath           509     Could not begin the path
+    errcDev_EndPath             510     Could not end the path
+    errcDev_BitBlit             511     Could not blit from source to destination device
+    errcDev_Box                 512     Could not render a box to a graphics device
+    errcDev_DrawFocus           513     Could not draw the focus box. Area=%(1)
+    errcDev_DrawCircle          514     Could not draw the circle. Center=%(1), Radius=%(2)
+    errcDev_DrawIcon            515     Could not draw the icon
+    errcDev_CreateMemDev        516     Could not create the compatible memory device
+    errcDev_DestroyMemDev       517     Could not clean up the memory device
+    errcDev_DeleteObj           518     Could not delete a '%(1)' object
+    errcDev_GetCurPos           519     Could not get the current device output position
+    errcDev_DrawLine            520     Could not draw a line
+    errcDev_MoveTo              521     Could not move current output position. New pos=%(1)
+    errcDev_DrawString          522     Could not draw the text string.
+    errcDev_EnableBounds        523     Could not enable/disable bounds accumulation on a graphics device
+    errcDev_ResetBounds         524     Could not reset the bounding area
+    errcDev_InvertArea          525     Could not invert the area: %(1)
+    errcDev_FillArea            526     Could not fill an area of graphics device. Area=%(1)
+    errcDev_FillPath            527     Could not fill path
+    errcDev_GradientFill        528     Could not do the gradient fill
+    errcDev_MoveRelative        529     Could not move relatively set the device output position. Ofs=%(1)
+    errcDev_SetClipRegion       530     Could not set the clip region on the device
+    errcDev_SetClipPath         531     Could not set the clip path on the device
+    errcDev_ClearClipRegion     532     Could not clear the clip region
+    errcDev_CreateRegion        533     Could not create region
+    errcDev_StrokeAndFillPath   534     Could not stroke and fill path
+    errcDev_StrokePath          535     Could not stroke path
+    errcDev_DrawBorder          536     A device error occured while drawing the border
+    errcDev_CreateFont          537     Could not create font. Facename=%(1)
+    errcDev_SaveState           538     Could not save the device's state
+    errcDev_RestoreState        539     Could not retore the device's state
+    errcDev_CreateInfoDev       540     Could not create an info graphic device. Driver/Device=%(1)/%(2)
+    errcDev_DestroyInfoDev      541     Could not destroy the info graphic device
+    errcDev_DeselBitmap         542     Could not deselect the bitmap from the device
+    errcDev_GetWindow           543     Could not get a window handle from a graphics device
+    errcDev_EndPaint            544     Could not release a paint mode graphics device handle
+    errcDev_CreatePrintDev      545     Could not create a print graphic device. Driver/Device=%(1)/%(2)
+    errcDev_DestroyPrintDev     546     Could not destroy the printer graphic device
+    errcDev_QueryRgnData        547     Could not query the region data
+    errcDev_SetBackMixMode      548     Could not set the background graphics mode
+    errcDev_SetMixMode          549     Could not set the mix mode. Mode=%(1)
+    errcDev_SetBackColor        550     Could not set the background color. Color=%(1)
+    errcDev_SetTextColor        551     Could not set the text color. Color=%(1)
+    errcDev_CreateWndDev        552     Could not get a graphics device handle from a window
+    errcDev_DestroyWndDev       553     Could not destroy the window based graphic device
+    errcDev_WndFromDev          554     Could not get the window associated with a graphics device
+    errcDev_SetTextExtra        555     Could not set the extra text attribute
+    errcDev_GetTextExtra        556     Could not get the extra text attribute
+    errcDev_SetBrushOrg         557     Could not set the brush origin
+    errcDev_CombineRegion       558     Could not combine regions
+    errcDev_OffsetRegion        559     Could not offset the region. Offset=%(1)
+    errcDev_GetRgnBounds        560     Could not the get region bounds
+    errcDev_StrandedFont        561     A window device dtor found an invalid handle with a selected font
+    errcDev_UnbalancedSel       562     The device had an unbalanced select/deselect for its %(1) objects
+    errcDev_StrokeRegion        563     Could not stroke the region
+    errcDev_GetClipRegion       564     Could not get clip region of device
+    errcDev_FillRegion          565     Could not fill the region
+    errcDev_SetPixel            566     Could not set the pixel at point %(1)
+    errcDev_StrokeArea          567     Could not stroke the area
+    errcDev_ScrollBits          568     Could not scroll device bits
+    errcDev_ExcludeRegion       568     Could not exclude area from current clip region
+    errcDev_IntersectRegion     569     Could not intersect area with current clip region
+
+    ; Font related errors
+    errcFont_GetCurMetrics      1400    Could not get the metrics for the currently set font
+    errcFont_GetCurSelAttrs     1401    Could not get the selection attributes for the currently set font
+    errcFont_NoneSet            1402    There is no font set on the device
+    errcFont_UnknownWeight      1403    '%(1)' is not a valid font weight name
+    errcFont_BadSelAttrsSize    1404    Expected %(1) bytes to stream in font select attrs, but got %(2)
+    errcFont_UnknownFamily      1405    %(1) is not a known font familty value
+    errcFont_UnknownDir         1406    %(1) is no a supported font direction
+
+    ; Icon errors
+    errcIcon_LoadFromModule     3000    Could not load icon with id %(1) from module %(2)
+    errcIcon_LoadFromFile       3001    Could not load icon from file %(1)
+    errcIcon_LoadSysIcon        3002    Could not load system icon %(1)
+    errcIcon_Delete             3003    Could not delete the icon handle
+    errcIcon_QueryInfo          3004    Could not query info about the icon
+    errcIcon_DupIcon            3005    Could not duplicate the icon
+    errcIcon_UnknownSize        3006    %(1) is not a valid EIconSizes value
+    errcIcon_ZeroRefCount       3007    The handle ref count was zero
+    errcIcon_InvalidHandle      3008    The passed icon handle was invalid
+    errcIcon_CreateFromBmp      3009    Could not create icon from bitmap
+    errcIcon_BadSrcFmt          3010    The source image must be true/truealpha based to create an icon
+
+    ; Platform errors
+    errcPlat_CannotXlat         5500    Cannot translate %(1) to a '%(2)' value
+
+    ; Resource errors
+    errcRes_BadResType          5800    Resource %(1).%(2) was not of the type requested
+
+    ; System info errors
+    errcSys_BadSysColor         6000    Bad system color. Id=%(1)
+    errcSys_CantGetFonts        6001    Could not query default system font information
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    ; Text for the text effects enum
+    midTextFX_None             17000    None
+    midTextFX_Gradient         17001    Gradient
+    midTextFX_GradientRefl     17002    Gradient Reflected
+    midTextFX_Reflected        17004    Reflected
+    midTextFX_GaussianBlur     17005    Gaussian Blur
+    midTextFX_DropShadow       17006    Drop Shadow
+
+END MESSAGES
+

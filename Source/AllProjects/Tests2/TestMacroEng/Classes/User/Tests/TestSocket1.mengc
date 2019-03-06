@@ -1,0 +1,85 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestSocket1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.MemBuf;
+    MEng.System.Runtime.DGramSocket;
+    MEng.System.Runtime.TextXCoder;
+    MEng.System.Runtime.IPEndPoint;
+EndImports;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    MemBuf              m_Buf;
+    Card4               m_Count;
+    DGramSocket         m_Sock;
+    IPEndPoint          m_EndPoint;
+    Card4               m_Timeout;
+    TextXCoder          m_XCoder;
+    String              m_Text;
+    TestHelpers         m_Helper;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_RetVal(0);
+        m_Buf(64, 1024);
+        m_XCoder("USASCII");
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        // Should not show up as bound yet
+        If (m_Sock.GetIsBound())
+            m_Helper.PrintErr("DG socket shouldn't bound yet", m_Output, $CurLine);
+            Return -1;
+        EndIf;
+
+        //
+        //  Bind to an automatically provided local end point.
+        //  Time service uses UDP protocol.
+        //
+        m_Sock.DefBindLocal(SockProtos.UDP);
+        If (!m_Sock.GetIsBound())
+            m_Helper.PrintErr("DG socket should be bound", m_Output, $CurLine);
+            Return -1;
+        EndIf;
+
+        //
+        //  Create an end point for the server we want to get
+        //  the time from. The time service uses port 13.
+        //
+        m_EndPoint.Set2("dawn", 13, IPAddrTypes.IPV4);
+
+        // Write a dummy byte to the server, doesn't matter what
+        m_Buf.PutCard1At(0, 0);
+        m_Sock.SendTo(m_EndPoint, m_Buf, 1);
+
+        // Read back the resulting packet
+        m_Timeout := 1000;
+        m_Count := m_Sock.ReadFrom(m_EndPoint, m_Timeout, m_Buf, 1024);
+
+        //
+        //  Transcode it from the US-ASCII format to our
+        //  internal Unicode and print it out.
+        //
+        m_XCoder.ConvertFrom(m_Buf, m_Count, m_Text);
+        m_Output.FmtStr("Time is: ");
+        m_Output.FmtStr(m_Text);
+        m_Output.DNewLn();
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

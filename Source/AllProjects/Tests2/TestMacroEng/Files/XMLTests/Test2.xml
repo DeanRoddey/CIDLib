@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Root Attr1="1" Attr2="2">
+    <Child1 Inst="1"/>
+    <Child2 Inst="1"/>
+    <Child3 Inst="1">
+        <Anthony Inst="1"/>
+        <Barbara Inst="1"/>
+        <Candy Inst="1"/>
+        <Danny Inst="1"/>
+        <Danny Inst="2"/>
+        <Enzo Inst="1"/>
+        <Enzo Inst="2"/>
+        <Anthony Inst="2">
+            <AnthonysChild Inst="1"/>
+            <AnthonysChild Inst="2"/>
+        </Anthony>
+        <Enzo Inst="3"/>
+        <Candy Inst="2"/>
+    </Child3>
+    <Child3 Inst="2"/>
+</Root>
+

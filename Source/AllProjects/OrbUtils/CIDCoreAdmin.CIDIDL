@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - This file defines the IDL for the most fundamental remote admin
+  - interface, which most servers based on the CIDLib Orb should use. They
+  - will also often provide another, application specific, interface in
+  - addition to this one. But by providing this basic interface, they will
+  - support basic administration via standard CIDLib tools.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:ClassIntf   CIDIDL:Name="CIDCoreAdmin"
+                        CIDIDL:InterfaceId="2117FF72EE8BD81D-F320AE6BEB1B2F0C">
+
+        <CIDIDL:Methods>
+
+            <!-- =============================================================
+              - This method allows the client to bring down the server. The
+              - server should exit in a timely manner.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="AdminStop">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - This method allows you to reasonably efficiently poll the
+              - values of stats previously gotten via c4QueryStats(). If it
+              - returns false, the query stamp is out of date and you need to
+              - call c4QueryStats again.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bPollValuesInScope">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+
+                <CIDIDL:Param CIDIDL:Name="strParScope" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bDirectOnly" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8QueryStamp" CIDIDL:Dir="In">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8PollStamp" CIDIDL:Dir="InOut">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="fcolIds" CIDIDL:Dir="Out">
+                    <CIDIDL:TFundVector CIDIDL:ElemType="tCIDLib::TCard4"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="fcolValues" CIDIDL:Dir="Out">
+                    <CIDIDL:TFundVector CIDIDL:ElemType="tCIDLib::TCard8"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - This method allows the client to query stats from a remote
+              - server. Its not something that should be polled fast in a
+              - loop by any means. Its more appropriate, for example, to show
+              - to the user who has selected 'Show Stats' from an icon that
+              - represents that server in some topological view or something
+              - of that nature. If polled, it shouldn't be polled too fast.
+              -
+              - You provide a parent scope, and will get back a list of names
+              - and values for each item under that scope. The names will
+              - be relative to the parent scope. You can indicate whether you
+              - want only direct children or all descendants. They will be
+              - in no particular order either way, so presentation order is
+              - your responsibility.
+              -
+              - It returns the number of items in the list of returned values.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="c4QueryStats">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+
+                <CIDIDL:Param CIDIDL:Name="strParScope" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colItems" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TStatsCacheItemInfo"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bDirectOnly" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8Stamp" CIDIDL:Dir="InOut">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - This method allows you to query some basic info about a remote
+              - server.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="QueryBasicInfo">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+
+                <CIDIDL:Param CIDIDL:Name="strHostName" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strProcName" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4CPUCount" CIDIDL:Dir="Out">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strOSInfo" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8StartTime" CIDIDL:Dir="Out">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - This method allows the client to set a logging level on a
+              - specific module within the target process. The passed module
+              - name is used to build up the path to the stat cache entry
+              - that holds the logging level for that module and sets it.
+              -
+              - The level one of the values Info, Warn, Failed, ProcFatal,
+              - SysFatal, Status. These are the values of the
+              - tCIDLib::Severities enumeration.
+              -
+              - This one can be handled by the generic implementation of the
+              - server side on behalf of all servers that implement this
+              - interface.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="SetModLogLevel">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strModule" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strLevel" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - This method allows the client to set the error trace flag for the
+              - indicated module within the target process.
+              -
+              - This one can be handled by the generic implementation of the
+              - server side on behalf of all servers that implement this
+              - interface.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="SetModLogTrace">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strModule" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bState" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+        </CIDIDL:Methods>
+
+    </CIDIDL:ClassIntf>
+
+</CIDIDL:Interface>
+
+

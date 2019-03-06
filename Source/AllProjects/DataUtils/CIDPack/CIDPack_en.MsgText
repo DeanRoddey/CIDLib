@@ -1,0 +1,67 @@
+;
+; FILE NAME: CIDPack_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 03/21/1015
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  This file and its contents are the property of Charmed Quark Software. It
+;  may not be redistributed in any modified form, or as part of any product
+;  other than the original CIDLib C++ Frameworks distribution file. Its
+;  contents may not be compiled into any other product, except when required
+;  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;  product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;  This is the Englihs message text file for the facility.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kPackErrs
+    MsgPref=kPackMsgs
+END CTRL
+
+
+; -----------------------------------------------------------------------------
+;  Error ids
+; -----------------------------------------------------------------------------
+ERRORS=
+
+    ; No error
+    errcNoError                     0       No error
+
+    ; Control structure errors
+    errcCtrl_BadHdr                 2000    The CIDPack package header %(1) is invalid
+    errcCtrl_BadFlHdr               2001    The CIDPack per-file header %(1) is invalid
+
+    ; Debug type errors
+    errcDbg_NotInTree               3000    A source file is not within the top level scope
+    errcDbg_EmptyRepPath            3001    A source file's relative path is empty
+    errcDbg_OutWithinSrc            3002    The target file cannot be within the source tree
+    errcDbg_NotACIDPack             3003    The source file is not a valid CIDPack file
+    errcDbg_SrcPackNotFound         3004    The source CIDPack file was not found
+    errcDbg_NotOrgSize              3005    The file did not decompress to original size
+    errcDbg_BadHash                 3006    The file hash did not match the stored one
+
+END ERRORS
+
+
+; -----------------------------------------------------------------------------
+;  Message ids
+; -----------------------------------------------------------------------------
+MESSAGES=
+
+    ; Some status msgs we dump out to the status stream
+    midStatus_FileStart             19000  "Compressing file: "
+
+END MESSAGES
+
+

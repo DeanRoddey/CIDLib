@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - We need some IDL generated enums to test most of the enumeration functionality
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum CIDIDL:Name="ETest1" CIDIDL:IncDec="Inc"
+                         CIDIDL:TextStreamMap="BaseName">
+                <CIDIDL:DocText>
+                    For testing contiguous enums
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Value1"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Value2"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Value3"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Value4"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Value5"/>
+
+                <CIDIDL:EnumSyn CIDIDL:Name="StartVal" CIDIDL:Value="Value2"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="EndVal" CIDIDL:Value="Value4"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>

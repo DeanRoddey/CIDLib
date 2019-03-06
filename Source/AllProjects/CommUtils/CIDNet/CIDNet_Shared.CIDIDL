@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  -   This IDL is just used to generate types and constants for
+  -   convenience (since it does some useful things for us) and to potentially
+  -   make them available to non-C++ code later.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <!-- Global types -->
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum    CIDIDL:Name="EHTTPAuthTypes" CIDIDL:XlatMap="BaseName"
+                            CIDIDL:LoadMap="BaseName" >
+                <CIDIDL:DocText>
+                    The built in authorization types for HTTP
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Basic"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Digest"/>
+            </CIDIDL:Enum>
+
+
+
+            <CIDIDL:Enum    CIDIDL:Name="EMailAuthTypes" CIDIDL:XlatMap="BaseName"
+                            CIDIDL:LoadMap="BaseName" >
+                <CIDIDL:DocText>
+                    The types of authentication supported by the SMTP client class.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SMTP"/>
+                <CIDIDL:EnumVal CIDIDL:Name="POPFirst"/>
+            </CIDIDL:Enum>
+
+
+
+            <CIDIDL:Enum    CIDIDL:Name="EHTTPCodes" CIDIDL:XlatMap="BaseName"
+                            CIDIDL:TextStreamMap="BaseName"
+                            CIDIDL:LoadMap="BaseName" >
+                <CIDIDL:DocText>
+                    The types of authentication supported by the SMTP client class.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Unknown"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Info"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Success"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Redirect"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ClientErr"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SrvErr"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum    CIDIDL:Name="EJSONVTypes" CIDIDL:XlatMap="BaseName"
+                            CIDIDL:LoadMap="BaseName" >
+                <CIDIDL:DocText>
+                    The possible types of values in a JSON value node.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Array"/>
+                <CIDIDL:EnumVal CIDIDL:Name="False"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Null"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Number"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Object"/>
+                <CIDIDL:EnumVal CIDIDL:Name="String"/>
+                <CIDIDL:EnumVal CIDIDL:Name="True"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum    CIDIDL:Name="ELogFlags" CIDIDL:XlatMap="BaseName"
+                            CIDIDL:AltTextSrc="Inline" CIDIDL:LoadMap="BaseName"
+                            CIDIDL:AltMap="AltText" >
+                <CIDIDL:DocText>
+                    Our CIDNet logging control flags.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="CoreParser" CIDIDL:AltText="CIDNet/CoreParser"/>
+                <CIDIDL:EnumVal CIDIDL:Name="HTTPClient" CIDIDL:AltText="CIDNet/HTTPClient"/>
+                <CIDIDL:EnumVal CIDIDL:Name="JSON" CIDIDL:AltText="CIDNet/JSON"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SMTP" CIDIDL:AltText="CIDNet/SMTP"/>
+                <CIDIDL:EnumVal CIDIDL:Name="XMLURLEntitySrc" CIDIDL:AltText="CIDNet/XMLURLEntitySrc"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum    CIDIDL:Name="ENetPReadRes" 
+                            CIDIDL:TextStreamMap="BaseName">
+                <CIDIDL:DocText>
+                    Values returned from the low level core parser msg reader
+
+                    THERE IS A method, THTTPClient::c4ReadResMsg, that maps these to
+                    status and texts. Update that if you change this!
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Success"/>
+                <CIDIDL:EnumVal CIDIDL:Name="BadFirstLine"/>
+                <CIDIDL:EnumVal CIDIDL:Name="BadHdrLine"/>
+                <CIDIDL:EnumVal CIDIDL:Name="BadLineCont"/>
+                <CIDIDL:EnumVal CIDIDL:Name="BadProtoVer"/>
+                <CIDIDL:EnumVal CIDIDL:Name="BufTooSmall"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ContLen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="InvalidMsg"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PartialMsg"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Timeout"/>
+            </CIDIDL:Enum>
+
+
+
+            <CIDIDL:Enum    CIDIDL:Name="EReadTypes" >
+                <CIDIDL:DocText>
+                    In some cases we have some code that might be used both from the client
+                    and the server side. So we need to indicate which end we are calling it
+                    from.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Client"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Server"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+
+

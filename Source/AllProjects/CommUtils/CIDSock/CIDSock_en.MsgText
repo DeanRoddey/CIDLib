@@ -1,0 +1,208 @@
+;
+; FILE NAME: CIDSock_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 12/06/98
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kSockErrs
+    MsgPref=kSockMsgs
+END CTRL
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    ; No error occured
+    errcNoError                 0       No error occured
+
+    ; General errors
+    errcGen_ProtoNotImplemented 1       The %(1) protocol is not implemented yet
+
+    ; Enum errors
+    errcEnum_BadValue           800     '%(1)' is not a valid value for type: %(2)
+
+    ; Listener engine errors
+    errcLEng_AlreadyRunning     1500    The listner engine is already running
+    errcLEng_NoPorts            1501    Both ports were zero, nothing to do
+    errcLEng_InitFailed         1502    Could not initialize listener engine on port %(1)
+    errcLEng_ListenFailed       1503    An exeption occurred while listening on port %(1)
+    errcLEng_CantQueue          1504    Could not queue up connection from %(1) to port %(2)
+
+    ; Object Pipe errors
+    errcPipe_NullSocket         4000    The pipe socket cannot be null
+    errcPipe_AlreadySet         4001    The object is already set
+    errcPipe_PacketHdrSend      4002    Failed to send a packet header. Seq #%(1)
+    errcPipe_ObjectHdrSend      4003    Failed to send the object header
+    errcPipe_PacketRead         4004    Failed to read packet. Seq #%(1)
+    errcPipe_PacketSend         4005    Failed to send packet. Seq #%(1)
+    errcPipe_InvalidPacketHdr   4006    Recieved an invalid packet header
+    errcPipe_InvalidObjectHdr   4007    Recieved an invalid packet header
+    errcPipe_GotBadPLSize       4008    The recieved header's payload size is too large. Size=%(1)
+    errcPipe_WrongTargetType    4009    The provided target object is of type %(1), but recieved type %(2)
+    errcPipe_NotAllObject       4010    The object header indcated %(1) bytes, but only got %(2)
+    errcPipe_BadSeqNumber       4011    Expected packet sequence #%(1), but got #%(2)
+    errcPipe_SendPacketCount    4012    Expected to end on packet #%(1), but ended on #%(2)
+    errcPipe_PacketHdrRead      4013    Failed to read a packet header. Seq #%(1)
+    errcPipe_ObjectHdrRead      4014    Failed to read the object header
+
+    ; Pinger errors
+    errcPing_Start              4125    Could not start a new ping session to target '%(1)'
+    errcPing_SendReq            4126    Could not send a ping request to target=%(1)
+    errcPing_Wait               4127    An error occurred while waiting for a ping reply for target '%(1)'
+    errcPing_End                4128    An error occurred while cleaning up ping session
+    errcPing_CancelWait         4129    An error occurred while cancelling a reply for target '%(1)'
+    errcPing_NotWaiting         4130    The pinger (%(1)) is not currently waiting for a reply
+    errcPing_NotReady           4131    The pinger object is not currently started
+
+    ; Socket errors
+    errcSock_Create             5000    Could not create the socket
+    errcSock_QueryStatus        5001    Could not query the socket's status
+    errcSock_QuerySockOpt       5002    Could not query the socket option: %(1)
+    errcSock_SetSockOpt         5003    Could not set the socket option: %(1)
+    errcSock_Receive            5004    Socket read operation failed
+    errcSock_Send               5005    Socket write operation failed
+    errcSock_BindDefault        5006    Local default bind operation failed. Port=%(1)
+    errcSock_Shutdown           5007    Shutdown operation failed.
+    errcSock_Connect            5008    Connect operation failed. Tried to connect to: %(1)
+    errcSock_Close              5009    Could not close the socket down
+    errcSock_Destruct           5010    An error occurred while destructing socket object
+    errcSock_Listen             5011    An error occured while listening for a client connection
+    errcSock_Accept             5012    An error occured while accepting a new client connection
+    errcSock_NoServerSet        5013    Cannot create a stream, because no server name was available
+    errcSock_NotAllData         5014    Could not read or write all requested bytes
+    errcSock_BufTooSmall        5015    The max buffer size (%(1)) is smaller than the bytes requested (%(2))
+    errcSock_QueryLocalBind     5016    Could not query local bound endpoint information
+    errcSock_ConnAborted        5017    The connect was aborted by the other side
+    errcSock_AlreadyShutdown    5018    The socket has already been shutdown
+    errcSock_AlreadyClosed      5019    The socket has already been closed (on this side.)
+    errcSock_AlreadyBound       5020    The socket has already been bound to endpoint: %(1)
+    errcSock_AlreadyConnected   5021    The socket has already been connected
+    errcSock_ReceiveFrom        5022    Datagram receive from operation failed
+    errcSock_SendTo             5023    Datagram send operation failed, writing to: %(1)
+    errcSock_NotValidForType    5024    %(1) is not valid for a %(2) socket
+    errcSock_NotConnected       5025    The socket is not currently connected
+    errcSock_Wait               5026    Failure trying to wait for data to arrive
+    errcSock_QueryRemotePoint   5027    Could not query the remote end point of the supposedly connected socket
+    errcSock_OpenCheckFailed    5028    Could not check whether the socket was open
+    errcSock_Unsupported        5029    An unsupported operation was attempted
+    errcSock_Timeout            5030    The operation timed out
+    errcSock_NetworkUnreachable 5031    The network is unreachable
+    errcSock_NetworkDown        5032    The network is down
+    errcSock_ConnRefused        5033    The connection was refused
+    errcSock_HostUnreachable    5034    The host was unreachable
+    errcSock_NameTooLong        5035    The name was too long
+    errcSock_BadMSelCount       5036    A max of %(1) sockets can be passed to bMultiSelect(), but got %(2)
+    errcSock_MultiSelect        5037    An error occured while doing a multi-select call
+    errcSock_WaitConnect        5038    An error occured while waiting for a connection
+    errcSock_TargetBufOverflow  5039    The target buffer was overflowed!
+    errcSock_ZeroBytesRequested 5040    Zero bytes were requested for a read
+    errcSock_DGBufTooSmall      5041    The datagram size will not fit in the provided buffer.
+    errcSock_AssocEvent         5042    Could not associate read event with the socket
+    errcSock_ClearEvent         5043    Could not clear the read event from the socket
+    errcSock_OtherSideBusy      5044    Other side (%(1)) is too busy to accept data
+    errcSock_EnumEvents         5045    Enumeration of socket events failed
+    errcSock_ListenerSetupErr   5046    Could not set up listener on IP address %(1)
+    errcSock_ListAlreadyInit    5047    The listener object was already initialized
+    errcSock_NoListenIntf       5048    Could not bind any listening interfaces on %(1)
+    errcSock_BindRemote         5049    Could not bind local for target %(1), port=%(2)
+    errcSock_BindListen         5050    Could not listening bind for local address %(1)
+    errcSock_JoinMCGrp          5051    Could not joing multicast group %(1)
+
+    ; Socket stream errors
+    errcStrm_ResetNotSupported  5200    The reset operation is not supported for socket based streams
+
+    ; TCP/IP errors
+    errcTCP_IPAddrIndex         5500    Invalid IP address index. Index=%(1), Max=%(2)
+    errcTCP_AliasIndex          5501    Invalid alias index. Index=%(1), Max=%(2)
+    errcTCP_NoIPAddrs           5502    There are no IP addresses to access
+    errcTCP_NoAliases           5503    There are no host aliases to access
+    errcTCP_CantConvertIPAddr   5504    Cannot convert the IP address to text format
+    errcTCP_BadByteIndex        5505    The passed byte index (%(1)) was invalid for this address. Size=%(2)
+    errcTCP_CantConvertTextAddr 5506    Cannot convert the textual address '%(1)' to an IP address
+    errcTCP_QueryHostInfo       5507    Cannot query the host TCP/IP information
+    errcTCP_GetIPHostName       5508    Could not get the IP host name of this workstation
+    errcTCP_GetIPVersion        5509    Could not get the IP version information
+    errcTCP_BadEndPointFmt      5510    The encoded end point must be in the form "addr:port"
+    errcTCP_GetRemIPHostName    5511    Could not get the IP host name of host at IP: %(1)
+    errcTCP_BadMACAddr          5512    A MAC address must be 12 hex digits. Got '%(1)'
+    errcTCP_HWAddrBufSz         5513    The hardware address buffer is too small. Got %(1), but needed %(2)
+    errcTCP_QueryAdapterInfo    5514    Cannot query the host network adapter information
+    errcTCP_QueryAdapterByName  5515    Could not query host adaptor info for adapter '%(1)'
+    errcTCP_QueryDefLocalAddr   5516    Could not query the default local IP address
+    errcTCP_QueryHostAddrs      5517    Could not query available host address
+    errcTCP_BadIPAddrSz         5518    %(1) is not a valid IP address data size
+
+    ; URL errors
+    errcURL_ExpectedSlash       7800    Expected to see a slash at offset %(1)
+    errcURL_ExpectedHost        7801    Expected to see a host name at offset %(1)
+    errcURL_UnknownProto        7802    %(1) is not a valid EProtos value
+    errcURL_NotFQ               7803    The URL is not completely qualified
+    errcURL_BadCharRef          7804    Expected two hex digits after % character
+    errcURL_ProtoNameInitErr    7805    There are more protocol types than names to init with
+    errcURL_TooManyUps          7806    The relative URL has more leading '..' parts than the parent URL can provide
+    errcURL_BaseNotFull         7807    A base URL must be fully qualified
+    errcURL_SpaceNotAllowed     7808    Whitespace is not allowed in a URL
+    errcURL_EmptyQPName         7809    Empty query parameter names are not legal
+    errcURL_BadPort             7810    '%(1)' is not a valid port number
+    errcURL_UnexpectedEnd       7811    The URL ended unexpectedly
+    errcURL_BadProtocolCh       7812    Periods are not valid protocol characters
+    errcURL_EmptyURL            7813    The URL text is empty
+    errcURL_NotRelative         7814    The URL is not relative
+    errcURL_MissingEndBracket   7815    No end bracket for bracketed IP addres
+    errcURL_BadPortFmt          7816    The port portion must be in the form :portnum
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+;  Message ids (i.e. not for errors)
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+    ; Messages used by CIDSock_Socket.Cpp
+    midSock_ReadOnShutdown     15700    Reading remaining data
+    midSock_Stream             15701    stream
+    midSock_Datagram           15702    datagram
+    midSock_DontRoute          15703    dontroute
+    midSock_Linger             15704    linger
+    midSock_KeepAlive          15705    keepalive
+    midSock_MaxMsgSize         15706    maxmsgsz
+    midSock_RecvBufSize        15707    recvbufsz
+    midSock_ReuseAddr          15708    reuseaddr
+    midSock_SendBufSize        15709    sendbufsz
+    midSock_Nagle              15710    nagle
+    midSock_AllowBroadcast     15711    broadcast
+
+    ; Messages used by CIDSock_SMTPClient.Cpp
+    midSMTP_Msg                15800    Message
+    midSMTP_To                 15801    To
+    midSMTP_From               15802    From
+
+    ; URL messages used by CIDSock_URL.Cpp
+    midURL_UnexpectedEnd       16800    Unexpected end of URL
+    midURL_UnknownProto        16801    The URL protocol '%(1)' is not supported
+    midURL_ExpectedPortNum     16802    Expected a decimal radix port number after host:
+    midURL_IllegalChar         16803    Found an illegal character in the URL
+    midURL_InvalidPortNum      16804    Port number must be in the form :d, where d is a set of decimal digits
+
+END MESSAGES
+

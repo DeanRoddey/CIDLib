@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - This file defines the IDL for the CIDLib Configuration Server interface.
+  - It allows client applications to store configuration data in a centralized
+  - way. Any distributed system is going to need to allow for centralized
+  - maintenance of and access to configuration data, so that it doesn't have
+  - to be stored on each computer, and therefore updated on each computer.
+  - And even locally stored data will often be needed and/or shared by multiple
+  - processes running on the same process.
+  -
+  - The config server is based on the CIDLib Object Store engine (the
+  - CIDObjStore facility), so it uses the object store's key paradigm, which
+  - is a hierarchical path. It is actually a very thin wrapper around the
+  - object store. It does though, add some semantics onto the underlying
+  - object store, which allows for complete freedom of access.
+  -
+  - This API is not directly exposed to the outside world. We wrap a class
+  - interface around it, because there is some magic that needs to be done
+  - on the client side. The object store works in terms of streamable objects
+  - (which implement the MStreamable mixin interface), but we cannot use that
+  - in the IDL interface. So our client wrapper class (in CIDOrbUC), provides
+  - these APIs, and just reads/writes memory buffer objects. It also sends
+  - class info along with objects written. The server stores objects that
+  - contain both the stored object data and the class type info, which allows
+  - for type safe read/write operations.
+  -
+  - Note that we use the special THeapBuf parameter type, which spit out
+  - a magic buffer size parameter, which makes things much more efficient
+  - since only the actual bytes in use in the buffer get streamed.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:ClassIntf   CIDIDL:Name="CIDCfgSrv"
+                        CIDIDL:InterfaceId="9BEA088A1BD33D3A-FB3EA0B995167E0E">
+
+        <!-- =================================================================
+          - Define some class specific constants
+          -  =================================================================
+          -->
+        <CIDIDL:Constants>
+            <CIDIDL:Constant CIDIDL:Name="strScope"
+                             CIDIDL:Type="TString"
+                             CIDIDL:Value="/CIDLib/CfgSrv/%(h)"/>
+
+            <CIDIDL:Constant CIDIDL:Name="strAdminBinding"
+                             CIDIDL:Type="TString"
+                             CIDIDL:Value="/CIDLib/CfgSrv/%(h)/CoreAdmin"/>
+
+            <CIDIDL:Constant CIDIDL:Name="strBinding"
+                             CIDIDL:Type="TString"
+                             CIDIDL:Value="/CIDLib/CfgSrv/%(h)/RepoObj"/>
+        </CIDIDL:Constants>
+
+
+        <!-- =================================================================
+          - Define the interface methods
+          -  =================================================================
+          -->
+        <CIDIDL:Methods>
+
+            <!-- =============================================================
+              - Adds an object to the object store. If the key already exists,
+              - then an exception will be thrown. So it is for unconditionally
+              - adding objects. It's version number will be 1 upon successful
+              - return.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="AddObject">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In">
+                    <CIDIDL:THeapBuf/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4Reserve" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Conditionally adds or updates an object in the store. If the
+              - object exists, it will be updated. If it doesn't exist, it is
+              - added. The return indicates if it was added. If false, it wasn't
+              - added, just updated.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bAddOrUpdate">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4Version" CIDIDL:Dir="Out">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In">
+                    <CIDIDL:THeapBuf/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4Reserve" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Returns the names of all objects under the indicated scope,
+              - recursively.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bAllObjectsUnder">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strStartScope" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colPathsFound" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TString"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Delete an object if it exists. I.e. it's a conditional delete,
+              - unlike DeleteKey() which will throw if the key doesn't exist.
+              - The return indicates if it was deleted or not.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bDeleteObjectIfExists">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Check to see if a key exists anywhere under a given starting scope
+              - in the config repo. If so, it returns the full path to it.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bFindNameUnder">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strName" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strStartScope" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colPathsFound" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TString"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Check to see if a key exists. Of course, this is only advisory
+              - since another process could delete it right after you check. We
+              - have a second version that also returns the version number if it
+              - exists.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bKeyExists">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <CIDIDL:Method CIDIDL:Name="bKeyExists2">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4Version" CIDIDL:Dir="Out">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Reads an object from the store. If the passed in version is the
+              - same as the existing object, nothing will be streamed back. Else,
+              - the object is streamed back and the version is updated to reflect
+              - the version of the object returned.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bReadObject">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="mbufToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:THeapBuf/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4Version" CIDIDL:Dir="InOut">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Enumerate all of the objects in the indicated scope. It doesn't
+              - return sub-scopes, only objects. The return indicates the number
+              - of objects found. If the key doesn't exist, it throws.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="c4QueryObjectsInScope">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strParScope" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TString"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Enumerate all of the sub-scopes under the indicated scope. It doesn't
+              - return objects, only scopes. The return indicates the number
+              - of scopes found. If the key doesn't exist, it throws.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="c4QuerySubScopes">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strParScope" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TString"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Unconditionally updates an object in the store. If the
+              - object does not exist, and exception is thrown. The return
+              - value is the new version number of the object.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="c4UpdateObject">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In">
+                    <CIDIDL:THeapBuf/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Unconditionally deletes an object from the store. If the key
+              - doesn't exist, it throws an exception.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="DeleteObject">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <!-- =============================================================
+              - Deletes all objects in a scope.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="DeleteScope">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strScopeKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - This is similar to bReadObject above, but in this case, it will
+              - not throw if the key does not exist. Instead, it returns an
+              - enumerated value that can indicate new data, no new data, or
+              - the key doesn't exist.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="eReadObject">
+                <CIDIDL:RetType>
+                    <CIDIDL:Enumerated CIDIDL:Type="tCIDLib::ELoadRes"/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="mbufToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:THeapBuf/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4Version" CIDIDL:Dir="InOut">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bThrowIfNot" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+        </CIDIDL:Methods>
+
+    </CIDIDL:ClassIntf>
+
+</CIDIDL:Interface>
+

@@ -1,0 +1,17 @@
+{
+    "id":10
+    ,"jsonrpc":"2.0"
+    ,"result":
+    {
+        "ListItem.FileNameAndPath":"K:\\"
+        ,"ListItem.Label2":""
+        ,"ListItem.Property(Fanart_Image)":""
+        ,"Listitem.Label":"ACRONIS REC"
+        ,"Listitem.Thumb":""
+        ,"System.CurrentControl":"[ACRONIS REC]"
+        ,"System.CurrentWindow":"Pictures"
+        ,"System.ScreenMode":"Windowed"
+        ,"System.ScreenResolution":"622x410 - Windowed (25.10 fps)"
+    }
+}
+

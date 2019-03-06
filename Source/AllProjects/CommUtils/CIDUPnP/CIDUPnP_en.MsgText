@@ -1,0 +1,76 @@
+;
+; FILE NAME: CIDUPnP.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 10/15/20110
+;
+; COPYRIGHT: 1992..2001, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kUPnPErrs
+    MsgPref=kUPnPMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;   Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; Device errors
+    errcDev_QueryServices       100     Could not query the services of UPnP device '%(1)'
+    errcDev_GetAttr             101     Could not get the %(1) attribute of UPnP device '%(2)'
+    errcDev_GetSvc              102     Could not get service '%(1)' of UPnP device '%(2)'
+    errcDev_QueryChildDevs      103     Could not query the child devices of UPnP devie '%(1)'
+    errcDev_TypeNotFound        104     No device of type '%(1)' was found in the provided list
+    errcDev_GetRootDev          105     Could not get the root UPnP device
+    errcDev_QueryDevInfo        106     Could not query basic UPnP device info
+    errcDev_AlreadyRoot         107     The current UPnP device is already the root device
+    errcDev_ParseDevXML         108     Could not parse XML content for device '%(1)'
+    errcDev_NoServices          109     No services are listed for device '%(1)'
+
+    ; Debug errors
+    errcDbg_NotInit             200     The %(1) object has not been initialized yet
+    errcDbg_WrongType           201     The passed UPnP %(1) is not the right type for a %(2) object
+
+    ; Finder errors
+    errcFnd_NoDevWithUID        300     Could not find a UPnP device with UID '%(1)'
+    errcFnd_FindDevByType       301     An error occurred while finding UPnP devices with type '%(1)'
+    errcFnd_FindByID            302     An error occurred while looking up device with id '%(1)'
+    errcFnd_StartAsync          304     Async finder '%(1)' could not start new search '%(2)'
+    errcFnd_SeachNotFound       305     Async finder '%(1)' does not have a search named '%(2)'
+    errcFnd_DupSearchName       306     Async finder '%(1)' already has a search named '%(2)'
+    errcFnd_StopSearch          307     Async finder '%(1)' could not stop search named '%(2)'
+
+    ; Service errors
+    errcSvc_GetAttr             800     Could not get the %(1) attribute of UPnP service '%(2)'
+    errcSvc_InvokeAction        801     Action invocation %(1) failed on service id %(2). Info=%(3)
+    errcSvc_TooManyInParms      802     The passed action input parm list was too large. Cmd=%(1)
+    errcSvc_WrongOutParmCnt     803     The %(1) action should have returned %(2) values, but returned %(3) instead
+    errcSvc_InvalidOutParms     804     The values returned for the %(1) action were not valid
+    errcSvc_ValNotImpl          805     The %(1) value was not implemented on service %(2). Cmd=%(3)
+    errcSvc_QueryStateVar       806     Could not query the value of state variable %(1)
+    errcSvc_SrvRepXMLParse      807     The '%(1)' XML reply could not be parsed
+    errcSrv_TypeNotFound        809     No service of type '%(1)' was found in the provided list
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;   Messages
+; ----------------------------------------------------------------------------
+

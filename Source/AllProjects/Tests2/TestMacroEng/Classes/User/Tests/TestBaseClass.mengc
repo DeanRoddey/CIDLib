@@ -1,0 +1,59 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestBaseClass;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+EndImports;
+
+Types=
+    // Declare a test enum
+    Enum=TestEnum
+        Value1 : "Text for value 1";
+        Value2 : "Text for value 2";
+        Value3 : "Text for value 3";
+        Value4 : "Text for value 4";
+    EndEnum;
+EndTypes;
+
+Literals=
+    Card4       kTestCard(4914);
+EndLiterals;
+
+
+Members=
+    Card4       m_TestCard;
+EndMembers;
+
+
+Methods=[Public,NonFinal]
+
+    Method Test([InOut] String Result) Returns Boolean
+    Begin
+        If (!Result.IsEmpty())
+            Result.Append(",");
+        EndIf;
+        Result.Append("BaseClass");
+        Return True;
+    EndMethod;
+
+EndMethods;
+
+Methods=[Public,Required]
+
+    Method CallMe() Returns Boolean
+    Begin
+        Return True;
+    EndMethod;
+
+EndMethods;
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+EndMethods;
+
+

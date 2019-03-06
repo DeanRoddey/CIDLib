@@ -1,0 +1,99 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestBoolean1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Boolean             m_Test1;
+    Boolean             m_Test2;
+    Boolean             m_Test3;
+    Int4                m_RetVal;
+    TestHelpers         m_Helper;
+
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_Test1(False);
+        m_Test2(True);
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        // Check that the initializers set the values correctly
+        If (m_Test1 != False)
+            m_Helper.PrintErr("Initial m_Test1 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Test2)
+            m_Helper.PrintErr("Initial m_Test2 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test3)
+            m_Helper.PrintErr("Initial m_Test3 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.Negate();
+        If (m_Test1 != m_Test2)
+            m_Helper.PrintErr("Negate failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test some logical ops
+        m_Test1 := False;
+        m_Test2 := False;
+        m_Test3 := True;
+        If (m_Test1 | m_Test2)
+            m_Helper.PrintErr("OR operation failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!(m_Test1 | m_Test3))
+            m_Helper.PrintErr("OR operation failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test3 ^ True)
+            m_Helper.PrintErr("XOR operation failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_Test1 ^ True) != True)
+            m_Helper.PrintErr("XOR operation failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test some logical assignments
+        m_Test1 |= m_Test3;
+        If (!m_Test1)
+            m_Helper.PrintErr("OR equal operation failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 &= m_Test2;
+        If (m_Test1)
+            m_Helper.PrintErr("AND equal operation failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

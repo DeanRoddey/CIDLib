@@ -1,0 +1,128 @@
+;
+; FILE NAME: CIDNet_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 02/05/2000
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kNetErrs
+    MsgPref=kNetMsgs
+END CTRL
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    ; No error occured
+    errcNoError                 0       No error occured
+
+    ; Async HTTP
+    errcAHTTP_Busy              1000    There is an active async HTTP request. Name=%(1)
+    errcAHTTP_UnknownExcept     1001    Unknown exception during async HTTP request. Name=%(1)
+
+    ; HTTP client errors
+    errcHTTP_BadStatus          2000    No/invalid HTTP return status line was found
+    errcHTTP_BadStatusCode      2001    Invalid HTTP status code '%(1)'
+    errcHTTP_BadRequest         2005    %(1) is not a valid client request type
+    errcHTTP_BadCharRef         2008    An invalid char reference was found during expansion. Starts at character %(1)
+    errcHTTP_UnknownAuthType    2009    '%(1)' is not a known HTTP authentication type
+    errcHTTP_UnexpectedQuote    2010    A quotation mark is not valid here
+    errcHTTP_ExpectedComma      2011    A comma was expected here
+    errcHTTP_UnexpectedEOL      2012    The input line ended unexpectedly
+    errcHTTP_SSLGetFailed       2013    The SSL GET operation failed
+    errcHTTP_ReqFailed          2014    HTTP client request failed
+    errcHTTP_UnsupportedProto   2015    Only HTTP/HTTPS protocols are supported
+
+    ; JSON errors
+    errcJSON_BadFormat          2100    JSON format error. Expected to see %(1) but got %(2). Line/Col=%(3)/%(4)
+    errcJSON_BadAttrInd         2101    %(1) is not a valid attribute index for the target JSON node
+    errcJSON_BadChildInd        2102    %(1) is not a valid child index for the target JSON node
+    errcJSON_BadChar            2103    %(1) is not a valid character at this location
+    errcJSON_TrailingData       2104    There was illegal content after the last closing brace.
+    errcJSON_NotANodeValue      2105    The JSON value is not a node type
+    errcJSON_ValueInValue       2106    Cannot nest a JSON value node in another value node
+    errcJSON_TypeMismatch       2107    The JSON value type is not compatible with the access requested
+    errcJSON_NotASimpleValue    2108    The JSON value node is not a simple value type
+    errcJSON_EndOfStream        2109    Hit end of input while waiting for %(1)
+    errcJSON_NameNotFound       2110    Could not find a child node named '%(1)'
+
+    ; Multi-part MIME processing
+    errcMPMIME_NoBoundary       2200    No multi-part boundary string was provided
+    errcMPMIME_BadHeader        2202    Bad part header in part #%(1)
+    errcMPMIME_Truncated        2203    Multi-part content ended before expected
+    errcMPMIME_NotMultiPart     2204    The passed content is not a multipart/* type
+
+    ; Core network protocol parser
+    errcNetP_Success            2300    OK
+    errcNetP_NoReply            2301    No reply to client net parser request
+    errcNetP_Timeout            2302    Timed out waiting for message
+    errcNetP_UnexpectedEOS      2303    Unexpected end of stream
+    errcNetP_BadHdrContinue     2304    Saw header line continuation before seeing a valid header line
+    errcNetP_BadHdrLine         2305    Header line had no key/value separator
+    errcNetP_BufTooSmall        2306    The target buffer's max size is too small for the content
+    errcNetP_PartialMsg         2307    Received a partial message
+    errcNetP_InvalidMsg         2308    Recieved invalid msg data
+    errcNetP_BadFirstLine       2309    The first msg line was not correct
+    errcNetP_UnsupTransEncoding 2310    '%(1)' is not a supported transfer encoding
+    errcNetP_BadChunkSize       2311    Got an invalid chunked transfer size line
+    errcNetP_ChunkEOS           2312    Hit end of stream while reading in data chunk
+    errcNetP_NoChunkTerm        2313    Data chunk did not have terminating CR/LF
+    errcNetP_BadChunkSizeTerm   2314    The data chunk size line was not property terminated
+    errcNetP_BadProtoVer        2315    Invalid protocol version
+    errcNetP_ContLen            2316    Invalid content length usage
+    errcNetP_UnkownErr          2317    An unknown error occurred
+
+    ; SMTP client errors
+    errcSMTP_NotComplete        5100    The %(1) field must be provided to make the message complete
+    errcSMTP_ProtoError         5101    An SMTP error occured. Error=%(1)
+    errcSMTP_TempProtoError     5102    A transient SMTP error occured, try again later. Error=%(1)
+    errcSMTP_BadReplyCode       5104    The SMTP server returned an invalid status code. Code=%(1)
+    errcSMTP_QueueEmpty         5105    The outgoing queue is empty
+    errcSMTP_Timeout            5106    The server did not reply to the '%(1)' request
+    errcSMTP_BadColWidth        5107    The column width must from 32 to 4196
+    errcSMTP_MsgError           5108    While sending a message, the '%(1)' event failed. Response=%(2)
+    errcSMTP_MsgDataError       5109    Failed to send the data for the message. Response=%(1)
+    errcSMTP_MsgTermError       5110    The end of message data event failed. Response=%(1)
+    errcSMTP_NotSingleLine      5111    Expected to get a single line response to %(1)
+    errcSMTP_UnknownAuthReply   5112    Got an unknown response to the authentication process (%(1) - %(2))
+    errcSMTP_NoAuthData         5113    No user name or password was set for authentication
+    errcSMTP_AuthFailed         5114    Mail authentication failed. Reason=%(1)
+    errcSMTP_NoConnectLines     5115    The server did not respond to connection with header lines
+    errcSMTP_SrvNotSecure       5117    The server does not support secure connections
+    errcSMTP_BadlyFormedLine    5118    Invalid format for SMTP server response
+    errcSMTP_StartTLSRejected   5119    The server rejected STARTTLS request. Reason=%(1)
+    errcSMTP_TLSHelloFailed     5120    The post-TLS negotiation EHLO failed. Reason=%(1)
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+;  Message ids (i.e. not for errors)
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+    ; Messages used by the SMTP client and possibly others
+    midSMTP_Msg                16000    Message
+    midSMTP_To                 16001    To
+    midSMTP_From               16002    From
+
+END MESSAGES
+

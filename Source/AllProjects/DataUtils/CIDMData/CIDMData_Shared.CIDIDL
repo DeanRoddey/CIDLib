@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - This one is just to generate some constants and types that need to
+  - be shared with non-C++ client apps, so that they don't have to replicate
+  - all of them, and to provide us with to/from text conversion methods.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Constants>
+
+            <CIDIDL:Constant CIDIDL:Name="strAttrLim_Required"
+                             CIDIDL:Type="TString" CIDIDL:Value="[Required]">
+                <CIDIDL:DocText>
+                    Attributes passed to the attribute editor window (in CIDWUtils)
+                    can have limit info provided, to help it do more validation
+                    generically. Some special values can be used that don't reprsent
+                    actual limits.
+
+                    [Required]  - For string values, no particular limits but it cannot be
+                                    empty. It will be limited to a single line.
+                    [SingleLine]- For string values, indicates it is limited to a single line
+                                    of text, else it's allowed to be multi-line.
+                    [SingleReq] - Is required and must be single line.
+                    Area:       - For Point types, limits the area where the point can
+                                    be. It's followed by an area in standard x,y,cx,cy form.
+                    Chars:      - For Char types. Indicates a list of valid characters, no
+                                    spaces or other whitespace unless those are valid chars.
+                    Enum:       - Followed by a comma separated list of values, of which
+                                    and empty value could be one, to allow for 'no selection'.
+                    FileSel:    - Followed by a file type description, another colon, then
+                                    a comma separated list of wild cards.
+                    Range:      - Followed by two comma separated numbers that define the
+                                    min and max values, only useful for Card/Int or
+                                    Card/Int ranges. For the latter indicates the max
+                                    range that the range has to be within.
+                    Size:       - Useful only for Size attributes. It is followed by two
+                                    sets of size values: cx,cy/cx,cy. The first is the
+                                    minimum size and the second is the max. Set the first
+                                    to zero if it doesn't matter.
+
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strAttrLim_SingleLine"
+                             CIDIDL:Type="TString" CIDIDL:Value="[SingleLine]"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrLim_SingleReq"
+                             CIDIDL:Type="TString" CIDIDL:Value="[SingleReq]"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrLim_AreaPref"
+                             CIDIDL:Type="TString" CIDIDL:Value="Area:"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrLim_CharPref"
+                             CIDIDL:Type="TString" CIDIDL:Value="Char"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrLim_EnumPref"
+                             CIDIDL:Type="TString" CIDIDL:Value="Enum:"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrLim_FileSelPref"
+                             CIDIDL:Type="TString" CIDIDL:Value="FileSel:"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrLim_RangePref"
+                             CIDIDL:Type="TString" CIDIDL:Value="Range:"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrLim_SizePref"
+                             CIDIDL:Type="TString" CIDIDL:Value="Size:"/>
+
+
+
+            <CIDIDL:Constant CIDIDL:Name="strAttrVal_False"
+                             CIDIDL:Type="TString" CIDIDL:Value="False">
+                <CIDIDL:DocText>
+                    Special attribute values
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strAttrVal_AltFalse1"
+                             CIDIDL:Type="TString" CIDIDL:Value="0"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrVal_AltFalse2"
+                             CIDIDL:Type="TString" CIDIDL:Value="No"/>
+
+            <CIDIDL:Constant CIDIDL:Name="strAttrVal_True"
+                             CIDIDL:Type="TString" CIDIDL:Value="True"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrVal_AltTrue1"
+                             CIDIDL:Type="TString" CIDIDL:Value="1"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttrVal_AltTrue2"
+                             CIDIDL:Type="TString" CIDIDL:Value="Yes"/>
+
+
+            <CIDIDL:Constant CIDIDL:Name="c1ChunkFlag_DataChange"
+                             CIDIDL:Type="TCard1" CIDIDL:Value="0x01">
+                <CIDIDL:DocText>
+                    The numeric constants for the flag byte that is in each chunk as stored
+                    on disk.
+
+                    DataChange - If it changes bump the serial number and last change
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+
+
+            <CIDIDL:Constant CIDIDL:Name="c4ChunkFlId_FileEnd"
+                             CIDIDL:Type="TCard4" CIDIDL:Value="0x470FB9A9">
+                <CIDIDL:DocText>
+                    Some magic ids embedded in the chunked file format. We have magic
+                    start/end file markers, chunk start/end markers
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="c4ChunkFlId_FileStart"
+                             CIDIDL:Type="TCard4" CIDIDL:Value="0xA3957BE1"/>
+            <CIDIDL:Constant CIDIDL:Name="c1ChunkFlId_ChunkStart"
+                             CIDIDL:Type="TCard1" CIDIDL:Value="0xEA"/>
+            <CIDIDL:Constant CIDIDL:Name="c1ChunkFlId_ChunkEnd"
+                             CIDIDL:Type="TCard1" CIDIDL:Value="0xBC"/>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strChunkId_Data"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CQSL/CF/Data">
+                <CIDIDL:DocText>
+                    The numeric constant ids of the defined chunks in the chunked file
+                    format.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strChunkId_Meta"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CQSL/CF/Meta"/>
+
+
+            <CIDIDL:Constant CIDIDL:Name="c1ChunkFl_FmtVersion"
+                             CIDIDL:Type="TCard1" CIDIDL:Value="1">
+                <CIDIDL:DocText>
+                    Some magic constants related to the overall chunked file format.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="c4ChunkFl_MaxMetaKeys"
+                             CIDIDL:Type="TCard4" CIDIDL:Value="48"/>
+
+            <CIDIDL:Constant CIDIDL:Name="strChFlMetaKey_Application"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CQSL/CF/Application">
+                <CIDIDL:DocText>
+                    The predefined meta chunk keys.
+
+                    Source -    The name of the original source it came from. It might
+                                be the original file system path, or some other sort
+                                of indicator of where it came from, such as a path into
+                                a data structure or whatever.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strChFlMetaKey_Author"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CQSL/CF/Author"/>
+            <CIDIDL:Constant CIDIDL:Name="strChFlMetaKey_FileName"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CQSL/CF/Source"/>
+            <CIDIDL:Constant CIDIDL:Name="strChFlMetaKey_Notes"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CQSL/CF/Notes"/>
+            <CIDIDL:Constant CIDIDL:Name="strChFlMetaKey_Title"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CQSL/CF/Title"/>
+            <CIDIDL:Constant CIDIDL:Name="strChFlMetaKey_Version"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CQSL/CF/Version"/>
+            <CIDIDL:Constant CIDIDL:Name="strChFlMetaKey_StdPrefix"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CQSL/CF/"/>
+
+        </CIDIDL:Constants>
+
+
+        <CIDIDL:Types>
+
+            <!-- The base attribute data types -->
+            <CIDIDL:Enum CIDIDL:Name="EAttrTypes" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="BaseName" CIDIDL:BinStream="Yes"
+                         >
+                <CIDIDL:DocText>
+                    The base types supported by the TAttrData class. They can define
+                    their own extended types, but these are the fundamental types that
+                    define the storage formats available.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Area"/>
+                <CIDIDL:EnumVal CIDIDL:Name="AppImage"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Binary"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Bool"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Card"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Card64"/>
+                <CIDIDL:EnumVal CIDIDL:Name="CardRange"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Char"/>
+                <CIDIDL:EnumVal CIDIDL:Name="File"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Float"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Int"/>
+                <CIDIDL:EnumVal CIDIDL:Name="IntRange"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MLString"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Point"/>
+                <CIDIDL:EnumVal CIDIDL:Name="RGBColor"/>
+                <CIDIDL:EnumVal CIDIDL:Name="String"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Separator"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Size"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Time"/>
+            </CIDIDL:Enum>
+
+            <CIDIDL:Enum CIDIDL:Name="EAttrEdTypes" CIDIDL:XlatMap="BaseName"
+                          CIDIDL:BinStream="Yes">
+                <CIDIDL:DocText>
+                    This is used by the attribute data class, which is in turn used by the
+                    the atttribute editor in CIDWUtils, and indicates the ways in which a
+                    given attribute can be edited.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="InPlace"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Visual"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Both"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+
+

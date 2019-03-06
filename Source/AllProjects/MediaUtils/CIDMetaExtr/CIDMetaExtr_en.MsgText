@@ -1,0 +1,61 @@
+;
+; FILE NAME: CIDMetaExtr.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 06/24/2007
+;
+; COPYRIGHT: 2007..2007, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kMExtrErrs
+    MsgPref=kMExtrMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;   Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+	; BD ID errors
+    errcBDID_NoFiles           	200     No files were found in the BDMV\STREAM directory
+
+    ; DVD ID errors
+    errcDVDID_BadPath           500     The DVD VIDEO_TS directory was not found
+    errcDVDID_NoFiles           501     No files were found in the VIDEO_TS directory
+
+    ; Format errors
+    errcFmt_NotOfType           1000    The source data is not of type '%(1)'
+    errcFmt_InvalidBoxSize      1001    %(1) is not a valid MPEG4 box size
+    errcFmt_InvalidDataSize     1002    %(1) is not a valid size for an MPEG4 data box
+    errcFmt_ExpectedDataBox     1003    Expected an MPEG4 DATA box but did not find it
+    errcFmt_ImageExtract        1004    The cover art could not be extracted
+
+    ; WMA extrator errors
+    errcWMA_Reader              2000    The WMA reader object could not be created
+    errcWMA_HdrInfo             2001    The WMA header info object could not be created
+    errcWMA_GetAttrCnt          2002    Could not get WMA file attribute count
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;   Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+

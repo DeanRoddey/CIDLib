@@ -1,0 +1,57 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestDynType1;
+    ParentClass MEng.Object;
+EndClass;
+
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.User.Tests.DynType1Inc;
+    DynTypeRef(DynType1Inc.kTypeName);
+EndImports;
+
+
+Literals=
+    String  kStrType("MEng.String");
+EndLiterals;
+
+
+Members=
+    ConsoleOutStream                    m_Output;
+    TestHelpers                         m_Helper;
+    DynTypeRef(kStrType)                m_Str;
+    DynTypeRef("MEng.Card4")            m_Card;
+    DynTypeRef(DynType1Inc.kTypeName)   m_DType;
+    Int4                                m_RetVal;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Str("This is the value");
+        m_Card(13);
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        If (m_Str != "This is the value")
+            m_Helper.PrintErr("Initial m_Str value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Card != 13)
+            m_Helper.PrintErr("Initial m_Card value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

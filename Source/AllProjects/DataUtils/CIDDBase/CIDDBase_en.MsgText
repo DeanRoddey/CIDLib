@@ -1,0 +1,79 @@
+;
+; FILE NAME: CIDBase.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 09/21/2003
+;
+; COPYRIGHT: 2003..2003, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This is the message text file for the facility.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kDBErrs
+    MsgPref=kDBMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; Connection errors
+    errcConn_AlreadyConnected   2000    Already connected to data source %(1)
+    errcConn_QuerySrcs          2001    An error occured while querying data sources. Info=%(1)
+    errcConn_NotConnected       2002    The connection object has not be initialized
+    errcConn_ConnFailed         2003    Failed to connect to SQL source '%(1)'. Info=%(2)
+    errcConn_ConnStrFailed      2004    Connect string based connect failed. Info=%(1)
+
+    ; Init errors
+    errcInit_SQLEnvInitFailed   3000    The SQL environment could not be initialized
+
+    ; Statement errors
+    errcStmt_BindFailed         6500    Could not complete column binding %(1) on statement %(2). Info=%(3)
+    errcStmt_Alloc              6501    Could not allocate handle for statement %(1). Info=%(2)
+    errcStmt_DirectFailed       6502    Direct statement execution failed for statement %(1). Info=%(2)
+    errcStmt_Fetch              6503    The statement fetch failed for statement %(1). Info=%(2)
+    errcStmt_ClearColBindings   6504    An error occured clearning column bindings for statement %(1). Info=%(2)
+    errcStmt_ClearParmBindings  6505    An error occured clearning parameters for statement %(1). Info=%(2)
+    errcStmt_BadColBindAccess   6506    Column binding %(1) of statement %(2) was accessed as %(3), but is of type %(4)
+    errcStmt_ClearCursor        6507    An error occured clearing cursor for statement %(1). Info=%(2)
+    errcStmt_CommitFailed       6508    Commit statement '%(1)' failed
+    errcStmt_RollbackFailed     6509    Rollback statement '%(1)' failed
+    errcStmt_StartTrans         6510    Could not begin transaction '%(1)'
+
+    ; General SQL errors
+    errcSQL_Unknown             7000    Unknown SQL error
+    errcSQL_InvalidHandle       7001    The SQL handle is invalid
+    errcSQL_DriverError         7002    SQL driver error
+    errcSQL_NoSuchConnection    7003    There is no such SQL connection
+    errcSQL_GeneralErr          7004    General SQL error
+    errcSQL_MemAllocErr         7005    Memory allocation error in SQL
+    errcSQL_InvalidNul          7006    Invalid use of a null pointer
+    errcSQL_InitSeqError        7007    The correct SQL init sequence was not followed
+    errcSQL_TooManyHandles      7008    Another SQL handle could not be allocated
+    errcSQL_InvalidOption       7009    A parameter/option was not valid for the SQL function called
+    errcSQL_ConnectTimeout      7010    The SQL connection timed out
+    errcSQL_NotSupported        7011    The SQL driver does not support the function
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+END MESSAGES
+
+

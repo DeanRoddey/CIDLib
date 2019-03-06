@@ -1,0 +1,127 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestHTTPClient1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.HTTPClient;
+    MEng.System.Runtime.KVPair;
+    MEng.System.Runtime.URL;
+    MEng.User.Tests.TestHelpers;
+EndImports;
+
+Types=
+    VectorOf[KVPair]    KVList;
+    VectorOf[URL]       URLList;
+EndTypes;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    HTTPClient          m_HTTPClient;
+    URL                 m_URL;
+    URL                 m_URL2;
+    URLList             m_URLList;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            Card4   Index;
+            Card4   Count;
+            Card4   ResCode;
+            String  ReplyText;
+            KVList  HdrInLines;
+            KVList  HdrOutLines;
+            String  ContType;
+            Card4   ContLen;
+            MemBuf  BodyText(4096, 100000);
+        EndLocals;
+
+        Try
+            // Force our HTTP client to use IPV6 addressing
+            m_HTTPClient.SetAddrType(IPAddr
+
+            // Set up the URL to the page we'll get
+            m_URL.Set("http://www.google.com/index.html", FQTypes.Full);
+
+            // Copy the URL and compare
+            m_URL2 := m_URL;
+            If (m_URL != m_URL2)
+                m_Helper.PrintErr("Objects different after copy", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+            m_URLList.AddObject(m_URL2);
+
+            // Do a GET
+            ResCode := m_HTTPClient.SendGET
+            (
+                m_URL
+                , 4000
+                , "CIDLib HTTP Client Test/1.0"
+                , "text/html"
+                , ReplyText
+                , HdrOutLines
+                , ContType
+                , BodyText
+                , ContLen
+                , False
+                , HdrInLines
+            );
+
+            // If in debug mode, then dump the contents
+            #BeginDebug
+            m_Output.FmtStr("Status Code: ");
+            m_Output.FmtCard4(ResCode);
+            m_Output.FmtStr("\nReply Text: ");
+            m_Output.FmtStr(ReplyText);
+            m_Output.FmtStr("\nContent Type: ");
+            m_Output.FmtStr(ContType);
+            m_Output.DNewLn();
+
+            Count := HdrOutLines.GetElemCount();
+            If (Count > 0)
+                m_Output.FmtStr("Header Lines:\n-------------------\n");
+                Index := 0;
+                While (Index < Count)
+                    m_Output.FmtStr("    ");
+                    m_Output.Format(HdrOutLines[Index]);
+                    m_Output.NewLn();
+                    Index++;
+                EndWhile;
+                m_Output.DNewLn();
+            EndIf;
+
+//            If (!BodyText.IsEmpty())
+//                m_Output.FmtStr("Body Text:\n-------------------\n");
+//                m_Output.FmtStr(BodyText);
+//            EndIf;
+            #EndDebug
+
+            If (ResCode != 200)
+                m_Helper.PrintErr("Did not get status 200 reply to GET", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndTry;
+
+        Catch
+            m_Helper.PrintErr("Exception during GET operation", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndCatch;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;

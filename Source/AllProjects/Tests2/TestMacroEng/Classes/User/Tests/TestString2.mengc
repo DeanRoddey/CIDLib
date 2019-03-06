@@ -1,0 +1,90 @@
+// There's a lot of stuff to test, so this is a second test class for strings
+Class=[Final]
+    ClassPath MEng.User.Tests.TestString2;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Literals=
+EndLiterals;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    String              m_Test1;
+    String              m_Test2;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            Boolean GotIt;
+            Card4   Index;
+        EndLocals;
+
+        //
+        //  Do some substring replacements. It just calls the underlying C++
+        //  implementation, so monstly we are just making sure the CML wrapper
+        //  invocation is correct.
+        //
+        m_Test1 := "ABC123ABC456ABC789";
+        Index := 0;
+        If (!m_Test1.ReplaceSubStr("ABC", "", Index, True, True))
+            m_Helper.PrintErr("Substr replace failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test1 != "123456789")
+            m_Helper.PrintErr("Substr results were incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure we catch a start index beyond the end (don't get a C++ exception)
+        Try
+            GotIt := False;
+            m_Test1 := "12345";
+            Index := 6;
+            m_Test1.ReplaceSubStr("12", "AB", Index, True, True);
+        EndTry;
+
+        Catch
+            GotIt := True;
+        EndCatch;
+
+        If (!GotIt)
+            m_Helper.PrintErr("Failed to catch bad start index", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // But it should be ok at the end
+        Try
+            m_Test1 := "12345";
+            Index := 5;
+            If (m_Test1.ReplaceSubStr("12", "AB", Index, True, True))
+                m_Helper.PrintErr("Got a match at end of string", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndTry;
+
+        Catch
+            m_Helper.PrintErr("Got an exception on search at end", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndCatch;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;

@@ -1,0 +1,59 @@
+;
+; FILE NAME: CIDNameSrv_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 02/09/2001
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  This file and its contents are the property of Charmed Quark Software. It
+;  may not be redistributed in any modified form, or as part of any product
+;  other than the original CIDLib C++ Frameworks distribution file. Its
+;  contents may not be compiled into any other product, except when required
+;  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;  product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for the CIDNameSrv compiler
+;   program.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kNSErrs
+    MsgPref=kNSMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Error ids
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    errc_NoError                0       No Error
+
+    ; Command line parameter errors
+    errcParm_UnknownParm        5000    '%(1)' is not a known command line parameter
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Message ids
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    midStatus_CIDLibExcept     17000    An unhandled CIDLib exception was seen. %(1)
+    midStatus_UnknownExcept    17001    An unknown exception was seen. %(1)
+    midStatus_ExitingApp       17002    Exiting CIDLib Name Server
+    midStatus_RestartingLL     17003    Restarting Name Server Landlord thread
+    midStatus_EjectedBinding   17004    Binding '%(1)' exceeded it's binding time and was ejected from the name server
+
+END MESSAGES
+

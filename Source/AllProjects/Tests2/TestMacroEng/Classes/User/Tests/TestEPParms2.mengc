@@ -1,0 +1,77 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestEPParms2;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.ASCII;
+EndImports;
+
+Types=
+    Enum=EnumParm
+        ValP1 : "Param Value 1";
+        ValP2 : "Param Value 2";
+    EndEnum;
+EndTypes;
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    ASCII               m_Ascii;
+    Int4                m_RetVal;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start([In]   Card4       InCard
+                , [In]  Float8      InFloat
+                , [In]  Int4        InInt
+                , [In]  Char        InChar
+                , [In]  String      InString
+                , [In]  EnumParm    InEnum) Returns Int4
+    Begin
+        If (InCard != 1)
+            m_Helper.PrintErr("Card EP parm is bad", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (InFloat != 2.3)
+            m_Helper.PrintErr("Float EP parm is bad", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (InInt != -4)
+            m_Helper.PrintErr("Int EP parm is bad", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (InChar != 'C')
+            m_Helper.PrintErr("Char EP parm is bad", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (InString != "Eat Me")
+            m_Helper.PrintErr("String EP parm is bad", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (InEnum != EnumParm.ValP2)
+            m_Helper.PrintErr("Enum EP parm is bad", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+
+

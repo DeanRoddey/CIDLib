@@ -1,0 +1,249 @@
+;
+; FILE NAME: CIDXML.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 08/20/1999
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kXMLErrs
+    MsgPref=kXMLMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;   Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    errcNone                        0       No Error
+
+    ; Attribute oriented errors
+    errcAttr_NotEnumType            100     The attribute is not a notation or enumeration
+    errcAttr_EnumValsNeverSet       101     The attribute's enumeration/notation values were never set
+
+    ; Content model errors
+    errcCM_InvalidTypeForBinOp      700     An binary op node must have type | or ,
+    errcCM_InvalidTypeForUnaryOp    701     An unary op node must have type ?, *, or +
+    errcCM_UnknownCMType            702     %(1) is not a valid content model type
+    errcCM_StateError               703     This content model type should not have a content model object
+    errcCM_BadCMTypeHere            704     Content model type %(1) is not valid in this context
+    errcCM_CurNodeNull              705     The current node should not be null
+
+    ; Context stack errors
+    errcCntx_StackIsEmpty           800     There are no levels on the context stack
+    errcCntx_TopElemNotSet          801     The top of stack element has not be set
+    errcCntx_BadChildCount          802     The child array is null but the child count is non-zero
+
+    ; Entity spooler/mgr errors
+    errcEnt_UnknownEncoding         1700    Could not create a transcoder for encoding '%(1)'
+    errcEnt_BadAutoEncoding         1701    The encoding '%(1)' is not a valid autosensed encoding
+    errcEnt_CvtrAlreadyExists       1702    A decoder already exists, internal error
+    errcEnt_BadCharInXMLDecl        1703    An invalid char was encountered during decode of XMLDecl
+    errcEnt_BOMConflict             1704    The UTF-16 BOM found conflicts with the autosensed or forced encoding
+    errcEnt_NoExtEntityFound        1705    No external entity was up the spooler stack
+
+    ; General errors
+    errcGen_CantLoadErrText         3000    Could not load text for XML error %(1)
+    errcGen_UnknownErrorType        3001    Could not determine error type for XML error %(1)
+    errcGen_UnknownTokenType        3002    %(1) is not a known content token type
+    errcGen_CantMakeConverter       3003    Can't create a text converter for encoding '%(1)'
+    errcGen_MustHaveValidator       3004    A validator is required to construct a core parser
+    errcGen_UnknownValidResType     3005    %(1) is not a valid validity check result value
+    errcGen_UnknownElementId        3006    Element id %(1) was not found
+    errcGen_CursorInvalid           3007    The cursor is no longer valid, reset it before use
+
+    ; Parser errors
+    errcParse_NoDOCTYPESupport      5000    The installed validator does not support DTDs
+    errcParse_UnexpectedEOI         5001    Unexpected end of input
+    errcParse_CannotContinue        5002    An unrecoverable error has occured, parse is stopped
+    errcParse_MarkupStartsWith      5003    __ParseMarkupDecl() expects to start with a < character
+    errcParse_MaxErrsReached        5004    The maximum number of errors has been reached, parsed stopped
+
+    ; Path errors
+    errcPath_NotFound               5200    The indicated XML path was not found: %(1)
+    errcPath_AttrNotFound           5201    Attribute %(1) was not found on path: %(2)
+    errcPath_BadInstNum             5203    '%(1)' is not a valid XML path instance number
+
+    ; Pool errors
+    errcPool_InvalidHash            5500    The hash %(1) is larger than the pool modulus of %(2)
+    errcPool_IdNotInPool            5501    Id %(1) is not found in the %(2) pool
+
+    ; Standard catalog errors
+    errcSCat_BadDTDId               5800    You must use '%(1)' as the DTD for standard CIDLib catalog files
+    errcSCat_SrcParseFailed         5801    Failed to parse the CIDLib catalog file
+    errcSCat_ExpectedElem           5802    Expected to see XML element %(1) but got %(2)
+
+    ; Tree parser messages
+    errcTree_NoRoot                 6200    The document has not been filled in yet
+    errcTree_AttrNotFound           6201    No attribute of element '%(1)' has the name '%(2)'
+    errcTree_WrongType              6202    Child #%(1) of element '%(2)' cannot be cast to type '%(3)'
+    errcTree_AttrValAs              6203    The value '%(1)' of attribute '%(2)' cannot be convert to type %(3)
+    errcTree_BadAttrIndex           6204    Got an attribute index of %(1) but only %(2) exist
+    errcTree_BadChildIndex          6204    Got a child index of %(1) but only %(2) exist in this %(3) element
+    errcTree_DeleteDoc              6205    Failure while deleting tree parser document object
+    errcTree_DeleteCat              6206    Failure while deleting catalog installed on tree parser
+    errcTree_DeleteElemStack        6205    Failure while deleting tree parser element stack
+    errcTree_DeleteErrs             6206    Failure while deleting tree parser error list
+    errcTree_ElemNotFound           6207    No child element with name %(1) was found
+    errcTree_NoSuchElementIndex     6208    %(1) is not a valid Nth child element index
+    errcTree_AttrValRange           6209    The value '%(1)' of attribute '%(2)' is out of range for type %(3)
+
+    ; URL errors (actually in CIDNet where the URL entity source class is)
+    errcURL_Unsupported             6300    Only file://localhost/ or http:// style URLs are supported at this time
+    errcURL_BadHTTPGetReply         6301    Bad HTTP GET server response: '%(1)'
+    errcURL_HTTPGetFailed           6302    Could not GET HTTP document. Reply: '%(1)'
+    errcURL_MakeURLEntity           6303    Creating URL entity source
+
+    ; XML warning messages
+    errcXMLW_Start                  6800    XML Warning Start Marker
+    errcXMLW_UndeclElemInCM         6801    The element '%(1)' was referenced in a content model, but never declared
+    errcXMLW_UndeclElemInAttr       6802    The element '%(1)' was referenced in an attribute list, but never declared
+    errcXMLW_End                    6803    XML Warning End Marker
+
+    ; XML error messages
+    errcXMLE_Start                  7000    XML Error Start Marker
+
+    errcXMLE_ExpectedMarkup         7001    Expected to find some sort of markup here
+    errcXMLE_NoXMLDeclHere          7002    An XMLDecl is not allowed here
+    errcXMLE_BadDeclCase            7003    An XMLDecl must be in lower case
+    errcXMLE_ExpectedWhitespace     7004    Whitespace was expected here
+    errcXMLE_UnknownDeclString      7005    Expected "encoding", "version", or "standalone", but got "%(1)"
+    errcXMLE_ExpectedEqualSign      7006    Expected an equal sign here
+    errcXMLE_ExpectedQuotedString   7007    Expected a quoted string here
+    errcXMLE_MustBePublicIDChar     7008    In invalid character was found in the public id
+    errcXMLE_DeclStringReused       7009    The '%(1)' XMLDecl string was used more than once
+    errcXMLE_BadVersionStr          7010    '%(1)' is not a supported XML version
+    errcXMLE_EmptyEncodingStr       7011    The encoding="" string cannot be empty
+    errcXMLE_BadStandaloneStr       7012    '%(1)' is not a value standalone value
+    errcXMLE_UnterminatedDecl       7013    The XMLDecl or TextDecl was not terminated correctly
+    errcXMLE_DeclStringsMisordered  7014    The XMLDecl values were not in the correct order
+    errcXMLE_MultiLeadingSurrogate  7015    Got two leading surrogate characters in a row
+    errcXMLE_NonXMLCharacter        7016    A non-XML character was encountered
+    errcXMLE_NotAllowedInComment    7017    The sequence '--' is not allowed in a comment
+    errcXMLE_UnterminatedComment    7018    A comment was not terminated correctly
+    errcXMLE_ExpectedPITarget       7019    Expected to see the PI target name here
+    errcXMLE_UnterminatedPI         7021    The PI was not correctly terminated
+    errcXMLE_PartialMarkupErr       7022    A piece of markup crossed an entity boundary
+    errcXMLE_ExpectedCommentOrCDATA 7023    Expected a comment or CDATA section here
+    errcXMLE_ExpectedCDATA          7024    Expected a CDATA section here
+    errcXMLE_CommentsMustStartWith  7025    Comments must start with '<!--'
+    errcXMLE_ExpectedElementName    7026    Expected an element name here
+    errcXMLE_IllegalRootElem        7027    The element '%(1)' is not a valid root element
+    errcXMLE_ExpectedRootElem       7028    Expected the DTD root element name here
+    errcXMLE_ExpectedExtId          7029    Expected a system or public id literal
+    errcXMLE_ExpectedPublicId       7030    Expected a PUBLIC id here
+    errcXMLE_ExpectedSystemId       7031    Expected a SYSTEM id here
+    errcXMLE_ExpectedIdType         7032    Expected an id type here (SYSTEM or PUBLIC)
+    errcXMLE_ExpectedQuote          7033    Expected a single or double quote character
+    errcXMLE_DOCTYPENotEnded        7034    Expected a > character at the end of the internal subset
+    errcXMLE_InvalidTopLevelDTD     7035    Expected a markup decl, comment, PI, whitespace, or ] character here
+    errcXMLE_ExpectedEntityName     7036    Expected the entity name here
+    errcXMLE_ExpectedSurrogate      7037    Expected the second part of a surrogate pair here
+    errcXMLE_InvalidCharRefChar     7038    The character entity reference contained an invalid digit
+    errcXMLE_UnterminatedMarkup     7039    All markup declarations must end with a '>' character
+    errcXMLE_ExpectedNDATA          7040    Expected to see 'NDATA' here
+    errcXMLE_ExpectedNotName        7041    Expected the name of the notation here
+    errcXMLE_ParseException         7042    XML Parser Error:\n    ERROR: %(1)
+    errcXMLE_CIDLibException        7043    CIDLib Exception:\n    ERROR: %(1)
+    errcXMLE_UnknownException       7044    A non-CIDLib exception occured
+    errcXMLE_UnterminatedTag        7045    All start/end tags must end with '>' or '/>'
+    errcXMLE_WrongTagEnded          7046    Got the end of tag '%(1)', but expected end of tag '%(2)'
+    errcXMLE_InvalidCharSeq         7047    The sequence ']]>' is not allowed with character data
+    errcXMLE_NoSpaceBeforePITarget  7048    No spaces are allowed before the PI target
+    errcXMLE_ExpectedContentSpec    7049    Expected a content specification expression, e.g. (foo,bar)
+    errcXMLE_OpenContentSpec        7050    The content model was not correctly terminated
+    errcXMLE_ExpectedComma          7051    Expected a comma here
+    errcXMLE_BadChildModel          7052    Expected to find ',', '|', or ')' here
+    errcXMLE_UnexpectedWhitespace   7053    Whitespace is not allowed here
+    errcXMLE_MixedContentTypes      7054    Sequence and alternation cannot be mixed
+    errcXMLE_ExpectedAttrType       7055    Expected an attribute type here (CDATA, ENTITY, etc...)
+    errcXMLE_ExpectedAttrName       7056    Expected an attribute name here
+    errcXMLE_AttrAlreadyUsed        7057    Attribute '%(1)' has already been used in this tag
+    errcXMLE_EntityNotFound         7058    Entity '%(1)' was never declared
+    errcXMLE_UnterminatedERef       7059    Unterminated entity reference, expected a semicolon
+    errcXMLE_EmptyMainEntity        7060    The primary XML entity cannot be empty
+    errcXMLE_NestedCDATA            7061    CDATA sections cannot be nested
+    errcXMLE_ExpectedOpenBracket    7062    Expected an open bracket character here ('[')
+    errcXMLE_ExpectedPIOrComment    7063    Expected a comment or PI here
+    errcXMLE_AttrNotSameAsFixed     7064    The value of attribute '%(1)' must match its fixed value
+    errcXMLE_AttrValueIsEmpty       7065    The value of attribute '%(1)' cannot be empty
+    errcXMLE_ExpectedOpenParen      7066    Expected an open parenthesis here
+    errcXMLE_ExpectedEnumValue      7067    Expected to get an enumerated value here
+    errcXMLE_ExpectedEnumSep        7068    Expected the enumeration separator here ('|')
+    errcXMLE_ExtEntRefInStandalone  7069    Standalone documents cannot have references to external entities
+    errcXMLE_ExpectedEOC            7070    Expected the end of a conditional section here
+    errcXMLE_EncodingRequired       7071    The encoding string is required in an external entity TextDecl
+    errcXMLE_ExpectedIncludeIgnore  7072    Expected either 'INCLUDE' or 'IGNORE' here
+    errcXMLE_ConditionalInISS       7073    Conditional sections are not legal in the internal subset
+    errcXMLE_ExpectedAttrValue      7074    Expected the quoted attribute value here
+    errcXMLE_NotLegalInAttrVal      7075    The '<' character is not legal in attribute values (use &lt; instead.)
+    errcXMLE_UnterminatedCDATA      7076    The CDATA section was not terminated
+    errcXMLE_CDATAInPreContent      7077    CDATA is only legal within the root element
+    errcXMLE_ExtEntityNotAllowed    7078    A reference to an external entity is not allowed here
+    errcXMLE_RecursiveEntityRef     7079    The entity '%(1)' is recursively referenced
+    errcXMLE_UnparsedNotAllowed     7080    A referenced to an unparsed entity is not allowed here
+    errcXMLE_PEHadNDATA             7081    NDATA is not legal for parameter entities
+    errcXMLE_BadHexRadix            7082    Use 'x' (not 'X') for hexadecimal character references
+    errcXMLE_StandaloneInExt        7083    'Standalone=' is only value in the primary document entity
+    errcXMLE_PEInMarkupInISS        7084    Parameter entity references are illegal inside markup in the internal subset
+    errcXMLE_OpenTagsAtEOI          7085    The end of input was reached before all tags were closed. Last='%(1)'
+
+    errcXMLE_End                    7086    XML Error End Marker
+
+
+    ; XML validity messages
+    errcXMLV_Start                  7100    XML Validity Start Marker
+
+    errcXMLV_ElemNotDeclared        7101    Element '%(1)' was never declared
+    errcXMLV_NotInCM                7102    Child #%(1) '%(2)' is not valid for content model: %(3)
+    errcXMLV_TooManyChildren        7103    There are too many elements for the content model: %(1)
+    errcXMLV_TooFewChildren         7104    There are too few elements for the content model: %(1)
+    errcXMLV_OnlyWSLegal            7105    Only whitespace character data is valid for content mode: %(1)
+    errcXMLV_CharsNotLegal          7106    Character data is not valid for content model: %(1)
+    errcXMLV_AttrNotDeclared        7107    Attribute '%(1)' is not declared for element '%(2)'
+    errcXMLV_ReqAttrNotProvided     7108    The required attribute '%(1)' was not provided
+    errcXMLV_IDAttrDefType          7109    The ID attribute '%(1)' must have a default of IMPLIED or REQUIRED
+    errcXMLV_UndeclElemAsRoot       7110    The element '%(1)' was referenced in the DOCTYPE, but never declared
+    errcXMLV_BadMultiValue          7111    Attribute '%(1)' is not of a multi-valued type, so space is illegal
+    errcXMLV_TooManyIDAttrs         7112    Element '%(1)' has more than one ID attribute
+    errcXMLV_BadEnumRefAttr         7113    '%(1)' does not match any enum value for attribute '%(2)'
+    errcXMLV_BadEntityRefAttr       7114    Attribute '%(1)' must refer to a declared entity
+    errcXMLV_MustBeUnparsed         7115    Attribute '%(1)' must refer to an unparsed entity
+    errcXMLV_NameTokenAttrExpected  7116    Attribute '%(1)' must be composed of name tokens
+    errcXMLV_DupInMixedModel        7117    Mixed models cannot have duplicate elements
+    errcXMLV_BadEntityNotation      7118    Entity '%(1)' references unknown notation '%(2)'
+    errcXMLV_ElemRedecl             7119    Element '%(1)' is already declared
+    errcXMLV_NoIntSSAllowed         7120    The application disallowed DTD internal subset, but one was found
+
+    errcXMLV_End                    7121    XML Validity End Marker
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;   Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    midGen_EntityName               14000   Entity Name
+    midGen_LineCol                  14001   Line/Col
+    midGen_element                  14002   element
+
+END MESSAGES
+

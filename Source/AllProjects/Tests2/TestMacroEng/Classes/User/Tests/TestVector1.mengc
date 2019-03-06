@@ -1,0 +1,328 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestVector1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.User.Tests.TestHelpers;
+EndImports;
+
+Types=
+    VectorOf[String]    TestVec;
+    VectorOf[String]    TestVec2;
+EndTypes;
+
+Members=[Const]
+    String              m_ValTmpl;
+EndMembers;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Card4               m_Index;
+    Card4               m_TmpVal;
+    Int4                m_RetVal;
+    TestVec             m_List;
+    TestVec2            m_List2;
+    String              m_ValStr;
+    TestHelpers         m_Helper;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_ValTmpl("Value String %(1)");
+        m_Index(0);
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+
+    //
+    //  We create two string vector types, but they should be considered
+    //  equiv when passing to a parm. So we take one type here, and below
+    //  will try to pass in one of the other type.
+    //
+    Method TestEquiv([In] TestVec ToCheck) Returns Boolean
+    Begin
+        #BeginDebug
+        // Should fail to compile
+        ToCheck[0] := "Test";
+        #EndDebug
+        Return (ToCheck.GetElemCount() = 2);
+    EndMethod;
+
+
+    Method TestConst([Out] TestVec ToCheck)
+    Begin
+        // It should be syntactically ok to assign here
+        ToCheck[0] := "Test";
+    EndMethod;
+
+
+    Method TestIndex([In] TestVec ToCheck, [In] Card4 Index)
+    Begin
+        Locals=
+            Boolean Flag(False);
+            String  TmpStr;
+        EndLocals;
+
+        Try
+            TmpStr := ToCheck[Index];
+        EndTry;
+
+        Catch
+            If ($Exception.Check(CollectErrors.BadIndex))
+                Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!Flag)
+            m_Helper.PrintErr("Failed to catch index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+    EndMethod;
+
+
+    Method TestIndex2([InOut] TestVec ToCheck, [In] Card4 Index)
+    Begin
+        Locals=
+            Boolean Flag(False);
+        EndLocals;
+
+        Try
+            ToCheck[Index] := "Bad Insert";
+        EndTry;
+
+        Catch
+            If ($Exception.Check(CollectErrors.BadIndex))
+                Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!Flag)
+            m_Helper.PrintErr("Failed to catch index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+    EndMethod;
+
+
+    // This one allows the exception to propogate
+    Method TestIndex3([InOut] TestVec ToCheck, [In] Card4 Index)
+    Begin
+        ToCheck[Index] := "Bad Insert";
+    EndMethod;
+
+
+    Method TestIndex4()
+    Begin
+        Locals=
+            Boolean Flag(False);
+            TestVec EmptyCheck;
+        EndLocals;
+
+        Try
+            EmptyCheck[0] := "Bad Insert";
+        EndTry;
+
+        Catch
+            If ($Exception.Check(CollectErrors.BadIndex))
+                Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!Flag)
+            m_Helper.PrintErr("Failed to catch index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+    EndMethod;
+
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            Boolean Flag;
+        EndLocals;
+
+        // Check the initial element count, which should be zero
+        If (m_List.GetElemCount() != 0)
+            m_Helper.PrintErr("Initial list was not empty", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_List.IsEmpty())
+            m_Helper.PrintErr("Initial list was not empty", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test for a bad index
+        TestIndex(m_List, 0);
+        TestIndex2(m_List, Card4.kMaxValue);
+        Try
+            TestIndex3(m_List, 0);
+        EndTry;
+        Catch
+            If ($Exception.Check(CollectErrors.BadIndex))
+                Flag := True;
+            EndIf;
+        EndCatch;
+        If (!Flag)
+            m_Helper.PrintErr("Failed to catch index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Add one element and check the element count
+        m_List.AddObject("Testing");
+        If (m_List.GetElemCount() != 1)
+            m_Helper.PrintErr("Added object but count wasn't one", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Remove all elements and check it again
+        m_List.RemoveAll();
+        If (m_List.GetElemCount() != 0)
+            m_Helper.PrintErr("RemoveAll did not remove all", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_List.IsEmpty())
+            m_Helper.PrintErr("RemoveAll did not remove all", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Add 10 items
+        While (m_Index < 10)
+            m_ValStr := m_ValTmpl;
+            m_ValStr.ReplaceToken('1', m_Index);
+            m_List.AddObject(m_ValStr);
+            m_Index++;
+        EndWhile;
+
+        If (m_List.GetElemCount() != 10)
+            m_Helper.PrintErr("Did not get 10 elements", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test for a bad index
+        TestIndex(m_List, 11);
+
+        // Go back and compare them again
+        m_Index := 0;
+        While (m_Index < m_List.GetElemCount())
+            m_ValStr := m_ValTmpl;
+            m_ValStr.ReplaceToken('1', m_Index);
+            If (m_ValStr != m_List[m_Index])
+                m_Helper.PrintErr("Added items did not validate", m_Output, $CurLine);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+            m_Index++;
+        EndWhile;
+
+        // Test call against a returned element
+        If (m_List[0].GetLength() != 14)
+            m_Helper.PrintErr("Call on element failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Remove the first and last element, and check again
+        m_List.RemoveAt(9);
+        m_List.RemoveAt(0);
+        If (m_List.GetElemCount() != 8)
+            m_Helper.PrintErr("Did not get 8 elements", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Index := 0;
+        m_TmpVal := 1;
+        While (m_Index < m_List.GetElemCount())
+            m_ValStr := m_ValTmpl;
+            m_ValStr.ReplaceToken('1', m_TmpVal);
+            If (m_ValStr != m_List[m_Index])
+                m_Helper.PrintErr("Added items did not validate", m_Output, $CurLine);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+            m_Index++;
+            m_TmpVal++;
+        EndWhile;
+
+        // Insert an object
+        m_List.InsertObject("Inserted value", 0);
+        If (m_List.GetElemCount() != 9)
+            m_Helper.PrintErr("Insert did not increase elem count", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_List[0] != "Inserted value")
+            m_Helper.PrintErr("Inserted element value not correct", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Modify elements by assigning to them
+        m_List[0] := "Assigned Val";
+        If (m_List[0] != "Assigned Val")
+            m_Helper.PrintErr("Direct element assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Remove all elements and check count again
+        m_List.RemoveAll();
+        If (m_List.GetElemCount() != 0)
+            m_Helper.PrintErr("RemoveAll did not remove all", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test vector equivalency
+        m_List2.AddObject("Test 1");
+        m_List2.AddObject("Test 2");
+        If (!TestEquiv(m_List2))
+            m_Helper.PrintErr("Collection equiv failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Assign one to the other and compare the element counts, and then
+        //  compare the elements.
+        //
+        m_List.AddObject("Yet");
+        m_List.AddObject("Another");
+        m_List.AddObject("String");
+        m_List := m_List2;
+        If (m_List.GetElemCount() = m_List2.GetElemCount())
+            m_Index := 0;
+            While (m_Index < m_List2.GetElemCount())
+                If (m_List[m_Index] != m_List2[m_Index])
+                    m_Helper.PrintErr("Unequal element after assign", m_Output, $CurLine);
+                    Break;
+                EndIf;
+                m_Index++;
+            EndWhile;
+        Else
+            m_Helper.PrintErr("Unequal element count after assign", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test assignment of an element to itself
+        m_List.RemoveAll();
+        m_List.AddObject("Test Value");
+        m_List[0] := m_List[0];
+
+        // Do some more index tests
+        TestIndex4();
+
+        // Make sure we can do an insert at the end or empty
+        m_List.RemoveAll();
+        m_List.InsertObject("Inserted at 0", 0);
+        m_List.InsertObject("Inserted at 1", 1);
+
+        If ((m_List[0] != "Inserted at 0") || (m_List[1] != "Inserted at 1"))
+            m_Helper.PrintErr("Inserts at end failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+EndMethods;
+

@@ -1,0 +1,11 @@
+$CSSPreStart
+    Key1=Value 1
+    Key2 = Value 2
+    Key3 = $Key1 + $Key2
+$CSSPreEnd
+
+.html {
+    value1 : $Key1;
+    value2 : $Key2;
+    value3 : $Key3;
+}

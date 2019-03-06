@@ -1,0 +1,128 @@
+;
+; FILE NAME: CIDImage.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 12/27/97
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  This file and its contents are the property of Charmed Quark Software. It
+;  may not be redistributed in any modified form, or as part of any product
+;  other than the original CIDLib C++ Frameworks distribution file. Its
+;  contents may not be compiled into any other product, except when required
+;  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;  product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;  This is the message text file for the CIDImage facility. It contains
+;  the raw message text and ids for the facility, and is compiled into
+;  headers and binary output files.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kImgErrs
+    MsgPref=kImgMsgs
+END CTRL
+
+
+
+; -----------------------------------------------------------------------------
+;  Error ids
+; -----------------------------------------------------------------------------
+ERRORS=
+
+    ; No error occured
+    errcNoError                     0       No error occured
+
+    ; Bitmap target errors
+    errcBmp_UnknownCompress         200     %(1) is not a recognized compression value
+    errcBmp_TargetOverflow          201     Decoding the compressed data overflowed the target buffer. Target size: %(1)
+    errcBmp_UnknownFileType         202     %(1) is not a valid bitmap file type marker
+    errcBmp_ArrayNotSupported       203     OS/2 array type images must use TBitmapArrayImage
+    errcBmp_CompressError           204     The compression was not 'none' but the image size was zero
+    errcBmp_UnknownHdrSize          205     %(1) is not a recognized bitmap header size
+    errcBmp_ColorCounts             206     Either the colors important (%(1)) or colors used (%(2)) is > 256
+    errcBmp_InternalPalErr          207     ParsePalette() called for image with no palette
+    errcBmp_DeltaBeyondEnd          208     The delta marker would move beyond the source buffer end
+    errcBmp_NotAtEnd                209     Found end of image marker before end of reported image size
+    errcBmp_NoEndOfData             210     Reached end of compressed data without hitting end of data marker
+    errcBmp_SizeTooLarge            211     The size of the image (%(1)) is too large for the target format to support
+    errcBmp_UnknownTypeEnum         212     %(1) is not a known bitmap type enum
+    errcBmp_NoHuffman               213     Huffman1D compression is not support by CIDLib at this time
+    errcBmp_NoBitFields             214     Bitfield compression is not support by CIDLib at this time
+
+    ; Color errors
+    errcClr_BadHSVValue             600     The Value of an HSV color must be from 0.0 to 1.0. Got %(1)
+    errcClr_BadHSVSaturation        601     The Saturation of an HSV color must be from 0.0 to 1.0. Got %(1)
+
+    ; Debug-mode only errors
+    errcDbg_BadClrIndex             650     %(1) is not a valid color index for this pixel fmt
+
+    ; Enum errors
+    errcEnum_BadValue               800     %(1) is not a valid value for enumeration %(2)
+
+    ; General errors
+    errcGen_UnknownImgType          1000    The image type is uknown
+
+    ; Image errors
+    errcImg_NotSetYet               1800    The image data has not been initialized after a default construction
+    errcImg_BadLineRounding         1801    %(1) is not a valid line byte rounding value. It must be 1 to 32
+    errcImg_UnknownType             1802    %(1) is not a valid identifier for a %(2) type image
+    errcImg_UnknownCompression      1803    %(1) is not a valid compression type for a %(2) image
+    errcImg_BadBitDepth             1804    %(1) is not a valid bit depth for this image type
+    errcImg_NoPaletteAvailable      1805    This %(1) image has no palette
+    errcImg_CantHavePalette         1806    An image with > 8 bits per pixel cannot have a palette
+    errcImg_MustHavePalette         1807    An image with < 8 bits per pixel must have a palette
+    errcImg_NotEnoughPelData        1808    The memory buffer has %(1) bytes, but the image size is %(2)
+    errcImg_PaletteTooSmall         1809    The palette has only %(1) colors, but the bit depth is %(2)
+    errcImg_BadFmt                  1810    The image format combination is invalid (%(1),%(2))
+    errcImg_NoAlpha                 1811    The image has no alpha channel
+    errcImg_NotGrayScale            1812    The image is not a gray scale image
+    errcImg_PalNotSupported         1813    Palette based images are not supported here
+    errcImg_ColorOnly               1814    Only color based images are supported here
+    errcImg_BadImgPoint             1815    Point %(1) is not within the image size of %(2)
+    errcImg_NewBitsDifferentFmt     1816    The provided new image bits are of a different format than the target image
+    errcImg_UnsupFormat             1817    The %(1) operation doesn't support image of this bit depth
+    errcImg_NotWithinArea           1818    The source content does not fit within the target
+
+    ; Palette errors
+    errcPal_ZeroElems               5500    A palette cannot have 0 elements
+    errcPal_InitCount               5501    The init container has %(1) elements but the palette has %(2)
+    errcPal_TextFormat              5502    (Line %(1)) -Expected %(2) in the palette text being parsed
+    errcPal_Type                    5503    %(1) is not a valid palette type
+    errcPal_ZeroStoredSize          5504    The palette size streamed back in was zero. This cannot be correct.
+
+    ; Pixel array errors
+    errcPixa_BadPadding             6000    The line byte padding must be at least 1
+    errcPixa_DifferentSize          6001    The target pixel array size is %(1), but this one is %(2)
+    errcPixa_BufTooSmall            6002    The passed buffer was %(1) bytes, but the image data size is %(2)
+    errcPixa_WrongSrcFormat         6003    The source pixel array must be in format %(1)
+    errcPixa_WrongTarFormat         6004    The target pixel array must be in format %(1)
+    errcPixa_DifferentFmt           6005    The source/target pixel arrays must be of the same format
+    errcPixa_TarTooSmall            6006    The target pixel array must be at least as large as the source
+    errcPixa_NoPalFormat            6007    Palette-based formats are not handled by this method
+    errcPixa_BitDepthTooSmall       6008    This algorithm only accepts images of %(1) bit depth or greater
+
+END ERRORS
+
+
+
+; -----------------------------------------------------------------------------
+;   Messages ids (i.e. not for errors)
+; -----------------------------------------------------------------------------
+MESSAGES=
+
+    ; Strings used by the CIDImage_ColorPalette.cpp file
+    midCPal_BlueComp               16000    blue color component
+    midCPal_GreenComp              16001    green color component
+    midCPal_RedComp                16002    red color component
+
+END MESSAGES
+

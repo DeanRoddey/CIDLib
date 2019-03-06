@@ -1,0 +1,26 @@
+// Just validates that we can handle a classpath with - and _ chars
+Class=[Final]
+    ClassPath MEng.User.Tests.Path-Name_Test;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+EndImports;
+
+Members=
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        Return 0;
+    EndMethod;
+
+EndMethods;
+
+

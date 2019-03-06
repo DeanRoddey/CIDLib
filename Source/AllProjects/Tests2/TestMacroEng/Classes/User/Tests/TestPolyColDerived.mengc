@@ -1,0 +1,42 @@
+Class=[NonFinal]
+    ClassPath MEng.User.Tests.TestPolyColDerived;
+    ParentClass MEng.User.Tests.TestPolyColBase;
+EndClass;
+
+
+Imports=
+    MEng.System.Runtime.TextOutStream;
+EndImports;
+
+
+Members=
+    String  m_DerivedValue;
+EndMembers;
+
+
+
+Methods=[Public,Const,Overrides]
+
+    Method FormatTo([InOut] TextOutStream TarStrm)
+    Begin
+        $Parent.FormatTo(TarStrm);
+        TarStrm.FmtStr(", DerivedClass=");
+        TarStrm.Format(m_DerivedValue);
+    EndMethod;
+
+EndMethods;
+
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+
+    Method SetDerivedValue([In] String ToSet)
+    Begin
+        m_DerivedValue := ToSet;
+    EndMethod;
+
+EndMethods;

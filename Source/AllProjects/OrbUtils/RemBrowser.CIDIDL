@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - This file defines the IDL for the remove disk browser interface. This
+  - guy has to implement the functionality needed by a derivative of the
+  - TFileOpenBrowser class. That class is an abstract pluggable file
+  - browser interface used by the file open dialog. By creating a derivative
+  - of that browser class, which works in terms of this interface, we
+  - provide a generic remote file browsing capability that any server app
+  - can support by just creating and registering a server side object of
+  - this interface.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:ClassIntf   CIDIDL:Name="RemBrowser"
+                        CIDIDL:InterfaceId="9719B1449E1B5AC2-5A871C3214D2F876">
+
+        <CIDIDL:Methods>
+
+            <!-- =============================================================
+              - Checks to see if a particular file exists on the remote machine
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bFileExists">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToCheck" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Checks to see if a particular file or subdir exists on the
+              - remote machine under the indicated directory, and returns the
+              - find buffer for it if so
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bFind">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strPath" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strItem" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="fndbToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:Object CIDIDL:Type="TFindBuf"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <CIDIDL:Method CIDIDL:Name="bFind2">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strPath" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="fndbToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:Object CIDIDL:Type="TFindBuf"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Checks to see if the passed path is a directory on the remote
+              - host.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bIsDirectory">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToCheck" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Queries the available volumes on the remote host. It returns
+              - two lists, one of volumes and one of error items for those
+              - volumes that couldn't be queried successfully. It returns the
+              - number of good volumes returned in colVols.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="c4QueryVolumes">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colVols" CIDIDL:Dir="Out">
+                    <CIDIDL:TKeyedHashSet CIDIDL:ElemType="TVolumeInfo"
+                                          CIDIDL:KeyType="TString"
+                                          CIDIDL:KeyOps="TStringKeyOps"
+                                          CIDIDL:KeyExtract="strVolKey"
+                                          CIDIDL:Modulus="29"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colFails" CIDIDL:Dir="Out">
+                    <CIDIDL:TKeyedHashSet CIDIDL:ElemType="TVolFailureInfo"
+                                          CIDIDL:KeyType="TString"
+                                          CIDIDL:KeyOps="TStringKeyOps"
+                                          CIDIDL:KeyExtract="strVolKey"
+                                          CIDIDL:Modulus="29"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Reads in the contents of the remote file. The buffer can hold
+              - anything. It's up to the user of browser to understand what
+              - a given browser gives back. It's just flatted data.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="ReadFile">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToRead" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="mbufToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:THeapBuf/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Loads up the files in the passed directory that match the
+              - passed wildcard. It either works, or throws.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="LoadFiles">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strPath" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strWildcard" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colSubDirs" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TFindBuf"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colFiles" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TFindBuf"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Makes a new subdirectory under the indicated path
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="MakeDirectory">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strBasePath" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strNewDir" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Query the name of the host that the server side is running on.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="QueryHostName">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Removes an indicated path or deletes an indicated file
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="RemoveSelected">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToRemove" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Renames a file or direcotory on the remote host
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="Rename">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strOrgName" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strNewName" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bIsScope" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+        </CIDIDL:Methods>
+    </CIDIDL:ClassIntf>
+
+</CIDIDL:Interface>
+
+
+

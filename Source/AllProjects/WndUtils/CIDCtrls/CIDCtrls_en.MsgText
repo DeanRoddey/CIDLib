@@ -1,0 +1,295 @@
+;
+; FILE NAME: CIDCtrls.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 06/11/1996
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This is the message text file for the facility.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kCtrlsErrs
+    MsgPref=kCtrlsMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    errcNoError                 0       No error
+
+    ; Calendar errors
+    errcCal_GetCurDate          800     Could not get calendar time stamp. Id=%(1)
+    errcCal_SetCurDate          801     Could not set calendar time stamp. Id=%(1)
+
+    ; Clipboard errors
+    errcClip_OpenFailed         350     Could not open the clipboard, must be opened by another window
+    errcClip_Close              351     Could not close the clipboard
+    errcClip_UnsupportedFormat  352     '%(1)' is not a supported clipboard format
+    errcClip_CantRegisterType   353     Could not register CIDLib clipboard format '%(1)'
+    errcClip_Clear              354     Could not clear clipboard
+    errcClip_FormatNotAvail     355     The requested format was not on the clipboard
+    errcClip_CantAlloc          356     Could not allocate global memory to store clipboard data in
+    errcClip_CantStoreMem       357     The copied clipboard data could not be stored
+    errcClip_CantStoreHandle    358     The handle to the clipboard data could not be stored
+    errcClip_CantGetCBData      359     The clipboard seemed to hold the correct format data, but getting it failed
+
+    ; Dialog box errors
+    errcDlg_LoadFailed          950     Could not load the dialog box
+    errcDlg_RunFailed           951     Could not run the dialog box
+
+    ; Dialog description errors
+    errcDlgD_CouldntLoadRes     1000    Dialog description resource %(1) could not be loaded
+    errcDlgD_ItemIdNotFound     1001    No dialog item with id %(1) was found in dialog resource %(2)
+    errcDlgD_ItemType           1002    There is no window class for dialog item type '%(1)'
+
+    ; Facility oriented errors
+    errcFac_UnknownAppImg       1900    standard app image found with name '%(1)'
+    errcFac_BadAppImgFmt        1901    All standard app images must be true-alpha. '%(1)'
+    errcFac_LoadSysPointer      1902    Could not load system pointer %(1)
+    errcFac_SetPointerPos       1903    Could not set the pointer position
+    errcFac_UnknownSysBmp       1904    Unknown system bitmap
+
+    ; Frame window errors
+    errcFrame_NoMenuBar         1950    No menu bar is set on this frame window
+    errcFrame_ActivationErr     1951    The derived class threw an exception from the activation change handler. Getting=%(1)
+
+    ; General errors
+    errcGen_AlreadyCreated      2000    The %(1) has already been created
+    errcGen_CreateFailed        2001    Could not create the %(1)
+    errcGen_GetText             2002    Could not get text from window with id %(1)
+    errcGen_LoopExcept          2003    An unhandled exception occurred in the main msg loop
+
+    ; Image list errors
+    errcImgList_WrongSize       2500    This image list takes images of size %(1)
+    errcImgList_AddFailed       2501    Could not add a new image to the image list
+    errcImgList_DupFailed       2502    Could not duplicate the image list
+
+    ; List oriented errors
+    errcList_AddItem            3000    Could not add new item to the list control. Id=%(1)
+    errcList_BadIndex           3001    Index %(1) not valid for the list. Id=%(2). Count=%(3)
+    errcList_NotMultiSelect     3002    The list is not multi-select capable. Id=%(1)
+    errcList_RemoveAll          3003    Could not remove all items from list. Id=%(1)
+    errcList_WrongColCount      3004    The list has %(1) columns, %(2) values provided. Id=%(3)
+    errcList_AddSubItem         3005    Could not add new sub-item to the list box. Id=%(1)
+    errcList_BadColVals         3006    Could not parse the multi-col list item values. Id=%(1)
+    errcList_NoColumns          3007    Multi-column controls must have at least one column. Id=%(1)
+    errcList_GetCount           3008    Could not get the count of items in the list. Id=%(1)
+    errcList_RemoveItem         3009    Could not get remove item at index %(1). Id=%(2)
+    errcList_NoIdMapping        3010    No list item has the item id %(1). Id=%(2)
+    errcList_GetColCnt          3011    Could not get column count for list. Id=%(1)
+    errcList_CountNEqual        3012    The rows and ids lists are not the same size. Id=%(1)
+    errcList_AccessIndex        3013    Could not access list index %(1). Id=%(2)
+    errcList_TextNotFound       3014    Not list item with text '%(1)'. Id=%(2)
+    errcList_GetColArea         3015    Could not get column area (%(1)/%(2)). Id=%(3)
+    errcList_GetRowArea         3016    Could not get row area (%(1)). Id=%(2)
+    errcList_BadColIndex        3017    %(1) is not a valid column index. Id=%(2)
+    errcList_SetColumnInfo      3018    Could not set options for column %(1). Id=%(2)
+    errcList_GetColText         3019    Could not get column text (%(1)/%(2)). Id=%(3)
+    errcList_UpdateRow          3020    Could not update list row %(1). Id=%(2)
+    errcList_SetItemId          3021    Could not set item id for row %(1). Id=%(2)
+    errcList_BadIItemId         3022    List box item ids cannot be 0xFFFFFFFF. Id=%(1)
+    errcList_GetItemId          3023    Could not get item id for row %(1). Id=%(2)
+    errcList_GetColWidth        3024    Could not get the width of column %(1). Id=%(2)
+    errcList_RedrawRange        3025    Could not redraw list range. Id=%(1)
+    errcList_GetIsMarked        3026    Could not get the marked state of index %(1). Id=%(2)
+    errcList_MarkAll            3027    Could not mark all items. Id=%(1)
+    errcList_SetColumnText      3028    Could not set text for column %(1). Id=%(2)
+    errcList_MarkAt             3029    Could not mark item. Index=%(1), Id=%(2)
+    errcList_SetColTitle        3030    Could not set title for column %(1), Id=%(2)
+    errcList_LoadNumRange       3031    An error occurred loading the combo box with a numeric range. Id=%(1), Vals=%(2)/%(3), Failed=%(4)
+    errcList_InsertItem         3032    An error occured while inserting an item at index %(1). Id=%(2)
+    errcList_NotSorted          3033    The list is not sorted
+
+    ; Menuerrors
+    errcMenu_Create             5100    Could not create menu. Name=(%(1))
+    errcMenu_AlreadyAssigned    5101    The menu is already assigned to a window. Name=(%(1))
+    errcMenu_NotCreated         5102    The menu is not created yet. Name=(%(1))
+    errcMenu_BadItemType        5103    %(1) is not a valid menu resource item type. Name=%(1)
+    errcMenu_AddSubMenu         5104    Could not add submenu to the target menu. Name=%(1)
+    errcMenu_AddActionItem      5105    Could not add action item to the target menu. Name=%(1)
+    errcMenu_AddSeparator       5106    Could not add separator to the target menu. Name=%(1)
+    errcMenu_CantFindItemAt     5108    Could not find menu item at menu index %(1). Name=%(1)
+    errcMenu_EnableItemOfs      5109    Could not enable/disable menu item at offset %(1). Name=%(2)
+    errcMenu_DeleteItem         5110    Could not delete menu item with command id %(1). Name=%(2)
+    errcMenu_EnableItem         5111    Could not enable/disable menu item with command id %(1). Name=%(2)
+    errcMenu_CantFindItem       5112    Could not find menu item with id %(1). Name=%(2)
+    errcMenu_GetItemInfo        5113    Could not get info for menu item id %(1). Name=%(2)
+    errcMenu_CreateAccel        5114    Could not create menu accellerator table
+    errcMenu_Assign             5115    Could not assign menu to a frame window. Name=%(1)
+    errcMenu_NotBarType         5116    Only menu bars can be assigned to windows. Name=%(1)
+    errcMenu_FindSubMenu        5117    Could not find submenu with id %(1) in menu '%(2)'
+
+    ; Named window errors
+    errcNWnd_WndNotFound        5125    No window found named '%(1)'
+    errcNWnd_WndNotValid        5126    The window naned '%(1)' is not valid
+    errcNWnd_DupWndName         5127    There is already a window naned '%(1)'
+
+    ; Notification errors
+    errcNot_BadIdLen            5200    Notification id '%(1)' is too long. Max length is %(2)
+    errcNot_NotHandlerInUse     5201    Notification handler for id '%(1)' is already installed
+    errcNot_NotRequestInUse     5202    Notification request for id '%(1)' is already installed on another window
+    errcNot_CantNotify          5203    Could not send the notification for id '%(1)'
+    errcNot_NullTargetOrSrc     5204    The target or source for a windoww event cannot be null
+
+    ; Object view errors
+    errcObjV_AddItem            5300    Could not add new item to the object view. Id=%(1)
+
+    ; Pane windwo manager
+    errcPWnd_DupPriority        5310   Only one panel each can have Primary/Secondary priority
+
+    ; Some general errors used by numeric range based controls
+    errcRange_MinMax            5400    The min value (%(1)) is >= the max value (%(2))
+    errcRange_NewVal            5401    The value (%(1)) is > the max value (%(2))
+    errcRange_NewVal2           5402    The value (%(1)) is outside the range (%(2) to %(3))
+    errcRange_EnumVal           5403    '%(1)' does not match any existing value
+
+    ; Resource related errors
+    errcRes_NotFound            4500    Facility '%(1)' does not have a resource with id %(2)
+
+    ; Scroll area errors
+    errcScrA_NoChild            5500    No child is set on the scrollable area. Id=%(1)
+    errcScrA_BadPos             5501    %(1) is not a valid scroll position. Id=%(2)
+
+    ; GUI Shell errors
+    errcShell_CoInit            5800    Could not initialize the COM interface. COM Error: %(1)
+    errcShell_ShellLink         5801    Could not create the shell link interface. COM Error: %(1)
+    errcShell_PersistFile       5802    Could not create the persist file interface. COM Error: %(1)
+    errcShell_ShortCutSetFailed 5803    Could not set one of the fields for short cut '%(1)'
+    errcShell_GetDesktopPath    5804    Could not get the desktop path. COM error: %(1)
+    errcShell_SetSavePath       5805    Could not set the target path '%(1)' on persist file. COM errors: %(2)
+    errcShell_InvokeFile        5806    Could not invoke file. Reason=%(1)
+    errcShell_ShortCutNotReady  5807    The shortcut object has not been initialized. Path=%(1)
+
+    ; Spin box errors
+    errcSpin_GetCurVal          6011    Could not get the up/down value
+
+    ; Source editor errs
+    errcSrcEd_TextPreQuery      6020    The text pre-query failed
+    errcSrcEd_BadLineIndex      6021    %(1) is not a valid line index for the multi-line editor. Lines=%(2)
+    errcSrcEd_MustBeFixedFont   6022    The multi-line editor can only accept fixed width fonts
+    errcSrcEd_BadRegEx          6023    The regular expression could not be parsed
+    errcSrcEd_BadSROp           6024    The passed search/replace operation is invalid for this file
+    errcSrcEd_TxtQOverwrite     6025    Querying of MLE text overflowed buffer
+
+    ; Status bar errors
+    errcSBar_SetAreas           6050    Could not set status bar areas. Count=%(1)
+    errcSBar_SetAreaText        6051    Could not set status bar text for area %(1)
+    errcSBar_GetRange           6052    Could not get scroll bar range
+    errcSBar_GetScrollPos       6053    Could not get scroll bar position
+
+    ; Tabbed window errors
+    errcTab_NameNotFound        6100    No tab with the name '%(1)' was found
+    errcTab_BadTabName          6101    The new tab name '%(1)' is empty or not unique
+    errcTab_InsertTab           6102    Could not insert the new tab named '%(1)'
+    errcTab_CurTabIndex         6103    The system returned an invalid tab index '%(1)', count=%(2)
+    errcTab_BadTabIndex         6104    %(1) is not a valid tab index. Count=%(2), Id=%(3)
+    errcTab_IdNotFound          6105    No tab with the id '%(1)' was found
+
+    ; Window timer errors
+    errcTimer_BadId             6150    %(1) is not a valid timer id
+    errcTimer_NotReady          6151    Timer id %(1) has not been allocated
+    errcTimer_Already           6152    Time id %(1) is already started, stop it or reset it
+    errcTimer_SuspUnderflow     6153    The timer suspsension counter for window %(1) underflowed
+    errcTimer_Start             6154    Could not start timer id %(1)
+    errcTimer_Stop              6155    Could not stop timer id %(1)
+    errcTimer_NoIdAvail         6156    Nor more timer ids are available for window %(1)
+    errcTimer_Reset             6157    Could not reset timer id %(1)
+
+    ; Tray app errors
+    errcTray_CantAdd            6175    Could not add the app to the system tray
+
+    ; Tree control errors
+    errcTree_IdNotFound         6200    The item id '%(1)' was not found in the tree
+    errcTree_ParentNotFound     6201    Could not find parent of tree item with id %(1)
+    errcTree_HandleNotFound     6202    Could not find the item's handle in the tree
+    errcTree_PathNotFound       6203    The item path '%(1)' was not found in the tree
+    errcTree_GetItemText        6204    Could not get item text for path '%(1)'
+    errcTree_GetItem            6205    Could not get item info for path '%(1)'
+    errcTree_SetItem            6206    Could not set item info for path '%(1)'
+    errcTree_NotAScope          6207    Path '%(1)' is not a scope item
+
+    ; Core window errors
+    errcWnd_RegisterClass       7000    Could not register window class %(1)
+    errcWnd_NotValidWnd         7001    The window object is not a valid window
+    errcWnd_CreateWnd           7002    Could not create window. Class=%(1)
+    errcWnd_APIFailed           7003    Window API failed. Window id=%(1), API=%(2)
+    errcWnd_NoChildWithId       7004    No child window with id %(1) was found
+    errcWnd_ParOwnerNotFound    7005    No parent or owner window was found
+    errcWnd_NotValidWindow      7006    The underlying window is no longer valid
+    errcWnd_SetPos              7007    Could not set position of window with id %(1). Pos=%(2)
+    errcWnd_QueryArea           7008    Could not query the area of window with id %(1)
+    errcWnd_NoClient            7009    The frame window does not have a client window
+    errcWnd_SetValue            7010    Could not set the %(1) value. Id=%(2)
+    errcWnd_ValueRange          7011    The %(1) value is out of the valid range. Id=%(2)
+    errcWnd_ItemIdNotFound      7012    No item with id %(1) found in %(2) control
+    errcWnd_InsertItem          7013    Could not insert item into %(1) control. Id=%(2)
+    errcWnd_AddColumn           7014    Could not add column header. Id=%(1)
+    errcWnd_NotCIDWindow        7015    Child %(1) is not a CIDCtrls window
+    errcWnd_SetParent           7016    Could not change the window's parent window
+    errcWnd_GetParent           7017    Could not get the window's parent window
+    errcWnd_GetOwner            7018    Could not get the window's owner window
+    errcWnd_SetOwner            7019    Could not change the window's owner window
+    errcWnd_NotAChild           7020    The passed window must be a child of this window. Id=%(1)
+    errcWnd_Redraw              7021    Could not force a redraw of window. Id=%(1)
+    errcWnd_BeginPaint          7022    Painting setup failed. Id=%(1)
+    errcWnd_SetZOrder           7023    Could not set the Z order of this window. Id=%(1)
+    errcWnd_BadTrackPnt         7024    The initial point (%(1)) was not within the track area (%(2))
+    errcWnd_ReleaseMouse        7025    Could not release the mouse capture
+    errcWnd_NoTopLevelWnd       7026    No top level parent could be found
+    errcWnd_SetSize             7027    Could not set size of window with id %(1). Size=%(2)
+    errcWnd_SetArea             7028    Could not set area of window with id %(1). Area=%(2)
+    errcWnd_MapWndCoordinates   7029    Could not map the window coordinate: %(1)
+    errcWnd_Scroll              7030    Could not scroll the window
+    errcWnd_SetOrder            7031    Could not set the Z order of this window. Id=%(1)
+    errcWnd_Invalidate          7032    The attempt to invalidate an area of the window failed. Area=%(1), Window Id=%(2)
+    errcWnd_InvalidateRgn       7033    The attempt to invalidate a region of the window failed. Window Id=%(1)
+    errcWnd_EnumWindows         7034    Could not enumerate top level windows
+    errcWnd_CantSendInput       7035    Could not send fake user input packet
+    errcWnd_MultiWndRepos       7036    Multi-window resize/pos operation failed
+    errcWnd_QueryClientArea     7037    Could not query the client area of window with id %(1)
+    errcWnd_SetId               7038    The window's id could not be set
+
+    ; Window state errors
+    errcWState_AlreadyExists    7200    Windows state '%(1)' already exists on this window
+    errcWState_NotFound         7201    This window does not have a state named '%(1)'
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    ; Text for the error popup dialog
+    midDlg_Err_Caption         15100    An error has occured, see text below:
+    midDlg_Err_Details         15101    &Details
+    midDlg_Err_Copy            15102    C&opy
+    midDlg_Err_Close           15103    &Close
+
+    ; Text for the error details dialog
+    midDlg_TError_Title        25250    Error Details [Proc=%(1)]
+    midDlg_TError_FacPref      25251    Facility:
+    midDlg_TError_SevPref      25252    Severity:
+    midDlg_TError_LinePref     25253    Line:
+    midDlg_TError_ClassPref    25254    Error Class:
+    midDlg_TError_ErrPref      25255    Error #:
+
+
+END MESSAGES
+

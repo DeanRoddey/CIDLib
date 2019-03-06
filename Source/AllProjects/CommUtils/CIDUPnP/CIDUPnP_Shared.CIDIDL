@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  -   This IDL is just used to generate types and constants for
+  -   convenience (since it does some useful things for us) and to potentially
+  -   make them available to non-C++ code later.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <!-- Global constants -->
+        <CIDIDL:Constants>
+
+            <!-- Define some device type URNs -->
+            <CIDIDL:Constant CIDIDL:Name="strDevType_MediaRenderer" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:device:MediaRenderer:1">
+                <CIDIDL:DocText>
+                    Some well known UPnP device type URNs
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strDevType_MediaServer" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:device:MediaServer:1"/>
+            <CIDIDL:Constant CIDIDL:Name="strDevType_RootDev" CIDIDL:Type="TString"
+                             CIDIDL:Value="upnp:rootdevice"/>
+            <CIDIDL:Constant CIDIDL:Name="strDevType_ZonePlayer" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:device:ZonePlayer:1"/>
+
+
+            <!-- Define some service type URNs -->
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_AVTransport" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:AVTransport:1">
+                <CIDIDL:DocText>
+                    Some well known UPnP service type URNs
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_AlarmClock" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:AlarmClock:1"/>
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_AudioIn" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:AudioIn:1"/>
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_ConnectionMgr" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:ConnectionManager:1"/>
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_ContentDirectory" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:ContentDirectory:1"/>
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_DeviceProperties" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:DeviceProperties:1"/>
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_GroupManagement" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:GroupManagement:1"/>
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_MusicServices" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:MusicServices:1"/>
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_RendControl" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:RenderingControl:1"/>
+            <CIDIDL:Constant CIDIDL:Name="strSvcType_ZoneGroupTopology" CIDIDL:Type="TString"
+                             CIDIDL:Value="urn:schemas-upnp-org:service:ZoneGroupTopology:1"/>
+
+        </CIDIDL:Constants>
+
+        <!-- Global types -->
+        <CIDIDL:Types>
+
+            <!-- The UPnP play modes -->
+            <CIDIDL:Enum    CIDIDL:Name="EPlayModes" CIDIDL:XlatMap="Text"
+                            CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="Text"
+                            CIDIDL:AltMap="BaseName" CIDIDL:FormatMap="Text"
+                            >
+                <CIDIDL:DocText>
+                    The supported UPnP play modes
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="UNKNOWN" CIDIDL:Text="Unknown"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NORMAL" CIDIDL:Text="Normal"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SHUFFLE" CIDIDL:Text="Shuffle"/>
+                <CIDIDL:EnumVal CIDIDL:Name="REPEAT" CIDIDL:Text="Repeat"/>
+                <CIDIDL:EnumVal CIDIDL:Name="REPEATONE" CIDIDL:Text="RepeatOne"/>
+                <CIDIDL:EnumVal CIDIDL:Name="RANDOM" CIDIDL:Text="Random"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DIRECT" CIDIDL:Text="Direct"/>
+                <CIDIDL:EnumVal CIDIDL:Name="INTRO" CIDIDL:Text="Intro"/>
+            </CIDIDL:Enum>
+
+
+            <!-- The UPnP AV Transport transport state values -->
+            <CIDIDL:Enum    CIDIDL:Name="ETransStates" CIDIDL:XlatMap="Text"
+                            CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="Text"
+                            CIDIDL:AltMap="BaseName" CIDIDL:FormatMap="Text"
+                            >
+                <CIDIDL:DocText>
+                    The supported UPnP transport modes
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="UNKNOWN" CIDIDL:Text="Unknown"/>
+                <CIDIDL:EnumVal CIDIDL:Name="STOPPED" CIDIDL:Text="Stopped"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PAUSED_PLAYBACK" CIDIDL:Text="Paused PB"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PAUSED_RECORDING" CIDIDL:Text="Paused Rec"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PLAYING" CIDIDL:Text="Playing"/>
+                <CIDIDL:EnumVal CIDIDL:Name="RECORDING" CIDIDL:Text="Recording"/>
+                <CIDIDL:EnumVal CIDIDL:Name="TRANSITIONING" CIDIDL:Text="Transitioning"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NO_MEDIA_PRESENT" CIDIDL:Text="No Media"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+

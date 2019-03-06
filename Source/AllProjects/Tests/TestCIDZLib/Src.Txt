@@ -1,0 +1,3910 @@
+//
+// FILE NAME: CIDLib_String.cpp
+//
+// AUTHOR: Dean Roddey
+//
+// CREATED: 11/16/1992
+//
+// COPYRIGHT: 1992..2002, Charmed Quark Software
+//
+//  This file and its contents are the property of Charmed Quark Software. It
+//  may not be redistributed in any modified form, or as part of any product
+//  other than the original CIDLib C++ Frameworks distribution file. Its
+//  contents may not be compiled into any other product, except when required
+//  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+//  product is subject to any relevant licensing agreements.
+//
+// DESCRIPTION:
+//
+//  This file implements the standard string classes. These classes provide
+//  all of the usual string manipulation services.
+//
+// CAVEATS/GOTCHAS:
+//
+//  1)  Token replacement is an important component of the string class. A
+//      token has the following potential formats:
+//
+//          %(X)        - X is the token character
+//          %(X,W)      - W is the field width, negative means left justify
+//          %(X,W,F)    - F is the fill character for the field
+//
+// LOG:
+//
+//  $Log$
+//
+
+
+// ---------------------------------------------------------------------------
+//  Includes
+// ---------------------------------------------------------------------------
+#include    "CIDLib_.hpp"
+
+
+// ---------------------------------------------------------------------------
+//  Do our RTTI macros
+// ---------------------------------------------------------------------------
+AdvRTTIDecls(TString,TObject)
+
+
+// ---------------------------------------------------------------------------
+//  This class does not need to null terminate until the user calls the
+//  pszBuffer() method. This can sometimes make things hard to read in the
+//  debugger, so in extreme cases we can turn this on to force null terms
+//  to be done. This can make the difference when trying to figure out a
+//  problem in the string manipulation.
+// ---------------------------------------------------------------------------
+// #define CIDSTRING_NULTERM
+
+
+namespace CIDLib_String
+{
+    // -----------------------------------------------------------------------
+    //  Local, constant data
+    //
+    //  c1FmtVersion
+    //      A format version that we stream out, so that we can upgrade the
+    //      persistence format automatically later if needed.
+    //
+    //  c4ReallocBlock
+    //      The steps that we try to alloc strings in.
+    // -----------------------------------------------------------------------
+    const tCIDLib::TCard1   c1FmtVersion    = 1;
+    const tCIDLib::TCard4   c4ReallocBlock  = 64;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  Local functions
+// ---------------------------------------------------------------------------
+
+//
+//  This method will find a token in the passed string, parse it out, and
+//  give back the token information.
+//
+//  Returns a pointer to the % sign of the token found, or 0 if not found.
+//
+static const tCIDLib::TCh*
+pszFindToken(   const   tCIDLib::TCh* const pszSource
+                , const tCIDLib::TCh        chToken
+                ,       tCIDLib::EHJustify& eJustify
+                ,       tCIDLib::TCard4&    c4FldWidth
+                ,       tCIDLib::TCh&       chFill
+                ,       tCIDLib::TCard4&    c4TokenChars)
+{
+    const tCIDLib::TCh* const pszSeparators = L"(,)%";
+
+    tCIDLib::TCh        chTokenType;
+    tCIDLib::TInt4      i4WidthVal;
+    const tCIDLib::TCh* pszCur;
+    const tCIDLib::TCh* pszClose;
+    tCIDLib::TCh*       pszTok;
+    tCIDLib::TCh        szTmp[64];
+
+    // Set up the returns with correct default values
+    eJustify        = tCIDLib::EHJustify_Right;
+    c4FldWidth      = 0;
+    c4TokenChars    = 0;
+    chFill          = kCIDLib::chSpace;
+
+    //
+    //  Do an initial search for a percent sign. After we find one, check the
+    //  next character to see what we are looking for.
+    //
+    pszCur = TRawStr::pszFindChar(pszSource, L'%');
+    while (pszCur != 0)
+    {
+        // See if the next char is the end of the string. If so, then no match
+        if (*(pszCur + 1) == 0)
+            return 0;
+
+        // If the next char is a (, then it is a token so check it out
+        if (*(pszCur + 1) == L'(')
+        {
+            // Search for the closing paren
+            pszClose = TRawStr::pszFindChar(pszCur + 1, L')');
+
+            //
+            //  There was no closing parm so we need to just search for the
+            //  next %, because this was a false alarm.
+            //
+            if (!pszClose)
+            {
+                pszCur++;
+                pszCur = TRawStr::pszFindChar(pszCur, L'%');
+                continue;
+            }
+
+            //
+            //  If the enclosed text is larger than the tmp buffer, then
+            //  something is wrong.
+            //
+            if (pszClose - pszCur > c4MaxBufChars(szTmp))
+            {
+                facCIDLib().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kCIDErrs::errcStr_InvalidToken
+                    , tCIDLib::ESev_Warning
+                    , tCIDLib::EClass_BadParms
+                );
+                return 0;
+            }
+
+            // If it is empty, then can't be right
+            if (pszClose-pszCur == 1)
+            {
+                facCIDLib().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kCIDErrs::errcStr_InvalidToken
+                    , tCIDLib::ESev_Warning
+                    , tCIDLib::EClass_BadParms
+                );
+                return 0;
+            }
+
+            //
+            //  We need to parse the token contents. So copy the substring of
+            //  the token to a temp buffer. Note that we multiply by the char
+            //  size in order to convert chars to bytes.
+            //
+            TRawMem::CopyMemBuf
+            (
+                szTmp
+                , pszCur
+                , (pszClose - pszCur) * kCIDLib::c4CharBytes
+            );
+            szTmp[pszClose - pszCur] = 0;
+            pszTok = TRawStr::pszStrTokenize(szTmp, pszSeparators);
+
+            //
+            //  If no token or the more than a character, then invalid.
+            //  Otherwise, pull out the token as the token character.
+            //
+            if (!pszTok || (TRawStr::c4StrLen(pszTok) > 1))
+            {
+                facCIDLib().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kCIDErrs::errcStr_InvalidToken
+                    , tCIDLib::ESev_Warning
+                    , tCIDLib::EClass_BadParms
+                );
+                return 0;
+            }
+            chTokenType = pszTok[0];
+
+            //
+            //  See if the char is the token character. If not, then start
+            //  looking for the next character.
+            //
+            if (chToken != chTokenType)
+            {
+                pszCur++;
+                pszCur = TRawStr::pszFindChar(pszCur, L'%');
+                continue;
+            }
+
+            // We know the token width now
+            c4TokenChars = (pszClose - pszCur) + 1;
+
+            //
+            //  Look for another token. If so, then it will be the field
+            //  width. It must be a valid integral value. If it is negative,
+            //  that means left justification.
+            //
+            pszTok = TRawStr::pszStrTokenize(0, pszSeparators);
+            if (pszTok)
+            {
+                tCIDLib::TBoolean  bValid;
+                i4WidthVal = TRawStr::i4AsBinary
+                (
+                    pszTok
+                    , bValid
+                    , tCIDLib::ERadix_Dec
+                );
+
+                if (!bValid)
+                {
+                    facCIDLib().ThrowErr
+                    (
+                        CID_FILE
+                        , CID_LINE
+                        , kCIDErrs::errcStr_InvalidToken
+                        , tCIDLib::ESev_Warning
+                        , tCIDLib::EClass_BadParms
+                    );
+                    return 0;
+                }
+
+                if (i4WidthVal < 0)
+                {
+                    eJustify = tCIDLib::EHJustify_Left;
+                    if (i4WidthVal < 0)
+                        c4FldWidth = i4WidthVal * -1;
+                    else
+                        c4FldWidth = i4WidthVal;
+                }
+                 else
+                {
+                    c4FldWidth = i4WidthVal;
+                }
+
+                pszTok = TRawStr::pszStrTokenize(0, L"(,)%");
+                if (pszTok)
+                {
+                    if (TRawStr::c4StrLen(pszTok) > 1)
+                    {
+                        facCIDLib().ThrowErr
+                        (
+                            CID_FILE
+                            , CID_LINE
+                            , kCIDErrs::errcStr_InvalidToken
+                            , tCIDLib::ESev_Warning
+                            , tCIDLib::EClass_BadParms
+                        );
+                        return 0;
+                    }
+                    chFill = pszTok[0];
+                }
+            }
+
+            // Break out to return
+            break;
+        }
+
+        // Look for another percent sign
+        pszCur++;
+        pszCur = TRawStr::pszFindChar(pszCur, L'%');
+    }
+    return pszCur;
+}
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStrBuf
+//  PREFIX: strb
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TStrBuf: Constructors and Destructor
+// ---------------------------------------------------------------------------
+TString::TStrBuf::TStrBuf() :
+
+    m_c4CurEnd(0)
+    , m_c4BufChars(8)
+    , m_pszBuffer(0)
+{
+    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+}
+
+TString::TStrBuf::TStrBuf(const tCIDLib::TCard4 c4BufSize) :
+
+    m_c4CurEnd(0)
+    , m_c4BufChars(c4BufSize)
+    , m_pszBuffer(0)
+{
+    // Catch psycho scenario and bump it back to 8
+    if (!m_c4BufChars)
+        m_c4BufChars = 8;
+
+    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[0] = 0;
+    #endif
+}
+
+TString::TStrBuf::TStrBuf(const tCIDLib::TCh chInit) :
+
+    m_c4CurEnd(1)
+    , m_c4BufChars(8)
+    , m_pszBuffer(0)
+{
+    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+    m_pszBuffer[0] = chInit;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[1] = 0;
+    #endif
+}
+
+TString::TStrBuf::TStrBuf(  const   tCIDLib::TCh* const pszInit
+                            , const tCIDLib::TCard4     c4ExtraChars) :
+    m_c4CurEnd(0)
+    , m_c4BufChars(0)
+    , m_pszBuffer(0)
+{
+    //
+    //  Watch for a null value and format the magic value for a null string.
+    //  Else, just process it normally.
+    //
+    const tCIDLib::TCh* pszSrc = pszInit;
+    if (!pszInit)
+        pszSrc = kCIDLib::pszNullStr;
+
+    m_c4CurEnd = TRawStr::c4StrLen(pszSrc);
+    m_c4BufChars = m_c4CurEnd + c4ExtraChars;
+    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+    TRawMem::CopyMemBuf
+    (
+        m_pszBuffer
+        , pszSrc
+        , m_c4CurEnd * kCIDLib::c4CharBytes
+    );
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+TString::TStrBuf::TStrBuf(  const   TStrBuf&            strbInit
+                            , const tCIDLib::TCard4     c4ExtraChars) :
+    m_c4CurEnd(0)
+    , m_c4BufChars(0)
+    , m_pszBuffer(0)
+{
+    m_c4CurEnd = strbInit.m_c4CurEnd;
+    m_c4BufChars = strbInit.m_c4BufChars + c4ExtraChars;
+    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+    TRawMem::CopyMemBuf
+    (
+        m_pszBuffer
+        , strbInit.m_pszBuffer
+        , m_c4CurEnd * kCIDLib::c4CharBytes
+    );
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+TString::TStrBuf::TStrBuf(          tCIDLib::TCh* const pszToAdopt
+                            , const tCIDLib::EAdoptOpts eAdopt) :
+    m_c4CurEnd(0)
+    , m_c4BufChars(0)
+    , m_pszBuffer(0)
+{
+    //
+    //  If its a null pointer, then be tolerant and just create another buffer
+    //  of our own, which will be empty. Otherwise, just accept the passed
+    //  buffer and either adopt or copy it.
+    //
+    if (!pszToAdopt)
+    {
+        m_c4BufChars = 8;
+        m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+        m_c4CurEnd = 0;
+        *m_pszBuffer = 0;
+    }
+     else
+    {
+        m_c4CurEnd = TRawStr::c4StrLen(pszToAdopt);
+        m_c4BufChars = m_c4CurEnd;
+
+        if (eAdopt)
+            m_pszBuffer = pszToAdopt;
+        else
+            m_pszBuffer = TRawStr::pszReplicate(pszToAdopt);
+    }
+}
+
+TString::TStrBuf::TStrBuf(  const   tCIDLib::TCh* const pszInit1
+                            , const tCIDLib::TCh* const pszInit2) :
+    m_c4CurEnd(0)
+    , m_c4BufChars(0)
+    , m_pszBuffer(0)
+{
+    //
+    //  Calculate the needed length, we have to deal with either of them
+    //  being null, and use the magic Null string value.
+    //
+    const tCIDLib::TCh* pszActual1 = pszInit1 ? pszInit1 : kCIDLib::pszNullStr;
+    const tCIDLib::TCh* pszActual2 = pszInit2 ? pszInit2 : kCIDLib::pszNullStr;
+    const tCIDLib::TCard4 c4Len1 = TRawStr::c4StrLen(pszActual1);
+    const tCIDLib::TCard4 c4Len2 = TRawStr::c4StrLen(pszActual2);
+
+    // Store the length, which is the sum of the two init strings
+    m_c4CurEnd = c4Len1 + c4Len2;
+
+    // Set the buffer a little larger, just in case
+    m_c4BufChars = m_c4CurEnd + 16;
+
+    // Allocate the buffer now and copy, append the strings in
+    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+
+    TRawMem::CopyMemBuf
+    (
+        m_pszBuffer
+        , pszActual1
+        , c4Len1 * kCIDLib::c4CharBytes
+    );
+
+    // On this one
+    TRawMem::CopyMemBuf
+    (
+        &m_pszBuffer[c4Len1]
+        , pszActual2
+        , c4Len2 * kCIDLib::c4CharBytes
+    );
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+TString::TStrBuf::TStrBuf(const TStrBuf& strb1, const TStrBuf& strb2) :
+
+    m_c4CurEnd(0)
+    , m_c4BufChars(0)
+    , m_pszBuffer(0)
+{
+    //
+    //  Set the current length as the sum of the two init strings. Set the
+    //  current buffer a little bit bigger than that.
+    //
+    m_c4CurEnd = strb1.m_c4CurEnd + strb2.m_c4CurEnd;
+    m_c4BufChars = m_c4CurEnd + 16;
+
+    // Allocate the buffer now and copy, append the strings in
+    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+
+    TRawMem::CopyMemBuf
+    (
+        m_pszBuffer
+        , strb1.m_pszBuffer
+        , strb1.m_c4CurEnd * kCIDLib::c4CharBytes
+    );
+
+    // On this one
+    TRawMem::CopyMemBuf
+    (
+        &m_pszBuffer[strb1.m_c4CurEnd]
+        , strb2.m_pszBuffer
+        , strb2.m_c4CurEnd * kCIDLib::c4CharBytes
+    );
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+TString::TStrBuf::TStrBuf(const TStrBuf& strbToCopy) :
+
+    m_c4CurEnd(strbToCopy.m_c4CurEnd)
+    , m_c4BufChars(strbToCopy.m_c4BufChars)
+    , m_pszBuffer(0)
+{
+    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+    TRawMem::CopyMemBuf
+    (
+        m_pszBuffer
+        , strbToCopy.m_pszBuffer
+        , m_c4CurEnd * kCIDLib::c4CharBytes
+    );
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+TString::TStrBuf::~TStrBuf()
+{
+    delete [] m_pszBuffer;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TStrBuf: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TString::TStrBuf::Append(const tCIDLib::TCh* const pszToAppend)
+{
+    // If the source string is a null pointer, then make it the special value
+    const tCIDLib::TCh* pszActual = pszToAppend ? pszToAppend
+                                                : kCIDLib::pszNullStr;
+
+    // Get the length of the source string
+    const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszActual);
+
+    // See if we have enough to hold it, else expand. Maintain the current text
+    if (m_c4CurEnd + c4SrcLen > m_c4BufChars)
+        Reallocate(m_c4CurEnd + c4SrcLen, kCIDLib::True);
+
+    // And copy the src onto the end
+    TRawMem::CopyMemBuf
+    (
+        &m_pszBuffer[m_c4CurEnd]
+        , pszActual
+        , c4SrcLen * kCIDLib::c4CharBytes
+    );
+
+    // And update the length
+    m_c4CurEnd += c4SrcLen;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::Append(const TStrBuf& strbToAppend)
+{
+    //
+    //  Calculate the buffer size we'll need. If the passed string is empty,
+    //  then just bail out now.
+    //
+    const tCIDLib::TCard4 c4Needed = m_c4CurEnd + strbToAppend.m_c4CurEnd;
+    if (c4Needed == m_c4CurEnd)
+        return;
+
+    // Reallocate if needed. Maintain the current content
+    if (c4Needed > m_c4BufChars)
+        Reallocate(c4Needed, kCIDLib::True);
+
+    // Copy the source onto the end, getting the null terminator
+    TRawMem::CopyMemBuf
+    (
+        &m_pszBuffer[m_c4CurEnd]
+        , strbToAppend.m_pszBuffer
+        , strbToAppend.m_c4CurEnd * kCIDLib::c4CharBytes
+    );
+
+    m_c4CurEnd = c4Needed;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid
+TString::TStrBuf::AppendSubStr( const   TStrBuf&        strbAppend
+                                , const tCIDLib::TCard4 c4Start
+                                , const tCIDLib::TCard4 c4Len)
+{
+    // Is the source string is empty, then just return cause nothing to do
+    if (!strbAppend.m_c4CurEnd)
+        return;
+
+    // Make sure the start is within the current length of the source
+    if (c4Start >= strbAppend.m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4Start)
+            , clsThis()
+            , TCardinal(strbAppend.m_c4CurEnd)
+        );
+    }
+
+    //
+    //  If the len is c4MaxCard, then set to exactly the rest of the source
+    //  string.
+    //
+    tCIDLib::TCard4 c4ActualLen = c4Len;
+    if (c4ActualLen == kCIDLib::c4MaxCard)
+    {
+        c4ActualLen = strbAppend.m_c4CurEnd - c4Start;
+    }
+     else
+    {
+        if (c4Start + c4ActualLen > strbAppend.m_c4CurEnd)
+        {
+            facCIDLib().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kCIDErrs::errcGen_IndexError
+                , tCIDLib::ESev_APIFailed
+                , tCIDLib::EClass_BadParms
+                , TCardinal(c4Start + c4Len)
+                , clsThis()
+                , TCardinal(strbAppend.m_c4CurEnd)
+            );
+        }
+    }
+
+    // If we ended up with nothing to do, then return
+    if (!c4ActualLen)
+        return;
+
+    //
+    //  See if we need to reallocate. If so it will reallocate to the
+    //  nearest next realloc increment thats equal to or greater than
+    //  c4Actual. Maintain the current text content in the new buffer.
+    //
+    if (m_c4CurEnd + c4ActualLen > m_c4BufChars)
+        Reallocate(m_c4CurEnd + c4ActualLen, kCIDLib::True);
+
+    //
+    //  Copy over the data. We multiply by the character size to convert
+    //  chars to bytes.
+    //
+    TRawMem::CopyMemBuf
+    (
+        &m_pszBuffer[m_c4CurEnd]
+        , &strbAppend.m_pszBuffer[c4Start]
+        , c4ActualLen * kCIDLib::c4CharBytes
+    );
+
+    // And update the current length
+    m_c4CurEnd += c4ActualLen;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid
+TString::TStrBuf::AppendSubStr( const   tCIDLib::TCh* const pszAppend
+                                , const tCIDLib::TCard4     c4Start
+                                , const tCIDLib::TCard4     c4Len)
+{
+    // The source cannot be a null pointer in this case
+    if (!pszAppend)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_NullSrc
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+        );
+    }
+
+    //
+    //  If the len is c4MaxCard, then set to exactly the rest of the source
+    //  string.
+    //
+    tCIDLib::TCard4 c4ActualLen = c4Len;
+    if (c4ActualLen == kCIDLib::c4MaxCard)
+    {
+        // Get the length of the text we are appending from
+        const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszAppend);
+        c4ActualLen = c4SrcLen - c4Start;
+    }
+
+    // If we ended up with nothing to do, then return
+    if (!c4ActualLen)
+        return;
+
+    //
+    //  See if we need to reallocate. If so it will reallocate to the
+    //  nearest next realloc increment thats equal to or greater than
+    //  c4Actual. Maintain the current text content in the new buffer.
+    //
+    if (m_c4CurEnd + c4ActualLen > m_c4BufChars)
+        Reallocate(m_c4CurEnd + c4ActualLen, kCIDLib::True);
+
+    //
+    //  Copy over the data. We multiply by the character size to convert
+    //  chars to bytes.
+    //
+    TRawMem::CopyMemBuf
+    (
+        &m_pszBuffer[m_c4CurEnd]
+        , &pszAppend[c4Start]
+        , c4ActualLen * kCIDLib::c4CharBytes
+    );
+
+    // And update the current length
+    m_c4CurEnd += c4ActualLen;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TBoolean TString::TStrBuf::bEqual(const TStrBuf& strbToComp) const
+{
+    // Can't be equal if not the same length
+    if (m_c4CurEnd != strbToComp.m_c4CurEnd)
+        return kCIDLib::False;
+
+    // We know the lengths, so just do a memory compare now
+    const tCIDLib::ESortComps eRes = TRawMem::eCompareMemBuf
+    (
+        m_pszBuffer
+        , strbToComp.m_pszBuffer
+        , m_c4CurEnd * kCIDLib::c4CharBytes
+    );
+    return (eRes == tCIDLib::ESort_Equal);
+}
+
+
+tCIDLib::TCh& TString::TStrBuf::chAt(const tCIDLib::TCard4 c4Ind)
+{
+    if (c4Ind < m_c4CurEnd)
+        return m_pszBuffer[c4Ind];
+
+    facCIDLib().ThrowErr
+    (
+        CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcGen_IndexError
+        , tCIDLib::ESev_APIFailed
+        , tCIDLib::EClass_BadParms
+        , TCardinal(c4Ind)
+        , clsThis()
+        , TCardinal(m_c4CurEnd)
+    );
+
+    // Make the compiler happy, but we'll never get here
+    return m_pszBuffer[0];
+}
+
+tCIDLib::TCh TString::TStrBuf::chAt(const tCIDLib::TCard4 c4Ind) const
+{
+    if (c4Ind < m_c4CurEnd)
+        return m_pszBuffer[c4Ind];
+
+    facCIDLib().ThrowErr
+    (
+        CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcGen_IndexError
+        , tCIDLib::ESev_APIFailed
+        , tCIDLib::EClass_BadParms
+        , TCardinal(c4Ind)
+        , clsThis()
+        , TCardinal(m_c4CurEnd)
+    );
+
+    // Make the compiler happy, but we'll never get here
+    return 0;
+}
+
+
+tCIDLib::TCh TString::TStrBuf::chLast() const
+{
+    if (!m_c4CurEnd)
+        return kCIDLib::chNull;
+    return m_pszBuffer[m_c4CurEnd - 1];
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::CapAt(const tCIDLib::TCard4 c4Index)
+{
+    //
+    //  We'll let it be at the current end, which basically becomes a no-op,
+    //  since its already capped there, but it makes things easier for client
+    //  code, so they don't have to special case this.
+    //
+    if (c4Index <= m_c4CurEnd)
+    {
+        m_c4CurEnd = c4Index;
+
+        // If in debug mode, null terminate it for easier reading in the debugger
+        #ifdef CIDSTRING_NULTERM
+        m_pszBuffer[m_c4CurEnd] = 0;
+        #endif
+        return;
+    }
+
+    facCIDLib().ThrowErr
+    (
+        CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcGen_IndexError
+        , tCIDLib::ESev_APIFailed
+        , tCIDLib::EClass_BadParms
+        , TCardinal(c4Index)
+        , clsThis()
+        , TCardinal(m_c4CurEnd)
+    );
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::Clear()
+{
+    m_c4CurEnd = 0;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid
+TString::TStrBuf::Cut(const tCIDLib::TCard4 c4Start, const tCIDLib::TCard4 c4Len)
+{
+    if (!c4Len)
+        return;
+
+    // We cannot start beyond the end
+    if (c4Start >= m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4Start)
+            , clsThis()
+            , TCardinal(m_c4CurEnd)
+        );
+    }
+
+    tCIDLib::TCard4 c4ActualLen = c4Len;
+    if ((c4ActualLen == kCIDLib::c4MaxCard)
+    ||  ((c4Start + c4ActualLen) == m_c4CurEnd))
+    {
+        m_c4CurEnd = c4Start;
+        return;
+    }
+     else if ((c4Start + c4ActualLen) > m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4Start + c4Len)
+            , clsThis()
+            , TCardinal(m_c4CurEnd)
+        );
+    }
+
+    // Copy the text at c4Start+c4ActualLen down to c4Start
+    tCIDLib::TCh* pszDest = &m_pszBuffer[c4Start];
+    tCIDLib::TCh* pszSrc  = &m_pszBuffer[c4Start + c4ActualLen];
+    tCIDLib::TCh* pszEnd  = &m_pszBuffer[m_c4CurEnd];
+    while (pszSrc < pszEnd)
+        *pszDest++ = *pszSrc++;
+
+    // Adjust the end by the actual length
+    m_c4CurEnd -= c4ActualLen;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::DeleteLast()
+{
+    // If already empty, then we are happy
+    if (!m_c4CurEnd)
+        return;
+
+    // Just put a 0 in the last character and dec the length
+    m_c4CurEnd--;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid
+TString::TStrBuf::FromZStr( const   tCIDLib::TCh* const pszSrc
+                            , const tCIDLib::TCard4     c4Count)
+{
+    // If the source is a null pointer, then set it to the special value
+    const tCIDLib::TCh* pszActual = pszSrc ? pszSrc : kCIDLib::pszNullStr;
+
+    // Get the length of the actual source string
+    const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszActual);
+
+    // Get the actual count, which if zero means the actual source length
+    tCIDLib::TCard4 c4ActualCount = c4Count ? c4Count : c4SrcLen;
+
+    // If the actual count is longer than the source string, an error
+    if (c4ActualCount > c4SrcLen)
+    {
+        facCIDLib().ThrowErr
+        (
+             CID_FILE
+             , CID_LINE
+             , kCIDErrs::errcStr_CountOverLen
+             , tCIDLib::ESev_APIFailed
+             , tCIDLib::EClass_AppError
+             , TCardinal(c4ActualCount)
+             , TCardinal(c4SrcLen)
+        );
+    }
+
+    //
+    //  If the actual count is bigger than our current buffer, reallocate.
+    //  Tell it not to bother retaining the current contents, since we are
+    //  going to just set a new value below.
+    //
+    if (c4ActualCount > m_c4BufChars)
+        Reallocate(c4ActualCount + 16, kCIDLib::False);
+
+    TRawMem::CopyMemBuf
+    (
+        m_pszBuffer
+        , pszActual
+        , c4ActualCount * kCIDLib::c4CharBytes
+    );
+    m_c4CurEnd = c4ActualCount;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid
+TString::TStrBuf::FormatToFld(  const   TStrBuf&            strbSrc
+                                , const tCIDLib::TCard4     c4FldWidth
+                                , const tCIDLib::EHJustify  eJustify
+                                , const tCIDLib::TCh        chFill)
+{
+    //
+    //  If the field width is zero, then we will just make it fit the
+    //  source string, so its an easy one.
+    //
+    if (!c4FldWidth)
+    {
+        Set(strbSrc);
+        return;
+    }
+
+    //
+    //  See if we need to reallocate. If so, it will reallocate up to the
+    //  next realloc block size that is >= the passed actual. The second
+    //  parm says don't bother preserving the text content.
+    //
+    if (c4FldWidth > m_c4BufChars)
+        Reallocate(c4FldWidth, kCIDLib::False);
+
+    strbSrc.m_pszBuffer[strbSrc.m_c4CurEnd] = kCIDLib::chNull;
+    if (!TRawStr::bFormatStr(strbSrc.m_pszBuffer
+                            , m_pszBuffer
+                            , c4FldWidth
+                            , chFill
+                            , eJustify))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatFld
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+
+    // Update the current length to the width of the field
+    m_c4CurEnd = c4FldWidth;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::Insert(const   tCIDLib::TCh* const pszInsert
+                                        , const tCIDLib::TCard4     c4Ind)
+{
+    //
+    //  Make sure that the insert index is valid. Note that, in this case, we
+    //  allow it to fall on the terminating null, so that an insert at the end
+    //  will be like an append. Otherwise, you could not insert after the last
+    //  char, because the index is the 'insert after' index.
+    //
+    if (c4Ind > m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4Ind)
+            , clsThis()
+            , TCardinal(m_c4CurEnd)
+        );
+    }
+
+    // If the source is a null pointer, then set it to the special Null value
+    const tCIDLib::TCh* pszActual = pszInsert ? pszInsert : kCIDLib::pszNullStr;
+
+    // Get the length of the string we are going to insert
+    const tCIDLib::TCard4 c4InsertLen = TRawStr::c4StrLen(pszActual);
+
+    // Do a quick sanity check to see if we need to do anything
+    if (!c4InsertLen)
+        return;
+
+    // If the insert point is at the end, then we just append
+    if (c4Ind == m_c4CurEnd)
+    {
+        Append(pszActual);
+        return;
+    }
+
+    // Extend the string if we are going to need to. Retain current content
+    if (m_c4CurEnd + c4InsertLen > m_c4BufChars)
+        Reallocate(m_c4CurEnd + c4InsertLen, kCIDLib::True);
+
+    //
+    //  Lets move the text after the insert point upwards to make room for
+    //  the insert text.
+    //
+    tCIDLib::TCh* pszSrc = &m_pszBuffer[m_c4CurEnd - 1];
+    tCIDLib::TCh* pszDest = &m_pszBuffer[(m_c4CurEnd - 1) + c4InsertLen];
+    while (pszSrc >= &m_pszBuffer[c4Ind])
+        *pszDest-- = *pszSrc--;
+
+    // And now move the insert text into the section left open
+    TRawMem::CopyMemBuf
+    (
+        &m_pszBuffer[c4Ind]
+        , pszActual
+        , c4InsertLen * kCIDLib::c4CharBytes
+    );
+
+    // Adjust the current end up by the insert length
+    m_c4CurEnd += c4InsertLen;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::Insert(const   TStrBuf&        strbSrc
+                                        , const tCIDLib::TCard4 c4Ind)
+{
+    //
+    //  Make sure that the insert index is valid. Note that, in this case, we
+    //  allow it to fall on the terminating null, so that an insert at the end
+    //  will be like an append. Otherwise, you could not insert after the last
+    //  char, because the index is the 'insert after' index.
+    //
+    if (c4Ind > m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4Ind)
+            , clsThis()
+            , TCardinal(m_c4CurEnd)
+        );
+    }
+
+    // Do a quick sanity check to see if we need to do anything
+    if (!strbSrc.m_c4CurEnd)
+        return;
+
+    // If the insert point is at the end, then we just append
+    if (c4Ind == m_c4CurEnd)
+    {
+        Append(strbSrc);
+        return;
+    }
+
+    // Extend the string if we are going to need to. Retain current content
+    if (m_c4CurEnd + strbSrc.m_c4CurEnd > m_c4BufChars)
+        Reallocate(m_c4CurEnd + strbSrc.m_c4CurEnd, kCIDLib::True);
+
+    //
+    //  Lets move the text after the insert point upwards to make room for
+    //  the insert text.
+    //
+    tCIDLib::TCh* pszSrc = &m_pszBuffer[m_c4CurEnd - 1];
+    tCIDLib::TCh* pszDest = &m_pszBuffer[(m_c4CurEnd - 1) + strbSrc.m_c4CurEnd];
+    while (pszSrc >= &m_pszBuffer[c4Ind])
+        *pszDest-- = *pszSrc--;
+
+    // And now move the insert text into the section left open
+    TRawMem::CopyMemBuf
+    (
+        &m_pszBuffer[c4Ind]
+        , strbSrc.m_pszBuffer
+        , strbSrc.m_c4CurEnd * kCIDLib::c4CharBytes
+    );
+
+    // Adjust the current end up by the insert length
+    m_c4CurEnd += strbSrc.m_c4CurEnd;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TCh* TString::TStrBuf::pszDupBuffer() const
+{
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+    tCIDLib::TCh* pszRet = new tCIDLib::TCh[m_c4CurEnd + 1];
+    TRawMem::CopyMemBuf
+    (
+        pszRet
+        , m_pszBuffer
+        , (m_c4CurEnd + 1) * kCIDLib::c4CharBytes
+    );
+    return pszRet;
+}
+
+
+const tCIDLib::TCh* TString::TStrBuf::pszBuffer() const
+{
+    // Make sure its null terminated
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+    return m_pszBuffer;
+}
+
+
+const tCIDLib::TCh*
+TString::TStrBuf::pszBufferAt(const tCIDLib::TCard4 c4At) const
+{
+    // We do allow them to point at the null terminator, so its lt or equal
+    if (c4At <= m_c4CurEnd)
+    {
+        // Make sure its null terminated
+        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+        return &m_pszBuffer[c4At];
+    }
+
+    facCIDLib().ThrowErr
+    (
+        CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcGen_IndexError
+        , tCIDLib::ESev_APIFailed
+        , tCIDLib::EClass_BadParms
+        , TCardinal(c4At)
+        , clsThis()
+        , TCardinal(m_c4CurEnd)
+    );
+    return 0;
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::PutAt( const   tCIDLib::TCard4 c4Index
+                                        , const tCIDLib::TCh    chToPut)
+{
+    if (c4Index < m_c4CurEnd)
+    {
+        //
+        //  If the character is a null, then this is a truncation operation, so we
+        //  must adjust our current end.
+        //
+        if (!chToPut)
+            m_c4CurEnd = c4Index;
+
+        // Stick the character in
+        m_pszBuffer[c4Index] = chToPut;
+        return;
+    }
+
+    facCIDLib().ThrowErr
+    (
+        CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcGen_IndexError
+        , tCIDLib::ESev_APIFailed
+        , tCIDLib::EClass_BadParms
+        , TCardinal(c4Index)
+        , clsThis()
+        , TCardinal(m_c4CurEnd)
+    );
+}
+
+
+tCIDLib::TVoid
+TString::TStrBuf::Reallocate(const  tCIDLib::TCard4     c4NewSize
+                            , const tCIDLib::TBoolean   bPreserve)
+{
+    // If the same, then nothing to do
+    if (c4NewSize == m_c4BufChars)
+        return;
+
+    if (bPreserve && (c4NewSize < m_c4CurEnd))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_Reallocate
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_AppError
+            , facCIDLib().strMsg(kCIDMsgs::midStr_CantPreserve)
+        );
+    }
+
+    //
+    //  Reallocate the buffer. If the new size is not at least one realloc
+    //  block larger, then make it one realloc block larger anyway.
+    //
+    tCIDLib::TCard4 c4Actual = c4NewSize;
+    if (m_c4BufChars + CIDLib_String::c4ReallocBlock > c4NewSize)
+        c4Actual = m_c4BufChars + CIDLib_String::c4ReallocBlock;
+
+    //
+    //  Save the old buffer pointer and put a janitor on it so that it will
+    //  get cleaned up. zero the current buffer so we give up control.
+    //
+    tCIDLib::TCh* pszOldBuffer = m_pszBuffer;
+    TArrayJanitor<tCIDLib::TCh> janOld(pszOldBuffer);
+    m_pszBuffer = 0;
+
+    // Now reallocate the new buffer
+    m_pszBuffer = new tCIDLib::TCh[c4Actual + 1];
+
+    //
+    //  If we are preserving, then copy the old content. Else, just set the
+    //  end to zero.
+    //
+    if (bPreserve && m_c4CurEnd)
+    {
+        TRawMem::CopyMemBuf
+        (
+            m_pszBuffer
+            , pszOldBuffer
+            , m_c4CurEnd * kCIDLib::c4CharBytes
+        );
+    }
+     else
+    {
+        m_c4CurEnd = 0;
+    }
+
+    // Save the new current buffer size
+    m_c4BufChars = c4Actual;
+}
+
+
+tCIDLib::TVoid
+TString::TStrBuf::Replace(  const   tCIDLib::TCard4     c4RepStart
+                            , const tCIDLib::TCard4     c4RepEnd
+                            , const tCIDLib::TCh* const pszRepText
+                            , const tCIDLib::TCard4     c4RepLen)
+{
+    //
+    //  Get the rep text len. If the len is zero, then the caller doesn't know
+    //  so we figure it out.
+    //
+    const tCIDLib::TCard4 c4ActualLen = c4RepLen ? c4RepLen
+                                                 : TRawStr::c4StrLen(pszRepText);
+
+    //
+    //  Calculate the size of the substring we are replacing. Check for the
+    //  problems of bad start/end values.
+    //
+    if (c4RepStart >= c4RepEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_StartPastEnd
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4RepStart)
+            , TCardinal(c4RepEnd)
+        );
+    }
+
+    if (c4RepEnd > m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4RepEnd)
+            , clsThis()
+            , TCardinal(m_c4CurEnd)
+        );
+    }
+
+    const tCIDLib::TCard4 c4TargetLen = (c4RepEnd - c4RepStart) + 1;
+
+    //
+    //  Lets first test for the optimum scenario, where the replacement token
+    //  takes exactly the same chars as what is being replaced. In this case,
+    //  we can just copy it directly over.
+    //
+    //  The other two scenarios are that the replacement text is bigger than
+    //  the target area, and when its smaller than the target area.
+    //
+    if (c4TargetLen == c4ActualLen)
+    {
+        TRawMem::CopyMemBuf
+        (
+            &m_pszBuffer[c4RepStart]
+            , pszRepText
+            , c4ActualLen * kCIDLib::c4CharBytes
+        );
+    }
+     else if (c4TargetLen > c4ActualLen)
+    {
+        //
+        //  The target is bigger that the replacement text. So we can copy
+        //  the replace in, then copy down the remainder.
+        //
+        TRawMem::CopyMemBuf
+        (
+            &m_pszBuffer[c4RepStart]
+            , pszRepText
+            , c4ActualLen * kCIDLib::c4CharBytes
+        );
+
+        //
+        //  Copy down any text from the replacement end point to the end
+        //  of the replacement text we just copied in.
+        //
+        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+        tCIDLib::TCh* pszTarget = &m_pszBuffer[c4RepStart + c4ActualLen];
+        tCIDLib::TCh* pszSrc = &m_pszBuffer[c4RepStart + c4TargetLen];
+
+        while (*pszSrc)
+            *pszTarget++ = *pszSrc++;
+
+        // Recalc the length of the string
+        m_c4CurEnd -= c4TargetLen - c4ActualLen;
+    }
+     else
+    {
+        //
+        //  The replacement text is bigger than the target. So we need to
+        //  move up the text from the end to make room for it. We have to
+        //  deal with expanding the buffer if it won't hold the text.
+        //
+        if ((m_c4CurEnd - c4TargetLen) + c4ActualLen > m_c4BufChars)
+        {
+            //
+            //  We do have to expand. So we take advantage of that to just
+            //  steal the current buffer, allocate a new one, then copy over
+            //  form the old to the new.
+            //
+            tCIDLib::TCh* pszOld = m_pszBuffer;
+            TArrayJanitor<tCIDLib::TCh> janOld(pszOld);
+            m_c4BufChars = m_c4CurEnd + c4ActualLen;
+            m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+
+            TRawMem::CopyMemBuf
+            (
+                m_pszBuffer
+                , pszOld
+                , c4RepStart * kCIDLib::c4CharBytes
+            );
+
+            TRawMem::CopyMemBuf
+            (
+                &m_pszBuffer[c4RepStart]
+                , pszRepText
+                , c4ActualLen * kCIDLib::c4CharBytes
+            );
+
+            TRawMem::CopyMemBuf
+            (
+                &m_pszBuffer[c4RepStart + c4ActualLen]
+                , &pszOld[c4RepEnd + 1]
+                , (m_c4CurEnd - c4RepEnd) * kCIDLib::c4CharBytes
+            );
+        }
+         else
+        {
+            //
+            //  The buffer is big enough, so we need to move up the trailing
+            //  text to make room for the replacement text. First we calc how
+            //  many chars we have to move it up. Its the rep text length
+            //  minus the target length.
+            //
+            const tCIDLib::TCard4 c4ExpCount = c4ActualLen - c4TargetLen;
+            tCIDLib::TCh* pszTarget = &m_pszBuffer[m_c4CurEnd + c4ExpCount];
+            tCIDLib::TCh* pszSrc = &m_pszBuffer[m_c4CurEnd];
+            while (pszSrc > (m_pszBuffer + c4RepEnd))
+                *pszTarget-- = *pszSrc--;
+
+            // Copy the replacement text into place now
+            TRawMem::CopyMemBuf
+            (
+                &m_pszBuffer[c4RepStart]
+                , pszRepText
+                , c4ActualLen * kCIDLib::c4CharBytes
+            );
+        }
+
+        // Recalculate the length
+        m_c4CurEnd += c4ActualLen - c4TargetLen;
+    }
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::ReplaceChar(const  tCIDLib::TCh    chToReplace
+                                            , const tCIDLib::TCh    chReplaceWith)
+{
+    if (chToReplace)
+    {
+        //
+        //  Loop through the string and replace any instances of the replacement
+        //  character with the replacement character.
+        //
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurEnd; c4Index++)
+        {
+            if (m_pszBuffer[c4Index] == chToReplace)
+                m_pszBuffer[c4Index] = chReplaceWith;
+        }
+        return;
+    }
+
+    facCIDLib().ThrowErr
+    (
+        CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcStr_CannotBeNul
+        , tCIDLib::ESev_APIFailed
+        , tCIDLib::EClass_BadParms
+    );
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::Set(const tCIDLib::TCh* const pszSrc)
+{
+    // If the source string is the same address as our buffer, then return
+    if (pszSrc == m_pszBuffer)
+        return;
+
+    // If the source string is a null pointer, then set it to the special value
+    const tCIDLib::TCh* pszActual = pszSrc ? pszSrc : kCIDLib::pszNullStr;
+
+    // If the source string is within our buffer, then an error
+    if ((pszActual > m_pszBuffer) && (pszActual < m_pszBuffer+m_c4BufChars))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_SourceInDest
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_AppError
+        );
+    }
+
+    // Get the new length
+    const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszActual);
+
+    //
+    //  If its larger than our current buffer, then reallocate. The last parm
+    //  says don't maintain current content
+    //
+    if (c4SrcLen > m_c4BufChars)
+        Reallocate(c4SrcLen, kCIDLib::False);
+
+    TRawMem::CopyMemBuf
+    (
+        m_pszBuffer
+        , pszActual
+        , c4SrcLen * kCIDLib::c4CharBytes
+    );
+
+    // And be sure to update the new end
+    m_c4CurEnd = c4SrcLen;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::Set(const TStrBuf& strbNewValue)
+{
+    // If the source buffer is the same address as our buffer, then return
+    if (this == &strbNewValue)
+        return;
+
+    //
+    //  If its larger than our current buffer, then reallocate. The last parm
+    //  says don't maintain current content
+    //
+    if (strbNewValue.m_c4CurEnd > m_c4BufChars)
+        Reallocate(strbNewValue.m_c4CurEnd, kCIDLib::False);
+
+    TRawMem::CopyMemBuf
+    (
+        m_pszBuffer
+        , strbNewValue.m_pszBuffer
+        , strbNewValue.m_c4CurEnd * kCIDLib::c4CharBytes
+    );
+
+    // And be sure to update the new end
+    m_c4CurEnd = strbNewValue.m_c4CurEnd;
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::SetLast(const tCIDLib::TCh chNew)
+{
+    if (!m_c4CurEnd)
+        return;
+
+    // Just put the new char in the last character
+    m_pszBuffer[m_c4CurEnd - 1] = chNew;
+
+    // If the new character is a null, then adjust the length
+    if (!chNew)
+        m_c4CurEnd--;
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::StreamFrom(TBinInStream& strmToReadFrom)
+{
+    try
+    {
+        //
+        //  The first thing has to be a start object marker. We do this in
+        //  order to minimize the possibility of reading some random value
+        //  and trying to allocate a huge buffer.
+        //
+        strmToReadFrom.CheckForStartMarker(CID_FILE, CID_LINE);
+
+        // Check the format version
+        tCIDLib::TCard1 c1FmtVersion;
+        strmToReadFrom  >> c1FmtVersion;
+        if (c1FmtVersion != CIDLib_String::c1FmtVersion)
+        {
+            facCIDLib().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kCIDErrs::errcGen_UnknownFmtVersion
+                , tCIDLib::ESev_APIFailed
+                , tCIDLib::EClass_Format
+                , TCardinal(c1FmtVersion)
+                , clsThis()
+            );
+        }
+
+        // Read the number of chars we are gong to read in
+        tCIDLib::TCard4 c4CharsStored;
+        strmToReadFrom >> c4CharsStored;
+
+        //
+        //  If the cur buffer size is smaller than the stored one, then we
+        //  have to reallocate. The second parm says  don't preserve current
+        //  content. This will set m_c4BufChars to the new buffer size, and
+        //  will avoid possibly lots of reallocations of the buffer.
+        //
+        if (c4CharsStored > m_c4BufChars)
+            Reallocate(c4CharsStored, kCIDLib::False);
+
+        //
+        //  Only stream in new chars if we actually stored any chars during
+        //  the out, which we might not have. We call the standard stream
+        //  method to do this, since we use its outgoing counterpart to write
+        //  the data out. It converts it from the 'on the wire' canonical
+        //  format to the internal wide char format.
+        //
+        if (c4CharsStored)
+        {
+            strmToReadFrom.ReadArray(m_pszBuffer, c4CharsStored);
+
+            // We don't really need this. Its just for debuggin
+            m_pszBuffer[c4CharsStored] = kCIDLib::chNull;
+        }
+
+        // And it should end with an end object marker
+        strmToReadFrom.CheckForEndMarker(CID_FILE, CID_LINE);
+
+        // And now update our current char count since it seemed to have worked
+        m_c4CurEnd = c4CharsStored;
+    }
+
+    catch(...)
+    {
+        // Don't leave junk in the string
+        m_c4CurEnd = 0;
+        throw;
+    }
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::StreamTo(TBinOutStream& strmToWriteTo) const
+{
+    //
+    //  Write a start object marker to start the object, and write out the
+    //  number of chars that have now, to use as a sanity check on the way back
+    //  in. And it will allow us to pre-expand the target string to hold all
+    //  the chars we are going to stream in, to avoid lots of re-allocations of
+    //  the buffer. We also put out a format version, so that we can upgrade
+    //  this format automatically later.
+    //
+    strmToWriteTo   << tCIDLib::EStreamMarker_StartObject
+                    << CIDLib_String::c1FmtVersion
+                    << m_c4CurEnd;
+
+    //
+    //  If any chars to write, then stream them out. The output stream provides
+    //  a method to do this. It converts them to a canonical format for
+    //  streaming, so always use this to write char arrays.
+    //
+    if (m_c4CurEnd)
+        strmToWriteTo.WriteArray(m_pszBuffer, m_c4CurEnd);
+
+    // And finish off with an end object marker
+    strmToWriteTo << tCIDLib::EStreamMarker_EndObject;
+}
+
+
+tCIDLib::TVoid
+TString::TStrBuf::Strip(const   tCIDLib::TCh* const     pszStripChars
+                        , const tCIDLib::EStripModes    eMode)
+{
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+    TRawStr::StripStr(m_pszBuffer, pszStripChars, eMode);
+    m_c4CurEnd = TRawStr::c4StrLen(m_pszBuffer);
+
+    // If in debug mode, null terminate it for easier reading in the debugger
+    #ifdef CIDSTRING_NULTERM
+    m_pszBuffer[m_c4CurEnd] = 0;
+    #endif
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::ToLower(const  tCIDLib::TCard4 c4StartInd
+                                        , const tCIDLib::TCard4 c4Len)
+{
+    tCIDLib::TCard4 c4Actual;
+
+    //
+    //  If the length is max card, then we want to just make it long enough
+    //  to get to the end of the string.
+    //
+    c4Actual = c4Len;
+    if (c4Actual == kCIDLib::c4MaxCard)
+        c4Actual = m_c4CurEnd - c4StartInd;
+
+    // If the start plus the actual is too big, then an error
+    if (c4StartInd + c4Actual > m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_Range
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_OutResource
+            , TCardinal(c4StartInd)
+            , TCardinal(c4Actual)
+            , TCardinal(m_c4CurEnd)
+        );
+    }
+
+    // If the length would take us to the end of the string, then do it directly
+    if (c4StartInd + c4Actual >= m_c4CurEnd)
+    {
+        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+        TRawStr::pszLowerCase(&m_pszBuffer[c4StartInd]);
+        return;
+    }
+     else
+    {
+        // Else, we have to use a loop
+        tCIDLib::TCard4 c4Ind;
+        for (c4Ind = c4StartInd; c4Ind < c4StartInd + c4Actual; c4Ind++)
+            m_pszBuffer[c4Ind] = TRawStr::chLower(m_pszBuffer[c4Ind]);
+    }
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::ToUpper(const  tCIDLib::TCard4 c4StartInd
+                                        , const tCIDLib::TCard4 c4Len)
+{
+    tCIDLib::TCard4 c4Actual;
+
+    //
+    //  If the length is max card, then we want to just make it long enough
+    //  to get to the end of the string.
+    //
+    c4Actual = c4Len;
+    if (c4Actual == kCIDLib::c4MaxCard)
+        c4Actual = m_c4CurEnd - c4StartInd;
+
+    // If the start plus the actual is too big, then an error
+    if (c4StartInd + c4Actual > m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_Range
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_OutResource
+            , TCardinal(c4StartInd)
+            , TCardinal(c4Actual)
+            , TCardinal(m_c4CurEnd)
+        );
+    }
+
+    // If the length would take us to the end of the string, then do it directly
+    if (c4StartInd + c4Actual >= m_c4CurEnd)
+    {
+        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+        TRawStr::pszUpperCase(&m_pszBuffer[c4StartInd]);
+        return;
+    }
+     else
+    {
+        // Else, we have to use a loop
+        tCIDLib::TCard4 c4Ind;
+        for (c4Ind = c4StartInd; c4Ind < c4StartInd + c4Actual; c4Ind++)
+            m_pszBuffer[c4Ind] = TRawStr::chUpper(m_pszBuffer[c4Ind]);
+    }
+}
+
+
+
+tCIDLib::TVoid
+TString::TStrBuf::ToZStr(       tCIDLib::TCh* const pszTarget
+                        , const tCIDLib::TCard4     c4MaxChars
+                        , const tCIDLib::TCard4     c4StartInd) const
+{
+    #if CID_DEBUG_ON
+    if (!pszTarget)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_NullTarget
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+        );
+    }
+    #endif
+
+    // Clear the target zstring
+    pszTarget[0] = kCIDLib::chNull;
+
+    // If no chars in this string, then we are done
+    if (!m_c4CurEnd)
+        return;
+
+    // If start index is at end of string, then we are done
+    if (c4StartInd == m_c4CurEnd)
+        return;
+
+    // If the start index is >= than the length of this string, then an error
+    if (c4StartInd >= m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4StartInd)
+            , clsThis()
+            , TCardinal(m_c4CurEnd)
+        );
+    }
+
+    // Copy as many chars as will fit or are available, whichever is smaller
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+    const tCIDLib::TCard4 c4ToCopy
+                    = TGenTmpls::MinVal(c4MaxChars, m_c4CurEnd - c4StartInd);
+    TRawStr::CopyStr(pszTarget, &m_pszBuffer[c4StartInd], c4ToCopy);
+
+    // Cap off the target appropriately
+    pszTarget[c4ToCopy] = kCIDLib::chNull;
+}
+
+
+
+
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TString
+//  PREFIX: str
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TString: Public, static data
+// ---------------------------------------------------------------------------
+const TString& TString::strEmpty()
+{
+    static TString* pstrEmpty = 0;
+    if (!pstrEmpty)
+    {
+        TBaseLock lockInit;
+        if (!pstrEmpty)
+            pstrEmpty = new TString;
+    }
+    return *pstrEmpty;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TString: Public, static methods
+// ---------------------------------------------------------------------------
+TString& TString::Nul_TString()
+{
+    static TString* pstrNull = 0;
+
+    if (!pstrNull)
+    {
+        TBaseLock lockInit;
+        if (!pstrNull)
+            pstrNull = new TString;
+    }
+    return *pstrNull;
+}
+
+
+tCIDLib::TBoolean TString::bComp(const  TString&    str1
+                                , const TString&    str2)
+{
+    return str1.eCompare(str2) == tCIDLib::ESort_FirstLess;
+}
+
+
+tCIDLib::ESortComps TString::eComp( const   TString&    str1
+                                    , const TString&    str2)
+{
+    return str1.eCompare(str2);
+}
+
+
+// ---------------------------------------------------------------------------
+//  TString: Constructors and Destructor
+// ---------------------------------------------------------------------------
+TString::TString(   const   tCIDLib::TErrCode   errcToLoad
+                    , const TFacility&          facSrc) :
+
+    m_strbData(facSrc.pszLoadCIDMsg(errcToLoad), 64)
+{
+}
+
+TString::TString(   const  tCIDLib::TErrCode    errcToLoad
+                    , const TFacility&          facSrc
+                    , const MFormattable&       fmtblToken1
+                    , const MFormattable&       fmtblToken2
+                    , const MFormattable&       fmtblToken3
+                    , const MFormattable&       fmtblToken4) :
+
+    m_strbData(1024UL)
+{
+    tCIDLib::TBoolean bLoaded;
+    m_strbData.Set(facSrc.pszLoadCIDMsg(errcToLoad, bLoaded));
+
+    // If we loaded it ok, then do token replacement
+    if (bLoaded)
+    {
+        if (!MFormattable::bIsNullObject(fmtblToken1))
+            ReplaceToken(fmtblToken1, L'1');
+        if (!MFormattable::bIsNullObject(fmtblToken2))
+            ReplaceToken(fmtblToken2, L'2');
+        if (!MFormattable::bIsNullObject(fmtblToken3))
+            ReplaceToken(fmtblToken3, L'3');
+        if (!MFormattable::bIsNullObject(fmtblToken4))
+            ReplaceToken(fmtblToken4, L'4');
+    }
+}
+
+TString::TString(   const   MFormattable&   fmtblInitValue
+                    , const TStreamFmt&     strmfToUse) :
+
+    m_strbData(1024UL)
+{
+    //
+    //  Create a string based text stream that we can use to format the
+    //  passed object into. We tell it to format into us, but not to adopt
+    //  us. We pass on the stream format object. If its a nul object,
+    //  that is ok because the string stream will just then ignore it.
+    //
+    TTextStringOutStream strmTmp(this, strmfToUse, tCIDLib::EAdoptOpt_NoAdopt);
+
+    //
+    //  Now we just format the value into ourself, being sure to flush it
+    //  before we exit so that the stream will dump its cache into our
+    //  buffer.
+    //
+    strmTmp << fmtblInitValue << FlushIt;
+}
+
+TString::TString(const MFormattable& fmtblInitValue) :
+
+    m_strbData(1024UL)
+{
+    //
+    //  Create a string base text stream that we can use to format the
+    //  passed object into. We tell it to format into us, but not to adopt
+    //  us. We pass on the stream format object. If its a nul reference,
+    //  that is ok because the string stream will just then ignore it.
+    //
+    TTextStringOutStream strmTmp(this, tCIDLib::EAdoptOpt_NoAdopt);
+
+    //
+    //  Now we just format the value into ourself, being sure to flush it
+    //  before we exit so that the stream will dump its cache into our
+    //  buffer.
+    //
+    strmTmp << fmtblInitValue << FlushIt;
+}
+
+TString::TString(const tCIDLib::TSCh* const pszInit) :
+
+    m_strbData(TRawStr::c4StrLen(pszInit))
+{
+    //
+    //  Check for a null initial value. If it is, then set it to the special
+    //  null string. Otherwise, convert the init string to internal format and
+    //  make the new copy the buffer.
+    //
+    if (!pszInit)
+    {
+        m_strbData.Set(kCIDLib::pszNullStr);
+    }
+     else
+    {
+        // Transcode the string to a temp and store that
+        tCIDLib::TCh* pszTmp = TRawStr::pszConvert(pszInit);
+        TArrayJanitor<tCIDLib::TCh> janTmp(pszTmp);
+        m_strbData.Set(pszTmp);
+    }
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  TString: Public operators
+// ---------------------------------------------------------------------------
+tCIDLib::TBoolean
+TString::operator==(const tCIDLib::TSCh* const pszToCompare) const
+{
+    // Convert the short string so we can compare it
+    tCIDLib::TCh* pszConverted = TRawStr::pszConvert(pszToCompare);
+    TArrayJanitor<tCIDLib::TCh> janConverted(pszConverted);
+    return (TRawStr::eCompareStr(m_strbData.pszBuffer(), pszConverted) == tCIDLib::ESort_Equal);
+}
+
+
+TString& TString::operator=(const TString& strSrc)
+{
+    // Make sure we are not assigning to ourself
+    if (this == &strSrc)
+        return *this;
+
+    m_strbData.Set(strSrc.m_strbData);
+    return *this;
+}
+
+
+tCIDLib::TBoolean TString::operator<=(const TString& strToCompare) const
+{
+    const tCIDLib::ESortComps eComp = TRawStr::eCompareStr
+    (
+        m_strbData.pszBuffer()
+        , strToCompare.m_strbData.pszBuffer()
+    );
+    return (eComp == tCIDLib::ESort_FirstLess)
+            || (eComp == tCIDLib::ESort_Equal);
+}
+
+tCIDLib::TBoolean TString::operator>=(const TString& strToCompare) const
+{
+    const tCIDLib::ESortComps eComp = TRawStr::eCompareStr
+    (
+        m_strbData.pszBuffer()
+        , strToCompare.m_strbData.pszBuffer()
+    );
+    return (eComp == tCIDLib::ESort_FirstGreater)
+            || (eComp == tCIDLib::ESort_Equal);
+}
+
+
+inline tCIDLib::TBoolean
+TString::operator<=(const tCIDLib::TCh* const pszToCompare) const
+{
+    const tCIDLib::ESortComps eComp = TRawStr::eCompareStr
+    (
+        m_strbData.pszBuffer()
+        , pszToCompare
+    );
+    return (eComp == tCIDLib::ESort_FirstLess)
+            || (eComp == tCIDLib::ESort_Equal);
+}
+
+inline tCIDLib::TBoolean
+TString::operator>=(const tCIDLib::TCh* const pszToCompare) const
+{
+    const tCIDLib::ESortComps eComp = TRawStr::eCompareStr
+    (
+        m_strbData.pszBuffer()
+        , pszToCompare
+    );
+    return (eComp == tCIDLib::ESort_FirstGreater)
+            || (eComp == tCIDLib::ESort_Equal);
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  TString: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TString::Append(const tCIDLib::TCh chSrc)
+{
+    // Put it into a temporary asciiz string
+    tCIDLib::TCh pszTmp[2];
+    pszTmp[0] = chSrc;
+    pszTmp[1] = kCIDLib::chNull;
+
+    // And append it
+    m_strbData.Append(pszTmp);
+}
+
+
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TCard1     c1ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    tCIDLib::TZStr128 szTmp;
+    if (!TRawStr::bFormatVal(c1ToFmt
+                            , szTmp
+                            , c4MaxBufChars(szTmp)
+                            , eRadix
+                            , c4GroupSize
+                            , chGroupSep))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatBin
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+    m_strbData.Append(szTmp);
+}
+
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TCard2     c2ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    tCIDLib::TZStr128 szTmp;
+    if (!TRawStr::bFormatVal(c2ToFmt
+                            , szTmp
+                            , c4MaxBufChars(szTmp)
+                            , eRadix
+                            , c4GroupSize
+                            , chGroupSep))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatBin
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+    m_strbData.Append(szTmp);
+}
+
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TCard4     c4ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    tCIDLib::TZStr128 szTmp;
+    if (!TRawStr::bFormatVal(c4ToFmt
+                            , szTmp
+                            , c4MaxBufChars(szTmp)
+                            , eRadix
+                            , c4GroupSize
+                            , chGroupSep))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatBin
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+    m_strbData.Append(szTmp);
+}
+
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TCard8     c8ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    tCIDLib::TZStr128 szTmp;
+    if (!TRawStr::bFormatVal(c8ToFmt
+                            , szTmp
+                            , c4MaxBufChars(szTmp)
+                            , eRadix
+                            , c4GroupSize
+                            , chGroupSep))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatBin
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+    m_strbData.Append(szTmp);
+}
+
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TFloat8    f8ToFmt
+                        , const tCIDLib::TCard4     c4DecPlaces)
+{
+    tCIDLib::TZStr512 szTmp;
+    if (!TRawStr::bFormatVal(f8ToFmt
+                            , szTmp
+                            , c4DecPlaces
+                            , c4MaxBufChars(szTmp)))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatBin
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+    m_strbData.Append(szTmp);
+}
+
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TFloat8    f8ToFmt
+                        , const tCIDLib::TCard4     c4DecPlaces
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCh        chDecimal
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    tCIDLib::TZStr512 szTmp;
+    if (!TRawStr::bFormatVal(f8ToFmt
+                            , szTmp
+                            , c4DecPlaces
+                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::ETrail_Ignore
+                            , chNegSign
+                            , chDecimal
+                            , c4GroupSize
+                            , chGroupSep))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatBin
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+    m_strbData.Append(szTmp);
+}
+
+
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TInt1      i1ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    tCIDLib::TZStr128 szTmp;
+    if (!TRawStr::bFormatVal(i1ToFmt
+                            , szTmp
+                            , c4MaxBufChars(szTmp)
+                            , eRadix
+                            , chNegSign
+                            , c4GroupSize
+                            , chGroupSep))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatBin
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+    m_strbData.Append(szTmp);
+}
+
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TInt2      i2ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    tCIDLib::TZStr128 szTmp;
+    if (!TRawStr::bFormatVal(i2ToFmt
+                            , szTmp
+                            , c4MaxBufChars(szTmp)
+                            , eRadix
+                            , chNegSign
+                            , c4GroupSize
+                            , chGroupSep))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatBin
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+    m_strbData.Append(szTmp);
+}
+
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TInt4      i4ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    tCIDLib::TZStr128 szTmp;
+    if (!TRawStr::bFormatVal(i4ToFmt
+                            , szTmp
+                            , c4MaxBufChars(szTmp)
+                            , eRadix
+                            , chNegSign
+                            , c4GroupSize
+                            , chGroupSep))
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatBin
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_CantDo
+        );
+    }
+    m_strbData.Append(szTmp);
+}
+
+
+tCIDLib::TBoolean TString::bCompare(const TString& strToCompare) const
+{
+    return TRawStr::eCompareStr
+    (
+        m_strbData.pszBuffer()
+        , strToCompare.m_strbData.pszBuffer()
+    ) == tCIDLib::ESort_FirstLess;
+}
+
+
+tCIDLib::TBoolean
+TString::bICompare(const TString& strToCompare) const
+{
+    return TRawStr::eICompareStr
+    (
+        m_strbData.pszBuffer()
+        , strToCompare.m_strbData.pszBuffer()
+    ) == tCIDLib::ESort_FirstLess;
+}
+
+
+tCIDLib::TBoolean
+TString::bFirstOccurrence(  const   tCIDLib::TCh            chTarget
+                            ,       tCIDLib::TCard4&        c4Pos
+                            , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    //
+    //  See if there is a match.
+    //
+    //  NOTE: We don't pass in the position here, since its just an output
+    //          parameter here. We pass in zero to start at the beginning!
+    //
+    const tCIDLib::TCh* pszMatch = TRawStr::pszFindChar
+    (
+        m_strbData.pszBuffer()
+        , chTarget
+        , 0
+        , eCaseSensitive
+    );
+
+    // If not, then get out
+    if (!pszMatch)
+    {
+        c4Pos = kCIDLib::c4MaxCard;
+        return kCIDLib::False;
+    }
+
+    // Calc the position
+    c4Pos = tCIDLib::TCard4(pszMatch - m_strbData.pszBuffer());
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TString::bFirstOccurrence(  const   TString&                strSubStr
+                            ,       tCIDLib::TCard4&        c4Pos
+                            , const tCIDLib::TBoolean       bAnyChar
+                            , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    //
+    //  See if there is a match.
+    //
+    //  NOTE: We don't pass the position in on these, its just an output
+    //          parameter. We pass in zero to start at the beginning!
+    //
+    const tCIDLib::TCh* pszMatch;
+    if (bAnyChar)
+    {
+        pszMatch = TRawStr::pszFindChars
+        (
+            m_strbData.pszBuffer()
+            , strSubStr.m_strbData.pszBuffer()
+            , 0
+            , eCaseSensitive
+        );
+    }
+     else
+    {
+        pszMatch = TRawStr::pszFindSubStr
+        (
+            m_strbData.pszBuffer()
+            , strSubStr.m_strbData.pszBuffer()
+            , 0
+            , eCaseSensitive
+        );
+    }
+
+    // If not, then get out
+    if (!pszMatch)
+    {
+        c4Pos = kCIDLib::c4MaxCard;
+        return kCIDLib::False;
+    }
+
+    // Calc the position and return true
+    c4Pos = tCIDLib::TCard4(pszMatch - m_strbData.pszBuffer());
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TString::bLastOccurrence(   const   tCIDLib::TCh            chTarget
+                            ,       tCIDLib::TCard4&        c4Pos
+                            , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    // See if there is a match
+    const tCIDLib::TCh* pszMatch = TRawStr::pszFindLastChar
+    (
+        m_strbData.pszBuffer()
+        , chTarget
+        , eCaseSensitive
+    );
+
+    // If not, then get out
+    if (!pszMatch)
+    {
+        c4Pos = kCIDLib::c4MaxCard;
+        return kCIDLib::False;
+    }
+
+    // Calc the position and return true
+    c4Pos = tCIDLib::TCard4(pszMatch - m_strbData.pszBuffer());
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TString::bLastOccurrence(   const   TString&                strSubStr
+                            ,       tCIDLib::TCard4&        c4Pos
+                            , const tCIDLib::TBoolean       bAnyChar
+                            , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    // See if there is a match
+    const tCIDLib::TCh* pszMatch;
+    if (bAnyChar)
+    {
+        pszMatch = TRawStr::pszFindLastChars
+        (
+            m_strbData.pszBuffer()
+            , strSubStr.m_strbData.pszBuffer()
+            , eCaseSensitive
+        );
+    }
+     else
+    {
+        pszMatch = TRawStr::pszFindLastSubStr
+        (
+            m_strbData.pszBuffer()
+            , strSubStr.m_strbData.pszBuffer()
+            , eCaseSensitive
+        );
+    }
+
+    // If not, then get out
+    if (!pszMatch)
+    {
+        c4Pos = kCIDLib::c4MaxCard;
+        return kCIDLib::False;
+    }
+
+    // Calc the position of the match and return true
+    c4Pos = tCIDLib::TCard4(pszMatch - m_strbData.pszBuffer());
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TString::bNextOccurrence(   const   tCIDLib::TCh            chTarget
+                            ,       tCIDLib::TCard4&        c4Pos
+                            , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    // If over the length, then an error
+    if (c4Pos >= m_strbData.c4Length())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4Pos)
+            , clsThis()
+            , TCardinal(m_strbData.c4Length())
+        );
+    }
+
+    // See if there is a match
+    const tCIDLib::TCh* pszMatch = TRawStr::pszFindChar
+    (
+        m_strbData.pszBuffer()
+        , chTarget
+        , c4Pos + 1
+        , eCaseSensitive
+    );
+
+    // If not, then get out
+    if (!pszMatch)
+    {
+        c4Pos = kCIDLib::c4MaxCard;
+        return kCIDLib::False;
+    }
+
+    // Calc the position
+    c4Pos = tCIDLib::TCard4(pszMatch - m_strbData.pszBuffer());
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TString::bNextOccurrence(   const   TString&                strSubStr
+                            ,       tCIDLib::TCard4&        c4Pos
+                            , const tCIDLib::TBoolean       bAnyChar
+                            , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    // If position is beyond the end, then an error
+    if (c4Pos >= m_strbData.c4Length())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4Pos)
+            , clsThis()
+            , TCardinal(m_strbData.c4Length())
+        );
+    }
+
+    // See if there is a match
+    const tCIDLib::TCh* pszMatch;
+
+    if (bAnyChar)
+    {
+        pszMatch = TRawStr::pszFindChars
+        (
+            m_strbData.pszBuffer()
+            , strSubStr.m_strbData.pszBuffer()
+            , c4Pos + 1
+            , eCaseSensitive
+        );
+    }
+     else
+    {
+        pszMatch = TRawStr::pszFindSubStr
+        (
+            m_strbData.pszBuffer()
+            , strSubStr.m_strbData.pszBuffer()
+            , c4Pos + 1
+            , eCaseSensitive
+        );
+    }
+    const tCIDLib::TCh* pszLast = pszMatch;
+
+    // If not, then get out with negative result
+    if (!pszMatch)
+    {
+        c4Pos = kCIDLib::c4MaxCard;
+        return kCIDLib::False;
+    }
+
+    // Calc the position of the match and return true
+    c4Pos = tCIDLib::TCard4(pszLast - m_strbData.pszBuffer());
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TString::bPrevOccurrence(   const   tCIDLib::TCh            chTarget
+                            ,       tCIDLib::TCard4&        c4Pos
+                            , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    // If the position is zero, then no further to look
+    if (!c4Pos)
+    {
+        c4Pos = kCIDLib::c4MaxCard;
+        return kCIDLib::False;
+    }
+
+    // If starting point is beyond the string length, then an error
+    if (c4Pos > m_strbData.c4Length())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4Pos)
+            , clsThis()
+            , TCardinal(m_strbData.c4Length())
+        );
+    }
+
+    const tCIDLib::TCh* pszMatch;
+    pszMatch = TRawStr::pszFindPrevChar
+    (
+        m_strbData.pszBuffer()
+        , chTarget
+        , c4Pos - 1
+        , eCaseSensitive
+    );
+
+    if (!pszMatch)
+    {
+        c4Pos = kCIDLib::c4MaxCard;
+        return kCIDLib::False;
+    }
+
+    // Calc the position of the match and return true
+    c4Pos = tCIDLib::TCard4(pszMatch - m_strbData.pszBuffer());
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TString::bPrevOccurrence(   const   TString&                strSubStr
+                            ,       tCIDLib::TCard4&        c4Pos
+                            , const tCIDLib::TBoolean       bAnyChar
+                            , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    // If the position is zero, then no further to look
+    if (!c4Pos)
+    {
+        c4Pos = kCIDLib::c4MaxCard;
+        return kCIDLib::False;
+    }
+
+    // In debug mode, make sure start is within string
+    if (c4Pos >= m_strbData.c4Length())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , TCardinal(c4Pos)
+            , clsThis()
+            , TCardinal(m_strbData.c4Length())
+        );
+    }
+
+    const tCIDLib::TCh* pszFind = 0;
+
+    //
+    //  If we are looking for any character, then we can do a simpler
+    //  search. If we are looking for the previous substring, then we
+    //  want to do a smarter search.
+    //
+    if (bAnyChar)
+    {
+        //
+        //  All we have to do is find the the previous char that shows up
+        //  in the substring anywhere.
+        //
+        pszFind = TRawStr::pszFindPrevChars
+        (
+            m_strbData.pszBuffer()
+            , strSubStr.m_strbData.pszBuffer()
+            , c4Pos - 1
+            , eCaseSensitive
+        );
+    }
+     else
+    {
+        pszFind = TRawStr::pszFindPrevSubStr
+        (
+            m_strbData.pszBuffer()
+            , strSubStr.m_strbData.pszBuffer()
+            , c4Pos - 1
+            , eCaseSensitive
+        );
+    }
+
+    if (pszFind)
+    {
+        c4Pos = tCIDLib::TCard4(pszFind - m_strbData.pszBuffer());
+        return kCIDLib::True;
+    }
+
+    c4Pos = kCIDLib::c4MaxCard;
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean TString::bTokenExists(const tCIDLib::TCh chToken) const
+{
+    //
+    //  We don't care about these, but the searching function returns
+    //  them, so...
+    //
+    tCIDLib::EHJustify  eJustify;
+    tCIDLib::TCard4     c4Width, c4Chars;
+    tCIDLib::TCh        chFill;
+
+    // And look for the token.
+    if (pszFindToken
+    (
+        m_strbData.pszBuffer()
+        , chToken
+        , eJustify
+        , c4Width
+        , chFill
+        , c4Chars))
+    {
+        return kCIDLib::True;
+    }
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TString::bStartsWith(const  tCIDLib::TCh* const     pszToCheck
+                    , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    const tCIDLib::TCh* pszUs = m_strbData.pszBuffer();
+    const tCIDLib::TCh* pszThem = pszToCheck;
+
+    if (eCaseSensitive)
+    {
+        while (*pszThem)
+        {
+            if (*pszUs++ != *pszThem++)
+                return kCIDLib::False;
+        }
+    }
+     else
+    {
+        while (*pszThem)
+        {
+            if (TRawStr::chUpper(*pszUs++) != TRawStr::chUpper(*pszThem++))
+                return kCIDLib::False;
+        }
+    }
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TString::bStartsWith(const  TString&                strToCheck
+                    , const tCIDLib::ECaseSenses    eCaseSensitive) const
+{
+    const tCIDLib::TCard4 c4SrcLen = strToCheck.c4Length();
+
+    // Do the fast check, where this string is shorter
+    if (c4Length() < c4SrcLen)
+        return kCIDLib::False;
+
+    // Oh well, check the strings
+    const tCIDLib::TCh* pszUs = m_strbData.pszBuffer();
+    const tCIDLib::TCh* pszThem = strToCheck.m_strbData.pszBuffer();
+
+    if (eCaseSensitive)
+    {
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4SrcLen; c4Index++)
+        {
+            if (*pszUs++ != *pszThem++)
+                return kCIDLib::False;
+        }
+    }
+     else
+    {
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4SrcLen; c4Index++)
+        {
+            if (TRawStr::chUpper(*pszUs++) != TRawStr::chUpper(*pszThem++))
+                return kCIDLib::False;
+        }
+    }
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TCard4 TString::c4Val(const tCIDLib::ERadices eRadix) const
+{
+    tCIDLib::TBoolean bValid;
+    const tCIDLib::TCard4 c4Ret = TRawStr::c4AsBinary
+    (
+        m_strbData.pszBuffer()
+        , bValid
+        , eRadix
+    );
+
+    if (!bValid)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TextConvert
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , *this
+            , TString(L"tCIDLib::TCard4")
+        );
+    }
+    return c4Ret;
+}
+
+tCIDLib::TCard8 TString::c8Val(const tCIDLib::ERadices eRadix) const
+{
+    tCIDLib::TBoolean bValid;
+    const tCIDLib::TCard8 c8Ret = TRawStr::c8AsBinary
+    (
+        m_strbData.pszBuffer()
+        , bValid
+        , eRadix
+    );
+
+    if (!bValid)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TextConvert
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , *this
+            , TString(L"tCIDLib::TCard8")
+        );
+    }
+    return c8Ret;
+}
+
+
+tCIDLib::ESortComps
+TString::eCompare(const tCIDLib::TCh* const pszToCompare) const
+{
+    if (!pszToCompare)
+        return tCIDLib::ESort_FirstLess;
+
+    return TRawStr::eCompareStr(m_strbData.pszBuffer(), pszToCompare);
+}
+
+tCIDLib::ESortComps TString::eCompare(const TString& strToCompare) const
+{
+    return TRawStr::eCompareStr
+    (
+        m_strbData.pszBuffer()
+        , strToCompare.m_strbData.pszBuffer()
+    );
+}
+
+
+
+tCIDLib::ESortComps
+TString::eCompareN( const   tCIDLib::TCh* const pszToCompare
+                    , const tCIDLib::TCard4     c4MaxComp) const
+{
+    if (!pszToCompare)
+        return tCIDLib::ESort_FirstLess;
+
+    if (!c4MaxComp)
+        return tCIDLib::ESort_Equal;
+
+    return TRawStr::eNCompareStr(m_strbData.pszBuffer(), pszToCompare, c4MaxComp);
+}
+
+tCIDLib::ESortComps
+TString::eCompareN( const   TString&        strToCompare
+                    , const tCIDLib::TCard4 c4MaxComp) const
+{
+    if (!c4MaxComp)
+        return tCIDLib::ESort_Equal;
+
+    return TRawStr::eNCompareStr
+    (
+        m_strbData.pszBuffer()
+        , strToCompare.m_strbData.pszBuffer()
+        , c4MaxComp
+    );
+}
+
+tCIDLib::ESortComps
+TString::eICompare(const tCIDLib::TCh* const pszToCompare) const
+{
+    if (!pszToCompare)
+        return tCIDLib::ESort_FirstLess;
+
+    return TRawStr::eICompareStr(m_strbData.pszBuffer(), pszToCompare);
+}
+
+tCIDLib::ESortComps
+TString::eICompare(const TString& strToCompare) const
+{
+    return TRawStr::eICompareStr
+    (
+        m_strbData.pszBuffer()
+        , strToCompare.m_strbData.pszBuffer()
+    );
+}
+
+tCIDLib::ESortComps
+TString::eICompareN(const   tCIDLib::TCh* const pszToCompare
+                    , const tCIDLib::TCard4     c4MaxComp) const
+{
+    if (!pszToCompare)
+        return tCIDLib::ESort_FirstLess;
+
+    if (!c4MaxComp)
+        return tCIDLib::ESort_Equal;
+
+    return TRawStr::eNICompareStr(m_strbData.pszBuffer(), pszToCompare, c4MaxComp);
+}
+
+tCIDLib::ESortComps
+TString::eICompareN(const   TString&        strToCompare
+                    , const tCIDLib::TCard4 c4MaxComp) const
+{
+    if (!c4MaxComp)
+        return tCIDLib::ESort_Equal;
+
+    return TRawStr::eNICompareStr
+    (
+        m_strbData.pszBuffer()
+        , strToCompare.m_strbData.pszBuffer()
+        , c4MaxComp
+    );
+}
+
+
+tCIDLib::TFloat8 TString::f8Val() const
+{
+    tCIDLib::TBoolean bValid;
+    tCIDLib::TFloat8 f8Ret = TRawStr::f8AsBinary(m_strbData.pszBuffer(), bValid);
+    if (!bValid)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TextConvert
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , *this
+            , TString(L"tCIDLib::TFloat8")
+        );
+    }
+    return f8Ret;
+}
+
+
+tCIDLib::TVoid
+TString::FormatToFld(const  TString&                strToFormat
+                    , const tCIDLib::TCard4         c4FldWidth
+                    , const tCIDLib::EHJustify      eJustify
+                    , const tCIDLib::TCh            chFill)
+{
+    // Just delegate to the buffer object
+    m_strbData.FormatToFld(strToFormat.m_strbData, c4FldWidth, eJustify, chFill);
+}
+
+
+tCIDLib::THashVal
+TString::hshCalcHash(const tCIDLib::TCard4 c4Modulus) const
+{
+    tCIDLib::THashVal hshRet = TRawStr::hshHashStr
+    (
+        m_strbData.pszBuffer()
+        , c4Modulus
+    );
+
+    if (!hshRet)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_NotValidUnicode
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Format
+        );
+    }
+    return hshRet;
+}
+
+
+tCIDLib::TInt4 TString::i4Val(const tCIDLib::ERadices eRadix) const
+{
+    tCIDLib::TBoolean bValid;
+    const tCIDLib::TInt4 i4Ret = TRawStr::i4AsBinary
+    (
+        m_strbData.pszBuffer()
+        , bValid
+        , eRadix
+    );
+
+    if (!bValid)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TextConvert
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , *this
+            , TString(L"tCIDLib::TInt4")
+        );
+    }
+    return i4Ret;
+}
+
+tCIDLib::TInt8 TString::i8Val(const tCIDLib::ERadices eRadix) const
+{
+    tCIDLib::TBoolean bValid;
+    const tCIDLib::TInt8 i8Ret = TRawStr::i8AsBinary
+    (
+        m_strbData.pszBuffer()
+        , bValid
+        , eRadix
+    );
+
+    if (!bValid)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TextConvert
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_BadParms
+            , *this
+            , TString(L"tCIDLib::TInt8")
+        );
+    }
+    return i8Ret;
+}
+
+
+tCIDLib::TVoid
+TString::Insert(const tCIDLib::TCh chInsert, const tCIDLib::TCard4 c4Ind)
+{
+    tCIDLib::TCh szTmp[2];
+    szTmp[0] = chInsert;
+    szTmp[1] = kCIDLib::chNull;
+    m_strbData.Insert(szTmp, c4Ind);
+}
+
+
+tCIDLib::TVoid
+TString::LoadFromMsg(   const   tCIDLib::TErrCode   errcToLoad
+                        , const TFacility&          facSrc)
+{
+    const tCIDLib::TCh* pszTmp = facSrc.pszLoadCIDMsg(errcToLoad);
+    m_strbData.Set(pszTmp);
+}
+
+tCIDLib::TVoid
+TString::LoadFromMsg(   const   tCIDLib::TErrCode   errcToLoad
+                        , const TFacility&          facSrc
+                        , const MFormattable&       fmtblToken1
+                        , const MFormattable&       fmtblToken2
+                        , const MFormattable&       fmtblToken3
+                        , const MFormattable&       fmtblToken4)
+{
+    //
+    //  Call the other version first. This will get the string allocated
+    //  and we just have to handle the token replacement.
+    //
+    LoadFromMsg(errcToLoad, facSrc);
+
+    // Handle the token replacement
+    if (!MFormattable::bIsNullObject(fmtblToken1))
+        ReplaceToken(fmtblToken1, L'1');
+    if (!MFormattable::bIsNullObject(fmtblToken2))
+        ReplaceToken(fmtblToken2, L'2');
+    if (!MFormattable::bIsNullObject(fmtblToken3))
+        ReplaceToken(fmtblToken3, L'3');
+    if (!MFormattable::bIsNullObject(fmtblToken4))
+        ReplaceToken(fmtblToken4, L'4');
+}
+
+
+tCIDLib::TVoid TString::Prepend(const tCIDLib::TCh chPrepend)
+{
+    // Put it into a temporary asciiz string
+    tCIDLib::TCh pszTmp[2];
+    pszTmp[0] = chPrepend;
+    pszTmp[1] = kCIDLib::chNull;
+
+    // And insert it at 0
+    Insert(pszTmp, 0);
+}
+
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TCh    chVal
+                        , const tCIDLib::TCh    chToken)
+{
+    tCIDLib::TCh szTmp[2];
+    szTmp[0] = chVal;
+    szTmp[1] = kCIDLib::chNull;
+    ReplaceToken(szTmp, chToken);
+}
+
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TCh* const pszVal
+                        , const tCIDLib::TCh        chToken)
+{
+    tCIDLib::TCh        chFill;
+    tCIDLib::TCard4     c4Index, c4FldWidth, c4Chars;
+    tCIDLib::EHJustify  eJustify;
+
+    //  Find the first valid replacement token.
+    const tCIDLib::TCh* pszTmp = pszFindToken
+    (
+        m_strbData.pszBuffer()
+        , chToken
+        , eJustify
+        , c4FldWidth
+        , chFill
+        , c4Chars
+    );
+
+    // If no token, log a message and return
+    if (!pszTmp)
+    {
+        facCIDLib().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TokenNotFound
+            , tCIDLib::ESev_Warning
+            , tCIDLib::EClass_NotFound
+            , TString(chToken)
+        );
+        return;
+    }
+
+    // Calc the index where we found it
+    c4Index = pszTmp - m_strbData.pszBuffer();
+
+    if (!c4FldWidth)
+        c4FldWidth = TRawStr::c4StrLen(pszVal);
+
+    tCIDLib::TCh* pszFmt = new tCIDLib::TCh[c4FldWidth + 1];
+    TArrayJanitor<tCIDLib::TCh> janFmt(pszFmt);
+    if (!TRawStr::bFormatStr(pszVal, pszFmt, c4FldWidth, chFill, eJustify))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(pszFmt, L"???", c4FldWidth);
+    }
+
+    // And ask the buffer object to replace the token with the text
+    m_strbData.Replace(c4Index, c4Index + (c4Chars - 1), pszFmt, c4FldWidth);
+}
+
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   MFormattable&   fmtblVal
+                        , const tCIDLib::TCh    chToken)
+{
+    tCIDLib::TCh        chFill;
+    tCIDLib::TCard4     c4Index, c4FldWidth, c4Chars;
+    tCIDLib::EHJustify  eJustify;
+
+    const tCIDLib::TCh* pszTmp = pszFindToken
+    (
+        m_strbData.pszBuffer()
+        , chToken
+        , eJustify
+        , c4FldWidth
+        , chFill
+        , c4Chars
+    );
+
+    // If no token, log a message and return
+    if (!pszTmp)
+    {
+        facCIDLib().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TokenNotFound
+            , tCIDLib::ESev_Warning
+            , tCIDLib::EClass_NotFound
+            , TString(chToken)
+        );
+        return;
+    }
+
+    // Calc the index where we found it
+    c4Index = pszTmp - m_strbData.pszBuffer();
+
+    //
+    //  Format the replacement value to a string, being sure to flush it
+    //  so that the cache is forced out to the string buffer.
+    //
+    TTextStringOutStream strmTmp
+    (
+        256
+        , TStreamFmt(c4FldWidth, 2, eJustify, chFill)
+    );
+    strmTmp << fmtblVal << FlushIt;
+
+    // And ask the buffer object to replace the token with the text
+    m_strbData.Replace
+    (
+        c4Index
+        , c4Index + (c4Chars - 1)
+        , strmTmp.strData().pszBuffer()
+        , c4FldWidth
+    );
+}
+
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TBoolean   bVal
+                        , const tCIDLib::TCh        chToken)
+{
+    tCIDLib::TCh        chFill;
+    tCIDLib::TCard4     c4Index, c4FldWidth, c4Chars;
+    tCIDLib::EHJustify  eJustify;
+
+    //  Find the first valid replacement token.
+    const tCIDLib::TCh* pszTmp = pszFindToken
+    (
+        m_strbData.pszBuffer()
+        , chToken
+        , eJustify
+        , c4FldWidth
+        , chFill
+        , c4Chars
+    );
+
+    // If no token, log a message and return
+    if (!pszTmp)
+    {
+        facCIDLib().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TokenNotFound
+            , tCIDLib::ESev_Warning
+            , tCIDLib::EClass_NotFound
+            , TString(chToken)
+        );
+        return;
+    }
+
+    // Calc the index where we found it
+    c4Index = pszTmp - m_strbData.pszBuffer();
+
+    // And ask the buffer object to replace the token with the text
+    const tCIDLib::TCh* pszVal = bVal
+                                 ? facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_True)
+                                 : facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_False);
+
+    // Format it into the indicated field width
+    tCIDLib::TCh* pszFmt = new tCIDLib::TCh[c4FldWidth + 1];
+    TArrayJanitor<tCIDLib::TCh> janFmt(pszFmt);
+    if (!TRawStr::bFormatStr(pszVal, pszFmt, c4FldWidth, chFill, eJustify))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(pszFmt, L"???", c4FldWidth);
+    }
+
+    // And ask the buffer object to replace the token with the text
+    m_strbData.Replace(c4Index, c4Index + (c4Chars - 1), pszFmt, c4FldWidth);
+}
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TCard1     c1Val
+                        , const tCIDLib::TCh        chToken
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Just call the TCard4 version
+    ReplaceToken(tCIDLib::TCard4(c1Val), chToken, eRadix);
+}
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TCard2     c2Val
+                        , const tCIDLib::TCh        chToken
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Just call the TCard4 version
+    ReplaceToken(tCIDLib::TCard4(c2Val), chToken, eRadix);
+}
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TCard4     c4Val
+                        , const tCIDLib::TCh        chToken
+                        , const tCIDLib::ERadices   eRadix)
+{
+    tCIDLib::TCh        chFill;
+    tCIDLib::TCard4     c4Index, c4FldWidth, c4Chars;
+    tCIDLib::EHJustify  eJustify;
+
+    //  Find the first valid replacement token.
+    const tCIDLib::TCh* pszTmp = pszFindToken
+    (
+        m_strbData.pszBuffer()
+        , chToken
+        , eJustify
+        , c4FldWidth
+        , chFill
+        , c4Chars
+    );
+
+    // If no token, log a message and return
+    if (!pszTmp)
+    {
+        facCIDLib().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TokenNotFound
+            , tCIDLib::ESev_Warning
+            , tCIDLib::EClass_NotFound
+            , TString(chToken)
+        );
+        return;
+    }
+
+    // Calc the index where we found it
+    c4Index = pszTmp - m_strbData.pszBuffer();
+
+    tCIDLib::TZStr64 szTmp;
+    if (!TRawStr::bFormatVal(c4Val, szTmp, 64, eRadix))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(szTmp, L"???", 64);
+    }
+
+    if (!c4FldWidth)
+        c4FldWidth = TRawStr::c4StrLen(szTmp);
+
+    tCIDLib::TCh* pszFmt = new tCIDLib::TCh[c4FldWidth + 1];
+    TArrayJanitor<tCIDLib::TCh> janFmt(pszFmt);
+    if (!TRawStr::bFormatStr(szTmp, pszFmt, c4FldWidth, chFill, eJustify))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(pszFmt, L"???", c4FldWidth);
+    }
+
+    // And ask the buffer object to replace the token with the text
+    m_strbData.Replace(c4Index, c4Index + (c4Chars - 1), pszFmt, c4FldWidth);
+}
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TCard8     c8Val
+                        , const tCIDLib::TCh        chToken
+                        , const tCIDLib::ERadices   eRadix)
+{
+    tCIDLib::TCh        chFill;
+    tCIDLib::TCard4     c4Index, c4FldWidth, c4Chars;
+    tCIDLib::EHJustify  eJustify;
+
+    //  Find the first valid replacement token.
+    const tCIDLib::TCh* pszTmp = pszFindToken
+    (
+        m_strbData.pszBuffer()
+        , chToken
+        , eJustify
+        , c4FldWidth
+        , chFill
+        , c4Chars
+    );
+
+    // If no token, log a message and return
+    if (!pszTmp)
+    {
+        facCIDLib().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TokenNotFound
+            , tCIDLib::ESev_Warning
+            , tCIDLib::EClass_NotFound
+            , TString(chToken)
+        );
+        return;
+    }
+
+    // Calc the index where we found it
+    c4Index = pszTmp - m_strbData.pszBuffer();
+
+    tCIDLib::TZStr128 szTmp;
+    if (!TRawStr::bFormatVal(c8Val, szTmp, 128, eRadix))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(szTmp, L"???", 128);
+    }
+
+    if (!c4FldWidth)
+        c4FldWidth = TRawStr::c4StrLen(szTmp);
+
+    tCIDLib::TCh* pszFmt = new tCIDLib::TCh[c4FldWidth + 1];
+    TArrayJanitor<tCIDLib::TCh> janFmt(pszFmt);
+    if (!TRawStr::bFormatStr(szTmp, pszFmt, c4FldWidth, chFill, eJustify))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(pszFmt, L"???", c4FldWidth);
+    }
+
+    // And ask the buffer object to replace the token with the text
+    m_strbData.Replace(c4Index, c4Index + (c4Chars - 1), pszFmt, c4FldWidth);
+}
+
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TFloat8&   f8Val
+                        , const tCIDLib::TCh        chToken
+                        , const tCIDLib::TCard1     c1Precision)
+{
+    tCIDLib::TCh        chFill;
+    tCIDLib::TCard4     c4Index, c4FldWidth, c4Chars;
+    tCIDLib::EHJustify  eJustify;
+
+    // Find the first valid replacement token
+    const tCIDLib::TCh* pszTmp = pszFindToken
+    (
+        m_strbData.pszBuffer()
+        , chToken
+        , eJustify
+        , c4FldWidth
+        , chFill
+        , c4Chars
+    );
+
+    // If no token, log a message and return
+    if (!pszTmp)
+    {
+        facCIDLib().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TokenNotFound
+            , tCIDLib::ESev_Warning
+            , tCIDLib::EClass_NotFound
+            , TString(chToken)
+        );
+        return;
+    }
+
+    // Calc the index where we found it
+    c4Index = pszTmp - m_strbData.pszBuffer();
+
+    tCIDLib::TZStr128 szTmp;
+    if (!TRawStr::bFormatVal(f8Val, szTmp, c1Precision, 128, tCIDLib::ETrail_Zeroes))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(szTmp, L"???", 128);
+    }
+
+    if (!c4FldWidth)
+        c4FldWidth = TRawStr::c4StrLen(szTmp);
+
+    tCIDLib::TCh* pszFmt = new tCIDLib::TCh[c4FldWidth + 1];
+    TArrayJanitor<tCIDLib::TCh> janFmt(pszFmt);
+    if (!TRawStr::bFormatStr(szTmp, pszFmt, c4FldWidth, chFill, eJustify))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(pszFmt, L"???", c4FldWidth);
+    }
+
+    // And ask the buffer object to replace the token with the text
+    m_strbData.Replace(c4Index, c4Index + (c4Chars - 1), pszFmt, c4FldWidth);
+}
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TInt1      i1Val
+                        , const tCIDLib::TCh        chToken
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Just call the TInt4 version
+    ReplaceToken(tCIDLib::TInt4(i1Val), chToken, eRadix);
+}
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TInt2      i2Val
+                        , const tCIDLib::TCh        chToken
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Just call the TInt4 version
+    ReplaceToken(tCIDLib::TInt4(i2Val), chToken, eRadix);
+}
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TInt4      i4Val
+                        , const tCIDLib::TCh        chToken
+                        , const tCIDLib::ERadices   eRadix)
+{
+    tCIDLib::TCh        chFill;
+    tCIDLib::TCard4     c4Index, c4FldWidth, c4Chars;
+    tCIDLib::EHJustify  eJustify;
+
+    //  Find the first valid replacement token.
+    const tCIDLib::TCh* pszTmp = pszFindToken
+    (
+        m_strbData.pszBuffer()
+        , chToken
+        , eJustify
+        , c4FldWidth
+        , chFill
+        , c4Chars
+    );
+
+    // If no token, log a message and return
+    if (!pszTmp)
+    {
+        facCIDLib().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TokenNotFound
+            , tCIDLib::ESev_Warning
+            , tCIDLib::EClass_NotFound
+            , TString(chToken)
+        );
+        return;
+    }
+
+    // Calc the index where we found it
+    c4Index = pszTmp - m_strbData.pszBuffer();
+
+    tCIDLib::TZStr64 szTmp;
+    if (!TRawStr::bFormatVal(i4Val, szTmp, 64, eRadix))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(szTmp, L"???", 64);
+    }
+
+    if (!c4FldWidth)
+        c4FldWidth = TRawStr::c4StrLen(szTmp);
+
+    // Could get an exception here and leak the buffer
+    tCIDLib::TCh* pszFmt = new tCIDLib::TCh[c4FldWidth + 1];
+    TArrayJanitor<tCIDLib::TCh> janFmt(pszFmt);
+    if (!TRawStr::bFormatStr(szTmp, pszFmt, c4FldWidth, chFill, eJustify))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(pszFmt, L"???", c4FldWidth);
+    }
+
+    // And ask the buffer object to replace the token with the text
+    m_strbData.Replace(c4Index, c4Index + (c4Chars - 1), pszFmt, c4FldWidth);
+}
+
+tCIDLib::TVoid
+TString::ReplaceToken(  const   tCIDLib::TInt8      i8Val
+                        , const tCIDLib::TCh        chToken
+                        , const tCIDLib::ERadices   eRadix)
+{
+    tCIDLib::TCh        chFill;
+    tCIDLib::TCard4     c4Index, c4FldWidth, c4Chars;
+    tCIDLib::EHJustify  eJustify;
+
+    //  Find the first valid replacement token.
+    const tCIDLib::TCh* pszTmp = pszFindToken
+    (
+        m_strbData.pszBuffer()
+        , chToken
+        , eJustify
+        , c4FldWidth
+        , chFill
+        , c4Chars
+    );
+
+    // If no token, log a message and return
+    if (!pszTmp)
+    {
+        facCIDLib().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_TokenNotFound
+            , tCIDLib::ESev_Warning
+            , tCIDLib::EClass_NotFound
+            , TString(chToken)
+        );
+        return;
+    }
+
+    // Calc the index where we found it
+    c4Index = pszTmp - m_strbData.pszBuffer();
+
+    tCIDLib::TZStr128  szTmp;
+    if (!TRawStr::bFormatVal(i8Val, szTmp, 128, eRadix))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(szTmp, L"???", 64);
+    }
+
+    if (!c4FldWidth)
+        c4FldWidth = TRawStr::c4StrLen(szTmp);
+
+    // Could get an exception here and leak the buffer
+    tCIDLib::TCh* pszFmt = new tCIDLib::TCh[c4FldWidth + 1];
+    TArrayJanitor<tCIDLib::TCh> janFmt(pszFmt);
+    if (!TRawStr::bFormatStr(szTmp, pszFmt, c4FldWidth, chFill, eJustify))
+    {
+        facCIDLib().LogKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_FormatToken
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESev_APIFailed
+            , tCIDLib::EClass_Internal
+        );
+        TRawStr::CopyStr(pszFmt, L"???", c4FldWidth);
+    }
+
+    // And ask the buffer object to replace the token with the text
+    m_strbData.Replace(c4Index, c4Index + (c4Chars - 1), pszFmt, c4FldWidth);
+}
+
+
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TCard1     c1ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    Clear();
+    AppendFormatted(c1ToFmt, eRadix, c4GroupSize, chGroupSep);
+}
+
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TCard2     c2ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    Clear();
+    AppendFormatted(c2ToFmt, eRadix, c4GroupSize, chGroupSep);
+}
+
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TCard4     c4ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    Clear();
+    AppendFormatted(c4ToFmt, eRadix, c4GroupSize, chGroupSep);
+}
+
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TCard8     c8ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    Clear();
+    AppendFormatted(c8ToFmt, eRadix, c4GroupSize, chGroupSep);
+}
+
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TFloat8    f8ToFmt
+                        , const tCIDLib::TCard4     c4DecPlaces)
+{
+    Clear();
+    AppendFormatted(f8ToFmt, c4DecPlaces);
+}
+
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TFloat8    f8ToFmt
+                        , const tCIDLib::TCard4     c4DecPlaces
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCh        chDecimal
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    Clear();
+    AppendFormatted
+    (
+        f8ToFmt
+        , c4DecPlaces
+        , chNegSign
+        , chDecimal
+        , c4GroupSize
+        , chGroupSep
+    );
+}
+
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TInt1      i1ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    Clear();
+    AppendFormatted(i1ToFmt, eRadix, chNegSign, c4GroupSize, chGroupSep);
+}
+
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TInt2      i2ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    Clear();
+    AppendFormatted(i2ToFmt, eRadix, chNegSign, c4GroupSize, chGroupSep);
+}
+
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TInt4      i4ToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    Clear();
+    AppendFormatted(i4ToFmt, eRadix, chNegSign, c4GroupSize, chGroupSep);
+}
+
+
+
+tCIDLib::TVoid
+TString::StripWhitespace(const tCIDLib::EStripModes eStripMode)
+{
+    Strip(kCIDLib::szWhitespace, eStripMode);
+}
+
+
+// ---------------------------------------------------------------------------
+//  TString: Protected, inherited methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TString::FormatTo(TTextOutStream& strmToWriteTo) const
+{
+    //
+    //  Dump the raw string pointer to the string. DO NOT dump 'this'
+    //  to the stream! This will kick off a recursive circle jerk.
+    //
+    strmToWriteTo << m_strbData.pszBuffer();
+}
+
+
+tCIDLib::TVoid TString::StreamFrom(TBinInStream& strmToReadFrom)
+{
+    m_strbData.StreamFrom(strmToReadFrom);
+}
+
+
+tCIDLib::TVoid TString::StreamTo(TBinOutStream& strmToWriteTo) const
+{
+    m_strbData.StreamTo(strmToWriteTo);
+}
+
+
+// ---------------------------------------------------------------------------
+//  TString: Private, static methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TString::BadHexChar(const tCIDLib::TCh chToXlat)
+{
+    facCIDLib().ThrowErr
+    (
+        CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcStr_BadHexChar
+        , tCIDLib::ESev_APIFailed
+        , tCIDLib::EClass_Format
+        , TCardinal(chToXlat)
+    );
+}
+
+

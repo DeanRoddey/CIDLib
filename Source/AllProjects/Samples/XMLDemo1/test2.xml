@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE Root PUBLIC "MapXMLDemoDTD" "ShouldFail.Dtd"
+[
+    <!ELEMENT IntSSElem1 ANY>
+    <!ENTITY  IntSSEntity1 "Internal subset text">
+]>
+
+<Root>
+    <ExtSSElem1><Child1/><Child2/></ExtSSElem1>
+    <IntSSElem1/>
+    <Child2/>
+</Root>
+

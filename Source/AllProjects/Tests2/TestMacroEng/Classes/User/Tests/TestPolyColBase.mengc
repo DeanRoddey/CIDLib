@@ -1,0 +1,40 @@
+Class=[NonFinal]
+    ClassPath MEng.User.Tests.TestPolyColBase;
+    ParentClass MEng.Formattable;
+EndClass;
+
+
+Imports=
+    MEng.System.Runtime.TextOutStream;
+EndImports;
+
+
+Members=
+    String  m_BaseValue;
+EndMembers;
+
+
+Methods=[Public,Const,Overrides]
+
+    Method FormatTo([InOut] TextOutStream TarStrm)
+    Begin
+        TarStrm.FmtStr("BaseClass=");
+        TarStrm.FmtStr(m_BaseValue);
+    EndMethod;
+
+EndMethods;
+
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+
+    Method SetBaseValue([In] String ToSet)
+    Begin
+        m_BaseValue := ToSet;
+    EndMethod;
+
+EndMethods;

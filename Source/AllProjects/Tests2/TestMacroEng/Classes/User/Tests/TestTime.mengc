@@ -1,0 +1,155 @@
+Class=[NonFinal]
+    ClassPath MEng.User.Tests.TestTime;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    Int4                m_RetVal;
+    Time                m_TimeInfo;
+    Time                m_TimeInfo2;
+    Time.WeekDays       m_DayOfWeek;
+    Card4               m_Year;
+    Time.Months         m_Month;
+    Card4               m_Day;
+    Card4               m_Hour;
+    Card4               m_Minute;
+    Card4               m_Second;
+    TimeCompList        m_ParsePattern;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+
+        //
+        //  Set it to a particular time/date that we can test against. We'll
+        //  set it to Dec, 16th, 2004 which we know was a thursday. Time will
+        //  be 3 minute and 2 second after 1 AM.
+        //
+        m_TimeInfo.SetDateTime(2004, Months.December, 16, 1, 2, 3);
+
+        // Get that it gives back the right weekday
+        If (m_TimeInfo.GetWeekday() != WeekDays.Thursday)
+            m_Helper.PrintErr("Initial day of week was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Get the date values out and check them that way also
+        m_DayOfWeek := m_TimeInfo.GetDateFlds(m_Year, m_Month, m_Day);
+
+        If ((m_DayOfWeek != WeekDays.Thursday)
+        ||  (m_Month != Months.December)
+        ||  (m_Day != 16))
+            m_Helper.PrintErr("Date fields were incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Get the time fields out
+        m_TimeInfo.GetTimeFlds(m_Hour, m_Minute, m_Second);
+        If ((m_Hour != 1) || (m_Minute != 2) || (m_Second != 3))
+            m_Helper.PrintErr("Time fields were incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Check the Julian date
+        If (m_TimeInfo.GetJulianDate() != 2453356)
+            m_Helper.PrintErr("Julian date was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Round trip it
+        m_TimeInfo2.SetFromJulian(2453356);
+        m_TimeInfo2.GetDateFlds(m_Year, m_Month, m_Day);
+        If ((m_Year != 2004) || (m_Month != Months.December) || (m_Day != 16))
+            m_Helper.PrintErr("Julian round trip failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Test some sunrise/sunset times that we pre-did and validated
+        //  as correct. First, do one for Melbourne AU for Feb 4, 2005
+        //
+        m_TimeInfo.SetDate(2005, Months.February, 4);
+        m_TimeInfo.SetToSunrise(-37.5, 145.0, 600);
+        m_TimeInfo.GetTimeFlds(m_Hour, m_Minute, m_Second);
+        If ((m_Hour != 5) || (m_Minute != 38))
+            m_Helper.PrintErr("Melbourne sunrise is incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_TimeInfo.SetToSunset(-37.5, 145.0, 600);
+        m_TimeInfo.GetTimeFlds(m_Hour, m_Minute, m_Second);
+        If ((m_Hour != 19) || (m_Minute != 28))
+            m_Helper.PrintErr("Melbourne sunset is incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do a local to UTC to local round trip
+        m_TimeInfo.SetSpecial(SpecialTimes.CurTime);
+        m_TimeInfo2 := m_TimeInfo;
+        m_TimeInfo.LocalToUTC();
+        m_TimeInfo.UTCToLocal();
+        If (m_TimeInfo != m_TimeInfo2)
+            m_Helper.PrintErr("UTC/Local conversion failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test the pattern based parsing
+        m_ParsePattern.AddObject(TimeComps.DayNum);
+        m_ParsePattern.AddObject(TimeComps.DateSep);
+        m_ParsePattern.AddObject(TimeComps.MonthNum);
+        m_ParsePattern.AddObject(TimeComps.DateSep);
+        m_ParsePattern.AddObject(TimeComps.Year4);
+        m_TimeInfo.SetParsePattern2(m_ParsePattern, '/', ':', ' ');
+        m_TimeInfo.ParseFromPattern("10/02/2000");
+
+        m_TimeInfo2.SetDateTime(2000, Months.February, 10, 0, 0, 0);
+        If (m_TimeInfo.GetCurStamp() != m_TimeInfo2.GetCurStamp())
+            m_Helper.PrintErr("Pattern based parse failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // This is the ISO8601 format, without time zone, so a pretty good test
+        m_ParsePattern.RemoveAll();
+        m_ParsePattern.AddObject(TimeComps.Year4);
+        m_ParsePattern.AddObject(TimeComps.DateSep);
+        m_ParsePattern.AddObject(TimeComps.MonthNum);
+        m_ParsePattern.AddObject(TimeComps.DateSep);
+        m_ParsePattern.AddObject(TimeComps.DayNum);
+        m_ParsePattern.AddObject(TimeComps.T);
+        m_ParsePattern.AddObject(TimeComps.Hour24);
+        m_ParsePattern.AddObject(TimeComps.TimeSep);
+        m_ParsePattern.AddObject(TimeComps.Minute);
+        m_ParsePattern.AddObject(TimeComps.TimeSep);
+        m_ParsePattern.AddObject(TimeComps.Second);
+        m_TimeInfo.SetParsePattern2(m_ParsePattern, '-', ':', ' ');
+        m_TimeInfo.ParseFromPattern("2018-10-03T22:55:00");
+
+        m_TimeInfo2.SetDateTime(2018, Months.October, 3, 22, 55, 0);
+        If (m_TimeInfo.GetCurStamp() != m_TimeInfo2.GetCurStamp())
+            m_Helper.PrintErr("Pattern based parse of ISO8601 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+

@@ -1,0 +1,1624 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<grammar version="1.0"
+         xml:lang="en-US"
+         root="TopRule"
+         tag-format="semantics/1.0"
+         xmlns="http://www.w3.org/2001/06/grammar"
+         xmlns:sapi="http://schemas.microsoft.com/Speech/2002/06/SRGSExtensions"
+         sapi:alphabet="x-microsoft-ups">
+
+    <!--
+       - The top level list that refs all the others.
+       -
+       - We have some commands that are only enabled when they are required, the ones
+       - that start with OnDem (for OnDemand.) This also helps reduce potential
+       - confusability.
+       -
+       - The Action semantic value MUST be the same as the name of rule that sets it!
+       -->
+    <rule id="TopRule" scope="public">
+        <item>
+            <one-of>
+                <!-- Key rules -->
+                <item><ruleref uri="#WakeupKeyWord"/></item>
+
+                <!-- Command rules -->
+                <item><ruleref uri="#CmdArmSecSystem"/></item>
+                <item><ruleref uri="#CmdCancelAllReminders"/></item>
+                <item><ruleref uri="#CmdCancelLastReminder"/></item>
+                <item><ruleref uri="#CmdClearMusicPL"/></item>
+                <item><ruleref uri="#CmdDisarmSecSystem"/></item>
+                <item><ruleref uri="#CmdMusicTransport"/></item>
+                <item><ruleref uri="#CmdPlayMusicFromCat"/></item>
+                <item><ruleref uri="#CmdPlayMusicPL"/></item>
+                <item><ruleref uri="#CmdReloadCfg"/></item>
+                <item><ruleref uri="#CmdRemindMe"/></item>
+                <item><ruleref uri="#CmdSetLightLevel"/></item>
+                <item><ruleref uri="#CmdSetLightSwitch"/></item>
+                <item><ruleref uri="#CmdSetMusicMute"/></item>
+                <item><ruleref uri="#CmdSetMusicPLMode"/></item>
+                <item><ruleref uri="#CmdSetMusicVolume"/></item>
+                <item><ruleref uri="#CmdSetRoomMode"/></item>
+                <item><ruleref uri="#CmdSetThermoHLSP"/></item>
+
+                <!-- Query rules -->
+                <item><ruleref uri="#QueryCQCVer"/></item>
+                <item><ruleref uri="#QueryCurrentTemp"/></item>
+                <item><ruleref uri="#QueryCurrentTime"/></item>
+                <item><ruleref uri="#QueryLightSwitch"/></item>
+                <item><ruleref uri="#QueryLightSwitchState"/></item>
+                <item><ruleref uri="#QuerySecZoneState"/></item>
+                <item><ruleref uri="#QueryThermoHLSP"/></item>
+                <item><ruleref uri="#QueryTodaysDate"/></item>
+                <item><ruleref uri="#QueryWeatherShortFC"/></item>
+
+
+                <!--
+                   - Context rules that operate on the last target being discussed.
+                   - The are only in non-prefixed variations.
+                   -->
+                <item><ruleref uri="#CmdTurnItOffOn"/></item>
+                <item><ruleref uri="#CmdSetItToNum"/></item>
+
+                <!--
+                   - General purpose rules.
+                   -->
+                <item><ruleref uri="#CancelOp"/></item>
+                <item><ruleref uri="#No"/></item>
+
+                <!--
+                   - NOTE:  Those that these are disabled initially after the grammar
+                   -        is loaded and set up. They will be enabled on a scoped basis
+                   -        as needed (on demand). These are never prefixed. THEY MUST
+                   -        start with OnDem so that we can find them programmatically.
+                   -->
+                <item><ruleref uri="#OnDemClarifyAddUpdateReminder"/></item>
+                <item><ruleref uri="#OnDemClarifyArmMode"/></item>
+                <item><ruleref uri="#OnDemClarifyHLSP"/></item>
+                <item><ruleref uri="#OnDemClarifyMinutes"/></item>
+                <item><ruleref uri="#OnDemClarifyOff"/></item>
+                <item><ruleref uri="#OnDemClarifyOn"/></item>
+                <item><ruleref uri="#OnDemClarifyMusicCat"/></item>
+                <item><ruleref uri="#OnDemClarifyMusicPL"/></item>
+                <item><ruleref uri="#OnDemClarifyMute"/></item>
+                <item><ruleref uri="#OnDemClarifyPercentVal"/></item>
+                <item><ruleref uri="#OnDemClarifyRoomMode"/></item>
+                <item><ruleref uri="#OnDemClarifySignedNum"/></item>
+                <item><ruleref uri="#OnDemClarifyZoneName"/></item>
+                <item><ruleref uri="#OnDemClarifyZoneState"/></item>
+                <item><ruleref uri="#OnDemClarifyIntExtTemp"/></item>
+                <item><ruleref uri="#OnDemYes"/></item>
+
+            </one-of>
+        </item>
+    </rule>
+
+
+    <rule id="WakeupKeyWord" sapi:dynamic="true">
+        Janet
+        <tag> out.Action = "HelloJarvis"; </tag>
+    </rule>
+
+    <rule id="KeyWord" scope="private" sapi:dynamic="true">
+        Janet
+    </rule>
+
+
+
+    <!-- ===================================================
+       -  Some miscellaneous bits that are not commands or queries, but they are
+       -  top level rules. They are only used as part of conversations and so never
+       -  start with the keyword.
+       - =================================================== -->
+    <rule id="CancelOp">
+        <item>
+            <one-of>
+                <item> That's all for now </item>
+                <item> That will be all </item>
+                <item> That will be all for now </item>
+                <item> That will be all for the moment </item>
+                <item> That's all for the moment </item>
+                <item> You are dismissed </item>
+            </one-of>
+        </item>
+        <item repeat="0-1">
+            <one-of>
+                <item> Thanks </item>
+                <item> Thank you </item>
+            </one-of>
+        </item>
+        <tag>
+            out.Action = "CancelOp";
+            out.DataType = "";
+            out.TarType = "";
+            out.Target = "";
+            out.State = "";
+            out.Prefixed = "";
+        </tag>
+    </rule>
+
+
+    <!--
+       - General yes/no rules. We just wrap the internal ones and add semantic
+       - content to them.
+       -->
+    <rule id="No">
+        <item><ruleref uri="#IntNo"/></item>
+        <tag>
+            out.Action = "No";
+            out.DataType = "Boolean";
+            out.TarType = "";
+            out.Target = "";
+            out.State = "0";
+            out.Prefixed = "";
+        </tag>
+    </rule>
+
+
+    <!-- ===================================================
+       -  Clarifications. These are never prefixed and are kept disabled
+       -  except when needed.
+       - =================================================== -->
+
+    <rule id="OnDemYes" scope="public">
+        <item><ruleref uri="#IntYes"/></item>
+        <tag>
+            out.Action = "Yes";
+            out.DataType = "Boolean";
+            out.TarType = "";
+            out.Target = "";
+            out.State = "1";
+            out.Prefixed = "";
+        </tag>
+    </rule>
+
+    <!-- To clarify whether a new thing should be added or the existing one updated -->
+    <rule id="OnDemClarifyAddUpdateReminder" scope="public">
+        <one-of>
+            <item> Add a new reminder <tag> out.State = "add"; </tag> </item>
+            <item> Update the current reminder <tag> out.State = "update"; </tag> </item>
+            <item> Update the existing reminder <tag> out.State = "update"; </tag> </item>
+        </one-of>
+        <tag>
+            out.Action = "ClarifyAddUpdateReminder";
+            out.DataType = "String";
+            out.TarType = "";
+            out.Target = "";
+            out.Prefixed = "";
+        </tag>
+    </rule>
+
+    <!-- To clarify an arming mode, if not sure which they said -->
+    <rule id="OnDemClarifyArmMode" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <item> arm for </item>
+        <ruleref uri="#ArmModes"/>
+        <item> mode </item>
+        <tag>
+            out.Action = "ClarifyArmMode";
+            out.DataType = "String";
+            out.TarType = "Security";
+            out.Target = "ArmMode";
+            out.State = rules.ArmModes;
+            out.Prefixed = "";
+
+            out.Map_State = "ArmModes";
+        </tag>
+    </rule>
+
+    <!-- To clarify a number of minutes-->
+    <rule id="OnDemClarifyMinutes" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <item><ruleref uri="#NumberVal"/></item>
+        <item> minutes </item>
+        <tag>
+            out.Action = "ClarifyMinutes";
+            out.DataType = "Card";
+            out.TarType = "";
+            out.Target = "";
+            out.State = rules.NumberVal;
+            out.Prefixed = "";
+
+            out.Map_State = "NumberVal";
+        </tag>
+    </rule>
+
+    <!-- To clarify an off command, if not sure which they said -->
+    <rule id="OnDemClarifyOff" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <one-of>
+            <item> turn it off </item>
+        </one-of>
+        <tag>
+            out.Action = "ClarifyOff";
+            out.DataType = "Boolean";
+            out.TarType = "";
+            out.Target = "";
+            out.State = "0";
+            out.Prefixed = "";
+        </tag>
+    </rule>
+
+    <!-- To clarify an on command, if not sure which they said -->
+    <rule id="OnDemClarifyOn" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <one-of>
+            <item> turn it on </item>
+        </one-of>
+        <tag>
+            out.Action = "ClarifyOn";
+            out.DataType = "Boolean";
+            out.TarType = "";
+            out.Target = "";
+            out.State = "1";
+            out.Prefixed = "";
+        </tag>
+    </rule>
+
+
+    <!-- To clarify a percentage -->
+    <rule id="OnDemClarifyPercentVal" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <ruleref uri="#PercentVal"/>
+        <item> percent </item>
+        <tag>
+            out.Action = "ClarifyPercentVal";
+            out.DataType = "Card";
+            out.TarType = "";
+            out.Target = "";
+            out.State = rules.PercentVal;
+            out.Prefixed = "";
+
+            out.Map_State = "PercentVal";
+        </tag>
+    </rule>
+
+
+    <!-- To clarify a signed number -->
+    <rule id="OnDemClarifySignedNum" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <ruleref uri="#SignedNumberVal"/>
+        <item>
+            <one-of>
+                <item> degrees </item>
+                <item> percent </item>
+            </one-of>
+        </item>
+        <tag>
+            out.Action = "ClarifySignedNum";
+            out.DataType = "Int";
+            out.TarType = "";
+            out.Target = "";
+            out.State = rules.SignedNumberVal;
+            out.Prefixed = "";
+
+            out.Map_State = "SignedNumberVal";
+        </tag>
+    </rule>
+
+
+    <!-- To clarify a room mode -->
+    <rule id="OnDemClarifyRoomMode" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <item> set the </item>
+        <ruleref uri="#RoomModes"/>
+        <item> room mode </item>
+        <tag>
+            out.Action = "ClarifyRoomMode";
+            out.DataType = "String";
+            out.TarType = "RoomMode";
+            out.Target = rules.RoomModes.Id;
+            out.Info = rules.RoomModes.Name;
+            out.State = "";
+            out.Prefixed = "";
+
+            out.Map_Target = "RoomModes";
+            out.Map_Info = "RoomModes";
+        </tag>
+    </rule>
+
+    <!-- Clarify low or high set point -->
+    <rule id="OnDemClarifyHLSP" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <item> the </item>
+        <ruleref uri="#LowOrHighSP"/>
+        <item> set point </item>
+        <tag>
+            out.Action = "ClarifyHLSP";
+            out.DataType = "Int";
+            out.TarType = "SetPoint";
+            out.Target = rules.LowOrHighSP;
+            out.State = "";
+            out.Prefixed = "";
+
+            out.Map_Target = "LowOrHighSP";
+        </tag>
+    </rule>
+
+    <!-- To clarify a music playlist -->
+    <rule id="OnDemClarifyMusicPL" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <item> the </item>
+        <ruleref uri="#PlayLists"/>
+        <item> play list </item>
+        <tag>
+            out.Action = "ClarifyMusicPL";
+            out.DataType = "String";
+            out.TarType = "MusicPlayList";
+            out.Target = rules.PlayLists.Id;
+            out.Info = rules.PlayLists.Name;
+            out.State = "";
+            out.Prefixed = "";
+
+            out.Map_Target = "PlayLists";
+            out.Map_Info = "PlayLists";
+        </tag>
+    </rule>
+
+    <!-- To clarify a music category -->
+    <rule id="OnDemClarifyMusicCat" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <item> the </item>
+        <ruleref uri="#MusicCategories"/>
+        <item repeat="0-1"> music </item>
+        <item> category </item>
+        <tag>
+            out.Action = "ClarifyMusicCat";
+            out.DataType = "String";
+            out.TarType = "MusicCategory";
+            out.Target = rules.MusicCategories.Id;
+            out.Info = rules.MusicCategories.Name;
+            out.State = "";
+            out.Prefixed = "";
+
+            out.Map_Target = "MusicCategories";
+            out.Map_Info = "MusicCategories";
+        </tag>
+    </rule>
+
+    <!-- To clarify a mute state -->
+    <rule id="OnDemClarifyMute" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <item repeat="0-1"> to </item>
+        <ruleref uri="#MuteUnMute"/>
+        <item> the music </item>
+        <item>
+            <one-of>
+                <item> player </item>
+                <item> playback </item>
+            </one-of>
+        </item>
+        <tag>
+            out.Action = "ClarifyMute";
+            out.DataType = "Boolean";
+            out.TarType = "Music";
+            out.Target = "Mute";
+            out.State = rules.MuteUnMute;
+            out.Prefixed = "";
+
+            out.Map_State = "MuteUnMute";
+        </tag>
+    </rule>
+
+        <!-- To clarify a zone name -->
+    <rule id="OnDemClarifyZoneName" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <item> the </item>
+        <ruleref uri="#SecZones"/>
+        <item> zone </item>
+        <tag>
+            out.Action = "ClarifyZoneName";
+            out.DataType = "String";
+            out.TarType = "SecZone";
+            out.Target = rules.SecZones;
+            out.State = "";
+            out.Prefixed = "";
+
+            out.Map_Target = "SecZones";
+        </tag>
+    </rule>
+
+    <!-- To clarify a zone state -->
+    <rule id="OnDemClarifyZoneState" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <ruleref uri="#SecZoneStates"/>
+        <item> state </item>
+        <tag>
+            out.Action = "ClarifyZoneName";
+            out.DataType = "String";
+            out.TarType = "SecZone";
+            out.Target = "";
+            out.State = rules.SecZoneStates.State;
+            out.Info = rules.SecZoneStates.Info;
+            out.Prefixed = "";
+
+            out.Map_State = "SecZoneStates";
+            out.Map_Info = "SecZoneStates";
+        </tag>
+    </rule>
+
+    <rule id="OnDemClarifyIntExtTemp" scope="public">
+        <ruleref uri="#ClarifyPref"/>
+        <item repeat="0-1"> the </item>
+        <ruleref uri="#IntExtTemp"/>
+        <item>temperature </item>
+        <tag>
+            out.Action = "ClarifyIntExtTemp";
+            out.DataType = "Card";
+            out.TarType = "Temperature";
+            out.Target = rules.IntExtTemp;
+            out.State = "";
+            out.Prefixed = "";
+
+            out.Map_Target = "IntExtTemp";
+        </tag>
+    </rule>
+
+
+    <!-- ===================================================
+       -  These operate on the target of the previous command. The nodes that handle
+       -  them will look for a BT tree context variable that is used to store the
+       -  last target and and target type semantic values. It can use that to know if
+       -  it can reasonably do its thing. These never use the leading keyword since
+       -  they are only useful within an already established conversation. Without
+       -  the keyword they be ignored in the main input loop.
+       -
+       -  Some others handle this on specific things, these are general ones.
+       -
+       -  These purposefully do not set the target and target type semantic values, so
+       -  that they don't undo the current topic if they are used.
+       - =================================================== -->
+
+
+    <!-- If we were previously talking about some boolean thing -->
+    <rule id="CmdTurnItOffOn" scope="public">
+        <item> turn it </item>
+        <ruleref uri="#OffOrOn"/>
+        <item repeat="0-1"> please </item>
+        <tag>
+            out.Action = "CmdTurnItOffOn";
+            out.DataType = "Boolean";
+            out.State = rules.OffOrOn;
+            out.Prefixed = "";
+
+            out.Map_State = "OffOrOn";
+        </tag>
+    </rule>
+
+    <!-- If we were previously talking about some percent or degree -->
+    <rule id="CmdSetItToNum" scope="public">
+        <item> set it to </item>
+        <ruleref uri="#SignedNumberVal"/>
+        <item>
+            <one-of>
+                <item> percent </item>
+                <item> degrees </item>
+            </one-of>
+        </item>
+        <tag>
+            out.Action = "CmdSetItToNum";
+            out.DataType = "Int";
+            out.State = rules.SignedNumberVal;
+            out.Prefixed = "";
+
+            out.Map_State = "SignedNumberVal";
+        </tag>
+    </rule>
+
+
+
+    <!-- ===================================================
+       -  General queries and commands
+       - =================================================== -->
+
+    <!-- Reload the room configuration -->
+    <rule id="CmdReloadCfg" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> reload the </item>
+        <one-of>
+            <item> room </item>
+            <item> system </item>
+        </one-of>
+        <item> configuration </item>
+        <tag>
+            out.Action = "CmdReloadCfg";
+            out.DataType = "";
+            out.TarType = "";
+            out.Target = "";
+            out.State = "";
+
+            out.Prefixed = rules.KeyWord.out ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord.out ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- Run a room mode action -->
+    <rule id="CmdSetRoomMode" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <one-of>
+            <item>
+                <item> set the room to </item>
+                <ruleref uri="#RoomModes"/>
+                <item> mode </item>
+            </item>
+            <item>
+                <item> set the room mode to </item>
+                <ruleref uri="#RoomModes"/>
+            </item>
+        </one-of>
+        <tag>
+            out.Action = "CmdSetRoomMode";
+            out.DataType = "String";
+            out.TarType = "RoomMode";
+            out.Target = rules.RoomModes.Id;
+            out.State = "";
+            out.Info = rules.RoomModes.Name
+
+            out.Map_Target = "RoomModes";
+            out.Map_Info = "RoomModes";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- Query the current time -->
+    <rule id="QueryCurrentTime" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> What is the current time </item>
+        <tag>
+            out.Action = "QueryCurrentTime";
+            out.DataType = "";
+            out.TarType = "";
+            out.Target = "";
+            out.State = "";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- Query the current CQC version -->
+    <rule id="QueryCQCVer" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <one-of>
+            <item> what is my current C Q C version </item>
+            <item> what C Q C version do I have </item>
+        </one-of>
+        <tag>
+            out.Action = "QueryCQCVer";
+            out.DataType = "";
+            out.TarType = "";
+            out.Target = "";
+            out.State = "";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- Query the today's date -->
+    <rule id="QueryTodaysDate" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> What is </item>
+        <one-of>
+            <item> today's date </item>
+            <!-- <item> the date </item> -->
+            <item> the current date </item>
+        </one-of>
+        <tag>
+            out.Action = "QueryTodaysDate";
+            out.DataType = "";
+            out.TarType = "";
+            out.Target = "";
+            out.State = "";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- ===================================================
+       -  HCAV oriented operations
+       - =================================================== -->
+
+    <!-- Get the low or high set point -->
+    <rule id="LowOrHighSP" scope="private">
+        <one-of>
+            <item> low <tag> out = "Low"; </tag> </item>
+            <item> heat <tag> out = "Low"; </tag> </item>
+            <item> heating <tag> out = "Low"; </tag> </item>
+
+            <item> high <tag> out = "High"; </tag> </item>
+            <item> cool <tag> out = "High"; </tag> </item>
+            <item> cooling <tag> out = "High"; </tag> </item>
+        </one-of>
+    </rule>
+
+
+    <!-- Query the low/high set point of the thermostat -->
+    <rule id="QueryThermoHLSP" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> What is the </item>
+        <item repeat="0-1"> current </item>
+        <ruleref uri="#LowOrHighSP"/>
+        <item> set point </item>
+        <tag>
+            out.Action = "QueryThermoHLSP";
+            out.DataType = "Int";
+            out.TarType = "HLSetPoint";
+            out.Target = rules.LowOrHighSP;
+            out.State = "";
+
+            out.Map_Target = "LowOrHighSP";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- Set the low/high set point of the thermostat -->
+    <rule id="CmdSetThermoHLSP" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> Set the </item>
+        <item repeat="0-1"> current </item>
+        <ruleref uri="#LowOrHighSP"/>
+        <item>
+            <one-of>
+                <item> set point </item>
+            </one-of>
+        </item>
+        <item> to </item>
+        <ruleref uri="#SignedNumberVal"/>
+        <item> degrees </item>
+        <tag>
+            out.Action = "CmdSetThermoHLSP";
+            out.DataType = "Int";
+            out.TarType = "HLSetPoint";
+            out.Target = rules.LowOrHighSP;
+            out.State = rules.SignedNumberVal;
+
+            out.Map_Target = "LowOrHighSP";
+            out.Map_State = "SignedNumberVal";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- ===================================================
+       -  Lighting oriented operations
+       - =================================================== -->
+
+    <!-- The most basic switch off/on command -->
+    <rule id="CmdSetLightSwitch" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <one-of>
+            <item>
+                <item> turn </item>
+                <ruleref uri="#OffOrOn"/>
+                <item> the </item>
+                <ruleref uri="#LightList"/>
+                <item> light </item>
+            </item>
+            <item>
+                <item> turn the </item>
+                <ruleref uri="#LightList"/>
+                <item> light </item>
+                <ruleref uri="#OffOrOn"/>
+            </item>
+        </one-of>
+        <tag>
+            out.Action = "CmdSetLightSwitch";
+            out.DataType = "Boolean";
+            out.TarType = "LightSwitch";
+            out.Target = rules.LightList;
+            out.State = rules.OffOrOn;
+
+            out.Map_Target = "LightList";
+            out.Map_State = "OffOrOn";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- Set a dimmer's level -->
+    <rule id="CmdSetLightLevel" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> set the </item>
+        <ruleref uri="#LightList"/>
+        <item> light to </item>
+        <ruleref uri="#PercentVal"/>
+        <item> percent </item>
+        <tag>
+            out.Action = "CmdSetLightLevel";
+            out.DataType = "Card";
+            out.TarType = "Dimmer";
+            out.Target = rules.LightList;
+            out.State = rules.PercentVal;
+
+            out.Map_Target = "LightList";
+            out.Map_State = "PercentVal";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- Query if a light switch is in a specific state -->
+    <rule id="QueryLightSwitchState" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> Is the </item>
+        <ruleref uri="#LightList"/>
+        <item> light currently </item>
+        <ruleref uri="#OffOrOn"/>
+        <tag>
+            out.Action = "QueryLightSwitchState";
+            out.DataType = "Boolean";
+            out.TarType = "LightSwitch";
+            out.Target = rules.LightList;
+            out.State = rules.OffOrOn;
+
+            out.Map_Target = "LightList";
+            out.Map_State = "OffOrOn";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- Query what state of light switch is -->
+    <rule id="QueryLightSwitch" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> What is the state of the </item>
+        <ruleref uri="#LightList"/>
+        <item> light </item>
+        <tag>
+            out.Action = "QueryLightSwitch";
+            out.DataType = "Boolean";
+            out.TarType = "LightSwitch";
+            out.Target = rules.LightList;
+            out.State = "";
+
+            out.Map_Target = "LightList";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- ===================================================
+       -  Media oriented operations
+       - =================================================== -->
+
+    <!-- A little helper rule for loading playlists, items, etc... -->
+    <rule id="MediaPLLoadMode" scope="private">
+        <one-of>
+            <item> load <tag> out = "Play" </tag> </item>
+            <item> play <tag> out = "Play" </tag> </item>
+            <item> queue <tag> out = "Enqueue" </tag> </item>
+            <item> queue up <tag> out = "Enqueue" </tag> </item>
+        </one-of>
+    </rule>
+
+
+    <!-- Clear the music render's playlist -->
+    <rule id="CmdClearMusicPL" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item>
+            <one-of>
+                <item> flush </item>
+                <item> clear </item>
+            </one-of>
+        </item>
+        <item> the music playlist </item>
+        <tag>
+            out.Action = "CmdClearMusicPL";
+            out.DataType = "";
+            out.TarType = "Music";
+            out.Target = "RendPlayList";
+            out.State = "";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- Play music from a category -->
+    <rule id="CmdPlayMusicFromCat" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> play music from the category </item>
+        <ruleref uri="#MusicCategories"/>
+        <tag>
+            out.Action = "CmdPlayMusicFromCat";
+            out.DataType = "String";
+            out.TarType = "MusicCat";
+            out.Target = rules.MusicCategories.Id;
+            out.Info = rules.MusicCategories.Name;
+            out.State = "";
+
+            out.Map_Target = "MusicCategories";
+            out.Map_Info = "MusicCategories";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- Directly play a music playlist -->
+    <rule id="CmdPlayMusicPL" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <ruleref uri="#MediaPLLoadMode"/>
+        <item> the music play list </item>
+        <ruleref uri="#PlayLists"/>
+        <tag>
+            out.Action = "CmdPlayMusicPL";
+            out.DataType = "String";
+            out.TarType = "MusicPlayList";
+            out.Target = rules.PlayLists.Id;
+            out.Info = rules.PlayLists.Name;
+            out.State = rules.MediaPLLoadMode;
+
+            out.Map_Target = "PlayLists";
+            out.Map_Info = "PlayLists";
+            out.Map_State = "MediaPLLoadMode";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- A little helper rule for pause/resume -->
+    <rule id="TransportCmds" scope="private">
+        <one-of>
+            <item> pause <tag> out.Cmd = "Pause"; out.Desc = "paused"; </tag> </item>
+            <item> play <tag> out.Cmd = "Play"; out.Desc = "played"; </tag> </item>
+            <item> resume <tag> out.Cmd = "Play"; out.Desc = "resumed"; </tag> </item>
+            <item> restart <tag> out.Cmd = "Play"; out.Desc = "started"; </tag> </item>
+            <item> start <tag> out.Cmd = "Play"; out.Desc = "started"; </tag> </item>
+            <item> stop <tag> out.Cmd = "Stop"; out.Desc = "stopped"; </tag> </item>
+        </one-of>
+    </rule>
+
+    <!--
+       - The available playlist modes. We include random category, though it will be
+       - rejected since there's a special command for that.
+       -->
+    <rule id="PLModes" scope="private">
+        <one-of>
+            <item> normal <tag> out = "Normal"; </tag> </item>
+            <item> Juke box <tag> out = "Jukebox"; </tag> </item>
+            <item> Shuffle <tag> out = "Shuffle"; </tag> </item>
+            <item> Random <tag> out = "Random Category"; </tag> </item>
+            <item> Random Category <tag> out = "Random Category"; </tag> </item>
+        </one-of>
+    </rule>
+
+    <!-- Pause/resume music playback -->
+    <rule id="CmdMusicTransport" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <ruleref uri="#TransportCmds"/>
+        <item> the music </item>
+        <item>
+            <one-of>
+                <item> playback </item>
+                <item> player </item>
+            </one-of>
+        </item>
+        <tag>
+            out.Action = "CmdMusicTransport";
+            out.DataType = "String";
+            out.TarType = "Music";
+            out.Target = "Transport";
+            out.State = rules.TransportCmds.Cmd;
+            out.Info = rules.TransportCmds.Desc;
+
+            out.Map_State = "TransportCmds";
+            out.Map_Info = "TransportCmds";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- Set the music playlist mode -->
+    <rule id="CmdSetMusicPLMode" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> set the music play list mode to </item>
+        <ruleref uri="#PLModes"/>
+        <tag>
+            out.Action = "CmdSetMusicPLMode";
+            out.DataType = "String";
+            out.TarType = "Music";
+            out.Target = "PLMode";
+            out.State = rules.PLModes;
+
+            out.Map_State = "PLModes";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- Set the music volume -->
+    <rule id="CmdSetMusicVolume" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> set the music volume to </item>
+        <ruleref uri="#PercentVal"/>
+        <item> percent </item>
+        <tag>
+            out.Action = "CmdSetMusicVolume";
+            out.DataType = "Card";
+            out.TarType = "Music";
+            out.Target = "Volume";
+            out.State = rules.PercentVal;
+
+            out.Map_State = "PercentVal";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- Mute/unmute the music -->
+    <rule id="CmdSetMusicMute" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <ruleref uri="#MuteUnMute"/>
+        <item> the music </item>
+        <item>
+            <one-of>
+                <item> player </item>
+                <item> playback </item>
+            </one-of>
+        </item>
+        <tag>
+            out.Action = "CmdSetMusicMute";
+            out.DataType = "Boolean";
+            out.TarType = "Music";
+            out.Target = "Mute";
+            out.State = rules.MuteUnMute;
+
+            out.Map_State = "MuteUnMute";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- ===================================================
+       -  Reminder oriented rules
+       - =================================================== -->
+
+    <!-- Cancels all reminders -->
+    <rule id="CmdCancelAllReminders" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> Cancel all reminders </item>
+        <tag>
+            out.Action = "CmdCancelAllReminders";
+            out.DataType = "";
+            out.TarType = "Reminder";
+            out.Target = ""
+            out.State = "";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- Aks for a reminder -->
+    <rule id="CmdRemindMe" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> Remind me in </item>
+        <ruleref uri="#NumberVal"/>
+        <item> minutes to </item>
+        <one-of>
+            <item><ruleref uri="#StdReminders"/></item>
+            <item><ruleref uri="#CustReminders"/></item>
+        </one-of>
+        <tag>
+            out.Action = "CmdRemindMe";
+            out.DataType = "String";
+            out.TarType = "Reminder";
+            out.Target = rules.CustReminders ? rules.CustReminders : rules.StdReminders;
+            out.State = rules.NumberVal;
+
+            out.Map_Target = rules.CustReminders ? "CustReminders" : "StdReminders";
+            out.Map_State = "NumberVal";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- Cancels the last reminder -->
+    <rule id="CmdCancelLastReminder" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> Cancel the last reminder </item>
+        <tag>
+            out.Action = "CmdCancelLastReminder";
+            out.DataType = "";
+            out.TarType = "Reminder";
+            out.Target = ""
+            out.State = "";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- ===================================================
+       -  Security oriented operations
+       - =================================================== -->
+
+    <!-- The states we can check a security zone for -->
+    <rule id="SecZoneStates" scope="private">
+        <one-of>
+            <item> open <tag> out.State = "NotReady"; out.Info = "open"; </tag> </item>
+            <item> closed <tag> out.State = "Secure"; out.Info = "closed"; </tag> </item>
+            <item> secure <tag> out.State = "Secure"; out.Info = "secure";  </tag>  </item>
+            <item> ready <tag> out.State = "Secure"; out.Info = "ready"; </tag> </item>
+            <item> not ready <tag> out.State = "NotReady"; out.Info = "not ready"; </tag> </item>
+            <item> violated <tag> out.State = "Violated"; out.Info = "violated"; </tag> </item>
+        </one-of>
+    </rule>
+
+
+    <!-- Disarm the security system -->
+    <rule id="CmdDisarmSecSystem" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> disarm the security system </item>
+        <tag>
+            out.Action = "CmdDisarmSecSystem";
+            out.DataType = "String";
+            out.TarType = "Security";
+            out.Target = "ArmMode";
+            out.State = "Off";
+
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+    <!-- Arm the security system -->
+    <rule id="CmdArmSecSystem" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> arm the security system for </item>
+        <ruleref uri="#ArmModes"/>
+        <item> mode </item>
+        <tag>
+            out.Action = "CmdArmSecSystem";
+            out.DataType = "String";
+            out.TarType = "Security";
+            out.Target = "ArmMode";
+            out.State = rules.ArmModes;
+
+            out.Map_State = "ArmModes";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- Query whether a security zone is open, closed, ready, not-ready -->
+    <rule id="QuerySecZoneState" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> is the </item>
+        <ruleref uri="#SecZones"/>
+        <item> currently </item>
+        <ruleref uri="#SecZoneStates"/>
+        <tag>
+            out.Action = "QuerySecZoneState";
+            out.DataType = "String";
+            out.TarType = "SecZone";
+            out.Target = rules.SecZones;
+            out.State = rules.SecZoneStates.State;
+            out.Info = rules.SecZoneStates.Info;
+
+            out.Map_Target = "SecZones";
+            out.Map_State = "SecZoneStates";
+            out.Map_Info = "SecZoneStates";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- ===================================================
+       -  Weather oriented operations
+       - =================================================== -->
+    <rule id="IntExtTemp" scope="private">
+        <item>
+            <one-of>
+                <item> external <tag> out = "External"; </tag> </item>
+                <item> internal <tag> out = "Internal"; </tag> </item>
+                <item> room <tag> out = "Internal"; </tag> </item>
+            </one-of>
+        </item>
+    </rule>
+
+
+    <rule id="QueryCurrentTemp" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> What is the current </item>
+        <item repeat="0-1">
+            <ruleref uri="#IntExtTemp"/>
+        </item>
+        <item> temperature </item>
+        <tag>
+            out.Action = "QueryCurrentTemp";
+            out.DataType = "Card";
+            out.TarType = "Temperature";
+            out.Target = rules.IntExtTemp;
+            out.State = "";
+
+            out.Map_Target = "IntExtTemp";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <rule id="ShortFCDays" scope="private">
+        <one-of>
+            <item> the current <tag> out = "Today"; </tag> </item>
+            <item> today's <tag> out = "Today"; </tag> </item>
+            <item> tomorrow's <tag> out = "Tomorrow"; </tag> </item>
+        </one-of>
+    </rule>
+
+
+    <rule id="QueryWeatherShortFC" scope="public">
+        <item repeat="0-1">
+            <ruleref uri="#KeyWord"/>
+        </item>
+        <item> What is </item>
+        <ruleref uri="#ShortFCDays"/>
+        <item> weather forecast </item>
+        <tag>
+            out.Action = "QueryWeatherShortFC";
+            out.DataType = "";
+            out.TarType = "WeatherFC";
+            out.Target = rules.ShortFCDays;
+            out.State = "";
+
+            out.Map_Target = "ShortFCDays";
+            out.Prefixed = rules.KeyWord ? "Prefixed" : "";
+            out.Map_Prefixed = rules.KeyWord ? "KeyWord" : "";
+        </tag>
+    </rule>
+
+
+
+    <!-- ===================================================
+       -  Internal rules that are only referenced from other rules. So they don't include
+       -  the standard semantic info.
+       - =================================================== -->
+
+    <!-- Always at the start of clarification replies -->
+    <rule id="ClarifyPref" scope="private">
+        <item>
+            <one-of>
+                <item> I Said </item>
+                <item> I Meant </item>
+                <item> I Wanted </item>
+            </one-of>
+        </item>
+    </rule>
+
+    <!-- We also have wrappers for these as to level rules -->
+    <rule id="IntYes" scope="private">
+        <item>
+            <one-of>
+                <item> Affirmative </item>
+                <item> That's a roger </item>
+                <item> Roger </item>
+                <item> Yes </item>
+                <item> Yep </item>
+                <item> Yes, I do </item>
+                <item> Yes, that would be great </item>
+                <item> Yes, please </item>
+                <item> Yes, please do that </item>
+                <item> Please, yes </item>
+                <item> Please </item>
+                <item> Yes, thank you </item>
+            </one-of>
+            <tag> out = "Yes"; </tag>
+        </item>
+    </rule>
+
+    <rule id="IntNo" scope="private">
+        <item>
+            <one-of>
+                <item> Negative </item>
+                <item> No </item>
+                <item> Nope </item>
+                <item> No, I do not </item>
+                <item> No, please do not </item>
+                <item> No, do not do that </item>
+                <item> No, I would prefer not </item>
+                <item> Please, no </item>
+                <item> Not at this time </item>
+                <item> Not at this time, no </item>
+            </one-of>
+            <item repeat="0-1">
+                <one-of>
+                    <item> thank you </item>
+                    <item> thanks </item>
+                    <item> please </item>
+                </one-of>
+            </item>
+            <tag> out = "No"; </tag>
+        </item>
+    </rule>
+
+    <rule id="MuteUnMute" scope="private">
+        <item>
+            <one-of>
+                <item> Mute <tag> out = "1"; </tag> </item>
+                <item> Unmute <tag> out = "0"; </tag> </item>
+            </one-of>
+        </item>
+    </rule>
+
+    <rule id="OffOrOn" scope="private">
+        <item>
+            <one-of>
+                <item> Off <tag> out = "0"; </tag> </item>
+                <item> On <tag> out = "1"; </tag> </item>
+            </one-of>
+        </item>
+    </rule>
+
+
+
+    <!--
+      - As set of rules that allow us to deal with all numbers from zero to 100
+      - in a fairly compact way. First we define the single digit numbers.
+      -->
+    <rule id="OnesDigits" scope="private">
+        <one-of>
+            <item> Zero <tag> out = "0"; </tag> </item>
+            <item> One <tag> out = "1"; </tag> </item>
+            <item> Two <tag> out = "2"; </tag> </item>
+            <item> Three <tag> out = "3"; </tag> </item>
+            <item> Four <tag> out = "4"; </tag> </item>
+            <item> Five <tag> out = "5"; </tag> </item>
+            <item> Six <tag> out = "6"; </tag> </item>
+            <item> Seven <tag> out = "7"; </tag> </item>
+            <item> Eight <tag> out = "8"; </tag> </item>
+            <item> Nine <tag> out = "9"; </tag> </item>
+        </one-of>
+    </rule>
+
+    <!-- Then the special case teens -->
+    <rule id="TeensNumbers" scope="private">
+        <one-of>
+            <item> Ten <tag> out = "10"; </tag> </item>
+            <item> Eleven <tag> out = "11"; </tag> </item>
+            <item> Twelve <tag> out = "12"; </tag> </item>
+            <item> Thirteen <tag> out = "13"; </tag> </item>
+            <item> Fourteen <tag> out = "14"; </tag> </item>
+            <item> Fifteen <tag> out = "15"; </tag> </item>
+            <item> Sixteen <tag> out = "16"; </tag> </item>
+            <item> Seventeen <tag> out = "17"; </tag> </item>
+            <item> Eighteen <tag> out = "18"; </tag> </item>
+            <item> Nineteen <tag> out = "19"; </tag> </item>
+        </one-of>
+    </rule>
+
+    <!--
+       - Then the tens, but WITHOUT the trailing zero. So we can use it for things
+       - like twenty + five. When it's used on its own, we force the trailing zero
+       - onto it.
+       - -->
+    <rule id="TensNumbers" scope="private">
+        <one-of>
+            <item> Twenty <tag> out = "2"; </tag> </item>
+            <item> Thirty <tag> out = "3"; </tag> </item>
+            <item> Forty <tag> out = "4"; </tag> </item>
+            <item> Fifty <tag> out = "5"; </tag> </item>
+            <item> Sixty <tag> out = "6"; </tag> </item>
+            <item> Seventy <tag> out = "7"; </tag> </item>
+            <item> Eighty <tag> out = "8"; </tag> </item>
+            <item> Ninety <tag> out = "9"; </tag> </item>
+        </one-of>
+    </rule>
+
+    <!--
+       - The rest are a combination of tens + ones. This isn't real addition, just
+       - string concatenation.
+       -->
+    <rule id="OtherNumbers" scope="private">
+        <ruleref uri="#TensNumbers"/>
+        <tag> out = rules.latest(); </tag>
+
+        <ruleref uri="#OnesDigits"/>
+        <tag> out += rules.latest(); </tag>
+    </rule>
+
+    <!-- A positive or negative indicator -->
+    <rule id="PositiveNegative" scope="private">
+        <one-of>
+            <item> negative <tag> out = "-";</tag> </item>
+            <item> positive <tag> out = "+";</tag> </item>
+        </one-of>
+    </rule>
+
+    <!-- The numbers from 0 to 100 -->
+    <rule id="NumberVal" scope="private">
+        <one-of>
+            <item><ruleref uri="#OnesDigits"/> </item>
+            <item><ruleref uri="#TeensNumbers"/> </item>
+            <item><ruleref uri="#TensNumbers"/> <tag> out = rules.TensNumbers + "0"; </tag> </item>
+            <item><ruleref uri="#OtherNumbers"/> </item>
+            <item> One Hundred <tag> out = "100"; </tag> </item>
+        </one-of>
+    </rule>
+
+
+    <!-- The 0 to 100 numbers above, but optionally negative or positive -->
+    <rule id="SignedNumberVal" scope="private">
+        <item repeat="0-1"><ruleref uri="#PositiveNegative"/></item>
+        <ruleref uri="#NumberVal"/>
+        <tag> out = (rules.PositiveNegative ? rules.PositiveNegative : "") + rules.NumberVal; </tag>
+    </rule>
+
+
+    <!-- A set of commonly used factions, translated to their percent values -->
+    <rule id="FractionVal" scope="private">
+        <one-of>
+            <item> Full Off <tag> out = "0"; </tag> </item>
+            <item> One Quarter <tag> out = "25"; </tag> </item>
+            <item> One Half <tag> out = "50"; </tag> </item>
+            <item> Three Quarters <tag> out = "75"; </tag> </item>
+            <item> One Third <tag> out = "33"; </tag> </item>
+            <item> Two Thirds <tag> out = "66"; </tag> </item>
+        </one-of>
+    </rule>
+
+
+    <!--
+       - A percentage value. It's the numbers above, or a set of commonly used
+       - fractions.
+       -->
+    <rule id="PercentVal" scope="private">
+        <one-of>
+            <item><ruleref uri="#NumberVal"/></item>
+            <item><ruleref uri="#FractionVal"/></item>
+        </one-of>
+        <item repeat="0-1"> percent </item>
+        <tag> out = rules.latest(); </tag>
+    </rule>
+
+    <!--
+       - A standard set of reminders that we support. There is a dynamic rule below
+       - for custom reminders created by the user.
+       -->
+    <rule id="StdReminders" scope="private">
+        <one-of>
+            <item>
+                <item> call </item>
+                <one-of>
+                    <item> the </item>
+                    <item> my </item>
+                </one-of>
+                <one-of>
+                    <item> dentist </item>
+                    <item> dentist's office </item>
+                    <item> doctor </item>
+                    <item> doctor's office </item>
+                    <item> home </item>
+                    <item> office </item>
+                    <item> work </item>
+                </one-of>
+            </item>
+            <item>
+                <item> feed </item>
+                <one-of>
+                    <item> the </item>
+                    <item> my </item>
+                </one-of>
+                <one-of>
+                    <item> cat </item>
+                    <item> dog </item>
+                    <item> fish </item>
+                </one-of>
+            </item>
+            <item>
+                <item> get </item>
+                <one-of>
+                    <item> dressed </item>
+                    <item> groceries </item>
+                    <item> ready </item>
+                    <item> the groceries </item>
+                    <item> the kids </item>
+                </one-of>
+            </item>
+            <item>
+                <item> go </item>
+                <one-of>
+                    <item> running </item>
+                    <item> to bed </item>
+                    <item> to sleep </item>
+                    <item> to the gym </item>
+                    <item> to the store </item>
+                    <item> to work </item>
+                </one-of>
+            </item>
+            <item>
+                <item> pick up </item>
+                <one-of>
+                    <item> the </item>
+                    <item> my </item>
+                </one-of>
+                <one-of>
+                    <item> brother </item>
+                    <item> father </item>
+                    <item> kids </item>
+                    <item> mail </item>
+                    <item> mother </item>
+                    <item> prescription </item>
+                </one-of>
+            </item>
+            <item>
+                <item> start </item>
+                <one-of>
+                    <item> breakfast </item>
+                    <item> dinner </item>
+                    <item> lunch </item>
+                    <item> supper </item>
+                </one-of>
+            </item>
+            <item>
+                <item> take out the </item>
+                <one-of>
+                    <item> garbage </item>
+                    <item> trash </item>
+                </one-of>
+            </item>
+            <item>
+                <item> walk </item>
+                <one-of>
+                    <item> the </item>
+                    <item> my </item>
+                </one-of>
+                <one-of>
+                    <item> cat </item>
+                    <item> dog </item>
+                </one-of>
+            </item>
+        </one-of>
+    </rule>
+
+
+    <!-- ===================================================
+       -  Dynamic rules that we update with actual information from the room
+       -  configuration data.
+       - =================================================== -->
+
+    <!-- We fill this with the available security system arming modes -->
+    <rule id="ArmModes" sapi:dynamic="true">
+    <one-of>
+        <item> Away </item>
+        <item> Night </item>
+        <item> Stay </item>
+    </one-of>
+    </rule>
+
+    <!-- We fill this with the available lights -->
+    <rule id="LightList" sapi:dynamic="true">
+    <one-of>
+        <item> Driveway </item>
+        <item> Kitchen Table </item>
+        <item> Living Rom </item>
+    </one-of>
+    </rule>
+
+
+    <!--
+       - We fill this with the available custom reminders, if any. We put in one bogus
+       - entry in case they define none.
+       -->
+    <rule id="CustReminders" sapi:dynamic="true">
+        <item> scream at Saturn on Sunday </item>
+    </rule>
+
+    <!-- We fill this with the available music categories, if any -->
+    <rule id="MusicCategories" sapi:dynamic="true">
+    </rule>
+
+    <!-- We fill this with the available music playlists, if any -->
+    <rule id="PlayLists" sapi:dynamic="true">
+    </rule>
+
+    <!-- We fill this with the user defined room mode names, if any -->
+    <rule id="RoomModes" sapi:dynamic="true">
+    </rule>
+
+    <!-- We fill this with the available security zones, if any -->
+    <rule id="SecZones" sapi:dynamic="true">
+    <one-of>
+        <item> Kitchen Door </item>
+        <item> Patio Door </item>
+        <item> Living Room Window </item>
+    </one-of>
+    </rule>
+
+</grammar>
+

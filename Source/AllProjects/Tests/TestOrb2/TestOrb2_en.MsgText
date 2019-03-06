@@ -1,0 +1,40 @@
+;
+; FILE NAME: TestOrb2_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 11/09/2001
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;   This file and its contents are the property of Charmed Quark Software. It
+;   forms part of the internal implementation of the Charmed Quark Controller
+;   product. It contains proprietary source code and is not to be distributed
+;   publically in any way, shape, or form.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for this test program
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kTestErrs
+    MsgPref=kTestMsgs
+END CTRL
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    ; Test errors
+    errcTest_TestExcept         1   Test exception return
+
+END ERRORS
+

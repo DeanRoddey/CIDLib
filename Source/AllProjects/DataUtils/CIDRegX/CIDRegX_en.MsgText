@@ -1,0 +1,75 @@
+;
+; FILE NAME: CIDRegX_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 03/21/99
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the English message and error text and ids for this
+;  facility. From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kRegXErrs
+    MsgPref=kRegXMsgs
+END CTRL
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    ; Regular expression errors
+    errcRegEx_NoPattern         2900    The regular expression has not been set yet
+    errcRegEx_EmptyPattern      2901    The new regular expression is empty
+    errcRegEx_NoStatesYet       2902    There are no states in the NFA to update
+    errcRegEx_StateOverflow     2903    Overflowed the NFA state arrays. Max States=%(1)
+    errcRegEx_UnexpectedEOP     2904    Unexpected end of regular expression pattern
+    errcRegEx_CloseParen        2905    Expected ')' at offset %(1) of RegEx pattern, for expression at offset %(2)
+    errcRegEx_EscapeAtEOP       2906    Cannot have an escape character as the last character of the RegEx pattern
+    errcRegEx_ExpectedFactor    2907    Expected a character, special character, or open paren of a RegEx expression at offset %(1)
+    errcRegEx_BadRangeState     2908    An invalid state occured while parsing a RegEx character range
+    errcRegEx_EscapeRequired    2909    Special character (%(1)) must be escaped when used here in RegEx pattern
+    errcRegEx_EmptyRange        2910    Empty RegEx character ranges are not allowed
+    errcRegEx_InvalidRange      2911    The first character of a RegEx range ('%(1)') must be less than the second ('%(2)')
+    errcRegEx_BadStartAt        2912    The 'start at' index (%(1)) is beyond the end of the RegEx search string (%(2))
+    errcRegEx_PatternOverflow   2913    Running the NFA overflowed the search string
+    errcRegEx_ExpectedExpr      2914    Expected "|<expr>" at offset %(1) of RegEx pattern
+    errcRegEx_ZeroMaxElems      2915    Cannot set the NFA maximum states to zero
+    errcRegEx_NoMatcher         2916    There is no matcher object associated with an epsilon state
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+;  Message ids
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+    ; General strings
+    midGen_Pattern             13000    Pattern
+    midGen_NotApplicable       13002    N/A
+
+
+    ; Strings used by the CIDLib_RegEx.Cpp file
+    midRegEx_NoPattern         14000    No Pattern Set
+    midRegEx_NFA               14001    NFA:
+    midRegEx_NOT               14002    (Not)
+    midRegEx_AnyChar           14003    Any Char
+    midRegEx_AtStart           14004    AtStart
+    midRegEx_AtEnd             14005    AtEnd
+
+END MESSAGES
+

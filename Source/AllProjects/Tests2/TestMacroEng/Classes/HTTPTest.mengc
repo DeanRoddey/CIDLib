@@ -1,0 +1,112 @@
+Class=[NonFinal]
+    ClassPath MEng.HTTPTest;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.System.Runtime.HTTPClient;
+    MEng.System.Runtime.URL;
+    MEng.System.Runtime.StreamSocket;
+    MEng.System.Runtime.IPEndPoint;
+    MEng.System.Runtime.KVPair;
+    MEng.System.Runtime.DataSrc;
+EndImports;
+
+Members=
+    HTTPClient          m_HTTP;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            LinesList   OutHdrLines;
+            LinesList   InHdrLines;
+            KVPair      HdrVal;
+            URL         URLToGet;
+            String      RepText;
+            String      ContType;
+            MemBuf      DataBuf;
+            Card4       ContLen(0);
+            String      ContText;
+            Card4       ResCode;
+            IPEndPoint  IPEPSrv;
+            DataSrc  	DataSrc;
+        EndLocals;
+
+        // Set up the URL, we know it's fully qualified
+        URLToGet.Set("http://www.gootle.com", FQTypes.Full);
+
+        //
+        //  Query the page, we expect HTML back in this case. Indicate
+        //  not outgoing body content. We don't set up any outgoing
+        //  header lines.
+        //
+        HdrVal.Set("Connection", "Close");
+        InHdrLines.AddObject(HdrVal);
+
+        URLToGet.GetIPEndPoint(IPEPSrv, IPAddrTypes.Unspec, True);
+        DataSrc.TCPSetup(IPEPSrv, False);
+
+        ResCode := m_HTTP.SendRUGET
+        (
+            URLToGet
+            , 2500
+            , "CQSL TestReq"
+            , "text/html"
+            , RepText
+            , OutHdrLines
+            , ContType
+            , DataBuf
+            , ContLen
+            , False
+            , InHdrLines
+            , DataSrc
+        );
+
+        If (ResCode = HTTPClient.kHTTPCode_OK)
+            //
+            //  In this case know the body text is ASCII, so we just do
+            //  an export of the data to a string. If not, we'd have to
+            //  parse out hte returned ContType to get the encoding and
+            //  set up a text encoder.
+            //
+            DataBuf.ExportString(ContText, ContLen);
+
+        ElseIf (ResCode = HTTPClient.kHTTPCode_MovedTemp)
+
+            // Find the new target
+            If (m_HTTP.FindHdrLine(OutHdrLines, "LOCATION", RepText))
+                URLToGet.Set("http://www.microsoft.com", FQTypes.DontCare);
+
+                InHdrLines.RemoveAll();
+                ResCode := m_HTTP.SendRUGET
+                (
+                    URLToGet
+                    , 2500
+                    , "CQSL TestReq"
+                    , "text/html"
+                    , RepText
+                    , OutHdrLines
+                    , ContType
+                    , DataBuf
+                    , ContLen
+                    , False
+                    , InHdrLines
+                    , DataSrc
+                );
+            EndIf;
+
+        Else
+            // It failed, code is in ResCode
+        EndIf;
+
+        Return 0;
+    EndMethod;
+EndMethods;
+

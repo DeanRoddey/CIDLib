@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<CIDIDL:Interface>
+
+    <CIDIDL:ClassIntf   CIDIDL:Name="TestOrb2Intf"
+                        CIDIDL:InterfaceId="04B5C1BC4E24325C-2549453D6539A000">
+        <CIDIDL:Methods>
+            <!--
+              - This is the only method. This test is just a benchmark for measuring
+              - the basic performance of a simple ping type client to server call.
+              -->
+            <CIDIDL:Method CIDIDL:Name="Ping">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+            </CIDIDL:Method>
+        </CIDIDL:Methods>
+    </CIDIDL:ClassIntf>
+
+</CIDIDL:Interface>
+

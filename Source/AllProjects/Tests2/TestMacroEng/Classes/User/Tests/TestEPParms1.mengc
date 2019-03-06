@@ -1,0 +1,39 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestEPParms1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.ASCII;
+EndImports;
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    ASCII               m_Ascii;
+    Int4                m_RetVal;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start([In] Card4 InVal) Returns Int4
+    Begin
+        If (InVal != 1)
+            m_Helper.PrintErr("Bad entry point param value", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

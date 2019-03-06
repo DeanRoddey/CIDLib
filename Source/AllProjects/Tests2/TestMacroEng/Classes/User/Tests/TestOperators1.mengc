@@ -1,0 +1,242 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestOperators1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Types=
+    VectorOf[String]    TestList;
+EndTypes;
+
+Literals=
+    String              kSuffix("2");
+EndLiterals;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Boolean             m_Flag;
+    Card4               m_Card1;
+    Card4               m_Card2;
+    Int4                m_Int1;
+    Int4                m_Int2;
+    Int4                m_RetVal;
+    TestHelpers         m_Helper;
+    TestList            m_List;
+    String              m_Str1;
+    String              m_Str2;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_Card1();
+        m_Card2(10);
+        m_Int1();
+        m_Int2(-15);
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method TestCard()
+    Begin
+    EndMethod;
+
+
+    Method Start() Returns Int4
+    Begin
+        // Check that initializers were correct
+        If (m_Card1 != 0)
+            m_Helper.PrintErr("Initial m_Card1 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Card2 != 10)
+            m_Helper.PrintErr("Initial m_Card2 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Int1 != 0)
+            m_Helper.PrintErr("Initial m_Int1 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Int2 != -15)
+            m_Helper.PrintErr("Initial m_Int2 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And assign test2 to it and make sure that they are now equal
+        m_Card1 := m_Card2;
+        If (m_Card1 != m_Card2)
+            m_Helper.PrintErr("Assignment operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the inc/dec operators for cardinals
+        m_Card1 := 0;
+        If (m_Card1 != 0)
+            m_Helper.PrintErr("Assignment operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card1++;
+        If (m_Card1 != 1)
+            m_Helper.PrintErr("Inc operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card1--;
+        If (m_Card1 != 0)
+            m_Helper.PrintErr("Dec operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the 'plus eq' and 'minus eq' operators
+        m_Card1 += 10;
+        If (m_Card1 != 10)
+            m_Helper.PrintErr("PlusEq operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card1 -= 5;
+        If (m_Card1 != 5)
+            m_Helper.PrintErr("MinusEq operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the inc/dec operators for integers
+        m_Int1 := 0;
+        If (m_Int1 != 0)
+            m_Helper.PrintErr("Assignment operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Int1++;
+        If (m_Int1!= 1)
+            m_Helper.PrintErr("Inc operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Int1--;
+        If (m_Int1 != 0)
+            m_Helper.PrintErr("Dec operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the 'plus eq' and 'minus eq' operators
+        m_Int1 += 10;
+        If (m_Int1 != 10)
+            m_Helper.PrintErr("PlusEq operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Int1 -= 15;
+        If (m_Int1 != -5)
+            m_Helper.PrintErr("MinusEq operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test some of the bit fiddling operators
+        m_Card1 := 0;
+        m_Card1 |= 0x80;
+        If (m_Card1 != 0x80)
+            m_Helper.PrintErr("OrEqual operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_Card1 & 0x80) != 0x80)
+            m_Helper.PrintErr("Bitwise & failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card1 ^= 0x80;
+        If (m_Card1 != 0)
+            m_Helper.PrintErr("Xor operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the logical operators
+        m_Card1 := 10;
+        m_Int1  := -19;
+        If ((m_Card1 != 10) || (m_Int1 != -19))
+            m_Helper.PrintErr("Loical OR operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!((m_Card1 = 10) && (m_Int1 = -19)))
+            m_Helper.PrintErr("Loical AND operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_Card1 = 10) ^^ (m_Int1 = -19))
+            m_Helper.PrintErr("Loical XOR operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the binary addition operators
+        m_Card1 := 10 + 20;
+        If (m_Card1 != 30)
+            m_Helper.PrintErr("Binary addition operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do a more complex nested operator expression
+        If ((10 != 10) && ((20 != 20) || (30 = 31)))
+            m_Helper.PrintErr("Nested operator sequence failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card1 := 0x40;
+        m_Flag := False;
+        If ((m_Card1 & 0x2) = 0x2)
+            m_Flag := False;
+        Else
+            m_Flag := True;
+        EndIf;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Nested operator sequence failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Check the pre/postfix versions of the inc/dec operators
+        m_Card1 := 1;
+        m_Card2 := m_Card1++;
+        If (m_Card2 != 1)
+            m_Helper.PrintErr("Postfix increment failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_List.AddObject("A");
+        m_List.AddObject("B");
+        m_List.AddObject("C");
+        m_List.AddObject("D");
+        m_Card1 := 0;
+        m_Str1.Clear();
+        While (m_Card1 < m_List.GetElemCount())
+            m_Str1 += m_List[m_Card1++];
+        EndWhile;
+
+        If (m_Str1 != "ABCD")
+            m_Helper.PrintErr("String built from vector iter failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Str2 := "1" + m_Str1 + kSuffix;
+        If (m_Str2 != "1ABCD2")
+            m_Helper.PrintErr("Binary string + operator failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

@@ -1,0 +1,78 @@
+;
+; FILE NAME: CIDComm.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 08/27/2000
+;
+; COPYRIGHT: 1992..2001, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kCommErrs
+    MsgPref=kCommMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;   Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; Facility errors
+    errcFac_BadPortName         350     '%(1)' is not a valid COM port name
+    errcFac_BadPortNum          351     '%(1)' is not a valid COM port number
+
+    ; Factory errors
+    errcFact_DupId              400     Factory id '%(1)' is already used
+
+    ; Enum errors
+    errcGen_NoError             500     No error
+
+    ; Comm port errors
+    errcPort_Open               5000    Could not open %(1)
+    errcPort_QueryFlags         5001    Could not query flags for %(1)
+    errcPort_QueryCfg           5002    Could not query config info for %(1)
+    errcPort_QueryXChars        5003    Could not query Xon/Xoff chars for %(1)
+    errcPort_ReadData           5004    Read failed on %(1). Port Err: %(2)
+    errcPort_SetBaud            5005    Could not set baud to %(1) on %(2)
+    errcPort_SetDTR             5006    Could not set DTR for %(1)
+    errcPort_SetEOFChar         5007    Could not set EOF char for %(1)
+    errcPort_SetFlags           5008    Could not set flags for %(1)
+    errcPort_SetRTS             5009    Could not set RTSs for %(1)
+    errcPort_SetCfg             5010    Could not set config info for %(1)
+    errcPort_SetParity          5011    Could not set parity for %(1)
+    errcPort_SetStopBits        5012    Could not set stop bits for %(1)
+    errcPort_WriteData          5013    Write failed on %(1). Port Err: %(2)
+    errcPort_SetPort            5014    Could not set port number. Object is already open on %(1)
+    errcPort_SetDataBits        5015    Could not set data bits for %(1)
+    errcPort_WBufTooSmall       5016    Asked to write %(1) bytes from buffer of %(2) bytes
+    errcPort_RBufTooSmall       5017    Asked to read %(1) up to bytes into buffer of %(2) max bytes
+    errcPort_PurgeRead          5018    Could not purge the read buffer for %(1)
+    errcPort_PurgeWrite         5019    Could not purge the write buffer for %(1)
+    errcPort_Cycle              5020    Could not cycle %(1)
+    errcPort_FlushWrite         5021    Could not flush the write buffer
+    errcPort_Close              5022    Could not close the comm port
+    errcPort_QueryLineState     5023    Could not query comm line state for %(1)
+    errcPort_Reset              5024    Could not reset %(1)
+    errcPort_SetBreak           5025    Could not set break state for %(1)
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;   Messages
+; ----------------------------------------------------------------------------
+

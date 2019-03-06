@@ -1,0 +1,136 @@
+Class=[NonFinal]
+    ClassPath MEng.TestPing;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.SockPinger;
+    MEng.System.Runtime.IPEndPoint;
+EndImports;
+
+Types=
+    VectorOf[SockPinger]    PingerList;
+EndTypes;
+
+Members=
+    PingerList          m_Pings;
+    ConsoleOutStream    m_OutCon;
+    Time                m_Time;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+    Method ProcessOne([InOut] SockPinger Pinger)
+    Begin
+        Locals=
+            Card4 RepMillis;
+        EndLocals;
+
+        m_Time.SetSpecial(SpecialTimes.CurTime);
+        Switch(Pinger.GetState())
+            Case PingerStates.WaitSend :
+                If (m_Time.IsDiffGreater(Pinger.GetLastTime(), 60))
+                    Pinger.SendRequest();
+                    m_OutCon.FmtStr("Starting ping for address ");
+                    m_OutCon.FmtStr(Pinger.GetRemAddr());
+                    m_OutCon.NewLn();
+                    m_OutCon.Flush();
+                EndIf;
+            EndCase;
+
+            Case PingerStates.WaitReply :
+                If (Pinger.WaitReply(10, RepMillis))
+                    m_OutCon.FmtStr("Got a reply for address ");
+                    m_OutCon.FmtStr(Pinger.GetRemAddr());
+                    m_OutCon.NewLn();
+                    m_OutCon.Flush();
+                Else
+                    If (m_Time.IsDiffGreater(Pinger.GetLastTime(), 10))
+                        //
+                        //  Give up on this one, but don't reset the time stamp.
+                        //  That way the ten seconds we waited will now be part
+                        //  of the wait for the 60 seconds to the next poll.
+                        //
+                        Pinger.CancelWait(False);
+                        m_OutCon.FmtStr("Timed out on address ");
+                        m_OutCon.FmtStr(Pinger.GetRemAddr());
+                        m_OutCon.NewLn();
+                        m_OutCon.Flush();
+                    EndIf;
+                EndIf;
+            EndCase;
+
+            Default :
+            EndCase;
+
+        EndSwitch;
+
+    EndMethod;
+
+
+    Method Start() Returns Int4
+    Begin
+        Locals=[Const]
+            Card4       Count(2);
+        EndLocals;
+
+        Locals=
+            IPEndPoint  TarEP;
+            Card4       Index(0);
+            SockPinger  DummyPinger;
+        EndLocals;
+
+        Try
+            // Add some pinger objects to the list
+            m_Pings.AddObject(DummyPinger);
+            m_Pings.AddObject(DummyPinger);
+
+            m_Pings[0].StartPing
+            (
+                "www.google.com", IPAddrTypes.Unspec, TarEP
+            );
+            m_OutCon.FmtStr("Engaging Ping for address ");
+            m_OutCon.Format(TarEP);
+            m_OutCon.NewLn();
+
+            m_Pings[1].StartPing
+            (
+                "www.yahoo.com", IPAddrTypes.Unspec, TarEP
+            );
+
+            m_OutCon.FmtStr("Engaging Ping for address ");
+            m_OutCon.Format(TarEP);
+            m_OutCon.NewLn();
+            m_OutCon.Flush();
+
+            While(True)
+                ProcessOne(m_Pings[Index]);
+
+                Index++;
+                If (Index = Count)
+                    Index := 0;
+                EndIf;
+
+                // Sleep half a second between checks
+                m_Time.Sleep(500);
+            EndWhile;
+
+        EndTry;
+
+        Catch
+            m_OutCon.FmtStr("\nEXCEPTION: ");
+            m_OutCon.FmtStr($Exception.GetErrorText());
+            m_OutCon.NewLn();
+        EndCatch;
+
+        m_OutCon.Flush();
+
+        Return 0;
+    EndMethod;
+EndMethods;
+

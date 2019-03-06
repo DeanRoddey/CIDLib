@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum CIDIDL:Name="EGraphScales" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="BaseName" CIDIDL:BinStream="Yes"
+                         CIDIDL:IncDec="Inc"
+                         CIDIDL:FormatMap="BaseName">
+                <CIDIDL:DocText>
+                    The available graph vertical scaling types
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Linear"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Log10"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ELogTypes" CIDIDL:XlatMap="Text"
+                         CIDIDL:TextStreamMap="Text" CIDIDL:IncDec="Inc"
+                         CIDIDL:BinStream="Yes" >
+                <CIDIDL:DocText>
+                    The types of logarithmic algorithms. Used by TFLogMap, but it is
+                    generally useful.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Natural" CIDIDL:Text="Natural"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Base10" CIDIDL:Text="Base 10"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMatrixElems"
+                         CIDIDL:XlatMap="Text" CIDIDL:TextStreamMap="Text"
+                         CIDIDL:BinStream="Yes" 
+                         CIDIDL:AltMap="BaseName" CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    This enum is used to index matrices via the subscript operator.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="M11" CIDIDL:Text="1-1"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M12" CIDIDL:Text="1-2"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M13" CIDIDL:Text="1-3"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M14" CIDIDL:Text="1-4"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M21" CIDIDL:Text="2-1"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M22" CIDIDL:Text="2-2"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M23" CIDIDL:Text="2-3"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M24" CIDIDL:Text="2-4"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M31" CIDIDL:Text="3-1"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M32" CIDIDL:Text="3-2"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M33" CIDIDL:Text="3-3"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M34" CIDIDL:Text="3-4"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MXt" CIDIDL:Text="Xt"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MYt" CIDIDL:Text="Yt"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MZt" CIDIDL:Text="Zt"/>
+                <CIDIDL:EnumVal CIDIDL:Name="M44" CIDIDL:Text="4-4"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+
+
+

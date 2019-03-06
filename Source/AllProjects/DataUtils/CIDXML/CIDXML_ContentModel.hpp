@@ -1,0 +1,99 @@
+//
+// FILE NAME: CIDXML_ContentModel.hpp
+//
+// AUTHOR: Dean Roddey
+//
+// CREATED: 09/22/1999
+//
+// COPYRIGHT: $_CIDLib_CopyRight_$
+//
+//  $_CIDLib_CopyRight2_$
+//
+// DESCRIPTION:
+//
+//  This is the header file for the CIDXML_ContentModel.Cpp file, which
+//  implements the TXMLContentModel class. This class is an abstraction from
+//  which a few different specific content model types can be derived.
+//
+// CAVEATS/GOTCHAS:
+//
+// LOG:
+//
+//  $_CIDLib_Log_$
+//
+#pragma once
+
+
+#pragma CIDLIB_PACK(CIDLIBPACK)
+
+class TXMLValidator;
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TXMLContentModel
+// PREFIX: xcm
+// ---------------------------------------------------------------------------
+class CIDXMLEXP TXMLContentModel : public TObject
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        ~TXMLContentModel();
+
+
+        // -------------------------------------------------------------------
+        //  Public, pure virtual methods
+        // -------------------------------------------------------------------
+        virtual tCIDXML::EValidRes eValidate
+        (
+            const   tCIDLib::TCard4* const  pc4ChildIds
+            , const tCIDLib::TCard4         c4ChildCount
+            ,       tCIDLib::TCard4&        c4FailedAt
+        )   const = 0;
+
+        virtual tCIDLib::TVoid FormatTo
+        (
+                    TTextOutStream&         strmDest
+            , const TXMLValidator&          xvalSrc
+        )   const = 0;
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  Hidden constructors
+        // -------------------------------------------------------------------
+        TXMLContentModel();
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Unimplemented constructors and operators
+        // -------------------------------------------------------------------
+        TXMLContentModel(const TXMLContentModel&);
+        tCIDLib::TVoid operator=(const TXMLContentModel&);
+
+
+        // -------------------------------------------------------------------
+        //  Magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TXMLContentModel,TObject)
+};
+
+#pragma CIDLIB_POPPACK
+
+
+// ---------------------------------------------------------------------------
+//  TXMLContentModel: Constructors and Destructor
+// ---------------------------------------------------------------------------
+inline TXMLContentModel::~TXMLContentModel()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TXMLContentModel: Hidden constructors
+// ---------------------------------------------------------------------------
+inline TXMLContentModel::TXMLContentModel()
+{
+}

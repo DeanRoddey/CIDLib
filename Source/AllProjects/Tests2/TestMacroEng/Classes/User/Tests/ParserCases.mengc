@@ -1,0 +1,84 @@
+//
+//  This class just tests some parser corner cases. Some will just
+//  cause parse failures if they fai.
+//
+Class=[Final]
+    ClassPath MEng.User.Tests.ParserCases;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+
+Members=
+    Int4                m_IVal;
+    Int4                m_IVal2;
+    Int4                m_RetVal;
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+
+        //
+        //  Check that left+1 (no spaces) is correctly interpreted as a
+        //  left plus one, instead of left plus a positive constant 1.
+        //
+        m_IVal := 0;
+        m_IVal2 := m_IVal+1;
+        If (m_IVal2 != 1)
+            m_Helper.PrintErr("Addition operator parse case 1 didn't create correct value", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And this should work as well
+        m_IVal := 2;
+        m_IVal2 := m_IVal + +1;
+        If (m_IVal2 != 3)
+            m_Helper.PrintErr("Addition operator parse case 2 didn't create correct value", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the subtraction versions of those
+        m_IVal := 5;
+        m_IVal2 := m_IVal-1;
+        If (m_IVal2 != 4)
+            m_Helper.PrintErr("Subtraction operator parse case 1 didn't create correct value", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_IVal := 6;
+        m_IVal2 := m_IVal - -1;
+        If (m_IVal2 != 7)
+            m_Helper.PrintErr("Subtrction operator parse case 2 didn't create correct value", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  This should work in the context of a test as well, and this should not
+        //  mess up unary inc/dec. We have to explicitly paren, since CML has no
+        //  operator precedence.
+        //
+        If ((m_IVal+1) = 7)
+            m_IVal++;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+

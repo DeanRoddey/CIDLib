@@ -1,0 +1,34 @@
+; ----------------------------------------------------------------------------
+; FILE: CIDGraphDev.CIDRC
+;
+; This is the resource file for the CIDGraphDev facility.
+;
+; LOG:
+;
+;   $Log$
+; ----------------------------------------------------------------------------
+
+; This block must be first but we don't use it here
+CTRL=
+END CTRL
+
+
+;
+; These are some commonly used bitmaps, that are used to support halftone
+; fills and such.
+;
+; DO NOT change the numbering here. Add new ones at the end!
+;
+BITMAPS=
+    ridBmp_Halftone1        10      "./Res/CIDWnd_Halftone1.bmp"
+    ridBmp_Halftone2        11      "./Res/CIDWnd_Halftone2.bmp"
+    ridBmp_Halftone3        12      "./Res/CIDWnd_Halftone3.bmp"
+    ridBmp_Halftone4        13      "./Res/CIDWnd_Halftone4.bmp"
+    ridBmp_Halftone5        14      "./Res/CIDWnd_Halftone5.bmp"
+    ridBmp_Halftone6        15      "./Res/CIDWnd_Halftone6.bmp"
+    ridBmp_Halftone7        16      "./Res/CIDWnd_Halftone7.bmp"
+    ridBmp_Halftone8        17      "./Res/CIDWnd_Halftone8.bmp"
+    ridBmp_Halftone9        18      "./Res/CIDWnd_Halftone9.bmp"
+END BITMAPS
+
+

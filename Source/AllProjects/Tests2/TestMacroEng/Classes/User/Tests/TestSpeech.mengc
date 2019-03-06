@@ -1,0 +1,33 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestSpeech;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.Speech;
+EndImports;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Speech              m_Speech;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        m_Speech.Speak("CML Speach Test in Progress", SpeechFlags.Default);
+        Return 0;
+    EndMethod;
+
+EndMethods;
+
+

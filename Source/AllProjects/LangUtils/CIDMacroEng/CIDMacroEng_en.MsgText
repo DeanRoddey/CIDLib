@@ -1,0 +1,303 @@
+;
+; FILE NAME: CIDExprEng.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 01/11/2002
+;
+; COPYRIGHT: 2003..2003, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kMEngErrs
+    MsgPref=kMEngMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;   Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; General errors
+
+    ; Debug only errors
+    errcDbg_UnhandledSpecChar   900     Failed to handle a special syntax char %(1) in token extraction
+    errcDbg_BadJmpTableIndex    901     %(1) is not a valid jump table index
+    errcDbg_BadFlowStack        902     The flow stack cannot be popped because it is empty
+    errcDbg_ExpectedCaseFI      903     Expected a Case/Default flow item here
+    errcDbg_UnknownSwitchType   904     %(1) is not a legal type for a switch statement
+    errcDbg_DifferentCaseTypes  905     The passed case value to check was of a different type. Actual=%(1), Got=%(2)
+    errcDbg_BadLiteralType      906     Literals can only be char, string, boolean, or numeric types, but got '%(1)'
+    errcDbg_NoConsoleStrm       907     The console stream has not been set
+    errcDbg_BadLitValAccess     908     The literal %(1) was accessed as the wrong type
+    errcDbg_NotCollectionType   910     The collection index opcode was applied to a non-collection type. Type=%(1)
+    errcDbg_AlreadyExists       911     The %(1) %(2) already exists, cannot create/open
+    errcDbg_NotCreated          912     The %(1) has not been created yet
+    errcDbg_MustBeAPath         913     This is available for path type strings
+    errcDbg_ValNotReady         914     The %(1) has not been initialized yet
+    errcDbg_ExpectedTryFlowItem 915     INTERNAL ERROR: A Try flow item should have been on the top of stack here
+
+
+    ; Class related errors
+    errcClass_Mismatch          1000    '%(1)' and '%(2)' are not compatible types
+    errcClass_DupRegistered     1001    Type '%(1)' has already been registered
+    errcClass_BadId             1002    %(1) is not a valid registered macro type id. Count=%(2)
+    errcClass_ClassHasNoValue   1003    The class '%(1)' has no instance value to create
+    errcClass_NotRegistered     1004    The macro type %(1) was used without being registered
+    errcClass_DupMember         1005    The member '%(1)' already exists in class '%(2)'
+    errcClass_DupMethod         1006    The method '%(1)' already exists in class '%(2)'
+    errcClass_MemberNotFound    1007    The member '%(1)' was not found in class '%(2)'
+    errcClass_MethodNotFound    1008    The method '%(1)' was not found in class '%(2)'
+    errcClass_BadMethodId       1009    %(1) is not a valid method id for class %(2). Count=%(3)
+    errcClass_BadMemberId       1010    %(1) is not a valid member id for class %(2). Count=%(3)
+    errcClass_ImplWithoutInfo   1012    Method implementation %(1) was added to class %(2), but no method info was found
+    errcClass_ImplInfoIdMatch   1013    Method id mismatch for method %(1).%(2) (%(3)/%(4))
+    errcClass_InfoWithoutImpl   1014    Class %(1) defined a method %(2) but provided no implementation
+    errcClass_NoDefCtor         1015    Class '%(1)' has no default constructor
+    errcClass_MemberMismatch    1016    Two instances of class '%(1)' have different numbers of members
+    errcClass_InitOrder         1017    Members must be initialized in the order they are declared
+    errcClass_DupLiteral        1018    The literal '%(1)' already exists in class '%(2)'
+    errcClass_DefCtorFailed     1019    The default constructor failed for class '%(1)'
+    errcClass_DupDefCtor        1020    Class '%(1)' already has a default contructor
+
+    ; Engine related errors
+    errcEng_DupClassName        1500    The class '%(1)' has already been defined and registered
+    errcEng_BadClassId          1501    %(1) is not a valid class id. Count=%(2)
+    errcEng_ClassNotFound       1502    Class '%(1)' was not found
+    errcEng_CallStackUnderflow  1503    The call stack underflowed
+    errcEng_EmptyCallStack      1504    The call stack is empty, so no item is availabe
+    errcEng_NotACallItem        1505    The indicated call stack item is not a method call item
+    errcEng_NotAValueItem       1506    The indicated call stack item is not a value item
+    errcEng_NotImValueItem      1507    The indicated call stack item is not an immediate value item
+    errcEng_BadItemResetType    1508    The call stack item was reset with a bad item type
+    errcEng_BadStackIndex       1509    %(1) is a bad call stack index. Top=%(2)
+    errcEng_WrongStackType      1510    Expected a %(1) value at stack index %(2), but got %(3)
+    errcEng_BadStackOfs         1511    %(1) is not a valid stack top offset. Top=%(2)
+    errcEng_BadMemberId         1512    %(1).%(2) is not a valid class/member id combo
+    errcEng_ExceptionIn         1513    An exception was thrown while processing method %(1).%(2)
+    errcEng_CleanupErr          1514    An error occured during macro engine cleanup
+    errcEng_ResetErr            1515    An error occured during macro engine reset
+    errcEng_UnknownExceptFrom   1516    An unknown exception was thrown from method %(1).%(2)
+    errcEng_ExceptionFrom       1517    An exception was thrown from method %(1).%(2)
+    errcEng_UnknownExceptIn     1518    An unknown exception was while processing method %(1).%(2)
+    errcEng_BadEntryPoint       1519    The entry point must be named 'Start', have a return type of MEng.Int4, and be Final.
+    errcEng_BadEntryParmCnt     1520    Class %(1) entry point needs %(2) parms, but %(3) were provided
+    errcEng_BadCallFrame        1521    There is not a valid call frame at the stack top
+    errcEng_MustBeNonAdopting   1522    The class matches collection must be non-adopting
+    errcEng_NotImNumOpCode      1523    Expected only immediate numeric opcodes here, but got %(1)
+    errcEng_RepushMethod        1524    Cannot repush a method call stack item
+    errcEng_NotStackItemType    1525    Expected a %(1) value on the top of the stack
+    errcEng_NotConstStackItem   1526    Expected a const %(1) value on the top of the stack
+    errcEng_NotNConstStackItem  1527    Expected a non-const %(1) value on the top of the stack
+    errcEng_BadEnumInit         1528    The initial enum value (%(1)) for enum %(2) is beyond the max value (%(3))
+    errcEng_BadEnumSet          1529    Enum %(1) cannot hold the value (%(2)). The max ordinal is (%(3))
+    errcEng_BadBreakIndex       1530    %(1) is not a valid break index for the current flow item
+    errcEng_BadEndStackTop      1531    The stack did not get correctly unwound at macro exit. Top=%(1)
+    errcEng_WrongStackTopType   1532    Expected a %(1) value on the stack top, but got %(2)
+    errcEng_BadStackFlip        1533    FlipStackTop() was called with less than two items on the stack
+    errcEng_BadIntrinsicId      1534    An intrinsic class did not get the expected fixed id
+    errcEng_ExpectedTry         1535    A Try item was not on the stack, at line %(1) of class %(2)
+    errcEng_EnumMapValNotFound  1536    Map value %(1) was not found in enum %(2)
+    errcEng_BadEntryParmType    1537    Parameter %(1) of class '%(2)' entry point type %(3), but got type %(4)
+    errcEng_BadTextEPParmType   1538    Class '%(1)' is not supported as a text mode command line parameter to a macro. Target class='%(2)'
+    errcEng_BadTextEPParmVal    1539    Command line parameter %(1) to class '%(2)' could not be converted to type '%(3)'
+    errcEng_UnknownCallType     1540    Expected member, local, or parameter call type. Opcode=%(1)
+    errcEng_CantConvertPath     1541    '%(1)' cannot be converted to a CML level path
+    errcEng_EmptyEnum           1542    Enumerated type %(1) has no defined values
+    errcEng_BadExpPath          1543    '%(1)' does not expand to a valid CML accessible file path
+    errcEng_NoUserContext       1544    No user context has been set on this macro engine instance
+    errcEng_IdOverflow          1545    Out of available ids for %(1)
+
+    ; Method related errors
+    errcMeth_BadParmId          4000    %(1) is not a valid parameter id for method %(2)
+    errcMeth_ParmCount          4001    Method %(1) expects %(2) parms, but %(3) were passed
+    errcMeth_ParmType           4002    Method %(1) expected parm %(2) to be of type %(3), but got %(4)
+    errcMeth_NoneOpCode         4003    Found 'None' opcode on line %(1) of method '%(2).%(3)'
+    errcMeth_UnknownOpCode      4004    Unknown opcode (value=%(1)) found on line %(2) method '%(3).%(4)'
+    errcMeth_BadOpcodeIndex     4005    %(1) is not a valid index for an opcode
+    errcMeth_BadJump            4006    Opcode %(1) in method '%(2).%(3)' was an invalid jump out of range
+    errcMeth_BadLocalId         4007    %(1) is not a valid local id for method %(2)
+    errcMeth_DupLocalName       4008    Method %(1) already has a local named %(2)
+    errcMeth_TooManyParms       4009    Method '%(1)' exceeds the maximum parameter count of %(2)
+    errcMeth_BadIP              4010    An attempt was made to access opcodes beyond the end of method %(1). Index=%(2)
+    errcMeth_BadStringPoolId    4011    %(1) is not a valid string pool id for method %(2)
+    errcMeth_BadFixedId         4012    Method %(1) of class %(2) was expected to have id %(3), but had %(4) instead
+    errcMeth_BadJumpTableId     4013    %(1) is not a valid jump table index for method %(2)
+    errcMeth_RetType            4014    Method %(1) expected return to be of type %(2), but got %(3)
+
+    ; Parser related errors
+    errcPrs_BadQuoteHere        6500    A quote character is not allowed here
+    errcPrs_PushBackNL          6501    Internal error: Cannot push back over a new line
+    errcPrs_ExpectedBoolConst   6502    Expected a boolean constant (True/False)
+    errcPrs_UnterminatedStr     6503    The string was never terminated
+    errcPrs_UnexpectedEOF       6504    The end of file was not expected here
+    errcPrs_Unrecoverable       6505    An unrecoverable error occured while parsing
+    errcPrs_ExpectedToken       6506    Expected token '%(1)'
+    errcPrs_ExpectedClassPath   6507    Expected a class path here
+    errcPrs_EmptyPathPart       6508    A class path cannot have two consequetive separators
+    errcPrs_TrailPathPart       6509    A class path cannot end with a separator
+    errcPrs_ExpectedSemiColon   6510    Expected a semicolon ';' here
+    errcPrs_BadClassPath        6511    '%(1)' is not a valid class path
+    errcPrs_BadClassPathChar    6512    Class paths can only contain ASCII alphanumeric chars and separators
+    errcPrs_BadEncoding         6513    '%(1)' is not a valid encoding for class %(2)
+    errcPrs_ClassPathMatch      6514    The source classpath (%(1)) did not match the given path (%(2))
+    errcPrs_ExpectedEquals      6515    Expected an equal sign '=' here
+    errcPrs_ExpectedDirective   6516    Expected a directive here in the form: name=value
+    errcPrs_ExpectedOpenParen   6517    Expected an open parenthesis '(' here
+    errcPrs_ExpectedCloseParen  6518    Expected a close parenthesis ')' here
+    errcPrs_DupDirective        6519    '%(1)' is a duplicate directive, and is being ignored
+    errcPrs_ExpectedImport      6520    Expected a class import here
+    errcPrs_ExpectedEnumObj     6521    Expected a reference to an object of an enumerated type
+    errcPrs_ClassNotImported    6522    Class '%(1)' must be imported into this class before it can be used
+    errcPrs_ExpectedMembAttr    6523    Expected a member attribute (Const or NonConst), but got '%(1)'
+    errcPrs_ExpectedComma       6524    Expected a comma ',' here
+    errcPrs_ExpectedName        6525    Expected a name token here (e.g. variable name, method name, etc...)
+    errcPrs_ReservedWord        6526    '%(1)' is a reserved word and cannot be used here
+    errcPrs_FirstNameChar       6527    Names must start with an ASCII alphabetic character (a-z, A-Z)
+    errcPrs_BadNameChar         6528    Names can only contain ASCII alphanumeric characters
+    errcPrs_AmbiguousClass      6529    '%(1)' is an ambiguous class. It could be:\n      %(2)
+    errcPrs_DupName             6530    The name '%(1)' has already been used by another element of this class
+    errcPrs_ExpectedMethAttr    6531    Expected a method attribute (Private/Public, Final/NonFinal/Required, Const/NonConst), but got '%(1)'
+    errcPrs_ExpectedMethod      6532    Expected a method definition here
+    errcPrs_ExpectedBegin       6533    Expected Begin here to start the method body
+    errcPrs_RequiresOverride    6534    Method %(1) exists in the parent class, so this must be an override
+    errcPrs_ParentMethodIsFinal 6535    Method %(1) is final in the parent class. It cannot be overridden
+    errcPrs_BadOverride         6536    Overrides must have identical parameters, return, and visibility as the overriden method
+    errcPrs_ParentMethNotFound  6537    Method %(1) is an override, but no such method exists in the parent class
+    errcPrs_ExpectedStatement   6538    Expected a method call, object reference, or flow control statement here
+    errcPrs_BadNameRef          6539    %(1) is not a known local, parameter, member, or class name.
+    errcPrs_MustReturnValue     6540    The expression must return a value when used here
+    errcPrs_UnexpectedToken     6541    '%(1)' was not expected here
+    errcPrs_BadNumLiteral       6542    '%(1)' looked like a numeric literal, but isn't a valid one
+    errcPrs_ExpectedDotName     6543    Expected a method name or enumerated value here
+    errcPrs_ExpectedPeriod      6544    Expected a period here
+    errcPrs_CtorAttrs           6545    Constructors must have [Public,Final,NonConst] attributes
+    errcPrs_NotRetClass         6546    The returned value does not match the method's indicated return type
+    errcPrs_NotCopyable         6547    '%(1)' is not a copyable class, but a copyable class is required here
+    errcPrs_ExpectedQuoted      6548    Expected a quoted string here
+    errcPrs_ExpectedEndCtor     6549    Expected EndConstructor here
+    errcPrs_ExpectedEndMethod   6550    Expected EndMethod here
+    errcPrs_NoCtors             6551    No constructor was defined for class '%(1)'
+    errcPrs_ExpectedMethodCtor  6552    Expected a method or constructor definition here
+    errcPrs_CantResolvePath     6553    Classpath '%(1)' could not be resolved, so it is being skipped
+    errcPrs_CtorCantReturn      6554    Constructors cannot return a value
+    errcPrs_CtorAlreadyExists   6555    The constructor name already existed!! Name=%(1)
+    errcPrs_ExpectedParmAttr    6556    Expected a parameter attribute ([In], [Out], or [InOut])
+    errcPrs_ExpectedOpenBracket 6557    Expected an open bracket '[' here
+    errcPrs_ExpectedCloseBracket 6558   Expected a close bracket ']' here
+    errcPrs_DupParmName         6559    A parameter with the name '%(1)' already exists
+    errcPrs_NoInitializers      6560    Expected member initializers before the method body
+    errcPrs_CtorOutParm         6561    Constructor parameters must be [In]
+    errcPrs_NoCtorMatch         6562    No constructor for member '%(1)' matched the provided parameters
+    errcPrs_NoParentCtorMatch   6563    No constructor for parent class '%(1)' matched the provided parameters
+    errcPrs_UnusedReturn        6564    The return value is not being used
+    errcPrs_NumRangeErr         6565    The numeric literal's value is larger than it's indicated type
+    errcPrs_AmbiguousOverload   6566    The provided parameters match more than one method/constructor variant
+    errcPrs_ExpectedBoolExpr    6567    A boolean expression is required here
+    errcPrs_ExpectedEndFlow     6568    Previous control flow was a(n) %(1) on line %(2), so a(n) %(3) was unexpected
+    errcPrs_MemberIsConst       6569    Method %(1) is non-const, so it cannot be called on a const object
+    errcPrs_MethodIsConst       6570    Method %(1) is non-const, so it cannot be called within a const method
+    errcPrs_UnexpectedEndFlow   6571    %(1) was seen without a previous matching start of block
+    errcPrs_UnexpectedBreak     6572    A break is only legal within a looped block (While, DoLoop)
+    errcPrs_UnexpectedClassName 6573    A class name was not expected here
+    errcPrs_BadCharLiteral      6574    A badly formed character literal value was seen
+    errcPrs_BadEnumValue        6575    %(1) is not a valid value of the enumerated class %(2)
+    errcPrs_ExpectedReturn      6576    This method must return a value
+    errcPrs_ExpectedNumLit      6577    Expected a numeric literal here
+    errcPrs_ExpectedNestedType  6578    Expected a type definition here
+    errcPrs_DupEnumItem         6579    The item %(1) already exists in this enumerated type
+    errcPrs_ExpectedColon       6580    Expected a colon ':' here
+    errcPrs_ExpectedClassAttr   6581    Expected a class attribute (Abstract, NonFinal, or Final), but got %(1)
+    errcPrs_ParentClassIsFinal  6582    The parent class '%(1)' is final and cannot be derived from
+    errcPrs_CallOnVoid          6583    A method call was made on an MEng.Void value
+    errcPrs_AbstractClass       6584    '%(1)' is an abstract class and cannot be directly instantiated
+    errcPrs_AbstractNotCopyable 6585    Class '%(1)' must be both copyable, and non-abstract
+    errcPrs_NotIndexableObj     6586    The object references is not an indexable object
+    errcPrs_ExpectedEnumLit     6587    Expected an enumerated value or named literal here
+    errcPrs_BadCastType         6588    Casts are only valid between numeric, enumerated, boolean types
+    errcPrs_HasNoNestedTypes    6589    Class %(1) has no nested types
+    errcPrs_NCOpOnConstObj      6590    Operator is non-const, so it cannot be called on a const object
+    errcPrs_OpNotSupported      6591    The operator is not supported by class %(1)
+    errcPrs_BadAssign           6592    A %(1) object cannot be assigned to a %(2) object
+    errcPrs_BadOpHere           6593    This operator was not expected here
+    errcPrs_MustBeObjRef        6594    This operation requires a direct object reference
+    errcPrs_NotOnLHS            6595    This was not expected on the left side of an expression
+    errcPrs_NotOnRHS            6596    This was not expected on the right side of an expression
+    errcPrs_CannotCast          6596    Cannot cast from type '%(1)' to type '%(2)'
+    errcPrs_LogOpExprs          6597    Both sides of a logical operator must be boolean
+    errcPrs_OpenFlowStatement   6598    A flow control statement was not terminated. Last seen was %(1) on line %(2)
+    errcPrs_ExpectedCatch       6699    A Try block must be followed by a Catch block
+    errcPrs_ThrowType           6600    The paremeter to Throw must be an enumerated type
+    errcPrs_OnlyInCatch         6601    This is only allowed within a Catch block
+    errcPrs_BadSwitchType       6602    The type switched on must be cardinal, integral, char, or enumerated.
+    errcPrs_ExpectedCase        6603    Expected to see Case/Default block here
+    errcPrs_ExpectedCaseOrEnd   6604    Expected to see a Case/Default or EndSwitch here
+    errcPrs_CaseMustBeLiteral   6605    Case values must be literals (integral, cardinal, character, or enumerated)
+    errcPrs_CantConvertLiteral  6606    The literal value cannot be converted to the target type of %(1)
+    errcPrs_AlreadyDefCase      6607    The default case for this switch has already been set
+    errcPrs_CaseIsUsed          6608    This case value has already been used in this switch statement
+    errcPrs_FlowNotFound        6609    A %(1) flow control item was not found on the flow stack
+    errcPrs_RequiredCases       6610    The switch statement is either empty or has no default case
+    errcPrs_NoCaseValue         6611    Expected a case value before the colon
+    errcPrs_NotSwitchType       6612    Case values must be of the same type as used in the switch statement
+    errcPrs_ReqMethodNotOver    6613    Method %(1) is Required but was not overridden
+    errcPrs_BadLiteralInit      6614    The initializer for a literal must be an immediate, literal value of the correct type
+    errcPrs_CircularImport      6615    Class '%(1)' is involved in a circular import, cannot continue
+    errcPrs_ParentFailed        6616    Parent class '%(1)' failed to compile, cannot continue
+    errcPrs_ThrowFmtType        6617    Throw replacement tokens must be derived from MEng.Formattable
+    errcPrs_TooManyThrowTokens  6618    The Throw statement only takes up to 8 replacement tokens
+    errcPrs_ExpectedLocalAttr   6619    Expected a local attribute (Const or NonConst)
+    errcPrs_ExprSidesMatch      6620    The two sides of a RHS expression must be of the same type
+    errcPrs_ExpectedLitStr      6621    Expected a quoted string or string literal here
+    errcPrs_EOFInConditional    6622    The end of file was hit while in a conditional block
+    errcPrs_CondUnderflow       6623    The EndDebug had no matching BeginDebug
+    errcPrs_NewlineInString     6624    A string literal crossed a line boundary
+    errcPrs_DupMethod           6625    Method '%(1)' already exists in this class, so this name cannot be reused
+    errcPrs_BadCharOrdinal      6626    Expected a 4 digital hex number representing the character ordinal
+    errcPrs_InParmOnly          6627    Parameter %(1) is Out or InOut, so only non-const values can be passed here
+    errcPrs_EmptySpecDynRef     6628    The special dynamic class reference was used, but it has not been set
+
+    ; Runtime errors
+    errcRT_SockAlready          7000    The socket is already connected
+    errcRT_NumericIndexType     7001    Expected the index value to be of MEng.Card4 or enumerated type
+    errcRT_IndexError           7002    The index was not valid for the target collection
+    errcRT_SockNotRead          7003    The macro socket value was not prepared before use
+    errcRT_MacroExcept          7004    Exception '%(1)' was thrown from line %(2)
+    errcRT_BadCopyOpParms       7005    The copy opcode need two copyable objects of the same class. Got %(1) and %(2)
+    errcRT_UnknownCharType      7006    %(1) is not a known character type enum ordinal
+    errcRT_NotOpen              7007    The device or file '(%(1))' is not open
+    errcRT_BadXMLId             7008    The XML parent entity was not well formed (%(1))
+
+    ; String pool errors
+    errcStrP_MaxedOut           7400    The string pool has maxed out
+    errcStrP_BadIndex           7401    The released string pool index was invalid
+    errcStrP_NotInUse           7402    The released string pool index was not in use
+
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;   Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    ; File related messages
+    midFile_MacroDescr         17500    CIDLib Macros
+    midFile_MacroWildCard      17501    *.mengc
+
+END MESSAGES
+

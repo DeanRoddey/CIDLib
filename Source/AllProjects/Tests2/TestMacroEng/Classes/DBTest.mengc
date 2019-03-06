@@ -1,0 +1,90 @@
+Class=[NonFinal]
+    ClassPath MEng.DBTest;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.DBConnect;
+    MEng.System.Runtime.DBStatement;
+EndImports;
+
+Types=
+EndTypes;
+
+Literals=
+    Card4   kSKULen(24);
+    Card4   kProdDescLen(128);
+EndLiterals;
+
+Members=
+    ConsoleOutStream    m_Out;
+    DBConnect           m_DBConn;
+    DBStatement         m_DBStmt;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            DBConnect.DBSrcList Srcs;
+            Card4               DBSrcCnt;
+            Card4               Index;
+            String              OutConn;
+        EndLocals;
+
+        m_Out.FmtStr("DB Sources\n------------------------\n");
+        DBSrcCnt := m_DBConn.GetSrcList(Srcs);
+        If (DBSrcCnt != 0)
+            Index := 0;
+            While(Index < DBSrcCnt)
+                m_Out.FmtStr(Srcs[Index].GetKey());
+                m_Out.NewLn();
+                Index++;
+            EndWhile;
+            m_Out.DNewLn();
+            m_Out.Flush();
+
+            Try
+                m_DBConn.Connect("CQSLCustSrv");
+            EndTry;
+
+            Catch
+                m_Out.FmtStr("Connect Error: ");
+                m_Out.Format($Exception);
+                m_Out.NewLn();
+                m_Out.Flush();
+                Return -1;
+            EndCatch;
+
+            m_DBStmt.Reset(m_DBConn, "Product List");
+            m_DBStmt.AddStrBinding("SKU", kSKULen);
+            m_DBStmt.AddStrBinding("Descr", kProdDescLen);
+            m_DBStmt.AddBinding("Active", DBColTypes.Boolean);
+
+            m_DBStmt.Execute("SELECT Prod_SKU, Prod_Desc, Prod_Active FROM Products");
+
+            m_Out.FmtStr("Product SKUs\n------------------------\n");
+            While (m_DBStmt.Fetch())
+                m_Out.FmtStr(m_DBStmt.GetStrCol(0));
+                m_Out.FmtStr("  (");
+                If (m_DBStmt.GetBoolCol(2))
+                    m_Out.FmtStr("ACTIVE - ");
+                Else
+                    m_Out.FmtStr("INACTIVE - ");
+                EndIf;
+                m_Out.FmtStr(m_DBStmt.GetStrCol(1));
+                m_Out.FmtStr(")\n");
+            EndWhile;
+
+        EndIf;
+        m_Out.Flush();
+        Return 0;
+    EndMethod;
+EndMethods;
+

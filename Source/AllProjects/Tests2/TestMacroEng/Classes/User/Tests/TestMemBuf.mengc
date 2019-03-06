@@ -1,0 +1,591 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestMemBuf;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.MemBuf;
+EndImports;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Card4               m_Test1;
+    Int4                m_RetVal;
+    TestHelpers         m_Helper;
+    Boolean             m_Flag;
+    MEng.System.Runtime.MemBuf m_Buf;
+    MemBuf              m_Buf2;
+    MemBuf              m_Buf3;
+    String              m_Str;
+    Char                m_Ch;
+    Card4               m_Index;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_Test1();
+        m_RetVal(0);
+        m_Buf(64, 128);
+        m_Buf2(92, 128);
+        m_Buf3(257, 257);
+    Begin
+    EndConstructor;
+
+
+    //
+    //  Runs the most basic tests that insure things are basically correct
+    //  the other tests won't be compromised by stupid stuff.
+    //
+    Method BasicTests()
+    Begin
+        // Make sure that the max size is correct
+        If ((m_Buf.GetMaxSize() != 128)
+        ||  (m_Buf2.GetMaxSize() != 128)
+        ||  (m_Buf3.GetMaxSize() != 257))
+            m_Helper.PrintErr("Initial max size is wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Make sure that the alloc size is at least what we set. It could
+        //  be more because of the expansion increment.
+        //
+        If ((m_Buf.GetAlloc() < 64)
+        ||  (m_Buf2.GetAlloc() < 92)
+        ||  (m_Buf3.GetAlloc() < 257))
+            m_Helper.PrintErr("Initial buffer alloc is wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Set all bytes to 1
+        m_Buf.SetAll(1);
+
+        // And now check that they are all 1
+        m_Test1 := 0;
+        While (m_Test1 < 64)
+            If (m_Buf.GetCard1At(m_Test1) != 1)
+                m_Helper.PrintErr("Buffer set failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+            m_Test1++;
+        EndWhile;
+
+        // Set them with incrementing values and go back and check
+        m_Test1 := 0;
+        While (m_Test1 < 64)
+            m_Buf.PutCard1At(m_Test1, TypeCast(MEng.Card1, m_Test1));
+            m_Test1++;
+        EndWhile;
+
+        // And now check that they have incrementing values
+        m_Test1 := 0;
+        While (m_Test1 < 64)
+            If (m_Buf.GetCard1At(m_Test1) != TypeCast(MEng.Card1, m_Test1))
+                m_Helper.PrintErr("Buffer set failed", m_Output, $CurLine);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+            m_Test1++;
+        EndWhile;
+
+        // Make sure we catch index errors
+        m_Flag := False;
+        Try
+            m_Buf.PutCard1At(128, 1);
+        EndTry;
+
+        Catch
+            If ($Exception.Check(MemBufErrors.BadIndex))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch Put index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Put a byte at the last index to make sure it doesn't throw
+        m_Buf.PutCard1At(127, 1);
+
+        // This should ahve expanded it
+        If (m_Buf.GetAlloc() != 128)
+            m_Helper.PrintErr("Put should have expanded the buffer", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  A get past the current allocation should throw. Puts use the max
+        //  size and expand if needed. Gets can only get what's there.
+        //
+        m_Flag := False;
+        Try
+            m_Buf2.GetCard1At(m_Buf2.GetAlloc());
+        EndTry;
+
+        Catch
+            If ($Exception.Check(MemBufErrors.BadIndex))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch Get index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // One less than the allocation size should work
+        m_Flag := False;
+        Try
+            m_Buf2.GetCard1At(m_Buf2.GetAlloc() - 1);
+        EndTry;
+
+        Catch
+            m_Flag := True;
+        EndCatch;
+
+        If (m_Flag)
+            m_Helper.PrintErr("Unexpected Get index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        //
+        //  Copy the buf1 contents to buf2. Buf2 isn't fully allocated, so
+        //  this will test expansion again and copying.
+        //
+        m_Buf2.SetAll(0xFF);
+        m_Buf3.SetAll(0xFF);
+        m_Buf2.CopyIn(m_Buf, 128, 0);
+        m_Buf2.CopyOut(m_Buf3, 128, 0);
+
+        // Now all should be equal
+        If (!m_Buf.CompByteRange(m_Buf2, 0, 128))
+            m_Helper.PrintErr("Not equal after copy", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_Buf.CompByteRange(m_Buf3, 0, 128))
+            m_Helper.PrintErr("Not equal after copy", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Change a byte and make sure they aren't equal
+        m_Buf2.PutCard1At(0, 1);
+        If (m_Buf.CompByteRange(m_Buf2, 0, 128))
+            m_Helper.PrintErr("Buffers equal after change", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Change the last byte as well but comp the bytes in between, where
+        //  they should still be the same.
+        //
+        m_Buf2.PutCard1At(127, 129);
+        If (!m_Buf.CompByteRange(m_Buf2, 1, 126))
+            m_Helper.PrintErr("Buffers should have been equal", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    //
+    //  Runs tests related to the methods that get and put basic data types
+    //
+    Method GetPutTests()
+    Begin
+        // Test the ASCII digit extraction stuff
+        m_Buf.PutCard1At(0, 0x41);
+        m_Buf.PutCard1At(1, 0x46);
+        m_Buf.PutCard1At(2, 0x30);
+        m_Buf.PutCard1At(3, 0x39);
+        m_Buf.PutCard1At(4, 0x61);
+        m_Buf.PutCard1At(5, 0x66);
+        m_Buf.PutCard1At(6, 0x38);
+        m_Buf.PutCard1At(7, 0x33);
+        m_Buf.PutCard1At(8, 0x43);
+
+        Try
+            If (m_Buf.ExtractHexDigAt(0) != 0xA)
+                m_Helper.PrintErr("Bad extract of 'A'", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            If (m_Buf.ExtractHexDigAt(1) != 0xF)
+                m_Helper.PrintErr("Bad extract of 'F'", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            If (m_Buf.ExtractHexDigAt(2) != 0)
+                m_Helper.PrintErr("Bad extract of '0'", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            If (m_Buf.ExtractHexDigAt(3) != 9)
+                m_Helper.PrintErr("Bad extract of '9'", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            If (m_Buf.ExtractHexDigAt(4) != 0xA)
+                m_Helper.PrintErr("Bad extract of 'f'", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            If (m_Buf.ExtractHexDigAt(5) != 0xF)
+                m_Helper.PrintErr("Bad extract of 'F'", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            If (m_Buf.ExtractDecDigAt(2) != 0)
+                m_Helper.PrintErr("Bad extract of '0'", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            If (m_Buf.ExtractDecDigAt(3) != 9)
+                m_Helper.PrintErr("Bad extract of '9'", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            If (m_Buf.ExtractHexValAt(0, 2) != 0xAF)
+                m_Helper.PrintErr("Bad extract of AF", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+            If (m_Buf.ExtractDecValAt(6, 2) != 83)
+                m_Helper.PrintErr("Bad extract of AF", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+
+        EndTry;
+
+        Catch
+            m_Helper.PrintErr("An ASCII digit extract failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndCatch;
+
+        // Try a decimal conversion with hex digits in it
+        m_Flag := False;
+        Try
+            m_Buf.ExtractDecValAt(5, 2);
+        EndTry;
+
+        Catch
+            If ($Exception.Check(MemBufErrors.NotDecDig))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch conversion error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Try a string too long to convert to Card4 format
+        m_Flag := False;
+        Try
+            m_Buf.ExtractHexValAt(0, 9);
+        EndTry;
+
+        Catch
+            If ($Exception.Check(MemBufErrors.BadValue))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch conversion error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+    EndMethod;
+
+
+    Method StrImpExpTests()
+    Begin
+        // Test string import
+        m_Index := 0;
+        m_Str.Clear();
+        While (m_Index < 258)
+            m_Ch.SetOrdinal(m_Index);
+            m_Str.AppendChar(m_Ch);
+            m_Index++;
+        EndWhile;
+        If (m_Buf3.ImportString(m_Str, 256) != 256)
+            m_Helper.PrintErr("String import return is bad", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Index := 0;
+        While (m_Index < 256)
+            If (TypeCast(MEng.Card4,m_Buf3.GetCard1At(m_Index)) != m_Index)
+                m_Helper.PrintErr("Bad value in imported string values", m_Output, $CurLine);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+            m_Index++;
+        EndWhile;
+
+        // Make sure it catches a value that won't fit
+        m_Flag := False;
+        Try
+            m_Buf3.ImportString(m_Str, 257);
+        EndTry;
+
+        Catch
+            If ($Exception.Check(MemBufErrors.ByteRange))
+                m_Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch byte range error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the importation of a string at a given target index
+        m_Str.CapAt(4);
+        m_Buf3.PutCard1At(0, 0xFF);
+        m_Buf3.PutCard1At(1, 0xFE);
+        m_Buf3.PutCard1At(6, 0xAE);
+        m_Buf3.PutCard1At(7, 0xBE);
+        If (m_Buf3.ImportStringAt(m_Str, 4, 2) != 4)
+            m_Helper.PrintErr("String import return is bad", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_Buf3.GetCard1At(0) != 0xFF)
+        ||  (m_Buf3.GetCard1At(1) != 0xFE)
+        ||  (m_Buf3.GetCard1At(6) != 0xAE)
+        ||  (m_Buf3.GetCard1At(7) != 0xBE))
+            m_Helper.PrintErr("String import wrote out of bounds", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_Buf3.GetCard1At(2) != 0)
+        ||  (m_Buf3.GetCard1At(3) != 1)
+        ||  (m_Buf3.GetCard1At(4) != 2)
+        ||  (m_Buf3.GetCard1At(5) != 3))
+            m_Helper.PrintErr("String import wrote out of bounds", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    Method CopyInOutTests()
+    Begin
+        Locals=
+            MemBuf TestBuf1(8, 8);
+            MemBuf TestBuf2(8, 8);
+        EndLocals;
+
+        // Set some bytes into the first buffer
+        TestBuf1.SetAll(0);
+        TestBuf1.PutCard1At(0, 1);
+        TestBuf1.PutCard1At(1, 2);
+        TestBuf1.PutCard1At(2, 3);
+        TestBuf1.PutCard1At(3, 4);
+        TestBuf1.PutCard1At(4, 5);
+        TestBuf1.PutCard1At(5, 6);
+        TestBuf1.PutCard1At(6, 7);
+        TestBuf1.PutCard1At(7, 8);
+
+        //
+        //  Now copy out of it using the CopyInAt. This is supposed to copy
+        //  to a given place in the target. So we should end up with:
+        //
+        //  0xFF 1 2 3 4 5 6 7
+        //
+        TestBuf2.SetAll(0xFF);
+        TestBuf2.CopyInAt(TestBuf1, 7, 1);
+
+        If (TestBuf2.GetCard1At(0) != 0xFF)
+            m_Helper.PrintErr("CopyInAt failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (TestBuf2.GetCard1At(7) != 7)
+            m_Helper.PrintErr("CopyInAt failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Do another variation. This should leave us with
+        //
+        //  0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 1 0xFF
+        //
+        TestBuf2.SetAll(0xFF);
+        TestBuf2.CopyInAt(TestBuf1, 1, 6);
+
+        If (TestBuf2.GetCard1At(6) != 1)
+            m_Helper.PrintErr("CopyInAt failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // CopyIn should copy from a specific place in the source
+        TestBuf2.SetAll(0xFF);
+        TestBuf2.CopyIn(TestBuf1, 2, 2);
+
+        If ((TestBuf2.GetCard1At(0) != 3)
+        ||  (TestBuf2.GetCard1At(1) != 4)
+        ||  (TestBuf2.GetCard1At(3) != 0xFF))
+            m_Helper.PrintErr("CopyIn failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // We can't exceed the source buffer sz in a CopyIn
+        m_Flag := False;
+        Try
+            TestBuf2.CopyIn(TestBuf1, 7, 2);
+        EndTry;
+
+        Catch
+            m_Flag := True;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch CopyIn index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Check the corner case of hitting just to the end
+        m_Flag := False;
+        Try
+            TestBuf2.CopyIn(TestBuf1, 6, 2);
+        EndTry;
+
+        Catch
+            m_Flag := True;
+        EndCatch;
+
+        If (m_Flag)
+            m_Helper.PrintErr("CopyIn shouldn't have thrown", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // The source and target cannot be the same
+        m_Flag := False;
+        Try
+            TestBuf1.CopyIn(TestBuf1, 0, 2);
+        EndTry;
+
+        Catch
+            m_Flag := True;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch CopyIn to self", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Flag := False;
+        Try
+            TestBuf1.CopyInAt(TestBuf1, 2, 0);
+        EndTry;
+
+        Catch
+            m_Flag := True;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch CopyInAt to self", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Flag := False;
+        Try
+            TestBuf1.CopyOut(TestBuf1, 0, 2);
+        EndTry;
+
+        Catch
+            m_Flag := True;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Failed to catch CopyOut to self", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    Method CompExpTests()
+    Begin
+        Locals=
+            MemBuf  TestBuf(6, 8);
+            Card4   Index(0);
+        EndLocals;
+
+        TestBuf.PutCard1At(0, 0);
+        TestBuf.PutCard1At(1, 1);
+        TestBuf.PutCard1At(2, 2);
+        TestBuf.PutCard1At(3, 5);
+        TestBuf.PutCard1At(4, 6);
+        TestBuf.PutCard1At(5, 7);
+
+        // Expand it up two and put in the missing values
+        TestBuf.MakeSpace(3, 2, 6);
+        TestBuf.PutCard1At(3, 3);
+        TestBuf.PutCard1At(4, 4);
+
+        // Now it should be contiguous
+        Index := 0;
+        While (Index < 8)
+            If (TestBuf.GetCard1At(Index) != TypeCast(MEng.Card1, Index))
+                m_Helper.PrintErr("MakeSpace failed", m_Output, $CurLine);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+            Index++;
+        EndWhile;
+
+        If (m_RetVal != -1)
+            // And now cut out all but two
+            TestBuf.RemoveSpace(1, 6, 8);
+            If ((TestBuf.GetCard1At(0) != 0)
+            ||  (TestBuf.GetCard1At(1) != 7))
+                m_Helper.PrintErr("MakeSpace failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndIf;
+
+        // Do a corner case scenario by moving the 2nd byte down to the first
+        If (m_RetVal != -1)
+            TestBuf.MoveToStart(1, 1);
+            If (TestBuf.GetCard1At(0) != 7)
+                m_Helper.PrintErr("MoveToStart failed", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndIf;
+
+    EndMethod;
+
+
+
+    Method Start() Returns Int4
+    Begin
+        // Do some really basic tests
+        BasicTests();
+
+        // Test the get/put type methods
+        GetPutTests();
+
+        // Do string import/export methods
+        StrImpExpTests();
+
+        // Test some copyin/out stuff
+        CopyInOutTests();
+
+        // Test compaction/expansion stuff
+        CompExpTests();
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+

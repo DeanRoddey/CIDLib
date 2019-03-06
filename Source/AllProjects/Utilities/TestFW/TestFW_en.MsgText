@@ -1,0 +1,47 @@
+;
+; FILE NAME: TestFW_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 03/06/2007
+;
+; COPYRIGHT: 2007..2007, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This is the message text file for this facility.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+
+; This block must be first but we don't use it here
+CTRL=
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; General errors
+    errcGen_GroupNotFound       2500    Group '%(1)' was not found in the group list
+    errcGen_FmtrNotFound        2501    Results rormatter type '%(1)' is not supported
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+
+

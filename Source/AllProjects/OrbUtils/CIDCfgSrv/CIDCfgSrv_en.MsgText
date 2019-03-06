@@ -1,0 +1,68 @@
+;
+; FILE NAME: CIDCfgSrv_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 12/05/2001
+;
+; COPYRIGHT: 2001..2003, Charmed Quark Software
+;
+;   This file and its contents are the property of Charmed Quark Software. It
+;   may not be redistributed in any modified form, or as part of any product
+;   other than the original CIDLib C++ Frameworks distribution file. Its
+;   contents may not be compiled into any other product, except when required
+;   by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;   product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for the CIDCfgSrv program.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kCfgSrvErrs
+    MsgPref=kCfgSrvMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Error ids
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    errc_NoError                0       No Error
+
+    ; Command line parameter errors
+    errcParm_UnknownParm        5000    '%(1)' is not a known command line parameter
+
+    ; Object store errors
+    errcStore_InitFailed        7000    The object store could not be initialized
+    errcStore_CloseFailed       7001    The object store could not be closed
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Message ids
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    ; Status messages
+    midStatus_Startup          17000    CIDLib Config Server starting. Version=%(1)
+    midStatus_StartupComplete  17001    Initialization was completed successfully
+    midStatus_StartParms       17002    Starting command line parse
+    midStatus_ParmsComplete    17003    Parsing of command line parameters is complete
+    midStatus_StartSetup       17004    Starting core program setup
+    midStatus_SetupComplete    17005    Core program setup complete
+    midStatus_OrbTermFailed    17006    A failure occured while shutting down the Orb
+    midStatus_NSCleanupFailed  17007    A failured occured while cleaning up name server entries
+    midStatus_ParmParseFailed  17008    A failure occured while parsing command line parameters
+    midStatus_SetupFailed      17009    A failure occured while doing basic program setup
+
+END MESSAGES
+

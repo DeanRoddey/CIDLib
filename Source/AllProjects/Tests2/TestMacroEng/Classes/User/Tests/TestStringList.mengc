@@ -1,0 +1,555 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestStringList;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Types=
+    Enum=CopyTypes
+        Append  : "AppendFrom";
+        Copy    : "CopyFrom";
+        Steal   : "StealFrom";
+    EndEnum;
+EndTypes;
+
+Literals=
+EndLiterals;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    String              m_Test1;
+    Int4                m_RetVal;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+
+    // A helper to test that two lists have the same strings in the same order
+    Method HasSameStrings([In] StringList List1, [In] StringList List2) Returns Boolean
+    Begin
+        Locals=[Const]
+            Card4   Count(List1.GetElemCount());
+        EndLocals;
+
+        Locals=
+            Card4   Index(0);
+        EndLocals;
+
+        // They have to have the same count of strings of course
+        If (List2.GetElemCount() != Count)
+            Return False;
+        EndIf;
+
+        While (Index < Count)
+            If (List1.GetAt(Index) != List2.GetAt(Index))
+                Break;
+            EndIf;
+
+            Index++;
+        EndWhile;
+
+        Return (Index = Count);
+    EndMethod;
+
+
+    // A helper to test the various element copying methods
+    Method TestFromSrc( [In]    CopyTypes   OpType
+                        , [In]  StringList  Src
+                        , [Out] StringList  Tar
+                        , [In]  Card4       LineNum
+                        , [In]  Boolean     ShouldWork) Returns Boolean
+    Begin
+        Locals=[Const]
+            // Save the incoming element counts
+            Card4   OrgSrcCnt(Src.GetElemCount());
+            Card4   OrgTarCnt(Tar.GetElemCount());
+        EndLocals;
+
+        Locals=
+            String  ErrMsg;
+        EndLocals;
+
+        Try
+            If (OpType = CopyTypes.Copy)
+                Tar.CopyFrom(Src);
+            ElseIf (OpType = CopyTypes.Append)
+                Tar.AppendFrom(Src);
+            Else
+                Tar.StealFrom(Src);
+            EndIf;
+        EndTry;
+
+        Catch
+            // If it should have worked, then we failed
+            If (ShouldWork)
+                ErrMsg := OpType.GetText();
+                ErrMsg.Append(" method caused an exception. Text=");
+                ErrMsg.Append($Exception.GetErrorText());
+                m_Helper.PrintErr(ErrMsg, m_Output, LineNum);
+
+                m_RetVal := -1;
+            EndIf;
+            Return False;
+        EndCatch;
+
+        //
+        //  If it should have worked (and it did), then check the results
+        //
+        If (ShouldWork)
+            If (OpType = CopyTypes.Copy)
+                If (!HasSameStrings(Src, Tar))
+                    m_Helper.PrintErr("Not same contents after CopyFrom", m_Output, LineNum);
+                    m_RetVal := -1;
+                    Return False;
+                EndIf;
+            ElseIf (OpType = CopyTypes.Steal)
+                If ((Src.GetElemCount() != 0) || (Tar.GetElemCount() != OrgSrcCnt))
+                    m_Helper.PrintErr("Wrong counts after StealFrom", m_Output, LineNum);
+                    m_RetVal := -1;
+                    Return False;
+                EndIf;
+            Else
+                // Just check that the target has the combined count of elements
+                If (Tar.GetElemCount() != OrgTarCnt + Src.GetElemCount())
+                    m_Helper.PrintErr("Wrong combined elem count after AppendFrom", m_Output, LineNum);
+                    m_RetVal := -1;
+                    Return False;
+                EndIf;
+            EndIf;
+        EndIf;
+
+        Return True;
+    EndMethod;
+
+
+    //
+    //  Some common tests called from other tests to check initial list
+    //  conditions. 
+    //
+    Method CommonTests( [InOut] StringList  ToTest
+                        , [In]  Card4       LineNum
+                        , [In]  Boolean     IsUnique) Returns Boolean
+    Begin
+        Locals=
+            Card4   FindIndex;
+            Card4   Index;
+            Boolean GotErr;
+            String  TmpStr;
+        EndLocals;
+
+        // Check that the list has initial zero count
+        If (ToTest.GetElemCount() != 0)
+            m_Helper.PrintErr("Non-Zero initial element count", m_Output, LineNum);
+            m_RetVal := -1;
+        EndIf;
+
+        // A Get at zero should cause an index error
+        GotErr := False;
+        Try
+            ToTest.GetAt(0);
+        EndTry;
+
+        Catch
+            GotErr := True;
+        EndCatch;
+
+        If (!GotErr)
+            m_Helper.PrintErr("Get on empty list didn't fail", m_Output, LineNum);
+            m_RetVal := -1;
+        EndIf;
+
+        // And a Set should also
+        GotErr := False;
+        Try
+            ToTest.SetAt(0, "New Value");
+        EndTry;
+
+        Catch
+            GotErr := True;
+        EndCatch;
+
+        If (!GotErr)
+            m_Helper.PrintErr("Set on empty list didn't fail", m_Output, LineNum);
+            m_RetVal := -1;
+        EndIf;
+
+        // Add a couple items
+        ToTest.Append("Value 3");
+        ToTest.Append("Value 4");
+
+        // Check the element count again
+        If (ToTest.GetElemCount() != 2)
+            m_Helper.PrintErr("The element count was incorrect after appends", m_Output, LineNum);
+            m_RetVal := -1;
+        EndIf;
+
+        // Insert a couple and check again
+        ToTest.InsertAt(0, "Value 2");
+        ToTest.InsertAt(0, "Value 1");
+
+        // Check the element count again
+        If (ToTest.GetElemCount() != 4)
+            m_Helper.PrintErr("The element count was incorrect after inserts", m_Output, LineNum);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure we get back the expected values in the expected order
+        Index := 0;
+        While (Index < 4)
+            TmpStr := "Value ";
+            TmpStr.AppendCard4(Index + 1, Radices.Dec);
+            If (TmpStr != ToTest.GetAt(Index))
+                m_Helper.PrintErr("Got incorrect value in list slot", m_Output, LineNum);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+            Index++;
+        EndWhile;
+
+        // Remove an item and test again
+        ToTest.RemoveAt(2);
+        If (ToTest.GetElemCount() != 3)
+            m_Helper.PrintErr("The element count was incorrect after remove", m_Output, LineNum);
+            m_RetVal := -1;
+        EndIf;
+
+        // The 2rd slow should now have the old third slot
+        If (ToTest.GetAt(2) != "Value 4")
+            m_Helper.PrintErr("Remove did not rearrange slots correctly", m_Output, LineNum);
+            m_RetVal := -1;
+        EndIf;
+
+        // Append some more values
+        ToTest.Append("Value 5");
+        ToTest.Append("Value 6");
+        ToTest.Append("Value 7");
+
+        // And insert back the one we removed and append another
+        ToTest.InsertAt(2,"Value 3");
+        ToTest.Append("Value 8");
+
+        // Now test the ordering again
+        Index := 0;
+        While (Index < 8)
+            TmpStr := "Value ";
+            TmpStr.AppendCard4(Index + 1, Radices.Dec);
+            If (TmpStr != ToTest.GetAt(Index))
+                m_Helper.PrintErr("Got incorrect value in list slot (2)", m_Output, LineNum);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+            Index++;
+        EndWhile;
+
+        // And do a lookup pass of each value
+        Index := 0;
+        While (Index < 8)
+            TmpStr := "Value ";
+            TmpStr.AppendCard4(Index + 1, Radices.Dec);
+
+            If (!ToTest.FindString(TmpStr, FindIndex))
+                m_Helper.PrintErr("Failed to find value in list", m_Output, LineNum);
+                m_RetVal := -1;
+            EndIf;
+
+            If (FindIndex != Index)
+                m_Helper.PrintErr("List value was found at wrong index", m_Output, LineNum);
+                m_RetVal := -1;
+            EndIf;
+
+            Index++;
+        EndWhile;
+
+        // Remove all items and test the count again
+        ToTest.RemoveAll();
+        If (ToTest.GetElemCount() != 0)
+            m_Helper.PrintErr("The element count was non-zero after remove all", m_Output, LineNum);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure we see the expected unique only attribute
+        If (ToTest.GetUnique() != IsUnique)
+            m_Helper.PrintErr("The expected unique attribute was not seen", m_Output, LineNum);
+            m_RetVal := -1;
+        EndIf;
+
+        Return (m_RetVal = 0);
+    EndMethod;
+
+
+    //
+    //  This is a helper that any of the other lists tested can be passed to
+    //  if it should be one that doesn't allow duplicate values. It'll make
+    //  sure a dup cannot be added.
+    //
+    Method UniqueTests([InOut] StringList ToTest)
+    Begin
+        Locals=
+            Boolean     GotErr(False);
+        EndLocals;
+
+        // Remove all items and put in a couple test items
+        ToTest.RemoveAll();
+
+        // Sanity check we get an empty list, else not worth continuing
+        If (ToTest.GetElemCount() != 0)
+            m_Helper.PrintErr("Remove all did not empty list", m_Output, $CurLine);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        ToTest.Append("Value 1");
+        ToTest.Append("Value 2");
+
+        // Try via append
+        GotErr := False;
+        Try
+            ToTest.Append("Value 1");
+        EndTry;
+
+        Catch
+            GotErr := True;
+        EndCatch;
+
+        If (!GotErr)
+            m_Helper.PrintErr("Failed to catch append of dup item", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do it via an insert
+        GotErr := False;
+        Try
+            ToTest.InsertAt(1, "Value 1");
+        EndTry;
+
+        Catch
+            GotErr := True;
+        EndCatch;
+
+        If (!GotErr)
+            m_Helper.PrintErr("Failed to catch insert of dup item", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And try to update the second item to have the same value as the first
+        GotErr := False;
+        Try
+            ToTest.SetAt(1, "Value 1");
+        EndTry;
+
+        Catch
+            GotErr := True;
+        EndCatch;
+
+        If (!GotErr)
+            m_Helper.PrintErr("Failed to catch insert of dup item", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+    
+    EndMethod;
+
+
+    //
+    //  We'll test a default constructed list. This should create a list that
+    //  doesn't allow dups.
+    //
+    Method Test1()
+    Begin
+        Locals=
+            StringList TestList;
+        EndLocals;
+
+        // Do common initail condition tests first
+        If (!CommonTests(TestList, $CurLine, True))
+            Return;
+        EndIf;
+
+        // This one should not allow dups, since that's the default
+        UniqueTests(TestList);
+
+    EndMethod;
+
+
+    //
+    //  Same as above but with an explicit indication of unique only
+    //
+    Method Test2()
+    Begin
+        Locals=
+            StringList TestList(True);
+        EndLocals;
+
+        // Do common initail condition tests first
+        If (!CommonTests(TestList, $CurLine, True))
+            Return;
+        EndIf;
+
+        // This one should not allow dups, since that's the default
+        UniqueTests(TestList);
+
+    EndMethod;
+
+
+    //
+    //  And test a non-unique one
+    //
+    Method Test3()
+    Begin
+        Locals=
+            Boolean     GotErr;
+            StringList  TestList(False);
+        EndLocals;
+
+        // Do common initail condition tests first
+        If (!CommonTests(TestList, $CurLine, False))
+            Return;
+        EndIf;
+
+        TestList.InsertAt(0, "Value 1");
+        TestList.InsertAt(1, "Value 2");
+    
+        // We shouldn't get an exception on a dup
+        GotErr := False;
+        Try
+            TestList.Append("Value 1");
+            TestList.InsertAt(1, "Value 2");
+        EndTry;
+
+        Catch
+            GotErr := True;
+        EndCatch;
+
+        If (GotErr)
+            m_Helper.PrintErr("Dup item shouldn't have failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    //
+    //  We test here a copy ctor, to make sure the values get copied and
+    //  that the uniqueness flag does as well.
+    //
+    Method Test4Helper([In] StringList ToCopy, [In] Boolean UniqueFlag)
+    Begin
+        Locals=
+            Boolean     GotErr;
+            StringList  TestCopy;
+        EndLocals;
+
+        // Copy the list
+        TestCopy := ToCopy;
+
+        // Make sure the element counts match
+        If (TestCopy.GetElemCount() != ToCopy.GetElemCount())
+            m_Helper.PrintErr("Copied list has wrong elem count", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Should not allow a dup
+        GotErr := False;
+        Try
+            TestCopy.Append(ToCopy.GetAt(0));
+        EndTry;
+
+        Catch
+            GotErr := True;
+        EndCatch;
+
+        If (UniqueFlag != GotErr)
+            m_Helper.PrintErr("Unique flag was not copied", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+    Method Test4()
+    Begin
+        Locals=
+            StringList UniqueList(True);
+            StringList NonUniqueList(False);
+        EndLocals;
+
+        // Put a couple items in each list
+        UniqueList.Append("A Value");
+        UniqueList.Append("Another Value");
+
+        NonUniqueList.Append("A Dup'ed Value");
+        NonUniqueList.Append("A Dup'ed Value");
+
+        // And test them
+        Test4Helper(UniqueList, True);
+        Test4Helper(NonUniqueList, False);
+    EndMethod;
+
+
+    //
+    //  This one tests the bulk copy methods that copy strings from one
+    //  string list to another.
+    //
+    Method Test5([In] CopyTypes OpType)
+    Begin
+        Locals=
+            StringList UniqueList(True);
+            StringList NonUniqueList(False);
+            StringList UniqueTar(True);
+            StringList NonUniqueTar(False);
+        EndLocals;
+
+        // Put some strings in each list
+        UniqueList.Append("A Value");
+        UniqueList.Append("Another Value");
+        UniqueList.Append("Yet Another Value");
+
+        NonUniqueList.Append("A Dup'ed Value");
+        NonUniqueList.Append("A Dup'ed Value");
+        NonUniqueList.Append("A Non-Dup'ed Value");
+
+        // We should be able to copy the strings from the respective types
+        TestFromSrc(OpType, UniqueList, UniqueTar, $CurLine, True);
+        TestFromSrc(OpType, NonUniqueList, NonUniqueTar, $CurLine, True);
+
+        // We should be able to copy the unique one into the non-unique one
+        TestFromSrc(OpType, UniqueList, NonUniqueTar, $CurLine, True);
+
+        // We shouldn't be able to copy the non-unique to the unique
+        TestFromSrc(OpType, NonUniqueList, UniqueTar, $CurLine, False);
+
+        // But if we load the non-unique with unique items it should work
+        NonUniqueList.RemoveAll();
+        NonUniqueList.Append("Value 1");
+        NonUniqueList.Append("Value 2");
+        NonUniqueList.Append("Value 3");
+        TestFromSrc(OpType, NonUniqueList, UniqueTar, $CurLine, True);
+    EndMethod;
+
+
+    // Tests a path to see if it has the expected component values
+    Method Start() Returns Int4
+    Begin
+        Test1();
+        Test2();
+        Test3();
+        Test4();
+
+        // Test the various copy from source methods
+        Test5(CopyTypes.Append);
+        Test5(CopyTypes.Copy);
+        Test5(CopyTypes.Steal);
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;

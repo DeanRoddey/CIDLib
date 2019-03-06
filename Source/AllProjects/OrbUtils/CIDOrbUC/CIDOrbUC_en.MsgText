@@ -1,0 +1,94 @@
+;
+; FILE NAME: CIDOrbC_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 02/16/2001
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  This file and its contents are the property of Charmed Quark Software. It
+;  may not be redistributed in any modified form, or as part of any product
+;  other than the original CIDLib C++ Frameworks distribution file. Its
+;  contents may not be compiled into any other product, except when required
+;  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;  product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for the CIDOrbC facility
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kOrbUCErrs
+    MsgPref=kOrbUCMsgs
+END CTRL
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    ; General error ids
+    errcGen_NoError             0       No Error
+
+    ; Log server logger errors
+    errcLSLgr_SpoolErr          3000    An error occured while spooling out locally logged events
+
+    ; Name server errors
+    errcNS_BadNSEndPoint        4501    %(1) is not a valid IP end point address
+    errcNS_CantSetLocalNS       4502    No name server end point was set, but default local failed also
+    errcNS_BadBindingPath       4503    '%(1)' is not a valid name server binding path
+    errcNS_BadScopePath         4504    '%(1)' is not a valid name server scope path
+
+    ;
+    ; Name server protocol errors. These are thrown by the name server
+    ; but need to be here so that clients can get to them.
+    ;
+    errcNSP_NotAScope           4600    '%(1)' is not a scope, it is a binding node
+    errcNSP_NotABinding         4601    '%(1)' is not a binding, it is a scope node
+    errcNSP_UnknownDumpFormat   4602    '%(1)' is not a known dump format
+    errcNSP_CantRemoveRoot      4603    You cannot remove the root scope
+    errcNSP_BindingNotFound     4604    Binding '%(1)' does not exist
+    errcNSP_ScopeNotFound       4605    Scope '%(1)' does not exist
+    errcNSP_NoPathInfo          4606    No information is available on name server path %(1)
+    errcNSP_BadExtraValInd      4607    %(1) is not a valid extra value index
+
+    ; Auto rebind errors
+    errcRebind_NotFound         5000    Name server path '%(1)' was not in the list
+    errcRebind_AlreadyExists    5001    Name server path '%(1)' was alread in the list
+    errcRebind_ThreadRestart    5002    Orb rebind thread restarted after error. See the logs
+    errcRebind_NotATerminal     5003    Rebind path '%(1)' is not a terminal, removing it
+    errcRebind_MaxFails         5004    Rebind path '%(1)' has been rejected, removing it
+
+
+    ; Server type errors
+    errcSrv_LSNotFound          6000    The CIDLib Log Server could not be contacted
+    errcSrv_CSNotFound          6001    The CIDLib Configuration Server could not be contacted
+    errcSrv_CAdminNotFound      6002    The Core Server Admin interface at binding '%(1)' could not be contacted
+    errcSrv_NSNotFound          6003    Could not contact the CIDLib Name Server (at %(1):%(2))
+    errcSrv_SetStatError        6004    The stats cache items '%(1)' could not be set
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+;  Message ids
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+    ; Log server logger messages
+    midLgr_FallingBack         14000    Log server contact lost, falling back to local log
+    midLgr_Reconnect           14001    Reconnected to the log server
+    midLgr_SpoolingLocal       14002    Spooling out locally logged data
+    midLgr_ForcedLocal         14003    Force local was engaged, disconnecting from log server
+    midLgr_FailedFLocal        14004    An error occured while trying to force local log mode
+
+END MESSAGES
+

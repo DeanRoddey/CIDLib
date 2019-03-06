@@ -1,0 +1,63 @@
+;
+; FILE NAME: CIDImgFact_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 03/02/2013
+;
+; COPYRIGHT: 2013..2013, Charmed Quark Software
+;
+;  This file and its contents are the property of Charmed Quark Software. It
+;  may not be redistributed in any modified form, or as part of any product
+;  other than the original CIDLib C++ Frameworks distribution file. Its
+;  contents may not be compiled into any other product, except when required
+;  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;  product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;  This is the message text file for the CIDImgFact facility. It contains
+;  the raw message text and ids for the facility, and is compiled into
+;  headers and binary output files.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kImgFactErrs
+    MsgPref=kImgFactMsgs
+END CTRL
+
+
+
+; -----------------------------------------------------------------------------
+;  Error ids
+; -----------------------------------------------------------------------------
+ERRORS=
+
+    ; No error occured
+    errcNoError                     0       No error occured
+
+END ERRORS
+
+
+
+; -----------------------------------------------------------------------------
+;   Messages ids
+; -----------------------------------------------------------------------------
+MESSAGES=
+
+    ; Image format strings
+    midFmt_BitsPerClr              16400    (%(1) bits/color)
+    midFmt_Palette                 16401    Palette (%(1) colors)
+    midFmt_TrueColor               16402    True Color
+    midFmt_TrueAlpha               16403    True Alpha
+    midFmt_GrayScale               16404    Gray Scale
+    midFmt_GrayAlpha               16405    Gray Alpha
+
+END MESSAGES
+
+

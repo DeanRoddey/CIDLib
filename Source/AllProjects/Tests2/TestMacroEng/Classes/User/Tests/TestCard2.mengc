@@ -1,0 +1,297 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestCard2;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Literals=
+    Card2   kLitVal1(1844#C1);
+    Card2   kLitVal2(0x44DD);
+EndLiterals;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Card2               m_Test1;
+    Card2               m_Test2;
+    Card2               m_Test3;
+    Int4                m_RetVal;
+    TestHelpers         m_Helper;
+    String              m_TmpStr;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_Test1();
+        m_Test2(10);
+        m_Test3(0xFFFF);
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        // Check that the initializers set the values correctly
+        If (m_Test1 != 0)
+            m_Helper.PrintErr("Initial m_Test1 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test2 != 10)
+            m_Helper.PrintErr("Initial m_Test2 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test3 != 0xFFFF)
+            m_Helper.PrintErr("Initial m_Test3 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure the literals work
+        If ((kLitVal1 != 1844) && (kLitVal2 != 0x44DD))
+            m_Helper.PrintErr("Literals were not correctly set", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do some basic checks of equality and relative magnitude tests
+        If (m_Test1 = m_Test2)
+            m_Helper.PrintErr("Invalid equality reported", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!(m_Test1 < m_Test2))
+            m_Helper.PrintErr("Invalid < reported", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test1 > m_Test2)
+            m_Helper.PrintErr("Invalid > reported", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure that a copy results in equal objects
+        m_Test1 := m_Test2;
+        If (m_Test1 != m_Test2)
+            m_Helper.PrintErr("Objects not equal after copy", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!(m_Test1 >= m_Test2))
+            m_Helper.PrintErr("Objects not gt/equal after copy", m_Output, $CurLine);
+            m_RetVal := TypeCast(MEng.Int4, -1);
+        EndIf;
+
+        If (!(m_Test1 <= m_Test2))
+            m_Helper.PrintErr("Objects not ls/equal after copy", m_Output, $CurLine);
+            m_RetVal := TypeCast(MEng.Int4, -1);
+        EndIf;
+
+        // Test the mul/div methods
+        m_Test1 := 20;
+        m_Test1 *= 2;
+        If (m_Test1 != 40)
+            m_Helper.PrintErr("MulEq failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test2 := m_Test1 * 2;
+        If (m_Test2 != 80)
+            m_Helper.PrintErr("Mul failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := m_Test2 / 4;
+        If (m_Test1 != 20)
+            m_Helper.PrintErr("Div failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 /= 2;
+        If (m_Test1 != 10)
+            m_Helper.PrintErr("DivEq failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 10;
+        m_Test1 %= 3;
+        If (m_Test1 != 1)
+            m_Helper.PrintErr("ModDivEq failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 15;
+        m_Test2 := m_Test1 % 4;
+        If (m_Test2 != 3)
+            m_Helper.PrintErr("ModDiv failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the add/sub methods
+        m_Test1 := 20;
+        m_Test1 += 2;
+        If (m_Test1 != 22)
+            m_Helper.PrintErr("PlusEq failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test2 := m_Test1 + 4;
+        If (m_Test2 != 26)
+            m_Helper.PrintErr("Plus failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := m_Test2 - 8;
+        If (m_Test1 != 18)
+            m_Helper.PrintErr("Minus failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 -= 4;
+        If (m_Test1 != 14)
+            m_Helper.PrintErr("MinusEq failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the bitwise logical methods
+        m_Test1 := 0x81;
+        m_Test1 |= 0x2;
+        If (m_Test1 != 0x83)
+            m_Helper.PrintErr("OrEq failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 &= 0x7E;
+        If (m_Test1 != 0x2)
+            m_Helper.PrintErr("AndEq failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 ^= 0x12;
+        If (m_Test1 != 0x10)
+            m_Helper.PrintErr("XorEq failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test2 := m_Test1 | 0x80;
+        If (m_Test2 != 0x90)
+            m_Helper.PrintErr("Or failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test2 := m_Test1 & 0x1F;
+        If (m_Test2 != 0x10)
+            m_Helper.PrintErr("And failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test2 := m_Test1 ^ 0x11;
+        If (m_Test2 != 0x1)
+            m_Helper.PrintErr("Xor failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And test some misc stuff
+        m_Test1 := 0x1;
+        m_Test1.ShiftLeft(2);
+        If (m_Test1 != 0x4)
+            m_Helper.PrintErr("Shift left failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.ShiftRight(1);
+        If (m_Test1 != 0x2)
+            m_Helper.PrintErr("Shift right failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the bit get/set methods
+        m_Test1 := 0x8001;
+        If (!m_Test1.GetBit(15)
+        ||  !m_Test1.GetBit(0)
+        ||   m_Test1.GetBit(1)
+        ||   m_Test1.GetBit(14))
+            m_Helper.PrintErr("GetBit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1.SetBit(1, True);
+        m_Test1.SetBit(14, True);
+        m_Test1.SetBit(0, False);
+        m_Test1.SetBit(15, False);
+        If (m_Test1 != 0x4002)
+            m_Helper.PrintErr("SetBit failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test some suffix stuff
+        m_Test1 := 102#C2;
+        If (m_Test1 != 102)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 0xFFFF#C2;
+        If (m_Test1 != 0xFFFF)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 0x0#C2;
+        If (m_Test1 != 0)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 0#C2;
+        If (m_Test1 != 0)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 022#C1;
+        If (m_Test1 != 18)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Should convert automatically since it will fit the target
+        m_Test1 := 0xFFFF#C4;
+        If (m_Test1 != 0xFFFF)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test min/max methods
+        m_Test1 := 10;
+        If ((m_Test1.MaxVal(11) != 11)
+        ||  (m_Test1.MinVal(11) != 10))
+            m_Helper.PrintErr("Min/max failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test formatting values
+        m_TmpStr.Clear();
+        m_Test1 := 348;
+        m_TmpStr.AppendCard2(m_Test1, Radices.Dec);
+        If (m_TmpStr != "348")
+            m_Helper.PrintErr("Formatted append failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 145;
+        m_TmpStr.AppendCard2(m_Test1, Radices.Dec);
+        If (m_TmpStr != "348145")
+            m_Helper.PrintErr("Formatted append failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;

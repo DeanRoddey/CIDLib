@@ -1,0 +1,2546 @@
+; ----------------------------------------------------------------------------
+; FILE: CIDBuild.Projects
+;
+;   This is the projects file for the CIDLib system. It contains the build
+;   settings (in a platform independent way) for all of the projects in the
+;   CIDLib system.
+;
+;   The following defaults are used if values are not provided:
+;
+;   DISPLAY     = Console
+;   INCLINK     = Yes
+;   MINREBUILD  = Yes
+;   MSGFILE     = No
+;   PLATFORMDIR = No
+;   PUREANSI    = Yes
+;   RESFILE     = No
+;   RTL         = Multi/Dynamic
+;   TYPE        = Executable
+;   USESYSLIBS  = No
+;   VARARGS     = No
+;   VERSIONED   = No
+;
+;
+;   This one is just a hint to the release creation code that this one is a
+;   sample that should be copied over to a developer's release. Only legal
+;   for an Executable type project.
+;
+;   SAMPLE      = No
+;
+; MODIFICATION LOG:
+;
+;   $Log$
+;
+; ----------------------------------------------------------------------------
+
+; ----------------------------------------------------------------------------
+; Copy all the common application images. These are a little too much to
+; load as resources and make everyone pay for them memory-wise, so we just
+; load them as required.
+; ----------------------------------------------------------------------------
+PROJECT=AppImages
+
+    SETTINGS
+        DIRECTORY   = AppImages
+        TYPE        = FileCopy
+    END SETTINGS
+
+    FILECOPIES=AppImages
+        *
+    END FILECOPIES
+
+END PROJECT
+
+
+; ----------------------------------------------------------------------------
+; Copy any application icons
+; ----------------------------------------------------------------------------
+PROJECT=AppIcons
+
+    SETTINGS
+        DIRECTORY   = AppIcons
+        TYPE        = FileCopy
+    END SETTINGS
+
+    FILECOPIES=AppIcons
+        *
+    END FILECOPIES
+
+END PROJECT
+
+
+
+; ----------------------------------------------------------------------------
+;   The core library facilities and the IDL compiler. These are the first things built
+;   when starting a new build from scratch, because we have to get the IDL compiler
+;   built, then run it in order to generate the IDL based files. So none of these
+;   facilities can use the IDL system because that would cause a circular dependency.
+; ----------------------------------------------------------------------------
+PROJECT=CIDKernel
+
+    SETTINGS
+        DIRECTORY   = CIDKernel
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        PLATFORMDIR = Yes
+        PUREANSI    = No
+        TYPE        = SharedLib
+        USESYSLIBS  = Yes
+        VERSIONED   = Yes
+    END SETTINGS
+
+    INCLUDEPATHS
+        .\Win32\ASPI
+    END INCLUDEPATHS
+
+END PROJECT
+
+
+PROJECT=CIDLib
+    SETTINGS
+        DIRECTORY   = CIDLib
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDKernel
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDEncode
+    SETTINGS
+        DIRECTORY   = DataUtils\CIDEncode
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDCrypto
+    SETTINGS
+        DIRECTORY   = SecureUtils\CIDCrypto
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=CIDMData
+    SETTINGS
+        DIRECTORY   = DataUtils\CIDMData
+        DISPLAY     = N/A
+        EXPORT      = CIDMDATAEXP
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDMData_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDCrypto
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDXML
+    SETTINGS
+        DIRECTORY   = DataUtils\CIDXML
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDEncode
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDIDL
+    SETTINGS
+        DIRECTORY   = OrbUtils\CIDIDL
+        MSGFILE     = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDCrypto
+        CIDLib
+        CIDXML
+    END DEPENDENTS
+END PROJECT
+
+; ----------------------------------------------------------------------------
+;   From here forward they can all use IDL based content
+; ----------------------------------------------------------------------------
+
+
+
+
+; ----------------------------------------------------------------------------
+;   Other fundamental, non-GUI library facilities.
+; ----------------------------------------------------------------------------
+
+PROJECT=CIDMath
+    SETTINGS
+        DIRECTORY   = CIDMath
+        DISPLAY     = N/A
+        EXPORT      = CIDMATHEXP
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDMath_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDZLib
+    SETTINGS
+        DIRECTORY   = DataUtils\CIDZLib
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=CIDImage
+    SETTINGS
+        DIRECTORY   = GraphicUtils\CIDImage
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMath
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDPNG
+    SETTINGS
+        DIRECTORY   = GraphicUtils\CIDPNG
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDImage
+        CIDZLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDJPEG
+    SETTINGS
+        DIRECTORY   = GraphicUtils\CIDJPEG
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        PUREANSI    = No
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDImage
+    END DEPENDENTS
+
+    INCLUDEPATHS
+        .\JLibInc
+    END INCLUDEPATHS
+
+END PROJECT
+
+
+PROJECT=CIDImgFact
+    SETTINGS
+        DIRECTORY   = GraphicUtils\CIDImgFact
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDImage
+        CIDJPEG
+        CIDPNG
+    END DEPENDENTS
+
+END PROJECT
+
+
+; ----------------------------------------------------------------------------
+;  Our 'AI' oriented facility and some stuff that supports it.
+; ----------------------------------------------------------------------------
+
+PROJECT=CIDSpReco
+    SETTINGS
+        DIRECTORY   = AIUtils\CIDSpReco
+        DISPLAY     = N/A
+        EXPORT      = CIDSPRECOEXP
+        MSGFILE     = Yes
+        PUREANSI    = No
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDAudStream
+        CIDXML
+    END DEPENDENTS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDSpReco_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+END PROJECT
+
+PROJECT=CIDAI
+    SETTINGS
+        DIRECTORY   = AIUtils\CIDAI
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDMath
+        CIDXML
+        ; CIDSpReco
+    END DEPENDENTS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDAI_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+END PROJECT
+
+; ----------------------------------------------------------------------------
+;   The fundemental graphics/GUI library facilities, and our resource editor tool
+;   that works in terms of them.
+; ----------------------------------------------------------------------------
+
+PROJECT=CIDGraphDev
+    SETTINGS
+        DIRECTORY   = GraphicUtils\CIDGraphDev
+        DISPLAY     = N/A
+        EXPORT      = CIDGRDEVEXP
+        MSGFILE     = Yes
+        PUREANSI    = No
+        RESFILE     = Yes
+        TYPE        = SharedLib
+        USESYSLIBS  = Yes
+        VERSIONED   = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDGraphDev_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+        CIDMath
+        CIDImgFact
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=CIDCtrls
+    SETTINGS
+        DIRECTORY   = WndUtils\CIDCtrls
+        DISPLAY     = N/A
+        EXPORT      = CIDCTRLSEXP
+        MSGFILE     = Yes
+        PUREANSI    = No
+        RESFILE     = Yes
+        TYPE        = SharedLib
+        USESYSLIBS  = Yes
+        VERSIONED   = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDCtrls_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+        CIDMData
+        CIDGraphDev
+        CIDPNG
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDAdvGraph
+    SETTINGS
+
+        DIRECTORY   = GraphicUtils\CIDAdvGraph
+        DISPLAY     = N/A
+        EXPORT      = CIDADVGREXP
+        MSGFILE     = Yes
+        PUREANSI    = No
+        RESFILE     = No
+        TYPE        = SharedLib
+        USESYSLIBS  = Yes
+        VERSIONED   = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    IDLFILES
+;        IDLFILE
+;            SRCFILE = CIDAdvGraph_Shared
+;            GEN     = GLOBALS
+;            NAMEEXT = Shared
+;        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+        CIDCtrls
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=CIDWUtils
+    SETTINGS
+        DIRECTORY   = WndUtils\CIDWUtils
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        PUREANSI    = No
+        RESFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDMData
+        CIDCtrls
+        CIDComm
+        CIDRegX
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDResEd
+    SETTINGS
+        DIRECTORY   = Utilities\CIDResEd
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        PUREANSI    = No
+        RESFILE     = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDResEd_Types
+            GEN     = GLOBALS
+            NAMEEXT = Types
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDCtrls
+        CIDWUtils
+    END DEPENDENTS
+
+END PROJECT
+
+
+
+; ----------------------------------------------------------------------------
+;   Data processing/storage related facilities
+; ----------------------------------------------------------------------------
+
+PROJECT=CIDDBase
+    SETTINGS
+        DIRECTORY   = DataUtils\CIDDBase
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        PUREANSI    = No
+        TYPE        = SharedLib
+        USESYSLIBS  = Yes
+        VERSIONED   = Yes
+    END SETTINGS
+
+    ; Win32 only for now until we can address this guy's portability
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDRegX
+    SETTINGS
+        DIRECTORY   = DataUtils\CIDRegX
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDObjStore
+    SETTINGS
+        DIRECTORY   = DataUtils\CIDObjStore
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDCrypto
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=CIDPack
+    SETTINGS
+        DIRECTORY   = DataUtils\CIDPack
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDCrypto
+        CIDZLib
+    END DEPENDENTS
+
+END PROJECT
+
+
+; ----------------------------------------------------------------------------
+;   Security related facilities
+; ----------------------------------------------------------------------------
+
+PROJECT=CIDSChan
+    SETTINGS
+        DIRECTORY   = SecureUtils\CIDSChan
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        PLATFORMDIR = Yes
+        PUREANSI    = No
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDCrypto
+        CIDSock
+    END DEPENDENTS
+
+END PROJECT
+
+
+
+
+; ----------------------------------------------------------------------------
+;   Communications related facilities
+; ----------------------------------------------------------------------------
+PROJECT=CIDComm
+    SETTINGS
+        DIRECTORY   = CommUtils\CIDComm
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDSock
+    SETTINGS
+        DIRECTORY   = CommUtils\CIDSock
+        DISPLAY     = N/A
+        EXPORT      = CIDSOCKEXP
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDSock_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDCrypto
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDSIP
+    SETTINGS
+        DIRECTORY   = CommUtils\CIDSIP
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDSock
+        CIDCrypto
+        CIDEncode
+        CIDNet
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=CIDNet
+    SETTINGS
+        DIRECTORY   = CommUtils\CIDNet
+        DISPLAY     = N/A
+        EXPORT      = CIDNETEXP
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDNet_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDSock
+        CIDCrypto
+        CIDEncode
+        CIDSChan
+        CIDXML
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDUPnP
+    SETTINGS
+        DIRECTORY   = CommUtils\CIDUPnP
+        DISPLAY     = N/A
+        EXPORT      = CIDUPNPEXP
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDUPnP_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDSock
+        CIDXML
+        CIDNet
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=CIDWebSock
+    SETTINGS
+        DIRECTORY   = CommUtils\CIDWebSock
+        DISPLAY     = N/A
+        EXPORT      = CIDWEBSOCKEXP
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDWebSock_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDSock
+        CIDCrypto
+        CIDEncode
+        CIDSChan
+    END DEPENDENTS
+
+END PROJECT
+
+
+
+; ----------------------------------------------------------------------------
+;   Media related facilities
+; ----------------------------------------------------------------------------
+
+;
+;   A framework for streaming audio in from sources and out to targets.
+;
+PROJECT=CIDAudStream
+    SETTINGS
+        DIRECTORY   = MediaUtils\CIDAudStream
+        DISPLAY     = N/A
+        EXPORT      = CIDAUDSTREAMEXP
+        MSGFILE     = Yes
+        PUREANSI    = No
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDAudStream_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+
+    INCLUDEPATHS
+    END INCLUDEPATHS
+
+END PROJECT
+
+;
+;  Digital audio extraction and format conversion. We have to bring in some
+;  external headers specially here since we provide some wrappers around
+;  system media stuff.
+;
+PROJECT=CIDDAE
+    SETTINGS
+        DIRECTORY   = MediaUtils\CIDDAE
+        DISPLAY     = N/A
+        EXPORT      = CIDDAEEXP
+        MSGFILE     = Yes
+        PUREANSI    = No
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    ; For now only Win32. Needs to have some stuff split out into per-platform
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDDAE_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+
+    INCLUDEPATHS
+        $(WMFSDKDIR)\Include
+    END INCLUDEPATHS
+
+END PROJECT
+
+
+;
+;  Metadata extraction. It provides classes to extra metadata tag info from
+;  various media formats.
+;
+PROJECT=CIDMetaExtr
+    SETTINGS
+        DIRECTORY   = MediaUtils\CIDMetaExtr
+        DISPLAY     = N/A
+        EXPORT      = CIDMETAEXTREXP
+        MSGFILE     = Yes
+        PUREANSI    = No
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    ; For now only Win32. Needs to have some stuff split out into per-platform
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDMetaExtr_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDCrypto
+        CIDImgFact
+    END DEPENDENTS
+
+END PROJECT
+
+
+;
+;  Implements the RTP/RTCP standards
+;
+PROJECT=CIDRTP
+    SETTINGS
+        DIRECTORY   = MediaUtils\CIDRTP
+        DISPLAY     = N/A
+        EXPORT      = CIDRTPEXP
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDSock
+        CIDMath
+        CIDNet
+        CIDCrypto
+    END DEPENDENTS
+
+END PROJECT
+
+
+
+; ----------------------------------------------------------------------------
+;  Higher level GUI related facilities
+; ----------------------------------------------------------------------------
+PROJECT=CIDWebBrowser
+    SETTINGS
+        DIRECTORY   = WndUtils\CIDWebBrowser
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        PUREANSI    = No
+        TYPE        = SharedLib
+        USESYSLIBS  = Yes
+        VERSIONED   = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+
+
+; ----------------------------------------------------------------------------
+;   Program execution related facilities
+; ----------------------------------------------------------------------------
+PROJECT=CIDAppSh
+    SETTINGS
+        DIRECTORY   = ExecUtils\CIDAppSh
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    ; For now only Win32. Needs to have some stuff split out into per-platform
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDXML
+        CIDOrbUC
+    END DEPENDENTS
+END PROJECT
+
+
+
+
+; ----------------------------------------------------------------------------
+;   Language related facilities
+; ----------------------------------------------------------------------------
+PROJECT=CIDMacroEng
+    SETTINGS
+        DIRECTORY   = LangUtils\CIDMacroEng
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDMacroEng_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDMath
+        CIDDBase
+        CIDEncode
+        CIDCrypto
+        CIDComm
+        CIDSock
+        CIDNet
+        CIDXML
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=CIDMacroDbg
+    SETTINGS
+        DIRECTORY   = LangUtils\CIDMacroDbg
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        RESFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDEncode
+        CIDMacroEng
+        CIDCtrls
+        CIDWUtils
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=TestMacroDbg
+    SETTINGS
+        DIRECTORY   = Tests\TestMacroDbg
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        RESFILE     = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDCtrls
+        CIDImage
+        CIDWUtils
+        CIDMacroDbg
+    END DEPENDENTS
+
+END PROJECT
+
+
+
+; ----------------------------------------------------------------------------
+;  ORB oriented facilities, and the standard ORB based servers that we provide at
+;  the CIDLib level.
+; ----------------------------------------------------------------------------
+PROJECT=CIDOrb
+    SETTINGS
+        DIRECTORY   = OrbUtils\CIDOrb
+        DISPLAY     = N/A
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDSock
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDOrbUC
+    SETTINGS
+        DIRECTORY   = OrbUtils\CIDOrbUC
+        DISPLAY     = N/A
+        EXPORT      = CIDORBUCEXP
+        MSGFILE     = Yes
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = ..\LogServer
+            GEN     = CLIENT,SERVER
+            NAMEEXT = LogSrv
+        END IDLFILE
+
+        IDLFILE
+            SRCFILE = ..\CIDCoreAdmin
+            GEN     = CLIENT,SERVER
+            NAMEEXT = CoreAdmin
+        END IDLFILE
+
+        IDLFILE
+            SRCFILE = ..\NameServer
+            GEN     = CLIENT
+            NAMEEXT = NameSrv
+        END IDLFILE
+
+        IDLFILE
+            SRCFILE = ..\CfgServer
+            GEN     = CLIENT
+            NAMEEXT = CfgSrv
+        END IDLFILE
+
+        IDLFILE
+            SRCFILE = ..\RemBrowser
+            GEN     = CLIENT,SERVER
+            NAMEEXT = RemBrowser
+        END IDLFILE
+
+    END IDLFILES
+
+    DEPENDENTS
+        CIDOrb
+        CIDCrypto
+        CIDObjStore
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDNameSrv
+    SETTINGS
+        DIRECTORY   = OrbUtils\CIDNameSrv
+        MSGFILE     = Yes
+        TYPE        = Service
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = ..\NameServer
+            GEN     = SERVER
+            NAMEEXT = NameSrv
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDOrbUC
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDLogSrv
+    SETTINGS
+        DIRECTORY   = OrbUtils\CIDLogSrv
+        MSGFILE     = Yes
+        TYPE        = Service
+    END SETTINGS
+
+    DEPENDENTS
+        CIDRegX
+        CIDOrbUC
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDCfgSrv
+    SETTINGS
+        DIRECTORY   = OrbUtils\CIDCfgSrv
+        MSGFILE     = No
+        MSGFILE     = Yes
+        TYPE        = Service
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = ..\CfgServer
+            GEN     = SERVER
+            NAMEEXT = Cfg
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDOrbUC
+        CIDObjStore
+    END DEPENDENTS
+END PROJECT
+
+
+
+; ----------------------------------------------------------------------------
+;  ORB based utilities. These are primarily for debugging purposes, to poke around
+;  into the ORB system to see what is going on, or to talk to the standard ORB
+;  based servers.
+; ----------------------------------------------------------------------------
+
+PROJECT=CIDNSAdmin
+    SETTINGS
+        DIRECTORY   = OrbUtils\CIDNSAdmin
+        MSGFILE     = No
+    END SETTINGS
+
+    DEPENDENTS
+        CIDOrbUC
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDLogAdmin
+    SETTINGS
+        DIRECTORY   = OrbUtils\CIDLogAdmin
+        MSGFILE     = No
+    END SETTINGS
+
+    DEPENDENTS
+        CIDRegX
+        CIDOrbUC
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CIDLogMon
+    SETTINGS
+        DIRECTORY   = OrbUtils\CIDLogMon
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        RESFILE     = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDOrbUC
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+
+; ----------------------------------------------------------------------------
+;   Some general purpose utilities
+; ----------------------------------------------------------------------------
+PROJECT=MakeDocs
+    SETTINGS
+        DIRECTORY   = Utilities\MakeDocs
+        MSGFILE     = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=GenXMLChTable
+    SETTINGS
+        DIRECTORY   = Utilities\GenXMLChTable
+    END SETTINGS
+
+    DEPENDENTS
+        CIDXML
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=CSSPre
+    SETTINGS
+        DIRECTORY   = Utilities\CSSPre
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+
+END PROJECT
+
+
+; ----------------------------------------------------------------------------
+;   The test framework and the library shared by the framework and the test
+;   programs.
+; ----------------------------------------------------------------------------
+PROJECT=TestFWLib
+    SETTINGS
+        DIRECTORY   = Utilities\TestFWLib
+        DISPLAY     = N/A
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=TestFW
+    SETTINGS
+        DIRECTORY   = Utilities\TestFW
+        MSGFILE     = Yes
+        USESYSLIBS  = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+
+
+; ----------------------------------------------------------------------------
+;  Formal Tests (via the test framework)
+; ----------------------------------------------------------------------------
+
+; Cryptography libraries
+PROJECT=TestCrypto
+    SETTINGS
+        DIRECTORY   = Tests2\TestCrypto
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDCrypto
+        CIDSock
+        CIDSChan
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; CIDLib libraries
+PROJECT=TestCIDLib2
+    SETTINGS
+        DIRECTORY   = Tests2\TestCIDLib2
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = TestCIDLib2_IDLGen
+            GEN     = GLOBALS
+            NAMEEXT = IDLGen
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; CIDEncode libraries
+PROJECT=TestCIDEncode
+    SETTINGS
+        DIRECTORY   = Tests2\TestCIDEncode
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDEncode
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; Math libraries
+PROJECT=TestMathLib
+    SETTINGS
+        DIRECTORY   = Tests2\TestMathLib
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMath
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; CIDMData libraries
+PROJECT=TestCIDMData
+    SETTINGS
+        DIRECTORY   = Tests2\TestCIDMData
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDCrypto
+        CIDMData
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; Macro engine
+PROJECT=TestMacroEng
+    SETTINGS
+        DIRECTORY   = Tests2\TestMacroEng
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMacroEng
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; URLs, IP end points and address, sockets, etc...
+PROJECT=TestNet
+    SETTINGS
+        DIRECTORY   = Tests2\TestNet
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDSock
+        CIDNet
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=TestObjStore
+    SETTINGS
+        DIRECTORY   = Tests2\TestObjStore
+    END SETTINGS
+
+    DEPENDENTS
+        CIDMath
+        CIDObjStore
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; Tests the ORB
+PROJECT=TestORB
+    SETTINGS
+        DIRECTORY   = Tests2\TestORB
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = TestOrb_Loopback
+            GEN     = CLIENT,SERVER
+            NAMEEXT = Loopback
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDORB
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; Regular expressions
+PROJECT=TestRegX
+    SETTINGS
+        DIRECTORY   = Tests2\TestRegX
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDRegX
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; XML Parser
+PROJECT=TestXML
+    SETTINGS
+        DIRECTORY   = Tests2\TestXML
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDXML
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; The AI facility
+PROJECT=TestAI
+    SETTINGS
+        DIRECTORY   = Tests2\TestAI
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDXML
+        CIDAI
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; Higher level sterss tests
+PROJECT=StressTests
+    SETTINGS
+        DIRECTORY   = Tests2\StressTests
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMath
+        CIDObjStore
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; A group project for the '2' tests
+PROJECT=Tests2
+    SETTINGS
+        DIRECTORY   = Tests2
+        TYPE        = Group
+    END SETTINGS
+
+    DEPENDENTS
+        TestAI
+        TestCIDLib2
+        TestMathLib
+        TestCIDEncode
+        TestRegX
+        TestCrypto
+        TestXML
+        TestCIDMData
+        TestNet
+        TestObjStore
+        TestORB
+        StressTests
+    END DEPENDENTS
+
+END PROJECT
+
+
+
+; ----------------------------------------------------------------------------
+;  Ad hoc tests, and some that test things that the test framework itself uses, so
+;  we need to make sure that the framework is basically trustworthy.
+; ----------------------------------------------------------------------------
+PROJECT=ShellTester
+    SETTINGS
+        DIRECTORY   = Tests\TestAppShell\ShellTester
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestAppShell
+    SETTINGS
+        DIRECTORY   = Tests\TestAppShell
+    END SETTINGS
+
+    DEPENDENTS
+        CIDAppSh
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestCIDDBase
+    SETTINGS
+        DIRECTORY   = Tests\TestCIDDBase
+    END SETTINGS
+
+    ; For now only Win32 until CIDDBase gets sorted out for portability
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDLib
+        CIDDBase
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=TestCIDLib
+    SETTINGS
+        DIRECTORY   = Tests\TestCIDLib
+        MSGFILE     = Yes
+        USESYSLIBS  = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=TestCIDCtrls
+
+    SETTINGS
+        DIRECTORY   = WndUtils\CIDCtrls\TestCIDCtrls
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        RESFILE     = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDCtrls
+        ; CIDWUtils
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestCIDCtrls2
+
+    SETTINGS
+        DIRECTORY   = WndUtils\CIDCtrls\TestCIDCtrls2
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        RESFILE     = No
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestScroll
+
+    SETTINGS
+        DIRECTORY   = WndUtils\CIDCtrls\TestScroll
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        RESFILE     = No
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestCIDZLib
+    SETTINGS
+        DIRECTORY   = Tests\TestCIDZLib
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDZLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestGestures
+
+    SETTINGS
+        DIRECTORY   = Tests\TestGestures
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        RESFILE     = Yes
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestKernel
+    SETTINGS
+        DIRECTORY   = Tests\TestKernel
+        MSGFILE     = Yes
+        USESYSLIBS  = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDKernel
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestLogSrv
+    SETTINGS
+        DIRECTORY   = Tests\TestLogSrv
+    END SETTINGS
+
+    DEPENDENTS
+        CIDMath
+        CIDOrbUC
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestLogSrv2
+    SETTINGS
+        DIRECTORY   = Tests\TestLogSrv2
+    END SETTINGS
+
+    DEPENDENTS
+        CIDOrbUC
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestOrb2
+    SETTINGS
+        DIRECTORY   = Tests\TestOrb2
+        MSGFILE     = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = TestOrb2_TestIntf
+            GEN     = CLIENT,SERVER
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDOrb
+        CIDMath
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestOrb3
+    SETTINGS
+        DIRECTORY   = Tests\TestOrb3
+        MSGFILE     = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = TestOrb3_Types
+            GEN     = GLOBALS
+            NAMEEXT = Types
+        END IDLFILE
+
+        IDLFILE
+            SRCFILE = TestOrb3_TestIntf
+            GEN     = CLIENT,SERVER
+            NAMEEXT = Intf
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDOrb
+    END DEPENDENTS
+END PROJECT
+
+
+;PROJECT=TestRTP
+;    SETTINGS
+;        DIRECTORY   = Tests\TestRTP
+;    END SETTINGS
+;
+;    DEPENDENTS
+;        CIDMath
+;        CIDSock
+;        CIDRTP
+;    END DEPENDENTS
+;END PROJECT
+
+
+;PROJECT=TestSocket
+;    SETTINGS
+;        DIRECTORY   = Tests\TestSocket
+;    END SETTINGS
+;
+;    DEPENDENTS
+;        CIDSock
+;    END DEPENDENTS
+;END PROJECT
+;
+;
+;PROJECT=TestSocket2
+;    SETTINGS
+;        DIRECTORY   = Tests\TestSocket2
+;    END SETTINGS
+;
+;    DEPENDENTS
+;        CIDSock
+;    END DEPENDENTS
+;END PROJECT
+
+
+; ----------------------------------------------------------------------------
+;  Sample programs to demonstrate various aspects of CIDLib
+; ----------------------------------------------------------------------------
+PROJECT=Beeper
+    SETTINGS
+        DIRECTORY   = Samples\Beeper
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CDROM1
+    SETTINGS
+        DIRECTORY   = Samples\CDROM1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+        CIDJPEG
+        CIDDAE
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Collect1
+    SETTINGS
+        DIRECTORY   = Samples\Collect1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Collect2
+    SETTINGS
+        DIRECTORY   = Samples\Collect2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Collect3
+    SETTINGS
+        DIRECTORY   = Samples\Collect3
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDMath
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Collect4
+    SETTINGS
+        DIRECTORY   = Samples\Collect4
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDMath
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Crypto1
+    SETTINGS
+        DIRECTORY   = Samples\Crypto1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDCrypto
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=CvtImgToTrans
+    SETTINGS
+        DIRECTORY   = Samples\CvtImgToTrans
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDImage
+        CIDPNG
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=DAE1
+    SETTINGS
+        DIRECTORY   = Samples\DAE1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    ; For now only Win32 until CIDDAE gets sorted out for portability
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDLib
+        CIDDAE
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=DAE2
+    SETTINGS
+        DIRECTORY   = Samples\DAE2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    ; For now only Win32 until CIDDAE gets sorted out for portability
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDLib
+        CIDDAE
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=DumpRepo
+    SETTINGS
+        DIRECTORY   = Samples\DumpRepo
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDRegX
+        CIDObjStore
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=EnumMons
+    SETTINGS
+        DIRECTORY   = Samples\EnumMons
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=FileSys1
+    SETTINGS
+        DIRECTORY   = Samples\FileSys1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=FileSys2
+    SETTINGS
+        DIRECTORY   = Samples\FileSys2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=FileSys3
+    SETTINGS
+        DIRECTORY   = Samples\FileSys3
+        MSGFILE     = Yes
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=FWMediaChanger
+    SETTINGS
+        DIRECTORY   = Samples\FWMediaChanger
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=HTTPClient1
+    SETTINGS
+        DIRECTORY   = Samples\HTTPClient1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDEncode
+        CIDNet
+        CIDSChan
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=ImgCvt
+    SETTINGS
+        DIRECTORY   = Samples\ImgCvt
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDImage
+        CIDJPEG
+        CIDPNG
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Locale1
+    SETTINGS
+        DIRECTORY   = Samples\Locale1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=MakePreviews
+    SETTINGS
+        DIRECTORY   = Samples\MakePreviews
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDImage
+        CIDJPEG
+        CIDPNG
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=HTTPSrv1
+    SETTINGS
+        DIRECTORY   = Samples\HTTPSrv1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDEncode
+        CIDCrypto
+        CIDSChan
+        CIDNet
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=JSON1
+    SETTINGS
+        DIRECTORY   = Samples\JSON1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDEncode
+        CIDNet
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=SpReco1
+    SETTINGS
+        DIRECTORY   = Samples\SpReco1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDSpReco
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=MetaExtract
+    SETTINGS
+        DIRECTORY   = Samples\MetaExtract
+        SAMPLE      = Yes
+    END SETTINGS
+
+    ; For now only Win32 until CIDMetaExtr gets sorted out for portability
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDLib
+        CIDMetaExtr
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Pack1
+    SETTINGS
+        DIRECTORY   = Samples\Pack1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDPack
+        CIDCrypto
+        CIDZLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Process1
+    SETTINGS
+        DIRECTORY   = Samples\Process1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Process2
+    SETTINGS
+        DIRECTORY   = Samples\Process2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=RandGen
+    SETTINGS
+        DIRECTORY   = Samples\RandGen
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDCrypto
+        CIDMath
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=Reg1
+    SETTINGS
+        DIRECTORY   = Samples\Reg1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=RegEx1
+    SETTINGS
+        DIRECTORY   = Samples\RegEx1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDRegX
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=RTTI1
+    SETTINGS
+        DIRECTORY   = Samples\RTTI1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=SpGrammarComp
+    SETTINGS
+        DIRECTORY   = Samples\SpGrammarComp
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDSpReco
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=Speech
+    SETTINGS
+        DIRECTORY   = Samples\Speech
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestService
+    SETTINGS
+        DIRECTORY   = Tests\TestService
+    END SETTINGS
+
+    ; For now only Win32, until services get portable
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestServiceInst
+    SETTINGS
+        DIRECTORY   = Tests\TestService\Install
+    END SETTINGS
+
+    ; For now only Win32, until services get portable
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=SMTP1
+    SETTINGS
+        DIRECTORY   = Samples\SMTP1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDNet
+        CIDSChan
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Sock1
+    SETTINGS
+        DIRECTORY   = Samples\Sock1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDSock
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Sock2
+    SETTINGS
+        DIRECTORY   = Samples\Sock2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDSock
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=SockPing
+    SETTINGS
+        DIRECTORY   = Samples\SockPing
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDSock
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Streams1
+    SETTINGS
+        DIRECTORY   = Samples\Streams1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Streams2
+    SETTINGS
+        DIRECTORY   = Samples\Streams2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMath
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Streams3
+    SETTINGS
+        DIRECTORY   = Samples\Streams3
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Streams4
+    SETTINGS
+        DIRECTORY   = Samples\Streams4
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Streams5
+    SETTINGS
+        DIRECTORY   = Samples\Streams5
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=Streams6
+    SETTINGS
+        DIRECTORY   = Samples\Streams6
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=UPnP1
+    SETTINGS
+        DIRECTORY   = Samples\UPnP1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDKernel
+        CIDLib
+        CIDUPnP
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=WakeOnLAN
+    SETTINGS
+        DIRECTORY   = Samples\WakeOnLAN
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDSock
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=XMLDemo1
+    SETTINGS
+        DIRECTORY   = Samples\XMLDemo1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDXML
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=XMLDemo2
+    SETTINGS
+        DIRECTORY   = Samples\XMLDemo2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDXML
+    END DEPENDENTS
+END PROJECT
+
+
+; For random trying stuff
+;PROJECT=Test
+;    SETTINGS
+;        DIRECTORY   = Samples\Test
+;        SAMPLE      = Yes
+;    END SETTINGS
+;
+;    DEPENDENTS
+;        CIDSChan
+;    END DEPENDENTS
+;END PROJECT
+
+
+; ----------------------------------------------------------------------------
+;  A project to reuse for some videos we make to demonstrate CIDLib and whatnot
+; ----------------------------------------------------------------------------
+
+;PROJECT=VideoDemoS
+;
+;    SETTINGS
+;        DIRECTORY   = Demos\VideoDemo\Server
+;        SAMPLE      = Yes
+;        MSGFILE     = Yes
+;    END SETTINGS
+;
+;    IDLFILES
+;        IDLFILE
+;            SRCFILE = ..\VideoDemo_Intf
+;            GEN     = SERVER
+;            NAMEEXT = Intf
+;        END IDLFILE
+;    END IDLFILES
+;
+;    DEPENDENTS
+;        CIDLib
+;        CIDOrb
+;        CIDOrbUC
+;        VideoDemoSh
+;    END DEPENDENTS
+;
+;END PROJECT
+;
+;PROJECT=VideoDemoC
+;
+;    SETTINGS
+;        DIRECTORY   = Demos\VideoDemo\Client
+;        SAMPLE      = Yes
+;    END SETTINGS
+;
+;    IDLFILES
+;        IDLFILE
+;            SRCFILE = ..\VideoDemo_Intf
+;            GEN     = CLIENT
+;            NAMEEXT = Intf
+;        END IDLFILE
+;    END IDLFILES
+;
+;    DEPENDENTS
+;        CIDLib
+;        CIDOrb
+;        CIDOrbUC
+;        VideoDemoSh
+;    END DEPENDENTS
+;
+;END PROJECT
+;
+;PROJECT=VideoDemoSh
+;
+;    SETTINGS
+;        DIRECTORY   = Demos\VideoDemo\Shared
+;        DISPLAY     = N/A
+;        EXPORT      = VIDEODEMOSHEXP
+;        TYPE        = SharedLib
+;        VERSIONED   = Yes
+;    END SETTINGS
+;
+;    IDLFILES
+;        IDLFILE
+;            SRCFILE = VideoDemoSh_Types
+;            GEN     = GLOBALS
+;            NAMEEXT = Types
+;        END IDLFILE
+;    END IDLFILES
+;
+;    DEPENDENTS
+;        CIDLib
+;    END DEPENDENTS
+;
+;END PROJECT
+
+
+; ----------------------------------------------------------------------------
+;  A reusable project for testing out things
+; ----------------------------------------------------------------------------
+PROJECT=JunkStuff
+
+    SETTINGS
+        DIRECTORY   = Tests\JunkStuff
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDRegX
+    END DEPENDENTS
+
+END PROJECT
+

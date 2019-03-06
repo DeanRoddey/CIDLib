@@ -1,0 +1,200 @@
+//
+//  This one demonstrates basic authentication. You will be prompted
+//  for a URL that requires basic authentication. Include the user name
+//  and password in the URL.
+//
+//  Of course in a situation where you use a known URL, you could just
+//  provide the user name and password separately from the URL.
+//
+//  And in a scenario where you repeatedly access the same URL, you can
+//  cache the authorization info after the first round and just send it
+//  in preemptively after that, to avoid the double access.
+//
+Class=[Final]
+    ClassPath MEng.User.Tests.TestHTTPClient2;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.HTTPClient;
+    MEng.System.Runtime.KVPair;
+    MEng.System.Runtime.URL;
+    MEng.User.Tests.TestHelpers;
+EndImports;
+
+Types=
+    VectorOf[KVPair]    KVList;
+EndTypes;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    HTTPClient          m_HTTPClient;
+    URL                 m_URL;
+    URL                 m_URL2;
+    String              m_UserName;
+    String              m_Password;
+EndMembers;
+
+
+Methods=[Private,Final]
+
+    //
+    //  A little helper to keep the main code cleaner. Parses the
+    //  passed authorization request hdr line, checks that it really
+    //  is asking for basic authorization. If so, builds up the
+    //  required outgoing lien and gives it back.
+    //
+    Method BuildAuthStr([InOut] String ToParse) Returns Boolean
+    Begin
+        Locals=
+            HTTPAuthTypes   AuthType;
+            String          Realm;
+            String          Nonce;
+            String          Opaque;
+            String          Domain;
+            String          Algorithm;
+        EndLocals;
+
+        AuthType := m_HTTPClient.ParseAuthReq
+        (
+            ToParse
+            , Realm
+            , Nonce
+            , Opaque
+            , Domain
+            , Algorithm
+        );
+
+        If (AuthType != HTTPAuthTypes.Basic)
+            m_Helper.PrintErr("Request was not for Basic type", m_Output, $CurLine);
+            Return False;
+        EndIf;
+
+        //
+        //  For basic, all that really matters is the realm and even there
+        //  only for caching of login info. All we need to for this simple
+        //  test is build up the reply info. We'll build it back into the
+        //  caller's string parm.
+        //
+        m_HTTPClient.CreateBasicAuthStr(m_UserName, m_Password, ToParse);
+
+        // This just creates the hash, prepend the basic type
+        ToParse.Prepend("Basic ");
+        Return True;
+    EndMethod;
+
+EndMethods;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+    Begin
+    EndConstructor;
+
+
+    Method Start([In] String SrcURL) Returns Int4
+    Begin
+        Locals=
+            Boolean OutBody;
+            Card4   Index;
+            Card4   Count;
+            Card4   ResCode;
+            String  ReplyText;
+            KVList  HdrInLines;
+            KVList  HdrOutLines;
+            String  ContType;
+            String  AuthInfo;
+            Card4   ContLen;
+            MemBuf  BodyText(4096, 100000);
+            KVPair  KVal;
+        EndLocals;
+
+        Try
+            // Set up the URL to the page we'll get
+            m_URL.Set(SrcURL, FQTypes.Full);
+
+            //
+            //  Make sure it has user name/password info and store that
+            //  for later use.
+            //
+            m_URL.GetUserName(m_UserName);
+            m_URL.GetPassword(m_Password);
+            If (m_UserName.IsEmpty() || m_Password.IsEmpty())
+                m_Helper.PrintErr("URL did not have name/password", m_Output, $CurLine);
+                Return -1;
+            EndIf;
+
+            // Do a GET
+            ResCode := m_HTTPClient.SendGET
+            (
+                m_URL
+                , 8000
+                , "CIDLib HTTP Client Test/1.0"
+                , "text/html"
+                , ReplyText
+                , HdrInLines
+                , ContType
+                , BodyText
+                , ContLen
+                , OutBody
+                , HdrOutLines
+            );
+
+            // It should return a 401
+            If (ResCode != m_HTTPClient.kHTTPCode_AuthRequired)
+                m_Helper.PrintErr("Did not get auth request", m_Output, $CurLine);
+                Return -1;
+            EndIf;
+
+            // Find the authorization line
+            If (!m_HTTPClient.FindHdrLine(HdrInLines, "WWW-Authenticate", AuthInfo))
+                m_Helper.PrintErr("No authenticate hdr line found", m_Output, $CurLine);
+                Return -1;
+            EndIf;
+
+            // Parse the line and get the info we need for basic authentication
+            If (!BuildAuthStr(AuthInfo))
+                m_Helper.PrintErr("Could not build auth info", m_Output, $CurLine);
+                Return -1;
+            EndIf;
+
+            // OK set up the outgoing line witht he auth info
+            KVal.Set("Authorization", AuthInfo);
+            HdrOutLines.AddObject(KVal);
+
+            // And re-issue the request
+            ResCode := m_HTTPClient.SendGET
+            (
+                m_URL
+                , 8000
+                , "CIDLib HTTP Client Test/1.0"
+                , "text/html"
+                , ReplyText
+                , HdrInLines
+                , ContType
+                , BodyText
+                , ContLen
+                , OutBody
+                , HdrOutLines
+            );
+
+            If (ResCode != m_HTTPClient.kHTTPCode_OK)
+                m_Helper.PrintErr("The return code was not OK", m_Output, $CurLine);
+                Return -1;
+            EndIf;
+        EndTry;
+
+        Catch
+            m_Helper.PrintErr("Exception during GET operation", m_Output, $CurLine);
+            Return -1;
+        EndCatch;
+
+        m_Output.Flush();
+        Return 0;
+    EndMethod;
+
+EndMethods;

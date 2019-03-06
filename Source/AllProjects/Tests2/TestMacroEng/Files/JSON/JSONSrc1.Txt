@@ -1,0 +1,40 @@
+{
+    "Elem1": {
+            "Attr1": "1",
+            "Attr2": "2",
+            "SubElem1": {
+                    "Attr1": 11,
+                    "Attr2": 12,
+                    "Attr3": 13
+            }
+    },
+
+    "Elem2": {
+            "Attr21" : "21",
+            "Attr22" : "22"
+    },
+
+    "Elem3": {
+            "Attr31" : "\t\r\n\\\"\'\v"
+    },
+
+    "Thermos": [
+        {
+            "name" : "Thermo1",
+            "Events":[
+                   "VacationTest",
+                   "2012-05-09",
+                   "12:00:00",
+                   "2012-05-09",
+                   "17:00:00"
+            ]
+        }
+    ],
+
+    "Elem4": [ 1, null, true, false, "last" ],
+
+    "Elem5": [],
+
+    "Elem6": 12.3
+}
+

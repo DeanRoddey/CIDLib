@@ -1,0 +1,46 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestDerivedClass;
+    ParentClass MEng.User.Tests.TestBaseClass;
+EndClass;
+
+
+Members=
+    TestEnum    m_TestEnum;
+EndMembers;
+
+
+Methods=[Public,Final,Overrides]
+
+    Method Test([InOut] String Result) Returns Boolean
+    Begin
+        If (!Result.IsEmpty())
+            Result.Append(",");
+        EndIf;
+        Result.Append("DerivedClass");
+
+        Return $Parent.Test(Result);
+    EndMethod;
+
+    Method CallMe() Returns Boolean
+    Begin
+        Return $Parent.CallMe();
+    EndMethod;
+
+EndMethods;
+
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+        m_TestEnum := TestEnum.Value1;
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        Return 0;
+    EndMethod;
+
+EndMethods;
+
+

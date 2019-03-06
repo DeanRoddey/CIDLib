@@ -1,0 +1,45 @@
+;
+; FILE NAME: TestCIDLib.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 07/02/97
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  This file is part of a demonstration program of the CIDLib C++ Class
+;  libraries. Its contents are distributed 'as is', to provide guidance on
+;  the use of the CIDLib system. However, these demos are not intended to
+;  represent a full fledged applications. Any direct use of demo code in
+;  user applications is at the user's discretion, and no warranties are
+;  implied as to its correctness or applicability.
+;
+; DESCRIPTION:
+;
+;  This is the message text file for the facility. This file is used to
+;  create the binary message file and the Hpp file with the ids for the
+;  messages.
+;
+;  This program just has some test strings that are used in testing the
+;  message loading stuff.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kTestErrs
+    MsgPref=kTestMsgs
+END CTRL
+
+
+MESSAGES=
+
+    midTest1   17000   This is test string 1
+    midTest2   17001   This is test string 2
+    midTest3   17002   This is %(1) string %(2)
+
+END MESSAGES
+

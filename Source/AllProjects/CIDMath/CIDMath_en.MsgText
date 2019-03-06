@@ -1,0 +1,53 @@
+;
+; FILE NAME: CIDMath.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 01/04/1998
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kMathErrs
+    MsgPref=kMathMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;   Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; Float area errors
+    errcFArea_BadCoord          1000    %(1) of %(2) would be on wrong side of %(3) of %(4)
+
+	; Graph errors
+	errcGraph_BadIndex			2000	%(1) is not a valid index for this graph oject
+
+    ; Value map errors
+    errcVMap_BadElemSize        6000    %(1) is not a valid element size
+    errcVMap_RangeIndexError    6001    %(1) is outside the range. Max Value=%(2)
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;   Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+

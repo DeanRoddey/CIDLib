@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - This one is just to generate some constants and types that need to
+  - be shared with non-C++ client apps, so that they don't have to replicate
+  - all of them, and to provide us with to/from text conversion methods.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Constants>
+
+            <CIDIDL:Constant CIDIDL:Name="strDlgFlag_Sizeable"
+                             CIDIDL:Type="TString" CIDIDL:Value="Sizeable">
+                <CIDIDL:DocText>
+                    The values that are used in the resource files to indicate dialog
+                    flags being enabled.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strDlgFlag_ScreenOrigin"
+                             CIDIDL:Type="TString" CIDIDL:Value="ScreenOrigin"/>
+            <CIDIDL:Constant CIDIDL:Name="strDlgFlag_SetFgn"
+                             CIDIDL:Type="TString" CIDIDL:Value="SetFgn"/>
+            <CIDIDL:Constant CIDIDL:Name="strDlgFlag_UseOrigin"
+                             CIDIDL:Type="TString" CIDIDL:Value="UseOrigin"/>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strDlgItemFlag_InitFocus"
+                             CIDIDL:Type="TString" CIDIDL:Value="InitFocus">
+                <CIDIDL:DocText>
+                    The values that are used in the resource files to indicate dlg
+                    item flags being enabled.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strDlgItemFlag_Disabled"
+                             CIDIDL:Type="TString" CIDIDL:Value="Disabled"/>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strHint_Animate"
+                             CIDIDL:Type="TString" CIDIDL:Value="Animate">
+                <CIDIDL:DocText>
+                    The dialog item hint strings we use, to keep from having literal
+                    strings all over the place.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strHint_AutoAll"
+                             CIDIDL:Type="TString" CIDIDL:Value="AutoAll"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_AutoLast"
+                             CIDIDL:Type="TString" CIDIDL:Value="AutoLast"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_AutoScroll"
+                             CIDIDL:Type="TString" CIDIDL:Value="AutoScroll"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_AutoSort"
+                             CIDIDL:Type="TString" CIDIDL:Value="AutoSort"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_AutoTicks"
+                             CIDIDL:Type="TString" CIDIDL:Value="AutoTicks"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Border"
+                             CIDIDL:Type="TString" CIDIDL:Value="Border"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Center"
+                             CIDIDL:Type="TString" CIDIDL:Value="Center"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_EndEllipsis"
+                             CIDIDL:Type="TString" CIDIDL:Value="EndEllipsis"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_CheckBox"
+                             CIDIDL:Type="TString" CIDIDL:Value="CheckBox"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_ColSort"
+                             CIDIDL:Type="TString" CIDIDL:Value="ColSort"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_CurValue"
+                             CIDIDL:Type="TString" CIDIDL:Value="CurValue"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_DefButton"
+                             CIDIDL:Type="TString" CIDIDL:Value="DefButton"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_EmphVal"
+                             CIDIDL:Type="TString" CIDIDL:Value="EmphVal"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_FinePrint"
+                             CIDIDL:Type="TString" CIDIDL:Value="FinePrint"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_FixedFirst"
+                             CIDIDL:Type="TString" CIDIDL:Value="FixedFirst"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Grid"
+                             CIDIDL:Type="TString" CIDIDL:Value="Grid"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Group"
+                             CIDIDL:Type="TString" CIDIDL:Value="Group"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_HorzScroll"
+                             CIDIDL:Type="TString" CIDIDL:Value="HorzScroll"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Instruct"
+                             CIDIDL:Type="TString" CIDIDL:Value="Instruct"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Invoke"
+                             CIDIDL:Type="TString" CIDIDL:Value="Invoke"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Label"
+                             CIDIDL:Type="TString" CIDIDL:Value="Label"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_LeftSide"
+                             CIDIDL:Type="TString" CIDIDL:Value="LeftSide"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_LiveTrack"
+                             CIDIDL:Type="TString" CIDIDL:Value="LiveTrack"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_MultiVal"
+                             CIDIDL:Type="TString" CIDIDL:Value="MultiVal"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_NoAutoCheck"
+                             CIDIDL:Type="TString" CIDIDL:Value="NoAutoCheck"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_NoBorder"
+                             CIDIDL:Type="TString" CIDIDL:Value="NoBorder"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_NoTitles"
+                             CIDIDL:Type="TString" CIDIDL:Value="NoTitles"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Number"
+                             CIDIDL:Type="TString" CIDIDL:Value="Number"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_ParentMenu"
+                             CIDIDL:Type="TString" CIDIDL:Value="ParentMenu"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Password"
+                             CIDIDL:Type="TString" CIDIDL:Value="Password"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Prefix"
+                             CIDIDL:Type="TString" CIDIDL:Value="Prefix"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_ReadOnly"
+                             CIDIDL:Type="TString" CIDIDL:Value="ReadOnly"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_ReportChanges"
+                             CIDIDL:Type="TString" CIDIDL:Value="ReportChanges"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_ReportClicks"
+                             CIDIDL:Type="TString" CIDIDL:Value="ReportClicks"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_SourceCode"
+                             CIDIDL:Type="TString" CIDIDL:Value="SourceCode"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Sort"
+                             CIDIDL:Type="TString" CIDIDL:Value="Sort"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Ticks"
+                             CIDIDL:Type="TString" CIDIDL:Value="Ticks"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_TopLevel"
+                             CIDIDL:Type="TString" CIDIDL:Value="TopLevel"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Title"
+                             CIDIDL:Type="TString" CIDIDL:Value="Title"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Transparent"
+                             CIDIDL:Type="TString" CIDIDL:Value="Transparent"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_TwoLine"
+                             CIDIDL:Type="TString" CIDIDL:Value="TwoLine"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Vertical"
+                             CIDIDL:Type="TString" CIDIDL:Value="Vertical"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_VertScroll"
+                             CIDIDL:Type="TString" CIDIDL:Value="VertScroll"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_WantEnter"
+                             CIDIDL:Type="TString" CIDIDL:Value="WantEnter"/>
+            <CIDIDL:Constant CIDIDL:Name="strHint_Wrap"
+                             CIDIDL:Type="TString" CIDIDL:Value="Wrap"/>
+        </CIDIDL:Constants>
+
+
+        <CIDIDL:Types>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ECalStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    The calendar widget specific styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="SizeTo"    CIDIDL:Value="0x00000001"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ECBStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    The calendar widget specific styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="NoAuto"    CIDIDL:Value="0x00000001"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EComboStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    The styles for the combo box control
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="ReadOnly"  CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Sort"      CIDIDL:Value="0x00000002"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ECustDrFlags" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    The flags for the custom drawing callback
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Disabled"  CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Selected"  CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Focus"     CIDIDL:Value="0x00000004"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EEFStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Entry field specific styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Password"      CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Number"        CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="UpperCase"     CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="CueOnFocus"    CIDIDL:Value="0x00000008"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ParentMenu"    CIDIDL:Value="0x00000010"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ReadOnly"      CIDIDL:Value="0x00000020"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EFOpenOpts" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    File open dialog options.
+
+                    FileSystemOnly means just file system objects, no desktop and whatnot. There
+                    is a separate parameter for what type of things to allow (files, paths, or
+                    either.)
+
+                    SelectFolders means they can only select paths, not files. Otherwise it can
+                    be either and the caller has to check for paths and ignore them if he doesn't
+                    accept them.
+
+                    They don't map directly to any underlying values, so actual values don't
+                    matter other than for backwards binary compability.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="ConfirmPrompt"     CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="FileMustExist"     CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="FileSystemOnly"    CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MultiSelect"       CIDIDL:Value="0x00000008"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NoReadOnly"        CIDIDL:Value="0x00000010"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PathMustExist"     CIDIDL:Value="0x00000020"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SelectFolders"     CIDIDL:Value="0x00000040"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ShowSpecialFiles"  CIDIDL:Value="0x00000080"/>
+                <CIDIDL:EnumVal CIDIDL:Name="StrictTypes"       CIDIDL:Value="0x00000100"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EFrameStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Frame window specific styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="NoActivate"        CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="StatusBar"         CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MaxButton"         CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MinButton"         CIDIDL:Value="0x00000008"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SysMenu"           CIDIDL:Value="0x00000010"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NoClose"           CIDIDL:Value="0x10000000"/>
+
+                <CIDIDL:EnumSyn CIDIDL:Name="StdFrame"          CIDIDL:Value="0x0000001C"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="StdSBFrame"        CIDIDL:Value="0x0000001E"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="NoCloseStdFrame"   CIDIDL:Value="0x1000001C"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ELBStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    List box specific styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Sorted"        CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MultiSel"      CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ScrollAlways"  CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ReadOnly"      CIDIDL:Value="0x00000008"/>
+                <CIDIDL:EnumVal CIDIDL:Name="AutoAddBottom" CIDIDL:Value="0x00000010"/>
+                <CIDIDL:EnumVal CIDIDL:Name="CustDraw"      CIDIDL:Value="0x00000020"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMCLBStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    List box specific styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="NoTitles"      CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MultiSel"      CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="FullRowSel"    CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="AutoLastCol"   CIDIDL:Value="0x00000008"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NoColResize"   CIDIDL:Value="0x00000010"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ColSort"       CIDIDL:Value="0x00000020"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DblBuffer"     CIDIDL:Value="0x00000040"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Sorted"        CIDIDL:Value="0x00000080"/>
+                <CIDIDL:EnumVal CIDIDL:Name="FocusSel"      CIDIDL:Value="0x00000100"/>
+                <CIDIDL:EnumVal CIDIDL:Name="GridLines"     CIDIDL:Value="0x00000200"/>
+
+                <CIDIDL:EnumSyn CIDIDL:Name="AutoSort"      CIDIDL:Value="0x000000A0"/>
+            </CIDIDL:Enum>
+
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMCLBCustOpts" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Multi-column list custom draw options
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="PreRow"    CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PostRow"   CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PreCol"    CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PostCol"   CIDIDL:Value="0x00000008"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PostDraw"  CIDIDL:Value="0x00000010"/>
+
+                <CIDIDL:EnumSyn CIDIDL:Name="All"       CIDIDL:Value="0x0000001F"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="AllPost"   CIDIDL:Value="0x0000001A"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="AllPre"    CIDIDL:Value="0x00000005"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="AllRowCol" CIDIDL:Value="0x0000000F"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMCLBCustRets" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Multi-column list custom draw return values
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="NewFont"       CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DontDraw"      CIDIDL:Value="0x00000004"/>
+
+                <CIDIDL:EnumVal CIDIDL:Name="NewTextClr"    CIDIDL:Value="0x10000000"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NewBgnClr"     CIDIDL:Value="0x20000000"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMLEStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Multi-line editor specific styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="AutoScroll"    CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="WantEnter"     CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ReadOnly"      CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ReportChanges" CIDIDL:Value="0x00000008"/>
+
+                <CIDIDL:EnumSyn CIDIDL:Name="Std"           CIDIDL:Value="0x00000003"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="StdReadOnly"   CIDIDL:Value="0x00000004"/>
+            </CIDIDL:Enum>
+
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMLSStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Multi-line static text specific styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="ReportClicks"  CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SizeToText"    CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NoWrap"        CIDIDL:Value="0x00000004"/>
+            </CIDIDL:Enum>
+
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMouseActs"
+                         CIDIDL:TextStreamMap="BaseName" >
+                <CIDIDL:DocText>
+                    Mouse activiation results
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Activate"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ActivateEat"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NoActivate"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NoActivateEat"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMouseButts" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="BaseName" CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The types of mouse buttons
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Left"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Middle"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Right"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMouseClicks" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="BaseName"  >
+                <CIDIDL:DocText>
+                    The types of mouse button clicks
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Down"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Up"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Double"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EObjVStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Object view styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="MultiSel"  CIDIDL:Value="0x00000001"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EPBarStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Progress bar styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Vertical"  CIDIDL:Value="0x00000001"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EPButtStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Push button styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Default"   CIDIDL:Value="0x00000001"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ERBStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Radio button styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="NoAuto"    CIDIDL:Value="0x00000001"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EScrAStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Scroll area styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="PlaceHolder"   CIDIDL:Value="0x1"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ESBStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Scroll bar styles for standalone scroll bars
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Placeholder"   CIDIDL:Value="0x1"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ESldrStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Multi-line static text specific styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="TrackEvs"  CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Ticks"     CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Vertical"  CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="AutoTicks" CIDIDL:Value="0x00000008"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ESpinStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Spin box styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Wrap"      CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Numeric"   CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ReadOnly"  CIDIDL:Value="0x00000004"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ESClrStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Static color styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="ReportClicks"  CIDIDL:Value="0x00000001"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ESImgStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Static image styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="ReportClicks"  CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Transparent"   CIDIDL:Value="0x00000002"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ESTextStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Static image styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="NoMnemonics"   CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ReportClicks"  CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="EndEllipsis"   CIDIDL:Value="0x00000004"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ETabWStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Tabbed window styles
+
+                    FixedFirst means the first tab cannot be moved out of the far left position.
+                    If the user selects other tabs from the drop down, they are moved to position
+                    1, not 0.
+
+                    TopLevel indicates that it's going to contain tabs that themselves contain tabbed
+                    windows. In that case it will register an extra set of Ctrl-F4/F6 handlers, whihch
+                    include Shift as well. This way, you can always force the top level tabbed window to
+                    respond even if you are within a nested one (which would otherwise eat the keys.)
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="TwoLineHdr"    CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="FixedFirst"    CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="TopLevel"      CIDIDL:Value="0x00000004"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ETreeStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Tree view styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="CheckBoxes"    CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="HasLines"      CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ReadOnly"      CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SingleExp"     CIDIDL:Value="0x00000008"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ToolTips"      CIDIDL:Value="0x00000010"/>
+                <CIDIDL:EnumVal CIDIDL:Name="InvokeOnEnter" CIDIDL:Value="0x00000020"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ETreeCustOpts" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Tree view styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="PreItem"   CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PostItem"  CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PostDraw"  CIDIDL:Value="0x00000004"/>
+
+                <CIDIDL:EnumSyn CIDIDL:Name="All"       CIDIDL:Value="0x00000007"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="AllItem"   CIDIDL:Value="0x00000003"/>
+            </CIDIDL:Enum>
+
+
+
+            <CIDIDL:Enum CIDIDL:Name="ETreeCustRets" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Tree view styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="NewFont"       CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NewTextClr"    CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NewBgnClr"     CIDIDL:Value="0x00000004"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EUpDnStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Up/Down control styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Wrap"      CIDIDL:Value="0x00000001"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EVSepStyles" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    Vertical separator styles
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Left"      CIDIDL:Value="0x00000001"/>
+            </CIDIDL:Enum>
+
+
+
+            <CIDIDL:Enum CIDIDL:Name="EWantInputs" CIDIDL:Type="Bmp"
+                         >
+                <CIDIDL:DocText>
+                    The 'want input' values that windows must set if they want to process
+                    certain types of keys, else the system will pass them on to other things.
+                    This is passed to TWindow:SetWantInput().
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="AllKeys"       CIDIDL:Value="0x0004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Arrows"        CIDIDL:Value="0x0001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Chars"         CIDIDL:Value="0x0080"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Tab"           CIDIDL:Value="0x0002"/>
+
+                <CIDIDL:EnumSyn CIDIDL:Name="CharsArrows"   CIDIDL:Value="0x0081"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="Everything"    CIDIDL:Value="0x0087"/>
+
+            </CIDIDL:Enum>
+
+
+        </CIDIDL:Types>
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+

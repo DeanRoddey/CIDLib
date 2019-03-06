@@ -1,0 +1,174 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestXCoder1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.TextXCoder;
+    MEng.System.Runtime.MemBuf;
+EndImports;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Card4               m_Count;
+    Card4               m_Count2;
+    String              m_Test1;
+    String              m_Test2;
+    Int4                m_RetVal;
+    MemBuf              m_Buf;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Helper();
+        m_Output();
+        m_Test1("12345678901234567890123456789012");
+        m_RetVal(0);
+        m_Buf(32, 32);
+    Begin
+    EndConstructor;
+
+
+    Method TestErrActs()
+    Begin
+        Locals=
+            Boolean     CaughtIt;
+            TextXCoder  XCoder("Latin3");
+        EndLocals;
+
+        // Set up some data in the source buffer
+        m_Buf.PutCard1At(0, 0x61);
+        m_Buf.PutCard1At(1, 0x62);
+        m_Buf.PutCard1At(2, 0xC3);
+        m_Buf.PutCard1At(3, 0x63);
+        m_Buf.PutCard1At(4, 0x64);
+
+        // Set the transcoder to throw mode. This one should fail first time
+        XCoder.SetErrorAction(CvtErrActs.Throw);
+        CaughtIt := False;
+        Try
+            XCoder.ConvertFrom(m_Buf, 5, m_Test1);
+        EndTry;
+
+        Catch
+            CaughtIt := True;
+        EndCatch;
+
+        If (!CaughtIt)
+            m_Helper.PrintErr("Throw mode failed to catch bad src text", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Set stop/throw mode, which should get 2 bytes, then fail.
+        XCoder.SetErrorAction(CvtErrActs.StopThrow);
+        CaughtIt := False;
+        Try
+            m_Count2 := XCoder.ConvertFrom(m_Buf, 5, m_Test1);
+        EndTry;
+
+        Catch
+            CaughtIt := True;
+        EndCatch;
+
+        If (CaughtIt)
+            m_Helper.PrintErr("Stop/Throw mode failed on first call", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Count2 != 2)
+            m_Helper.PrintErr("Stop/Throw mode didn't do 2 chars first round", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Now this one should fail 
+        CaughtIt := False;
+        Try
+            XCoder.ConvertFromRange(m_Buf, 2, 3, m_Test1);
+        EndTry;
+
+        Catch
+            CaughtIt := True;
+        EndCatch;
+
+        If (!CaughtIt)
+            m_Helper.PrintErr("/StopThrow mode didn't fail second time", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Now set the replacement character mode
+        XCoder.SetErrorAction(CvtErrActs.RepChar);
+        XCoder.SetRepChar('$');
+        CaughtIt := False;
+        Try
+            XCoder.ConvertFrom(m_Buf, 5, m_Test1);
+        EndTry;
+
+        Catch
+            CaughtIt := True;
+        EndCatch;
+
+        If (CaughtIt)
+            m_Helper.PrintErr("RepChar mode failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        Else
+            If (m_Test1 != "ab$cd")
+                m_Helper.PrintErr("RepChar mode caused wrong output", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndIf;
+
+    EndMethod;
+
+
+    // Do a simple round trip transcode
+    Method TestRoundTrip()
+    Begin
+        Locals=
+            TextXCoder XCoder("USASCII");
+        EndLocals;
+
+        // Transcode the test 1 contents to the buffer and check the counts
+        m_Count := XCoder.ConvertTo(m_Test1, m_Buf, m_Count2);
+        If ((m_Count != 32) || (m_Count2 != 32))
+            m_Helper.PrintErr("Bad xcode to counts", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Now got the other way to another string
+        m_Count := XCoder.ConvertFrom(m_Buf, 32, m_Test2);
+        If ((m_Count != 32) || (m_Count2 != 32))
+            m_Helper.PrintErr("Bad xcode from counts", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // We should have gotten the same char back
+        If (m_Test1 != m_Test2)
+            m_Helper.PrintErr("Round trip text not equal", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+    EndMethod;
+
+
+
+    Method Start() Returns Int4
+
+    Begin
+        // Test simple round tripping
+        TestRoundTrip();
+
+        // Test the various error modes
+        TestErrActs();
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+
+

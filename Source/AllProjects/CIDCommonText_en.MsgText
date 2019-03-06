@@ -1,0 +1,127 @@
+;
+; FILE NAME: CIDCommontext.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 06/15/2007
+;
+; COPYRIGHT: 2007..2007, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message text for the common loadable text symbols.
+;  These are loaded as the special text symbols and are available to any
+;  facility's dialog definitions, so that we can avoid redundantly creating
+;  loadable text versions of stuff like OK, Cancel, Save, etc...
+;
+;  They reference these using a syntax like [Close]. We see the brackets and
+;  pull that out and create a symbol name like midCTxt_Close and see if that
+;  is one of the symbols below.
+;
+;  To keep all msgs with unique ids, these go from 30,000 up. This leave the values
+;  below that for errors and messages.
+;
+; CAVEATS/GOTCHAS:
+;
+;   1)  PUT NEW ONES at the end of their respective ranges, else you have
+;       to force a rebuild because there's no header for these that will force
+;       a rebuild if you change the ids of existing ones
+;
+;  LOG:
+;
+;   $Log$
+;
+
+; This has to be first, but we don't use it for this file
+CTRL=
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Message ids
+; ----------------------------------------------------------------------------
+
+COMMON=
+
+    ;
+    ; These are the common loadable text strings. These can be refereced
+    ; from any facility's dialog descriptions using a special syntax. They
+    ; must have this prefix.
+    ;
+
+    ; Some commmon words without mnemonics
+    midCTxt_Accept                  30001      Accept
+    midCTxt_AddNew                  30002      Add New
+    midCTxt_Cancel                  30004      Cancel
+    midCTxt_Change                  30005      Change
+    midCTxt_Close                   30006      Close
+    midCTxt_Continue                30007      Continue
+    midCTxt_Copy                    30008      Copy
+    midCTxt_Create                  30009      Create
+    midCTxt_Cut                     30010      Cut
+    midCTxt_Delete                  30011      Delete
+    midCTxt_Edit                    30012      Edit
+    midCTxt_Exit                    30013      Exit
+    midCTxt_Open                    30014      Open
+    midCTxt_OK                      30015      OK
+    midCTxt_New                     30016      New
+    midCTxt_Paste                   30017      Paste
+    midCTxt_Remove                  30018      Remove
+    midCTxt_RemoveAll               30019      Remove All
+    midCTxt_Revert                  30020      Revert
+    midCTxt_Save                    30021      Save
+    midCTxt_Select                  30022      Select
+    midCTxt_Add                     30023      Add
+    midCTxt_Update                  30024      Update
+    midCTxt_Discard                 30025      Discard
+
+    ; Some that often want to have ellipsis
+    midCTxt_AddE                    30050      Add...
+    midCTxt_Browse                  30051      Browse...
+    midCTxt_ChangeE                 30052      Change...
+    midCTxt_CreateE                 30053      Create...
+    midCTxt_EditE                   30054      Edit...
+    midCTxt_NewE                    30055      New...
+    midCTxt_OpenE                   30056      Open...
+    midCTxt_UpdateE                 30057      Update...
+
+    ; The same commmon words with mnemonics
+    midCTxt_MnAddNew                30101     &Add New
+    midCTxt_MnAccept                30102     &Accept
+    midCTxt_MnCancel                30104     &Cancel
+    midCTxt_MnChange                30105     C&hange
+    midCTxt_MnClose                 30106     &Close
+    midCTxt_MnContinue              30107     Contin&ue
+    midCTxt_MnCopy                  30108     C&opy
+    midCTxt_MnCreate                30109     C&reate
+    midCTxt_MnCut                   30110     Cu&t
+    midCTxt_MnDelete                30111     &Delete
+    midCTxt_MnEdit                  30112     &Edit
+    midCTxt_MnExit                  30113     E&xit
+    midCTxt_MnOpen                  30114     Ope&n
+    midCTxt_MnOK                    30115     O&K
+    midCTxt_MnNew                   30116     &New
+    midCTxt_MnPaste                 30117     &Paste
+    midCTxt_MnRemove                30118     Remo&ve
+    midCTxt_MnRemoveAll             30119     Remove A&ll
+    midCTxt_MnRevert                30120     &Revert
+    midCTxt_MnSave                  30121     &Save
+    midCTxt_MnSelect                30122     Selec&t
+    midCTxt_MnAdd                   30123     &Add
+    midCTxt_MnUpdate                30124     &Update
+    midCTxt_MnDiscard               30125     &Discard
+
+    ; And the same as the ellipsed ones but with Mnemonics
+    midCTxt_MnAddE                  30150     &Add...
+    midCTxt_MnBrowse                30151     &Browse...
+    midCTxt_MnChangeE               30152     C&hange...
+    midCTxt_MnCreateE               30153     C&reate...
+    midCTxt_MnEditE                 30154     &Edit...
+    midCTxt_MnNewE                  30155     &New...
+    midCTxt_MnOpenE                 30156     &Open...
+    midCTxt_MnUpdateE               30157     &Update...
+
+END COMMON
+

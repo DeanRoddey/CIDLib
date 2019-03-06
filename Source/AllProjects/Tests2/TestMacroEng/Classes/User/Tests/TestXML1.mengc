@@ -1,0 +1,476 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestXML1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.XMLTreeAnchor;
+    MEng.System.Runtime.XMLTreeParser;
+EndImports;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    TestHelpers         m_Helper;
+    XMLTreeParser       m_Parser;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    // A helper to format out a given XML parser error
+    Method FmtError([In] Card4 Index, [Out] String ToFill)
+    Begin
+        Locals=
+            String  ErrMsg;
+            String  EntityName;
+            Card4   Line;
+            Card4   Col;
+        EndLocals;
+
+        m_Parser.GetErrorAt(Index, EntityName, Line, Col, ErrMsg);
+        ToFill := "[L/C=";
+        ToFill.AppendCard4(Line, Radices.Dec);
+        ToFill.AppendChar('/');
+        ToFill.AppendCard4(Col, Radices.Dec);
+        ToFill.Append(", ");
+        ToFill.Append(EntityName);
+        ToFill.Append("] - ");
+        ToFill.Append(ErrMsg);
+        ToFill.Append("\r\n");
+    EndMethod;
+
+
+    //
+    //  Does the most basic tests on a very simple file that looks like
+    //  this:
+    //
+    //      <?xml version="1.0" encoding="ISO-8859-1"?>
+    //      <root Attr1="1" Attr2="2"/>
+    //
+    Method TestBasic()
+    Begin
+        Locals=
+            Boolean         GotIt;
+            Card4           ErrCnt;
+            XMLTreeAnchor   XAnchor;
+            String          Value1;
+            String          Value2;
+        EndLocals;
+
+        // Do a very simple test first
+        ErrCnt := m_Parser.ParseFile("/XMLTests/Test1.xml");
+        If (ErrCnt != 0)
+            m_Helper.PrintErr("XML parse errors from Test1 file", m_Output, $CurLine);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        // Make sure the we get an exception if we use the anchor without setup
+        GotIt := False;
+        Try
+            m_Parser.GetAttribute(XAnchor, "Attr1", Value1);
+        EndTry;
+
+        Catch
+            If ($Exception.Check(XMLTreeParserErrs.BadAnchor))
+                GotIt := True;
+            EndIf;
+        EndCatch;
+
+        //
+        //  This file only has a root element. Get an anchor for the root
+        //  element and check the element name.
+        //
+        m_Parser.GetRootAnchor(XAnchor);
+        m_Parser.GetElemName(XAnchor, Value1);
+        If (Value1 != "root")
+            m_Helper.PrintErr("Root element name was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Get the two attributes on the root element and check them
+        m_Parser.GetAttribute(XAnchor, "Attr1", Value1);
+        m_Parser.GetAttribute(XAnchor, "Attr2", Value2);
+        If ((Value1 != "1") || (Value2 != "2"))
+            m_Helper.PrintErr("Attributes values were incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    //
+    //  Does some tests of finding specific paths. The file looks like this:
+    //
+    //    <?xml version="1.0" encoding="ISO-8859-1"?>
+    //    <Root Attr1="1" Attr2="2">
+    //        <Child1/>
+    //        <Child2/>
+    //        <Child3 Inst="1">
+    //            <Anthony Inst="1"/>
+    //            <Barbara Inst="1"/>
+    //            <Candy Inst="1"/>
+    //            <Danny Inst="1"/>
+    //            <Danny Inst="2"/>
+    //            <Enzo Inst="1"/>
+    //            <Enzo Inst="2"/>
+    //            <Anthony Inst="2">
+    //                <AnthonysChild/>
+    //            </Anthony>
+    //            <Enzo Inst="3"/>
+    //            <Candy Inst="2"/>
+    //        </Child3>
+    //        <Child3 Inst="2"/>
+    //    </Root>
+    //
+    Method TestPathsHelper( [In]    String Path
+                            , [In]  String Elem
+                            , [In]  String Inst
+                            , [In]  Boolean ShouldFail) Returns Boolean
+    Begin
+        Locals=
+            XMLTreeAnchor   XAnchor;
+            String          InstVal;
+            String          ElemName;
+            String          ErrMsg;
+        EndLocals;
+
+        Try
+            m_Parser.GetAnchor(Path, XAnchor);
+            m_Parser.GetElemName(XAnchor, ElemName);
+            m_Parser.GetAttribute(XAnchor, "Inst", InstVal);
+        EndTry;
+
+        Catch
+            If (ShouldFail)
+                Return True;
+            Else
+                m_Helper.PrintErr($Exception.GetErrorText(), m_Output, $CurLine);
+                Return False;
+            EndIf;
+        EndCatch;
+
+        If (ElemName != Elem)
+            ErrMsg := "Got wrong element for path '";
+            ErrMsg.Append(Path);
+            ErrMsg.Append("'");
+            If (ShouldFail)
+                Return True;
+            Else
+                m_Helper.PrintErr(ErrMsg, m_Output, $CurLine);
+                Return False;
+            EndIf;
+        EndIf;
+
+        If (InstVal != Inst)
+            ErrMsg := "Got wrong element instance for path '";
+            ErrMsg.Append(Path);
+            ErrMsg.Append("'");
+            If (ShouldFail)
+                Return True;
+            Else
+                m_Helper.PrintErr(ErrMsg, m_Output, $CurLine);
+                Return False;
+            EndIf;
+        EndIf;
+
+        If (ShouldFail)
+            m_Helper.PrintErr("Test should have failed", m_Output, $CurLine);
+            Return False;
+        EndIf;
+
+        Return True;
+    EndMethod;
+
+
+    Method TestPaths()
+    Begin
+        Locals=
+            Card4   ErrCnt;
+            String  ErrMsg;
+        EndLocals;
+
+        ErrCnt := m_Parser.ParseFile("/XMLTests/Test2.xml");
+        If (ErrCnt != 0)
+            m_Helper.PrintErr("XML parse errors from Test2 file", m_Output, $CurLine);
+            FmtError(0, ErrMsg);
+            m_Helper.PrintErr(ErrMsg, m_Output, $CurLine);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        // Get the only instance of the Child 1 node
+        If (!TestPathsHelper("/Root/Child1", "Child1", "1", False))
+            m_RetVal := -1;
+        EndIf;
+
+        // Get the second instance of the Anthony node
+        If (!TestPathsHelper("/Root/Child3/Anthony[2]", "Anthony", "2", False))
+            m_RetVal := -1;
+        EndIf;
+
+        // Get the third instance of the Enzo node
+        If (!TestPathsHelper("/Root/Child3/Enzo[3]", "Enzo", "3", False))
+            m_RetVal := -1;
+        EndIf;
+
+        // This time, explicitly indicate the first Child3
+        If (!TestPathsHelper("/Root/Child3[1]/Enzo[3]", "Enzo", "3", False))
+            m_RetVal := -1;
+        EndIf;
+
+        // This one should fail. We use the wrong Child3
+        If (!TestPathsHelper("/Root/Child3[2]/Enzo[3]", "Enzo", "3", True))
+            m_RetVal := -1;
+        EndIf;
+
+        // Get the second instance of Anthony's child
+        If (!TestPathsHelper("/Root/Child3[1]/Anthony[2]/AnthonysChild[2]", "AnthonysChild", "2", False))
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    //
+    //  Does some tests getting text out of the XML nodes. The file looks
+    //  like this:
+    //
+    //    <?xml version="1.0" encoding="ISO-8859-1"?>
+    //    <root>
+    //        Text 1
+    //        <Child1/>
+    //        Text 2
+    //        <Child2>Child Text</Child2>
+    //    </root>
+    //
+    Method TestText()
+    Begin
+        Locals=
+            Card4           ErrCnt;
+            XMLTreeAnchor   XAnchor;
+            String          Value;
+        EndLocals;
+
+        // Do a very simple test first
+        ErrCnt := m_Parser.ParseFile("/XMLTests/Test3.xml");
+        If (ErrCnt != 0)
+            m_Helper.PrintErr("XML parse errors from Test3 file", m_Output, $CurLine);
+            FmtError(0, Value);
+            m_Helper.PrintErr(Value, m_Output, $CurLine);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        // Get all the text directly under the root
+        m_Parser.GetRootAnchor(XAnchor);
+        m_Parser.GetChildText(XAnchor, Value);
+        If (Value != "\n    Text 1\n    \n    Text 2\n    \n")
+            m_Helper.PrintErr("Root element text was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Get all the text under the Child1. It should be empty
+        m_Parser.GetAnchor("/root/Child1", XAnchor);
+        m_Parser.GetChildText(XAnchor, Value);
+        If (Value != "")
+            m_Helper.PrintErr("Element text was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Get all the text under the Child2
+        m_Parser.GetAnchor("/root/Child2", XAnchor);
+        m_Parser.GetChildText(XAnchor, Value);
+        If (Value != "Child Text")
+            m_Helper.PrintErr("Element text was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    //
+    //  Just makes sure that a simple file with a referenced DTD works
+    //  correctly and validates.
+    //
+    Method TestDTD()
+    Begin
+        Locals=
+            Card4   ErrCnt;
+            String  ErrMsg;
+        EndLocals;
+
+        m_Parser.SetOption(XMLTreeOpts.IgnoreDTD, False);
+        m_Parser.SetOption(XMLTreeOpts.Validate, True);
+        ErrCnt := m_Parser.ParseFile("\\XMLTests\\Test4.xml");
+
+        If (ErrCnt != 0)
+            FmtError(0, ErrMsg);
+            m_Helper.PrintErr(ErrMsg, m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do the same file via a URL
+        ErrCnt := m_Parser.ParseFile("file:/XMLTests/Test4.xml");
+        If (ErrCnt != 0)
+            FmtError(0, ErrMsg);
+            m_Helper.PrintErr(ErrMsg, m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test some failure scenarios. This one has content model errors
+        ErrCnt := m_Parser.ParseFile("\\XMLTests\\Test4Fail1.xml");
+        If (ErrCnt = 0)
+            m_Helper.PrintErr("Failed to catch error in Test4Fail1", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // This one should fail because the path to the DTD is invalid
+        ErrCnt := m_Parser.ParseFile("/XMLTests/Test4Fail2.xml");
+        If (ErrCnt = 0)
+            m_Helper.PrintErr("Failed to catch error in Test4Fail2", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    //
+    //  This is the same as TestText above, but parses from a memory buffer
+    //  instead of a string. So we import the text into a memory buffer,
+    //  which creates an ASCII text buffer, and then parse that.
+    //
+    Method TestMemBuf()
+    Begin
+        Locals=
+            Card4           ErrCnt;
+            XMLTreeAnchor   XAnchor;
+            String          Value;
+            MemBuf          MBufSrc;
+            Card4           SrcBytes;
+        EndLocals;
+
+        // Turn off validation for this one, we have no DTD
+        m_Parser.SetOption(XMLTreeOpts.Validate, False);
+
+        Value :=  "<?xml version='1.0' encoding='ASCII'?>\n";
+        Value.Append("<root>Text 1<Child1/>Text 2<Child2>Child Text</Child2></root>\n");
+        SrcBytes := MBufSrc.ImportString(Value, Card4.kMaxValue);
+
+        // Do a very simple test first
+        ErrCnt := m_Parser.ParseBuf(MBufSrc, SrcBytes);
+        If (ErrCnt != 0)
+            m_Helper.PrintErr("XML parse errors from buffer", m_Output, $CurLine);
+            FmtError(0, Value);
+            m_Helper.PrintErr(Value, m_Output, $CurLine);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        // Get all the text directly under the root
+        m_Parser.GetRootAnchor(XAnchor);
+        m_Parser.GetChildText(XAnchor, Value);
+        If (Value != "Text 1Text 2")
+            m_Helper.PrintErr("Root element text was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Get all the text under the Child1. It should be empty
+        m_Parser.GetAnchor("/root/Child1", XAnchor);
+        m_Parser.GetChildText(XAnchor, Value);
+        If (Value != "")
+            m_Helper.PrintErr("Element text was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Get all the text under the Child2
+        m_Parser.GetAnchor("/root/Child2", XAnchor);
+        m_Parser.GetChildText(XAnchor, Value);
+        If (Value != "Child Text")
+            m_Helper.PrintErr("Element text was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    // This is the same as above, but straight from the string
+    Method TestString()
+    Begin
+        Locals=
+            Card4           ErrCnt;
+            XMLTreeAnchor   XAnchor;
+            String          Value;
+        EndLocals;
+
+        // Turn off validation for this one, we have no DTD
+        m_Parser.SetOption(XMLTreeOpts.Validate, False);
+
+        Value :=  "<?xml version='1.0' encoding='$NativeWideChar$'?>\n";
+        Value.Append("<root>Text 1<Child1/>Text 2<Child2>Child Text</Child2></root>\n");
+
+        ErrCnt := m_Parser.ParseString(Value);
+        If (ErrCnt != 0)
+            m_Helper.PrintErr("XML parse errors from buffer", m_Output, $CurLine);
+            FmtError(0, Value);
+            m_Helper.PrintErr(Value, m_Output, $CurLine);
+            m_RetVal := -1;
+            Return;
+        EndIf;
+
+        // Get all the text directly under the root
+        m_Parser.GetRootAnchor(XAnchor);
+        m_Parser.GetChildText(XAnchor, Value);
+        If (Value != "Text 1Text 2")
+            m_Helper.PrintErr("Root element text was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Get all the text under the Child1. It should be empty
+        m_Parser.GetAnchor("/root/Child1", XAnchor);
+        m_Parser.GetChildText(XAnchor, Value);
+        If (Value != "")
+            m_Helper.PrintErr("Element text was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Get all the text under the Child2
+        m_Parser.GetAnchor("/root/Child2", XAnchor);
+        m_Parser.GetChildText(XAnchor, Value);
+        If (Value != "Child Text")
+            m_Helper.PrintErr("Element text was wrong", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    Method Start() Returns Int4
+    Begin
+        TestBasic();
+        TestPaths();
+        TestText();
+        TestDTD();
+        TestMemBuf();
+        TestString();
+
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+
+

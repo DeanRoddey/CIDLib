@@ -1,0 +1,50 @@
+;
+; FILE NAME: CIDWebBrowser.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 10/10/2005
+;
+; COPYRIGHT: 2005..2005, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This is the message text file for the facility.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kWBrsErrs
+    MsgPref=kWBrsMsgs
+END CTRL
+
+
+
+; ----------------------------------------------------------------------------
+;  Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    errcNoError                 0       No error
+
+    ; Options errors
+    errcOpt_UnknownOp           5000    %(1) is not a known web browser option
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+
+END MESSAGES
+
+

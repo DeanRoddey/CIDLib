@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - This one is just to generate some constants and types that need to
+  - be shared with non-C++ client apps, so that they don't have to replicate
+  - all of them, and to provide us with to/from text conversion methods.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Types>
+            <!-- The background mixing modes -->
+            <CIDIDL:Enum CIDIDL:Name="EBackMixModes" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="BaseName" 
+                         CIDIDL:FormatMap="BaseName" CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The available background mixing modes
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Opaque"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Transparent"/>
+            </CIDIDL:Enum>
+
+            <!-- Raster blit types -->
+            <CIDIDL:Enum CIDIDL:Name="EBltTypes" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:BinStream="Yes" 
+                         CIDIDL:FormatMap="BaseName" CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The facility class' eCalcPlacement uses this. It returns the type
+                    of blit that will be needed to do the calculated placement.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Clip"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Stretch"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Both"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Tile"/>
+            </CIDIDL:Enum>
+
+            <!-- The bitmap blitting modes -->
+            <CIDIDL:Enum CIDIDL:Name="EBmpModes" CIDIDL:BinStream="Yes"
+                         CIDIDL:XlatMap="BaseName" >
+                <CIDIDL:DocText>
+                    The available bitmap raster modes
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Blackness"/>
+                <CIDIDL:EnumVal CIDIDL:Name="CaptureBlt"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DstInvert"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MergeCopy"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MergePaint"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NoMirrorBitmap"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NotSrcCopy"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NotSrcErase"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PatCopy"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PatInvert"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PatPaint"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SrcAnd"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SrcCopy"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SrcErase"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SrcInvert"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SrcPaint"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Whiteness"/>
+            </CIDIDL:Enum>
+
+            <!-- The text drawing directions we support -->
+            <CIDIDL:Enum CIDIDL:Name="EFontDirs" CIDIDL:XlatMap="AltText"
+                         CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="AltText"
+                         CIDIDL:FormatMap="AltText" CIDIDL:IncDec="Inc"
+                          CIDIDL:AltTextSrc="Inline">
+                <CIDIDL:DocText>
+                    The text drawing directions we allow, which are basically 0, 90.
+                    180, and 270 degrees.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="D0"    CIDIDL:AltText="0"/>
+                <CIDIDL:EnumVal CIDIDL:Name="D90"   CIDIDL:AltText="90"/>
+                <CIDIDL:EnumVal CIDIDL:Name="D180"  CIDIDL:AltText="180"/>
+                <CIDIDL:EnumVal CIDIDL:Name="D270"  CIDIDL:AltText="270"/>
+            </CIDIDL:Enum>
+
+
+            <!-- The available font weights -->
+            <CIDIDL:Enum CIDIDL:Name="EFontWeights" CIDIDL:XlatMap="Text"
+                         CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="Text"
+                          CIDIDL:FormatMap="Text"
+                         CIDIDL:IncDec="Inc" CIDIDL:AltMap="BaseName">
+                <CIDIDL:DocText>
+                    The available font weights
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="DontCare" CIDIDL:Text="Don't Care"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Thin" CIDIDL:Text="Thin"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ExtraLight" CIDIDL:Text="ExtraLight"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Light" CIDIDL:Text="Light"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Normal" CIDIDL:Text="Normal"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Medium" CIDIDL:Text="Medium"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SemiBold" CIDIDL:Text="SemiBold"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Bold" CIDIDL:Text="Bold"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ExtraBold" CIDIDL:Text="ExtraBold"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Heavy" CIDIDL:Text="EHeavy"/>
+            </CIDIDL:Enum>
+
+
+            <!-- The available gradient fill directions -->
+            <CIDIDL:Enum CIDIDL:Name="EGradDirs" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
+                          CIDIDL:FormatMap="BaseName"
+                         CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The available gradient fill directions
+                </CIDIDL:DocText>
+
+                <CIDIDL:EnumVal CIDIDL:Name="Horizontal"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Vertical"/>
+                <CIDIDL:EnumVal CIDIDL:Name="UpDiagonal"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DownDiagonal"/>
+            </CIDIDL:Enum>
+
+
+            <!-- The available line end styles -->
+            <CIDIDL:Enum CIDIDL:Name="ELineEnds" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
+                          CIDIDL:FormatMap="BaseName"
+                         CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The available line end types. Controls how geometric lines that end
+                    at the same end point in a polygon will form a corner.
+                </CIDIDL:DocText>
+
+                <CIDIDL:EnumVal CIDIDL:Name="Flat"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Square"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Round"/>
+            </CIDIDL:Enum>
+
+            <!-- The available line join styles -->
+            <CIDIDL:Enum CIDIDL:Name="ELineJoins" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
+                          CIDIDL:FormatMap="BaseName"
+                         CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The available ine join styles.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Bevel"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Round"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Mitre"/>
+            </CIDIDL:Enum>
+
+            <!-- The available line styles  -->
+            <CIDIDL:Enum CIDIDL:Name="ELineStyles" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
+                          CIDIDL:FormatMap="BaseName"
+                         CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The available line drawing styles, Controls whether the line is
+                    solid or uses one of a set of periodic patterns.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Solid"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Dot"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Dash"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DashDot"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DashDoubleDot"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Invisible"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Alternate"/>
+            </CIDIDL:Enum>
+
+            <!-- The foreground mix modes -->
+            <CIDIDL:Enum CIDIDL:Name="EMixModes" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="BaseName" 
+                         CIDIDL:FormatMap="BaseName" CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The foreground mix modes
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Black"/>
+                <CIDIDL:EnumVal CIDIDL:Name="CopyPen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MaskNotPen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MaskPen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MaskPenNot"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MergeNotPen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MergePen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MergePenNot"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NOP"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Not"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NotCopyPen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NotMaskPen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NotMergePen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NotXorPen"/>
+                <CIDIDL:EnumVal CIDIDL:Name="White"/>
+                <CIDIDL:EnumVal CIDIDL:Name="XorPen"/>
+            </CIDIDL:Enum>
+
+
+            <!-- The available built in fill patterns -->
+            <CIDIDL:Enum CIDIDL:Name="EPatterns" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
+                          CIDIDL:FormatMap="BaseName"
+                         CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The available built in brush fill patterns. Others can be created
+                    using bitmaps, but these are always available.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Solid"/>
+                <CIDIDL:EnumVal CIDIDL:Name="BackDiagonal"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Cross"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DiagonalCross"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ForwardDiagonal"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Horizontal"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Vertical"/>
+            </CIDIDL:Enum>
+
+
+            <!-- The available image placement options -->
+            <CIDIDL:Enum CIDIDL:Name="EPlacement" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
+                          CIDIDL:FormatMap="BaseName"
+                         CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The placement options of images within their target display area.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Center"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SizeToFit"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Tile"/>
+                <CIDIDL:EnumVal CIDIDL:Name="UpperLeft"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SizeIfTooBig"/>
+                <CIDIDL:EnumVal CIDIDL:Name="KeepAR"/>
+                <CIDIDL:EnumVal CIDIDL:Name="FitAR"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum    CIDIDL:Name="ESysBmps" 
+                            CIDIDL:BinStream="Yes" CIDIDL:AltMap="BaseName"
+                            CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The system bitmaps
+
+                    This enum must remain zero based and contiguous. If you change it, adjust the
+                    mapping array in CIDGraphDev_Bitmap.cpp!
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Close"/>
+                <CIDIDL:EnumVal CIDIDL:Name="UpArrow"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DownArrow"/>
+                <CIDIDL:EnumVal CIDIDL:Name="RightArrow"/>
+                <CIDIDL:EnumVal CIDIDL:Name="LeftArrow"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Reduce"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Zoom"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Restore"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Reduced"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Zoomed"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Restored"/>
+                <CIDIDL:EnumVal CIDIDL:Name="UpArrowD"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DownArrowD"/>
+                <CIDIDL:EnumVal CIDIDL:Name="RightArrowD"/>
+                <CIDIDL:EnumVal CIDIDL:Name="LeftArrowD"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MnArrow"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Combo"/>
+                <CIDIDL:EnumVal CIDIDL:Name="UpArrowI"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DownArrowI"/>
+                <CIDIDL:EnumVal CIDIDL:Name="RightArrowI"/>
+                <CIDIDL:EnumVal CIDIDL:Name="LeftArrowI"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Size"/>
+                <CIDIDL:EnumVal CIDIDL:Name="BtSize"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Check"/>
+
+                <CIDIDL:EnumVal CIDIDL:Name="Halftone1"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Halftone2"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Halftone3"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Halftone4"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Halftone5"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Halftone6"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Halftone7"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Halftone8"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Halftone9"/>
+
+                <CIDIDL:EnumSyn CIDIDL:Name="FirstSys" CIDIDL:Value="Close"/>
+                <CIDIDL:EnumSyn CIDIDL:Name="LastSys" CIDIDL:Value="Check"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum    CIDIDL:Name="ESysPtrs"
+                            CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
+                            CIDIDL:XlatMap="BaseName" >
+                <CIDIDL:DocText>
+                    The available system pointers
+                </CIDIDL:DocText>
+
+                <CIDIDL:EnumVal CIDIDL:Name="AppStarting"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Arrow"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Cross"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Hand"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Help"/>
+                <CIDIDL:EnumVal CIDIDL:Name="IBeam"/>
+                <CIDIDL:EnumVal CIDIDL:Name="No"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SizeAll"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SizeNESW"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SizeNS"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SizeNWSE"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SizeWE"/>
+                <CIDIDL:EnumVal CIDIDL:Name="UpArrow"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Wait"/>
+            </CIDIDL:Enum>
+
+            <CIDIDL:Enum    CIDIDL:Name="ETextFX"
+                            CIDIDL:XlatMap="Text" CIDIDL:MsgNS="kGrDevMsgs"
+                            CIDIDL:MsgFac="CIDGraphDev()" CIDIDL:BinStream="Yes"
+                            CIDIDL:TextStreamMap="Text" CIDIDL:AltMap="BaseName"
+                             CIDIDL:FormatMap="Text"
+                            CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    This enum is used by the caption interface and most widgets that use this
+                    interface. It indicates what special text effect to use when drawing the
+                    text.
+
+                    NOTE:   Add new ones at the END, because this enum is streamed out
+                            to disk in various places.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None" CIDIDL:Text="midTextFX_None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Gradient" CIDIDL:Text="midTextFX_Gradient"/>
+                <CIDIDL:EnumVal CIDIDL:Name="GradientRefl" CIDIDL:Text="midTextFX_GradientRefl"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Reflected" CIDIDL:Text="midTextFX_Reflected"/>
+                <CIDIDL:EnumVal CIDIDL:Name="GaussianBlur" CIDIDL:Text="midTextFX_GaussianBlur"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DropShadow" CIDIDL:Text="midTextFX_DropShadow"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+
+

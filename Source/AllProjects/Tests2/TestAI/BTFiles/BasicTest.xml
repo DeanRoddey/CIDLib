@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE CQCCfg:DriverCfg PUBLIC "urn:charmedquark.com:CID-BehaviorTree.DTD"
+                           "CIDBehaviorTree.DTD">
+
+<BehaviorTree TreeName="BasicTest" Version="1">
+
+    <BTNode NodeType="/CIDAI/Sequence" NodeName="MainSeq">
+        <BTNode NodeType="/CIDAI/Sequence" NodeName="SubSeq">
+            <NodeParams>
+                <NodeParam Key="TestKey" Value="TestValue"/>
+            </NodeParams>
+        </BTNode>
+    </BTNode>
+
+</BehaviorTree>

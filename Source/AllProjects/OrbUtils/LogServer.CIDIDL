@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - This file defines the IDL for the CIDLib Logging Server interface.
+  - It allows client applications to log events (standard CIDLib TLogEvent
+  - objects) to a remove log server. CIDLib provides a standard Log Server
+  - implementation which will be good enough for most folks; however, if
+  - you need more, you can implement your own. Both the client proxy and
+  - server stub are exported via the CIDOrbUC facility.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:ClassIntf   CIDIDL:Name="CIDLogSrv"
+                        CIDIDL:InterfaceId="7F1112BEFF72CF9A-1A3600EA74289F30">
+
+        <!-- =================================================================
+          - Define some class specific constants
+          -  =================================================================
+          -->
+        <CIDIDL:Constants>
+            <CIDIDL:Constant CIDIDL:Name="strScope"
+                             CIDIDL:Type="TString"
+                             CIDIDL:Value="/CIDLib/CIDLogSrv"/>
+
+            <CIDIDL:Constant CIDIDL:Name="strAdminBinding"
+                             CIDIDL:Type="TString"
+                             CIDIDL:Value="/CIDLib/CIDLogSrv/CoreAdmin"/>
+
+            <CIDIDL:Constant CIDIDL:Name="strBinding"
+                             CIDIDL:Type="TString"
+                             CIDIDL:Value="/CIDLib/CIDLogSrv/LogObj"/>
+        </CIDIDL:Constants>
+
+
+        <!-- =================================================================
+          - Define the interface methods
+          -  =================================================================
+          -->
+        <CIDIDL:Methods>
+
+            <!-- =============================================================
+              - Queries the live log queue. The log server maintains at least
+              - 15 seconds of events in a live queue that can be queried. Each
+              - log event is numbered, so the caller initially passes in 0,
+              - and gets the current events. The parm is updated with the number
+              - of the next message it should get. As long as the client comes
+              - back within 15 seconds, it won't miss any log events. This is
+              - implemented as a poll method since, if the caller's number
+              - indicates that no new data is available, which is usually the
+              - case, it doesn't have to stream any results back at all.
+              -  =============================================================
+              -->
+            <CIDIDL:PollMethod CIDIDL:Name="bGetLiveEvents">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="c4NextEventId" CIDIDL:Dir="InOut">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TLogEvent"/>
+                </CIDIDL:Param>
+            </CIDIDL:PollMethod>
+
+
+            <!-- =============================================================
+              - Query the logged events and return the matching items. There
+              - are multile versions, which take different amounts of filter
+              - criteria. The one that takes no criteria just returns all
+              - events. They all indicate a maximum that they want to get
+              - back. The hard maximum is 256 entries. If the max to return is
+              - more than that, it will be clipped to that amount.
+              -
+              - They are returned in time order as logged.
+              -
+              - The variants are:
+              -     1. Return the most recent events, up to the max count
+              -     2. Return all events that were logged within some number
+              -         of minutes before the current time, up to the max
+              -         count.
+              -     3. Return the events that match the passed criteria, up to
+              -         the max count.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="c4QueryEvents">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TLogEvent"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4MaxToReturn" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <CIDIDL:Method CIDIDL:Name="c4QueryEvents">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TLogEvent"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4Minutes" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4MaxToReturn" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <CIDIDL:Method CIDIDL:Name="c4QueryEvents">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TLogEvent"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4MaxToReturn" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strHostExpr" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strProcExpr" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strFacExpr" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strThreadExpr" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8SevLevels" CIDIDL:Dir="In">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8ErrClasses" CIDIDL:Dir="In">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Tell it to do a debug dump
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="DebugDump">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="mbufData" CIDIDL:Dir="Out">
+                    <CIDIDL:THeapBuf/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Send a single TError object to the server
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="LogSingle">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="logevToSend" CIDIDL:Dir="In">
+                    <CIDIDL:Object CIDIDL:Type="TLogEvent"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Send multiple TError objects to the server.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="LogMultiple">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colErrors" CIDIDL:Dir="In">
+                    <CIDIDL:TBag CIDIDL:ElemType="TLogEvent"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Flush all log events from the log
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="RemoveAll">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+            </CIDIDL:Method>
+
+
+        </CIDIDL:Methods>
+    </CIDIDL:ClassIntf>
+
+</CIDIDL:Interface>
+

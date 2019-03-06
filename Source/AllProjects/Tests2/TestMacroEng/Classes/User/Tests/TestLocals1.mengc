@@ -1,0 +1,97 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestLocals1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Members=[Const]
+    Card4               m_MemConst1;
+    Card4               m_MemConst2;
+EndMembers;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    TestHelpers         m_Helper;
+    String              m_StrMem1;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_MemConst1(66);
+        m_MemConst2(166);
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+
+    Method Test()
+    Begin
+        // Declare local constants
+        Locals=[Const]
+            Card4   m_LocConst1(15);
+            Card1   m_LocDef1;
+        EndLocals;
+
+        // Declare local variables
+        Locals=
+            Card4   m_CardLoc1(m_MemConst1);
+            String  m_StrLoc1("Testing");
+        EndLocals;
+
+        // Make sure the default ctor version worked
+        If (m_LocDef1 != 0)
+            m_Helper.PrintErr("Default local ctor didn't work", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Check local ctors are working
+        If (m_CardLoc1 != 66)
+            m_Helper.PrintErr("Local did not construct correctly", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_LocConst1 != 15)
+            m_Helper.PrintErr("Local const did not construct correctly", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_StrLoc1 != "Testing")
+            m_Helper.PrintErr("Local did not construct correctly", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test assignment, equality across local/member
+        m_CardLoc1 := m_MemConst2;
+        If (m_CardLoc1 != m_MemConst2)
+            m_Helper.PrintErr("Member/local assignment failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // And local to local assign and equality
+        m_CardLoc1 := m_LocConst1;
+        If (m_CardLoc1 != m_LocConst1)
+            m_Helper.PrintErr("Local/local assignment failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+    EndMethod;
+
+
+    Method Start() Returns Int4
+    Begin
+        Test();
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+
+

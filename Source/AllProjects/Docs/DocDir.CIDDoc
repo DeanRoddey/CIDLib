@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="Latin1"?>
+<!DOCTYPE CQCTopic PUBLIC "urn:charmedquark.com:CIDLib-SrcDocs.DTD" "CIDLibSrcDocs.DTD">
+
+<CIDDoc>
+    <Overview>
+        <P>CIDLib is a general purpose C++ development environment. It's not just a library, it is a complete environment with its own build tools, project definition system, loadable resource system, etc... Though it is currently only deployed on Windows, CIDLib is very portable, with a 'virtual kernel' that abstracts it from the underlying operating system.<P>
+
+        <P></P>
+    </Overview>
+
+</CIDDoc>

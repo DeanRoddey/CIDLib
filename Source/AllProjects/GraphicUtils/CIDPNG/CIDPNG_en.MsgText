@@ -1,0 +1,57 @@
+;
+; FILE NAME: CIDPNG_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 09/18/2004
+;
+; COPYRIGHT: 2004..2004, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the English message and error text and ids for this
+;  facility. From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kPNGErrs
+    MsgPref=kPNGMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Error ids
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; Debug errors
+    errcDbg_LnEatBadLen     1000    The bytes eaten this line != line bytes
+    errcDbg_NoInterlace     1001    Interlaced PNGs are not currently supported.
+
+    ; Format errors
+    errcPNG_ExpectedHdr     2000    The PNG header chunk must come first
+    errcPNG_BadChunkCRC     2001    The chunk CRC was invalid. Chunk id=%(1)
+    errcPNG_BadCompType     2002    %(1) is not a known PNG compression code
+    errcPNG_BadPalSize      2003    The palette chunk has bad palette size data
+    errcPNG_BadInterlType   2004    %(1) is not a known PNG interlace code
+    errcPNG_BadClrType      2005    %(1) is not a known PNG color format
+    errcPNG_PalWithAlpha    2006    Palette based images cannot have alpha channels
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Message ids
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+
+

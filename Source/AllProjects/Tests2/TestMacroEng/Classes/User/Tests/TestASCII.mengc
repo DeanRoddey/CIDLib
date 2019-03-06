@@ -1,0 +1,84 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestASCII;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.ASCII;
+EndImports;
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    ASCII               m_Ascii;
+    Int4                m_RetVal;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+
+        // Test some of the literals
+        If ((ASCII.kESC != 27)
+        ||  (ASCII.kCR != 0x0D)
+        ||  (ASCII.kLF != 0x0A)
+        ||  (ASCII.kDig_0 != 0x30)
+        ||  (ASCII.kDig_9 != 0x39)
+        ||  (ASCII.kChar_A != 0x41)
+        ||  (ASCII.kChar_z != 0x7A)
+        ||  (ASCII.kEqual != 0x3D))
+            m_Helper.PrintErr("Bad literal value", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the conversion from dec/hex digits
+        If ((m_Ascii.FromDecDigit(0x30) != 0)
+        ||  (m_Ascii.FromDecDigit(0x34) != 4)
+        ||  (m_Ascii.FromDecDigit(0x39) != 9))
+            m_Helper.PrintErr("From dec convert failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_Ascii.FromHexDigit(0x30) != 0)
+        ||  (m_Ascii.FromHexDigit(0x34) != 4)
+        ||  (m_Ascii.FromHexDigit(0x39) != 9)
+        ||  (m_Ascii.FromHexDigit(0x41) != 0xA)
+        ||  (m_Ascii.FromHexDigit(0x61) != 0xA)
+        ||  (m_Ascii.FromHexDigit(0x46) != 0xF)
+        ||  (m_Ascii.FromHexDigit(0x66) != 0xF))
+            m_Helper.PrintErr("From hex convert failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test teh conversion from binary to digits
+        If ((m_Ascii.ToDecDigit(0) != 0x30)
+        ||  (m_Ascii.ToDecDigit(4) != 0x34)
+        ||  (m_Ascii.ToDecDigit(9) != 0x39))
+            m_Helper.PrintErr("To dec convert failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If ((m_Ascii.ToHexDigit(0) != 0x30)
+        ||  (m_Ascii.ToHexDigit(4) != 0x34)
+        ||  (m_Ascii.ToHexDigit(9) != 0x39)
+        ||  (m_Ascii.ToHexDigit(0xA) != 0x41)
+        ||  (m_Ascii.ToHexDigit(0xF) != 0x46))
+            m_Helper.PrintErr("To hex convert failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

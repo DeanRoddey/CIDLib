@@ -1,0 +1,86 @@
+// This one is mostly just to test for handling escape characters
+Class=[Final]
+    ClassPath MEng.User.Tests.TestJSONParser2;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.FileInStream;
+    MEng.System.Runtime.MemBuf;
+    MEng.System.Runtime.JSONParser;
+    MEng.System.Runtime.JSONAnchor;
+EndImports;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    JSONParser          m_Parser;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+
+    //
+    //  Just invokes all the local tests
+    //
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            FileInStream    SrcStream;
+            JSONAnchor      Root;
+            JSONAnchor      UnInit;
+            JSONAnchor      Child;
+            Boolean     GotExcept;
+        EndLocals;
+
+        // For our purposes, we'll use a file with a canned response
+        SrcStream.Open("\\JSON\\JSONSrc2.Txt");
+        m_Parser.ParseResponse(SrcStream);
+
+        // Get the root anchor
+        m_Parser.GetRootAnchor(Root);
+
+        // Find the result object
+        Try
+            m_Parser.FindObject(Root, "result", Child, True);
+            If (m_Parser.GetName(Child) != "result")
+                m_RetVal := -1;
+                m_Helper.PrintErr("FindObject returned wrong node", m_Output, $CurLine);
+            EndIf;
+        EndTry;
+
+        Catch
+            m_RetVal := -1;
+            m_Helper.PrintErr("Findobject failed", m_Output, $CurLine);
+        EndCatch;
+
+        // Get one of the values under it
+        Try
+            If (m_Parser.FindValue(Child, "ListItem.FileNameAndPath", False) != "K:\\")
+                m_RetVal := -1;
+                m_Helper.PrintErr("FindValue returned wrong value", m_Output, $CurLine);
+            EndIf;
+        EndTry;
+
+        Catch
+            m_RetVal := -1;
+            m_Helper.PrintErr("FindValue shouldn't have thrown", m_Output, $CurLine);
+        EndCatch;
+
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

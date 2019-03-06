@@ -1,0 +1,46 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestRandomNum;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.RandomNum;
+EndImports;
+
+Literals=
+EndLiterals;
+
+Members=
+    Int4        m_RetVal;
+    RandomNum   m_Rand;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        //
+        //  We can't really TEST this class, since it just generates random
+        //  numbers. This class is really just to verify that the class
+        //  compiled OK and works and that the wrapper stuff is doing what
+        //  it should around the underlying C++ class.
+        //
+        m_Rand.Seed(0x4941312);
+        m_Rand.GetNextVal(29);
+        m_Rand.GetNextVal(109);
+
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+
+
+

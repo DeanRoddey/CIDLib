@@ -1,0 +1,73 @@
+;
+; FILE NAME: CIDZLib_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 08/13/2004
+;
+; COPYRIGHT: 2004..2004, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the English message and error text and ids for this
+;  facility. From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kZLibErrs
+    MsgPref=kZLibMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Error ids
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; Debug errors
+    errcDbg_BadInitCnt          2000    Got %(1) tree init values, but the size was %(2)
+    errcDbg_NotEnoughBits       2001    Inflate asked for %(1) bits, but only %(2) were in the buffer
+    errcDbg_NoStoredBlocks      2002    Stored zlib blocks are not supported at this time
+    errcDbg_NoFastDeflate       2003    Fast deflate mode is not supported at this time
+    errcDbg_NegBlockStart       2004    The block start on stored block flush was negative
+    errcDbg_NoFastLongest       2005    Fast longest match mode is not supported at this time
+    errcDbg_DeflIndexErr        2006    An index error occured during deflation. Data=%(1), Index=%(2), Count=%(3)
+
+    ; Inflate errors
+    errcInfl_BadHeaderChk       3000    The header check failed
+    errcInfl_BadCompType        3001    The compression type is not recognized
+    errcInfl_BadWndSz           3002    The window size is not correct
+    errcInfl_BadBlockType       3003    The block type at offset %(1) was unknown
+    errcInfl_NoCodes            3004    No table codes to inflate
+    errcInfl_OverSubTbl         3005    Inflated table codes are oversubsribed
+    errcInfl_IncompleteTbl      3006    Inflated table codes are incomplete
+    errcInfl_NoTblSpace         3007    Not enough space to inflate table
+    errcInfl_BadBitLenRep       3008    Invalid bit length repeat
+    errcInfl_BadLLCode          3009    Invalid literal/length code
+    errcInfl_BadDistCode        3010    Invalid distance code
+    errcInfl_DistTooBig         3011    Distance code is too large
+    errcInfl_BadStoredBlkLen    3012    Invalid stored block length
+    errcInfl_BadCheckSum        3013    The Adler checksum was incorrect
+    errcInfl_NeedDictionary     3014    No dictionary was found
+
+    ; I/O errors
+    errcIO_InvalidEOS           4000    The end of input is not legal here (offset=%(1))
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Message ids
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+
+

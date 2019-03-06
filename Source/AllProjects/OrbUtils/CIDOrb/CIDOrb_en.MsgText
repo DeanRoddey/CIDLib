@@ -1,0 +1,144 @@
+;
+; FILE NAME: CIDorb_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 07/03/2000
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;   This file and its contents are the property of Charmed Quark Software. It
+;   forms part of the internal implementation of the Charmed Quark Controller
+;   product. It contains proprietary source code and is not to be distributed
+;   publically in any way, shape, or form.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for the CQC toolkit program.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kOrbErrs
+    MsgPref=kOrbMsgs
+END CTRL
+
+
+
+; ----------------------------------------------------------------------------
+;  Error ids
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; General error ids
+    errcGen_NoError             0       No Error
+    errcGen_NotWhenRunning      1       This operation is not allowed when the ORB is running
+
+    ; Client base errors
+    errcClient_BadSeqReply      1000    The command reply had a different sequence id
+    errcClient_NoReply          1001    The server did not reply to command
+    errcClient_BadIntfId        1002    Got an object id with interface id '%(1)', but class has id '%(2)'
+    errcClient_BadSrvRefCount   1003    The server at %(1) had a bad reference count in dtor of %(2) proxy
+    errcClient_NoStatusRet      1004    No connect status recieved from server at %(1)
+    errcClient_ServerClosed     1005    The server at %(1) has closed the connection. Can't write from %(2) proxy
+    errcClient_SrvNotAvailable  1006    The server at %(1) was not available
+    errcClient_ConnRejected     1007    The connection to server at %(1) was rejected because: %(2)
+    errcClient_Timeout          1008    The server at %(1) did not reply within the requested time. Proxy class=%(2)
+    errcClient_NotReady         1009    The client ORB has not been initialized yet
+    errcClient_NoSrvTarget      1010    No server target end point %(1). Can't write from %(2) proxy
+    errcClient_SrvRemove        1011    An error occured while removing server at %(1) from %(2) dtor
+    errcClient_ServerLost       1012    The server at %(1) has closed the connection
+    errcClient_StreamFailed     1013    An unknown exception occured while streaming a returned ORB packet
+    errcClient_TooManyQReqs     1014    The client ORB request queue is full. No more requests can be accepted
+    errcClient_LostConn         1015    Connection to the server at %(1) was lost
+    errcClient_DiffEndPoint     1016    The connection found has a different end point
+    errcClient_SockCleanupErr   1017    An exception occured while cleaning up a socket
+
+    ; Command errors
+    errcCmd_BadPacketSize       1200    The command packet size info is inconsistent
+    errcCmd_UnknownMethod       1201    Command '%(1)' is not implemented by object: %(2)
+    errcCmd_BadPlainTextCnt     1202    ORB packket plain text byte count was wrong
+
+    ; Communications errors
+    errcComm_BadPacketHash      1500    The hash of the packet data from '%(1)' did not match the header hash
+    errcComm_PartialHdr         1501    A partial ORB packet header was read from '%(1)'
+    errcComm_BadHdrMagicVal     1502    The ORB packet header had bad magic values, from '%(1)'
+    errcComm_PartialPacket      1503    A partial ORB data packet was read from '%(1)'
+    errcComm_NoAcceptReply      1504    The server ORB did not send back a connection accept/deny response
+
+    ; Id errors
+    errcId_BadHashLen           3500    Expected both hashs to be %(1) bytes, but they were not
+
+    ; Object id errors
+    errcOOId_Inconsistent       5000    Object ids with equal keys had different end points or client proxy classes
+    errcOOId_WrongProxyClass    5001    The assigned object id uses client proxy class '%(1)', but this class is '%(2)'
+
+    ; Server errors
+    errcServ_BadHash            6500    The server object's hash (%(1)) is not legal
+    errcServ_DupKey             6501    The server object key is a duplicate. Key=%(1)
+    errcServ_UnknownExcept      6502    An unknown exception recieved from server object
+    errcServ_ObjNotFound        6503    Object '%(1)' was not found on this server
+    errcServ_NotInitialized     6504    The server support must be initialized first
+    errcServ_SrvObjTermError    6505    Error while terminating driver '%(1)'
+    errcServ_BadIterState       6506    The object list iterator state is inconsistent
+    errcServ_InvalidIterator    6507    The iterator is not valid at this time
+    errcServ_DeregObj           6508    Could not deregister object. InterfaceId=%(1)
+    errcServ_UnknownExceptDereg 6509    An unknown exception occured while deregistering %(1) object
+    errcServ_ExitTimeout        6510    Timed out waiting for threads to exit an %(1) object
+    errcServ_NulObject          6511    The registered/deregistered object pointer was null
+    errcServ_CantCreateListener 6512    Could not create the ORB listener on port %(1)
+    errcServ_RejectedClient     6513    A client connection was rejected. Reason=%(1)
+    errcServ_LostConn           6514    Connection to the client at %(1) was lost
+    errcServ_ReleaseWorkItem    6515    An exception occured while releasing a server work item
+    errcServ_ConmImplNotFound   6516    The passed connection impl (%(1)) was not found in the client list.
+    errcServ_ShutdownClient     6517    The client connection to client %(1) could not be shut down
+    errcServ_NotShutdown        6518    The connection object is not shut down yet
+    errcServ_WaitNonLB          6519    Waiting for non-loopback addresses to bind to
+    errcServ_NoInterfaces       6520    Couldn't bind to any listening interfaces
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Message ids
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    ; Text for the rejection status returns
+    midRej_Unknown              16500    Unknown rejection reason
+    midRej_TooManyClients       16501    Too many client connections
+
+    ; Status messages that are logged at important points
+    midStatus_StartListener     17000    Starting listener thread. Port=%(1), MaxClients=%(2),
+    midStatus_ClientDropped     17001    Client at end point '%(1)' dropped the connection
+    midStatus_MonShutdownErr    17002    The ORB server monitor thread could not be shutdown
+    midStatus_SpoolShutdownErr  17003    Could not shut down ORB spooler thread for client at %(1)
+    midStatus_WorkerShutdownErr 17004    Could not shut down ORB server worker thread %(1)
+    midStatus_ListenShutdownErr 17005    The ORB listener thread could not be shutdown
+    midStatus_TermStarted       17006    CIDOrb termination started
+    midStatus_ListenTError      17007    The listener thread is restarting after a TError, see logs
+    midStatus_ListenError       17008    The listener thread is restarting after a system exception, see logs
+    midStatus_WorkerTError      17009    The worker thread serving %(1) is restarting after a TError, see logs
+    midStatus_WorkerError       17010    The listener thread serving %(1) is restarting after a system exception, see logs
+    midStatus_ClientTermDone    17011    The client side orb termination complete
+    midStatus_TermDone          17012    CIDOrb termination completed
+    midStatus_ServerInited      17013    CIDOrb server initialization completed
+    midStatus_ClientInited      17014    CIDOrb client initialization completed
+    midStatus_ListenDelete      17015    An error occured while deleting the listener socket
+    midStatus_StopListener      17016    The ORB listener thread has been stopped
+    midStatus_NewWorkerThread   17017    Started a new worker thread. New count is %(1)
+    midStatus_ObjListUnderflow  17018    The element count on the object list underflowed
+    midStatus_CreatedListener   17019    Created ORB listener thread on port %(1)
+    midStatus_ClientIdleDrop    17020    Client at '%(1)' exceeded max idle time and was dropped
+    midStatus_ClientHWMInc      17021    The client high water mark has increased to %(1)
+    midStatus_CmdCacheGrowth    17022    ORB command cache size is now %(1)
+    midStatus_ClientConnFrom    17023    Accepted an ORB connection from %(1)
+    midStatus_ConnToServer      17024    Connected to server orb at %(1) from %(2). Waiting for acceptance...
+    midStatus_ProxyConnect      17025    Creation of %(1) proxy caused connection to end point %(2)
+
+END MESSAGES
+

@@ -1,0 +1,50 @@
+;
+; FILE NAME: CIDJPEG_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 03/14/2005
+;
+; COPYRIGHT: 2005..2005, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the English message and error text and ids for this
+;  facility. From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kJPEGErrs
+    MsgPref=kJPEGMsgs
+END CTRL
+
+
+
+; ----------------------------------------------------------------------------
+;  Error ids
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; General bad file format error
+    errcFile_UnsupportedFmt 1000    The JPEG file seems to contain an invalid component format
+    errcFile_ReadFailed     1001    An error occured while reading the JPEG file
+    errcFile_WriteFailed    1002    An error occured while writing the JPEG file
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Message ids
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+
+

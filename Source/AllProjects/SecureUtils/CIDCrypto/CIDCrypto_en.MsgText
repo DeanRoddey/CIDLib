@@ -1,0 +1,73 @@
+;
+; FILE NAME: CIDCrypto.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 10/21/96
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This is the message text file for the facility.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kCryptoErrs
+    MsgPref=kCryptoMsgs
+END CTRL
+
+
+
+; ----------------------------------------------------------------------------
+;  Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; AES errors
+    errcAES_BadKeySize          100     AES keys must be 128, 192, or 256 bits in size. Got %(1)
+
+    ; Block encryption errors
+    errcBlock_NotBlockMultiple  300     The buffer size (%(1)) is not an even multiple of the block size (%(2))
+    errcBlock_OutputMismatch    401     The calculated output bytes (%(1)) did not match the bytes actually done (%(2))
+    errcBlock_NoIV              402     The current encryption mode requires an IV
+    errcBlock_TarTooSmall       403     The target decryption buffer is too small to hold the plain text
+
+    ; Hash format oriented errors
+    errcFmt_IdStrFmt            500     The string is not in the standard %(1) hash format
+
+    ; General errors
+    errcGen_TargetTooSmall      1000    The target buffer is too small for (en/de)cryped data. Needed %(1) bytes but got %(2)
+    errcGen_BadCount            1002    The count (%(1)) is larger than the source bytes available (%(2))
+
+    ; Hash oriented errors
+    errcHash_BufTooSmall        2001    The target buffer is only %(1) bytes, but %(2) are required
+    errcHash_NewBytesBadSize    2002    This message hash is %(1) bytes, but only %(2) were provided
+    errcHash_BadSrcBytes        2003    %(1) init bytes were provided, but this message hash requires %(2)
+    errcHash_InvalidByteCount   2004    The passed buffer has %(1) bytes, but the bytes to use indicated is %(2)
+    errcHash_DifferentSizes     2005    The source and destination hash had different byte counts (%(1) vs. %(2))
+
+    ; Key oriented errors
+    errcKey_EmptyKey            2500    The passed key was empty. Empty keys are not legal
+    errcKey_BadKeyBytes         2501    The passed key bytes count (%(1)) was larger than the passed data (%(2))
+    errcKey_InvalidCount        2502    %(1) bits is not a valid key length for a %(2) encrypter
+    errcKey_DifferentSizes      2503    The source and destination crypto keys had different byte counts (%(1) vs. %(2))
+
+    ; Unique id oriented errors
+    errcUId_TypeSizeErr         7000    The sizes of some standard CIDLib types have changed
+    errcUId_NoSysId             7001    The local system unique id could not be queried
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Messages
+; ----------------------------------------------------------------------------
+

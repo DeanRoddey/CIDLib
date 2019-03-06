@@ -1,0 +1,5 @@
+<?xml encoding="iso-8859-1"?>
+<!ELEMENT SubChild (#PCDATA)>
+<!ELEMENT Child (SubChild*)>
+<!ELEMENT RootElem (Child+)>
+

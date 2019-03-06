@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - This one is just to generate some constants and types that need to
+  - be shared with non-C++ client apps, so that they don't have to replicate
+  - all of them, and to provide us with to/from text conversion methods.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Constants>
+
+            <CIDIDL:Constant CIDIDL:Name="strAttr_Area"
+                             CIDIDL:Type="TString" CIDIDL:Value="Area">
+                <CIDIDL:DocText>
+                    These are constants for the various item and dialog attributes
+                    that we use, to avoid typos and such. Some of them are done
+                    via enums below.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_Anchor"
+                             CIDIDL:Type="TString" CIDIDL:Value="Anchor"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_AppImage"
+                             CIDIDL:Type="TString" CIDIDL:Value="AppImage"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_Hints"
+                             CIDIDL:Type="TString" CIDIDL:Value="Hints"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_InitFocus"
+                             CIDIDL:Type="TString" CIDIDL:Value="InitFocus"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_ResId"
+                             CIDIDL:Type="TString" CIDIDL:Value="Resource Id"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_ScreenOrigin"
+                             CIDIDL:Type="TString" CIDIDL:Value="ScreenOrigin"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_SetFgn"
+                             CIDIDL:Type="TString" CIDIDL:Value="SetFgn"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_Sizeable"
+                             CIDIDL:Type="TString" CIDIDL:Value="Sizeable"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_Symbol"
+                             CIDIDL:Type="TString" CIDIDL:Value="Symbol"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_Theme"
+                             CIDIDL:Type="TString" CIDIDL:Value="Theme"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_Title"
+                             CIDIDL:Type="TString" CIDIDL:Value="Title"/>
+            <CIDIDL:Constant CIDIDL:Name="strAttr_UseOrigin"
+                             CIDIDL:Type="TString" CIDIDL:Value="UseOrigin"/>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strSpecType_LoadText"
+                             CIDIDL:Type="TString" CIDIDL:Value="LoadText">
+                <CIDIDL:DocText>
+                    These are constants for the special attribute types that we
+                    set on some attributes, so that we can easily recognize them
+                    when we receive a change or in validation.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strSpecType_Hint"
+                             CIDIDL:Type="TString" CIDIDL:Value="CtrlHint"/>
+            <CIDIDL:Constant CIDIDL:Name="strSpecType_DlgItemFlag"
+                             CIDIDL:Type="TString" CIDIDL:Value="DlgItemFlag"/>
+
+        </CIDIDL:Constants>
+
+        <CIDIDL:Types>
+
+            <!-- The types of messages -->
+            <CIDIDL:Enum CIDIDL:Name="EMsgTypes" CIDIDL:LoadMap="BaseName"
+                         CIDIDL:TextStreamMap="BaseName" 
+                         CIDIDL:BinStream="Yes" CIDIDL:AltTextSrc="Inline"
+                         CIDIDL:IncDec="Inc" CIDIDL:AltMap="AltText">
+                <CIDIDL:DocText>
+                    The types of loadable text we support.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Common" CIDIDL:AltText="Com"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Error" CIDIDL:AltText="Err"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Message" CIDIDL:AltText="Msg"/>
+            </CIDIDL:Enum>
+
+
+            <!--
+               - The types of text symbols a dialog item can have
+               -
+               - THE ORDER IS IMPORTANT, since we depend on it to minimize some
+               - grunt code in some places.
+               -->
+            <CIDIDL:Enum CIDIDL:Name="ETextSyms" CIDIDL:XlatMap="BaseName"
+                          CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    The types of text symbols a dialog ite can have
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Cue"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Flyover"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Text"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+
+

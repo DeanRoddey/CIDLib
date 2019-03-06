@@ -1,0 +1,53 @@
+;
+; FILE NAME: TestKernel.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 11/22/96
+;
+; COPYRIGHT: 1992..2002, 'CIDCorp
+;
+; DESCRIPTION:
+;
+;  This is the message file for the test program. It just has dummy test messages
+;  in it for message load tests.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kTestKrnlErrs
+    MsgPref=kTestKrnlMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+; Error ids
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    errcFailure1        1   This is the text for error 1
+    errcFailure2        2    This is the text for error 2
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+; Message ids
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    midTestId1      17001   This is the text for Test id 1
+    midTestId2      17002   This is the text for Test id 2
+    midTestId3      17003   This is the text for Test id 3, which is longer than the others
+    midTestId4      17004   This is the text for Test id 4
+
+    midTestId5      17005   This is the extra special text, which will be \
+                            wrapped around onto multiple lines. These lines \
+                            should all be read as a single message.
+
+END MESSAGES
+

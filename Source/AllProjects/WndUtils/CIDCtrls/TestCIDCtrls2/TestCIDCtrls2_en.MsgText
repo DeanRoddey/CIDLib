@@ -1,0 +1,43 @@
+;
+; FILE NAME: TestCIDCtrls2.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 06/11/1996
+;
+; COPYRIGHT: 2015..2015, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This is the message text file for this test program
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kTCtrls2Errs
+    MsgPref=kTCtrls2Msgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+    errcGen_NoError         1000    No Error
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+
+

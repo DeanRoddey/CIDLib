@@ -1,0 +1,61 @@
+;
+; FILE NAME: CIDAppSh_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 07/29/2001
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  This file and its contents are the property of Charmed Quark Software. It
+;  may not be redistributed in any modified form, or as part of any product
+;  other than the original CIDLib C++ Frameworks distribution file. Its
+;  contents may not be compiled into any other product, except when required
+;  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;  product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for the CIDAppSh facility
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kAppShErrs
+    MsgPref=kAppShMsgs
+END CTRL
+
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    errc_NoError                0       No Error
+
+    ; Engine errors
+    errcEng_ShutdownTimeout     2500    Not all processes could be stopped within the timeout period
+    errcEng_ExceptInMoThread    2501    An exception occured in the shell monitor thread, restarting it
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+;  Message ids
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+    ; Status messages
+    midStatus_ActivatingAll    17500    Activing all unactivated applications
+    midStatus_AddingApp        17501    Adding application '%(1)' to the shell list
+    midStatus_CycleAll         17502    Cycling all applications
+    midStatus_StartingAll      17503    Starting all currently active applications
+    midStatus_StoppingAll      17504    Stopping all currently active applications
+
+END MESSAGES
+

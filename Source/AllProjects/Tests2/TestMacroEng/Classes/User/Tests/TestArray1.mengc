@@ -1,0 +1,189 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestArray1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.User.Tests.TestHelpers;
+EndImports;
+
+Types=
+    // Create two types, to test for equivalency
+    ArrayOf[String]    TestArray;
+    ArrayOf[String]    TestArray2;
+
+    // And one for card4 values
+    ArrayOf[Card4]      Card4Array;
+EndTypes;
+
+Literals=
+    Card4   kList1Sz(24);
+    Card4   kList2Sz(8);
+EndLiterals;
+
+Members=[Const]
+    String              m_ValTmpl;
+EndMembers;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Card4               m_Index;
+    Card4               m_TmpVal;
+    Int4                m_RetVal;
+    TestArray           m_List;
+    TestArray2          m_List2;
+    String              m_ValStr;
+    TestHelpers         m_Helper;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_ValTmpl("Value String %(1)");
+        m_Index(0);
+        m_RetVal(0);
+        m_List(kList1Sz);
+        m_List2(kList2Sz);
+    Begin
+    EndConstructor;
+
+
+    //
+    //  We create two string vector types, but they should be considered
+    //  equiv when passing to a parm. So we take one type here, and below
+    //  will try to pass in one of the other type.
+    //
+    Method TestEquiv([In] TestArray ToCheck) Returns Boolean
+    Begin
+        Return (ToCheck.GetElemCount() = 2);
+    EndMethod;
+
+    Method TestConst([Out] TestArray ToCheck)
+    Begin
+        // It should be syntactically ok to assign here
+        ToCheck[0] := "Test";
+    EndMethod;
+
+    Method TestIndex([In] TestArray ToCheck, [In] Card4 Index)
+    Begin
+        Locals=
+            Boolean Flag(False);
+            String  TmpStr;
+        EndLocals;
+
+        Try
+            TmpStr := ToCheck[Index];
+        EndTry;
+
+        Catch
+            If ($Exception.Check(CollectErrors.BadIndex))
+                Flag := True;
+            EndIf;
+        EndCatch;
+
+        If (!Flag)
+            m_Helper.PrintErr("Failed to catch index error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+    EndMethod;
+
+
+    //
+    //  Tests the creation of an array, setting a value, then assigning to it
+    //  from an unitialized one. This insures that the target one ends up with
+    //  default values as it should, since the never set values of the source
+    //  should cause default values in the target.
+    //
+    Method TestDefAssign() 
+    Begin
+        Locals=
+            Card4Array  CardArray1(4);
+            Card4Array  CardArray2(4);
+        EndLocals;
+
+        CardArray1[0] := 10;
+        CardArray1[1] := 11;
+        CardArray1[2] := 12;
+        CardArray1[3] := 13;
+        CardArray1 := CardArray2;
+
+        If ((CardArray1[0] != 0)
+        ||  (CardArray1[1] != 0)
+        ||  (CardArray1[2] != 0)
+        ||  (CardArray1[3] != 0))
+            m_Helper.PrintErr("Default array assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+    EndMethod;
+
+
+    Method Start() Returns Int4
+    Begin
+        // Check the initial element count, which should be zero
+        If (m_List.GetElemCount() != kList1Sz)
+            m_Helper.PrintErr("Initial list had bad elem count", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test a few items, which should have default values
+        If ((m_List[1] != "") || (m_List[4] != "") || (m_List[23] != ""))
+            m_Helper.PrintErr("Initial elem values are bad", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Put some values in and make sure they come out
+        m_List[2] := "Val 2";
+        m_List[8] := "Val 8";
+        m_List[16] := "Val 16";
+
+        If ((m_List[2] != "Val 2") || (m_List[8] != "Val 8") || (m_List[16] != "Val 16"))
+            m_Helper.PrintErr("Set values not read back", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do an assignment and then compare
+        m_List2 := m_List;
+        If (m_List.GetElemCount() != m_List2.GetElemCount())
+            m_Helper.PrintErr("Different elem counts after assign", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test some elements for equality
+        If ((m_List[2] != m_List2[2]) || (m_List[8] != m_List2[8])
+        ||  (m_List[16] != m_List2[16]) || (m_List[18] != m_List2[18]))
+            m_Helper.PrintErr("Elem differences after assign", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Do an assignment of elements, then change the original and make
+        //  sure the target one doesn't change (to check for aliasing issues
+        //  in the underlying C++ impl.)
+        //
+        m_List[8] := m_List2[8];
+        m_List2[8] := "New Val 8";
+        If (m_List[8] != "Val 8")
+            m_Helper.PrintErr("Aliasing error", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test for index range errors
+        TestIndex(m_List, 24);
+
+        // Test for compile time equivalency
+        TestEquiv(m_List2);
+
+        // Test constancy
+        TestConst(m_List2);
+
+        // Test assign of default constructed array
+        TestDefAssign();
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+EndMethods;
+
+
+

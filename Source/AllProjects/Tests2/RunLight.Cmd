@@ -1,0 +1,18 @@
+@ECHO OFF
+SETLOCAL
+SET APPCMD=%CID_RESDIR%\TestFW.exe /CfgFile=.\CIDLibTests.TestCfg /Verbosity=High /Groups=Light
+IF "%1"=="debug" GOTO DO_DEBUG
+
+SET GROUPPARM=
+IF "%1"=="" GOTO INVOKETEST
+SET GROUPPARM=/Groups=%1
+
+:INVOKETEST
+%APPCMD% %GROUPPARM%
+GOTO DONE
+
+:DO_DEBUG
+devenv /debugexe %APPCMD%
+
+:DONE
+

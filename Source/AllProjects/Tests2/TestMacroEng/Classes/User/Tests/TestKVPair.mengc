@@ -1,0 +1,110 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestKVPair;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.KVPair;
+EndImports;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    KVPair              m_TestPair1;
+    KVPair              m_TestPair2;
+    String              m_Str;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Helper();
+        m_Output();
+        m_RetVal(0);
+        m_TestPair1("InitKey", "InitVal");
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+
+        // Make sure that both pairs correctly constructed
+        If (m_TestPair1.GetKey() != "InitKey")
+            m_Helper.PrintErr("Initial key was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_TestPair1.GetValue() != "InitVal")
+            m_Helper.PrintErr("Initial value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_TestPair2.GetKey() != "")
+            m_Helper.PrintErr("Initial key was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_TestPair2.GetValue() != "")
+            m_Helper.PrintErr("Initial value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // The keys and values should be different
+        If (m_TestPair1.SameKey(m_TestPair2))
+            m_Helper.PrintErr("Key compare failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_TestPair1.SameValue(m_TestPair2))
+            m_Helper.PrintErr("Value compare failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do the query form and we should get the same values
+        m_TestPair1.CopyKey(m_Str);
+        If (m_TestPair1.GetKey() != m_Str)
+            m_Helper.PrintErr("Get/Copy key disagree", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_TestPair1.CopyValue(m_Str);
+        If (m_TestPair1.GetValue() != m_Str)
+            m_Helper.PrintErr("Get/Copy value disagree", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Assign one to the other and make sure that they are equal
+        m_TestPair2 := m_TestPair1;
+        If (m_TestPair1 != m_TestPair2)
+            m_Helper.PrintErr("Assignment failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_TestPair1.SameKey(m_TestPair2))
+            m_Helper.PrintErr("Key compare failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_TestPair1.SameValue(m_TestPair2))
+            m_Helper.PrintErr("Value compare failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Set the fields and make sure that they get set correctly
+        m_TestPair1.Set("NewKey", "NewValue");
+        If ((m_TestPair1.GetKey() != "NewKey")
+        ||  (m_TestPair1.GetValue() != "NewValue"))
+            m_Helper.PrintErr("Set failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

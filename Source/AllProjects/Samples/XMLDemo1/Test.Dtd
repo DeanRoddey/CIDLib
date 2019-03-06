@@ -1,0 +1,8 @@
+<?xml encoding="ISO-8859-1"?>
+
+<!ELEMENT ExtSSElem1 (Child1, Child2)>
+<!ELEMENT Child1 EMPTY>
+<!ELEMENT Child2 EMPTY>
+
+<!ELEMENT Root (ExtSSElem1, IntSSElem1, (Child1 | Child2)?)>
+

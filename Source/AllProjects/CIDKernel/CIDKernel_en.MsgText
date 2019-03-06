@@ -1,0 +1,556 @@
+;
+; FILE NAME: CIDKernel.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 09/08/98
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+;   1)  The token replacement system is not available at this level so none
+;       of these uses them!
+;
+;  LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kKrnlErrs
+    MsgPref=kKrnlMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Error ids
+; ----------------------------------------------------------------------------
+ERRORS=
+    errcNoError                        0    No error
+    errcUnknown                     7998    An unknown error occured
+    errcHostErr                     7999    An error occured in a host API
+
+
+    ; General errors
+    errcGen_NotSupported               1    The operation is not supported
+    errcGen_NoData                     2    No data was available
+    errcGen_MoreData                   3    More data was available than could be processed
+    errcGen_OpenFailed                 4    The open operation failed
+    errcGen_Busy                       5    The target was busy
+    errcGen_WriteFault                 6    Write fault
+    errcGen_ReadFault                  7    Read fault
+    errcGen_GenFailure                 8    General failure
+    errcGen_AlreadyOpen                9    The target was already open
+    errcGen_WrongOS                   10    The host OS is the wrong OS for this system
+    errcGen_AlreadyExists             11    The target already exists
+    errcGen_NegativeResult            12    A negative value is not a valid result
+    errcGen_Timeout                   13    The operation timed out
+    errcGen_AlreadyOwned              14    The target was already owned
+    errcGen_NotFound                  15    The target was not found
+    errcGen_NullName                  16    The name was null
+    errcGen_TooMany                   17    Too many of the relevant objects already exist
+    errcGen_AlreadyAllocated          18    The target is already allocated
+    errcGen_AlreadySet                19    The target is already set
+    errcGen_NotReady                  20    The target is not ready
+    errcGen_NotOwner                  21    The caller is not the owner
+    errcGen_InitError                 22    An initialization error occured
+    errcGen_IndexError                23    An index error occured
+    errcGen_Interrupted               28    The operation was interrupted
+    errcGen_GeneralFault              29    A general fault occured!
+    errcGen_WouldBlock                30    The operation would block
+    errcGen_InProgress                31    The operation is in progress
+    errcGen_NotAvailable              32    The desired resource was not available
+    errcGen_NotEmpty                  33    The target is not empty
+    errcGen_NotInitialized            34    The target is not initialized
+    errcGen_InvalidDeviceId           35    The provided device id is not valid
+    errcGen_CRC                       36    CRC error
+    errcGen_StackOverflow             37    Stack overflow
+    errcGen_ShutdownInProgress        38    Shutdown is in progress
+    errcGen_NeverStarted              39    Never started
+    errcGen_AlreadyStarted            40    Already started
+    errcGen_TermError                 41    Cleanup/termination error
+    errcGen_AlreadyConnected          42    Already connected
+    errcGen_NotConnected              43    Not connected
+    errcGen_DeleteError               44    Delete error
+    errcGen_Locked                    45    Target is locked
+    errcGen_Full                      46    The target is full, cannot complete the operation
+    errcGen_StillRunning              47    Still running
+    errcGen_NotRunning                48    Not running
+    errcGen_Already                   49    Already
+    errcGen_CloseHandle               50    Could not close the handle
+    errcGen_InvalidHandle             51    The handle was invalid
+    errcGen_NotEnoughResources        52    Not enough system resources were available
+    errcGen_SystemException           53    A system exception occured
+    errcGen_HandleWait                54    Error while waiting for a handle to be signaled
+    errcGen_MaxWaitHandles            55    Too many handles to wait on for this platform
+    errcGen_OutOfSync                 56    Out of sync error, need to rescan
+    errcGen_Cancel                    57    The operation could not be cancelled
+
+    ; Access errors
+    errcAcc_AccessDenied             100    Access denied
+    errcAcc_InvalidAccess            101    Invalid access attempt
+    errcAcc_WriteProtect             102    The target is write protected
+    errcAcc_SharingViolation         103    Sharing violation
+    errcAcc_LockViolation            104    Locking violation
+    errcAcc_NoAccess                 105    No access permitted
+
+    ; Audio errors
+    errcAudio_BadCue                 100    Unknown audio cue
+    errcAudio_OpenMixer              101    Could not open mixer
+    errcAudio_GetSpeakerLine         102    Could not get mixer speaker line
+    errcAudio_GetLineCtrl            103    Could not get line control
+    errcAudio_GetLineCtrlDets        104    Could not get line control details
+    errcAudio_SetLineCtrlDets        105    Could not set line control details
+    errcAudio_EnumDevs               106    Could not enumerate audio devices
+    errcAudio_SetSysVolume           107    Could not set the system volume
+    errcAudio_QuerySysVolume         108    Could not query the system volume
+    errcAudio_SetSysMute             109    Could not set the system mute
+    errcAudio_QuerySysMute           110    Could not query the system mute
+    errcAudio_GetDefAudioOut         111    Could not get default system audio output
+    errcAudio_GetEPCount             112    Could not get audio device end point count
+    errcAudio_GetEPList              113    Could not get audio device end point list
+    errcAudio_GetEndPoint            114    Could not get audio device end point
+    errcAudio_GetEPID                115    Could not get audio device end point ID
+    errcAudio_GetEPProps             116    Could not get audio device end point properties
+    errcAudio_GetEPName              117    Could not get audio device end point name
+
+    ; Remmovable media errors
+    errcRemM_QueryId                 135    The CDROM product id could not be queried
+
+    ; Comm port errors
+    errcComm_BadPortNum              140    The passed serial port number was not valid
+    errcComm_BadDTR                  141    The passed DTR enum was not valid
+    errcComm_BadRTS                  142    The passed RTS enum was not valid
+    errcComm_BadFlags                143    The passed port flags are not valid
+    errcComm_SetTimeouts             144    Failed to set port timeouts
+    errcComm_ClearCommErr            145    Could not clear comm errors
+    errcComm_GetTimeouts             146    Failed to get port timeouts
+    errcComm_Write                   147    Could not write to port
+    errcComm_Read                    148    Could not read from port
+    errcComm_GetCommState            149    Could not get comm port state
+    errcComm_SetCommState            150    Could not set comm port state
+    errcComm_GetLineState            151    Could not get comm port control lines state
+
+    ; Console errors
+    errcCon_BadCursorPos             160    Current line cannot be calculated
+
+
+    ; Critical section errors
+    errcCritSec_Create               175    Error creating critical section
+    errcCritSec_Delete               176    Error deleting critical section
+
+
+    ; Invalid data/params errors
+    errcData_InvalidFunction         200    The function is invalid
+    errcData_InvalidHandle           201    The handle is invalid
+    errcData_InvalidData             202    The provided data is invalid
+    errcData_InvalidCommand          203    The command is invalid
+    errcData_InvalidLength           204    The length is invalid
+    errcData_DuplicateName           205    The name is a duplicate
+    errcData_InvalidParameter        206    The parameter is invalid
+    errcData_InvalidName             207    The name is invalid
+    errcData_InvalidLevel            208    The level is invalid
+    errcData_InsufficientBuffer      209    The buffer is too small
+    errcData_InvalidArguments        210    The arguments are invalid
+    errcData_BufferOverflow          211    The buffer overflowed
+    errcData_InvalidFlag             212    The flag is invalid
+    errcData_InvalidAlias            213    The alias is invalid
+    errcData_InvalidFormat           214    Invalid data format
+    errcData_NotAllData              215    Not all data could be processed
+    errcData_ZeroSizedBuffer         216    The provided buffer was zero sized
+    errcData_InvalidValue            217    The provided value was invalid
+    errcData_NameTooLong             218    The name is too long
+    errcData_EndOfData               219    The end of the available data has been reached
+    errcData_BadRadix                220    The passed radix is invalid at this time
+
+
+    ; Device errors
+    errcDev_NotSameDevice            257    Not the same device
+    errcDev_InvalidUnit              258    Invalid unit
+    errcDev_NoSuchDevice             259    No such device
+    errcDev_NegativeSeek             260    Negative seek offset
+    errcDev_SeekOnDevice             261    Seek error on device
+    errcDev_NoDriverLoaded           262    No driver loaded
+
+
+    ; Ummm... error errors
+    errcErr_OutOfOrder               400    The kernel error mapping list is not in sorted order!
+    errcErr_SetSlot                  401    Could not set the 'last error' per-thread slot
+
+
+    ; Environment errors
+    errcEnv_InvalidEnvironment       500    Environment object is invalid
+
+
+    ; External process errors
+    errcExtP_EmptyCmdLine            550    The passed command line was empty
+
+
+    ; Firewall errors
+    errcFW_CantInit                  575    Could not initialize the firewall API
+    errcFW_CantGetPolicy             576    Could not get firewall policy
+    errcFW_CantGetProfile            577    Could not get firewall profile
+    errcFW_CantQueryEnabled          578    Could not query firewall exception flag
+    errcFW_CantQueryApps             579    Could not query authorized apps
+    errcFW_CantCreateApp             580    Could not create authorized app
+    errcFW_CantSetupApp              581    Could not set up authorized app
+    errcFW_CantAddApp                582    Could not add authorized app
+    errcFW_CantQueryAppState         583    Could not query authorized app state
+    errcFW_CantEnableApp             583    Could not enabled authorized app
+
+
+    ; File system errors
+    errcFl_PathNotFound              625    Path not found
+    errcFl_FileNotFound              626    File not found
+    errcFl_InvalidDrive              627    Invalid drive
+    errcFl_CurrentDirectory          628    Current directory
+    errcFl_NoMoreFiles               629    No more files
+    errcFl_NotValidDisk              630    Not valid disk
+    errcFl_TooManyOpenFiles          631    Too many open files
+    errcFl_Seek                      632    Seek error
+    errcFl_DiskChange                633    Disk change
+    errcFl_WrongDisk                 635    Wrong disk
+    errcFl_NoMoreSearchHandles       638    No more search handles
+    errcFl_BusyVolume                639    The volume is busy
+    errcFl_SameVolume                640    The volumes are the same
+    errcFl_NotRootDirectory          641    Not root directory
+    errcFl_DirNotEmpty               642    Directory not empty
+    errcFl_InvalidPathName           643    Invalid path name
+    errcFl_UnsupportedFileSystem     644    Unsupported file system
+    errcFl_CantDetermineVol          645    The containing volume cannot be determined from the path
+    errcFl_FlAlreadyExists           646    A file already exists with the given directory name
+    errcFl_NotFullyQualified         647    The path must be fully qualified
+    errcFl_Normalize                 648    The path could not be normalized
+    errcFl_Complete                  650    The path could not be completed
+
+    ; Formatting errors
+    errcFmt_InvalidJustification     660    Invalid justification
+    errcFmt_InvalidGroupSep          661    If a group size is given, a group separator must be provided
+
+
+    ; Hash map errors
+    errcHshMap_Create                675    Error creating hash map
+    errcHshMap_Delete                676    Deleting hash map
+    errcHshMap_InvalidIterator       678    Invalid iterator
+    errcHshMap_ElemCountUnderflow    679    Element count underflow
+
+
+    ; Init errors
+    errcInit_KrnlInitError           700    A kernel exception occured during facility initialization. Subsystem=
+    errcInit_KrnlTermError           701    A kernel exception occured during facility termination. Subsystem=
+    errcInit_SysInitError            702    A system exception occured during facility initialization. Subsystem=
+    errcInit_SysTermError            703    A system exception occured during facility termination. Subsystem=
+    errcInit_LoadEnv                 704    Error loading environment to hash map
+    errcInit_InvalidEnvironment      705    Cannot parse out environment during initialization
+
+    ; IP related errors
+    errcIP_BadAddrSize               720    The IP address data was the wrong size for the address type
+    errcIP_UnknownAddrType           721    The IP address type was not known
+
+    ; Locale errors
+    errcLoc_ConvertValue             750    Cannot convert the value
+    errcLoc_UnknownCurrMode          751    Unknown currency mode
+    errcLoc_UnknownStrField          752    Unknown string type field
+    errcLoc_UnknownDTField           753    Unknown time/date field
+    errcLoc_ParseState               755    Invalid parser state
+    errcLoc_EnumAvailable            757    Enumerating available system locales
+    errcLoc_BadSuffixList            758    The language suffix list size != ELanguages_Count
+
+
+    ; Memory errors
+    errcMem_NotEnoughMemory          801    Not enough memory available
+    errcMem_OutOfMemory              802    Out of memory
+    errcMem_InvalidAddress           804    Invalid address
+    errcMem_AllocError               805    Allocation error
+    errcMem_HostPageSize             806    The system page size is not equal to kCIDLib::c4MemPageSz
+    errcMem_CannotCommit             807    The requested pages cannot be committed
+
+
+    ; Module errors
+    errcMod_MsgNotFound              826    The requested message was not attached to this module
+    errcMod_ResNotFound              827    The requested resource was not attached to this module
+    errcMod_DLLInitFailed            828    The DLL's initialization code failed
+    errcMod_ModuleNotFound           829    Could not find a module with the given name
+    errcMod_ProcNotFound             830    The named procedure not found in the given module
+    errcMod_NoMsgs                   825    No messages are attached to this module
+    errcMod_LoadMsgs                 826    Cannot the load the facility's message file (though it did exist)
+    errcMod_BadMsgFileFormat         827    The message file for the facility was malformed
+    errcMod_NotAllMsgFile            828    Could not read all of the facility's message file
+
+
+    ; Metrics system errors
+    errcMtr_InvalidMetricCount       925    Invalid metric count
+    errcMtr_DirFull                  926    The metrics directory is full
+    errcMtr_CreateResName            927    Error creating metrics dir resource name object
+    errcMtr_CreateMtx                928    Error creating/opening the metrics sync mutex
+    errcMtr_Locking                  929    Error locking the metrics sync mutex
+    errcMtr_OpenMem                  930    Error creating/opening the metrics memory
+    errcMtr_FreeMem                  931    Could not free the metrics directory during init failure
+    errcMtr_DeleteMtx                932    Error deleting the metrics mutex
+    errcMtr_DeleteMem                933    Error freeing the metrics memory
+    errcMtr_DtorError                934    Failure during metrics directory destructor
+
+
+    ; Network errors
+    errcNet_InvalidNetPath          1000    Invalid network path
+    errcNet_NetworkBusy             1001    Network busy
+    errcNet_NetNameDeleted          1002    Network name deleted
+    errcNet_NetworkAccessDenied     1003    Network access denied
+    errcNet_InvalidNetName          1004    Invalid network name
+    errcNet_InvalidGroupName        1005    Invalid group name
+    errcNet_InvalidComputerName     1006    Invalid computer name
+    errcNet_InvalidEventName        1007    Invalid event name
+    errcNet_InvalidDomainName       1008    Invalid domain name
+    errcNet_InvalidServiceName      1009    Invalid service name
+    errcNet_InvalidShareName        1010    Invalid share name
+    errcNet_NoNetwork               1011    No network installed
+    errcNet_NetError                1012    Network system error
+    errcNet_NotASocket              1013    Not a socket
+    errcNet_DestAdrRequired         1014    Destination address required
+    errcNet_MsgSize                 1015    Message size error
+    errcNet_ProtoType               1016    Protocol type error
+    errcNet_NoProtoOpts             1017    No protocol options
+    errcNet_NetworkDown             1018    Network down
+    errcNet_NetworkUnreachable      1019    Network unreachable
+    errcNet_NetworkReset            1020    Network reset
+    errcNet_ConnAborted             1021    Connection aborted
+    errcNet_ConnReset               1022    Connection reset
+    errcNet_NoBuffers               1023    No buffers
+    errcNet_Shutdown                1026    Shutdown
+    errcNet_ConnRefused             1027    Connection refused
+    errcNet_Loop                    1028    Loop
+    errcNet_HostDown                1030    Host down
+    errcNet_HostUnreachable         1031    Host unreachable
+    errcNet_Users                   1033    Users
+    errcNet_Stale                   1035    Stale
+    errcNet_Remote                  1036    Remote
+    errcNet_Disconnect              1037    Disconnect
+    errcNet_InvalidAddrString       1038    Invalid address string
+    errcNet_InvalidAddr             1039    Invalid address
+    errcNet_WrongSOType             1040    Wrong socket type
+    errcNet_Close                   1043    Higher layer did not close socket, and low level attempt failed
+    errcNet_NotClosed               1044    The socket handle must be closed before calling dtor
+    errcNet_Quota                   1045    The quota has been reached
+    errcNet_GetOptSize              1046    The data returned from getsockopt was not the right size
+    errcNet_BadSockOpt              1047    An uknown socket option was passed
+    errcNet_SelListTooBig           1048    The passed socket select list is to large
+    errcNet_GetLocalAddr            1049    Could not get local binding for target address
+
+    ; Printing errors
+    errcPrn_OutOfPaper              1200    Out of paper
+    errcPrn_NoSpoolSpace            1202    No spooler space left
+    errcPrn_JobCancelled            1203    Print job was cancelled
+    errcPrn_SpoolNoStartDoc         1204    No document start was issued
+    errcPrn_SpoolNoAddJob           1205    Job not added to spooler
+
+
+    ; Process registry errors
+    errcPReg_Underflow              1523    Process registry index underflow
+    errcPReg_InvalidRegistry        1525    Invalid process registry
+    errcPReg_Locking                1526    Error locking the process registry mutex
+    errcPReg_OpenMem                1527    Error opening the process registry memory
+    errcPReg_InitMem                1528    Error initializing the process registry memory
+    errcPReg_EntryInit              1529    Error initializing our registry entry
+    errcPReg_EntryClean             1530    Error cleaning up my registry entry
+    errcPReg_FreeMem                1531    Could not free the process registry memory
+
+
+    ; Thread and process errors
+    errcProc_InvalidPriority        1700    Invalid priority
+    errcProc_MaxThreadsReached      1702    Maximum threads reached
+    errcProc_UnknownPrio            1707    Unknown priority
+    errcProc_QueryProcTimes         1701    Error querying process times
+    errcProc_ProcessLimit           1703    The maximum number of processes has been reached
+    errcProc_NotThisThread          1704    The operation can only be performed by its own thread
+    errcProc_BadAttachInfo          1705    The passed attach info is badly formatted
+    errcProc_BadSingleInstInfo      1706    The single process instance info structure was invalid
+
+    ; Per-thread data errors
+    errcPTD_AllocSlot               2750    Could not allocate a thread local slot
+    errcPTD_FreeSlot                2751    Could not free the thread local slot
+    errcPTD_SetSlot                 2752    Could not set the value of the thread local slot
+
+
+    ; Registry errors
+    errcReg_Recovered               3000    Registry recovered
+    errcReg_Corrupt                 3001    Registry corrupted
+    errcReg_IOFailed                3002    Registry I/O failed
+    errcReg_NotRegistryFile         3003    Not a registry file
+    errcReg_KeyDeleted              3004    Key deleted
+    errcReg_KeyHasChildren          3005    Key has children
+    errcReg_CantRead                3006    The key cannot be read
+    errcReg_CantWrite               3007    The key cannot be written
+    errcReg_CantOpen                3008    The key cannot be opened
+    errcReg_CantCreate              3009    The key cannot be created
+
+
+    ; Resource name errors
+    errcRsc_InvalidType             3500    Invalid named resource type
+
+
+    ; Security errors
+    errcSec_InvalidPassword         4500    Invalid password
+    errcSec_InvalidPasswordName     4501    Invalid password name
+    errcSec_NoSuchPrivilege         4502    No such privilege
+    errcSec_PrivilegeNotHeld        4503    Privilege not held
+    errcSec_NoSecurityOnObject      4504    No security on object
+    errcSec_InvalidAccountName      4505    Invalid account name
+    errcSec_InvalidUserName         4506    Invalid user name
+    errcSec_MemberOfGroup           4507    Member of group
+    errcSec_NotMemberOfGroup        4508    Not member of group
+    errcSec_LogonFailed             4509    Logon failed
+    errcSec_SetAccessFailed         4510    Could not set access rights
+
+    ; Semaphore, mutex, event errors
+    errcSem_OwnerDied               5001    Owner died owning object
+
+
+    ; Signal related errors
+    errcSig_UnknownSigHandler       5400    The signal handler to remove was not found
+
+    ; Socket pinger related errors
+    errcSPing_AlreadyInit           5425    The socket pinger is already initialized
+    errcSPing_NotReqReady           5426    The socket pinger is not ready to make a request
+    errcSPing_InitSocket            5427    Could not initialize the ICMP socket
+    errcSPing_NoCtxInfo             5428    The socket pinger context has not been set
+    errcSPing_NotWaiting            5429    The socket pinger is not currently waiting for a reply
+    errcSPing_Bind                  5430    Could not locally bind the ping socket
+    errcSPing_GetTarAddr            5431    Could not get target IP address bytes
+    errcSPing_SendReq               5432    An error occurred while sending the ping request
+    errcSPing_ReadRep               5433    An error occurred while reading the ping reply
+    errcSPing_BadCntRecv            5434    The received ping byte count is not the same as that sent
+    errcSPing_BadDataRecv           5435    The ping data received is not the same as that sent
+    errcSPing_NotInitialized        5436    The pinger must be set up before using
+
+
+    ; Scheduled task errors
+    errcSchTask_BadStartType        5450    Invalid scheduled task startup type
+    errcSchTask_CreateErr           5451    System error while creating scheduled task
+    errcSchTask_SetupErr            5452    System error while configuring scheduled task
+
+    ; SSL socket errors
+    errcSSL_InitFailed              5500    Could not open the SSL HTTP service
+    errcSSL_ConnectFailed           5501    Could not make SSL connection to target address
+    errcSSL_OpenReqFailed           5502    SSL open request failed
+    errcSSL_SendReqFailed           5503    The SSL send request failed
+    errcSSL_NoResponse              5504    No response was received to the SSL request
+    errcSSL_CreateStream            5505    Could not create SSL input stream
+    errcSSL_CreateBuf               5506    Could not allocate SSL input buffer
+    errcSSL_StoreBytes              5507    Could not store SSL data into input stream
+    errcSSL_GetStreamData           5508    Could not get SSL data from input stream
+    errcSSL_InvalidContLenStr       5509    The content length string was not a number
+    errcSSL_UnknownOp               5510    The operation code was not GET, PUT, or POST
+    errcSSL_SetOptFailed            5511    Could not set options on the session
+
+    ; Stack dump errors
+    errcStDump_InitSyms             5900    Failed to init system symbol support
+    errcStDump_TraceError           5901    Failure during stack trace
+
+
+    ; String errors
+    errcStr_StartPastEnd            5950    The start point is past the string end
+    errcStr_BadUnicode              5951    The string is not a valid Unicode string
+
+    ; Synchronization errors
+    errcSync_PossibleDeadlock       6000    Possible deadlock
+
+
+    ; System information errors
+    errcSysI_InvalidSysColor        6300    Invalid system color
+    errcSysI_QueryOSVer             6301    Could not query OS version info
+    errcSysI_QueryCompName          6304    Could not query computer name
+    errcSysI_QueryExeName           6305    Could not get Exe module name
+    errcSysI_QuerySpecialPath       6306    Could not query special path
+
+
+    ; Service related errors
+    errcSvc_AlreadyExists           6400    The service already exists
+    errcSvc_AlreadyRunning          6401    The service is already running
+    errcSvc_ServiceSpecific         6402    The service returned a service specific error
+    errcSvc_Disabled                6403    The service is disabled
+    errcSvc_ScheduledForDelete      6404    The service is scheduled for removal. Please reboot.
+    errcSvc_NotFound                6405    The service name was not found
+    errcSvc_NotRunning              6406    The named service is not running
+
+    ; Time related errors
+    errcTm_InvalidDayOfWeek         6500    Invalid day of the week
+    errcTm_LoadTZInfo               6501    Load time zone info
+    errcTm_InvalidSpecialTime       6502    Invalid special time
+    errcTm_LoadTimeZone             6503    Error loading time zone info
+    errcTm_BelowBaseTime            6504    The base time is midnight 01/01/1970
+
+    ; Text to speech
+    errcTTS_CreateStream            6505    Could not create the target TTS output stream
+    errcTTS_Create                  6506    Could not create the TTS object
+    errcTTS_Speak                   6507    The TTS operation failed
+
+    ; UPnP errors (some are just our versions of system errors we map between)
+    errcUPnP_CreateFinder           6700    Could not create the UPnP finder
+    errcUPnP_AlreadyInit            6701    The UPnP object is already initialized
+    errcUPnP_SearchFailed           6703    The UPnP search failed
+    errcUPnP_UIDLookupFailed        6704    The UPnP device lookup by UID failed
+    errcUPnP_GetService             6705    Could not get the requested UPnP service
+    errcUPnP_PlatErr                6706    An underlying platform error occurred
+    errcUPnP_UnknownAct             6707    The provided action was not recognized
+    errcUPnP_InvokeAct              6708    An error was returned from the action invocation
+    errcUPnp_AttrQuery              6710    Could not query the requested UPnP device/service attribute
+    errcUPnP_GetOutParms            6711    Could not get the output parameters of the action
+    errcUPnP_QueryStateVar          6712    Could not query the value of state variable
+    errcUPnP_QueryServiceType       6713    Could not query the service's type
+    errcUPnP_InitAsyncFinder        6715    Could not initialize async finder object
+    errcUPnP_StartAsyncFind         6716    Could not start the async find operation
+    errcUPnP_QueryChildDevs         6717    Could not query the UPnP device's child devices
+    errcUPnP_BadSearchID            6718    The UPnP async search ID was invalid
+    errcUPnP_CancelAsyncSearch      6719    Could not cancel the indicated async UPnP search
+    errcUPnp_GetRoot                6720    Could not get the root UPnP device
+
+    ; Window related errors
+    errcWnd_NoWndClass              6800    The window class does not exist
+    errcWnd_NotAChild               6801    The window is not a child window
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Message ids
+; ----------------------------------------------------------------------------
+
+MESSAGES=
+
+    ; General strings
+    midGen_Unknown                 15000    Unknown
+    midGen_Title1                  15001    CIDLib Kernel Abstraction Layer
+    midGen_Title2                  15002    Copyright (c) CIDLib 1992..2012
+
+    ; Initialization strings
+    midInit_Core                   17000    Core initialization
+    midInit_StackDump              17001    Stack dump
+    midInit_Error                  17002    Error management
+    midInit_Audio                  17004    Audio support
+    midInit_Locale                 17005    Locale support
+    midInit_IP                     17006    IP Networking
+    midInit_Time                   17007    Time services
+    midInit_PerThread              17008    Per thread data
+    midInit_SysInfo                17009    System information
+    midInit_Environment            17010    Environmental support
+    midInit_Thread                 17011    Thread support
+    midInit_Console                17012    Console support
+    midInit_SigHandler             17013    Signal handling
+    midInit_FileSys                17014    File System
+    midInit_RemMedia               17015    Removable media
+
+    ; Messages used by TKrnlPathStr
+    midPath_UnknownPart            20000    Unknown path part enum value
+
+    ; Messages used by TKrnlThread
+    midThrd_BadRunState            25900    Internal and system view of running states disagreed
+
+END MESSAGES
+

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  -   This IDL is just used to generate types and constants for convenience
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <!-- Global types -->
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum    CIDIDL:Name="EProtos" CIDIDL:XlatMap="Text"
+                            CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="Text"
+                             CIDIDL:AltTextSrc="Inline"
+                            CIDIDL:AltMap="AltText">
+                <CIDIDL:DocText>
+                    Our known supported internet protocols
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"  CIDIDL:Text="None"     CIDIDL:AltText=""/>
+                <CIDIDL:EnumVal CIDIDL:Name="File"  CIDIDL:Text="File"     CIDIDL:AltText="file"/>
+                <CIDIDL:EnumVal CIDIDL:Name="HTTP"  CIDIDL:Text="HTTP"     CIDIDL:AltText="http"/>
+                <CIDIDL:EnumVal CIDIDL:Name="FTP"   CIDIDL:Text="FTP"      CIDIDL:AltText="ftp"/>
+                <CIDIDL:EnumVal CIDIDL:Name="MailTo" CIDIDL:Text="MailTo"  CIDIDL:AltText="mailto"/>
+                <CIDIDL:EnumVal CIDIDL:Name="News"  CIDIDL:Text="News"     CIDIDL:AltText="news"/>
+                <CIDIDL:EnumVal CIDIDL:Name="HTTPS" CIDIDL:Text="HTTPS"    CIDIDL:AltText="https"/>
+                <CIDIDL:EnumVal CIDIDL:Name="RTSP"  CIDIDL:Text="RTSP"     CIDIDL:AltText="rtsp"/>
+                <CIDIDL:EnumVal CIDIDL:Name="RTSPS" CIDIDL:Text="RTSPS"    CIDIDL:AltText="rtsps"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SIP"   CIDIDL:Text="SIP"      CIDIDL:AltText="sip"/>
+                <CIDIDL:EnumVal CIDIDL:Name="WS"    CIDIDL:Text="WS"       CIDIDL:AltText="ws"/>
+                <CIDIDL:EnumVal CIDIDL:Name="WSS"   CIDIDL:Text="WSS"      CIDIDL:AltText="wss"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum    CIDIDL:Name="EQualified" CIDIDL:XlatMap="BaseName"
+                            CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
+                            >
+                <CIDIDL:DocText>
+                    Flags for URL qualification
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Partial"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Full"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DontCare"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum    CIDIDL:Name="EExpOpts" CIDIDL:XlatMap="BaseName"
+                            CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
+                            >
+                <CIDIDL:DocText>
+                    URL encoding/expansion flags
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Encode"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Expand"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+
+

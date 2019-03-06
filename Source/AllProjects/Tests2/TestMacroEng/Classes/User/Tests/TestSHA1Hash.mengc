@@ -1,0 +1,77 @@
+Class=[NonFinal]
+    ClassPath MEng.User.Tests.TestSHA1Hash;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.SHA1Digest;
+    MEng.System.Runtime.SHA1Hash;
+    MEng.System.Runtime.TextXCoder;
+EndImports;
+
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    SHA1Digest          m_Digest;
+    SHA1Hash            m_Hash;
+    StringList          m_InList;
+    StringList          m_ResList;
+    Int4                m_RetVal;
+    TextXCoder          m_XCoder;
+    MemBuf              m_DataBuf;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+        m_XCoder("USASCII");
+    Begin
+        // Load up the input strings that we will test
+        m_InList.Append("abc");
+        m_InList.Append("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
+        m_InList.Append("The quick brown fox jumps over the lazy dog");
+        m_InList.Append("The quick brown fox jumps over the lazy cog");
+
+        // Load up the expected hashes, in formatted form
+        m_ResList.Append("A9993E36 4706816A BA3E2571 7850C26C 9CD0D89D");
+        m_ResList.Append("84983E44 1C3BD26E BAAE4AA1 F95129E5 E54670F1");
+        m_ResList.Append("2FD4E1C6 7A2D28FC ED849EE1 BB76E739 1B93EB12");
+        m_ResList.Append("DE9F2C7F D25E1B3A FAD3E85A 0BD17D9B 100DB4B3");
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            Card4 Count;
+            Card4 Index(0);
+        EndLocals;
+
+        //
+        //  Loop through the input list and hash the input string, then
+        //  compare them to the expected results in the result list.
+        //
+        Count := m_InList.GetElemCount();
+        While (Index < Count)
+            m_Digest.DigestStr(m_Hash, m_InList.GetAt(Index));
+            If (m_ResList.GetAt(Index) != m_Hash.GetAsString())
+                m_Helper.PrintErr("Hash was not expected value", m_Output, $CurLine);
+                m_Output.Flush();
+                m_RetVal := -1;
+            EndIf;
+            Index++;
+        EndWhile;
+
+        m_Digest.DigestStr(m_Hash, m_InList.GetAt(0));
+        Count := m_Hash.CopyToMemBuf(m_DataBuf);
+
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

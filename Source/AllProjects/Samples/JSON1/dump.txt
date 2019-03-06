@@ -1,0 +1,2099 @@
+Detected memory leaks!
+Dumping objects ->
+{1196} normal block at 0x00EA0E10, 52 bytes long.
+ Data: <        s       > F0 0D EA 00 00 00 00 00 73 03 00 00 A5 00 00 00 
+{1091} normal block at 0x00EAB720, 12 bytes long.
+ Data: <   e     ?  > F4 1A FC 65 01 00 00 00 80 3F EB 00 
+{1090} normal block at 0x00EA32C8, 20 bytes long.
+ Data: <T e s t . j s o > 54 00 65 00 73 00 74 00 2E 00 6A 00 73 00 6F 00 
+{1089} normal block at 0x00EA3048, 20 bytes long.
+ Data: <T e s t . j s o > 54 00 65 00 73 00 74 00 2E 00 6A 00 73 00 6F 00 
+{1088} normal block at 0x00E9E3C0, 4 bytes long.
+ Data: <    > B0 03 00 00 
+{1087} normal block at 0x00EB3F80, 40 bytes long.
+ Data: <   e    H0  t  f> D0 81 F4 65 C0 E3 E9 00 48 30 EA 00 74 B6 07 66 
+{1086} normal block at 0x00EA3808, 18 bytes long.
+ Data: <U T F - 8       > 55 00 54 00 46 00 2D 00 38 00 00 00 CD CD CD CD 
+{1084} normal block at 0x00EB4708, 8264 bytes long.
+ Data: <X  e{      "MTyp> 58 C5 F4 65 7B 0D 0A 20 20 20 20 22 4D 54 79 70 
+{1083} normal block at 0x00EA3448, 18 bytes long.
+ Data: <U S - A S C I I > 55 00 53 00 2D 00 41 00 53 00 43 00 49 00 49 00 
+{1081} normal block at 0x00EA0C90, 48 bytes long.
+ Data: < M  ,M          > 00 4D 8D 00 2C 4D 8D 00 20 00 CD CD 00 00 00 00 
+{1080} normal block at 0x00EB4648, 146 bytes long.
+ Data: <T e s t . j s o > 54 00 65 00 73 00 74 00 2E 00 6A 00 73 00 6F 00 
+{1079} normal block at 0x00EB37F0, 42 bytes long.
+ Data: <C Q S L - V M - > 43 00 51 00 53 00 4C 00 2D 00 56 00 4D 00 2D 00 
+{1078} normal block at 0x00E99CB0, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1075} normal block at 0x00EB3E78, 42 bytes long.
+ Data: <C Q S L - V M - > 43 00 51 00 53 00 4C 00 2D 00 56 00 4D 00 2D 00 
+{1074} normal block at 0x00E99B48, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1073} normal block at 0x00EB4590, 140 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{1072} normal block at 0x00E997E8, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1071} normal block at 0x00EB44B0, 174 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{1070} normal block at 0x00E99BD8, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1069} normal block at 0x00EB1D70, 158 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{1068} normal block at 0x00E99710, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1067} normal block at 0x00E8F7C8, 70 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{1066} normal block at 0x00E99830, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1065} normal block at 0x00EB3030, 68 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{1064} normal block at 0x00E99D88, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1063} normal block at 0x00EB33B0, 62 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{1062} normal block at 0x00E99B90, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1061} normal block at 0x00EAAD38, 82 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{1060} normal block at 0x00E99878, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1059} normal block at 0x00E63AC0, 138 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{1058} normal block at 0x00E99A28, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1057} normal block at 0x00EABFB8, 104 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{1056} normal block at 0x00E99AB8, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1055} normal block at 0x00E64288, 122 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{1054} normal block at 0x00E998C0, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1053} normal block at 0x00EA1858, 56 bytes long.
+ Data: <C : \ W I N D O > 43 00 3A 00 5C 00 57 00 49 00 4E 00 44 00 4F 00 
+{1052} normal block at 0x00E99D40, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1051} normal block at 0x00E6A0A0, 88 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{1050} normal block at 0x00E99128, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1049} normal block at 0x00EB3340, 62 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{1048} normal block at 0x00E99518, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1047} normal block at 0x00E95A68, 68 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{1046} normal block at 0x00E99440, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1045} normal block at 0x00EA00F0, 46 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{1044} normal block at 0x00E993B0, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1042} normal block at 0x00E9ABD8, 32 bytes long.
+ Data: <d r o d d e y   > 64 00 72 00 6F 00 64 00 64 00 65 00 79 00 00 00 
+{1041} normal block at 0x00E994D0, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1040} normal block at 0x00EA3488, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{1039} normal block at 0x00E99170, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{1036} normal block at 0x00EA3788, 18 bytes long.
+ Data: <U T F - 8       > 55 00 54 00 46 00 2D 00 38 00 00 00 CD CD CD CD 
+{1034} normal block at 0x00EB0A88, 4260 bytes long.
+ Data: <l  eI t e r a t > 6C 89 F5 65 49 00 74 00 65 00 72 00 61 00 74 00 
+{1033} normal block at 0x00E9E030, 4 bytes long.
+ Data: <h   > 68 03 00 00 
+{1032} normal block at 0x00EA3748, 20 bytes long.
+ Data: <   e        0   > B0 10 F8 65 DA 04 00 00 00 00 00 00 30 E0 E9 00 
+{1031} normal block at 0x00E9A818, 34 bytes long.
+ Data: <$ N a t i v e W > 24 00 4E 00 61 00 74 00 69 00 76 00 65 00 57 00 
+{1029} normal block at 0x00E97D78, 44 bytes long.
+ Data: < r f4r f        > 08 72 01 66 34 72 01 66 20 00 CD CD 00 00 00 00 
+{1028} normal block at 0x00EA9028, 4152 bytes long.
+ Data: <   eI t e r a t > F8 10 F8 65 49 00 74 00 65 00 72 00 61 00 74 00 
+{1027} normal block at 0x00E9DF40, 1 bytes long.
+ Data: < > 00 
+minkernel\crts\ucrt\src\appcrt\internal\per_thread_data.cpp(242) : {1026} crt block at 0x00EA7C10, subtype 0, 1736 bytes long.
+ Data: <p  e            > 70 1F AF 65 00 00 00 00 00 00 00 00 00 00 00 00 
+d:\agent\_work\2\s\src\vctools\crt\vcruntime\src\internal\per_thread_data.cpp(130) : {1025} crt block at 0x00E97CC8, subtype 0, 40 bytes long.
+ Data: <                > 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+minkernel\crts\ucrt\src\appcrt\startup\thread.cpp(135) : {1024} crt block at 0x00EA37C8, subtype 0, 20 bytes long.
+ Data: <E 3i 7        3i> 45 16 33 69 08 37 EA 00 00 00 00 00 00 00 33 69 
+{1023} normal block at 0x00E9AB38, 32 bytes long.
+ Data: <J S O N 1 M a i > 4A 00 53 00 4F 00 4E 00 31 00 4D 00 61 00 69 00 
+{1022} normal block at 0x00EA3708, 20 bytes long.
+ Data: <   e    x       > 1F C3 C6 65 00 00 00 00 78 AA E6 00 9C AA E6 00 
+{1021} normal block at 0x00E97C70, 44 bytes long.
+ Data: </ S t a t s / C > 2F 00 53 00 74 00 61 00 74 00 73 00 2F 00 43 00 
+{1020} normal block at 0x00E97A60, 40 bytes long.
+ Data: <        0>    7 > 15 00 00 00 CD CD CD CD 30 3E BA 19 C6 15 37 00 
+Win32\CIDKernel_Mutex_Win32.cpp(45) : {1019} normal block at 0x00E97B68, 43 bytes long.
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{1018} normal block at 0x00E93248, 8 bytes long.
+ Data: < {      > 80 7B E9 00 00 00 00 00 
+{1017} normal block at 0x00EA3248, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{1016} normal block at 0x00E9DC40, 2 bytes long.
+ Data: <  > 00 00 
+{1015} normal block at 0x00E9E150, 2 bytes long.
+ Data: <  > 00 00 
+{1014} normal block at 0x00E9DF10, 2 bytes long.
+ Data: <  > 00 00 
+Win32\CIDKernel_Mutex_Win32.cpp(45) : {1013} normal block at 0x00E97B10, 43 bytes long.
+ Data: <         {      > CD CD CD CD CD CD CD CD 10 7B E9 00 ED ED ED ED 
+{1012} normal block at 0x00E5A4E0, 84 bytes long.
+ Data: <h3 f 3 f     {  > 68 33 01 66 80 33 01 66 00 CD CD CD 20 7B E9 00 
+{1011} normal block at 0x00E92FE0, 12 bytes long.
+ Data: <   f   f^   > F8 80 0B 66 1C 81 0B 66 5E 11 8C 00 
+{1010} normal block at 0x00E9AD18, 32 bytes long.
+ Data: <J S O N 1 M a i > 4A 00 53 00 4F 00 4E 00 31 00 4D 00 61 00 69 00 
+{1009} normal block at 0x00E93558, 8 bytes long.
+ Data: <8    6  > 38 03 00 00 84 36 00 00 
+Win32\CIDKernel_Event_Win32.cpp(45) : {1008} normal block at 0x00E97AB8, 43 bytes long.
+ Data: < z      0       > B8 7A E9 00 ED ED ED ED 30 03 00 00 CD CD CD CD 
+Win32\CIDKernel_Event_Win32.cpp(45) : {1007} normal block at 0x00E97C18, 43 bytes long.
+ Data: < |      ,       > 18 7C E9 00 ED ED ED ED 2C 03 00 00 CD CD CD CD 
+{1005} normal block at 0x00E6AA78, 80 bytes long.
+ Data: <HM  pM          > 48 4D 8D 00 70 4D 8D 00 00 00 00 CD 00 00 00 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {1004} crt block at 0x00E69000, subtype 0, 164 bytes long.
+ Data: <_ N T _ A L T _ > 5F 00 4E 00 54 00 5F 00 41 00 4C 00 54 00 5F 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {1003} crt block at 0x00E67798, subtype 0, 128 bytes long.
+ Data: <W M P S D K D I > 57 00 4D 00 50 00 53 00 44 00 4B 00 44 00 49 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {1002} crt block at 0x00E67378, subtype 0, 126 bytes long.
+ Data: <W M F S D K D I > 57 00 4D 00 46 00 53 00 44 00 4B 00 44 00 49 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {1001} crt block at 0x00E9ACC8, subtype 0, 36 bytes long.
+ Data: <w i n d i r = C > 77 00 69 00 6E 00 64 00 69 00 72 00 3D 00 43 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {1000} crt block at 0x00E66EA8, subtype 0, 128 bytes long.
+ Data: <V S T U D I O P > 56 00 53 00 54 00 55 00 44 00 49 00 4F 00 50 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {999} crt block at 0x00EACEA0, subtype 0, 164 bytes long.
+ Data: <V S 1 4 0 C O M > 56 00 53 00 31 00 34 00 30 00 43 00 4F 00 4D 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {998} crt block at 0x00E61FE8, subtype 0, 164 bytes long.
+ Data: <V S 1 2 0 C O M > 56 00 53 00 31 00 32 00 30 00 43 00 4F 00 4D 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {997} crt block at 0x00E5F4C0, subtype 0, 164 bytes long.
+ Data: <V S 1 1 0 C O M > 56 00 53 00 31 00 31 00 30 00 43 00 4F 00 4D 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {996} crt block at 0x00EA6920, subtype 0, 116 bytes long.
+ Data: <V B O X _ M S I > 56 00 42 00 4F 00 58 00 5F 00 4D 00 53 00 49 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {995} crt block at 0x00EA1CD0, subtype 0, 58 bytes long.
+ Data: <U S E R P R O F > 55 00 53 00 45 00 52 00 50 00 52 00 4F 00 46 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {994} crt block at 0x00E9AC78, subtype 0, 34 bytes long.
+ Data: <U S E R N A M E > 55 00 53 00 45 00 52 00 4E 00 41 00 4D 00 45 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {993} crt block at 0x00E62210, subtype 0, 78 bytes long.
+ Data: <U S E R D O M A > 55 00 53 00 45 00 52 00 44 00 4F 00 4D 00 41 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {992} crt block at 0x00EA07B0, subtype 0, 48 bytes long.
+ Data: <U S E R D O M A > 55 00 53 00 45 00 52 00 44 00 4F 00 4D 00 41 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {991} crt block at 0x00E592F8, subtype 0, 80 bytes long.
+ Data: <T M P = C : \ U > 54 00 4D 00 50 00 3D 00 43 00 3A 00 5C 00 55 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {990} crt block at 0x00E958A8, subtype 0, 62 bytes long.
+ Data: <T e s t V a r 2 > 54 00 65 00 73 00 74 00 56 00 61 00 72 00 32 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {989} crt block at 0x00E956E8, subtype 0, 62 bytes long.
+ Data: <T e s t V a r 1 > 54 00 65 00 73 00 74 00 56 00 61 00 72 00 31 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {988} crt block at 0x00E64EE8, subtype 0, 82 bytes long.
+ Data: <T E M P = C : \ > 54 00 45 00 4D 00 50 00 3D 00 43 00 3A 00 5C 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {987} crt block at 0x00E97A08, subtype 0, 44 bytes long.
+ Data: <S y s t e m R o > 53 00 79 00 73 00 74 00 65 00 6D 00 52 00 6F 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {986} crt block at 0x00E9A8B8, subtype 0, 30 bytes long.
+ Data: <S y s t e m D r > 53 00 79 00 73 00 74 00 65 00 6D 00 44 00 72 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {985} crt block at 0x00E645D0, subtype 0, 118 bytes long.
+ Data: <S P E E C H S D > 53 00 50 00 45 00 45 00 43 00 48 00 53 00 44 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {984} crt block at 0x00E67638, subtype 0, 130 bytes long.
+ Data: <S P E E C H P L > 53 00 50 00 45 00 45 00 43 00 48 00 50 00 4C 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {983} crt block at 0x00E6A018, subtype 0, 88 bytes long.
+ Data: <S D K T W E A K > 53 00 44 00 4B 00 54 00 57 00 45 00 41 00 4B 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {982} crt block at 0x00E62FC8, subtype 0, 98 bytes long.
+ Data: <S C I N T I L L > 53 00 43 00 49 00 4E 00 54 00 49 00 4C 00 4C 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {981} crt block at 0x00E69358, subtype 0, 86 bytes long.
+ Data: <Q T S D K = C : > 51 00 54 00 53 00 44 00 4B 00 3D 00 43 00 3A 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {980} crt block at 0x00EA0210, subtype 0, 46 bytes long.
+ Data: <P U B L I C = C > 50 00 55 00 42 00 4C 00 49 00 43 00 3D 00 43 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {979} crt block at 0x00E66458, subtype 0, 390 bytes long.
+ Data: <P S M o d u l e > 50 00 53 00 4D 00 6F 00 64 00 75 00 6C 00 65 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {978} crt block at 0x00E99488, subtype 0, 24 bytes long.
+ Data: <P R O M P T = $ > 50 00 52 00 4F 00 4D 00 50 00 54 00 3D 00 24 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {977} crt block at 0x00EA1788, subtype 0, 60 bytes long.
+ Data: <P r o g r a m W > 50 00 72 00 6F 00 67 00 72 00 61 00 6D 00 57 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {976} crt block at 0x00E66370, subtype 0, 82 bytes long.
+ Data: <P r o g r a m F > 50 00 72 00 6F 00 67 00 72 00 61 00 6D 00 46 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {975} crt block at 0x00E8FC00, subtype 0, 72 bytes long.
+ Data: <P r o g r a m F > 50 00 72 00 6F 00 67 00 72 00 61 00 6D 00 46 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {974} crt block at 0x00EA19F8, subtype 0, 54 bytes long.
+ Data: <P r o g r a m D > 50 00 72 00 6F 00 67 00 72 00 61 00 6D 00 44 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {973} crt block at 0x00EA0150, subtype 0, 48 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {972} crt block at 0x00E9A9A8, subtype 0, 36 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {971} crt block at 0x00E6B360, subtype 0, 144 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {970} crt block at 0x00EA1650, subtype 0, 58 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {969} crt block at 0x00EA1A60, subtype 0, 54 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {968} crt block at 0x00EAC3E0, subtype 0, 102 bytes long.
+ Data: <P L A T F O R M > 50 00 4C 00 41 00 54 00 46 00 4F 00 52 00 4D 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {967} crt block at 0x00E64BB8, subtype 0, 124 bytes long.
+ Data: <P A T H E X T = > 50 00 41 00 54 00 48 00 45 00 58 00 54 00 3D 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {966} crt block at 0x00EA54F8, subtype 0, 4276 bytes long.
+ Data: <P a t h = C : \ > 50 00 61 00 74 00 68 00 3D 00 43 00 3A 00 5C 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {965} crt block at 0x00E99050, subtype 0, 28 bytes long.
+ Data: <O S = W i n d o > 4F 00 53 00 3D 00 57 00 69 00 6E 00 64 00 6F 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {964} crt block at 0x00E8FA20, subtype 0, 70 bytes long.
+ Data: <O n e D r i v e > 4F 00 6E 00 65 00 44 00 72 00 69 00 76 00 65 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {963} crt block at 0x00EA0750, subtype 0, 46 bytes long.
+ Data: <N U M B E R _ O > 4E 00 55 00 4D 00 42 00 45 00 52 00 5F 00 4F 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {962} crt block at 0x00EA17F0, subtype 0, 54 bytes long.
+ Data: <L O G O N S E R > 4C 00 4F 00 47 00 4F 00 4E 00 53 00 45 00 52 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {961} crt block at 0x00E69AC8, subtype 0, 88 bytes long.
+ Data: <L O C A L A P P > 4C 00 4F 00 43 00 41 00 4C 00 41 00 50 00 50 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {960} crt block at 0x00E69798, subtype 0, 86 bytes long.
+ Data: <L I B V L C _ S > 4C 00 49 00 42 00 56 00 4C 00 43 00 5F 00 53 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {959} crt block at 0x00E62E18, subtype 0, 96 bytes long.
+ Data: <L I B V L C _ P > 4C 00 49 00 42 00 56 00 4C 00 43 00 5F 00 50 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {958} crt block at 0x00EAC910, subtype 0, 1376 bytes long.
+ Data: <L I B = D : \ C > 4C 00 49 00 42 00 3D 00 44 00 3A 00 5C 00 43 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {957} crt block at 0x00E676E8, subtype 0, 130 bytes long.
+ Data: <K I N E C T S D > 4B 00 49 00 4E 00 45 00 43 00 54 00 53 00 44 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {956} crt block at 0x00E8F9A8, subtype 0, 76 bytes long.
+ Data: <I T U N E S S D > 49 00 54 00 55 00 4E 00 45 00 53 00 53 00 44 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {955} crt block at 0x00EA4DE8, subtype 0, 1764 bytes long.
+ Data: <I N C L U D E = > 49 00 4E 00 43 00 4C 00 55 00 44 00 45 00 3D 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {954} crt block at 0x00EA0030, subtype 0, 48 bytes long.
+ Data: <H O M E P A T H > 48 00 4F 00 4D 00 45 00 50 00 41 00 54 00 48 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {953} crt block at 0x00E99560, subtype 0, 26 bytes long.
+ Data: <H O M E D R I V > 48 00 4F 00 4D 00 45 00 44 00 52 00 49 00 56 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {952} crt block at 0x00EAC050, subtype 0, 102 bytes long.
+ Data: <E N V S E T U P > 45 00 4E 00 56 00 53 00 45 00 54 00 55 00 50 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {951} crt block at 0x00E62908, subtype 0, 100 bytes long.
+ Data: <D r i v e r D a > 44 00 72 00 69 00 76 00 65 00 72 00 44 00 61 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {950} crt block at 0x00E69E80, subtype 0, 90 bytes long.
+ Data: <C Q C R u n t i > 43 00 51 00 43 00 52 00 75 00 6E 00 74 00 69 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {949} crt block at 0x00E5F008, subtype 0, 82 bytes long.
+ Data: <C Q C I n s t I > 43 00 51 00 43 00 49 00 6E 00 73 00 74 00 49 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {948} crt block at 0x00E8F750, subtype 0, 72 bytes long.
+ Data: <C o m S p e c = > 43 00 6F 00 6D 00 53 00 70 00 65 00 63 00 3D 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {947} crt block at 0x00EA04B0, subtype 0, 52 bytes long.
+ Data: <C O M P U T E R > 43 00 4F 00 4D 00 50 00 55 00 54 00 45 00 52 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {946} crt block at 0x00E63178, subtype 0, 98 bytes long.
+ Data: <C o m m o n P r > 43 00 6F 00 6D 00 6D 00 6F 00 6E 00 50 00 72 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {945} crt block at 0x00E64A68, subtype 0, 120 bytes long.
+ Data: <C o m m o n P r > 43 00 6F 00 6D 00 6D 00 6F 00 6E 00 50 00 72 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {944} crt block at 0x00E61F00, subtype 0, 110 bytes long.
+ Data: <C o m m o n P r > 43 00 6F 00 6D 00 6D 00 6F 00 6E 00 50 00 72 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {943} crt block at 0x00E979B0, subtype 0, 44 bytes long.
+ Data: <C I D _ V E R S > 43 00 49 00 44 00 5F 00 56 00 45 00 52 00 53 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {942} crt block at 0x00E97BC0, subtype 0, 40 bytes long.
+ Data: <C I D _ V E R S > 43 00 49 00 44 00 5F 00 56 00 45 00 52 00 53 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {941} crt block at 0x00E62CF8, subtype 0, 96 bytes long.
+ Data: <C I D _ S R C T > 43 00 49 00 44 00 5F 00 53 00 52 00 43 00 54 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {940} crt block at 0x00E6BD58, subtype 0, 144 bytes long.
+ Data: <C I D _ R E S D > 43 00 49 00 44 00 5F 00 52 00 45 00 53 00 44 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {939} crt block at 0x00EA0570, subtype 0, 48 bytes long.
+ Data: <C I D _ P L A T > 43 00 49 00 44 00 5F 00 50 00 4C 00 41 00 54 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {938} crt block at 0x00E61DA8, subtype 0, 198 bytes long.
+ Data: <C I D _ L O C A > 43 00 49 00 44 00 5F 00 4C 00 4F 00 43 00 41 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {937} crt block at 0x00E98EA0, subtype 0, 26 bytes long.
+ Data: <C I D _ D R I V > 43 00 49 00 44 00 5F 00 44 00 52 00 49 00 56 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {936} crt block at 0x00E9AD68, subtype 0, 36 bytes long.
+ Data: <C I D _ B U I L > 43 00 49 00 44 00 5F 00 42 00 55 00 49 00 4C 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {935} crt block at 0x00E63298, subtype 0, 100 bytes long.
+ Data: <C I D L I B _ S > 43 00 49 00 44 00 4C 00 49 00 42 00 5F 00 53 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {934} crt block at 0x00E66C40, subtype 0, 82 bytes long.
+ Data: <A P P D A T A = > 41 00 50 00 50 00 44 00 41 00 54 00 41 00 3D 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {933} crt block at 0x00E95678, subtype 0, 62 bytes long.
+ Data: <A L L U S E R S > 41 00 4C 00 4C 00 55 00 53 00 45 00 52 00 53 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(115) : {932} crt block at 0x00E68DD0, subtype 0, 292 bytes long.
+ Data: <xV  @l   2  h   > 78 56 E9 00 40 6C E6 00 98 32 E6 00 68 AD E9 00 
+minkernel\crts\ucrt\src\appcrt\internal\per_thread_data.cpp(242) : {930} crt block at 0x00EA4020, subtype 0, 1736 bytes long.
+ Data: <p  e            > 70 1F AF 65 00 00 00 00 00 00 00 00 00 00 00 00 
+d:\agent\_work\2\s\src\vctools\crt\vcruntime\src\internal\per_thread_data.cpp(130) : {929} crt block at 0x00E96F60, subtype 0, 40 bytes long.
+ Data: <                > 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+minkernel\crts\ucrt\src\appcrt\startup\argv_parsing.cpp(285) : {928} crt block at 0x00E96F08, subtype 0, 44 bytes long.
+ Data: < o   o      J S > 14 6F E9 00 20 6F E9 00 00 00 00 00 4A 00 53 00 
+minkernel\crts\ucrt\src\appcrt\startup\onexit.cpp(112) : {927} crt block at 0x00E66DF8, subtype 0, 128 bytes long.
+ Data: <t   ~   ~   ~   > 74 CE BC 99 7E CB 9F D9 7E CB 9F D9 7E CB 9F D9 
+{926} normal block at 0x00E95758, 64 bytes long.
+ Data: <5 _ 3 3 3 3 _ y > 35 00 5F 00 33 00 33 00 33 00 33 00 5F 00 79 00 
+{924} normal block at 0x00EA3548, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{923} normal block at 0x00EA13E0, 54 bytes long.
+ Data: <E R e a d T y p > 45 00 52 00 65 00 61 00 64 00 54 00 79 00 70 00 
+{922} normal block at 0x00E9A138, 30 bytes long.
+ Data: <S e r v e r     > 53 00 65 00 72 00 76 00 65 00 72 00 00 00 CD CD 
+{921} normal block at 0x00EA3508, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{920} normal block at 0x00EA30C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{919} normal block at 0x00EA31C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{918} normal block at 0x00EA3608, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{917} normal block at 0x00EA1720, 54 bytes long.
+ Data: <E R e a d T y p > 45 00 52 00 65 00 61 00 64 00 54 00 79 00 70 00 
+{916} normal block at 0x00E9A458, 30 bytes long.
+ Data: <C l i e n t     > 43 00 6C 00 69 00 65 00 6E 00 74 00 00 00 CD CD 
+{915} normal block at 0x00EA3588, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{914} normal block at 0x00EA3188, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{913} normal block at 0x00EA3288, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{911} normal block at 0x00EA36C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{910} normal block at 0x00EA1990, 60 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{909} normal block at 0x00E9A098, 32 bytes long.
+ Data: <T i m e o u t   > 54 00 69 00 6D 00 65 00 6F 00 75 00 74 00 00 00 
+{908} normal block at 0x00EA3148, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{907} normal block at 0x00EA3208, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{906} normal block at 0x00EA3408, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{905} normal block at 0x00EA35C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{904} normal block at 0x00E95598, 66 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{903} normal block at 0x00E97850, 38 bytes long.
+ Data: <P a r t i a l M > 50 00 61 00 72 00 74 00 69 00 61 00 6C 00 4D 00 
+{902} normal block at 0x00EA3088, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{901} normal block at 0x00EA3108, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{900} normal block at 0x00EA3648, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{899} normal block at 0x00EA3688, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{898} normal block at 0x00E959F8, 66 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{897} normal block at 0x00E97640, 38 bytes long.
+ Data: <I n v a l i d M > 49 00 6E 00 76 00 61 00 6C 00 69 00 64 00 4D 00 
+{896} normal block at 0x00EA2A40, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{895} normal block at 0x00EA2900, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{894} normal block at 0x00EA28C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{893} normal block at 0x00EA2840, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{892} normal block at 0x00EA1580, 60 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{891} normal block at 0x00E9A048, 32 bytes long.
+ Data: <C o n t L e n   > 43 00 6F 00 6E 00 74 00 4C 00 65 00 6E 00 00 00 
+{890} normal block at 0x00EA2A00, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{889} normal block at 0x00EA2B80, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{888} normal block at 0x00EA2880, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{887} normal block at 0x00EA2B40, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{886} normal block at 0x00E95528, 68 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{885} normal block at 0x00E96EB0, 40 bytes long.
+ Data: <B u f T o o S m > 42 00 75 00 66 00 54 00 6F 00 6F 00 53 00 6D 00 
+{884} normal block at 0x00EA2E00, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{883} normal block at 0x00EA2B00, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{882} normal block at 0x00EA2AC0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{881} normal block at 0x00EA2CC0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{880} normal block at 0x00E95838, 68 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{879} normal block at 0x00E97590, 40 bytes long.
+ Data: <B a d P r o t o > 42 00 61 00 64 00 50 00 72 00 6F 00 74 00 6F 00 
+{878} normal block at 0x00EA2980, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{877} normal block at 0x00EA2D00, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{876} normal block at 0x00EA2FC0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{875} normal block at 0x00EA2A80, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{874} normal block at 0x00E954B8, 68 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{873} normal block at 0x00E971C8, 40 bytes long.
+ Data: <B a d L i n e C > 42 00 61 00 64 00 4C 00 69 00 6E 00 65 00 43 00 
+{872} normal block at 0x00EA2C80, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{871} normal block at 0x00EA2DC0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{870} normal block at 0x00EA2F00, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{869} normal block at 0x00EA2940, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{868} normal block at 0x00E957C8, 66 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{867} normal block at 0x00E974E0, 38 bytes long.
+ Data: <B a d H d r L i > 42 00 61 00 64 00 48 00 64 00 72 00 4C 00 69 00 
+{866} normal block at 0x00EA2E40, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{865} normal block at 0x00EA2EC0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{864} normal block at 0x00EA2C40, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{863} normal block at 0x00EA2D40, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{862} normal block at 0x00E8FDE0, 70 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{861} normal block at 0x00E97488, 42 bytes long.
+ Data: <B a d F i r s t > 42 00 61 00 64 00 46 00 69 00 72 00 73 00 74 00 
+{860} normal block at 0x00EA2F80, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{859} normal block at 0x00EA29C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{858} normal block at 0x00EA2BC0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{857} normal block at 0x00EA2C00, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{856} normal block at 0x00EA1AC8, 60 bytes long.
+ Data: <E N e t P R e a > 45 00 4E 00 65 00 74 00 50 00 52 00 65 00 61 00 
+{855} normal block at 0x00E9A2C8, 32 bytes long.
+ Data: <S u c c e s s   > 53 00 75 00 63 00 63 00 65 00 73 00 73 00 00 00 
+{854} normal block at 0x00EA2E80, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{853} normal block at 0x00EA2D80, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{852} normal block at 0x00EA2F40, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{850} normal block at 0x00EA2280, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{849} normal block at 0x00E8FD68, 70 bytes long.
+ Data: <E L o g F l a g > 45 00 4C 00 6F 00 67 00 46 00 6C 00 61 00 67 00 
+{848} normal block at 0x00EA0870, 48 bytes long.
+ Data: <X M L U R L E n > 58 00 4D 00 4C 00 55 00 52 00 4C 00 45 00 6E 00 
+{847} normal block at 0x00EA27C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{846} normal block at 0x00E95448, 62 bytes long.
+ Data: <C I D N e t / X > 43 00 49 00 44 00 4E 00 65 00 74 00 2F 00 58 00 
+{845} normal block at 0x00EA2500, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{844} normal block at 0x00EA2200, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{843} normal block at 0x00EA0630, 48 bytes long.
+ Data: <E L o g F l a g > 45 00 4C 00 6F 00 67 00 46 00 6C 00 61 00 67 00 
+{842} normal block at 0x00E99248, 26 bytes long.
+ Data: <S M T P         > 53 00 4D 00 54 00 50 00 00 00 CD CD CD CD CD CD 
+{841} normal block at 0x00EA24C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{840} normal block at 0x00E973D8, 40 bytes long.
+ Data: <C I D N e t / S > 43 00 49 00 44 00 4E 00 65 00 74 00 2F 00 53 00 
+{839} normal block at 0x00EA21C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{838} normal block at 0x00EA2480, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{837} normal block at 0x00EA0090, 48 bytes long.
+ Data: <E L o g F l a g > 45 00 4C 00 6F 00 67 00 46 00 6C 00 61 00 67 00 
+{836} normal block at 0x00E98E58, 26 bytes long.
+ Data: <J S O N         > 4A 00 53 00 4F 00 4E 00 00 00 CD CD CD CD CD CD 
+{835} normal block at 0x00EA2440, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{834} normal block at 0x00E97170, 40 bytes long.
+ Data: <C I D N e t / J > 43 00 49 00 44 00 4E 00 65 00 74 00 2F 00 4A 00 
+{833} normal block at 0x00EA2700, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{832} normal block at 0x00EA20C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{831} normal block at 0x00EA16B8, 60 bytes long.
+ Data: <E L o g F l a g > 45 00 4C 00 6F 00 67 00 46 00 6C 00 61 00 67 00 
+{830} normal block at 0x00E96E58, 38 bytes long.
+ Data: <H T T P C l i e > 48 00 54 00 54 00 50 00 43 00 6C 00 69 00 65 00 
+{829} normal block at 0x00EA26C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{828} normal block at 0x00EA05D0, 52 bytes long.
+ Data: <C I D N e t / H > 43 00 49 00 44 00 4E 00 65 00 74 00 2F 00 48 00 
+{827} normal block at 0x00EA2780, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{826} normal block at 0x00EA2040, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{825} normal block at 0x00EA1378, 60 bytes long.
+ Data: <E L o g F l a g > 45 00 4C 00 6F 00 67 00 46 00 6C 00 61 00 67 00 
+{824} normal block at 0x00E97430, 38 bytes long.
+ Data: <C o r e P a r s > 43 00 6F 00 72 00 65 00 50 00 61 00 72 00 73 00 
+{823} normal block at 0x00EA2400, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{822} normal block at 0x00EA06F0, 52 bytes long.
+ Data: <C I D N e t / C > 43 00 49 00 44 00 4E 00 65 00 74 00 2F 00 43 00 
+{821} normal block at 0x00EA2800, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+minkernel\crts\ucrt\src\appcrt\startup\onexit.cpp(112) : {819} crt block at 0x00E9B050, subtype 0, 256 bytes long.
+ Data: <                > DE B6 14 C3 D2 B6 14 C3 A2 B6 14 C3 C6 B6 14 C3 
+{818} normal block at 0x00EA2180, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{817} normal block at 0x00EA0690, 52 bytes long.
+ Data: <E J S O N V T y > 45 00 4A 00 53 00 4F 00 4E 00 56 00 54 00 79 00 
+{816} normal block at 0x00E990E0, 26 bytes long.
+ Data: <T r u e         > 54 00 72 00 75 00 65 00 00 00 CD CD CD CD CD CD 
+{815} normal block at 0x00EA23C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{814} normal block at 0x00EA2080, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{813} normal block at 0x00EA2340, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{812} normal block at 0x00EA2240, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{811} normal block at 0x00EA1928, 56 bytes long.
+ Data: <E J S O N V T y > 45 00 4A 00 53 00 4F 00 4E 00 56 00 54 00 79 00 
+{810} normal block at 0x00E9A3B8, 30 bytes long.
+ Data: <S t r i n g     > 53 00 74 00 72 00 69 00 6E 00 67 00 00 00 CD CD 
+{809} normal block at 0x00EA22C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{808} normal block at 0x00EA2680, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{807} normal block at 0x00EA2380, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{806} normal block at 0x00EA2640, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{805} normal block at 0x00EA18C0, 56 bytes long.
+ Data: <E J S O N V T y > 45 00 4A 00 53 00 4F 00 4E 00 56 00 54 00 79 00 
+{804} normal block at 0x00E9A548, 30 bytes long.
+ Data: <O b j e c t     > 4F 00 62 00 6A 00 65 00 63 00 74 00 00 00 CD CD 
+{803} normal block at 0x00EA2580, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{802} normal block at 0x00EA2740, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{801} normal block at 0x00EA2140, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{800} normal block at 0x00EA2100, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{799} normal block at 0x00EA15E8, 56 bytes long.
+ Data: <E J S O N V T y > 45 00 4A 00 53 00 4F 00 4E 00 56 00 54 00 79 00 
+{798} normal block at 0x00E99FF8, 30 bytes long.
+ Data: <N u m b e r     > 4E 00 75 00 6D 00 62 00 65 00 72 00 00 00 CD CD 
+{797} normal block at 0x00EA2540, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{796} normal block at 0x00EA2600, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{795} normal block at 0x00EA2300, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{794} normal block at 0x00EA25C0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{793} normal block at 0x00EA0990, 52 bytes long.
+ Data: <E J S O N V T y > 45 00 4A 00 53 00 4F 00 4E 00 56 00 54 00 79 00 
+{792} normal block at 0x00E99008, 26 bytes long.
+ Data: <N u l l         > 4E 00 75 00 6C 00 6C 00 00 00 CD CD CD CD CD CD 
+{791} normal block at 0x00E9F2E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{790} normal block at 0x00E9F1E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{789} normal block at 0x00E9F1A8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{788} normal block at 0x00E9F668, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{787} normal block at 0x00EA1518, 54 bytes long.
+ Data: <E J S O N V T y > 45 00 4A 00 53 00 4F 00 4E 00 56 00 54 00 79 00 
+{786} normal block at 0x00E98E10, 28 bytes long.
+ Data: <F a l s e       > 46 00 61 00 6C 00 73 00 65 00 00 00 CD CD CD CD 
+{785} normal block at 0x00E9F328, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{784} normal block at 0x00E9F168, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{783} normal block at 0x00E9F068, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{782} normal block at 0x00E9F768, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{781} normal block at 0x00E8E520, 54 bytes long.
+ Data: <E J S O N V T y > 45 00 4A 00 53 00 4F 00 4E 00 56 00 54 00 79 00 
+{780} normal block at 0x00E98EE8, 28 bytes long.
+ Data: <A r r a y       > 41 00 72 00 72 00 61 00 79 00 00 00 CD CD CD CD 
+{779} normal block at 0x00E9F628, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{778} normal block at 0x00E9F7A8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{777} normal block at 0x00E9F7E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{775} normal block at 0x00E9F5E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{774} normal block at 0x00E8E318, 54 bytes long.
+ Data: <E H T T P C o d > 45 00 48 00 54 00 54 00 50 00 43 00 6F 00 64 00 
+{773} normal block at 0x00E99F08, 30 bytes long.
+ Data: <S r v E r r     > 53 00 72 00 76 00 45 00 72 00 72 00 00 00 CD CD 
+{772} normal block at 0x00E9F128, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{771} normal block at 0x00E9F2A8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{770} normal block at 0x00E9F728, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{769} normal block at 0x00E9F268, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{768} normal block at 0x00E8E2B0, 60 bytes long.
+ Data: <E H T T P C o d > 45 00 48 00 54 00 54 00 50 00 43 00 6F 00 64 00 
+{767} normal block at 0x00E9A728, 36 bytes long.
+ Data: <C l i e n t E r > 43 00 6C 00 69 00 65 00 6E 00 74 00 45 00 72 00 
+{766} normal block at 0x00E9F5A8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{765} normal block at 0x00E9F0A8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{764} normal block at 0x00E9F028, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{763} normal block at 0x00E9F0E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{762} normal block at 0x00E8E5F0, 58 bytes long.
+ Data: <E H T T P C o d > 45 00 48 00 54 00 54 00 50 00 43 00 6F 00 64 00 
+{761} normal block at 0x00E9A598, 34 bytes long.
+ Data: <R e d i r e c t > 52 00 65 00 64 00 69 00 72 00 65 00 63 00 74 00 
+{760} normal block at 0x00E9F4E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{759} normal block at 0x00E9F3E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{758} normal block at 0x00E9F228, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{757} normal block at 0x00E9F6E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{756} normal block at 0x00E8E1E0, 56 bytes long.
+ Data: <E H T T P C o d > 45 00 48 00 54 00 54 00 50 00 43 00 6F 00 64 00 
+{755} normal block at 0x00E9A0E8, 32 bytes long.
+ Data: <S u c c e s s   > 53 00 75 00 63 00 63 00 65 00 73 00 73 00 00 00 
+{754} normal block at 0x00E9F3A8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{753} normal block at 0x00E9F4A8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{752} normal block at 0x00E9F6A8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{751} normal block at 0x00E9F468, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{750} normal block at 0x00EA0930, 50 bytes long.
+ Data: <E H T T P C o d > 45 00 48 00 54 00 54 00 50 00 43 00 6F 00 64 00 
+{749} normal block at 0x00E98FC0, 26 bytes long.
+ Data: <I n f o         > 49 00 6E 00 66 00 6F 00 00 00 CD CD CD CD CD CD 
+{748} normal block at 0x00E9F568, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{747} normal block at 0x00E9F528, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{746} normal block at 0x00E9F428, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{745} normal block at 0x00E9F368, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{744} normal block at 0x00E8E4B8, 56 bytes long.
+ Data: <E H T T P C o d > 45 00 48 00 54 00 54 00 50 00 43 00 6F 00 64 00 
+{743} normal block at 0x00E9A408, 32 bytes long.
+ Data: <U n k n o w n   > 55 00 6E 00 6B 00 6E 00 6F 00 77 00 6E 00 00 00 
+{742} normal block at 0x00E9FCA8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{741} normal block at 0x00E9F868, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{740} normal block at 0x00E9FC68, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{738} normal block at 0x00E9FC28, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{737} normal block at 0x00E953D8, 66 bytes long.
+ Data: <E M a i l A u t > 45 00 4D 00 61 00 69 00 6C 00 41 00 75 00 74 00 
+{736} normal block at 0x00E99FA8, 34 bytes long.
+ Data: <P O P F i r s t > 50 00 4F 00 50 00 46 00 69 00 72 00 73 00 74 00 
+{735} normal block at 0x00E9F828, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{734} normal block at 0x00E9FDE8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{733} normal block at 0x00E9FF68, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{732} normal block at 0x00E9FDA8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{731} normal block at 0x00E8E178, 58 bytes long.
+ Data: <E M a i l A u t > 45 00 4D 00 61 00 69 00 6C 00 41 00 75 00 74 00 
+{730} normal block at 0x00E995F0, 26 bytes long.
+ Data: <S M T P         > 53 00 4D 00 54 00 50 00 00 00 CD CD CD CD CD CD 
+{729} normal block at 0x00E9FB28, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{728} normal block at 0x00E9FF28, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{727} normal block at 0x00E9FBA8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{726} normal block at 0x00E9FA68, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{725} normal block at 0x00E8E450, 58 bytes long.
+ Data: <E M a i l A u t > 45 00 4D 00 61 00 69 00 6C 00 41 00 75 00 74 00 
+{724} normal block at 0x00E991B8, 26 bytes long.
+ Data: <N o n e         > 4E 00 6F 00 6E 00 65 00 00 00 CD CD CD CD CD CD 
+{723} normal block at 0x00E9FA28, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{722} normal block at 0x00E9FD68, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{721} normal block at 0x00E9FAE8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{719} normal block at 0x00E9F8A8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{718} normal block at 0x00E95AD8, 62 bytes long.
+ Data: <E H T T P A u t > 45 00 48 00 54 00 54 00 50 00 41 00 75 00 74 00 
+{717} normal block at 0x00E9A278, 30 bytes long.
+ Data: <D i g e s t     > 44 00 69 00 67 00 65 00 73 00 74 00 00 00 CD CD 
+{716} normal block at 0x00E9F968, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{715} normal block at 0x00E9FAA8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{714} normal block at 0x00E9FEE8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{713} normal block at 0x00E9F8E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{712} normal block at 0x00E8E110, 60 bytes long.
+ Data: <E H T T P A u t > 45 00 48 00 54 00 54 00 50 00 41 00 75 00 74 00 
+{711} normal block at 0x00E99320, 28 bytes long.
+ Data: <B a s i c       > 42 00 61 00 73 00 69 00 63 00 00 00 CD CD CD CD 
+{710} normal block at 0x00E9FFA8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{709} normal block at 0x00E9FEA8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{708} normal block at 0x00E9F9E8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{707} normal block at 0x00EA0B70, 50 bytes long.
+ Data: <W W W - A u t h > 57 00 57 00 57 00 2D 00 41 00 75 00 74 00 68 00 
+{706} normal block at 0x00E99E68, 32 bytes long.
+ Data: <U p g r a d e   > 55 00 70 00 67 00 72 00 61 00 64 00 65 00 00 00 
+{705} normal block at 0x00E995A8, 22 bytes long.
+ Data: <T E             > 54 00 45 00 00 00 CD CD CD CD CD CD CD CD CD CD 
+{704} normal block at 0x00EA09F0, 52 bytes long.
+ Data: <T r a n s f e r > 54 00 72 00 61 00 6E 00 73 00 66 00 65 00 72 00 
+{703} normal block at 0x00EA0390, 52 bytes long.
+ Data: <S e c - W e b S > 53 00 65 00 63 00 2D 00 57 00 65 00 62 00 53 00 
+{702} normal block at 0x00E8E248, 58 bytes long.
+ Data: <S e c - W e b S > 53 00 65 00 63 00 2D 00 57 00 65 00 62 00 53 00 
+{701} normal block at 0x00E99E18, 30 bytes long.
+ Data: <O r i g i n     > 4F 00 72 00 69 00 67 00 69 00 6E 00 00 00 CD CD 
+{700} normal block at 0x00E9A6D8, 34 bytes long.
+ Data: <L o c a t i o n > 4C 00 6F 00 63 00 61 00 74 00 69 00 6F 00 6E 00 
+{699} normal block at 0x00E97118, 44 bytes long.
+ Data: <L a s t - M o d > 4C 00 61 00 73 00 74 00 2D 00 4D 00 6F 00 64 00 
+{698} normal block at 0x00EA08D0, 52 bytes long.
+ Data: <I f - M o d i f > 49 00 66 00 2D 00 4D 00 6F 00 64 00 69 00 66 00 
+{697} normal block at 0x00E99638, 26 bytes long.
+ Data: <H o s t         > 48 00 6F 00 73 00 74 00 00 00 CD CD CD CD CD CD 
+{696} normal block at 0x00E9A7C8, 32 bytes long.
+ Data: <E x p i r e s   > 45 00 78 00 70 00 69 00 72 00 65 00 73 00 00 00 
+{695} normal block at 0x00E996C8, 26 bytes long.
+ Data: <E T a g         > 45 00 54 00 61 00 67 00 00 00 CD CD CD CD CD CD 
+{694} normal block at 0x00E97328, 42 bytes long.
+ Data: <C o n t e n t - > 43 00 6F 00 6E 00 74 00 65 00 6E 00 74 00 2D 00 
+{693} normal block at 0x00E95368, 68 bytes long.
+ Data: <C o n t e n t - > 43 00 6F 00 6E 00 74 00 65 00 6E 00 74 00 2D 00 
+{692} normal block at 0x00E8CE18, 46 bytes long.
+ Data: <C o n t e n t - > 43 00 6F 00 6E 00 74 00 65 00 6E 00 74 00 2D 00 
+{691} normal block at 0x00E8E0A8, 56 bytes long.
+ Data: <C o n t e n t - > 43 00 6F 00 6E 00 74 00 65 00 6E 00 74 00 2D 00 
+{690} normal block at 0x00E97068, 38 bytes long.
+ Data: <C o n n e c t i > 43 00 6F 00 6E 00 6E 00 65 00 63 00 74 00 69 00 
+{689} normal block at 0x00E972D0, 44 bytes long.
+ Data: <C a c h e - C o > 43 00 61 00 63 00 68 00 65 00 2D 00 43 00 6F 00 
+{688} normal block at 0x00E99EB8, 30 bytes long.
+ Data: <A c c e p t     > 41 00 63 00 63 00 65 00 70 00 74 00 00 00 CD CD 
+{687} normal block at 0x00E9A228, 34 bytes long.
+ Data: <n o - s t o r e > 6E 00 6F 00 2D 00 73 00 74 00 6F 00 72 00 65 00 
+{686} normal block at 0x00E9A688, 34 bytes long.
+ Data: <n o - c a c h e > 6E 00 6F 00 2D 00 63 00 61 00 63 00 68 00 65 00 
+{685} normal block at 0x00E8CDB8, 48 bytes long.
+ Data: <m u s t - r e v > 6D 00 75 00 73 00 74 00 2D 00 72 00 65 00 76 00 
+{684} normal block at 0x00E9A4F8, 34 bytes long.
+ Data: <s - m a x a g e > 73 00 2D 00 6D 00 61 00 78 00 61 00 67 00 65 00 
+{683} normal block at 0x00E9A188, 36 bytes long.
+ Data: <m a x - s t a l > 6D 00 61 00 78 00 2D 00 73 00 74 00 61 00 6C 00 
+{681} normal block at 0x00E9A318, 32 bytes long.
+ Data: <m a x - a g e   > 6D 00 61 00 78 00 2D 00 61 00 67 00 65 00 00 00 
+{680} normal block at 0x00E9AF20, 260 bytes long.
+ Data: <                > 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+{679} normal block at 0x00E931A0, 8 bytes long.
+ Data: <A       > 41 00 00 00 20 AF E9 00 
+{678} normal block at 0x00E9ADF0, 256 bytes long.
+ Data: <h; e            > 68 3B 80 65 00 00 00 00 00 00 00 00 00 00 00 00 
+minkernel\crts\ucrt\src\appcrt\startup\onexit.cpp(112) : {677} crt block at 0x00E67588, subtype 0, 128 bytes long.
+ Data: < r   r  ~   ~   > FA 72 C1 C0 EE 72 C1 C0 7E CB 9F D9 7E CB 9F D9 
+{676} normal block at 0x00E98F78, 22 bytes long.
+ Data: <T C r y p t o K > 54 00 43 00 72 00 79 00 70 00 74 00 6F 00 4B 00 
+{675} normal block at 0x00E9FCE8, 16 bytes long.
+ Data: <x   Y     xe    > 78 8F E9 00 59 00 00 00 C8 10 78 65 C8 89 E9 00 
+Win32\CIDKernel_SafeCounter_Win32.cpp(190) : {674} normal block at 0x00E97698, 43 bytes long.
+ Data: < v              > 98 76 E9 00 ED ED ED ED 00 00 00 00 CD CD CD CD 
+{673} normal block at 0x00E95210, 146 bytes long.
+ Data: <E B C D I C - U > 45 00 42 00 43 00 44 00 49 00 43 00 2D 00 55 00 
+{671} normal block at 0x00E9FE28, 18 bytes long.
+ Data: <U T F - 8       > 55 00 54 00 46 00 2D 00 38 00 00 00 CD CD CD CD 
+{670} normal block at 0x00E9F928, 18 bytes long.
+ Data: <U T F 1 6 - L E > 55 00 54 00 46 00 31 00 36 00 2D 00 4C 00 45 00 
+{669} normal block at 0x00E9FBE8, 18 bytes long.
+ Data: <U C S 4 - L E   > 55 00 43 00 53 00 34 00 2D 00 4C 00 45 00 00 00 
+{668} normal block at 0x00E9FD28, 18 bytes long.
+ Data: <U T F 1 6 - B E > 55 00 54 00 46 00 31 00 36 00 2D 00 42 00 45 00 
+{667} normal block at 0x00E9FE68, 18 bytes long.
+ Data: <U C S 4 - B E   > 55 00 43 00 53 00 34 00 2D 00 42 00 45 00 00 00 
+{666} normal block at 0x00E99F58, 36 bytes long.
+ Data: <E B C D I C - U > 45 00 42 00 43 00 44 00 49 00 43 00 2D 00 55 00 
+{665} normal block at 0x00E99200, 28 bytes long.
+ Data: <U T F - 8       > 55 00 54 00 46 00 2D 00 38 00 00 00 CD CD CD CD 
+{664} normal block at 0x00E9A1D8, 34 bytes long.
+ Data: <U T F 1 6 - L E > 55 00 54 00 46 00 31 00 36 00 2D 00 4C 00 45 00 
+{663} normal block at 0x00E9A5E8, 32 bytes long.
+ Data: <U C S 4 - L E   > 55 00 43 00 53 00 34 00 2D 00 4C 00 45 00 00 00 
+{662} normal block at 0x00E9A638, 34 bytes long.
+ Data: <U T F 1 6 - B E > 55 00 54 00 46 00 31 00 36 00 2D 00 42 00 45 00 
+{661} normal block at 0x00E9A368, 32 bytes long.
+ Data: <U C S 4 - B E   > 55 00 43 00 53 00 34 00 2D 00 42 00 45 00 00 00 
+minkernel\crts\ucrt\src\appcrt\startup\onexit.cpp(112) : {660} crt block at 0x00E67E78, subtype 0, 128 bytes long.
+ Data: <     ~   ~   ~  > DE F6 FC C0 F2 7E FC C0 FA 7E FC C0 06 7E FC C0 
+{659} normal block at 0x00E977A0, 38 bytes long.
+ Data: <T Z W a v e O E > 54 00 5A 00 57 00 61 00 76 00 65 00 4F 00 45 00 
+{658} normal block at 0x00E9FB68, 16 bytes long.
+ Data: < w         jX   > A0 77 E9 00 20 00 00 00 A8 17 1F 6A 58 A9 E7 00 
+{657} normal block at 0x00E9A778, 36 bytes long.
+ Data: <T W i n 1 2 5 2 > 54 00 57 00 69 00 6E 00 31 00 32 00 35 00 32 00 
+{656} normal block at 0x00E9F9A8, 16 bytes long.
+ Data: <x   U      j    > 78 A7 E9 00 55 00 00 00 94 17 1F 6A 00 00 00 00 
+{655} normal block at 0x00E9A4A8, 36 bytes long.
+ Data: <T W i n 1 2 5 1 > 54 00 57 00 69 00 6E 00 31 00 32 00 35 00 31 00 
+{654} normal block at 0x00E98B88, 16 bytes long.
+ Data: <    V      j    > A8 A4 E9 00 56 00 00 00 14 10 1F 6A 00 00 00 00 
+{653} normal block at 0x00E7E190, 34 bytes long.
+ Data: <T U C S 4 L E C > 54 00 55 00 43 00 53 00 34 00 4C 00 45 00 43 00 
+{652} normal block at 0x00E98B08, 16 bytes long.
+ Data: <    @   Q  j    > 90 E1 E7 00 40 00 00 00 51 14 1F 6A 08 88 E9 00 
+{651} normal block at 0x00E7E6E0, 34 bytes long.
+ Data: <T U C S 4 B E C > 54 00 55 00 43 00 53 00 34 00 42 00 45 00 43 00 
+{650} normal block at 0x00E98A48, 16 bytes long.
+ Data: <        3  j    > E0 E6 E7 00 0E 00 00 00 33 19 1F 6A 88 89 E9 00 
+{649} normal block at 0x00E7E5A0, 32 bytes long.
+ Data: <T P C 8 5 0 C o > 54 00 50 00 43 00 38 00 35 00 30 00 43 00 6F 00 
+{648} normal block at 0x00E98A08, 16 bytes long.
+ Data: <        W  j    > A0 E5 E7 00 1A 00 00 00 57 13 1F 6A 00 00 00 00 
+{647} normal block at 0x00E7E550, 32 bytes long.
+ Data: <T P C 4 3 7 C o > 54 00 50 00 43 00 34 00 33 00 37 00 43 00 6F 00 
+{646} normal block at 0x00E989C8, 16 bytes long.
+ Data: <P   Y   1  j    > 50 E5 E7 00 59 00 00 00 31 16 1F 6A 00 00 00 00 
+{645} normal block at 0x00E7E690, 34 bytes long.
+ Data: <T L a t i n 6 C > 54 00 4C 00 61 00 74 00 69 00 6E 00 36 00 43 00 
+{644} normal block at 0x00E98988, 16 bytes long.
+ Data: <        )  j    > 90 E6 E7 00 0E 00 00 00 29 19 1F 6A 00 00 00 00 
+{643} normal block at 0x00E7E500, 34 bytes long.
+ Data: <T L a t i n 5 C > 54 00 4C 00 61 00 74 00 69 00 6E 00 35 00 43 00 
+{642} normal block at 0x00E98948, 16 bytes long.
+ Data: <    S   z  j    > 00 E5 E7 00 53 00 00 00 7A 13 1F 6A 00 00 00 00 
+{641} normal block at 0x00E7E410, 34 bytes long.
+ Data: <T L a t i n 4 C > 54 00 4C 00 61 00 74 00 69 00 6E 00 34 00 43 00 
+{640} normal block at 0x00E98808, 16 bytes long.
+ Data: <    @      jX   > 10 E4 E7 00 40 00 00 00 F2 18 1F 6A 58 B0 E7 00 
+{639} normal block at 0x00E7E4B0, 34 bytes long.
+ Data: <T L a t i n 3 C > 54 00 4C 00 61 00 74 00 69 00 6E 00 33 00 43 00 
+{638} normal block at 0x00E98908, 16 bytes long.
+ Data: <    f   g  j    > B0 E4 E7 00 66 00 00 00 67 17 1F 6A 00 00 00 00 
+{637} normal block at 0x00E7E460, 34 bytes long.
+ Data: <T L a t i n 2 C > 54 00 4C 00 61 00 74 00 69 00 6E 00 32 00 43 00 
+{636} normal block at 0x00E98888, 16 bytes long.
+ Data: <`          j >  > 60 E4 E7 00 0D 00 00 00 C8 1A 1F 6A 10 3E E9 00 
+{635} normal block at 0x00E7E640, 34 bytes long.
+ Data: <T L a t i n 1 C > 54 00 4C 00 61 00 74 00 69 00 6E 00 31 00 43 00 
+{634} normal block at 0x00E98B48, 16 bytes long.
+ Data: <@          j    > 40 E6 E7 00 01 00 00 00 F1 14 1F 6A 00 00 00 00 
+{633} normal block at 0x00E97010, 42 bytes long.
+ Data: <T E B C D I C 1 > 54 00 45 00 42 00 43 00 44 00 49 00 43 00 31 00 
+{632} normal block at 0x00E986C8, 16 bytes long.
+ Data: < p  R   Y  jP,  > 10 70 E9 00 52 00 00 00 59 11 1F 6A 50 2C E9 00 
+minkernel\crts\ucrt\src\appcrt\startup\onexit.cpp(112) : {631} crt block at 0x00E66F58, subtype 0, 128 bytes long.
+ Data: <Z   N   B   6   > 5A 82 17 C3 4E 82 17 C3 42 82 17 C3 36 82 17 C3 
+{630} normal block at 0x00E97380, 40 bytes long.
+ Data: <T E B C D I C 0 > 54 00 45 00 42 00 43 00 44 00 49 00 43 00 30 00 
+{629} normal block at 0x00E98748, 16 bytes long.
+ Data: < s  i      j 9  > 80 73 E9 00 69 00 00 00 BD 16 1F 6A 90 39 E9 00 
+{628} normal block at 0x00E988C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{627} normal block at 0x00E94728, 692 bytes long.
+ Data: <                > 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+{626} normal block at 0x00E98D08, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{625} normal block at 0x00E9DFA0, 2 bytes long.
+ Data: <  > 00 00 
+{624} normal block at 0x00E9DE20, 2 bytes long.
+ Data: <  > 00 00 
+{623} normal block at 0x00E9E0C0, 2 bytes long.
+ Data: <  > 00 00 
+Win32\CIDKernel_Mutex_Win32.cpp(45) : {622} normal block at 0x00E97278, 43 bytes long.
+ Data: <xr              > 78 72 E9 00 ED ED ED ED 14 03 00 00 CD CD CD CD 
+{621} normal block at 0x00E946A8, 84 bytes long.
+ Data: <h3 f 3 f     r  > 68 33 01 66 80 33 01 66 00 CD CD CD 80 72 E9 00 
+{620} normal block at 0x00E98C88, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{619} normal block at 0x00E97538, 40 bytes long.
+ Data: < = e = e    t  f> C4 3D AA 65 DC 3D AA 65 01 CD CD CD 74 B6 07 66 
+{617} normal block at 0x00E98C48, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{616} normal block at 0x00E8CB18, 50 bytes long.
+ Data: <E E x p O p t s > 45 00 45 00 78 00 70 00 4F 00 70 00 74 00 73 00 
+{615} normal block at 0x00E7E3C0, 30 bytes long.
+ Data: <E x p a n d     > 45 00 78 00 70 00 61 00 6E 00 64 00 00 00 CD CD 
+{614} normal block at 0x00E987C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{613} normal block at 0x00E98848, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{612} normal block at 0x00E98A88, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{611} normal block at 0x00E98688, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{610} normal block at 0x00E8D298, 50 bytes long.
+ Data: <E E x p O p t s > 45 00 45 00 78 00 70 00 4F 00 70 00 74 00 73 00 
+{609} normal block at 0x00E7E5F0, 30 bytes long.
+ Data: <E n c o d e     > 45 00 6E 00 63 00 6F 00 64 00 65 00 00 00 CD CD 
+{608} normal block at 0x00E98648, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{607} normal block at 0x00E98AC8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{606} normal block at 0x00E98C08, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{605} normal block at 0x00E98CC8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{604} normal block at 0x00E8D1D8, 46 bytes long.
+ Data: <E E x p O p t s > 45 00 45 00 78 00 70 00 4F 00 70 00 74 00 73 00 
+{603} normal block at 0x00E98F30, 26 bytes long.
+ Data: <N o n e         > 4E 00 6F 00 6E 00 65 00 00 00 CD CD CD CD CD CD 
+{602} normal block at 0x00E98BC8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{601} normal block at 0x00E98D88, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{600} normal block at 0x00E98788, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{598} normal block at 0x00E98D48, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{597} normal block at 0x00E8E380, 58 bytes long.
+ Data: <E Q u a l i f i > 45 00 51 00 75 00 61 00 6C 00 69 00 66 00 69 00 
+{596} normal block at 0x00E7E320, 34 bytes long.
+ Data: <D o n t C a r e > 44 00 6F 00 6E 00 74 00 43 00 61 00 72 00 65 00 
+{595} normal block at 0x00E98608, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{594} normal block at 0x00E97F08, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{593} normal block at 0x00E98308, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{592} normal block at 0x00E97EC8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{591} normal block at 0x00E8D178, 50 bytes long.
+ Data: <E Q u a l i f i > 45 00 51 00 75 00 61 00 6C 00 69 00 66 00 69 00 
+{590} normal block at 0x00E99680, 26 bytes long.
+ Data: <F u l l         > 46 00 75 00 6C 00 6C 00 00 00 CD CD CD CD CD CD 
+{589} normal block at 0x00E97E88, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{588} normal block at 0x00E97E48, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{587} normal block at 0x00E98288, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{586} normal block at 0x00E98248, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{585} normal block at 0x00E8E040, 56 bytes long.
+ Data: <E Q u a l i f i > 45 00 51 00 75 00 61 00 6C 00 69 00 66 00 69 00 
+{584} normal block at 0x00E7E2D0, 32 bytes long.
+ Data: <P a r t i a l   > 50 00 61 00 72 00 74 00 69 00 61 00 6C 00 00 00 
+{583} normal block at 0x00E981C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{582} normal block at 0x00E97E08, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{581} normal block at 0x00E980C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+minkernel\crts\ucrt\src\appcrt\startup\onexit.cpp(112) : {579} crt block at 0x00E68298, subtype 0, 128 bytes long.
+ Data: < H  bO  zO  VO  > 86 48 F6 C0 62 4F F6 C0 7A 4F F6 C0 56 4F F6 C0 
+{578} normal block at 0x00E99368, 24 bytes long.
+ Data: <W S S           > 57 00 53 00 53 00 00 00 CD CD CD CD CD CD CD CD 
+{577} normal block at 0x00E96E00, 42 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{576} normal block at 0x00E95ED8, 24 bytes long.
+ Data: <W S S           > 57 00 53 00 53 00 00 00 CD CD CD CD CD CD CD CD 
+{575} normal block at 0x00E983C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{574} normal block at 0x00E95C98, 24 bytes long.
+ Data: <w s s           > 77 00 73 00 73 00 00 00 CD CD CD CD CD CD CD CD 
+{573} normal block at 0x00E982C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{572} normal block at 0x00E961F0, 22 bytes long.
+ Data: <W S             > 57 00 53 00 00 00 CD CD CD CD CD CD CD CD CD CD 
+{571} normal block at 0x00E970C0, 40 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{570} normal block at 0x00E95C08, 22 bytes long.
+ Data: <W S             > 57 00 53 00 00 00 CD CD CD CD CD CD CD CD CD CD 
+{569} normal block at 0x00E98548, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{568} normal block at 0x00E95E48, 22 bytes long.
+ Data: <w s             > 77 00 73 00 00 00 CD CD CD CD CD CD CD CD CD CD 
+{567} normal block at 0x00E98188, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{566} normal block at 0x00E95FF8, 24 bytes long.
+ Data: <S I P           > 53 00 49 00 50 00 00 00 CD CD CD CD CD CD CD CD 
+{565} normal block at 0x00E97748, 42 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{564} normal block at 0x00E961A8, 24 bytes long.
+ Data: <S I P           > 53 00 49 00 50 00 00 00 CD CD CD CD CD CD CD CD 
+{563} normal block at 0x00E98488, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{562} normal block at 0x00E95D70, 24 bytes long.
+ Data: <s i p           > 73 00 69 00 70 00 00 00 CD CD CD CD CD CD CD CD 
+{561} normal block at 0x00E98388, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{560} normal block at 0x00E96160, 28 bytes long.
+ Data: <R T S P S       > 52 00 54 00 53 00 50 00 53 00 00 00 CD CD CD CD 
+{559} normal block at 0x00E8D118, 46 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{558} normal block at 0x00E95F68, 28 bytes long.
+ Data: <R T S P S       > 52 00 54 00 53 00 50 00 53 00 00 00 CD CD CD CD 
+{557} normal block at 0x00E98088, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{556} normal block at 0x00E96118, 28 bytes long.
+ Data: <r t s p s       > 72 00 74 00 73 00 70 00 73 00 00 00 CD CD CD CD 
+{555} normal block at 0x00E984C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{554} normal block at 0x00E962C8, 26 bytes long.
+ Data: <R T S P         > 52 00 54 00 53 00 50 00 00 00 CD CD CD CD CD CD 
+{553} normal block at 0x00E97220, 44 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{552} normal block at 0x00E960D0, 26 bytes long.
+ Data: <R T S P         > 52 00 54 00 53 00 50 00 00 00 CD CD CD CD CD CD 
+{551} normal block at 0x00E98108, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{550} normal block at 0x00E95BC0, 26 bytes long.
+ Data: <r t s p         > 72 00 74 00 73 00 70 00 00 00 CD CD CD CD CD CD 
+{549} normal block at 0x00E98048, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{548} normal block at 0x00E963A0, 28 bytes long.
+ Data: <H T T P S       > 48 00 54 00 54 00 50 00 53 00 00 00 CD CD CD CD 
+{547} normal block at 0x00E8D0B8, 46 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{546} normal block at 0x00E96358, 28 bytes long.
+ Data: <H T T P S       > 48 00 54 00 54 00 50 00 53 00 00 00 CD CD CD CD 
+{545} normal block at 0x00E98348, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{544} normal block at 0x00E96238, 28 bytes long.
+ Data: <h t t p s       > 68 00 74 00 74 00 70 00 73 00 00 00 CD CD CD CD 
+{543} normal block at 0x00E98508, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{542} normal block at 0x00E95CE0, 26 bytes long.
+ Data: <N e w s         > 4E 00 65 00 77 00 73 00 00 00 CD CD CD CD CD CD 
+{541} normal block at 0x00E977F8, 44 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{540} normal block at 0x00E95FB0, 26 bytes long.
+ Data: <N e w s         > 4E 00 65 00 77 00 73 00 00 00 CD CD CD CD CD CD 
+{539} normal block at 0x00E97F88, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{538} normal block at 0x00E95DB8, 26 bytes long.
+ Data: <n e w s         > 6E 00 65 00 77 00 73 00 00 00 CD CD CD CD CD CD 
+{537} normal block at 0x00E98148, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{536} normal block at 0x00E7E230, 30 bytes long.
+ Data: <M a i l T o     > 4D 00 61 00 69 00 6C 00 54 00 6F 00 00 00 CD CD 
+{535} normal block at 0x00E8D058, 48 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{534} normal block at 0x00E7E370, 30 bytes long.
+ Data: <M a i l T o     > 4D 00 61 00 69 00 6C 00 54 00 6F 00 00 00 CD CD 
+{533} normal block at 0x00E98008, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{532} normal block at 0x00E7E1E0, 30 bytes long.
+ Data: <m a i l t o     > 6D 00 61 00 69 00 6C 00 74 00 6F 00 00 00 CD CD 
+{531} normal block at 0x00E985C8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{530} normal block at 0x00E95F20, 24 bytes long.
+ Data: <F T P           > 46 00 54 00 50 00 00 00 CD CD CD CD CD CD CD CD 
+{529} normal block at 0x00E96FB8, 42 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{528} normal block at 0x00E95E90, 24 bytes long.
+ Data: <F T P           > 46 00 54 00 50 00 00 00 CD CD CD CD CD CD CD CD 
+{527} normal block at 0x00E98448, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{526} normal block at 0x00E95C50, 24 bytes long.
+ Data: <f t p           > 66 00 74 00 70 00 00 00 CD CD CD CD CD CD CD CD 
+{525} normal block at 0x00E98408, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{524} normal block at 0x00E96088, 26 bytes long.
+ Data: <H T T P         > 48 00 54 00 54 00 50 00 00 00 CD CD CD CD CD CD 
+{523} normal block at 0x00E978A8, 44 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{522} normal block at 0x00E96280, 26 bytes long.
+ Data: <H T T P         > 48 00 54 00 54 00 50 00 00 00 CD CD CD CD CD CD 
+{521} normal block at 0x00E97FC8, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{520} normal block at 0x00E95B78, 26 bytes long.
+ Data: <h t t p         > 68 00 74 00 74 00 70 00 00 00 CD CD CD CD CD CD 
+{519} normal block at 0x00E98588, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{518} normal block at 0x00E96310, 26 bytes long.
+ Data: <F i l e         > 46 00 69 00 6C 00 65 00 00 00 CD CD CD CD CD CD 
+{517} normal block at 0x00E976F0, 44 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{516} normal block at 0x00E95E00, 26 bytes long.
+ Data: <F i l e         > 46 00 69 00 6C 00 65 00 00 00 CD CD CD CD CD CD 
+{515} normal block at 0x00E97F48, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{514} normal block at 0x00E963E8, 26 bytes long.
+ Data: <f i l e         > 66 00 69 00 6C 00 65 00 00 00 CD CD CD CD CD CD 
+{513} normal block at 0x00E98208, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{512} normal block at 0x00E96430, 26 bytes long.
+ Data: <N o n e         > 4E 00 6F 00 6E 00 65 00 00 00 CD CD CD CD CD CD 
+{511} normal block at 0x00E975E8, 44 bytes long.
+ Data: <E P r o t o s : > 45 00 50 00 72 00 6F 00 74 00 6F 00 73 00 3A 00 
+{510} normal block at 0x00E95D28, 26 bytes long.
+ Data: <N o n e         > 4E 00 6F 00 6E 00 65 00 00 00 CD CD CD CD CD CD 
+{509} normal block at 0x00E92790, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{508} normal block at 0x00E93B50, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{507} normal block at 0x00E93A50, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{506} normal block at 0x00E96040, 24 bytes long.
+ Data: <T V o l u m e I > 54 00 56 00 6F 00 6C 00 75 00 6D 00 65 00 49 00 
+{505} normal block at 0x00E93B10, 16 bytes long.
+ Data: <@`  %    Y e    > 40 60 E9 00 25 00 00 00 DE 59 C6 65 00 00 00 00 
+{504} normal block at 0x00E7E280, 30 bytes long.
+ Data: <T U T F 8 C o n > 54 00 55 00 54 00 46 00 38 00 43 00 6F 00 6E 00 
+{503} normal block at 0x00E93990, 16 bytes long.
+ Data: <    i    O e    > 80 E2 E7 00 69 00 00 00 CF 4F C6 65 00 00 00 00 
+{502} normal block at 0x00E7DC40, 36 bytes long.
+ Data: <T U T F 1 6 L E > 54 00 55 00 54 00 46 00 31 00 36 00 4C 00 45 00 
+{501} normal block at 0x00E93A10, 16 bytes long.
+ Data: <@   ]    L e    > 40 DC E7 00 5D 00 00 00 96 4C C6 65 00 00 00 00 
+{500} normal block at 0x00E7DBA0, 36 bytes long.
+ Data: <T U T F 1 6 B E > 54 00 55 00 54 00 46 00 31 00 36 00 42 00 45 00 
+{499} normal block at 0x00E93E50, 16 bytes long.
+ Data: <           e    > A0 DB E7 00 1B 00 00 00 B8 C0 C6 65 00 00 00 00 
+{498} normal block at 0x00E7DB50, 36 bytes long.
+ Data: <T U S A S C I I > 54 00 55 00 53 00 41 00 53 00 43 00 49 00 49 00 
+{497} normal block at 0x00E93E10, 16 bytes long.
+ Data: <P          e    > 50 DB E7 00 0D 00 00 00 7F D6 C6 65 00 00 00 00 
+{496} normal block at 0x00E96670, 28 bytes long.
+ Data: <T U T F C o n v > 54 00 55 00 54 00 46 00 43 00 6F 00 6E 00 76 00 
+{495} normal block at 0x00E94150, 16 bytes long.
+ Data: <pf         e    > 70 66 E9 00 10 00 00 00 F9 CF C6 65 00 00 00 00 
+{494} normal block at 0x00E93950, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{493} normal block at 0x00E93D90, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{492} normal block at 0x00E93710, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{490} normal block at 0x00E93C50, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{489} normal block at 0x00E93D50, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{488} normal block at 0x00E936D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{487} normal block at 0x00E938D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{486} normal block at 0x00E93850, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{485} normal block at 0x00E93BD0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{483} normal block at 0x00E93DD0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{482} normal block at 0x00E93B90, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{481} normal block at 0x00E93750, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{480} normal block at 0x00E93810, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{479} normal block at 0x00E93CD0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{478} normal block at 0x00E93AD0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{477} normal block at 0x00E93A90, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{476} normal block at 0x00E93C10, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{475} normal block at 0x00E937D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{474} normal block at 0x00E93910, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{473} normal block at 0x00E939D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{472} normal block at 0x00E93D10, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{471} normal block at 0x00E93C90, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{470} normal block at 0x00E93E90, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{469} normal block at 0x00E93790, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{468} normal block at 0x00E93890, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{467} normal block at 0x00E94390, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{466} normal block at 0x00E94350, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{465} normal block at 0x00E94190, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{464} normal block at 0x00E94610, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{463} normal block at 0x00E94650, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{462} normal block at 0x00E945D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{461} normal block at 0x00E94510, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{460} normal block at 0x00E94110, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{459} normal block at 0x00E94090, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{458} normal block at 0x00E942D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{457} normal block at 0x00E94050, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{456} normal block at 0x00E94550, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{455} normal block at 0x00E93FD0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{454} normal block at 0x00E93F90, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{453} normal block at 0x00E93F50, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{452} normal block at 0x00E94010, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{451} normal block at 0x00E93ED0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{450} normal block at 0x00E94290, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{449} normal block at 0x00E94250, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{448} normal block at 0x00E93F10, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{447} normal block at 0x00E941D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{446} normal block at 0x00E940D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{445} normal block at 0x00E94450, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{444} normal block at 0x00E94310, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{442} normal block at 0x00E944D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{441} normal block at 0x00E94210, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{440} normal block at 0x00E94490, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{438} normal block at 0x00E94410, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{437} normal block at 0x00E943D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{436} normal block at 0x00E94590, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{435} normal block at 0x00E923D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{434} normal block at 0x00E92310, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{433} normal block at 0x00E92210, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{432} normal block at 0x00E92150, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{431} normal block at 0x00E92490, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{430} normal block at 0x00E92410, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{429} normal block at 0x00E920D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{428} normal block at 0x00E92290, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{427} normal block at 0x00E92390, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{426} normal block at 0x00E92450, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{425} normal block at 0x00E92110, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{424} normal block at 0x00E92050, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{423} normal block at 0x00E92350, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{422} normal block at 0x00E91F90, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{421} normal block at 0x00E91F50, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{420} normal block at 0x00E922D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{419} normal block at 0x00E91F10, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{418} normal block at 0x00E92090, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{417} normal block at 0x00E91ED0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{416} normal block at 0x00E91E10, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{415} normal block at 0x00E924D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{414} normal block at 0x00E92010, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{413} normal block at 0x00E91E50, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{412} normal block at 0x00E92250, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{411} normal block at 0x00E91DD0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{410} normal block at 0x00E92550, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{409} normal block at 0x00E92510, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{408} normal block at 0x00E921D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{407} normal block at 0x00E92190, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{406} normal block at 0x00E91D90, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{405} normal block at 0x00E91E90, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{404} normal block at 0x00E91FD0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{403} normal block at 0x00E92850, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{402} normal block at 0x00E92810, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{401} normal block at 0x00E927D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{400} normal block at 0x00E92690, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{399} normal block at 0x00E92650, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{398} normal block at 0x00E92750, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{397} normal block at 0x00E92610, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{396} normal block at 0x00E925D0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{395} normal block at 0x00E92590, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{394} normal block at 0x00E92CD0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{393} normal block at 0x00E92B10, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{392} normal block at 0x00E92AD0, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{390} normal block at 0x00E92C10, 18 bytes long.
+ Data: <                > 00 00 CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{389} normal block at 0x00E965E0, 28 bytes long.
+ Data: <t  f   f   f   f> 74 B6 07 66 8C B6 07 66 9C B6 07 66 B8 B6 07 66 
+{388} normal block at 0x00E930C0, 12 bytes long.
+ Data: <T T i m e   > 54 00 54 00 69 00 6D 00 65 00 00 00 
+{387} normal block at 0x00E92950, 16 bytes long.
+ Data: < 0  -      e    > C0 30 E9 00 2D 00 00 00 CB 9E C6 65 D8 AA E7 00 
+{386} normal block at 0x00E7E050, 32 bytes long.
+ Data: <T T e x t F i l > 54 00 54 00 65 00 78 00 74 00 46 00 69 00 6C 00 
+{385} normal block at 0x00E929D0, 16 bytes long.
+ Data: <P   k   `  e    > 50 E0 E7 00 6B 00 00 00 60 87 C6 65 00 00 00 00 
+minkernel\crts\ucrt\src\appcrt\startup\onexit.cpp(112) : {384} crt block at 0x00E92D68, subtype 0, 256 bytes long.
+ Data: <                > FA 17 E5 C0 C6 EB E3 C0 CE EB E3 C0 BE EB E3 C0 
+{383} normal block at 0x00E92BD0, 16 bytes long.
+ Data: <T S t r i n g   > 54 00 53 00 74 00 72 00 69 00 6E 00 67 00 00 00 
+{382} normal block at 0x00E92710, 16 bytes long.
+ Data: < +  7   S  e    > D0 2B E9 00 37 00 00 00 53 CB C6 65 00 00 00 00 
+{381} normal block at 0x00E96598, 22 bytes long.
+ Data: <T S t r e a m F > 54 00 53 00 74 00 72 00 65 00 61 00 6D 00 46 00 
+{380} normal block at 0x00E92A50, 16 bytes long.
+ Data: < e       5 e    > 98 65 E9 00 1D 00 00 00 08 35 C6 65 00 00 00 00 
+{379} normal block at 0x00E96550, 28 bytes long.
+ Data: <T S t d E r r L > 54 00 53 00 74 00 64 00 45 00 72 00 72 00 4C 00 
+{378} normal block at 0x00E92910, 16 bytes long.
+ Data: <Pe  G   T  e    > 50 65 E9 00 47 00 00 00 54 7F C6 65 00 00 00 00 
+{377} normal block at 0x00E918E8, 12 bytes long.
+ Data: <T S i z e   > 54 00 53 00 69 00 7A 00 65 00 00 00 
+{376} normal block at 0x00E92A10, 16 bytes long.
+ Data: <    :   5{ e    > E8 18 E9 00 3A 00 00 00 35 7B C6 65 00 00 00 00 
+{375} normal block at 0x00E96478, 26 bytes long.
+ Data: <T P o p U p L o > 54 00 50 00 6F 00 70 00 55 00 70 00 4C 00 6F 00 
+{374} normal block at 0x00E92B90, 16 bytes long.
+ Data: <xd      N? e    > 78 64 E9 00 1E 00 00 00 4E 3F C6 65 00 00 00 00 
+{373} normal block at 0x00E928D0, 18 bytes long.
+ Data: <T P o i n t e r > 54 00 50 00 6F 00 69 00 6E 00 74 00 65 00 72 00 
+{372} normal block at 0x00E92990, 16 bytes long.
+ Data: < (      4  e    > D0 28 E9 00 08 00 00 00 34 95 C6 65 00 00 00 00 
+{371} normal block at 0x00E92890, 14 bytes long.
+ Data: <T P o i n t   > 54 00 50 00 6F 00 69 00 6E 00 74 00 00 00 
+{370} normal block at 0x00E92D10, 16 bytes long.
+ Data: < (       g e    > 90 28 E9 00 03 00 00 00 03 67 C6 65 00 00 00 00 
+{369} normal block at 0x00E926D0, 18 bytes long.
+ Data: <T P a t h S t r > 54 00 50 00 61 00 74 00 68 00 53 00 74 00 72 00 
+{368} normal block at 0x00E92C90, 16 bytes long.
+ Data: < &  W   m  e    > D0 26 E9 00 57 00 00 00 6D 11 C6 65 00 00 00 00 
+{367} normal block at 0x00E7ED98, 38 bytes long.
+ Data: <T N a t i v e W > 54 00 4E 00 61 00 74 00 69 00 76 00 65 00 57 00 
+{366} normal block at 0x00E92C50, 16 bytes long.
+ Data: <    R      e    > 98 ED E7 00 52 00 00 00 B2 AD C6 65 00 00 00 00 
+{365} normal block at 0x00E92A90, 14 bytes long.
+ Data: <T M o n e y   > 54 00 4D 00 6F 00 6E 00 65 00 79 00 00 00 
+{364} normal block at 0x00E92B50, 16 bytes long.
+ Data: < *       ] e    > 90 2A E9 00 0C 00 00 00 E4 5D C6 65 00 00 00 00 
+{363} normal block at 0x00E7AFD8, 14 bytes long.
+ Data: <T E r r o r   > 54 00 45 00 72 00 72 00 6F 00 72 00 00 00 
+{362} normal block at 0x00E7B018, 16 bytes long.
+ Data: <         S e    > D8 AF E7 00 1C 00 00 00 E9 53 C6 65 00 00 00 00 
+{361} normal block at 0x00E7AD98, 20 bytes long.
+ Data: <T L o g E v e n > 54 00 4C 00 6F 00 67 00 45 00 76 00 65 00 6E 00 
+{360} normal block at 0x00E7ABD8, 16 bytes long.
+ Data: <    6    S e    > 98 AD E7 00 36 00 00 00 E9 53 C6 65 00 00 00 00 
+{359} normal block at 0x00E96628, 28 bytes long.
+ Data: <T L o c I n t e > 54 00 4C 00 6F 00 63 00 49 00 6E 00 74 00 65 00 
+{358} normal block at 0x00E7AC98, 16 bytes long.
+ Data: <(f  l      e    > 28 66 E9 00 6C 00 00 00 9F 89 C6 65 00 00 00 00 
+{357} normal block at 0x00E96508, 24 bytes long.
+ Data: <T L o c I n t e > 54 00 4C 00 6F 00 63 00 49 00 6E 00 74 00 65 00 
+{356} normal block at 0x00E7AF98, 16 bytes long.
+ Data: < e  <      e    > 08 65 E9 00 3C 00 00 00 D6 D4 C6 65 00 00 00 00 
+{355} normal block at 0x00E966B8, 22 bytes long.
+ Data: <T I n t e g e r > 54 00 49 00 6E 00 74 00 65 00 67 00 65 00 72 00 
+{354} normal block at 0x00E7AB58, 16 bytes long.
+ Data: < f  5    3 e    > B8 66 E9 00 35 00 00 00 F0 33 C6 65 18 AF E7 00 
+{353} normal block at 0x00E7AB18, 18 bytes long.
+ Data: <T I n t e g e r > 54 00 49 00 6E 00 74 00 65 00 67 00 65 00 72 00 
+{352} normal block at 0x00E7A958, 16 bytes long.
+ Data: <         L e    > 18 AB E7 00 20 00 00 00 A5 4C C6 65 00 00 00 00 
+{351} normal block at 0x00E7AC18, 20 bytes long.
+ Data: <T L o c F l o a > 54 00 4C 00 6F 00 63 00 46 00 6C 00 6F 00 61 00 
+{350} normal block at 0x00E7AA18, 16 bytes long.
+ Data: <    ,    + e    > 18 AC E7 00 2C 00 00 00 94 2B C6 65 00 00 00 00 
+{349} normal block at 0x00E7AB98, 14 bytes long.
+ Data: <T F l o a t   > 54 00 46 00 6C 00 6F 00 61 00 74 00 00 00 
+{348} normal block at 0x00E7AF58, 16 bytes long.
+ Data: <    ^    | e    > 98 AB E7 00 5E 00 00 00 F7 7C C6 65 00 00 00 00 
+{347} normal block at 0x00E7A9D8, 18 bytes long.
+ Data: <T F i n d B u f > 54 00 46 00 69 00 6E 00 64 00 42 00 75 00 66 00 
+{346} normal block at 0x00E7AF18, 16 bytes long.
+ Data: <    5   B  e    > D8 A9 E7 00 35 00 00 00 42 1E C6 65 00 00 00 00 
+{345} normal block at 0x00E96868, 24 bytes long.
+ Data: <T F i l e L o g > 54 00 46 00 69 00 6C 00 65 00 4C 00 6F 00 67 00 
+{344} normal block at 0x00E7B098, 16 bytes long.
+ Data: <hh  \    Z e    > 68 68 E9 00 5C 00 00 00 83 5A C6 65 00 00 00 00 
+{343} normal block at 0x00E96988, 24 bytes long.
+ Data: <? ? ?           > 3F 00 3F 00 3F 00 00 00 CD CD CD CD CD CD CD CD 
+{342} normal block at 0x00E7DA10, 30 bytes long.
+ Data: <T L o c C a r d > 54 00 4C 00 6F 00 63 00 43 00 61 00 72 00 64 00 
+{341} normal block at 0x00E7B058, 16 bytes long.
+ Data: <    @   && e    > 10 DA E7 00 40 00 00 00 26 26 C6 65 00 00 00 00 
+{340} normal block at 0x00E96AF0, 26 bytes long.
+ Data: <T L o c C a r d > 54 00 4C 00 6F 00 63 00 43 00 61 00 72 00 64 00 
+{339} normal block at 0x00E7AAD8, 16 bytes long.
+ Data: < j  -    _ e    > F0 6A E9 00 2D 00 00 00 92 5F C6 65 00 00 00 00 
+{338} normal block at 0x00E968B0, 24 bytes long.
+ Data: <T C a r d i n a > 54 00 43 00 61 00 72 00 64 00 69 00 6E 00 61 00 
+{337} normal block at 0x00E7AD58, 16 bytes long.
+ Data: < h         e    > B0 68 E9 00 16 00 00 00 F1 D7 C6 65 00 00 00 00 
+{336} normal block at 0x00E7AD18, 20 bytes long.
+ Data: <T C a r d i n a > 54 00 43 00 61 00 72 00 64 00 69 00 6E 00 61 00 
+{335} normal block at 0x00E7A998, 16 bytes long.
+ Data: <    '    V e    > 18 AD E7 00 27 00 00 00 EB 56 C6 65 00 00 00 00 
+{334} normal block at 0x00E7AE18, 18 bytes long.
+ Data: <T B o o l e a n > 54 00 42 00 6F 00 6F 00 6C 00 65 00 61 00 6E 00 
+{333} normal block at 0x00E7AA98, 16 bytes long.
+ Data: <         ? e    > 18 AE E7 00 02 00 00 00 DA 3F C6 65 00 00 00 00 
+{332} normal block at 0x00E91958, 12 bytes long.
+ Data: <T A r e a   > 54 00 41 00 72 00 65 00 61 00 00 00 
+{331} normal block at 0x00E7A918, 16 bytes long.
+ Data: <X   j   dV e    > 58 19 E9 00 6A 00 00 00 64 56 C6 65 00 00 00 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(42) : {330} normal block at 0x00E96AA8, 24 bytes long.
+ Data: <                > FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(79) : {329} normal block at 0x00E8CD58, 47 bytes long.
+ Data: <X          e j  > 58 CD E8 00 ED ED ED ED BC A8 F2 65 A8 6A E9 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(42) : {328} normal block at 0x00E96820, 24 bytes long.
+ Data: <                > FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(79) : {327} normal block at 0x00E7EE48, 43 bytes long.
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+Win32\CIDKernel_SafeCounter_Win32.cpp(201) : {325} normal block at 0x00E7EA80, 43 bytes long.
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+Win32\CIDKernel_CriticalSection_Win32.cpp(42) : {324} normal block at 0x00E967D8, 24 bytes long.
+ Data: <                > FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(79) : {323} normal block at 0x00E7ECE8, 43 bytes long.
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{322} normal block at 0x00E649C0, 124 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{321} normal block at 0x00E7E9D0, 40 bytes long.
+ Data: <_ N T _ A L T _ > 5F 00 4E 00 54 00 5F 00 41 00 4C 00 54 00 5F 00 
+{320} normal block at 0x00E91920, 12 bytes long.
+ Data: <     I  8   > D0 E9 E7 00 C0 49 E6 00 38 EE E8 00 
+{319} normal block at 0x00E96D38, 108 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{318} normal block at 0x00E7AED8, 20 bytes long.
+ Data: <W M P S D K D I > 57 00 4D 00 50 00 53 00 44 00 4B 00 44 00 49 00 
+{317} normal block at 0x00E91450, 12 bytes long.
+ Data: <    8m      > D8 AE E7 00 38 6D E9 00 10 16 E9 00 
+{316} normal block at 0x00E96CA0, 106 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{315} normal block at 0x00E7AA58, 20 bytes long.
+ Data: <W M F S D K D I > 57 00 4D 00 46 00 53 00 44 00 4B 00 44 00 49 00 
+{314} normal block at 0x00E917D0, 12 bytes long.
+ Data: <X    l      > 58 AA E7 00 A0 6C E9 00 C0 14 E9 00 
+{313} normal block at 0x00E96790, 22 bytes long.
+ Data: <C : \ W I N D O > 43 00 3A 00 5C 00 57 00 49 00 4E 00 44 00 4F 00 
+{312} normal block at 0x00E7AC58, 14 bytes long.
+ Data: <W I N D I R   > 57 00 49 00 4E 00 44 00 49 00 52 00 00 00 
+{311} normal block at 0x00E91418, 12 bytes long.
+ Data: <X    g  @   > 58 AC E7 00 90 67 E9 00 40 18 E9 00 
+{310} normal block at 0x00E96C08, 104 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{309} normal block at 0x00E96A18, 24 bytes long.
+ Data: <V S T U D I O P > 56 00 53 00 54 00 55 00 44 00 49 00 4F 00 50 00 
+{308} normal block at 0x00E91258, 12 bytes long.
+ Data: < j   l  (   > 18 6A E9 00 08 6C E9 00 28 17 E9 00 
+{307} normal block at 0x00E96B50, 134 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{306} normal block at 0x00E7E000, 30 bytes long.
+ Data: <V S 1 4 0 C O M > 56 00 53 00 31 00 34 00 30 00 43 00 4F 00 4D 00 
+{305} normal block at 0x00E91728, 12 bytes long.
+ Data: <    Pk  H   > 00 E0 E7 00 50 6B E9 00 48 16 E9 00 
+{304} normal block at 0x00E91CA8, 134 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{303} normal block at 0x00E7DFB0, 30 bytes long.
+ Data: <V S 1 2 0 C O M > 56 00 53 00 31 00 32 00 30 00 43 00 4F 00 4D 00 
+{302} normal block at 0x00E91220, 12 bytes long.
+ Data: <            > B0 DF E7 00 A8 1C E9 00 98 EB E8 00 
+{301} normal block at 0x00E91BF0, 134 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{300} normal block at 0x00E7D9C0, 30 bytes long.
+ Data: <V S 1 1 0 C O M > 56 00 53 00 31 00 31 00 30 00 43 00 4F 00 4D 00 
+{299} normal block at 0x00E913A8, 12 bytes long.
+ Data: <        `   > C0 D9 E7 00 F0 1B E9 00 60 17 E9 00 
+{298} normal block at 0x00E8FB88, 72 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{297} normal block at 0x00E7EC90, 44 bytes long.
+ Data: <V B O X _ M S I > 56 00 42 00 4F 00 58 00 5F 00 4D 00 53 00 49 00 
+{296} normal block at 0x00E911E8, 12 bytes long.
+ Data: <            > 90 EC E7 00 88 FB E8 00 F0 16 E9 00 
+{295} normal block at 0x00E7DF10, 34 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{294} normal block at 0x00E964C0, 24 bytes long.
+ Data: <U S E R P R O F > 55 00 53 00 45 00 52 00 50 00 52 00 4F 00 46 00 
+{293} normal block at 0x00E91338, 12 bytes long.
+ Data: < d          > C0 64 E9 00 10 DF E7 00 A0 15 E9 00 
+{292} normal block at 0x00E7AE98, 16 bytes long.
+ Data: <d r o d d e y   > 64 00 72 00 6F 00 64 00 64 00 65 00 79 00 00 00 
+{291} normal block at 0x00E7ACD8, 18 bytes long.
+ Data: <U S E R N A M E > 55 00 53 00 45 00 52 00 4E 00 41 00 4D 00 45 00 
+{290} normal block at 0x00E91648, 12 bytes long.
+ Data: <            > D8 AC E7 00 98 AE E7 00 E0 13 E9 00 
+{289} normal block at 0x00E968F8, 26 bytes long.
+ Data: <C Q S L - V M - > 43 00 51 00 53 00 4C 00 2D 00 56 00 4D 00 2D 00 
+{288} normal block at 0x00E8CBD8, 52 bytes long.
+ Data: <U S E R D O M A > 55 00 53 00 45 00 52 00 44 00 4F 00 4D 00 41 00 
+{287} normal block at 0x00E913E0, 12 bytes long.
+ Data: <     h      > D8 CB E8 00 F8 68 E9 00 B0 18 E9 00 
+{286} normal block at 0x00E96748, 26 bytes long.
+ Data: <C Q S L - V M - > 43 00 51 00 53 00 4C 00 2D 00 56 00 4D 00 2D 00 
+{285} normal block at 0x00E969D0, 22 bytes long.
+ Data: <U S E R D O M A > 55 00 53 00 45 00 52 00 44 00 4F 00 4D 00 41 00 
+{284} normal block at 0x00E916F0, 12 bytes long.
+ Data: < i  Hg  x   > D0 69 E9 00 48 67 E9 00 78 EC E8 00 
+{283} normal block at 0x00E8FE58, 72 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{282} normal block at 0x00E91290, 8 bytes long.
+ Data: <T M P   > 54 00 4D 00 50 00 00 00 
+{281} normal block at 0x00E91370, 12 bytes long.
+ Data: <    X       > 90 12 E9 00 58 FE E8 00 98 17 E9 00 
+{280} normal block at 0x00E7ED40, 44 bytes long.
+ Data: <T h e   v a l u > 54 00 68 00 65 00 20 00 76 00 61 00 6C 00 75 00 
+{279} normal block at 0x00E7AE58, 18 bytes long.
+ Data: <T E S T V A R 2 > 54 00 45 00 53 00 54 00 56 00 41 00 52 00 32 00 
+{278} normal block at 0x00E91840, 12 bytes long.
+ Data: <X   @       > 58 AE E7 00 40 ED E7 00 88 E8 E8 00 
+{277} normal block at 0x00E7EC38, 44 bytes long.
+ Data: <T h e   v a l u > 54 00 68 00 65 00 20 00 76 00 61 00 6C 00 75 00 
+{276} normal block at 0x00E7ADD8, 18 bytes long.
+ Data: <T E S T V A R 1 > 54 00 45 00 53 00 54 00 56 00 41 00 52 00 31 00 
+{275} normal block at 0x00E915A0, 12 bytes long.
+ Data: <    8       > D8 AD E7 00 38 EC E7 00 08 18 E9 00 
+{274} normal block at 0x00E8FCF0, 72 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{273} normal block at 0x00E91488, 10 bytes long.
+ Data: <T E M P   > 54 00 45 00 4D 00 50 00 00 00 
+{272} normal block at 0x00E91808, 12 bytes long.
+ Data: <            > 88 14 E9 00 F0 FC E8 00 D8 15 E9 00 
+{271} normal block at 0x00E96940, 22 bytes long.
+ Data: <C : \ W I N D O > 43 00 3A 00 5C 00 57 00 49 00 4E 00 44 00 4F 00 
+{270} normal block at 0x00E96A60, 22 bytes long.
+ Data: <S Y S T E M R O > 53 00 59 00 53 00 54 00 45 00 4D 00 52 00 4F 00 
+{269} normal block at 0x00E918B0, 12 bytes long.
+ Data: <`j  @i  (   > 60 6A E9 00 40 69 E9 00 28 EB E8 00 
+{268} normal block at 0x00E91878, 6 bytes long.
+ Data: <C :   > 43 00 3A 00 00 00 
+{267} normal block at 0x00E96700, 24 bytes long.
+ Data: <S Y S T E M D R > 53 00 59 00 53 00 54 00 45 00 4D 00 44 00 52 00 
+{266} normal block at 0x00E91530, 12 bytes long.
+ Data: < g  x   P   > 00 67 E9 00 78 18 E9 00 50 EF E8 00 
+{265} normal block at 0x00E69DF8, 92 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{264} normal block at 0x00E71B88, 26 bytes long.
+ Data: <S P E E C H S D > 53 00 50 00 45 00 45 00 43 00 48 00 53 00 44 00 
+{263} normal block at 0x00E915D8, 12 bytes long.
+ Data: <            > 88 1B E7 00 F8 9D E6 00 A0 E9 E8 00 
+{262} normal block at 0x00E91B58, 102 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{261} normal block at 0x00E71438, 28 bytes long.
+ Data: <S P E E C H P L > 53 00 50 00 45 00 45 00 43 00 48 00 50 00 4C 00 
+{260} normal block at 0x00E914F8, 12 bytes long.
+ Data: <8   X       > 38 14 E7 00 58 1B E9 00 90 ED E8 00 
+{259} normal block at 0x00E95988, 68 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{258} normal block at 0x00E7A8D8, 20 bytes long.
+ Data: <S D K T W E A K > 53 00 44 00 4B 00 54 00 57 00 45 00 41 00 4B 00 
+{257} normal block at 0x00E916B8, 12 bytes long.
+ Data: <     Y      > D8 A8 E7 00 88 59 E9 00 00 00 00 00 
+{256} normal block at 0x00E95608, 68 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{255} normal block at 0x00E7D8D0, 30 bytes long.
+ Data: <S C I N T I L L > 53 00 43 00 49 00 4E 00 54 00 49 00 4C 00 4C 00 
+{254} normal block at 0x00E914C0, 12 bytes long.
+ Data: <     V      > D0 D8 E7 00 08 56 E9 00 00 EE E8 00 
+{253} normal block at 0x00E8F930, 74 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{252} normal block at 0x00E91300, 12 bytes long.
+ Data: <Q T S D K   > 51 00 54 00 53 00 44 00 4B 00 00 00 
+{251} normal block at 0x00E91610, 12 bytes long.
+ Data: <    0       > 00 13 E9 00 30 F9 E8 00 E0 EE E8 00 
+{250} normal block at 0x00E7DF60, 32 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{249} normal block at 0x00E7B658, 14 bytes long.
+ Data: <P U B L I C   > 50 00 55 00 42 00 4C 00 49 00 43 00 00 00 
+{248} normal block at 0x00E91798, 12 bytes long.
+ Data: <X   `   0   > 58 B6 E7 00 60 DF E7 00 30 01 E7 00 
+{247} normal block at 0x00E919C0, 364 bytes long.
+ Data: <C : \ W I N D O > 43 00 3A 00 5C 00 57 00 49 00 4E 00 44 00 4F 00 
+{246} normal block at 0x00E71630, 26 bytes long.
+ Data: <P S M O D U L E > 50 00 53 00 4D 00 4F 00 44 00 55 00 4C 00 45 00 
+{245} normal block at 0x00E91568, 12 bytes long.
+ Data: <0           > 30 16 E7 00 C0 19 E9 00 C0 EF E8 00 
+{244} normal block at 0x00E91680, 10 bytes long.
+ Data: <$ P $ G   > 24 00 50 00 24 00 47 00 00 00 
+{243} normal block at 0x00E7B618, 14 bytes long.
+ Data: <P R O M P T   > 50 00 52 00 4F 00 4D 00 50 00 54 00 00 00 
+{242} normal block at 0x00E912C8, 12 bytes long.
+ Data: <        0   > 18 B6 E7 00 80 16 E9 00 30 E9 E8 00 
+{241} normal block at 0x00E7DBF0, 34 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{240} normal block at 0x00E71B40, 26 bytes long.
+ Data: <P R O G R A M W > 50 00 52 00 4F 00 47 00 52 00 41 00 4D 00 57 00 
+{239} normal block at 0x00E91760, 12 bytes long.
+ Data: <@           > 40 1B E7 00 F0 DB E7 00 E8 EC E8 00 
+{238} normal block at 0x00E8CE78, 46 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{237} normal block at 0x00E7D970, 36 bytes long.
+ Data: <P R O G R A M F > 50 00 52 00 4F 00 47 00 52 00 41 00 4D 00 46 00 
+{236} normal block at 0x00E8EF88, 12 bytes long.
+ Data: <p   x       > 70 D9 E7 00 78 CE E8 00 C0 E8 E8 00 
+{235} normal block at 0x00E8CCF8, 46 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{234} normal block at 0x00E713F0, 26 bytes long.
+ Data: <P R O G R A M F > 50 00 52 00 4F 00 47 00 52 00 41 00 4D 00 46 00 
+{233} normal block at 0x00E8EF50, 12 bytes long.
+ Data: <            > F0 13 E7 00 F8 CC E8 00 00 00 00 00 
+{232} normal block at 0x00E7D880, 30 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{231} normal block at 0x00E71AB0, 24 bytes long.
+ Data: <P R O G R A M D > 50 00 52 00 4F 00 47 00 52 00 41 00 4D 00 44 00 
+{230} normal block at 0x00E8EFC0, 12 bytes long.
+ Data: <        h   > B0 1A E7 00 80 D8 E7 00 68 E9 E8 00 
+{229} normal block at 0x00E8EB60, 10 bytes long.
+ Data: <3 c 0 3   > 33 00 63 00 30 00 33 00 00 00 
+{228} normal block at 0x00E7E978, 38 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+{227} normal block at 0x00E8E850, 12 bytes long.
+ Data: <x   `       > 78 E9 E7 00 60 EB E8 00 00 00 00 00 
+{226} normal block at 0x00E9E1B0, 4 bytes long.
+ Data: <6   > 36 00 00 00 
+{225} normal block at 0x00E7DEC0, 32 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+{224} normal block at 0x00E8EEE0, 12 bytes long.
+ Data: <            > C0 DE E7 00 B0 E1 E9 00 08 EC E8 00 
+{223} normal block at 0x00E91120, 102 bytes long.
+ Data: <I n t e l 6 4   > 49 00 6E 00 74 00 65 00 6C 00 36 00 34 00 20 00 
+{222} normal block at 0x00E7F0B0, 42 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+{221} normal block at 0x00E8EE00, 12 bytes long.
+ Data: <            > B0 F0 E7 00 20 11 E9 00 00 00 00 00 
+{220} normal block at 0x00E8EDC8, 12 bytes long.
+ Data: <A M D 6 4   > 41 00 4D 00 44 00 36 00 34 00 00 00 
+{219} normal block at 0x00E8D238, 46 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+{218} normal block at 0x00E8EB28, 12 bytes long.
+ Data: <8       @   > 38 D2 E8 00 C8 ED E8 00 40 EC E8 00 
+{217} normal block at 0x00E8EAF0, 8 bytes long.
+ Data: <x 8 6   > 78 00 38 00 36 00 00 00 
+{216} normal block at 0x00E8CF98, 46 bytes long.
+ Data: <P R O C E S S O > 50 00 52 00 4F 00 43 00 45 00 53 00 53 00 4F 00 
+{215} normal block at 0x00E8ED90, 12 bytes long.
+ Data: <            > 98 CF E8 00 F0 EA E8 00 F8 E8 E8 00 
+{214} normal block at 0x00E910A0, 78 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{213} normal block at 0x00E71A68, 24 bytes long.
+ Data: <P L A T F O R M > 50 00 4C 00 41 00 54 00 46 00 4F 00 52 00 4D 00 
+{212} normal block at 0x00E8ECE8, 12 bytes long.
+ Data: <h       p   > 68 1A E7 00 A0 10 E9 00 70 EE E8 00 
+{211} normal block at 0x00E91008, 108 bytes long.
+ Data: <. C O M ; . E X > 2E 00 43 00 4F 00 4D 00 3B 00 2E 00 45 00 58 00 
+{210} normal block at 0x00E7B698, 16 bytes long.
+ Data: <P A T H E X T   > 50 00 41 00 54 00 48 00 45 00 58 00 54 00 00 00 
+{209} normal block at 0x00E8EC40, 12 bytes long.
+ Data: <            > 98 B6 E7 00 08 10 E9 00 A8 EE E8 00 
+{208} normal block at 0x00E8FF30, 4266 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{207} normal block at 0x00E8EAB8, 10 bytes long.
+ Data: <P A T H   > 50 00 41 00 54 00 48 00 00 00 
+{206} normal block at 0x00E8EE38, 12 bytes long.
+ Data: <    0       > B8 EA E8 00 30 FF E8 00 D0 03 E7 00 
+{205} normal block at 0x00E71A20, 22 bytes long.
+ Data: <W i n d o w s _ > 57 00 69 00 6E 00 64 00 6F 00 77 00 73 00 5F 00 
+{204} normal block at 0x00E8E9D8, 6 bytes long.
+ Data: <O S   > 4F 00 53 00 00 00 
+{203} normal block at 0x00E8ED20, 12 bytes long.
+ Data: <            > D8 E9 E8 00 20 1A E7 00 B0 EC E8 00 
+{202} normal block at 0x00E8CB78, 52 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{201} normal block at 0x00E7B498, 18 bytes long.
+ Data: <O N E D R I V E > 4F 00 4E 00 45 00 44 00 52 00 49 00 56 00 45 00 
+{200} normal block at 0x00E8E9A0, 12 bytes long.
+ Data: <    x   `   > 98 B4 E7 00 78 CB E8 00 60 03 E7 00 
+{199} normal block at 0x00E9E120, 4 bytes long.
+ Data: <8   > 38 00 00 00 
+{198} normal block at 0x00E7EEA0, 42 bytes long.
+ Data: <N U M B E R _ O > 4E 00 55 00 4D 00 42 00 45 00 52 00 5F 00 4F 00 
+{197} normal block at 0x00E8ECB0, 12 bytes long.
+ Data: <            > A0 EE E7 00 20 E1 E9 00 98 03 E7 00 
+{196} normal block at 0x00E7D830, 30 bytes long.
+ Data: <\ \ C Q S L - V > 5C 00 5C 00 43 00 51 00 53 00 4C 00 2D 00 56 00 
+{195} normal block at 0x00E715E8, 24 bytes long.
+ Data: <L O G O N S E R > 4C 00 4F 00 47 00 4F 00 4E 00 53 00 45 00 52 00 
+{194} normal block at 0x00E8E968, 12 bytes long.
+ Data: <    0       > E8 15 E7 00 30 D8 E7 00 00 00 00 00 
+{193} normal block at 0x00E9EF88, 62 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{192} normal block at 0x00E719D8, 26 bytes long.
+ Data: <L O C A L A P P > 4C 00 4F 00 43 00 41 00 4C 00 41 00 50 00 50 00 
+{191} normal block at 0x00E8EB98, 12 bytes long.
+ Data: <            > D8 19 E7 00 88 EF E9 00 10 EA E8 00 
+{190} normal block at 0x00E8E3E8, 56 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{189} normal block at 0x00E7DD80, 30 bytes long.
+ Data: <L I B V L C _ S > 4C 00 49 00 42 00 56 00 4C 00 43 00 5F 00 53 00 
+{188} normal block at 0x00E8E930, 12 bytes long.
+ Data: <        H   > 80 DD E7 00 E8 E3 E8 00 48 EA E8 00 
+{187} normal block at 0x00E8FB10, 72 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{186} normal block at 0x00E713A8, 24 bytes long.
+ Data: <L I B V L C _ P > 4C 00 49 00 42 00 56 00 4C 00 43 00 5F 00 50 00 
+{185} normal block at 0x00E8EC08, 12 bytes long.
+ Data: <        X   > A8 13 E7 00 10 FB E8 00 58 05 E7 00 
+{184} normal block at 0x00E9EA00, 1368 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{183} normal block at 0x00E8ED58, 8 bytes long.
+ Data: <L I B   > 4C 00 49 00 42 00 00 00 
+{182} normal block at 0x00E8EC78, 12 bytes long.
+ Data: <X           > 58 ED E8 00 00 EA E9 00 80 EA E8 00 
+{181} normal block at 0x00E630E8, 98 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{180} normal block at 0x00E7DD30, 32 bytes long.
+ Data: <K I N E C T S D > 4B 00 49 00 4E 00 45 00 43 00 54 00 53 00 44 00 
+{179} normal block at 0x00E8E8C0, 12 bytes long.
+ Data: <0    0      > 30 DD E7 00 E8 30 E6 00 00 00 00 00 
+{178} normal block at 0x00E8E790, 56 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{177} normal block at 0x00E7B458, 20 bytes long.
+ Data: <I T U N E S S D > 49 00 54 00 55 00 4E 00 45 00 53 00 53 00 44 00 
+{176} normal block at 0x00E8EEA8, 12 bytes long.
+ Data: <X       (   > 58 B4 E7 00 90 E7 E8 00 28 03 E7 00 
+{175} normal block at 0x00E8F028, 1748 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{174} normal block at 0x00E7B418, 16 bytes long.
+ Data: <I N C L U D E   > 49 00 4E 00 43 00 4C 00 55 00 44 00 45 00 00 00 
+{173} normal block at 0x00E8EA48, 12 bytes long.
+ Data: <    (       > 18 B4 E7 00 28 F0 E8 00 00 00 00 00 
+{172} normal block at 0x00E7E0A0, 30 bytes long.
+ Data: <\ U s e r s \ d > 5C 00 55 00 73 00 65 00 72 00 73 00 5C 00 64 00 
+{171} normal block at 0x00E7B1D8, 18 bytes long.
+ Data: <H O M E P A T H > 48 00 4F 00 4D 00 45 00 50 00 41 00 54 00 48 00 
+{170} normal block at 0x00E8EE70, 12 bytes long.
+ Data: <            > D8 B1 E7 00 A0 E0 E7 00 00 00 00 00 
+{169} normal block at 0x00E8EF18, 6 bytes long.
+ Data: <C :   > 43 00 3A 00 00 00 
+{168} normal block at 0x00E7B118, 20 bytes long.
+ Data: <H O M E D R I V > 48 00 4F 00 4D 00 45 00 44 00 52 00 49 00 56 00 
+{167} normal block at 0x00E8E8F8, 12 bytes long.
+ Data: <            > 18 B1 E7 00 18 EF E8 00 C0 00 E7 00 
+{166} normal block at 0x00E9E988, 74 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{165} normal block at 0x00E71360, 28 bytes long.
+ Data: <E N V S E T U P > 45 00 4E 00 56 00 53 00 45 00 54 00 55 00 50 00 
+{164} normal block at 0x00E8EBD0, 12 bytes long.
+ Data: <`           > 60 13 E7 00 88 E9 E9 00 00 00 00 00 
+{163} normal block at 0x00E9E908, 78 bytes long.
+ Data: <C : \ W i n d o > 43 00 3A 00 5C 00 57 00 69 00 6E 00 64 00 6F 00 
+{162} normal block at 0x00E71948, 22 bytes long.
+ Data: <D R I V E R D A > 44 00 52 00 49 00 56 00 45 00 52 00 44 00 41 00 
+{161} normal block at 0x00E8E888, 12 bytes long.
+ Data: <H           > 48 19 E7 00 08 E9 E9 00 00 00 00 00 
+{160} normal block at 0x00E9E898, 68 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{159} normal block at 0x00E716C0, 22 bytes long.
+ Data: <C Q C R U N T I > 43 00 51 00 43 00 52 00 55 00 4E 00 54 00 49 00 
+{158} normal block at 0x00E8EA10, 12 bytes long.
+ Data: <            > C0 16 E7 00 98 E8 E9 00 00 00 00 00 
+{157} normal block at 0x00E8E588, 54 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{156} normal block at 0x00E71828, 28 bytes long.
+ Data: <C Q C I N S T I > 43 00 51 00 43 00 49 00 4E 00 53 00 54 00 49 00 
+{155} normal block at 0x00E8EA80, 12 bytes long.
+ Data: <(       @   > 28 18 E7 00 88 E5 E8 00 40 04 E7 00 
+{154} normal block at 0x00E8E6C0, 56 bytes long.
+ Data: <C : \ W I N D O > 43 00 3A 00 5C 00 57 00 49 00 4E 00 44 00 4F 00 
+{153} normal block at 0x00E7B398, 16 bytes long.
+ Data: <C O M S P E C   > 43 00 4F 00 4D 00 53 00 50 00 45 00 43 00 00 00 
+{152} normal block at 0x00E70558, 12 bytes long.
+ Data: <            > 98 B3 E7 00 C0 E6 E8 00 20 05 E7 00 
+{151} normal block at 0x00E71750, 26 bytes long.
+ Data: <C Q S L - V M - > 43 00 51 00 53 00 4C 00 2D 00 56 00 4D 00 2D 00 
+{150} normal block at 0x00E71558, 26 bytes long.
+ Data: <C O M P U T E R > 43 00 4F 00 4D 00 50 00 55 00 54 00 45 00 52 00 
+{149} normal block at 0x00E70520, 12 bytes long.
+ Data: <X   P       > 58 15 E7 00 50 17 E7 00 08 04 E7 00 
+{148} normal block at 0x00E8E658, 60 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{147} normal block at 0x00E7EB30, 38 bytes long.
+ Data: <C O M M O N P R > 43 00 4F 00 4D 00 4D 00 4F 00 4E 00 50 00 52 00 
+{146} normal block at 0x00E704E8, 12 bytes long.
+ Data: <0   X       > 30 EB E7 00 58 E6 E8 00 90 FE E6 00 
+{145} normal block at 0x00E9E820, 72 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{144} normal block at 0x00E8CF38, 48 bytes long.
+ Data: <C O M M O N P R > 43 00 4F 00 4D 00 4D 00 4F 00 4E 00 50 00 52 00 
+{143} normal block at 0x00E70408, 12 bytes long.
+ Data: <8           > 38 CF E8 00 20 E8 E9 00 80 02 E7 00 
+{142} normal block at 0x00E9C770, 72 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{141} normal block at 0x00E7F058, 38 bytes long.
+ Data: <C O M M O N P R > 43 00 4F 00 4D 00 4D 00 4F 00 4E 00 50 00 52 00 
+{140} normal block at 0x00E703D0, 12 bytes long.
+ Data: <X   p       > 58 F0 E7 00 70 C7 E9 00 00 00 00 00 
+{139} normal block at 0x00E7B0D8, 16 bytes long.
+ Data: <5 _ 3 _ 9 3 6   > 35 00 5F 00 33 00 5F 00 39 00 33 00 36 00 00 00 
+{138} normal block at 0x00E718B8, 28 bytes long.
+ Data: <C I D _ V E R S > 43 00 49 00 44 00 5F 00 56 00 45 00 52 00 53 00 
+{137} normal block at 0x00E70360, 12 bytes long.
+ Data: <            > B8 18 E7 00 D8 B0 E7 00 00 00 00 00 
+{136} normal block at 0x00E7B7D8, 16 bytes long.
+ Data: <5 . 3 . 9 3 6   > 35 00 2E 00 33 00 2E 00 39 00 33 00 36 00 00 00 
+{135} normal block at 0x00E71708, 24 bytes long.
+ Data: <C I D _ V E R S > 43 00 49 00 44 00 5F 00 56 00 45 00 52 00 53 00 
+{134} normal block at 0x00E70328, 12 bytes long.
+ Data: <            > 08 17 E7 00 D8 B7 E7 00 C8 FE E6 00 
+{133} normal block at 0x00E9C6F8, 72 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{132} normal block at 0x00E71990, 24 bytes long.
+ Data: <C I D _ S R C T > 43 00 49 00 44 00 5F 00 53 00 52 00 43 00 54 00 
+{131} normal block at 0x00E70280, 12 bytes long.
+ Data: <            > 90 19 E7 00 F8 C6 E9 00 00 00 00 00 
+{130} normal block at 0x00E63FE8, 122 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{129} normal block at 0x00E71900, 22 bytes long.
+ Data: <C I D _ R E S D > 43 00 49 00 44 00 5F 00 52 00 45 00 53 00 44 00 
+{128} normal block at 0x00E70440, 12 bytes long.
+ Data: <     ?      > 00 19 E7 00 E8 3F E6 00 D8 01 E7 00 
+{127} normal block at 0x00E71678, 22 bytes long.
+ Data: <W I N 3 2 _ W I > 57 00 49 00 4E 00 33 00 32 00 5F 00 57 00 49 00 
+{126} normal block at 0x00E71480, 26 bytes long.
+ Data: <C I D _ P L A T > 43 00 49 00 44 00 5F 00 50 00 4C 00 41 00 54 00 
+{125} normal block at 0x00E70130, 12 bytes long.
+ Data: <    x       > 80 14 E7 00 78 16 E7 00 F8 00 E7 00 
+{124} normal block at 0x00E7A148, 172 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{123} normal block at 0x00E715A0, 26 bytes long.
+ Data: <C I D _ L O C A > 43 00 49 00 44 00 5F 00 4C 00 4F 00 43 00 41 00 
+{122} normal block at 0x00E700F8, 12 bytes long.
+ Data: <    H       > A0 15 E7 00 48 A1 E7 00 00 00 00 00 
+{121} normal block at 0x00E70248, 6 bytes long.
+ Data: <D :   > 44 00 3A 00 00 00 
+{120} normal block at 0x00E7B818, 20 bytes long.
+ Data: <C I D _ D R I V > 43 00 49 00 44 00 5F 00 44 00 52 00 49 00 56 00 
+{119} normal block at 0x00E6FE90, 12 bytes long.
+ Data: <    H       > 18 B8 E7 00 48 02 E7 00 00 00 00 00 
+{118} normal block at 0x00E6FE58, 8 bytes long.
+ Data: <D e v   > 44 00 65 00 76 00 00 00 
+{117} normal block at 0x00E71798, 28 bytes long.
+ Data: <C I D _ B U I L > 43 00 49 00 44 00 5F 00 42 00 55 00 49 00 4C 00 
+{116} normal block at 0x00E701D8, 12 bytes long.
+ Data: <    X       > 98 17 E7 00 58 FE E6 00 00 00 00 00 
+{115} normal block at 0x00E9C680, 72 bytes long.
+ Data: <D : \ C Q S L \ > 44 00 3A 00 5C 00 43 00 51 00 53 00 4C 00 5C 00 
+{114} normal block at 0x00E71318, 28 bytes long.
+ Data: <C I D L I B _ S > 43 00 49 00 44 00 4C 00 49 00 42 00 5F 00 53 00 
+{113} normal block at 0x00E6FEC8, 12 bytes long.
+ Data: <            > 18 13 E7 00 80 C6 E9 00 00 00 00 00 
+{112} normal block at 0x00E82740, 66 bytes long.
+ Data: <C : \ U s e r s > 43 00 3A 00 5C 00 55 00 73 00 65 00 72 00 73 00 
+{111} normal block at 0x00E7B358, 16 bytes long.
+ Data: <A P P D A T A   > 41 00 50 00 50 00 44 00 41 00 54 00 41 00 00 00 
+{110} normal block at 0x00E70398, 12 bytes long.
+ Data: <X   @'      > 58 B3 E7 00 40 27 E8 00 00 00 00 00 
+{109} normal block at 0x00E7DAB0, 30 bytes long.
+ Data: <C : \ P r o g r > 43 00 3A 00 5C 00 50 00 72 00 6F 00 67 00 72 00 
+{108} normal block at 0x00E7D7E0, 32 bytes long.
+ Data: <A L L U S E R S > 41 00 4C 00 4C 00 55 00 53 00 45 00 52 00 53 00 
+{107} normal block at 0x00E700C0, 12 bytes long.
+ Data: <            > E0 D7 E7 00 B0 DA E7 00 00 00 00 00 
+{105} normal block at 0x00E69A40, 92 bytes long.
+ Data: <    X           > 00 00 00 00 58 12 E9 00 D0 17 E9 00 20 ED E8 00 
+{104} normal block at 0x00E7B198, 20 bytes long.
+ Data: <@       H       > 40 9A E6 00 00 00 00 00 48 00 00 00 17 00 00 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(42) : {103} normal block at 0x00E71BD0, 24 bytes long.
+ Data: <                > FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(79) : {102} normal block at 0x00E7EFA8, 43 bytes long.
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+{101} normal block at 0x00E7B718, 20 bytes long.
+ Data: <T e s t . j s o > 54 00 65 00 73 00 74 00 2E 00 6A 00 73 00 6F 00 
+{100} normal block at 0x00E6FE20, 12 bytes long.
+ Data: <J S O N 1   > 4A 00 53 00 4F 00 4E 00 31 00 00 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(42) : {98} normal block at 0x00E71870, 24 bytes long.
+ Data: <                > FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(79) : {97} normal block at 0x00E7EB88, 43 bytes long.
+ Data: <                > CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD CD 
+Win32\CIDKernel_CriticalSection_Win32.cpp(42) : {96} normal block at 0x00E714C8, 24 bytes long.
+ Data: <                > FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 
+Win32\CIDKernel_CriticalSection_Win32.cpp(79) : {95} normal block at 0x00E7EDF0, 43 bytes long.
+ Data: <                > CD CD CD CD CD CD CD CD F0 ED E7 00 ED ED ED ED 
+{94} normal block at 0x00E84008, 27122 bytes long.
+ Data: <    ,e  ,   5  N> 84 01 00 00 2C 65 00 00 2C 0F 00 00 35 00 20 4E 
+{91} normal block at 0x00E70D10, 4 bytes long.
+ Data: <  3i> 00 00 33 69 
+minkernel\crts\ucrt\src\appcrt\startup\onexit.cpp(112) : {90} crt block at 0x00E672C8, subtype 0, 128 bytes long.
+ Data: <                > E8 B5 D1 03 1E B5 D1 C3 0A B5 D1 C3 16 B5 D1 C3 
+minkernel\crts\ucrt\src\appcrt\stdio\_file.cpp(78) : {89} crt block at 0x00E7F510, subtype 0, 2048 bytes long.
+ Data: <0: eh: e : e    > 30 3A C4 65 68 3A C4 65 A0 3A C4 65 00 00 00 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {88} crt block at 0x00E7F490, subtype 0, 82 bytes long.
+ Data: <_NT_ALT_SYMBOL_P> 5F 4E 54 5F 41 4C 54 5F 53 59 4D 42 4F 4C 5F 50 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {87} crt block at 0x00E7F420, subtype 0, 64 bytes long.
+ Data: <WMPSDKDIR=C:\Pro> 57 4D 50 53 44 4B 44 49 52 3D 43 3A 5C 50 72 6F 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {86} crt block at 0x00E7F3B0, subtype 0, 63 bytes long.
+ Data: <WMFSDKDIR=C:\Pro> 57 4D 46 53 44 4B 44 49 52 3D 43 3A 5C 50 72 6F 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {85} crt block at 0x00E7B598, subtype 0, 18 bytes long.
+ Data: <windir=C:\WINDOW> 77 69 6E 64 69 72 3D 43 3A 5C 57 49 4E 44 4F 57 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {84} crt block at 0x00E7F340, subtype 0, 64 bytes long.
+ Data: <VSTUDIOPATH=C:\P> 56 53 54 55 44 49 4F 50 41 54 48 3D 43 3A 5C 50 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {83} crt block at 0x00E7F2C0, subtype 0, 82 bytes long.
+ Data: <VS140COMNTOOLS=C> 56 53 31 34 30 43 4F 4D 4E 54 4F 4F 4C 53 3D 43 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {82} crt block at 0x00E7F240, subtype 0, 82 bytes long.
+ Data: <VS120COMNTOOLS=C> 56 53 31 32 30 43 4F 4D 4E 54 4F 4F 4C 53 3D 43 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {81} crt block at 0x00E7F1C0, subtype 0, 82 bytes long.
+ Data: <VS110COMNTOOLS=C> 56 53 31 31 30 43 4F 4D 4E 54 4F 4F 4C 53 3D 43 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {80} crt block at 0x00E7F158, subtype 0, 58 bytes long.
+ Data: <VBOX_MSI_INSTALL> 56 42 4F 58 5F 4D 53 49 5F 49 4E 53 54 41 4C 4C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {79} crt block at 0x00E7DC90, subtype 0, 29 bytes long.
+ Data: <USERPROFILE=C:\U> 55 53 45 52 50 52 4F 46 49 4C 45 3D 43 3A 5C 55 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {78} crt block at 0x00E7B4D8, subtype 0, 17 bytes long.
+ Data: <USERNAME=droddey> 55 53 45 52 4E 41 4D 45 3D 64 72 6F 64 64 65 79 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {77} crt block at 0x00E7EA28, subtype 0, 39 bytes long.
+ Data: <USERDOMAIN_ROAMI> 55 53 45 52 44 4F 4D 41 49 4E 5F 52 4F 41 4D 49 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {76} crt block at 0x00E72008, subtype 0, 24 bytes long.
+ Data: <USERDOMAIN=CQSL-> 55 53 45 52 44 4F 4D 41 49 4E 3D 43 51 53 4C 2D 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {75} crt block at 0x00E7EAD8, subtype 0, 40 bytes long.
+ Data: <TMP=C:\Users\dro> 54 4D 50 3D 43 3A 5C 55 73 65 72 73 5C 64 72 6F 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {74} crt block at 0x00E7E140, subtype 0, 31 bytes long.
+ Data: <TestVar2=The val> 54 65 73 74 56 61 72 32 3D 54 68 65 20 76 61 6C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {73} crt block at 0x00E7D790, subtype 0, 31 bytes long.
+ Data: <TestVar1=The val> 54 65 73 74 56 61 72 31 3D 54 68 65 20 76 61 6C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {72} crt block at 0x00E7F000, subtype 0, 41 bytes long.
+ Data: <TEMP=C:\Users\dr> 54 45 4D 50 3D 43 3A 5C 55 73 65 72 73 5C 64 72 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {71} crt block at 0x00E71FC0, subtype 0, 22 bytes long.
+ Data: <SystemRoot=C:\WI> 53 79 73 74 65 6D 52 6F 6F 74 3D 43 3A 5C 57 49 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {70} crt block at 0x00E7B518, subtype 0, 15 bytes long.
+ Data: <SystemDrive=C: > 53 79 73 74 65 6D 44 72 69 76 65 3D 43 3A 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {69} crt block at 0x00E7E8E8, subtype 0, 59 bytes long.
+ Data: <SPEECHSDKDIR=C:\> 53 50 45 45 43 48 53 44 4B 44 49 52 3D 43 3A 5C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {68} crt block at 0x00E7E878, subtype 0, 65 bytes long.
+ Data: <SPEECHPLATDIR=C:> 53 50 45 45 43 48 50 4C 41 54 44 49 52 3D 43 3A 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {67} crt block at 0x00E7E820, subtype 0, 44 bytes long.
+ Data: <SDKTWEAKS=D:\CQS> 53 44 4B 54 57 45 41 4B 53 3D 44 3A 5C 43 51 53 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {66} crt block at 0x00E7E7C0, subtype 0, 49 bytes long.
+ Data: <SCINTILLA_PATH=D> 53 43 49 4E 54 49 4C 4C 41 5F 50 41 54 48 3D 44 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {65} crt block at 0x00E7E768, subtype 0, 43 bytes long.
+ Data: <QTSDK=C:\Program> 51 54 53 44 4B 3D 43 3A 5C 50 72 6F 67 72 61 6D 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {64} crt block at 0x00E72170, subtype 0, 23 bytes long.
+ Data: <PUBLIC=C:\Users\> 50 55 42 4C 49 43 3D 43 3A 5C 55 73 65 72 73 5C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {63} crt block at 0x00E83F18, subtype 0, 195 bytes long.
+ Data: <PSModulePath=C:\> 50 53 4D 6F 64 75 6C 65 50 61 74 68 3D 43 3A 5C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {62} crt block at 0x00E70050, subtype 0, 12 bytes long.
+ Data: <PROMPT=$P$G > 50 52 4F 4D 50 54 3D 24 50 24 47 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {61} crt block at 0x00E7DB00, subtype 0, 30 bytes long.
+ Data: <ProgramW6432=C:\> 50 72 6F 67 72 61 6D 57 36 34 33 32 3D 43 3A 5C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {60} crt block at 0x00E83EC0, subtype 0, 41 bytes long.
+ Data: <ProgramFiles(x86> 50 72 6F 67 72 61 6D 46 69 6C 65 73 28 78 38 36 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {59} crt block at 0x00E7D920, subtype 0, 36 bytes long.
+ Data: <ProgramFiles=C:\> 50 72 6F 67 72 61 6D 46 69 6C 65 73 3D 43 3A 5C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {58} crt block at 0x00E71F78, subtype 0, 27 bytes long.
+ Data: <ProgramData=C:\P> 50 72 6F 67 72 61 6D 44 61 74 61 3D 43 3A 5C 50 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {57} crt block at 0x00E71F30, subtype 0, 24 bytes long.
+ Data: <PROCESSOR_REVISI> 50 52 4F 43 45 53 53 4F 52 5F 52 45 56 49 53 49 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {56} crt block at 0x00E7B3D8, subtype 0, 18 bytes long.
+ Data: <PROCESSOR_LEVEL=> 50 52 4F 43 45 53 53 4F 52 5F 4C 45 56 45 4C 3D 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {55} crt block at 0x00E83E48, subtype 0, 72 bytes long.
+ Data: <PROCESSOR_IDENTI> 50 52 4F 43 45 53 53 4F 52 5F 49 44 45 4E 54 49 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {54} crt block at 0x00E7DE70, subtype 0, 29 bytes long.
+ Data: <PROCESSOR_ARCHIT> 50 52 4F 43 45 53 53 4F 52 5F 41 52 43 48 49 54 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {53} crt block at 0x00E71D80, subtype 0, 27 bytes long.
+ Data: <PROCESSOR_ARCHIT> 50 52 4F 43 45 53 53 4F 52 5F 41 52 43 48 49 54 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {52} crt block at 0x00E83DE8, subtype 0, 51 bytes long.
+ Data: <PLATFORMSDK=C:\P> 50 4C 41 54 46 4F 52 4D 53 44 4B 3D 43 3A 5C 50 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {51} crt block at 0x00E83D78, subtype 0, 62 bytes long.
+ Data: <PATHEXT=.COM;.EX> 50 41 54 48 45 58 54 3D 2E 43 4F 4D 3B 2E 45 58 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {50} crt block at 0x00E834F0, subtype 0, 2138 bytes long.
+ Data: <Path=C:\Program > 50 61 74 68 3D 43 3A 5C 50 72 6F 67 72 61 6D 20 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {49} crt block at 0x00E7B258, subtype 0, 14 bytes long.
+ Data: <OS=Windows_NT > 4F 53 3D 57 69 6E 64 6F 77 73 5F 4E 54 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {48} crt block at 0x00E7DDD0, subtype 0, 35 bytes long.
+ Data: <OneDrive=C:\User> 4F 6E 65 44 72 69 76 65 3D 43 3A 5C 55 73 65 72 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {47} crt block at 0x00E72050, subtype 0, 23 bytes long.
+ Data: <NUMBER_OF_PROCES> 4E 55 4D 42 45 52 5F 4F 46 5F 50 52 4F 43 45 53 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {46} crt block at 0x00E71CF0, subtype 0, 27 bytes long.
+ Data: <LOGONSERVER=\\CQ> 4C 4F 47 4F 4E 53 45 52 56 45 52 3D 5C 5C 43 51 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {45} crt block at 0x00E83498, subtype 0, 44 bytes long.
+ Data: <LOCALAPPDATA=C:\> 4C 4F 43 41 4C 41 50 50 44 41 54 41 3D 43 3A 5C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {44} crt block at 0x00E83440, subtype 0, 43 bytes long.
+ Data: <LIBVLC_SDKPATH=D> 4C 49 42 56 4C 43 5F 53 44 4B 50 41 54 48 3D 44 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {43} crt block at 0x00E833E0, subtype 0, 48 bytes long.
+ Data: <LIBVLC_PATH=C:\P> 4C 49 42 56 4C 43 5F 50 41 54 48 3D 43 3A 5C 50 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {42} crt block at 0x00E83100, subtype 0, 688 bytes long.
+ Data: <LIB=D:\CQSL\Deve> 4C 49 42 3D 44 3A 5C 43 51 53 4C 5C 44 65 76 65 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {41} crt block at 0x00E83090, subtype 0, 65 bytes long.
+ Data: <KINECTSDK20_DIR=> 4B 49 4E 45 43 54 53 44 4B 32 30 5F 44 49 52 3D 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {40} crt block at 0x00E83038, subtype 0, 38 bytes long.
+ Data: <ITUNESSDK=D:\CQS> 49 54 55 4E 45 53 53 44 4B 3D 44 3A 5C 43 51 53 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {39} crt block at 0x00E82C98, subtype 0, 882 bytes long.
+ Data: <INCLUDE=D:\CQSL\> 49 4E 43 4C 55 44 45 3D 44 3A 5C 43 51 53 4C 5C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {38} crt block at 0x00E71CA8, subtype 0, 24 bytes long.
+ Data: <HOMEPATH=\Users\> 48 4F 4D 45 50 41 54 48 3D 5C 55 73 65 72 73 5C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {37} crt block at 0x00E7B858, subtype 0, 13 bytes long.
+ Data: <HOMEDRIVE=C: > 48 4F 4D 45 44 52 49 56 45 3D 43 3A 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {36} crt block at 0x00E82C38, subtype 0, 51 bytes long.
+ Data: <ENVSETUPFILES=D:> 45 4E 56 53 45 54 55 50 46 49 4C 45 53 3D 44 3A 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {35} crt block at 0x00E82BD8, subtype 0, 50 bytes long.
+ Data: <DriverData=C:\Wi> 44 72 69 76 65 72 44 61 74 61 3D 43 3A 5C 57 69 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {34} crt block at 0x00E82B78, subtype 0, 45 bytes long.
+ Data: <CQCRuntime=D:\CQ> 43 51 43 52 75 6E 74 69 6D 65 3D 44 3A 5C 43 51 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {33} crt block at 0x00E82B20, subtype 0, 41 bytes long.
+ Data: <CQCInstImages=D:> 43 51 43 49 6E 73 74 49 6D 61 67 65 73 3D 44 3A 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {32} crt block at 0x00E608F8, subtype 0, 36 bytes long.
+ Data: <ComSpec=C:\WINDO> 43 6F 6D 53 70 65 63 3D 43 3A 5C 57 49 4E 44 4F 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {31} crt block at 0x00E72128, subtype 0, 26 bytes long.
+ Data: <COMPUTERNAME=CQS> 43 4F 4D 50 55 54 45 52 4E 41 4D 45 3D 43 51 53 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {30} crt block at 0x00E82AC0, subtype 0, 49 bytes long.
+ Data: <CommonProgramW64> 43 6F 6D 6D 6F 6E 50 72 6F 67 72 61 6D 57 36 34 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {29} crt block at 0x00E82A58, subtype 0, 60 bytes long.
+ Data: <CommonProgramFil> 43 6F 6D 6D 6F 6E 50 72 6F 67 72 61 6D 46 69 6C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {28} crt block at 0x00E829F0, subtype 0, 55 bytes long.
+ Data: <CommonProgramFil> 43 6F 6D 6D 6F 6E 50 72 6F 67 72 61 6D 46 69 6C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {27} crt block at 0x00E72248, subtype 0, 22 bytes long.
+ Data: <CID_VERSIONUL=5_> 43 49 44 5F 56 45 52 53 49 4F 4E 55 4C 3D 35 5F 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {26} crt block at 0x00E7B298, subtype 0, 20 bytes long.
+ Data: <CID_VERSION=5.3.> 43 49 44 5F 56 45 52 53 49 4F 4E 3D 35 2E 33 2E 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {25} crt block at 0x00E82990, subtype 0, 48 bytes long.
+ Data: <CID_SRCTREE=D:\C> 43 49 44 5F 53 52 43 54 52 45 45 3D 44 3A 5C 43 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {24} crt block at 0x00E82918, subtype 0, 72 bytes long.
+ Data: <CID_RESDIR=D:\CQ> 43 49 44 5F 52 45 53 44 49 52 3D 44 3A 5C 43 51 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {23} crt block at 0x00E71EE8, subtype 0, 24 bytes long.
+ Data: <CID_PLATFORM=WIN> 43 49 44 5F 50 4C 41 54 46 4F 52 4D 3D 57 49 4E 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {22} crt block at 0x00E63058, subtype 0, 99 bytes long.
+ Data: <CID_LOCALLOG=D:\> 43 49 44 5F 4C 4F 43 41 4C 4C 4F 47 3D 44 3A 5C 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {21} crt block at 0x00E7B158, subtype 0, 13 bytes long.
+ Data: <CID_DRIVE=D: > 43 49 44 5F 44 52 49 56 45 3D 44 3A 00 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {20} crt block at 0x00E7B758, subtype 0, 18 bytes long.
+ Data: <CID_BUILDMODE=De> 43 49 44 5F 42 55 49 4C 44 4D 4F 44 45 3D 44 65 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {19} crt block at 0x00E783B8, subtype 0, 50 bytes long.
+ Data: <CIDLIB_SRCDIR=D:> 43 49 44 4C 49 42 5F 53 52 43 44 49 52 3D 44 3A 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {18} crt block at 0x00E78208, subtype 0, 41 bytes long.
+ Data: <APPDATA=C:\Users> 41 50 50 44 41 54 41 3D 43 3A 5C 55 73 65 72 73 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(129) : {17} crt block at 0x00E608A8, subtype 0, 31 bytes long.
+ Data: <ALLUSERSPROFILE=> 41 4C 4C 55 53 45 52 53 50 52 4F 46 49 4C 45 3D 
+minkernel\crts\ucrt\src\desktopcrt\env\environment_initialization.cpp(115) : {16} crt block at 0x00E827C8, subtype 0, 292 bytes long.
+ Data: <            X   > A8 08 E6 00 08 82 E7 00 B8 83 E7 00 58 B7 E7 00 
+minkernel\crts\ucrt\src\appcrt\mbstring\mbctype.cpp(410) : {9} crt block at 0x00E7D510, subtype 0, 544 bytes long.
+ Data: <                > 02 00 00 00 E4 04 00 00 00 00 00 00 00 00 00 00 
+minkernel\crts\ucrt\src\appcrt\mbstring\mbctype.cpp(410) : {3} crt block at 0x00E7D2C0, subtype 0, 544 bytes long.
+ Data: <                > 02 00 00 00 E4 04 00 00 00 00 00 00 00 00 00 00 
+minkernel\crts\ucrt\src\appcrt\lowio\osfinfo.cpp(17) : {2} crt block at 0x00E7C490, subtype 0, 3584 bytes long.
+ Data: <                > FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 
+minkernel\crts\ucrt\src\appcrt\internal\per_thread_data.cpp(242) : {1} crt block at 0x00E7BD98, subtype 0, 1736 bytes long.
+ Data: <p  e            > 70 1F AF 65 00 00 00 00 00 00 00 00 00 00 00 00 
+Object dump complete.

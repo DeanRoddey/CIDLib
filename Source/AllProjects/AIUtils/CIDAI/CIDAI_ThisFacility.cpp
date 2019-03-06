@@ -1,0 +1,109 @@
+//
+// FILE NAME: CIDAI_ThisFacility.cpp
+//
+// AUTHOR: Dean Roddey
+//
+// CREATED: 11/30/2016
+//
+// COPYRIGHT: $_CIDLib_CopyRight_$
+//
+//  $_CIDLib_CopyRight2_$
+//
+// DESCRIPTION:
+//
+//  This file implements the facilty class for this facility.
+//
+// CAVEATS/GOTCHAS:
+//
+// LOG:
+//
+//  $_CIDLib_Log_$
+//
+
+
+// ---------------------------------------------------------------------------
+//  Includes
+// ---------------------------------------------------------------------------
+#include    "CIDAI_.hpp"
+#include    "CIDAI_BTDefNodeFactory_.hpp"
+#include    "CIDAI_BTParser_.hpp"
+
+
+
+// ---------------------------------------------------------------------------
+//  Magic macros
+// ---------------------------------------------------------------------------
+RTTIDecls(TFacCIDAI,TFacility)
+
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TFacCIDAI
+//  PREFIX: fac
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TFacCIDAI: Constructors and Destructor
+// ---------------------------------------------------------------------------
+TFacCIDAI::TFacCIDAI() :
+
+    TFacility
+    (
+        L"CIDAI"
+        , tCIDLib::EModTypes::Dll
+        , kCIDLib::c4MajVersion
+        , kCIDLib::c4MinVersion
+        , kCIDLib::c4Revision
+        , tCIDLib::EModFlags::HasMsgFile
+    )
+    , m_colFactList
+      (
+        tCIDLib::EAdoptOpts::Adopt
+        , 109
+        , new TStringKeyOps(kCIDLib::False)
+        , &TAIBTNodeFact::strKey
+      )
+{
+    // Register our default node factory
+    RegisterFactory(new TAIBTDefNodeFact);
+}
+
+TFacCIDAI::~TFacCIDAI()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TFacCIDAI: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+
+//
+//  See if we have a factory registered under the passed factory type. If so, return
+//  a pointer to it.
+//
+TAIBTNodeFact& TFacCIDAI::nfactFind(const TString& strFactType)
+{
+    // Let's find the factory
+    TAIBTNodeFact* pnfactTar = m_colFactList.pobjFindByKey(strFactType, kCIDLib::False);
+    if (!pnfactTar)
+    {
+        facCIDAI().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kAIErrs::errcBT_FactNotFound
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::NotFound
+            , strFactType
+        );
+    }
+
+    return *pnfactTar;
+}
+
+
+tCIDLib::TVoid TFacCIDAI::RegisterFactory(TAIBTNodeFact* const pnfactToAdopt)
+{
+    m_colFactList.Add(pnfactToAdopt);
+}
+

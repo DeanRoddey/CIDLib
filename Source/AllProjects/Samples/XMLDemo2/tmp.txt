@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<!DOCTYPE CQCCfg:DriverCfg PUBLIC 'urn:charmedquark.com:CQC-DrvManifest.DTD' 'CQCDriverCfg.DTD'>
+<CQCCfg:DriverCfg>
+    
+
+        <CQCCfg:ServerCfg CQCCfg:LibName="MEng.System.CQC.Drivers.ADA.Suite.DriverImpl" CQCCfg:DrvType="Macro"/>
+    
+
+        <CQCCfg:CommonCfg CQCCfg:Author="Mark Stega" CQCCfg:Contact="support@charmedquark.com" CQCCfg:Description="Supports the ADA Suite 8100, Suite 8x8, and Suite 16" CQCCfg:DisplayName="ADA Suite" CQCCfg:Category="MZAudio" CQCCfg:Make="ADA" CQCCfg:Model="Suite-Serial" CQCCfg:Version="0.10"/>
+    
+
+        <!--
+       - Define the connection configuration. We allow edits
+       -->
+    
+        <CQCCfg:ConnCfg CQCCfg:Editable="True">
+        
+                <CQCCfg:SerialConn CQCCfg:Baud="Baud_19200" CQCCfg:Bits="Bits8" CQCCfg:Parity="None" CQCCfg:StopBits="One" CQCCfg:DTRFlag="Enable" CQCCfg:RTSFlag="Enable" CQCCfg:ParityCheck="No" CQCCfg:CTSOut="No" CQCCfg:DSROut="No" CQCCfg:XIn="No" CQCCfg:XOut="No"/>
+        
+        </CQCCfg:ConnCfg>
+    
+
+        <!-- Define the "other" driver config -->
+    
+        <CQCCfg:OtherCfg>
+        
+                <CQCCfg:CfgPrompts>
+            
+
+                        <CQCCfg:CfgLPrompt CQCCfg:Title="ADA model" CQCCfg:Name="ADAModel" CQCCfg:ItemList="Suite 8100,Suite 8x8, Suite 16, Millennium">
+                
+                                <CQCCfg:PromptText>
+                    
+                    Please select your ADA controller from the list.
+                                </CQCCfg:PromptText>
+                
+                                <CQCCfg:PromptDef CQCCfg:ValName="Selected" CQCCfg:Default="Suite 8100"/>
+                
+                        </CQCCfg:CfgLPrompt>
+            
+
+                        <CQCCfg:CfgLPrompt CQCCfg:Title="Tuner type (Bus 0/Module 1)" CQCCfg:Name="Tuner1" CQCCfg:ItemList="None,Analog AM/FM/WX,HD Radio AM/FM/WX,Sirius Satellite,XM Satellite">
+                
+                                <CQCCfg:PromptText>
+                    
+                    Please select your tuner from the list (#1 - Bus 0/Module 1).
+                                </CQCCfg:PromptText>
+                
+                                <CQCCfg:PromptDef CQCCfg:ValName="Selected" CQCCfg:Default="None"/>
+                
+                        </CQCCfg:CfgLPrompt>
+            
+
+                        <CQCCfg:CfgLPrompt CQCCfg:Title="Tuner type (Bus 0/Module 2)" CQCCfg:Name="Tuner2" CQCCfg:ItemList="None,Analog AM/FM/WX,HD Radio AM/FM/WX,Sirius Satellite,XM Satellite">
+                
+                                <CQCCfg:PromptText>
+                    
+                    Please select your tuner from the list (#2 - Bus 0/Module 2).
+                                </CQCCfg:PromptText>
+                
+                                <CQCCfg:PromptDef CQCCfg:ValName="Selected" CQCCfg:Default="None"/>
+                
+                        </CQCCfg:CfgLPrompt>
+            
+
+                        <CQCCfg:CfgLPrompt CQCCfg:Title="Tuner type (Bus 0/Module 3)" CQCCfg:Name="Tuner3" CQCCfg:ItemList="None,Analog AM/FM/WX,HD Radio AM/FM/WX,Sirius Satellite,XM Satellite">
+                
+                                <CQCCfg:PromptText>
+                    
+                    Please select your tuner from the list (#3 - Bus 0/Module 3).
+                                </CQCCfg:PromptText>
+                
+                                <CQCCfg:PromptDef CQCCfg:ValName="Selected" CQCCfg:Default="None"/>
+                
+                        </CQCCfg:CfgLPrompt>
+            
+
+                        <CQCCfg:CfgLPrompt CQCCfg:Title="Tuner type (Bus 1/Module 1)" CQCCfg:Name="Tuner4" CQCCfg:ItemList="None,Analog AM/FM/WX,HD Radio AM/FM/WX,Sirius Satellite,XM Satellite">
+                
+                                <CQCCfg:PromptText>
+                    
+                    Please select your tuner from the list (#4 - Bus 1/Module 1).
+                                </CQCCfg:PromptText>
+                
+                                <CQCCfg:PromptDef CQCCfg:ValName="Selected" CQCCfg:Default="None"/>
+                
+                        </CQCCfg:CfgLPrompt>
+            
+
+                        <CQCCfg:CfgLPrompt CQCCfg:Title="iBase quantity" CQCCfg:Name="iBaseQuantity" CQCCfg:ItemList="0,1,2,3,4,5,6,7,8">
+                
+                                <CQCCfg:PromptText>
+                    
+                    Please select the number of iBase controllers from the list.
+                                </CQCCfg:PromptText>
+                
+                                <CQCCfg:PromptDef CQCCfg:ValName="Selected" CQCCfg:Default="0"/>
+                
+                        </CQCCfg:CfgLPrompt>
+            
+
+                </CQCCfg:CfgPrompts>
+        
+        </CQCCfg:OtherCfg>
+    
+
+</CQCCfg:DriverCfg>
+
+

@@ -1,0 +1,77 @@
+Class=[NonFinal]
+    ClassPath MEng.User.Tests.TestMD5Hash;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.MD5Digest;
+    MEng.System.Runtime.MD5Hash;
+    MEng.System.Runtime.TextXCoder;
+EndImports;
+
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    MD5Digest           m_Digest;
+    MD5Hash             m_Hash;
+    StringList          m_InList;
+    StringList          m_ResList;
+    Int4                m_RetVal;
+    TextXCoder          m_XCoder;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+        m_XCoder("USASCII");
+    Begin
+        // Load up the input strings that we will test
+        m_InList.Append("");
+        m_InList.Append("a");
+        m_InList.Append("abc");
+        m_InList.Append("message digest");
+        m_InList.Append("abcdefghijklmnopqrstuvwxyz");
+        m_InList.Append("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+        m_InList.Append("12345678901234567890123456789012345678901234567890123456789012345678901234567890");
+
+        // Load up the expected hashes, in formatted format
+        m_ResList.Append("D41D8CD98F00B204-E9800998ECF8427E");
+        m_ResList.Append("0CC175B9C0F1B6A8-31C399E269772661");
+        m_ResList.Append("900150983CD24FB0-D6963F7D28E17F72");
+        m_ResList.Append("F96B697D7CB7938D-525A2F31AAF161D0");
+        m_ResList.Append("C3FCD3D76192E400-7DFB496CCA67E13B");
+        m_ResList.Append("D174AB98D277D9F5-A5611C2C9F419D9F");
+        m_ResList.Append("57EDF4A22BE3C955-AC49DA2E2107B67A");
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            Card4 Count;
+            Card4 Index(0);
+        EndLocals;
+
+        //
+        //  Loop through the input list and hash the input string, then
+        //  compare them to the expected results in the result list.
+        //
+        Count := m_InList.GetElemCount();
+        While (Index < Count)
+            m_Digest.DigestStr(m_Hash, m_InList.GetAt(Index));
+            If (m_ResList.GetAt(Index) != m_Hash.GetAsString())
+                m_Helper.PrintErr("Hash was not expected value", m_Output, $CurLine);
+                m_Output.Flush();
+                m_RetVal := -1;
+            EndIf;
+            Index++;
+        EndWhile;
+
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;

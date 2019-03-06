@@ -1,0 +1,219 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestNamedValMap;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.NamedValMap;
+EndImports;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    NamedValMap         m_TestMap;
+    String              m_Str;
+    Boolean             m_Flag;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Helper();
+        m_Output();
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+
+        // Map should be initially empty
+        If (!m_TestMap.IsEmpty())
+            m_Helper.PrintErr("Initial map was not empty", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Add an item, and make sure it's now not empty and that the key exists
+        m_TestMap.AddItem("Item1");
+        If (m_TestMap.IsEmpty())
+            m_Helper.PrintErr("Map was empty after adding item", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (!m_TestMap.ItemExists("Item1"))
+            m_Helper.PrintErr("Added item was not found", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // The item should show up empty
+        If (!m_TestMap.ItemIsEmpty("Item1"))
+            m_Helper.PrintErr("Added item was not empty", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Add a second item and make sure that exists
+        m_TestMap.AddItem("Item2");
+        If (!m_TestMap.ItemExists("Item2"))
+            m_Helper.PrintErr("Added 2nd item was not found", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Add a value to item 1
+        m_TestMap.AddValue("Item1", "SubKey1", "This is value 1");
+
+        // The item should not show up empty now
+        If (m_TestMap.ItemIsEmpty("Item1"))
+            m_Helper.PrintErr("Item was empty after adding a value", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure it's there
+        If (!m_TestMap.SubKeyExists("Item1", "SubKey1"))
+            m_Helper.PrintErr("Subkey was not found after added", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Get the value back out and make sure it's correct
+        If (m_TestMap.GetValue("Item1", "SubKey1") != "This is value 1")
+            m_Helper.PrintErr("Didn't get value back out that was written", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Change the value and read it back
+        m_TestMap.SetValue("Item1", "SubKey1", "New value 1");
+        If (m_TestMap.GetValue("Item1", "SubKey1") != "New value 1")
+            m_Helper.PrintErr("Value change failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Look for a value we know now isn't there. In this case, we'll get
+        //  a sub-key not found, because the key exists, but not the value.
+        //
+        m_Flag := False;
+        Try
+            m_Str := m_TestMap.GetValue("Item1", "SubKey16");
+        EndTry;
+
+        Catch
+            // Make sure it's the right exception
+            If ($Exception.Check(NamedValMapErrs.SubKeyNotFound))
+                m_Flag := True;
+           EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Did not catch missing value exception", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Add two subkeys to the second item
+        m_TestMap.AddValue("Item2", "SubKey1", "Value 1");
+        m_TestMap.AddValue("Item2", "SubKey2", "Value 2");
+
+        // Check both their values
+        If ((m_TestMap.GetValue("Item2", "SubKey1") != "Value 1")
+        ||  (m_TestMap.GetValue("Item2", "SubKey2") != "Value 2"))
+            m_Helper.PrintErr("Added subkeys had wrong values", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Remove the one key we added to the first item, and it shoudl be empty
+        m_TestMap.RemoveSubKey("Item1", "SubKey1");
+        If (!m_TestMap.ItemIsEmpty("Item1"))
+            m_Helper.PrintErr("Item not empty after remove", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Try to add a value that is already in the map.
+        //
+        m_Flag := False;
+        Try
+            m_TestMap.AddValue("Item2", "SubKey1", "Blah blah");
+        EndTry;
+
+        Catch
+            // Make sure it's the right exception
+            If ($Exception.Check(NamedValMapErrs.SubKeyAlreadyExists))
+                m_Flag := True;
+           EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Did not catch add of existing value", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Try to add an item that is already in the map.
+        //
+        m_Flag := False;
+        Try
+            m_Str := m_TestMap.AddItem("Item2");
+        EndTry;
+
+        Catch
+            // Make sure it's the right exception
+            If ($Exception.Check(NamedValMapErrs.KeyAlreadyExists))
+                m_Flag := True;
+           EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Did not catch add of existing item", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Remove the first item now
+        m_TestMap.RemoveItem("Item1");
+        If (m_TestMap.ItemExists("Item1"))
+            m_Helper.PrintErr("Removed item was still found", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Clear the second item and it should then be empty
+        m_TestMap.ClearItem("Item2");
+        If (!m_TestMap.ItemIsEmpty("Item2"))
+            m_Helper.PrintErr("Item not empty after clear", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Clear the whole map and it should be empty now
+        m_TestMap.ClearMap();
+        If (!m_TestMap.IsEmpty())
+            m_Helper.PrintErr("Map was not empty after clear", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        //
+        //  Look for a value we know now isn't there. In this case, we'll get
+        //  a key not found, because the key doesn't even exist.
+        //
+        m_Flag := False;
+        Try
+            m_Str := m_TestMap.GetValue("Item1", "Value1");
+        EndTry;
+
+        Catch
+            // Make sure it's the right exception
+            If ($Exception.Check(NamedValMapErrs.KeyNotFound))
+                m_Flag := True;
+           EndIf;
+        EndCatch;
+
+        If (!m_Flag)
+            m_Helper.PrintErr("Did not catch missing item exception", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

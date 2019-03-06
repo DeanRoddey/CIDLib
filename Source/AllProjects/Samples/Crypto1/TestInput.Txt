@@ -1,0 +1,2 @@
+This the the test input file. It can be encrypted and then decrypted again
+and the contents compared. It should be exactly the same as the original.

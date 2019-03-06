@@ -1,0 +1,60 @@
+;
+; FILE NAME: CIDRTP.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 12/20/2014
+;
+; COPYRIGHT: 2014..2014, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kRTPErrs
+    MsgPref=kRTPMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;   Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; Source data format errors
+    errcData_BadSrcFormat       2000    The source data does not match AVP type %(1)
+    errcData_NotWAVFile         2001    The source file does not appear to be a WAV file
+    errcData_NotSupportedFmt    2002    This I/O data source does not support AVP format %(1)
+    errcData_NoWAVData          2003    No data chunk found in WAV file
+
+    ; General session errors
+    errcSess_AlreadyRunning     5000    The %(1) session object is already running. Name=%(2)
+    errcSess_OpenSocks          5001    One or more %(1) sockets could not be opened. Session=%(2)
+    errcSess_NullIO             5002    The passed RTP I/O object was null. Session=%(1)
+    errcSess_InitIO             5004    The passed RTP I/O object could not be initialized. Session=%(1)
+    errcSess_AlreadyInitIO      5004    The passed RTP I/O object was already initialized. Session=%(1)
+
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;   Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    ; Some info logging messages
+    msgInfo_Starting           16000    Starting RTP session. Client RTP=%(1), Client RTCP=%(2)
+
+END MESSAGES
+

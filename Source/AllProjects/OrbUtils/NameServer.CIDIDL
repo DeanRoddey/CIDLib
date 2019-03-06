@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - This file defines the IDL for the name server interface. This API
+  - allows server processes to register their server object ids in a
+  - hierarchical data structure, and for clients to browse through that
+  - hierarchy and get object ids out (so that it can create client proxy
+  - objects for them.)
+  -
+  - This server also provides an 'alias' function, which allows client apps
+  - to create keys in the name server which just in turn map to some other
+  - key. This supports both to maintaining backwards compatibility when keys
+  - are rearranged and provides some other flexibility.
+  -
+  - Unlike some other standard servers, the server stubs are not exported,
+  - so you cannot provide your own replacement name server.
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:ClassIntf   CIDIDL:Name="CIDNameSrv"
+                        CIDIDL:InterfaceId="DA7622D8FE9D1744-8BBD12DB0DD8ABF3">
+
+        <!-- =================================================================
+          - Define some class specific constants
+          -  =================================================================
+          -->
+        <CIDIDL:Constants>
+            <CIDIDL:Constant CIDIDL:Name="strAdminScope"
+                             CIDIDL:Type="TString"
+                             CIDIDL:Value="/CIDLib/CIDNameSrv"/>
+
+            <CIDIDL:Constant CIDIDL:Name="strAdminBinding"
+                             CIDIDL:Type="TString"
+                             CIDIDL:Value="/CIDLib/CIDNameSrv/CoreAdmin"/>
+        </CIDIDL:Constants>
+
+
+        <!-- =================================================================
+          - Define the interface methods
+          -  =================================================================
+          -->
+        <CIDIDL:Methods>
+
+            <!-- =============================================================
+              - Checks to see if a particular binding exists.
+              -
+              - It also returns the current name server cookie, because this
+              - makes it easy to piggy back checking for the NS having cycled
+              - with getting object ids. If a client sees the cookie has
+              - changed, he can flush his object id cache.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bBindingExists">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToCheck" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8CurCookie" CIDIDL:Dir="Out">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Get the object id at the indicated binding. Just returns a
+              - boolean that indicates whether it worked or not. It doesn't
+              - throw since its just a query.
+              -
+              - It also returns the current name server cookie, because this
+              - makes it easy to piggy back checking for the NS having cycled
+              - with getting object ids. If a client sees the cookie has
+              - changed, he can flush his object id cache.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bGetObject">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strBinding" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="ooidToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:Object CIDIDL:Type="TOrbObjId"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8CurCookie" CIDIDL:Dir="Out">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Get the  info for a particular name (either a a scope or
+              - binding.)
+              -
+              - Since this is often used in situations where the object must
+              - be there to work, and in situations where its more of a check,
+              - there is also a QueryNameInfo() version just throws an exception
+              - if the path isn't found.
+              -
+              - We have one that just returns name and description, and another
+              - that returns the extra values.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bQueryNameInfo">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strNameToQuery" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strName" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strDescr" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <CIDIDL:Method CIDIDL:Name="bQueryNameInfo2">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strNameToQuery" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strName" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strDescr" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra1" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra2" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra3" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra4" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Returns the names of the items in the indicated scope. They can ask
+              - to only get object names, else we return both scope and object names.
+              -
+              - We return the serial number for the scope. The caller can pass back
+              - in the previously returned serial number. If the serial number has
+              - not changed it will return false and no data. Else it will return
+              - true and the new data.
+              -  =============================================================
+              -->
+            <CIDIDL:PollMethod CIDIDL:Name="bQueryScopeKeys">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="c4SerialNum" CIDIDL:Dir="InOut">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strScopeToEnum" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colResults" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TString"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bObjectsOnly" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bThrowIfNot" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+            </CIDIDL:PollMethod>
+
+
+            <!-- =============================================================
+              - Update existing bindings with new info. If a binding does
+              - not exist, it will be created, else it will be updated. Since
+              - this is really only used by the rebinder, and he already has
+              - the info in the name server info object format, we just accept
+              - a list of those. That's how the NS stores them, so it's more
+              - efficient all around. Since we are going to the server, we
+              - pass the cookie to check for out of sync. If so, it will return
+              - false without doing anything and the client has to fully
+              - rebind.
+              -
+              - If individual ones fail, there's not much we can do, however
+              - we need to know so that we can keep up with whether we've ever
+              - even gotten a given one bound the first time yet or not. So we
+              - get back a list of flags, the same size as the incoming
+              - binding list, which indicates whether each of the failed or
+              - worked. That's if our cookie is up to date of course, else no
+              - bindings are done.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bRebindObjs">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colBindings" CIDIDL:Dir="In">
+                    <CIDIDL:TVector CIDIDL:ElemType="TNSRebindInfo"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="fcolResults" CIDIDL:Dir="Out">
+                    <CIDIDL:TFundVector CIDIDL:ElemType="tCIDOrb::ERebindRes"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8CurCookie" CIDIDL:Dir="InOut">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+
+            <!-- =============================================================
+              - In order to deal with servers going down and leaving a bogus
+              - binding in the name server, they only get to lease their entries
+              - and have to renew it within a timeout period (defined as a
+              - constant in the CIDOrb facility), or it will get dropped.
+              - This is fairly easy to do, since they all use the auto-rebinder
+              - anyway (because they have to rebind if the name server cycles
+              - as well), and it will do this periodic lease renewal. Scopes
+              - are fine and can just stay there unless removed, only object
+              - bindings are an issue.
+              -
+              - To be efficient, since the rebinder works with any registered
+              - objects of the process, this guy supports updating multiple
+              - bindings at once. We pass a list of paths, and an output list
+              - of booleans that indicate which ones were successfully updated.
+              - The ones that were not have been lost and need a rebind.
+              -
+              - We pass in the last name server cookie we saw, so that the NS
+              - can see if we are even in sync. If not, then the NS has cycled
+              - and we need to both flush the client side OOID cache, and do a
+              - full rebind pass for all bindings. The return value indicates
+              - whether we were in sync (true) or not (false.)
+              -
+              - If the rebinder side has cycled, his initial cookie will be
+              - zero and that guarantees we'll be out of sync. So we don't
+              - have to pass in the object ids here to insure that they are
+              - the correct ones. If the rebinding side cycled, it's going to
+              - return false and all bindings will be rebound.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bRenewLeases" CIDIDL:TimeOut='10000'>
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colPaths" CIDIDL:Dir="In">
+                    <CIDIDL:TVector CIDIDL:ElemType="TString"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="fcolResults" CIDIDL:Dir="Out">
+                    <CIDIDL:TFundVector CIDIDL:ElemType="tCIDLib::TBoolean"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8CurCookie" CIDIDL:Dir="InOut">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Checks to see if a particular scope exists.
+              -
+              - It also returns the current name server cookie, because this
+              - makes it easy to piggy back checking for the NS having cycled
+              - with getting object ids. If a client sees the cookie has
+              - changed, he can flush his object id cache.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="bScopeExists">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToCheck" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c8CurCookie" CIDIDL:Dir="Out">
+                    <CIDIDL:TCard8/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+
+            <!-- =============================================================
+              - Enumerate the terminal (object) nodes under a particular parent
+              - scope. The parent node of course must be a non-terminal scope
+              - node, or an exception will occur. It returns a sorted vector
+              - of the nodes as TNameServerInfo objects.
+              -
+              - The return is the number of nodes in the collection. You could
+              - just ask the collection, but its a convenience.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="c4EnumObjects">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strScopeToEnum" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colResults" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TNameServerInfo"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bThrowIfNot" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Enumerate the non-terminal (sub-scope) nodes under a particular
+              - parent scope. The parent node of course must be a non-terminal
+              - scope node, or an exception will occur. It returns a sorted
+              - vector of the node names and descriptions as key/value pair
+              - nodes.
+              -
+              - The return is the number of nodes in the collection. You could
+              - just ask the collection, but its a convenience.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="c4EnumSubScopes">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard4/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strScopeToEnum" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colResults" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TKeyValuePair"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bThrowIfNot" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - This is used by clients that use the 'auto rebinder' mechanism.
+              - The rebinder needs to see if the name server has cycled, so it
+              - calls and gets a  magic cookie from the name server. It then
+              - polls the name server and if the magic cookie has changed, it
+              - knows the name server has cycled and it rebinds all of the
+              - objects registered with it.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="c8QueryCookie">
+                <CIDIDL:RetType>
+                    <CIDIDL:TCard8/>
+                </CIDIDL:RetType>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Create a terminal node in the name server. This is a node
+              - which holds an orb object id representing a server side Orb
+              - object. The name must not already exist. We have ones that
+              - takes the separate values, and one that takes a rebind object.
+              - which is what the rebinder will do.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="BindObj">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strBinding" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strDescription" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra1" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra2" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra3" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra4" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="ooidToStore" CIDIDL:Dir="In">
+                    <CIDIDL:Object CIDIDL:Type="TOrbObjId"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <CIDIDL:Method CIDIDL:Name="BindObj2">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strParentScope" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strNewName" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strDescription" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra1" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra2" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra3" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra4" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="ooidToStore" CIDIDL:Dir="In">
+                    <CIDIDL:Object CIDIDL:Type="TOrbObjId"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <CIDIDL:Method CIDIDL:Name="BindObj3">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="nsrbiToBind" CIDIDL:Dir="In">
+                    <CIDIDL:Object CIDIDL:Type="TNSRebindInfo"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+
+            <!-- =============================================================
+              - Clear out a scope and all of its recursive contents. But we
+              - don't remove the scope itself. Use RemoveScope() for that.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="ClearScope">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToClear" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Create a non-terminal node in the name server. This is a node
+              - which can contain other nodes, but not any data.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="CreateScope">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strParentScope" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strNewScope" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strDescription" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - A convenience method to create a scope and all of the parent
+              - scopes that it lives under. So it creates a whole path to a
+              - scope. This avoids a lot of single calls to CreateScope().
+              -
+              - If the whole path already exists, then it does nothing. However
+              - the node that it resolves to must be a scope, or an exception
+              - will be thrown.
+              -
+              - If it does already exist, then the passed description is just
+              - tossed. Else, its used to create the new scope.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="CreateScopePath">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strScopePath" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strDescription" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <CIDIDL:Method CIDIDL:Name="CreateScopePath">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="colPathParts" CIDIDL:Dir="In">
+                    <CIDIDL:TVector CIDIDL:ElemType="TKeyValuePair"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - This method just fills in the passed string with a simple
+              - XML'ized version of the whole name server tree.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="Dump">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToFill" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="eFormat" CIDIDL:Dir="In">
+                    <CIDIDL:Enumerated CIDIDL:Type="tCIDOrbUC::EDumpFmts"/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+
+            <!-- =============================================================
+              - Get the info for a particular name (either a scope or binding.)
+              -
+              - Since this is often used in situations where the object must
+              - be there to work, and in situations where its more of a check,
+              - there is also a bQueryNameInfo() version that doesn't throw
+              - if this path isn't found.
+              -
+              - We have one that returns just name/descr and another that
+              - returns the extra values.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="QueryNameInfo">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strPath" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strName" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strDescr" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+            <CIDIDL:Method CIDIDL:Name="QueryNameInfo2">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strPath" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strName" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strDescr" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra1" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra2" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra3" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strExtra4" CIDIDL:Dir="Out">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Remove an object binding from the NS. The passed path must
+              - point to a terminal node. It can optionally throw an exception
+              - if the binding doesn't exist, but mostly apps just want to be
+              - sure that any bindings that they might have created are
+              - removed when they exit.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="RemoveBinding">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToRemove" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bThrowIfNot" CIDIDL:Dir="In">
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Remove a scope and all of its recursive contents. If you just
+              - want to clean out the scope, but leave the scope itself, then
+              - use ClearScope(). You cannot remove the root scope.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="RemoveScope">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToRemove" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+
+            <!-- =============================================================
+              - Update one of the extra values of a binding.
+              -  =============================================================
+              -->
+            <CIDIDL:Method CIDIDL:Name="UpdateExtraVal">
+                <CIDIDL:RetType>
+                    <CIDIDL:TVoid/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strBinding" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="c4Index" CIDIDL:Dir="In">
+                    <CIDIDL:TCard4/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="strNewValue" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+            </CIDIDL:Method>
+
+        </CIDIDL:Methods>
+    </CIDIDL:ClassIntf>
+
+</CIDIDL:Interface>
+
+

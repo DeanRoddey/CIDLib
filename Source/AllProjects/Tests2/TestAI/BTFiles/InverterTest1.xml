@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE CQCCfg:DriverCfg PUBLIC "urn:charmedquark.com:CID-BehaviorTree.DTD"
+                           "CIDBehaviorTree.DTD">
+
+<!--
+   - Tests an inverter by just putting it around a success node, which should make it
+   - return failure.
+   -->
+<BehaviorTree TreeName="InverterTest1" Version="1">
+
+    <BTNode NodeType="/CIDAI/Inverter" NodeName="InverterTest1">
+        <BTNode NodeType="/CIDAI/Success"/>
+    </BTNode>
+
+</BehaviorTree>

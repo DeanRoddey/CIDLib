@@ -1,0 +1,193 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestFloat4;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+EndImports;
+
+Literals=
+    Float4  kLitVal1(1.1);
+    Float4  kLitVal2(100.43);
+EndLiterals;
+
+Members=
+    ConsoleOutStream    m_Output;
+    Float4              m_Test1;
+    Float4              m_Test2;
+    Float4              m_Test3;
+    Int4                m_RetVal;
+    Int1                m_Int1;
+    Card4               m_Card4;
+    Card8               m_Card8;
+    TestHelpers         m_Helper;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_Output();
+        m_Test1(0.1);
+        m_Test2(-12.3);
+        m_Test3(+12321.931);
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        // Check that the initializers set the values correctly
+        If (m_Test1 != 0.1)
+            m_Helper.PrintErr("Initial m_Test1 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test2 != -12.3)
+            m_Helper.PrintErr("Initial m_Test2 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test3 != 12321.931)
+            m_Helper.PrintErr("Initial m_Test3 value was incorrect", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Make sure the literals work
+        If ((kLitVal1 != 1.1) && (kLitVal2 != 100.43))
+            m_Helper.PrintErr("Literals were not correctly set", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test some suffix stuff
+        m_Test1 := 102#C2;
+        If (m_Test1 != 102)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 0xFFFF#C4;
+        If (m_Test1 != 0xFFFF)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 0x0#C1;
+        If (m_Test1 != 0)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 0#C2;
+        If (m_Test1 != 0)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 022#C4;
+        If (m_Test1 != 18#F4)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Should convert automatically since it will fit the target
+        m_Test1 := 0xFFFF#C4;
+        If (m_Test1 != 0xFFFF#C8)
+            m_Helper.PrintErr("Suffix assign failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test min/max methods
+        m_Test1 := 10.1;
+        If ((m_Test1.MaxVal(11.2) != 11.2)
+        ||  (m_Test1.MinVal(11.2) != 10.1))
+            m_Helper.PrintErr("Min/max failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test negation
+        m_Test1 := -1.4;
+        m_Test1.Negate();
+        If (m_Test1 != 1.4)
+            m_Helper.PrintErr("Negation failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test the absolute value
+        m_Test1 := -1.9;
+        If (m_Test1.Abs() != 1.9)
+            m_Helper.PrintErr("Abs failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Test some type-casting
+        m_Test1 := 100.1;
+
+        m_Card4 := TypeCast(MEng.Card4, m_Test1);
+        If (m_Card4 != 100)
+            m_Helper.PrintErr("Cast to Card4 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Card8 := TypeCast(MEng.Card8, m_Test1);
+        If (m_Card8 != 100)
+            m_Helper.PrintErr("Cast to Card8 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Int1 := TypeCast(MEng.Int1, m_Test1);
+        If (m_Int1 != 100)
+            m_Helper.PrintErr("Cast to Int1 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        // Do some rounding tests
+        m_Test1 := 1.499;
+        m_Test1.Round(UpDnClosest.Down);
+        If (m_Test1 != 1.0)
+            m_Helper.PrintErr("Rounding down failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 1.499;
+        m_Test1.Round(UpDnClosest.Up);
+        If (m_Test1 != 2.0)
+            m_Helper.PrintErr("Rounding down failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 1.499;
+        m_Test1.Round(UpDnClosest.Closest);
+        If (m_Test1 != 1.0)
+            m_Helper.PrintErr("Rounding closest failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Test1 := 1.5;
+        m_Test1.Round(UpDnClosest.Closest);
+        If (m_Test1 != 2.0)
+            m_Helper.PrintErr("Rounding closest failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        // Test ceiling and floor
+        m_Test1 := 2.5;
+        If (m_Test1.Ceiling() != 3.0)
+            m_Helper.PrintErr("Ceiling failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_Test1.Floor() != 2.0)
+            m_Helper.PrintErr("Floor failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+

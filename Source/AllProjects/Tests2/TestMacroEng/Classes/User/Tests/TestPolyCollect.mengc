@@ -1,0 +1,97 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestPolyCollect;
+    ParentClass MEng.Object;
+EndClass;
+
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.Vector;
+
+    MEng.User.Tests.TestPolyColBase;
+    MEng.User.Tests.TestPolyColDerived;
+EndImports;
+
+
+Types=
+    VectorOf[TestPolyColBase]       BaseList;
+    VectorOf[TestPolyColDerived]    DerivedList;
+EndTypes;
+
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Method Test([In] BaseList OutList)
+    Begin
+        Locals=
+            Card4   Count(OutList.GetElemCount());
+            Card4   Index(0);
+            TestPolyColBase TestBase;
+        EndLocals;
+
+        TestBase := OutList[1];
+        m_Output.FmtStr("Copied=");
+        m_Output.Format(TestBase);
+        m_Output.NewLn();
+
+        While (Index < Count)
+            m_Output.Format(OutList[Index]);
+            m_Output.NewLn();
+            Index++;
+        EndWhile;
+    EndMethod;
+
+
+    Method Test2([In] BaseList Src, [Out] BaseList Tar)
+    Begin
+        Tar := Src;
+    EndMethod;
+
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            BaseList            List1;
+            DerivedList         List2;
+
+            TestPolyColBase     Base;
+            TestPolyColDerived  Derived;
+        EndLocals;
+
+        Base.SetBaseValue("1");
+        List1.AddObject(Base);
+        Base.SetBaseValue("2");
+        List1.AddObject(Base);
+
+        Derived.SetBaseValue("3");
+        Derived.SetDerivedValue("4");
+        List2.AddObject(Derived);
+        Derived.SetBaseValue("5");
+        Derived.SetDerivedValue("6");
+        List2.AddObject(Derived);
+
+        Test(List1);
+        m_Output.DNewLn();
+        Test(List2);
+        m_Output.DNewLn();
+
+        Test2(List2, List1);
+        Test(List1);
+
+        Return 0;
+    EndMethod;
+
+EndMethods;
+

@@ -1,0 +1,11 @@
+This is just a text file that can be read in.
+It has some lines of text that can be read in.
+Reading in lines of text can be soothing to some,
+Not so soothing to others.
+Four out of five dentists recommend reading in text,
+but studies show that most of those dentists don't
+read in any text themselves.
+Is this hypocrasy or is there is a plan behind
+this statistical anomaly?
+We can't really say, can we?
+If we could, then we just say it and be done with it.

@@ -1,0 +1,114 @@
+;
+; FILE NAME: CIDDAE.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 03/21/2006
+;
+; COPYRIGHT: 2006..2006, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kDAEErrs
+    MsgPref=kDAEMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;   Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    ; Data access errors
+    errcData_GetTOC             500     The table of contents could be accessed
+    errcData_CantReadInit       501     Could not read initial sector block
+    errcData_CantReadBlks       502     Could not read blocks at offset %(1)
+    errcData_PoolCleanup        503     An error occured while cleaning up the buffer pool
+    errcData_ExtractTrack       504     Could not extract track info for track %(1)
+    errcData_Unknown            505     Unknown exception occurred during ripping
+
+    ; Encoding errors
+    errcEnc_ReadErr             1000    Not all requested bytes could be read (Count=%(1))
+    errcEnc_SeekErr             1001    Could not seek to position %(1)
+    errcEnc_WriteErr            1002    Not all requested bytes could be written (Count=%(1))
+
+    ; Metadata errors
+    errcMeta_CantInit           3000    Metadata server %(1) cannot be initialized. Reason=%(2)
+    errcMeta_CantTerm           3001    Metadata server %(1) cannot be terminated. Reason=%(2)
+    errcMeta_GenReqFailed       3002    The metadata request could not be generated. Code=%(1)
+    errcMeta_NoReply            3003    There was no reply from the metadata service
+    errcMeta_BadReply           3004    The metadata response was badly formed
+    errcMeta_WrongReply         3005    Did not get the expected reply (%(1)) from the metadata service. Got %(2)
+    errcMeta_CantParse          3006    The reply could not be parsed. Reason=%(1)
+    errcMeta_NotFound           3007    No metadata records matched the source media
+    errcMeta_SrvRejected        3008    The metadata server rejected the packet format
+    errcMeta_QArtRejected       3009    The metadata server rejected the cover art query. Error=%(1)
+
+    ; Procsesing errors
+    errcProc_CantStopThread     6000    The ripping %(1) thread could not be stopped! It is recommended \
+                                        that you exit and restart this application.
+
+    ; WAV specific errors
+    errcWAV_NotWaveFile         7800    The source data is not a valid WAV file
+    errcWAV_WaveFmt             7801    WAV file sample ch/size/rate is incorrect (%(1)/%(2)/%(3))
+
+    ; WMA specific errors
+    errcWMA_CreateWriter        8000    Could not create WMF writer
+    errcWMA_CreateProfMgr       8001    Could not create profile manager
+    errcWMA_CreateProfile       8002    Could not create encoder profile
+    errcWMA_SetProfile          8003    Could not set profile on writer
+    errcWMA_GetMediaProps       8004    Could not get media properties
+    errcWMA_SetMediaType        8005    Could not set media type info on writer
+    errcWMA_SetInputProps       8006    Could not set writer input properties
+    errcWMA_AllocSampBuf        8007    Could not allocate new sample buffer
+    errcWMA_WriteSample         8008    Could not write new sample buffer to writer
+    errcWMA_BufTooSmall         8009    Sample buffer is too small for samples. Need %(1) but got %(2)
+    errcWMA_QueryPropVault      8010    Could not query property vault
+    errcWMA_AddStreamToProfile  8011    Could not add the stream to its profile
+    errcWMA_BeginWrite          8012    Could not start the writer
+    errcWMA_QueryCodecInfo      8013    Could not query codec info interface
+    errcWMA_QueryCodecCnt       8014    Could not query codec count
+    errcWMA_QueryCodecNameLen   8015    Could not query codec name length
+    errcWMA_QueryCodecName      8016    Could not query codec name
+    errcWMA_CodecNotFound       8017    The required Audio codec was not found
+    errcWMA_QueryCodecFmtCnt    8018    Could not query the codec format count
+    errcWMA_QueryCodecFmt       8019    Could not query the codec format
+    errcWMA_QueryCodecFmtName   8020    Could not query the codec format name
+    errcWMA_GetPropertyVault    8021    Could not query the stream's property vault
+    errcWMA_SetEnumType         8022    Could not set the codec format enum type
+    errcWMA_InvalidCodecIndex   8023    %(1) is not a valid codec index. Count=%(2)
+    errcWMA_UnknownEncodeFmt    8024    Could not find format '%(1)' in codec '%(2)'
+    errcWMA_CreateStream        8025    Could not create the profile stream
+    errcWMA_SetStreamNum        8026    Could not set the stream number
+    errcWMA_SetStreamName       8027    Could not set the stream name
+    errcWMA_SetConnectionName   8028    Could not set the connection name
+    errcWMA_SetBitrate          8029    Could not set the stream bitrate
+    errcWMA_GetMediaType        8030    Could not query the stream media type
+    errcWMA_SetQuality          8031    Could not set the stream quality level
+    errcWMA_CreateReader        8032    Could not create WMF sync reader object
+    errcWMA_GetSample           8033    Could not get next input sample
+    errcWMA_OpenSource          8034    Could not open the source file
+    errcWMA_GetBufferInfo       8035    Could not get source buffer size/ptr info
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;   Messages
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+

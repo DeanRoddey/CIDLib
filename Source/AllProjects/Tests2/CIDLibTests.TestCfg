@@ -1,0 +1,194 @@
+// ---------------------------------------------------------------------------
+//  This is a test framework configuration file for the CIDLib tests.
+//  defines all the tests and sets up some groups for testing various bits
+//  and pieces.
+// ---------------------------------------------------------------------------
+
+
+// ---------------------------------------------------------------------------
+//  Define the tests. For the magic <AllGroups> group, they will be in the
+//  order defined here, so we declare them in the order that we want them to
+//  run if no specific group is used (i.e. test the lower level stuff first,
+//  then the progressively higher level stuff.)
+// ---------------------------------------------------------------------------
+TestPrgs=CIDLib Test Suite
+
+    TestPrg=CIDLib
+        TestPath=<Root>\TestCIDLib2.exe
+        Description=Tests the core classes in CIDLib
+    EndTestPrg;
+
+    TestPrg=MathLib
+        TestPath=<Root>\TestMathLib.exe
+        Description=Tests the math classes in CIDMath
+    EndTestPrg;
+
+    TestPrg=TextEncode
+        TestPath=<Root>\TestCIDEncode.exe
+        Description=Tests the text converter classes in CIDEncode
+    EndTestPrg;
+
+    TestPrg=RegEx
+        TestPath=<Root>\TestRegX.exe
+        Description=Tests the regular expression engine in CIDRegEx
+    EndTestPrg;
+
+    TestPrg=Crypto
+        TestPath=<Root>\TestCrypto.exe
+        Description=Tests the crypography classes in CIDCrypto
+    EndTestPrg;
+
+    TestPrg=Network
+        TestPath=<Root>\TestNet.exe
+        Description=Tests the core network related classes in CIDSock
+    EndTestPrg;
+
+    TestPrg=ObjStore
+        TestPath=<Root>\TestObjStore.exe
+        Description=Tests object store engine in CIDObjStore
+        WorkDir=TestObjStore
+    EndTestPrg;
+
+    TestPrg=XMLParser
+        TestPath=<Root>\TestXML.exe
+        Description=Tests the XML Parser facility
+        WorkDir=TestXML
+    EndTestPrg;
+
+    TestPrg=ObjReqBroker
+        TestPath=<Root>\TestORB.exe
+        Description=Tests the ORB classes in CIDOrb
+    EndTestPrg;
+
+    TestPrg=ArtInt
+        TestPath=<Root>\TestAI.exe
+        Description=Tests the AI classes in CIDAI
+        WorkDir=TestAI
+    EndTestPrg;
+
+    TestPrg=MData
+        TestPath=<Root>\TestCIDMData.exe
+        Description=Tests the classes in CIDMData
+        WorkDir=TestCIDMData
+    EndTestPrg;
+
+    // This uses lots of other stuff, so keep it almost last
+    TestPrg=MacroEng
+        TestPath=<Root>\TestMacroEng.exe
+        Description=Tests the macro engine in CIDMacroEng
+        WorkDir=TestMacroEng
+    EndTestPrg;
+
+    // Higher level stress tests, so the very last
+    TestPrg=StressTests
+        TestPath=<Root>\StressTests.exe
+        Description=Runs higher level stress tests
+        WorkDir=StressTests
+    EndTestPrg;
+
+EndTestPrgs;
+
+
+// ---------------------------------------------------------------------------
+// Define the groups
+// ---------------------------------------------------------------------------
+Groups=
+
+    Group=Crypto
+        Description=Tests the cryptography related facilities
+        TestPrgs=
+            Crypto
+        EndTestPrgs;
+    EndGroup;
+
+    Group=Core
+        Description=The most fundamental tests
+        TestPrgs=
+            CIDLib
+            MathLib
+            TextEncode
+        EndTestPrgs;
+    EndGroup;
+
+    Group=MacroEngine
+        Description=Just tests the macro engine
+        TestPrgs=
+            MacroEng
+        EndTestPrgs;
+    EndGroup;
+
+    Group=Network
+        Description=Just tests the network related stuff
+        TestPrgs=
+            Network
+        EndTestPrgs;
+    EndGroup;
+
+    Group=ObjStore
+        Description=Just tests the object store
+        TestPrgs=
+            ObjStore
+        EndTestPrgs;
+    EndGroup;
+
+    Group=RegEx
+        Description=Just tests the regular expression engine
+        TestPrgs=
+            RegEx
+        EndTestPrgs;
+    EndGroup;
+
+    Group=XML
+        Description=Just tests the XML parser services
+        TestPrgs=
+            XMLParser
+        EndTestPrgs;
+    EndGroup;
+
+    Group=ORB
+        Description=Just tests the Object Request Broker
+        TestPrgs=
+            ObjReqBroker
+        EndTestPrgs;
+    EndGroup;
+
+    Group=MData
+        Description=Just tests the CIDMData facility
+        TestPrgs=
+            MData
+        EndTestPrgs;
+    EndGroup;
+
+    Group=AI
+        Description=Just tests the AI engine
+        TestPrgs=
+            ArtInt
+        EndTestPrgs;
+    EndGroup;
+
+    Group=Stress
+        Description=Runs the higher level stress tests
+        TestPrgs=
+            StressTests
+        EndTestPrgs;
+    EndGroup;
+
+    Group=Light
+        Description=Does all non-long running stress tests
+        TestPrgs=
+            CIDLib
+            MathLib
+            RegEx
+            Crypto
+            XMLParser
+            MData
+            TextEncode
+            Network
+            ObjStore
+            ArtInt
+        EndTestPrgs;
+    EndGroup;
+
+
+EndGroups;
+

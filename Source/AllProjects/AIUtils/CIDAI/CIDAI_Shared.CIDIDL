@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - Generates some public types and constants
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Constants>
+
+            <CIDIDL:Constant CIDIDL:Name="c4MaxChildNodes"
+                             CIDIDL:Type="TCard4" CIDIDL:Value="64">
+                <CIDIDL:DocText>
+                    The maximum number of child nodes a composite node can have.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strFact_Default"
+                             CIDIDL:Type="TString" CIDIDL:Value="CIDAI">
+                <CIDIDL:DocText>
+                    The factory name for the default BT node factory (which handles creation
+                    of all of the built in node types.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strFact_DefPrefix"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CIDAI/"/>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strDefFact_Inverter"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CADAI/Inverter">
+                <CIDIDL:DocText>
+                    The node types supported by the default BT node factory.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strDefFact_Link"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CADAI/Link"/>
+            <CIDIDL:Constant CIDIDL:Name="strDefFact_Root"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CIDAI/Root"/>
+            <CIDIDL:Constant CIDIDL:Name="strDefFact_RandChoice"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CIDAI/RandChoice"/>
+            <CIDIDL:Constant CIDIDL:Name="strDefFact_Selector"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CIDAI/Selector"/>
+            <CIDIDL:Constant CIDIDL:Name="strDefFact_Sequence"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CIDAI/Sequence"/>
+            <CIDIDL:Constant CIDIDL:Name="strDefFact_Success"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CIDAI/Success"/>
+            <CIDIDL:Constant CIDIDL:Name="strDefFact_VarTest"
+                             CIDIDL:Type="TString" CIDIDL:Value="/CIDAI/VarTest"/>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strNParam_LinkTarget"
+                             CIDIDL:Type="TString" CIDIDL:Value="LinkTarget">
+                <CIDIDL:DocText>
+                    Some commonly used values.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strNParam_VarTestComp"
+                             CIDIDL:Type="TString" CIDIDL:Value="VarTestComp"/>
+            <CIDIDL:Constant CIDIDL:Name="strNParam_VarTestVal"
+                             CIDIDL:Type="TString" CIDIDL:Value="VarTestVal"/>
+            <CIDIDL:Constant CIDIDL:Name="strNParam_VarTestVar"
+                             CIDIDL:Type="TString" CIDIDL:Value="VarTestVar"/>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strVal_False"
+                             CIDIDL:Type="TString" CIDIDL:Value="False">
+                <CIDIDL:DocText>
+                    Some commonly used values.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strVal_True"
+                             CIDIDL:Type="TString" CIDIDL:Value="True"/>
+
+        </CIDIDL:Constants>
+
+
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum CIDIDL:Name="ENodeStates" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName">
+                <CIDIDL:DocText>
+                    The status that the behavior tree nodes can have.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Running"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Success"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Cancel"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Failure"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+

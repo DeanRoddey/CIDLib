@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum CIDIDL:Name="ETests"
+                         CIDIDL:TextStreamMap="Text" 
+                         CIDIDL:AltTextSrc="Inline" CIDIDL:AltMap="AltText"
+                         CIDIDL:AltText2="Yes" CIDIDL:AltMap2="AltText2"
+                         CIDIDL:FormatMap="BaseName" CIDIDL:IncDec="Inc">
+                <CIDIDL:DocText>
+                    A test enum
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Val1" CIDIDL:Text="Text 1" CIDIDL:AltText="Alt Value 1" CIDIDL:AltText2="The First Value"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Val2" CIDIDL:Text="Text 2" CIDIDL:AltText="Alt Value 1" CIDIDL:AltText2="The Second Value"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Val3" CIDIDL:Text="Text 3" CIDIDL:AltText="Alt Value 3" CIDIDL:AltText2="The Third Value"/>
+
+                <CIDIDL:EnumSyn CIDIDL:Name="ASynVal" CIDIDL:Value="Val3"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ELoadedVals"
+                         CIDIDL:TextStreamMap="Text" 
+                         CIDIDL:MsgNS="kTestMsgs" CIDIDL:MsgFac="TestOrb3"
+                         CIDIDL:LoadMap="Text" CIDIDL:AltNumVal="Yes">
+                <CIDIDL:DocText>
+                    A loaded text test enum
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Val1" CIDIDL:Text="midEnum1_Value1" CIDIDL:AltNumVal="101"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Val2" CIDIDL:Text="midEnum1_Value2" CIDIDL:AltNumVal="202"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Val3" CIDIDL:Text="midEnum1_Value3" CIDIDL:AltNumVal="303"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EBmpEnum"
+                         CIDIDL:TextStreamMap="BaseName" 
+                         CIDIDL:Type="Bmp" CIDIDL:FormatMap="Text" CIDIDL:XlatMap="Name">
+                <CIDIDL:DocText>
+                    A bitmapped (non-contiguous) text enum
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Bmp1" CIDIDL:Text="Bmp Value 1" CIDIDL:Value="0x0001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Bmp2" CIDIDL:Text="Bmp Value 2" CIDIDL:Value="0x0010"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Bmp3" CIDIDL:Text="Bmp Value 3" CIDIDL:Value="0x0200"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Bmp23" CIDIDL:Text="Bmp Value 2-3" CIDIDL:Value="0x0210"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+

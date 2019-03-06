@@ -1,0 +1,83 @@
+;
+; FILE NAME: CIDSChan.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 10/11/2104
+;
+; COPYRIGHT: 2014..2014, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This is the message text file for the facility.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kSChanErrs
+    MsgPref=kSChanMsgs
+END CTRL
+
+
+
+; ----------------------------------------------------------------------------
+;  Errors
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    errcGen_NoError         0   No Error
+
+    ; Huge number oriented errors
+    errcHNum_BadIndex       2000    %(1) is not a valid index for the huge number. Length=%(2)
+    errcHNum_DivByZero      2001    Divide by zero
+
+    ; RSA errors
+    errcRSA_NotBlockMul     4000    The input size is not a multiple of the block size (%(1))
+    errcRSA_BadPaddingType  4001    The RSA padding type is not valid (%(1))
+    errcRSA_NoBlockMark     4002    The RSA block did not have the required zero marker byte
+
+    ; Secure channel stuff
+    errcSChan_BadCertInfo   5000    The passed certificate location was invalid. Name=%(1), Info=%(2)
+    errcSChan_OpenStore     5001    Could not open the local certificate store. Name=%(1)
+    errcSChan_OpenCert      5002    Could not open the indicated certificate. Name=%(1), Info=%(2)
+    errcSChan_AqcCreds      5003    Could not acquire credentials. Name=%(1), Code=%(2)
+    errcSChan_NotInit       5004    The secure channel must be initialized before read/write. Name=%(1)
+    errcSChan_ConnFailed    5005    Could not establish secure connection. Name=%(1), Error=%(2)
+    errcSChan_CertType      5006    '%(1)' is not a supported certificate location type. Name=%(2)
+    errcSChan_AlreadyInit   5007    The secure channel is already initialized. Name=%(1)
+    errcSChan_Closed        5008    The connection was closed before %(1) began. Name=%(2)
+    errcSChan_AcceptSecCtx  5009    Failed while accepting security context. Name=%(1), Error=%(2)
+    errcSChan_GetPkgInfo    5010    Could not get security package info. Name=%(1), Error=%(2)
+    errcSChan_CompAuthToken 5011    Could not complete authentication token. Name=%(1), Error=%(2)
+    errcSChan_Encrypt       5012    Could not encrypt outgoing data. Name=%(1), Error=%(2)
+    errcSChan_NoData        5013    Received no data from other side. Name=%(1)
+    errcSChan_Renegotiate   5014    Renegotiation of the connection failed. Name=%(1)
+    errcSChan_NotAllData    5015    Caller asked for %(1) bytes, but only %(2) could be decrypted. Name=%(3)
+    errcSChan_ShutdownReq   5016    Negotiation cancelled due to thread shutdown request. Name=%(1)
+    errcSChan_NoClientCert  5017    The server requires a client certificate. Name=%(1)
+    errcSChan_PartialMsg    5018    Got an incomplete encrypted packet. Name=%(1)
+    errcSChan_OutOfSeq      5019    Got an out of sequence encrypted packet. Name=%(1)
+    errcSChan_MsgAltered    5020    An encrypted packet was altered in transit. Name=%(1)
+
+    ; These are mapped to from Windows status returns
+    errcSChan_Internal      5050    Internal Windows SChannel error. Name=%(1)
+    errcSChan_Handle        5051    Invalid SChannel handle error. Name=%(1)
+    errcSChan_Token         5052    Invalid TLS token received from client. Name=%(1)
+    errcSChan_NoAuth        5053    No authenticating authority found. Name=%(1)
+    errcSChan_NoCreds       5054    The provided credentials were invalid. Name=%(1)
+    errcSChan_FuncUnsupp    5055    An unsupported context function was requested. Name=%(1)
+    errcSChan_BadBindings   5056    Channel binding policy was not satisfied. Name=%(1)
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Messages
+; ----------------------------------------------------------------------------
+

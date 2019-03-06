@@ -1,0 +1,10 @@
+#
+# Under windows GIT is set to case insensitive, but just in ummm... case,
+# use a pattern to insure we get them under any case.
+#
+*.[bB][mM][pP] binary
+*.[iI][cC][oO] binary
+*.[jJ][pP][gG] binary
+*.[jJ][pP][eE][gG] binary
+*.[mM][eE][nN][gG][cC] binary
+*.[pP][nN][gG] binary

@@ -1,0 +1,54 @@
+;
+; FILE NAME: CIDSIP_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 03/05/2013
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  $_CIDLib_CopyRight2_$
+;
+; DESCRIPTION:
+;
+;  This file contains the message and error text and ids for this facility.
+;  From this file are created the headers and binary message file.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kSIPErrs
+    MsgPref=kSIPMsgs
+END CTRL
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    ; No error occured
+    errcNoError                 0       No error occured
+
+    ; SIP client errors
+    errcSIP_NoCall              5000    No SIP call is currently active
+    errcSIP_Already             5001    A SIP call is already active, close it first
+    errcSIP_InviteReq           5002    The first call method must be an INVITE, not a %(1)
+    errcSIP_NotSuppURI          5003    The To or From address is not a supported SIP URI
+    errcSIP_BadContLenLine      5004    The content length value must be an unsigned number
+    errcSIP_NoSuchHdrLn         5005    Could not find the indicated SIP header line
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+;  Message ids (i.e. not for errors)
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+

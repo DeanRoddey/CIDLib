@@ -1,0 +1,37 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestHelpers;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.System.Runtime.TextOutStream;
+EndImports;
+
+// Just for testing the access of another class' literals
+Literals=
+    Boolean     kTestLit(False);
+    Card4       kTestLit2(831);
+    Card4       kTestLit_Underscored(1);
+
+EndLiterals;
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+    Method PrintErr([In]        String          Text
+                    , [InOut]   TextOutStream   Output
+                    , [In]      Card4           CurLine)
+    Begin
+        Output.FmtStr("    (Line: ");
+        Output.FmtCard4(CurLine);
+        Output.FmtStr(") - ");
+        Output.FmtStr(Text);
+        Output.NewLn();
+        Output.Flush();
+    EndMethod;
+
+EndMethods;
+

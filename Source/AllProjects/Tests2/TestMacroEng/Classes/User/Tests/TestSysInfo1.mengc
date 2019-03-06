@@ -1,0 +1,40 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestSysInfo1;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.SysInfo;
+EndImports;
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    SysInfo             m_Info;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        //
+        //  Not much we can do to test the results, but just make sure
+        //  that the signatures don't change or that they don't do something
+        //  bad when called.
+        //
+        m_Info.GetNodeName();
+        m_Info.GetCPUCount();
+
+        m_Output.Flush();
+        Return 0;
+    EndMethod;
+
+EndMethods;
+
+

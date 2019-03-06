@@ -1,0 +1,97 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestBase64;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.Base64;
+EndImports;
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    Base64              m_Base64;
+    Int4                m_RetVal;
+    MemBuf              m_Buf1;
+    MemBuf              m_Buf2;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+        m_Buf1(256, 256);
+        m_Buf2(256, 256);
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            Card4   Count(0);
+            String  SrcText;
+            String  Decoded;
+            String  Encoded;
+        EndLocals;
+
+        //
+        //  First we'll do a round trip test using buffers. We fill
+        //  a buffer, encode it, then decode it back, and make sure
+        //  that we got back the original stuff.
+        //
+        While (Count < 256)
+            m_Buf1.PutCard1At(Count, TypeCast(MEng.Card1, Count));
+            Count++;
+        EndWhile;
+        m_Base64.EncodeBuf(m_Buf1, Count, Encoded);
+        Count := m_Base64.DecodeToBuf(Encoded, m_Buf2);
+
+        // We should have gotten 256 bytes back
+        If (Count != 256)
+            m_Helper.PrintErr("Did not get back 256 bytes", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        If (m_RetVal = 0)
+            // And the buffers should be the same
+            Count := 0;
+            While (Count < 256)
+                If (m_Buf1.GetCard1At(Count) != m_Buf2.GetCard1At(Count))
+                    m_Helper.PrintErr("Binary round trip failed", m_Output, $CurLine);
+                    m_RetVal := -1;
+                    Break;
+                EndIf;
+                Count++;
+            EndWhile;
+        EndIf;
+
+        //
+        //  It's also possible to go straight from a string, which assumes
+        //  that the string just holds ASCI text.
+        //
+        SrcText := "This is the original text";
+        m_Base64.EncodeStr(SrcText, Encoded);
+
+        //
+        //  Now go back the other way. We have to decode it to a buffer
+        //  then we can export it to a string since we know it's ASCII
+        //
+        Count := m_Base64.DecodeToBuf(Encoded, m_Buf1);
+        m_Buf1.ExportString(Decoded, Count);
+
+        // And the strings must be the same
+        If (SrcText != Decoded)
+            m_Helper.PrintErr("String to string round trip failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;
+
+
+

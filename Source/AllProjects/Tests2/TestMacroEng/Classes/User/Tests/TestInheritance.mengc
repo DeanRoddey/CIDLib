@@ -1,0 +1,32 @@
+Class=[NonFinal]
+    ClassPath MEng.User.Tests.TestInheritance;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestDerivedClass;
+EndImports;
+
+Members=
+    TestDerivedClass    m_Test;
+    String              m_Text;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+    Method Start() Returns Int4
+    Begin
+        If (!m_Test.CallMe())
+            
+        EndIf;
+
+        m_Test.Test(m_Text);
+        Return 0;
+    EndMethod;
+
+EndMethods;

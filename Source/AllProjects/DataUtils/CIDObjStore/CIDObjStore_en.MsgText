@@ -1,0 +1,109 @@
+;
+; FILE NAME: CIDAppSh_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 09/16/2002
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;  This file and its contents are the property of Charmed Quark Software. It
+;  may not be redistributed in any modified form, or as part of any product
+;  other than the original CIDLib C++ Frameworks distribution file. Its
+;  contents may not be compiled into any other product, except when required
+;  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;  product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for the CIDLib object store.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kObjSErrs
+    MsgPref=kObjSMsgs
+END CTRL
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    errc_NoError                0       No Error
+
+    ; Backup errors
+    errcBack_BadKey             500     Key %(1) was invalid and not copied to the backup store
+    errcBack_OpenCompacted      501     The new compacted object store cannot be opened, going back to original
+    errcBack_RollbackFailed     502     Could not revert to original store after compaction attempt
+    errcBack_NewCompFailed      503     The newly compacted repository could not be opened, will try to revert...
+
+    ; Data errors
+    errcData_KeyNotFound        2000    Could not find key '%(1)' in store '%(2)'
+    errcData_CantExpandIndex    2001    The index for object store '%(1)' could not be expanded any more
+    errcData_KeyAlreadyExists   2002    The key '%(1)' already exists in store '%(2)', so it cannot be added
+    errcData_GapInData          2003    A gap was found in the object store free/item lists
+    errcData_BadFreeSlotSize    2004    The free item size in the store (%(1)) does not match that in the free list (%(2)), in store '%(3)'
+    errcData_BadItemSlotSize    2005    The store item size in the store (%(1)) but %(2) in the index, in store '%(3)
+    errcData_KeySzMismatch      2006    The index item key size is '%(1)', but the store header size is '%(2)'. Store='%(3)'
+    errcData_SizeMismatch       2007    The index item size (%(1)) does not match the store header's size (%(2)). Store='%(3)', Key=%(4)
+    errcData_HashMismatch       2008    The hash of the data of item '%(1)' in store '%(2)', does match the hash in the index
+    errcData_AllocMismatch      2009    The index item alloc is %(1), but the store header is '%(2)'. Store='%(3)', Key=%(4)
+    errcData_UsedMismatch       2010    The index item current used is %(1), but the store header is '%(2)'. Store='%(3)', Key=%(4)
+    errcData_BadMagicVal        2011    The magic value at offset %(1) in store '%(2)' is inconsistent with the slot type
+    errcData_NotAllStoreUsed    2012    The used/free items did not cover the whole store file for store '%(1)'
+    errcData_BadHdrMagicVal     2013    The object store header is not correctly formatted, in store '%(1)'
+    errcData_BadFreeHdr         2014    The free item header at offset %(1) was bad in store '%(2)'
+    errcData_UnknownStoreMarker 2015    Found an unknown store item marker at offset %(1) in store '%(2)'
+    errcData_BadAllocUsed       2016    The item allocation (%(1)) was less than the used bytes %(2), for key %(3).
+    errcData_BadKey             2017    Key '%(1)' is not a valid object store path
+    errcData_BadBindingKey      2018    Binding keys cannot end with a separator. Key=%(1)
+    errcData_Recovering         2019    Recovering from bad marker at offset %(1). Store='%(2)'
+    errcData_RecoverFailed      2020    Failed to recover from bad market, giving up. Store='%(1)'
+    errcData_RemoveDupKey       2021    Remove duplicate key '%(1)' from store '%(2)'
+
+    ; Some debug only errors
+    errcDbg_FreeSlotTooSmall    2050    Got back a free list slot too small to hold the data
+    errcDbg_SubMinFreeSlot      2051    Found a free list slot of %(1) bytes in store '%(2)', but the min size is %(3)
+    errcDbg_CreatedMinFreeSlot  2052    Attempt to create a free list slot of %(1) bytes in store '%(2)', but the min size is %(3)
+    errcDbg_BadCombine          2053    Two sequence objects of different types were joined
+    errcDbg_TookTooMuch         2054    %(1) bytes were taken from the free list item, but only %(2) were available
+    errcDbg_GapAfterHeader      2055    The first store item started beyond the end of the header of store %(1)
+    errcDbg_FreeItemNotFound    2056    The free item to remove was not found on the free list. Store=%(1)
+
+    ; Initialization errors
+    errcInit_AlreadyInitialized 4800    The store is already initialized
+    errcInit_NotInitialized     4801    The store is not initialized yet
+
+    ; I/O errors
+    errcIO_CreateStore          5001    Could not create the store file for object store '%(1)'
+    errcIO_OpenStore            5002    Could not open the store file for object store '%(1)'
+    errcIO_CreateFreeSpace      5003    Failed while creating new free space in the store '%(1)'
+    errcIO_WriteStoreItemHdr    5004    Failed while writing the store item header for object '%(1)', in store '%(2)'
+    errcIO_WriteStoreItemData   5005    Failed while writing the store item data for object '%(1)', in store '%(2)'
+    errcIO_ReadStoreItemHdr     5011    Failed while reading the store item header for object '%(1)', in store '%(2)'
+    errcIO_ReadStoreItem        5012    Failed while reading the store item data for object '%(1)', in store '%(2)'
+    errcIO_WriteFreeStoreHdr    5013    Failed when writing a free list item header to store '%(1)'
+    errcIO_WriteStoreItemKey    5014    Failed when writing the store item key data for object '%(1)', in store '%(2)'
+    errcIO_ReadMagicVal         5015    Could not read the magic value of store slot at offset %(1) in store '%(2)'
+    errcIO_WriteStoreFlHdr      5017    Failed while writing out the store file header to new store '%(1)'
+    errcIO_ReadItemKey          5018    Failed while reading the key data for object '%(1)', in store '%(2)'
+    errcIO_ReadFreeStoreHdr     5019    Failed when reading a free list item header from store '%(1)'
+    errcIO_ReadStoreFlHdr       5020    Failed while reading in store file header from new store '%(1)'
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+;  Message ids
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+END MESSAGES
+
+

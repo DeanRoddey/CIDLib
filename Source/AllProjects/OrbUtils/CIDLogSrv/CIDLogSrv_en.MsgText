@@ -1,0 +1,105 @@
+;
+; FILE NAME: CIDLogSrv_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 02/28/2001
+;
+; COPYRIGHT: 1992..2002, Charmed Quark Software
+;
+;   This file and its contents are the property of Charmed Quark Software. It
+;   may not be redistributed in any modified form, or as part of any product
+;   other than the original CIDLib C++ Frameworks distribution file. Its
+;   contents may not be compiled into any other product, except when required
+;   by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;   product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for the CIDLogSrv compiler
+;   program.
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kLogSErrs
+    MsgPref=kLogSMsgs
+END CTRL
+
+
+; ----------------------------------------------------------------------------
+;  Error ids
+; ----------------------------------------------------------------------------
+ERRORS=
+
+    errc_NoError                0       No Error
+
+    ; Log file errors
+    errcFile_NotAtStoreOfs      1000    The operation did not leave us at the store ofs
+    errcFile_FlusherWriteFailed 1001    The flusher thread failed to write the header
+    errcFile_GapMismatch        1002    The next gap is not between the current two keys
+    errcFile_NoMoreGaps         1003    Expected another free list gap entry
+    errcFile_NoDeadBeef         1004    The list divider value was not found on eader read
+    errcFile_NothingInGap       1005    During compaction, two contiguous gaps were found
+    errcFile_NotAllRead         1006    Failed to read a complete log event record
+    errcFile_NotAllBlockRead    1007    Failed to read a block of log events, during compaction
+    errcFile_HdrReadFailed      1008    Failed to read in the log file header
+    errcFile_KeyReadFailed      1009    Failed to read the log file key array
+    errcFile_FreeReadFailed     1010    Failed to read the log file free list array
+    errcFile_BeefReadFailed     1011    Failed to find key/free list separator
+    errcFile_HdrWriteFailed     1008    Failed to write out the log file header
+    errcFile_KeyWriteFailed     1009    Failed to write out the log file key array
+    errcFile_FreeWriteFailed    1010    Failed to write out the log file free list array
+    errcFile_BeefWriteFailed    1011    Failed to write out the key/free list separator
+    errcFile_BadHdrMarker       1012    The header marker was not valid
+    errcFile_CantFreeSpace      1013    Space cannot be created or freed to store the new log item
+
+    ; Free list errors
+    errcFree_Overflow           1100    The free list overflowed
+    errcFree_BadIndex           1101    Free list index %(1) is not legal. Count=%(2)
+
+    ; General errors
+    errcGen_UknownKeyKey        1200    %(1) is not a known key list key value
+
+    ; Initialization errors
+    errcInit_FileInitFailed     2500    Could not create the initial log file
+
+    ; Key list errors
+    errcKeys_BadIndex           3000    Key list index %(1) is not legal. Count=%(2)
+
+    ; Live data errors
+    errcLive_OutOfSync          3500    Sync has been lost and has been reset, some events may have been lost
+    errcLive_EventsMissed       3501    Some log events have been missed
+    errcLive_BadId              3502    %(1) is an unknown live event id, resetting it
+
+    ; Command line parameter errors
+    errcParm_UnknownParm        5000    '%(1)' is not a known command line parameter
+
+END ERRORS
+
+
+; ----------------------------------------------------------------------------
+;  Message ids
+; ----------------------------------------------------------------------------
+MESSAGES=
+
+    ; Status messages
+    midStatus_Startup          17000    CIDLib Log Server starting. Version=%(1)
+    midStatus_StartupComplete  17001    Initialization was completed successfully
+    midStatus_StartParms       17002    Starting command line parse
+    midStatus_ParmsComplete    17003    Parsing of command line parameters is complete
+    midStatus_StartSetup       17004    Starting core program setup
+    midStatus_SetupComplete    17005    Core program setup complete
+    midStatus_OrbTermFailed    17006    A failure occured while shutting down the Orb
+    midStatus_NSCleanupFailed  17007    A failured occured while cleaning up name server entries
+    midStatus_ParmParseFailed  17008    A failure occured while parsing command line parameters
+    midStatus_SetupFailed      17009    A failure occured while doing basic program setup
+    midStatus_Title            17010    CIDLib Log Server
+    midStatus_Title2           17011    Copyright (c) Charmed Quark Software
+
+END MESSAGES
+

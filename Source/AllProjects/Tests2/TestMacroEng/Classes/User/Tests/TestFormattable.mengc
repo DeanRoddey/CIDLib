@@ -1,0 +1,64 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestFormattable;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.StringOutStream;
+EndImports;
+
+Members=
+    ConsoleOutStream    m_Output;
+    TestHelpers         m_Helper;
+    StringOutStream     m_TestStrm;
+    Int4                m_RetVal;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    Method FormatVal([In] Formattable Value)
+    Begin
+        m_TestStrm.Format(Value);
+        m_TestStrm.FmtStr(", ");
+    EndMethod;
+
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            Boolean         BoolVal(False);
+            Card1           Card1Val(1);
+            Card2           Card2Val(2);
+            Card4           Card4Val(4);
+            String          StrVal("Testing");
+        EndLocals;
+
+        // Format out a number of derivatives of Formattable
+        FormatVal(BoolVal);
+        FormatVal(Card1Val);
+        FormatVal(Card2Val);
+        FormatVal(Card4Val);
+        FormatVal(StrVal);
+
+        // Now flush it out and make sure the result is correct
+        m_TestStrm.Flush();
+        m_TestStrm.GetText(StrVal);
+
+        If (StrVal != "False, 1, 2, 4, Testing, ")
+            m_Helper.PrintErr("Formattable results didn't match", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+        Return 0;
+    EndMethod;
+
+EndMethods;
+
+
+

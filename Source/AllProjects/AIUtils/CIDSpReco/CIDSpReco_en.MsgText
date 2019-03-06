@@ -1,0 +1,100 @@
+;
+; FILE NAME: CIDSpReco_en.MsgText
+;
+; AUTHOR: Dean Roddey
+;
+; CREATED: 11/30/2016
+;
+; COPYRIGHT: 2016..2016, Charmed Quark Software
+;
+;  This file and its contents are the property of Charmed Quark Software. It
+;  may not be redistributed in any modified form, or as part of any product
+;  other than the original CIDLib C++ Frameworks distribution file. Its
+;  contents may not be compiled into any other product, except when required
+;  by use of the CIDLib C++ Frameworks product. Such use in any commercial
+;  product is subject to any relevant licensing agreements.
+;
+; DESCRIPTION:
+;
+;   This is the English language message file for the speech recognition wrapper
+;   facility
+;
+; CAVEATS/GOTCHAS:
+;
+; LOG:
+;
+;   $Log$
+;
+CTRL=
+    ErrPref=kSpRecoErrs
+    MsgPref=kSpRecoMsgs
+END CTRL
+
+
+
+; --------------------------------------------------------------------------------
+;  Error ids
+; --------------------------------------------------------------------------------
+ERRORS=
+
+    errcGen_NoError                 0       No Error
+
+    ; General reco engine errors
+    errcEng_NotReady                2000    The speech reco engine is not initialized yet
+    errcEng_CreateSpeechStream      2001    Could not create speech stream. Error=%(1)
+    errcEng_CreateRecog             2002    Could not create the speech recognizer. Error=%(1)
+    errcEng_LoadModel               2003    Language acoustic model could not be loaded. Error=%(1)
+    errcEng_CreateGrammar           2004    The grammar object could not be created. Error=%(1)
+    errcEng_SetBaseStream           2005    Could not set the base speech reco stream. Error=%(1)
+    errcEng_NoAdaptation            2006    Could not disable adapative recogition. Error=%(1)
+    errcEng_Pause                   2007    Could not pause the speech reco engine. Error=%(1)
+    errcEng_RegForEvents            2008    Could not register for speech reco engine events. Error=%(1)
+    errcEng_GetNotifyHandle         2009    Could not get speech reco engine notification handle. Error=%(1)
+    errcEng_GrammarNotReady         2010    The spec reco grammar is not ready yet
+    errcEng_SrcStrmNotReady         2011    The spec reco's audio source stream is not ready yet
+
+    ; Grammar errors
+    errcGram_FileLoadFailed         3001    Could not load grammar from file. Error=%(1)
+    errcGram_SrcFileFailed          3002    Could not open source grammar file. Error=%(1)
+    errcGram_TarFileFailed          3003    Could not create target grammar file. Error=%(1)
+    errcGram_CreateCompiler         3004    Could not create the grammar compiler. Error=%(1)
+    errcGram_CompileFailed          3005    The grammar compilation failed. Error=%(1)
+    errcGram_RuleNotFound           3006    No rule named '%(1)' was found in the grammar. Error=%(2)
+    errcGram_ClearRule              3007    The dynamic rule '%(1)' could not be cleared
+    errcGram_WordTrans              3008    Could not add a grammar word transition. Rule=%(1), Error=%(2)
+    errcGram_CommitFailed           3009    Dynamic grammar changes could not be committed. Error=%(1)
+    errcGram_PauseFailed            3010    Could not pause/resume the grammar. Error=%(1)
+    errcGram_GetPauseFailed         3011    Could not get the grammar pause state. Error=%(1)
+    errcGram_SetRuleState           3012    Could not set the state of rule '%(1)'. Error=%(2)
+    errcGram_SetGrammarState        3013    Could not set the grammar state. Error=%(1)
+    errcGram_BufAllocFailed         3014    Could not allocate grammar buffer to load from. Error=%(1)
+    errcGram_BufLockFailed          3015    Could not lock grammar buffer to load from. Error=%(1)
+    errcGram_BufLoadFailed          3016    Could not load grammar from memory buffer. Error=%(1)
+    errcGram_GetGrammar2            3017    The Grammar2 interface could not be obtained. Error=%(1)
+
+    ; Semantic errors
+    errcSem_NotFound                8000    No semantic value named '%(1)' was found
+    errcSem_MapSemRuleNotFound      8001    The mapped rule path '%(1)' was not found, for rule '%(2)'
+    errcSem_MapSemTarNotFound       8002    The mapping semantic target '%(1)' was not found, for rule '%(2)'
+
+    ; Stream errors
+    errcStrm_AlreadyInit            8300    The source stream is already initialized
+    errcStrm_OpenDefWavIn           8301    Could not open the default WAVEIn device. Error=%(1)
+    errcStrm_InitWAVEBuf            8302    Could not initialize WAVEIn buffer. Error=%(1)
+    errcStrm_StartWAVIn             8303    Could not start WAVEIn processing. Error=%(1)
+    errcStrm_NotReady               8304    The source audio stream is not ready
+    errcStrm_AddWAVEBuf             8305    Could not add WAVEIn buffer. Error=%(1)
+
+END ERRORS
+
+
+; --------------------------------------------------------------------------------
+;  Message ids
+; --------------------------------------------------------------------------------
+MESSAGES=
+
+    ; General status messages
+    midStatus_EvQFull               18000   The speech reco event queue is full, event dropped
+
+END MESSAGES
+

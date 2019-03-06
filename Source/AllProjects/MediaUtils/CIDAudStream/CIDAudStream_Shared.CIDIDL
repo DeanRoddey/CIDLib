@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!-- =====================================================================
+  - Generates some public types and constants
+  -  =====================================================================
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum CIDIDL:Name="EStrmStates" CIDIDL:XlatMap="BaseName"
+                          CIDIDL:TextStreamMap="BaseName">
+                <CIDIDL:DocText>
+                    The possible statuses of a derivative of our base source stream.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Ready"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Error"/>
+                <CIDIDL:EnumVal CIDIDL:Name="WaitConnect"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
