@@ -4,7 +4,7 @@ int main(int argc, char** argv)
 {
     try
     {
-        ::Beep(880, 400);
+       ::Beep(880, 400);
     }
 
     catch(...)
