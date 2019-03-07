@@ -114,7 +114,12 @@ class CIDLIBEXP TDLinkedList : public TObject
             const   TDLinkedList&           colSrc
         );
 
-        TDLinkedList(TDLinkedList&&) = delete;
+        TDLinkedList(TDLinkedList&& llstSrc) :
+
+            TDLinkedList()
+        {
+            *this = tCIDLib::ForceMove(llstSrc);
+        }
 
         ~TDLinkedList();
 
@@ -134,7 +139,10 @@ class CIDLIBEXP TDLinkedList : public TObject
 
         TDLinkedList& operator=(const TDLinkedList&) = delete;
 
-        TDLinkedList& operator=(TDLinkedList&&) = delete;
+        TDLinkedList& operator=
+        (
+                    TDLinkedList&&          llstSrc
+        );
 
 
         // -------------------------------------------------------------------

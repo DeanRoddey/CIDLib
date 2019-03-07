@@ -431,8 +431,8 @@ class TRefVector : public TRefCollection<TElem>
             );
         }
 
-        TRefVector(const TMyType&) = delete;
         TRefVector(TMyType&&) = delete;
+        TRefVector(const TMyType&) = delete;
 
         ~TRefVector()
         {
@@ -466,8 +466,9 @@ class TRefVector : public TRefCollection<TElem>
             return m_apElems[c4Index];
         }
 
-        TMyType& operator=(const TMyType&) = delete;
         TMyType& operator=(TMyType&&) = delete;
+        TMyType& operator=(const TMyType&) = delete;
+
 
 
         // -------------------------------------------------------------------

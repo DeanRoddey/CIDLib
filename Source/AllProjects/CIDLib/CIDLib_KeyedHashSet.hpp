@@ -730,7 +730,21 @@ class TKeyedHashSet : public TCollection<TElem>
             }
         }
 
-        TKeyedHashSet(const TMyType&&) = delete;
+        // No def ctor, so do minimial setup them swap
+        TKeyedHashSet(const TMyType&& colSrc) :
+
+            TCollection<TElem>(tCIDLib::EMTStates::Unsafe)
+            , m_apBuckets(0)
+            , m_c4CurElements(0)
+            , m_c4HashModulus(1)
+            , m_pfnKeyExtract(colSrc.m_pfnKeyExtract)
+            , m_pkopsToUse(::pDupObject<TKeyOps>(*colSrc.m_pkopsToUse))
+        {
+            m_apBuckets = new TNode*[m_c4HashModulus];
+            m_apBuckets[0] = nullptr;
+
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~TKeyedHashSet()
         {

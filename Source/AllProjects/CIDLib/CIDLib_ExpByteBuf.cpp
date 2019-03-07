@@ -48,9 +48,9 @@ TExpByteBuf::TExpByteBuf(const tCIDLib::TCard4 c4InitAlloc) :
     , m_c4CurOfs(0)
     , m_pc1Buffer(nullptr)
 {
-    // If the init size was zero, then set it to 256
+    // If the init size was zero, then set it to 8
     if (!m_c4CurSize)
-        m_c4CurSize = 256;
+        m_c4CurSize = 8;
 
     m_pc1Buffer = new tCIDLib::TCard1[m_c4CurSize];
 }

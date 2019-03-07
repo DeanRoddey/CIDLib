@@ -52,7 +52,11 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
         {
         }
 
-        TBag(TBag&&) = delete;
+        TBag(TBag&& colSrc) :
+
+            TParent(tCIDLib::ForceMove(colSrc))
+        {
+        }
 
         ~TBag()
         {
@@ -69,7 +73,11 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
             return *this;
         }
 
-        TBag& operator=(TBag&&) = delete;
+        TBag& operator=(TBag&& colSrc)
+        {
+            TParent::operator=(tCIDLib::ForceMove(colSrc));
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
