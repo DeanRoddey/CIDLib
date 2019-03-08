@@ -271,6 +271,10 @@ ERRORS=
     errcMem_AllocError               805    Allocation error
     errcMem_HostPageSize             806    The system page size is not equal to kCIDLib::c4MemPageSz
     errcMem_CannotCommit             807    The requested pages cannot be committed
+    errcMem_ZeroRefCntRel            808    A reference count cannot be released if it is already zero
+    errcMem_RefCntUnderflow          809    The reference count underflowed due to another thread release while releasing
+    errcMem_BadRefCntRel             810    A reference count cannot be > i4MaxInt
+
 
 
     ; Module errors

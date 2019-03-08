@@ -75,6 +75,11 @@ namespace TRawMem
         const   tCIDLib::TVoid* const   pBuf
     );
 
+    KRNLEXPORT tCIDLib::TBoolean bSafeRefRelease
+    (
+                tCIDLib::TCard4&        c4Ref
+    );
+
     KRNLEXPORT tCIDLib::TCard4 c4CompareAndExchange
     (
                 tCIDLib::TCard4&        c4ToFill
@@ -198,6 +203,11 @@ namespace TRawMem
     (
         const   tCIDLib::TVoid*         pBufToQuery
         ,       TSysMemInfo&            MemInfo
+    );
+
+    KRNLEXPORT tCIDLib::TVoid SafeRefAcquire
+    (
+                tCIDLib::TCard4&        c4Ref
     );
 
     KRNLEXPORT tCIDLib::TVoid SetMemBuf

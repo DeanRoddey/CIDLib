@@ -86,6 +86,41 @@ TRawMem::bAllocSysMem(  const   tCIDLib::TCard4         c4Size
 }
 
 
+//
+//  We do a safe decrement of the passed reference. It cannot be zero or greater than
+//  i4MaxInt. If so we return an error. So, if it underflows, we know something is
+//  wrong. A ref count cannot go below zero unless the counting is bad.
+//
+tCIDLib::TBoolean TRawMem::bSafeRefRelease(tCIDLib::TCard4& c4Ref)
+{
+    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
+        return kCIDLib::False;
+    }
+
+    if (!c4Ref)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_ZeroRefCntRel);
+        return kCIDLib::False;
+    }
+
+    LONG lVal = (LONG)c4Ref;
+    lVal = ::InterlockedDecrementRelease(&lVal);
+
+    // The ref count management must be wrong
+    if (lVal < 0)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_RefCntUnderflow);
+        return kCIDLib::False;
+    }
+
+    c4Ref = tCIDLib::TCard4(lVal);
+    return kCIDLib::True;
+}
+
+
+
 tCIDLib::TCard4
 TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
                                 , const tCIDLib::TCard4     c4New
@@ -156,4 +191,14 @@ TRawMem::pQueryMemFlags(const   tCIDLib::TVoid*         pBufToQuery
     MemInfo.pAllocBase    = RawInfo.AllocationBase;
 
     return RawInfo.BaseAddress;
+}
+
+
+//
+//  We do a safe increment of the passed value. Windows provides us with a function
+//  to do this.
+//
+tCIDLib::TVoid TRawMem::SafeRefAcquire(tCIDLib::TCard4& c4Ref)
+{
+    ::InterlockedIncrementAcquire(&c4Ref);
 }

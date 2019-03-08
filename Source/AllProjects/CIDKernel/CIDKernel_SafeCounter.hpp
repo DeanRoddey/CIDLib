@@ -58,10 +58,6 @@ class KRNLEXPORT TKrnlSafeCard4Counter
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bDec();
-
-        tCIDLib::TBoolean bInc();
-
         tCIDLib::TCard4 c4AddTo
         (
             const   tCIDLib::TCard4         c4ToAdd
@@ -77,6 +73,10 @@ class KRNLEXPORT TKrnlSafeCard4Counter
         (
             const   tCIDLib::TCard4         c4New
         );
+
+        tCIDLib::TCard4 c4Dec();
+
+        tCIDLib::TCard4 c4Inc();
 
         tCIDLib::TCard4 c4SetValue
         (
@@ -96,17 +96,15 @@ class KRNLEXPORT TKrnlSafeCard4Counter
         //  Private data members
         //
         //  m_pc4Counter
-        //      This is the counter member that is incremented and decremented.
-        //      It is a pointer because it may have alignment requirements for a
-        //      given platform.
+        //      This is the counter member that is incremented and decremented. It is a
+        //      pointer because it may have alignment requirements for a given platform.
         //
         //  m_pLockData
-        //      This is the locking data for this counter. Its just an
-        //      anonymous pointer here so that it can be anything required
-        //      internally.
+        //      This is the per-platform locking data for this counter. Its just an
+        //      anonymous pointer here so that it can be anything required internally.
         // -------------------------------------------------------------------
-        volatile tCIDLib::TCard4*   m_pc4Counter;
-        tCIDLib::TVoid*             m_pLockData;
+        tCIDLib::TCard4*    m_pc4Counter;
+        tCIDLib::TVoid*     m_pLockData;
 };
 
 
@@ -141,10 +139,6 @@ class KRNLEXPORT TKrnlSafeInt4Counter
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bDec();
-
-        tCIDLib::TBoolean bInc();
-
         tCIDLib::TInt4 i4AddTo
         (
             const   tCIDLib::TInt4          i4ToAdd
@@ -160,6 +154,10 @@ class KRNLEXPORT TKrnlSafeInt4Counter
         (
             const   tCIDLib::TInt4          i4New
         );
+
+        tCIDLib::TInt4 i4Dec();
+
+        tCIDLib::TInt4 i4Inc();
 
         tCIDLib::TInt4 i4SetValue
         (
@@ -183,14 +181,11 @@ class KRNLEXPORT TKrnlSafeInt4Counter
         //      is a pointer because a given platform may have alignment requirements.
         //
         //  m_pLockData
-        //      This is the locking data for this counter. Its just an
-        //      anonymous pointer here so that it can be anything required
-        //      internally.
+        //      This is the per-platform locking data for this counter. Its just an
+        //      anonymous pointer here so that it can be anything required internally.
         // -------------------------------------------------------------------
-        volatile tCIDLib::TInt4*    m_pi4Counter;
-        tCIDLib::TVoid*             m_pLockData;
+        tCIDLib::TInt4*     m_pi4Counter;
+        tCIDLib::TVoid*     m_pLockData;
 };
 
 #pragma CIDLIB_POPPACK
-
-
