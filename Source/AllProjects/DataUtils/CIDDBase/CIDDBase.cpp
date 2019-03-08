@@ -46,12 +46,12 @@
 //
 TFacCIDDBase& facCIDDBase()
 {
-    static TFacCIDDBase* pfacCIDDBase = 0;
+    static TFacCIDDBase* pfacCIDDBase = nullptr;
     if (!pfacCIDDBase)
     {
         TBaseLock lockInit;
         if (!pfacCIDDBase)
-            TRawMem::pExchangePtr(pfacCIDDBase, new TFacCIDDBase);
+            pfacCIDDBase = new TFacCIDDBase;
     }
     return *pfacCIDDBase;
 }

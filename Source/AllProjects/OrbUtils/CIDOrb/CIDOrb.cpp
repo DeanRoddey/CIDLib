@@ -44,7 +44,7 @@ TFacCIDOrb& facCIDOrb()
     {
         TBaseLock lockInit;
         if (!pfacCIDOrb)
-            TRawMem::pExchangePtr(pfacCIDOrb, new TFacCIDOrb);
+            pfacCIDOrb = new TFacCIDOrb;
     }
     return *pfacCIDOrb;
 }

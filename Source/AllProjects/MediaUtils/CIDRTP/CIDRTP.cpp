@@ -32,12 +32,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDRTP& facCIDRTP()
 {
-    static TFacCIDRTP* pfacCIDRTP = 0;
+    static TFacCIDRTP* pfacCIDRTP = nullptr;
     if (!pfacCIDRTP)
     {
         TBaseLock lockInit;
         if (!pfacCIDRTP)
-            TRawMem::pExchangePtr(pfacCIDRTP, new TFacCIDRTP);
+            pfacCIDRTP = new TFacCIDRTP;
     }
     return *pfacCIDRTP;
 }

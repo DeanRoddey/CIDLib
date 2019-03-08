@@ -366,7 +366,7 @@ TFacCIDLib& facCIDLib()
     {
         TBaseLock lockInit;
         if (!pfacCIDLib)
-            TRawMem::pExchangePtr(pfacCIDLib, new TFacCIDLib);
+            pfacCIDLib = new TFacCIDLib;
     }
     return *pfacCIDLib;
 }

@@ -46,12 +46,12 @@ template class CIDUPNPEXP TRefKeyedHashSet<TUPnPAsyncFinderItem, TString, TStrin
 // ---------------------------------------------------------------------------
 TFacCIDUPnP& facCIDUPnP()
 {
-    static TFacCIDUPnP* pfacCIDUPnP = 0;
+    static TFacCIDUPnP* pfacCIDUPnP = nullptr;
     if (!pfacCIDUPnP)
     {
         TBaseLock lockInit;
         if (!pfacCIDUPnP)
-            TRawMem::pExchangePtr(pfacCIDUPnP, new TFacCIDUPnP);
+            pfacCIDUPnP = new TFacCIDUPnP;
     }
     return *pfacCIDUPnP;
 }

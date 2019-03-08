@@ -31,12 +31,12 @@
 //
 TFacCIDZLib& facCIDZLib()
 {
-    static TFacCIDZLib* pfacCIDZLib = 0;
+    static TFacCIDZLib* pfacCIDZLib = nullptr;
     if (!pfacCIDZLib)
     {
         TBaseLock lockInit;
         if (!pfacCIDZLib)
-            TRawMem::pExchangePtr(pfacCIDZLib, new TFacCIDZLib);
+            pfacCIDZLib = new TFacCIDZLib;
     }
     return *pfacCIDZLib;
 }

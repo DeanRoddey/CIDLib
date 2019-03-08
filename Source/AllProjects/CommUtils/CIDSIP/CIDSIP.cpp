@@ -38,12 +38,12 @@ RTTIDecls(TFacCIDSIP,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDSIP& facCIDSIP()
 {
-    static TFacCIDSIP* pfacCIDSIP = 0;
+    static TFacCIDSIP* pfacCIDSIP = nullptr;
     if (!pfacCIDSIP)
     {
         TBaseLock lockInit;
         if (!pfacCIDSIP)
-            TRawMem::pExchangePtr(pfacCIDSIP, new TFacCIDSIP);
+            pfacCIDSIP = new TFacCIDSIP;
     }
     return *pfacCIDSIP;
 }

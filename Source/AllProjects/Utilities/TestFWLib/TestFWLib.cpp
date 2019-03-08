@@ -37,7 +37,7 @@ TFacTestFWLib& facTestFWLib()
     {
         TBaseLock lockInit;
         if (!pfacTestFWLib)
-            TRawMem::pExchangePtr(pfacTestFWLib, new TFacTestFWLib);
+            pfacTestFWLib = new TFacTestFWLib;
     }
     return *pfacTestFWLib;
 }

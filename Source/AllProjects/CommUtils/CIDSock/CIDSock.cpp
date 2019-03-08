@@ -48,12 +48,12 @@ template class CIDSOCKEXP TVector<TIPAddress>;
 // ---------------------------------------------------------------------------
 TFacCIDSock& facCIDSock()
 {
-    static TFacCIDSock* pfacCIDSock = 0;
+    static TFacCIDSock* pfacCIDSock = nullptr;
     if (!pfacCIDSock)
     {
         TBaseLock lockInit;
         if (!pfacCIDSock)
-            TRawMem::pExchangePtr(pfacCIDSock, new TFacCIDSock);
+            pfacCIDSock = new TFacCIDSock;
     }
     return *pfacCIDSock;
 }

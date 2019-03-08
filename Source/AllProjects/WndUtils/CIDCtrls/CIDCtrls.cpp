@@ -64,7 +64,7 @@ TFacCIDCtrls& facCIDCtrls()
     {
         TBaseLock lockInit;
         if (!pfacCIDCtrls)
-            TRawMem::pExchangePtr(pfacCIDCtrls, new TFacCIDCtrls);
+            pfacCIDCtrls = new TFacCIDCtrls;
     }
     return *pfacCIDCtrls;
 }

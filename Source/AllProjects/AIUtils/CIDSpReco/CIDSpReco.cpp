@@ -40,12 +40,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDSpReco& facCIDSpReco()
 {
-    static TFacCIDSpReco* pfacCIDSpReco = 0;
+    static TFacCIDSpReco* pfacCIDSpReco = nullptr;
     if (!pfacCIDSpReco)
     {
         TBaseLock lockInit;
         if (!pfacCIDSpReco)
-            TRawMem::pExchangePtr(pfacCIDSpReco, new TFacCIDSpReco);
+            pfacCIDSpReco = new TFacCIDSpReco;
     }
     return *pfacCIDSpReco;
 }

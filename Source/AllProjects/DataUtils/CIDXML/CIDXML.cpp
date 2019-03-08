@@ -73,7 +73,7 @@ TFacCIDXML& facCIDXML()
     {
         TBaseLock lockInit;
         if (!pfacCIDXML)
-            TRawMem::pExchangePtr(pfacCIDXML, new TFacCIDXML);
+            pfacCIDXML = new TFacCIDXML;
     }
     return *pfacCIDXML;
 }

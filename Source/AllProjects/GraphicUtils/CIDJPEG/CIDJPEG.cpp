@@ -32,12 +32,12 @@
 //
 TFacCIDJPEG& facCIDJPEG()
 {
-    static TFacCIDJPEG* pfacCIDJPEG = 0;
+    static TFacCIDJPEG* pfacCIDJPEG = nullptr;
     if (!pfacCIDJPEG)
     {
         TBaseLock lockInit;
         if (!pfacCIDJPEG)
-            TRawMem::pExchangePtr(pfacCIDJPEG, new TFacCIDJPEG);
+            pfacCIDJPEG = new TFacCIDJPEG;
     }
     return *pfacCIDJPEG;
 }

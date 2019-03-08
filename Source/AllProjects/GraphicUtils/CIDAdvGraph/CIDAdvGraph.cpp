@@ -40,12 +40,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDAdvGraph& facCIDAdvGraph()
 {
-    static TFacCIDAdvGraph* pfacCIDAdvGraph = 0;
+    static TFacCIDAdvGraph* pfacCIDAdvGraph = nullptr;
     if (!pfacCIDAdvGraph)
     {
         TBaseLock lockInit;
         if (!pfacCIDAdvGraph)
-            TRawMem::pExchangePtr(pfacCIDAdvGraph, new TFacCIDAdvGraph);
+            pfacCIDAdvGraph = new TFacCIDAdvGraph;
     }
     return *pfacCIDAdvGraph;
 }

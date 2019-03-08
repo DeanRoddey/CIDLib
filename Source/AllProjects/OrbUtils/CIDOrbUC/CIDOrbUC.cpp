@@ -31,7 +31,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDOrbUC& facCIDOrbUC()
 {
-    static TFacCIDOrbUC* pfacCIDOrbUC = 0;
+    static TFacCIDOrbUC* pfacCIDOrbUC = nullptr;
     if (!pfacCIDOrbUC)
     {
         TBaseLock lockInit;

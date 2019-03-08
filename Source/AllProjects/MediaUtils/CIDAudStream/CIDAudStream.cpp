@@ -31,12 +31,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDAudStream& facCIDAudStream()
 {
-    static TFacCIDAudStream* pfacCIDAudStream = 0;
+    static TFacCIDAudStream* pfacCIDAudStream = nullptr;
     if (!pfacCIDAudStream)
     {
         TBaseLock lockInit;
         if (!pfacCIDAudStream)
-            TRawMem::pExchangePtr(pfacCIDAudStream, new TFacCIDAudStream);
+            pfacCIDAudStream = new TFacCIDAudStream;
     }
     return *pfacCIDAudStream;
 }

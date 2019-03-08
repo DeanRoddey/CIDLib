@@ -32,12 +32,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDMath& facCIDMath()
 {
-    static TFacCIDMath* pfacCIDMath = 0;
+    static TFacCIDMath* pfacCIDMath = nullptr;
     if (!pfacCIDMath)
     {
         TBaseLock lockInit;
         if (!pfacCIDMath)
-            TRawMem::pExchangePtr(pfacCIDMath, new TFacCIDMath);
+            pfacCIDMath = new TFacCIDMath;
     }
     return *pfacCIDMath;
 }

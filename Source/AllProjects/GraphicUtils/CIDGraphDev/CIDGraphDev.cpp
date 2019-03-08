@@ -42,12 +42,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDGraphDev& facCIDGraphDev()
 {
-    static TFacCIDGraphDev* pfacCIDGraphDev = 0;
+    static TFacCIDGraphDev* pfacCIDGraphDev = nullptr;
     if (!pfacCIDGraphDev)
     {
         TBaseLock lockInit;
         if (!pfacCIDGraphDev)
-            TRawMem::pExchangePtr(pfacCIDGraphDev, new TFacCIDGraphDev);
+            pfacCIDGraphDev = new TFacCIDGraphDev;
     }
     return *pfacCIDGraphDev;
 }

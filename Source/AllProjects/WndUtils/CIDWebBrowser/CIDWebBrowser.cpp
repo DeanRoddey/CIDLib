@@ -32,12 +32,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDWebBrowser& facCIDWebBrowser()
 {
-    static TFacCIDWebBrowser* pfacCIDWebBrowser = 0;
+    static TFacCIDWebBrowser* pfacCIDWebBrowser = nullptr;
     if (!pfacCIDWebBrowser)
     {
         TBaseLock lockInit;
         if (!pfacCIDWebBrowser)
-            TRawMem::pExchangePtr(pfacCIDWebBrowser, new TFacCIDWebBrowser);
+            pfacCIDWebBrowser = new TFacCIDWebBrowser;
     }
     return *pfacCIDWebBrowser;
 }
