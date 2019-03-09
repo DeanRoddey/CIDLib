@@ -100,7 +100,7 @@ class CIDGRDEVEXP TGUIPen : public TObject
         //      The handle to the pen. We fault it in upon first use. The
         //      derived class creates it, and we store it.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean           m_bSetOnDevice;
+        tCIDLib::TBoolean                m_bSetOnDevice;
         mutable tCIDGraphDev::TPenHandle m_hpenThis;
 
 

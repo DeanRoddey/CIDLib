@@ -46,49 +46,31 @@ RTTIDecls(TPointArray,TObject)
 // ---------------------------------------------------------------------------
 //  TPointArray: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TPointArray::TPointArray(   const   tCIDLib::TCard4             c4PointCount
-                            ,       TPointArray::pfnInitPntAry  pfnInitFunc) :
+
+// Just set up a 1 pointe array
+TPointArray::TPointArray() :
+
+    m_c4Count(1)
+    , m_paptPoints(new tCIDLib::THostPoint[1])
+{
+    m_paptPoints[0] = {0, 0};
+}
+
+TPointArray::TPointArray(const tCIDLib::TCard4 c4PointCount) :
+
     m_c4Count(c4PointCount)
     , m_paptPoints(nullptr)
 {
-    // Validate the count if debugging
-    #if CID_DEBUG_ON
-    if (m_c4Count < 2)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_BadEnumValue
-            , tCIDLib::ESeverities::ProcFatal
-            , tCIDLib::EErrClasses::BadParms
-            , TCardinal(m_c4Count)
-            , TString(L"point count")
-        );
-    }
-    #endif
+    CheckCount(c4PointCount);
 
-    // Allocate the point array
+    // Allocate the point array and zero it
     m_paptPoints = new tCIDLib::THostPoint[m_c4Count];
-
-    //
-    //  If there is a callout, then use it. Otherwise, we just want to
-    //  zero out the whole array.
-    //
-    if (pfnInitFunc)
-    {
-        for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4Count; c4Ind++)
-            pfnInitFunc(c4Ind, m_paptPoints[c4Ind]);
-    }
-     else
-    {
-        TRawMem::SetMemBuf
-        (
-            m_paptPoints
-            , tCIDLib::TCard1(0)
-            , m_c4Count * sizeof(tCIDLib::THostPoint)
-        );
-    }
+    TRawMem::SetMemBuf
+    (
+        m_paptPoints
+        , tCIDLib::TCard1(0)
+        , m_c4Count * sizeof(tCIDLib::THostPoint)
+    );
 }
 
 TPointArray::TPointArray(const TPointArray& pntaSrc) :
@@ -106,6 +88,13 @@ TPointArray::TPointArray(const TPointArray& pntaSrc) :
         , pntaSrc.m_paptPoints
         , sizeof(tCIDLib::THostPoint) * m_c4Count
     );
+}
+
+TPointArray::TPointArray(TPointArray&& pntaSrc) :
+
+    TPointArray()
+{
+    *this = operator=(tCIDLib::ForceMove(pntaSrc));
 }
 
 TPointArray::~TPointArray()
@@ -142,8 +131,23 @@ TPointArray& TPointArray::operator=(const TPointArray& pntaSrc)
 }
 
 
+TPointArray& TPointArray::operator=(TPointArray&& pntaSrc)
+{
+    if (this != &pntaSrc)
+    {
+        tCIDLib::Swap(m_c4Count, pntaSrc.m_c4Count);
+        tCIDLib::Swap(m_paptPoints, pntaSrc.m_paptPoints);
+    }
+    return *this;
+}
+
+
 tCIDLib::TBoolean TPointArray::operator==(const TPointArray& pntaToTest) const
 {
+    if (&pntaToTest == this)
+        return kCIDLib::True;
+
+    // If not the same count, then clearly not equal
     if (pntaToTest.m_c4Count != m_c4Count)
         return kCIDLib::False;
 
@@ -166,12 +170,7 @@ tCIDLib::TBoolean TPointArray::operator!=(const TPointArray& pntaToTest) const
 
 const TPoint TPointArray::operator[](const tCIDLib::TCard4 c4Index)
 {
-    // Check the index if in debug mode
-    #if CID_DEBUG_ON
     CheckIndex(CID_LINE, c4Index);
-    #endif
-
-    // Return the point
     return TPoint(m_paptPoints[c4Index]);
 }
 
@@ -179,13 +178,6 @@ const TPoint TPointArray::operator[](const tCIDLib::TCard4 c4Index)
 // ---------------------------------------------------------------------------
 //  TPointArray: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-
-// Return the count of points we are allocated to
-tCIDLib::TCard4 TPointArray::c4Count() const
-{
-    return m_c4Count;
-}
-
 
 //
 //  Given a graph object, a vertical scale type, and min/max values, set up our
@@ -621,59 +613,25 @@ TPointArray::OffsetRange(   const   tCIDLib::TCard4 c4FromIndex
 }
 
 
-tCIDLib::TVoid
-TPointArray::Reallocate(const   tCIDLib::TCard4             c4NewCount
-                        ,       TPointArray::pfnInitPntAry  pfnInitFunc)
+tCIDLib::TVoid TPointArray::Reallocate(const tCIDLib::TCard4 c4NewCount)
 {
-    if (!c4NewCount)
-    {
-        // Validate the count if debugging
-        #if CID_DEBUG_ON
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_BadEnumValue
-            , tCIDLib::ESeverities::ProcFatal
-            , tCIDLib::EErrClasses::BadParms
-            , TCardinal(c4NewCount)
-            , TString(L"point count")
-        );
-        #endif
-    }
+    CheckCount(c4NewCount);
 
     //
-    //  If the new is equal to the old, then do nothing
-    if (c4NewCount == m_c4Count)
-        return;
-
-    // Store the new count
-    m_c4Count = c4NewCount;
-
-    // We have to reallocate the array, so toast the old one
-    delete [] m_paptPoints;
-    m_paptPoints = 0;
-
-    // Try to allocate the new array
-    m_paptPoints = new tCIDLib::THostPoint[m_c4Count];
-
-    //
-    //  If there is a callout, then use it. Otherwise, we just want to
-    //  zero out the whole array.
-    //
-    if (pfnInitFunc)
+    //  If the new is not equal to the old then reallocate
+    if (c4NewCount != m_c4Count)
     {
-        for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4Count; c4Ind++)
-            pfnInitFunc(c4Ind, m_paptPoints[c4Ind]);
-    }
-     else
-    {
+        // Make sure we can allocate and init a new array
+        TArrayJanitor<tCIDLib::THostPoint> janNew(c4NewCount);
         TRawMem::SetMemBuf
         (
-            m_paptPoints
-            , tCIDLib::TCard1(0)
-            , m_c4Count * sizeof(tCIDLib::THostPoint)
+            janNew.paThis(), tCIDLib::TCard1(0), m_c4Count * sizeof(tCIDLib::THostPoint)
         );
+
+        // Looks good so clean up the old and orphan out the new
+        delete [] m_paptPoints;
+        m_c4Count = c4NewCount;
+        m_paptPoints = janNew.paOrphan();
     }
 }
 
@@ -872,6 +830,22 @@ const tCIDLib::THostPoint* TPointArray::aptList() const
 // ---------------------------------------------------------------------------
 //  TPointArray: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+tCIDLib::TVoid TPointArray::CheckCount(const tCIDLib::TCard4 c4Check) const
+{
+    if (c4Check < 2)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_BadEnumValue
+            , tCIDLib::ESeverities::ProcFatal
+            , tCIDLib::EErrClasses::BadParms
+            , TCardinal(c4Check)
+            , TString(L"point count")
+        );
+    }
+}
 
 //
 //  This method will check the passed index and log an error if its invalid.

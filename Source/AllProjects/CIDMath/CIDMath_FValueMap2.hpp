@@ -57,7 +57,7 @@ class CIDMATHEXP TFLogMap : public TFValueMap
         tCIDLib::TFloat8 f8MapValue
         (
             const   tCIDLib::TFloat8        f8ToMap
-        )   const;
+        )   const override;
 
 
     private :

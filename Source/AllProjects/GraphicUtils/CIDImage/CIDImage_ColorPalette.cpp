@@ -61,7 +61,7 @@ TClrPalette& TClrPalette::Nul_TClrPalette()
     {
         TBaseLock lockInit;
         if (!ppalNull)
-            TRawMem::pExchangePtr(ppalNull, new TClrPalette);
+            TRawMem::pExchangePtr(&ppalNull, new TClrPalette);
     }
     return *ppalNull;
 }

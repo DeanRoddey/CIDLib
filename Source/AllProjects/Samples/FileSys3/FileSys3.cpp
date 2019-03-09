@@ -35,10 +35,14 @@
 //  If the pattern has spaces in it, then put it in double quotes. That's
 //  legal as long as the target file system allows spaces.
 //
-// CAVEATS/GOTCHAS:
 //
-//  1)  This program assumes that the target file system is case insensitive
-//      but case preserving (as NTFS and OS/2's HPFS are.)
+//  This program is one of the first samples to use loadable text, and error
+//  and message ids built from a .MsgText file.
+//
+//  It also creates a facility object so that it can load its text and log msgs
+//  and throw errors that do that same.
+//
+// CAVEATS/GOTCHAS:
 //
 // LOG:
 //
@@ -47,8 +51,7 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. We just include our main header which brings in anything we
-//  we need. This header is set up as the precompiled header file.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "FileSys3.hpp"
 
@@ -60,26 +63,18 @@
 //  do that well since the hashing scheme takes into account the case of the
 //  text of the file name.
 // ----------------------------------------------------------------------------
-typedef TBag<TFindBuf>  TFileCol;
+using TFileCol = TBag<TFindBuf>;
 
 
 // ----------------------------------------------------------------------------
 //  Forward references
 // ----------------------------------------------------------------------------
-static tCIDLib::EExitCodes eMainThreadFunc
-(
-            TThread&            thrThis
-    ,       tCIDLib::TVoid*     pData
-);
-
 static tCIDLib::TVoid RenameFiles
 (
     const   TFileCol&           colFiles
     , const TString&            strPattern
     , const TString&            strTargetDir
 );
-
-static tCIDLib::TVoid ShowUsage();
 
 
 
@@ -93,32 +88,41 @@ static tCIDLib::TVoid ShowUsage();
 //  facFileSys3
 //      This is our facility object, which we need in order to log errors and
 //      load message resources. Since we have no particular needs, we just
-//      create a regular TFacility object.
+//      create a regular TFacility object instead of creating our own derivative
 // ----------------------------------------------------------------------------
 static TOutConsole  conOut;
 static TFacility    facFileSys3
-                    (
-                        L"FileSys3"
-                        , tCIDLib::EModTypes::Exe
-                        , kCIDLib::c4MajVersion
-                        , kCIDLib::c4MinVersion
-                        , kCIDLib::c4Revision
-                        , tCIDLib::EModFlags::HasMsgFile
-                    );
+(
+    L"FileSys3"
+    , tCIDLib::EModTypes::Exe
+    , kCIDLib::c4MajVersion
+    , kCIDLib::c4MinVersion
+    , kCIDLib::c4Revision
+    , tCIDLib::EModFlags::HasMsgFile
+);
 
 
 // ----------------------------------------------------------------------------
 //  Do the magic main module code
 // ----------------------------------------------------------------------------
+static tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"FileSys3MainThread", eMainThreadFunc))
 
 
 // ----------------------------------------------------------------------------
 //  Local functions
 // ----------------------------------------------------------------------------
-//
-//  This is the the thread function for the main thread.
-//
+
+//  Shows the parameter usage for the program.
+static tCIDLib::TVoid ShowUsage()
+{
+    conOut  << kCIDLib::NewLn << facFileSys3.strMsg(kFSMsgs::midUsage)
+            << kCIDLib::NewLn << kCIDLib::EndLn;
+}
+
+
+
+// This is the the thread function for the main thread.
 static tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
     // We have to let our calling thread go first
@@ -133,16 +137,6 @@ static tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     {
         // Display the program blurb
         conOut << facFileSys3.strMsg(kFSMsgs::midBlurb1) << kCIDLib::EndLn;
-
-        //
-        //  Create a hash map of TPathName objects. This will let us look
-        //  up all of the existing files in the directory before we starting
-        //  renaming them.
-        //
-        //  The TFileCol name is just a typedef set up above, so we don't have
-        //  to use the grotesquely long template names.
-        //
-        TFileCol colFileList;
 
         //
         //  Ok, lets first check out the command line parameters. We need
@@ -193,9 +187,8 @@ static tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         pathSearch.AddLevel(kCIDLib::pszAllFilesSpec);
 
         // Search the directory for all normal files
-        if (!TFileSys::c4SearchDir( pathSearch
-                                    , colFileList
-                                    , tCIDLib::EDirSearchFlags::NormalFiles))
+        TFileCol colFileList;
+        if (!TFileSys::c4SearchDir(pathSearch, colFileList, tCIDLib::EDirSearchFlags::NormalFiles))
         {
             // No matches
             conOut  << facFileSys3.strMsg(kFSErrs::errcEmptyTarget)
@@ -220,15 +213,8 @@ static tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut  << facFileSys3.strMsg(kFSMsgs::midRuntimeErr)
                 << errToCatch.strErrText() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
@@ -280,9 +266,10 @@ static tCIDLib::TVoid RenameFiles(  const   TFileCol&   colFiles
     //
     //  And create a hash set that we'll use to keep up with each file that
     //  we've used (or found to already exist) so far. This lets us check
-    //  quickly whether a target name is in use.
+    //  quickly whether a target name is in use. Tell the key ops not to be
+    //  case sensitive, so it will catch names that just differ in case.
     //
-    tCIDLib::TStrHashSet colUsed(29, new TStringKeyOps);
+    tCIDLib::TStrHashSet colUsed(29, new TStringKeyOps(kCIDLib::False));
 
     // And loop through the source files
     for (; cursFiles; ++cursFiles)
@@ -315,18 +302,9 @@ static tCIDLib::TVoid RenameFiles(  const   TFileCol&   colFiles
             colUsed.objAdd(pathNewName);
         }
 
-        // Move the counter up to the next value
+        // Move the counter up to the next value to use
         c4Counter++;
     }
 }
 
-
-//
-//  Shows the parameter usage for the program.
-//
-static tCIDLib::TVoid ShowUsage()
-{
-    conOut  << kCIDLib::NewLn << facFileSys3.strMsg(kFSMsgs::midUsage)
-            << kCIDLib::NewLn << kCIDLib::EndLn;
-}
 

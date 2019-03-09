@@ -46,7 +46,15 @@ class TTextOutTab : public TTabWindow
             const   TString&                strName
         );
 
+        TTextOutTab(const TTextOutTab&) = delete;
+
         ~TTextOutTab();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TTextOutTab& operator=(const TTextOutTab&) = delete;
 
 
         // -------------------------------------------------------------------

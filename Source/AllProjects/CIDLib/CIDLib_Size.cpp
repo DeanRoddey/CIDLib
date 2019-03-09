@@ -49,7 +49,7 @@ TSize& TSize::Nul_TSize()
     {
         TBaseLock lockInit;
         if (!pszNull)
-            TRawMem::pExchangePtr(pszNull, new TSize);
+            TRawMem::pExchangePtr(&pszNull, new TSize);
     }
     return *pszNull;
 }

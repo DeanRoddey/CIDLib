@@ -164,10 +164,8 @@ tCIDLib::TBoolean T4By4Matrix::operator!=(const T4By4Matrix& mtrxSrc) const
 
 T4By4Matrix& T4By4Matrix::operator=(const T4By4Matrix& mtrxSrc)
 {
-    if (this == &mtrxSrc)
-        return *this;
-
-    TRawMem::CopyMemBuf(m_af8Matrix, mtrxSrc.m_af8Matrix, sizeof(m_af8Matrix));
+    if (this != &mtrxSrc)
+        TRawMem::CopyMemBuf(m_af8Matrix, mtrxSrc.m_af8Matrix, sizeof(m_af8Matrix));
     return *this;
 }
 

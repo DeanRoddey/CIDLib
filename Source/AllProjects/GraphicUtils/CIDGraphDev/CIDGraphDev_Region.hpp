@@ -51,7 +51,7 @@ class CIDGRDEVEXP TGUIRegion : public TObject
 
         TGUIRegion
         (
-            const   TGUIRegion&                 grgnToCopy
+            const   TGUIRegion&                 grgnSrc
         );
 
         ~TGUIRegion();
@@ -62,7 +62,7 @@ class CIDGRDEVEXP TGUIRegion : public TObject
         // -------------------------------------------------------------------
         TGUIRegion& operator=
         (
-            const   TGUIRegion&                 grgnToAssign
+            const   TGUIRegion&                 grgnSrc
         );
 
 
@@ -73,12 +73,12 @@ class CIDGRDEVEXP TGUIRegion : public TObject
 
         tCIDLib::TBoolean bContainsPnt
         (
-            const   TPoint&                     pntToTest
+            const   TPoint&                     pntTest
         )   const;
 
         tCIDLib::TBoolean bIntersects
         (
-            const   TArea&                      areaToTest
+            const   TArea&                      areaTest
         )   const;
 
         tCIDLib::TBoolean bIsEmpty() const;

@@ -83,7 +83,7 @@ TIPAddress& TIPAddress::Nul_TIPAddress()
     {
         TBaseLock lockInit;
         if (!pipaNull)
-            TRawMem::pExchangePtr(pipaNull, new TIPAddress);
+            TRawMem::pExchangePtr(&pipaNull, new TIPAddress);
     }
     return *pipaNull;
 }
@@ -632,7 +632,7 @@ TIPEndPoint& TIPEndPoint::Nul_TIPEndPoint()
     {
         TBaseLock lockInit;
         if (!pipepNull)
-            TRawMem::pExchangePtr(pipepNull, new TIPEndPoint);
+            TRawMem::pExchangePtr(&pipepNull, new TIPEndPoint);
     }
     return *pipepNull;
 }

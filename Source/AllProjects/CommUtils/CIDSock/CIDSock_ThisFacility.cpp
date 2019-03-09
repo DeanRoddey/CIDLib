@@ -383,8 +383,7 @@ const TString& THostAdapter::strName() const
 // ---------------------------------------------------------------------------
 //  THostAdapter: Protected, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid
-THostAdapter::LoadFrom(const TKrnlIP::TAdaptorInfo& kadpSrc)
+tCIDLib::TVoid THostAdapter::LoadFrom(const TKrnlIP::TAdaptorInfo& kadpSrc)
 {
     m_bDHCPEnabled  = kadpSrc.bDHCPEnabled;
     m_bIPV4Enabled  = kadpSrc.bIPV4Enabled;

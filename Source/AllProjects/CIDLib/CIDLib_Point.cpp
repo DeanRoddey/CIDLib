@@ -56,7 +56,7 @@ TPoint& TPoint::Nul_TPoint()
     {
         TBaseLock lockInit;
         if (!ppntNull)
-            TRawMem::pExchangePtr(ppntNull, new TPoint);
+            TRawMem::pExchangePtr(&ppntNull, new TPoint);
     }
     return *ppntNull;
 }

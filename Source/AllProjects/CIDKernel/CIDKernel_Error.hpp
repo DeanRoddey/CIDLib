@@ -106,10 +106,7 @@ class KRNLEXPORT TKrnlError
             , const tCIDLib::TOSErrCode     errcHostId
         );
 
-        TKrnlError
-        (
-            const   TKrnlError&             kerrToCopy
-        );
+        TKrnlError(const TKrnlError&) = default;
 
         ~TKrnlError();
 
@@ -117,10 +114,7 @@ class KRNLEXPORT TKrnlError
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TKrnlError& operator=
-        (
-            const   TKrnlError&             kerrToAssign
-        );
+        TKrnlError& operator=(const TKrnlError&) = default;
 
         tCIDLib::TBoolean operator==
         (

@@ -761,7 +761,7 @@ const TString& TTime::strTimeZoneName()
                     , tCIDLib::EErrClasses::CantDo
                 );
             }
-            TRawMem::pExchangePtr(CIDLib_Time::pstrTZName, new TString(szTZName));
+            TRawMem::pExchangePtr(&CIDLib_Time::pstrTZName, new TString(szTZName));
         }
     }
 

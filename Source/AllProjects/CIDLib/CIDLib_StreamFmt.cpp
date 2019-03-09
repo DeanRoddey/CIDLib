@@ -52,7 +52,7 @@ TStreamFmt& TStreamFmt::Nul_TStreamFmt()
     {
         TBaseLock lockInit;
         if (!pstrmfNull)
-            TRawMem::pExchangePtr(pstrmfNull, new TStreamFmt);
+            TRawMem::pExchangePtr(&pstrmfNull, new TStreamFmt);
     }
     return *pstrmfNull;
 }

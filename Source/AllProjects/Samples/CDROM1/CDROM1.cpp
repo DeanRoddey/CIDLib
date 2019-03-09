@@ -21,8 +21,17 @@
 //  about a CD in a drive. It shows all the CD drives, and for any that
 //  have a CD in them, it displays the table of contents info.
 //
+//  As with most of the other simple samples, it doesn't have a facility object,
+//  it just starts up a thread on a local function.
+//
+//  You may get an error that it cannot determine that media format if there is
+//  no disc in the drive.
+//
 // CAVEATS/GOTCHAS:
 //
+//  1)  Note that there is currently no higher level wrapper for some of the low level
+//      CD access stuff, so we are using mostly CIDKernel stuff here, which is not
+//      normal.
 //
 // LOG:
 //
@@ -34,57 +43,44 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
 #include    "CIDJPEG.hpp"
-
 #include    "CIDDAE.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  Forward references
-// ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
 
 
 // ---------------------------------------------------------------------------
 //  Do the magic main module code
 // ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"CDROM1MainThread", eMainThreadFunc))
 
+
+// ---------------------------------------------------------------------------
+//  Local data
+// ---------------------------------------------------------------------------
+TTextOutStream& strmOut = TSysInfo::strmOut();
 
 
 // ---------------------------------------------------------------------------
 //  Local functions
 // ---------------------------------------------------------------------------
 
-
-//
-//  This is the the thread function for the main thread.
-//
+// CIDLib_MainModule() above starts up the main thread on this function
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
     // We have to let our calling thread go first
     thrThis.Sync();
 
-    TOutConsole strmOut;
     try
     {
         // We can ask for a list of device paths of CDROMs available
-        const tCIDLib::TCard4 c4EnumBufSz = 2048;
-        tCIDLib::TCh szBuf[c4EnumBufSz + 1];
-        tCIDLib::TCard4 c4DevsFound;
-        if (!TKrnlRemMedia::bEnumDrvs(szBuf, c4EnumBufSz, c4DevsFound))
+        TKrnlLList<TKrnlString> kllstDevs;
+
+        if (!TKrnlRemMedia::bEnumDrvs(kllstDevs))
         {
             strmOut << L"CDROM enum failed" << kCIDLib::EndLn;
             return tCIDLib::EExitCodes::FatalError;
         }
 
-        // Create an input text stream over it
-        TTextStringInStream strmEnum(new TString(szBuf), tCIDLib::EAdoptOpts::Adopt);
 
         // And now go through all the objects and dump info on them
         TKrnlRemMediaDrv rmmdCur;
@@ -93,14 +89,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         const tCIDLib::TCard4 c4BufSz = 20 * TKrnlRemMedia::c4CDRawSectorSz;
         THeapBuf mbufData(c4BufSz, c4BufSz);
         tCIDLib::TBoolean bRes;
-        TString strCurDev;
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4DevsFound; c4Index++)
+        TKrnlString* pkstrDev;
+        while (kllstDevs.bNext(pkstrDev))
         {
-            // Read in the next line from the enumeration buffer
-            strmEnum >> strCurDev;
-
             // Set up the CDROM object with this new device path
-            if (!rmmdCur.bSetPath(strCurDev.pszBuffer()))
+            if (!rmmdCur.bSetPath(pkstrDev->pszValue()))
             {
                 strmOut << L"   Could not set new device path\n" << kCIDLib::EndLn;
                 continue;
@@ -113,7 +106,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 continue;
             }
 
-            strmOut << L"\nDRIVE: " << strCurDev << L", "
+            strmOut << L"\nDRIVE: " << pkstrDev->pszValue() << L", "
                     << rmmdCur.pszDriveId()
                     << kCIDLib::EndLn;
 
@@ -123,19 +116,17 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             ||  (eMediaType == TKrnlRemMedia::EMediaTypes::None)
             ||  (eMediaType == TKrnlRemMedia::EMediaTypes::Unknown))
             {
-                strmOut << L"Could not determine media type"
+                strmOut << L"    Could not determine media type. Is there a disc in the drive?"
                         << kCIDLib::NewLn;
             }
-             else
+            else
             {
                 strmOut << L"  Media type is: "
                         << TKrnlRemMedia::apszMediaTypes[tCIDLib::c4EnumOrd(eMediaType)]
                         << kCIDLib::NewLn;
             }
 
-            //
-            //  Get TOC info based on the media type
-            //
+            // Get TOC info based on the media type
             if (TKrnlRemMedia::bIsCDType(eMediaType))
             {
                 if (rmmdCur.bQueryCDTOC(TOCInfo))
@@ -164,7 +155,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                     }
                     strmOut << kCIDLib::EndLn;
                 }
-                 else
+                else
                 {
                     strmOut << L"  (No TOC Available)\n";
                 }
@@ -172,6 +163,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
              else if (TKrnlRemMedia::bIsDVDType(eMediaType))
             {
                 // We don't have any TOC extraction stuff at this level for DVDs
+                strmOut << L"    Can't extract DVD TOC at this level\n";
+            }
+             else
+            {
+                strmOut << L"    This program doesn't understand the disc's media type\n";
             }
             strmOut << kCIDLib::EndLn;
         }
@@ -179,17 +175,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
     catch(TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
-        TSysInfo::strmOut()
-                    <<  L"A CIDLib runtime error occured during processing. "
-                    <<  L"\nError: " << errToCatch.strErrText()
-                    << kCIDLib::NewLn << kCIDLib::EndLn;
+        strmOut <<  L"A CIDLib runtime error occured during processing. "
+                <<  L"\nError: " << errToCatch.strErrText()
+                << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
@@ -200,9 +188,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //
     catch(const TKrnlError& kerrToCatch)
     {
-        TSysInfo::strmOut()
-                    << L"A kernel error occured during processing.\n  Error="
-                    << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
+        strmOut << L"A kernel error occured during processing.\n  Error="
+                << kerrToCatch.errcId() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 

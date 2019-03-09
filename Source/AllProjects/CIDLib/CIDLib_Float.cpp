@@ -51,7 +51,7 @@ TFloat& TFloat::Nul_TFloat()
     {
         TBaseLock lockInit;
         if (!pfNull)
-            TRawMem::pExchangePtr(pfNull, new TFloat);
+            TRawMem::pExchangePtr(&pfNull, new TFloat);
     }
     return *pfNull;
 }

@@ -295,7 +295,7 @@ static tCIDLib::TVoid DummyFunc()
     // Unique pointer template expansion to make sure it's good
     TUniquePtr<TString> uptrTest1(new TString(L"This is a test"));
     TUniquePtr<TString> uptrTest2(tCIDLib::ForceMove(uptrTest1));
-    if (uptrTest1.pData() || !uptrTest2->bCompare(L"This is a test"))
+    if (uptrTest1 || !uptrTest2->bCompare(L"This is a test"))
     {
     }
 
@@ -383,5 +383,4 @@ TFacCIDLib& facCIDLib()
 tCIDLib::TVoid CIDLib_Init()
 {
 }
-
 

@@ -60,7 +60,7 @@ class CIDMACROENGEXP TMEngArrayVal : public TMEngCollectVal
             const   TString&                strName
             , const tCIDLib::TCard2         c2Id
             , const tCIDLib::TCard2         c2ElemId
-            , const tCIDMacroEng::EConstTypes  eConst
+            , const tCIDMacroEng::EConstTypes eConst
             ,       TMEngCollectInfo*       pmeciBase
         );
 
@@ -80,7 +80,7 @@ class CIDMACROENGEXP TMEngArrayVal : public TMEngCollectVal
         (
                     TTextOutStream&         strmTarget
             , const TMEngClassInfo&         meciThis
-            , const tCIDMacroEng::EDbgFmts     eFormat
+            , const tCIDMacroEng::EDbgFmts  eFormat
             , const tCIDLib::ERadices       eRadix
             , const TCIDMacroEngine&        meOwner
         )   const override;

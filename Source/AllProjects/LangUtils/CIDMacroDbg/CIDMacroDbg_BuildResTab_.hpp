@@ -41,6 +41,8 @@ class CIDMACRODBGEXP TPrsErrPosInfo : public TCtrlNotify
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TPrsErrPosInfo() = delete;
+
         TPrsErrPosInfo
         (
             const   TWindow&                wndSrc
@@ -51,7 +53,7 @@ class CIDMACRODBGEXP TPrsErrPosInfo : public TCtrlNotify
 
         TPrsErrPosInfo
         (
-            const   TPrsErrPosInfo&         wnotToCopy
+            const   TPrsErrPosInfo&         wnotSrc
         );
 
         ~TPrsErrPosInfo();
@@ -62,7 +64,7 @@ class CIDMACRODBGEXP TPrsErrPosInfo : public TCtrlNotify
         // -------------------------------------------------------------------
         TPrsErrPosInfo& operator=
         (
-            const   TPrsErrPosInfo&         wnotToAssign
+            const   TPrsErrPosInfo&         wnotSrc
         );
 
 
@@ -77,12 +79,6 @@ class CIDMACRODBGEXP TPrsErrPosInfo : public TCtrlNotify
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TPrsErrPosInfo();
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -125,7 +121,15 @@ class TBuildResTab : public TTabWindow, public MMEngPrsErrHandler
         // -------------------------------------------------------------------
         TBuildResTab();
 
+        TBuildResTab(const TBuildResTab&) = delete;
+
         ~TBuildResTab();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TBuildResTab& operator=(const TBuildResTab&) = delete;
 
 
         // -------------------------------------------------------------------

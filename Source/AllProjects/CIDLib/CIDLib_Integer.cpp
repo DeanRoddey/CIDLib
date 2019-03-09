@@ -55,7 +55,7 @@ TInteger& TInteger::Nul_TInteger()
     {
         TBaseLock lockInit;
         if (!piNull)
-            TRawMem::pExchangePtr(piNull, new TInteger);
+            TRawMem::pExchangePtr(&piNull, new TInteger);
     }
     return *piNull;
 }
@@ -233,7 +233,7 @@ TInteger64& TInteger64::Nul_TInteger64()
     {
         TBaseLock lockInit;
         if (!piNull)
-            TRawMem::pExchangePtr(piNull, new TInteger64);
+            TRawMem::pExchangePtr(&piNull, new TInteger64);
     }
     return *piNull;
 }

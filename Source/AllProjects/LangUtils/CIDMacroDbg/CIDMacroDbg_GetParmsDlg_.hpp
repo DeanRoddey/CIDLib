@@ -38,7 +38,15 @@ class TGetParmsDlg : public TDlgBox
         // -------------------------------------------------------------------
         TGetParmsDlg();
 
+        TGetParmsDlg(const TGetParmsDlg&) = delete;
+
         ~TGetParmsDlg();
+
+
+        // -------------------------------------------------------------------
+        //  Public oeprators
+        // -------------------------------------------------------------------
+        TGetParmsDlg& operator=(const TGetParmsDlg&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -56,17 +64,10 @@ class TGetParmsDlg : public TDlgBox
         // -------------------------------------------------------------------
         //  Protected inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bCreated();
+        tCIDLib::TBoolean bCreated() override;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TGetParmsDlg(const TGetParmsDlg&);
-        tCIDLib::TVoid operator=(const TGetParmsDlg&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         // -------------------------------------------------------------------

@@ -103,7 +103,7 @@ const TStreamFmt& TTextOutStream::strmfDefault()
         {
             TRawMem::pExchangePtr<const TStreamFmt>
             (
-                CIDLib_TextOutStream::pstrmfDef
+                &CIDLib_TextOutStream::pstrmfDef
                 , new TStreamFmt(0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace)
             );
         }
@@ -120,7 +120,7 @@ const TStreamFmt& TTextOutStream::strmfHex()
         {
             TRawMem::pExchangePtr<const TStreamFmt>
             (
-                CIDLib_TextOutStream::pstrmfHex
+                &CIDLib_TextOutStream::pstrmfHex
                 , new TStreamFmt(0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace, tCIDLib::ERadices::Hex)
             );
         }
@@ -137,7 +137,7 @@ const TStreamFmt& TTextOutStream::strmfHex2()
         {
             TRawMem::pExchangePtr<const TStreamFmt>
             (
-                CIDLib_TextOutStream::pstrmfHex2
+                &CIDLib_TextOutStream::pstrmfHex2
                 , new TStreamFmt(2, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex)
             );
         }
@@ -154,7 +154,7 @@ const TStreamFmt& TTextOutStream::strmfHex4()
         {
             TRawMem::pExchangePtr<const TStreamFmt>
             (
-                CIDLib_TextOutStream::pstrmfHex4
+                &CIDLib_TextOutStream::pstrmfHex4
                 , new TStreamFmt(4, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex)
             );
         }

@@ -90,7 +90,7 @@ class KRNLEXPORT TKrnlConIn : public MSignalHandler
         tCIDLib::TBoolean bHandleSignal
         (
             const   tCIDLib::ESignals       eSignal
-        );
+        )   override;
 
 
         // -------------------------------------------------------------------

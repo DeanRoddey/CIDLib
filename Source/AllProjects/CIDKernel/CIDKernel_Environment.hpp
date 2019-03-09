@@ -55,16 +55,20 @@ class KRNLEXPORT TKrnlEnvironment
             public :
                 TElem() :
 
-                    pszKey(0)
-                    , pszValue(0)
+                    pszKey(nullptr)
+                    , pszValue(nullptr)
                 {
                 }
+
+                TElem(const TElem&) = delete;
 
                 ~TElem()
                 {
                     delete [] pszKey;
                     delete [] pszValue;
                 }
+
+                TElem& operator=(const TElem&) = delete;
 
                 tCIDLib::TVoid Set( const   tCIDLib::TCh* const pszTheKey
                                     , const tCIDLib::TCh* const pszTheValue)
@@ -75,10 +79,6 @@ class KRNLEXPORT TKrnlEnvironment
 
                 tCIDLib::TCh*   pszKey;
                 tCIDLib::TCh*   pszValue;
-
-            private :
-                TElem(const TElem&);
-                tCIDLib::TVoid operator=(const TElem&);
         };
 
 

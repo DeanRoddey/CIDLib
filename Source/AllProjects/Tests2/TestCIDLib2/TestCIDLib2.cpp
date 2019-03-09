@@ -71,6 +71,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
 
     // The most fundamental stuff
     AddTest(new TTest_Types);
+    AddTest(new TTest_CntPtr1);
     AddTest(new TTest_UniquePtr);
     AddTest(new TTest_FlagJanitor);
     AddTest(new TTest_Enum1);
@@ -110,10 +111,10 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
 
     // Collection tests
     AddTest(new TTest_ObjArrayLambda);
-//    AddTest(new TTest_ObjArrayMoveSem);
+    // AddTest(new TTest_ObjArrayMoveSem);
     AddTest(new TTest_RefVectorLambda);
     AddTest(new TTest_RefVectorMoveItem);
-//    AddTest(new TTest_RefVectorMoveSem);
+    // AddTest(new TTest_RefVectorMoveSem);
     AddTest(new TTest_VectorLambda);
     AddTest(new TTest_VectorMoveSem);
 
@@ -139,6 +140,10 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
 
     // Cicular buffer
     AddTest(new TTest_CircularBuf);
+
+    // High level tests that can gen up some threads
+    AddTest(new TTest_CntPtr2);
+    AddTest(new TTest_SafeCnt1);
 
     // Publish/subscribe
     AddTest(new TTest_PubSub1);

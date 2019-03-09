@@ -76,11 +76,6 @@ static tCIDLib::TVoid TestBasicCountedPointer(TTextOutStream& strmOut)
     {
         TCntPtr<TTester> cptrTest(new TTester(bGotDeleted));
 
-        // Check that the class name was set up correctly
-        const TClass& clsTest = TCntPtr<TTester>::clsThis();
-        if (TCntPtr<TTester>::clsThis() != TClass(L"TCntPtr<T>"))
-            strmOut << CUR_LN << L"Class name was not correct" << kCIDLib::EndLn;
-
         // Make sure that we can access the point members via the operators
         cptrTest->m_i4Field1 = 1;
         cptrTest->m_i4Field2 = 2;

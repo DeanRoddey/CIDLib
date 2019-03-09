@@ -16,8 +16,11 @@
 //
 // DESCRIPTION:
 //
-//  This is the main header for the facility. It includes anything that is
-//  needed by our program, and is the precompiled headers file.
+//  These are very basic tests, just to make sure there's nothing fundamentally wrong
+//  and that the test framework based tests shouldn't have an issue running.
+//
+//  We keep things quite simple here, since we are testing stuff, we don't want to
+//  use features aren't even really tested until up in the framework based tests.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -94,7 +97,15 @@ class TFacTestCIDLib : public TFacility
         // --------------------------------------------------------------------
         TFacTestCIDLib();
 
+        TFacTestCIDLib(const TFacTestCIDLib&) = delete;
+
         ~TFacTestCIDLib();
+
+
+        // ---------------------------------------------------------------------
+        //  Public operators
+        // ---------------------------------------------------------------------
+        TFacTestCIDLib& operator=(const TFacTestCIDLib&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -102,7 +113,12 @@ class TFacTestCIDLib : public TFacility
         // --------------------------------------------------------------------
         static tCIDLib::TVoid Announce();
         static tCIDLib::TVoid CoreTests();
-        static TTextOutStream& strmOut();
+
+        static TTextOutStream& strmOut()
+        {
+            return *s_pstrmOutput;
+        }
+
         static tCIDLib::TVoid ShowSystemInfo();
         static tCIDLib::TVoid ShowTests();
         static tCIDLib::TVoid TestBags();
@@ -135,13 +151,6 @@ class TFacTestCIDLib : public TFacility
 
     private :
         // ---------------------------------------------------------------------
-        //  Unimplimented constructors and operators
-        // ---------------------------------------------------------------------
-        TFacTestCIDLib(const TFacTestCIDLib&);
-        tCIDLib::TVoid operator=(const TFacTestCIDLib&);
-
-
-        // ---------------------------------------------------------------------
         //  Private data members
         //
         //  s_pstrmOutput
@@ -151,13 +160,6 @@ class TFacTestCIDLib : public TFacility
         static TTextOutStream*  s_pstrmOutput;
 };
 
-// ----------------------------------------------------------------------------
-//  Public, non-virtual methods
-// ----------------------------------------------------------------------------
-inline TTextOutStream& TFacTestCIDLib::strmOut()
-{
-    return *s_pstrmOutput;
-}
 
 
 // ----------------------------------------------------------------------------
@@ -172,12 +174,9 @@ extern TFacTestCIDLib   facTestCIDLib;
 //  prototype that all of the test functions use.
 // ----------------------------------------------------------------------------
 typedef tCIDLib::TVoid (*TTestFunction)();
-
 struct TTestFuncRecord
 {
     TTestFunction           pfnTester;
     const tCIDLib::TCh*     pszName;
     tCIDLib::TBoolean       bRun;
 };
-
-

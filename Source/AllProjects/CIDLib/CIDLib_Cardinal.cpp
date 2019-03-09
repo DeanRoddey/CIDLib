@@ -53,7 +53,7 @@ TCardinal& TCardinal::Nul_TCardinal()
     {
         TBaseLock lockInit;
         if (!pcNull)
-            TRawMem::pExchangePtr(pcNull, new TCardinal);
+            TRawMem::pExchangePtr(&pcNull, new TCardinal);
     }
     return *pcNull;
 }
@@ -234,7 +234,7 @@ TCardinal64& TCardinal64::Nul_TCardinal64()
     {
         TBaseLock lockInit;
         if (!pcNull)
-            TRawMem::pExchangePtr(pcNull, new TCardinal64);
+            TRawMem::pExchangePtr(&pcNull, new TCardinal64);
     }
     return *pcNull;
 }

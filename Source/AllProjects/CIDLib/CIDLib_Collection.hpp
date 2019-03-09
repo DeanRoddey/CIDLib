@@ -569,8 +569,7 @@ class CIDLIBEXP TCollectionBase : public TObject
 
         tCIDLib::TVoid KeyNotFound
         (
-            const   TObject&                objKey
-            , const tCIDLib::TCh* const     pszFile
+             const  tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
 

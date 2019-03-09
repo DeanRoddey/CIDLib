@@ -343,12 +343,12 @@ TPNGImage::TPNGImage(const  TPixelArray&    pixaBits
     ForceRowOrder(tCIDImage::ERowOrders::TopDown);
 }
 
-TPNGImage::TPNGImage(const TPNGImage& imgToCopy) :
+TPNGImage::TPNGImage(const TPNGImage& imgSrc) :
 
-    TCIDImage(tCIDImage::EImgTypes::PNG, imgToCopy)
-    , m_bStrictMode(imgToCopy.m_bStrictMode)
-    , m_eCompType(imgToCopy.m_eCompType)
-    , m_eInterlaceType(imgToCopy.m_eInterlaceType)
+    TCIDImage(tCIDImage::EImgTypes::PNG, imgSrc)
+    , m_bStrictMode(imgSrc.m_bStrictMode)
+    , m_eCompType(imgSrc.m_eCompType)
+    , m_eInterlaceType(imgSrc.m_eInterlaceType)
 
 {
 }
@@ -364,10 +364,10 @@ TPNGImage::TPNGImage(const TCIDImage& imgSrc) :
     ForceRowOrder(tCIDImage::ERowOrders::TopDown);
 }
 
-TPNGImage::TPNGImage(const  TCIDImage&  imgToCopy
+TPNGImage::TPNGImage(const  TCIDImage&  imgSrc
                     , const TSize&      szNew) :
 
-    TCIDImage(tCIDImage::EImgTypes::PNG, imgToCopy, szNew)
+    TCIDImage(tCIDImage::EImgTypes::PNG, imgSrc, szNew)
     , m_bStrictMode(kCIDLib::False)
     , m_eCompType(tCIDPNG::ECompTypes::Deflate)
     , m_eInterlaceType(tCIDPNG::EInterlaces::None)

@@ -19,6 +19,11 @@
 //  This is the main (only) module of the JSON.cpp demo program. This
 //  program demonstrates the JSON parser classes.
 //
+//  It takes a JSON file to parse, parses it, and then outputs in two ways. One
+//  is via regular hierarchy iteration, which outputs valid JSON back out. The
+//  other is via the callback mechanism, which passes back each node along with
+//  a pseudo path you can use to look for nodes you are interested in.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -28,33 +33,17 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own.
+//  Includes.
 // ----------------------------------------------------------------------------
 #include    "CIDEncode.hpp"
-
 #include    "CIDNet.hpp"
 
 
 
 // ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-
-// ----------------------------------------------------------------------------
 //  Do the magic main module code
-//
-//  This tells CIDLib what the main thread of the program is. This is the
-//  only thread object that is run automatically. All others are started
-//  manually when required or desired.
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"JSON1MainThread", eMainThreadFunc))
 
 
@@ -77,7 +66,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         // Output a little program blurb
         TSysInfo::strmOut() << L"\nJSON1.Exe\n"
                             << L"CIDLib JSON Demo #1\n"
-                            << L"    JSON1 [src file]n"
+                            << L"    JSON1 [src file]"
                             << kCIDLib::NewEndLn;
 
 
@@ -104,8 +93,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         }
         TSysInfo::strmOut() << kCIDLib::NewEndLn;
 
-
-        TSysInfo::strmOut() << L"Iteration output\n---------------------\n";
+        TSysInfo::strmOut() << L"Callback output\n---------------------\n";
         {
             strmFile.Reset();
             TJSONParser jprsTest;
@@ -152,15 +140,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         TSysInfo::strmOut()
                 << L"A CIDLib runtime error occured during processing.\n  Error: "
                 << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;

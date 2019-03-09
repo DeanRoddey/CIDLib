@@ -37,7 +37,15 @@ class TBreakPntsTab : public TTabWindow
         // -------------------------------------------------------------------
         TBreakPntsTab();
 
+        TBreakPntsTab(const TBreakPntsTab&) = delete;
+
         ~TBreakPntsTab();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TBreakPntsTab& operator=(const TBreakPntsTab&) = delete;
 
 
         // -------------------------------------------------------------------

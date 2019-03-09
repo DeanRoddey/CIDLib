@@ -66,7 +66,7 @@ class KRNLEXPORT TBaseLock
         //  Public operators
         // -------------------------------------------------------------------
         TBaseLock& operator=(const TBaseLock&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 };
 
 #pragma CIDLIB_POPPACK

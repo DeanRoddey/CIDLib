@@ -653,11 +653,11 @@ class TKeyedHashSet : public TCollection<TElem>
 
         TKeyedHashSet(  const   tCIDLib::TCard4     c4Modulus
                         ,       TKeyOps* const      pkopsToAdopt
-                        , const TKeyExtract         pfnKeyExtract
+                        ,       TKeyExtract         pfnKeyExtract
                         , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             TCollection<TElem>(eMTSafe)
-            , m_apBuckets(0)
+            , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
             , m_pfnKeyExtract(pfnKeyExtract)
@@ -686,7 +686,7 @@ class TKeyedHashSet : public TCollection<TElem>
         TKeyedHashSet(const TMyType& colSrc) :
 
             TCollection<TElem>(colSrc)
-            , m_apBuckets(0)
+            , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(colSrc.m_c4HashModulus)
             , m_pfnKeyExtract(colSrc.m_pfnKeyExtract)
@@ -734,7 +734,7 @@ class TKeyedHashSet : public TCollection<TElem>
         TKeyedHashSet(const TMyType&& colSrc) :
 
             TCollection<TElem>(tCIDLib::EMTStates::Unsafe)
-            , m_apBuckets(0)
+            , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(1)
             , m_pfnKeyExtract(colSrc.m_pfnKeyExtract)
@@ -1049,7 +1049,7 @@ class TKeyedHashSet : public TCollection<TElem>
             {
                 // Throw if told to, else just return false
                 if (bThrowIfNot)
-                    this->KeyNotFound(objKeyToRemove, CID_FILE, CID_LINE);
+                    this->KeyNotFound(CID_FILE, CID_LINE);
                 return kCIDLib::False;
             }
 
@@ -1165,7 +1165,7 @@ class TKeyedHashSet : public TCollection<TElem>
 
             // Not found so throw an exception
             if (!pnodeRet)
-                this->KeyNotFound(objKeyToFind, CID_FILE, CID_LINE);
+                this->KeyNotFound(CID_FILE, CID_LINE);
 
             // we found it so return the object data
             return pnodeRet->objData();
@@ -1180,7 +1180,7 @@ class TKeyedHashSet : public TCollection<TElem>
 
             // Not found so throw an exception
             if (!pnodeRet)
-                this->KeyNotFound(objKeyToFind, CID_FILE, CID_LINE);
+                this->KeyNotFound(CID_FILE, CID_LINE);
 
             // we found it so return the object data
             return pnodeRet->objData();
@@ -1301,7 +1301,7 @@ class TKeyedHashSet : public TCollection<TElem>
             TNode* pnodeRep = pnodeFind(m_pfnKeyExtract(objNewValue), hshElem);
 
             if (!pnodeRep)
-                this->KeyNotFound(objNewValue, CID_FILE, CID_LINE);
+                this->KeyNotFound(CID_FILE, CID_LINE);
 
             // Don't let them change the key
             if (!m_pkopsToUse->bCompKeys(m_pfnKeyExtract(pnodeRep->objData())

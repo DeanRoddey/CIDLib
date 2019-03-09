@@ -302,7 +302,7 @@ TConsoleInImpl::chReadChar(         tCIDLib::EConKeys&  eKeyType
                             ,       TObject* const      pobjCBData)
 {
     tCIDLib::TCh chKey;
-    if (!m_kconImpl.bReadChar(eKeyType, chKey, c4WaitMS, pfnCallback, pobjCBData))
+    if (!m_kconImpl.bReadCharMS(eKeyType, chKey, c4WaitMS, pfnCallback, pobjCBData))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -531,7 +531,10 @@ TInConsole::chReadChar(         tCIDLib::EConKeys&  eKeyType
                         ,       TKrnlConIn::TIdleCB pfnCallback
                         ,       TObject* const      pobjCBData)
 {
-    return m_pstrmiCon->chReadChar(eKeyType, c4WaitMS, pfnCallback, pobjCBData);
+    return m_pstrmiCon->chReadChar
+    (
+        eKeyType, c4WaitMS, pfnCallback, pobjCBData
+);
 }
 
 

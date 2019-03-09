@@ -121,13 +121,13 @@ class CIDSOCKEXP TTextOutSockStream : public TTextOutStream
         (
                     TStreamSocket* const    psockToAdopt
             , const tCIDLib::EAdoptOpts     eAdopt
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextOutSockStream
         (
                     TBinOutSockStream* const pstrmToAdopt
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextOutSockStream(const TTextOutSockStream&) = delete;

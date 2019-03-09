@@ -154,7 +154,7 @@ static TCriticalSection* pcrsLock()
     {
         TBaseLock lockInit;
         if (!pcrsTRLock)
-            TRawMem::pExchangePtr(pcrsTRLock, new TCriticalSection);
+            TRawMem::pExchangePtr(&pcrsTRLock, new TCriticalSection);
     }
     return pcrsTRLock;
 }

@@ -149,7 +149,15 @@ class CIDMACROENGEXP TMEngBooleanInfo : public TMEngClassInfo
                     TCIDMacroEngine&        meOwner
         );
 
+        TMEngBooleanInfo(const TMEngBooleanInfo&) = delete;
+
         ~TMEngBooleanInfo();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TMEngBooleanInfo& operator=(const TMEngBooleanInfo&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -188,13 +196,6 @@ class CIDMACROENGEXP TMEngBooleanInfo : public TMEngClassInfo
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMEngBooleanInfo(const TMEngBooleanInfo&) = delete;
-        TMEngBooleanInfo& operator=(const TMEngBooleanInfo&) = delete;
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //

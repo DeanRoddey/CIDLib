@@ -87,7 +87,7 @@ static tCIDLib::EExitCodes eThreadFunc(TThread* const, tCIDLib::TVoid* const)
 static tCIDLib::EExitCodes eThreadFunc2(TThread* const, tCIDLib::TVoid* const)
 {
     // Bump up the safe counter
-    kscntTest.bInc();
+    kscntTest.c4Inc();
 
     // Indicate we're up on the first event
     if (!pkevTest1->bTrigger())
@@ -98,7 +98,7 @@ static tCIDLib::EExitCodes eThreadFunc2(TThread* const, tCIDLib::TVoid* const)
         throw TKrnlError::kerrLast();
 
     // Bump down the count
-    kscntTest.bDec();
+    kscntTest.c4Dec();
 
     return tCIDLib::EExitCodes::Normal;
 }

@@ -47,9 +47,9 @@ RTTIDecls(TGetParmsDlg,TDlgBox)
 TGetParmsDlg::TGetParmsDlg() :
 
     m_c4ExpectedCount(0)
-    , m_pwndAcceptButton(0)
-    , m_pwndCancelButton(0)
-    , m_pwndParms(0)
+    , m_pwndAcceptButton(nullptr)
+    , m_pwndCancelButton(nullptr)
+    , m_pwndParms(nullptr)
 {
 }
 
@@ -74,9 +74,7 @@ TGetParmsDlg::bRunDlg(          TWindow&        wndOwner
 
     const tCIDLib::TCard4 c4Res = c4RunDlg
     (
-        wndOwner
-        , facCIDMacroDbg()
-        , kCIDMacroDbg::ridDlg_GetParms
+        wndOwner, facCIDMacroDbg(), kCIDMacroDbg::ridDlg_GetParms
     );
 
     if (c4Res && (c4Res != kCIDLib::c4MaxCard))

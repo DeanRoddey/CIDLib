@@ -64,8 +64,15 @@ class CIDGRDEVEXP TFacCIDGraphDev : public TFacility
         // -------------------------------------------------------------------
         TFacCIDGraphDev();
 
+        TFacCIDGraphDev(const TFacCIDGraphDev&) = delete;
+
         ~TFacCIDGraphDev();
 
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFacCIDGraphDev& operator=(const TFacCIDGraphDev&) = delete;
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods

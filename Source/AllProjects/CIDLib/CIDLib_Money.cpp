@@ -50,7 +50,7 @@ TMoney& TMoney::Nul_TMoney()
     {
         TBaseLock lockInit;
         if (!pmonNull)
-            TRawMem::pExchangePtr(pmonNull, new TMoney);
+            TRawMem::pExchangePtr(&pmonNull, new TMoney);
     }
     return *pmonNull;
 }

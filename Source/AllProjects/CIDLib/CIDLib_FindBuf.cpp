@@ -103,7 +103,7 @@ const TString& TFindBuf::strFull()
         {
             TRawMem::pExchangePtr<const TString>
             (
-                pstrFull, new TString(CIDLib_FindBuf::pszDefFmt)
+                &pstrFull, new TString(CIDLib_FindBuf::pszDefFmt)
             );
         }
     }
@@ -127,7 +127,7 @@ const TString& TFindBuf::strNameAndSize()
         {
             TRawMem::pExchangePtr<const TString>
             (
-                pstrNameAndSize, new TString(L"%(S,10) %(P)")
+                &pstrNameAndSize, new TString(L"%(S,10) %(P)")
             );
         }
     }

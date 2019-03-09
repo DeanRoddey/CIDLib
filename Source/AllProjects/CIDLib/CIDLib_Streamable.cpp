@@ -47,7 +47,7 @@ MStreamable& MStreamable::Nul_MStreamable()
     {
         TBaseLock lockInit;
         if (!pstrmblNull)
-            TRawMem::pExchangePtr(pstrmblNull, new TPoint);
+            TRawMem::pExchangePtr(&pstrmblNull, new TPoint);
     }
     return *pstrmblNull;
 }

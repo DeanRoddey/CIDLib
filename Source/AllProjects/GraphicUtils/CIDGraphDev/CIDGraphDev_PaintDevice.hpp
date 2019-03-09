@@ -68,10 +68,9 @@ class CIDGRDEVEXP TGraphPaintDev : public TGraphDrawDev
         //  Private data members
         //
         //  m_phpiThis
-        //      For paint devices, this is some extra info needed to clean
-        //      the thing up. On other platforms, this may just be a dummy
-        //      structure with nothing in it. Its allocated when needed so
-        //      that every object does not pay the cost.
+        //      For paint devices, this is some extra info needed to clean the thing up.
+        //      On other platforms, this may just be a dummystructure with nothing in it.
+        //      Its allocated when needed so that every object does not pay the cost.
         // -------------------------------------------------------------------
         THostPaintInfo* m_phpiThis;
 

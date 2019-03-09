@@ -75,7 +75,7 @@ class KRNLEXPORT MUPnPSvcCallback
         // -------------------------------------------------------------------
         MUPnPSvcCallback();
         MUPnPSvcCallback(const MUPnPSvcCallback&);
-        tCIDLib::TVoid operator=(const MUPnPSvcCallback&);
+        MUPnPSvcCallback& operator=(const MUPnPSvcCallback&);
 };
 
 

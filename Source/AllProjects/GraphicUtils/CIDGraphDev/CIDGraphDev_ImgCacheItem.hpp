@@ -62,7 +62,7 @@ class CIDGRDEVEXP TImgCacheItem : public TObject
 
         TImgCacheItem
         (
-            const   TImgCacheItem&          iciToCopy
+            const   TImgCacheItem&          I_NsClientBindSearch
         );
 
         ~TImgCacheItem();
@@ -73,7 +73,7 @@ class CIDGRDEVEXP TImgCacheItem : public TObject
         // -------------------------------------------------------------------
         TImgCacheItem& operator=
         (
-            const   TImgCacheItem&          iciToAssign
+            const   TImgCacheItem&          iciSrc
         );
 
 

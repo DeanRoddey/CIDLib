@@ -51,7 +51,7 @@ MFormattable& MFormattable::Nul_MFormattable()
     {
         TBaseLock lockInit;
         if (!pfmtblNull)
-            TRawMem::pExchangePtr(pfmtblNull, new TPoint);
+            TRawMem::pExchangePtr(&pfmtblNull, new TPoint);
     }
     return *pfmtblNull;
 }

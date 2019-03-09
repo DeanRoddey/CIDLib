@@ -228,10 +228,7 @@ class CIDSOCKEXP TURL :
             , const tCIDLib::TCh* const     pszURLText
         );
 
-        TURL
-        (
-            const   TURL&                   urlSrc
-        );
+        TURL(const TURL&) = default;
 
         ~TURL();
 
@@ -239,10 +236,7 @@ class CIDSOCKEXP TURL :
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TURL& operator=
-        (
-            const   TURL&                   urlSrc
-        );
+        TURL& operator=(const TURL&) = default;
 
         tCIDLib::TBoolean operator==
         (

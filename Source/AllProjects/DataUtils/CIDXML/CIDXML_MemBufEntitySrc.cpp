@@ -203,7 +203,7 @@ tCIDLib::TCard4 TMemBufEntitySrc::c4SrcBytes(const tCIDLib::TCard4 c4ToSet)
 TBinInStream* TMemBufEntitySrc::pstrmMakeNew() const
 {
     // Default is for it not to adopt, which is what we want
-    const TMemBuf* pmbufCur = m_cptrBuffer.pobjData();
-    return new TBinMBufInStream(pmbufCur, m_c4SrcBytes);
+    const TMemBuf& mbufCur = *m_cptrBuffer;
+    return new TBinMBufInStream(&mbufCur, m_c4SrcBytes);
 }
 

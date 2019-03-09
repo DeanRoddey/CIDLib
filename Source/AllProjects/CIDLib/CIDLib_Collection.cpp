@@ -801,23 +801,9 @@ TCollectionBase::MustClearFirst(const   tCIDLib::TCh* const pszFile
 
 
 tCIDLib::TVoid
-TCollectionBase::KeyNotFound(const  TObject&            objKey
-                            , const tCIDLib::TCh* const pszFile
+TCollectionBase::KeyNotFound(const  tCIDLib::TCh* const pszFile
                             , const tCIDLib::TCard4     c4Line) const
 {
-    // See if we can format it
-    TString strKey;
-    const MFormattable* pmftblKey = dynamic_cast<const MFormattable*>(&objKey);
-    if (pmftblKey)
-    {
-        TTextStringOutStream strmOut(&strKey);
-        strmOut << *pmftblKey;
-    }
-     else
-    {
-        strKey = L"???";
-    }
-
     facCIDLib().ThrowErr
     (
         pszFile
@@ -825,7 +811,6 @@ TCollectionBase::KeyNotFound(const  TObject&            objKey
         , kCIDErrs::errcCol_KeyNotFound
         , tCIDLib::ESeverities::Failed
         , tCIDLib::EErrClasses::NotFound
-        , strKey
         , clsIsA()
     );
 }

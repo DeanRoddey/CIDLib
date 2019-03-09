@@ -329,7 +329,7 @@ TEnvironment& TEnvironment::Nul_TEnvironment()
     {
         TBaseLock lockInit;
         if (!penvNull)
-           TRawMem::pExchangePtr(penvNull, new TEnvironment);
+           TRawMem::pExchangePtr(&penvNull, new TEnvironment);
     }
     return *penvNull;
 }

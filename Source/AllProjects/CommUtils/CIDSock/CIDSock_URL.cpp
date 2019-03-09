@@ -208,12 +208,12 @@ static tCIDLib::TVoid InitCharTable()
 // ---------------------------------------------------------------------------
 TURL& TURL::Nul_TURL()
 {
-    static TURL* purlNull = 0;
+    static TURL* purlNull = nullptr;
     if (!purlNull)
     {
         TBaseLock lockInit;
         if (!purlNull)
-            TRawMem::pExchangePtr(purlNull, new TURL);
+            purlNull = new TURL;
     }
     return *purlNull;
 }
@@ -987,20 +987,6 @@ TURL::TURL( const   TURL&               urlRelTo
 }
 
 
-TURL::TURL(const TURL& urlSrc) :
-
-    m_colQParms(urlSrc.m_colQParms)
-    , m_eProto(urlSrc.m_eProto)
-    , m_ippnHost(urlSrc.m_ippnHost)
-    , m_strFragment(urlSrc.m_strFragment)
-    , m_strHost(urlSrc.m_strHost)
-    , m_strParams(urlSrc.m_strParams)
-    , m_strPassword(urlSrc.m_strPassword)
-    , m_strPath(urlSrc.m_strPath)
-    , m_strUser(urlSrc.m_strUser)
-{
-}
-
 TURL::~TURL()
 {
 }
@@ -1009,60 +995,29 @@ TURL::~TURL()
 // ---------------------------------------------------------------------------
 //  TURL: Public operators
 // ---------------------------------------------------------------------------
-TURL& TURL::operator=(const TURL& urlSrc)
+tCIDLib::TBoolean TURL::operator==(const TURL& urlSrc) const
 {
     if (this != &urlSrc)
     {
-        m_colQParms     = urlSrc.m_colQParms;
-        m_eProto        = urlSrc.m_eProto;
-        m_ippnHost      = urlSrc.m_ippnHost;
-        m_strFragment   = urlSrc.m_strFragment;
-        m_strHost       = urlSrc.m_strHost;
-        m_strParams     = urlSrc.m_strParams;
-        m_strPassword   = urlSrc.m_strPassword;
-        m_strPath       = urlSrc.m_strPath;
-        m_strUser       = urlSrc.m_strUser;
-    }
-    return *this;
-}
-
-
-tCIDLib::TBoolean TURL::operator==(const TURL& urlSrc) const
-{
-    // Check for self comparison
-    if (this == &urlSrc)
-        return kCIDLib::True;
-
-    // Do the easy ones first
-    if ((m_eProto != urlSrc.m_eProto)
-    ||  (m_ippnHost != urlSrc.m_ippnHost))
-    {
-        return kCIDLib::False;
-    }
-
-    // Test the string members
-    if ((m_strFragment != urlSrc.m_strFragment)
-    ||  (m_strHost != urlSrc.m_strHost)
-    ||  (m_strParams != urlSrc.m_strParams)
-    ||  (m_strPassword != urlSrc.m_strPassword)
-    ||  (m_strPath != urlSrc.m_strPath)
-    ||  (m_strUser != urlSrc.m_strUser))
-    {
-        return kCIDLib::False;
-    }
-
-    // And the query params
-    const tCIDLib::TCard4 c4Count = m_colQParms.c4ElemCount();
-    if (c4Count != urlSrc.m_colQParms.c4ElemCount())
-        return kCIDLib::False;
-
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-    {
-        if (m_colQParms[c4Index] != urlSrc.m_colQParms[c4Index])
+        // Do the easy ones first
+        if ((m_eProto != urlSrc.m_eProto)
+        ||  (m_ippnHost != urlSrc.m_ippnHost))
+        {
             return kCIDLib::False;
-    }
+        }
 
-    // Its the same, amazing
+        // Test the string members
+        if ((m_strFragment != urlSrc.m_strFragment)
+        ||  (m_strHost != urlSrc.m_strHost)
+        ||  (m_strParams != urlSrc.m_strParams)
+        ||  (m_strPassword != urlSrc.m_strPassword)
+        ||  (m_strPath != urlSrc.m_strPath)
+        ||  (m_strUser != urlSrc.m_strUser)
+        ||  (m_colQParms != urlSrc.m_colQParms))
+        {
+            return kCIDLib::False;
+        }
+    }
     return kCIDLib::True;
 }
 

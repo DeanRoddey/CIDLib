@@ -59,12 +59,12 @@ TTypeFactoryKicker::~TTypeFactoryKicker()
 // ---------------------------------------------------------------------------
 TClass& TClass::Nul_TClass()
 {
-    static TClass* pclsNull = 0;
+    static TClass* pclsNull = nullptr;
     if (!pclsNull)
     {
         TBaseLock lockInit;
         if (!pclsNull)
-            TRawMem::pExchangePtr(pclsNull, new TClass);
+            TRawMem::pExchangePtr(&pclsNull, new TClass);
     }
     return *pclsNull;
 }
@@ -311,12 +311,12 @@ TClass& TClass::operator=(const TClass& clsSrc)
 // ---------------------------------------------------------------------------
 const TClass& TClass::clsIsA() const
 {
-    static TClass* pclsThis = 0;
+    static TClass* pclsThis = nullptr;
     if (!pclsThis)
     {
         TBaseLock lockInit;
         if (!pclsThis)
-            TRawMem::pExchangePtr(pclsThis, new TClass(L"TClass"));
+            TRawMem::pExchangePtr(&pclsThis, new TClass(L"TClass"));
     }
     return *pclsThis;
 }
@@ -324,12 +324,12 @@ const TClass& TClass::clsIsA() const
 
 const TClass& TClass::clsParent() const
 {
-    static TClass* pclsThis = 0;
+    static TClass* pclsThis = nullptr;
     if (!pclsThis)
     {
         TBaseLock lockInit;
         if (!pclsThis)
-            TRawMem::pExchangePtr(pclsThis, new TClass(L"TObject"));
+            TRawMem::pExchangePtr(&pclsThis, new TClass(L"TObject"));
     }
     return *pclsThis;
 }

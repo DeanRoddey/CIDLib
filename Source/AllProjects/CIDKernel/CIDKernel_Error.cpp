@@ -75,13 +75,6 @@ TKrnlError::TKrnlError( const   tCIDLib::TErrCode   errcId
 {
 }
 
-TKrnlError::TKrnlError(const TKrnlError& kerrToCopy) :
-
-    m_errcId(kerrToCopy.m_errcId)
-    , m_errcHostId(kerrToCopy.m_errcHostId)
-{
-}
-
 TKrnlError::~TKrnlError()
 {
 }
@@ -107,15 +100,6 @@ TKrnlError::operator==(const TKrnlError& kerrToCompare) const
 tCIDLib::TBoolean TKrnlError::operator!=(const TKrnlError& kerrToCompare) const
 {
     return !operator==(kerrToCompare);
-}
-
-TKrnlError& TKrnlError::operator=(const TKrnlError& kerrToAssign)
-{
-    if (this == &kerrToAssign)
-        return *this;
-    m_errcId = kerrToAssign.m_errcId;
-    m_errcHostId = kerrToAssign.m_errcHostId;
-    return *this;
 }
 
 

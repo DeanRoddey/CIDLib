@@ -989,7 +989,7 @@ TDTDValidator::ExpandPEntityRef(  const   tCIDLib::TBoolean       bParseExt
         }
 
         // If it wasn't resolved, then do it ourself
-        if (!esrExt.pobjData())
+        if (!esrExt)
         {
             //
             //  Assume its a local file path. If the new file is not fully

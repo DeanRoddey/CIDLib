@@ -714,6 +714,98 @@ class TTest_Color2 : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_CntPtr1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_CntPtr1 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_CntPtr1();
+
+        ~TTest_CntPtr1();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        );
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_CntPtr1,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_CntPtr2
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_CntPtr2 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_CntPtr2();
+
+        ~TTest_CntPtr2();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        );
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::EExitCodes eTestThread
+        (
+                    TThread&                thrThis
+            ,       tCIDLib::TVoid*         pData
+        );
+
+
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_colThreads
+        //      A list of threads we start up to do the testing. They are all started
+        //      on eTestThread.
+        //
+        //  m_cptrTest
+        //      A counted pointer that the threads will make and destroy copies of
+        //      ultimately leaving the ref count at 0.
+        // -------------------------------------------------------------------
+        TRefVector<TThread>     m_colThreads;
+        TCntPtr<TCardinal>      m_cptrTest;
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_CntPtr2,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TTest_Enum1
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
@@ -1219,7 +1311,6 @@ class TTest_ObjArrayMoveSem : public TTestFWTest
 */
 
 
-
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_UniquePtr
 // PREFIX: tfwt
@@ -1448,20 +1539,81 @@ class TTest_RefVectorMoveItem : public TTestFWTest
 };
 
 
-/*
+
 // ---------------------------------------------------------------------------
-//  CLASS: TTest_RefVectorMoveSem
+//  CLASS: TTest_SafeCnt1
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_RefVectorMoveSem : public TTestFWTest
+class TTest_SafeCnt1 : public TTestFWTest
 {
     public  :
         // -------------------------------------------------------------------
         //  Constructor and Destructor
         // -------------------------------------------------------------------
-        TTest_RefVectorMoveSem();
+        TTest_SafeCnt1();
 
-        ~TTest_RefVectorMoveSem();
+        ~TTest_SafeCnt1();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        );
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::EExitCodes eTestThread
+        (
+                    TThread&                thrThis
+            ,       tCIDLib::TVoid*         pData
+        );
+
+
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_colThreads
+        //      A list of threads we start up to do the testing. They are all started
+        //      on eTestThread.
+        //
+        //  m_scntCard
+        //  m_scntInt
+        //      Counters for the threads to inc/dec. Ultimately they should end up back
+        //      at zero.
+        // -------------------------------------------------------------------
+        TRefVector<TThread>     m_colThreads;
+        TSafeCard4Counter       m_scntCard;
+        TSafeInt4Counter        m_scntInt;
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_SafeCnt1,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_SimplePoolPtr
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_SimplePoolPtr : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_SimplePoolPtr();
+
+        ~TTest_SimplePoolPtr();
 
 
         // -------------------------------------------------------------------
@@ -1478,9 +1630,9 @@ class TTest_RefVectorMoveSem : public TTestFWTest
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
-        RTTIDefs(TTest_RefVectorMoveSem,TTestFWTest)
+        RTTIDefs(TTest_SimplePoolPtr,TTestFWTest)
 };
-*/
+
 
 
 // ---------------------------------------------------------------------------
@@ -1868,39 +2020,6 @@ class TTest_SimplePool : public TTestFWTest
         RTTIDefs(TTest_SimplePool,TTestFWTest)
 };
 
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_SimplePoolPtr
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_SimplePoolPtr : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_SimplePoolPtr();
-
-        ~TTest_SimplePoolPtr();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        );
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_SimplePoolPtr,TTestFWTest)
-};
 
 
 // ---------------------------------------------------------------------------

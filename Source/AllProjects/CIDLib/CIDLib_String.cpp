@@ -2417,7 +2417,7 @@ const TString& TString::strEmpty()
     {
         TBaseLock lockInit;
         if (!pstrEmpty)
-            TRawMem::pExchangePtr(pstrEmpty, new TString);
+            TRawMem::pExchangePtr(&pstrEmpty, new TString);
     }
     return *pstrEmpty;
 }
@@ -2434,7 +2434,7 @@ TString& TString::Nul_TString()
     {
         TBaseLock lockInit;
         if (!pstrNull)
-            TRawMem::pExchangePtr(pstrNull, new TString);
+            TRawMem::pExchangePtr(&pstrNull, new TString);
     }
     return *pstrNull;
 }

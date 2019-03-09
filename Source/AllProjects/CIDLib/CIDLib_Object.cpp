@@ -47,7 +47,7 @@ const TClass& TObject::clsThis()
         {
             TRawMem::pExchangePtr<const TClass>
             (
-                pclsThis, new TClass(L"TObject")
+                &pclsThis, new TClass(L"TObject")
             );
         }
     }

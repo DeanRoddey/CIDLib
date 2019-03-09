@@ -377,8 +377,9 @@ MUPnPSvcCallback::MUPnPSvcCallback(const MUPnPSvcCallback&)
 {
 }
 
-tCIDLib::TVoid MUPnPSvcCallback::operator=(const MUPnPSvcCallback&)
+MUPnPSvcCallback& MUPnPSvcCallback::operator=(const MUPnPSvcCallback&)
 {
+    return *this;
 }
 
 
@@ -399,7 +400,7 @@ TKrnlUPnPService::~TKrnlUPnPService()
     if (m_pData)
     {
         static_cast<IUPnPService*>(m_pData)->Release();
-        m_pData = 0;
+        m_pData = nullptr;
     }
 }
 
@@ -691,7 +692,7 @@ TKrnlUPnPDevice::~TKrnlUPnPDevice()
     if (m_pData)
     {
         static_cast<IUPnPDevice*>(m_pData)->Release();
-        m_pData = 0;
+        m_pData = nullptr;
     }
 }
 
@@ -707,7 +708,7 @@ TKrnlUPnPDevice::~TKrnlUPnPDevice()
 tCIDLib::TBoolean
 TKrnlUPnPDevice::bGetRootDevice(TKrnlUPnPDevice*& pkupnpdToFill)
 {
-    pkupnpdToFill = 0;
+    pkupnpdToFill = nullptr;
 
     // First see if this device is the root device
     VARIANT_BOOL IsRoot;
@@ -718,7 +719,7 @@ TKrnlUPnPDevice::bGetRootDevice(TKrnlUPnPDevice*& pkupnpdToFill)
         return kCIDLib::False;
     }
 
-    IUPnPDevice* pDev = 0;
+    IUPnPDevice* pDev = nullptr;
     if (IsRoot == VARIANT_FALSE)
     {
         HRESULT hRes = static_cast<IUPnPDevice*>(m_pData)->get_RootDevice(&pDev);
@@ -783,7 +784,7 @@ tCIDLib::TBoolean TKrnlUPnPDevice::
 bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
                     , const tCIDLib::TCh* const         pszOfType) const
 {
-    IUPnPDevices* pDevices = 0;
+    IUPnPDevices* pDevices = nullptr;
     HRESULT hRes;
 
     // Empty the incoming list first
@@ -814,7 +815,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
 
 
     // We have something to iterate, so get an enumerator for the collection
-    IUnknown* pUnk;
+    IUnknown* pUnk = nullptr;
     pDevices->get__NewEnum(&pUnk);
     TCOMJanitor<IUnknown> janUnk(&pUnk);
     IEnumUnknown* pEnum;
@@ -829,7 +830,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
     // Enumerate them an fill our list
     for (LONG lIndex = 0; lIndex < lCount; lIndex++)
     {
-        IUPnPDevice* pDev;
+        IUPnPDevice* pDev = nullptr;
         hRes = pEnum->Next(1, (IUnknown**)&pDev, 0);
         if (!FAILED(hRes))
         {
@@ -889,8 +890,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
 
 
 // Query the device description URL
-tCIDLib::TBoolean
-TKrnlUPnPDevice::bQueryDevDescrURL(TKrnlString& kstrToFill) const
+tCIDLib::TBoolean TKrnlUPnPDevice::bQueryDevDescrURL(TKrnlString& kstrToFill) const
 {
     // Get a pointer to our actual data
     IUPnPDevice* pDev = static_cast<IUPnPDevice*>(m_pData);
