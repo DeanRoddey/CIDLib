@@ -60,7 +60,7 @@ TFacCIDNet& facCIDNet()
     {
         TBaseLock lockInit;
         if (!pfacCIDNet)
-            TRawMem::pExchangePtr(pfacCIDNet, new TFacCIDNet);
+            pfacCIDNet = new TFacCIDNet;
     }
     return *pfacCIDNet;
 }

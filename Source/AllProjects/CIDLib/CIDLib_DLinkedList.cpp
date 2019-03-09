@@ -119,6 +119,17 @@ TDLinkedList::operator!=(const TDLinkedList& llstToTest) const
     return !operator==(llstToTest);
 }
 
+TDLinkedList& TDLinkedList::operator=(TDLinkedList&& llstSrc)
+{
+    if (&llstSrc != this)
+    {
+        tCIDLib::Swap(m_c4ElemCount, llstSrc.m_c4ElemCount);
+        tCIDLib::Swap(m_pnodeHead, llstSrc.m_pnodeHead);
+        tCIDLib::Swap(m_pnodeTail, llstSrc.m_pnodeTail);
+    }
+    return *this;
+}
+
 
 // ---------------------------------------------------------------------------
 //  TDLinkedList: Public, non-virtual methods

@@ -39,20 +39,9 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDLib, which is all we need.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
-
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
 
 
 // ----------------------------------------------------------------------------
@@ -66,8 +55,9 @@ static TOutConsole  conOut;
 
 
 // ----------------------------------------------------------------------------
-//  Do the magic main module code
+//  Do the magic main module code to start the main thread
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"FileSys2MainThread", eMainThreadFunc))
 
 
@@ -90,9 +80,8 @@ static const TString& strVolFailureKey(const TVolFailureInfo& volfiSrc)
 }
 
 
-//
-//  This is the the thread function for the main thread.
-//
+
+// This is the the thread function for the main thread
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
     // We have to let our calling thread go first
@@ -117,17 +106,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         using TVolInfoCol = TKeyedHashSet<TVolumeInfo, TString, TStringKeyOps>;
         using TVolFailureCol = TKeyedHashSet<TVolFailureInfo, TString, TStringKeyOps>;
 
-        TVolInfoCol colVolumes(29, new TStringKeyOps, strVolInfoKey);
-        TVolFailureCol  colFailures(29, new TStringKeyOps, strVolFailureKey);
+        TVolInfoCol colVols(29, new TStringKeyOps, strVolInfoKey);
+        TVolFailureCol  colFails(29, new TStringKeyOps, strVolFailureKey);
 
-        //
-        //  Ask the file system class to give us a list of all of the
-        //  available volumes.
-        //
-        if (!TFileSys::c4QueryAvailableVolumes( colVolumes
-                                                , colFailures
-                                                , kCIDLib::True
-                                                , kCIDLib::False))
+        // Ask the file system class for a list of all of the  available volumes.
+        if (!TFileSys::c4QueryAvailableVolumes(colVols, colFails, kCIDLib::True, kCIDLib::False))
         {
             conOut << kCIDLib::NewLn << L"Could not find any volumes to report on"
                      << kCIDLib::NewLn << kCIDLib::EndLn;
@@ -135,7 +118,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         }
 
         // Indicate what we are displaying
-        conOut << L"\nInformation on available volumes:" << kCIDLib::NewLn << kCIDLib::EndLn;
+        conOut << L"\nInformation on available volumes:" << kCIDLib::NewEndLn;
 
         //
         //  We need to create stream format objects for each of the columns
@@ -143,15 +126,15 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //
         //  The columns are:
         //
-        //  1) Volume path. A string, left justified in a width of 16
-        //  2) Volume label. A string. Left justified in a width of 12
-        //  3) File system type. A string. Left justified in a width of 10
-        //  4) Bytes available (in MB). Float, right justified, 3 decimal
-        //  5) Total bytes (in MB). Numeric, right justified, 3 decimal
+        //  1) Volume path. A string, left justified in a width of 22
+        //  2) Volume label. A string. Left justified in a width of 14
+        //  3) File system type. A string. Left justified in a width of 8
+        //  4) MBs used. Float, right justified
+        //  5) Total MBs. Right justified
         //  6) Max path length. Numeric, right justified in a width of 8
         //
-        TStreamFmt strmfPath(20, 0, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
-        TStreamFmt strmfLabel(12, 0, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
+        TStreamFmt strmfPath(22, 0, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
+        TStreamFmt strmfLabel(14, 0, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
         TStreamFmt strmfType(8, 0, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
         TStreamFmt strmfUsed(12, 0, tCIDLib::EHJustify::Right, kCIDLib::chSpace);
         TStreamFmt strmfTotal(12, 0, tCIDLib::EHJustify::Right, kCIDLib::chSpace);
@@ -176,8 +159,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 << strmfPathLen << L"Max Path" << TTextOutStream::Spaces(2)
                 << kCIDLib::NewLn
 
-                << TTextOutStream::RepChars(L'-', 20) << TTextOutStream::Spaces(2)
-                << TTextOutStream::RepChars(L'-', 12) << TTextOutStream::Spaces(2)
+                << TTextOutStream::RepChars(L'-', 22) << TTextOutStream::Spaces(2)
+                << TTextOutStream::RepChars(L'-', 14) << TTextOutStream::Spaces(2)
                 << TTextOutStream::RepChars(L'-', 8) << TTextOutStream::Spaces(2)
                 << TTextOutStream::RepChars(L'-', 12) << TTextOutStream::Spaces(2)
                 << TTextOutStream::RepChars(L'-', 12) << TTextOutStream::Spaces(2)
@@ -188,7 +171,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //  We want to display the volumes in alphabetical order. This includes
         //  the ones that failed. So we have to put the names of the volumes
         //  and failed volumes into a sort bag. Then we'll iterate it and
-        //  find the names in one or other of the original collections.
+        //  find the names in one or other of the original collections. It needs a
+        //  comparitor, which the string class provides.
         //
         TSortedBag<TString> colNames(TString::eComp);
 
@@ -196,11 +180,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //  Create a cursor for both our source collections and add them to
         //  the sorted bag.
         //
-        TVolInfoCol::TCursor cursVolumes(&colVolumes);
+        TVolInfoCol::TCursor cursVolumes(&colVols);
         for (; cursVolumes; ++cursVolumes)
             colNames.objAdd(cursVolumes->strVolume());
 
-        TVolFailureCol::TCursor cursFailures(&colFailures);
+        TVolFailureCol::TCursor cursFailures(&colFails);
         for (; cursFailures; ++cursFailures)
             colNames.objAdd(cursFailures->strVolume());
 
@@ -211,10 +195,10 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         TSortedBag<TString>::TCursor cursNames(&colNames);
         for (; cursNames; ++cursNames)
         {
-            if (colVolumes.bKeyExists(*cursNames))
+            if (colVols.bKeyExists(*cursNames))
             {
                 // Get a quicker, shorter name to the current volume object
-                const TVolumeInfo& volCur = colVolumes.objFindByKey(*cursNames);
+                const TVolumeInfo& volCur = colVols.objFindByKey(*cursNames);
 
                 // Query the space info
                 tCIDLib::TCard8 c8TotalBytes = 0;
@@ -248,12 +232,12 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             }
              else
             {
-                const TVolFailureInfo& volfiCur = colFailures.objFindByKey(*cursNames);
+                const TVolFailureInfo& volfiCur = colFails.objFindByKey(*cursNames);
 
-                conOut << strmfPath << volfiCur.strVolume() << TTextOutStream::Spaces(2);
                 conOut.SetDefaultFormat();
+                conOut << volfiCur.strVolume() << L" - ";
                 if (volfiCur.errcReason() == kKrnlErrs::errcFl_UnsupportedFileSystem)
-                    conOut << L"[Unknown file system type]" << kCIDLib::EndLn;
+                    conOut << L"[Unknown type]" << kCIDLib::EndLn;
                 else if (volfiCur.errcReason() == kKrnlErrs::errcGen_NotReady)
                     conOut << L"[Not ready]" << kCIDLib::EndLn;
                 else
@@ -263,15 +247,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut << L"A CIDLib runtime error occured during processing. "
                  << L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::FatalError;

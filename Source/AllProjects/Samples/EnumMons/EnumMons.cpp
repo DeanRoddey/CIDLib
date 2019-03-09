@@ -20,13 +20,11 @@
 //  enumerate the available video display monitors and get some info about
 //  them.
 //
+//  This program is so simple that it does not create a facility object.
+//
 // CAVEATS/GOTCHAS:
 //
-//  1)  This program is so simple that it does not create a facility object
-//      for itself, or have a main facility header.
-//
-//  2)  This program does not attempt to be language independent.
-//
+
 // LOG:
 //
 //  $_CIDLib_Log_$
@@ -34,26 +32,15 @@
 
 
 // ---------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDWnd, which will in turn include anything else
-//  we need.
+//  Includes. The base UI header brings in everything we need
 // ---------------------------------------------------------------------------
 #include    "CIDCtrls.hpp"
 
 
 // ---------------------------------------------------------------------------
-//  Forward references
+//  Do the magic main module code to start the main thread
 // ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-// ---------------------------------------------------------------------------
-//  Do the magic main module code
-// ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"FileSys1MainThread", eMainThreadFunc))
 
 
@@ -62,15 +49,16 @@ CIDLib_MainModule(TThread(L"FileSys1MainThread", eMainThreadFunc))
 //  Local functions
 // ---------------------------------------------------------------------------
 
-//
-//  This is the the thread function for the main thread.
-//
+// This is the the thread function for the main thread
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
     // We have to let our calling thread go first
     thrThis.Sync();
 
-    // Get a shortcut to the standard output stream
+    //
+    //  Get a shortcut to the standard output stream. We do this instead of a
+    //  console, so we can be redirected.
+    //
     TTextOutStream& strmOut = TSysInfo::strmOut();
 
     //
@@ -80,27 +68,25 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //
     try
     {
+        // Get a list of available monikers, then iterate and display them
         TVector<TGUIMonInfo> colMons;
         facCIDCtrls().QueryMonitors(colMons);
 
         strmOut << L"\n\nAvailable Monitors\n----------------------------\n";
-
-        const tCIDLib::TCard4 c4Count = colMons.c4ElemCount();
-        for (tCIDLib::TCard4 c4index = 0; c4index < c4Count; c4index++)
-        {
-            const TGUIMonInfo& gmiCur = colMons[c4index];
-            strmOut << L"DevName=" << gmiCur.strDevName()
-                    << L"\n    Phys=" << gmiCur.areaPhysical()
-                    << L"\n    Avail=" << gmiCur.areaAvailable()
-                    << kCIDLib::DNewLn;
-        }
-
+        colMons.ForEach
+        (
+            [&strmOut](const TGUIMonInfo& gmiCur)
+            {
+                strmOut << L"DevName=" << gmiCur.strDevName()
+                        << L"\n    Phys=" << gmiCur.areaPhysical()
+                        << L"\n    Avail=" << gmiCur.areaAvailable()
+                        << kCIDLib::DNewLn;
+                return kCIDLib::True;
+            }
+        );
         strmOut << kCIDLib::EndLn;
     }
 
-    //
-    //  Catch any unhandled CIDLib runtime errors
-    //
     catch(TError& errToCatch)
     {
         // If this hasn't been logged already, then log it

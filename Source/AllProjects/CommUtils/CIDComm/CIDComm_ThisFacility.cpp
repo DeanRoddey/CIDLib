@@ -94,7 +94,7 @@ TFacCIDComm::TFacCIDComm() :
             // Store the list last, else we'll have a race condition!
             TRawMem::pExchangePtr
             (
-                CIDComm_ThisFacility::pcolFList, janCol.pobjOrphan()
+                &CIDComm_ThisFacility::pcolFList, janCol.pobjOrphan()
             );
         }
     }

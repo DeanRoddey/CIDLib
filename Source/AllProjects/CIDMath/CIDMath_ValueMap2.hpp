@@ -47,7 +47,7 @@ class CIDMATHEXP TLogMap : public TValueMap
 
         TLogMap
         (
-            const   TLogMap&                vmapToCopy
+            const   TLogMap&                vmapSrc
         );
 
         ~TLogMap();
@@ -58,17 +58,17 @@ class CIDMATHEXP TLogMap : public TValueMap
         // -------------------------------------------------------------------
         TLogMap& operator=
         (
-            const   TLogMap&                vmapToAssign
+            const   TLogMap&                vmapSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TLogMap&                vmapToCompare
+            const   TLogMap&                vmapSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TLogMap&                vmapToCompare
+            const   TLogMap&                vmapSrc
         )   const;
 
 

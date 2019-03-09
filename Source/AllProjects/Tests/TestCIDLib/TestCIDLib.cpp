@@ -161,9 +161,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         spchAnnounce.Speak(L"CIDLib Tests In Progress", tCIDLib::ESpeechFlags::Async);
 
         //
-        //  See what tests we need to run. The user indicates which
-        //  tests by naming them on the command line. If none were named
-        //  then we run them all.
+        //  See what tests we need to run. The user indicates which tests by naming them
+        //  on the command line. If none were named then we run them all.
         //
         tCIDLib::TCard4 c4FnInd;
         TSysInfo::TCmdLineCursor cursParms = TSysInfo::cursCmdLineParms();
@@ -266,7 +265,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 // -----------------------------------------------------------------------------
 //  TFacTestCIDLib: Static data
 // -----------------------------------------------------------------------------
-TTextOutStream* TFacTestCIDLib::s_pstrmOutput = 0;
+TTextOutStream* TFacTestCIDLib::s_pstrmOutput = nullptr;
 
 // -----------------------------------------------------------------------------
 //  TFacTestCIDLib: Constructors and destructors
@@ -324,7 +323,7 @@ tCIDLib::TVoid TFacTestCIDLib::ShowSystemInfo()
     strmTar << L"Command line parm count: "
             << TSysInfo::c4CmdLineParmCount() << kCIDLib::NewLn;
 
-    tCIDLib::TCard4 c4Index = 0;
+    tCIDLib::TCard4 c4Index{0};
     TSysInfo::colCmdLineParms().ForEach
     (
         [&c4Index, &strmTar](const TString& strCur)
@@ -431,7 +430,7 @@ tCIDLib::TVoid TFacTestCIDLib::ShowSystemInfo()
 
     strmTar   << L"Available Audio Outputs\n"
                 << TTextOutStream::RepChars(L'-', 32) << kCIDLib::NewLn;
-    tCIDLib::TCard4 c4Count = TAudio::c4EnumAudioDevices(colKVList);
+    tCIDLib::TCard4 c4Count{TAudio::c4EnumAudioDevices(colKVList)};
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TKeyValuePair& kvalCur = colKVList[c4Index];

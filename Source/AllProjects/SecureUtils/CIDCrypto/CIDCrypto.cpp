@@ -33,12 +33,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDCrypto& facCIDCrypto()
 {
-    static TFacCIDCrypto* pfacCIDCrypto = 0;
+    static TFacCIDCrypto* pfacCIDCrypto = nullptr;
     if (!pfacCIDCrypto)
     {
         TBaseLock lockInit;
         if (!pfacCIDCrypto)
-            TRawMem::pExchangePtr(pfacCIDCrypto, new TFacCIDCrypto);
+            pfacCIDCrypto = new TFacCIDCrypto;
     }
     return *pfacCIDCrypto;
 }

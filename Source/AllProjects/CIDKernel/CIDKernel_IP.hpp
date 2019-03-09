@@ -62,7 +62,7 @@ class KRNLEXPORT TKrnlIPAddr
 
         TKrnlIPAddr
         (
-            const   TKrnlIPAddr&            kipaToCopy
+            const   TKrnlIPAddr&            kipaSrc
         );
 
         ~TKrnlIPAddr();

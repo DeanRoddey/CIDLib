@@ -12,9 +12,12 @@
 // DESCRIPTION:
 //
 //  This is the header for the file CIDMacroDbg_StateInfo.cpp, which implements
-//  a small class that we can give back to the outside world. It holds our
-//  current client window position info, so that we can put every thing back
-//  to where it was last time.
+//  a small class that we can give back to the outside world. It will ultimately
+//  be used to give them last state info that they can give back to us so that we can
+//  re-create the size/positions of things, previously opened calsses, and such.
+//
+//  But, for now, it's just empty so that they can at least go through the motions
+//  and be ready for when we get this implemented.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -41,7 +44,7 @@ class CIDMACRODBGEXP TMacroDbgStateInfo : public TObject, public MStreamable
 
         TMacroDbgStateInfo
         (
-            const   TMacroDbgStateInfo&     stiToCopy
+            const   TMacroDbgStateInfo&     stiSrc
         );
 
         ~TMacroDbgStateInfo();
@@ -52,7 +55,7 @@ class CIDMACRODBGEXP TMacroDbgStateInfo : public TObject, public MStreamable
         // -------------------------------------------------------------------
         TMacroDbgStateInfo& operator=
         (
-            const   TMacroDbgStateInfo&     stiToAssign
+            const   TMacroDbgStateInfo&     stiSrcr
         );
 
 
@@ -69,12 +72,12 @@ class CIDMACRODBGEXP TMacroDbgStateInfo : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :
@@ -82,12 +85,6 @@ class CIDMACRODBGEXP TMacroDbgStateInfo : public TObject, public MStreamable
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::TVoid SetDefaults();
-
-
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        // -------------------------------------------------------------------
 
 
         // -------------------------------------------------------------------

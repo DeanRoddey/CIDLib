@@ -480,7 +480,7 @@ TPubSubMsg& TPubSubMsg::operator=(const TPubSubMsg& psmsgSrc)
 // ---------------------------------------------------------------------------
 const TObject& TPubSubMsg::objMsg() const
 {
-    if (!m_cptrMsgImpl.pobjData())
+    if (!m_cptrMsgImpl)
     {
         facCIDLib().ThrowErr
         (
@@ -497,7 +497,7 @@ const TObject& TPubSubMsg::objMsg() const
 
 const TString& TPubSubMsg::strSrcTopicPath() const
 {
-    if (!m_cptrMsgImpl.pobjData())
+    if (!m_cptrMsgImpl)
     {
         facCIDLib().ThrowErr
         (
@@ -523,7 +523,7 @@ const TString& TPubSubMsg::strSrcTopicPath() const
 //
 tCIDLib::TVoid TPubSubMsg::CheckMsgType(const TClass& clsToCheck) const
 {
-    if (!m_cptrMsgImpl.pobjData()
+    if (!m_cptrMsgImpl
     ||  !m_cptrMsgImpl->objMsg().bIsDescendantOf(clsToCheck))
     {
         facCIDLib().ThrowErr
@@ -533,8 +533,8 @@ tCIDLib::TVoid TPubSubMsg::CheckMsgType(const TClass& clsToCheck) const
             , kCIDErrs::errcPubSub_MsgCast
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::TypeMatch
-            , m_cptrMsgImpl.pobjData() ? m_cptrMsgImpl->objMsg().clsIsA().strClassName()
-                                       : TString(L"???")
+            , m_cptrMsgImpl ? m_cptrMsgImpl->objMsg().clsIsA().strClassName()
+                            : TString(L"???")
             , clsToCheck.strClassName()
         );
     }
@@ -1100,7 +1100,7 @@ TPubSubTopic::TPubSubTopic(const TPubSubTopic& pstopSrc) :
     m_cptrImpl(pstopSrc.m_cptrImpl)
 {
     // Make sure this is after our impl has been updated
-    if (m_cptrImpl.pobjData())
+    if (m_cptrImpl)
         m_strTopicPath = m_cptrImpl->strPath();
 }
 
@@ -1123,14 +1123,10 @@ TPubSubTopic& TPubSubTopic::operator=(const TPubSubTopic& pstopSrc)
         //  If we got a new impl (not null), then get a copy of the topic path out
         //  else clear our copy.
         //
-        if (m_cptrImpl.pobjData())
-        {
+        if (m_cptrImpl)
             m_strTopicPath = m_cptrImpl->strPath();
-        }
-         else
-        {
+        else
             m_strTopicPath.Clear();
-        }
     }
     return *this;
 }
@@ -1143,7 +1139,7 @@ TPubSubTopic& TPubSubTopic::operator=(const TPubSubTopic& pstopSrc)
 // See if we have an implementation object set, which means we are published
 tCIDLib::TBoolean TPubSubTopic::bIsPublished() const
 {
-    return (m_cptrImpl.pobjData() != nullptr);
+    return tCIDLib::TBoolean(m_cptrImpl);
 }
 
 
@@ -1215,7 +1211,7 @@ tCIDLib::TVoid TPubSubTopic::AddSubscriber(const tCIDLib::TCard4 c4SubId)
     // Should always be an impl object, so just a debug mode check
     CIDAssertX
     (
-        m_cptrImpl.pobjData() != nullptr
+        tCIDLib::TBoolean(m_cptrImpl)
         , L"Topic %(1) has no impl at add subscriber"
         , m_strTopicPath
     );
@@ -1234,7 +1230,7 @@ tCIDLib::TVoid TPubSubTopic::RemoveSubscriber(const tCIDLib::TCard4 c4SubId)
     // Should always be an impl object, so just a debug mode check
     CIDAssertX
     (
-        m_cptrImpl.pobjData() != nullptr
+        tCIDLib::TBoolean(m_cptrImpl)
         , L"Topic %(1) has no impl at remove subscriber"
         , m_strTopicPath
     );
@@ -1249,7 +1245,7 @@ tCIDLib::TVoid TPubSubTopic::RemoveSubscriber(const tCIDLib::TCard4 c4SubId)
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TPubSubTopic::CheckReady() const
 {
-    if (!m_cptrImpl.pobjData())
+    if (!m_cptrImpl)
     {
         facCIDLib().ThrowErr
         (

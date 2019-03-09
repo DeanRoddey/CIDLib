@@ -23,7 +23,9 @@
 //
 //  We do the following:
 //
-//  1. Create a listener for the port you indicate
+//  1. Create a listener for the port you indicate. We don't use the more elaborate
+//      listener engine (which will listen on all interfaces) we just create a simple
+//      single listener object.
 //  2. Spin up a pool of threads to handle requests. You can request 'single' mode
 //      for a single thread. That's easier for debugging purposes since some browsers
 //      will make multiple simultaneous requests on different socket connections.
@@ -68,8 +70,7 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDCrypto.hpp"
 #include    "CIDEncode.hpp"
@@ -78,13 +79,9 @@
 
 
 // ----------------------------------------------------------------------------
-//  Forward references
+//  Local types
 // ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
+using TClientQ = TRefQueue<TServerStreamSocket>;
 
 
 
@@ -102,7 +99,7 @@ tCIDLib::EExitCodes eMainThreadFunc
 //
 //  c4DefThreadCnt
 //      The default number of worker threads we start up to process requests. But
-//      if /Single is provided, we only do 1.
+//      if /Single is provided, we only do 1, which is very useful for debugging.
 //
 //  c4WaitReq
 //      how many seconds we'll wait for the client to send us a request before we drop
@@ -130,33 +127,27 @@ tCIDLib::EExitCodes eMainThreadFunc
 //      text stream, which writes to the standard output. We use this to dump out
 //      debugging type info to indicate what is going on.
 // ----------------------------------------------------------------------------
-static tCIDLib::TBoolean                bSecure = kCIDLib::False;
-static tCIDLib::TBoolean                bSingleThread = kCIDLib::False;
-static const tCIDLib::TCard4            c4DefThreadCnt = 8;
-static TRefQueue<TServerStreamSocket>   colSockQ
-(
-    tCIDLib::EAdoptOpts::Adopt, tCIDLib::EMTStates::Safe
-);
-static TMutex                           mtxSyncOut;
-static TString                          strCertInfo;
-static TString                          strRootPath;
-static TTextFileOutStream               strmOut(tCIDLib::EStdFiles::StdOut);
+static tCIDLib::TBoolean        bSecure = kCIDLib::False;
+static tCIDLib::TBoolean        bSingleThread = kCIDLib::False;
+static const tCIDLib::TCard4    c4DefThreadCnt = 8;
+static TClientQ                 colSockQ(tCIDLib::EAdoptOpts::Adopt, tCIDLib::EMTStates::Safe);
+static TMutex                   mtxSyncOut;
+static TString                  strCertInfo;
+static TString                  strRootPath;
+static TTextFileOutStream       strmOut(tCIDLib::EStdFiles::StdOut);
 
 #if CID_DEBUG_ON
-static const tCIDLib::TCard4            c4WaitReq = 30;
+static const tCIDLib::TCard4    c4WaitReq = 30;
 #else
-static const tCIDLib::TCard4            c4WaitReq = 10;
+static const tCIDLib::TCard4    c4WaitReq = 10;
 #endif
 
 
 
 // ----------------------------------------------------------------------------
-//  Do the magic main module code
-//
-//  This tells CIDLib what the main thread of the program is. This is the
-//  only thread object that is run automatically. All others are started
-//  manually when required or desired.
+//  Do the magic main module code to start the main thread
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"HTTPSrv1MainThread", eMainThreadFunc))
 
 
@@ -179,13 +170,12 @@ static tCIDLib::TVoid ShowReq(  const   tCIDLib::TCard4     c4ThreadInd
     strmOut << L'[' << c4ThreadInd << L"] - Request For : " << strURL << kCIDLib::EndLn;
 
     TString strClip;
-    const tCIDLib::TCard4 c4Count = colHdrLines.c4ElemCount();
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    tCIDLib::TKVPList::TCursor cursHdr(&colHdrLines);
+    for (; cursHdr; ++cursHdr)
     {
-        const TKeyValuePair& kvalCur = colHdrLines[c4Index];
+        const TKeyValuePair& kvalCur = *cursHdr;
 
         strmOut << L"      " << kvalCur.strKey() << L" = ";
-
         if (kvalCur.strValue().c4Length() > 40)
         {
             strClip = kvalCur.strValue();
@@ -320,7 +310,8 @@ ProcessReq( const   tCIDLib::TCard4     c4ThreadInd
 
         //
         //  Now write out both the header and body content to the data source, and
-        //  flush it to the client.
+        //  flush it to the client, which causes it to be sent. We give it an end
+        //  time it has to send it by or fail.
         //
         cdsClient.WriteBytes(strmTar.mbufData(), strmTar.c4CurSize());
         cdsClient.WriteBytes(mbufFile, c4ContLen);
@@ -447,10 +438,9 @@ tCIDLib::EExitCodes eServiceThread(TThread& thrThis, tCIDLib::TVoid* pData)
             //  will set up/tear down the secure connection.
             //
             TCIDDataSrcJan janSrc(pcdsClient, tCIDLib::EAdoptOpts::Adopt, kCIDLib::True);
-
             psockClient->bLinger(kCIDLib::True, 5);
 
-            // Loop until the client closes (or after the first round if its 1.0 or an error
+            // Loop until the client closes (or after the first round if its 1.0 or an error)
             tCIDLib::TBoolean bClose = kCIDLib::False;
             while (!bClose)
             {
@@ -498,7 +488,7 @@ tCIDLib::EExitCodes eServiceThread(TThread& thrThis, tCIDLib::TVoid* pData)
                     else
                     {
                         if (TNetCoreParser::bFindHdrLine(colHdrLines, L"Connection", strHdrLnVal)
-                            && strHdrLnVal.bCompareI(L"close"))
+                        &&  strHdrLnVal.bCompareI(L"close"))
                         {
                             bClose = kCIDLib::True;
                         }
@@ -524,7 +514,8 @@ tCIDLib::EExitCodes eServiceThread(TThread& thrThis, tCIDLib::TVoid* pData)
 
                     //
                     //  Convert that to a file path relative to our root, and normalize it so
-                    //  that we can catch any attempt to access up above the root directory.
+                    //  that we can catch any attempt to access up above the root directory,
+                    //  though we don't both with that check here.
                     //
                     pathRes = strRootPath;
                     pathRes.AddLevel(strResource);
@@ -595,7 +586,6 @@ tCIDLib::EExitCodes eServiceThread(TThread& thrThis, tCIDLib::TVoid* pData)
     }
 
     ShowMsg(c4ThreadInd, L"Shutting down...");
-
     return tCIDLib::EExitCodes::Normal;
 }
 
@@ -615,7 +605,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //  catch all exceptions cleanly and report them. So put the whole thing
     //  in a try.
     //
-    TRefVector<TThread> colThreads(tCIDLib::EAdoptOpts::Adopt);
+    using TThreadList = TRefVector<TThread>;
+    TThreadList colThreads(tCIDLib::EAdoptOpts::Adopt);
     try
     {
         // Output a little program blurb
@@ -689,7 +680,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         //
         //  Start up our thread poll threads. We only start one if run in single
-        //  thread mode, else a few more.
+        //  thread mode, else a few more. We pass each one its respective index.
+        //  The CIDLib facility has a helper to create unique thread names but we
+        //  just do our own in this case.
         //
         {
             const tCIDLib::TCard4 c4Count = bSingleThread ? 1 : c4DefThreadCnt;
@@ -706,42 +699,23 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         //
         //  Create a listener, for our simple purposes, setting the max connections
-        //  we will accept at once to four for our simple test server.
+        //  we will accept up to four for our simple test server.
         //
         TSocketListener socklSrv(ippnListen, tCIDSock::ESockProtos::TCP, 4);
-
-        while (kCIDLib::True)
+        const tCIDLib::TEncodedTime enctWait(kCIDLib::enctOneSecond * 2);
+        TIPEndPoint ipepClient;
+        while (!thrThis.bCheckShutdownRequest())
         {
-            // Check for shutdown requests
-            if (thrThis.bCheckShutdownRequest())
-                break;
-
             // Wait a while for a connection
-            TIPEndPoint ipepClient;
-            TServerStreamSocket* psockSess = socklSrv.psockListenFor
-            (
-                kCIDLib::enctOneSecond * 2, ipepClient
-            );
-
-            // If none, then go back to the top
-            if (!psockSess)
-                continue;
-
-            // Else add it to the queue to be processed by the worker threads
-            colSockQ.Add(psockSess);
+            TServerStreamSocket* psockSess = socklSrv.psockListenFor(enctWait, ipepClient);
+            if (psockSess)
+                colSockQ.Add(psockSess);
         }
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         strmOut << L"A CIDLib runtime error occured during processing.\n  Error: "
                 << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;
@@ -767,6 +741,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         return tCIDLib::EExitCodes::SystemException;
     }
 
+    // In a real server we'd also error out any pending connections in the queue
+
     //
     //  Stop all of the worker threads. First just go through and do a non-syncing
     //  shutdown request, basically just sets the shutdown flag on the thread without
@@ -776,23 +752,26 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //  parallel.
     //
     const tCIDLib::TCard4 c4Count = bSingleThread ? 1 : c4DefThreadCnt;
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-        colThreads[c4Index]->ReqShutdownNoSync();
+    TThreadList::TNCCursor cursThreads(&colThreads);
+    for (; cursThreads; ++cursThreads)
+        cursThreads->ReqShutdownNoSync();
 
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    cursThreads.bReset();
+    for (; cursThreads; ++cursThreads)
     {
         try
         {
-            colThreads[c4Index]->eWaitForDeath(8000);
+            cursThreads->eWaitForDeath(8000);
         }
 
-        catch(const TError&)
+        catch(const TError& errToCatch)
         {
-            strmOut << L"Failed to stop thread #" << (c4Index + 1)
+            strmOut << L"Failed to stop thread " << cursThreads->strName()
+                    << kCIDLib::EndLn
+                    << errToCatch
                     << kCIDLib::EndLn;
         }
     }
-
     return tCIDLib::EExitCodes::Normal;
 }
 

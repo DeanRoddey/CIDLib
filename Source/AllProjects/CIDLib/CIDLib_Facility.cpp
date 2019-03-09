@@ -90,7 +90,7 @@ static TCriticalSection* pcrsList()
     {
         TBaseLock lockSync;
         if (!pcrsList)
-            TRawMem::pExchangePtr(pcrsList, new TCriticalSection);
+            TRawMem::pExchangePtr(&pcrsList, new TCriticalSection);
     }
     return pcrsList;
 }

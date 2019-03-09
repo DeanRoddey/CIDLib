@@ -17,7 +17,9 @@
 // DESCRIPTION:
 //
 //  This is the main header for the program. It brings anything needed by
-//  the program so that all.cpp files just have to include this one file.
+//  the program so that all cpp files just have to include this one file.
+//
+//  See the main Cpp file for a description of what this one does.
 //
 // CAVEATS/GOTCHAS:
 //

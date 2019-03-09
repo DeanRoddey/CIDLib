@@ -32,12 +32,12 @@
 //
 TFacCIDImgFact& facCIDImgFact()
 {
-    static TFacCIDImgFact* pfacCIDImgFact = 0;
+    static TFacCIDImgFact* pfacCIDImgFact = nullptr;
     if (!pfacCIDImgFact)
     {
         TBaseLock lockInit;
         if (!pfacCIDImgFact)
-            TRawMem::pExchangePtr(pfacCIDImgFact, new TFacCIDImgFact);
+            pfacCIDImgFact = new TFacCIDImgFact;
     }
     return *pfacCIDImgFact;
 }

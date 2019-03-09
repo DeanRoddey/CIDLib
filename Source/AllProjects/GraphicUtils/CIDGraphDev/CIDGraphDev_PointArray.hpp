@@ -36,32 +36,35 @@ class CIDGRDEVEXP TPointArray : public TObject, public MDuplicable
 {
     public  :
         // -------------------------------------------------------------------
-        //  Class specific types
-        //
-        //  pfnInitPntAry
-        //      This is a function pointer that can be passed in to provide
-        //      non-default initialization of the point array. It is called
-        //      for each element.
-        // -------------------------------------------------------------------
-        using pfnInitPntAry = tCIDLib::TVoid (*)
-        (
-            const   tCIDLib::TCard4             c4Index
-            ,       tCIDLib::THostPoint&        ptToFill
-        );
-
-
-        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TPointArray();
+
         TPointArray
         (
             const   tCIDLib::TCard4             c4PointCount
-            ,       pfnInitPntAry               pfnInitFunc = nullptr
         );
+
+        template <typename TFunc>
+        TPointArray(const tCIDLib::TCard4 c4Count, TFunc pfnInit) :
+
+            m_c4Count(c4Count)
+        {
+            CheckCount(m_c4Count);
+
+            m_paptPoints = new tCIDLib::THostPoint[m_c4Count];
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Count; c4Index++)
+                pfnInit(c4Index, m_paptPoints[c4Index]);
+        }
 
         TPointArray
         (
             const   TPointArray&                pntaSrc
+        );
+
+        TPointArray
+        (
+                    TPointArray&&               pntaSrc
         );
 
         ~TPointArray();
@@ -73,6 +76,11 @@ class CIDGRDEVEXP TPointArray : public TObject, public MDuplicable
         TPointArray& operator=
         (
             const   TPointArray&                pntaSrc
+        );
+
+        TPointArray& operator=
+        (
+                    TPointArray&&               pntaSrc
         );
 
         const TPoint operator[]
@@ -94,7 +102,10 @@ class CIDGRDEVEXP TPointArray : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4Count() const;
+        tCIDLib::TCard4 c4Count() const
+        {
+            return m_c4Count;
+        }
 
         tCIDLib::TCard4 c4SetFromGraph
         (
@@ -188,8 +199,20 @@ class CIDGRDEVEXP TPointArray : public TObject, public MDuplicable
         tCIDLib::TVoid Reallocate
         (
             const   tCIDLib::TCard4             c4NewCount
-            ,       pfnInitPntAry               pfnInitFunc = 0
         );
+
+        template <typename TFunc> tCIDLib::TVoid
+        Reallocate(const tCIDLib::TCard4 c4NewCount, TFunc pfnInit)
+        {
+            CheckCount(c4NewCount);
+
+            delete [] m_paptPoints;
+            m_paptPoints = nullptr;
+
+            m_paptPoints = new tCIDLib::THostPoint[m_c4Count];
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Count; c4Index++)
+                pfnInit(c4Index, m_paptPoints[c4Index]);
+        }
 
         tCIDLib::TVoid SetAll
         (
@@ -258,12 +281,6 @@ class CIDGRDEVEXP TPointArray : public TObject, public MDuplicable
 
 
         // -------------------------------------------------------------------
-        //  Hidden Constructors and Destructor
-        // -------------------------------------------------------------------
-        TPointArray();
-
-
-        // -------------------------------------------------------------------
         //  Protected, non-virtual methods
         // -------------------------------------------------------------------
         const tCIDLib::THostPoint* aptList() const;
@@ -273,6 +290,11 @@ class CIDGRDEVEXP TPointArray : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TVoid CheckCount
+        (
+            const   tCIDLib::TCard4         c4Check
+        )   const;
+
         tCIDLib::TVoid CheckIndex
         (
             const   tCIDLib::TCard4             c4Line

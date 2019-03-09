@@ -33,8 +33,8 @@
 // ---------------------------------------------------------------------------
 //  TKrnlEnvironment: Static data members
 // ---------------------------------------------------------------------------
-TKrnlCritSec*   TKrnlEnvironment::s_pkcrsAccess = 0;
-TKrnlHashMap*   TKrnlEnvironment::s_pkhshmEnv = 0;
+TKrnlCritSec*   TKrnlEnvironment::s_pkcrsAccess = nullptr;
+TKrnlHashMap*   TKrnlEnvironment::s_pkhshmEnv = nullptr;
 
 
 // ---------------------------------------------------------------------------

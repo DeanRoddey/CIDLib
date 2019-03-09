@@ -54,7 +54,7 @@ TMemBuf& TMemBuf::Nul_TMemBuf()
         {
             TRawMem::pExchangePtr
             (
-                pmbufNull, static_cast<TMemBuf*>(new THeapBuf(1))
+                &pmbufNull, static_cast<TMemBuf*>(new THeapBuf(1))
             );
         }
     }

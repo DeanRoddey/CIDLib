@@ -41,15 +41,6 @@
 #include    "Collect3.hpp"
 
 
-// ---------------------------------------------------------------------------
-//  Local static data
-//
-//  unamThreads
-//      This is a unique name object that is used to create the unique names
-//      required for the multiple instances of the threads.
-// ---------------------------------------------------------------------------
-static TUniqueName  unamThreads(L"ColThread%(1)");
-
 
 // ---------------------------------------------------------------------------
 //  Do our RTTI macros
@@ -69,13 +60,14 @@ RTTIDecls(TColThread,TThread)
 //
 //
 //  The only available constructor takes the info that the thread needs. It
-//  will be started later by the caller.
+//  will be started later by the caller. We use a helper in the CIDLib facility
+//  to generate unique names for each thread
 //
 TColThread::TColThread(         TTestCol* const             pcolToUse
                         , const TColThread::EThreadTypes    eType
                         ,       TTextOutStream* const       pstrmOut) :
 
-    TThread(unamThreads.strQueryNewName())
+    TThread(facCIDLib().strNextThreadName(L"Col3Thread"))
     , m_eType(eType)
     , m_pcolToUse(pcolToUse)
     , m_pstrmOut(pstrmOut)
@@ -100,9 +92,9 @@ tCIDLib::EExitCodes TColThread::eProcess()
     // Let the starting thread go
     Sync();
 
-    // Seed the random number generator differently for each thread
+    // Set up a random number generator for this thread
     TRandomNum randGen;
-    randGen.Seed(TTime::c4Millis());
+    randGen.Seed(TTime::c4Millis() + tidThis());
 
     //
     //  Loop until we are asked to shutdown. The main thread will let us

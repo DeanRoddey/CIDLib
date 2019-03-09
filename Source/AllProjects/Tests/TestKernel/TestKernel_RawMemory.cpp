@@ -248,7 +248,7 @@ static tCIDLib::TVoid TestAtomics()
     CID_CACHEALIGN tCIDLib::TCard4* pc4Val2 = &c4Val2;
     CID_CACHEALIGN tCIDLib::TCard4* pc4Val3 = &c4Val3;
 
-    if (TRawMem::pExchangePtr<tCIDLib::TCard4>(pc4Val1, pc4Val2) != &c4Val1)
+    if (TRawMem::pExchangePtr<tCIDLib::TCard4>(&pc4Val1, pc4Val2) != &c4Val1)
         strmOut << CUR_LN << L"pExchangePtr did not return old value\n";
 
     if (pc4Val1 != pc4Val2)
@@ -259,7 +259,7 @@ static tCIDLib::TVoid TestAtomics()
     pc4Val2 = &c4Val2;
     pc4Val3 = &c4Val3;
 
-    if (TRawMem::pCompareAndExchangePtr<tCIDLib::TCard4>(pc4Val1, pc4Val2, pc4Val3) != &c4Val1)
+    if (TRawMem::pCompareAndExchangePtr<tCIDLib::TCard4>(&pc4Val1, pc4Val2, pc4Val3) != &c4Val1)
         strmOut << CUR_LN << L"pCompareAndExchangePtr returned wrong value\n";
 
     // It should not have updated the first value either
@@ -271,7 +271,7 @@ static tCIDLib::TVoid TestAtomics()
     pc4Val2 = &c4Val2;
     pc4Val3 = &c4Val1;
 
-    if (TRawMem::pCompareAndExchangePtr<tCIDLib::TCard4>(pc4Val1, pc4Val2, pc4Val3) != &c4Val1)
+    if (TRawMem::pCompareAndExchangePtr<tCIDLib::TCard4>(&pc4Val1, pc4Val2, pc4Val3) != &c4Val1)
         strmOut << CUR_LN << L"pCompareAndExchangePtr returned wrong value\n";
 
     // It should have updated the first value also

@@ -56,7 +56,7 @@ TFacCIDCfgSrv::TFacCIDCfgSrv() :
     )
     , m_c4MaxClients(0)
     , m_ippnListen(kCIDOrbUC::ippnCfgSrvDefPort)
-    , m_pevWait(0)
+    , m_pevWait(nullptr)
 {
 }
 

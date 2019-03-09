@@ -90,9 +90,15 @@ class KRNLEXPORT TKrnlEvent
             const   TKrnlEvent&             kevToDup
         );
 
-        tCIDLib::TBoolean bIsValid() const;
+        tCIDLib::TBoolean bIsValid() const
+        {
+            return m_hevThis.bIsValid();
+        }
 
-        tCIDLib::TBoolean bNamed() const;
+        tCIDLib::TBoolean bNamed() const
+        {
+            return (m_pszName != nullptr);
+        }
 
         tCIDLib::TBoolean bOpen();
 
@@ -119,9 +125,15 @@ class KRNLEXPORT TKrnlEvent
             const   tCIDLib::TCard4         c4MilliSecs = kCIDLib::c4MaxWait
         );
 
-        const TEventHandle& hevThis() const;
+        const TEventHandle& hevThis() const
+        {
+            return m_hevThis;
+        }
 
-        const tCIDLib::TCh* pszName() const;
+        const tCIDLib::TCh* pszName() const
+        {
+            return m_pszName;
+        }
 
 
     private :
@@ -151,29 +163,4 @@ class KRNLEXPORT TKrnlEvent
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean TKrnlEvent::bNamed() const
-{
-    return (m_pszName != 0);
-}
-
-inline tCIDLib::TBoolean TKrnlEvent::bIsValid() const
-{
-    return m_hevThis.bIsValid();
-}
-
-inline const TEventHandle& TKrnlEvent::hevThis() const
-{
-    return m_hevThis;
-}
-
-inline const tCIDLib::TCh* TKrnlEvent::pszName() const
-{
-    return m_pszName;
-}
-
 

@@ -1937,19 +1937,6 @@ PROJECT=DAE2
 END PROJECT
 
 
-PROJECT=DumpRepo
-    SETTINGS
-        DIRECTORY   = Samples\DumpRepo
-        SAMPLE      = Yes
-    END SETTINGS
-
-    DEPENDENTS
-        CIDRegX
-        CIDObjStore
-    END DEPENDENTS
-END PROJECT
-
-
 PROJECT=EnumMons
     SETTINGS
         DIRECTORY   = Samples\EnumMons

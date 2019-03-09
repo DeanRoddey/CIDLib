@@ -634,7 +634,7 @@ TWindow& TWindow::Nul_TWindow()
     {
         TBaseLock lockInit;
         if (!pwndNull)
-            TRawMem::pExchangePtr(pwndNull, new TWindow(kCIDLib::False));
+            TRawMem::pExchangePtr(&pwndNull, new TWindow(kCIDLib::False));
     }
     return *pwndNull;
 }
@@ -670,7 +670,7 @@ TFrameWnd& TWindow::wndDesktop()
         TBaseLock lockInit;
         if (!m_pwndDesktop)
         {
-            TRawMem::pExchangePtr(m_pwndDesktop, new TFrameWnd);
+            TRawMem::pExchangePtr(&m_pwndDesktop, new TFrameWnd);
 
             //
             //  Note that this adds it to the window list. We tell it not to

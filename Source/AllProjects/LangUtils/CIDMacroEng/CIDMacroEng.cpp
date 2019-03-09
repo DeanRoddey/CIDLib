@@ -61,12 +61,12 @@ template class TRefVector<TMEngStringVal>;
 // ---------------------------------------------------------------------------
 TFacCIDMacroEng& facCIDMacroEng()
 {
-    static TFacCIDMacroEng* pfacCIDMacroEng = 0;
+    static TFacCIDMacroEng* pfacCIDMacroEng = nullptr;
     if (!pfacCIDMacroEng)
     {
         TBaseLock lockInit;
         if (!pfacCIDMacroEng)
-            TRawMem::pExchangePtr(pfacCIDMacroEng, new TFacCIDMacroEng);
+            pfacCIDMacroEng = new TFacCIDMacroEng;
     }
     return *pfacCIDMacroEng;
 }

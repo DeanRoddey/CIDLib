@@ -148,7 +148,7 @@ TBitmap TFacCIDGraphDev::bmpSysBitmaps(const tCIDGraphDev::ESysBmps eBmp) const
     {
         TBaseLock lockBmp;
         if (!CIDGraphDev_ThisFacility::apbmpMap[eBmp])
-            TRawMem::pExchangePtr(CIDGraphDev_ThisFacility::apbmpMap[eBmp], new TBitmap(eBmp));
+            TRawMem::pExchangePtr(&CIDGraphDev_ThisFacility::apbmpMap[eBmp], new TBitmap(eBmp));
     }
 
     //

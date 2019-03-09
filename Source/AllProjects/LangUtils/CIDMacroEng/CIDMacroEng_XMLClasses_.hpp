@@ -63,6 +63,8 @@ class TMEngFileEntitySrc : public TXMLEntitySrc
             , const TString&                strActualPath
         );
 
+        TMEngFileEntitySrc(const TMEngFileEntitySrc&) = default;
+
         ~TMEngFileEntitySrc();
 
 
@@ -107,6 +109,8 @@ class TMEngXMLTreeParser : public TXMLTreeParser
         (
                     TCIDMacroEngine* const  pmeOwner
         );
+
+        TMEngXMLTreeParser(const TMEngXMLTreeParser&) = delete;
 
         ~TMEngXMLTreeParser();
 
@@ -190,7 +194,7 @@ class TMEngXMLTreeAnchorVal : public TMEngClassVal
         (
             const   TMEngClassVal&          mecvToCopy
             ,       TCIDMacroEngine&        meOwner
-        );
+        )   override;
 
 
         // -------------------------------------------------------------------
@@ -348,7 +352,7 @@ class TMEngXMLTreeParserVal : public TMEngClassVal
         (
             const   TString&                strName
             , const tCIDLib::TCard2         c2Id
-            , const tCIDMacroEng::EConstTypes  eConst
+            , const tCIDMacroEng::EConstTypes eConst
             ,       TCIDMacroEngine* const  pmeOwner
         );
 

@@ -51,7 +51,7 @@ THSVClr& THSVClr::Nul_THSVClr()
     {
         TBaseLock lockInit;
         if (!phsvNull)
-            TRawMem::pExchangePtr(phsvNull, new THSVClr);
+            TRawMem::pExchangePtr(&phsvNull, new THSVClr);
     }
     return *phsvNull;
 }

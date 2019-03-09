@@ -46,7 +46,7 @@ MDuplicable& MDuplicable::Nul_MDuplicable()
     {
         TBaseLock lockInit;
         if (!pmdupNull)
-            TRawMem::pExchangePtr(pmdupNull, new TPoint);
+            TRawMem::pExchangePtr(&pmdupNull, new TPoint);
     }
     return *pmdupNull;
 }

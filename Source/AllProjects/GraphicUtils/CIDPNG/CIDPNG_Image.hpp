@@ -77,17 +77,17 @@ class CIDPNGEXP TPNGImage : public TCIDImage
 
         TPNGImage
         (
-            const   TPNGImage&              imgToCopy
+            const   TPNGImage&              imgSrc
         );
 
         TPNGImage
         (
-            const   TCIDImage&              imgToCopy
+            const   TCIDImage&              imgSrc
         );
 
         TPNGImage
         (
-            const   TCIDImage&              imgToCopy
+            const   TCIDImage&              imgSrc
             , const TSize&                  szNew
         );
 
@@ -99,12 +99,12 @@ class CIDPNGEXP TPNGImage : public TCIDImage
         // -------------------------------------------------------------------
         TPNGImage& operator=
         (
-            const   TPNGImage&              imgToAssign
+            const   TPNGImage&              imgSrc
         );
 
         TPNGImage& operator=
         (
-            const   TCIDImage&              imgToAssign
+            const   TCIDImage&              imgSrc
         );
 
 
@@ -126,17 +126,17 @@ class CIDPNGEXP TPNGImage : public TCIDImage
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :
         // -------------------------------------------------------------------
-        //  Private, statiic methods
+        //  Private, static methods
         // -------------------------------------------------------------------
         static tCIDLib::TBoolean bCheckCRC
         (

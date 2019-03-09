@@ -21,19 +21,17 @@
 //  This demonstrates directory iteration, recursive directory searching,
 //  and some formatting of objects and text stream stuff.
 //
-//  It outputs pretty much the same as the built in NT "DIR" command.
+//  It outputs pretty much the same as the built in Windows "DIR" command.
+//
+//  There are simpler ways of doing this type of iteration, using a callback
+//  but this is just to show how it works at the basic level.
 //
 // CAVEATS/GOTCHAS:
 //
 //  1)  This program is so simple that it does not create a facility object
-//      for itself, or have a main facility header.
+//      for itself
 //
-//  2)  We create a TFindBuf object on each level of the recursive search.
-//      In a 'real' program we'd probably be a little more paranoid about
-//      stack overflow and just allocate one on each level, using a janitor
-//      object to clean it up.
-//
-//  3)  This program does not attempt to be language independent.
+//  2)  This program does not attempt to be language independent.
 //
 // LOG:
 //
@@ -42,27 +40,22 @@
 
 
 // ---------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDLib, which is all we need.
+//  Includes. The base CIDLib facility header is all we need
 // ---------------------------------------------------------------------------
 #include    "CIDLib.hpp"
 
 
 // ---------------------------------------------------------------------------
-//  Forward references
+//  Do the magic main module code to start the main thread
 // ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-// ---------------------------------------------------------------------------
-//  Do the magic main module code
-// ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"FileSys1MainThread", eMainThreadFunc))
 
+
+// ---------------------------------------------------------------------------
+//  Local data
+// ---------------------------------------------------------------------------
+TTextOutStream& strmOut = TSysInfo::strmOut();
 
 
 // ---------------------------------------------------------------------------
@@ -74,25 +67,22 @@ CIDLib_MainModule(TThread(L"FileSys1MainThread", eMainThreadFunc))
 //  operation. We just recurse our way down the chain.
 //
 static tCIDLib::TVoid
-RecursiveSearch(const   TPathStr&           pathFullPath
-                , const TPathStr&           pathWildCard
+RecursiveSearch(const   TPathStr&           pathFull
+                , const TPathStr&           pathWC
                 ,       tCIDLib::TCard8&    c8TotalBytes
                 ,       tCIDLib::TCard4&    c4TotalFiles)
 {
-    //
-    //  First we want to iterate this whole directory and display anything
-    //  that matches the wildcard.
-    //
     tCIDLib::TCard4 c4CurFiles = 0;
     tCIDLib::TCard8 c8CurBytes = 0;
-    TDirIter        diterLevel;
+    TDirIter        diterCur;
     TFindBuf        fndbSearch;
 
-    if (diterLevel.bFindFirst(pathFullPath, pathWildCard, fndbSearch, tCIDLib::EDirSearchFlags::All))
+    // We do files first at each level, so search for normal files at this level
+    if (diterCur.bFindFirst(pathFull, pathWC, fndbSearch, tCIDLib::EDirSearchFlags::NormalFiles))
     {
-        TSysInfo::strmOut() << kCIDLib::DNewLn
-                            << L"  Directory of " << pathFullPath
-                            << kCIDLib::NewLn << kCIDLib::EndLn;
+        strmOut << kCIDLib::DNewLn
+                << L"  Directory of " << pathFull
+                << kCIDLib::NewLn << kCIDLib::EndLn;
 
         //
         //  Just iterate the rest of files, displaying each one. Keep
@@ -104,21 +94,20 @@ RecursiveSearch(const   TPathStr&           pathFullPath
             //  Just do the default format of a find buffer by just
             //  dumping it to the console.
             //
-            TSysInfo::strmOut() << fndbSearch << kCIDLib::NewLn;
+            strmOut << fndbSearch << kCIDLib::NewLn;
 
             c4TotalFiles++;
             c8TotalBytes += fndbSearch.c8Size();
-
             c4CurFiles++;
             c8CurBytes += fndbSearch.c8Size();
 
-        }   while (diterLevel.bFindNext(fndbSearch));
+        }   while (diterCur.bFindNext(fndbSearch));
     }
 
     if (c4CurFiles)
     {
-        TSysInfo::strmOut() << L"   " << c4CurFiles << L" File(s), "
-                            << c8CurBytes << L" bytes" << kCIDLib::EndLn;
+        strmOut << L"   " << c4CurFiles << L" File(s), "
+                << c8CurBytes << L" bytes" << kCIDLib::EndLn;
     }
 
     //
@@ -130,32 +119,15 @@ RecursiveSearch(const   TPathStr&           pathFullPath
     //  way. pszAllFilesSpec is a predefined spec that has this effect, so
     //  its safer to do than something hard coded.
     //
-    if (diterLevel.bFindFirst
-    (
-        pathFullPath
-        , kCIDLib::pszAllFilesSpec
-        , fndbSearch
-        , tCIDLib::EDirSearchFlags::NormalDirs))
+    if (diterCur.bFindFirst(pathFull, kCIDLib::pszAllFilesSpec, fndbSearch, tCIDLib::EDirSearchFlags::NormalDirs))
     {
-        //
-        //  Ok, for all of the rest of the finds, we want to recurse upon
-        //  ourselves.
-        //
         do
         {
             // Now handle this level if its a normal directory
             if (fndbSearch.bIsNormalDir())
-            {
-                RecursiveSearch
-                (
-                    fndbSearch.pathFileName()
-                    , pathWildCard
-                    , c8TotalBytes
-                    , c4TotalFiles
-                );
-            }
+                RecursiveSearch(fndbSearch.pathFileName(), pathWC, c8TotalBytes, c4TotalFiles);
             c4TotalFiles++;
-        }   while (diterLevel.bFindNext(fndbSearch));
+        }   while (diterCur.bFindNext(fndbSearch));
     }
 }
 
@@ -165,20 +137,17 @@ RecursiveSearch(const   TPathStr&           pathFullPath
 //
 static tCIDLib::TVoid ShowUsage()
 {
-    TSysInfo::strmOut()
-                << L"Usage: FileSys1 wildcard [/s]" << kCIDLib::DNewLn
-                << L"  wildcard  The file search specification, e.g. *.*"
-                << kCIDLib::NewLn
-                << L"  /s        Indicates a recursive directory search."
-                << kCIDLib::NewLn
-                << L"              Otherwise just the current directory is listed"
-                << kCIDLib::NewLn << kCIDLib::EndLn;
+    strmOut << L"Usage: FileSys1 wildcard [/s]" << kCIDLib::DNewLn
+            << L"  wildcard  The file search specification, e.g. *.*"
+            << kCIDLib::NewLn
+            << L"  /s        Indicates a recursive directory search."
+            << kCIDLib::NewLn
+            << L"              Otherwise just the current directory is listed"
+            << kCIDLib::NewLn << kCIDLib::EndLn;
 }
 
 
-//
-//  This is the the thread function for the main thread.
-//
+// This is the the thread function for the main thread.
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
     // We have to let our calling thread go first
@@ -201,23 +170,14 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         //
         //  If there is a single user parm and its /?, then show the program
-        //  usage and exit. If its not, then it must be the wildcard. If there
-        //  is none, then set wildcard to default.
+        //  usage and exit. If its not, then it must be the wildcard.
         //
         TPathStr pathSearchSpec;
-        if (c4Args == 1)
+        pathSearchSpec = TSysInfo::strCmdLineParmAt(0);
+        if (pathSearchSpec == L"/?")
         {
-            pathSearchSpec = TSysInfo::strCmdLineParmAt(0);
-            if (pathSearchSpec == L"/?")
-            {
-                ShowUsage();
-                return tCIDLib::EExitCodes::Normal;
-            }
-        }
-         else
-        {
-            // Set it to the default 'all files' spec
-            pathSearchSpec = kCIDLib::pszAllFilesSpec;
+            ShowUsage();
+            return tCIDLib::EExitCodes::Normal;
         }
 
         //
@@ -227,7 +187,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         tCIDLib::TBoolean bRecursive = kCIDLib::False;
         if (c4Args == 2)
         {
-            if (TSysInfo::strCmdLineParmAt(1) != L"/s")
+            if (!TSysInfo::strCmdLineParmAt(1).bCompareI(L"/s"))
             {
                 ShowUsage();
                 return tCIDLib::EExitCodes::BadParameters;
@@ -255,26 +215,21 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         catch(TError& errToCatch)
         {
-            // If this hasn't been logged already, then log it
-            if (!errToCatch.bLogged())
-            {
-                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
-            }
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            TModule::LogEventObj(errToCatch);
 
-            TSysInfo::strmOut() << errToCatch.strErrText();
+            strmOut << errToCatch.strErrText();
             if (!errToCatch.strAuxText().bIsEmpty())
-                TSysInfo::strmOut() << L"\nReason: " << errToCatch.strAuxText();
-            TSysInfo::strmOut() << kCIDLib::NewLn << kCIDLib::EndLn;
+                strmOut << L"\n   Reason: " << errToCatch.strAuxText();
+            strmOut << kCIDLib::NewLn << kCIDLib::EndLn;
             return tCIDLib::EExitCodes::ResourceAccess;
         }
 
         // Now output the preamble stuff
-        TSysInfo::strmOut()
-                    << L"  Volume in drive " << voliTarget.strVolume()
-                    << L" is " << voliTarget.strVolumeLabel() << kCIDLib::NewLn
-                    << L"  Volume Serial Number is "
-                    << voliTarget.strVolumeSerialNum() << kCIDLib::NewLn << kCIDLib::EndLn;
+        strmOut << L"  Volume in drive " << voliTarget.strVolume()
+                << L" is " << voliTarget.strVolumeLabel() << kCIDLib::NewLn
+                << L"  Volume Serial Number is "
+                << voliTarget.strVolumeSerialNum() << kCIDLib::NewLn << kCIDLib::EndLn;
 
         //
         //  Now we need to split out the wildcard part of it from the path
@@ -316,18 +271,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         {
             if (bRecursive)
             {
-                RecursiveSearch
-                (
-                    pathFullPath
-                    , pathWildCard
-                    , c8TotalBytes
-                    , c4TotalFiles
-                );
+                RecursiveSearch(pathFullPath, pathWildCard, c8TotalBytes, c4TotalFiles);
             }
              else
             {
-                TSysInfo::strmOut() << L"  Directory of " << pathFullPath
-                                    << kCIDLib::NewLn << kCIDLib::EndLn;
+                strmOut << L"  Directory of " << pathFullPath << kCIDLib::NewEndLn;
 
                 // Use the default search flags, which is to find everything
                 TDirIter diterSearch;
@@ -342,13 +290,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                     {
                         //
                         //  Just do the default format of a find buffer by just
-                        //  dumping it to the console.
+                        //  dumping it to the output.
                         //
-                        TSysInfo::strmOut() << fndbSearch << kCIDLib::EndLn;
-
+                        strmOut << fndbSearch << kCIDLib::EndLn;
                         c4TotalFiles++;
                         c8TotalBytes += fndbSearch.c8Size();
-
                     }   while (diterSearch.bFindNext(fndbSearch));
                 }
             }
@@ -363,17 +309,16 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 TModule::LogEventObj(errToCatch);
             }
 
-            TSysInfo::strmOut() << errToCatch.strErrText();
+            strmOut << errToCatch.strErrText();
             if (!errToCatch.strAuxText().bIsEmpty())
-                TSysInfo::strmOut() << L"\nReason: " << errToCatch.strAuxText();
-            TSysInfo::strmOut() << kCIDLib::NewLn << kCIDLib::EndLn;
+                strmOut << L"\nReason: " << errToCatch.strAuxText();
+            strmOut << kCIDLib::NewLn << kCIDLib::EndLn;
             return tCIDLib::EExitCodes::RuntimeError;
         }
 
         if (!c4TotalFiles)
         {
-            TSysInfo::strmOut() << L"There were no files found at: "
-                                << pathFullPath << kCIDLib::NewLn << kCIDLib::EndLn;
+            strmOut << L"There were no files found at: " << pathFullPath << kCIDLib::NewEndLn;
             return tCIDLib::EExitCodes::NotFound;
         }
 
@@ -389,7 +334,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         );
 
         // Output the totals
-        TSysInfo::strmOut()
+        strmOut
                     << kCIDLib::NewLn
                     << L"   Total Files: " << c4TotalFiles << kCIDLib::NewLn
                     << L"   Total Bytes: " << TLocCardinal64(c8TotalBytes) << kCIDLib::NewLn
@@ -397,13 +342,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                     << TLocCardinal64(c8UserAvailBytes) << kCIDLib::NewLn
                     << L"    Free Bytes: "
                     << TLocCardinal64(c8VolFreeBytes)
-                    << kCIDLib::NewLn << kCIDLib::EndLn;
+                    << kCIDLib::NewEndLn;
     }
 
 
-    //
-    //  Catch any unhandled CIDLib runtime errors
-    //
+    // Catch any unhandled CIDLib runtime errors
     catch(TError& errToCatch)
     {
         // If this hasn't been logged already, then log it
@@ -413,10 +356,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             TModule::LogEventObj(errToCatch);
         }
 
-        TSysInfo::strmOut()
-                    <<  L"A CIDLib runtime error occured during processing. "
-                    <<  L"\nError: " << errToCatch.strErrText()
-                    << kCIDLib::NewLn << kCIDLib::EndLn;
+        strmOut <<  L"A CIDLib runtime error occured during processing. "
+                <<  L"\nError: " << errToCatch.strErrText()
+                << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
@@ -427,18 +369,16 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //
     catch(const TKrnlError& kerrToCatch)
     {
-        TSysInfo::strmOut()
-                    << L"A kernel error occured during processing.\n  Error="
-                    << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
+        strmOut << L"A kernel error occured during processing.\n  Error="
+                << kerrToCatch.errcId() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
     // Catch a general exception
     catch(...)
     {
-        TSysInfo::strmOut()
-                    << L"A general exception occured during processing\n"
-                    << kCIDLib::EndLn;
+        strmOut << L"A general exception occured during processing"
+                << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::SystemException;
     }
 

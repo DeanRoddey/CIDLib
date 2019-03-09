@@ -46,7 +46,15 @@ class CIDMACRODBGEXP TSrcTab : public TTabWindow
             , const tCIDLib::TBoolean       bIsSessionClass
         );
 
+        TSrcTab(const TSrcTab&) = delete;
+
         ~TSrcTab();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TSrcTab& operator=(const TSrcTab&) = delete;
 
 
         // -------------------------------------------------------------------

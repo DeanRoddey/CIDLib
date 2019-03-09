@@ -30,6 +30,14 @@
 //  color, and use the level of antialisaing to set the alpha channel on
 //  those pixels. This creates a nice, smooth alpha-based anti-aliasing.
 //
+//  This isn't a particularly clean or clear one. It was done ad hoc to deal
+//  with an immediate issue. But, I threw it into the samples since it does
+//  demonstrate some useful stuff.
+//
+//  It shows the use of the bitmap and pixel array classes in particular. It
+//  does some low level accessing of the pixel data as well, which you have to
+//  be careful about, but it's often important in image process performance.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -39,27 +47,17 @@
 
 
 // -----------------------------------------------------------------------------
-//  CIDLib includes
+//  Includes
 // -----------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
 #include    "CIDPNG.hpp"
 
 
 
 // -----------------------------------------------------------------------------
-//  Forward references
+//  Include magic main module code to start the main thread
 // -----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-// -----------------------------------------------------------------------------
-//  Include magic main module code
-// -----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"MainThread", eMainThreadFunc))
 
 
@@ -70,16 +68,14 @@ TOutConsole     conOut;
 TInConsole      conIn;
 TPathStr        pathSrc;
 TPathStr        pathTar;
-THSVClr         hsvCur;
-TRGBClr         rgbCur;
 
-enum EPixTypes
+enum class EPixTypes
 {
-    EPixType_Lead1
-    , EPixType_Lead2
-    , EPixType_Interior
-    , EPixType_Trail2
-    , EPixType_Trail1
+    Lead1
+    , Lead2
+    , Interior
+    , Trail2
+    , Trail1
 };
 
 
@@ -91,19 +87,13 @@ tCIDLib::TVoid ProcessPixel(const   TPixelArray::TRGBTriple*&   prgbSrc
                             ,       TPixelArray::TRGBQuad*&     prgbTar
                             , const EPixTypes                   eType)
 {
-//    rgbCur.Set(prgbSrc->c1Red, prgbSrc->c1Green, prgbSrc->c1Blue);
-//    hsvCur.FromRGB(rgbCur);
-//    hsvCur.f4Saturation(1.0);
-//    hsvCur.f4Value(1.0);
-//    hsvCur.ToRGB(rgbCur);
-
     prgbTar->c1Red = prgbSrc->c1Red;
     prgbTar->c1Green = prgbSrc->c1Green;
     prgbTar->c1Blue = prgbSrc->c1Blue;
 
-    if ((eType == EPixType_Lead1) || (eType == EPixType_Trail1))
+    if ((eType == EPixTypes::Lead1) || (eType == EPixTypes::Trail1))
         prgbTar->c1Alpha = 92;
-    else if ((eType == EPixType_Lead2) || (eType == EPixType_Trail2))
+    else if ((eType == EPixTypes::Lead2) || (eType == EPixTypes::Trail2))
         prgbTar->c1Alpha = 64;
     else
         prgbTar->c1Alpha = 0xFF;
@@ -156,7 +146,6 @@ tCIDLib::TVoid ProcessImg(const TPNGImage& imgCur, TPixelArray& pixaNew)
             //  If it's a pure background pixel, just copy it over as is
             //  and set the alpha fully transparent.
             //
-            // See if it's white
             const tCIDLib::TBoolean bIsWhite
             (
                 (prgbSrc->c1Red & prgbSrc->c1Green & prgbSrc->c1Blue) == 0xFF
@@ -207,12 +196,12 @@ tCIDLib::TVoid ProcessImg(const TPNGImage& imgCur, TPixelArray& pixaNew)
                 //  each end.
                 //
                 tCIDLib::TCard4 c4Index = 0;
-                ProcessPixel(prgbSrc, prgbTar, EPixType_Lead1);
+                ProcessPixel(prgbSrc, prgbTar, EPixTypes::Lead1);
                 c4Index++;
                 tCIDLib::TCard4 c4IntEnd;
                 if (c4FWidth > 3)
                 {
-                    ProcessPixel(prgbSrc, prgbTar, EPixType_Lead2);
+                    ProcessPixel(prgbSrc, prgbTar, EPixTypes::Lead2);
                     c4Index++;
                     c4IntEnd = c4FWidth - 2;
                 }
@@ -226,13 +215,13 @@ tCIDLib::TVoid ProcessImg(const TPNGImage& imgCur, TPixelArray& pixaNew)
                 }
                 while (c4Index < c4IntEnd)
                 {
-                    ProcessPixel(prgbSrc, prgbTar, EPixType_Interior);
+                    ProcessPixel(prgbSrc, prgbTar, EPixTypes::Interior);
                     c4Index++;
                 }
                 if (c4FWidth > 3)
-                    ProcessPixel(prgbSrc, prgbTar, EPixType_Trail2);
+                    ProcessPixel(prgbSrc, prgbTar, EPixTypes::Trail2);
                 if (c4FWidth > 1)
-                    ProcessPixel(prgbSrc, prgbTar, EPixType_Trail1);
+                    ProcessPixel(prgbSrc, prgbTar, EPixTypes::Trail1);
 
                 // Now move us up to the end pixel
                 c4Col += c4FWidth - 1;
@@ -250,20 +239,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid* const)
 {
     // Let our caller go
     thrThis.Sync();
-
-TBitmapImage imgBmp;
-TBinFileInStream strmBmp
-(
-    // L"C:\\ProgramData\\Cakewalk\\SONAR 8 Producer Edition\\Track Icons\\Bass\\Ibnz 1B.bmp"
-	L"C:\\tmp\\capture.bmp"
-    , tCIDLib::ECreateActs::OpenIfExists
-    , tCIDLib::EFilePerms::Default
-    , tCIDLib::EFileFlags::SequentialScan
-    , tCIDLib::EAccessModes::Excl_Read
-);
-strmBmp >> imgBmp;
-return tCIDLib::EExitCodes::Normal;
-
 
     // Get the source directory
     conOut << L"Source logo path: " << kCIDLib::FlushIt;
@@ -289,7 +264,7 @@ return tCIDLib::EExitCodes::Normal;
     TFindBuf fndbCur;
     if (!diterFiles.bFindFirst(pathSrc, L"*.PNG", fndbCur))
     {
-        conOut << L"No PNG files were found" << kCIDLib::EndLn;
+        conOut << L"No source PNG files were found" << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::Normal;
     }
 
@@ -299,7 +274,7 @@ return tCIDLib::EExitCodes::Normal;
     TString     strNameExt;
     do
     {
-        // Create a binary file input stream over this file
+        // Create a binary file input stream over the current file
         {
             TBinFileInStream strmPNG
             (
@@ -352,7 +327,6 @@ return tCIDLib::EExitCodes::Normal;
 
             // Create the new image to write out
             TPNGImage imgNew(pixaNew);
-
             TBinFileOutStream strmOut
             (
                 pathOutFile

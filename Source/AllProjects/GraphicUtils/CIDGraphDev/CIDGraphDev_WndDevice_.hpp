@@ -40,7 +40,15 @@ class TIntGraphWndDev : public TGraphDrawDev
         // -------------------------------------------------------------------
         TIntGraphWndDev();
 
+        TIntGraphWndDev(const TIntGraphWndDev&) = delete;
+
         ~TIntGraphWndDev();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TIntGraphWndDev& operator=(const TIntGraphWndDev&) = delete;
 
 
     private :

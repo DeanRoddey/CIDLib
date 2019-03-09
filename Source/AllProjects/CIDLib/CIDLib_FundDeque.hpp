@@ -73,7 +73,7 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
             m_c4MaxElements(fcolSrc.m_c4MaxElements)
             , m_c4Head(fcolSrc.m_c4Head)
             , m_c4Tail(fcolSrc.m_c4Tail)
-            , m_ptElements(0)
+            , m_ptElements(nullptr)
         {
             m_ptElements = new T[m_c4MaxElements];
             TRawMem::CopyMemBuf
@@ -83,6 +83,8 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
                 , m_c4MaxElements * sizeof(T)
             );
         }
+
+        TFundDeque(TFundDeque<T>&&) = delete;
 
         ~TFundDeque()
         {
@@ -94,29 +96,28 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
         // --------------------------------------------------------------------
         //  Public operators
         // --------------------------------------------------------------------
-        TFundDeque<T>& operator=(const TFundDeque<T>& fcolToAssign)
+        TFundDeque<T>& operator=(const TFundDeque<T>& fcolSrc)
         {
-            if (this == &fcolToAssign)
-                return *this;
-
-            if (m_c4MaxElements != fcolToAssign.m_c4MaxElements)
+            if (this != &fcolSrc)
             {
-                delete [] m_ptElements;
-                m_ptElements = new T[fcolToAssign.m_c4MaxElements];
-                m_c4MaxElements = fcolToAssign.m_c4MaxElements;
+                if (m_c4MaxElements != fcolSrc.m_c4MaxElements)
+                {
+                    delete [] m_ptElements;
+                    m_ptElements = new T[fcolSrc.m_c4MaxElements];
+                    m_c4MaxElements = fcolSrc.m_c4MaxElements;
+                }
+
+                m_c4Head = fcolSrc.m_c4Head;
+                m_c4Tail = fcolSrc.m_c4Tail;
+                TRawMem::CopyMemBuf
+                (
+                    m_ptElements, fcolSrc.m_ptElements, m_c4MaxElements * sizeof(T)
+                );
             }
-
-            m_c4Head = fcolToAssign.m_c4Head;
-            m_c4Tail = fcolToAssign.m_c4Tail;
-            TRawMem::CopyMemBuf
-            (
-                m_ptElements
-                , fcolToAssign.m_ptElements
-                , m_c4MaxElements * sizeof(T)
-            );
-
             return *this;
         }
+
+        TFundDeque<T>& operator=(TFundDeque<T>&&) = delete;
 
         tCIDLib::TBoolean operator==(const TFundDeque<T>& fcolSrc)
         {
@@ -163,6 +164,7 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
         {
             return !operator==(fcolSrc);
         }
+
 
 
         // -------------------------------------------------------------------

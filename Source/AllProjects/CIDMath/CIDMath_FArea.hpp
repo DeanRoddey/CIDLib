@@ -163,17 +163,17 @@ class CIDMATHEXP TFArea :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        ) const;
+        )   const override;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToWriteTo
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :

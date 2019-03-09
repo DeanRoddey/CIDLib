@@ -55,7 +55,7 @@ TArea& TArea::Nul_TArea()
     {
         TBaseLock lockInit;
         if (!pareaNull)
-            TRawMem::pExchangePtr(pareaNull, new TArea);
+            TRawMem::pExchangePtr(&pareaNull, new TArea);
     }
     return *pareaNull;
 }

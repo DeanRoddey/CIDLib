@@ -769,7 +769,7 @@ TMutex* TModule::pmtxLogSync()
     {
         TBaseLock lockInit;
         if (!pmtxLogSync)
-            TRawMem::pExchangePtr(pmtxLogSync, new TMutex(tCIDLib::ELockStates::Unlocked));
+            TRawMem::pExchangePtr(&pmtxLogSync, new TMutex(tCIDLib::ELockStates::Unlocked));
     }
     return pmtxLogSync;
 }

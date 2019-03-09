@@ -126,17 +126,17 @@ class CIDMATHEXP TComplex :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const;
+        )   const override;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :

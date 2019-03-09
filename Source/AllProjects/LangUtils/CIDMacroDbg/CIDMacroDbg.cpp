@@ -31,12 +31,12 @@
 //
 TFacCIDMacroDbg& facCIDMacroDbg()
 {
-    static TFacCIDMacroDbg* pfacCIDMacroDbg = 0;
+    static TFacCIDMacroDbg* pfacCIDMacroDbg = nullptr;
     if (!pfacCIDMacroDbg)
     {
         TBaseLock lockInit;
         if (!pfacCIDMacroDbg)
-            TRawMem::pExchangePtr(pfacCIDMacroDbg, new TFacCIDMacroDbg);
+            pfacCIDMacroDbg = new TFacCIDMacroDbg;
     }
     return *pfacCIDMacroDbg;
 }

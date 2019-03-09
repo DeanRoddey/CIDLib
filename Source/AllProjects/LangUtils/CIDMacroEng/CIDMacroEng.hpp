@@ -84,6 +84,13 @@ class TCIDMacroEngine;
 
 #include    "CIDMacroEng_NamedItem.hpp"
 #include    "CIDMacroEng_ClassValue.hpp"
+
+namespace tCIDMacroEng
+{
+    using TClassValList = TRefVector<TMEngClassVal>;
+    using TCntValList   = TCntPtr<TClassValList>;
+}
+
 #include    "CIDMacroEng_LiteralVal.hpp"
 #include    "CIDMacroEng_LocalInfo.hpp"
 #include    "CIDMacroEng_ParmInfo.hpp"

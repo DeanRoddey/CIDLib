@@ -988,7 +988,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
             // Not found so throw an exception
             if (!pnodeRet)
-                this->KeyNotFound(objKeyToFind, CID_FILE, CID_LINE);
+                this->KeyNotFound(CID_FILE, CID_LINE);
 
             // we found it so return the object value
             return pnodeRet->objPair();
@@ -1003,7 +1003,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
             // Not found so throw an exception
             if (!pnodeRet)
-                this->KeyNotFound(objKeyToFind, CID_FILE, CID_LINE);
+                this->KeyNotFound(CID_FILE, CID_LINE);
 
             // we found it so return the object value
             return pnodeRet->objPair();
@@ -1118,7 +1118,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         tCIDLib::TVoid RemoveKey(const TKey& objKeyToRemove)
         {
             if (!bRemoveIfExists(objKeyToRemove))
-                this->KeyNotFound(objKeyToRemove, CID_FILE, CID_LINE);
+                this->KeyNotFound(CID_FILE, CID_LINE);
         }
 
         tCIDLib::TVoid Set( const   tCIDLib::EMTStates  eToSet
@@ -1156,7 +1156,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             TNode* pnodeRep = pnodeFind(objKey, hshKey);
 
             if (!pnodeRep)
-                this->KeyNotFound(objKey, CID_FILE, CID_LINE);
+                this->KeyNotFound(CID_FILE, CID_LINE);
 
             // Copy in the new data
             pnodeRep->objValue(objNewValue);

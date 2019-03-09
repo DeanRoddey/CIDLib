@@ -50,7 +50,7 @@ RTTIDecls(TNullPen,TGUIPen)
 // ---------------------------------------------------------------------------
 TGUIPen& TGUIPen::Nul_TGUIPen()
 {
-    static TGUIPen* pgpenNull = 0;
+    static TGUIPen* pgpenNull = nullptr;
     if (!pgpenNull)
     {
         TBaseLock lockInit;
@@ -58,7 +58,7 @@ TGUIPen& TGUIPen::Nul_TGUIPen()
         {
             TRawMem::pExchangePtr<TGUIPen>
             (
-                pgpenNull, new TCosmeticPen(facCIDGraphDev().rgbBlack)
+                &pgpenNull, new TCosmeticPen(facCIDGraphDev().rgbBlack)
             );
         }
     }

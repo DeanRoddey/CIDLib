@@ -47,7 +47,7 @@ class CIDMACROENGEXP TCIDMacroEngine : public TObject
         // -------------------------------------------------------------------
         //  Public class types
         // -------------------------------------------------------------------
-        using TParmList = TRefVector<TMEngClassVal>;
+        using TParmList = tCIDMacroEng::TClassValList;
 
 
         // -------------------------------------------------------------------
@@ -800,8 +800,7 @@ class CIDMACROENGEXP TCIDMacroEngine : public TObject
         // -------------------------------------------------------------------
         using TClassList    = TRefKeyedHashSet<TMEngClassInfo,TString,TStringKeyOps>;
         using TClassIdList  = TRefVector<TMEngClassInfo>;
-        using TClassValList = TRefVector<TMEngClassVal>;
-        using TCntValList   = TCntPtr<TClassValList>;
+        using TCntValList   = TCntPtr<tCIDMacroEng::TClassValList>;
         using TTempPool     = TVector<TCntValList>;
         using TCallStack    = TRefVector<TMEngCallStackItem>;
 

@@ -32,12 +32,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDObjStore& facCIDObjStore()
 {
-    static TFacCIDObjStore* pfacCIDObjStore = 0;
+    static TFacCIDObjStore* pfacCIDObjStore = nullptr;
     if (!pfacCIDObjStore)
     {
         TBaseLock lockInit;
         if (!pfacCIDObjStore)
-            TRawMem::pExchangePtr(pfacCIDObjStore, new TFacCIDObjStore);
+            pfacCIDObjStore = new TFacCIDObjStore;
     }
     return *pfacCIDObjStore;
 }

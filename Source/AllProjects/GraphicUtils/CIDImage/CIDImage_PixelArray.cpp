@@ -342,14 +342,6 @@ TPixelArray::TPixelArray(const TPixelArray& pixaSrc) :
     TRawMem::CopyMemBuf(m_pc1Pixels, pixaSrc.m_pc1Pixels, m_c4BufSz);
 }
 
-TPixelArray::TPixelArray(TPixelArray&& pixaSrc) :
-
-    TPixelArray()
-{
-    *this = tCIDLib::ForceMove(pixaSrc);
-}
-
-
 TPixelArray::~TPixelArray()
 {
     // Delete the buffer if we are adopting
@@ -403,25 +395,6 @@ TPixelArray& TPixelArray::operator=(const TPixelArray& pixaSrc)
         //  the whole buffer which might be larger.
         //
         TRawMem::CopyMemBuf(m_pc1Pixels, pixaSrc.m_pc1Pixels, m_c4ImageSz);
-    }
-    return *this;
-}
-
-TPixelArray& TPixelArray::operator=(TPixelArray&& pixaSrc)
-{
-    if (this != &pixaSrc)
-    {
-        tCIDLib::Swap(m_c4BufSz, pixaSrc.m_c4BufSz);
-        tCIDLib::Swap(m_c4Height, pixaSrc.m_c4Height);
-        tCIDLib::Swap(m_c4ImageSz, pixaSrc.m_c4ImageSz);
-        tCIDLib::Swap(m_c4LineBytePadding, pixaSrc.m_c4LineBytePadding);
-        tCIDLib::Swap(m_c4LineWidth, pixaSrc.m_c4LineWidth);
-        tCIDLib::Swap(m_c4Width, pixaSrc.m_c4Width);
-        tCIDLib::Swap(m_eAdoptOpt, pixaSrc.m_eAdoptOpt);
-        tCIDLib::Swap(m_eBitDepth, pixaSrc.m_eBitDepth);
-        tCIDLib::Swap(m_eFmt, pixaSrc.m_eFmt);
-        tCIDLib::Swap(m_eRowOrder, pixaSrc.m_eRowOrder);
-        tCIDLib::Swap(m_pc1Pixels, pixaSrc.m_pc1Pixels);
     }
     return *this;
 }

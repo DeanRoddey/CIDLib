@@ -86,6 +86,49 @@ TRawMem::bAllocSysMem(  const   tCIDLib::TCard4         c4Size
 }
 
 
+
+//
+//  We do a safe inc/dec of the passed reference. Just to be safe we don't allow ref counts
+//  beyond i4MaxCard, since the interlocked stuff really works on signed values. It would be
+//  psychotic to expect such a thing anyway. And we check for an underflow in the release
+//  since that means something went really wrong.
+//
+tCIDLib::TBoolean TRawMem::bSafeRefAcquire(volatile tCIDLib::TCard4& c4Ref)
+{
+    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
+        return kCIDLib::False;
+    }
+    ::InterlockedIncrementAcquire(&c4Ref);
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean TRawMem::bSafeRefRelease(volatile tCIDLib::TCard4& c4Ref)
+{
+    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
+        return kCIDLib::False;
+    }
+
+    if (!c4Ref)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_ZeroRefCntRel);
+        return kCIDLib::False;
+    }
+
+    if (::InterlockedDecrementRelease(&c4Ref) < 0)
+    {
+        // The ref count management must be wrong
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_RefCntUnderflow);
+        return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
+
+
+
 tCIDLib::TCard4
 TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
                                 , const tCIDLib::TCard4     c4New
@@ -119,16 +162,26 @@ TRawMem::c4Exchange(        tCIDLib::TCard4&    c4ToFill
 
 
 tCIDLib::TVoid*
-TRawMem::pCompareAndExchangePtr(const   tCIDLib::TVoid* pToFill
-                                , const tCIDLib::TVoid* pNew
-                                , const tCIDLib::TVoid* pCompare)
+TRawMem::pCompareAndExchangeRawPtr(         tCIDLib::TVoid**    ppToFill
+                                    , const tCIDLib::TVoid*     pNew
+                                    , const tCIDLib::TVoid*     pCompare)
 {
     // We have to cast because this API doesn't understand const'ness
     return ::InterlockedCompareExchangePointer
     (
-        const_cast<tCIDLib::TVoid**>(&pToFill)
+        const_cast<tCIDLib::TVoid**>(ppToFill)
         , const_cast<tCIDLib::TVoid*>(pNew)
         , const_cast<tCIDLib::TVoid*>(pCompare)
+    );
+}
+
+tCIDLib::TVoid*
+TRawMem::pExchangeRawPtr(tCIDLib::TVoid** ppToFill, const tCIDLib::TVoid* pNew)
+{
+    // We have to cast because this API doesn't understand const'ness
+    return ::InterlockedExchangePointer
+    (
+        const_cast<tCIDLib::TVoid**>(ppToFill), const_cast<tCIDLib::TVoid*>(pNew)
     );
 }
 
@@ -157,3 +210,4 @@ TRawMem::pQueryMemFlags(const   tCIDLib::TVoid*         pBufToQuery
 
     return RawInfo.BaseAddress;
 }
+

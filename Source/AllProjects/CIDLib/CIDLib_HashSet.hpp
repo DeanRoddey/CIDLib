@@ -682,7 +682,20 @@ template <class TElem, class TKeyOps> class THashSet
             }
         }
 
-        THashSet(TMyType&&) = delete;
+        // No default ctor, so do minimal setup then swap
+        THashSet(TMyType&& colSrc) :
+
+            TCollection<TElem>(tCIDLib::EMTStates::Unsafe)
+            , m_apBuckets(nullptr)
+            , m_c4CurElements(0)
+            , m_c4HashModulus(1)
+            , m_pkopsToUse(pDupObject<TKeyOps>(*colSrc.m_pkopsToUse))
+        {
+            m_apBuckets = new TNode*[m_c4HashModulus];
+            m_apBuckets[0] = nullptr;
+
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~THashSet()
         {
@@ -743,7 +756,17 @@ template <class TElem, class TKeyOps> class THashSet
             return *this;
         }
 
-        TMyType& operator=(TMyType&&) = delete;
+        // We don't swap key ops, just element content
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                tCIDLib::Swap(m_apBuckets, colSrc.m_apBuckets);
+                tCIDLib::Swap(m_c4CurElements, colSrc.m_c4CurElements);
+                tCIDLib::Swap(m_c4HashModulus, colSrc.m_c4HashModulus);
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------

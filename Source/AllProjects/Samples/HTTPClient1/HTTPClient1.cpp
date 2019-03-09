@@ -21,6 +21,9 @@
 //  GET request and just dumping out the returned information. It does a get
 //  of a URL provided on the command line.
 //
+//  As with most of these basic samples, this guy does not create a facility
+//  object, it just starts a thread on a local function.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -30,8 +33,7 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own.
+//  Includes.
 // ----------------------------------------------------------------------------
 #include    "CIDEncode.hpp"
 #include    "CIDNet.hpp"
@@ -40,23 +42,13 @@
 
 
 // ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-
-// ----------------------------------------------------------------------------
 //  Local data
 //
 //  strmOut
 //      We don't need any interactivity for this program so we just set up
-//      an output text stream, which writes to the standard output. Use the
-//      default text encoding for this platform.
+//      an output text stream, which writes to the standard output. There are
+//      other ways to get this, which some of the other samples do. This is
+//      is another.
 // ----------------------------------------------------------------------------
 static TTextFileOutStream strmOut(tCIDLib::EStdFiles::StdOut);
 
@@ -64,11 +56,8 @@ static TTextFileOutStream strmOut(tCIDLib::EStdFiles::StdOut);
 
 // ----------------------------------------------------------------------------
 //  Do the magic main module code
-//
-//  This tells CIDLib what the main thread of the program is. This is the
-//  only thread object that is run automatically. All others are started
-//  manually when required or desired.
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"HTTPClient1MainThread", eMainThreadFunc))
 
 
@@ -76,6 +65,8 @@ CIDLib_MainModule(TThread(L"HTTPClient1MainThread", eMainThreadFunc))
 // ----------------------------------------------------------------------------
 //  Local functions
 // ----------------------------------------------------------------------------
+
+// Dumps out the info we get back from the HTTP operation
 static tCIDLib::TVoid
 DumpInfo(const  tCIDLib::TKVPList&  colOutHdrs
         , const TMemBuf&            mbufContent
@@ -97,7 +88,7 @@ DumpInfo(const  tCIDLib::TKVPList&  colOutHdrs
 
             //
             //  Handle the cache control header specially and break out
-            //  the values. otehrwise, just dump the key=value. The HTTP
+            //  the values. Otherwise, just dump the key=value. The HTTP
             //  client class has a helper to prase the cache control info
             //  line, also giving us back a set of key/value strings.
             //
@@ -152,41 +143,30 @@ DumpInfo(const  tCIDLib::TKVPList&  colOutHdrs
         if (facCIDEncode().bSupportsEncoding(strEncoding))
         {
             // Show the content type
-            strmOut << L"\n\nBody Text\n-------------------------\n"
-                    << kCIDLib::EndLn;
+            strmOut << L"\n\nBody Text\n-------------------------" << kCIDLib::NewEndLn;
 
             //
-            //  We do so create a text encoder and set that on a
-            //  text input stream we create over the body content,
-            //  so that we can stream it in. We got the size of the
-            //  body content in the GET, and provide that as the
+            //  We do so create a text encoder and set that on a text input stream
+            //  we create over the body content, so that we can stream it in. We
+            //  got the size of the body content in the GET, and provide that as the
             //  end of stream point.
             //
-            //  We tell it not to adopt the memory buffer of course,
-            //  though it always adopts the text converter, so we
-            //  don't need to clean that up.
+            //  We tell it not to adopt the memory buffer of course,  though it always
+            //  adopts the text converter, so we don't need to clean that up.
             //
-            //  To help finding text encoding errors, we tell the
-            //  text encoder to stop parsing if it hits an error,
-            //  adn return what it got. That way, we'll dump out
-            //  text up to the error point, instead of stopping
-            //  way before that (since the stream pre-streams in
-            //  chunks at a time.)
+            //  To help finding text encoding errors, we tell the text encoder to stop
+            //  parsing if it hits an error, and return what it got. That way, we'll
+            //  dump out text up to the error point, instead of stopping way before that
+            //  (since the stream pre-streams in chunks at a time.)
             //
             TTextConverter* ptcvtBody = facCIDEncode().ptcvtMakeNew(strEncoding);
             ptcvtBody->eErrorAction(tCIDLib::ETCvtActions::StopThenThrow);
             TTextMBufInStream strmSrc
             (
-                &mbufContent
-                , c4ContLen
-                , tCIDLib::EAdoptOpts::NoAdopt
-                , ptcvtBody
+                &mbufContent, c4ContLen, tCIDLib::EAdoptOpts::NoAdopt, ptcvtBody
             );
 
-            //
-            //  OK, just read and dump lines until we hit the end of
-            //  the body content.
-            //
+            // OK, just read and dump lines until we hit the end of the body content.
             TString strLine;
             while (!strmSrc.bEndOfStream())
             {
@@ -198,12 +178,12 @@ DumpInfo(const  tCIDLib::TKVPList&  colOutHdrs
          else
         {
             strmOut << L"The content type text encoding is not supported"
-                    << kCIDLib::EndLn;
+                    << kCIDLib::NewEndLn;
         }
     }
      else
     {
-        strmOut << L"Body is a binary or uknown text type" << kCIDLib::EndLn;
+        strmOut << L"Body is a binary or uknown text type" << kCIDLib::NewEndLn;
     }
 
     strmOut << kCIDLib::NewEndLn;
@@ -262,7 +242,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             return tCIDLib::EExitCodes::BadParameters;
         }
 
-
         // If any optional parms get those
         for (; cursParms; ++cursParms)
         {
@@ -309,15 +288,17 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         //
         //  Do the get. Use the version that supoprts redirection. We'll get back
-        //  the HTTP status code as the return.
+        //  the HTTP status code as the return. We set an end time and keep passing
+        //  that back in. If we run out of time at any of the rounds, we give up.
         //
         tCIDLib::TCard4 c4Res;
         const tCIDLib::TEncodedTime enctEnd = TTime::enctNowPlusSecs(8);
         if (strReqType == L"HEAD")
         {
+            // Let the client object do a one-shot connection
             c4Res = httpcGet.c4SendHead
             (
-                0
+                nullptr
                 , urlGet
                 , enctEnd
                 , L"CIDLib Net1 Sample/1.0"
@@ -332,30 +313,30 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         }
          else if (strReqType == L"GET")
         {
-
-            TCIDDataSrc* pcdsSrv = nullptr;
-
             //
             //  In our case we could have just passed in a null data source and the
-            //  HTTP client would have created one in a one-short sort of way for us.
+            //  HTTP client would have created one in a one-shot sort of way for us.
             //  But we want to demonstrate how you create one if you want to do multiple
             //  calls on a single connection.
             //
             //  Based on the protocol, we create a regular socket based data source or
             //  a secure channel based one.
             //
+            TCIDDataSrc* pcdsSrv = nullptr;
             if (urlGet.eProto() == tCIDSock::EProtos::HTTP)
             {
                 pcdsSrv = new TCIDSockStreamDataSrc(urlGet.ipepHost());
             }
              else
             {
+                //
+                //  Create a socket and and then a secure channel data source that adopts it.
+                //  Give it the host to use as the security principal.
+                //
                 TClientStreamSocket* psockSrc = new TClientStreamSocket
                 (
                     tCIDSock::ESockProtos::TCP, urlGet.ipepHost()
                 );
-
-                // Let the data source adopt the socket
                 pcdsSrv = new TCIDSChanClDataSrc
                 (
                     psockSrc, tCIDLib::EAdoptOpts::Adopt, urlGet.strHost()
@@ -363,21 +344,14 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             }
 
             //
-            //  If asked to send a close and we are doing persistent connections,
-            //  then send one. No need to if doing a 1.0 type connection.
+            //  Put the data source into a janitor, and let it adopt the source. Tell it
+            //  to do the shutdown sequence when it cleans up.
             //
-            if (bClose && pcdsSrv)
-                colInHdrs.objAdd(TKeyValuePair(L"Connection", L"close"));
+            TCIDDataSrcJan janSrc(pcdsSrv, tCIDLib::EAdoptOpts::Adopt, kCIDLib::True);
 
-            //
-            //  Put the data source into a janitor, and let it adopt the source. Pass
-            //  along the close flag, which will make the janitor close down the
-            //  underlying socket as well.
-            //
-            TCIDDataSrcJan janSrc
-            (
-                pcdsSrv, tCIDLib::EAdoptOpts::Adopt, kCIDLib::True
-            );
+            // If asked to send a close, add that
+            if (bClose)
+                colInHdrs.objAdd(TKeyValuePair(L"Connection", L"close"));
 
             c4Res = httpcGet.c4SendGetRedir
             (
@@ -411,15 +385,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         strmOut << L"A CIDLib runtime error occured during processing.\n  Error: "
                 << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;

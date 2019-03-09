@@ -224,9 +224,7 @@ namespace TKrnlRemMedia
 {
     KRNLEXPORT tCIDLib::TBoolean bEnumDrvs
     (
-                tCIDLib::TCh* const     pszToFill
-        , const tCIDLib::TCard4         c4MaxChars
-        ,       tCIDLib::TCard4&        c4Found
+                TKrnlLList<TKrnlString>& kllstToFill
     );
 
     KRNLEXPORT tCIDLib::TBoolean bExtractCDTrackInfo

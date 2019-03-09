@@ -33,12 +33,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDMData& facCIDMData()
 {
-    static TFacCIDMData* pfacCIDMData = 0;
+    static TFacCIDMData* pfacCIDMData = nullptr;
     if (!pfacCIDMData)
     {
         TBaseLock lockInit;
         if (!pfacCIDMData)
-            TRawMem::pExchangePtr(pfacCIDMData, new TFacCIDMData);
+            pfacCIDMData = new TFacCIDMData;
     }
     return *pfacCIDMData;
 }

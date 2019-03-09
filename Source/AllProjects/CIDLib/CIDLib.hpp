@@ -71,7 +71,7 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_ModuleInfo.hpp"
 #include    "CIDLib_Module.hpp"
 #include    "CIDLib_KeyValuePair.hpp"
-#include    "CIDLib_CountedPointer.hpp"
+#include    "CIDLib_SmartPointer.hpp"
 #include    "CIDLib_SearchNSort.hpp"
 #include    "CIDLib_PubSub.hpp"
 

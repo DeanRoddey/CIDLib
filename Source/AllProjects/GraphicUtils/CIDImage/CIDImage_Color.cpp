@@ -49,7 +49,7 @@ TFRGBClr& TFRGBClr::Nul_TFRGBClr()
     {
         TBaseLock lockInit;
         if (!pfrgbNull)
-            TRawMem::pExchangePtr(pfrgbNull, new TFRGBClr);
+            TRawMem::pExchangePtr(&pfrgbNull, new TFRGBClr);
     }
     return *pfrgbNull;
 }

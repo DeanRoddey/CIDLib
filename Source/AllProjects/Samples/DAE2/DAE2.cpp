@@ -21,8 +21,10 @@
 //  other compressed audio file format supported locally and decodes it
 //  back to a WAV and spits it out.
 //
-// CAVEATS/GOTCHAS:
+//  It takes a single command line parameter, which is the path to file
+//  to decode.
 //
+// CAVEATS/GOTCHAS:
 //
 // LOG:
 //
@@ -31,25 +33,15 @@
 
 
 // ---------------------------------------------------------------------------
-//  Includes. Note that the DAE class is not much used so it is not normally
-//  included.
+//  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDDAE.hpp"
 
 
 // ---------------------------------------------------------------------------
-//  Forward references
+//  Do the magic main module code to start up the main thread
 // ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-// ---------------------------------------------------------------------------
-//  Do the magic main module code
-// ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"DAE2MainThread", eMainThreadFunc))
 
 
@@ -66,14 +58,9 @@ tCIDLib::TBoolean   bBreak;
 //  Local functions
 // ---------------------------------------------------------------------------
 
-
-//
-//  This is the the thread function for the main thread.
-//
+// The main thread is pointed here
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
-    TString strTmp;
-
     // We have to let our calling thread go first
     thrThis.Sync();
 
@@ -83,15 +70,14 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     try
     {
         // Get the source file
-        strSrc = strTmp = TSysInfo::strCmdLineParmAt(0);
+        strSrc = TSysInfo::strCmdLineParmAt(0);
 
         //
         //  Create a decoder. We assume WMA here (which can also handle
-        //  other formats if codecs are installed.)
+        //  other formats if codecs are installed.) Do the start decode
+        //  phase to see if the source file is basically understood.
         //
         TCIDDAEWMADec daedTest;
-
-        // Do the start phase. If this works, we should be ok
         daedTest.StartDecode(strSrc);
 
         // Ok, it worked, so let's create the output file
@@ -118,17 +104,16 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //
         tCIDLib::TCard4 c4ThisTime;
         tCIDLib::TCard4 c4SoFar = 0;
-        do
+        while (c4ThisTime = daedTest.c4LoadChunk(mbufChunk))
         {
-            c4ThisTime = daedTest.c4LoadChunk(mbufChunk);
-            if (c4ThisTime)
-            {
-                flTarget.c4WriteBuffer(mbufChunk, c4ThisTime);
-                c4SoFar += c4ThisTime;
-            }
-        }   while (c4ThisTime);
+            flTarget.c4WriteBuffer(mbufChunk, c4ThisTime);
+            c4SoFar += c4ThisTime;
+        }
 
-        // Now we can fill in a WAV header and go back and write it in
+        //
+        //  Now we can fill in a WAV header and go back and write it in. We set
+        //  it up for the CD format we know we just converted to.
+        //
         tCIDMedia::TWaveHdr Hdr = {0};
         TRawMem::CopyMemBuf(Hdr.szRiff, "RIFF", 4);
         Hdr.c4Len = c4SoFar + 44 - 8;

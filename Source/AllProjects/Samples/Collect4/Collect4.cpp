@@ -24,32 +24,18 @@
 //  This program simulates what a queue would be used for, a situation where
 //  there are multiple 'producer' threads that are putting objects into a
 //  queue which is read from one element at a time by a 'consumer' thread
-//  that handles each element one at a time.
-//
-//  There are number of reasons for this kind of scheme. One is that it
-//  naturally serializes access to a resource while allowing multiple threads
-//  to make requests or perform actions against it. For instance, multiple
-//  threads might want to log messages to a server. You don't want to have
-//  a separate network connection for each thread so you can set up a thread
-//  that monitors the queue and pulls elements out and sends them to the
-//  server. The threads that send messages just dump them to the queue and
-//  go on about their business without waiting around since they know that
-//  the queue consumer thread will handle it.
-//
-//  There are cases where the thread does want to wait, in which case the
-//  element put into the queue can have an event object in it. The consumer
-//  thread can post the event after handling the thread's request.
+//  that handles each element one at a time. Or of course it could be the
+//  other way around, or multiple threads on both sides.
 //
 //  In this program, we just simulate this kind of situation. The worker
 //  threads sleep for a given period of time, then they put their own
 //  thread name on the queue. This is a useless program but it just illustrates
-//  the issue. In reality, the worker threads might be waiting on a client
+//  the issue. In reality, the worker threads might be waiting on a remote
 //  machine to send a request which they would put onto the queue.
 //
 //  Note that the sleep time is generated as a random number by the main
-//  thread and passed to the worker thread. This demonstrates how nice the
-//  CIDLib thread start mechanism is. Since the the thread that starts a new
-//  thread is in sync mode, it won't return until the started thread calls
+//  thread and passed to the worker thread. Since the the thread that starts
+//  a new thread is in sync mode, it won't return until the started thread calls
 //  its Sync() method. So the main thread can just pass a pointer to the
 //  counter that is using. The worker thread will get its copy before calling
 //  Sync(), so there is no need to dynamically allocate a value or provide
@@ -61,12 +47,12 @@
 //  to shut down and then it exits. It prints out the elements as it gets
 //  them out of the queue.
 //
-//  Note that no external synchronization is used here because the writers
-//  do a single operation and the read does a single operation. The previous
-//  demo required that each thread do multiple operations on the collection,
-//  which had to be atomic, so it locked the collection itself and did all
-//  of the operations while the collection was locked. This one can just
-//  depend on the natural safety of a thread safe collection.
+//  Note that no external synchronization is used here because threads are
+//  doing single, atomic operations. The previous demo required that each
+//  thread do multiple operations on the collection, which had to be atomic,
+//  so it locked the collection itself and did all of the operations while
+//  the collection was locked. This one can just depend on the natural
+//  safety of a thread safe collection.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -85,17 +71,8 @@
 // ---------------------------------------------------------------------------
 //  Forward references
 // ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-tCIDLib::EExitCodes eWorkerThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
+tCIDLib::EExitCodes eWorkerThreadFunc(TThread&, tCIDLib::TVoid*);
 
 
 // ---------------------------------------------------------------------------
@@ -112,17 +89,10 @@ tCIDLib::EExitCodes eWorkerThreadFunc
 //
 //  evWait
 //      We hold the threads back until they are all created.
-//
-//  unamThreads
-//      This is a unique name generator that is used to generate names for
-//      the threads we spin up. Threads must have unique names within the
-//      process. We use it in a way where it just uses a pattern and adds a
-//      running counter atomically to each call to generate a new name.
 // ---------------------------------------------------------------------------
 static TQueue<TString>  colTest(tCIDLib::EMTStates::Safe);
 static TOutConsole      conOut;
 static TEvent           evWait(tCIDLib::EEventStates::Reset);
-static TUniqueName      unamThreads(L"WorkerThread%(1)");
 
 
 // ---------------------------------------------------------------------------
@@ -152,27 +122,27 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //  collection of them. We make it adopting so that it owns the threads
     //  that we put into it.
     //
+    using TThreadList = TRefVector<TThread>;
     const tCIDLib::TCard4 c4ThreadCount = 5;
-    TRefVector<TThread> colOfThreads(tCIDLib::EAdoptOpts::Adopt, c4ThreadCount);
+    TThreadList colOfThreads(tCIDLib::EAdoptOpts::Adopt, c4ThreadCount);
 
     // Default return value
     tCIDLib::EExitCodes eRet = tCIDLib::EExitCodes::Normal;
     try
     {
         TRandomNum randTest;
-        randTest.Seed(0xF19DA31);
+        randTest.Seed(TTime::c4Millis());
 
-        // Create our list of worker threads
+        //
+        //  Create our list of worker threads. We use a helper in the CIDLib faclity
+        //  to give each one the required unique name.
+        //
         tCIDLib::TCard4 c4Index;
         for (c4Index = 0; c4Index < c4ThreadCount; c4Index++)
         {
-            //
-            //  Create the thread, give it the next unique name, and point
-            //  it at the function we want it to run on.
-            //
             colOfThreads.Add
             (
-                new TThread(unamThreads.strQueryNewName(), eWorkerThreadFunc)
+                new TThread(facCIDLib().strNextThreadName(L"Collect4Worker"), eWorkerThreadFunc)
             );
         }
 
@@ -187,7 +157,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //  just gets us the wrapper object. objData() gets us a reference
         //  to the object its wrapping.
         //
-        for (c4Index = 0; c4Index < c4ThreadCount; c4Index++)
+        TThreadList::TNCCursor cursThreads(&colOfThreads);
+        for (; cursThreads; ++cursThreads)
         {
             //
             //  Get a random number between 1000 and 2000. This will be the
@@ -201,7 +172,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             //  Start the thread up now. We don't come back until it's up
             //  and got a copy of its passed start time.
             //
-            colOfThreads[c4Index]->Start(&c4SleepTime);
+            cursThreads->Start(&c4SleepTime);
         }
 
         // Let them go now
@@ -230,18 +201,29 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                     << kCIDLib::EndLn;
             c4Count++;
         }
+
+        //
+        //  Now lets go through the list and ask each thread to shutdown. We
+        //  do a non-synchronized request, so it just flags them to stop and
+        //  returns. This way, we can start them all shutting down at once.
+        //
+        conOut << L"Asking threads to stop..." << kCIDLib::EndLn;
+        cursThreads.bReset();
+        for (; cursThreads; ++cursThreads)
+            cursThreads->ReqShutdownNoSync();
+
+        //
+        //  Now wait for them to all be dead. We don't care about the exit
+        //  status, so we don't check it.
+        //
+        cursThreads.bReset();
+        for (; cursThreads; ++cursThreads)
+            cursThreads->eWaitForDeath();
     }
 
     // Catch any CIDLib runtime errors for debuggin purposes
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut  <<  L"A CIDLib runtime error occured during processing.\n"
                 <<  L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         eRet = tCIDLib::EExitCodes::RuntimeError;
@@ -267,23 +249,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         eRet = tCIDLib::EExitCodes::SystemException;
     }
 
-    //
-    //  Now lets go through the list and ask each thread to shutdown. We
-    //  also then wait for it to really die, since returning from the
-    //  ReqShutdownSync() just means that the thread sees the request and
-    //  is on the way out.
-    //
-    conOut << L"Asking threads to stop..." << kCIDLib::EndLn;
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ThreadCount; c4Index++)
-        colOfThreads[c4Index]->ReqShutdownSync(5000);
-
-    //
-    //  Now wait for them to all be dead. We don't care about the exit
-    //  status, so we don't check it.
-    //
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ThreadCount; c4Index++)
-        colOfThreads[c4Index]->eWaitForDeath();
-
     return eRet;
 }
 
@@ -293,17 +258,15 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 //  just sleeps some random amount of time. When it wakes up, it puts its
 //  name on the global test queue collection.
 //
-tCIDLib::EExitCodes eWorkerThreadFunc(  TThread&            thrThis
-                                        , tCIDLib::TVoid*   pData)
+tCIDLib::EExitCodes
+eWorkerThreadFunc(TThread& thrThis, tCIDLib::TVoid* pData)
 {
     //
     //  Get our sleep time out that was passed to us. We need to do this
     //  before we sync and let the caller go, since he is going to reuse
     //  that data potentially.
     //
-    const tCIDLib::TCard4 c4SleepTime = *(tCIDLib::TCard4*)pData;
-
-    // Now let the main thread go against
+    const tCIDLib::TCard4 c4SleepTime = *reinterpret_cast<tCIDLib::TCard4*>(pData);
     thrThis.Sync();
 
     // Wait until we are told to go
@@ -311,22 +274,12 @@ tCIDLib::EExitCodes eWorkerThreadFunc(  TThread&            thrThis
 
     //
     //  Enter our loop. We just sleep for our sleep time, then we wake up
-    //  and put our string name onto the test queue. We check for shutdown
-    //  requests each time.
+    //  and put our thread name onto the test queue. We check for shutdown
+    //  requests each time. If we are asked to shutdown, the sleep call
+    //  will return false.
     //
-    while (kCIDLib::True)
-    {
-        //
-        //  Sleep for our appointed time, and watch for a shutdown request
-        //  at the same time. If we are interrupted with a request to
-        //  shut down, then just break out and we ar edone.
-        //
-        if (!thrThis.bSleep(c4SleepTime))
-            break;
-
-        // Add our name to the queue
+    while (thrThis.bSleep(c4SleepTime))
         colTest.objAdd(thrThis.strName());
-    }
 
     return tCIDLib::EExitCodes::Normal;
 }

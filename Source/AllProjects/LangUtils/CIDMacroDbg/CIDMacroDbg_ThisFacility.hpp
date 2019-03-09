@@ -36,23 +36,18 @@ class CIDMACRODBGEXP TFacCIDMacroDbg : public TGUIFacility
         // -------------------------------------------------------------------
         TFacCIDMacroDbg();
 
+        TFacCIDMacroDbg(const TFacCIDMacroDbg&) = delete;
+
         ~TFacCIDMacroDbg();
 
 
+        // -------------------------------------------------------------------
+        //  Public oeprators
+        // -------------------------------------------------------------------
+        TFacCIDMacroDbg& operator=(const TFacCIDMacroDbg&) = delete;
+
+
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TFacCIDMacroDbg(const TFacCIDMacroDbg&);
-        tCIDLib::TVoid operator=(const TFacCIDMacroDbg&);
-
-
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        // -------------------------------------------------------------------
-
-
         // -------------------------------------------------------------------
         //  Magic Macros
         // -------------------------------------------------------------------

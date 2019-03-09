@@ -65,29 +65,29 @@ static tCIDLib::TVoid SimpleTests()
     //
     //  Do the basic inc/dec operations
     //
-    if (kscntTest1.bInc())
-        strmOut << CUR_LN << L"Inc should not have returned true\n";
-
-    if (kscntTest1.c4Value() != 1)
+    if ((kscntTest1.c4Inc() != 1)
+    ||  (kscntTest1.c4Value() != 1))
+    {
         strmOut << CUR_LN << L"Card4 increment failed\n";
+    }
 
-    if (kscntTest3.bInc())
-        strmOut << CUR_LN << L"Inc should not have returned true\n";
-
-    if (kscntTest3.i4Value() != 1)
+    if ((kscntTest3.i4Inc() != 1)
+    ||  (kscntTest3.i4Value() != 1))
+    {
         strmOut << CUR_LN << L"Int4 increment failed\n";
+    }
 
-    if (!kscntTest1.bDec())
-        strmOut << CUR_LN << L"Dec should have returned true\n";
-
-    if (kscntTest1.c4Value() != 0)
+    if ((kscntTest1.c4Dec() != 0)
+    ||  (kscntTest1.c4Value() != 0))
+    {
         strmOut << CUR_LN << L"Card4 decrement failed\n";
+    }
 
-    if (!kscntTest3.bDec())
-        strmOut << CUR_LN << L"Dec should have returned true\n";
-
-    if (kscntTest3.i4Value() != 0)
+    if ((kscntTest3.i4Dec() != 0)
+    ||  (kscntTest3.i4Value() != 0))
+    {
         strmOut << CUR_LN << L"Int4 decrement failed\n";
+    }
 
     //
     //  Test out the exchange methods

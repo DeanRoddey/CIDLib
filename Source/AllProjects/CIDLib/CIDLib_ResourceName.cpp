@@ -59,7 +59,7 @@ TResourceName& TResourceName::Nul_TResourceName()
     {
         TBaseLock lockInit;
         if (!prsnNull)
-            TRawMem::pExchangePtr(prsnNull, new TResourceName);
+            TRawMem::pExchangePtr(&prsnNull, new TResourceName);
     }
     return *prsnNull;
 }

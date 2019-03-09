@@ -45,7 +45,7 @@ class CIDLIBEXP TExpCharBuf : public TObject
         // -------------------------------------------------------------------
         TExpCharBuf
         (
-            const   tCIDLib::TCard4         c4InitAlloc = 256
+            const   tCIDLib::TCard4         c4InitAlloc = 8
         );
 
         TExpCharBuf(const TExpCharBuf&) = delete;

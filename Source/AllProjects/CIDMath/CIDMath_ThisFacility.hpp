@@ -38,7 +38,14 @@ class CIDMATHEXP TFacCIDMath : public TFacility
         // -------------------------------------------------------------------
         TFacCIDMath();
 
+        TFacCIDMath(const TFacCIDMath&) = delete;
+
         ~TFacCIDMath();
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFacCIDMath& operator=(const TFacCIDMath&) = delete;
 
 
     private :

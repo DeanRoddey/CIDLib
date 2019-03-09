@@ -81,7 +81,7 @@ TGUIBrush& TGUIBrush::Nul_TGUIBrush()
         {
             TRawMem::pExchangePtr<TGUIBrush>
             (
-                pgbrNull, new TSolidBrush(facCIDGraphDev().rgbBlack)
+                &pgbrNull, new TSolidBrush(facCIDGraphDev().rgbBlack)
             );
         }
     }

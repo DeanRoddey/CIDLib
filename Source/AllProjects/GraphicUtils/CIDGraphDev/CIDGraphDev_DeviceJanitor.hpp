@@ -37,6 +37,8 @@ class CIDGRDEVEXP TGraphicDevJanitor : public TObject
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TGraphicDevJanitor() = delete;
+
         TGraphicDevJanitor
         (
                     TGraphDrawDev* const    pgdevToSanitize

@@ -337,7 +337,7 @@ static TMutex* pmtxListAccess()
     {
         TBaseLock lockInit;
         if (!pmtxListAccess)
-            TRawMem::pExchangePtr(pmtxListAccess, new TMutex);
+            TRawMem::pExchangePtr(&pmtxListAccess, new TMutex);
     }
     return pmtxListAccess;
 }

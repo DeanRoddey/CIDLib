@@ -33,12 +33,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDSChan& facCIDSChan()
 {
-    static TFacCIDSChan* pfacCIDSChan = 0;
+    static TFacCIDSChan* pfacCIDSChan = nullptr;
     if (!pfacCIDSChan)
     {
         TBaseLock lockInit;
         if (!pfacCIDSChan)
-            TRawMem::pExchangePtr(pfacCIDSChan, new TFacCIDSChan);
+            pfacCIDSChan = new TFacCIDSChan;
     }
     return *pfacCIDSChan;
 }

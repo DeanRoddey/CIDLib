@@ -62,8 +62,15 @@ class TObjListTab : public TTabWindow, public MIPEIntf
             , const EModes                  eMode
         );
 
+        TObjListTab(const TObjListTab&) = delete;
+
         ~TObjListTab();
 
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TObjListTab& operator=(const TObjListTab&) = delete;
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
@@ -132,7 +139,7 @@ class TObjListTab : public TTabWindow, public MIPEIntf
 
     private :
         // -------------------------------------------------------------------
-        //  Private, non-virtaul methods
+        //  Private, non-virtual methods
         // -------------------------------------------------------------------
         tCIDCtrls::EEvResponses eLBHandler
         (

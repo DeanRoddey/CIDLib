@@ -56,7 +56,7 @@ class KRNLEXPORT TKrnlRscName
 
         TKrnlRscName
         (
-            const   TKrnlRscName&           krscnToCopy
+            const   TKrnlRscName&           krscnSrc
         );
 
         ~TKrnlRscName();
@@ -67,17 +67,17 @@ class KRNLEXPORT TKrnlRscName
         // -------------------------------------------------------------------
         TKrnlRscName& operator=
         (
-            const   TKrnlRscName&           krscnToAssign
+            const   TKrnlRscName&           krscnSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TKrnlRscName&           krscnToCompare
+            const   TKrnlRscName&           krscnSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TKrnlRscName&           krscnToCompare
+            const   TKrnlRscName&           krscnSrc
         )   const;
 
 

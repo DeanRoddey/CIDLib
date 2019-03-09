@@ -420,7 +420,12 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
             }
         }
 
-        TBasicDLinkedCol(TBasicDLinkedCol<TElem>&&) = delete;
+        TBasicDLinkedCol(TBasicDLinkedCol<TElem>&& colSrc) :
+
+            TBasicDLinkedCol()
+        {
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~TBasicDLinkedCol()
         {
@@ -458,7 +463,15 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
             return *this;
         }
 
-        TBasicDLinkedCol<TElem>& operator=(TBasicDLinkedCol<TElem>&&) = delete;
+        TBasicDLinkedCol<TElem>& operator=(TBasicDLinkedCol<TElem>&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                TParent::operator=(tCIDLib::ForceMove(colSrc));
+                m_llstCol = tCIDLib::ForceMove(colSrc.m_llstCol);
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------

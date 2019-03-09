@@ -91,8 +91,8 @@ static  TKrnlSafeCard4Counter   kscntCounter3;
 static tCIDLib::EExitCodes
 eThreadFunc(TThread* const, tCIDLib::TVoid* const pData)
 {
-    // Bump up the counter
-    kscntCounter1.bInc();
+    // Bump up the main counter
+    kscntCounter1.c4Inc();
 
     TThreadInfo& Info = *(TThreadInfo*)pData;
     for  (tCIDLib::TCard4 c4Counter = 0; c4Counter < Info.c4Count; c4Counter++)
@@ -103,16 +103,16 @@ eThreadFunc(TThread* const, tCIDLib::TVoid* const pData)
         kscntCounter3.c4AddTo(4);
         kscntCounter2.i4SubFrom(100);
         kscntCounter3.c4AddTo(10);
-        kscntCounter2.bInc();
+        kscntCounter2.i4Inc();
         kscntCounter2.i4AddTo(97);
         kscntCounter3.c4SubFrom(13);
-        kscntCounter3.bDec();
-        kscntCounter2.bInc();
-        kscntCounter2.bInc();
+        kscntCounter3.c4Dec();
+        kscntCounter2.i4Inc();
+        kscntCounter2.i4Inc();
     }
 
-    // Dec the counter and release main thread if 0
-    if (kscntCounter1.bDec())
+    // Dec the main counter and release main thread if 0
+    if (!kscntCounter1.c4Dec())
         kevWakeup.bTrigger();
     return tCIDLib::EExitCodes::Normal;
 }

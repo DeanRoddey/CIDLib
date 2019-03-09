@@ -32,12 +32,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDMetaExtr& facCIDMetaExtr()
 {
-    static TFacCIDMetaExtr* pfacCIDMetaExtr = 0;
+    static TFacCIDMetaExtr* pfacCIDMetaExtr = nullptr;
     if (!pfacCIDMetaExtr)
     {
         TBaseLock lockInit;
         if (!pfacCIDMetaExtr)
-            TRawMem::pExchangePtr(pfacCIDMetaExtr, new TFacCIDMetaExtr);
+            pfacCIDMetaExtr = new TFacCIDMetaExtr;
     }
     return *pfacCIDMetaExtr;
 }

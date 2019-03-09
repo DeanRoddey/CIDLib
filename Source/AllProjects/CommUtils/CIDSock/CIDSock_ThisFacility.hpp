@@ -42,7 +42,7 @@ class CIDSOCKEXP THostAdapter : public TObject
 
         THostAdapter
         (
-            const   THostAdapter&           hadpToCopy
+            const   THostAdapter&           hadpSrc
         );
 
         ~THostAdapter();
@@ -53,7 +53,7 @@ class CIDSOCKEXP THostAdapter : public TObject
         // -------------------------------------------------------------------
         THostAdapter& operator=
         (
-            const   THostAdapter&           hadpToAssign
+            const   THostAdapter&           hadpSrc
         );
 
 

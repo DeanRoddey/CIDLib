@@ -106,7 +106,7 @@ ERRORS=
     errcCol_IsEmpty             775     The %(1) collection is empty
     errcCol_NotMyCursor         776     The passed %(1) cursor does not belong to this %(2) collection
     errcCol_DuplicateKey        777     The key '%(1)' is already represented in the %(2) collection
-    errcCol_KeyNotFound         778     The key '%(1)' was not found in the %(2) collection
+    errcCol_KeyNotFound         778     The requested key was not found in the %(1) collection
     errcCol_StaleCursor         779     The %(1) cursor is out of sync with its target collection
     errcCol_DuplicateElem       780     Set collections cannot contain duplicate elements
     errcCol_InvalidInsert       781     Invalid insert. Either new node is already a memory, or after node is not a member
@@ -450,9 +450,15 @@ ERRORS=
     errcSig_CantRemoveHandler   3100    The signal handler could not be removed
 
     ; Size errors
-    errcSize_UnderOverflow      3150    The operation caused an under/overflow of one or both of the size fields
-    errcSize_CantPack           3151    The values are too big to pack into a TCard4
-    errcSize_BadFormat          3152    Could not parse size object from passed text
+    errcSize_UnderOverflow      3125    The operation caused an under/overflow of one or both of the size fields
+    errcSize_CantPack           3126    The values are too big to pack into a TCard4
+    errcSize_BadFormat          3127    Could not parse size object from passed text
+
+    ; Smart pointer related errors
+    errcSPtr_NoReference        3150    The counted pointer doesn't have a reference
+    errcSPtr_RefReleaseErr      3151    A ref count release error occurred
+    errcSPtr_RefUnderflow       3152    Ref count was at zero before release call
+    errcSPtr_RefAcquireErr      3153    A ref count acquire error occurred
 
     ; Speech related errors
     errcSpeech_SpeakFailed      3160    Text to speech operation failed

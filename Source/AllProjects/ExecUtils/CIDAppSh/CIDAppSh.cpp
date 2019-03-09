@@ -33,12 +33,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDAppSh& facCIDAppSh()
 {
-    static TFacCIDAppSh* pfacCIDAppShell = 0;
+    static TFacCIDAppSh* pfacCIDAppShell = nullptr;
     if (!pfacCIDAppShell)
     {
         TBaseLock lockInit;
         if (!pfacCIDAppShell)
-            TRawMem::pExchangePtr(pfacCIDAppShell, new TFacCIDAppSh);
+            pfacCIDAppShell = new TFacCIDAppSh;
     }
     return *pfacCIDAppShell;
 }

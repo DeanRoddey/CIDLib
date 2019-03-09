@@ -93,7 +93,7 @@ class CIDGRDEVEXP TIcon : public TObject, public MDrawable
 
         TIcon
         (
-            const   TFacility&                  facSource
+            const   TFacility&                  facSrc
             , const tCIDLib::TResId             ridIcon
         );
 
@@ -124,7 +124,7 @@ class CIDGRDEVEXP TIcon : public TObject, public MDrawable
 
         TIcon
         (
-            const   TIcon&                      icoToCopy
+            const   TIcon&                      icoSrc
         );
 
         ~TIcon();
@@ -135,7 +135,7 @@ class CIDGRDEVEXP TIcon : public TObject, public MDrawable
         // -------------------------------------------------------------------
         TIcon& operator=
         (
-            const   TIcon&                      icoToAssign
+            const   TIcon&                      icoSrc
         );
 
 

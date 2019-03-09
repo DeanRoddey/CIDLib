@@ -185,7 +185,7 @@ TFontMetrics& TFontMetrics::Nul_TFontMetrics()
     {
         TBaseLock lockInit;
         if (!pfmtrNull)
-            TRawMem::pExchangePtr(pfmtrNull, new TFontMetrics);
+            TRawMem::pExchangePtr(&pfmtrNull, new TFontMetrics);
     }
     return *pfmtrNull;
 }

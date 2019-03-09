@@ -3321,7 +3321,7 @@ tCIDLib::TVoid TCIDMacroEngine::InitTempPool()
     {
         m_colTempPool.objAdd
         (
-            TCntValList(new TClassValList(tCIDLib::EAdoptOpts::Adopt, 32))
+            TCntValList(new tCIDMacroEng::TClassValList(tCIDLib::EAdoptOpts::Adopt, 32))
         );
     }
 }
@@ -3350,7 +3350,7 @@ TCIDMacroEngine::pmecvGet(  const   TString&                    strName
     //  Get the actual counted collection out of it, and search this list for
     //  an available item.
     //
-    TClassValList& colList = cptrList.objData();
+    tCIDMacroEng::TClassValList& colList = *cptrList;
     const tCIDLib::TCard4 c4Count = colList.c4ElemCount();
     tCIDLib::TCard4 c4Index;
     TMEngClassVal* pmecvRet = 0;

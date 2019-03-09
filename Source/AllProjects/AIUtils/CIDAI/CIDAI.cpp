@@ -32,12 +32,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDAI& facCIDAI()
 {
-    static TFacCIDAI* pfacCIDAI = 0;
+    static TFacCIDAI* pfacCIDAI = nullptr;
     if (!pfacCIDAI)
     {
         TBaseLock lockInit;
         if (!pfacCIDAI)
-            TRawMem::pExchangePtr(pfacCIDAI, new TFacCIDAI);
+            pfacCIDAI = new TFacCIDAI;
     }
     return *pfacCIDAI;
 }

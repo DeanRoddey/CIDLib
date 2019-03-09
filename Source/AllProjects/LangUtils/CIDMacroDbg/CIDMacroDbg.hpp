@@ -38,9 +38,7 @@
 //  Include our needed underlying headers.
 // ---------------------------------------------------------------------------
 #include    "CIDCtrls.hpp"
-
 #include    "CIDWUtils.hpp"
-
 #include    "CIDMacroEng.hpp"
 
 

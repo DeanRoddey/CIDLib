@@ -376,8 +376,7 @@ TTextOutStream& TSysInfo::strmErr()
             {
                 TRawMem::pExchangePtr<TTextOutStream>
                 (
-                    s_pstrmErr
-                    , new TTextFileOutStream(tCIDLib::EStdFiles::StdErr)
+                    &s_pstrmErr, new TTextFileOutStream(tCIDLib::EStdFiles::StdErr)
                 );
             }
              else
@@ -388,9 +387,9 @@ TTextOutStream& TSysInfo::strmErr()
                 //  already and set the error stream to the same thing.
                 //
                 if (!s_pstrmOut)
-                    TRawMem::pExchangePtr<TTextOutStream>(s_pstrmOut, new TOutConsole);
+                    TRawMem::pExchangePtr<TTextOutStream>(&s_pstrmOut, new TOutConsole);
 
-                TRawMem::pExchangePtr<TTextOutStream>(s_pstrmErr, s_pstrmOut);
+                TRawMem::pExchangePtr<TTextOutStream>(&s_pstrmErr, s_pstrmOut);
             }
         }
     }
@@ -410,12 +409,12 @@ TTextInStream& TSysInfo::strmIn()
             {
                 TRawMem::pExchangePtr<TTextInStream>
                 (
-                    s_pstrmIn, new TTextFileInStream(tCIDLib::EStdFiles::StdIn)
+                    &s_pstrmIn, new TTextFileInStream(tCIDLib::EStdFiles::StdIn)
                 );
             }
              else
             {
-                TRawMem::pExchangePtr<TTextInStream>(s_pstrmIn, new TInConsole);
+                TRawMem::pExchangePtr<TTextInStream>(&s_pstrmIn, new TInConsole);
             }
         }
     }
@@ -435,12 +434,12 @@ TTextOutStream& TSysInfo::strmOut()
             {
                 TRawMem::pExchangePtr<TTextOutStream>
                 (
-                    s_pstrmOut, new TTextFileOutStream(tCIDLib::EStdFiles::StdOut)
+                    &s_pstrmOut, new TTextFileOutStream(tCIDLib::EStdFiles::StdOut)
                 );
             }
              else
             {
-                TRawMem::pExchangePtr<TTextOutStream>(s_pstrmOut, new TOutConsole);
+                TRawMem::pExchangePtr<TTextOutStream>(&s_pstrmOut, new TOutConsole);
             }
         }
     }

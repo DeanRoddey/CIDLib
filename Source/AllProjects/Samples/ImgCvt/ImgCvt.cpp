@@ -31,23 +31,11 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include some image facility headers, which bring in all
-//  we need.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDJPEG.hpp"
 #include    "CIDPNG.hpp"
 
-
-
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
 
 
 // ----------------------------------------------------------------------------
@@ -73,12 +61,9 @@ static TString              strSrcFiles;
 
 
 // ----------------------------------------------------------------------------
-//  Do the magic main module code
-//
-//  This tells CIDLib what the main thread of the program is. This is the
-//  only thread object that is run automatically. All others are started
-//  manually when required or desired.
+//  Do the magic main module code to start teh main thread
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"ImgCvtMainThread", eMainThreadFunc))
 
 
@@ -92,13 +77,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     thrThis.Sync();
 
     //
-    //  Get the standard output stream. We don't have any interactive needs,
-    //  so we can just use this standard one, so that we support redirection.
-    //
-    TTextOutStream& strmOut = TSysInfo::strmOut();
-
-
-    //
     //  Since this is a demo and partly a testing program, we'd like to
     //  catch all exceptions cleanly and report them. So put the whole thing
     //  in a try.
@@ -107,15 +85,15 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     {
         // Output a little program blurb
         strmOut << L"\nImgCvt.Exe\n"
-                << L"CIDLib Image Conversion Demo\n\n" << kCIDLib::EndLn;
+                << L"CIDLib Image Conversion Demo" << kCIDLib::NewEndLn;
 
         // We need three params so get those
         tCIDLib::TCard4 c4Args = TSysInfo::c4CmdLineParmCount();
         if (c4Args != 3)
         {
             strmOut << L"Usage:\n    ImgCvt srcdir tardir cvttype\n"
-                       L"            cvttype = PNG2JPG or JPG2PNG\n\n"
-                    << kCIDLib::EndLn;
+                       L"            cvttype = PNG2JPG or JPG2PNG"
+                    << kCIDLib::NewEndLn;
             return tCIDLib::EExitCodes::BadParameters;
         }
 
@@ -125,27 +103,13 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         // Make sure the source exists
         if (!TFileSys::bExists(pathSrc))
         {
-            strmOut << L"    The source path does not exist\n\n"
-                    << kCIDLib::EndLn;
+            strmOut << L"    The source path does not exist" << kCIDLib::NewEndLn;
             return tCIDLib::EExitCodes::BadParameters;
         }
 
-        // If the target doesn't exist, then create it
+        // If the target path doesn't exist, then create it
         if (!TFileSys::bExists(pathTar))
-        {
-            try
-            {
-                TFileSys::MakeDirectory(pathTar);
-            }
-
-            catch(...)
-            {
-                strmOut << L"    The target path did not exist and could not be"
-                           L" created.\n\n"
-                        << kCIDLib::EndLn;
-                return tCIDLib::EExitCodes::BadParameters;
-            }
-        }
+            TFileSys::MakePath(pathTar);
 
         //
         //  Set up JPEG and PNG image objects. Set up the output quality
@@ -171,8 +135,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         }
          else
         {
-            strmOut << L"    The conversion type was not recognized\n\n"
-                    << kCIDLib::EndLn;
+            strmOut << L"    The conversion type was not recognized" << kCIDLib::NewEndLn;
         }
 
         // And now do a search of the src dir for the source files
@@ -180,8 +143,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         TFindBuf fndbCur;
         if (!diterSrc.bFindFirst(pathSrc, strSrcFiles, fndbCur))
         {
-            strmOut << L"No matching files were found in the source directory\n\n"
-                    << kCIDLib::EndLn;
+            strmOut << L"No matching source files were found" << kCIDLib::NewEndLn;
             return tCIDLib::EExitCodes::BadParameters;
         }
 
@@ -243,17 +205,10 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         strmOut << L"A CIDLib runtime error occured during processing.\nError:\n\n"
-                << errToCatch << kCIDLib::NewLn << kCIDLib::EndLn;
+                << errToCatch << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::RuntimeError;
     }
 
@@ -265,7 +220,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     catch(const TKrnlError& kerrToCatch)
     {
         strmOut << L"A kernel error occured during processing.\nError="
-                << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
+                << kerrToCatch.errcId() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
@@ -273,7 +228,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     catch(...)
     {
         strmOut << L"A general exception occured during processing"
-                << kCIDLib::DNewLn << kCIDLib::EndLn;
+                << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::SystemException;
     }
 

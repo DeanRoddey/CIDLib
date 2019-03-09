@@ -33,7 +33,6 @@
 // ---------------------------------------------------------------------------
 RTTIDecls(TTest_RefVectorLambda, TTestFWTest)
 RTTIDecls(TTest_RefVectorMoveItem, TTestFWTest)
-// RTTIDecls(TTest_RefVectorMoveSem, TTestFWTest)
 
 
 // ---------------------------------------------------------------------------
@@ -107,91 +106,6 @@ TTest_RefVectorLambda::eRunTest(TTextStringOutStream&   strmOut
 }
 
 
-
-/*
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_RefVectorMoveSem
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TTest_RefVectorMoveSem: Constructor and Destructor
-// ---------------------------------------------------------------------------
-TTest_RefVectorMoveSem::TTest_RefVectorMoveSem() :
-
-    TTestFWTest
-    (
-        L"Ref Vector Move Semantics", L"Ref vector move ctor and assignment", 3
-    )
-{
-}
-
-TTest_RefVectorMoveSem::~TTest_RefVectorMoveSem()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TTest_RefVectorMoveSem: Public, inherited methods
-// ---------------------------------------------------------------------------
-tTestFWLib::ETestRes
-TTest_RefVectorMoveSem::eRunTest(TTextStringOutStream&  strmOut
-                                , tCIDLib::TBoolean&    bWarning)
-{
-    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
-
-    // Load up a ref fector with some objects
-    TRefVector<TString> colTest(tCIDLib::EAdoptOpts::Adopt, 16);
-    TString strVal(32UL);
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < 16; c4Index++)
-    {
-        strVal = L"Value ";
-        strVal.AppendFormatted(c4Index);
-        colTest.Add(new TString(strVal));
-    }
-
-    //
-    //  Force a move ctor. The new guy should have the elements and the original
-    //  should have none.
-    //
-    TRefVector<TString> colMoveCtor(tCIDLib::ForceMove(colTest));
-    if (colMoveCtor.c4ElemCount() != 16)
-    {
-        strmOut << L"Move ctor did not move elements to new collection\n\n";
-        eRes = tTestFWLib::ETestRes::Failed;
-    }
-
-    // And the original should be empty now
-    if (colTest.c4ElemCount() != 0)
-    {
-        strmOut << L"Move ctor did not empty source collection\n\n";
-        eRes = tTestFWLib::ETestRes::Failed;
-    }
-
-    // And it should be non-adopting now
-    if (colTest.eAdopt() != tCIDLib::EAdoptOpts::NoAdopt)
-    {
-        strmOut << L"Move ctor did not update source adopt option\n\n";
-        eRes = tTestFWLib::ETestRes::Failed;
-    }
-
-    // And make sure that we got the correct values over
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < 16; c4Index++)
-    {
-        strVal = L"Value ";
-        strVal.AppendFormatted(c4Index);
-        if (*colMoveCtor[c4Index] != strVal)
-        {
-            strmOut << L"Move ctor copy is out of sequence\n\n";
-            eRes = tTestFWLib::ETestRes::Failed;
-            break;
-        }
-    }
-
-    return eRes;
-}
-
-*/
 
 
 // ---------------------------------------------------------------------------

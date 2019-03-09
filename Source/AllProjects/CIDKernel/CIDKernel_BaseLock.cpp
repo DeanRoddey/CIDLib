@@ -74,7 +74,7 @@ TBaseLock::TBaseLock()
         //  done. The original value is returned, so if the return is 0, then
         //  we won. Otherwise, we have to toast our candidate.
         //
-        if (TRawMem::pCompareAndExchangePtr(CIDKernel_BaseLock::pkcrsLock
+        if (TRawMem::pCompareAndExchangePtr(&CIDKernel_BaseLock::pkcrsLock
                                             , pkcrsCandidate
                                             , pkcrsNone))
         {

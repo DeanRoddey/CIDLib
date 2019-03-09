@@ -33,12 +33,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDPack& facCIDPack()
 {
-    static TFacCIDPack* pfacCIDPack = 0;
+    static TFacCIDPack* pfacCIDPack = nullptr;
     if (!pfacCIDPack)
     {
         TBaseLock lockInit;
         if (!pfacCIDPack)
-            TRawMem::pExchangePtr(pfacCIDPack, new TFacCIDPack);
+            pfacCIDPack = new TFacCIDPack;
     }
     return *pfacCIDPack;
 }

@@ -207,8 +207,8 @@ TKrnlSockPinger::TKrnlSockPinger() :
     , m_c4TTL(128)
     , m_enctLastTime(0)
     , m_eState(tCIDSock::EPingStates::WaitInit)
-    , m_pc1Buf(0)
-    , m_pContext(0)
+    , m_pc1Buf(nullptr)
+    , m_pContext(nullptr)
 {
     //
     //  Get a unique id for this pinger object. Wrap it if it gets close to
@@ -217,7 +217,10 @@ TKrnlSockPinger::TKrnlSockPinger() :
     //  reset it and two subequent threads would be get 1, but it's so unlikely
     //  it's not worth worrying about.
     //
-    const tCIDLib::TCard4 c4Id = s_scntIds.c4AddTo(1);
+    //  And of course our safe pointer is signed as well, and keeping the values
+    //  small means we never have to worry about it wrapping.
+    //
+    const tCIDLib::TCard4 c4Id = s_scntIds.c4Inc();
     if (c4Id >= 0xFFA0)
         s_scntIds.c4SetValue(1);
     m_c2Id = tCIDLib::TCard2(c4Id);
@@ -240,7 +243,7 @@ TKrnlSockPinger::~TKrnlSockPinger()
         bTerminate();
 
         delete pCtx;
-        m_pContext = 0;
+        m_pContext = nullptr;
     }
 
     // Clean up our buffer
@@ -624,7 +627,7 @@ const TKrnlIPAddr& TKrnlSockPinger::ipaTar() const
 // ---------------------------------------------------------------------------
 //  TKrnlSockPinger: Private, static data
 // ---------------------------------------------------------------------------
-TKrnlSafeCard4Counter TKrnlSockPinger::s_scntIds(1);
+TKrnlSafeCard4Counter    TKrnlSockPinger::s_scntIds(1);
 
 
 // ---------------------------------------------------------------------------

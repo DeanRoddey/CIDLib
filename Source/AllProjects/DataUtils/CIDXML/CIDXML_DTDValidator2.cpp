@@ -900,7 +900,7 @@ tCIDLib::TVoid TDTDValidator::ParseDOCType(const tCIDLib::TBoolean bDTOnly)
         }
 
         // If not resolved, try to do it ourself
-        if (!esrExtSS.pobjData())
+        if (!esrExtSS)
         {
             //
             //  Assume its a local file path. If the new file is not fully

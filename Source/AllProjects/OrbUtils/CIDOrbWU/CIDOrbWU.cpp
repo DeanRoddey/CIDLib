@@ -32,12 +32,12 @@
 // ---------------------------------------------------------------------------
 TFacCIDOrbWU& facCIDOrbWU()
 {
-    static TFacCIDOrbWU* pfacCIDOrbWU = 0;
+    static TFacCIDOrbWU* pfacCIDOrbWU = nullptr;
     if (!pfacCIDOrbWU)
     {
         TBaseLock lockInit;
         if (!pfacCIDOrbWU)
-            TRawMem::pExchangePtr(pfacCIDOrbWU, new TFacCIDOrbWU);
+            pfacCIDOrbWU = new TFacCIDOrbWU;
     }
     return *pfacCIDOrbWU;
 }

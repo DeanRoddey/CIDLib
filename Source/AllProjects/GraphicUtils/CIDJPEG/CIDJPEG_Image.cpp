@@ -94,8 +94,8 @@ TJPEGImage::TJPEGImage() :
     , m_bOptimalEncoding(kCIDLib::False)
     , m_c4CompQuality(75)
     , m_eOutSample(tCIDJPEG::EOutSamples::F4_2_2)
-    , m_pc1DecContext(0)
-    , m_pc1EncContext(0)
+    , m_pc1DecContext(nullptr)
+    , m_pc1EncContext(nullptr)
 {
 }
 
@@ -106,8 +106,8 @@ TJPEGImage::TJPEGImage(const TJPEGImage& imgToCopy) :
     , m_bOptimalEncoding(imgToCopy.m_bOptimalEncoding)
     , m_c4CompQuality(imgToCopy.m_c4CompQuality)
     , m_eOutSample(imgToCopy.m_eOutSample)
-    , m_pc1DecContext(0)
-    , m_pc1EncContext(0)
+    , m_pc1DecContext(nullptr)
+    , m_pc1EncContext(nullptr)
 {
     // Note that we zero the enc/dec contexts. We'll fault our own in if needed
 }
@@ -119,8 +119,8 @@ TJPEGImage::TJPEGImage(const TPixelArray& pixaBits) :
     , m_bOptimalEncoding(kCIDLib::False)
     , m_c4CompQuality(75)
     , m_eOutSample(tCIDJPEG::EOutSamples::F4_2_2)
-    , m_pc1DecContext(0)
-    , m_pc1EncContext(0)
+    , m_pc1DecContext(nullptr)
+    , m_pc1EncContext(nullptr)
 {
     // We need our data to be top down, so if it's not, flip it
     ForceRowOrder(tCIDImage::ERowOrders::TopDown);
@@ -143,8 +143,8 @@ TJPEGImage::TJPEGImage( const   TPixelArray&    pixaBits
     , m_bOptimalEncoding(kCIDLib::False)
     , m_c4CompQuality(75)
     , m_eOutSample(tCIDJPEG::EOutSamples::F4_2_2)
-    , m_pc1DecContext(0)
-    , m_pc1EncContext(0)
+    , m_pc1DecContext(nullptr)
+    , m_pc1EncContext(nullptr)
 {
     // We need our data to be top down, so if it's not, flip it
     ForceRowOrder(tCIDImage::ERowOrders::TopDown);
@@ -157,8 +157,8 @@ TJPEGImage::TJPEGImage(const TCIDImage& imgSrc) :
     , m_bOptimalEncoding(kCIDLib::False)
     , m_c4CompQuality(75)
     , m_eOutSample(tCIDJPEG::EOutSamples::F4_2_2)
-    , m_pc1DecContext(0)
-    , m_pc1EncContext(0)
+    , m_pc1DecContext(nullptr)
+    , m_pc1EncContext(nullptr)
 {
     // We need our data to be top down, so if it's not, flip it
     ForceRowOrder(tCIDImage::ERowOrders::TopDown);
@@ -173,6 +173,7 @@ TJPEGImage::~TJPEGImage()
         jpeg_decompress_struct* pcinfo = (jpeg_decompress_struct*)m_pc1DecContext;
         jpeg_destroy_decompress(pcinfo);
         delete [] m_pc1DecContext;
+        m_pc1DecContext = nullptr;
     }
 
     if (m_pc1EncContext)
@@ -181,6 +182,7 @@ TJPEGImage::~TJPEGImage()
         jpeg_compress_struct* pcinfo = (jpeg_compress_struct*)m_pc1EncContext;
         jpeg_destroy_compress(pcinfo);
         delete [] m_pc1EncContext;
+        m_pc1EncContext = nullptr;
     }
 }
 
@@ -261,7 +263,7 @@ tCIDJPEG::EOutSamples TJPEGImage::eOutSample(const tCIDJPEG::EOutSamples eToSet)
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TJPEGImage::StreamFrom(TBinInStream& strmToReadFrom)
 {
-    jpeg_decompress_struct* pcinfo = 0;
+    jpeg_decompress_struct* pcinfo = nullptr;
     try
     {
         //
@@ -394,7 +396,7 @@ tCIDLib::TVoid TJPEGImage::StreamTo(TBinOutStream& strmToWriteTo) const
     //
     tCIDLib::TBoolean bNeedFinish = kCIDLib::False;
 
-    jpeg_compress_struct* pcinfo = 0;
+    jpeg_compress_struct* pcinfo = nullptr;
     try
     {
         //

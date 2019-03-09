@@ -22,9 +22,9 @@
 //  key phrase, and input file and and output file and a flag that says
 //  whether to encrypt or decrypt the input file.
 //
-//  We take a key as a command line parameter. The default if we provided
-//  that as text as a key is that it will be converted to UTF-8, with no
-//  trailing terminator. That will then be used as the actual key. UTF-8 is
+//  We take a key as a command line parameter. The default, if we pass that
+//  strihng as a key, is that it will be converted to UTF-8, with no trailing
+//  terminator and no BOM. That will then be used as the actual key. UTF-8 is
 //  not byte order dependent.
 //
 // CAVEATS/GOTCHAS:
@@ -55,23 +55,9 @@
 
 
 // ---------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDCrypto, which is all we need. It brings in
-//  CIDLib.Hpp.
+//  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDCrypto.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  Forward references
-// ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-static tCIDLib::TVoid ShowUsage();
 
 
 
@@ -87,8 +73,9 @@ static  TOutConsole conOut;
 
 
 // ---------------------------------------------------------------------------
-//  Do the magic main module code
+//  Do the magic main module code to start the main thread
 // ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Crypto1MainThread", eMainThreadFunc))
 
 
@@ -96,6 +83,23 @@ CIDLib_MainModule(TThread(L"Crypto1MainThread", eMainThreadFunc))
 // ---------------------------------------------------------------------------
 //  Local methods
 // ---------------------------------------------------------------------------
+
+//
+//  This is called if any of the parameters are not right. It will display
+//  the correct parameter usage.
+//
+static tCIDLib::TVoid ShowUsage()
+{
+    conOut << L"Invalid parameters! Correct usage:\n"
+             << L"  Crypto1 /flag key infile outfile\n"
+             << L"  /flag   - /Decrypt or /Encrypt\n"
+             << L"  key     - The key to use. In quotes if spaces are used\n"
+             << L"  infile  - The input file to en(de)crypt\n"
+             << L"  outfile - The output file that holds the results\n"
+             << kCIDLib::EndLn;
+}
+
+
 
 //
 //  This is the the thread function for the main thread.
@@ -106,22 +110,16 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     thrThis.Sync();
 
     //
-    //  Display a little blurb to say what we are and our version.
-    //
-    conOut    << kCIDLib::NewLn << L"Crypto1.Exe\nCompiled: "
-                << TString(__DATE__) << kCIDLib::NewLn << kCIDLib::EndLn;
-
-    //
     //  Ok, now we do our real work. Lets set up a try statement so that
     //  we can catch any errors that might occur and display a message.
     //
-    tCIDLib::TBoolean   bEncrypt;
-    tCIDLib::TBoolean   bOutputFileCreated = kCIDLib::False;
-    TBinFileOutStream   strmOutput;
-    tCIDLib::EExitCodes eExitCode = tCIDLib::EExitCodes::Normal;
-    TString             strPhase;
+    TString strPhase;
     try
     {
+        tCIDLib::TBoolean   bEncrypt;
+        tCIDLib::TBoolean   bOutputFileCreated = kCIDLib::False;
+
+
         // Create a local string for temp command line work
         TString strTmp(512UL);
 
@@ -129,7 +127,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //  See if there are enough parameters. There must be 4, the encrypt/decrypt
         //  flag, the key, the input file, and the output file.
         //
-        strPhase = L"testing command line parms";
         if (TSysInfo::c4CmdLineParmCount() != 4)
         {
             ShowUsage();
@@ -164,14 +161,10 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         strTmp = TSysInfo::strCmdLineParmAt(1);
         TCryptoKey ckeyWork(strTmp);
 
-        //
-        //  Get the input file and try to open it for read only access. We
-        //  use a binary file stream for our reading.
-        //
-        strPhase = L"opening input file";
+        // Create our input file stream, if the file exists
+        strPhase = L"opening the input file";
         strTmp = TSysInfo::strCmdLineParmAt(2);
-        TBinFileInStream strmInput;
-        strmInput.Open
+        TBinFileInStream strmInput
         (
             strTmp
             , tCIDLib::ECreateActs::OpenIfExists
@@ -184,9 +177,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //  truncate an existing one. We also use a binary file stream
         //  here for our writing.
         //
-        strPhase = L"creating output file";
+        strPhase = L"creating the output file";
         strTmp = TSysInfo::strCmdLineParmAt(3);
-        strmOutput.Open
+        TBinFileOutStream strmOutput
         (
             strTmp
             , tCIDLib::ECreateActs::CreateAlways
@@ -218,7 +211,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //  know that we have not gotten some random file.
         //
         tCIDLib::TCard8 c8OriginalSize = strmInput.c8CurSize();
-
         if (bEncrypt)
         {
             strmOutput  << c8OriginalSize << ~c8OriginalSize << kCIDLib::FlushIt;
@@ -255,8 +247,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         THeapBuf mbufInput(c4BufSize);
         THeapBuf mbufOutput(c4BufSize);
 
-        strPhase = L"converting file";
-        while (1)
+        strPhase = L"converting the file";
+        while (kCIDLib::True)
         {
             //
             //  Read up to the input buffer size from the file. If we get
@@ -308,20 +300,13 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             strmOutput.TruncateAt(c8OriginalSize);
     }
 
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut << L"An error occured while "
                  << strPhase << L"\n"
                  << L"Error: " << errToCatch.strErrText()
                  << kCIDLib::NewLn << kCIDLib::EndLn;
-        eExitCode = tCIDLib::EExitCodes::RuntimeError;
+        return tCIDLib::EExitCodes::RuntimeError;
     }
 
     catch(const TKrnlError& kerrToCatch)
@@ -332,48 +317,16 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                  << L"/" << kerrToCatch.errcHostId() << L"\n"
                  << L"Please report this error!! Kernel errors should not ever be seen by you\n"
                  << kCIDLib::EndLn;
-        eExitCode = tCIDLib::EExitCodes::RuntimeError;
+        return tCIDLib::EExitCodes::RuntimeError;
     }
 
     catch(...)
     {
         conOut << L"A system error occured while "
                  << strPhase << kCIDLib::NewLn << kCIDLib::EndLn;
-        eExitCode = tCIDLib::EExitCodes::FatalError;
+        return tCIDLib::EExitCodes::FatalError;
     }
 
-    // Close the input and output files
-    strmOutput.Close();
-
-    //
-    //  If we failed and the output file got created, then we need
-    //  to remove it. If it went well, then announce it.
-    //
-    if (eExitCode != tCIDLib::EExitCodes::Normal)
-    {
-        if (bOutputFileCreated && TFileSys::bExists(strmOutput.strFileName()))
-            TFileSys::DeleteFile(strmOutput.strFileName());
-    }
-     else
-    {
-        conOut << L"The operation succeeded\n" << kCIDLib::EndLn;
-    }
-    return eExitCode;
-}
-
-
-//
-//  This is called if any of the parameters are not right. It will display
-//  the correct parameter usage.
-//
-static tCIDLib::TVoid ShowUsage()
-{
-    conOut << L"Invalid parameters! Correct usage:\n"
-             << L"  Crypto1 /flag key infile outfile\n"
-             << L"  /flag   - /Decrypt or /Encrypt\n"
-             << L"  key     - The key to use. In quotes if spaces are used\n"
-             << L"  infile  - The input file to en(de)crypt\n"
-             << L"  outfile - The output file that holds the results\n"
-             << kCIDLib::EndLn;
+    return tCIDLib::EExitCodes::Normal;
 }
 

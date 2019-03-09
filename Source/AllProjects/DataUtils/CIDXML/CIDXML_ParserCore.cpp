@@ -241,7 +241,7 @@ TXMLParserCore::ParseRootEntity(        tCIDXML::TEntitySrcRef& esrRoot
             PostXMLError(kXMLErrs::errcXMLE_EmptyMainEntity);
 
             if (m_pmxevDocEvents && bInfoWanted(tCIDXML::EParseFlags::Topology))
-                m_pmxevDocEvents->EndDocument(esrRoot.objData());
+                m_pmxevDocEvents->EndDocument(*esrRoot);
             return;
         }
 
@@ -250,7 +250,7 @@ TXMLParserCore::ParseRootEntity(        tCIDXML::TEntitySrcRef& esrRoot
         //  know that a new document is being started.
         //
         if (m_pmxevDocEvents && bInfoWanted(tCIDXML::EParseFlags::Topology))
-            m_pmxevDocEvents->StartDocument(esrRoot.objData());
+            m_pmxevDocEvents->StartDocument(*esrRoot);
 
         //
         //  Alrighty, lets actually try to parse some input. We start by doing
@@ -302,7 +302,7 @@ TXMLParserCore::ParseRootEntity(        tCIDXML::TEntitySrcRef& esrRoot
 
     // Call the end document event callback
     if (m_pmxevDocEvents && bInfoWanted(tCIDXML::EParseFlags::Topology))
-        m_pmxevDocEvents->EndDocument(esrRoot.objData());
+        m_pmxevDocEvents->EndDocument(*esrRoot);
 }
 
 
@@ -1491,7 +1491,7 @@ tCIDLib::TVoid TXMLParserCore::ParsePreContent()
     //  locked.
     //
     if (!bSawDOCTYPE
-    &&  m_esrDefExtSS.pobjData()
+    &&  m_esrDefExtSS
     &&  !m_bValidatorLocked
     &&  tCIDLib::bAllBitsOn(m_eOptions, tCIDXML::EParseOpts::IgnoreDTD))
     {

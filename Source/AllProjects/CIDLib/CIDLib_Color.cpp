@@ -51,7 +51,7 @@ TRGBClr& TRGBClr::Nul_TRGBClr()
     {
         TBaseLock lockInit;
         if (!prgbNull)
-            TRawMem::pExchangePtr(prgbNull, new TRGBClr);
+            TRawMem::pExchangePtr(&prgbNull, new TRGBClr);
     }
     return *prgbNull;
 }

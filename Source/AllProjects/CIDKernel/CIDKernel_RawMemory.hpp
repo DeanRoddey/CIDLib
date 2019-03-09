@@ -75,6 +75,16 @@ namespace TRawMem
         const   tCIDLib::TVoid* const   pBuf
     );
 
+    KRNLEXPORT tCIDLib::TBoolean bSafeRefAcquire
+    (
+        volatile tCIDLib::TCard4&      c4Ref
+    );
+
+    KRNLEXPORT tCIDLib::TBoolean bSafeRefRelease
+    (
+        volatile tCIDLib::TCard4&       c4Ref
+    );
+
     KRNLEXPORT tCIDLib::TCard4 c4CompareAndExchange
     (
                 tCIDLib::TCard4&        c4ToFill
@@ -162,11 +172,17 @@ namespace TRawMem
         , const tCIDLib::TCard4         c4Count
     );
 
-    KRNLEXPORT tCIDLib::TVoid* pCompareAndExchangePtr
+    KRNLEXPORT tCIDLib::TVoid* pCompareAndExchangeRawPtr
     (
-        const   tCIDLib::TVoid*         pToFill
+                tCIDLib::TVoid**        ppToFill
         , const tCIDLib::TVoid*         pNew
         , const tCIDLib::TVoid*         pCompare
+    );
+
+    KRNLEXPORT tCIDLib::TVoid* pExchangeRawPtr
+    (
+                tCIDLib::TVoid**        ppToFill
+        , const tCIDLib::TVoid*         pNew
     );
 
     KRNLEXPORT const tCIDLib::TVoid* pNextPageAdr
@@ -289,30 +305,21 @@ namespace TRawMem
     //  These are some templates that make the business of doing compare
     //  and exchanges on pointers typesafe and convenient.
     //
-    template <class T> T* pExchangePtr(T*& pToFill, const T* const pNew)
+    template <class T> T* pExchangePtr(T** ppToFill, const T* const pNew)
     {
         return reinterpret_cast<T*>
         (
-            c4Exchange
-            (
-                reinterpret_cast<tCIDLib::TCard4&>(pToFill)
-                , reinterpret_cast<tCIDLib::TCard4>(pNew)
-            )
+            pExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew)
         );
     }
 
-    template <class T> T* pCompareAndExchangePtr(       T*&         pToFill
+    template <class T> T* pCompareAndExchangePtr(       T**         ppToFill
                                                 , const T* const    pNew
                                                 , const T* const    pCompare)
     {
         return reinterpret_cast<T*>
         (
-            c4CompareAndExchange
-            (
-                *reinterpret_cast<tCIDLib::TCard4*>(&pToFill)
-                , reinterpret_cast<tCIDLib::TCard4>(pNew)
-                , reinterpret_cast<tCIDLib::TCard4>(pCompare)
-            )
+            pCompareAndExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew, pCompare)
         );
     }
 

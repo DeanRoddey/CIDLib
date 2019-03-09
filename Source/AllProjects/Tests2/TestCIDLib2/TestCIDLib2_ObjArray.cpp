@@ -181,5 +181,4 @@ TTest_ObjArrayMoveSem::eRunTest(  TTextStringOutStream&   strmOut
 
     return eRes;
 }
-
 */

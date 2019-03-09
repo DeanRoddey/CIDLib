@@ -38,12 +38,12 @@
 //
 TFacCIDWUtils& facCIDWUtils()
 {
-    static TFacCIDWUtils* pfacCIDWUtils = 0;
+    static TFacCIDWUtils* pfacCIDWUtils = nullptr;
     if (!pfacCIDWUtils)
     {
         TBaseLock lockInit;
         if (!pfacCIDWUtils)
-            TRawMem::pExchangePtr(pfacCIDWUtils, new TFacCIDWUtils);
+            pfacCIDWUtils = new TFacCIDWUtils;
     }
     return *pfacCIDWUtils;
 }

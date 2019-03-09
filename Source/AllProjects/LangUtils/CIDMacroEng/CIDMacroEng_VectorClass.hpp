@@ -149,7 +149,7 @@ class CIDMACROENGEXP TMEngVectorVal : public TMEngCollectVal
         //      macro level class info class, so that we can throw macro
         //      level exceptions that it provides.
         // -------------------------------------------------------------------
-        TRefVector<TMEngClassVal>   m_colElems;
+        tCIDMacroEng::TClassValList m_colElems;
         TMEngCollectInfo*           m_pmeciBase;
 
 

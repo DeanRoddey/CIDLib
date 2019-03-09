@@ -45,12 +45,12 @@ AdvRTTIDecls(TBoolean,TObject)
 // ---------------------------------------------------------------------------
 TBoolean& TBoolean::Nul_TBoolean()
 {
-    static TBoolean* pbNull = 0;
+    static TBoolean* pbNull = nullptr;
     if (!pbNull)
     {
         TBaseLock lockInit;
         if (!pbNull)
-            TRawMem::pExchangePtr(pbNull, new TBoolean);
+            TRawMem::pExchangePtr(&pbNull, new TBoolean);
     }
     return *pbNull;
 }

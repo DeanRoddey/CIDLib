@@ -898,14 +898,9 @@ const tCIDLib::TCh* TKrnlRemMediaDrv::pszDrivePath() const
 //  paths for all the DVD/CDROMs found.
 //
 tCIDLib::TBoolean
-TKrnlRemMedia::bEnumDrvs(       tCIDLib::TCh* const pszToFill
-                        , const tCIDLib::TCard4     c4MaxChars
-                        ,       tCIDLib::TCard4&    c4Found)
+TKrnlRemMedia::bEnumDrvs(TKrnlLList<TKrnlString>& kllstToFill)
 {
-    // Start the return value at zero
-    c4Found = 0;
-
-    pszToFill[0] = kCIDLib::chNull;
+    kllstToFill.RemoveAll();
 
     // Get the drive map and loop through them looking for CDROMS
     const tCIDLib::TCard4 c4DriveMap = ::GetLogicalDrives();
@@ -921,19 +916,9 @@ TKrnlRemMedia::bEnumDrvs(       tCIDLib::TCh* const pszToFill
         szVol[0] = tCIDLib::TCh(L'A' + c4Index);
         c4DrvType = ::GetDriveType(szVol);
 
-        // If not a CD-ROM, then skip it
-        if (c4DrvType != DRIVE_CDROM)
-            continue;
-
-        //
-        //  It is one, so keep this one if we have room. Note that both
-        //  CD and DVDROM drives show up as CDROMs with this call.
-        //
-        if (TRawStr::c4StrLen(szVol) + 2 >= c4MaxChars)
-            break;
-        TRawStr::CatStr(pszToFill, szVol, c4MaxChars);
-        TRawStr::CatStr(pszToFill, L"\n", c4MaxChars);
-        c4Found++;
+        // Take it if it's a CD drive
+        if (c4DrvType == DRIVE_CDROM)
+            kllstToFill.pobjAddNew(new TKrnlString(szVol));
     }
     return kCIDLib::True;
 }

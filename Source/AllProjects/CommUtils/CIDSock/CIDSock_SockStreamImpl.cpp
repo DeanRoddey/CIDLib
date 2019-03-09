@@ -71,7 +71,18 @@ TSockInStreamImpl::~TSockInStreamImpl()
 {
     // If we adopted it, then clean it up
     if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
-        delete m_psockIn;
+    {
+        try
+        {
+            delete m_psockIn;
+        }
+
+        catch(TError& errToCatch)
+        {
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            TModule::LogEventObj(errToCatch);
+        }
+    }
 }
 
 

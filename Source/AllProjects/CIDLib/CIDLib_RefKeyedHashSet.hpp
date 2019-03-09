@@ -187,7 +187,6 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         using TMyType = TRefKeyedHashSet<TElem, TKey, TKeyOps>;
         using TNode = TRefKeyedHashSetNode<TElem,TKey> ;
         using TKeyExtract = const TKey& (*)(const TElem&);
-        using TObjEqFunc = tCIDLib::TBoolean (*)(const TElem&, const TElem&);
 
 
         // -------------------------------------------------------------------
@@ -683,11 +682,11 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         TRefKeyedHashSet(const  tCIDLib::EAdoptOpts eAdopt
                         , const tCIDLib::TCard4     c4Modulus
                         ,       TKeyOps* const      pkopsToAdopt
-                        , const TKeyExtract         pfnKeyExtract
+                        ,       TKeyExtract         pfnKeyExtract
                         , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             TRefCollection<TElem>(eMTSafe)
-            , m_apBuckets(0)
+            , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
             , m_eAdopt(eAdopt)
@@ -879,7 +878,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             }
 
             if (!pnodeToOrphan)
-                this->KeyNotFound(objKey, CID_FILE, CID_LINE);
+                this->KeyNotFound(CID_FILE, CID_LINE);
 
             //
             //  If the previous node is 0, then this is the head node, else we
@@ -948,7 +947,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             }
 
             if (!pnodeToRemove)
-                this->KeyNotFound(objKey, CID_FILE, CID_LINE);
+                this->KeyNotFound(CID_FILE, CID_LINE);
 
             //
             //  If the previous node is 0, then this is the head node, else we
@@ -1047,7 +1046,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             {
                 // Throw if told to, else just return false
                 if (bThrowIfNot)
-                    this->KeyNotFound(objKeyToRemove, CID_FILE, CID_LINE);
+                    this->KeyNotFound(CID_FILE, CID_LINE);
                 return kCIDLib::False;
             }
 
@@ -1181,7 +1180,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             if (!pnodeRet)
             {
                 if (bThrowIfNotFound)
-                    this->KeyNotFound(objKeyToFind, CID_FILE, CID_LINE);
+                    this->KeyNotFound(CID_FILE, CID_LINE);
                 return nullptr;
             }
 
@@ -1202,7 +1201,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             if (!pnodeRet)
             {
                 if (bThrowIfNotFound)
-                    this->KeyNotFound(objKeyToFind, CID_FILE, CID_LINE);
+                    this->KeyNotFound(CID_FILE, CID_LINE);
                 return nullptr;
             }
 

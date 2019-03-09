@@ -152,8 +152,7 @@ tCIDLib::TBoolean TLogMap::operator!=(const TLogMap& vmapSrc) const
 // ---------------------------------------------------------------------------
 //  TLogMap: Public, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TCard4
-TLogMap::c4MapIndex(const tCIDLib::TCard4 c4Index1) const
+tCIDLib::TCard4 TLogMap::c4MapIndex(const tCIDLib::TCard4 c4Index1) const
 {
     // Sanity check the index
     if (c4Index1 > c4MaxIndex1())

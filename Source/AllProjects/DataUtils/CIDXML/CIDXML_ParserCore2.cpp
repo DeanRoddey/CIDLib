@@ -822,7 +822,7 @@ TXMLParserCore::eExpandEntityRef(const  tCIDLib::TBoolean   bExtOk
         }
 
         // If it wasn't resolved, let's do it ourself
-        if (!esrRef.pobjData())
+        if (!esrRef)
         {
             //
             //  Assume its a local file path. If the new file is not fully

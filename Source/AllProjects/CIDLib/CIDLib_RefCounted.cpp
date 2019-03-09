@@ -57,7 +57,7 @@ MRefCounted& MRefCounted::Nul_MRefCounted()
     {
         TBaseLock lockInit;
         if (!pdupNull)
-            TRawMem::pExchangePtr(pdupNull, new TNulRefCounted);
+            TRawMem::pExchangePtr(&pdupNull, new TNulRefCounted);
     }
     return *pdupNull;
 }

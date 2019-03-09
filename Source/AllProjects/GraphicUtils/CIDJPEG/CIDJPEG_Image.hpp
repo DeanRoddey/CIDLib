@@ -54,12 +54,12 @@ class CIDJPEGEXP TJPEGImage : public TCIDImage
 
         TJPEGImage
         (
-            const   TCIDImage&              imgToCopy
+            const   TCIDImage&              imgSrc
         );
 
         TJPEGImage
         (
-            const   TJPEGImage&             imgToCopy
+            const   TJPEGImage&             imgSrc
         );
 
         ~TJPEGImage();
@@ -70,7 +70,7 @@ class CIDJPEGEXP TJPEGImage : public TCIDImage
         // -------------------------------------------------------------------
         TJPEGImage& operator=
         (
-            const   TJPEGImage&             imgToAssign
+            const   TJPEGImage&             imgSrc
         );
 
 

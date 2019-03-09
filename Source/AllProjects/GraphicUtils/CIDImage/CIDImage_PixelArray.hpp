@@ -148,10 +148,7 @@ class CIDIMGEXP TPixelArray :
             const   TPixelArray&            pixaSrc
         );
 
-        TPixelArray
-        (
-                    TPixelArray&&           pixaSrc
-        );
+        TPixelArray(TPixelArray&&) = delete;
 
         ~TPixelArray();
 
@@ -164,10 +161,7 @@ class CIDIMGEXP TPixelArray :
             const   TPixelArray&            pixaSrc
         );
 
-        TPixelArray& operator=
-        (
-                    TPixelArray&&           pixaSrc
-        );
+        TPixelArray& operator=(TPixelArray&&) = delete;
 
 
         // -------------------------------------------------------------------

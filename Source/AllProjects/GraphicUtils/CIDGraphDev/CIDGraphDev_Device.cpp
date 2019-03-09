@@ -234,7 +234,7 @@ TGraphicDevice& TGraphicDevice::Nul_TGraphicDevice()
     {
         TBaseLock lockInit;
         if (!pgdevNull)
-            TRawMem::pExchangePtr(pgdevNull, new TGraphicDevice);
+            TRawMem::pExchangePtr(&pgdevNull, new TGraphicDevice);
     }
     return *pgdevNull;
 }

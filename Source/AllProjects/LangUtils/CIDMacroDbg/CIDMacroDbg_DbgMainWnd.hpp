@@ -77,7 +77,7 @@ class CIDMACRODBGEXP TCMLDbgChangeInfo : public TCtrlNotify
 
         TCMLDbgChangeInfo
         (
-            const   TCMLDbgChangeInfo&      wnotToCopy
+            const   TCMLDbgChangeInfo&      wnotSrc
         );
 
         ~TCMLDbgChangeInfo();
@@ -88,7 +88,7 @@ class CIDMACRODBGEXP TCMLDbgChangeInfo : public TCtrlNotify
         // -------------------------------------------------------------------
         TCMLDbgChangeInfo& operator=
         (
-            const   TCMLDbgChangeInfo&      wnotToAssign
+            const   TCMLDbgChangeInfo&      wnotSrc
         );
 
 
@@ -155,7 +155,7 @@ class CIDMACRODBGEXP TCMLCustomTab : public TTabWindow
 
 
         // -------------------------------------------------------------------
-        //  Public, inherited methods
+        //  Public, virtual  methods
         // -------------------------------------------------------------------
         virtual tCIDLib::TVoid RunStatusChanged
         (

@@ -605,11 +605,8 @@ TRegionJanitor::~TRegionJanitor()
 
         catch(TError& errToCatch)
         {
-            if (facCIDGraphDev().bShouldLog(errToCatch))
-            {
-                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
-            }
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            TModule::LogEventObj(errToCatch);
 
             // Fall through so we get the old regions cleaned up
         }
