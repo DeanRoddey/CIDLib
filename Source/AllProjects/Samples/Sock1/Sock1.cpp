@@ -22,6 +22,9 @@
 //  or TCP/IP address of the server on the command line and it will create a
 //  datagram socket, read the date back from the server, and display it.
 //
+//  Like most of the basic samples, this one doesn't create a facility object, it
+//  just starts a main thread on a local
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -35,18 +38,6 @@
 //  our own. So just include CIDSock, which will bring in all we need.
 // ----------------------------------------------------------------------------
 #include    "CIDSock.hpp"
-
-
-
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
 
 
 // ----------------------------------------------------------------------------
@@ -63,11 +54,8 @@ static TTextFileOutStream strmOut(tCIDLib::EStdFiles::StdOut);
 
 // ----------------------------------------------------------------------------
 //  Do the magic main module code
-//
-//  This tells CIDLib what the main thread of the program is. This is the
-//  only thread object that is run automatically. All others are started
-//  manually when required or desired.
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Sock1MainThread", eMainThreadFunc))
 
 
@@ -151,14 +139,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         {
             TClientStreamSocket sockSrv(tCIDSock::ESockProtos::TCP, ipepDayTime);
             ipepFrom = sockSrv.ipepRemoteEndPoint();
-//            sockSrv.Send(&c1Dummy, 1);
-
             c4Count = sockSrv.c4ReceiveMBufTO
             (
-                mbufRead
-                , kCIDLib::enctTenSeconds
-                , 1024
-                , tCIDLib::EAllData::OkIfNotAll
+                mbufRead, kCIDLib::enctTenSeconds, 1024, tCIDLib::EAllData::OkIfNotAll
             );
         }
          else
@@ -188,10 +171,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             //
             TTextMBufInStream strmTmp
             (
-                &mbufRead
-                , c4Count
-                , tCIDLib::EAdoptOpts::NoAdopt
-                , new TUSASCIIConverter
+                &mbufRead, c4Count, tCIDLib::EAdoptOpts::NoAdopt, new TUSASCIIConverter
             );
 
             // Lets read a line of text from it and print it out
@@ -206,15 +186,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         strmOut << L"A CIDLib runtime error occured during processing.\n  Error: "
                 << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;

@@ -20,6 +20,10 @@
 //  capabilities of CIDLib. It just creates a speech object, and loops,
 //  speaking the same text over and over with a slight pause between.
 //
+//
+//  Like most of the basic samples, this one doesn't create a facility object, it
+//  just starts a main thread on a local
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -29,20 +33,9 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDLib, which is all we need.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
-
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
 
 
 // ----------------------------------------------------------------------------
@@ -76,6 +69,7 @@ static TOutConsole  conOut;
 //  only thread object that is run automatically. All others are started
 //  manually when required or desired.
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"SpeechMainThread", eMainThreadFunc))
 
 
@@ -120,17 +114,10 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut  << L"A CIDLib runtime error occured during processing.\n"
-                << L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
+                << L"Error: " << errToCatch.strErrText() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::RuntimeError;
     }
 
@@ -142,7 +129,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     catch(const TKrnlError& kerrToCatch)
     {
         conOut  << L"A kernel error occured during processing.\n  Error="
-                << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
+                << kerrToCatch.errcId() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
@@ -150,7 +137,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     catch(...)
     {
         conOut  << L"A general exception occured during processing"
-                << kCIDLib::NewLn << kCIDLib::EndLn;
+                << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::SystemException;
     }
     return tCIDLib::EExitCodes::Normal;

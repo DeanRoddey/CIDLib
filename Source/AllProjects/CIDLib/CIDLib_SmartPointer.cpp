@@ -29,20 +29,17 @@
 #include    "CIDLib_.hpp"
 
 
-tCIDLib::TVoid TSmartPtrHelpers::CheckRef(const tCIDLib::TVoid* pToCheck)
+tCIDLib::TVoid TSmartPtrHelpers::ThrowNullRef(const tCIDLib::TCard4 c4Line)
 {
-    if (!pToCheck)
-    {
-        facCIDLib().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcSPtr_RefReleaseErr
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Internal
-        );
-    }
+    facCIDLib().ThrowKrnlErr
+    (
+        CID_FILE
+        , c4Line
+        , kCIDErrs::errcSPtr_RefReleaseErr
+        , TKrnlError::kerrLast()
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Internal
+    );
 }
 
 tCIDLib::TVoid TSmartPtrHelpers::CheckRefNotZero(const tCIDLib::TCard4 c4ToCheck)

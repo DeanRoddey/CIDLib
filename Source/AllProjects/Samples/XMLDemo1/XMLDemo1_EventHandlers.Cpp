@@ -95,35 +95,6 @@ tCIDLib::TVoid TFacXMLDemo1::DocPI( const   TString&    strTarget
 }
 
 
-tCIDLib::TVoid
-TFacXMLDemo1::DocType(  const   TString&    strRootElemName
-                        , const TString&    strPublicId
-                        , const TString&    strSystemId)
-{
-    // If no display mode, then nothing to do
-    if (m_eDisplayMode == EDisplayModes::None)
-        return;
-
-    *m_pstrmOut << L"<!DOCTYPE " << strRootElemName;
-
-    if (strPublicId.c4Length() || strSystemId.c4Length())
-    {
-        if (strPublicId.c4Length() && strSystemId.c4Length())
-            *m_pstrmOut << L"PUBLIC ";
-        else
-            *m_pstrmOut << L"SYSTEM ";
-
-        if (strPublicId.c4Length())
-            *m_pstrmOut << L"\"" << strPublicId << L"\" ";
-
-        if (strSystemId.c4Length())
-            *m_pstrmOut << L"\"" << strSystemId << L"\"";
-    }
-
-    *m_pstrmOut << L">";
-}
-
-
 tCIDLib::TVoid TFacXMLDemo1::EndDocument(const TXMLEntitySrc& xsrcOfRoot)
 {
     // Flush the output stream

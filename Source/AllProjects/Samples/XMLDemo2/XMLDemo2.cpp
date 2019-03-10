@@ -24,6 +24,10 @@
 //
 // CAVEATS/GOTCHAS:
 //
+//  1)  This program is very simple so it does not attempt to be language
+//      independent and it does not provide its own facility object since
+//      it does not need one.
+//
 // LOG:
 //
 //  $_CIDLib_Log_$
@@ -31,31 +35,28 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. The XML header brings in all we need here
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDXML.hpp"
 
 
+
 // ----------------------------------------------------------------------------
-//  Forward references
+//  Include magic main module code to start the main thread
 // ----------------------------------------------------------------------------
 tCIDLib::EExitCodes eXMLDemo2Thread(TThread&, tCIDLib::TVoid*);
-
-
-// ----------------------------------------------------------------------------
-//  Include magic main module code
-// ----------------------------------------------------------------------------
 CIDLib_MainModule(TThread(L"XMLDemo2Thread", eXMLDemo2Thread))
 
 
 // ----------------------------------------------------------------------------
 //  Local data
 //
-//  pstrmOut
+//  uptrOut
 //      The output stream. If its redirected, we create a file stream with a
 //      UTF-8 converter. Otherwise, its just a console.
 // ----------------------------------------------------------------------------
-static  TTextOutStream*     pstrmOut;
+using   TStreamPtr = TUniquePtr<TTextOutStream>;
+static  TStreamPtr  uptrOut;
 
 
 
@@ -66,13 +67,13 @@ static  TTextOutStream*     pstrmOut;
 // Just shows a usage banner if we get bad parms
 static tCIDLib::TVoid ShowUsage()
 {
-    *pstrmOut <<  L"Usage: XMLDemo2 [options]\n"
-                    L"       Options:\n"
-                    L"          /File=xxx\n"
-                    L"          /IgnoreBadChars\n"
-                    L"          /MemTest\n"
-                    L"          /Validate\n"
-                << kCIDLib::EndLn;
+    *uptrOut << L"Usage: XMLDemo2 [options]\n"
+                L"       Options:\n"
+                L"          /File=xxx\n"
+                L"          /IgnoreBadChars\n"
+                L"          /MemTest\n"
+                L"          /Validate\n"
+            << kCIDLib::EndLn;
 }
 
 
@@ -98,31 +99,25 @@ static tCIDLib::TVoid DoParse(          TXMLTreeParser&     xtprsToUse
         {
             // Print the document out if asked to
             if (bDump)
-                *pstrmOut << xtprsToUse.xtdocThis() << kCIDLib::DNewLn;
+                *uptrOut << xtprsToUse.xtdocThis() << kCIDLib::DNewLn;
         }
          else
         {
             const TXMLTreeParser::TErrInfo& errCur = xtprsToUse.colErrors()[0];
-            *pstrmOut   << L"The parse failed\n"
-                        << errCur.strText()
-                        << kCIDLib::NewLn << L"(" << errCur.c4Line()
-                        << kCIDLib::chPeriod << errCur.c4Column()
-                        << L") " << errCur.strSystemId() << kCIDLib::NewEndLn;
+            *uptrOut   << L"The parse failed\n"
+                       << errCur.strText()
+                       << kCIDLib::NewLn << L"(" << errCur.c4Line()
+                       << kCIDLib::chPeriod << errCur.c4Column()
+                       << L") " << errCur.strSystemId() << kCIDLib::NewEndLn;
         }
 
         // Flush the output stream to force all output out
-        pstrmOut->Flush();
+        uptrOut->Flush();
     }
 
     catch(TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-        *pstrmOut << L"A CIDLib runtime error occured during parsing.\n"
+        *uptrOut    << L"A CIDLib runtime error occured during parsing.\n"
                     << L"Error: " << errToCatch.strErrText() << kCIDLib::NewEndLn;
     }
 
@@ -133,15 +128,15 @@ static tCIDLib::TVoid DoParse(          TXMLTreeParser&     xtprsToUse
     //
     catch(const TKrnlError& kerrToCatch)
     {
-        *pstrmOut << L"A kernel error occured during parsing.\nError="
-                    << kerrToCatch.errcId() << kCIDLib::NewEndLn;
+        *uptrOut << L"A kernel error occured during parsing.\nError="
+                 << kerrToCatch.errcId() << kCIDLib::NewEndLn;
     }
 
     // Catch a general exception
     catch(...)
     {
-        *pstrmOut << L"A general exception occured during parsing"
-                    << kCIDLib::NewEndLn;
+        *uptrOut << L"A general exception occured during parsing"
+                 << kCIDLib::NewEndLn;
     }
 }
 
@@ -157,15 +152,17 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     // Create our standard output stream
     if (TFileSys::bIsRedirected(tCIDLib::EStdFiles::StdOut))
     {
-        pstrmOut = new TTextFileOutStream
+        uptrOut = TStreamPtr
         (
-            tCIDLib::EStdFiles::StdOut
-            , new TUTFConverter(TUTFConverter::EEncodings::UTF8)
+            new TTextFileOutStream
+            (
+                tCIDLib::EStdFiles::StdOut, new TUTFConverter(TUTFConverter::EEncodings::UTF8)
+            )
         );
     }
      else
     {
-        pstrmOut = new TOutConsole;
+        uptrOut = TStreamPtr(new TOutConsole);
     }
 
     tCIDLib::TBoolean   bMemTest = kCIDLib::False;
@@ -225,17 +222,11 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-        *pstrmOut << L"A CIDLib runtime error occured during init.\n"
-                  << L"Error: " << errToCatch.strErrText()
-                  << kCIDLib::NewLn << kCIDLib::EndLn;
+        *uptrOut << L"A CIDLib runtime error occured during init.\n"
+                 << L"Error: " << errToCatch.strErrText()
+                 << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;
     }
 
@@ -246,25 +237,22 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     //
     catch(const TKrnlError& kerrToCatch)
     {
-        *pstrmOut << L"A kernel error occured during init.\nError="
-                    << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
+        *uptrOut   << L"A kernel error occured during init.\nError="
+                   << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
     // Catch a general exception
     catch(...)
     {
-        *pstrmOut << L"A general exception occured during init"
-                    << kCIDLib::NewLn << kCIDLib::EndLn;
+        *uptrOut   << L"A general exception occured during init"
+                   << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::SystemException;
     }
 
     // Run the test. Ask it to dump out the results
     TXMLTreeParser xtprsToUse;
     DoParse(xtprsToUse, strFileParm, eOptsToUse, kCIDLib::True);
-
-//    xtprsToUse.bLockValidator(kCIDLib::True);
-//    DoParse(xtprsToUse, L"\\Tmp\\Tmp2.xml", eOptsToUse, kCIDLib::True);
 
     //
     //  Debug memory leaks by running it again with a memory check around it.
@@ -273,7 +261,7 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     //  in the current directory.
     //
     #if CID_DEBUG_ON
-    #define DUMP_MEM 1
+    #define DUMP_MEM 0
     #if DUMP_MEM
     if (bMemTest)
     {
@@ -290,9 +278,6 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     }
     #endif
     #endif
-
-    // Clean up the output stream
-    delete pstrmOut;
 
     return tCIDLib::EExitCodes::Normal;
 }

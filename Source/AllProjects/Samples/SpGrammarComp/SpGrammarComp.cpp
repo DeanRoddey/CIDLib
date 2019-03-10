@@ -19,7 +19,11 @@
 //  This is the main (only) module of the speech grammar compiler demo program. This
 //  guy takes an input file which is the path to a .grxml grammar file and a target
 //  file name to compile it to. This creates a binary format version of the grammar
-//  that is faster to load and of course cannot be messed with by customers.
+//  that is faster to load and of course cannot be messed with by users.
+//
+//
+//  Like most of the basic samples, this one doesn't create a facility object, it
+//  just starts a main thread on a local
 //
 // CAVEATS/GOTCHAS:
 //
@@ -33,21 +37,9 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include the recognition engine, which will bring in all we need.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDSpReco.hpp"
-
-
-
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
 
 
 
@@ -72,6 +64,7 @@ static TOutConsole          conOut;
 //  only thread object that is run automatically. All others are started
 //  manually when required or desired.
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"SpGrammarCompMainThread", eMainThreadFunc))
 
 
@@ -95,7 +88,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         const tCIDLib::TCard4 c4ParmCnt = TSysInfo::c4CmdLineParmCount();
         if ((c4ParmCnt < 2) || (c4ParmCnt > 3))
         {
-            conOut  << L"\nUSAGE:\n"
+            conOut  << L"\nUsage:\n"
                     << L"   SpGrammarComp srcfile tarfile [/silent]\n"
                     << kCIDLib::EndLn;
             return tCIDLib::EExitCodes::Normal;
@@ -115,7 +108,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                         << kCIDLib::EndLn;
                 return tCIDLib::EExitCodes::Normal;
             }
-
             bVerbose = kCIDLib::False;
         }
 
@@ -142,24 +134,15 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         if (bVerbose)
         {
-            conOut  << L"Compiling: " << pathGrammar
-                    << L"\nTo: " << pathBin
+            conOut  << L"Compiling: " << pathGrammar << L"\nTo: " << pathBin
                     << kCIDLib::NewEndLn;
         }
-
         facCIDSpReco().CompileGrammarTo(pathGrammar, pathBin);
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut << L"A CIDLib runtime error occured during processing.\n  Error: "
                 << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;

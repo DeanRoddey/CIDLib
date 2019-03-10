@@ -20,6 +20,10 @@
 //  demonstrates the SockPinger class, which implements the standard ICMP
 //  ping protocol. You just provide a target host.
 //
+//
+//  Like most of the basic samples, this one doesn't create a facility object, it
+//  just starts a main thread on a local
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -29,31 +33,15 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDSock, which will bring in all we need.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDSock.hpp"
 
 
-
 // ----------------------------------------------------------------------------
-//  Forward references
+//  Do the magic main module code to start the main thread
 // ----------------------------------------------------------------------------
-static tCIDLib::EExitCodes eMainThreadFunc
-(
-    TThread&            thrThis
-    , tCIDLib::TVoid*   pData
-);
-
-
-
-// ----------------------------------------------------------------------------
-//  Do the magic main module code
-//
-//  This tells CIDLib what the main thread of the program is. This is the
-//  only thread object that is run automatically. All others are started
-//  manually when required or desired.
-// ----------------------------------------------------------------------------
+static tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"SockPingMainThread", eMainThreadFunc))
 
 
@@ -112,7 +100,7 @@ static tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         // Output what we are doing
         strmOut << L"\n   Pinging address " << strHost
-                << L"  (" << ipaTar << L")\n"
+                << L"  (" << ipaTar << L")"
                 << kCIDLib::NewEndLn;
 
         for (tCIDLib::TCard4 c4Index = 0; c4Index < 3; c4Index++)
@@ -144,15 +132,8 @@ static tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         strmOut << L"A CIDLib runtime error occured during processing.\n  Error: "
                 << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;

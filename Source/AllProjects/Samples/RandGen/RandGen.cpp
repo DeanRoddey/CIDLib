@@ -19,12 +19,11 @@
 //  This is the main module for a simple program that generates a set of random
 //  numbers in a given range and generates a set of unique ids.
 //
+//
+//  As with most of these basic samples, this guy does not create a facility
+//  object, it just starts up a thread on a local function.
+//
 // CAVEATS/GOTCHAS:
-//
-//  1)  This program is so simple that it does not create a facility object
-//      for itself, or have a main facility header.
-//
-//  2)  This program does not attempt to be language independent.
 //
 // LOG:
 //
@@ -33,21 +32,16 @@
 
 
 // ---------------------------------------------------------------------------
-//  Includes.
+//  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDMath.hpp"
 #include    "CIDCrypto.hpp"
 
 
 // ---------------------------------------------------------------------------
-//  Forward references
-// ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
-
-
-// ---------------------------------------------------------------------------
 //  Do the magic main module code
 // ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"RandGenMainThread", eMainThreadFunc))
 
 
@@ -131,7 +125,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         //
         //  Set up a random number generator. Generate a simple seed from the
-        //  current time.
+        //  current millis.
         //
         TRandomNum randOut;
         randOut.Seed(TTime::c4Millis());
@@ -143,7 +137,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                         = TSysInfo::strCmdLineParmAt(1).c4Val(tCIDLib::ERadices::Dec);
 
         // Generate the random numbers
-        conOut << L"Generating random numbers:\n-----------------------\n";
+        conOut << L"Generating random numbers:\n-----------------------" << kCIDLib::EndLn;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < 64; c4Index++)
         {
             tCIDLib::TCard4 c4Cur = c4GenNum(randOut, c4MinVal, c4MaxVal);
@@ -153,7 +147,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         // Generate the unique ids
         TString strUID;
-        conOut << L"Generating unique ids:\n-----------------------\n";
+        conOut << L"Generating unique ids:\n-----------------------" << kCIDLib::EndLn;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < 24; c4Index++)
         {
             TUniqueId::MakeId(strUID);
@@ -163,15 +157,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut <<  L"A CIDLib runtime error occured during processing. "
                  <<  L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::NewLn;
         return tCIDLib::EExitCodes::FatalError;

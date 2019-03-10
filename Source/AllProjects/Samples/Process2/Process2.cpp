@@ -21,6 +21,10 @@
 //  and waiting for it to die. It just executes the Process1 program and
 //  waits for it to die before exiting.
 //
+//
+//  As with most of these basic samples, this guy does not create a facility
+//  object, it just starts up a thread on a local function.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -39,16 +43,6 @@
 
 
 // ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-// ----------------------------------------------------------------------------
 //  Local static data
 //
 //  strmOut
@@ -61,12 +55,9 @@ static TTextFileOutStream   strmOut(tCIDLib::EStdFiles::StdOut);
 
 
 // ----------------------------------------------------------------------------
-//  Do the magic main module code
-//
-//  This must be done in one (and only one) module of the client program.
-//  It tells CIDLib which is the main thread of the program.) GUI apps use
-//  a similar, but differently named, mechanism.
+//  Do the magic main module code to start the main thread
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Process2MainThread", eMainThreadFunc))
 
 
@@ -74,14 +65,7 @@ CIDLib_MainModule(TThread(L"Process2MainThread", eMainThreadFunc))
 //  Local functions
 // ----------------------------------------------------------------------------
 
-//
-//  This is the the thread function for the main thread. It just starts the
-//  external process and waits for it to die, printing out a little info
-//  on it in the meantime.
-//
-//  RETURN: EExit_Normal if things go ok. If the worker thread returns a
-//              non-normal return, we return that.
-//
+// The main thread is started here
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
     // We have to let our calling thread go first
@@ -102,7 +86,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     // And now start it up
     strmOut << L"Waiting for Process1 to die..." << kCIDLib::EndLn;
     extpToRun.Start(L"Process1.Exe", TString::strEmpty());
-
     tCIDLib::EExitCodes eExit = extpToRun.eWaitForDeath();
 
     // Display the exit code

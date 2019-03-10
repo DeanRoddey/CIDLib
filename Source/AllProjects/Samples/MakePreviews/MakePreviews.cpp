@@ -21,6 +21,9 @@
 //  horz size (maintaining AR), and spit back out in JPEG format (regardless
 //  of input format) in a fairly low quality.
 //
+//  As with most of these basic samples, this one doesn't create a facility
+//  object, it just starts a thread on a local function.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -33,24 +36,13 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDJPEG.hpp"
-
 #include    "CIDPNG.hpp"
 
 
-
 // ---------------------------------------------------------------------------
-//  Forward references
+//  Do the magic main module code to start the main thread
 // ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-// ---------------------------------------------------------------------------
-//  Do the magic main module code
-// ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"CMakePreviwsMainThread", eMainThreadFunc))
 
 
@@ -65,6 +57,7 @@ CIDLib_MainModule(TThread(L"CMakePreviwsMainThread", eMainThreadFunc))
 TBitmapImage    imgBMP;
 TJPEGImage      imgJPEG;
 TPNGImage       imgPNG;
+TOutConsole     conOut;
 
 
 
@@ -72,14 +65,10 @@ TPNGImage       imgPNG;
 //  Local functions
 // ---------------------------------------------------------------------------
 
-//
-//  Shows the parameter usage for the program.
-//
+// Shows the parameter usage for the program.
 static tCIDLib::TVoid ShowUsage()
 {
-    TSysInfo::strmOut()
-            << kCIDLib::NewLn
-            << L"Usage: MakePreviews path [/MaxH=XX /Suffix=SSS]\n\n"
+    conOut  << L"\nUsage: MakePreviews path [/MaxH=XX /Suffix=SSS]\n\n"
                L"       If an image is larger in the horizontal direction than\n"
                L"       the indicated /MaxH then the image is scaled down so that\n"
                L"       the offending horzizontal fits. The aspect ratio is retained.\n\n"
@@ -109,8 +98,7 @@ static tCIDLib::TBoolean bParseParms(tCIDLib::TCard4&   c4MaxH
     TFileSys::QueryFullPath(strCur, strStartPath);
     if (!TFileSys::bIsDirectory(strStartPath))
     {
-        TSysInfo::strmOut() << L"The starting path was not found\n\n"
-                            << kCIDLib::FlushIt;
+        conOut << L"The starting path was not found" << kCIDLib::NewEndLn;
         return kCIDLib::False;
     }
 
@@ -126,8 +114,7 @@ static tCIDLib::TBoolean bParseParms(tCIDLib::TCard4&   c4MaxH
             c4MaxH = TRawStr::c4AsBinary(strCur.pszBuffer(), bOk, tCIDLib::ERadices::Dec);
             if (!bOk || (c4MaxH < 64))
             {
-                TSysInfo::strmOut() << L"MaxH must be >= 64\n\n"
-                                    << kCIDLib::FlushIt;
+                conOut << L"MaxH must be >= 64" << kCIDLib::NewEndLn;
                 return kCIDLib::False;
             }
         }
@@ -138,9 +125,8 @@ static tCIDLib::TBoolean bParseParms(tCIDLib::TCard4&   c4MaxH
         }
          else
         {
-            TSysInfo::strmOut() << L"'" << strCur
-                                << L"' is not a valid parameter\n\n"
-                                << kCIDLib::FlushIt;
+            conOut << L"'" << strCur << L"' is not a valid parameter"
+                   << kCIDLib::NewEndLn;
             return kCIDLib::False;
         }
     }
@@ -158,7 +144,7 @@ static tCIDLib::TVoid DoAFile(  const   TString&        strPath
         tCIDLib::TCard4 c4OrgSz;
 
         // Open a binary input file stream over this file
-        TCIDImage* pimgTar = 0;
+        TCIDImage* pimgTar = nullptr;
         {
             TBinFileInStream strmSrc
             (
@@ -212,13 +198,6 @@ static tCIDLib::TVoid DoAFile(  const   TString&        strPath
             }
             pathNewPath.AppendExt(L"jpg");
 
-//            if (!pimgTar->bIsDescendantOf(TPNGImage::clsThis()))
-//            {
-//                imgPNG = *pimgTar;
-//                pimgTar = &imgPNG;
-//            }
-//            pathNewPath.AppendExt(L"png");
-
             // Stream it out and remember the bytes we output
             tCIDLib::TCard4 c4OutBytes;
             {
@@ -244,8 +223,7 @@ static tCIDLib::TVoid DoAFile(  const   TString&        strPath
             {
                 c4Per = 100 - tCIDLib::TCard4
                 (
-                    tCIDLib::TFloat8(c4OutBytes) / tCIDLib::TFloat8(c4OrgSz)
-                    * 100
+                    tCIDLib::TFloat8(c4OutBytes) / tCIDLib::TFloat8(c4OrgSz) * 100
                 );
             }
 
@@ -257,23 +235,18 @@ static tCIDLib::TVoid DoAFile(  const   TString&        strPath
                 pathNewPath.Cut(0, c4OrgLen - 60);
                 pathNewPath.Prepend(L"...");
             }
-            TSysInfo::strmOut() << L"(Reduced ";
+            conOut << L"(Reduced ";
             if (c4Per < 10)
-                TSysInfo::strmOut() << L"0";
-            TSysInfo::strmOut() << c4Per;
-            TSysInfo::strmOut() << L"%) " << pathNewPath << kCIDLib::EndLn;
+                conOut << L"0";
+            conOut << c4Per;
+            conOut << L"%) " << pathNewPath << kCIDLib::EndLn;
         }
     }
 
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-        TSysInfo::strmOut() << L"Failed to convert file: " << strPath
-                            << kCIDLib::EndLn;
+        conOut << L"Failed to convert file. Reason:\n" << strPath
+                << errToCatch << kCIDLib::NewEndLn;
     }
 }
 
@@ -288,7 +261,7 @@ static tCIDLib::TVoid DoADir(const  TString&            strCurPath
     if (!diterLevel.bFindFirst( strCurPath
                                 , kCIDLib::pszAllFilesSpec
                                 , fndbSearch
-                                , tCIDLib::EDirSearchFlags::All))
+                                , tCIDLib::EDirSearchFlags::NormalFiles))
     {
         return;
     }
@@ -296,24 +269,17 @@ static tCIDLib::TVoid DoADir(const  TString&            strCurPath
     TString strTmp;
     do
     {
-        //
-        //  If it's a file, then pull the extension and see if it's an image
-        //  file type that we care about.
-        //
-        if (fndbSearch.bIsNormalFile())
+        // Pull the extension and see if it's an image file type that we care about.
+        const TPathStr& pathCur = fndbSearch.pathFileName();
+        pathCur.bQueryExt(strTmp);
+        strTmp.ToUpper();
+
+        if ((strTmp == L"BMP")
+        ||  (strTmp == L"JPEG")
+        ||  (strTmp == L"JPG")
+        ||  (strTmp == L"PNG"))
         {
-            const TPathStr& pathCur = fndbSearch.pathFileName();
-            pathCur.bQueryExt(strTmp);
-            strTmp.ToUpper();
-
-
-            if ((strTmp == L"BMP")
-            ||  (strTmp == L"JPEG")
-            ||  (strTmp == L"JPG")
-            ||  (strTmp == L"PNG"))
-            {
-                DoAFile(pathCur, strTmp, c4MaxH, strSuffix);
-            }
+            DoAFile(pathCur, strTmp, c4MaxH, strSuffix);
         }
     }   while (diterLevel.bFindNext(fndbSearch));
 }
@@ -352,9 +318,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         DoADir(strStartPath, c4MaxH, strSuffix);
     }
 
-    //
     //  Catch any unhandled CIDLib runtime errors
-    //
     catch(TError& errToCatch)
     {
         // If this hasn't been logged already, then log it
@@ -364,10 +328,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             TModule::LogEventObj(errToCatch);
         }
 
-        TSysInfo::strmOut()
-                    <<  L"A CIDLib runtime error occured during processing. "
-                    <<  L"\nError: " << errToCatch.strErrText()
-                    << kCIDLib::NewLn << kCIDLib::EndLn;
+        conOut  <<  L"A CIDLib runtime error occured during processing. "
+                <<  L"\nError: " << errToCatch.strErrText()
+                << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
@@ -378,18 +341,16 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //
     catch(const TKrnlError& kerrToCatch)
     {
-        TSysInfo::strmOut()
-                    << L"A kernel error occured during processing.\n  Error="
-                    << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
+        conOut  << L"A kernel error occured during processing.\n  Error="
+                << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
     // Catch a general exception
     catch(...)
     {
-        TSysInfo::strmOut()
-                    << L"A general exception occured during processing\n"
-                    << kCIDLib::EndLn;
+        conOut  << L"A general exception occured during processing\n"
+                << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::SystemException;
     }
 

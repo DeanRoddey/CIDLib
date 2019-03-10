@@ -31,6 +31,10 @@
 //  The output is sent to the standard output, via the console object that
 //  is also used for all the other output.
 //
+//
+//  Like most of the basic samples, this one doesn't create a facility object, it
+//  just starts a main thread on a local function.
+//
 // CAVEATS/GOTCHAS:
 //
 //  1)  This simple program does not attempt to be language independent.
@@ -49,20 +53,9 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDLib, which is all we need.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
-
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
 
 
 // ----------------------------------------------------------------------------
@@ -92,6 +85,7 @@ static TOutConsole  conOut;
 //  only thread object that is run automatically. All others are started
 //  manually when required or desired.
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Streams1MainThread", eMainThreadFunc))
 
 
@@ -110,7 +104,7 @@ static tCIDLib::TVoid DoWork()
     if (!TFileSys::bExists(strTestFile))
     {
         conOut  << L"The test source file " << strTestFile
-                << L" was not found" << kCIDLib::EndLn;
+                << L" was not found" << kCIDLib::NewEndLn;
         return;
     }
 
@@ -175,7 +169,9 @@ static tCIDLib::TVoid DoWork()
     while (!strmSource.bEndOfStream())
     {
         // Get a line of text. Skip it if its empty
-        if (strmSource.c4GetLine(strInput))
+        strmSource >> strInput;
+        strInput.StripWhitespace();
+        if (!strInput.bIsEmpty())
         {
             // Now break out the two parts using the tokenizer
             stokInput.Reset();
@@ -230,7 +226,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         }
 
         conOut  << L"A CIDLib runtime error occured during processing.\n"
-                << L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
+                << L"Error: " << errToCatch.strErrText() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::RuntimeError;
     }
 
@@ -242,7 +238,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     catch(const TKrnlError& kerrToCatch)
     {
         conOut  << L"A kernel error occured during processing.\n  Error="
-                << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
+                << kerrToCatch.errcId() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
@@ -250,7 +246,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     catch(...)
     {
         conOut  << L"A general exception occured during processing"
-                << kCIDLib::NewLn << kCIDLib::EndLn;
+                << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::SystemException;
     }
     return tCIDLib::EExitCodes::Normal;

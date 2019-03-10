@@ -31,6 +31,7 @@
 //  except one goes to a file and another goes to a memory buffer,
 //  demonstrating the flexibility of streams.
 //
+//
 // CAVEATS/GOTCHAS:
 //
 //  1)  This program is very simple so it does not attempt to be language
@@ -44,8 +45,7 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDMath, which brings in all we need.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDMath.hpp"
 
@@ -61,16 +61,6 @@ static const TString    strTestFile(L"TestStreamFile.Dat");
 
 
 // ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-// ----------------------------------------------------------------------------
 //  Local data
 //
 //  conOut
@@ -81,13 +71,9 @@ static TOutConsole  conOut;
 
 
 // ----------------------------------------------------------------------------
-//  Do the magic main module code
-//
-//  This tells CIDLib which thread is the primary program thread. This is the
-//  only thread started automatically. All others are started manully when
-//  desired or required. One, and only one, module of the program must do this
-//  in order to have a meaningful program.
+//  Do the magic main module code to start the main thread
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Streams2MainThread", eMainThreadFunc))
 
 
@@ -214,10 +200,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //  using the same memory buffer. We do this by passing the output
         //  stream to the constructor of the input stream.
         //
-        TBinMBufOutStream strmBufTestOut
-        (
-            kCIDLib::c4MemPageSize, kCIDLib::c4MemPageSize * 2
-        );
+        TBinMBufOutStream strmBufTestOut(kCIDLib::c4Sz_8K);
         TBinMBufInStream strmBufTestIn(strmBufTestOut);
 
         //
@@ -226,9 +209,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //
         conOut << L"Streaming to the memory stream..." << kCIDLib::EndLn;
         StreamTo(strmBufTestIn, strmBufTestOut);
-        conOut << kCIDLib::NewLn << kCIDLib::EndLn;
-
-
+        conOut << kCIDLib::NewEndLn;
 
         //
         //  Now lets create file based binary streams. Unlike with the memory
@@ -259,21 +240,14 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //
         conOut << L"Streaming to the file stream..." << kCIDLib::EndLn;
         StreamTo(strmFileTestIn, strmFileTestOut);
-        conOut << kCIDLib::NewLn << kCIDLib::EndLn;
+        conOut << kCIDLib::NewEndLn;
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut  << L"A CIDLib runtime error occured during processing.\n  "
-                << L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
+                << L"Error: " << errToCatch.strErrText() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::RuntimeError;
     }
 
@@ -285,7 +259,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     catch(const TKrnlError& kerrToCatch)
     {
         conOut  << L"A kernel error occured during processing.\nError=  "
-                << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
+                << kerrToCatch.errcId() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
@@ -293,7 +267,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     catch(...)
     {
         conOut  << L"A general exception occured during processing"
-                << kCIDLib::NewLn << kCIDLib::EndLn;
+                << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::SystemException;
     }
 

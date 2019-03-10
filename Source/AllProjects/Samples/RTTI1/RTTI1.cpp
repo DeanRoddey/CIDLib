@@ -27,11 +27,11 @@
 //  3)  Use the RTTIDecls() or AdvRTTIDecls() macros in their cpp file.
 //  4)  Support a default constructor if AdvRTTIDecls is used. The
 //      constructor can be protected, but then the class then has to use the
-//          BefriendFactory() macro so that the factory method can access the
-//          default constructor.
+//      BefriendFactory() macro so that the factory method can access the
+//      default constructor.
 //  5)  Although its not necessary, supporting polymorphic duplication is
-//          a plus by supporting the MDuplicable interface. This requires a
-//          copy constructor.
+//      a plus by supporting the MDuplicable interface. This requires a
+//      copy constructor.
 //
 //      * Template classes should use the TemplateRTTIDefs() macro in their
 //          class definition. Templates with multiple instantiation parms
@@ -48,20 +48,9 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDLib, which is all we need.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
-
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
 
 
 // ----------------------------------------------------------------------------
@@ -78,6 +67,7 @@ static TTextFileOutStream   strmOut(tCIDLib::EStdFiles::StdOut);
 // ----------------------------------------------------------------------------
 //  Do the magic main module code
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"RTTI1MainThread", eMainThreadFunc))
 
 
@@ -270,7 +260,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //  object of the type to be created, and creating it, and casting the
     //  returned object to the desired type.
     //
-    TTestClass* ptestDynamic= pobjMakeNewOfClass<TTestClass>(L"TTestClass");
+    TTestClass* ptestDynamic = pobjMakeNewOfClass<TTestClass>(L"TTestClass");
+    TJanitor<TTestClass> janDyn(ptestDynamic);
     strmOut << L"Dynamically created object is of type: "
             << ptestDynamic->clsIsA() << kCIDLib::EndLn;
 
@@ -282,9 +273,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     pobjDynamic = dynamic_cast<TObject*>(ptestDynamic);
     if (!pobjDynamic)
         strmOut << L"Could not cast ptestDynamic to pobjDynamic" << kCIDLib::EndLn;
-
-    // Clean up the temp object
-    delete ptestDynamic;
 
     return tCIDLib::EExitCodes::Normal;
 }

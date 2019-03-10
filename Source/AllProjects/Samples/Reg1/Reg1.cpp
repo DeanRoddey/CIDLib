@@ -36,20 +36,10 @@
 #include    "CIDKernel_RegistryWin32.hpp"
 
 
-
-// ---------------------------------------------------------------------------
-//  Forward references
-// ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
 // ---------------------------------------------------------------------------
 //  Do the magic main module code
 // ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Reg1MainThread", eMainThreadFunc))
 
 
@@ -60,16 +50,15 @@ CIDLib_MainModule(TThread(L"Reg1MainThread", eMainThreadFunc))
 const tCIDLib::TCard4 c4DataBufSz = 0x10000;
 const tCIDLib::TCard4 c4NameBufSz = 1024;
 
-TOutConsole conOut;
 tCIDLib::TCard1 ac1DataBuf[c4DataBufSz];
 tCIDLib::TCh    achNameBuf[c4NameBufSz + 1];
 tCIDLib::TCh    achTypeBuf[c4NameBufSz + 1];
+TOutConsole     conOut;
 
 
 // ---------------------------------------------------------------------------
 //  Local functions
 // ---------------------------------------------------------------------------
-
 static tCIDLib::TVoid SearchTree2(  const   tCIDKernel::TWRegHandle hkeyPar
                                     ,       TPathStr&               pathCur)
 {
@@ -123,14 +112,7 @@ static tCIDLib::TVoid SearchTree2(  const   tCIDKernel::TWRegHandle hkeyPar
     //
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4SubKeys; c4Index++)
     {
-        bOk = TKrnlWin32Registry::bQuerySubKeyAt
-        (
-            hkeyPar
-            , c4Index
-            , achNameBuf
-            , c4NameBufSz
-        );
-
+        bOk = TKrnlWin32Registry::bQuerySubKeyAt(hkeyPar, c4Index, achNameBuf, c4NameBufSz);
         if (bOk)
         {
         }
@@ -150,9 +132,7 @@ static tCIDLib::TVoid SearchTree(const  tCIDKernel::ERootKeys   eRoot
 {
     tCIDKernel::TWRegHandle hkeyCur = TKrnlWin32Registry::hkeyGetRootSubKey
     (
-        eRoot
-        , 0
-        , tCIDKernel::ERegAccFlags::ReadOnly
+        eRoot, 0, tCIDKernel::ERegAccFlags::ReadOnly
     );
 
     TPathStr pathCur(pszStart);

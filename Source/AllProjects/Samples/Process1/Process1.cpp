@@ -27,27 +27,20 @@
 //  functionality, and it lets each thread have its own per-thread data members
 //  inside each derived thread object.
 //
-//  Another obvious advantage to this scheme is that you can create some kind
-//  of base thread class that defines a virtual interface. You can then create
-//  a number of derivatives of this thread type, and control them all via the
-//  common base class. You provide the thread function, which does its work
-//  in terms of the new virtual interface. This is a good way to create a
-//  'thread farm' subsystem.
-//
 //  For demonstration purposes this program uses the self contained thread
-//  mechanism. A thread class is derived that provides its own internal thread
-//  function and works as a self contained unit. This thread class just plays
-//  a little tune. The main thread waits for it to die, then it dies too.
+//  mechanism. This thread class just plays a little tune. The main thread waits
+//  for it to die, then it dies too.
 //
 //  Extra credit for guessing the tune that the fragment comes from! I'm not
 //  sure if the tempo is correct, so adjust the EEighth note value below to
 //  adjust it to the right value if you are knowledgeable in this area and
 //  it offends you.
 //
-// CAVEATS/GOTCHAS:
 //
-//  1)  This one does not bother with any language independence, so what
-//      little it outputs is just hard coded.
+//  As with most of these basic samples, this guy does not create a facility
+//  object, it just starts up a thread on a local function.
+//
+// CAVEATS/GOTCHAS:
 //
 // LOG:
 //
@@ -57,9 +50,6 @@
 
 // ----------------------------------------------------------------------------
 //  Includes
-//
-//  We don't have a main header of our own for this simple program, so just
-//  include the CIDLib facility header, which is the only one we need.
 // ----------------------------------------------------------------------------
 #include    "CIDLib.hpp"
 
@@ -83,55 +73,45 @@
 //      This represents a note. Its a note type (and whether its dotted or
 //      not) and its frequency.
 // ----------------------------------------------------------------------------
-enum EDottedNote
+enum class EDotted
 {
-    ENormal
-    , EDotted
+    Normal
+    , Dotted
 };
 
-enum  ENotes
+enum class ENotes
 {
-    ENote_C         = 264
-    , ENote_D       = 296
-    , ENote_Eb      = 312
-    , ENote_E       = 328
-    , ENote_F       = 352
-    , ENote_G       = 392
-    , ENote_A       = 440
-    , ENote_Bb      = 464
-    , ENote_2C      = 528
-    , ENote_2D      = 592
-    , ENote_2Eb     = 624
-    , ENote_2E      = 656
-    , ENote_2F      = 704
-    , ENote_2G      = 784
+    C           = 264
+    , D         = 296
+    , Eb        = 312
+    , E         = 328
+    , F         = 352
+    , G         = 392
+    , A         = 440
+    , Bb        = 464
+    , C2        = 528
+    , D2        = 592
+    , Eb2       = 624
+    , E2        = 656
+    , F2        = 704
+    , G2        = 784
 };
 
-enum ENoteTypes
+enum class ETypes
 {
-    EEighth         = 110
-    , EQuarter      = EEighth * 2
-    , EHalf         = EQuarter * 2
-    , EWhole        = EHalf * 2
+    Eighth      = 125
+    , Quarter   = Eighth * 2
+    , Half      = Quarter * 2
+    , Whole     = Half * 2
 };
 
 struct TNote
 {
-    tCIDLib::TCard4     c4Freq;
-    ENoteTypes          eType;
-    EDottedNote         eDotted;
+    ENotes      eFreq;
+    ETypes      eType;
+    EDotted     eDotted;
 };
 
-
-
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
 
 
 // ----------------------------------------------------------------------------
@@ -139,62 +119,58 @@ tCIDLib::EExitCodes eMainThreadFunc
 //
 //  conOut
 //      This is a console object which we use in this program for our standard
-//      output. Its a specialized text stream class (derived from
-//      TTextOutStream.)
+//      output.
 //
-//  songData
+//  aSongData
 //  c4NoteCount
 //      This the data for the song we play, and the number of notes in the
 //      song.
 // ----------------------------------------------------------------------------
-static TOutConsole      conOut;
-static TNote            aSongData[] =
-                        {
-                                { ENote_D   , EQuarter  , ENormal }
-                            ,   { ENote_D   , EQuarter  , EDotted }
-                            ,   { ENote_F   , EEighth   , ENormal }
-                            ,   { ENote_F   , EQuarter  , ENormal }
-                            ,   { ENote_F   , EQuarter  , ENormal }
-                            ,   { ENote_F   , EQuarter  , EDotted }
-                            ,   { ENote_Bb  , EEighth   , ENormal }
-                            ,   { ENote_Bb  , EQuarter  , ENormal }
-                            ,   { ENote_Bb  , EEighth   , ENormal }
-                            ,   { ENote_2C  , EEighth   , ENormal }
-                            ,   { ENote_2D  , EQuarter  , ENormal }
-                            ,   { ENote_2C  , EQuarter  , ENormal }
-                            ,   { ENote_Bb  , EQuarter  , ENormal }
-                            ,   { ENote_A   , EQuarter  , ENormal }
-                            ,   { ENote_A   , EQuarter  , EDotted }
-                            ,   { ENote_G   , EEighth   , ENormal }
-                            ,   { ENote_G   , EQuarter  , ENormal }
-                            ,   { ENote_G   , EQuarter  , ENormal }
-                            ,   { ENote_G   , EQuarter  , EDotted }
-                            ,   { ENote_Bb  , EEighth   , ENormal }
-                            ,   { ENote_Bb  , EQuarter  , ENormal }
-                            ,   { ENote_Bb  , EQuarter  , ENormal }
-                            ,   { ENote_Bb  , EQuarter  , EDotted }
-                            ,   { ENote_2Eb , EEighth   , ENormal }
-                            ,   { ENote_2Eb , EQuarter  , ENormal }
-                            ,   { ENote_2Eb , EEighth   , ENormal }
-                            ,   { ENote_2F  , EEighth   , ENormal }
-                            ,   { ENote_2G  , EQuarter  , ENormal }
-                            ,   { ENote_2F  , EQuarter  , ENormal }
-                            ,   { ENote_2Eb , EQuarter  , ENormal }
-                            ,   { ENote_2D  , EQuarter  , ENormal }
-                            ,   { ENote_2C  , EQuarter  , EDotted }
-                            ,   { ENote_Bb  , EEighth   , EDotted }
-                            ,   { ENote_Bb  , EQuarter  , EDotted }
-                        };
+static TOutConsole  conOut;
+static TNote        aSongData[] =
+{
+        { ENotes::D   , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::D   , ETypes::Quarter  , EDotted::Dotted }
+    ,   { ENotes::F   , ETypes::Eighth   , EDotted::Normal }
+    ,   { ENotes::F   , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::F   , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::F   , ETypes::Quarter  , EDotted::Dotted }
+    ,   { ENotes::Bb  , ETypes::Eighth   , EDotted::Normal }
+    ,   { ENotes::Bb  , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::Bb  , ETypes::Eighth   , EDotted::Normal }
+    ,   { ENotes::C2  , ETypes::Eighth   , EDotted::Normal }
+    ,   { ENotes::D2  , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::C2  , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::Bb  , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::A   , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::A   , ETypes::Quarter  , EDotted::Dotted }
+    ,   { ENotes::G   , ETypes::Eighth   , EDotted::Normal }
+    ,   { ENotes::G   , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::G   , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::G   , ETypes::Quarter  , EDotted::Dotted }
+    ,   { ENotes::Bb  , ETypes::Eighth   , EDotted::Normal }
+    ,   { ENotes::Bb  , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::Bb  , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::Bb  , ETypes::Quarter  , EDotted::Dotted }
+    ,   { ENotes::Eb2 , ETypes::Eighth   , EDotted::Normal }
+    ,   { ENotes::Eb2 , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::Eb2 , ETypes::Eighth   , EDotted::Normal }
+    ,   { ENotes::F2  , ETypes::Eighth   , EDotted::Normal }
+    ,   { ENotes::G2  , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::F2  , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::Eb2 , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::D2  , ETypes::Quarter  , EDotted::Normal }
+    ,   { ENotes::C2  , ETypes::Quarter  , EDotted::Dotted }
+    ,   { ENotes::Bb  , ETypes::Eighth   , EDotted::Dotted }
+    ,   { ENotes::Bb  , ETypes::Quarter  , EDotted::Dotted }
+};
 static tCIDLib::TCard4  c4NoteCount = tCIDLib::c4ArrayElems(aSongData);
 
 
 // ----------------------------------------------------------------------------
-//  Do the magic main module code
-//
-//  This must be done in one (and only one) module of the client program.
-//  It tells CIDLib which is the main thread of the program.) GUI apps use
-//  a similar, but differently named, mechanism.
+//  Do the magic main module code to start the main thread
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Process1MainThread", eMainThreadFunc))
 
 
@@ -219,15 +195,48 @@ class TSongThread : public TThread
         // --------------------------------------------------------------------
         // Constructors and Destructors
         // --------------------------------------------------------------------
-        TSongThread();
-        ~TSongThread();
+        TSongThread() :
 
+            TThread(L"SongThread")
+        {
+        }
+
+        TSongThread(const TSongThread&) = delete;
+
+        ~TSongThread()
+        {
+        }
 
     protected :
         // --------------------------------------------------------------------
         //  Protected, inherited methods
         // --------------------------------------------------------------------
-        tCIDLib::EExitCodes eProcess();
+        tCIDLib::EExitCodes eProcess() override
+        {
+            // We have to let our calling thread go first
+            Sync();
+
+            //
+            //  Play the song, which is just a static array of note structures
+            //  that we whipped up. We use the standard beeper via facCIDLib which
+            //  will play through whatever audio device is installed as the CIDLib
+            //  audio device.
+            //
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < c4NoteCount; c4Index++)
+            {
+                // Calculate the duration, extended it by half if dotted
+                tCIDLib::TCard4 c4Duration = tCIDLib::c4EnumOrd(aSongData[c4Index].eType);
+                if (aSongData[c4Index].eDotted == EDotted::Dotted)
+                    c4Duration = tCIDLib::TCard4(1.5 * c4Duration);
+
+                // Play the frequency for the calculated duration
+                TAudio::Beep
+                (
+                    tCIDLib::c4EnumOrd(aSongData[c4Index].eFreq), c4Duration
+                );
+            }
+            return tCIDLib::EExitCodes::Normal;
+        }
 
 
         // --------------------------------------------------------------------
@@ -235,52 +244,8 @@ class TSongThread : public TThread
         // --------------------------------------------------------------------
         RTTIDefs(TSongThread,TThread)
 };
-
 RTTIDecls(TSongThread,TThread)
 
-
-// ----------------------------------------------------------------------------
-//  TSongThread: Public constructors and destructors
-// ----------------------------------------------------------------------------
-TSongThread::TSongThread() :
-
-    TThread(L"SongThread")
-{
-}
-
-TSongThread::~TSongThread()
-{
-}
-
-// ----------------------------------------------------------------------------
-//  TSongThread: Protected, inherited methods
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes TSongThread::eProcess()
-{
-    // We have to let our calling thread go first
-    Sync();
-
-    //
-    //  Play the song, which is just a static array of note structures
-    //  that we whipped up. We use the standard beeper via facCIDLib which
-    //  will play through whatever audio device is installed as the CIDLib
-    //  audio device.
-    //
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4NoteCount; c4Index++)
-    {
-        // Calculate the duration, extended it by half if dotted
-        tCIDLib::TCard4 c4Duration = aSongData[c4Index].eType;
-        if (aSongData[c4Index].eDotted == EDotted)
-            c4Duration = tCIDLib::TCard4(1.5 * c4Duration);
-
-        // Play the frequency for the calculated duration
-        TAudio::Beep(aSongData[c4Index].c4Freq, c4Duration);
-
-        // Provide a tiny break between notes
-        TThread::Sleep(10);
-    }
-    return tCIDLib::EExitCodes::Normal;
-}
 
 
 // ----------------------------------------------------------------------------
@@ -309,7 +274,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
     conOut << L"Waiting for thread to die..." << kCIDLib::EndLn;
     tCIDLib::EExitCodes eExit = thrdWorker.eWaitForDeath();
-
     if (eExit != tCIDLib::EExitCodes::Normal)
     {
         conOut  << L"Worker thread returned non-normal exit code: "

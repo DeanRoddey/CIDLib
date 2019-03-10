@@ -26,10 +26,9 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  This simple program does not attempt to be language independent.
-//
-//  2)  This program also does not create a facility object of its own because
-//      its so simple that it has no need for one.
+//  1)  This program is very simple so it does not attempt to be language
+//      independent and it does not provide its own facility object since
+//      it does not need one.
 //
 // LOG:
 //

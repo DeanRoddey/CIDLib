@@ -20,6 +20,9 @@
 //  extraction on a media file using the CIDMetaExtr facility. You give it
 //  a file and it extracts the metadata and displays it.
 //
+//  Like most of these basic samples, it doesn't create facility object, it
+//  just starts up a thread on a local function.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -29,25 +32,16 @@
 
 
 // ---------------------------------------------------------------------------
-//  Includes.
+//  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDJPEG.hpp"
 #include    "CIDMetaExtr.hpp"
 
 
 // ---------------------------------------------------------------------------
-//  Forward references
+//  Do the magic main module code to start up the main thread
 // ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-// ---------------------------------------------------------------------------
-//  Do the magic main module code
-// ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"MetaExtrMainThread", eMainThreadFunc))
 
 
@@ -67,10 +61,10 @@ TOutConsole conOut;
 //
 static tCIDLib::TVoid ShowUsage()
 {
-    conOut << kCIDLib::NewLn
-             << L"Usage: MetaExtract srcfile" << kCIDLib::DNewLn
-             << L"       srcfile is the path to the file to extract from\n"
-             << kCIDLib::EndLn;
+    conOut  << kCIDLib::NewLn
+            << L"Usage: MetaExtract srcfile" << kCIDLib::DNewLn
+            << L"       srcfile is the path to the file to extract from"
+            << kCIDLib::NewEndLn;
 }
 
 
@@ -84,11 +78,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     thrThis.Sync();
 
     // Display the program blurb
-    conOut << kCIDLib::NewLn
-             << L"MetaExtract.Exe, Version: "
-             << facCIDLib().strVersion() << kCIDLib::NewLn
-             << L"CIDLib Media Metadata Extractor Sample"
-             << kCIDLib::NewEndLn;
+    conOut  << kCIDLib::NewLn
+            << L"MetaExtract.Exe, Version: "
+            << facCIDLib().strVersion() << kCIDLib::NewLn
+            << L"CIDLib Media Metadata Extractor Sample"
+            << kCIDLib::NewEndLn;
 
 
     //
@@ -111,7 +105,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         tCIDLib::TCard4     c4Rating = 1;
         tCIDLib::TCard4     c4TrackNum = 0;
         tCIDLib::TCard4     c4Year = 0;
-        THeapBuf            mbufArt(64 * 1024, 0x1000000);
+        THeapBuf            mbufArt(kCIDLib::c4Sz_64K, kCIDLib::c4Sz_16M);
         TString             strAlbum;
         TString             strAlbumArtist;
         TString             strArtist;
@@ -144,6 +138,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         }
 
         // We got an extractor so try it
+        TJanitor<TCIDMetaExtractor> janExtract(pmetexToUse);
         pmetexToUse->bExtract
         (
             pathSrcFile
@@ -216,15 +211,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut <<  L"A CIDLib runtime error occured during processing. "
                  <<  L"Error: " << errToCatch.strErrText() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;

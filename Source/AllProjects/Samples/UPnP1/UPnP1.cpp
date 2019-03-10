@@ -28,6 +28,10 @@
 //
 // CAVEATS/GOTCHAS:
 //
+//  1)  This program is very simple so it does not attempt to be language
+//      independent and it does not provide its own facility object since
+//      it does not need one.
+//
 // LOG:
 //
 //  $_CIDLib_Log_$
@@ -45,16 +49,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  Forward references
-// ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-    ,   tCIDLib::TVoid*     pData
-);
-
-
-// ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
 static TInConsole       conIn(kCIDLib::True, 32);
@@ -65,6 +59,7 @@ static TOutConsole      conOut;
 // ---------------------------------------------------------------------------
 //  Do the magic main module code
 // ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"UPnP1MainThread", eMainThreadFunc))
 
 
@@ -402,7 +397,7 @@ bInitObjects(const  TString&                strZPId
     //  Set up a device properities service.
     //
     //  THERE's a problem as of a the latest Sonos firmware, and this one breaks
-    //  the WInodws UPnP implementation
+    //  the Winodws UPnP implementation
     //
     #if defined(USE_DEVPROPS)
     if (!bFindSvcByType(colZPServices, upnpdZP, upnpsDevProps, kCIDUPnP::strSvcType_DeviceProperties))
@@ -418,11 +413,7 @@ bInitObjects(const  TString&                strZPId
         conOut << L"\nZone Player had no group management service\n" << kCIDLib::EndLn;
         return kCIDLib::False;
     }
-    upnpdZP.SetServiceFromID
-    (
-        L"urn:upnp-org:serviceId:GroupManagement"
-        , upnpsGrpMgmt
-    );
+    upnpdZP.SetServiceFromID(L"urn:upnp-org:serviceId:GroupManagement", upnpsGrpMgmt);
     upnpsGrpMgmt.EnableEvents();
 
     // Now look up the ZP's child devices and find the media renderer one
@@ -631,7 +622,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 strInput.StripWhitespace();
                 c4InpVals = 0;
                 TStringTokenizer stokCmd(&strInput, kCIDLib::szWhitespace);
-                while(stokCmd.bGetNextToken(astrCmd[c4InpVals]))
+                while (stokCmd.bGetNextToken(astrCmd[c4InpVals]))
                 {
                     astrCmd[c4InpVals].StripWhitespace();
                     c4InpVals++;
@@ -647,10 +638,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             // The first one is always the command
             const TString& strCmd = astrCmd[0];
 
-
-            //
-            //  And now process the command
-            //
+            // And now process the command
             if (strCmd.bCompareI(L"AddPLToQ"))
             {
                 if (bCheckParmCnt(c4InpVals, 1))

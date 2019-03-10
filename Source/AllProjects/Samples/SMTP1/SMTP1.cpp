@@ -16,7 +16,7 @@
 //
 // DESCRIPTION:
 //
-//  This is the main (only) module of the Sock3 demo program. This program demonstrates
+//  This is the main (only) module of the SMTP1 demo program. This program demonstrates
 //  some slightly more complex uses of sockets. It provides a very simple SMTP client
 //  program. It will query you for the information required to send a single line e-mail
 //  message, then it will send the message for you.
@@ -27,6 +27,9 @@
 //
 //  It handles the standard SMTP authorization handshake.
 //
+//  Like most of the basic samples, this one doesn't create a facility object, it
+//  just starts a main thread on a local
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -36,21 +39,9 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDNet, which will bring in all we need.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDNet.hpp"
-
-
-
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-    TThread&            thrThis
-    , tCIDLib::TVoid*   pData
-);
 
 
 
@@ -68,14 +59,10 @@ static TInConsole   conIn(kCIDLib::True, 16);
 static TOutConsole  conOut;
 
 
-
 // ----------------------------------------------------------------------------
-//  Do the magic main module code
-//
-//  This tells CIDLib what the main thread of the program is. This is the
-//  only thread object that is run automatically. All others are started
-//  manually when required or desired.
+//  Do the magic main module code to start the main thread
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"SMTP1MainThread", eMainThreadFunc))
 
 
@@ -279,12 +266,10 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 //);
 
         //
-        //  Add some copies of the message to the client to be sent.
+        //  Add a copy of the msg to the client's send queue and then send queued msgs.
+        //  Set a 10 second per message timeout.
         //
-//        smtpClient.AddMsgToQueue(new TEmailMsg(emsgToSend));
         smtpClient.AddMsgToQueue(new TEmailMsg(emsgToSend));
-
-        // And finally we can try to send it. Set a 10 second per message timeout
         smtpClient.SendMsgs(10000);
 
         // The queue should be empty now
@@ -293,15 +278,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut  << L"A CIDLib runtime error occured during processing.\n  Error: "
                 << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;

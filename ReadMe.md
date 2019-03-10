@@ -1,6 +1,6 @@
 #  CIDLib - A C++ Development Environment
 
-CIDLib is the product of decades of work by the author. Actually, it's half of the product. The other half is a very extensive and powerful automation system called CQC (www.charmedquark.com). CIDLib is the 'bottom half' of that code base, and is a general purpose C++ development environment, on top of which CQC is built. CQC's code base remains proprietary, but I have chosen to open source the general purpose part, which comprises right around 450,000 lines of code, approximately 1100 classes. The CQC code base is about 625,000 lines, so a bit over a million lines in the whole code base.
+CIDLib is the product of decades of work by the author, about 25 man-years of work. Actually, it's half of the product. The other half is a very extensive and powerful automation system called CQC (www.charmedquark.com). CIDLib is the 'bottom half' of that code base, and is a general purpose C++ development environment, on top of which CQC is built. CQC's code base remains proprietary, but I have chosen to open source the general purpose part, which comprises right around 450,000 lines of code, approximately 1100 classes. The CQC code base is about 625,000 lines, so a bit over a million lines in the whole code base.
 
 CIDLib is not just a library for this or that. It is a complete environment with build tools, project definition language, loadable text system, a virtual kernel to isolate it from the underlying OS, up through a full set of 'standard libraries', wrappers around lots of common functionality, UI framework, Object Request Broker and IDL compiler, VM based OO macro language with IDE, custom implementations of many standards (XML, PNG, ZLib, JSON, SMTP, HTTP, etc...), and lots of other functionality.
 
@@ -64,15 +64,10 @@ Among the things I'd like to see are 3D graphics/gaming support, and there's an 
 
 **Usage/License**
 
-Though it is of course impossible to prevent people from abusing anything and everything for their own nefarious purposes, and though we realize that these issues are still a ways out pending documentation and such, clearly something like CIDLib will only achieve its ultimate capabilities if it remains a coherent entity. Therefore, we impose the following usage limitations:
+The following usage/license terms are imposed:
 
-1. Do not host in any public way your own versions of this code, in whole or in part. This repository should be the single source for the code base.
-2. Do not host or offer (for free or sale) any modified versions of this code base or any modified binary builds of this code base. Such things are to be used for your own private development purposes only.
-3. We would request that any fixes or improvements at least be offered for inclusion back into the code base, but we realize that's obviously not always practical if that code is commercial.
-4. You may use the official builds or your own builds of this code for development of free or commercial applications of your own. You must note in the documentation that the product is built on the CIDLib code base and provide a link to this repository.
-5. The previous point applies to applications. You may also build and make available C++ libraries that are based on the official CIDLib code. If it is based on your own version of the CIDLib code, you cannot make it publically available, it must be for your own private use. We would hope you do this in the context of the official code base of course.
-6. You must NOT install any non-official builds in any system directories where they could be seen by other CIDLib based applications. Limit them to your own application's local use.
-
-**A Plea**
-
-This code base represents approximately 25 man years of my life, with another 25'ish in the CQC automation platform layer. It is being put out there for the common good, at great personal cost (i.e. it can now never be profited from by me.) It is very much requested that the usage rules be respected and that useful contributions be offered back, so that others can benefit from them and so that we can build an ecosystem around CIDLib that could become a very powerful thing moving forward. And hopefully some very experienced developers might be interested in getting on board in a more active way, working specifically to develop new bespoke sub-systems and helping to maintain the code and documentation.
+1. Do whatever you want
+2. If you use my stuff, be a mensch and give me appropriate credit
+3. If you find bugs, please send them in, in digestable chunks.
+4. If you want to contribute large stuff, i.e. new facilities, then be sure to follow the existing style and substance carefull, because I'm an OCD, paranoid, anal-retentive. It would obviously be best to coordinate with me first to make sure no time and effort are wasted.
+5. Please don't install any non-official builds in any system directories of user's machines, where they could be seen by other CIDLib based applications. Limit them to your own application's local use.

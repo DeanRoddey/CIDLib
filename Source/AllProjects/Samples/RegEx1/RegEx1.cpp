@@ -24,11 +24,6 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  This program is so simple that it does not create a facility object
-//      for itself, or have a main facility header.
-//
-//  2)  This program does not attempt to be language independent.
-//
 // LOG:
 //
 //  $_CIDLib_Log_$
@@ -36,21 +31,9 @@
 
 
 // ---------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. So just include CIDRegX, which is all we need since it in turn
-//  includes whatever else we need.
+//  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDRegX.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  Forward references
-// ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
 
 
 // ---------------------------------------------------------------------------
@@ -86,10 +69,10 @@ TString                 strFile;
 TString                 strRegEx;
 
 
-
 // ---------------------------------------------------------------------------
-//  Do the magic main module code
+//  Do the magic main module code to start the main thread
 // ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"RegEx1MainThread", eMainThreadFunc))
 
 
@@ -177,25 +160,18 @@ static tCIDLib::TVoid SearchFile(TRegEx& regxToFind)
                     strLine.Append(L"...");
                 }
 
-                conOut << strmfOther << L"  Match at line: "
-                         << strmfLine << TCardinal(c4LineNum)
-                         << strmfOther << L" - "
-                         << strLine << kCIDLib::EndLn;
+                conOut  << strmfOther << L"  Match at line: "
+                        << strmfLine << TCardinal(c4LineNum)
+                        << strmfOther << L" - "
+                        << strLine << kCIDLib::EndLn;
             }
         }
     }
 
     catch(TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut << L"Error during process!\n   Error: "
-               << errToCatch << kCIDLib::NewLn << kCIDLib::EndLn;
+               << errToCatch << kCIDLib::NewEndLn;
     }
 }
 
@@ -212,7 +188,7 @@ static tCIDLib::TVoid ShowUsage()
              << L"       Options:" << kCIDLib::NewLn
              << L"          /NoCase     - Do case insensitive match" << kCIDLib::NewLn
              << L"          /Full       - Only matches full lines" << kCIDLib::NewLn
-             << kCIDLib::NewLn << kCIDLib::EndLn;
+             << kCIDLib::NewEndLn;
 }
 
 
@@ -229,7 +205,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
              << L"RegEx1.Exe, Version: "
              << facCIDLib().strVersion() << kCIDLib::NewLn
              << L"CIDLib Regular Expression Demo"
-             << kCIDLib::NewLn << kCIDLib::EndLn;
+             << kCIDLib::NewEndLn;
 
     //
     //  Since this is a demo and testing program, we'd like to catch
@@ -298,9 +274,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //
         if (!TFileSys::bExists(strFile))
         {
-            conOut << L"The input file '"
-                     << strFile
-                     << L"' does not exist" << kCIDLib::EndLn;
+            conOut  << L"The input file '" << strFile
+                    << L"' does not exist" << kCIDLib::EndLn;
             return tCIDLib::EExitCodes::NotFound;
         }
 
@@ -314,25 +289,18 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             regxToFind.SetExpression(strRegEx);
         }
 
-        catch(TError& errToCatch)
+        catch(const TError& errToCatch)
         {
-            // If this hasn't been logged already, then log it
-            if (!errToCatch.bLogged())
-            {
-                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
-            }
-
-            conOut << L"The regular expression is invalid" << kCIDLib::NewLn
-                     << L"  Reason: " << errToCatch.strErrText()
-                     << kCIDLib::NewLn << kCIDLib::EndLn;
+            conOut  << L"The regular expression is invalid" << kCIDLib::NewLn
+                    << L"  Reason: " << errToCatch.strErrText()
+                    << kCIDLib::NewEndLn;
             return tCIDLib::EExitCodes::BadParameters;
         }
 
         // We survived, so display the search info
         conOut << L"        File: " << strFile << kCIDLib::NewLn
                  << L"  Expression: " << strRegEx
-                 << kCIDLib::NewLn << kCIDLib::EndLn;
+                 << kCIDLib::NewEndLn;
 
         //
         //  Do the search of the file for all matches of the regular
@@ -345,17 +313,10 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
-        conOut <<  L"A CIDLib runtime error occured during processing. "
-                 <<  L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::NewLn;
+        conOut  <<  L"A CIDLib runtime error occured during processing. "
+                <<  L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::NewLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
@@ -367,15 +328,15 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     catch(const TKrnlError& kerrToCatch)
     {
         conOut << L"A kernel error occured during processing.\n  Error="
-                 << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
+                 << kerrToCatch.errcId() << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::FatalError;
     }
 
     // Catch a general exception
     catch(...)
     {
-        conOut << L"A general exception occured during processing"
-                 << kCIDLib::NewLn << kCIDLib::EndLn;
+        conOut  << L"A general exception occured during processing"
+                << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::SystemException;
     }
     return tCIDLib::EExitCodes::Normal;

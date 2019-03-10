@@ -42,11 +42,13 @@
 //  abstraction to persistent storage.
 //
 //  We also demonstrate here a 'by reference' collection which is used to
-//  manage the objects. In order to put pointers into a collection we have
-//  to use a 'pointer wrapper' class, TCntPtr in this case, which will
-//  reference count and mange the data pointer for us.
+//  manage our heterogenous list of widgets.
 //
 // CAVEATS/GOTCHAS:
+//
+//  1)  This program is very simple so it does not attempt to be language
+//      independent and it does not provide its own facility object since
+//      it does not need one.
 //
 // LOG:
 //
@@ -99,15 +101,6 @@ static const TRGBClr    rgbWhite(0xFF,0xFF,0xFF);
 static const TString    strTestFile(L"TestStreamFile.Dat");
 
 
-// ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
 
 // ----------------------------------------------------------------------------
 //  Local data
@@ -120,8 +113,9 @@ static TOutConsole  conOut;
 
 
 // ----------------------------------------------------------------------------
-//  Do the magic main module code
+//  Do the magic main module code to start the main thread
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Streams3MainThread", eMainThreadFunc))
 
 
@@ -202,7 +196,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //
         //  Now we can create a cursor and iterate the bag. We polymorphically
         //  stream each one out. This uses a template method that understands
-        //  now to write out the correct type information with the object.
+        //  how to write out the correct type information with the object.
         //
         TBagOWidgets::TCursor cursWidgets(&colWidgets);
         conOut << kCIDLib::DNewLn << L"Writing and 'drawing' objects" << kCIDLib::EndLn;
@@ -319,15 +313,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         conOut  << L"A CIDLib runtime error occured during processing.\n"
                 << L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;

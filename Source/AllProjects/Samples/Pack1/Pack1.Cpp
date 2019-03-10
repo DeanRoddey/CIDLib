@@ -24,6 +24,9 @@
 //  This program supports both packaging and extracting.
 //
 //
+//  Like most of these basic samples, this guy doesn't create a facility object,
+//  it just starts up a thread on a local function.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -33,26 +36,15 @@
 
 
 // ---------------------------------------------------------------------------
-//  Includes. This program is so simple that we don't even have a header of
-//  our own. Just bring in the CIDPack header, which will include anything we
-//  need.
+//  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDPack.hpp"
 
 
 // ---------------------------------------------------------------------------
-//  Forward references
+//  Do the magic main module code to start the main thread
 // ---------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-    ,   tCIDLib::TVoid*     pData
-);
-
-
-// ---------------------------------------------------------------------------
-//  Do the magic main module code
-// ---------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Pack1MainThread", eMainThreadFunc))
 
 
@@ -62,7 +54,7 @@ CIDLib_MainModule(TThread(L"Pack1MainThread", eMainThreadFunc))
 tCIDLib::TBoolean   bPackMode;
 tCIDLib::TBoolean   bVerbose = kCIDLib::False;
 tCIDLib::TCard8     c8Version = 0;
-TOutConsole         strmOut;
+TOutConsole         conOut;
 TPathStr            pathSrc;
 TPathStr            pathTar;
 TString             strNotes;
@@ -76,7 +68,7 @@ TString             strNotes;
 // Shows the program usage if we get incorrect input
 static tCIDLib::TVoid ShowUsage()
 {
-    strmOut << L"CIDLib Pack Demo 1\n\n"
+    conOut  << L"CIDLib Pack Demo 1\n\n"
             << L"   Usage:\n"
             << L"     Pack1 /pack srcdir tarpack [/Notes=text /Version=v.v.v /Verbose]\n\n"
             << L"   srcdir=Top directory to pack from\n"
@@ -84,9 +76,8 @@ static tCIDLib::TVoid ShowUsage()
             << L"   Version must be a 3 part value in M.m.r format\n\n"
             << L"     Pack1 /extract srcpack tardir\n\n"
             << L"   srcpack=Name of source package, without extension\n"
-            << L"   tardir=Top directory to extract to\n\n"
-
-            << kCIDLib::EndLn;
+            << L"   tardir=Top directory to extract to\n"
+            << kCIDLib::NewEndLn;
 }
 
 
@@ -159,7 +150,7 @@ static tCIDLib::TBoolean bParseParms()
             ||  !strMin.bToCard4(c4Min, tCIDLib::ERadices::Dec)
             ||  !strRev.bToCard4(c4Rev, tCIDLib::ERadices::Dec))
             {
-                strmOut << L"The Version parameter must be in the form M.m.r"
+                conOut  << L"The Version parameter must be in the form M.m.r"
                         << kCIDLib::NewEndLn;
                 return kCIDLib::False;
             }
@@ -173,7 +164,7 @@ static tCIDLib::TBoolean bParseParms()
         }
          else
         {
-            strmOut << L"One or more optional parameters were unknown"
+            conOut  << L"One or more optional parameters were unknown"
                     << kCIDLib::NewEndLn;
             return kCIDLib::False;
         }
@@ -196,7 +187,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     // We have to let our calling thread go first
     thrThis.Sync();
 
-
     try
     {
         //
@@ -216,8 +206,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             TFindBuf fndbStart;
             if (!TFileSys::bExists(pathSrc, fndbStart, tCIDLib::EDirSearchFlags::NormalDirs))
             {
-                strmOut << L"Source directory was not found\n    "
-                        << pathSrc << kCIDLib::NewEndLn;
+                conOut  << L"Source directory was not found" << kCIDLib::NewEndLn;
                 return tCIDLib::EExitCodes::BadParameters;
             }
 
@@ -225,15 +214,15 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             //  Make the call to create the package. We pass our console stream
             //  as a status output stream, so he'll output status info for us.
             //
-            strmOut << L"\nCreating Package "
+            conOut << L"\nCreating Package "
                     << L"\n     to: " << pathTar
                     << L"\n   from: " << pathSrc
                     << L"\n-------------------------------------------"
                     << kCIDLib::EndLn;
 
-            if (TFileSys::c4BuildFileTree(L"*.*", fndbStart))
+            if (TFileSys::c4BuildFileTree(kCIDLib::pszAllFilesSpec, fndbStart))
             {
-                // The True parm says overwrite ok
+                // The True parm says target file overwrite OK
                 tCIDLib::TCard4 c4SoFar = 0;
                 facCIDPack().CreatePackage
                 (
@@ -244,14 +233,14 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                     , c8Version
                     , TTime::enctNow()
                     , strNotes
-                    , &strmOut
+                    , &conOut
                     , c4SoFar
                     , bVerbose
                 );
             }
              else
             {
-                strmOut << L"\n  No files were found" << kCIDLib::EndLn;
+                conOut << L"\n  No files were found" << kCIDLib::EndLn;
             }
         }
          else
@@ -274,8 +263,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             TString strVer;
             strVer.AppendFormatted(c8Version >> 48);
             strVer.Append(kCIDLib::chPeriod);
-            strVer.AppendFormatted((c8Version >> 32) & kCIDLib::c2MaxCard
-);
+            strVer.AppendFormatted((c8Version >> 32) & kCIDLib::c2MaxCard);
             strVer.Append(kCIDLib::chPeriod);
             strVer.AppendFormatted(c8Version & kCIDLib::c4MaxCard);
 
@@ -283,7 +271,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             TTime tmFmt(enctStamp);
             tmFmt.strDefaultFormat(TTime::strCTime());
 
-            strmOut << L"\nExtracting Package "
+            conOut << L"\nExtracting Package "
                     << L"\n      From: " << pathSrc
                     << L"\n        To: " << pathTar
                     << L"\n     Notes: " << strNotes
@@ -304,7 +292,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 , enctStamp
                 , strNotes
                 , c4TotalFiles
-                , &strmOut
+                , &conOut
                 , c4SoFar
                 , kCIDLib::True
             );
@@ -314,7 +302,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     // Catch any CIDLib runtime errors
     catch(TError& errToCatch)
     {
-        strmOut << L"\n\nCIDLib Exception occurred\n"
+        conOut << L"\n\nCIDLib Exception occurred\n"
                 << errToCatch << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::RuntimeError;
     }
@@ -326,7 +314,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //
     catch(const TKrnlError& kerrToCatch)
     {
-        strmOut << L"\n\nCIDKernel exception occurred ("
+        conOut << L"\n\nCIDKernel exception occurred ("
                 << kerrToCatch.errcId()
                 << L"/" << kerrToCatch.errcHostId()
                 << L")"
@@ -338,7 +326,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     // Catch a general exception
     catch(...)
     {
-        strmOut << L"\n\nUnknown exception occurred" << kCIDLib::NewEndLn;
+        conOut << L"\n\nUnknown exception occurred" << kCIDLib::NewEndLn;
         return tCIDLib::EExitCodes::SystemException;
     }
 

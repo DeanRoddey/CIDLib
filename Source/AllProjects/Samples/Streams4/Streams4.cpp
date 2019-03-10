@@ -41,6 +41,10 @@
 //
 // CAVEATS/GOTCHAS:
 //
+//  1)  This program is very simple so it does not attempt to be language
+//      independent and it does not provide its own facility object since
+//      it does not need one.
+//
 // LOG:
 //
 //  $_CIDLib_Log_$

@@ -38,7 +38,6 @@
 #include    "XMLDemo1.Hpp"
 
 
-
 // ----------------------------------------------------------------------------
 //  Global Data
 //
@@ -251,7 +250,7 @@ TFacXMLDemo1::eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         DoParse(xprsTest, strFileParm);
 
         #if CID_DEBUG_ON
-        #define DEBUG_LEAKS 1
+        #define DEBUG_LEAKS 0
         #if DEBUG_LEAKS
         TKrnlMemCheck kmchkTest;
         kmchkTest.ReportToFile(L"MemDump.Txt");
@@ -280,15 +279,8 @@ TFacXMLDemo1::eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
+    catch(const TError& errToCatch)
     {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
         *m_pstrmOut << L"A CIDLib runtime error occured during processing.\n"
                     << L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;

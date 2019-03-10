@@ -72,7 +72,11 @@ class TBaseWidget : public TObject, public MStreamable, public MDuplicable
         // --------------------------------------------------------------------
         //  Public, virtual methods
         // --------------------------------------------------------------------
-        virtual TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const = 0;
+        virtual TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
+        {
+            strmToWriteTo << L"Type: " << clsIsA() << L" - ";
+            return strmToWriteTo;
+        }
 
 
     protected   :
@@ -89,14 +93,6 @@ class TBaseWidget : public TObject, public MStreamable, public MDuplicable
         // --------------------------------------------------------------------
         RTTIDefs(TBaseWidget,TObject)
 };
-
-
-inline TTextOutStream& TBaseWidget::Draw(TTextOutStream& strmToWriteTo) const
-{
-    strmToWriteTo << L"Type: " << clsIsA() << L" - ";
-    return strmToWriteTo;
-}
-
 
 
 // ----------------------------------------------------------------------------
@@ -135,7 +131,7 @@ class TLineWidget : public TBaseWidget
         // --------------------------------------------------------------------
         //  Public, inherited methods
         // --------------------------------------------------------------------
-        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
+        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const override
         {
             strmToWriteTo   << TParent::Draw(strmToWriteTo)
                             << L"{" << m_pntFrom
@@ -158,12 +154,12 @@ class TLineWidget : public TBaseWidget
         // --------------------------------------------------------------------
         //  Protected, implemented methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
+        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom) override
         {
             strmToReadFrom >> m_pntFrom >> m_pntTo;
         }
 
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
+        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const override
         {
             strmToWriteTo << m_pntFrom << m_pntTo;
         }
@@ -227,7 +223,7 @@ class TCircleWidget : public TBaseWidget
         // --------------------------------------------------------------------
         //  Public, inherited methods
         // --------------------------------------------------------------------
-        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
+        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const override
         {
             strmToWriteTo   << TParent::Draw(strmToWriteTo)
                             << L"Center/Radius: {" << m_pntCenter
@@ -250,12 +246,12 @@ class TCircleWidget : public TBaseWidget
         // --------------------------------------------------------------------
         //  Protected, implemented methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
+        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom) override
         {
             strmToReadFrom >> m_pntCenter >> m_c4Radius;
         }
 
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
+        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const override
         {
             strmToWriteTo << m_pntCenter << m_c4Radius;
         }
@@ -271,6 +267,7 @@ class TCircleWidget : public TBaseWidget
         // --------------------------------------------------------------------
         tCIDLib::TCard4 m_c4Radius;
         TPoint          m_pntCenter;
+
 
         // --------------------------------------------------------------------
         //  Magic macros
@@ -318,7 +315,7 @@ class TBoxWidget : public TBaseWidget
         // --------------------------------------------------------------------
         //  Public, inherited methods
         // --------------------------------------------------------------------
-        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
+        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const override
         {
             strmToWriteTo   << TParent::Draw(strmToWriteTo)
                             << L"Corners: {" << m_pntUL
@@ -341,12 +338,12 @@ class TBoxWidget : public TBaseWidget
         // --------------------------------------------------------------------
         //  Protected, implemented methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
+        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom) override
         {
             strmToReadFrom >> m_pntUL >> m_pntLR;
         }
 
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
+        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const override
         {
             strmToWriteTo << m_pntUL << m_pntLR;
         }
@@ -370,7 +367,6 @@ class TBoxWidget : public TBaseWidget
         DefPolyDup(TBoxWidget)
         BefriendFactory(TBoxWidget)
 };
-
 
 
 
@@ -412,7 +408,7 @@ class TFilledBoxWidget : public TBoxWidget
         // --------------------------------------------------------------------
         //  Public, inherited methods
         // --------------------------------------------------------------------
-        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
+        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const override
         {
             TParent::Draw(strmToWriteTo);
             strmToWriteTo << L", Fill Color: " << m_rgbFill;
@@ -434,13 +430,13 @@ class TFilledBoxWidget : public TBoxWidget
         // --------------------------------------------------------------------
         //  Protected, implemented methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
+        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom) override
         {
             TParent::StreamFrom(strmToReadFrom);
             strmToReadFrom >> m_rgbFill;
         }
 
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
+        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const override
         {
             TParent::StreamTo(strmToWriteTo);
             strmToWriteTo << m_rgbFill;
