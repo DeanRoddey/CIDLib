@@ -214,13 +214,15 @@ template <class T> class TCntPtr
 
         T* pobjData()
         {
-            CheckNullRef(CID_LINE);
+            if (!m_pcdRef)
+                return nullptr;
             return m_pcdRef->m_pobjData;
         }
 
         const T* pobjData() const
         {
-            CheckNullRef(CID_LINE);
+            if (!m_pcdRef)
+                return nullptr;
             return m_pcdRef->m_pobjData;
         }
 
