@@ -32,7 +32,7 @@ Keep in mind that CIDLib must continue to support CQC, which is likely to always
 
 Though CIDLib is currently only fielded on Windows, keeping it portable has always been a goal. I have done plenty of cross platform development in the past and understand the issues fairly well. As mentioned above, CIDLib is based on a 'virtual kernel' that abstracts it from the OS. That virtual kernel is in turn split into interface plus per-platform implementations. The build tools understand this situation so that helps a lot as well.
 
-There is a Win32 implementation currently. But there is still an old Lunix implementation from a few decades ago that's still down there. It would need to be brought up to speed, but it should not be difficult to get almost all of the back end stuff buildable onto Win32 and Linux (32 bit.) And that's not in the 'conditional code all over the place' sort of way, but cleanly supporting both platforms, since 95% of the code is platform independent and written in terms of our own classes.
+There is a Win32 implementation currently. But there is still an old Linux implementation from a few decades ago that's still down there. It would need to be brought up to speed, but it should not be difficult to get almost all of the back end stuff buildable onto Win32 and Linux (32 bit.) And that's not in the 'conditional code all over the place' sort of way, but cleanly supporting both platforms, since 95% of the non-UI code is platform independent and written in terms of our own classes.
 
 There are still a handlful of libraries that need to be given the 'split' treatment, i.e. break out the platform specific stuff from the platform independent parts. I will be giving those attention soon. Until then they are marked for build only on Win32.
 
@@ -48,7 +48,7 @@ But CIDLib remain to one degree or another the anti-STL. Modernization will be d
 
 Given its size, it will lean more towards keeping as much non-trivial code out of line as possible, rather than moving almost everything inline or completely header based subsystems, as seems to be the vogue amongst some these days. Build times would be brutal otherwise every time something remotely fundamental is changed.
 
-And we are manly enough not to be frightened by the existence of raw pointers, at least down in the more fundamental code certainly. At higher levels a move towards more smart encapsulation has already begun. But the lower level code needs to be well optimized (though not unduly so) so that higher level code and afford to be less so.
+And we are manly enough not to be frightened by the existence of raw pointers, at least down in the more fundamental code certainly. At higher levels a move towards more smart encapsulation has already begun. But the lower level code needs to be well optimized (though not unduly so) so that higher level code and afford to be less so. There are also lots of bootstrapping issues involved that play into this.
 
 Certainly we will not be trying to turn C++ into a non-OO language either, as many people these seem to be intent on doing.
 
@@ -56,7 +56,7 @@ Certainly we will not be trying to turn C++ into a non-OO language either, as ma
 
 So the goal of CIDLib is not to see how much third party stuff can be shoved into it, or how 'modern' it can be. It is not a goal to try to make it digestable by people who haven't mastered coding on the medium to larger scale, which clearly a system like CIDLib is more oriented towards. It will not likely ever be a tool for people who want C++ to become a new Javascript.
 
-It is definitely a goal to create a highly consistent, tightly integrated world of bespoke implementations of many technologies, not wrappers around third party stuff and all the complications that entails. I would hope that other developers who have interests in specific areas might get involved and provide implementations of technologies that they are expert in.
+It is definitely a goal to create a highly consistent, tightly integrated world of bespoke implementations of many technologies, not wrappers around third party stuff and all the complications and compromises that entails. I would hope that other highly experienced developers who have interests in specific areas might get involved and provide implementations of technologies that they are expert in.
 
 It is not a goal to add functionality for the sake of it. It needs to be high quality and highly consistent with the style and substance of the large body of existing code. So no quick hacks of third party code, which would be somewhat difficult anyway given that we don't allow standard library/STL code.
 
