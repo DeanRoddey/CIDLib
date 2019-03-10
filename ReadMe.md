@@ -69,5 +69,5 @@ The following usage/license terms are imposed:
 1. Do whatever you want
 2. If you use my stuff, be a mensch and give me appropriate credit
 3. If you find bugs, please send them in, in digestable chunks.
-4. If you want to contribute large stuff, i.e. new facilities, then be sure to follow the existing style and substance carefull, because I'm an OCD, paranoid, anal-retentive. It would obviously be best to coordinate with me first to make sure no time and effort are wasted.
+4. If you want to contribute large stuff, i.e. new facilities, then be sure to follow the existing style and substance carefully, because I'm an OCD, paranoid, anal-retentive. It would obviously be best to coordinate with me first to make sure no time and effort are wasted.
 5. Please don't install any non-official builds in any system directories of user's machines, where they could be seen by other CIDLib based applications. Limit them to your own application's local use.
