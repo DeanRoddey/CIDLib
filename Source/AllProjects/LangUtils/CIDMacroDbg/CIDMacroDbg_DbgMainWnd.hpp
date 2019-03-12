@@ -18,7 +18,7 @@
 //  manager control and it contains the other debugger windows within it. It
 //  provides methods to make it do things and depends on the app to provide
 //  the menu items or other means for the user to make them happen (though
-//  we provide some hot key support here.)
+//  we provide some hot key support here and the editor's popup menu.)
 //
 //  This window, being derived from the standard pane window container control,
 //  manages tiled panes. The top one is the man source viewer window, and the bottom

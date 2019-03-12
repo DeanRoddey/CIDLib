@@ -311,6 +311,10 @@ tCIDLib::TBoolean TFacCIDIDL::bParseParams()
             return kCIDLib::False;
         }
 
+        // Get the input file
+        m_strInputFile = *cursParms++;
+
+        // And then any options
         for (; cursParms; ++cursParms)
         {
             // Get the param

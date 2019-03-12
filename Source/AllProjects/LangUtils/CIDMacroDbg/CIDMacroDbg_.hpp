@@ -11,6 +11,7 @@
 //
 // DESCRIPTION:
 //
+//  Our internal header, which brings in the stuff we only need internally.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -32,7 +33,6 @@
 //  Bring in any facilities that we only need internally
 // ---------------------------------------------------------------------------
 #include    "CIDCtrls.hpp"
-
 #include    "CIDWUtils.hpp"
 
 

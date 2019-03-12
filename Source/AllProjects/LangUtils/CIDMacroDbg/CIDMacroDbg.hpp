@@ -11,9 +11,12 @@
 //
 // DESCRIPTION:
 //
-//  This is the main public header for the facility. It is the single point
-//  of contact for the outside world. By including it, they get what we
-//  have to offer.
+//  This is the main public header for the CML embeddable IDE facility. It is
+//  the single point of contact for the outside world. By including it, they
+//  get what we have to offer.
+//
+//  The functionality here would not be very typically used. It's for programs
+//  that want to let users edit and debug CML code.
 //
 // CAVEATS/GOTCHAS:
 //

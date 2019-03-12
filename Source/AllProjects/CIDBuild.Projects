@@ -631,6 +631,11 @@ PROJECT=CIDSChan
         VERSIONED   = Yes
     END SETTINGS
 
+    ; This one has per-platform implementations but only Win32 so far
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
     DEPENDENTS
         CIDLib
         CIDCrypto
@@ -680,6 +685,7 @@ PROJECT=CIDSock
     END IDLFILES
 
     DEPENDENTS
+        CIDKernel
         CIDLib
         CIDCrypto
     END DEPENDENTS
@@ -797,9 +803,7 @@ END PROJECT
 ;   Media related facilities
 ; ----------------------------------------------------------------------------
 
-;
-;   A framework for streaming audio in from sources and out to targets.
-;
+;  A framework for streaming audio in from sources and out to targets.
 PROJECT=CIDAudStream
     SETTINGS
         DIRECTORY   = MediaUtils\CIDAudStream
@@ -905,9 +909,7 @@ PROJECT=CIDMetaExtr
 END PROJECT
 
 
-;
-;  Implements the RTP/RTCP standards
-;
+; Implements the RTP/RTCP standards (just early work so far)
 PROJECT=CIDRTP
     SETTINGS
         DIRECTORY   = MediaUtils\CIDRTP
