@@ -1637,9 +1637,10 @@ c4SendGetRedir(         TCIDDataSrcJan&         janSrc
                     }
                      else if (urlToGet.eProto() == tCIDSock::EProtos::HTTPS)
                     {
+                        tCIDLib::TStrList colALPN;
                         pcdsNew = new TCIDSChanClDataSrc
                         (
-                            psockLocal, tCIDLib::EAdoptOpts::Adopt, urlToGet.strHost()
+                            psockLocal, tCIDLib::EAdoptOpts::Adopt, urlToGet.strHost(), colALPN
                         );
                     }
                      else
@@ -2325,9 +2326,10 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
                 }
                  else if (urlToGet.eProto() == tCIDSock::EProtos::HTTPS)
                 {
+                    tCIDLib::TStrList colALPN;
                     pcdsLocal = new TCIDSChanClDataSrc
                     (
-                        psockLocal, tCIDLib::EAdoptOpts::Adopt, urlToGet.strHost()
+                        psockLocal, tCIDLib::EAdoptOpts::Adopt, urlToGet.strHost(), colALPN
                     );
                 }
                  else

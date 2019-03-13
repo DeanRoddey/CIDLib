@@ -40,11 +40,21 @@
 TCIDSChanClDataSrc::
 TCIDSChanClDataSrc(         TClientStreamSocket* const  psockSrc
                     , const tCIDLib::EAdoptOpts         eAdopt
-                    , const TString&                    strPrincipal) :
+                    , const TString&                    strPrincipal
+                    , const tCIDLib::TStrCollect&       colALPNList) :
 
-    m_pcdsRawData(new TCIDSockStreamDataSrc(psockSrc, eAdopt))
+    m_colALPNList(colALPNList.c4ElemCount())
+    , m_pcdsRawData(new TCIDSockStreamDataSrc(psockSrc, eAdopt))
     , m_strPrincipal(strPrincipal)
 {
+    // Copy over the protocol list if any
+    if (!colALPNList.bIsEmpty())
+    {
+        TColCursor<TString>* pcursALPN = colALPNList.pcursNew();
+        TJanitor<TColCursor<TString>> janCurs(pcursALPN);
+        for (; pcursALPN->bIsValid(); pcursALPN->bNext())
+            m_colALPNList.objAdd(pcursALPN->objRCur());
+    }
 }
 
 TCIDSChanClDataSrc::
@@ -53,7 +63,8 @@ TCIDSChanClDataSrc( const   TIPEndPoint&            ipepTar
                     , const TString&                strPrincipal
                     , const tCIDLib::TStrCollect&   colALPNList) :
 
-    m_pcdsRawData(nullptr)
+    m_colALPNList(colALPNList.c4ElemCount())
+    , m_pcdsRawData(nullptr)
     , m_strPrincipal(strPrincipal)
 {
     TClientStreamSocket* psockSrc = nullptr;

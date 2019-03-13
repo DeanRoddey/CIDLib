@@ -51,6 +51,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
                     TClientStreamSocket* const psockSrv
             , const tCIDLib::EAdoptOpts     eAdopt
             , const TString&                strPrincipal
+            , const tCIDLib::TStrCollect&   colALPNList
         );
 
         TCIDSChanClDataSrc

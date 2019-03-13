@@ -232,11 +232,13 @@ TMEngDataSrcVal::SetSockTCP(const TIPEndPoint& ipepTar, const tCIDLib::TBoolean 
             //  Create the socket in this case and directly and pass it to the
             //  secure channel data source, who will adopt it.
             //
+            tCIDLib::TStrList colALPN;
             pcdsNew = new TCIDSChanClDataSrc
             (
                 new TClientStreamSocket(tCIDSock::ESockProtos::TCP, ipepTar)
                 , tCIDLib::EAdoptOpts::Adopt
                 , ipepTar.strHostName()
+                , colALPN
             );
         }
          else

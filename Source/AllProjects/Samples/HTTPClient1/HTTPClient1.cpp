@@ -337,9 +337,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 (
                     tCIDSock::ESockProtos::TCP, urlGet.ipepHost()
                 );
+
+                tCIDLib::TStrList colALPN;
                 pcdsSrv = new TCIDSChanClDataSrc
                 (
-                    psockSrc, tCIDLib::EAdoptOpts::Adopt, urlGet.strHost()
+                    psockSrc, tCIDLib::EAdoptOpts::Adopt, urlGet.strHost(), colALPN
                 );
             }
 

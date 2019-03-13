@@ -682,7 +682,11 @@ TSMTPClient::SendMsgs(  const   tCIDLib::TCard4     c4MaxMSPer
                 );
             }
 
-            pcdsSrv = new TCIDSChanClDataSrc(psockClient, tCIDLib::EAdoptOpts::Adopt, m_strServer);
+            tCIDLib::TStrList colALPN;
+            pcdsSrv = new TCIDSChanClDataSrc
+            (
+                psockClient, tCIDLib::EAdoptOpts::Adopt, m_strServer, colALPN
+            );
         }
          else
         {
