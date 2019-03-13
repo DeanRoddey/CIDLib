@@ -50,7 +50,8 @@ TCIDSChanClDataSrc(         TClientStreamSocket* const  psockSrc
 TCIDSChanClDataSrc::
 TCIDSChanClDataSrc( const   TIPEndPoint&            ipepTar
                     , const tCIDSock::ESockProtos   eProtocol
-                    , const TString&                strPrincipal) :
+                    , const TString&                strPrincipal
+                    , const tCIDLib::TStrCollect&   colALPNList) :
 
     m_pcdsRawData(nullptr)
     , m_strPrincipal(strPrincipal)
@@ -77,6 +78,15 @@ TCIDSChanClDataSrc( const   TIPEndPoint&            ipepTar
             }
         }
         throw;
+    }
+
+    // Copy over the protocol list if any
+    if (!colALPNList.bIsEmpty())
+    {
+        TColCursor<TString>* pcursALPN = colALPNList.pcursNew();
+        TJanitor<TColCursor<TString>> janCurs(pcursALPN);
+        for (; pcursALPN->bIsValid(); pcursALPN->bNext())
+            m_colALPNList.objAdd(pcursALPN->objRCur());
     }
 }
 
@@ -187,6 +197,7 @@ tCIDLib::TVoid TCIDSChanClDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd)
         , enctEnd
         , m_strPrincipal
         , L"Secure Client Data Source"
+        , m_colALPNList
     );
 }
 
@@ -210,6 +221,8 @@ TCIDSChanClDataSrc::TerminateSrc(const  tCIDLib::TEncodedTime   enctEnd
 
     catch(TError& errToCatch)
     {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
     }
 
     // And our nested data source, optionally closing it
@@ -220,6 +233,8 @@ TCIDSChanClDataSrc::TerminateSrc(const  tCIDLib::TEncodedTime   enctEnd
 
     catch(TError& errToCatch)
     {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
     }
 }
 
@@ -336,7 +351,8 @@ tCIDLib::TVoid TCIDSChanSrvDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd
     // Recursively initalize our own data source first
     m_pcdsRawData->Initialize(enctEnd);
 
-    // We have to user the secure channel to set up the encrypted connection
+    // The ALPN list is not used on the server side, so pass an empty list
+    tCIDLib::TStrList colALPN;
     m_schanSec.Connect
     (
         *m_pcdsRawData
@@ -344,6 +360,7 @@ tCIDLib::TVoid TCIDSChanSrvDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd
         , enctEnd
         , m_strCertInfo
         , L"Secure Server Data Source"
+        , colALPN
     );
 }
 
@@ -367,6 +384,8 @@ TCIDSChanSrvDataSrc::TerminateSrc(  const   tCIDLib::TEncodedTime   enctEnd
 
     catch(TError& errToCatch)
     {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
     }
 
     // And our nested data source
@@ -377,6 +396,8 @@ TCIDSChanSrvDataSrc::TerminateSrc(  const   tCIDLib::TEncodedTime   enctEnd
 
     catch(TError& errToCatch)
     {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
     }
 }
 

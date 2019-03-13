@@ -138,12 +138,16 @@ static tCIDLib::TErrCode errcMapSChanStatusToErr(const tCIDLib::TCard4 Status)
 //  Note that, for a client side connection the certificate info is actually the
 //  name of the target, i.e. the server side certificate must be for this target.
 //
+//  The ALPN list is only used on the client side, and can be empty if no particular
+//  preferred protocols are to be indicated.
+//
 tCIDLib::TVoid
 TSChannel::Connect(         TCIDDataSrc&            cdsTar
                     , const tCIDLib::TBoolean       bClient
                     , const tCIDLib::TEncodedTime   enctEnd
                     , const TString&                strCertInfo
-                    , const TString&                strName)
+                    , const TString&                strName
+                    , const tCIDLib::TStrCollect&   colALPNList)
 {
     //
     //  If we already have data, then this is not valid. They need to terminate the
@@ -160,6 +164,16 @@ TSChannel::Connect(         TCIDDataSrc&            cdsTar
             , tCIDLib::EErrClasses::Already
             , strName
         );
+    }
+
+    // Make a copy of the ALPN list
+    m_colALPNList.RemoveAll();
+    if (colALPNList.bIsEmpty())
+    {
+        TColCursor<TString>* pcursALPN = colALPNList.pcursNew();
+        TJanitor<TColCursor<TString>> janCurs(pcursALPN);
+        for (; pcursALPN->bIsValid(); pcursALPN->bNext())
+            m_colALPNList.objAdd(pcursALPN->objRCur());
     }
 
     //
@@ -374,10 +388,9 @@ TSChannel::Connect(         TCIDDataSrc&            cdsTar
         //
         if (bClient)
         {
-            ClNegotiate(cdsTar, strCertInfo, enctEnd);
-
             // Remember the principle in case we have to re-negotiate
             m_strPrincipal = strCertInfo;
+            ClNegotiate(cdsTar, enctEnd);
         }
          else
         {
@@ -723,7 +736,7 @@ TSChannel::c4ReceiveData(       TCIDDataSrc&            cdsTar
             try
             {
                 if (m_bClient)
-                    ClNegotiate(cdsTar, m_strPrincipal, enctRealEnd);
+                    ClNegotiate(cdsTar, enctRealEnd);
                 else
                     SrvNegotiate(cdsTar, enctRealEnd);
             }
@@ -842,7 +855,6 @@ tCIDLib::TVoid TSChannel::Cleanup()
 //
 tCIDLib::TVoid
 TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
-                        , const TString&                strPrincipal
                         , const tCIDLib::TEncodedTime   enctEnd)
 {
     tCIDLib::TBoolean   bDone = kCIDLib::False;
@@ -956,11 +968,11 @@ TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
         OutBuffers[0].BufferType= SECBUFFER_TOKEN;
 
         // And do a round
-        Status = ::InitializeSecurityContext
+        Status = ::InitializeSecurityContextW
         (
             &m_pInfo->CredH
             , m_pInfo->bGotSecContext ? &m_pInfo->CtxH : 0
-            , (SEC_WCHAR*)strPrincipal.pszBuffer()
+            , (SEC_WCHAR*)m_strPrincipal.pszBuffer()
             , c4InFlags
             , 0
             , 0

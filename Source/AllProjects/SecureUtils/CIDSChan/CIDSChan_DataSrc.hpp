@@ -58,6 +58,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
             const   TIPEndPoint&            ipepTar
             , const tCIDSock::ESockProtos   eProtocol
             , const TString&                strPrincipal
+            , const tCIDLib::TStrCollect&   colALPNList
         );
 
         TCIDSChanClDataSrc(const TCIDSChanClDataSrc&) = delete;
@@ -126,6 +127,11 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_colALPNList
+        //      The client code can provide a list of preferred protocols that will
+        //      be used in the 'application layer protocol negotiation' phase of the
+        //      secure connection process.
+        //
         //  m_pcdsRawData
         //      A straight data source over socket that we point at the socket we
         //      are given. This is what we pass to the secure channel for I/O. We
@@ -141,6 +147,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         //      This is the target we are connecting to. The certificate we get from
         //      the server must match this.
         // -------------------------------------------------------------------
+        tCIDLib::TStrList       m_colALPNList;
         TCIDSockStreamDataSrc*  m_pcdsRawData;
         TSChannel               m_schanSec;
         TString                 m_strPrincipal;

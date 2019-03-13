@@ -113,6 +113,7 @@ class CIDSCHANEXP TSChannel : public TObject
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strCertInfo
             , const TString&                strName
+            , const tCIDLib::TStrCollect&   colALPNList
         );
 
         tCIDLib::TVoid WriteData
@@ -154,7 +155,6 @@ class CIDSCHANEXP TSChannel : public TObject
         tCIDLib::TVoid ClNegotiate
         (
                     TCIDDataSrc&            cdsTar
-            , const TString&                strPrincipal
             , const tCIDLib::TEncodedTime   enctEnd
         );
 
@@ -194,6 +194,12 @@ class CIDSCHANEXP TSChannel : public TObject
         //      they run out and need to decrypt more. If a given platform doesn't
         //      need this, then they can ignore it and leave it zero.
         //
+        //  m_colALPNList
+        //      The client code can provide a list of preferred protocols that will
+        //      be used in the 'application layer protocol negotiation' phase of the
+        //      secure connection process. We have to keep it around in case we need
+        //      to re-negotiate.
+        //
         //  m_mbufDecBuf
         //      A temp buffer to decrypt into and to hold into decyrpted data that
         //      is too much for our caller's needs on the current round. See
@@ -217,6 +223,7 @@ class CIDSCHANEXP TSChannel : public TObject
         // -------------------------------------------------------------------
         tCIDLib::TBoolean   m_bClient;
         tCIDLib::TCard4     m_c4DecBufSz;
+        tCIDLib::TStrList   m_colALPNList;
         THeapBuf            m_mbufDecBuf;
         TSChanPlatData*     m_pInfo;
         TString             m_strName;
