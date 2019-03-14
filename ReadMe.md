@@ -33,6 +33,10 @@ https://www.youtube.com/watch?v=seXk3RbAjNU.
 
 It is obstensibly about the virtual kernel, but also provides a good overview of the functional boxes and how they are layered and such. The other videos there also very relevant, though some are prior to recent modernization efforts. In particular the ones on enumerations and the ORB was prior to a huge reworking of the code base to use newer style 'enum class' enums. Otherwise they are still relevant.
 
+I've set up a sub-Reddit for discussion and questions, which is here:
+
+https://www.reddit.com/r/CIDLib/
+
 
 **Acknowledgements**
 
