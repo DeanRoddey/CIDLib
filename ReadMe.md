@@ -38,7 +38,7 @@ It is obstensibly about the virtual kernel, but also provides a good overview of
 
 Though CIDLib very much tries to avoid use of any third party code beyond the OS, it does use the following:
 
-- Scintilla - A verion of the Scintilla engine is wrapped and used as the CML language source editor. Your own CIDLib based applications wouldn't need it unless the used the embedded CML IDE.
+- Scintilla - A version of the Scintilla engine is wrapped and used as the CML language source editor. Your own CIDLib based applications wouldn't need it unless they used the embedded CML IDE.
 - Standard JPEG Libaries - Some of the guts of the standard JPEG libraries are wrapped to provide the JPEG file format support.
 
 Otherwise it is just OS APIs and optional OS SDKs (speech recognition, Windows Media Format, etc...)
@@ -92,8 +92,8 @@ And, being a comprehensive system, used to create applications that are not put 
 
 Among the things I'd personally like to see added to CIDLib are:
 
-- 3D graphics/gaming support
-- More internet telephony stuff, there's already early some RTP/RTPC work and a skeleton SIP facility ready for when RTP/RTPC are done
+- 3D graphics/gaming support. There is a behavior tree facility but it's just very basic stuff so far, and only very lightly used in CQC.
+- More internet telephony stuff, there's already some early RTP/RTPC work and a skeleton SIP facility ready for when RTP/RTPC are done
 - Custom public cryptography system instead of wrapping system libraries
 - Same for UPnP. I've already taken over some of the UPnP functionality.
 
