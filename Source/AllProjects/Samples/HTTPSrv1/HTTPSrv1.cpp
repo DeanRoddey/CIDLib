@@ -421,7 +421,7 @@ tCIDLib::EExitCodes eServiceThread(TThread& thrThis, tCIDLib::TVoid* pData)
             {
                 pcdsClient = new TCIDSChanSrvDataSrc
                 (
-                    psockClient, tCIDLib::EAdoptOpts::Adopt, strCertInfo
+                    L"HTTPSrv 1", psockClient, tCIDLib::EAdoptOpts::Adopt, strCertInfo
                 );
             }
              else

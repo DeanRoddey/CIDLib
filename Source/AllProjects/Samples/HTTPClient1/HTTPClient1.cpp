@@ -341,7 +341,12 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 tCIDLib::TStrList colALPN;
                 pcdsSrv = new TCIDSChanClDataSrc
                 (
-                    psockSrc, tCIDLib::EAdoptOpts::Adopt, urlGet.strHost(), colALPN
+                    L"HTTP1 Demo"
+                    , psockSrc
+                    , tCIDLib::EAdoptOpts::Adopt
+                    , TString::strEmpty()
+                    , colALPN
+                    , urlGet.strHost()
                 );
             }
 

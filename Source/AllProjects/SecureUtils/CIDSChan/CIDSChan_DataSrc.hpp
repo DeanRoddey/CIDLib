@@ -48,18 +48,22 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         // -------------------------------------------------------------------
         TCIDSChanClDataSrc
         (
-                    TClientStreamSocket* const psockSrv
+            const   TString&                strName
+            ,       TClientStreamSocket* const psockSrv
             , const tCIDLib::EAdoptOpts     eAdopt
-            , const TString&                strPrincipal
+            , const TString&                strCertInfo
             , const tCIDLib::TStrCollect&   colALPNList
+            , const TString&                strPrincipal = TString::strEmpty()
         );
 
         TCIDSChanClDataSrc
         (
-            const   TIPEndPoint&            ipepTar
+            const   TString&                strName
+            , const TIPEndPoint&            ipepTar
             , const tCIDSock::ESockProtos   eProtocol
-            , const TString&                strPrincipal
+            , const TString&                strCertInfo
             , const tCIDLib::TStrCollect&   colALPNList
+            , const TString&                strPrincipal = TString::strEmpty()
         );
 
         TCIDSChanClDataSrc(const TCIDSChanClDataSrc&) = delete;
@@ -144,14 +148,24 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         //  m_schanSec
         //      The secure channel we will use to process the communications.
         //
+        //  m_strCertInfo
+        //      If they want a client side certificate, then this will be set to the
+        //      certificate info, else empty.
+        //
         //  m_strPrincipal
         //      This is the target we are connecting to. The certificate we get from
         //      the server must match this.
+        //
+        //  m_strName
+        //      A name that can be given to us for use in logging and such. We just
+        //      set it on the underlying secure channel.
         // -------------------------------------------------------------------
         tCIDLib::TStrList       m_colALPNList;
         TCIDSockStreamDataSrc*  m_pcdsRawData;
         TSChannel               m_schanSec;
+        TString                 m_strCertInfo;
         TString                 m_strPrincipal;
+        TString                 m_strName;
 };
 
 
@@ -168,7 +182,8 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
         // -------------------------------------------------------------------
         TCIDSChanSrvDataSrc
         (
-                    TServerStreamSocket* const psockSrv
+            const   TString&                strName
+            ,       TServerStreamSocket* const psockSrv
             , const tCIDLib::EAdoptOpts     eAdopt
             , const TString&                strCertInfo
         );
@@ -251,10 +266,14 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
         //      The caller provides us with a certificate info string that we pass
         //      on to the secure channel, to tell him where to find the certificate
         //      that we want to use as our server side cert.
+        //
+        //  m_strName
+        //      Client code can give us a name to be used in logged errors and such.
         // -------------------------------------------------------------------
         TCIDSockStreamDataSrc*  m_pcdsRawData;
         TSChannel               m_schanSec;
         TString                 m_strCertInfo;
+        TString                 m_strName;
 };
 
 

@@ -38,14 +38,18 @@
 //  TCIDSChanClDataSrc: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TCIDSChanClDataSrc::
-TCIDSChanClDataSrc(         TClientStreamSocket* const  psockSrc
+TCIDSChanClDataSrc( const   TString&                    strName
+                    ,       TClientStreamSocket* const  psockSrc
                     , const tCIDLib::EAdoptOpts         eAdopt
-                    , const TString&                    strPrincipal
-                    , const tCIDLib::TStrCollect&       colALPNList) :
+                    , const TString&                    strCertInfo
+                    , const tCIDLib::TStrCollect&       colALPNList
+                    , const TString&                    strPrincipal) :
 
     m_colALPNList(colALPNList.c4ElemCount())
     , m_pcdsRawData(new TCIDSockStreamDataSrc(psockSrc, eAdopt))
+    , m_strCertInfo(strCertInfo)
     , m_strPrincipal(strPrincipal)
+    , m_strName(strName)
 {
     // Copy over the protocol list if any
     if (!colALPNList.bIsEmpty())
@@ -58,14 +62,18 @@ TCIDSChanClDataSrc(         TClientStreamSocket* const  psockSrc
 }
 
 TCIDSChanClDataSrc::
-TCIDSChanClDataSrc( const   TIPEndPoint&            ipepTar
+TCIDSChanClDataSrc( const   TString&                strName
+                    , const TIPEndPoint&            ipepTar
                     , const tCIDSock::ESockProtos   eProtocol
-                    , const TString&                strPrincipal
-                    , const tCIDLib::TStrCollect&   colALPNList) :
+                    , const TString&                strCertInfo
+                    , const tCIDLib::TStrCollect&   colALPNList
+                    , const TString&                strPrincipal) :
 
     m_colALPNList(colALPNList.c4ElemCount())
     , m_pcdsRawData(nullptr)
+    , m_strCertInfo(strCertInfo)
     , m_strPrincipal(strPrincipal)
+    , m_strName(strName)
 {
     TClientStreamSocket* psockSrc = nullptr;
     try
@@ -201,14 +209,14 @@ tCIDLib::TVoid TCIDSChanClDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd)
     //  We have to use the secure channel to set up the encrypted connection. We
     //  indicate client side and pass the principal as the certificate info.
     //
-    m_schanSec.Connect
+    m_schanSec.ClConnect
     (
-        *m_pcdsRawData
-        , kCIDLib::True
+        m_strName
+        , *m_pcdsRawData
         , enctEnd
-        , m_strPrincipal
-        , L"Secure Client Data Source"
+        , m_strCertInfo
         , m_colALPNList
+        , m_strPrincipal
     );
 }
 
@@ -261,12 +269,14 @@ TCIDSChanClDataSrc::TerminateSrc(const  tCIDLib::TEncodedTime   enctEnd
 // ---------------------------------------------------------------------------
 
 TCIDSChanSrvDataSrc::
-TCIDSChanSrvDataSrc(        TServerStreamSocket* const  psockSrc
+TCIDSChanSrvDataSrc(const   TString&                    strName
+                    ,       TServerStreamSocket* const  psockSrc
                     , const tCIDLib::EAdoptOpts         eAdopt
                     , const TString&                    strCertInfo) :
 
     m_pcdsRawData(new TCIDSockStreamDataSrc(psockSrc, eAdopt))
     , m_strCertInfo(strCertInfo)
+    , m_strName(strName)
 {
 }
 
@@ -362,17 +372,8 @@ tCIDLib::TVoid TCIDSChanSrvDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd
     // Recursively initalize our own data source first
     m_pcdsRawData->Initialize(enctEnd);
 
-    // The ALPN list is not used on the server side, so pass an empty list
     tCIDLib::TStrList colALPN;
-    m_schanSec.Connect
-    (
-        *m_pcdsRawData
-        , kCIDLib::False
-        , enctEnd
-        , m_strCertInfo
-        , L"Secure Server Data Source"
-        , colALPN
-    );
+    m_schanSec.SrvConnect(m_strName, *m_pcdsRawData, enctEnd, m_strCertInfo);
 }
 
 

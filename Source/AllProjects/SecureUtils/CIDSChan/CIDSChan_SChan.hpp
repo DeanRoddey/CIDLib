@@ -106,14 +106,22 @@ class CIDSCHANEXP TSChannel : public TObject
             , const tCIDLib::EAllData       eAllData = tCIDLib::EAllData::FailIfNotAll
         );
 
-        tCIDLib::TVoid Connect
+        tCIDLib::TVoid ClConnect
         (
-                    TCIDDataSrc&            cdsSrc
-            , const tCIDLib::TBoolean       bClient
+            const   TString&                strName
+            ,       TCIDDataSrc&            cdsSrc
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strCertInfo
-            , const TString&                strName
             , const tCIDLib::TStrCollect&   colALPNList
+            , const TString&                strSecPrincipal = TString::strEmpty()
+        );
+
+        tCIDLib::TVoid SrvConnect
+        (
+            const   TString&                strName
+            ,       TCIDDataSrc&            cdsSrc
+            , const tCIDLib::TEncodedTime   enctEnd
+            , const TString&                strCertInfo
         );
 
         tCIDLib::TVoid WriteData
@@ -155,6 +163,13 @@ class CIDSCHANEXP TSChannel : public TObject
         tCIDLib::TVoid ClNegotiate
         (
                     TCIDDataSrc&            cdsTar
+            , const tCIDLib::TEncodedTime   enctEnd
+        );
+
+        tCIDLib::TVoid DoConnect
+        (
+                    TCIDDataSrc&            cdsSrc
+            , const TString&                strCertInfo
             , const tCIDLib::TEncodedTime   enctEnd
         );
 

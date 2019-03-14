@@ -140,6 +140,76 @@ TSChannel::c4ReadDataMS(        TCIDDataSrc&        cdsTar
 
 
 //
+//  We have separate client and server side connection methods. They store away the
+//  info they get, set the m_bClient flag, and then call the per-platform connection
+//  method.
+//
+tCIDLib::TVoid
+TSChannel::ClConnect(const  TString&                strName
+                    ,       TCIDDataSrc&            cdsSrc
+                    , const tCIDLib::TEncodedTime   enctEnd
+                    , const TString&                strCertInfo
+                    , const tCIDLib::TStrCollect&   colALPNList
+                    , const TString&                strSecPrincipal)
+{
+    if (m_pInfo)
+    {
+        facCIDSChan().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kSChanErrs::errcSChan_AlreadyInit
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Already
+            , m_strName
+        );
+    }
+
+    // Make a copy of the ALPN list
+    m_colALPNList.RemoveAll();
+    if (!colALPNList.bIsEmpty())
+    {
+        TColCursor<TString>* pcursALPN = colALPNList.pcursNew();
+        TJanitor<TColCursor<TString>> janCurs(pcursALPN);
+        for (; pcursALPN->bIsValid(); pcursALPN->bNext())
+            m_colALPNList.objAdd(pcursALPN->objRCur());
+    }
+
+    // Store the other info and call the private connection method
+    m_bClient = kCIDLib::True;
+    m_strName = strName;
+    m_strPrincipal = strSecPrincipal;
+    DoConnect(cdsSrc, strCertInfo, enctEnd);
+}
+
+tCIDLib::TVoid
+TSChannel::SrvConnect(  const   TString&                strName
+                        ,       TCIDDataSrc&            cdsSrc
+                        , const tCIDLib::TEncodedTime   enctEnd
+                        , const TString&                strCertInfo)
+{
+    if (m_pInfo)
+    {
+        facCIDSChan().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kSChanErrs::errcSChan_AlreadyInit
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Already
+            , m_strName
+        );
+    }
+
+    // Store the info and call the private connection method
+    m_bClient = kCIDLib::False;
+    m_strName = strName;
+    m_colALPNList.RemoveAll();
+    DoConnect(cdsSrc, strCertInfo, enctEnd);
+}
+
+
+//
 //  Both of these just call a private helper that will chunk the data, encrypt it and
 //  buffer it to our internal data source's output, then it will flush the data source
 //  output when everything is ready.

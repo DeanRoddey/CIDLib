@@ -235,10 +235,12 @@ TMEngDataSrcVal::SetSockTCP(const TIPEndPoint& ipepTar, const tCIDLib::TBoolean 
             tCIDLib::TStrList colALPN;
             pcdsNew = new TCIDSChanClDataSrc
             (
-                new TClientStreamSocket(tCIDSock::ESockProtos::TCP, ipepTar)
+                L"CML Secure Channel Client"
+                , new TClientStreamSocket(tCIDSock::ESockProtos::TCP, ipepTar)
                 , tCIDLib::EAdoptOpts::Adopt
-                , ipepTar.strHostName()
+                , TString::strEmpty()
                 , colALPN
+                , ipepTar.strHostName()
             );
         }
          else

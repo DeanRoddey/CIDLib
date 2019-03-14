@@ -1640,7 +1640,12 @@ c4SendGetRedir(         TCIDDataSrcJan&         janSrc
                         tCIDLib::TStrList colALPN;
                         pcdsNew = new TCIDSChanClDataSrc
                         (
-                            psockLocal, tCIDLib::EAdoptOpts::Adopt, urlToGet.strHost(), colALPN
+                            L"HTTPClient"
+                            , psockLocal
+                            , tCIDLib::EAdoptOpts::Adopt
+                            , TString::strEmpty()
+                            , colALPN
+                            , urlToGet.strHost()
                         );
                     }
                      else
@@ -2329,7 +2334,12 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
                     tCIDLib::TStrList colALPN;
                     pcdsLocal = new TCIDSChanClDataSrc
                     (
-                        psockLocal, tCIDLib::EAdoptOpts::Adopt, urlToGet.strHost(), colALPN
+                        L"HTTP Client"
+                        , psockLocal
+                        , tCIDLib::EAdoptOpts::Adopt
+                        , TString::strEmpty()
+                        , colALPN
+                        , urlToGet.strHost()
                     );
                 }
                  else

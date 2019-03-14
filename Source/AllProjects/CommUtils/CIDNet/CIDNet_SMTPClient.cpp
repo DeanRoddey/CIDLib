@@ -685,7 +685,12 @@ TSMTPClient::SendMsgs(  const   tCIDLib::TCard4     c4MaxMSPer
             tCIDLib::TStrList colALPN;
             pcdsSrv = new TCIDSChanClDataSrc
             (
-                psockClient, tCIDLib::EAdoptOpts::Adopt, m_strServer, colALPN
+                L"SMTP Client"
+                , psockClient
+                , tCIDLib::EAdoptOpts::Adopt
+                , TString::strEmpty()
+                , colALPN
+                , m_strServer
             );
         }
          else
