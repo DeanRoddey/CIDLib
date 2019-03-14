@@ -398,8 +398,7 @@ TSChannel::Connect(         TCIDDataSrc&            cdsTar
         SCCred.dwVersion = SCHANNEL_CRED_VERSION;
         if (m_bClient)
         {
-            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_0_CLIENT
-                                            | SP_PROT_TLS1_1_CLIENT
+            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_1_CLIENT
                                             | SP_PROT_TLS1_2_CLIENT;
             SCCred.dwFlags = SCH_CRED_NO_DEFAULT_CREDS;
         }
@@ -407,8 +406,7 @@ TSChannel::Connect(         TCIDDataSrc&            cdsTar
         {
             SCCred.cCreds = 1;
             SCCred.paCred = &m_pInfo->pCertContext;
-            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_0_SERVER
-                                            | SP_PROT_TLS1_1_SERVER
+            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_1_SERVER
                                             | SP_PROT_TLS1_2_SERVER;
         }
 
