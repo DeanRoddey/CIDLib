@@ -72,6 +72,68 @@ struct TSChanPlatData
 //  Local helpers
 // ---------------------------------------------------------------------------
 
+// Called to load up an ALPN buffer
+static tCIDLib::TCard4
+c4LoadALPNBuf(          tCIDLib::TCard1*    pc1Out
+                , const tCIDLib::TCard4     c4BufSz
+                , const tCIDLib::TStrList&  colNames)
+{
+    //
+    //  Set up an output stream to build up the info temporarily into. Default little endian
+    //  is correct.
+    //
+    tCIDLib::TCard4 c4Ret = 0;
+    THeapBuf mbufOutput(c4BufSz, c4BufSz);
+    {
+        TBinMBufOutStream strmTar(&mbufOutput);
+
+        // First put out a zero value that we'll fill in later with the buffer size
+        strmTar << tCIDLib::TCard4(0);
+
+        // Then we indicate that it has ALPN data
+        strmTar << tCIDLib::TCard4(SecApplicationProtocolNegotiationExt_ALPN);
+
+        //
+        //  And another one we'll come back to which contains the bytes for the actual
+        //  protocol names, only 16 bits this time.
+        //
+        strmTar << tCIDLib::TCard2(0);
+
+        //
+        //  Then for each entry, we have to transcode to UTF8, then put out the number of
+        //  bytes and then the bytes.
+        //
+        tCIDLib::TCard4 c4CurBytes;
+        TUTF8Converter tcvtUTF8;
+        THeapBuf mbufUTF8(64, c4BufSz - 20);
+        tCIDLib::TStrList::TCursor cursNames(&colNames);
+        for (; cursNames; ++cursNames)
+        {
+            // Put out the converted name bytes, followed by the bytes themselves
+            tcvtUTF8.c4ConvertTo(*cursNames, mbufUTF8, c4CurBytes);
+            strmTar << tCIDLib::TCard1(c4CurBytes);
+            strmTar.c4WriteBuffer(mbufUTF8, c4CurBytes);
+        }
+        strmTar.Flush();
+        c4Ret = strmTar.c4CurSize();
+    }
+    CIDAssert(c4Ret <= c4BufSz, L"The ALPN data is larger than the available buffer");
+
+    // Put in the overall buffer size we skipped, minus the size bytes themselves
+    mbufOutput.PutCard4(c4Ret - 4, 0);
+
+    //
+    //  Put the bytes for the actual protocols info, which is the full size minus
+    //  the two 4 byte and single 2 byte housekeeping values.
+    //
+    mbufOutput.PutCard2(tCIDLib::TCard2(c4Ret - 10), 8);
+
+    // And copy this back to the caller's buffer
+    mbufOutput.CopyOut(pc1Out, c4Ret);
+    return c4Ret;
+}
+
+
 //
 //  Maps some of the common errors to errors of our own, wo that we can provide more
 //  useful info for in the field diagnosis.
@@ -168,7 +230,7 @@ TSChannel::Connect(         TCIDDataSrc&            cdsTar
 
     // Make a copy of the ALPN list
     m_colALPNList.RemoveAll();
-    if (colALPNList.bIsEmpty())
+    if (!colALPNList.bIsEmpty())
     {
         TColCursor<TString>* pcursALPN = colALPNList.pcursNew();
         TJanitor<TColCursor<TString>> janCurs(pcursALPN);
@@ -866,8 +928,8 @@ TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
     // Get the token size info for schanne
     tCIDLib::TCard4 c4TokenSize = 0;
     {
-        PSecPkgInfo pkgInfo;
-        Status = ::QuerySecurityPackageInfo(L"schannel", &pkgInfo);
+        PSecPkgInfoW pkgInfo;
+        Status = ::QuerySecurityPackageInfoW(L"schannel", &pkgInfo);
         if (Status < 0)
         {
             facCIDSChan().ThrowErr
@@ -955,11 +1017,28 @@ TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
         // We've consumed any carryover from the previous round now
         c4CarryOver = 0;
 
-        // Set up our I/O buffers for this round
+        // Set up our buffers for this round
         InBuffers[0].pvBuffer   = pc1In;
         InBuffers[0].cbBuffer   = c4Cnt;
-        InBuffers[0].BufferType = SECBUFFER_TOKEN;
-        InBuffers[1].pvBuffer   = 0;
+        InBuffers[0].BufferType = SECBUFFER_EMPTY;
+        if (bFirstRound && !m_colALPNList.bIsEmpty())
+        {
+            // It's the first around and we have ALPN info so start with that
+            c4Cnt = c4LoadALPNBuf(pc1In, c4TokenSize, m_colALPNList);
+            if (c4Cnt)
+            {
+                InBuffers[0].cbBuffer = c4Cnt;
+                InBuffers[0].BufferType = SECBUFFER_APPLICATION_PROTOCOLS;
+            }
+        }
+         else if (c4Cnt)
+        {
+            // We just have token info to send, so it's a token buffer
+            InBuffers[0].BufferType = SECBUFFER_TOKEN;
+        }
+
+
+        InBuffers[1].pvBuffer   = nullptr;
         InBuffers[1].cbBuffer   = 0;
         InBuffers[1].BufferType = SECBUFFER_EMPTY;
 
@@ -976,7 +1055,7 @@ TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
             , c4InFlags
             , 0
             , 0
-            , bFirstRound ? 0 : &InBufList
+            , &InBufList
             , 0
             , &m_pInfo->CtxH
             , &OutBufList
@@ -1242,8 +1321,8 @@ TSChannel::SrvNegotiate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd
     // Get the token size info for schanne
     tCIDLib::TCard4 c4TokenSize = 0;
     {
-        PSecPkgInfo pkgInfo;
-        Status = ::QuerySecurityPackageInfo(L"schannel", &pkgInfo);
+        PSecPkgInfoW pkgInfo;
+        Status = ::QuerySecurityPackageInfoW(L"schannel", &pkgInfo);
         if (Status < 0)
         {
             facCIDSChan().ThrowErr
@@ -1280,9 +1359,9 @@ TSChannel::SrvNegotiate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd
     InBufList.pBuffers = InBuffers;
     InBufList.ulVersion = SECBUFFER_VERSION;
 
-    SecBuffer OutBuffers[1];
+    SecBuffer OutBuffers[2];
     SecBufferDesc OutBufList;
-    OutBufList.cBuffers = 1;
+    OutBufList.cBuffers = 2;
     OutBufList.pBuffers = OutBuffers;
     OutBufList.ulVersion = SECBUFFER_VERSION;
 
@@ -1340,6 +1419,9 @@ TSChannel::SrvNegotiate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd
         OutBuffers[0].pvBuffer  = pc1Out;
         OutBuffers[0].cbBuffer  = c4TokenSize;
         OutBuffers[0].BufferType= SECBUFFER_TOKEN;
+        OutBuffers[1].pvBuffer   = nullptr;
+        OutBuffers[1].cbBuffer   = 0;
+        OutBuffers[1].BufferType = SECBUFFER_ALERT;
 
         SECURITY_STATUS Status = ::AcceptSecurityContext
         (
