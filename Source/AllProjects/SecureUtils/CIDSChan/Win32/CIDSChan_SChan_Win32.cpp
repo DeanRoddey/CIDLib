@@ -1143,10 +1143,15 @@ TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
         }
          else
         {
-            SCCred.cCreds = 1;
-            SCCred.paCred = &m_pInfo->pCertContext;
             SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_1_SERVER
                                             | SP_PROT_TLS1_2_SERVER;
+        }
+
+        // If we had cert info, pass the certificate context
+        if (!strCertInfo.bIsEmpty())
+        {
+            SCCred.cCreds = 1;
+            SCCred.paCred = &m_pInfo->pCertContext;
         }
 
         // And try to aquire a credentials handle
