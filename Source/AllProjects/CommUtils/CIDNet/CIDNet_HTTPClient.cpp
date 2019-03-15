@@ -1645,6 +1645,7 @@ c4SendGetRedir(         TCIDDataSrcJan&         janSrc
                             , tCIDLib::EAdoptOpts::Adopt
                             , TString::strEmpty()
                             , colALPN
+                            , tCIDSChan::EConnOpts::None
                             , urlToGet.strHost()
                         );
                     }
@@ -2339,6 +2340,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
                         , tCIDLib::EAdoptOpts::Adopt
                         , TString::strEmpty()
                         , colALPN
+                        , tCIDSChan::EConnOpts::None
                         , urlToGet.strHost()
                     );
                 }

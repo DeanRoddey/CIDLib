@@ -45,6 +45,7 @@ TSChannel::TSChannel() :
 
     m_bClient(kCIDLib::False)
     , m_c4DecBufSz(0)
+    , m_eOpts(tCIDSChan::EConnOpts::None)
     , m_mbufDecBuf(32 * 1024)
     , m_pInfo(nullptr)
 {
@@ -150,6 +151,7 @@ TSChannel::ClConnect(const  TString&                strName
                     , const tCIDLib::TEncodedTime   enctEnd
                     , const TString&                strCertInfo
                     , const tCIDLib::TStrCollect&   colALPNList
+                    , const tCIDSChan::EConnOpts    eOpts
                     , const TString&                strSecPrincipal)
 {
     if (m_pInfo)
@@ -177,6 +179,7 @@ TSChannel::ClConnect(const  TString&                strName
 
     // Store the other info and call the private connection method
     m_bClient = kCIDLib::True;
+    m_eOpts = eOpts;
     m_strName = strName;
     m_strPrincipal = strSecPrincipal;
     DoConnect(cdsSrc, strCertInfo, enctEnd);
@@ -186,7 +189,8 @@ tCIDLib::TVoid
 TSChannel::SrvConnect(  const   TString&                strName
                         ,       TCIDDataSrc&            cdsSrc
                         , const tCIDLib::TEncodedTime   enctEnd
-                        , const TString&                strCertInfo)
+                        , const TString&                strCertInfo
+                        , const tCIDSChan::EConnOpts    eOpts)
 {
     if (m_pInfo)
     {
@@ -203,6 +207,7 @@ TSChannel::SrvConnect(  const   TString&                strName
 
     // Store the info and call the private connection method
     m_bClient = kCIDLib::False;
+    m_eOpts = eOpts;
     m_strName = strName;
     m_colALPNList.RemoveAll();
     DoConnect(cdsSrc, strCertInfo, enctEnd);

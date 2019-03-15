@@ -690,6 +690,7 @@ TSMTPClient::SendMsgs(  const   tCIDLib::TCard4     c4MaxMSPer
                 , tCIDLib::EAdoptOpts::Adopt
                 , TString::strEmpty()
                 , colALPN
+                , tCIDSChan::EConnOpts::None
                 , m_strServer
             );
         }

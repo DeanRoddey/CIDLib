@@ -631,6 +631,14 @@ PROJECT=CIDSChan
         VERSIONED   = Yes
     END SETTINGS
 
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDSChan_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
     ; This one has per-platform implementations but only Win32 so far
     PLATFORMS
         Win32

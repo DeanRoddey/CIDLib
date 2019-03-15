@@ -53,6 +53,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
             , const tCIDLib::EAdoptOpts     eAdopt
             , const TString&                strCertInfo
             , const tCIDLib::TStrCollect&   colALPNList
+            , const tCIDSChan::EConnOpts    eOpts = tCIDSChan::EConnOpts::None
             , const TString&                strPrincipal = TString::strEmpty()
         );
 
@@ -63,6 +64,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
             , const tCIDSock::ESockProtos   eProtocol
             , const TString&                strCertInfo
             , const tCIDLib::TStrCollect&   colALPNList
+            , const tCIDSChan::EConnOpts    eOpts = tCIDSChan::EConnOpts::None
             , const TString&                strPrincipal = TString::strEmpty()
         );
 
@@ -137,6 +139,10 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         //      be used in the 'application layer protocol negotiation' phase of the
         //      secure connection process.
         //
+        //  m_eOpts
+        //      We have to save this away to pass to the channel object when we
+        //      initialize it.
+        //
         //  m_pcdsRawData
         //      A straight data source over socket that we point at the socket we
         //      are given. This is what we pass to the secure channel for I/O. We
@@ -161,6 +167,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         //      set it on the underlying secure channel.
         // -------------------------------------------------------------------
         tCIDLib::TStrList       m_colALPNList;
+        tCIDSChan::EConnOpts    m_eOpts;
         TCIDSockStreamDataSrc*  m_pcdsRawData;
         TSChannel               m_schanSec;
         TString                 m_strCertInfo;
@@ -186,6 +193,7 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
             ,       TServerStreamSocket* const psockSrv
             , const tCIDLib::EAdoptOpts     eAdopt
             , const TString&                strCertInfo
+            , const tCIDSChan::EConnOpts    eOpts = tCIDSChan::EConnOpts::None
         );
 
         TCIDSChanSrvDataSrc(const TCIDSChanSrvDataSrc&) = delete;
@@ -254,6 +262,10 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_eOpts
+        //      We have to save this away to pass to the channel object when we
+        //      initialize it.
+        //
         //  m_pcdsRawData
         //      A straight data source over socket that we point at the socket we
         //      are given. This is what we pass to the secure channel for I/O. We
@@ -270,6 +282,7 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
         //  m_strName
         //      Client code can give us a name to be used in logged errors and such.
         // -------------------------------------------------------------------
+        tCIDSChan::EConnOpts    m_eOpts;
         TCIDSockStreamDataSrc*  m_pcdsRawData;
         TSChannel               m_schanSec;
         TString                 m_strCertInfo;

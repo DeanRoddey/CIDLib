@@ -60,6 +60,7 @@ namespace tCIDSChan
 //  Include our public headers
 // ---------------------------------------------------------------------------
 #include "CIDSChan_ErrorIds.hpp"
+#include "CIDSChan_Shared.hpp"
 #include "CIDSChan_SChan.hpp"
 #include "CIDSChan_DataSrc.hpp"
 #include "CIDSChan_ThisFacility.hpp"

@@ -346,6 +346,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                     , tCIDLib::EAdoptOpts::Adopt
                     , TString::strEmpty()
                     , colALPN
+                    , tCIDSChan::EConnOpts::None
                     , urlGet.strHost()
                 );
             }

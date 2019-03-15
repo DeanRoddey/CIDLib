@@ -43,9 +43,11 @@ TCIDSChanClDataSrc( const   TString&                    strName
                     , const tCIDLib::EAdoptOpts         eAdopt
                     , const TString&                    strCertInfo
                     , const tCIDLib::TStrCollect&       colALPNList
+                    , const tCIDSChan::EConnOpts        eOpts
                     , const TString&                    strPrincipal) :
 
     m_colALPNList(colALPNList.c4ElemCount())
+    , m_eOpts(eOpts)
     , m_pcdsRawData(new TCIDSockStreamDataSrc(psockSrc, eAdopt))
     , m_strCertInfo(strCertInfo)
     , m_strPrincipal(strPrincipal)
@@ -67,9 +69,11 @@ TCIDSChanClDataSrc( const   TString&                strName
                     , const tCIDSock::ESockProtos   eProtocol
                     , const TString&                strCertInfo
                     , const tCIDLib::TStrCollect&   colALPNList
+                    , const tCIDSChan::EConnOpts    eOpts
                     , const TString&                strPrincipal) :
 
     m_colALPNList(colALPNList.c4ElemCount())
+    , m_eOpts(eOpts)
     , m_pcdsRawData(nullptr)
     , m_strCertInfo(strCertInfo)
     , m_strPrincipal(strPrincipal)
@@ -207,7 +211,8 @@ tCIDLib::TVoid TCIDSChanClDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd)
 
     //
     //  We have to use the secure channel to set up the encrypted connection. We
-    //  indicate client side and pass the principal as the certificate info.
+    //  indicate client side and pass the other info we saved away from our own ctor
+    //  to keep around until now.
     //
     m_schanSec.ClConnect
     (
@@ -216,6 +221,7 @@ tCIDLib::TVoid TCIDSChanClDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd)
         , enctEnd
         , m_strCertInfo
         , m_colALPNList
+        , m_eOpts
         , m_strPrincipal
     );
 }
@@ -272,9 +278,11 @@ TCIDSChanSrvDataSrc::
 TCIDSChanSrvDataSrc(const   TString&                    strName
                     ,       TServerStreamSocket* const  psockSrc
                     , const tCIDLib::EAdoptOpts         eAdopt
-                    , const TString&                    strCertInfo) :
+                    , const TString&                    strCertInfo
+                    , const tCIDSChan::EConnOpts        eOpts) :
 
     m_pcdsRawData(new TCIDSockStreamDataSrc(psockSrc, eAdopt))
+    , m_eOpts(eOpts)
     , m_strCertInfo(strCertInfo)
     , m_strName(strName)
 {
@@ -373,7 +381,7 @@ tCIDLib::TVoid TCIDSChanSrvDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd
     m_pcdsRawData->Initialize(enctEnd);
 
     tCIDLib::TStrList colALPN;
-    m_schanSec.SrvConnect(m_strName, *m_pcdsRawData, enctEnd, m_strCertInfo);
+    m_schanSec.SrvConnect(m_strName, *m_pcdsRawData, enctEnd, m_strCertInfo, m_eOpts);
 }
 
 

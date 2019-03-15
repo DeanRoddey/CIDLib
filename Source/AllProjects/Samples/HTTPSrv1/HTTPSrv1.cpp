@@ -421,7 +421,11 @@ tCIDLib::EExitCodes eServiceThread(TThread& thrThis, tCIDLib::TVoid* pData)
             {
                 pcdsClient = new TCIDSChanSrvDataSrc
                 (
-                    L"HTTPSrv 1", psockClient, tCIDLib::EAdoptOpts::Adopt, strCertInfo
+                    L"HTTPSrv 1"
+                    , psockClient
+                    , tCIDLib::EAdoptOpts::Adopt
+                    , strCertInfo
+                    , tCIDSChan::EConnOpts::None
                 );
             }
              else
@@ -657,9 +661,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             {
                 strParm = *cursParms;
 
-                if (strParm.bStartsWithI(L"/Secure="))
+                if (strParm.bStartsWithI(L"/CertInfo="))
                 {
-                    strParm.Cut(0, 8);
+                    strParm.Cut(0, 10);
                     strCertInfo = strParm;
                     bSecure = kCIDLib::True;
                 }

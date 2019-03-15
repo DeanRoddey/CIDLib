@@ -1090,7 +1090,7 @@ TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
             }
              else
             {
-                facCIDSChan().LogMsg
+                facCIDSChan().ThrowErr
                 (
                     CID_FILE
                     , CID_LINE
@@ -1138,16 +1138,27 @@ TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
         // Set up the credentials stuff we want
         SCHANNEL_CRED SCCred = { 0 };
         SCCred.dwVersion = SCHANNEL_CRED_VERSION;
+        DWORD dwAcquireFlags = 0;
         if (m_bClient)
         {
-            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_1_CLIENT
-                                            | SP_PROT_TLS1_2_CLIENT;
-            SCCred.dwFlags = SCH_CRED_NO_DEFAULT_CREDS;
+            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_2_CLIENT;
+
+            if (tCIDLib::bAllBitsOn(m_eOpts, tCIDSChan::EConnOpts::AllowTLS1_1))
+                SCCred.grbitEnabledProtocols |= SP_PROT_TLS1_1_CLIENT;
+
+            if (tCIDLib::bAllBitsOn(m_eOpts, tCIDSChan::EConnOpts::NoDefCreds))
+                SCCred.dwFlags = SCH_CRED_NO_DEFAULT_CREDS;
+
+            dwAcquireFlags = SECPKG_CRED_OUTBOUND;
         }
          else
         {
-            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_1_SERVER
-                                            | SP_PROT_TLS1_2_SERVER;
+            SCCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER;
+
+            if (tCIDLib::bAllBitsOn(m_eOpts, tCIDSChan::EConnOpts::AllowTLS1_1))
+                SCCred.grbitEnabledProtocols |= SP_PROT_TLS1_1_SERVER;
+
+            dwAcquireFlags = SECPKG_CRED_INBOUND;
         }
 
         // If we had cert info, pass the certificate context
@@ -1162,7 +1173,7 @@ TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
         (
             NULL
             , UNISP_NAME
-            , m_bClient ? SECPKG_CRED_OUTBOUND : SECPKG_CRED_INBOUND
+            , dwAcquireFlags
             , NULL
             , &SCCred
             , NULL
@@ -1353,9 +1364,9 @@ TSChannel::SrvNegotiate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd
     InBufList.pBuffers = InBuffers;
     InBufList.ulVersion = SECBUFFER_VERSION;
 
-    SecBuffer OutBuffers[2];
+    SecBuffer OutBuffers[1];
     SecBufferDesc OutBufList;
-    OutBufList.cBuffers = 2;
+    OutBufList.cBuffers = 1;
     OutBufList.pBuffers = OutBuffers;
     OutBufList.ulVersion = SECBUFFER_VERSION;
 
@@ -1413,9 +1424,6 @@ TSChannel::SrvNegotiate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd
         OutBuffers[0].pvBuffer  = pc1Out;
         OutBuffers[0].cbBuffer  = c4TokenSize;
         OutBuffers[0].BufferType= SECBUFFER_TOKEN;
-        OutBuffers[1].pvBuffer   = nullptr;
-        OutBuffers[1].cbBuffer   = 0;
-        OutBuffers[1].BufferType = SECBUFFER_ALERT;
 
         SECURITY_STATUS Status = ::AcceptSecurityContext
         (

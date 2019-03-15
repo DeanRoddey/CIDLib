@@ -113,6 +113,7 @@ class CIDSCHANEXP TSChannel : public TObject
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strCertInfo
             , const tCIDLib::TStrCollect&   colALPNList
+            , const tCIDSChan::EConnOpts    eOpts = tCIDSChan::EConnOpts::None
             , const TString&                strSecPrincipal = TString::strEmpty()
         );
 
@@ -122,6 +123,7 @@ class CIDSCHANEXP TSChannel : public TObject
             ,       TCIDDataSrc&            cdsSrc
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strCertInfo
+            , const tCIDSChan::EConnOpts    eOpts = tCIDSChan::EConnOpts::None
         );
 
         tCIDLib::TVoid WriteData
@@ -215,6 +217,10 @@ class CIDSCHANEXP TSChannel : public TObject
         //      secure connection process. We have to keep it around in case we need
         //      to re-negotiate.
         //
+        //  m_eOpts
+        //      A set of option flags to enable/disable this or that, mostly for future
+        //      flexibility.
+        //
         //  m_mbufDecBuf
         //      A temp buffer to decrypt into and to hold into decyrpted data that
         //      is too much for our caller's needs on the current round. See
@@ -236,13 +242,14 @@ class CIDSCHANEXP TSChannel : public TObject
         //      cert info here after a successful session establishment and clear it
         //      when Cleanup() is called.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bClient;
-        tCIDLib::TCard4     m_c4DecBufSz;
-        tCIDLib::TStrList   m_colALPNList;
-        THeapBuf            m_mbufDecBuf;
-        TSChanPlatData*     m_pInfo;
-        TString             m_strName;
-        TString             m_strPrincipal;
+        tCIDLib::TBoolean       m_bClient;
+        tCIDLib::TCard4         m_c4DecBufSz;
+        tCIDLib::TStrList       m_colALPNList;
+        tCIDSChan::EConnOpts    m_eOpts;
+        THeapBuf                m_mbufDecBuf;
+        TSChanPlatData*         m_pInfo;
+        TString                 m_strName;
+        TString                 m_strPrincipal;
 
 
         // -------------------------------------------------------------------

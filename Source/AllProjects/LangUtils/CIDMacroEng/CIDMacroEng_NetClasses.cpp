@@ -240,6 +240,7 @@ TMEngDataSrcVal::SetSockTCP(const TIPEndPoint& ipepTar, const tCIDLib::TBoolean 
                 , tCIDLib::EAdoptOpts::Adopt
                 , TString::strEmpty()
                 , colALPN
+                , tCIDSChan::EConnOpts::None
                 , ipepTar.strHostName()
             );
         }
