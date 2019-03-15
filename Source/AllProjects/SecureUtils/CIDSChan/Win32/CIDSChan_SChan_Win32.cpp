@@ -1053,17 +1053,6 @@ TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
                         , m_strName
                     );
                 }
-
-                // That worked so let's look for the caller's certificate
-                pCertContext = ::CertFindCertificateInStore
-                (
-                    hMyCertStore
-                    , X509_ASN_ENCODING | PKCS_7_ASN_ENCODING
-                    , 0
-                    , CERT_FIND_SUBJECT_STR_W
-                    , strCertName.pszBuffer()
-                    , NULL
-                );
             }
              else if (strCertType == L"file")
             {
@@ -1073,27 +1062,30 @@ TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
                 //
                 if (TFileSys::bExists(strCertStore))
                 {
-                    TBinaryFile bflCert(strCertStore);
-                    bflCert.Open
+                    hMyCertStore = ::CertOpenStore
                     (
-                        tCIDLib::EAccessModes::Read
-                        , tCIDLib::ECreateActs::OpenIfExists
-                        , tCIDLib::EFilePerms::Default
-                        , tCIDLib::EFileFlags::SequentialScan
+                        CERT_STORE_PROV_FILENAME
+                        , X509_ASN_ENCODING
+                        , NULL
+                        , CERT_STORE_OPEN_EXISTING_FLAG
+                          | CERT_STORE_READONLY_FLAG
+                        , strCertStore.pszBuffer()
                     );
 
-                    THeapBuf mbufCert(8192UL);
-                    tCIDLib::TCard4 c4Bytes = bflCert.c4ReadBuffer
-                    (
-                        mbufCert
-                        , tCIDLib::TCard4(bflCert.c8CurSize())
-                        , tCIDLib::EAllData::FailIfNotAll
-                    );
-
-                    pCertContext = ::CertCreateCertificateContext
-                    (
-                        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, mbufCert.pc1Data(), c4Bytes
-                    );
+                    if (hMyCertStore == NULL)
+                    {
+                        // Can't go any further
+                        facCIDSChan().ThrowKrnlErr
+                        (
+                            CID_FILE
+                            , CID_LINE
+                            , kSChanErrs::errcSChan_OpenStore
+                            , TKrnlError::kerrLast()
+                            , tCIDLib::ESeverities::Failed
+                            , tCIDLib::EErrClasses::CantDo
+                            , m_strName
+                        );
+                    }
                 }
             }
              else
@@ -1109,6 +1101,17 @@ TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
                     , m_strName
                 );
             }
+
+            // We got the store open, so let's try to find the named certificate
+            pCertContext = ::CertFindCertificateInStore
+            (
+                hMyCertStore
+                , X509_ASN_ENCODING | PKCS_7_ASN_ENCODING
+                , 0
+                , CERT_FIND_SUBJECT_STR_W
+                , strCertName.pszBuffer()
+                , NULL
+            );
 
             // If we never got one open
             if (pCertContext == NULL)
@@ -1179,7 +1182,7 @@ TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::CantDo
                 , m_strName
-                , TInteger(Status)
+                , TCardinal(Status, tCIDLib::ERadices::Hex)
             );
         }
 

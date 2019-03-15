@@ -73,17 +73,17 @@ TFacCIDSChan::~TFacCIDSChan()
 //      UStore:[store], [name]
 //          [type]  -   From current user store
 //          [store] -   The store name to load from
-//          [name]  -   The CN of the server side certificate to look for.
+//          [name]  -   The CN of the certificate to look for.
 //
 //      MStore:[store], [name]
 //          [type]  -   From local machine store
 //          [store] -   The store name to load from.
-//          [name]  -   The CN of the server side certificate to look for.
+//          [name]  -   The CN of the certificate to look for.
 //
-//      File:[path]
+//      File:[path], [name]
 //          [type]  -   From a file
 //          [store] -   The path to the certificate file to load
-//          [name]      Not used in this case
+//          [name]  -   The CN of the certificate to look for
 
 //
 tCIDLib::TBoolean
@@ -102,22 +102,15 @@ TFacCIDSChan::bParseCertInfo(const  TString&    strToParse
 
     // Now, based on the type, deal with the other bits
     tCIDLib::TBoolean bRes = kCIDLib::False;
-    if ((strType == L"mstore") || (strType == L"ustore"))
-    {
-        // Break out the name
-        if (strStore.bSplit(strName, L','))
-        {
-            strStore.StripWhitespace();
-            strName.StripWhitespace();
 
-            // Neither the store nor the name can be empty
-            bRes = !strStore.bIsEmpty() && !strName.bIsEmpty();
-        }
-    }
-     else if (strType == L"file")
+    // Break out the name
+    if (strStore.bSplit(strName, L','))
     {
-        // We are already ok, the store string holds the path
-        bRes = kCIDLib::True;
+        strStore.StripWhitespace();
+        strName.StripWhitespace();
+
+        // Neither the store nor the name can be empty
+        bRes = !strStore.bIsEmpty() && !strName.bIsEmpty();
     }
 
     return bRes;
