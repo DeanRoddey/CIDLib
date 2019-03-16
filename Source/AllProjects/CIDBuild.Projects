@@ -1282,18 +1282,6 @@ PROJECT=GenXMLChTable
 END PROJECT
 
 
-PROJECT=CSSPre
-    SETTINGS
-        DIRECTORY   = Utilities\CSSPre
-    END SETTINGS
-
-    DEPENDENTS
-        CIDLib
-    END DEPENDENTS
-
-END PROJECT
-
-
 ; ----------------------------------------------------------------------------
 ;   The test framework and the library shared by the framework and the test
 ;   programs.
