@@ -19,6 +19,9 @@
 //  the TComplex class. This class represents a standard complex floating
 //  point number, for doing math in the complex number plane.
 //
+//  This is just old code that probably isn't very good. It's not currently
+//  used and needs some love.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:

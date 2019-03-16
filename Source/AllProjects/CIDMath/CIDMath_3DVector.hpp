@@ -16,9 +16,10 @@
 // DESCRIPTION:
 //
 //  This is the header for the CIDMath_3DVector.cpp file. This file
-//  implements the T3DVector class, which is a mathematical construct that
-//  represent forces, position, velocity, magnetic phenomena, etc... in a
-//  3D floating point coordinate space.
+//  implements the T3DVector class
+//
+//  This is just old code that isn't very good. It's not currently used and
+//  needs some love.
 //
 // CAVEATS/GOTCHAS:
 //

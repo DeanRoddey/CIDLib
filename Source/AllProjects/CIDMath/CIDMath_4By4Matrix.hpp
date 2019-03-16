@@ -19,18 +19,16 @@
 //  implements the T4By4Matrix class, which is a 4x4 homogenous coordinate
 //  matrix.
 //
+//  This is just old code that isn't very good. It's not currently used and
+//  needs some love.
+//
+//
 //  The 4x4 matrix has members in the following configuration:
 //
 //      f81_1   f81_2   f81_3   0
 //      f82_1   f82_2   f82_3   0
 //      f83_1   f83_2   f83_3   0
 //      f8Xt    f8Yt    f8Zt    1
-//
-//  Translation elements are on the bottom row. The last column is not
-//  accessible to the outside world, and are just here because of the
-//  need to work in homogenous coordinates. Using homogenous coordinates
-//  means that translations are treated just like rotations, skews, etc...
-//  i.e. they can be concatenated into the matrix via a multiply operation.
 //
 // CAVEATS/GOTCHAS:
 //

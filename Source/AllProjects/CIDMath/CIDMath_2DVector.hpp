@@ -16,9 +16,10 @@
 // DESCRIPTION:
 //
 //  This is the header for the CIDMath_2DVector.cpp file. This file
-//  implements the T2DVector class, which is a mathematical construct that
-//  represent forces, velocity, magnetic phenomena, etc... in a 2
-//  dimensional floating point coordinate space.
+//  implements the T2DVector class.
+//
+//  This is just old code that isn't very good. It's not currently used and
+//  needs some love.
 //
 // CAVEATS/GOTCHAS:
 //
