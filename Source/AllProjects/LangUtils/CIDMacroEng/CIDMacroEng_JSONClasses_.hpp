@@ -5,7 +5,7 @@
 //
 // CREATED: 10/17/2005
 //
-// COPYRIGHT: Charmed Quark Systems, Ltd - 2019
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
 //  This file and its contents are the property of Charmed Quark Software. It
 //  may not be redistributed in any modified form, or as part of any product
