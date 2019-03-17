@@ -19,6 +19,14 @@
 //  of contact for the outside world. By including it, they get what we
 //  have to offer.
 //
+//  This guy provides support for extracting metadata from media files. We support
+//  AAC/MP4 and WMA files currently, But it's a framework and various other types
+//  could be supported.
+//
+//  We also have some stuff for generating unique ids based on the content of DVDs
+//  and blurays. There are various requirements for these types of things and
+//  other variations may be needed moving forward.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:

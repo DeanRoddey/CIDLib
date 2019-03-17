@@ -19,6 +19,10 @@
 //  of contact for the outside world. By including it, they get what we
 //  have to offer.
 //
+//  This facility is the core UI framework. This stuff is all wrapped just as
+//  well as the back end stuff, but there is not much hope of making it per-platform.
+//  So guy will only be built on Win32.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -44,7 +48,6 @@
 #include    "CIDLib.hpp"
 #include    "CIDMData.hpp"
 #include    "CIDGraphDev.hpp"
-
 
 
 // ---------------------------------------------------------------------------
@@ -155,9 +158,9 @@ class TCaretJanitor;
 // Slip in some facility types
 namespace tCIDCtrls
 {
-    typedef TRefVector<const TWindow>                       TWndList;
-    typedef TRefKeyedHashSet<TWindow,TString,TStringKeyOps> TKeyedWndList;
-    typedef tCIDLib::TStrList                               THintsList;
+    using TWndList      = TRefVector<const TWindow>;
+    using TKeyedWndList = TRefKeyedHashSet<TWindow,TString,TStringKeyOps>;
+    using THintsList    = tCIDLib::TStrList;
 }
 
 

@@ -15,7 +15,12 @@
 //
 // DESCRIPTION:
 //
-//  This is the main public header for the facility.
+//  This is the main public header for the image factory facility. Include
+//  this to get all of the functionality offered.
+//
+//  This facility provides a way to gen up images generically, convert them
+//  back and forth between formats, etc... So it makes it fairly easy to deal
+//  with images without having to do much work to load them and convert them.
 //
 // CAVEATS/GOTCHAS:
 //

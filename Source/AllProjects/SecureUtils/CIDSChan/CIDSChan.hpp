@@ -17,8 +17,11 @@
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This facility provides secure sockets functionality. This guy has per-platfrom
+//  code that implements the secure channel stuff. Currently there is only a Win32
+//  version, so this guy is only built on Win32 for now.
 //
 // CAVEATS/GOTCHAS:
 //

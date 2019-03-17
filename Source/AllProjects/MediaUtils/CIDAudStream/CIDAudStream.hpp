@@ -25,6 +25,9 @@
 //
 // CAVEATS/GOTCHAS:
 //
+//  1)  This one needs to have the per-platform treatment to get the Windows
+//      specific stuff into its own Win32 sub-directory.
+//
 // LOG:
 //
 //  $_CIDLib_Log_$

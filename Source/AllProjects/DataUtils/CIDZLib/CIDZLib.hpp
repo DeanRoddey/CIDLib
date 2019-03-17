@@ -19,6 +19,9 @@
 //  the ZLib compression algorithm, specialized for integration into the
 //  CIDLib libraries.
 //
+//  You create a TZLibCompressor object and use its inflate and deflate methods
+//  to compress and decompress data.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:

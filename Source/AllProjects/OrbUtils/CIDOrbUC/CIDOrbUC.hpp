@@ -53,7 +53,6 @@
 //  Include our underlying headers if not already included
 // ---------------------------------------------------------------------------
 #include    "CIDOrb.hpp"
-
 #include    "CIDObjStore.hpp"
 
 

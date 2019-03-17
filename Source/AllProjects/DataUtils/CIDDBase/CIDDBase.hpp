@@ -17,10 +17,15 @@
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get all that we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This facility provides an objectified ODBC interface. So it provides wrappers
+//  for connections, statements, bindings and such.
 //
 // CAVEATS/GOTCHAS:
+//
+//  1)  This one needs to get the 'per-platform' split treatment to split the
+//      Win32 specific implementation into its own Win32 sub-directory.
 //
 // LOG:
 //

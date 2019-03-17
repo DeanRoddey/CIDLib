@@ -19,6 +19,12 @@
 //  of contact for the outside world. By including it, they get what we
 //  have to offer.
 //
+//  This facility provides higher level UI framework functionality, mostly specialized
+//  but often used dialogs, and some more advanced controls.
+//
+//  As with CIDCtrls, this stuff is all well encapsulated but that doesn't remotely
+//  make it portable, so this is Win32 specific.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -49,14 +55,6 @@
 //  Forward references
 // ---------------------------------------------------------------------------
 class TCommPortCfg;
-
-
-// ---------------------------------------------------------------------------
-//  Facilities namespace
-// ---------------------------------------------------------------------------
-namespace kCIDWUtils
-{
-};
 
 
 // ---------------------------------------------------------------------------

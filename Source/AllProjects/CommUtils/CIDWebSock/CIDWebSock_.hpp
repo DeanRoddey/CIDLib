@@ -42,20 +42,3 @@
 #include    "CIDEncode.hpp"
 #include    "CIDSChan.hpp"
 
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities types namespace. It contains non-class types
-//  for use within the facility.
-// ---------------------------------------------------------------------------
-namespace tCIDWebSock_
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities constants namespace.
-// ---------------------------------------------------------------------------
-namespace kCIDWebSock_
-{
-}
-

@@ -15,12 +15,24 @@
 //
 // DESCRIPTION:
 //
+//  This facility is the base facility for image manipulation. The main class
+/// is TPixelArray which represents an in-memory image bitmap that can be
+//  manipulated.
+//
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
 //
 // CAVEATS/GOTCHAS:
+//
+//  1)  The pixel array class definitely needs the per-platform split because
+//      currently it uses some assembly language. Once it's split, it would
+//      obviously be nice to update the Win32 stuff to support some SIMD
+//      code for better performance.
+//
+//      Some of the stuff could probably be replaced with bitmap raster ops
+//      that would achieve the same thing and get hardware support if it is
+//      available without us having to do anything.
 //
 // LOG:
 //

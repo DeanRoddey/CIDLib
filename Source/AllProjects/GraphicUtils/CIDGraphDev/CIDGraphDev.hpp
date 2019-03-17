@@ -15,10 +15,14 @@
 //
 // DESCRIPTION:
 //
+//  This facility provides a wrapper around the Win32 graphics interface, the
+//  graphics device one, not a DirectX type. So it provides the graphics device
+//  wrapper itself (a base class plus implementations for specific needs), and
+//  wrappers around pens, fonts, lines, regions, etc...
+//
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -43,7 +47,6 @@
 //  Include the needed underlying headers.
 // ---------------------------------------------------------------------------
 #include    "CIDMath.hpp"
-
 #include    "CIDImgFact.hpp"
 
 

@@ -17,8 +17,11 @@
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This facility implements a regular expression engine. It's quite a basic
+//  one. I have all the guts to make a really powerful one with the DFA that
+//  is used in the XML parser. It needs time to be addressed.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -45,7 +48,6 @@
 #include    "CIDLib.hpp"
 
 
-
 // ---------------------------------------------------------------------------
 //  Now subinclude our other headers, in the needed order.
 // ---------------------------------------------------------------------------
@@ -53,7 +55,6 @@
 #include    "CIDRegX_ThisFacility.hpp"
 #include    "CIDRegX_RegExNFA.hpp"
 #include    "CIDRegX_RegExEngine.hpp"
-
 
 
 // ---------------------------------------------------------------------------

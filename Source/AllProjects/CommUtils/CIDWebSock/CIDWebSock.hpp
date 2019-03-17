@@ -78,7 +78,6 @@
 //  Include our underlying headers if not already included
 // ---------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
 #include    "CIDSock.hpp"
 
 
@@ -190,7 +189,6 @@ namespace kCIDWebSock
 // ---------------------------------------------------------------------------
 #include    "CIDWebSock_ErrorIds.hpp"
 #include    "CIDWebSock_Shared.hpp"
-// #include    "CIDWebSock_Constant.hpp"
 #include    "CIDWebSock_ThisFacility.hpp"
 
 
@@ -204,15 +202,3 @@ extern CIDWEBSOCKEXP TFacCIDWebSock& facCIDWebSock();
 //  And subinclude our other headers
 // ---------------------------------------------------------------------------
 #include    "CIDWebSock_WSEngine.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  For those collection types that we pre-generate in our main cpp file, we want to
-//  insure that they don't get generated again in users of the DLL.
-// ---------------------------------------------------------------------------
-#if     !defined(CIDWEBSOCK_PREINST)
-// extern template class TRefQueue<TEmailMsg>;
-
-#endif
-
-

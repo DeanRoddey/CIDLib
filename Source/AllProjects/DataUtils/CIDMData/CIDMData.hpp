@@ -21,6 +21,7 @@
 //  and that we don't want to put into GUI code because it might be used by back
 //  end programs, and there's nowhere else that makes sense to put them.
 //
+//
 //  We have the attribute data classes, which are key constituents of visual attribute
 //  editing. It's used heavily in the CQC UI to query editable attributes of objects,
 //  load them into the attribute editor window (in CIDWUtils) and then to write them
@@ -82,6 +83,7 @@
 // Slip in some more facility types
 namespace tCIDMData
 {
+    // Various places we need a list of attribute data objects
     using TAttrList = TVector<TAttrData>;
 }
 

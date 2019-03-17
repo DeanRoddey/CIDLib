@@ -20,6 +20,10 @@
 //  repository, to allow distributed applications to keep all their config
 //  data in a centralized place, for easy maintenance.
 //
+//  It is based on a standard ORB interface. The client proxy is provided by
+//  the CIDOrbUC facility, so you don't need generate one yourself if you want
+//  to access a config server.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:

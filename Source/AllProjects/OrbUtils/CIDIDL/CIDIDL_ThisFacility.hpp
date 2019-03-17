@@ -16,7 +16,16 @@
 //
 // DESCRIPTION:
 //
-//  This is the header for the facility class for the IDL compiler.
+//  This is the header for the facility class for the IDL compiler. This guy
+//  is used for two primary purposes:
+//
+//  1)  Generate constants and enumerations, the latter being vastly increased in
+//      power compared to the standard C++ enums.
+//
+//  2)  To generate the client proxy/server stuff for ORB interfaces.
+//
+//  The build tool understands the ORB/IDL scheme so its easy to set up a facility
+//  to support IDL files.
 //
 // CAVEATS/GOTCHAS:
 //

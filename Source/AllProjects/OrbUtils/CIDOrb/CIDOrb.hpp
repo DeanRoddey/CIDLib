@@ -17,12 +17,11 @@
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
 //
-//  This is not a large facility, but it's complex and highly multi-threaded
+//  This is not a large facility, but it's complex and very multi-threaded
 //  and async in nature. There are two sides, client and server, each of which
-//  is implement in a few classes apiece.
+//  is implemented in a few classes apiece.
 //
 //  We define base classes for client side proxies classes and for server
 //  side stub classes. These represent the core end points of remote object
@@ -122,7 +121,6 @@
 //
 //  So that that's the client side in a nutshell. The server side works like
 //  this:
-//
 //
 //
 // CAVEATS/GOTCHAS:

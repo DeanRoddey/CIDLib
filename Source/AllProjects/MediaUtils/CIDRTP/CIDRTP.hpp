@@ -19,6 +19,8 @@
 //  of contact for the outside world. By including it, they get what we
 //  have to offer.
 //
+//  This is experimental work and isn't functional yet.
+//
 //  An RTP session is represented by a TCIDRTPRec or TCIDRTPSend object, which is
 //  given ports for RTP/RTCP, and which is given either a data source or a data
 //  target, depending on sender or receiver. It will spawn off three threads.

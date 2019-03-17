@@ -41,8 +41,7 @@ Methods=[Public,Final]
         EndLocals;
 
         Try
-            // m_URL.Set("http://www.google.com", FQTypes.Full);
-            m_URL.Set("http://192.168.0.232", FQTypes.Full);
+            m_URL.Set("http://www.google.com", FQTypes.Full);
 
             m_InHdrs.RemoveAll();
             m_Test.StartGETRedir
