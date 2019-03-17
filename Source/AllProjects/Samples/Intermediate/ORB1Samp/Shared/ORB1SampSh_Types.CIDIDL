@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum CIDIDL:Name="EStatus" CIDIDL:BinStream="Yes"
+                         CIDIDL:TextStreamMap="BaseName"
+                         CIDIDL:XlatMap="BaseName">
+                <CIDIDL:DocText>
+                    The status marital status of a patient
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Divorced"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Married"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Single"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Widowed"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>

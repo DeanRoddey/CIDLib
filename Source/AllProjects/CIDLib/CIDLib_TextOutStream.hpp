@@ -585,7 +585,7 @@ class CIDLIBEXP TStreamJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TStreamJanitor& operator=(const TStreamJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------
@@ -649,7 +649,7 @@ class CIDLIBEXP TStreamIndentJan
         //  Public operators
         // -------------------------------------------------------------------
         TStreamIndentJan& operator=(const TStreamIndentJan&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
     private :
@@ -704,7 +704,7 @@ class CIDLIBEXP TSafeTStrmJan
         //  Public operators
         // -------------------------------------------------------------------
         TSafeTStrmJan& operator=(const TSafeTStrmJan&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
         TTextOutStream& operator*()
         {

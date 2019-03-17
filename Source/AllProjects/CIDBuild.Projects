@@ -1797,11 +1797,11 @@ END PROJECT
 
 
 ; ----------------------------------------------------------------------------
-;  Sample programs to demonstrate various aspects of CIDLib
+;  Basic Sample programs to demonstrate various aspects of CIDLib
 ; ----------------------------------------------------------------------------
 PROJECT=Beeper
     SETTINGS
-        DIRECTORY   = Samples\Beeper
+        DIRECTORY   = Samples\Basic\Beeper
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1813,7 +1813,7 @@ END PROJECT
 
 PROJECT=CDROM1
     SETTINGS
-        DIRECTORY   = Samples\CDROM1
+        DIRECTORY   = Samples\Basic\CDROM1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1828,7 +1828,7 @@ END PROJECT
 
 PROJECT=Collect1
     SETTINGS
-        DIRECTORY   = Samples\Collect1
+        DIRECTORY   = Samples\Basic\Collect1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1840,7 +1840,7 @@ END PROJECT
 
 PROJECT=Collect2
     SETTINGS
-        DIRECTORY   = Samples\Collect2
+        DIRECTORY   = Samples\Basic\Collect2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1852,7 +1852,7 @@ END PROJECT
 
 PROJECT=Collect3
     SETTINGS
-        DIRECTORY   = Samples\Collect3
+        DIRECTORY   = Samples\Basic\Collect3
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1864,7 +1864,7 @@ END PROJECT
 
 PROJECT=Collect4
     SETTINGS
-        DIRECTORY   = Samples\Collect4
+        DIRECTORY   = Samples\Basic\Collect4
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1876,7 +1876,7 @@ END PROJECT
 
 PROJECT=Crypto1
     SETTINGS
-        DIRECTORY   = Samples\Crypto1
+        DIRECTORY   = Samples\Basic\Crypto1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1888,7 +1888,7 @@ END PROJECT
 
 PROJECT=CvtImgToTrans
     SETTINGS
-        DIRECTORY   = Samples\CvtImgToTrans
+        DIRECTORY   = Samples\Basic\CvtImgToTrans
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1901,7 +1901,7 @@ END PROJECT
 
 PROJECT=DAE1
     SETTINGS
-        DIRECTORY   = Samples\DAE1
+        DIRECTORY   = Samples\Basic\DAE1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1919,7 +1919,7 @@ END PROJECT
 
 PROJECT=DAE2
     SETTINGS
-        DIRECTORY   = Samples\DAE2
+        DIRECTORY   = Samples\Basic\DAE2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1937,7 +1937,7 @@ END PROJECT
 
 PROJECT=EnumMons
     SETTINGS
-        DIRECTORY   = Samples\EnumMons
+        DIRECTORY   = Samples\Basic\EnumMons
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1950,7 +1950,7 @@ END PROJECT
 
 PROJECT=FileSys1
     SETTINGS
-        DIRECTORY   = Samples\FileSys1
+        DIRECTORY   = Samples\Basic\FileSys1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1962,7 +1962,7 @@ END PROJECT
 
 PROJECT=FileSys2
     SETTINGS
-        DIRECTORY   = Samples\FileSys2
+        DIRECTORY   = Samples\Basic\FileSys2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1974,20 +1974,8 @@ END PROJECT
 
 PROJECT=FileSys3
     SETTINGS
-        DIRECTORY   = Samples\FileSys3
+        DIRECTORY   = Samples\Basic\FileSys3
         MSGFILE     = Yes
-        SAMPLE      = Yes
-    END SETTINGS
-
-    DEPENDENTS
-        CIDLib
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=FWMediaChanger
-    SETTINGS
-        DIRECTORY   = Samples\FWMediaChanger
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1999,7 +1987,7 @@ END PROJECT
 
 PROJECT=HTTPClient1
     SETTINGS
-        DIRECTORY   = Samples\HTTPClient1
+        DIRECTORY   = Samples\Basic\HTTPClient1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2013,7 +2001,7 @@ END PROJECT
 
 PROJECT=ImgCvt
     SETTINGS
-        DIRECTORY   = Samples\ImgCvt
+        DIRECTORY   = Samples\Basic\ImgCvt
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2028,7 +2016,7 @@ END PROJECT
 
 PROJECT=Locale1
     SETTINGS
-        DIRECTORY   = Samples\Locale1
+        DIRECTORY   = Samples\Basic\Locale1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2040,7 +2028,7 @@ END PROJECT
 
 PROJECT=MakePreviews
     SETTINGS
-        DIRECTORY   = Samples\MakePreviews
+        DIRECTORY   = Samples\Basic\MakePreviews
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2055,7 +2043,7 @@ END PROJECT
 
 PROJECT=HTTPSrv1
     SETTINGS
-        DIRECTORY   = Samples\HTTPSrv1
+        DIRECTORY   = Samples\Basic\HTTPSrv1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2069,7 +2057,7 @@ END PROJECT
 
 PROJECT=JSON1
     SETTINGS
-        DIRECTORY   = Samples\JSON1
+        DIRECTORY   = Samples\Basic\JSON1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2081,7 +2069,7 @@ END PROJECT
 
 PROJECT=SpReco1
     SETTINGS
-        DIRECTORY   = Samples\SpReco1
+        DIRECTORY   = Samples\Basic\SpReco1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2092,7 +2080,7 @@ END PROJECT
 
 PROJECT=MetaExtract
     SETTINGS
-        DIRECTORY   = Samples\MetaExtract
+        DIRECTORY   = Samples\Basic\MetaExtract
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2110,7 +2098,7 @@ END PROJECT
 
 PROJECT=Pack1
     SETTINGS
-        DIRECTORY   = Samples\Pack1
+        DIRECTORY   = Samples\Basic\Pack1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2125,7 +2113,7 @@ END PROJECT
 
 PROJECT=Process1
     SETTINGS
-        DIRECTORY   = Samples\Process1
+        DIRECTORY   = Samples\Basic\Process1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2137,7 +2125,7 @@ END PROJECT
 
 PROJECT=Process2
     SETTINGS
-        DIRECTORY   = Samples\Process2
+        DIRECTORY   = Samples\Basic\Process2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2149,7 +2137,7 @@ END PROJECT
 
 PROJECT=RandGen
     SETTINGS
-        DIRECTORY   = Samples\RandGen
+        DIRECTORY   = Samples\Basic\RandGen
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2162,7 +2150,7 @@ END PROJECT
 
 PROJECT=Reg1
     SETTINGS
-        DIRECTORY   = Samples\Reg1
+        DIRECTORY   = Samples\Basic\Reg1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2173,7 +2161,7 @@ END PROJECT
 
 PROJECT=RegEx1
     SETTINGS
-        DIRECTORY   = Samples\RegEx1
+        DIRECTORY   = Samples\Basic\RegEx1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2184,7 +2172,7 @@ END PROJECT
 
 PROJECT=RTTI1
     SETTINGS
-        DIRECTORY   = Samples\RTTI1
+        DIRECTORY   = Samples\Basic\RTTI1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2195,7 +2183,7 @@ END PROJECT
 
 PROJECT=SpGrammarComp
     SETTINGS
-        DIRECTORY   = Samples\SpGrammarComp
+        DIRECTORY   = Samples\Basic\SpGrammarComp
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2206,7 +2194,7 @@ END PROJECT
 
 PROJECT=Speech
     SETTINGS
-        DIRECTORY   = Samples\Speech
+        DIRECTORY   = Samples\Basic\Speech
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2252,7 +2240,7 @@ END PROJECT
 
 PROJECT=SMTP1
     SETTINGS
-        DIRECTORY   = Samples\SMTP1
+        DIRECTORY   = Samples\Basic\SMTP1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2265,7 +2253,7 @@ END PROJECT
 
 PROJECT=Sock1
     SETTINGS
-        DIRECTORY   = Samples\Sock1
+        DIRECTORY   = Samples\Basic\Sock1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2277,7 +2265,7 @@ END PROJECT
 
 PROJECT=Sock2
     SETTINGS
-        DIRECTORY   = Samples\Sock2
+        DIRECTORY   = Samples\Basic\Sock2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2289,7 +2277,7 @@ END PROJECT
 
 PROJECT=SockPing
     SETTINGS
-        DIRECTORY   = Samples\SockPing
+        DIRECTORY   = Samples\Basic\SockPing
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2301,7 +2289,7 @@ END PROJECT
 
 PROJECT=Streams1
     SETTINGS
-        DIRECTORY   = Samples\Streams1
+        DIRECTORY   = Samples\Basic\Streams1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2313,7 +2301,7 @@ END PROJECT
 
 PROJECT=Streams2
     SETTINGS
-        DIRECTORY   = Samples\Streams2
+        DIRECTORY   = Samples\Basic\Streams2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2326,7 +2314,7 @@ END PROJECT
 
 PROJECT=Streams3
     SETTINGS
-        DIRECTORY   = Samples\Streams3
+        DIRECTORY   = Samples\Basic\Streams3
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2338,7 +2326,7 @@ END PROJECT
 
 PROJECT=Streams4
     SETTINGS
-        DIRECTORY   = Samples\Streams4
+        DIRECTORY   = Samples\Basic\Streams4
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2350,7 +2338,7 @@ END PROJECT
 
 PROJECT=Streams5
     SETTINGS
-        DIRECTORY   = Samples\Streams5
+        DIRECTORY   = Samples\Basic\Streams5
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2362,7 +2350,7 @@ END PROJECT
 
 PROJECT=Streams6
     SETTINGS
-        DIRECTORY   = Samples\Streams6
+        DIRECTORY   = Samples\Basic\Streams6
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2374,7 +2362,7 @@ END PROJECT
 
 PROJECT=UPnP1
     SETTINGS
-        DIRECTORY   = Samples\UPnP1
+        DIRECTORY   = Samples\Basic\UPnP1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2388,7 +2376,7 @@ END PROJECT
 
 PROJECT=WakeOnLAN
     SETTINGS
-        DIRECTORY   = Samples\WakeOnLAN
+        DIRECTORY   = Samples\Basic\WakeOnLAN
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2400,7 +2388,7 @@ END PROJECT
 
 PROJECT=XMLDemo1
     SETTINGS
-        DIRECTORY   = Samples\XMLDemo1
+        DIRECTORY   = Samples\Basic\XMLDemo1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2411,7 +2399,7 @@ END PROJECT
 
 PROJECT=XMLDemo2
     SETTINGS
-        DIRECTORY   = Samples\XMLDemo2
+        DIRECTORY   = Samples\Basic\XMLDemo2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2424,7 +2412,7 @@ END PROJECT
 ; For random trying stuff
 ;PROJECT=Test
 ;    SETTINGS
-;        DIRECTORY   = Samples\Test
+;        DIRECTORY   = Samples\Basic\Test
 ;        SAMPLE      = Yes
 ;    END SETTINGS
 ;
@@ -2434,82 +2422,99 @@ END PROJECT
 ;END PROJECT
 
 
+
 ; ----------------------------------------------------------------------------
-;  A project to reuse for some videos we make to demonstrate CIDLib and whatnot
+;  Some intermediate samples
 ; ----------------------------------------------------------------------------
 
-;PROJECT=VideoDemoS
-;
-;    SETTINGS
-;        DIRECTORY   = Demos\VideoDemo\Server
-;        SAMPLE      = Yes
-;        MSGFILE     = Yes
-;    END SETTINGS
-;
-;    IDLFILES
-;        IDLFILE
-;            SRCFILE = ..\VideoDemo_Intf
-;            GEN     = SERVER
-;            NAMEEXT = Intf
-;        END IDLFILE
-;    END IDLFILES
-;
-;    DEPENDENTS
-;        CIDLib
-;        CIDOrb
-;        CIDOrbUC
-;        VideoDemoSh
-;    END DEPENDENTS
-;
-;END PROJECT
-;
-;PROJECT=VideoDemoC
-;
-;    SETTINGS
-;        DIRECTORY   = Demos\VideoDemo\Client
-;        SAMPLE      = Yes
-;    END SETTINGS
-;
-;    IDLFILES
-;        IDLFILE
-;            SRCFILE = ..\VideoDemo_Intf
-;            GEN     = CLIENT
-;            NAMEEXT = Intf
-;        END IDLFILE
-;    END IDLFILES
-;
-;    DEPENDENTS
-;        CIDLib
-;        CIDOrb
-;        CIDOrbUC
-;        VideoDemoSh
-;    END DEPENDENTS
-;
-;END PROJECT
-;
-;PROJECT=VideoDemoSh
-;
-;    SETTINGS
-;        DIRECTORY   = Demos\VideoDemo\Shared
-;        DISPLAY     = N/A
-;        EXPORT      = VIDEODEMOSHEXP
-;        TYPE        = SharedLib
-;        VERSIONED   = Yes
-;    END SETTINGS
-;
-;    IDLFILES
-;        IDLFILE
-;            SRCFILE = VideoDemoSh_Types
-;            GEN     = GLOBALS
-;            NAMEEXT = Types
-;        END IDLFILE
-;    END IDLFILES
-;
-;    DEPENDENTS
-;        CIDLib
-;    END DEPENDENTS
-;
-;END PROJECT
+PROJECT=ORB1SampS
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ORB1Samp\Server
+        SAMPLE      = Yes
+        MSGFILE     = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = ..\ORB1Samp_Intf
+            GEN     = SERVER
+            NAMEEXT = Intf
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDOrb
+        CIDOrbUC
+        ORB1SampSh
+    END DEPENDENTS
+
+END PROJECT
+
+PROJECT=ORB1SampC
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ORB1Samp\Client
+        SAMPLE      = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = ..\ORB1Samp_Intf
+            GEN     = CLIENT
+            NAMEEXT = Intf
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDOrb
+        CIDOrbUC
+        ORB1SampSh
+    END DEPENDENTS
+
+END PROJECT
+
+PROJECT=ORB1SampSh
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ORB1Samp\Shared
+        DISPLAY     = N/A
+        EXPORT      = ORB1SAMPSHEXP
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = ORB1SampSh_Types
+            GEN     = GLOBALS
+            NAMEEXT = Types
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+
+END PROJECT
+
+PROJECT=ORB1Samp
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ORB1Samp
+        TYPE        = Group
+    END SETTINGS
+
+    DEPENDENTS
+        ORB1SampSh
+        ORB1SampS
+        ORB1SampC
+    END DEPENDENTS
+
+END PROJECT
+
+
 
 
 ; ----------------------------------------------------------------------------
