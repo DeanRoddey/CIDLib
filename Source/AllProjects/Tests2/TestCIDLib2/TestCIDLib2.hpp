@@ -885,6 +885,39 @@ class TTest_EnumForEach : public TTestFWTest
 };
 
 
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_FixedSizePool
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_FixedSizePool : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_FixedSizePool();
+
+        ~TTest_FixedSizePool();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_FixedSizePool,TTestFWTest)
+};
+
+
 
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_FundVectorLambda

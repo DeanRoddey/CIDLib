@@ -274,6 +274,7 @@ namespace tCIDLib
 #include    "CIDLib_Environment.hpp"
 #include    "CIDLib_ExternalProcess.hpp"
 #include    "CIDLib_UndoCore.hpp"
+#include    "CIDLib_FixedSizePool.hpp"
 #include    "CIDLib_SimplePool.hpp"
 
 

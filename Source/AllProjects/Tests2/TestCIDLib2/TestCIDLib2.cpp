@@ -130,6 +130,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     // The pool and related classes
     AddTest(new TTest_SimplePool);
     AddTest(new TTest_SimplePoolPtr);
+    AddTest(new TTest_FixedSizePool);
 
     // Higher level stuff
     AddTest(new TTest_GenCache1);
