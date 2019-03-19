@@ -54,10 +54,84 @@
 // ---------------------------------------------------------------------------
 //  Magic macros
 // ---------------------------------------------------------------------------
+RTTIDecls(TTest_ByName,TTestFWTest)
 RTTIDecls(TTest_Convert,TTestFWTest)
 RTTIDecls(TTest_ErrModes,TTestFWTest)
 RTTIDecls(TTest_RoundTrip1,TTestFWTest)
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_ByName
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_ByName: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_ByName::TTest_ByName() :
+
+    TTestFWTest
+    (
+        L"Make converter by name"
+        , L"Tests the creation of converters by name"
+        , 2
+    )
+{
+}
+
+TTest_ByName::~TTest_ByName()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_Convert: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_ByName::eRunTest( TTextStringOutStream&   strmOut
+                        , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes    eRes = tTestFWLib::ETestRes::Success;
+
+    TString strCurName;
+    try
+    {
+        //
+        //  Try 8859-1 by what we know is the actual name case and then lower
+        //  case it and try that. Tell it to throw if not found
+        //
+        strCurName = L"ISO-8859-1";
+        delete facCIDEncode().ptcvtMakeNew(strCurName, kCIDLib::True);
+        strCurName = L"iso-8859-1";
+        delete facCIDEncode().ptcvtMakeNew(strCurName, kCIDLib::True);
+    }
+
+    catch(...)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"Failed to create '" << strCurName
+                << L"' converter by name" << kCIDLib::DNewLn;
+    }
+
+    // Test a known bad name and make sure that throw and returns a null as requested
+    try
+    {
+        facCIDEncode().ptcvtMakeNew(L"BogusEncoding", kCIDLib::True);
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"Request to create bad encoding name did not throw"
+                << kCIDLib::DNewLn;
+    }
+    catch(...) { }
+
+    if (facCIDEncode().ptcvtMakeNew(L"BogusEncoding2") != nullptr)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"Request to create bad encoding name did not return nullptr"
+                << kCIDLib::DNewLn;
+    }
+
+    return eRes;
+}
 
 
 

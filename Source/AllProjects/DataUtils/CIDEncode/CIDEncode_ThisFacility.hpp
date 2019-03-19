@@ -83,11 +83,13 @@ class CIDENCODEEXP TFacCIDEncode : public TFacility
         TTextConverter* ptcvtMakeNew
         (
             const   TString&                strName
+            , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
         )   const;
 
         tCIDEncode::TTCvtPtr mptrMakeNew
         (
             const   TString&                strName
+            , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
         )   const;
 
         TString strBaseNameFor

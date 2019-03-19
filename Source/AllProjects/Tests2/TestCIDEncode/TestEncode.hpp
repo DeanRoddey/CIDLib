@@ -39,6 +39,43 @@
 #include    "TestFWLib.hpp"
 
 
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_ByName
+// PREFIX: tfwt
+//
+//  Tests creation of some converters by their name, making sure case doesn't matter
+// ---------------------------------------------------------------------------
+class TTest_ByName : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_ByName();
+
+        TTest_ByName(const TTest_ByName&) = delete;
+
+        ~TTest_ByName();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_ByName,TTestFWTest)
+};
+
+
 
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_Convert
@@ -65,7 +102,7 @@ class TTest_Convert : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -125,7 +162,7 @@ class TTest_ErrModes : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -188,7 +225,7 @@ class TTest_RoundTrip1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :

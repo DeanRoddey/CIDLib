@@ -66,6 +66,7 @@ tCIDLib::TBoolean TEncodeTestApp::bInitialize(TString&)
 tCIDLib::TVoid TEncodeTestApp::LoadTests()
 {
     // Load up our tests on our parent class
+    AddTest(new TTest_ByName);
     AddTest(new TTest_Convert);
     AddTest(new TTest_ErrModes);
     AddTest(new TTest_RoundTrip1);
