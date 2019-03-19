@@ -585,10 +585,19 @@ PROJECT=CIDObjStore
     SETTINGS
         DIRECTORY   = DataUtils\CIDObjStore
         DISPLAY     = N/A
+        EXPORT      = CIDOBJSTOREEXP
         MSGFILE     = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDObjStore_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
 
     DEPENDENTS
         CIDLib

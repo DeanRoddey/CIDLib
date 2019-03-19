@@ -47,17 +47,6 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
 {
     public :
         // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static tCIDLib::TVoid RecoverStore
-        (
-            const   TString&                strSrcRepo
-            , const TString&                strTarFile
-            ,       TString&                strActionLog
-        );
-
-
-        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TCIDObjStore
@@ -133,7 +122,6 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         (
             const   TString&                strPath
             , const TString&                strStoreName
-            , const tCIDLib::TBoolean       bRestore = kCIDLib::False
         );
 
         tCIDLib::TBoolean bKeyExists

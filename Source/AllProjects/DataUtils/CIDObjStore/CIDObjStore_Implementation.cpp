@@ -50,16 +50,17 @@ RTTIDecls(TCIDObjStoreImpl,TObject)
 // ---------------------------------------------------------------------------
 //  TCIDObjStoreImpl: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TCIDObjStoreImpl::TCIDObjStoreImpl( const   TString&            strPath
-                                    , const TString&            strStoreName
-                                    ,const  tCIDLib::TBoolean   bCaseSensitiveKeys) :
+TCIDObjStoreImpl::TCIDObjStoreImpl( const   TString&                strPath
+                                    , const TString&                strStoreName
+                                    ,const  tCIDObjStore::EFlags    eFlags) :
     m_colStoreList
     (
         kCIDObjStore_::c4Modulus
-        , new TStringKeyOps(bCaseSensitiveKeys)
+        , new TStringKeyOps(tCIDLib::bAllBitsOn(eFlags, tCIDObjStore::EFlags::CaseSensitive))
         , &TOSStoreItem::strKey
     )
-    , m_bCaseSensitiveKeys(bCaseSensitiveKeys)
+    , m_bCaseSensitiveKeys(tCIDLib::bAllBitsOn(eFlags, tCIDObjStore::EFlags::CaseSensitive))
+    , m_bRecoveryMode(tCIDLib::bAllBitsOn(eFlags, tCIDObjStore::EFlags::RecoveryMode))
     , m_c4IndexVersionNum(0)
     , m_strStoreName(strStoreName)
 {
@@ -749,7 +750,7 @@ TCIDObjStoreImpl::eReadObject(  const   TString&            strKey
     try
     {
         // Load the data, in this case we get data and key data
-        LoadItemData(*posiCur, mbufData, mbufKey);
+        bLoadItemData(*posiCur, mbufData, mbufKey);
 
         // It worked, so set the caller's parms
         c4Version = posiCur->c4Version();
@@ -805,7 +806,7 @@ TCIDObjStoreImpl::eReadObject(  const   TString&            strKey
     try
     {
         // Load up the data. We only care about the object data in this case
-        LoadItemData(*posiCur, mbufData);
+        bLoadItemData(*posiCur, mbufData);
 
         // It worked, so set the caller's parms
         c4Version = posiCur->c4Version();

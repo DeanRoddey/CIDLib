@@ -73,8 +73,7 @@
 // ---------------------------------------------------------------------------
 #include    "CIDObjStore_ErrorIds.hpp"
 #include    "CIDObjStore_MessageIds.hpp"
-#include    "CIDObjStore_Constant.hpp"
-#include    "CIDObjStore_Type.hpp"
+#include    "CIDObjStore_Shared.hpp"
 #include    "CIDObjStore_ObjStore.hpp"
 #include    "CIDObjStore_ThisFacility.hpp"
 

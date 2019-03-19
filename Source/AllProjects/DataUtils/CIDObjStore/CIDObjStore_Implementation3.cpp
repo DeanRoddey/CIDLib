@@ -33,25 +33,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  TCIDObjStoreImpl: Public, static methods
-// ---------------------------------------------------------------------------
-
-//
-//  This method will do an emergency type of recovery attempt on a repo,
-//  creating a new file that has as much as can be recovered. It also
-//  provides a log of things it did.
-//
-tCIDLib::TVoid
-TCIDObjStoreImpl::RecoverStore( const   TString&    strSrcRepo
-                                , const TString&    strTarFile
-                                ,       TString&    strActionLog)
-{
-    // <TBD>
-}
-
-
-
-// ---------------------------------------------------------------------------
 //  TCIDObjStoreImpl: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TCIDObjStoreImpl::BackupStore()
@@ -142,42 +123,48 @@ tCIDLib::TVoid TCIDObjStoreImpl::BackupStore()
                 // Get a copy of the current item
                 TOSStoreItem osiCur = *cursItems;
 
-                // Read this one in from the current store
-                LoadItemData(osiCur, mbufData, mbufKey, hdrCur);
-
                 //
-                //  Validate that the sizes and version that we read in
-                //  matches what is in the store item.
+                //  Read this one in from the current store. If we are in recovery
+                //  mode it will return a status. If it's false that means it wasn't
+                //  correct but it was probably recoverable, so we just ignore that
+                //  one. Anything else will throw if bad.
                 //
-                if ((osiCur.c4CurUsed() != hdrCur.m_c4CurUsed)
-                ||  (osiCur.c4Version() != hdrCur.m_c4VersionNum)
-                ||  (osiCur.c4Allocated() != hdrCur.m_c4Allocated)
-                ||  (osiCur.c4KeyBytes() != hdrCur.m_c4KeyBytes))
+                if (bLoadItemData(osiCur, mbufData, mbufKey, hdrCur))
                 {
                     //
-                    //  If it doesn't, then log a message and leave it out of
-                    //  the backup.
+                    //  Validate that the sizes and version that we read in
+                    //  matches what is in the store item.
                     //
-                    if (facCIDObjStore().bLogWarnings())
+                    if ((osiCur.c4CurUsed() != hdrCur.m_c4CurUsed)
+                    ||  (osiCur.c4Version() != hdrCur.m_c4VersionNum)
+                    ||  (osiCur.c4Allocated() != hdrCur.m_c4Allocated)
+                    ||  (osiCur.c4KeyBytes() != hdrCur.m_c4KeyBytes))
                     {
-                        facCIDObjStore().LogMsg
-                        (
-                            CID_FILE
-                            , CID_LINE
-                            , kObjSErrs::errcBack_BadKey
-                            , tCIDLib::ESeverities::Warn
-                            , tCIDLib::EErrClasses::Format
-                            , osiCur.strKey()
-                        );
+                        //
+                        //  If it doesn't, then log a message and leave it out of
+                        //  the backup.
+                        //
+                        if (facCIDObjStore().bLogWarnings())
+                        {
+                            facCIDObjStore().LogMsg
+                            (
+                                CID_FILE
+                                , CID_LINE
+                                , kObjSErrs::errcBack_BadKey
+                                , tCIDLib::ESeverities::Warn
+                                , tCIDLib::EErrClasses::Format
+                                , osiCur.strKey()
+                            );
+                        }
                     }
-                }
-                 else
-                {
-                    // Update the copy with the current target file offset
-                    osiCur.c4Offset(tCIDLib::TCard4(flTmp.c8CurPos()));
+                    else
+                    {
+                        // Update the copy with the current target file offset
+                        osiCur.c4Offset(tCIDLib::TCard4(flTmp.c8CurPos()));
 
-                    // And write the data to the new spot in the temp store
-                    CommitStoreItem(flTmp, osiCur, mbufData, mbufKey, pathTmpFl);
+                        // And write the data to the new spot in the temp store
+                        CommitStoreItem(flTmp, osiCur, mbufData, mbufKey, pathTmpFl);
+                    }
                 }
             }
         }
@@ -1073,6 +1060,306 @@ TCIDObjStoreImpl::WriteFreeListItem(        TBinaryFile&        flTarget
 // ---------------------------------------------------------------------------
 
 //
+//  These methods load up the data for a given item in various ways, getting more or
+//  less information, and doing appropriate validity checks.
+//
+//  The return is only useful if in recovery mode and indicates if the item had to be
+//  recovered from an error. Else it would have thrown.
+//
+tCIDLib::TBoolean
+TCIDObjStoreImpl::bLoadItemData(const   TOSStoreItem&   osiToLoad
+                                ,       TMemBuf&        mbufData
+                                ,       TMemBuf&        mbufKey)
+{
+    // Just use a local store item header and call the other version
+    TStoreItemHdr hdrTmp;
+    return bLoadItemData(osiToLoad, mbufData, mbufKey, hdrTmp);
+}
+
+tCIDLib::TBoolean
+TCIDObjStoreImpl::bLoadItemData(const   TOSStoreItem&   osiToLoad
+                                ,       TMemBuf&        mbufData)
+{
+    // Just use a local store item header and call the other version
+    TStoreItemHdr hdrTmp;
+    return bLoadItemData(osiToLoad, mbufData, hdrTmp);
+}
+
+tCIDLib::TBoolean
+TCIDObjStoreImpl::bLoadItemData(const   TOSStoreItem&   osiToLoad
+                                ,       TMemBuf&        mbufData
+                                ,       TMemBuf&        mbufKey
+                                ,       TStoreItemHdr&  hdrToFill)
+{
+    // Assume good until proven otherwise
+    tCIDLib::TBoolean bRet = kCIDLib::True;
+
+    //
+    //  Seek to the item's offset, and read in the store header for a
+    //  sanity check.
+    //
+    m_flStore.SetFilePos(osiToLoad.c4Offset());
+    tCIDLib::TCard4 c4Read = m_flStore.c4ReadBuffer(&hdrToFill, sizeof(TStoreItemHdr));
+
+    if (c4Read != sizeof(TStoreItemHdr))
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcIO_ReadStoreItemHdr
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , osiToLoad.strKey()
+            , m_strStoreName
+        );
+    }
+
+    if (osiToLoad.c4Allocated() != hdrToFill.m_c4Allocated)
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcData_AllocMismatch
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , TCardinal(osiToLoad.c4Allocated())
+            , TCardinal(hdrToFill.m_c4Allocated)
+            , m_strStoreName
+            , osiToLoad.strKey()
+        );
+    }
+
+    if (osiToLoad.c4CurUsed() != hdrToFill.m_c4CurUsed)
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcData_UsedMismatch
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , TCardinal(osiToLoad.c4CurUsed())
+            , TCardinal(hdrToFill.m_c4CurUsed)
+            , m_strStoreName
+            , osiToLoad.strKey()
+        );
+    }
+
+    // Read in the key data, and make sure we agree on it's size
+    if (osiToLoad.c4KeyBytes() != hdrToFill.m_c4KeyBytes)
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcData_KeySzMismatch
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , TCardinal(osiToLoad.c4KeyBytes())
+            , TCardinal(hdrToFill.m_c4KeyBytes)
+            , m_strStoreName
+        );
+    }
+
+    c4Read = m_flStore.c4ReadBuffer(mbufKey, hdrToFill.m_c4KeyBytes);
+    if (c4Read != hdrToFill.m_c4KeyBytes)
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcIO_ReadItemKey
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , osiToLoad.strKey()
+            , m_strStoreName
+        );
+    }
+
+    // Ok, it all checks out, so read in the data
+    c4Read = m_flStore.c4ReadBuffer(mbufData, hdrToFill.m_c4CurUsed);
+    if (c4Read != hdrToFill.m_c4CurUsed)
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcIO_ReadStoreItem
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , osiToLoad.strKey()
+            , m_strStoreName
+        );
+    }
+
+    //
+    //  Hash the data and make sure it matches the has that was stored
+    //  in the store header.
+    //
+    const tCIDLib::THashVal hshTest = mbufData.hshCalcHash
+    (
+        kCIDObjStore_::c4Modulus, 0, hdrToFill.m_c4CurUsed
+    );
+
+    if (hshTest != hdrToFill.m_hshData)
+    {
+        if (m_bRecoveryMode)
+        {
+            hdrToFill.m_hshData = hshTest;
+            bRet = kCIDLib::False;
+        }
+         else
+        {
+            facCIDObjStore().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kObjSErrs::errcData_HashMismatch
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::Format
+                , osiToLoad.strKey()
+                , m_strStoreName
+            );
+        }
+    }
+    return bRet;
+}
+
+tCIDLib::TBoolean
+TCIDObjStoreImpl::bLoadItemData(const   TOSStoreItem&   osiToLoad
+                                ,       TMemBuf&        mbufData
+                                ,       TStoreItemHdr&  hdrToFill)
+{
+    tCIDLib::TBoolean bRet = kCIDLib::True;
+
+    //
+    //  Seek to the item's offset, and read in the store header for a
+    //  sanity check.
+    //
+    m_flStore.SetFilePos(osiToLoad.c4Offset());
+    tCIDLib::TCard4 c4Read = m_flStore.c4ReadBuffer
+    (
+        &hdrToFill
+        , sizeof(TStoreItemHdr)
+    );
+
+    if (c4Read != sizeof(TStoreItemHdr))
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcIO_ReadStoreItemHdr
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , osiToLoad.strKey()
+            , m_strStoreName
+        );
+    }
+
+    if (osiToLoad.c4Allocated() != hdrToFill.m_c4Allocated)
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcData_AllocMismatch
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , TCardinal(osiToLoad.c4Allocated())
+            , TCardinal(hdrToFill.m_c4Allocated)
+            , m_strStoreName
+            , osiToLoad.strKey()
+        );
+    }
+
+    if (osiToLoad.c4CurUsed() != hdrToFill.m_c4CurUsed)
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcData_UsedMismatch
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , TCardinal(osiToLoad.c4CurUsed())
+            , TCardinal(hdrToFill.m_c4CurUsed)
+            , m_strStoreName
+            , osiToLoad.strKey()
+        );
+    }
+
+    // Ok, skip over the key data, but make sure we agree on it's size
+    if (osiToLoad.c4KeyBytes() != hdrToFill.m_c4KeyBytes)
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcData_KeySzMismatch
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , TCardinal(osiToLoad.c4KeyBytes())
+            , TCardinal(hdrToFill.m_c4KeyBytes)
+            , m_strStoreName
+        );
+    }
+    m_flStore.c8OffsetFilePos(tCIDLib::TInt4(hdrToFill.m_c4KeyBytes));
+
+    // Ok, it all checks out, so read in the data
+    c4Read = m_flStore.c4ReadBuffer(mbufData, hdrToFill.m_c4CurUsed);
+    if (c4Read != hdrToFill.m_c4CurUsed)
+    {
+        facCIDObjStore().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kObjSErrs::errcIO_ReadStoreItem
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , osiToLoad.strKey()
+            , m_strStoreName
+        );
+    }
+
+    //
+    //  Hash the data and make sure it matches the has that was stored
+    //  in the store header.
+    //
+    const tCIDLib::THashVal hshTest = mbufData.hshCalcHash
+    (
+        kCIDObjStore_::c4Modulus, 0, hdrToFill.m_c4CurUsed
+    );
+
+    if (hshTest != hdrToFill.m_hshData)
+    {
+        if (m_bRecoveryMode)
+        {
+            hdrToFill.m_hshData = hshTest;
+            bRet = kCIDLib::False;
+        }
+         else
+        {
+            facCIDObjStore().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kObjSErrs::errcData_HashMismatch
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::Format
+                , osiToLoad.strKey()
+                , m_strStoreName
+            );
+        }
+    }
+    return bRet;
+}
+
+
+
+//
 //  This is called when an existing store is opened. It will scan the store,
 //  validating the format, and building the free and item lists as it goes.
 //  When we are done, if it validates ok, then we have a valid index build
@@ -1229,27 +1516,33 @@ tCIDLib::TVoid TCIDObjStoreImpl::BuildIndex()
 
             //
             //  Hash the data and make sure it matches the hash that was
-            //  stored in the two headers.
+            //  stored in the header.
             //
             const tCIDLib::THashVal hshTest = mbufData.hshCalcHash
             (
-                kCIDObjStore_::c4Modulus
-                , 0
-                , hdrItem.m_c4CurUsed
+                kCIDObjStore_::c4Modulus, 0, hdrItem.m_c4CurUsed
             );
 
             if (hshTest != hdrItem.m_hshData)
             {
-                facCIDObjStore().ThrowErr
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , kObjSErrs::errcData_HashMismatch
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::OutOfSync
-                    , strKey
-                    , m_strStoreName
-                );
+                if (m_bRecoveryMode)
+                {
+                    /// Update the header to match what's really there
+                    hdrItem.m_hshData = hshTest;
+                }
+                 else
+                {
+                    facCIDObjStore().ThrowErr
+                    (
+                        CID_FILE
+                        , CID_LINE
+                        , kObjSErrs::errcData_HashMismatch
+                        , tCIDLib::ESeverities::Failed
+                        , tCIDLib::EErrClasses::OutOfSync
+                        , strKey
+                        , m_strStoreName
+                    );
+                }
             }
 
             TOSStoreItem& osiNew = m_colStoreList.objAdd
@@ -1409,7 +1702,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::Compact(const tCIDLib::TCard4 c4Needed)
                 TOSStoreItem osiCur = *cursItems;
 
                 // Read this one in from the current store
-                LoadItemData(osiCur, mbufData, mbufKey, hdrCur);
+                bLoadItemData(osiCur, mbufData, mbufKey, hdrCur);
 
                 //
                 //  Validate that the sizes and version that we read in
@@ -1783,289 +2076,6 @@ tCIDLib::TVoid TCIDObjStoreImpl::ExpandStore(const tCIDLib::TCard4 c4Needed)
         throw;
     }
 }
-
-
-//
-//  These methods load up the data for a given item in various ways,
-//  getting more or less information, and doing appropriate validity
-//  checks.
-//
-tCIDLib::TVoid
-TCIDObjStoreImpl::LoadItemData( const   TOSStoreItem&   osiToLoad
-                                ,       TMemBuf&        mbufData
-                                ,       TMemBuf&        mbufKey)
-{
-    // Just use a local store item header and call the other version
-    TStoreItemHdr hdrTmp;
-    LoadItemData(osiToLoad, mbufData, mbufKey, hdrTmp);
-}
-
-tCIDLib::TVoid
-TCIDObjStoreImpl::LoadItemData( const   TOSStoreItem&   osiToLoad
-                                ,       TMemBuf&        mbufData)
-{
-    // Just use a local store item header and call the other version
-    TStoreItemHdr hdrTmp;
-    LoadItemData(osiToLoad, mbufData, hdrTmp);
-}
-
-tCIDLib::TVoid
-TCIDObjStoreImpl::LoadItemData( const   TOSStoreItem&   osiToLoad
-                                ,       TMemBuf&        mbufData
-                                ,       TMemBuf&        mbufKey
-                                ,       TStoreItemHdr&  hdrToFill)
-{
-    //
-    //  Seek to the item's offset, and read in the store header for a
-    //  sanity check.
-    //
-    m_flStore.SetFilePos(osiToLoad.c4Offset());
-    tCIDLib::TCard4 c4Read = m_flStore.c4ReadBuffer
-    (
-        &hdrToFill
-        , sizeof(TStoreItemHdr)
-    );
-
-    if (c4Read != sizeof(TStoreItemHdr))
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcIO_ReadStoreItemHdr
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , osiToLoad.strKey()
-            , m_strStoreName
-        );
-    }
-
-    if (osiToLoad.c4Allocated() != hdrToFill.m_c4Allocated)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcData_AllocMismatch
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(osiToLoad.c4Allocated())
-            , TCardinal(hdrToFill.m_c4Allocated)
-            , m_strStoreName
-            , osiToLoad.strKey()
-        );
-    }
-
-    if (osiToLoad.c4CurUsed() != hdrToFill.m_c4CurUsed)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcData_UsedMismatch
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(osiToLoad.c4CurUsed())
-            , TCardinal(hdrToFill.m_c4CurUsed)
-            , m_strStoreName
-            , osiToLoad.strKey()
-        );
-    }
-
-    // Read in the key data, and make sure we agree on it's size
-    if (osiToLoad.c4KeyBytes() != hdrToFill.m_c4KeyBytes)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcData_KeySzMismatch
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(osiToLoad.c4KeyBytes())
-            , TCardinal(hdrToFill.m_c4KeyBytes)
-            , m_strStoreName
-        );
-    }
-
-    c4Read = m_flStore.c4ReadBuffer(mbufKey, hdrToFill.m_c4KeyBytes);
-    if (c4Read != hdrToFill.m_c4KeyBytes)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcIO_ReadItemKey
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , osiToLoad.strKey()
-            , m_strStoreName
-        );
-    }
-
-    // Ok, it all checks out, so read in the data
-    c4Read = m_flStore.c4ReadBuffer(mbufData, hdrToFill.m_c4CurUsed);
-    if (c4Read != hdrToFill.m_c4CurUsed)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcIO_ReadStoreItem
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , osiToLoad.strKey()
-            , m_strStoreName
-        );
-    }
-
-    //
-    //  Hash the data and make sure it matches the has that was stored
-    //  in the store header.
-    //
-    const tCIDLib::THashVal hshTest = mbufData.hshCalcHash
-    (
-        kCIDObjStore_::c4Modulus
-        , 0
-        , hdrToFill.m_c4CurUsed
-    );
-
-    if (hshTest != hdrToFill.m_hshData)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcData_HashMismatch
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , osiToLoad.strKey()
-            , m_strStoreName
-        );
-    }
-}
-
-tCIDLib::TVoid
-TCIDObjStoreImpl::LoadItemData( const   TOSStoreItem&   osiToLoad
-                                ,       TMemBuf&        mbufData
-                                ,       TStoreItemHdr&  hdrToFill)
-{
-    //
-    //  Seek to the item's offset, and read in the store header for a
-    //  sanity check.
-    //
-    m_flStore.SetFilePos(osiToLoad.c4Offset());
-    tCIDLib::TCard4 c4Read = m_flStore.c4ReadBuffer
-    (
-        &hdrToFill
-        , sizeof(TStoreItemHdr)
-    );
-
-    if (c4Read != sizeof(TStoreItemHdr))
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcIO_ReadStoreItemHdr
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , osiToLoad.strKey()
-            , m_strStoreName
-        );
-    }
-
-    if (osiToLoad.c4Allocated() != hdrToFill.m_c4Allocated)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcData_AllocMismatch
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(osiToLoad.c4Allocated())
-            , TCardinal(hdrToFill.m_c4Allocated)
-            , m_strStoreName
-            , osiToLoad.strKey()
-        );
-    }
-
-    if (osiToLoad.c4CurUsed() != hdrToFill.m_c4CurUsed)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcData_UsedMismatch
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(osiToLoad.c4CurUsed())
-            , TCardinal(hdrToFill.m_c4CurUsed)
-            , m_strStoreName
-            , osiToLoad.strKey()
-        );
-    }
-
-    // Ok, skip over the key data, but make sure we agree on it's size
-    if (osiToLoad.c4KeyBytes() != hdrToFill.m_c4KeyBytes)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcData_KeySzMismatch
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(osiToLoad.c4KeyBytes())
-            , TCardinal(hdrToFill.m_c4KeyBytes)
-            , m_strStoreName
-        );
-    }
-    m_flStore.c8OffsetFilePos(tCIDLib::TInt4(hdrToFill.m_c4KeyBytes));
-
-    // Ok, it all checks out, so read in the data
-    c4Read = m_flStore.c4ReadBuffer(mbufData, hdrToFill.m_c4CurUsed);
-    if (c4Read != hdrToFill.m_c4CurUsed)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcIO_ReadStoreItem
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , osiToLoad.strKey()
-            , m_strStoreName
-        );
-    }
-
-    //
-    //  Hash the data and make sure it matches the has that was stored
-    //  in the store header.
-    //
-    const tCIDLib::THashVal hshTest = mbufData.hshCalcHash
-    (
-        kCIDObjStore_::c4Modulus
-        , 0
-        , hdrToFill.m_c4CurUsed
-    );
-
-    if (hshTest != hdrToFill.m_hshData)
-    {
-        facCIDObjStore().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kObjSErrs::errcData_HashMismatch
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , osiToLoad.strKey()
-            , m_strStoreName
-        );
-    }
-}
-
 
 
 //

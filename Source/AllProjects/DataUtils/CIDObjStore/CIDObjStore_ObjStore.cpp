@@ -46,24 +46,6 @@ RTTIDecls(TCIDObjStore,TObject)
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TCIDObjStore: Public, static methods
-// ---------------------------------------------------------------------------
-
-//
-//  Attempts to recover the source repo and creates a new one with the
-//  stuff that could be recovered.
-//
-tCIDLib::TVoid
-TCIDObjStore::RecoverStore( const   TString&    strSrcRepo
-                            , const TString&    strTarFile
-                            ,       TString&    strActionLog)
-{
-    // Pass it to the impl class
-    TCIDObjStoreImpl::RecoverStore(strSrcRepo, strTarFile, strActionLog);
-}
-
-
-// ---------------------------------------------------------------------------
 //  TCIDObjStore: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TCIDObjStore::TCIDObjStore(const tCIDObjStore::EFlags eFlags) :
@@ -259,9 +241,7 @@ tCIDLib::TBoolean TCIDObjStore::bDeleteObjectIfExists(const TString& strKey)
 
 
 tCIDLib::TBoolean
-TCIDObjStore::bInitialize(  const   TString&            strPath
-                            , const TString&            strStoreName
-                            , const tCIDLib::TBoolean   bRestore)
+TCIDObjStore::bInitialize(const TString& strPath, const TString& strStoreName)
 {
     // Lock while we initialize
     TMtxLocker lockStore(&m_mtxSync);
@@ -284,14 +264,7 @@ TCIDObjStore::bInitialize(  const   TString&            strPath
     //  already.
     //
     if (!m_postCache)
-    {
-        m_postCache = new TCIDObjStoreImpl
-        (
-            strPath
-            , strStoreName
-            , tCIDLib::bAllBitsOn(m_eFlags, tCIDObjStore::EFlags::CaseSensitive)
-        );
-    }
+        m_postCache = new TCIDObjStoreImpl(strPath, strStoreName, m_eFlags);
 
     //
     //  And initialize it. This will either create a new store, or load up
