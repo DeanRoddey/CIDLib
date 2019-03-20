@@ -1545,45 +1545,20 @@ END PROJECT
 
 ; ----------------------------------------------------------------------------
 ;  Ad hoc tests, and some that test things that the test framework itself uses, so
-;  we need to make sure that the framework is basically trustworthy.
+;  we need to make sure that the framework is basically trustworthy. And a few
+;  simple UI 'tests' for randomly trying stuff.
 ; ----------------------------------------------------------------------------
-PROJECT=ShellTester
+
+PROJECT=TestKernel
     SETTINGS
-        DIRECTORY   = Tests\TestAppShell\ShellTester
+        DIRECTORY   = Tests\TestKernel
+        MSGFILE     = Yes
+        USESYSLIBS  = Yes
     END SETTINGS
 
     DEPENDENTS
-        CIDLib
+        CIDKernel
     END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestAppShell
-    SETTINGS
-        DIRECTORY   = Tests\TestAppShell
-    END SETTINGS
-
-    DEPENDENTS
-        CIDAppSh
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestCIDDBase
-    SETTINGS
-        DIRECTORY   = Tests\TestCIDDBase
-    END SETTINGS
-
-    ; For now only Win32 until CIDDBase gets sorted out for portability
-    PLATFORMS
-        Win32
-    END PLATFORMS
-
-    DEPENDENTS
-        CIDLib
-        CIDDBase
-    END DEPENDENTS
-
 END PROJECT
 
 
@@ -1618,7 +1593,6 @@ PROJECT=TestCIDCtrls
     END DEPENDENTS
 END PROJECT
 
-
 PROJECT=TestCIDCtrls2
 
     SETTINGS
@@ -1636,7 +1610,6 @@ PROJECT=TestCIDCtrls2
         CIDCtrls
     END DEPENDENTS
 END PROJECT
-
 
 PROJECT=TestScroll
 
@@ -1656,153 +1629,6 @@ PROJECT=TestScroll
     END DEPENDENTS
 END PROJECT
 
-
-PROJECT=TestCIDZLib
-    SETTINGS
-        DIRECTORY   = Tests\TestCIDZLib
-        SAMPLE      = Yes
-    END SETTINGS
-
-    DEPENDENTS
-        CIDZLib
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestGestures
-
-    SETTINGS
-        DIRECTORY   = Tests\TestGestures
-        DISPLAY     = GUI
-        MSGFILE     = Yes
-        RESFILE     = Yes
-    END SETTINGS
-
-    PLATFORMS
-        Win32
-    END PLATFORMS
-
-    DEPENDENTS
-        CIDCtrls
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestKernel
-    SETTINGS
-        DIRECTORY   = Tests\TestKernel
-        MSGFILE     = Yes
-        USESYSLIBS  = Yes
-    END SETTINGS
-
-    DEPENDENTS
-        CIDKernel
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestLogSrv
-    SETTINGS
-        DIRECTORY   = Tests\TestLogSrv
-    END SETTINGS
-
-    DEPENDENTS
-        CIDMath
-        CIDOrbUC
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestLogSrv2
-    SETTINGS
-        DIRECTORY   = Tests\TestLogSrv2
-    END SETTINGS
-
-    DEPENDENTS
-        CIDOrbUC
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestOrb2
-    SETTINGS
-        DIRECTORY   = Tests\TestOrb2
-        MSGFILE     = Yes
-    END SETTINGS
-
-    IDLFILES
-        IDLFILE
-            SRCFILE = TestOrb2_TestIntf
-            GEN     = CLIENT,SERVER
-        END IDLFILE
-    END IDLFILES
-
-    DEPENDENTS
-        CIDOrb
-        CIDMath
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestOrb3
-    SETTINGS
-        DIRECTORY   = Tests\TestOrb3
-        MSGFILE     = Yes
-    END SETTINGS
-
-    IDLFILES
-        IDLFILE
-            SRCFILE = TestOrb3_Types
-            GEN     = GLOBALS
-            NAMEEXT = Types
-        END IDLFILE
-
-        IDLFILE
-            SRCFILE = TestOrb3_TestIntf
-            GEN     = CLIENT,SERVER
-            NAMEEXT = Intf
-        END IDLFILE
-    END IDLFILES
-
-    DEPENDENTS
-        CIDOrb
-    END DEPENDENTS
-END PROJECT
-
-
-;PROJECT=TestRTP
-;    SETTINGS
-;        DIRECTORY   = Tests\TestRTP
-;    END SETTINGS
-;
-;    DEPENDENTS
-;        CIDMath
-;        CIDSock
-;        CIDRTP
-;    END DEPENDENTS
-;END PROJECT
-
-
-;PROJECT=TestSocket
-;    SETTINGS
-;        DIRECTORY   = Tests\TestSocket
-;    END SETTINGS
-;
-;    DEPENDENTS
-;        CIDSock
-;    END DEPENDENTS
-;END PROJECT
-;
-;
-;PROJECT=TestSocket2
-;    SETTINGS
-;        DIRECTORY   = Tests\TestSocket2
-;    END SETTINGS
-;
-;    DEPENDENTS
-;        CIDSock
-;    END DEPENDENTS
-;END PROJECT
 
 
 ; ----------------------------------------------------------------------------
@@ -2213,40 +2039,6 @@ PROJECT=Speech
 END PROJECT
 
 
-PROJECT=TestService
-    SETTINGS
-        DIRECTORY   = Tests\TestService
-    END SETTINGS
-
-    ; For now only Win32, until services get portable
-    PLATFORMS
-        Win32
-    END PLATFORMS
-
-    DEPENDENTS
-        CIDKernel
-        CIDLib
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestServiceInst
-    SETTINGS
-        DIRECTORY   = Tests\TestService\Install
-    END SETTINGS
-
-    ; For now only Win32, until services get portable
-    PLATFORMS
-        Win32
-    END PLATFORMS
-
-    DEPENDENTS
-        CIDKernel
-        CIDLib
-    END DEPENDENTS
-END PROJECT
-
-
 PROJECT=SMTP1
     SETTINGS
         DIRECTORY   = Samples\Basic\SMTP1
@@ -2519,26 +2311,6 @@ PROJECT=ORB1Samp
         ORB1SampSh
         ORB1SampS
         ORB1SampC
-    END DEPENDENTS
-
-END PROJECT
-
-
-
-
-; ----------------------------------------------------------------------------
-;  A reusable project for testing out things
-; ----------------------------------------------------------------------------
-PROJECT=JunkStuff
-
-    SETTINGS
-        DIRECTORY   = Tests\JunkStuff
-        SAMPLE      = Yes
-    END SETTINGS
-
-    DEPENDENTS
-        CIDLib
-        CIDRegX
     END DEPENDENTS
 
 END PROJECT
