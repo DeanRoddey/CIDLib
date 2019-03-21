@@ -1268,6 +1268,7 @@ END PROJECT
 ;   Some general purpose utilities
 ; ----------------------------------------------------------------------------
 PROJECT=MakeDocs
+
     SETTINGS
         DIRECTORY   = Utilities\MakeDocs
         MSGFILE     = Yes
@@ -1275,6 +1276,7 @@ PROJECT=MakeDocs
 
     DEPENDENTS
         CIDLib
+        CIDXML
     END DEPENDENTS
 END PROJECT
 

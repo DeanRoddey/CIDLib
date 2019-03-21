@@ -7,12 +7,11 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -66,11 +65,21 @@ class TDocError : public TObject
         // --------------------------------------------------------------------
         //  Public, non-virtual methods
         // --------------------------------------------------------------------
-        tCIDLib::TCard4 c4Line() const;
+        tCIDLib::TCard4 c4Line() const
+        {
+            return m_c4SourceLine;
+        }
 
-        tCIDLib::TErrCode errcId() const;
+        tCIDLib::TErrCode errcId() const
+        {
+            return m_errcId;
+        }
 
-        const TString& strText() const;
+        const TString& strText() const
+        {
+            return m_strText;
+        }
+
 
     private :
         // --------------------------------------------------------------------
@@ -96,18 +105,4 @@ class TDocError : public TObject
         RTTIDefs(TDocError,TObject)
 };
 
-inline tCIDLib::TCard4 TDocError::c4Line() const
-{
-    return m_c4SourceLine;
-}
-
-inline tCIDLib::TErrCode TDocError::errcId() const
-{
-    return m_errcId;
-}
-
-inline const TString& TDocError::strText() const
-{
-    return m_strText;
-}
 
