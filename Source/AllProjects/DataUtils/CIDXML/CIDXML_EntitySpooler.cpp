@@ -1231,6 +1231,21 @@ TXMLEntSpooler::SetDeclEncoding(const TString& strDeclEncoding)
 // ---------------------------------------------------------------------------
 //  TXMLEntSpooler: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+
+//
+//  WE try to parse out the XMLDecl text. This is a special case because we can't
+//  really know the encoding until after we get the decl parsed. The caller did a
+//  probe to figure out the encoding based on the known possible forms of the first
+//  handful of characters. We get that and use it to pull out just the XMLDecl
+//  chars into m_achCharBuf (which is our spooling buffer.)
+//
+//  We update m_c4CharBufCount with how many characters we put into the
+//  spoolg buffer (i.e. how many characters in the XMLDecl we teased out of the
+//  data.) So once that's been eaten, the spool buffer has to be reloaded.
+//  We update m_c4RawBufInd to where we left off, so that's where we will start
+//  decoding bytes once the caller has parsed out the decl and set the real encoding
+//  on us.
+//
 tCIDLib::TVoid
 TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
 {
@@ -1239,25 +1254,25 @@ TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
     const tCIDLib::TCard1* pc1MyDecl = CIDXML_EntitySpooler::aac1Decls[c4EncIndex];
     const tCIDLib::TCard4  c4MyDeclBytes = CIDXML_EntitySpooler::ac4DeclBytes[c4EncIndex];
 
-    // And get a target pointer to the char buffer
+    //
+    //  And get a target pointer to the char spooling buffer that we can run up
+    //  as we decode decl chars.
+    //
     tCIDLib::TCh* pchOut = m_achCharBuf;
 
-    //
-    //  We know what the basic encoding is, which should be enough to get us
-    //  through the first line. Basically, we want to see whether the first
-    //  line is an XMLDecl/TextDecl. If so, we want to predecode it into
-    //  the internalized buffer.
-    //
     if (eEncoding == tCIDXML::EBaseEncodings::UTF8)
     {
         // If not enough bytes to even match the prefix, then definitely no decl
         if (m_c4RawBufCount < c4MyDeclBytes)
             return;
 
-        // Start of a source pointer at the star tof the raw buffer
+        // Point a source pointer at the start of the raw input buffer
         const tCIDLib::TCard1* pc1Src = m_ac1RawBuf;
 
-        // Check for a UTF-8 BOM and skip it
+        //
+        //  Check for a UTF-8 BOM and skip it. We also push the raw buffer index
+        //  forward by the same amount.
+        //
         m_c4RawBufInd = 0;
         if (m_c4RawBufCount > 3)
         {
