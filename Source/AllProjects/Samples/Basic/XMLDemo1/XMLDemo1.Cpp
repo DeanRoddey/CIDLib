@@ -16,16 +16,13 @@
 // DESCRIPTION:
 //
 //  This is the main module for the first of the XML demo programs. This one
-//  shows how to use the core XML services at its lowest level. This does not
-//  depend upon any publically defined XML APIs (such as SAX or DOM.) It just
-//  uses the core services, which are very fast and which provide maximum
-//  access to the XML data parsed.
+//  shows how to use the core XML services at its lowest level. It just
+//  uses the core parser and installs handlers for event callbacks, which are
+//  very fast and which provide maximum access to the XML data parsed.
 //
-//  In most cases, you wouldn't use this API. You'd use one of the parser
-//  classes, which does most of this work for you. You then just derive from
-//  one of the parsers and override its methods to get the events you want.
-//  But, if you want it fast and to get maximum XML info, then this is the way
-//  to go.
+//  If you need sparse access to the data, and there's a good bit of it, this
+//  is far more efficient than the tree parser that builds the whole thing
+//  into memory.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -53,21 +50,18 @@
 TFacXMLDemo1     facXMLDemo1;
 
 
-
 // ----------------------------------------------------------------------------
 //  Magic macros for the facility class
 // ----------------------------------------------------------------------------
 RTTIDecls(TFacXMLDemo1,TFacility)
 
 
-
 // ----------------------------------------------------------------------------
 //  Include magic main module code
 //
-//  Note that we make the main thread run a member of the facility object.
-//  See the program notes above in the file header. The TMemberFunc<>
-//  template class takes a pointer to the object and the name of a member
-//  on that object to run. It has to match the required prototype. See
+//  Note that we make the main thread run a member of the facility object. The
+//  TMemberFunc<> template class takes a pointer to the object and the name of a
+//  member on that object to run. It has to match the required prototype. See
 //  the TMemberFunc class for details.
 // ----------------------------------------------------------------------------
 CIDLib_MainModule
@@ -162,8 +156,7 @@ TFacXMLDemo1::~TFacXMLDemo1()
 //  This is the the thread function for the main thread. It is started by
 //  the CIDLib_MainModule() macro above.
 //
-tCIDLib::EExitCodes
-TFacXMLDemo1::eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
+tCIDLib::EExitCodes TFacXMLDemo1::eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
     // We have to let our calling thread go first
     thrThis.Sync();
@@ -171,8 +164,6 @@ TFacXMLDemo1::eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     try
     {
         // Get the command line parms
-
-
         if (TSysInfo::c4CmdLineParmCount() < 1)
         {
             ShowUsage();
@@ -356,7 +347,7 @@ tCIDLib::TBoolean TFacXMLDemo1::bLoadMapping(TString& strMapping)
 //  it once from the main thread method and then invoke it more times to
 //  watch for leaks. So this way we completely destroy everything again
 //  after we are done, so subsequent invocations shouldn't really create
-//  any more faulted in data. WE also take a parser to use, so that we
+//  any more faulted in data. We also take a parser to use, so that we
 //  can check when using the same parser, or destroying one and creating
 //  another, to see if there's any difference.
 //
@@ -364,10 +355,10 @@ tCIDLib::TVoid
 TFacXMLDemo1::DoParse(TXMLParserCore& xprsTest, const TString& strToParse)
 {
     //
-    //  Create the validator, and give him a pointer to the parser. He has
-    //  to use this to do a number of things, e.g. reporting errors. He
-    //  adopts it bue we keep a pointer so we can directly access it if
-    //  needed.
+    //  Create the validator, and give him a pointer to the parser. He has to
+    //  use this to do a number of things, e.g. reporting errors. The parser
+    //  adopts the validator but we keep a pointer so we can directly access
+    //  it if needed.
     //
     m_pxvalTest = new TDTDValidator(&xprsTest);
     xprsTest.pxvalValidator(m_pxvalTest);
@@ -386,20 +377,17 @@ TFacXMLDemo1::DoParse(TXMLParserCore& xprsTest, const TString& strToParse)
     //  interested in. If we are doing canonical format, we don't want
     //  any stuff outside the content.
     //
-    //  If we are doing canonical, we also need to remove ourselves as
-    //  the DTD event handler on the validator because we don't want any
-    //  stuff from there (and the parse flags only control optional stuff
-    //  not the markup decl stuff.)
+    //  If we are doing canonical, we don't add ou ourselfs as the DTD event
+    //  handler on the validator because we don't want any stuff from there
+    //  (and the parse flags only control optional stuff not the markup decl
+    //  stuff.)
     //
     tCIDXML::EParseFlags eFlags = tCIDXML::EParseFlags::Standard;
     if (m_eDisplayMode == EDisplayModes::Canonical)
     {
-        eFlags = tCIDLib::eOREnumBits
-        (
-            tCIDXML::EParseFlags::JustContent
-            , tCIDXML::EParseFlags::PIsAC
-            , tCIDXML::EParseFlags::PIsBC
-        );
+        eFlags = tCIDXML::EParseFlags::JustContent
+                 | tCIDXML::EParseFlags::PIsAC
+                 | tCIDXML::EParseFlags::PIsBC;
 
         // We only need to add the document events and errors
         xprsTest.pmxevDocEvents(this);
@@ -420,7 +408,10 @@ TFacXMLDemo1::DoParse(TXMLParserCore& xprsTest, const TString& strToParse)
         m_pxvalTest->pmxevDTDEventHandler(this);
     }
 
-    // If we got any entity mappings, set us as the entity resolver
+    //
+    //  If we got any entity mappings, set us as the entity resolver. Otherwise
+    //  there aren't any to resolve.
+    //
     if (!m_xcatMappings.c4MapCount())
         xprsTest.pmxevEntityResolver(this);
 
@@ -432,7 +423,6 @@ TFacXMLDemo1::DoParse(TXMLParserCore& xprsTest, const TString& strToParse)
 
     // Get the end time
     TTime tmEnd(tCIDLib::ESpecialTimes::CurrentTime);
-
     if (m_bTimeIt)
     {
         *m_pstrmOut << L"Elapsed MS: "
@@ -445,8 +435,8 @@ TFacXMLDemo1::DoParse(TXMLParserCore& xprsTest, const TString& strToParse)
     //  and force the parser to drop it as well, since we'll create a new
     //  one next time.
     //
-    m_pxvalTest = 0;
-    xprsTest.pxvalValidator(0);
+    m_pxvalTest = nullptr;
+    xprsTest.pxvalValidator(nullptr);
 }
 
 
@@ -460,7 +450,17 @@ tCIDLib::TVoid TFacXMLDemo1::ShowUsage()
                     L"          /[Canonical | ErrLoc | ErrLoc2 | Std]\n\n"
                     L"   * Using /Validate and /IgnoreDTD will not work of course\n"
                     L"     because you told it to ignore the DTD it needs in order\n"
-                    L"     to validate\n"
+                    L"     to validate. You would ignore the DTD if it isn't actually\n"
+                    L"     available, i.e. it's just some public ID reference\n\n"
+
+                    L"   * You can output in a few different formats. Std is the normal\n"
+                    L"     sort of readable format. The ErrLoc types only output errors,\n"
+                    L"     in a well defined way to help make automated location easier.\n"
+                    L"     Canonical is a format that could be used to look for content\n"
+                    L"     changes, i.e. not just format differences.\n\n"
+
+                    L"     You can use /Mapping to map a public id to a file, such as the\n"
+                    L"     DTD public id, so that validation can be done. It could be mapped\n"
+                    L"     to a URL but this program doesn't support that."
                 << kCIDLib::EndLn;
 }
-

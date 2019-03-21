@@ -40,8 +40,12 @@
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TFacXMLDemo1: Protected, inherited methods (from MXMLDocEvents)
+//  TFacXMLDemo1: Protected, inherited methods
+//
+//  From MXMLDocEvents, so document content (as opposed to DTD content)
 // ---------------------------------------------------------------------------
+
+// Handle document character (element CDATA, not attribute CDATA) content
 tCIDLib::TVoid
 TFacXMLDemo1::DocCharacters(const   TString&            strChars
                             , const tCIDLib::TBoolean   bIsCDATA
@@ -67,6 +71,7 @@ TFacXMLDemo1::DocCharacters(const   TString&            strChars
 }
 
 
+// Handle comments, we get the comment text
 tCIDLib::TVoid
 TFacXMLDemo1::DocComment(const  TString&        strCommentText
                         , const tCIDXML::ELocations)
@@ -84,6 +89,7 @@ TFacXMLDemo1::DocComment(const  TString&        strCommentText
 }
 
 
+// Handle PIs (processing instructions)
 tCIDLib::TVoid TFacXMLDemo1::DocPI( const   TString&    strTarget
                                     , const TString&    strValue
                                     , const tCIDXML::ELocations)
@@ -99,6 +105,7 @@ tCIDLib::TVoid TFacXMLDemo1::DocPI( const   TString&    strTarget
 }
 
 
+// Handle the end of the document. We just make sure the output stream is flushed
 tCIDLib::TVoid TFacXMLDemo1::EndDocument(const TXMLEntitySrc& xsrcOfRoot)
 {
     // Flush the output stream
@@ -106,6 +113,7 @@ tCIDLib::TVoid TFacXMLDemo1::EndDocument(const TXMLEntitySrc& xsrcOfRoot)
 }
 
 
+// Handle the end tag of an element
 tCIDLib::TVoid TFacXMLDemo1::EndTag(const TXMLElemDecl& xdeclElem)
 {
 
@@ -125,11 +133,22 @@ tCIDLib::TVoid TFacXMLDemo1::ResetDocument()
 }
 
 
-tCIDLib::TVoid TFacXMLDemo1::StartDocument(const TXMLEntitySrc& xsrcOfRoot)
+// Don't really need to do anything for this one
+tCIDLib::TVoid TFacXMLDemo1::StartDocument(const TXMLEntitySrc&)
 {
 }
 
 
+//
+//  Handle the start tag of an element. We get the attribute list as well.
+//  The list comes with a size so that the parser can just let the list grow
+//  and reuse the entries for efficiency (i.e. the number of entries in the
+//  list may be larger than the actual number of attributes for this element.)
+//
+//  If it's just an open element (i.e. ends with />) then bEmpty is set, so
+//  that we can reflect that in any output as well, and also because there will
+//  be no call to EndTag.
+//
 tCIDLib::TVoid
 TFacXMLDemo1::StartTag(         TXMLParserCore&     xprsSrc
                         , const TXMLElemDecl&       xdeclElem
@@ -215,6 +234,7 @@ TFacXMLDemo1::StartTag(         TXMLParserCore&     xprsSrc
 }
 
 
+// Handle the XML declaration content
 tCIDLib::TVoid
 TFacXMLDemo1::XMLDecl(  const   TString&    strVersion
                         , const TString&    strEncoding
@@ -245,7 +265,9 @@ TFacXMLDemo1::XMLDecl(  const   TString&    strVersion
 
 
 // ---------------------------------------------------------------------------
-//  TFacXMLDemo1: Protected, inherited methods (from MXMLErrorEvents)
+//  TFacXMLDemo1: Protected, inherited methods
+//
+//  From MXMLErrorEvents
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid
 TFacXMLDemo1::HandleXMLError(const  tCIDLib::TErrCode   errcToPost
@@ -330,7 +352,9 @@ tCIDLib::TVoid TFacXMLDemo1::ResetErrors()
 
 
 // ---------------------------------------------------------------------------
-//  TFacXMLDemo1: Protected, inherited methods (from MXMLDocTypeEvents)
+//  TFacXMLDemo1: Protected, inherited methods
+//
+//  From MXMLDocTypeEvents, so these are events from the DTD validator
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TFacXMLDemo1::AttrDef(const  TDTDAttrDef&        xadAttr
                                     , const tCIDLib::TBoolean   bIgnored)
@@ -540,7 +564,10 @@ TFacXMLDemo1::TextDecl( const   TString&    strVersion
 
 
 // ---------------------------------------------------------------------------
-//  TFacXMLDemo1: Protected, inherited methods (from MXMLEntityEvents)
+//  TFacXMLDemo1: Protected, inherited methods
+//
+//  From MXMLEntityEvents, so events related to the boundaries of the actual
+//  entities (parseable chunks) of data.
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TFacXMLDemo1::EndEntity(const TXMLEntityDecl& xdeclEnding)
 {
@@ -561,7 +588,11 @@ tCIDLib::TVoid TFacXMLDemo1::StartEntity(const TXMLEntityDecl& xdeclStarting)
 
 
 // ---------------------------------------------------------------------------
-//  TXMLTreeParser: Protected, virtual methods (entity resolver)
+//  TXMLTreeParser: Protected, inherited methods
+//
+//  From the Entity resolver, so this lets us map public ids to cached entity
+//  sources. If they used the /Mapping option, we could have some public ids that
+//  we can map to local files or URLs.
 // ---------------------------------------------------------------------------
 tCIDXML::TEntitySrcRef
 TFacXMLDemo1::esrResolve(const  TString&                strPublicId
@@ -591,8 +622,13 @@ tCIDLib::TVoid TFacXMLDemo1::ResetResolver()
 
 
 // ---------------------------------------------------------------------------
-//  Local methods
+//  TFacXMLDemo1: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+
+//
+//  A helper to output character data, handling character entity replacement if
+//  canonical format is requested.
+//
 tCIDLib::TVoid
 TFacXMLDemo1::ShowChars(const   TString&            strChars
                         , const tCIDLib::TBoolean   bDoEntReplacement)

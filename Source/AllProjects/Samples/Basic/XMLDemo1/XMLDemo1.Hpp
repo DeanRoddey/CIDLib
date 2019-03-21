@@ -16,7 +16,15 @@
 // DESCRIPTION:
 //
 //  This is the main header for the program which just brings in everything
-//  that we need and which defines the facility class.
+//  that we need and which defines the facility class, on which the main thread
+//  is started.
+//
+//  It gets a source file from the user, parses it, handles the events that
+//  get spit out of the parser and outputs them to the console. So basically it
+//  echoes the file back out but in one of a few different formats you can
+//  indicate as a parameter.
+//
+//  Type the name with no parameters to see the parameters.
 //
 // CAVEATS/GOTCHAS:
 //
