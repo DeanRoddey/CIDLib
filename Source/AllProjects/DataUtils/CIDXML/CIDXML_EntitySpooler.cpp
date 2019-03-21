@@ -80,7 +80,8 @@ namespace CIDXML_EntitySpooler
     //      a number of places in the code below.
     // ---------------------------------------------------------------------------
     const tCIDLib::TCard4 c4SeqLen = 6;
-    const tCIDLib::TCard1 aac1EncodingSeqs[tCIDXML::EBaseEncodings::Count][c4SeqLen] =
+    const tCIDLib::TCard1
+    aac1EncodingSeqs[tCIDLib::c4EnumOrd(tCIDXML::EBaseEncodings::Count)][c4SeqLen] =
     {
             { 0x00, 0x00, 0x00, 0x3C, 0x00, 0x00 }
         ,   { 0x00, 0x3C, 0x00, 0x3F, 0x00, 0x78 }
@@ -89,7 +90,8 @@ namespace CIDXML_EntitySpooler
         ,   { 0x3C, 0x3F, 0x78, 0x6D, 0x6C, 0x20 }
         ,   { 0x4C, 0x6F, 0xA7, 0x94, 0x93, 0x40 }
     };
-    const tCIDLib::TCard1 aac1Decls[tCIDXML::EBaseEncodings::Count][24] =
+    const tCIDLib::TCard1
+    aac1Decls[tCIDLib::c4EnumOrd(tCIDXML::EBaseEncodings::Count)][24] =
     {
             {
                 0x00, 0x00, 0x00, 0x3C, 0x00, 0x00, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x78
@@ -104,7 +106,7 @@ namespace CIDXML_EntitySpooler
         ,   {   0x3C, 0x3F, 0x78, 0x6D, 0x6C, 0x20 }
         ,   {   0x4C, 0x6F, 0xA7, 0x94, 0x93, 0x40 }
     };
-    const tCIDLib::TCard4 ac4DeclBytes[tCIDXML::EBaseEncodings::Count] =
+    const tCIDLib::TCard4 ac4DeclBytes[tCIDLib::c4EnumOrd(tCIDXML::EBaseEncodings::Count)] =
     {
         24, 12, 24, 12, 6, 6
     };
@@ -161,7 +163,7 @@ TXMLEntSpooler::eProbeBaseEncoding( const   tCIDLib::TCard1* const  pc1Buffer
     const tCIDLib::TCard1* pc1Cur = pc1Buffer;
 
     //
-    //  Check first for the Unicode BOM, in either orientation. We don't
+    //  Check first for the UTF-16 Unicode BOM, in either orientation. We don't
     //  have to have an XMLDecl for this one.
     //
     if ((pc1Cur[0] == 0xFE) && (pc1Cur[1] == 0xFF))
@@ -169,7 +171,18 @@ TXMLEntSpooler::eProbeBaseEncoding( const   tCIDLib::TCard1* const  pc1Buffer
      else if ((pc1Cur[0] == 0xFF) && (pc1Cur[1] == 0xFE))
         return tCIDXML::EBaseEncodings::UTF16_L;
 
-    // If there are less than a sequence's worht of  chars now, got to be UTF-8
+    // See if it's a UTF-8 BOM
+    if (c4Count > 3)
+    {
+        if ((pc1Cur[0] == 0xEF)
+        &&  (pc1Cur[1] == 0xBB)
+        &&  (pc1Cur[2] == 0xBF))
+        {
+            return tCIDXML::EBaseEncodings::UTF8;
+        }
+    }
+
+    // If there are less than a sequence's worth of  chars now, got to be UTF-8
     if (c4Count < CIDXML_EntitySpooler::c4SeqLen)
         return tCIDXML::EBaseEncodings::UTF8;
 
@@ -373,8 +386,7 @@ TXMLEntSpooler::TXMLEntSpooler( const   TString&                strSystemId
         {
             const tCIDXML::EBaseEncodings eBaseEncoding = eProbeBaseEncoding
             (
-                m_ac1RawBuf
-                , m_c4RawBufCount
+                m_ac1RawBuf, m_c4RawBufCount
             );
 
             //
@@ -1242,14 +1254,29 @@ TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
         if (m_c4RawBufCount < c4MyDeclBytes)
             return;
 
+        // Start of a source pointer at the star tof the raw buffer
+        const tCIDLib::TCard1* pc1Src = m_ac1RawBuf;
+
+        // Check for a UTF-8 BOM and skip it
+        m_c4RawBufInd = 0;
+        if (m_c4RawBufCount > 3)
+        {
+            if ((m_ac1RawBuf[0] == 0xEF)
+            &&  (m_ac1RawBuf[1] == 0xBB)
+            &&  (m_ac1RawBuf[2] == 0xBF))
+            {
+                pc1Src += 3;
+                m_c4RawBufInd += 3;
+            }
+        }
+
         // Check for the prefix to match. If not, then give up
-        if (TRawMem::bCompareMemBuf(pc1MyDecl, m_ac1RawBuf, c4MyDeclBytes))
+        if (TRawMem::bCompareMemBuf(pc1MyDecl, pc1Src, c4MyDeclBytes))
         {
             //
-            //  Now get an output pointer to the raw buffer. Also get a pointer
-            //  to the end of the raw buffer data.
+            //  Get a pointer to the end of the raw buffer data so we know when we
+            //  have hit the end.
             //
-            const tCIDLib::TCard1* pc1Src = m_ac1RawBuf;
             const tCIDLib::TCard1* pc1End = pc1Src + m_c4RawBufCount;
 
             //
@@ -1287,7 +1314,7 @@ TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
                 // Upcast the short char to a Unicode char, and bump the pointer
                 const tCIDLib::TCh chCur = static_cast<tCIDLib::TCh>(*pc1Src++);
 
-                // Looks ok, so store it and bump the raw bytes eaten index
+                // Looks ok, so store it
                 *pchOut++ = chCur;
 
                 // Break out when we hit the closing bracket
@@ -1295,9 +1322,13 @@ TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
                     break;
             }
 
-            // Updates the two indexes, they are the same value
+            //
+            //  Updates the two indexes, they are not the same potentially because
+            //  of the BOM. The raw buffer index may already be offset, so we just add
+            //  to it the number of chars we pulled out for the decl.
+            //
             m_c4CharBufCount = (pchOut - m_achCharBuf);
-            m_c4RawBufInd = m_c4CharBufCount;
+            m_c4RawBufInd += m_c4CharBufCount;
         }
     }
      else if ((eEncoding == tCIDXML::EBaseEncodings::UTF16_L)
@@ -1333,8 +1364,7 @@ TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
         const tCIDLib::TUniCh* puchSrc = reinterpret_cast<const tCIDLib::TUniCh*>(m_ac1RawBuf);
         const tCIDLib::TUniCh* puchEnd = tCIDLib::pOffsetPtr
         (
-            puchSrc
-            , m_c4RawBufCount
+            puchSrc, m_c4RawBufCount
         );
 
         // Look for a BOM and skip over it
