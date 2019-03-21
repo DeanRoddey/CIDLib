@@ -2315,3 +2315,21 @@ PROJECT=ORB1Samp
 
 END PROJECT
 
+
+PROJECT=Window1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Window1
+        DISPLAY     = GUI
+        MSGFILE     = No
+        RESFILE     = No
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
