@@ -71,8 +71,6 @@ class TVector : public TCollection<TElem>
                     , m_i4CurIndex(0)
                     , m_pcolCursoring(pcolToCursor)
                 {
-                    if (m_pcolCursoring->bIsEmpty())
-                        m_i4CurIndex = -1;
                 }
 
                 // We have to lock first, so we can't use member init!
