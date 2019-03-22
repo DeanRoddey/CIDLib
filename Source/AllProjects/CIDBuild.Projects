@@ -2335,3 +2335,21 @@ PROJECT=Window1
         CIDCtrls
     END DEPENDENTS
 END PROJECT
+
+PROJECT=Window2
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Window2
+        DISPLAY     = GUI
+        MSGFILE     = No
+        RESFILE     = No
+    END SETTINGS
+
+    PLATFORMS
+        Win32
+    END PLATFORMS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT

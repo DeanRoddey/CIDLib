@@ -99,6 +99,7 @@ TFacCIDGraphDev::TFacCIDGraphDev() :
     , rgbBlack(0,0,0)
     , rgbBlue(0, 0, 255)
     , rgbBrown(128, 128, 0)
+    , rgbCornflowerBlue(100, 149, 237)
     , rgbCyan(0, 255, 255)
     , rgbDarkBlue(0, 0, 128)
     , rgbDarkCyan(0, 128, 128)

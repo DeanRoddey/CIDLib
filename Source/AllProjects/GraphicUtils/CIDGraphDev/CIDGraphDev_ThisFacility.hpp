@@ -43,6 +43,7 @@ class CIDGRDEVEXP TFacCIDGraphDev : public TFacility
         const TRGBClr   rgbBlack;
         const TRGBClr   rgbBlue;
         const TRGBClr   rgbBrown;
+        const TRGBClr   rgbCornflowerBlue;
         const TRGBClr   rgbCyan;
         const TRGBClr   rgbDarkBlue;
         const TRGBClr   rgbDarkCyan;

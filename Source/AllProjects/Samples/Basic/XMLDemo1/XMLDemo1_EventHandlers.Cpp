@@ -45,7 +45,7 @@
 //  From MXMLDocEvents, so document content (as opposed to DTD content)
 // ---------------------------------------------------------------------------
 
-// Handle document character (element CDATA, not attribute CDATA) content
+// Handle document character. It may be CDATA type or regular text.
 tCIDLib::TVoid
 TFacXMLDemo1::DocCharacters(const   TString&            strChars
                             , const tCIDLib::TBoolean   bIsCDATA

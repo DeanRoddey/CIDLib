@@ -73,6 +73,8 @@ class TRefVector : public TRefCollection<TElem>
                     , m_i4CurIndex(0)
                     , m_pcolCursoring(pcolToCursor)
                 {
+                    if (pcolToCursor->bIsEmpty())
+                        m_i4CurIndex = -1;
                 }
 
                 // We have to lock first, so we can't use member init!
