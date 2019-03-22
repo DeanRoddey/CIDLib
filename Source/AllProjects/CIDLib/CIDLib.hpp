@@ -214,6 +214,7 @@ extern CIDLIBEXP TFacCIDLib& facCIDLib();
 #include    "CIDLib_RefStack.hpp"
 #include    "CIDLib_RefVector.hpp"
 
+#include    "CIDLib_ColAlgo.hpp"
 #include    "CIDLib_SystemInfo.hpp"
 #include    "CIDLib_PubSub2.hpp"
 #include    "CIDLib_GenCacheItem.hpp"

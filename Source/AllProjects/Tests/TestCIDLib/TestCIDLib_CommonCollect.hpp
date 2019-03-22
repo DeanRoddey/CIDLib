@@ -136,7 +136,7 @@ TestColCopy(TTextOutStream& strmOut, const TCol& colToTest)
     TCol colNew(colToTest);
 
     // Make sure that they are equal in both available ways
-    if (!tCIDLib::bCompareElems(colToTest, colNew, tCIDLib::bComp<TElem>))
+    if (!tCIDLib::bCompareElems(colToTest, colNew))
     {
         strmOut << CUR_LN
                 << L"bCompareCols failed for copied collection"

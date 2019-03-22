@@ -121,6 +121,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     // AddTest(new TTest_RefVectorMoveSem);
     AddTest(new TTest_VectorLambda);
     AddTest(new TTest_VectorMoveSem);
+    AddTest(new TTest_ColAlgo1);
 
     AddTest(new TTest_ColCursors);
 

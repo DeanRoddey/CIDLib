@@ -1322,11 +1322,11 @@ operator!=(const TRefCollection<TElem>& col1, const TRefCollection<TElem>& col2)
 //
 namespace tCIDLib
 {
-    template <typename TElem, typename TCompFunc>
+    template <typename TElem, typename TCompFunc = tCIDLib::TDefEqComp<TElem>>
     tCIDLib::TBoolean
     bCompareElems(  const   TCollection<TElem>& col1
                     , const TCollection<TElem>& col2
-                    ,       TCompFunc           pfnComp)
+                    ,       TCompFunc           pfnComp = tCIDLib::TDefEqComp<TElem>())
     {
         if (&col1 == &col2)
             return kCIDLib::True;

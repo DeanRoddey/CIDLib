@@ -391,8 +391,34 @@ namespace tCIDLib
 
 
     // Default equality comparator
-    template <typename T> tCIDLib::TBoolean bComp(const T& t1, const T& t2)
+    template <typename T> class TDefEqComp
     {
-        return t1 == t2;
-    }
+        public :
+            TDefEqComp() = default;
+            TDefEqComp(const TDefEqComp&) = default;
+            ~TDefEqComp() = default;
+
+            constexpr tCIDLib::TBoolean operator()(const T& t1, const T& t2) const
+            {
+                return t1 == t2;
+            }
+    };
+
+    // Default relative magnitude comparator
+    template <typename T> class TDefMagComp
+    {
+        public :
+            TDefMagComp() = default;
+            TDefMagComp(const TDefMagComp&) = default;
+            ~TDefMagComp() = default;
+
+            constexpr tCIDLib::ESortComps operator()(const T& t1, const T& t2) const
+            {
+                if (t1 < t2)
+                    return tCIDLib::ESortComps::FirstLess;
+                else if (t1 > t2)
+                    return tCIDLib::ESortComps::FirstGreater;
+                return tCIDLib::ESortComps::Equal;
+            }
+    };
 }
