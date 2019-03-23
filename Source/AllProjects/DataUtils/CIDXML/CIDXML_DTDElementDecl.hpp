@@ -169,7 +169,7 @@ class CIDXMLEXP TDTDElemDecl : public TXMLElemDecl
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid TDTDElemDecl::AddAttrDef
+        tCIDLib::TVoid AddAttrDef
         (
                     TDTDAttrDef* const      pxadToAdopt
         );

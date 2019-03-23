@@ -60,8 +60,8 @@ class CIDLIBEXP TFindBuf :
         // -------------------------------------------------------------------
         //  Class types
         // -------------------------------------------------------------------
-        using TCursor   = TBag<TFindBuf>::TCursor;
-        using TNCCursor = TBag<TFindBuf>::TNCCursor;
+        using TCursor   = TBasicDLinkedCol<TFindBuf>::TCursor;
+        using TNCCursor = TBasicDLinkedCol<TFindBuf>::TNCCursor;
 
 
         // -------------------------------------------------------------------

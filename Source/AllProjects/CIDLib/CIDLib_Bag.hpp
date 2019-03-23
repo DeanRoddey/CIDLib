@@ -37,13 +37,6 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Class types
-        // -------------------------------------------------------------------
-        using TCursor = TBasicDLinkedCol::TConstCursor<TElem>;
-        using TNCCursor = TBasicDLinkedCol::TNonConstCursor<TElem>;
-
-
-        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TBag(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :

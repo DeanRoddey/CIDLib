@@ -626,7 +626,7 @@ TBinInStream::CheckForMarker(const  tCIDLib::EStreamMarkers eMarker
 
     if (eActual != eMarker)
     {
-        tCIDLib::TCh* pszMarker = nullptr;
+        const tCIDLib::TCh* pszMarker = nullptr;
         if (eMarker == tCIDLib::EStreamMarkers::TypeName)
             pszMarker = L"TypeName";
         else if (eMarker == tCIDLib::EStreamMarkers::EndObject)

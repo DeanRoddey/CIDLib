@@ -74,7 +74,7 @@ class CIDLIBEXP TEnumMap
             tCIDLib::TInt4      m_i4Value;
             tCIDLib::TInt4      m_i4AltNumVal;
             tCIDLib::TMsgId     m_midLoad;
-            TString             m_astrTextVals[ETextVals::Count];
+            TString             m_astrTextVals[tCIDLib::c4EnumOrd(ETextVals::Count)];
         };
 
 

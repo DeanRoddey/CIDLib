@@ -180,7 +180,7 @@ namespace CIDLib_Type
     );
 
 
-    static const tCIDLib::TMsgId amidHJustifications[tCIDLib::EHJustify::Count] =
+    static const tCIDLib::TMsgId amidHJustifications[tCIDLib::c4EnumOrd(tCIDLib::EHJustify::Count)] =
     {
         kCIDMsgs::midGen_Left
         , kCIDMsgs::midGen_Right
@@ -256,7 +256,7 @@ namespace CIDLib_Type
         apszLogFlagVals
     );
 
-    static const tCIDLib::TMsgId amidLanguages[tCIDLib::ELanguages::Count] =
+    static const tCIDLib::TMsgId amidLanguages[tCIDLib::c4EnumOrd(tCIDLib::ELanguages::Count)] =
     {
         kCIDMsgs::midLang_Afrikaans
         , kCIDMsgs::midLang_Albanian
@@ -332,7 +332,7 @@ namespace CIDLib_Type
         apszSeverVals
     );
 
-    const tCIDLib::TMsgId amidVJustifications[tCIDLib::EVJustify::Count] =
+    const tCIDLib::TMsgId amidVJustifications[tCIDLib::c4EnumOrd(tCIDLib::EVJustify::Count)] =
     {
         kCIDMsgs::midGen_Bottom
         , kCIDMsgs::midGen_Center

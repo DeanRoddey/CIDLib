@@ -55,7 +55,7 @@ class CIDXMLEXP TXMLAttrDef : public TObject
         // -------------------------------------------------------------------
         //  Class types
         // -------------------------------------------------------------------
-        using TCursor = TBag<TString>::TCursor;
+        using TCursor = TBasicDLinkedCol<TString>::TCursor;
 
 
         // -------------------------------------------------------------------

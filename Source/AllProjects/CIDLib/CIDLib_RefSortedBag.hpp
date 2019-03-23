@@ -108,7 +108,7 @@ template <typename TElem> class TRefSortedBag : public TRefBag<TElem>
             //  than if descending) the new object. We then insert the new
             //  element before it.
             //
-            TParent::TCursor cursAdd(this);
+            TBasicDLinkedRefCol<TElem>::TCursor cursAdd(this);
             while (cursAdd)
             {
                 if (m_eDir == tCIDLib::ESortDirs::Ascending)

@@ -39,13 +39,6 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Class types
-        // -------------------------------------------------------------------
-        using TCursor   = TBasicDLinkedCol::TConstCursor<TElem>;
-        using TNCCursor = TBasicDLinkedCol::TNonConstCursor<TElem>;
-
-
-        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TStack(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :

@@ -134,7 +134,7 @@ class CIDNETEXP TEmailMsg : public TObject
         // -------------------------------------------------------------------
         //  Public class types and constants
         // -------------------------------------------------------------------
-        using TCursor = TBag<TString>::TCursor;
+        using TCursor = TBasicDLinkedCol<TString>::TCursor;
         static const tCIDLib::TCard4    c4MaxAttachements = 64;
 
 

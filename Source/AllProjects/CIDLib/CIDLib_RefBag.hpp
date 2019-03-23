@@ -38,13 +38,6 @@ template <class TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Class types
-        // -------------------------------------------------------------------
-        using TCursor   = TBasicDLinkedRefCol::TConstCursor<TElem>;
-        using TNCCursor = TBasicDLinkedRefCol::TNonConstCursor<TElem>;
-
-
-        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TRefBag() = delete;

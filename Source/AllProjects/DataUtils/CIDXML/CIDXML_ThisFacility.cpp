@@ -135,7 +135,7 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszInText
     {
         const tCIDLib::TCh chCur = pszInText[c4Index];
 
-        tCIDLib::TCh* pszEsc = 0;
+        const tCIDLib::TCh* pszEsc = nullptr;
         switch(eType)
         {
             case tCIDXML::EEscTypes::Attribute :
@@ -195,7 +195,7 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh        chInText
                         ,       TTextOutStream&     strmOut
                         , const tCIDXML::EEscTypes  eType)
 {
-    tCIDLib::TCh* pszEsc = 0;
+    const tCIDLib::TCh* pszEsc = nullptr;
     switch(eType)
     {
         case tCIDXML::EEscTypes::Attribute :

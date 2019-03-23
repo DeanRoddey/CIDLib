@@ -38,13 +38,6 @@ template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Class types
-        // -------------------------------------------------------------------
-        using TCursor = TBasicDLinkedCol::TConstCursor<TElem>;
-        using TNCCursor = TBasicDLinkedCol::TNonConstCursor<TElem>;
-
-
-        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TDeque(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :

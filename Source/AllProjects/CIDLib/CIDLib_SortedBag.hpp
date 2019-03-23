@@ -116,7 +116,7 @@ template <typename TElem> class TSortedBag : public TBag<TElem>
             //  the new element against a bunch of elements in the list that
             //  are equal.
             //
-            typename TParent::TCursor cursAdd(this);
+            typename TBasicDLinkedCol<TElem>::TCursor cursAdd(this);
             while (cursAdd)
             {
                 if (m_eDir == tCIDLib::ESortDirs::Ascending)
