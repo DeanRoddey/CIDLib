@@ -39,24 +39,5 @@
 //  Bring in any underlying headers we only need internally
 // ---------------------------------------------------------------------------
 #include    "CIDCrypto.hpp"
-
 #include    "CIDEncode.hpp"
-
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities types namespace. It contains non-class types
-//  for use within the facility.
-// ---------------------------------------------------------------------------
-namespace tCIDNet_
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities constants namespace.
-// ---------------------------------------------------------------------------
-namespace kCIDNet_
-{
-}
 

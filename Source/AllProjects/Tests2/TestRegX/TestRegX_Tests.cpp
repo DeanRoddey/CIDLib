@@ -51,14 +51,14 @@ RTTIDecls(TTest_RepAll,TTestFWTest)
 enum EMatchTypes { EPart, EFull };
 struct TTestEntry
 {
-    tCIDLib::TCard1     c1ShouldMatch;
-    tCIDLib::TCard1     c1OnlyAtStart;
-    EMatchTypes         eType;
-    tCIDLib::TCard4     c4StartAt;
-    tCIDLib::TCard4     c4ShouldMatchAt;
-    tCIDLib::TCard4     c4ExpectedLen;
-    tCIDLib::TCh*       pszPattern;
-    tCIDLib::TCh*       pszToSearch;
+    tCIDLib::TCard1         c1ShouldMatch;
+    tCIDLib::TCard1         c1OnlyAtStart;
+    EMatchTypes             eType;
+    tCIDLib::TCard4         c4StartAt;
+    tCIDLib::TCard4         c4ShouldMatchAt;
+    tCIDLib::TCard4         c4ExpectedLen;
+    const tCIDLib::TCh*     pszPattern;
+    const tCIDLib::TCh*     pszToSearch;
 };
 
 

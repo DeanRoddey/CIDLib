@@ -298,7 +298,7 @@ namespace kCIDZLib_
         tCIDZLib_::ECompFuncs   eFunc;
     };
 
-    const StratInfo aStratTable[tCIDZLib::ECompLevels::Count] =
+    const StratInfo aStratTable[tCIDLib::c4EnumOrd(tCIDZLib::ECompLevels::Count)] =
     {
         {  0,    0,   0,    0, tCIDZLib_::ECompFuncs::Store }
       , {  4,    4,   8,    4, tCIDZLib_::ECompFuncs::Fast }

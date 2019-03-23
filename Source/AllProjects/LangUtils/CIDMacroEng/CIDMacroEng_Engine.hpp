@@ -165,7 +165,7 @@ class CIDMACROENGEXP TCIDMacroEngine : public TObject
             , const tCIDLib::TBoolean       bCheckType = kCIDLib::False
         )   const;
 
-        tCIDLib::TBoolean TCIDMacroEngine::bValidation() const
+        tCIDLib::TBoolean bValidation() const
         {
             return m_bValidation;
         }

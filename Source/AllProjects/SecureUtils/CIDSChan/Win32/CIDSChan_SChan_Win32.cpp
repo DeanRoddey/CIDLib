@@ -665,7 +665,7 @@ TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
     tCIDLib::TCard4 c4TokenSize = 0;
     {
         PSecPkgInfoW pkgInfo;
-        Status = ::QuerySecurityPackageInfoW(L"schannel", &pkgInfo);
+        Status = ::QuerySecurityPackageInfoW((LPWSTR)L"schannel", &pkgInfo);
         if (Status < 0)
         {
             facCIDSChan().ThrowErr
@@ -1173,10 +1173,10 @@ TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
         }
 
         // And try to aquire a credentials handle
-        SECURITY_STATUS Status = ::AcquireCredentialsHandle
+        SECURITY_STATUS Status = ::AcquireCredentialsHandleW
         (
             NULL
-            , UNISP_NAME
+            , (LPWSTR)UNISP_NAME
             , dwAcquireFlags
             , NULL
             , &SCCred
@@ -1331,7 +1331,7 @@ TSChannel::SrvNegotiate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd
     tCIDLib::TCard4 c4TokenSize = 0;
     {
         PSecPkgInfoW pkgInfo;
-        Status = ::QuerySecurityPackageInfoW(L"schannel", &pkgInfo);
+        Status = ::QuerySecurityPackageInfoW((LPWSTR)L"schannel", &pkgInfo);
         if (Status < 0)
         {
             facCIDSChan().ThrowErr

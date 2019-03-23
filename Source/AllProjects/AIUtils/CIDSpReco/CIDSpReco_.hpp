@@ -33,34 +33,17 @@
 #include    "CIDSpReco.hpp"
 #include    <windows.h>
 
-__pragma(warning(push))
-__pragma(warning(disable: 4996))
+#pragma warning(push)
+#pragma warning(disable: 4996)
 #include    <sphelper.h>
-__pragma(warning(pop))
+#pragma warning(pop)
 
 
 // ---------------------------------------------------------------------------
 //  Bring in any underlying headers we only need internally
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_InternalHelpers_.hpp"
-
 #include    "CIDXML.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  Internal types namespace
-// ---------------------------------------------------------------------------
-namespace tCIDSpReco_
-{
-};
-
-
-// ---------------------------------------------------------------------------
-//  Internal constants namespace
-// ---------------------------------------------------------------------------
-namespace kCIDSpReco_
-{
-};
 
 
 // ---------------------------------------------------------------------------

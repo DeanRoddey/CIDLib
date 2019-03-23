@@ -37,12 +37,12 @@
 // -----------------------------------------------------------------------------
 //  Local static data
 // -----------------------------------------------------------------------------
-static tCIDLib::TCh* szTestText1 =
+static const tCIDLib::TCh* szTestText1 =
 {
     L"1234567890"
 };
 
-static tCIDLib::TCh* szTestText2 =
+static const tCIDLib::TCh* szTestText2 =
 {
     L"Frapit, scand'lous moppet. Freezing wonder, plunders, blunders "
     L"and thunderous flop. Flowing poets, mowed low by bullets. Singing "
@@ -52,7 +52,7 @@ static tCIDLib::TCh* szTestText2 =
     L"Who reigns, games with sane names never lied to lowered truth."
 };
 
-static tCIDLib::TCh* szTestText3 =
+static const tCIDLib::TCh* szTestText3 =
 {
     L"This is line #1\n"
     L"This is line #2\n"

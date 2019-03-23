@@ -243,8 +243,8 @@ TTest_URLParse::eRunTest(TTextStringOutStream&  strmOut
     {
         struct TURLTest
         {
-            tCIDLib::TCh*   pszRelative;
-            tCIDLib::TCh*   pszResult;
+            const tCIDLib::TCh* const   pszRelative;
+            const tCIDLib::TCh* const   pszResult;
         };
 
         TURLTest aTests[] =

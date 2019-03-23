@@ -74,8 +74,8 @@ TTest_PathValidation::eRunTest(  TTextStringOutStream&   strmOut
     //
     struct TestInfo
     {
-        tCIDLib::TCh* const     pszPath;
-        tCIDLib::TBoolean       bShouldPass;
+        const tCIDLib::TCh* const   pszPath;
+        tCIDLib::TBoolean           bShouldPass;
     };
 
     const TestInfo aTests[] =
@@ -166,10 +166,10 @@ TTest_NumConstProbe::eRunTest(  TTextStringOutStream&   strmOut
     //
     struct TestInfo
     {
-        tCIDLib::TCh* const     pszVal;
-        tCIDMacroEng::ENumTypes    eExpType;
-        tCIDLib::TInt4          i4Radix;
-        tCIDLib::TBoolean       bExplicitSuff;
+        const tCIDLib::TCh* const   pszVal;
+        tCIDMacroEng::ENumTypes     eExpType;
+        tCIDLib::TInt4              i4Radix;
+        tCIDLib::TBoolean           bExplicitSuff;
     };
 
     // These are positive tests and should pass

@@ -36,7 +36,7 @@
 // ---------------------------------------------------------------------------
 //  The edge anchors enumeration
 // ---------------------------------------------------------------------------
-static const TString astrEEdgeAnchorsVals[tCIDCtrls::EEdgeAnchors::Count] =
+static const TString astrEEdgeAnchorsVals[tCIDLib::c4EnumOrd(tCIDCtrls::EEdgeAnchors::Count)] =
 {
     L"None"
     , L"MoveBottom"
@@ -76,7 +76,7 @@ const TString& tCIDCtrls::strLoadEEdgeAnchors(const tCIDCtrls::EEdgeAnchors eToX
 // ---------------------------------------------------------------------------
 //  The window themes enumeration
 // ---------------------------------------------------------------------------
-static const TString astrEWndThemesVals[tCIDCtrls::EWndThemes::Count] =
+static const TString astrEWndThemesVals[tCIDLib::c4EnumOrd(tCIDCtrls::EWndThemes::Count)] =
 {
     L"None"
     , L"MainWnd"

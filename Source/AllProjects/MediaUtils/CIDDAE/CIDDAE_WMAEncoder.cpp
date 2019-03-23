@@ -264,11 +264,11 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
         pStreamCfg2->Release();
     }
 
-    hRes = pStreamCfg->SetStreamName(L"Audio Stream");
+    hRes = pStreamCfg->SetStreamName((WCHAR*)L"Audio Stream");
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_SetStreamName, hRes, CID_LINE);
 
-    hRes = pStreamCfg->SetConnectionName(L"Audio");
+    hRes = pStreamCfg->SetConnectionName((WCHAR*)L"Audio");
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_SetConnectionName, hRes, CID_LINE);
 

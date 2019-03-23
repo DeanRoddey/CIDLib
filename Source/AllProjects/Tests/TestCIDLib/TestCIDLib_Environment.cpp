@@ -57,7 +57,7 @@ static tCIDLib::TVoid BasicProcEnvTest(TTextOutStream& strmOut)
     //
     //  We start by looking for some values that we know should be there.
     //
-    tCIDLib::TCh* apszToFind[] =
+    const tCIDLib::TCh* apszToFind[] =
     {
         L"Path"
         , L"CID_DRIVE"
@@ -204,7 +204,7 @@ static tCIDLib::TVoid ProcEnvTest2(TTextOutStream& strmOut)
 
 static tCIDLib::TVoid BasicEnvTest(TTextOutStream& strmOut)
 {
-    static tCIDLib::TCh* apszKeys[] =
+    static const tCIDLib::TCh* apszKeys[] =
     {
         L"Jimi_Hendrix"
         , L"Janis_Joplin"
@@ -213,7 +213,7 @@ static tCIDLib::TVoid BasicEnvTest(TTextOutStream& strmOut)
         , L"John_Lennnon"
     };
 
-    static tCIDLib::TCh* apszValues[] =
+    static const tCIDLib::TCh* apszValues[] =
     {
         L"Greatest blues rock guitarist"
         , L"A white chick what can sang"

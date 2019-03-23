@@ -471,7 +471,7 @@ TTreeView::AddItem( const   TString&        strParPath
     TTreeMapItem* ptmiPar = ptmiFromPath(strParPath, kCIDLib::True, c4At);
 
     // And now add a a first value
-    TVINSERTSTRUCT Insert = {0};
+    TVINSERTSTRUCTW Insert = {0};
 
     Insert.hParent = (HTREEITEM)ptmiPar->m_hItem;
     Insert.hInsertAfter = TVI_SORT;
@@ -533,7 +533,7 @@ TTreeView::AddScope(const   TString&            strParPath
     tCIDLib::TCard4 c4At;
     TTreeMapItem* ptmiPar = ptmiFromPath(strParPath, kCIDLib::True, c4At);
 
-    TVINSERTSTRUCT Insert = {0};
+    TVINSERTSTRUCTW Insert = {0};
 
     Insert.hParent = (HTREEITEM)ptmiPar->m_hItem;
     Insert.hInsertAfter = TVI_SORT;
@@ -1032,7 +1032,7 @@ TTreeView::Create(  const   TWindow&                wndParent
     CreateWnd
     (
         wndParent.hwndThis()
-        , WC_TREEVIEW
+        , WC_TREEVIEWW
         , kCIDLib::pszEmptyZStr
         , areaInit
         , eStyles | tCIDCtrls::EWndStyles(c4Styles)
@@ -1358,10 +1358,10 @@ tCIDLib::TVoid TTreeView::Reset(const tCIDLib::TBoolean bVirtual)
     m_pcolMap->RemoveAll();
 
     // And now add a a first value
-    TVINSERTSTRUCT Insert = {0};
+    TVINSERTSTRUCTW Insert = {0};
 
     Insert.itemex.mask = TVIF_TEXT;
-    Insert.itemex.pszText = L"/";
+    Insert.itemex.pszText = (LPWSTR)L"/";
     Insert.itemex.iIntegral = 1;
 
     if (bVirtual)
@@ -1727,7 +1727,7 @@ TTreeView::UpdateItem(  const   TString&    strParPath
     m_pcolMap->Add(ptmiPar);
 
     // And update the display text
-    TVITEM Item = {0};
+    TVITEMW Item = {0};
     Item.mask = TVIF_TEXT | TVIF_HANDLE;
     Item.hItem = (HTREEITEM)ptmiPar->m_hItem;
     Item.pszText = (LPWSTR)strNewText.pszBuffer();

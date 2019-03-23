@@ -1024,7 +1024,7 @@ class TSimplePoolPtr : public TSimplePoolPtrBase<typename TElem>
         // -------------------------------------------------------------------
         TSimplePoolPtr& operator=(const TSimplePoolPtr& spptrSrc)
         {
-            TSimplePoolPtrBase::operator=(spptrSrc);
+            TSimplePoolPtrBase<TElem>::operator=(spptrSrc);
             return *this;
         }
 };

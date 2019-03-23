@@ -156,7 +156,7 @@ class TObjListTab : public TTabWindow, public MIPEIntf
             , const TMEngClassVal&          mecvVal
         );
 
-        tCIDLib::TVoid TObjListTab::InlineEdit
+        tCIDLib::TVoid InlineEdit
         (
             const   tCIDLib::TCard4         c4RowInd
             , const TMEngClassVal&          mecvVal

@@ -53,7 +53,7 @@ const TString& tCIDComm::strXlatEDataBits(const tCIDComm::EDataBits eToXlat)
         );
     }
 
-    static const TString* apstrValues[tCIDComm::EDataBits::Count];
+    static const TString* apstrValues[tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Count)];
     if (!apstrValues[0])
     {
         TBaseLock lockInit;

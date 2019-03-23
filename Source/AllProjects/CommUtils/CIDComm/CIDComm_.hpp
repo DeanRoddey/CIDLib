@@ -36,21 +36,3 @@
 #include    "CIDComm_Port_.hpp"
 #include    "CIDComm_LocalPortFactory_.hpp"
 
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities types namespace. It contains non-class types
-//  for use within the facility.
-// ---------------------------------------------------------------------------
-namespace tCIDComm_
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities constants namespace.
-// ---------------------------------------------------------------------------
-namespace kCIDComm_
-{
-}
-

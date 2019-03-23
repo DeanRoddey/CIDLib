@@ -25,7 +25,7 @@
 //  $_CIDLib_Log_$
 //
 
-TMapItem aitemMap[tCIDMacroEng::ETokens::Count] =
+TMapItem aitemMap[tCIDLib::c4EnumOrd(tCIDMacroEng::ETokens::Count)] =
 {
         { L"Abstract"           , 0 , tCIDMacroEng::ETokens::Abstract        }
     ,   { L"ArrayOf"            , 0 , tCIDMacroEng::ETokens::ArrayOf         }
