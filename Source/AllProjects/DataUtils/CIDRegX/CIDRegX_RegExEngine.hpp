@@ -61,7 +61,15 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
             const   tCIDLib::TCh* const     pszExpression
         );
 
+        TRegEx(const TRegEx&) = delete;
+
         ~TRegEx();
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TRegEx& operator=(const TRegEx&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -146,13 +154,6 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
 
 
     private :
-        // --------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // --------------------------------------------------------------------
-        TRegEx(const TRegEx&);
-        tCIDLib::TVoid operator=(const TRegEx&);
-
-
         // --------------------------------------------------------------------
         //  Private, non-virtual methods
         // --------------------------------------------------------------------

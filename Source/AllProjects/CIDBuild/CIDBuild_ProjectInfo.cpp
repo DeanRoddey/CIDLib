@@ -99,12 +99,10 @@ TBldStr& TProjFileCopy::strOutPath(const TBldStr& strToSet)
 TProjectInfo::TProjectInfo(const TBldStr& strName) :
 
     m_bIsSample(kCIDLib::False)
-    , m_bIncrementalLink(kCIDLib::True)
-    , m_bMinimalRebuild(kCIDLib::True)
     , m_bMsgFile(kCIDLib::False)
     , m_bNeedsAdminPrivs(kCIDLib::False)
     , m_bPlatformDir(kCIDLib::False)
-    , m_bPureANSI(kCIDLib::True)
+    , m_bPlatformInclude(kCIDLib::False)
     , m_bResFile(kCIDLib::False)
     , m_bUseSysLibs(kCIDLib::False)
     , m_bVarArgs(kCIDLib::False)
@@ -165,6 +163,7 @@ tCIDLib::TBoolean TProjectInfo::bHasMsgFile() const
     return m_bMsgFile;
 }
 
+
 tCIDLib::TBoolean TProjectInfo::bHasResFile() const
 {
     return m_bResFile;
@@ -173,11 +172,6 @@ tCIDLib::TBoolean TProjectInfo::bHasResFile() const
 tCIDLib::TBoolean TProjectInfo::bIsSample() const
 {
     return m_bIsSample;
-}
-
-tCIDLib::TBoolean TProjectInfo::bIncrementalLink() const
-{
-    return m_bIncrementalLink;
 }
 
 
@@ -195,11 +189,6 @@ tCIDLib::TBoolean TProjectInfo::bMakeOutDir() const
     return kCIDLib::True;
 }
 
-tCIDLib::TBoolean TProjectInfo::bMinimalRebuild() const
-{
-    return m_bMinimalRebuild;
-}
-
 tCIDLib::TBoolean TProjectInfo::bNeedsAdminPrivs() const
 {
     return m_bNeedsAdminPrivs;
@@ -210,27 +199,35 @@ tCIDLib::TBoolean TProjectInfo::bPlatformDir() const
     return m_bPlatformDir;
 }
 
-tCIDLib::TBoolean TProjectInfo::bPureANSI() const
-{
-    return m_bPureANSI;
-}
-
 
 tCIDLib::TBoolean
 TProjectInfo::bSupportsPlatform(const TBldStr& strToCheck) const
 {
-    // Search the project list for this one. If its empty, just say yes
+    //
+    //  If m_bPlatformInclude is true, we see if this project is in our list.
+    //  Else we see if it not in our list.
+    //
+    tCIDLib::TBoolean bInList = kCIDLib::False;
+
     TList<TBldStr>::TCursor cursPlatforms(&m_listPlatforms);
-    if (!cursPlatforms.bResetIter())
-        return kCIDLib::True;
-
-    do
+    if (cursPlatforms.bResetIter())
     {
-        if (cursPlatforms.tCurElement().bIEquals(strToCheck))
-            return kCIDLib::True;
+        do
+        {
+            if (cursPlatforms.tCurElement().bIEquals(strToCheck))
+            {
+                bInList = kCIDLib::True;
+                break;
+            }
+        }   while (cursPlatforms.bNext());
+    }
 
-    }   while (cursPlatforms.bNext());
-    return kCIDLib::False;
+    //
+    //  If the flags are equal, taht means that either in the list and we are in
+    //  include mode, or not in the list and we are in ignore mode, so either is
+    //  what we are looking for.
+    //
+    return (bInList == m_bPlatformInclude);
 }
 
 
@@ -316,7 +313,6 @@ tCIDLib::TVoid TProjectInfo::DumpSettings() const
             << L"    Platform Dir: " << (m_bPlatformDir ? L"Yes\n" : L"No\n")
             << L"    Use Sys Libs: " << (m_bUseSysLibs ? L"Yes\n" : L"No\n")
             << L"        Var Args: " << (m_bVarArgs ? L"Yes\n" : L"No\n")
-            << L"       Pure ANSI: " << (m_bPureANSI ? L"Yes\n" : L"No\n")
             << L"        RTL Mode: " << m_eRTLMode << L"\n"
             << L"          Sample: " << (m_bIsSample ? L"Yes\n" : L"No\n");
 
@@ -461,6 +457,46 @@ tCIDLib::TVoid TProjectInfo::LoadFileLists()
 }
 
 
+// Used by per-platform tools drivers to check for
+const TKeyValuePair*
+TProjectInfo::pkvpFindPlatOpt(const TBldStr& strPlatform, const TBldStr& strOption) const
+{
+    //
+    //  Loop through the list of lists. The key of the first entry in each one is
+    //  platform name.
+    //
+    TPlatOptList::TCursor cursPlatOpts(&m_listPlatOpts);
+    if (!cursPlatOpts.bResetIter())
+        return nullptr;
+
+    do
+    {
+        TKVPList::TCursor cursPlat(&cursPlatOpts.tCurElement());
+        if (cursPlat.bResetIter())
+        {
+            if (cursPlat->strKey().bIEquals(strPlatform))
+            {
+                //
+                // This is the right platform, so check it's entries, move past the first one
+                //  before we start.
+                //
+                if (!cursPlat.bNext())
+                    break;
+
+                do
+                {
+                    if (cursPlat->strKey().bIEquals(strOption))
+                        return &cursPlat.tCurElement();
+                }   while (cursPlat.bNext());
+            }
+        }
+    }   while (cursPlatOpts.bNext());
+
+    return nullptr;
+}
+
+
+// This is called to let us parse our contents out of the project definition file
 tCIDLib::TVoid TProjectInfo::ParseContent(TLineSpooler& lsplSource)
 {
     //
@@ -468,6 +504,7 @@ tCIDLib::TVoid TProjectInfo::ParseContent(TLineSpooler& lsplSource)
     //  we find the major sections here and then pass them off to private
     //  methods to deal with the details.
     //
+    tCIDLib::TBoolean bSeenPlats = kCIDLib::False;
     tCIDLib::TBoolean bDone = kCIDLib::False;
     TBldStr             strReadBuf;
     while (!bDone)
@@ -493,6 +530,20 @@ tCIDLib::TVoid TProjectInfo::ParseContent(TLineSpooler& lsplSource)
         {
             ParseDefines(lsplSource);
         }
+         else if (strReadBuf == L"EXCLUDEPLATS")
+        {
+            if (bSeenPlats)
+            {
+                stdOut  << L"(Line " << lsplSource.c4CurLine()
+                        << L") Only one of include/exclude platforms can be used"
+                        << kCIDBuild::EndLn;
+                throw tCIDBuild::EErrors::UnexpectedEOF;
+            }
+
+            bSeenPlats = kCIDLib::True;
+            m_bPlatformInclude = kCIDLib::False;
+            ParsePlatforms(lsplSource);
+        }
          else if (strReadBuf == L"EXTLIBS")
         {
             ParseExtLibs(lsplSource);
@@ -505,8 +556,17 @@ tCIDLib::TVoid TProjectInfo::ParseContent(TLineSpooler& lsplSource)
         {
             ParseIncludePaths(lsplSource);
         }
-         else if (strReadBuf == L"PLATFORMS")
+         else if (strReadBuf == L"INCLUDEPLATS")
         {
+            if (bSeenPlats)
+            {
+                stdOut  << L"(Line " << lsplSource.c4CurLine()
+                        << L") Only one of include/exclude platforms can be used"
+                        << kCIDBuild::EndLn;
+                throw tCIDBuild::EErrors::UnexpectedEOF;
+            }
+
+            m_bPlatformInclude = kCIDLib::True;
             ParsePlatforms(lsplSource);
         }
          else if (strReadBuf == L"END PROJECT")
@@ -531,6 +591,10 @@ tCIDLib::TVoid TProjectInfo::ParseContent(TLineSpooler& lsplSource)
                 strReadBuf.StripWhitespace();
             }
             ParseFileCopies(lsplSource, strReadBuf);
+        }
+         else if (strReadBuf == L"PLATFORMOPTS")
+        {
+            ParsePlatOpts(lsplSource);
         }
          else
         {
@@ -719,11 +783,6 @@ TProjectInfo::bSetSetting(const TBldStr& strName, const TBldStr& strValue)
         else
             return kCIDLib::False;
     }
-     else if (strName == L"INCLINK")
-    {
-        if (!TRawStr::bXlatBoolean(strValue.pszBuffer(), m_bIncrementalLink))
-            return kCIDLib::False;
-    }
      else if (strName == L"EXPORT")
     {
         m_strExportKeyword = strValue;
@@ -760,11 +819,6 @@ TProjectInfo::bSetSetting(const TBldStr& strName, const TBldStr& strValue)
             return kCIDLib::False;
         }
     }
-     else if (strName == L"MINREBUILD")
-    {
-        if (!TRawStr::bXlatBoolean(strValue.pszBuffer(), m_bMinimalRebuild))
-            return kCIDLib::False;
-    }
      else if (strName == L"ADMINPRIVS")
     {
         if (!TRawStr::bXlatBoolean(strValue.pszBuffer(), m_bNeedsAdminPrivs))
@@ -773,11 +827,6 @@ TProjectInfo::bSetSetting(const TBldStr& strName, const TBldStr& strValue)
      else if (strName == L"PLATFORMDIR")
     {
         if (!TRawStr::bXlatBoolean(strValue.pszBuffer(), m_bPlatformDir))
-            return kCIDLib::False;
-    }
-     else if (strName == L"PUREANSI")
-    {
-        if (!TRawStr::bXlatBoolean(strValue.pszBuffer(), m_bPureANSI))
             return kCIDLib::False;
     }
      else if (strName == L"RTL")
@@ -1142,16 +1191,95 @@ tCIDLib::TVoid TProjectInfo::ParsePlatforms(TLineSpooler& lsplSource)
         if (!lsplSource.bReadLine(strReadBuf))
         {
             stdOut  << L"(Line " << lsplSource.c4CurLine()
-                    << L") Expected 'platform name' or END PLATFORMS"
+                    << L") Expected 'platform name' or end of platforms"
                     << kCIDBuild::EndLn;
             throw tCIDBuild::EErrors::UnexpectedEOF;
         }
 
-        if (strReadBuf == L"END PLATFORMS")
+        if (((strReadBuf == L"END INCLUDEPLATS") && m_bPlatformInclude)
+        ||  ((strReadBuf == L"END EXPLUDEPLATS") && !m_bPlatformInclude))
+        {
             break;
+        }
 
         // Have to assume its the name of a support platform
         m_listPlatforms.Add(new TBldStr(strReadBuf));
+    }
+}
+
+
+tCIDLib::TVoid TProjectInfo::ParsePlatOpts(TLineSpooler& lsplSource)
+{
+    TBldStr strOptName;
+    TBldStr strOptValue;
+    TBldStr strPlatName;
+    TBldStr strReadBuf;
+    while (kCIDLib::True)
+    {
+        // Get the next line. If end of file, that's an error here
+        if (!lsplSource.bReadLine(strReadBuf))
+        {
+            stdOut  << L"(Line " << lsplSource.c4CurLine()
+                    << L") Expected END PLATFORMOPTS or PLATFORM="
+                    << kCIDBuild::EndLn;
+            throw tCIDBuild::EErrors::UnexpectedEOF;
+        }
+
+        if (strReadBuf == L"END PLATFORMOPTS")
+        {
+            break;
+        }
+
+        // It should start with PLATFORM= and the platform name
+        if (!strReadBuf.bStartsWith(L"PLATFORM="))
+        {
+            stdOut  << L"(Line " << lsplSource.c4CurLine()
+                    << L") Expected END PLATFORMOPTS or PLATFORM="
+                    << kCIDBuild::EndLn;
+            throw tCIDBuild::EErrors::FileFormat;
+        }
+
+        // Next should be the platform name so get that out
+        strPlatName = strReadBuf;
+        strPlatName.Cut(9);
+
+        //
+        //  Add a new list for this platform and a first entry with the key being
+        //  the platform name.
+        //
+        TKVPList* plistNew = new TKVPList();
+        plistNew->Add(new TKeyValuePair(strPlatName, L""));
+        m_listPlatOpts.Add(plistNew);
+
+        //
+        //  Now we loop till we see the end of this block, pulling out lines
+        //  each of which is either a value or a key=value pair.
+        //
+        while (kCIDLib::True)
+        {
+            // Get the next line. If end of file, that's an error here
+            if (!lsplSource.bReadLine(strReadBuf))
+            {
+                stdOut  << L"(Line " << lsplSource.c4CurLine()
+                        << L") Expected END PLATFORM or a platform option="
+                        << kCIDBuild::EndLn;
+                throw tCIDBuild::EErrors::UnexpectedEOF;
+            }
+
+            if (strReadBuf == L"END PLATFORM")
+                break;
+
+            // It has to be in our standard key=value format
+            if (!TUtils::bFindNVParts(strReadBuf, strOptName, strOptValue))
+            {
+                stdOut  << L"(Line " << lsplSource.c4CurLine()
+                        << L") Badly formed platform option statement" << kCIDBuild::EndLn;
+                throw tCIDBuild::EErrors::FileFormat;
+            }
+
+            // Add a new pair for this guy
+            plistNew->Add(new TKeyValuePair(strOptName, strOptValue));
+        }
     }
 }
 
@@ -1180,7 +1308,6 @@ tCIDLib::TVoid TProjectInfo::ParseSettings(TLineSpooler& lsplSource)
         //  recognize it. We use a utility function that will find the
         //  name/value parts of a string divided by an '=' sign.
         //
-
         if (!TUtils::bFindNVParts(strReadBuf, strName, strValue))
         {
             stdOut  << L"(Line " << lsplSource.c4CurLine()

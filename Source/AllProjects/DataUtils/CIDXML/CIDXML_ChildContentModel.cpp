@@ -218,12 +218,12 @@ TXMLChildCM::TXMLChildCM(TXMLCMSpecNode* const pxcsnToAdopt) :
     , m_c4EOCPosition(0)
     , m_c4LeafCount(0)
     , m_c4TransTableSize(0)
-    , m_ppc4TransTable(0)
-    , m_pbFinalFlags(0)
-    , m_pbtsFollowLists(0)
-    , m_pc4ElemList(0)
-    , m_pxcmnLeaves(0)
-    , m_pxcmnRoot(0)
+    , m_ppc4TransTable(nullptr)
+    , m_pbFinalFlags(nullptr)
+    , m_pbtsFollowLists(nullptr)
+    , m_pc4ElemList(nullptr)
+    , m_pxcmnLeaves(nullptr)
+    , m_pxcmnRoot(nullptr)
     , m_pxcsnRoot(pxcsnToAdopt)
 {
     // Lets call a private method to build the DFA data structures
@@ -382,9 +382,7 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     // Create the new root node and store it in our member
     m_pxcmnRoot = new TXMLCMBinOp
     (
-        tCIDXML::ECMNodeTypes::Sequence
-        , pxcmnOrgTree
-        , pxcmnEOC
+        tCIDXML::ECMNodeTypes::Sequence, pxcmnOrgTree, pxcmnEOC
     );
 
     //
@@ -500,8 +498,8 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     //  we create a new one. And we need anoterh temp set pointer to hold the
     //  set that we are currently working on.
     //
-    TBitset* pbtsNew = 0;
-    const TBitset* pbtsCur = 0;
+    TBitset* pbtsNew = nullptr;
+    const TBitset* pbtsCur = nullptr;
     while (c4StackIndex < c4StackTop)
     {
         //
@@ -571,7 +569,7 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
                     m_ppc4TransTable[c4StackTop] = pc4NewTransTableEntry();
 
                     // We've used the temp set so zero it out now
-                    pbtsNew = 0;
+                    pbtsNew = nullptr;
 
                     // And bump up the stack top
                     c4StackTop++;
@@ -626,11 +624,11 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     //  needed, now that we've built the transition tables.
     //
     delete [] m_pxcmnLeaves;
-    m_pxcmnLeaves = 0;
+    m_pxcmnLeaves = nullptr;
     delete [] m_pbtsFollowLists;
-    m_pbtsFollowLists = 0;
+    m_pbtsFollowLists = nullptr;
     delete m_pxcmnRoot;
-    m_pxcmnRoot = 0;
+    m_pxcmnRoot = nullptr;
 
     for (c4Index = 0; c4Index < c4StackTop; c4Index++)
         delete ppbtsToDoStack[c4Index];
@@ -775,7 +773,7 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
         case tCIDXML::ECMNodeTypes::Alternation :
         case tCIDXML::ECMNodeTypes::Sequence :
         {
-            TXMLCMBinOp* pxcmnBin = (TXMLCMBinOp*)pxcmnCur;
+            TXMLCMBinOp* pxcmnBin = static_cast<TXMLCMBinOp*>(pxcmnCur);
             TXMLCMNode* pxcmnLeft = pxcmnBin->pxcmnLeft();
             TXMLCMNode* pxcmnRight = pxcmnBin->pxcmnRight();
             c4LocalIndex = c4InitLeaves(pxcmnLeft, c4LocalIndex);
@@ -785,7 +783,7 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
 
         case tCIDXML::ECMNodeTypes::ZeroOrMore :
         {
-            TXMLCMUnaryOp* pxcmnUnary = (TXMLCMUnaryOp*)pxcmnCur;
+            TXMLCMUnaryOp* pxcmnUnary = static_cast<TXMLCMUnaryOp*>(pxcmnCur);
             c4LocalIndex = c4InitLeaves(pxcmnUnary->pxcmnChild(), c4LocalIndex);
             break;
         }
@@ -793,7 +791,7 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
         case tCIDXML::ECMNodeTypes::Leaf :
         {
             // If its a non-epsilon node, save it away
-            TXMLCMLeaf* pxcmnLeaf = (TXMLCMLeaf*)pxcmnCur;
+            TXMLCMLeaf* pxcmnLeaf = static_cast<TXMLCMLeaf*>(pxcmnCur);
             if (pxcmnLeaf->c4ElemId() != CIDXML_ChildCM::c4EpsilonId)
                 m_pxcmnLeaves[c4LocalIndex++] = pxcmnLeaf;
             break;
@@ -837,7 +835,7 @@ tCIDLib::TCard4* TXMLChildCM::pc4NewTransTableEntry() const
 //
 TXMLCMNode* TXMLChildCM::pxcmnRewriteTree(const TXMLCMSpecNode* const pxcsnCur)
 {
-    TXMLCMNode* pxcmnRet = 0;
+    TXMLCMNode* pxcmnRet = nullptr;
 
     // For speed and convenience, get a copy of the node type
     const tCIDXML::ECMNodeTypes eType = pxcsnCur->eNodeType();

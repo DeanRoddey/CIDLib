@@ -253,6 +253,10 @@ static const TTestEntry aTests[] =
   , { 1 , 0, EPart  , 0 , 1 , 1, L"A$"              , L" A" }
   , { 1 , 1, EFull  , 0 , 0 , 0, L".*XYX.*"         , L"The XYX Boys" }
   , { 1 , 1, EFull  , 0 , 0 , 0, L".*XYX"           , L"The XYX" }
+
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"[0-9]|[0-9][0-9]|[0-9][0-9][0-9],\\.", L"1" }
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"[0-9]|[0-9][0-9]|[0-9][0-9][0-9],\\.", L"12" }
+//  , { 1 , 1, EFull  , 0 , 0 , 0, L"[0-9]|[0-9][0-9]|[0-9][0-9][0-9],\\.", L"123" }
 };
 static const tCIDLib::TCard4 c4TestCount = tCIDLib::c4ArrayElems(aTests);
 

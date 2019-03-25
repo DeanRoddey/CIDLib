@@ -43,7 +43,15 @@ class CIDXMLEXP TXMLContentModel : public TObject
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TXMLContentModel();
+        TXMLContentModel(const TXMLContentModel&) = delete;
+
+        ~TXMLContentModel() {}
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLContentModel& operator=(const TXMLContentModel&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -67,17 +75,10 @@ class CIDXMLEXP TXMLContentModel : public TObject
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        TXMLContentModel();
+        TXMLContentModel() {}
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLContentModel(const TXMLContentModel&);
-        tCIDLib::TVoid operator=(const TXMLContentModel&);
-
-
         // -------------------------------------------------------------------
         //  Magic macros
         // -------------------------------------------------------------------
@@ -85,19 +86,3 @@ class CIDXMLEXP TXMLContentModel : public TObject
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TXMLContentModel: Constructors and Destructor
-// ---------------------------------------------------------------------------
-inline TXMLContentModel::~TXMLContentModel()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLContentModel: Hidden constructors
-// ---------------------------------------------------------------------------
-inline TXMLContentModel::TXMLContentModel()
-{
-}

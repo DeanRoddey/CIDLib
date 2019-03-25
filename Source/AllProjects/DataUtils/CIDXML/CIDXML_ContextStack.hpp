@@ -50,7 +50,15 @@ class CIDXMLEXP TXMLContextStack : public TObject
         // -------------------------------------------------------------------
         TXMLContextStack();
 
+        TXMLContextStack(const TXMLContextStack&) = delete;
+
         ~TXMLContextStack();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLContextStack& operator=(const TXMLContextStack&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -127,13 +135,6 @@ class CIDXMLEXP TXMLContextStack : public TObject
             tCIDLib::TCard4     c4MapCount;
             tCIDLib::TCard4     c4MapMax;
         };
-
-
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLContextStack(const TXMLContextStack&);
-        tCIDLib::TVoid operator=(const TXMLContextStack&);
 
 
         // -------------------------------------------------------------------

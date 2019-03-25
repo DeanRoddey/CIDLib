@@ -51,9 +51,9 @@ TRegExNFA::TRegExNFA(const tCIDLib::TCard4 c4InitMaxStates) :
 
     m_c4Entries(0)
     , m_c4StateCount(0)
-    , m_pc4State1(0)
-    , m_pc4State2(0)
-    , m_pmatchTrans(0)
+    , m_pc4State1(nullptr)
+    , m_pc4State2(nullptr)
+    , m_pmatchTrans(nullptr)
 {
     c4MaxStates(c4InitMaxStates);
 }
@@ -61,11 +61,13 @@ TRegExNFA::TRegExNFA(const tCIDLib::TCard4 c4InitMaxStates) :
 TRegExNFA::~TRegExNFA()
 {
     delete [] m_pc4State1;
-    m_pc4State1 = 0;
+    m_pc4State1 = nullptr;
     delete [] m_pc4State2;
-    m_pc4State2 = 0;
+    m_pc4State2 = nullptr;
+
+    CleanupMatches();
     delete [] m_pmatchTrans;
-    m_pmatchTrans = 0;
+    m_pmatchTrans = nullptr;
 }
 
 
@@ -206,7 +208,11 @@ tCIDLib::TCard4 TRegExNFA::c4MaxStates(const tCIDLib::TCard4 c4NewMax)
     if (m_c4Entries && (c4NewMax > m_c4Entries))
     {
         delete [] m_pc4State1;
+        m_pc4State1 = nullptr;
         delete [] m_pc4State2;
+        m_pc4State2 = nullptr;
+
+        CleanupMatches();
         delete [] m_pmatchTrans;
         m_c4Entries = 0;
     }
@@ -458,6 +464,16 @@ tCIDLib::TVoid TRegExNFA::FormatTo(TTextOutStream& strmDest) const
 // ----------------------------------------------------------------------------
 //  TRegExNFA: Private, non-virtual methods
 // ----------------------------------------------------------------------------
+tCIDLib::TVoid TRegExNFA::CleanupMatches()
+{
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Entries; c4Index++)
+    {
+        delete m_pmatchTrans[c4Index];
+        m_pmatchTrans[c4Index] = nullptr;
+    }
+}
+
+
 tCIDLib::TVoid TRegExNFA::TestIndex(const   tCIDLib::TCard4     c4At
                                     , const tCIDLib::TCard4     c4Line
                                     , const tCIDLib::TCh* const pszFile) const

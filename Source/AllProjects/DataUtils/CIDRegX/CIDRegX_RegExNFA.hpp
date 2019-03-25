@@ -49,7 +49,15 @@ class CIDREGXEXP TRXMatcher : public TObject, public MFormattable
         // --------------------------------------------------------------------
         TRXMatcher() {}
 
+        TRXMatcher(const TRXMatcher&) = delete;
+
         ~TRXMatcher() {}
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TRXMatcher& operator=(const TRXMatcher&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -65,13 +73,6 @@ class CIDREGXEXP TRXMatcher : public TObject, public MFormattable
 
 
     private :
-        // --------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // --------------------------------------------------------------------
-        TRXMatcher(const TRXMatcher&);
-        tCIDLib::TVoid operator=(const TRXMatcher&);
-
-
         // --------------------------------------------------------------------
         //  Magic macros
         // --------------------------------------------------------------------
@@ -90,12 +91,22 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         // --------------------------------------------------------------------
         //  Constructors and Destructor
         // --------------------------------------------------------------------
+        TRegExNFA() = delete;
+
         TRegExNFA
         (
             const   tCIDLib::TCard4         c4MaxStates
         );
 
+        TRegExNFA(const TRegExNFA&) = delete;
+
         ~TRegExNFA();
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TRegExNFA& operator==(const TRegExNFA&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -117,7 +128,7 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
 
         tCIDLib::TCard4 c4AddStatePointedPastEnd
         (
-                    TRXMatcher* const       pmatchNew = 0
+                    TRXMatcher* const       pmatchNew = nullptr
         );
 
         tCIDLib::TCard4 c4StateCount() const;
@@ -213,21 +224,15 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const override;
 
 
     private :
         // --------------------------------------------------------------------
-        //  Unimplemented constructors and destructor
-        // --------------------------------------------------------------------
-        TRegExNFA();
-        TRegExNFA(const TRegExNFA&);
-        tCIDLib::TVoid operator==(const TRegExNFA&);
-
-
-        // --------------------------------------------------------------------
         //  Private, non-virtual methods
         // --------------------------------------------------------------------
+        tCIDLib::TVoid CleanupMatches();
+
         tCIDLib::TVoid TestIndex
         (
             const   tCIDLib::TCard4         c4At

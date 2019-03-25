@@ -8,11 +8,8 @@
 ;   The following defaults are used if values are not provided:
 ;
 ;   DISPLAY     = Console
-;   INCLINK     = Yes
-;   MINREBUILD  = Yes
 ;   MSGFILE     = No
 ;   PLATFORMDIR = No
-;   PUREANSI    = Yes
 ;   RESFILE     = No
 ;   RTL         = Multi/Dynamic
 ;   TYPE        = Executable
@@ -20,10 +17,12 @@
 ;   VARARGS     = No
 ;   VERSIONED   = No
 ;
+;   PLATFORMOPTS=
+;   EXCLUDEPLATS=
+;   INCLUDEPLATS=
 ;
 ;   This one is just a hint to the release creation code that this one is a
-;   sample that should be copied over to a developer's release. Only legal
-;   for an Executable type project.
+;   sample. It might be treated differently in a packaging process.
 ;
 ;   SAMPLE      = No
 ;
@@ -72,7 +71,7 @@ END PROJECT
 
 ; ----------------------------------------------------------------------------
 ;   The core library facilities and the IDL compiler. These are the first things built
-;   when starting a new build from scratch, because we have to get the IDL compiler
+;   when starting from scratch (bootstrap build), because we have to get the IDL compiler
 ;   built, then run it in order to generate the IDL based files. So none of these
 ;   facilities can use the IDL system because that would cause a circular dependency.
 ; ----------------------------------------------------------------------------
@@ -83,11 +82,16 @@ PROJECT=CIDKernel
         DISPLAY     = N/A
         MSGFILE     = Yes
         PLATFORMDIR = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     INCLUDEPATHS
         .\Win32\ASPI
@@ -285,7 +289,6 @@ PROJECT=CIDJPEG
         DIRECTORY   = GraphicUtils\CIDJPEG
         DISPLAY     = N/A
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -294,6 +297,12 @@ PROJECT=CIDJPEG
         CIDLib
         CIDImage
     END DEPENDENTS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     INCLUDEPATHS
         .\JLibInc
@@ -330,7 +339,6 @@ PROJECT=CIDSpReco
         DISPLAY     = N/A
         EXPORT      = CIDSPRECOEXP
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -339,6 +347,13 @@ PROJECT=CIDSpReco
         CIDAudStream
         CIDXML
     END DEPENDENTS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+            PERMISSIVE  = Yes
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -386,16 +401,21 @@ PROJECT=CIDGraphDev
         DISPLAY     = N/A
         EXPORT      = CIDGRDEVEXP
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -421,16 +441,21 @@ PROJECT=CIDCtrls
         DISPLAY     = N/A
         EXPORT      = CIDCTRLSEXP
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -457,16 +482,21 @@ PROJECT=CIDAdvGraph
         DISPLAY     = N/A
         EXPORT      = CIDADVGREXP
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
 ;        IDLFILE
@@ -490,15 +520,20 @@ PROJECT=CIDWUtils
         DIRECTORY   = WndUtils\CIDWUtils
         DISPLAY     = N/A
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     DEPENDENTS
         CIDMData
@@ -514,13 +549,18 @@ PROJECT=CIDResEd
         DIRECTORY   = Utilities\CIDResEd
         DISPLAY     = GUI
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+           PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -548,16 +588,21 @@ PROJECT=CIDDBase
         DIRECTORY   = DataUtils\CIDDBase
         DISPLAY     = N/A
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
     ; Win32 only for now until we can address this guy's portability
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     DEPENDENTS
         CIDKernel
@@ -635,7 +680,6 @@ PROJECT=CIDSChan
         DISPLAY     = N/A
         MSGFILE     = Yes
         PLATFORMDIR = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -648,10 +692,16 @@ PROJECT=CIDSChan
         END IDLFILE
     END IDLFILES
 
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
+
     ; This one has per-platform implementations but only Win32 so far
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -827,7 +877,6 @@ PROJECT=CIDAudStream
         DISPLAY     = N/A
         EXPORT      = CIDAUDSTREAMEXP
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -839,6 +888,12 @@ PROJECT=CIDAudStream
             NAMEEXT = Shared
         END IDLFILE
     END IDLFILES
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     DEPENDENTS
         CIDLib
@@ -860,15 +915,20 @@ PROJECT=CIDDAE
         DISPLAY     = N/A
         EXPORT      = CIDDAEEXP
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
 
     ; For now only Win32. Needs to have some stuff split out into per-platform
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -899,15 +959,20 @@ PROJECT=CIDMetaExtr
         DISPLAY     = N/A
         EXPORT      = CIDMETAEXTREXP
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
 
     ; For now only Win32. Needs to have some stuff split out into per-platform
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -957,15 +1022,20 @@ PROJECT=CIDWebBrowser
         DIRECTORY   = WndUtils\CIDWebBrowser
         DISPLAY     = N/A
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     DEPENDENTS
         CIDKernel
@@ -989,9 +1059,9 @@ PROJECT=CIDAppSh
     END SETTINGS
 
     ; For now only Win32. Needs to have some stuff split out into per-platform
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDXML
@@ -1047,9 +1117,9 @@ PROJECT=CIDMacroDbg
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDEncode
@@ -1069,9 +1139,9 @@ PROJECT=TestMacroDbg
         RESFILE     = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
@@ -1253,9 +1323,9 @@ PROJECT=CIDLogMon
         RESFILE     = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDOrbUC
@@ -1585,9 +1655,9 @@ PROJECT=TestCIDCtrls
         RESFILE     = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
@@ -1604,9 +1674,9 @@ PROJECT=TestCIDCtrls2
         RESFILE     = No
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
@@ -1622,9 +1692,9 @@ PROJECT=TestScroll
         RESFILE     = No
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
@@ -1743,9 +1813,9 @@ PROJECT=DAE1
     END SETTINGS
 
     ; For now only Win32 until CIDDAE gets sorted out for portability
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -1761,9 +1831,9 @@ PROJECT=DAE2
     END SETTINGS
 
     ; For now only Win32 until CIDDAE gets sorted out for portability
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -1922,9 +1992,9 @@ PROJECT=MetaExtract
     END SETTINGS
 
     ; For now only Win32 until CIDMetaExtr gets sorted out for portability
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -2327,9 +2397,9 @@ PROJECT=Window1
         RESFILE     = No
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
@@ -2345,9 +2415,9 @@ PROJECT=Window2
         RESFILE     = No
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls

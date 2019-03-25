@@ -55,7 +55,15 @@ class CIDXMLEXP TXMLChildCM : public TXMLContentModel
                     TXMLCMSpecNode* const   pxcsnToAdopt
         );
 
+        TXMLChildCM(const TXMLChildCM&) = delete;
+
         ~TXMLChildCM();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLChildCM& operator=(const TXMLChildCM&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -66,13 +74,13 @@ class CIDXMLEXP TXMLChildCM : public TXMLContentModel
             const   tCIDLib::TCard4* const  pc4ChildIds
             , const tCIDLib::TCard4         c4ChildCount
             ,       tCIDLib::TCard4&        c4FailedAt
-        )   const;
+        )   const override;
 
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const;
+        )   const override;
 
 
     protected :
@@ -83,13 +91,6 @@ class CIDXMLEXP TXMLChildCM : public TXMLContentModel
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLChildCM(const TXMLChildCM&);
-        tCIDLib::TVoid operator=(const TXMLChildCM&);
-
-
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
