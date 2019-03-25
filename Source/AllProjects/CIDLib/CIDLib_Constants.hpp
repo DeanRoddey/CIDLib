@@ -104,67 +104,34 @@ namespace kCIDLib
     const tCIDLib::TCh* const   pszStat_Core_ThreadCount= L"/Stats/Core/ThreadCnt";
 }
 
+namespace tCIDLib
+{
+    CIDLIBEXP tCIDLib::TVoid ThrowAssert
+    (
+        const   TString&        strErr
+    );
+
+    CIDLIBEXP tCIDLib::TVoid ThrowAssert
+    (
+        const   TString&        strErr
+        , const MFormattable&   mfmtblToken1
+    );
+}
+
 
 // ---------------------------------------------------------------------------
-//  Some macros for doing debug mode assertions and such
+//  Some macros for doing debug mode assertions and such. We have to do it very low
+//  level here for compliance reasons. We call a helper in CIDLib.cpp, but declare
+//  above so that it's visible here.
 // ---------------------------------------------------------------------------
 #if CID_DEBUG_ON
-    #define CIDAssert(test,msg) \
-    if (!(test)) \
-    { \
-        facCIDLib().ThrowErr \
-        ( \
-            CID_FILE \
-            , CID_LINE \
-            , kCIDErrs::errcDbg_AssertFailed \
-            , msg \
-            , tCIDLib::ESeverities::Failed \
-            , tCIDLib::EErrClasses::Assert \
-        ); \
-    }
+    #define CIDAssert(test,msg) if (!(test)) { tCIDLib::ThrowAssert(msg); }
 
-    #define CIDAssertX(test,msg,tok1) \
-    if (!(test)) \
-    { \
-        TString strAssXMsg(msg); \
-        strAssXMsg.eReplaceToken(tok1, L'1'); \
-        facCIDLib().ThrowErr \
-        ( \
-            CID_FILE \
-            , CID_LINE \
-            , kCIDErrs::errcDbg_AssertFailed \
-            , strAssXMsg \
-            , tCIDLib::ESeverities::Failed \
-            , tCIDLib::EErrClasses::Assert \
-        ); \
-    }
+    #define CIDAssertX(test,msg,tok1) if (!(test)) { tCIDLib::ThrowAssert(msg, tok1); }
 
-    #define CIDAssert2(msg) \
-    facCIDLib().ThrowErr \
-    ( \
-        CID_FILE \
-        , CID_LINE \
-        , kCIDErrs::errcDbg_AssertFailed \
-        , msg \
-        , tCIDLib::ESeverities::Failed \
-        , tCIDLib::EErrClasses::Assert \
-    ); \
+    #define CIDAssert2(msg)  tCIDLib::ThrowAssert(msg);
 
-    #define CIDAssert2X(msg,tok1) \
-    { \
-        TString strAss2XMsg(msg); \
-        strAss2XMsg.eReplaceToken(tok1, L'1'); \
-        facCIDLib().ThrowErr \
-        ( \
-            CID_FILE \
-            , CID_LINE \
-            , kCIDErrs::errcDbg_AssertFailed \
-            , strAss2XMsg \
-            , tCIDLib::ESeverities::Failed \
-            , tCIDLib::EErrClasses::Assert \
-            , tok1 \
-        ); \
-    }
+    #define CIDAssert2X(msg,tok1)  tCIDLib::ThrowAssert(msg, tok1);
 
 #else
     #define CIDAssert(test,msg)

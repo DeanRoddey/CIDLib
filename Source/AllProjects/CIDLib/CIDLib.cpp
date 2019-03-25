@@ -133,6 +133,38 @@ namespace tCIDLib
     }
 }
 
+tCIDLib::TVoid tCIDLib::ThrowAssert(const TString& strErr)
+{
+    throw TLogEvent
+    (
+        L"CIDLib"
+        , CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcDbg_AssertFailed
+        , strErr
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Assert
+    );
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowAssert(const TString& strErr, const MFormattable& mfbtlToken1)
+{
+    TString strMsg(strErr);
+    strMsg.eReplaceToken(mfbtlToken1, kCIDLib::chDigit1);
+    throw TLogEvent
+    (
+        L"CIDLib"
+        , CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcDbg_AssertFailed
+        , strMsg
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Assert
+    );
+}
+
+
 
 // ---------------------------------------------------------------------------
 //  If debugging, then force instantiations of some template classes that are not

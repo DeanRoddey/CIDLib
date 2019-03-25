@@ -862,7 +862,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
 //  operator for those folks who want to use it. This means that collections
 //  cannot be streamed polymorphically via the base classes.
 //
-template <class TElem>
+template <typename TElem>
 TBinOutStream& operator<<(          TBinOutStream&              strmOut
                             , const TBasicDLinkedCol<TElem>&    colToStream)
 {
@@ -888,7 +888,7 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
     // If there were any elements, then stream them
     if (c4Count)
     {
-        TBasicDLinkedCol<TElem>::TCursor cursStream(&colToStream);
+        typename TBasicDLinkedCol<TElem>::TCursor cursStream(&colToStream);
         while (cursStream.bIsValid())
         {
             strmOut << cursStream.objRCur();
@@ -902,7 +902,7 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
 
 
 // We cannot lock the collection, since we might delete the mutex
-template <class TElem>
+template <typename TElem>
 TBinInStream& operator>>(TBinInStream&              strmIn
                         , TBasicDLinkedCol<TElem>&  colToStream)
 {

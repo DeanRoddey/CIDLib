@@ -94,14 +94,14 @@ namespace tColUtils
         //  state, but without any content. Put a janitor on it in case we hose
         //  during the process of duplicating it.
         //
-        typename TCol* pcolRet = colSrc.pcolMakeNewOf();
+        TCol* pcolRet = colSrc.pcolMakeNewOf();
         TJanitor<TCol> janRet(pcolRet);
 
         //
         //  Get a cursor for the passed collection. We'll use this to iterate it
         //  and get each node to duplicate.
         //
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         while (cursSrc.bIsValid())
         {
             pcolRet->Add(cursSrc.objRCur().pobjDuplicate());
@@ -124,7 +124,7 @@ namespace tColUtils
     template <typename IterCB, typename TCol>
     tCIDLib::TVoid ForEach(IterCB iterCB, const TCol& colToIterate)
     {
-        TCol::TCursor cursCB(&colToIterate);
+        typename TCol::TCursor cursCB(&colToIterate);
         while (cursCB.bIsValid())
         {
             // Break out if the callback returns kCIDLib::False
@@ -138,7 +138,7 @@ namespace tColUtils
     template <typename IterCB, typename TCol>
     tCIDLib::TVoid ForEachNC(IterCB iterCB, TCol& colToIterate)
     {
-        TCol::TNCCursor cursCB(&colToIterate);
+        typename TCol::TNCCursor cursCB(&colToIterate);
         if (!cursCB.bReset())
             return;
 

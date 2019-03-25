@@ -54,14 +54,14 @@ class CIDLIBEXP TStringTokenizer : public TObject
         static tCIDLib::TBoolean bParseQuotedCommaList
         (
             const   TString&                strText
-            ,       tCIDLib::TStrCollect&   colToFill
+            ,       TCollection<TString>&   colToFill
             ,       tCIDLib::TCard4&        c4ErrIndex
         );
 
         static tCIDLib::TBoolean bParseCSVLine
         (
             const   TString&                strText
-            ,       tCIDLib::TStrCollect&   colToFill
+            ,       TCollection<TString>&   colToFill
             ,       tCIDLib::TCard4&        c4ErrIndex
         );
 
@@ -73,7 +73,7 @@ class CIDLIBEXP TStringTokenizer : public TObject
 
         static tCIDLib::TVoid BuildQuotedCommaList
         (
-            const   tCIDLib::TStrCollect&   colValues
+            const   TCollection<TString>&   colValues
             ,       TString&                strAccum
         );
 
@@ -135,7 +135,7 @@ class CIDLIBEXP TStringTokenizer : public TObject
 
         tCIDLib::TCard4 c4BreakApart
         (
-                    tCIDLib::TStrCollect&   colToFill
+                    TCollection<TString>&   colToFill
         );
 
         tCIDLib::TCard4 c4CurToken() const;

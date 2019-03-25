@@ -74,7 +74,7 @@ namespace TArrayOps
 
             tCIDLib::TBoolean bIsEmpty() const
             {
-                return (m_c4CurCount == 0);
+                return (m_c4PendingCnt == 0);
             }
 
             tCIDLib::TCard4 c4LenAt(const tCIDLib::TCard4 c4At)
@@ -165,7 +165,7 @@ namespace TArrayOps
             //
             void FreeMem()
             {
-                if (m_ptMergeMem != m_ptMergArray)
+                if (m_ptMergeMem != m_ptMergeArray)
                     delete [] m_ptMergeMem;
 
                 m_c4MemSize = c4TmpArraySz;
