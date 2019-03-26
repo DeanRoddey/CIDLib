@@ -512,7 +512,8 @@ TKrnlWin32Registry::hkeyGetRootSubKey(  const   tCIDKernel::ERootKeys    eKey
                                         , const tCIDLib::TCh* const      pszSubKey
                                         , const tCIDKernel::ERegAccFlags eFlags)
 {
-    static const tCIDKernel::TWRegHandle ahkeyMagicKeys[tCIDKernel::ERootKeys::Count] =
+    static const tCIDKernel::TWRegHandle
+    ahkeyMagicKeys[tCIDLib::c4EnumOrd(tCIDKernel::ERootKeys::Count)] =
     {
         HKEY_CLASSES_ROOT
         , HKEY_CURRENT_USER

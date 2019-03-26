@@ -38,7 +38,7 @@
 // ----------------------------------------------------------------------------
 static tCIDLib::TVoid BasicTests()
 {
-    static tCIDLib::TCh* apszKeys[] =
+    static const tCIDLib::TCh* apszKeys[] =
     {
         L"PATH"
         , L"LIBPATH"
@@ -48,7 +48,7 @@ static tCIDLib::TVoid BasicTests()
         , L"CIDDRIVE"
     };
 
-    static tCIDLib::TCh* apszValues[] =
+    static const tCIDLib::TCh* apszValues[] =
     {
         L"C:\\TEMP;D:\\SOMEDIR;"
         , L"C:\\DLL;D:\\APP\\DLL;"

@@ -133,9 +133,9 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
 
     // Set the run type and remember a logon type appropriately
     TASK_LOGON_TYPE LoginType = TASK_LOGON_NONE;
-    tCIDLib::TCh* pszUser = 0;
+    const tCIDLib::TCh* pszUser = nullptr;
     {
-        ITriggerCollection* pTriggerCol = 0;
+        ITriggerCollection* pTriggerCol = nullptr;
         hRes = pTask->get_Triggers(&pTriggerCol);
         if (FAILED(hRes))
             return kCIDLib::False;

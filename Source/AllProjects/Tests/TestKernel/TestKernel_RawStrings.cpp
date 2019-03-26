@@ -793,14 +793,13 @@ static tCIDLib::TVoid TestOverflows()
 }
 
 
-// We want to test both const and non-const versions so its a template
-template <class T> static tCIDLib::TVoid TestFindCharForward(T* pszDummy)
+static tCIDLib::TVoid TestFindCharForward()
 {
     // Set up a test string to do searches in
-    T* const pszTest = L"This is a test string, 1, 2, 3";
+    const tCIDLib::TCh* const pszTest = L"This is a test string, 1, 2, 3";
 
-    tCIDLib::TCard4 c4At;
-    T*              pszFind;
+    tCIDLib::TCard4     c4At;
+    const tCIDLib::TCh* pszFind;
 
     // Do a search that should fail
     pszFind = TRawStr::pszFindChar(pszTest, L'W');
@@ -865,14 +864,13 @@ template <class T> static tCIDLib::TVoid TestFindCharForward(T* pszDummy)
     }
 }
 
-// We want to test both const and non-const versions so its a template
-template <class T> static tCIDLib::TVoid TestFindCharReverse(T* pszDummy)
+ static tCIDLib::TVoid TestFindCharReverse()
 {
     // Set up a test string to do searches in
-    T* const pszTest = L"012345678901234567890123456";
+    const tCIDLib::TCh* const pszTest = L"012345678901234567890123456";
 
-    tCIDLib::TCard4 c4At;
-    T*              pszFind;
+    tCIDLib::TCard4     c4At;
+    const tCIDLib::TCh* pszFind;
 
     // Do a search that should fail
     pszFind = TRawStr::pszFindLastChar(pszTest, L'A');
@@ -941,7 +939,7 @@ template <class T> static tCIDLib::TVoid TestFindCharReverse(T* pszDummy)
     //  starting at the string length-1 (a common operation.) Any boundary
     //  condition that counts beyond the base would get caught here.
     //
-    T* const pszTest2 = L"0123456789";
+    const tCIDLib::TCh* const pszTest2 = L"0123456789";
     pszFind = TRawStr::pszFindPrevChar(&pszTest2[1], L'0', TRawStr::c4StrLen(&pszTest2[1])-1);
     if (pszFind)
     {
@@ -962,14 +960,13 @@ template <class T> static tCIDLib::TVoid TestFindCharReverse(T* pszDummy)
 }
 
 
-// We want to test both const and non-const versions so its a template
-template <class T> static tCIDLib::TVoid TestFindSubStrForward(T* pszDummy)
+static tCIDLib::TVoid TestFindSubStrForward()
 {
     // Set up a test string to do searches in
-    T* const pszTest = L"012345678901234567890123456XYZ";
+    const tCIDLib::TCh* const pszTest = L"012345678901234567890123456XYZ";
 
-    tCIDLib::TCard4 c4At;
-    T*              pszFind;
+    tCIDLib::TCard4     c4At;
+    const tCIDLib::TCh* pszFind;
 
     // Do a substring search that should fail
     pszFind = TRawStr::pszFindSubStr(pszTest, L"ABC");
@@ -1054,13 +1051,13 @@ template <class T> static tCIDLib::TVoid TestFindSubStrForward(T* pszDummy)
     }
 }
 
-template <class T> static tCIDLib::TVoid TestFindSubStrReverse(T* pszDummy)
+static tCIDLib::TVoid TestFindSubStrReverse()
 {
     // Set up a test string to do searches in
-    T* const pszTest = L"XYZ012345678901234567890123456";
+    const tCIDLib::TCh* const pszTest = L"XYZ012345678901234567890123456";
 
-    tCIDLib::TCard4 c4At;
-    T*              pszFind;
+    tCIDLib::TCard4     c4At;
+    const tCIDLib::TCh* pszFind;
 
     // Do a substring search that should fail
     pszFind = TRawStr::pszFindLastSubStr(pszTest, L"ABC");
@@ -1176,20 +1173,7 @@ tCIDLib::TVoid TestRawStrings(const tCIDLib::TCard4)
     TestBinConversion();
     TestConversions();
 
-    //
-    //  These tests deal with APIs that have const and non-const versions,
-    //  so they are done as templates and both versions are checked with the
-    //  same code.
-    //
-    const tCIDLib::TCh* pszConst = L"";
-    tCIDLib::TCh* pszNonConst = L"";
-
-    TestFindCharForward<const tCIDLib::TCh>(pszConst);
-    TestFindCharForward<tCIDLib::TCh>(pszNonConst);
-
-    TestFindCharReverse<const tCIDLib::TCh>(pszConst);
-    TestFindCharReverse<tCIDLib::TCh>(pszNonConst);
-
-    TestFindSubStrForward<const tCIDLib::TCh>(pszConst);
-    TestFindSubStrReverse<const tCIDLib::TCh>(pszNonConst);
+    TestFindCharForward();
+    TestFindCharReverse();
+    TestFindSubStrForward();
 }

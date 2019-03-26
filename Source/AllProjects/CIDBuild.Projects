@@ -90,6 +90,7 @@ PROJECT=CIDKernel
     PLATFORMOPTS
         PLATFORM=WIN32_*
             PUREANSI    = No
+            PERMISSIVE  = Yes
         END PLATFORM
     END PLATFORMOPTS
 

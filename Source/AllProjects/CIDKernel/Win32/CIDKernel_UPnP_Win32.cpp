@@ -124,7 +124,7 @@ class CUPnPFinderCallback : public IUPnPDeviceFinderCallback
                 return 0;
             }
 
-            tCIDLib::TCh* pszRealUID = L"";
+            const tCIDLib::TCh* pszRealUID = L"";
             HRESULT hRes = pDev->get_FriendlyName(&NameStr);
             if (!FAILED(hRes))
             {
@@ -840,7 +840,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
         {
             TCOMJanitor<IUPnPDevice> janDev(&pDev);
 
-            tCIDLib::TCh* pszRealUID = L"";
+            const tCIDLib::TCh* pszRealUID = L"";
             tCIDLib::TBoolean bRes = kCIDLib::False;
             BSTR NameStr = 0;
             BSTR TypeStr = 0;
@@ -1208,7 +1208,7 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
         {
             TCOMJanitor<IUPnPDevice> janDev(&pDev);
 
-            tCIDLib::TCh* pszRealUID = L"";
+            const tCIDLib::TCh* pszRealUID = L"";
             tCIDLib::TBoolean bRes = kCIDLib::False;
             BSTR NameStr = 0;
             BSTR TypeStr = 0;

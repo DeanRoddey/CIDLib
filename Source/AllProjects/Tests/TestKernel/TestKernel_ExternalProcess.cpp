@@ -39,9 +39,9 @@ static tCIDLib::TVoid CmdLineParse()
 {
     struct CmdLineTest
     {
-        tCIDLib::TCh*   pszTest;
-        tCIDLib::TCard4 c4ExpectedCount;
-        tCIDLib::TCh*   pszParms[4];
+        const tCIDLib::TCh* pszTest;
+        tCIDLib::TCard4     c4ExpectedCount;
+        const tCIDLib::TCh* pszParms[4];
     };
 
     static CmdLineTest aTests[] =

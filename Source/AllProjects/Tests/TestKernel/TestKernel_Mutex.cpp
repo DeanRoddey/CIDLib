@@ -40,7 +40,7 @@ struct  TThreadInfo
     tCIDLib::TCard4     c4Id;
     tCIDLib::TCard4     c4SleepTime;
     tCIDLib::TBoolean   bShutdown;
-    tCIDLib::TCh*       pszError;
+    const tCIDLib::TCh* pszError;
     TKrnlMutex*         pkmtxTest;
 };
 
