@@ -77,31 +77,9 @@ TLogItem::TLogItem(const TLogEvent& errSrc, const tCIDLib::TCard4 c4UniqueId) :
 {
 }
 
-TLogItem::TLogItem(const TLogItem& liSrc) :
-
-    TLogEvent(liSrc)
-    , m_c4UniqueId(liSrc.m_c4UniqueId)
-{
-}
-
 TLogItem::~TLogItem()
 {
 }
-
-
-// ----------------------------------------------------------------------------
-//  TLogItem: Public operators
-// ----------------------------------------------------------------------------
-TLogItem& TLogItem::operator=(const TLogItem& liSrc)
-{
-    if (&liSrc != this)
-    {
-        TLogEvent::operator=(liSrc);
-        m_c4UniqueId = liSrc.m_c4UniqueId;
-    }
-    return *this;
-}
-
 
 
 // ---------------------------------------------------------------------------
@@ -348,8 +326,7 @@ TMainFrame::TMainFrame() :
     , m_pwndThreadName(nullptr)
     , m_thrPoll
       (
-        L"LogPollThread"
-        , TMemberFunc<TMainFrame>(this, &TMainFrame::ePollThread)
+        L"LogPollThread", TMemberFunc<TMainFrame>(this, &TMainFrame::ePollThread)
       )
 {
 }
@@ -421,14 +398,11 @@ tCIDLib::TBoolean TMainFrame::bCreateMain()
 const TLogItem* TMainFrame::pliFindById(const tCIDLib::TCard4 c4IdToFind) const
 {
     TDeque<TLogItem>::TCursor cursFind(&m_colList);
-    if (!cursFind.bReset())
-        return nullptr;
-
-    do
+    for (; cursFind; ++cursFind)
     {
-        if (cursFind.objRCur().m_c4UniqueId == c4IdToFind)
+        if (cursFind->m_c4UniqueId == c4IdToFind)
             return &cursFind.objRCur();
-    }   while(cursFind.bNext());
+    }
     return nullptr;
 }
 
@@ -669,14 +643,11 @@ TMainFrame::CodeReceived(const  tCIDLib::TInt4  i4Code
     //
     m_colLoad.RemoveAll();
     TDeque<TLogItem>::TCursor cursDeque(&m_colList);
-    if (cursDeque.bReset())
+    for (; cursDeque; ++cursDeque)
     {
-        do
-        {
-            // If not filtered out, then get a ref
-            if (!bFiltered(cursDeque.objRCur()))
-                m_colLoad.Add(&cursDeque.objRCur());
-        }   while (cursDeque.bNext());
+        // If not filtered out, then get a ref
+        if (!bFiltered(*cursDeque))
+            m_colLoad.Add(&cursDeque.objRCur());
     }
 
     //
@@ -1088,13 +1059,10 @@ tCIDLib::TVoid TMainFrame::SnapToFile()
         tmLogged.strDefaultFormat(L"%(M,2,0)/%(D,2,0) %(H,2,0):%(u,2,0):%(s,2,0)");
 
         TDeque<TLogItem>::TCursor cursSave(&m_colList);
-        if (cursSave.bReset())
+        for (; cursSave; ++cursSave)
         {
-            do
-            {
-                if (!bFiltered(cursSave.objRCur()))
-                    cursSave.objRCur().AdvFormat(strmOut, tmLogged);
-            }   while (cursSave.bNext());
+            if (!bFiltered(*cursSave))
+                cursSave->AdvFormat(strmOut, tmLogged);
         }
         strmOut.Flush();
         strmOut.Close();
@@ -1139,13 +1107,10 @@ tCIDLib::TVoid TMainFrame::UpdateFilters()
     m_pwndList->RemoveAll();
     m_colLoad.RemoveAll();
     TDeque<TLogItem>::TCursor cursFind(&m_colList);
-    if (cursFind.bReset())
+    for (; cursFind; ++cursFind)
     {
-        do
-        {
-            if (!bFiltered(cursFind.objRCur()))
-                m_colLoad.Add(&cursFind.objRCur());
-        }   while (cursFind.bNext());
+        if (!bFiltered(*cursFind))
+            m_colLoad.Add(&cursFind.objRCur());
     }
 
     TMCListItemOps mclopsLoad(&m_colLoad);

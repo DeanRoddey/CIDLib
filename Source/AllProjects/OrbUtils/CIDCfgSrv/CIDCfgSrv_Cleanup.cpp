@@ -144,7 +144,7 @@ tCIDLib::TVoid TFacCIDCfgSrv::Cleanup()
     try
     {
         delete m_pevWait;
-        m_pevWait = 0;
+        m_pevWait = nullptr;
     }
 
     catch(...)

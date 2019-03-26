@@ -55,7 +55,15 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
         // -------------------------------------------------------------------
         TFrameWnd();
 
+        TFrameWnd(const TFrameWnd&) = delete;
+
         ~TFrameWnd();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFrameWnd& operator=(const TFrameWnd&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -258,13 +266,6 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TFrameWnd(const TFrameWnd&);
-        tCIDLib::TVoid operator=(const TFrameWnd&);
-
-
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------

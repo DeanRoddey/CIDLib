@@ -107,10 +107,7 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
             , const TString&                strExtra4
         );
 
-        TNameServerInfo
-        (
-            const   TNameServerInfo&        nsviToCopy
-        );
+        TNameServerInfo(const TNameServerInfo&) = default;
 
         ~TNameServerInfo();
 
@@ -118,10 +115,7 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TNameServerInfo& operator=
-        (
-            const   TNameServerInfo&        nsviToAssign
-        );
+        TNameServerInfo& operator=(const TNameServerInfo&) = default;
 
 
         // -------------------------------------------------------------------
@@ -169,12 +163,12 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :
@@ -274,10 +268,7 @@ class CIDORBUCEXP TNSRebindInfo : public TNameServerInfo
             , const TString&                strExtra4
         );
 
-        TNSRebindInfo
-        (
-            const   TNSRebindInfo&          nsviToCopy
-        );
+        TNSRebindInfo(const TNSRebindInfo&) = default;
 
         ~TNSRebindInfo();
 
@@ -285,10 +276,7 @@ class CIDORBUCEXP TNSRebindInfo : public TNameServerInfo
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TNSRebindInfo& operator=
-        (
-            const   TNSRebindInfo&          nsviToAssign
-        );
+        TNSRebindInfo& operator=(const TNSRebindInfo&) = default;
 
 
         // -------------------------------------------------------------------
@@ -325,12 +313,12 @@ class CIDORBUCEXP TNSRebindInfo : public TNameServerInfo
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :

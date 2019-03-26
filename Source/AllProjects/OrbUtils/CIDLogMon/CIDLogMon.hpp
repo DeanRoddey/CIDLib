@@ -76,10 +76,7 @@ class TLogItem : public TLogEvent
             , const tCIDLib::TCard4         c4UniqueId
         );
 
-        TLogItem
-        (
-            const   TLogItem&               liSrc
-        );
+        TLogItem(const TLogItem&) = default;
 
         ~TLogItem();
 
@@ -87,10 +84,7 @@ class TLogItem : public TLogEvent
         // --------------------------------------------------------------------
         //  Public operators
         // --------------------------------------------------------------------
-        TLogItem& operator=
-        (
-            const   TLogItem&               liSrc
-        );
+        TLogItem& operator=(const TLogItem&) = default;
 
 
         // --------------------------------------------------------------------

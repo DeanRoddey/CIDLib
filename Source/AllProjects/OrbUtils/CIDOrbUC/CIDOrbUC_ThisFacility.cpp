@@ -199,7 +199,7 @@ TFacCIDOrbUC::bGetNSObject(         tCIDOrbUC::TNSrvProxy&  orbcNS
         enctRealEnd = TTime::enctNowPlusSecs(5);
 
     tCIDLib::TBoolean   bOK = kCIDLib::False;
-    TThread*            pthrCaller = 0;
+    TThread*            pthrCaller = nullptr;
     tCIDLib::TCard8     c8NSCookie = 0;
     while (!bOK)
     {
@@ -429,12 +429,8 @@ tCIDLib::TVoid TFacCIDOrbUC::Initialize()
 
     catch(TError& errToCatch)
     {
-        // Log it if not already, and then rethrow
-        if (facCIDOrbUC().bShouldLog(errToCatch))
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            LogEventObj(errToCatch);
-        }
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        LogEventObj(errToCatch);
 
         if (strNSAddr.bIsEmpty())
         {
@@ -518,8 +514,7 @@ TFacCIDOrbUC::orbcCoreSrvAdminProxy(const   TString&        strBindingName
 //  A convenience to get a log server proxy, packaged in a counted pointer
 //  so that it's easy to manage.
 //
-tCIDOrbUC::TLSrvProxy
-TFacCIDOrbUC::orbcLogSrvProxy(const tCIDLib::TCard4 c4WaitUpTo)
+tCIDOrbUC::TLSrvProxy TFacCIDOrbUC::orbcLogSrvProxy(const tCIDLib::TCard4 c4WaitUpTo)
 {
     // Try to create the client proxy, with all the caching support and such
     TCIDLogSrvClientProxy* porbcProxy = porbcMakeClient<TCIDLogSrvClientProxy>
@@ -600,17 +595,14 @@ TFacCIDOrbUC::porbcMakeNSProxy(const tCIDLib::TCard4 c4WaitUpTo)
     //  use so that we have some way to track it. If so, then let's
     //  try to create a proxy and see if it works.
     //
-    TCIDNameSrvClientProxy* porbcRet = 0;
+    TCIDNameSrvClientProxy* porbcRet = nullptr;
     TOrbObjId ooidServer;
     if (facCIDOrb().bCheckOOIDCache(TFacCIDOrb::strFauxNSBinding, ooidServer))
     {
         // It's there so try to create the proxy
         try
         {
-            porbcRet = new TCIDNameSrvClientProxy
-            (
-                ooidServer, TFacCIDOrb::strFauxNSBinding
-            );
+            porbcRet = new TCIDNameSrvClientProxy(ooidServer, TFacCIDOrb::strFauxNSBinding);
         }
 
         catch(TError& errToCatch)
@@ -622,7 +614,7 @@ TFacCIDOrbUC::porbcMakeNSProxy(const tCIDLib::TCard4 c4WaitUpTo)
             }
 
             // It failed, so flush this guy from the cache
-            porbcRet = 0;
+            porbcRet = nullptr;
             facCIDOrb().RemoveFromOIDCache(TFacCIDOrb::strFauxNSBinding);
         }
     }
@@ -665,7 +657,7 @@ TFacCIDOrbUC::porbcMakeNSProxy(const tCIDLib::TCard4 c4WaitUpTo)
     // And let's try to connect ot the server until we run out of time
     tCIDLib::TBoolean   bConnected = kCIDLib::False;
     TError              errCaught;
-    TThread*            pthrCaller = 0;
+    TThread*            pthrCaller = nullptr;
     while (!bConnected)
     {
         try

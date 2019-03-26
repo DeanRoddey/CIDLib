@@ -172,9 +172,7 @@ tCIDLib::TVoid TFacCIDCfgSrv::Setup()
     strTmp.eReplaceToken(facCIDSock().strIPHostName(), L'h');
     facCIDOrbUC().RegRebindObj
     (
-        m_porbsImpl->ooidThis()
-        , strTmp
-        , L"CIDLib Config Respository Object"
+        m_porbsImpl->ooidThis(), strTmp, L"CIDLib Config Respository Object"
     );
 
     //
@@ -205,9 +203,7 @@ tCIDLib::TVoid TFacCIDCfgSrv::Setup()
     strTmp.eReplaceToken(facCIDSock().strIPHostName(), L'h');
     facCIDOrbUC().RegRebindObj
     (
-        porbsAdmin->ooidThis()
-        , strTmp
-        , L"Cfg Server Core Admin Object"
+        porbsAdmin->ooidThis(), strTmp, L"Cfg Server Core Admin Object"
     );
 
     // And start the rebinder now

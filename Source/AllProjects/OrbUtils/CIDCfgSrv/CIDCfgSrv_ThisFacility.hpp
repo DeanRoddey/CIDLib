@@ -50,13 +50,17 @@ class TFacCIDCfgSrv : public TFacility, public MSignalHandler
 
 
         // -------------------------------------------------------------------
-        //  Public, non-virtual methods
+        //  Public, inherited methods
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bHandleSignal
         (
             const   tCIDLib::ESignals       eSignal
-        );
+        )   override;
 
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
         tCIDLib::EExitCodes eMainThread
         (
                     TThread&                thrThis

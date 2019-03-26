@@ -162,14 +162,7 @@ TFacCIDOrbUC::RegRebindObj( const   TOrbObjId&  ooidSrvObject
     // Create a rebind info object
     TNSRebindInfo nsrbiTmp
     (
-        strScope
-        , ooidSrvObject
-        , strName
-        , strDescr
-        , strExtra1
-        , strExtra2
-        , strExtra3
-        , strExtra4
+        strScope, ooidSrvObject, strName, strDescr, strExtra1, strExtra2, strExtra3, strExtra4
     );
 
     //
@@ -400,8 +393,7 @@ tCIDLib::TBoolean TFacCIDOrbUC::bBindAll(tCIDOrbUC::TNSrvProxy& orbcNS)
 //  rebind objects that need to be rebound, and does them.
 //
 tCIDLib::TBoolean
-TFacCIDOrbUC::bDoBindingPass(tCIDOrbUC::TNSrvProxy& orbcNS
-                            , tCIDLib::TBoolean&    bChanges)
+TFacCIDOrbUC::bDoBindingPass(tCIDOrbUC::TNSrvProxy& orbcNS, tCIDLib::TBoolean& bChanges)
 {
     // Assume no changes until proven otherwise
     bChanges = kCIDLib::False;
@@ -419,7 +411,6 @@ TFacCIDOrbUC::bDoBindingPass(tCIDOrbUC::TNSrvProxy& orbcNS
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TNSRebindInfo& nsrbiCur = m_colList[c4Index];
-
         if (!nsrbiCur.bIsBound())
         {
             TNSRebindInfo& nsrbiNew = colToBind.objAdd(nsrbiCur);
@@ -805,7 +796,7 @@ TNSRebindInfo* TFacCIDOrbUC::pnsrbiFind(const TString& strToFind)
     }
 
     // Never found it
-    return 0;
+    return nullptr;
 }
 
 

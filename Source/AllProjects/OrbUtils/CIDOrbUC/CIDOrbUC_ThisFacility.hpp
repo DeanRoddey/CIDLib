@@ -107,7 +107,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
                 bCached = facCIDOrb().bCheckOOIDCache(strNSBinding, ooidSrv);
 
             // If cached, try to create it
-            T* porbcRet = 0;
+            T* porbcRet = nullptr;
             if (bCached)
             {
                 try
@@ -180,7 +180,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
                 bCached = facCIDOrb().bCheckOOIDCache(strNSBinding, ooidSrv);
 
             // If so, try to create it
-            T* porbcRet = 0;
+            T* porbcRet = nullptr;
             if (bCached)
             {
                 try

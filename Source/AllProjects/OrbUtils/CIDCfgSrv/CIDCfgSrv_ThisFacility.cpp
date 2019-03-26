@@ -61,6 +61,8 @@ TFacCIDCfgSrv::TFacCIDCfgSrv() :
     , m_c4MaxClients(0)
     , m_ippnListen(kCIDOrbUC::ippnCfgSrvDefPort)
     , m_pevWait(nullptr)
+    , m_plgrLogSrv(nullptr)
+    , m_porbsImpl(nullptr)
 {
 }
 
@@ -70,7 +72,7 @@ TFacCIDCfgSrv::~TFacCIDCfgSrv()
 
 
 // ---------------------------------------------------------------------------
-//  TFacCIDCfgSrv: Public, non-virtual methods
+//  TFacCIDCfgSrv: Public, inherited methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TFacCIDCfgSrv::bHandleSignal(const tCIDLib::ESignals eSig)
 {
@@ -88,6 +90,9 @@ tCIDLib::TBoolean TFacCIDCfgSrv::bHandleSignal(const tCIDLib::ESignals eSig)
 }
 
 
+// ---------------------------------------------------------------------------
+//  TFacCIDCfgSrv: Public, non-virtual methods
+// ---------------------------------------------------------------------------
 tCIDLib::EExitCodes TFacCIDCfgSrv::eMainThread(TThread& thrThis, tCIDLib::TVoid*)
 {
     // Let our caller go
