@@ -5049,7 +5049,6 @@ tCIDLib::EFindRes TString::eTokenExists(const tCIDLib::TCh chToken) const
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::TCh        chFill;
 
-    // And look for the token.
     if (pszFindToken
     (
         m_strbData.pszBuffer()
@@ -5060,9 +5059,15 @@ tCIDLib::EFindRes TString::eTokenExists(const tCIDLib::TCh chToken) const
         , c4Chars
         , c4TokenCnt))
     {
-        return c4TokenCnt ? tCIDLib::EFindRes::NotFound : tCIDLib::EFindRes::NoMore;
+        return tCIDLib::EFindRes::Found;
     }
-    return tCIDLib::EFindRes::Found;
+
+    // Not found, but there are still tokens present
+    if (c4TokenCnt)
+        return tCIDLib::EFindRes::NotFound;
+
+    // Not found and no more tokens are present
+    return tCIDLib::EFindRes::NoMore;
 }
 
 
