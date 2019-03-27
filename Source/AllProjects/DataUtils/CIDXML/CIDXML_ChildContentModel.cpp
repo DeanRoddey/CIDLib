@@ -254,12 +254,19 @@ TXMLChildCM::~TXMLChildCM()
 {
     // Clean up the info we had to keep around the whole time
     delete [] m_pbFinalFlags;
+    m_pbFinalFlags = nullptr;
     delete [] m_pc4ElemList;
+    m_pc4ElemList = nullptr;
     delete m_pxcsnRoot;
+    m_pxcsnRoot = nullptr;
 
     for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4TransTableSize; c4Index++)
         delete [] m_ppc4TransTable[c4Index];
     delete [] m_ppc4TransTable;
+    m_ppc4TransTable = nullptr;
+
+    // And just in case do the temp data cleanup
+    ClearTempData();
 }
 
 
@@ -620,16 +627,12 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     m_c4TransTableSize = c4StackTop;
 
     //
-    //  Clean up all of the temporary data structures that are no longer
-    //  needed, now that we've built the transition tables.
+    //  Clean up all of the temporary members that are no longer needed, now that
+    //  we've built the transition tables.
     //
-    delete [] m_pxcmnLeaves;
-    m_pxcmnLeaves = nullptr;
-    delete [] m_pbtsFollowLists;
-    m_pbtsFollowLists = nullptr;
-    delete m_pxcmnRoot;
-    m_pxcmnRoot = nullptr;
+    ClearTempData();
 
+    // This is local only data so we have to deal with that here
     for (c4Index = 0; c4Index < c4StackTop; c4Index++)
         delete ppbtsToDoStack[c4Index];
     delete [] ppbtsToDoStack;
@@ -812,6 +815,33 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
             break;
     }
     return c4LocalIndex;
+}
+
+
+//
+//  We create some data that is temporary but still stored in members for access
+//  during the DFA building process. This will clean up that stuff. It is also called
+//  from the dtor just in case.
+//
+tCIDLib::TVoid TXMLChildCM::ClearTempData()
+{
+    if (m_pxcmnLeaves)
+    {
+        delete [] m_pxcmnLeaves;
+        m_pxcmnLeaves = nullptr;
+    }
+
+    if (m_pbtsFollowLists)
+    {
+        delete [] m_pbtsFollowLists;
+        m_pbtsFollowLists = nullptr;
+    }
+
+    if (m_pxcmnRoot)
+    {
+        delete m_pxcmnRoot;
+        m_pxcmnRoot = nullptr;
+    }
 }
 
 
