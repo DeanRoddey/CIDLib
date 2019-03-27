@@ -1338,19 +1338,19 @@ namespace TArrayOps
     //  a convenience to sort sub-files within an array. And then we have
     //  a set for doing by ref arrays.
     //
-    template <typename T, typename TComp>
+    template <typename T, typename TComp = tCIDLib::TDefMagComp<T>>
     tCIDLib::TVoid TSort(       T*                  ptArray
                         , const tCIDLib::TCard4     c4Count
-                        ,       TComp               pfnComp)
+                        ,       TComp               pfnComp = TComp())
     {
         DoTSort<T,TComp>(ptArray, c4Count, pfnComp);
     }
 
-    template <typename T, typename TComp>
+    template <typename T, typename TComp = tCIDLib::TDefMagComp<T>>
     tCIDLib::TVoid TSortSubFile(        T*                  ptArray
                                 , const tCIDLib::TCard4     c4Start
                                 , const tCIDLib::TCard4     c4Count
-                                ,       TComp               pfnComp)
+                                ,       TComp               pfnComp = TComp())
     {
         DoTSort<T,TComp>(&ptArray[c4Start], c4Count, pfnComp);
     }
@@ -1361,12 +1361,12 @@ namespace TArrayOps
     //  element was found, the return is kCIDLib::True and the index of
     //  the element is in c4Index.
     //
-    template <typename TElem, typename TCompFunc> tCIDLib::TBoolean
-    bBinarySearch(  const   TElem* const        ptElems
-                    , const TElem               tToFind
+    template <typename T, typename TComp = tCIDLib::TDefMagComp<T>> tCIDLib::TBoolean
+    bBinarySearch(  const   T* const            ptElems
+                    , const T                   tToFind
                     ,       tCIDLib::TCard4&    c4Index
                     , const tCIDLib::TCard4     c4ElemCount
-                    ,       TCompFunc           pfnComp)
+                    ,       TComp               pfnComp = TComp())
     {
         // Set up the two end points that are used to subdivide the list
         tCIDLib::TInt4 i4End = tCIDLib::TInt4(c4ElemCount) - 1;
@@ -1403,12 +1403,12 @@ namespace TArrayOps
     //  false, then c4Index is where you should insert the new one. If it's
     //  true, then that's where the match was found.
     //
-    template <typename TElem, typename TCompFunc> tCIDLib::TBoolean
-    bBinarySearch2( const   TElem* const        ptElems
-                    , const TElem&              tToFind
-                    ,       tCIDLib::TCard4&    c4Index
-                    , const tCIDLib::TCard4     c4ElemCount
-                    ,       TCompFunc           pfnComp)
+    template <typename T, typename TComp = tCIDLib::TDefMagComp<T>>
+    tCIDLib::TBoolean bBinarySearch2(const  T* const            ptElems
+                                    , const T&                  tToFind
+                                    ,       tCIDLib::TCard4&    c4Index
+                                    , const tCIDLib::TCard4     c4ElemCount
+                                    ,       TComp               pfnComp = TComp())
     {
         // Some special case checks to make the logic below safer
         tCIDLib::ESortComps eRes;
@@ -1497,13 +1497,14 @@ namespace TArrayOps
     }
 
 
-    template <typename TElem, typename TKey, typename TCompFunc> tCIDLib::TBoolean bSearch
+    template <typename TElem, typename TKey, typename TComp  = tCIDLib::TDefMagComp<T>>
+    tCIDLib::TBoolean bSearch
     (
         const   TElem* const        ptElems
         , const TKey                tToFind
         ,       tCIDLib::TCard4&    c4Index
         , const tCIDLib::TCard4     c4ElemCount
-        ,       TCompFunc           pfnComp)
+        ,       TComp               pfnComp = TComp())
     {
         // Set up the two end points that are used to subdivide the list
         tCIDLib::TInt4 i4End = tCIDLib::TInt4(c4ElemCount) - 1;
@@ -1530,5 +1531,4 @@ namespace TArrayOps
         }
         return kCIDLib::False;
     }
-
 }

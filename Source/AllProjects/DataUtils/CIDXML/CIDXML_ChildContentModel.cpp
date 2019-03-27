@@ -303,15 +303,15 @@ TXMLChildCM::eValidate( const   tCIDLib::TCard4* const  pc4ChildIds
         // Remember the current child element id and look it up in the list
         const tCIDLib::TCard4 c4CurId = pc4ChildIds[c4FailedAt];
 
-        tCIDLib::TCard4 c4ElemInd = 0;
-        for (; c4ElemInd < m_c4ElemListSize; c4ElemInd++)
-        {
-            if (m_pc4ElemList[c4ElemInd] == c4CurId)
-                break;
-        }
+        // Do a binary search for the id in the list of unique element ids
+        tCIDLib::TCard4 c4ElemInd;
+        const tCIDLib::TBoolean bFound = TArrayOps::bBinarySearch
+        (
+            m_pc4ElemList, c4CurId, c4ElemInd, m_c4ElemListSize
+        );
 
         // If not in the list, then we failed
-        if (c4ElemInd == m_c4ElemListSize)
+        if (!bFound)
             return tCIDXML::EValidRes::Mismatch;
 
         // See if there is a legal transition from here
@@ -457,6 +457,14 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
         if (c4InnerIndex == m_c4ElemListSize)
             m_pc4ElemList[m_c4ElemListSize++] = c4ElemId;
     }
+
+    //
+    //  Sort the list now, so that later validation can use binary searching to find
+    //  a given id's state transitions, and of course our transition list below will
+    //  be based on this order now, so the index into this list is the index into the
+    //  translation table.
+    //
+    TArrayOps::TSort<tCIDLib::TCard4>(m_pc4ElemList, m_c4ElemListSize);
 
     //
     //  And now we need to create a couple more data structures before we
