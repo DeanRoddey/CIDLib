@@ -86,7 +86,7 @@ class CIDENCODEEXP TFacCIDEncode : public TFacility
             , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
         )   const;
 
-        tCIDEncode::TTCvtPtr mptrMakeNew
+        tCIDEncode::TTCvtPtr cptrMakeNew
         (
             const   TString&                strName
             , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False

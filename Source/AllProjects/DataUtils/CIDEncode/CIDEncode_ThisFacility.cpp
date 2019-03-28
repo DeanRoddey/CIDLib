@@ -365,7 +365,7 @@ TFacCIDEncode::ptcvtMakeNew(const   TString&            strName
 }
 
 tCIDEncode::TTCvtPtr
-TFacCIDEncode::mptrMakeNew( const   TString&            strName
+TFacCIDEncode::cptrMakeNew( const   TString&            strName
                             , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     return tCIDEncode::TTCvtPtr(ptcvtMakeNew(strName, bThrowIfNot));
