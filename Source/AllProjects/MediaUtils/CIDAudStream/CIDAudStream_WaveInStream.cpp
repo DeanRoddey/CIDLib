@@ -46,8 +46,9 @@
 namespace CIDAudStream_WaveInSrcStream
 {
     //
-    //  Constants related to our audio format, which is 16K at 16 bits per sample
-    //  PCM, mono.
+    //  Constants related to our most common audio format, which is 16K at 16 bits
+    //  per sample PCM, mono. For now, it's the only format supported. This stuff needs
+    //  to be expanded to support format setting from the outside.
     //
     const tCIDLib::TCard4   c4Channels      = 1;
 
@@ -108,19 +109,15 @@ TWaveInSrcStream::TWaveInSrcStream() :
 
 TWaveInSrcStream::~TWaveInSrcStream()
 {
-    // Clean up our resources just in case we were not appropriately terminated
-    if (m_pInfo)
+    try
     {
-        try
-        {
-            Terminate();
-        }
+        Terminate();
+    }
 
-        catch(TError& errToCatch)
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
+    catch(TError& errToCatch)
+    {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
     }
 }
 
@@ -139,7 +136,8 @@ TWaveInSrcStream::bReadBytes(       tCIDLib::TCard1* const  pc1ToFill
                             ,       tCIDLib::TCard4&        c4BytesRead
                             , const tCIDLib::TCard4         c4WaitMSs)
 {
-    CheckReady();
+    if (!m_pInfo)
+        ThrowNotReady();
 
     // Lock while we do this
     TMtxLocker mtxlSync(&m_mtxSync);
@@ -246,7 +244,9 @@ TWaveInSrcStream::bReadBytes(       tCIDLib::TCard1* const  pc1ToFill
 //
 tCIDLib::TVoid TWaveInSrcStream::FlushBufs()
 {
-    // Lock while we do this
+    if (!m_pInfo)
+        ThrowNotReady();
+
     TMtxLocker mtxlSync(&m_mtxSync);
 
     // Just move through the buffers until we find one not ready
@@ -408,16 +408,24 @@ TWaveInSrcStream::QueryFormat(  tCIDLib::TCard4&    c4Channels
                                 , tCIDLib::TCard4&  c4BytesPerSample) const
 {
     // Make sure we are ready
-    CheckReady();
+    if (!m_pInfo)
+        ThrowNotReady();
 
+    TMtxLocker mtxlSync(&m_mtxSync);
     c4Channels = CIDAudStream_WaveInSrcStream::c4Channels;
     c4SamplesPerSec = CIDAudStream_WaveInSrcStream::c4SampleRate;
     c4BytesPerSample = CIDAudStream_WaveInSrcStream::c4SampleBytes;
 }
 
 
+//
+//  This will clean up our resources. We have ot make sure we leave ourself in a
+//  state where multiple calls to this method will not do anything wrong.
+//
 tCIDLib::TVoid TWaveInSrcStream::Terminate()
 {
+    TMtxLocker mtxlSync(&m_mtxSync);
+
     // Unprep our buffers and release them
     if (m_pInfo)
     {
@@ -451,7 +459,10 @@ tCIDLib::TVoid TWaveInSrcStream::Terminate()
 
     // Clean up our overflow buffer if we allocated it
     if (m_pac1Over)
+    {
         delete [] m_pac1Over;
+        m_pac1Over = nullptr;
+    }
 }
 
 
@@ -460,18 +471,15 @@ tCIDLib::TVoid TWaveInSrcStream::Terminate()
 //  TWaveInSrcStream: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 
-tCIDLib::TVoid TWaveInSrcStream::CheckReady() const
+tCIDLib::TVoid TWaveInSrcStream::ThrowNotReady() const
 {
-    if (!m_pInfo)
-    {
-        facCIDAudStream().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kAudStrErrs::errcStrm_NotReady
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::NotReady
-        );
-    }
+    facCIDAudStream().ThrowErr
+    (
+        CID_FILE
+        , CID_LINE
+        , kAudStrErrs::errcStrm_NotReady
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::NotReady
+    );
 }
 
