@@ -49,6 +49,7 @@ ERRORS=
     errcRegEx_ExpectedExpr      2914    Expected "|<expr>" at offset %(1) of RegEx pattern
     errcRegEx_ZeroMaxElems      2915    Cannot set the NFA maximum states to zero
     errcRegEx_NoMatcher         2916    There is no matcher object associated with an epsilon state
+    errcRegEx_MustReset         2917    The regular expression engine must be reset before you can reuse it
 
 END ERRORS
 
@@ -60,7 +61,6 @@ MESSAGES=
 
     ; General strings
     midGen_Pattern             13000    Pattern
-    midGen_NotApplicable       13002    N/A
 
 
     ; Strings used by the CIDLib_RegEx.Cpp file

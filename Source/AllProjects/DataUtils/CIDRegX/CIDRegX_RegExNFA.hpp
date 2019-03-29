@@ -117,6 +117,11 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
             const   tCIDLib::TCard4         c4At
         )   const;
 
+        tCIDLib::TBoolean bIsNullable() const
+        {
+            return m_bNullable;
+        }
+
         tCIDLib::TCard4 c4AddState();
 
         tCIDLib::TCard4 c4AddState
@@ -131,16 +136,16 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
                     TRXMatcher* const       pmatchNew = nullptr
         );
 
+        tCIDLib::TCard4 c4Reset
+        (
+            const   tCIDLib::TCard4         c4MaxStates
+        );
+
         tCIDLib::TCard4 c4StateCount() const;
 
         tCIDLib::TCard4 c4LastState() const;
 
         tCIDLib::TCard4 c4MaxStates() const;
-
-        tCIDLib::TCard4 c4MaxStates
-        (
-            const   tCIDLib::TCard4         c4NewMax
-        );
 
         tCIDLib::TCard4 c4State1At
         (
@@ -151,6 +156,8 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         (
             const   tCIDLib::TCard4         c4At
         )   const;
+
+        tCIDLib::TVoid Complete();
 
         const TRXMatcher& matchAt
         (
@@ -244,6 +251,17 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         // --------------------------------------------------------------------
         //  Private data members
         //
+        //  m_bNullable
+        //      When Complete is called, we see if there is path through the NFA
+        //      from start to end via epsilon nodes. If so, then this expression will
+        //      match an empty input pattern.
+        //
+        //  m_bReady
+        //      After setting all states the client code must call Complete to finish
+        //      setup and we set this to indicate we are ready. We clear it upon
+        //      a call to Reset() which the client code uses to get us ready to start
+        //      setting up a new parsed expression.
+        //
         //  m_c4StateCount
         //      The number of states in our NFA.
         //
@@ -260,6 +278,8 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         //      The array of transition matchers. Each one of them is matcher
         //      object that represents a single state's match criteria.
         // --------------------------------------------------------------------
+        tCIDLib::TBoolean       m_bNullable;
+        tCIDLib::TBoolean       m_bReady;
         tCIDLib::TCard4         m_c4StateCount;
         tCIDLib::TCard4         m_c4Entries;
         tCIDLib::TCard4*        m_pc4State1;

@@ -164,7 +164,7 @@ tCIDLib::TVoid TRXAnyCharMatcher::FormatTo(TTextOutStream& strmDest) const
 // ----------------------------------------------------------------------------
 TRXRangeMatcher::TRXRangeMatcher(const tCIDLib::TBoolean bNot) :
     m_bNot(bNot)
-    , m_pnodeHead(0)
+    , m_pnodeHead(nullptr)
 {
 }
 

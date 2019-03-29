@@ -1184,8 +1184,8 @@ TXMLCMSpecNode* TDTDValidator::pxcsnParseCMLevel()
     //
     tCIDLib::TCh            chNext;
     tCIDXML::ECMNodeTypes   eType = tCIDXML::ECMNodeTypes::Unknown;
-    TXMLCMSpecNode*         pxcsnNew = 0;
-    TXMLCMSpecNode*         pxcsnCur = 0;
+    TXMLCMSpecNode*         pxcsnNew = nullptr;
+    TXMLCMSpecNode*         pxcsnCur = nullptr;
     while (kCIDLib::True)
     {
         //

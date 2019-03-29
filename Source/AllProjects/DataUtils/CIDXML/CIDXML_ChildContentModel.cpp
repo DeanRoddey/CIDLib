@@ -691,7 +691,7 @@ tCIDLib::TVoid TXMLChildCM::BuildFollowLists(TXMLCMNode* const pxcmnCur)
             //
             //  Now update each set in the list that would affected by our
             //  first/last sets. For every position which is in our left
-            //  child's last set, add allof the states in our right child's
+            //  child's last set, add all of the states in our right child's
             //  first set to the follow set for that position.
             //
             const TBitset& btsLast = pxcmnBin->pxcmnLeft()->btsLastPos();

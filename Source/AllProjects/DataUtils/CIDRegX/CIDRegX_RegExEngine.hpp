@@ -123,6 +123,8 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const;
 
+        tCIDLib::TBoolean bIsNullable() const;
+
         tCIDLib::TBoolean bReplaceAll
         (
                     TString&                strFindIn
@@ -177,11 +179,11 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         //
         //  m_pszPattern
         //      A copy of the pattern string that is currently set up as our
-        //      NFA. If it has not been set yet, then its still a nul.
+        //      NFA. If it has not been set yet, then its still a null pointer.
         //
         //  m_prxnfaPattern
-        //      The NFA that contains the compiled pattern. It is lazily
-        //      allocated upon demand.
+        //      The NFA that contains the compiled pattern built up from parsing the
+        //      expression that gets set on us.
         // --------------------------------------------------------------------
         tCIDLib::TCh*           m_pszPattern;
         TRegExNFA*              m_prxnfaPattern;
