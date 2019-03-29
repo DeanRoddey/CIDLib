@@ -104,10 +104,6 @@ TFacCIDComm::TFacCIDComm() :
     }
 }
 
-TFacCIDComm::~TFacCIDComm()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TFacCIDComm: Public, non-virtual methods
@@ -220,7 +216,7 @@ TCommPortBase* TFacCIDComm::pcommMakeNew(const TString& strPath)
     // Lock the list while we do this
     TMtxLocker mtxlSync(CIDComm_ThisFacility::pcolFList->pmtxLock());
 
-    TCommPortBase* pcommRet = 0;
+    TCommPortBase* pcommRet = nullptr;
     const tCIDLib::TCard4 c4Count = CIDComm_ThisFacility::pcolFList->c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {

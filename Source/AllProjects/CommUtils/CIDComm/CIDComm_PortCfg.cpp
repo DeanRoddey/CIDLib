@@ -84,10 +84,6 @@ TCommPortCfg::TCommPortCfg( const   tCIDLib::TCard4         c4Baud
 {
 }
 
-TCommPortCfg::~TCommPortCfg()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TCommPortCfg: Public operators

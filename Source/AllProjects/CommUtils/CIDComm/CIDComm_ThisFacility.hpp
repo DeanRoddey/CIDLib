@@ -49,7 +49,15 @@ class CIDCOMMEXP TFacCIDComm : public TFacility
         // -------------------------------------------------------------------
         TFacCIDComm();
 
-        ~TFacCIDComm();
+        TFacCIDComm(const TFacCIDComm&) = delete;
+
+        ~TFacCIDComm() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFacCIDComm& operator=(const TFacCIDComm&) = delete;
 
 
         // -------------------------------------------------------------------

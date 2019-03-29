@@ -48,7 +48,7 @@ class TLocalComPortFactory : public TComPortFactory
 
         TLocalComPortFactory(const TLocalComPortFactory&) = delete;
 
-        ~TLocalComPortFactory();
+        ~TLocalComPortFactory() = default;
 
 
         // -------------------------------------------------------------------

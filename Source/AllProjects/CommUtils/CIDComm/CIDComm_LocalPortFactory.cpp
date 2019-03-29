@@ -59,10 +59,6 @@ TLocalComPortFactory::TLocalComPortFactory() :
 {
 }
 
-TLocalComPortFactory::~TLocalComPortFactory()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TLocalComPortFactory: Public, virtual methods

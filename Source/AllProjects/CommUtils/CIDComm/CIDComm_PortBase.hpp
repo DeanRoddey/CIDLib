@@ -49,7 +49,7 @@ class CIDCOMMEXP TCommPortBase : public TObject
         // -------------------------------------------------------------------
         TCommPortBase(const TCommPortBase&) = delete;
 
-        ~TCommPortBase();
+        ~TCommPortBase() = default;
 
 
         // -------------------------------------------------------------------

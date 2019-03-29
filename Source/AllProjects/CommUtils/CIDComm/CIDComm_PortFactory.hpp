@@ -53,9 +53,11 @@ class CIDCOMMEXP TComPortFactory : public TObject
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
+        TComPortFactory() = delete;
+
         TComPortFactory(const TComPortFactory&) = delete;
 
-        ~TComPortFactory();
+        ~TComPortFactory() = default;
 
 
         // -------------------------------------------------------------------
