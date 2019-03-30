@@ -142,6 +142,7 @@ ERRORS=
     errcCol_NotReady            811     The %(1) cursor has not been set up yet
     errcCol_MustClearFirst      812     The target collection must be clared first
     errcCol_Full                813     The '%(1)' is is full, no more items can be added
+    errcCol_HashChanged         814     The hash of an element in a hashed collection was modified in place
 
     ; Console errors
     errcCon_TextReadError       891     Could not read a text line from the console object

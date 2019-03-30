@@ -1116,6 +1116,39 @@ class TKeyedHashSet : public TCollection<TElem>
         }
 
 
+        //
+        //  We have to do non-const in each collection derivative. The base collection
+        //  class doesn't know about non-const cursors so it can't do this generically.
+        //  The collection is constant here, just the elements are non-const.
+        //
+        //  DO NOT change the element in a way that would modify the hash!
+        //
+        template <typename IterCB> tCIDLib::TVoid ForEachNC(IterCB iterCB) const
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+
+            tCIDLib::THashVal   hshCurBucket = 0;
+            TNode*              pnodeCur = pnodeFindFirst(hshCurBucket);
+            while (pnodeCur)
+            {
+                if (!iterCB(pnodeCur->objData()))
+                    break;
+
+                // In debug, make sure they didn't modify the hash of this element
+                #if CID_DEBUG_ON
+                const tCIDLib::THashVal hshCheck = m_pkopsToUse->hshKey
+                (
+                    m_pfnKeyExtract(pnodeCur->objData()), m_c4HashModulus
+                );
+                if (hshCheck != hshCurBucket)
+                    this->HashChanged(CID_FILE, CID_LINE);
+                #endif
+
+                pnodeCur = pnodeFindNext(pnodeCur, hshCurBucket);
+            }
+        }
+
+
         // Add the passed object if new, and return whether it was added or not
         TElem& objAddIfNew( const   TElem&              objToAdd
                             ,       tCIDLib::TBoolean&  bAdded)

@@ -571,6 +571,12 @@ class CIDLIBEXP TCollectionBase : public TObject
             const   TString&                strTopicPath
         );
 
+        tCIDLib::TVoid HashChanged
+        (
+            const   tCIDLib::TCh* const     pszFile
+            , const tCIDLib::TCard4         c4Line
+        )   const;
+
         tCIDLib::TVoid KeyNotFound
         (
              const  tCIDLib::TCh* const     pszFile

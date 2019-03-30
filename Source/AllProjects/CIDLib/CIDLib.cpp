@@ -327,6 +327,23 @@ static tCIDLib::TVoid DummyFunc()
     TRefQueue<TString> colStrRQ(tCIDLib::EAdoptOpts::Adopt);
     colStrRQ.ForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
 
+    TRefKeyedHashSet<TKeyValuePair, TString, TStringKeyOps>
+    colRKHS
+    (
+        tCIDLib::EAdoptOpts::NoAdopt
+        , 23
+        , new TStringKeyOps(kCIDLib::False)
+        , &TKeyValuePair::strExtractKey
+    );
+    colRKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
+
+    TKeyedHashSet<TKeyValuePair, TString, TStringKeyOps>
+    colKHS
+    (
+        23, new TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
+    );
+    colKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
+
 
     // Unique pointer template expansion to make sure it's good
     TUniquePtr<TString> uptrTest1(new TString(L"This is a test"));

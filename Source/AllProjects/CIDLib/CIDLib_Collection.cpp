@@ -790,13 +790,28 @@ tCIDLib::TVoid TCollectionBase::EnablePublish(const TString& strTopicPath)
 
 
 tCIDLib::TVoid
+TCollectionBase::HashChanged(const  tCIDLib::TCh* const     pszFile
+                            , const tCIDLib::TCard4         c4Line) const
+{
+    facCIDLib().ThrowErr
+    (
+        pszFile
+        , c4Line
+        , kCIDErrs::errcCol_HashChanged
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::NotSupported
+    );
+}
+
+
+tCIDLib::TVoid
 TCollectionBase::MustClearFirst(const   tCIDLib::TCh* const pszFile
                                 , const tCIDLib::TCard4     c4Line) const
 {
     facCIDLib().ThrowErr
     (
-        CID_FILE
-        , CID_LINE
+        pszFile
+        , c4Line
         , kCIDErrs::errcCol_MustClearFirst
         , tCIDLib::ESeverities::Failed
         , tCIDLib::EErrClasses::NotSupported
