@@ -175,7 +175,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_CollectCursor.hpp"
 #include    "CIDLib_Collection.hpp"
 #include    "CIDLib_BasicDLinkedCol.hpp"
-#include    "CIDLib_CollectionUtils.hpp"
 
 #include    "CIDLib_StreamFmt.hpp"
 #include    "CIDLib_TextInStream.hpp"

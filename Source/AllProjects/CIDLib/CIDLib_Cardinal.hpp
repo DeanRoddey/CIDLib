@@ -162,6 +162,25 @@ class CIDLIBEXP TCardinal :
             const   tCIDLib::TCard4         c4ToCompare
         )   const;
 
+        TCardinal& operator+=
+        (
+            const   TCardinal&              cSrc
+        );
+
+        TCardinal& operator-=
+        (
+            const   TCardinal&              cSrc
+        );
+
+        TCardinal& operator+=
+        (
+            const   tCIDLib::TCard4         c4Src
+        );
+
+        TCardinal& operator-=
+        (
+            const   tCIDLib::TCard4         c4Src
+        );
 
 
         // -------------------------------------------------------------------
@@ -329,6 +348,25 @@ class CIDLIBEXP TCardinal64 :
             const   tCIDLib::TCard8&        c8ToCompare
         )   const;
 
+        TCardinal64& operator+=
+        (
+            const   TCardinal64&            cSrc
+        );
+
+        TCardinal64& operator-=
+        (
+            const   TCardinal64&            cSrc
+        );
+
+        TCardinal64& operator+=
+        (
+            const   tCIDLib::TCard8         c8Src
+        );
+
+        TCardinal64& operator-=
+        (
+            const   tCIDLib::TCard8         c8Src
+        );
 
 
         // -------------------------------------------------------------------

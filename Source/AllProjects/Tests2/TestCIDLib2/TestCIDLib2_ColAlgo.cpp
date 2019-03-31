@@ -187,7 +187,47 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"First less reported bogus success\n\n";
         }
+    }
 
+    // Test the copying one, to copy between two different types of collections
+    {
+        TBag<TString> colTar;
+        tCIDColAlgo::CopyElems(colTar, colStrs);
+
+        // They should have the same element count
+        if (colTar.c4ElemCount() != colStrs.c4ElemCount())
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Collections not equal size after CopyElems\n\n";
+        }
+
+        //
+        //  The bag is ordered, so they should still iterate in the same order. So
+        //  we should be able to use the generic bCompareElems() method to compare
+        //  them.
+        //
+        if (!tCIDLib::bCompareElems<TString>(colTar, colStrs))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Elements not equal size after CopyElems\n\n";
+        }
+    }
+
+    // Test the accumulate method
+    {
+        const TCardinal cSum = tCIDColAlgo::tAccumulate(colCards, TCardinal(0));
+
+        // Do the sum manually and compare them
+        TCardList::TCursor cursSum(&colCards);
+        tCIDLib::TCard4 c4Sum2 = 0;
+        for (; cursSum; ++cursSum)
+            c4Sum2 += *cursSum;
+
+        if (cSum != c4Sum2)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"tAccumulate generated bad sum\n\n";
+        }
     }
 
     return eRes;

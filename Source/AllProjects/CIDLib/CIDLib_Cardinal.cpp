@@ -163,6 +163,29 @@ tCIDLib::TBoolean TCardinal::operator>=(const tCIDLib::TCard4 c4ToTest) const
     return (m_c4Val >= c4ToTest);
 }
 
+TCardinal& TCardinal::operator+=(const TCardinal& cSrc)
+{
+    m_c4Val += cSrc.m_c4Val;
+    return *this;
+}
+
+TCardinal& TCardinal::operator-=(const TCardinal& cSrc)
+{
+    m_c4Val -= cSrc.m_c4Val;
+    return *this;
+}
+
+TCardinal& TCardinal::operator+=(const tCIDLib::TCard4 c4Src)
+{
+    m_c4Val += c4Src;
+    return *this;
+}
+
+TCardinal& TCardinal::operator-=(const tCIDLib::TCard4 c4Src)
+{
+    m_c4Val -= c4Src;
+    return *this;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -314,6 +337,31 @@ tCIDLib::TBoolean TCardinal64::operator>=(const tCIDLib::TCard8& c8ToTest) const
 {
     return (m_c8Val >= c8ToTest);
 }
+
+TCardinal64& TCardinal64::operator+=(const TCardinal64& cSrc)
+{
+    m_c8Val += cSrc.m_c8Val;
+    return *this;
+}
+
+TCardinal64& TCardinal64::operator-=(const TCardinal64& cSrc)
+{
+    m_c8Val -= cSrc.m_c8Val;
+    return *this;
+}
+
+TCardinal64& TCardinal64::operator+=(const tCIDLib::TCard8 c8Src)
+{
+    m_c8Val += c8Src;
+    return *this;
+}
+
+TCardinal64& TCardinal64::operator-=(const tCIDLib::TCard8 c8Src)
+{
+    m_c8Val -= c8Src;
+    return *this;
+}
+
 
 
 // ---------------------------------------------------------------------------

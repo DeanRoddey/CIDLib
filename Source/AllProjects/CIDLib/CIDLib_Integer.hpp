@@ -159,6 +159,26 @@ class CIDLIBEXP TInteger :
             const   tCIDLib::TInt4          i4ToTest
         )   const;
 
+        TInteger& operator+=
+        (
+            const   TInteger&               iSrc
+        );
+
+        TInteger& operator-=
+        (
+            const   TInteger&               iSrc
+        );
+
+        TInteger& operator+=
+        (
+            const   tCIDLib::TInt4         i4Src
+        );
+
+        TInteger& operator-=
+        (
+            const   tCIDLib::TInt4         i4Src
+        );
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -318,6 +338,26 @@ class CIDLIBEXP TInteger64 :
         (
             const   tCIDLib::TInt8&         i8ToTest
         )   const;
+
+        TInteger64& operator+=
+        (
+            const   TInteger64&             iSrc
+        );
+
+        TInteger64& operator-=
+        (
+            const   TInteger64&             iSrc
+        );
+
+        TInteger64& operator+=
+        (
+            const   tCIDLib::TInt8          i8Src
+        );
+
+        TInteger64& operator-=
+        (
+            const   tCIDLib::TInt8          i8Src
+        );
 
 
         // -------------------------------------------------------------------

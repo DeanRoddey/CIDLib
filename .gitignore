@@ -16,7 +16,10 @@ thumbs.db
 #
 **/Save/
 **/Save[0-9]*/
-
+tmp.txt
+tmp.Txt
+Tmp.txt
+Tmp.Txt
 
 #
 # In a couple small instances we may build in place, for some small tests

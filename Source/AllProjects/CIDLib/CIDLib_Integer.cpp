@@ -160,6 +160,29 @@ tCIDLib::TBoolean TInteger::operator>=(const tCIDLib::TInt4 i4ToTest) const
     return (m_i4Val >= i4ToTest);
 }
 
+TInteger& TInteger::operator+=(const TInteger& iSrc)
+{
+    m_i4Val += iSrc.m_i4Val;
+    return *this;
+}
+
+TInteger& TInteger::operator-=(const TInteger& iSrc)
+{
+    m_i4Val -= iSrc.m_i4Val;
+    return *this;
+}
+
+TInteger& TInteger::operator+=(const tCIDLib::TInt4 i4Src)
+{
+    m_i4Val += i4Src;
+    return *this;
+}
+
+TInteger& TInteger::operator-=(const tCIDLib::TInt4 i4Src)
+{
+    m_i4Val -= i4Src;
+    return *this;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -313,7 +336,29 @@ tCIDLib::TBoolean TInteger64::operator>=(const tCIDLib::TInt8& i8ToTest) const
     return (m_i8Val >= i8ToTest);
 }
 
+TInteger64& TInteger64::operator+=(const TInteger64& iSrc)
+{
+    m_i8Val += iSrc.m_i8Val;
+    return *this;
+}
 
+TInteger64& TInteger64::operator-=(const TInteger64& iSrc)
+{
+    m_i8Val -= iSrc.m_i8Val;
+    return *this;
+}
+
+TInteger64& TInteger64::operator+=(const tCIDLib::TInt8 i8Src)
+{
+    m_i8Val += i8Src;
+    return *this;
+}
+
+TInteger64& TInteger64::operator-=(const tCIDLib::TInt8 i8Src)
+{
+    m_i8Val -= i8Src;
+    return *this;
+}
 
 // ---------------------------------------------------------------------------
 //  TInteger64: Public, non-virtual methods
