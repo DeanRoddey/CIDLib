@@ -345,6 +345,7 @@ namespace TFileSys
         , const TString&                strUserName
         , const TString&                strPassword
         , const tCIDLib::TBoolean       bTemporary
+        , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
     );
 
     CIDLIBEXP tCIDLib::TVoid MakeDirectory
