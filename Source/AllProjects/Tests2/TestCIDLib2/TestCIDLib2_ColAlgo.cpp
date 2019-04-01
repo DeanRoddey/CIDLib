@@ -229,7 +229,7 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
             strmOut << TFWCurLn << L"tAccumulate generated bad sum\n\n";
         }
 
-        TCardList colEmpty();
+        TCardList colEmpty;
         if (tCIDColAlgo::tAccumulate(colCards, TCardinal(1)) != TCardinal(1))
         {
             eRes = tTestFWLib::ETestRes::Failed;

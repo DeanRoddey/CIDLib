@@ -34,7 +34,7 @@
 //   CLASS: TCIDAudioSrcStream
 //  PREFIX: cass
 // ---------------------------------------------------------------------------
-class CIDAUDSTREAMEXP TCIDAudioSrcStream
+class CIDAUDSTREAMEXP TCIDAudioSrcStream : public TObject
 {
     public :
         // -------------------------------------------------------------------
@@ -98,6 +98,12 @@ class CIDAUDSTREAMEXP TCIDAudioSrcStream
         //      we make it available
         // -------------------------------------------------------------------
         tCIDAudStream::EStrmStates m_eState;
+
+
+        // -------------------------------------------------------------------
+        //  Magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TCIDAudioSrcStream, TObject)
 };
 
 #pragma CIDLIB_POPPACK

@@ -878,6 +878,7 @@ PROJECT=CIDAudStream
         DISPLAY     = N/A
         EXPORT      = CIDAUDSTREAMEXP
         MSGFILE     = Yes
+        PLATFORMDIR = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -895,6 +896,11 @@ PROJECT=CIDAudStream
             PUREANSI    = No
         END PLATFORM
     END PLATFORMOPTS
+
+    ; This one has per-platform implementations but only Win32 so far
+    INCLUDEPLATS
+        Win32
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
