@@ -49,6 +49,7 @@
 // ----------------------------------------------------------------------------
 //  Local data
 //
+//  conIn
 //  conOut
 //      Input and output consoles. We only need the input to get an enter key
 //      from the user to end the program.
@@ -56,8 +57,8 @@
 //  strGrammarPath
 //      We get a command line parameter with the path to the grammar file to load.
 // ----------------------------------------------------------------------------
-static TOutConsole  conOut;
 static TInConsole   conIn;
+static TOutConsole  conOut;
 static TString      strGrammarPath;
 
 
