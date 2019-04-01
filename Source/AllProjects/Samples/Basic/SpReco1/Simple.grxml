@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<grammar version="1.0"
+         xml:lang="en-US"
+         root="TopRule"
+         tag-format="semantics/1.0"
+         xmlns="http://www.w3.org/2001/06/grammar"
+         xmlns:sapi="http://schemas.microsoft.com/Speech/2002/06/SRGSExtensions"
+         sapi:alphabet="x-microsoft-ups">
+
+    <rule id="TopRule" scope="public">
+        <item>
+            <one-of>
+                <item><ruleref uri="#GoAway"/></item>
+                <item><ruleref uri="#Shutup"/></item>
+            </one-of>
+        </item>
+    </rule>
+
+    <rule id="GoAway">
+        <item repeat="0-1">
+            Please
+        </item>
+        <item>
+            go away
+        </item>
+        <tag>
+            out.Action = "GoAway";
+            out.Type = "Cmd";
+            out.Target = "Boss";
+        </tag>
+    </rule>
+
+    <rule id="Shutup">
+        <item repeat="0-1">
+            <one-of>
+                <item>Would you please</item>
+                <item>Please</item>
+            </one-of>
+        </item>
+        <item>
+            shut up
+        </item>
+        <tag>
+            out.Action = "Shutup";
+            out.Type = "Cmd";
+            out.Target = "MotherInLaw";
+        </tag>
+    </rule>
+
+</grammar>

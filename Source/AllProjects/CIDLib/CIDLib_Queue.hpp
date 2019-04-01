@@ -136,6 +136,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Nested aliases for the cursor and node types used by a queue.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TQueue<TElem>;
         using TNode = TQueueNode<TElem>;
 

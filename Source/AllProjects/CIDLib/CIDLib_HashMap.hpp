@@ -194,6 +194,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         //  Nested aliases s for the node and key ops types used by a keyed
         //  hash map.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = THashMap<TElem, TKey, TKeyOps>;
         using TPair = TKeyObjPair<TKey,TElem>;
         using TNode = THashMapNode<TKey,TElem>;

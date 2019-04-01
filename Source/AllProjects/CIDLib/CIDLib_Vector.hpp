@@ -44,15 +44,16 @@ class TVector : public TCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Nested type aliases for comparator and iteration callbacks
+        //  Nested class type aliases
         // -------------------------------------------------------------------
-        using TMyType = TVector<TElem, TIndex>;
+        using TMyElemType   = TElem;
+        using TMyType       = TVector<TElem, TIndex>;
 
 
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -247,7 +248,7 @@ class TVector : public TCollection<TElem>
                 )
         };
 
-        template <class TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------

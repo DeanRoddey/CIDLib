@@ -78,10 +78,12 @@ namespace tCIDColAlgo
     //  comparison functor will be used if not explicitly provided, which requires
     //  that the elements provide the equality operator.
     //
-    template<typename TCol, typename T, typename TComp = tCIDLib::TDefEqComp<T>>
-    typename TCol::TCursor cursFind(const   TCol&   colSrc
-                                    , const T&  objToFind
-                                    ,       TComp   pfnComp = TComp())
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TCursor cursFind(const   TCol&       colSrc
+                                    , const TElem&      objToFind
+                                    ,       TComp       pfnComp = TComp())
     {
         TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
@@ -99,9 +101,11 @@ namespace tCIDColAlgo
     //  equality comparison functor will be used if not explicitly provided, which
     //  requires that the elements provide the equality operator.
     //
-    template<typename TCol, typename T, typename TComp = tCIDLib::TDefEqComp<T>>
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
     typename TCol::TCursor cursFindNot( const   TCol&   colSrc
-                                        , const T&  objToFind
+                                        , const TElem&  objToFind
                                         ,       TComp   pfnComp = TComp())
     {
         TCol::TCursor cursSrc(&colSrc);
@@ -119,9 +123,11 @@ namespace tCIDColAlgo
     //  default magnitude comparison functor is used if not indicated explicitly. It
     //  requires that the element type provide < and > operators.
     //
-    template<typename TCol, typename T, typename TComp = tCIDLib::TDefMagComp<T>>
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
     typename TCol::TCursor cursFirstGreater(const   TCol&   colSrc
-                                            , const T&  objComp
+                                            , const TElem&  objComp
                                             ,       TComp   pfnComp = TComp())
     {
         TCol::TCursor cursSrc(&colSrc);
@@ -133,9 +139,11 @@ namespace tCIDColAlgo
         return cursSrc;
     }
 
-    template<typename TCol, typename T, typename TComp = tCIDLib::TDefMagComp<T>>
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
     typename TCol::TCursor cursFirstLess(const  TCol&   colSrc
-                                        , const T&  objComp
+                                        , const TElem&  objComp
                                         ,       TComp   pfnComp = TComp())
     {
         TCol::TCursor cursSrc(&colSrc);
@@ -153,8 +161,7 @@ namespace tCIDColAlgo
     //  target collection. It is assumed that the caller flushed the target
     //  collection if that was desirable or required.
     //
-    //  This version works only with 'by value' collections. There is another
-    //  version for 'by reference' collections.
+    //  This version works only with 'by value' collections.
     //
     //  If you are dealing with two collections of the same type (and you know
     //  if you are), then use the assignment or copy methods since they will
@@ -198,6 +205,39 @@ namespace tCIDColAlgo
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
             throw;
         }
+    }
+
+
+    //
+    //  Remove's consequtive dups and returns the number of them that were
+    //  removed. It must support a RemoveAt(curs) type method.
+    //
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    tCIDLib::TCard4 c4RemoveSeqDups(TCol& colSrc, TComp pfnComp = TComp())
+    {
+        if (colSrc.bIsEmpty())
+            return 0;
+
+        tCIDLib::TCard4 c4RemCount = 0;
+        TCol::TNCCursor cursCur(&colSrc);
+        TElem& objLast = *cursCur;
+        ++cursCur;
+        while (cursCur.bIsValid())
+        {
+            if (pfnComp(*cursCur, objLast))
+            {
+                colSrc.RemoveAt(cursCur);
+                c4RemCount++;
+            }
+             else
+            {
+                objLast = *cursCur;
+                ++cursCur;
+            }
+        }
+        return c4RemCount;
     }
 }
 

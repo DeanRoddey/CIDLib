@@ -138,6 +138,7 @@ template <class TElem, class TKeyOps> class THashSet
         //  Nested aliases for the node type used by a hash table and the
         //  user provided object equality function.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = THashSet<TElem, TKeyOps>;
         using TNode = THashSetNode<TElem>;
 

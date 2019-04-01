@@ -46,9 +46,10 @@ class TRefVector : public TRefCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Nested alias for the element comparator function
+        //  Class type aliases
         // -------------------------------------------------------------------
-        using TMyType   = TRefVector<TElem, TIndex>;
+        using TMyElemType   = TElem;
+        using TMyType       = TRefVector<TElem, TIndex>;
 
 
         // -------------------------------------------------------------------

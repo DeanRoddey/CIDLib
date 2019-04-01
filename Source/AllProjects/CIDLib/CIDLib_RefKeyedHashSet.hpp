@@ -163,7 +163,7 @@ template <class TElem,class TKey> class TRefKeyedHashSetNode
 //   CLASS: TRefKeyedHashSet
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem, class TKey, class TKeyOps>
+template <typename TElem, typename TKey, typename TKeyOps>
 class TRefKeyedHashSet : public TRefCollection<TElem>
 {
     public  :
@@ -185,9 +185,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Nested aliases for the node and key ops types used by a keyed hash
         //  set. And one for the key field extraction function that the
-        //  user provides. And another is provided for the object equality
-        //  function the user provides in some methods.
+        //  user provides.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TRefKeyedHashSet<TElem, TKey, TKeyOps>;
         using TNode = TRefKeyedHashSetNode<TElem,TKey> ;
         using TKeyExtract = const TKey& (*)(const TElem&);
@@ -196,7 +196,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem, class TKey, class TKeyOps> class TConstCursor :
+        template <typename TElem, typename TKey, typename TKeyOps> class TConstCursor :
 
             public TBiColCursor<TElem>
         {
@@ -504,7 +504,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         };
 
 
-        template <class TElem, class TKey, class TKeyOps> class TNonConstCursor :
+        template <typename TElem, typename TKey, typename TKeyOps> class TNonConstCursor :
 
             public TConstCursor<TElem, TKey, TKeyOps>
         {

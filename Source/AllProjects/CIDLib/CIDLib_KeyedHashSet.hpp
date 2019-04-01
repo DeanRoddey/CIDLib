@@ -156,6 +156,7 @@ class TKeyedHashSet : public TCollection<TElem>
         //  user provides. And another is provided for the object equality
         //  function the user provides in some methods.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TKeyedHashSet<TElem, TKey, TKeyOps>;
         using TNode = TKeyedHashSetNode<TElem, TKey>;
         using TKeyExtract = const TKey& (*)(const TElem&);

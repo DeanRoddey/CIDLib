@@ -46,8 +46,9 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Nested aliases for the cursor and node types used
+        //  Nested aliases for the cursor and types used
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TBasicDLinkedRefCol<TElem>;
         using TNode = TBasicColRefNode<TElem>;
 

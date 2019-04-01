@@ -45,9 +45,9 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Nested aliases for the cursors and node types used. We also do
-        //  one for an element comparator callback function.
+        //  Nested aliases for the cursors and types used.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TBasicDLinkedCol<TElem>;
         using TNode = TBasicColNode<TElem>;
 

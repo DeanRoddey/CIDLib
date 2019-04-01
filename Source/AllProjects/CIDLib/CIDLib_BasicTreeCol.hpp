@@ -871,6 +871,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Nested aliases for the node types used by this collection
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TBasicTreeCol<TElem>;
         using TNode = TBasicTreeNode<TElem>;
         using TNodeT = TTreeNodeT<TElem>;

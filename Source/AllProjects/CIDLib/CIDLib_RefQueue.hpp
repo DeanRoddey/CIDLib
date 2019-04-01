@@ -144,8 +144,9 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Typedef for our node type and equality function
+        //  Class type aliases
         // -------------------------------------------------------------------
+        using TMyElemType   = TElem;
         using TMyType       = TRefQueue<TElem>;
         using TNode         = TRefQueueNode<TElem>;
         using TObjEqFunc    = tCIDLib::TBoolean (*)(const TElem&, const TElem&);

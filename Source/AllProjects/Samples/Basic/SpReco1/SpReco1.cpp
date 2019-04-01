@@ -106,7 +106,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         TCIDSpReco sprecoTest(L"SpRecoTest1");
         sprecoTest.Initialize(nullptr);
 
-        // Load the grammar we were told to load. It's not dynamic so say not
+        // Load the grammar we were told to load. It's not dynamic so false 2nd parm
         sprecoTest.LoadGrammarFromFile(strGrammarPath, kCIDLib::False);
 
         //

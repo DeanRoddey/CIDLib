@@ -228,6 +228,78 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"tAccumulate generated bad sum\n\n";
         }
+
+        TCardList colEmpty();
+        if (tCIDColAlgo::tAccumulate(colCards, TCardinal(1)) != TCardinal(1))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"tAccumulate on empty collection gave bad sum\n\n";
+        }
+    }
+
+    // Test the removal of consequtive dups
+    {
+        tCIDLib::TStrList colDups(8UL);
+        colDups.objAdd(L"First");
+        colDups.objAdd(L"Second");
+        colDups.objAdd(L"Third");
+        colDups.objAdd(L"Third");
+        colDups.objAdd(L"Fourth");
+        colDups.objAdd(L"Fifth");
+        colDups.objAdd(L"Fifth");
+
+        if (colDups.c4ElemCount() != 7)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Initial dups list count is wrong\n\n";
+        }
+
+        // It should remove two of them
+        if (tCIDColAlgo::c4RemoveSeqDups(colDups) != 2)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Seq dups remove dropped wrong number of elements\n\n";
+        }
+
+        if (colDups.c4ElemCount() != 5)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Seq dups remove left wrong number of elements\n\n";
+        }
+
+        if ((colDups[3] != L"Fourth") || (colDups[4] != L"Fifth"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Seq dups remove bad remaining order\n\n";
+        }
+
+
+        // Do a more extreme example
+        colDups.RemoveAll();
+        colDups.objAdd(L"First");
+        colDups.objAdd(L"First");
+        colDups.objAdd(L"First");
+        colDups.objAdd(L"First");
+        if (tCIDColAlgo::c4RemoveSeqDups(colDups) != 3)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Seq dups remove dropped wrong number of elements\n\n";
+        }
+
+        // We should have a single one left
+        if ((colDups.c4ElemCount() != 1) || (colDups[0] != L"First"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Seq dups remove bad remaining elements\n\n";
+        }
+
+        // And a corner case
+        colDups.RemoveAll();
+        if (tCIDColAlgo::c4RemoveSeqDups(colDups) != 0)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Seq dups remove on empty list returned non-zero\n\n";
+        }
     }
 
     return eRes;
