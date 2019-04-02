@@ -15,8 +15,29 @@
 //
 // DESCRIPTION:
 //
-//  This is the header file for the CIDDBase_Connection.Cpp file. This
-//  file implements a database connection.
+//  This is the header file for the CIDDBase_Connection.Cpp file, which represents
+//  a connection to a particular database and is needed to do operations against
+//  that database.
+//
+//  We need a small class to represent a database connection. We have a database
+//  connection object as well, but this is a wrapper around the platform specific
+//  information necessary to represent a connection.
+//
+//  Below we define a counted pointer to one of these and that becomes our fundamental
+//  database connection handle. Anything that needs to keep around the connection
+//  that was used to create it (so that it can complete/undo something later) will
+//  make a copy of this reference counted handle to make sure the connection stays
+//  alive until its not needed anymore.
+//
+//  So the actual connection object can be discarded after any required statements have
+//  been set up. They will keep the connection alive until its no longer needed. Other
+//  per-platform code can look at the internal definition of the connection handle info
+//  as required.
+//
+//  We can connect via an ODBC data source or a connection string, and have separate
+//  connection methods for the two schemes. We can use database security or local OS
+//  security. IF local OS security then the username/password is ignored and can be
+//  blank.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -29,18 +50,11 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+class TDBConnection;
+
 // ---------------------------------------------------------------------------
 //   CLASS: TODBCConnHandle
 //  PREFIX: odbch
-//
-//  We need a small class that will be used to reference count connection
-//  handles. A connection handle cannot be destroyed until all the statements
-//  that use it are destroyed. Since we cannot enforce order of destruction
-//  of objects. we just internally reference count the connection handle, so
-//  that the connection object can be destroyed at any time after the desired
-//  statements have been created.
-//
-//  We use thse via a counted pointer object to get the reference counting.
 // ---------------------------------------------------------------------------
 class CIDDBASEEXP TODBCConnHandle
 {
@@ -49,12 +63,6 @@ class CIDDBASEEXP TODBCConnHandle
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TODBCConnHandle();
-
-        TODBCConnHandle
-        (
-            const   tCIDDBase::THandle      hConn
-            , const TString&                strSrcName
-        );
 
         TODBCConnHandle(const TODBCConnHandle&) = delete;
 
@@ -70,30 +78,47 @@ class CIDDBASEEXP TODBCConnHandle
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDDBase::THandle hConn() const;
+        tCIDLib::TBoolean bIsValid() const;
 
-        const TString& strDataSrc() const;
+        const tCIDDBase::TConnHandle* pConnection() const
+        {
+            return m_pConn;
+        }
+
+        const TString& strDataSrc() const
+        {
+            return m_strDataSrc;
+        }
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  The connection class is our friend
+        // -------------------------------------------------------------------
+        friend class TDBConnection;
 
 
     private :
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_hConn
-        //      The handle to the connection. It's opaque to the outside
-        //      world.
+        //  m_pConn
+        //      The opaque per-platform structure for keeping track of a connection.
+        //      The connection class below will create one of these and will set our
+        //      members.
         //
         //  m_strDataSrc
-        //      We store the data source name provided in the connect, if
-        //      successful, for later error reporting purposes.
+        //      We store the data source name provided in the connect, if successful,
+        //      for later error reporting purposes. If it was via connection string this
+        //      is the resulting output connection string.
         // -------------------------------------------------------------------
-        tCIDDBase::THandle  m_hConn;
-        TString             m_strDataSrc;
+        tCIDDBase::TConnHandle* m_pConn;
+        TString                 m_strDataSrc;
 };
 
 namespace tCIDDBase
 {
-    typedef TCntPtr<TODBCConnHandle>    TODBCHandleRef;
+    typedef TCntPtr<TODBCConnHandle>    THConn;
 }
 
 
@@ -136,7 +161,7 @@ class CIDDBASEEXP TDBConnection : public TObject
             const   TString&                strSrcName
             , const TString&                strUserName
             , const TString&                strPassword
-            , const tCIDLib::TBoolean       bUseWinAuth
+            , const tCIDLib::TBoolean       bUseOSAuth
         );
 
         tCIDLib::TVoid ConnectStr
@@ -148,9 +173,9 @@ class CIDDBASEEXP TDBConnection : public TObject
 
         tCIDLib::TVoid Disconnect();
 
-        const tCIDDBase::TODBCHandleRef& cptrHandle() const;
+        const tCIDDBase::THConn& hConnection() const;
 
-        tCIDDBase::TODBCHandleRef& cptrHandle();
+        tCIDDBase::THConn& hConnection();
 
 
     private :
@@ -165,11 +190,12 @@ class CIDDBASEEXP TDBConnection : public TObject
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_cptrHandle
-        //      The handle to the connection. It's a counted pointer to a
-        //      connection handle object
+        //  m_hConnection
+        //      The handle to the connection. It's a counted pointer to a connection
+        //      handle object that represents this connection. If we have never been
+        //      connected it will show up as not valid.
         // -------------------------------------------------------------------
-        tCIDDBase::TODBCHandleRef   m_cptrHandle;
+        tCIDDBase::THConn   m_hConnection;
 
 
         // -------------------------------------------------------------------

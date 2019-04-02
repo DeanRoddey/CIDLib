@@ -15,9 +15,8 @@
 //
 // DESCRIPTION:
 //
-//  This is the main file of the facility. It provides an init function that
-//  is called by the magic main module macro that users must include in their
-//  main program file.
+//  This is the main file of the facility. It provides the lazy faulting in
+//  method for our facility object.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -30,13 +29,6 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDDBase_.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  This facility talks directly to some system APIs, so we need to force it
-//  to bring in the ODBC library, so as not to force this on everyone.
-// ---------------------------------------------------------------------------
-#pragma comment(lib, "odbc32.lib")
 
 
 // ---------------------------------------------------------------------------
@@ -59,6 +51,4 @@ TFacCIDDBase& facCIDDBase()
     }
     return *pfacCIDDBase;
 }
-
-
 

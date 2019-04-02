@@ -29,6 +29,7 @@
 //  Facility specific includes
 // ---------------------------------------------------------------------------
 #include    "CIDDBase_.hpp"
+#include    "CIDDBase_Win32.hpp"
 
 
 // ---------------------------------------------------------------------------
@@ -37,43 +38,9 @@
 RTTIDecls(TDBStatement,TObject)
 
 
-
-// ---------------------------------------------------------------------------
-//  Local functions
-// ---------------------------------------------------------------------------
-
-// What is this? It's not used currently!
-static tCIDLib::TInt2 i2XlatDir(const tCIDDBase::EParmDirs eDir)
-{
-    tCIDLib::TInt2 i2Ret = -1;
-
-    if (eDir == tCIDDBase::EParmDirs::In)
-    {
-        i2Ret = SQL_PARAM_INPUT;
-    }
-//     else if (eDir == tCIDDBase::EParmDirs::Out)
-//    {
-//        i2Ret = SQL_PARAM_OUTPUT;
-//    }
-//     else if (eDir == tCIDDBase::EParmDirs::InOut)
-//    {
-//        i2Ret = SQL_PARAM_INPUT_OUTPUT;
-//    }
-
-    #if CID_DEBUG_ON
-    if (i2Ret == -1)
-    {
-        // <TBD>
-    }
-    #endif
-
-    return i2Ret;
-}
-
-
 //
 //  A templatized method to handle the casting of a binding object to it's
-//  actual size.
+//  actual type and throwing it if it not a valid cast.
 //
 template <class T> T*
 pdbbindCheckType(TDBBinding* pdbbindTest, const TString& strStmtName)
@@ -108,19 +75,15 @@ pdbbindCheckType(TDBBinding* pdbbindTest, const TString& strStmtName)
 // ---------------------------------------------------------------------------
 //  TDBStatement: Destructor
 // ---------------------------------------------------------------------------
+
+//
+//  This will also deref our connection handle when we exit this scope. If we are
+//  the last one holding onto it, it will be cleaned up.
+//
 TDBStatement::~TDBStatement()
 {
-    // If the Statement is open, then close it
-    if (m_hStatement != SQL_NULL_HSTMT)
-    {
-        ::SQLFreeHandle(SQL_HANDLE_STMT, m_hStatement);
-        m_hStatement = SQL_NULL_HSTMT;
-    }
-
-    //
-    //  This will also deref our connection handle when we exit this scope.
-    //  If we are the last one holding onto it, it will be cleaned up.
-    //
+    // Make sure the statement is cleaned up
+    DestroyStatement(m_hConnection->pConnection());
 }
 
 
@@ -206,31 +169,9 @@ tCIDLib::TBoolean TDBStatement::bColVal(const tCIDLib::TCard4 c4Index)
 
 tCIDLib::TBoolean TDBStatement::bFetch()
 {
-    const SQLRETURN RetVal = ::SQLFetch(m_hStatement);
-
-    if (RetVal == SQL_NO_DATA)
+    // Do the platform specific fetch. If no rows, return false now
+    if (!bDoPlatFetch())
         return kCIDLib::False;
-
-    if ((RetVal != SQL_SUCCESS_WITH_INFO) && (RetVal != SQL_SUCCESS))
-    {
-        TString strInfo;
-        TKrnlError kerrThrow = kerrcXlatDBError
-        (
-            SQL_HANDLE_STMT, m_hStatement, RetVal, strInfo
-        );
-
-        facCIDDBase().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kDBErrs::errcStmt_Fetch
-            , kerrThrow
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
-            , m_strName
-            , strInfo
-        );
-    }
 
     // Give each binding a chance to swizzle data
     const tCIDLib::TCard4 c4BindCnt = m_colColBindings.c4ElemCount();
@@ -288,12 +229,6 @@ tCIDLib::TCard8 TDBStatement::c8ColVal(const tCIDLib::TCard4 c4Index)
         m_colColBindings[c4Index], m_strName
     );
     return pdbbindRet->c8Value();
-}
-
-
-tCIDDBase::THandle TDBStatement::hStatement() const
-{
-    return m_hStatement;
 }
 
 
@@ -368,7 +303,7 @@ const TString& TDBStatement::strName() const
 }
 
 
-const TTime& TDBStatement::tmDateColVal(const tCIDLib::TCard4 c4Index)
+TTime TDBStatement::tmDateColVal(const tCIDLib::TCard4 c4Index)
 {
     TDBDateBinding* pdbbindRet = pdbbindCheckType<TDBDateBinding>
     (
@@ -378,7 +313,7 @@ const TTime& TDBStatement::tmDateColVal(const tCIDLib::TCard4 c4Index)
 }
 
 
-const TTime& TDBStatement::tmTimeColVal(const tCIDLib::TCard4 c4Index)
+TTime TDBStatement::tmTimeColVal(const tCIDLib::TCard4 c4Index)
 {
     TDBTimeBinding* pdbbindRet = pdbbindCheckType<TDBTimeBinding>
     (
@@ -396,37 +331,31 @@ TDBStatement::TDBStatement( const   TDBConnection&  dbconTarget
 
     m_colColBindings(tCIDLib::EAdoptOpts::Adopt)
     , m_colParmBindings(tCIDLib::EAdoptOpts::Adopt)
-    , m_hStatement(SQL_NULL_HSTMT)
+    , m_pStatement(nullptr)
     , m_strName(strName)
 {
-    const SQLRETURN RetVal = ::SQLAllocHandle
-    (
-        SQL_HANDLE_STMT, dbconTarget.cptrHandle()->hConn(), &m_hStatement
-    );
-
-    if ((RetVal != SQL_SUCCESS_WITH_INFO) && (RetVal != SQL_SUCCESS))
-    {
-        TString strInfo;
-        TKrnlError kerrThrow = kerrcXlatDBError
-        (
-          SQL_HANDLE_DBC, dbconTarget.cptrHandle()->hConn(), RetVal, strInfo
-        );
-
-        facCIDDBase().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kDBErrs::errcStmt_Alloc
-            , kerrThrow
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
-            , m_strName
-            , strInfo
-        );
-    }
+    // Let the platform create the per-platform statement
+    CreateStatement(dbconTarget.hConnection()->pConnection());
+    CIDAssert(m_pStatement != nullptr, L"The per-platform DB statement handle wasn't set");
 
     // It worked, so ref count the connection handle
-    m_cptrConn = dbconTarget.cptrHandle();
+    m_hConnection = dbconTarget.hConnection();
+}
+
+TDBStatement::TDBStatement( const   tCIDDBase::THConn&  hConnection
+                            , const TString&            strName) :
+
+    m_colColBindings(tCIDLib::EAdoptOpts::Adopt)
+    , m_colParmBindings(tCIDLib::EAdoptOpts::Adopt)
+    , m_pStatement(nullptr)
+    , m_strName(strName)
+{
+    // Let the platform create the per-platform statement
+    CreateStatement(hConnection->pConnection());
+    CIDAssert(m_pStatement != nullptr, L"The per-platform DB statement handle wasn't set");
+
+    // It worked, so ref count the connection handle
+    m_hConnection = hConnection;
 }
 
 
@@ -459,90 +388,6 @@ tCIDLib::TVoid TDBStatement::DoParmBindings()
 // ---------------------------------------------------------------------------
 //  TDBStatement: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TDBStatement::ClearCursor()
-{
-    // And clear any from the statement
-    const SQLRETURN RetVal = ::SQLFreeStmt(m_hStatement, SQL_CLOSE);
-
-    if ((RetVal != SQL_SUCCESS_WITH_INFO) && (RetVal != SQL_SUCCESS))
-    {
-        TString strInfo;
-        TKrnlError kerrThrow = kerrcXlatDBError
-        (
-            SQL_HANDLE_STMT, m_hStatement, RetVal, strInfo
-        );
-
-        facCIDDBase().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kDBErrs::errcStmt_ClearCursor
-            , kerrThrow
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
-            , m_strName
-            , strInfo
-        );
-    }
-}
-
-
-tCIDLib::TVoid TDBStatement::ClearHandleColBindings()
-{
-    // And clear any from the statement
-    const SQLRETURN RetVal = ::SQLFreeStmt(m_hStatement, SQL_UNBIND);
-
-    if ((RetVal != SQL_SUCCESS_WITH_INFO) && (RetVal != SQL_SUCCESS))
-    {
-        TString strInfo;
-        TKrnlError kerrThrow = kerrcXlatDBError
-        (
-            SQL_HANDLE_STMT, m_hStatement, RetVal, strInfo
-        );
-
-        facCIDDBase().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kDBErrs::errcStmt_ClearColBindings
-            , kerrThrow
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
-            , m_strName
-            , strInfo
-        );
-    }
-}
-
-
-tCIDLib::TVoid TDBStatement::ClearHandleParmBindings()
-{
-    // And clear any from the statement
-    const SQLRETURN RetVal = ::SQLFreeStmt(m_hStatement, SQL_RESET_PARAMS);
-
-    if ((RetVal != SQL_SUCCESS_WITH_INFO) && (RetVal != SQL_SUCCESS))
-    {
-        TString strInfo;
-        TKrnlError kerrThrow = kerrcXlatDBError
-        (
-            SQL_HANDLE_STMT, m_hStatement, RetVal, strInfo
-        );
-
-        facCIDDBase().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kDBErrs::errcStmt_ClearParmBindings
-            , kerrThrow
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
-            , m_strName
-            , strInfo
-        );
-    }
-}
-
-
 TDBBinding*
 TDBStatement::pdbbindMakeNew(const  TString&                strName
                             , const tCIDDBase::ECppTypes    eCppType

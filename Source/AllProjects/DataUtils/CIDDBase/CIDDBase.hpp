@@ -20,12 +20,17 @@
 //  have to offer.
 //
 //  This facility provides an objectified ODBC interface. So it provides wrappers
-//  for connections, statements, bindings and such.
+//  for connections, statements, column, bindings and such.
+//
+//  You must call the initialization method on the facility object to enable
+//  database support first. And you should call the terminate method to be a
+//  good citizen before you exit, or at any point where you no longer need to
+//  do database operations.
+//
+//  This lets the per-platform support do any required work to enable database
+//  support. That info is available to any other per-platform code.
 //
 // CAVEATS/GOTCHAS:
-//
-//  1)  This one needs to get the 'per-platform' split treatment to split the
-//      Win32 specific implementation into its own Win32 sub-directory.
 //
 // LOG:
 //
@@ -53,7 +58,6 @@
 // ---------------------------------------------------------------------------
 //  Now subinclude our other headers, in the needed order.
 // ---------------------------------------------------------------------------
-#include    "CIDDBase_Constants.hpp"
 #include    "CIDDBase_Types.hpp"
 #include    "CIDDBase_ErrorIds.hpp"
 

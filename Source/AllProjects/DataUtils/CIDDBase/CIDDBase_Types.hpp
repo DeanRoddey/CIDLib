@@ -29,16 +29,15 @@
 namespace tCIDDBase
 {
     // -----------------------------------------------------------------------
-    //  The opaque type of a SQL handle we expose
+    //  We define some opque structures that each platform driver defines internally
+    //  for its own needs. We just need them here so that we can can refer to them
+    //  in the classes that wrap these things and so that other wrapper classes can
+    //  access them.
     // -----------------------------------------------------------------------
-    typedef tCIDLib::TVoid*     THandle;
-
-
-    // -----------------------------------------------------------------------
-    //  And some other types that might need to change
-    // -----------------------------------------------------------------------
-    typedef long                TSQLIndicator;
-
+    struct TBindingInfo;
+    struct TConnHandle;
+    struct TDBEnvHandle;
+    struct TStmtHandle;
 
 
     // -----------------------------------------------------------------------

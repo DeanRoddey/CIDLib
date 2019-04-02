@@ -589,12 +589,13 @@ PROJECT=CIDDBase
         DIRECTORY   = DataUtils\CIDDBase
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PLATFORMDIR = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    ; Win32 only for now until we can address this guy's portability
+    ; This one has per-platform implementations but only Win32 so far
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS

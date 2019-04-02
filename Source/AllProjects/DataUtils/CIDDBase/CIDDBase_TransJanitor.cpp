@@ -15,7 +15,7 @@
 //
 // DESCRIPTION:
 //
-//  This file implements a scoped SQL Transaction class.
+//  This file implements a scoped transaction janitor class.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -45,39 +45,22 @@ RTTIDecls(TDBTransJan,TObject)
 // ---------------------------------------------------------------------------
 //  TDBTransJan: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TDBTransJan::TDBTransJan(       TDBConnection* const    pdbconToUse
-                        , const TString&                strName) :
+TDBTransJan::TDBTransJan(TDBConnection& dbconnTar, const TString& strName) :
 
     m_bCommited(kCIDLib::False)
-    , m_pdbconToUse(pdbconToUse)
+    , m_hConnection(dbconnTar.hConnection())
     , m_strName(strName)
 {
-    // Start a transaction
-    try
-    {
-        TDBDirStatement dbstmtBegin(*m_pdbconToUse, m_strName);
-        dbstmtBegin.Execute(L"BEGIN TRANSACTION");
-    }
+    StartTrans();
+}
 
-    catch(const TError& errToCatch)
-    {
-        if (facCIDDBase().bShouldLog(errToCatch))
-            TModule::LogEventObj(errToCatch);
+TDBTransJan::TDBTransJan(tCIDDBase::THConn& hConnection, const TString& strName) :
 
-        // Can't do much but complain to the logs
-        if (facCIDDBase().bLogFailures())
-        {
-            facCIDDBase().LogMsg
-            (
-                CID_FILE
-                , CID_LINE
-                , kDBErrs::errcStmt_StartTrans
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::CantDo
-                , m_strName
-            );
-        }
-    }
+    m_bCommited(kCIDLib::False)
+    , m_hConnection(hConnection)
+    , m_strName(strName)
+{
+    StartTrans();
 }
 
 TDBTransJan::~TDBTransJan()
@@ -87,28 +70,24 @@ TDBTransJan::~TDBTransJan()
     {
         try
         {
-            TDBDirStatement dbstmtCommit(*m_pdbconToUse, m_strName);
+            TDBDirStatement dbstmtCommit(m_hConnection, m_strName);
             dbstmtCommit.Execute(L"ROLLBACK TRANSACTION");
         }
 
-        catch(const TError& errToCatch)
+        catch(TError& errToCatch)
         {
-            if (facCIDDBase().bShouldLog(errToCatch))
-                TModule::LogEventObj(errToCatch);
+            facCIDDBase().LogMsg
+            (
+                CID_FILE
+                , CID_LINE
+                , kDBErrs::errcStmt_RollbackFailed
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::CantDo
+                , m_strName
+            );
 
-            // Can't do much but complain to the logs
-            if (facCIDDBase().bLogFailures())
-            {
-                facCIDDBase().LogMsg
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , kDBErrs::errcStmt_RollbackFailed
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::CantDo
-                    , m_strName
-                );
-            }
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            TModule::LogEventObj(errToCatch);
         }
     }
 }
@@ -119,36 +98,61 @@ TDBTransJan::~TDBTransJan()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TDBTransJan::Commit()
 {
-    // Issue a commit
     try
     {
-        TDBDirStatement dbstmtCommit(*m_pdbconToUse, m_strName);
+        TDBDirStatement dbstmtCommit(m_hConnection, m_strName);
         dbstmtCommit.Execute(L"COMMIT TRANSACTION");
-
-        // It worked so set our flag
         m_bCommited = kCIDLib::True;
     }
 
     catch(TError& errToCatch)
     {
-        if (facCIDDBase().bShouldLog(errToCatch))
-            TModule::LogEventObj(errToCatch);
-
-        if (facCIDDBase().bLogFailures())
-        {
-            facCIDDBase().LogMsg
-            (
-                CID_FILE
-                , CID_LINE
-                , kDBErrs::errcStmt_CommitFailed
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::CantDo
-                , m_strName
-            );
-        }
+        facCIDDBase().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kDBErrs::errcStmt_CommitFailed
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::CantDo
+            , m_strName
+        );
 
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
         throw;
     }
 }
 
+
+// ---------------------------------------------------------------------------
+//  TDBTransJan: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+
+//
+//  WE have to do this from multiple ctors, so break it out. If anything goes wrong
+//  it throw.
+//
+tCIDLib::TVoid TDBTransJan::StartTrans()
+{
+    // Start a transaction
+    try
+    {
+        TDBDirStatement dbstmtBegin(m_hConnection, m_strName);
+        dbstmtBegin.Execute(L"BEGIN TRANSACTION");
+    }
+
+    catch(TError& errToCatch)
+    {
+        facCIDDBase().LogMsg
+        (
+            CID_FILE
+            , CID_LINE
+            , kDBErrs::errcStmt_StartTrans
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::CantDo
+            , m_strName
+        );
+
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        throw;
+    }
+}

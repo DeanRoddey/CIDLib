@@ -15,11 +15,17 @@
 //
 // DESCRIPTION:
 //
-//  This is the header file for the CIDDBase_TransJanitor.Cpp file. This
-//  file implements a transaction janitor that can be drive by C++ scopes.
-//  The ctor invokes a transaction and, unless it is told otherwise by a
-//  call to it's commit method, will roll back the transaction at the end
-//  of the C++ scope it is in.
+//  This is the header file for the CIDDBase_TransJanitor.Cpp file. This file a
+//  janitorclass  that can be used to do transactions on a C++ scoped basis.
+//
+//  The ctor begins a transaction. If Commit() is not called before the object goes
+//  out of scope, it will do a rollback when its dtor is invoked. If the ctor cannot
+//  being the transaction it throws. If the dtor cannot roll back it will log an
+//  error.
+//
+//  We copy the (ref counted) connection handle so that it can't go away before
+//  we do. Not that it likely could anyway given the scoped nature of this janitor
+//  type class.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -44,7 +50,13 @@ class CIDDBASEEXP TDBTransJan : public TObject
         // -------------------------------------------------------------------
         TDBTransJan
         (
-                    TDBConnection* const    pdbconToUse
+                    TDBConnection&          dbconnTar
+            , const TString&                strName
+        );
+
+        TDBTransJan
+        (
+                    tCIDDBase::THConn&      hConnection
             , const TString&                strName
         );
 
@@ -67,22 +79,28 @@ class CIDDBASEEXP TDBTransJan : public TObject
 
     private :
         // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid StartTrans();
+
+
+        // -------------------------------------------------------------------
         //  Private data types
         //
         //  m_bCommited
-        //      The Commit method has been called, and we've commited, and
-        //      will invoke a rollback on destruction.
+        //      The Commit method has been called. So we have committed and will not
+        //      do a rollback on dtor.
         //
-        //  m_pdbconToUse
-        //      The database connection to use for our statement invocations.
-        //      We don't adopt, just use. But it means that we have to destruct
-        //      before the connection object does.
+        //  m_hConnection
+        //      The database connection handle to use for our statement invocations.
+        //      This is a counted pointer so it will stay alive long enough for us
+        //      to do our thing at least.
         //
         //  m_strName
         //      A name given in the ctor that we can use in error messages.
         // -------------------------------------------------------------------
         tCIDLib::TBoolean   m_bCommited;
-        TDBConnection*      m_pdbconToUse;
+        tCIDDBase::THConn   m_hConnection;
         TString             m_strName;
 
 

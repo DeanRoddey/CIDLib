@@ -508,7 +508,7 @@ TMEngDBConnInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
         TMEngStringVal& mecvRet = meOwner.mecvStackAtAs<TMEngStringVal>(c4FirstInd - 1);
         try
         {
-            mecvRet.strValue(mecvActual.dbconnValue().cptrHandle()->strDataSrc());
+            mecvRet.strValue(mecvActual.dbconnValue().hConnection()->strDataSrc());
         }
 
         catch(const TError& errToCatch)

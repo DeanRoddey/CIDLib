@@ -15,15 +15,22 @@
 //
 // DESCRIPTION:
 //
-//  This is the header file for the CIDDBase_Bindings.Cpp file. This
-//  file implements a set of binding classes, which are used in parameter
-//  and column binding operations, and which hide the actual internal
-//  database representations of data. The outside world just indicates
-//  the expected SQL type (for parm bindings) of the field (the C++ type
-//  is implied in the type of object created) and the parameter number
-//  and the binding object will handle fielding the binding and can then
-//  be queried for the value, which will be converted to the type returned
-//  by the particular binding class.
+//  This is the header file for the CIDDBase_Bindings.Cpp file. This file
+//  implements a set of binding classes, which are used in column binding
+//  operations for query fetches. They hide the actual database representations
+//  of column data.
+//
+//  To do a fetch, you set up the desired bindings on the statement and then do
+//  the fetch. For each row cursored through, you can access the binding objects
+//  for each column and get the returned values out. If the column has a null value
+//  then bIsNull() will return true.
+//
+//  Most of the work is done in the base binding class, but each derived binding
+//  class has to handle setting up its particular type of binding on the
+//  statement, which is done on a per-platform basis.
+//
+//  Some of the bindings have calls to create and clean up platform specific
+//  storage required for non-fundamental column types (like time, date, and string.)
 //
 // CAVEATS/GOTCHAS:
 //
@@ -47,9 +54,17 @@ class CIDDBASEEXP TDBBinding : public TObject
 {
     public  :
         // -------------------------------------------------------------------
-        //  Destructor
+        //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TDBBinding(const TDBBinding&) = delete;
+
         ~TDBBinding();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid operator=(const TDBBinding&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -67,11 +82,20 @@ class CIDDBASEEXP TDBBinding : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsNull() const;
+        tCIDLib::TBoolean bIsNull() const
+        {
+            return m_bIsNull;
+        }
 
-        tCIDDBase::ESQLTypes eType() const;
+        tCIDDBase::ESQLTypes eType() const
+        {
+            return m_eType;
+        }
 
-        const TString& strName() const;
+        const TString& strName() const
+        {
+            return m_strName;
+        }
 
 
     protected :
@@ -85,36 +109,35 @@ class CIDDBASEEXP TDBBinding : public TObject
             , const tCIDDBase::EParmDirs    eDir
         );
 
-        TDBBinding
-        (
-            const   TDBBinding&             dbbindToCopy
-        );
-
-        tCIDLib::TVoid operator=
-        (
-            const   TDBBinding&             dbbindToAssign
-        );
-
 
         // -------------------------------------------------------------------
-        //  Protected, non-virtual methods
+        //  Protected, non-virutal methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid CheckBindResult
+        tCIDDBase::TBindingInfo* pAllocBindingInfo();
+
+        tCIDLib::TVoid FreeBindingInfo
         (
-                    TDBStatement&           dbstmtSrc
-            , const tCIDLib::TSInt          sToCheck
+                    tCIDDBase::TBindingInfo* pToFree
         );
 
-        tCIDDBase::TSQLIndicator iIndicator() const;
+        tCIDDBase::TBindingInfo* pBindingInfo() const
+        {
+            return m_pPlatInfo;
+        }
 
-        const tCIDDBase::TSQLIndicator* piIndicator() const;
-
-        tCIDDBase::TSQLIndicator* piIndicator();
+        tCIDLib::TVoid SetNull(const tCIDLib::TBoolean bToSet)
+        {
+            m_bIsNull = bToSet;
+        }
 
 
     private :
         // -------------------------------------------------------------------
         //  Private data types
+        //
+        //  m_bIsNull
+        //      When a fetch is done, this is set if the result for this column
+        //      is null, else it's cleared.
         //
         //  m_eDir
         //      Only used for parameter bindings, indicates the binding
@@ -125,19 +148,19 @@ class CIDDBASEEXP TDBBinding : public TObject
         //      The SQL type of the parameter. This is only required for a
         //      parameter binding, and can be ESQLType_None for col bindings.
         //
-        //  m_iIndicator
-        //      Every binding needs one of these in case the data returned
-        //      is null, which is indicated here. It's part of the binding
-        //      of the column so it has to stay around as long the column is
-        //      bound.
+        //  m_pPlatInfo
+        //      If the per-platform code needs to keep more info around to deal with
+        //      bindings on that platform he can use the protected methods we provide
+        //      to set and access one of these.
         //
         //  m_strName
         //      The name of the bindng, which is only for application use so
         //      that errors can use meaningful titles for bindings.
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean           m_bIsNull;
         tCIDDBase::EParmDirs        m_eDir;
         tCIDDBase::ESQLTypes        m_eType;
-        tCIDDBase::TSQLIndicator    m_iIndicator;
+        tCIDDBase::TBindingInfo*    m_pPlatInfo;
         TString                     m_strName;
 
 
@@ -518,25 +541,29 @@ class CIDDBASEEXP TDBDateBinding : public TDBBinding
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TTime& tmValue() const;
+        TTime tmValue() const;
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid DeleteStorage();
+
+        tCIDLib::TVoid NullStorage();
+
+        tCIDLib::TVoid InitStorage();
+
+
         // -------------------------------------------------------------------
         //  Private data types
         //
         //  m_pStorage
         //      The storage for our binding. It's opaque to the outside world
         //      since it's a SQL specific structure.
-        //
-        //  m_tmValue
-        //      We provide a TTime object to the outside world. When they
-        //      call tmValue() we load up the info into it, so it has to be
-        //      mutable.
         // -------------------------------------------------------------------
         tCIDLib::TVoid* m_pStorage;
-        mutable TTime   m_tmValue;
-
+        TString         m_strDefFormat;
 
         // -------------------------------------------------------------------
         //  Do any needed magic macros
@@ -851,21 +878,36 @@ class CIDDBASEEXP TDBStrBinding : public TDBBinding
 
     private :
         // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid DeleteStorage();
+
+        tCIDLib::TVoid NullStorage();
+
+        tCIDLib::TVoid InitStorage();
+
+        tCIDLib::TVoid StorageToStr();
+
+
+        // -------------------------------------------------------------------
         //  Private data types
         //
         //  m_c4MaxChars
-        //  m_pchStorage
-        //      The storage for our binding. The caller indicates the max
-        //      chars he'll accept.
+        //      The max chars for this column.
+        //
+        //  m_pStorage
+        //      Each platform will allocate storage and we provide a set of methods
+        //      to let him manage this. He also has to convert this to our string
+        //      object.
         //
         //  m_strValue
         //      We provide a string object to the outside world. When they
         //      call strValue() we load up the text into it, so it has to be
         //      mutable.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 m_c4MaxChars;
-        tCIDLib::TCh*   m_pchStorage;
-        mutable TString m_strValue;
+        tCIDLib::TCard4     m_c4MaxChars;
+        tCIDLib::TVoid*     m_pStorage;
+        mutable TString     m_strValue;
 
 
         // -------------------------------------------------------------------
@@ -896,7 +938,7 @@ class CIDDBASEEXP TDBTimeBinding : public TDBBinding
         TDBTimeBinding
         (
             const   TString&                strName
-            , const TString&                strFormat
+            , const TString&                strDefFormat
             , const tCIDDBase::ESQLTypes    eType = tCIDDBase::ESQLTypes::None
             , const tCIDDBase::EParmDirs    eDir = tCIDDBase::EParmDirs::In
         );
@@ -927,10 +969,20 @@ class CIDDBASEEXP TDBTimeBinding : public TDBBinding
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TTime& tmValue() const;
+        TTime tmValue() const;
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid DeleteStorage();
+
+        tCIDLib::TVoid NullStorage();
+
+        tCIDLib::TVoid InitStorage();
+
+
         // -------------------------------------------------------------------
         //  Private data types
         //
@@ -938,13 +990,12 @@ class CIDDBASEEXP TDBTimeBinding : public TDBBinding
         //      The storage for our binding. It's opaque to the outside world
         //      since it's a SQL specific structure.
         //
-        //  m_tmValue
-        //      We provide a TTime object to the outside world. When they
-        //      call tmValue() we load up the info into it, so it has to be
-        //      mutable.
+        //  m_strDefFormat
+        //      A default format string to set on the returned time object. It can
+        //      be empty in which case we don't set one.
         // -------------------------------------------------------------------
         tCIDLib::TVoid* m_pStorage;
-        mutable TTime   m_tmValue;
+        TString         m_strDefFormat;
 
 
         // -------------------------------------------------------------------
@@ -953,7 +1004,4 @@ class CIDDBASEEXP TDBTimeBinding : public TDBBinding
         RTTIDefs(TDBTimeBinding,TDBBinding)
 };
 
-
 #pragma CIDLIB_POPPACK
-
-

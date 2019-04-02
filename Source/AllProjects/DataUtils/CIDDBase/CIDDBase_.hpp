@@ -17,7 +17,7 @@
 //
 //  This is the main internal header for the facility. It includes the main
 //  public header, any internal headers that are needed, intrafacility function
-//  prototypes, intrafacility constants, and macros.
+//  prototypes, intrafacility constants, etc...
 //
 // CAVEATS/GOTCHAS:
 //
@@ -38,29 +38,4 @@
 //  Bring in any internal headers
 // ---------------------------------------------------------------------------
 #include    "CIDDBase_MessageIds.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  Bring in the internal system headers we need
-// ---------------------------------------------------------------------------
-#include    <windows.h>
-#include    <Sql.h>
-#include    <Sqlext.h>
-#include    <Sqltypes.h>
-#include    <Sqlucode.h>
-
-#include    <Odbcss.h>
-
-
-// ---------------------------------------------------------------------------
-//  Some internal globals that use SQL specific types
-// ---------------------------------------------------------------------------
-extern TKrnlError kerrcXlatDBError
-(
-    const   SQLSMALLINT siType
-    ,       SQLHANDLE   hToCheck
-    , const SQLRETURN   resToXlat
-    ,       TString&    strInfo
-);
-
 
