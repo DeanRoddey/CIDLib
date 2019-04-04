@@ -2378,15 +2378,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         );
 
         if (pcdsLocal)
-        {
-            //
-            //  We are going to kill this socket immediately after we send, since it
-            //  is a temporary one, so put a little linger on it. Ten seconds should
-            //  be more than enough.
-            //
-            psockLocal->bLinger(kCIDLib::True, 10);
             pcdsToUse = pcdsLocal;
-        }
 
         //
         //  Break out the URL parts in their encoded forms that we need to

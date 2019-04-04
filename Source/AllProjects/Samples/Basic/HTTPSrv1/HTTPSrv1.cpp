@@ -441,7 +441,6 @@ tCIDLib::EExitCodes eServiceThread(TThread& thrThis, tCIDLib::TVoid* pData)
             //  will set up/tear down the secure connection.
             //
             TCIDDataSrcJan janSrc(pcdsClient, tCIDLib::EAdoptOpts::Adopt, kCIDLib::True);
-            psockClient->bLinger(kCIDLib::True, 5);
 
             // Loop until the client closes (or after the first round if its 1.0 or an error)
             tCIDLib::TBoolean bClose = kCIDLib::False;

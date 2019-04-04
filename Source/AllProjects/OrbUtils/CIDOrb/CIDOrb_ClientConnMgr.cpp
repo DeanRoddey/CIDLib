@@ -770,7 +770,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
 
             //
             //  We've done the clean shutdown, and this is server side, so don't
-            //  don't linger and let up a socket. This prevents DOS attack,
+            //  don't linger and eat up a socket. This prevents DOS attack,
             //  purposeful or accidental, by large numbers of rejected connections.
             //
             psockClient->bLinger(kCIDLib::False, 0);
