@@ -640,7 +640,7 @@ class TVector : public TCollection<TElem>
             return *m_apElems[m_c4CurCount - 1];
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockCol(this->pmtxLock());
             return new TCursor(this);

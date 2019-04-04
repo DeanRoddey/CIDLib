@@ -495,7 +495,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
             return c4Ret;
         }
 
-        TCursor* pcursNew() const
+        [[nodiscard]] TCursor* pcursNew() const
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);

@@ -364,7 +364,7 @@ class CIDCTRLSEXP TCIDWndGestHandler : public TCIDGestHandler
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
-        static TCIDWndGestHandler* pgesthMakeNew
+        static [[nodiscard]] TCIDWndGestHandler* pgesthMakeNew
         (
                     MCIDGestTarget* const   pmgesttToUse
             , const tCIDCtrls::TWndHandle   hwndTar

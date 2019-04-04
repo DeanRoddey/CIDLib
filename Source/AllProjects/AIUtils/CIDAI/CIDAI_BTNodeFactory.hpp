@@ -72,7 +72,7 @@ class CIDAIEXP TAIBTNodeFact : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        TAIBTNode* pbtnodeMakeNew
+        [[nodiscard]] TAIBTNode* pbtnodeMakeNew
         (
             const   TString&                strPath
             , const TString&                strName

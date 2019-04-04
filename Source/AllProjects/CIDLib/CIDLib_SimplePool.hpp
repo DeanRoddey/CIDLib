@@ -457,7 +457,7 @@ template<typename TElem> class TSimplePool : public TObject
             const   TElem&                  objSrc
         ) = 0;
 
-        virtual TElem* pelemMakeNew
+        [[nodiscard]] virtual TElem* pelemMakeNew
         (
             const   tCIDLib::TCard4         c4Size
         ) = 0;
@@ -1097,7 +1097,7 @@ class TStringPool : public TSimplePool<TString>
         }
 
         // Create a new string with the requested size
-        TString* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
+        [[nodiscard]] TString* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
         {
             return new TString(c4Size);
         }
@@ -1215,7 +1215,7 @@ class THeapBufPool : public TSimplePool<THeapBuf>
         }
 
         // Create a new string with the requested size
-        THeapBuf* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
+        [[nodiscard]] THeapBuf* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
         {
             return new THeapBuf(c4Size);
         }

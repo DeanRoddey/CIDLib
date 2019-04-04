@@ -80,7 +80,7 @@ class CIDENCODEEXP TFacCIDEncode : public TFacility
                     tCIDLib::TStrCollect&   colToFill
         )   const;
 
-        TTextConverter* ptcvtMakeNew
+        [[nodiscard]] TTextConverter* ptcvtMakeNew
         (
             const   TString&                strName
             , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False

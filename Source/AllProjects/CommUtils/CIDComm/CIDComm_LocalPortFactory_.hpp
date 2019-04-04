@@ -77,7 +77,7 @@ class TLocalComPortFactory : public TComPortFactory
             const   TString&                strPath
         )   const override;
 
-        TCommPortBase* pcommMakeNew
+        [[nodiscard]] TCommPortBase* pcommMakeNew
         (
             const   TString&                strPath
         )   override;

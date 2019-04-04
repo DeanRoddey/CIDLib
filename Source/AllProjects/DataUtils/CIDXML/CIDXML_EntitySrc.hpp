@@ -71,7 +71,7 @@ class CIDXMLEXP TXMLEntitySrc : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Public, virtual methods
         // -------------------------------------------------------------------
-        virtual TBinInStream* pstrmMakeNew() const = 0;
+        virtual [[nodiscard]] TBinInStream* pstrmMakeNew() const = 0;
 
 
         // -------------------------------------------------------------------

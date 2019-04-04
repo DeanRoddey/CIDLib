@@ -901,7 +901,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             m_c4CurElements--;
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);

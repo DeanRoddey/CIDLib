@@ -578,7 +578,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
             return objRet;
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return new TCursor(this);

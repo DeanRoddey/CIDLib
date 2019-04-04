@@ -140,7 +140,7 @@ class CIDXMLEXP TMemBufEntitySrc : public TXMLEntitySrc
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        TBinInStream* pstrmMakeNew() const;
+        [[nodiscard]] TBinInStream* pstrmMakeNew() const;
 
 
         // -------------------------------------------------------------------

@@ -85,12 +85,12 @@ class CIDCOMMEXP TFacCIDComm : public TFacility
             const   TString&                strFactoryId
         );
 
-        TCommPortBase* pcommMakeNew
+        [[nodiscard]] TCommPortBase* pcommMakeNew
         (
             const   TString&                strPath
         );
 
-        TComPortFactory* pfactById
+        [[nodiscard]] TComPortFactory* pfactById
         (
             const   TString&                strID
         );

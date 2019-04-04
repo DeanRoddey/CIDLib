@@ -108,7 +108,7 @@ const TClass& Class::clsThis() \
 }
 
 #define AdvRTTIDecls(Class,ParentClass) \
-TObject* pMakeNew_##Class() {return new Class;} \
+[[nodiscard]] TObject* pMakeNew_##Class() {return new Class;} \
 static const TTypeFactoryKicker Class##Kicker(CIDLib_MakeLStr2(Class), pMakeNew_##Class); \
 const TClass& Class::clsThis() \
 { \

@@ -53,7 +53,15 @@ class CIDAPPSHEXP TAppShEngine : public TObject
         // -------------------------------------------------------------------
         TAppShEngine();
 
+        TAppShEngine(const TAppShEngine&) = delete;
+
         ~TAppShEngine();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TAppShEngine& operator=(const TAppShEngine&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -141,13 +149,6 @@ class CIDAPPSHEXP TAppShEngine : public TObject
 
     private :
         // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TAppShEngine(const TAppShEngine&);
-        tCIDLib::TVoid operator=(const TAppShEngine&);
-
-
-        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::EExitCodes eMonThread
@@ -168,10 +169,7 @@ class CIDAPPSHEXP TAppShEngine : public TObject
         //
         //  m_colRecs
         //      This is our list of app shell records. Each one represents
-        //      an external process we are managing. The derived class creates
-        //      them via the pasrMakeNew() virtual method, which allows them
-        //      to store extra data. But we provide a default implementation
-        //      that creates a basic TAppShRecord object.
+        //      an external process we are managing.
         //
         //  m_mtxSync
         //      We have to syncrhonize between the monitor thread and the

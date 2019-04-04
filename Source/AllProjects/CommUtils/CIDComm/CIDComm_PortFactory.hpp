@@ -86,7 +86,7 @@ class CIDCOMMEXP TComPortFactory : public TObject
             const   TString&                strPath
         )   const = 0;
 
-        virtual TCommPortBase* pcommMakeNew
+        [[nodiscard]] virtual TCommPortBase* pcommMakeNew
         (
             const   TString&                strPath
         ) = 0;

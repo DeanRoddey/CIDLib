@@ -75,7 +75,7 @@ class TMEngFileEntitySrc : public TXMLEntitySrc
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        TBinInStream* pstrmMakeNew() const override;
+        [[nodiscard]] TBinInStream* pstrmMakeNew() const override;
 
 
     private :

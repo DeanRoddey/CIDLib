@@ -155,7 +155,7 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                     TString&                strToFill
         );
 
-        TXMLEntSpooler* pxesMakeNew
+        [[nodiscard]] TXMLEntSpooler* pxesMakeNew
         (
                     tCIDXML::TEntitySrcRef& esrFrom
             , const tCIDLib::TBoolean       bExpectDecl
@@ -163,7 +163,7 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
             , const tCIDXML::EEntityTypes   eType
         );
 
-        TXMLEntSpooler* pxesMakeNewFromInt
+        [[nodiscard]] TXMLEntSpooler* pxesMakeNewFromInt
         (
             const   TXMLEntityDecl&         xdeclSource
             , const tCIDXML::ERefFrom       eFrom

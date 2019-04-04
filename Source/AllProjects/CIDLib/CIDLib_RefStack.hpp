@@ -106,7 +106,7 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
             }
         }
 
-        TRefStack* pcolMakeNewOf() const
+        [[nodiscard]] TRefStack* pcolMakeNewOf() const
         {
             TMtxLocker lockStack(this->pmtxLock());
 

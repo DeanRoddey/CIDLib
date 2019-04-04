@@ -343,7 +343,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         // -------------------------------------------------------------------
         //  Protected, virtual methods
         // -------------------------------------------------------------------
-        virtual TElem* pelemMakeNew() = 0;
+        [[nodiscard]] virtual TElem* pelemMakeNew() = 0;
 
         virtual tCIDLib::TVoid PrepElement
         (

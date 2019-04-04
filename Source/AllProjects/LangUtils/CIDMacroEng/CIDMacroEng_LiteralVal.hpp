@@ -94,7 +94,7 @@ class CIDMACROENGEXP TMEngLiteralVal : public TMEngNamedItem
                     TString&                strToFill
         )   const;
 
-        TMEngClassVal* pmecvMakeNew
+        [[nodiscard]] TMEngClassVal* pmecvMakeNew
         (
             const   TString&                strName
         )   const;

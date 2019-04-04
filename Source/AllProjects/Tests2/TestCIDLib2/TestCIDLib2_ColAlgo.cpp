@@ -229,8 +229,14 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
             strmOut << TFWCurLn << L"tAccumulate generated bad sum\n\n";
         }
 
-        TCardList colEmpty;
-        if (tCIDColAlgo::tAccumulate(colCards, TCardinal(1)) != TCardinal(1))
+        if (tCIDColAlgo::tAccumulate(colCards, TCardinal(0)) != TCardinal(c4Sum2))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"tAccumulate on empty collection gave bad sum\n\n";
+        }
+
+        // Do it again with a non-zero starting value
+        if (tCIDColAlgo::tAccumulate(colCards, TCardinal(5)) != TCardinal(c4Sum2 + 5))
         {
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"tAccumulate on empty collection gave bad sum\n\n";

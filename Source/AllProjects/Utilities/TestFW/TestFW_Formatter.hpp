@@ -151,6 +151,7 @@ class TTFWHTMLFormatter : public TTFWFormatter
         tCIDLib::TVoid WriteGroupResults
         (
             const   tTestFW::TGroupList&    colGroupList
+            , const tTestFW::TNameList&     colGroupsRun
         );
 
         tCIDLib::TVoid WriteHeader

@@ -914,7 +914,7 @@ class TKeyedHashSet : public TCollection<TElem>
             return m_apBuckets[hshElem]->objData();
         }
 
-        TCursor* pcursNew() const
+        [[nodiscard]] TCursor* pcursNew() const
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);

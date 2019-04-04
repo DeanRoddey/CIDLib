@@ -844,7 +844,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             return m_apBuckets[hshKey]->objPair();
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);

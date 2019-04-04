@@ -93,6 +93,12 @@ EndTestPrgs;
 // Define the groups
 // ---------------------------------------------------------------------------
 Groups=
+    Group=Tmp
+        Description=Temp group for invoking a specific file for testing
+        TestPrgs=
+            CIDLib
+        EndTestPrgs;
+    EndGroup;
 
     Group=Crypto
         Description=Tests the cryptography related facilities
@@ -174,7 +180,7 @@ Groups=
     EndGroup;
 
     Group=Light
-        Description=Does all non-long running stress tests
+        Description=Does all non-long running (non-stress) tests
         TestPrgs=
             CIDLib
             MathLib

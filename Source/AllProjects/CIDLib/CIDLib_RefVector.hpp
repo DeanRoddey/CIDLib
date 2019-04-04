@@ -542,7 +542,7 @@ class TRefVector : public TRefCollection<TElem>
             bPullOutElem(pnodeToOrphan, kCIDLib::True);
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockThis(this->pmtxLock());
             return new TCursor(this);
@@ -940,7 +940,7 @@ class TRefVector : public TRefCollection<TElem>
             }
         }
 
-        TMyType* pcolMakeNewOf() const
+        [[nodiscard]] TMyType* pcolMakeNewOf() const
         {
             // Make a copy with same characteristics, but not content!
             TMtxLocker lockThis(this->pmtxLock());

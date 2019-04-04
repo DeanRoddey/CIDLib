@@ -503,7 +503,7 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
             this->c4IncSerialNum();
         }
 
-        TConstCursor<TElem>* pcursNew() const override
+        [[nodiscard]] TConstCursor<TElem>* pcursNew() const override
         {
             TMtxLocker lockThis(this->pmtxLock());
             return new TConstCursor<TElem>(this);

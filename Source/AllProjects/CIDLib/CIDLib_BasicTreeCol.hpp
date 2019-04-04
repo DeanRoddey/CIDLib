@@ -1678,7 +1678,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             return *pobjTmp;
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockThis(this->pmtxLock());
             return new TCursor(this);
@@ -1855,7 +1855,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 // Make current child the new parent
                 pnodeCurParent = static_cast<TNodeNT*>(pnodeChild);
 
-            }   while(pnodeCurParent && pcursPairs->bNext());
+            }   while (pnodeCurParent && pcursPairs->bNext());
 
             //
             //  For any more key/value paris we have left, we have to create

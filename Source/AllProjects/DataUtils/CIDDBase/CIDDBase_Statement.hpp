@@ -236,7 +236,7 @@ class CIDDBASEEXP TDBStatement : public TObject
             const   tCIDDBase::TConnHandle* pConnection
         );
 
-        TDBBinding* pdbbindMakeNew
+        [[nodiscard]] TDBBinding* pdbbindMakeNew
         (
             const   TString&                strName
             , const tCIDDBase::ECppTypes    eCppType

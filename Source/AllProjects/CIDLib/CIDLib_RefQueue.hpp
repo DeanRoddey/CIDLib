@@ -579,7 +579,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitSpace);
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return new TCursor(this);
@@ -786,7 +786,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
         }
 
 
-        TRefQueue<TElem>* pcolMakeNewOf() const
+        [[nodiscard]] TRefQueue<TElem>* pcolMakeNewOf() const
         {
             TMtxLocker lockQueue(this->pmtxLock());
 

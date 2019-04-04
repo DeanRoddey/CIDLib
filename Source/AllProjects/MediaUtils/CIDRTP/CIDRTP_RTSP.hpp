@@ -240,7 +240,7 @@ class CIDRTPEXP TCIDRTSPSrv : public TObject
             ,       TString&                strRepText
         ) = 0;
 
-        virtual TCIDRTPIOSrc* prtpioMakeNew
+        virtual [[nodiscard]] TCIDRTPIOSrc* prtpioMakeNew
         (
             const   TURL&                   urlToGet
             , const tCIDLib::TKVPList&      colSessInfo

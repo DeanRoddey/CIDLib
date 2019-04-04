@@ -790,7 +790,7 @@ class TCollection : public TCollectionBase, public MDuplicable
             const   TElem&                  objNew
         ) = 0;
 
-        virtual TColCursor<TElem>* pcursNew() const = 0;
+        [[nodiscard]] virtual TColCursor<TElem>* pcursNew() const = 0;
 
 
         // -------------------------------------------------------------------
@@ -1040,7 +1040,7 @@ template <class TElem> class TRefCollection : public TCollectionBase
                     TElem* const            pobjToRemove
         ) = 0;
 
-        virtual TColCursor<TElem>* pcursNew() const = 0;
+        [[nodiscard]] virtual TColCursor<TElem>* pcursNew() const = 0;
 
         virtual tCIDLib::TVoid RemoveElem
         (
