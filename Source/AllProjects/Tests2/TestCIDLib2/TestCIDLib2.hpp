@@ -1647,6 +1647,39 @@ class TTest_SafeCnt1 : public TTestFWTest
 
     private :
         // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_SafeCnt1,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_SafeCnt2
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_SafeCnt2 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_SafeCnt2();
+
+        ~TTest_SafeCnt2();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::EExitCodes eTestThread
@@ -1676,7 +1709,7 @@ class TTest_SafeCnt1 : public TTestFWTest
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
-        RTTIDefs(TTest_SafeCnt1,TTestFWTest)
+        RTTIDefs(TTest_SafeCnt2,TTestFWTest)
 };
 
 

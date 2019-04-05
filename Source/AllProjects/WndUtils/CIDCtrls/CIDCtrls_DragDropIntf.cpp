@@ -94,6 +94,7 @@ class CDropTarget : public IDropTarget
         {
             CIDAssert(m_scntRef.c4Value() > 0, L"DragDrop COM object ref count underflow");
 
+            // Pre-decrement so we get zero if it's currently one
             ULONG uRet = --m_scntRef;
             if (!uRet)
                 delete this;
@@ -354,7 +355,7 @@ CDropTarget::bQueryFileList(IDataObject*            pDataObject
 
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
-            if (::DragQueryFile(hDrop, c4Index, achBuf, c4BufSz))
+            if (::DragQueryFileW(hDrop, c4Index, achBuf, c4BufSz))
             {
                 pathCur = achBuf;
                 colFiles.objAdd(achBuf);
@@ -379,8 +380,6 @@ struct TDropData
 {
     CDropTarget*    pDropTarget;
 };
-
-
 
 
 
@@ -424,7 +423,7 @@ MDragAndDrop::InitDragAndDrop(TWindow& wndCont)
     HRESULT hRes = ::RegisterDragDrop(wndCont.hwndThis(), pDropData->pDropTarget);
     if (hRes != S_OK)
     {
-        hRes = 0;
+        // What can we do here?
     }
 }
 
@@ -433,10 +432,16 @@ tCIDLib::TVoid MDragAndDrop::TermDragAndDrop(TWindow& wndCont)
 {
     if (m_pData)
     {
+        //
+        //  Not that this will release the system's ref to our pDropTarget object
+        //  but we still have a ref ourself and will release it below if the object
+        //  got created.
+        //
         ::RevokeDragDrop(wndCont.hwndThis());
 
-        // Get a cast point of our data and then clear the data pointer
+        // Get a cast pointer to our data and then clear the member
         TDropData* pData = static_cast<TDropData*>(m_pData);
+        TJanitor<TDropData> janData(pData);
         m_pData = nullptr;
 
         // If we created the drop target COM object, release it
@@ -445,9 +450,6 @@ tCIDLib::TVoid MDragAndDrop::TermDragAndDrop(TWindow& wndCont)
             pData->pDropTarget->Release();
             pData->pDropTarget = nullptr;
         }
-
-        // And now we can get rid of our data
-        delete pData;
     }
 }
 

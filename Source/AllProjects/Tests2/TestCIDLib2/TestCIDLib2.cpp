@@ -75,6 +75,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
 
     // The most fundamental stuff
     AddTest(new TTest_Types);
+    AddTest(new TTest_SafeCnt1);
     AddTest(new TTest_CntPtr1);
     AddTest(new TTest_UniquePtr);
     AddTest(new TTest_FlagJanitor);
@@ -149,7 +150,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
 
     // High level tests that can gen up some threads
     AddTest(new TTest_CntPtr2);
-    AddTest(new TTest_SafeCnt1);
+    AddTest(new TTest_SafeCnt2);
 
     // Publish/subscribe
     AddTest(new TTest_PubSub1);
