@@ -29,12 +29,6 @@
 #include    "MakeDocs.hpp"
 
 
-// -----------------------------------------------------------------------------
-//  Do RTTI macros for classes that have no.cpp files of their own
-// -----------------------------------------------------------------------------
-RTTIDecls(TDocError,TObject)
-
-
 
 // -----------------------------------------------------------------------------
 //  Local function prototypes
@@ -85,12 +79,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid* const)
     }
 
     catch(TError& errToCatch)
-    {
-        return tCIDLib::EExitCodes::FatalError;
-    }
-
-    // Watch for parser errors
-    catch(const TDocError& errToCatch)
     {
         return tCIDLib::EExitCodes::FatalError;
     }

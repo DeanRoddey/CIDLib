@@ -36,8 +36,6 @@
 // -----------------------------------------------------------------------------
 #include    "MakeDocs_ErrorIds.hpp"
 #include    "MakeDocs_MessageIds.hpp"
-#include    "MakeDocs_ParserError.hpp"
-#include    "MakeDocs_Parser.hpp"
 #include    "MakeDocs_ThisFacility.hpp"
 
 
