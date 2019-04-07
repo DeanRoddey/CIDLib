@@ -5,9 +5,13 @@
 //
 // CREATED: 11/23/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -129,6 +133,38 @@ namespace tCIDLib
     }
 }
 
+tCIDLib::TVoid tCIDLib::ThrowAssert(const TString& strErr)
+{
+    throw TLogEvent
+    (
+        L"CIDLib"
+        , CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcDbg_AssertFailed
+        , strErr
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Assert
+    );
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowAssert(const TString& strErr, const MFormattable& mfbtlToken1)
+{
+    TString strMsg(strErr);
+    strMsg.eReplaceToken(mfbtlToken1, kCIDLib::chDigit1);
+    throw TLogEvent
+    (
+        L"CIDLib"
+        , CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcDbg_AssertFailed
+        , strMsg
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Assert
+    );
+}
+
+
 
 // ---------------------------------------------------------------------------
 //  If debugging, then force instantiations of some template classes that are not
@@ -187,8 +223,8 @@ static tCIDLib::TVoid DummyFunc()
 
     TVector<TString> colOne;
     TVector<TString> colTwo;
-    if (tCIDLib::bCompareElems(colOne, colTwo, tCIDLib::bComp<TString>)
-    ||  !tCIDLib::bCompareElems(colOne, colTwo, tCIDLib::bComp<TString>))
+    if (tCIDLib::bCompareElems(colOne, colTwo)
+    ||  !tCIDLib::bCompareElems(colOne, colTwo))
     {
     }
 
@@ -242,7 +278,7 @@ static tCIDLib::TVoid DummyFunc()
 
     tCIDLib::TKVHashSet col1(7, new TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
     tCIDLib::TKVHashSet col2(7, new TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
-    if (tCIDLib::bCompareElems(col1, col2, tCIDLib::bComp<TKeyValuePair>))
+    if (tCIDLib::bCompareElems(col1, col2, TKeyValuePair::bComp))
     {
     }
 
@@ -276,8 +312,8 @@ static tCIDLib::TVoid DummyFunc()
     TRefVector<TArea> colRefArea(tCIDLib::EAdoptOpts::Adopt);
     TRefVector<TArea> colRefArea2(tCIDLib::EAdoptOpts::Adopt);
     colRefArea.ForEachNC([] (TArea& areaCur) { return kCIDLib::True; });
-    if (tCIDLib::bCompareElems(colRefArea, colRefArea2, tCIDLib::bComp<TString>)
-    ||  !tCIDLib::bCompareElems(colRefArea, colRefArea2, tCIDLib::bComp<TString>))
+    if (tCIDLib::bCompareElems(colRefArea, colRefArea2, TString::bComp)
+    ||  !tCIDLib::bCompareElems(colRefArea, colRefArea2, TString::bComp))
     {
     }
 
@@ -290,6 +326,23 @@ static tCIDLib::TVoid DummyFunc()
 
     TRefQueue<TString> colStrRQ(tCIDLib::EAdoptOpts::Adopt);
     colStrRQ.ForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
+
+    TRefKeyedHashSet<TKeyValuePair, TString, TStringKeyOps>
+    colRKHS
+    (
+        tCIDLib::EAdoptOpts::NoAdopt
+        , 23
+        , new TStringKeyOps(kCIDLib::False)
+        , &TKeyValuePair::strExtractKey
+    );
+    colRKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
+
+    TKeyedHashSet<TKeyValuePair, TString, TStringKeyOps>
+    colKHS
+    (
+        23, new TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
+    );
+    colKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
 
 
     // Unique pointer template expansion to make sure it's good
@@ -338,6 +391,11 @@ static tCIDLib::TVoid DummyFunc()
     --cursNCTest;
 
     if ((cursTest->i4Y() == 0) && (*cursTest == TArea(0, 0, 0, 0)))
+    {
+    }
+
+    TVector<TArea>::TCursor cursFind = tCIDColAlgo::cursFind(colTestCurs, TArea(1,1,1,1));
+    if (cursFind.bIsValid())
     {
     }
 

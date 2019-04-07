@@ -5,9 +5,13 @@
 //
 // CREATED: 11/07/2012
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -129,9 +133,9 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
 
     // Set the run type and remember a logon type appropriately
     TASK_LOGON_TYPE LoginType = TASK_LOGON_NONE;
-    tCIDLib::TCh* pszUser = 0;
+    const tCIDLib::TCh* pszUser = nullptr;
     {
-        ITriggerCollection* pTriggerCol = 0;
+        ITriggerCollection* pTriggerCol = nullptr;
         hRes = pTask->get_Triggers(&pTriggerCol);
         if (FAILED(hRes))
             return kCIDLib::False;

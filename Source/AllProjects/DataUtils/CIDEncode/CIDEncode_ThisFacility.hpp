@@ -5,9 +5,13 @@
 //
 // CREATED: 05/26/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -76,14 +80,16 @@ class CIDENCODEEXP TFacCIDEncode : public TFacility
                     tCIDLib::TStrCollect&   colToFill
         )   const;
 
-        TTextConverter* ptcvtMakeNew
+        [[nodiscard]] TTextConverter* ptcvtMakeNew
         (
             const   TString&                strName
+            , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
         )   const;
 
-        tCIDEncode::TTCvtPtr mptrMakeNew
+        tCIDEncode::TTCvtPtr cptrMakeNew
         (
             const   TString&                strName
+            , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
         )   const;
 
         TString strBaseNameFor

@@ -5,9 +5,13 @@
 //
 // CREATED: 02/05/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -622,7 +626,7 @@ TBinInStream::CheckForMarker(const  tCIDLib::EStreamMarkers eMarker
 
     if (eActual != eMarker)
     {
-        tCIDLib::TCh* pszMarker = nullptr;
+        const tCIDLib::TCh* pszMarker = nullptr;
         if (eMarker == tCIDLib::EStreamMarkers::TypeName)
             pszMarker = L"TypeName";
         else if (eMarker == tCIDLib::EStreamMarkers::EndObject)

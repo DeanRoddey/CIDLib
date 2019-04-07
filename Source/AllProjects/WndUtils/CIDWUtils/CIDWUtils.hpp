@@ -5,15 +5,25 @@
 //
 // CREATED: 05/23/2015
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
 //  have to offer.
+//
+//  This facility provides higher level UI framework functionality, mostly specialized
+//  but often used dialogs, and some more advanced controls.
+//
+//  As with CIDCtrls, this stuff is all well encapsulated but that doesn't remotely
+//  make it portable, so this is Win32 specific.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -45,14 +55,6 @@
 //  Forward references
 // ---------------------------------------------------------------------------
 class TCommPortCfg;
-
-
-// ---------------------------------------------------------------------------
-//  Facilities namespace
-// ---------------------------------------------------------------------------
-namespace kCIDWUtils
-{
-};
 
 
 // ---------------------------------------------------------------------------

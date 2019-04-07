@@ -5,9 +5,13 @@
 //
 // CREATED: 09/11/2017
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -30,7 +34,7 @@
 //   CLASS: TCIDAudioSrcStream
 //  PREFIX: cass
 // ---------------------------------------------------------------------------
-class CIDAUDSTREAMEXP TCIDAudioSrcStream
+class CIDAUDSTREAMEXP TCIDAudioSrcStream : public TObject
 {
     public :
         // -------------------------------------------------------------------
@@ -94,6 +98,12 @@ class CIDAUDSTREAMEXP TCIDAudioSrcStream
         //      we make it available
         // -------------------------------------------------------------------
         tCIDAudStream::EStrmStates m_eState;
+
+
+        // -------------------------------------------------------------------
+        //  Magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TCIDAudioSrcStream, TObject)
 };
 
 #pragma CIDLIB_POPPACK

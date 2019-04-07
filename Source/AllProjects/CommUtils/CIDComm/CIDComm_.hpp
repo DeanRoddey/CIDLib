@@ -5,9 +5,13 @@
 //
 // CREATED: 08/27/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -31,22 +35,4 @@
 #include    "CIDComm_MessageIds.hpp"
 #include    "CIDComm_Port_.hpp"
 #include    "CIDComm_LocalPortFactory_.hpp"
-
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities types namespace. It contains non-class types
-//  for use within the facility.
-// ---------------------------------------------------------------------------
-namespace tCIDComm_
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities constants namespace.
-// ---------------------------------------------------------------------------
-namespace kCIDComm_
-{
-}
 

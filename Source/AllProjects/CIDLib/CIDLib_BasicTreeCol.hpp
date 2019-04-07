@@ -5,7 +5,7 @@
 //
 // CREATED: 02/11/2001
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
 //  This file is part of a demonstration program of the CIDLib C++
 //  Frameworks. Its contents are distributed 'as is', to provide guidance on
@@ -871,6 +871,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Nested aliases for the node types used by this collection
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TBasicTreeCol<TElem>;
         using TNode = TBasicTreeNode<TElem>;
         using TNodeT = TTreeNodeT<TElem>;
@@ -1677,7 +1678,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             return *pobjTmp;
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockThis(this->pmtxLock());
             return new TCursor(this);
@@ -1854,7 +1855,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 // Make current child the new parent
                 pnodeCurParent = static_cast<TNodeNT*>(pnodeChild);
 
-            }   while(pnodeCurParent && pcursPairs->bNext());
+            }   while (pnodeCurParent && pcursPairs->bNext());
 
             //
             //  For any more key/value paris we have left, we have to create

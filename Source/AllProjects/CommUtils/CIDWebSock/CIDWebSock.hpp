@@ -5,9 +5,13 @@
 //
 // CREATED: 05/24/2017
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -74,7 +78,6 @@
 //  Include our underlying headers if not already included
 // ---------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
 #include    "CIDSock.hpp"
 
 
@@ -186,7 +189,6 @@ namespace kCIDWebSock
 // ---------------------------------------------------------------------------
 #include    "CIDWebSock_ErrorIds.hpp"
 #include    "CIDWebSock_Shared.hpp"
-// #include    "CIDWebSock_Constant.hpp"
 #include    "CIDWebSock_ThisFacility.hpp"
 
 
@@ -200,15 +202,3 @@ extern CIDWEBSOCKEXP TFacCIDWebSock& facCIDWebSock();
 //  And subinclude our other headers
 // ---------------------------------------------------------------------------
 #include    "CIDWebSock_WSEngine.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  For those collection types that we pre-generate in our main cpp file, we want to
-//  insure that they don't get generated again in users of the DLL.
-// ---------------------------------------------------------------------------
-#if     !defined(CIDWEBSOCK_PREINST)
-// extern template class TRefQueue<TEmailMsg>;
-
-#endif
-
-

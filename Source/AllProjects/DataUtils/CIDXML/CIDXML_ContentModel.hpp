@@ -5,9 +5,13 @@
 //
 // CREATED: 09/22/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -39,7 +43,15 @@ class CIDXMLEXP TXMLContentModel : public TObject
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TXMLContentModel();
+        TXMLContentModel(const TXMLContentModel&) = delete;
+
+        ~TXMLContentModel() {}
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLContentModel& operator=(const TXMLContentModel&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -63,17 +75,10 @@ class CIDXMLEXP TXMLContentModel : public TObject
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        TXMLContentModel();
+        TXMLContentModel() {}
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLContentModel(const TXMLContentModel&);
-        tCIDLib::TVoid operator=(const TXMLContentModel&);
-
-
         // -------------------------------------------------------------------
         //  Magic macros
         // -------------------------------------------------------------------
@@ -81,19 +86,3 @@ class CIDXMLEXP TXMLContentModel : public TObject
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TXMLContentModel: Constructors and Destructor
-// ---------------------------------------------------------------------------
-inline TXMLContentModel::~TXMLContentModel()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLContentModel: Hidden constructors
-// ---------------------------------------------------------------------------
-inline TXMLContentModel::TXMLContentModel()
-{
-}

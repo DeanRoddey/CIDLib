@@ -5,9 +5,13 @@
 //
 // CREATED: 05/27/1997
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -51,7 +55,15 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
         // -------------------------------------------------------------------
         TFrameWnd();
 
+        TFrameWnd(const TFrameWnd&) = delete;
+
         ~TFrameWnd();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFrameWnd& operator=(const TFrameWnd&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -254,13 +266,6 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TFrameWnd(const TFrameWnd&);
-        tCIDLib::TVoid operator=(const TFrameWnd&);
-
-
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------

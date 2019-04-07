@@ -5,7 +5,7 @@
 //
 // CREATED: 12/05/1993
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
 //  This file is part of a demonstration program of the CIDLib C++
 //  Frameworks. Its contents are distributed 'as is', to provide guidance on

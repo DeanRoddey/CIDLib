@@ -5,9 +5,13 @@
 //
 // CREATED: 01/24/2007
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -47,14 +51,14 @@ RTTIDecls(TTest_RepAll,TTestFWTest)
 enum EMatchTypes { EPart, EFull };
 struct TTestEntry
 {
-    tCIDLib::TCard1     c1ShouldMatch;
-    tCIDLib::TCard1     c1OnlyAtStart;
-    EMatchTypes         eType;
-    tCIDLib::TCard4     c4StartAt;
-    tCIDLib::TCard4     c4ShouldMatchAt;
-    tCIDLib::TCard4     c4ExpectedLen;
-    tCIDLib::TCh*       pszPattern;
-    tCIDLib::TCh*       pszToSearch;
+    tCIDLib::TCard1         c1ShouldMatch;
+    tCIDLib::TCard1         c1OnlyAtStart;
+    EMatchTypes             eType;
+    tCIDLib::TCard4         c4StartAt;
+    tCIDLib::TCard4         c4ShouldMatchAt;
+    tCIDLib::TCard4         c4ExpectedLen;
+    const tCIDLib::TCh*     pszPattern;
+    const tCIDLib::TCh*     pszToSearch;
 };
 
 
@@ -249,6 +253,19 @@ static const TTestEntry aTests[] =
   , { 1 , 0, EPart  , 0 , 1 , 1, L"A$"              , L" A" }
   , { 1 , 1, EFull  , 0 , 0 , 0, L".*XYX.*"         , L"The XYX Boys" }
   , { 1 , 1, EFull  , 0 , 0 , 0, L".*XYX"           , L"The XYX" }
+
+  , { 0 , 0, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])?", L"" }
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])?", L"1" }
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])?", L"12" }
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])?", L"123" }
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])?", L"1.9" }
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])?", L"12.8" }
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])?", L"123.7" }
+  , { 1 , 0, EPart  , 0 , 1 , 5, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])?", L"A123.7B" }
+
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])*", L"1" }
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])*", L"1.2" }
+  , { 0 , 0, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])*", L"1.23" }
 };
 static const tCIDLib::TCard4 c4TestCount = tCIDLib::c4ArrayElems(aTests);
 
@@ -352,6 +369,9 @@ TTest_Parse::eRunTest(  TTextStringOutStream&   strmOut
     //  parse them all correctly.
     //
     regxTest.SetExpression(L"A");
+    regxTest.SetExpression(L"1?");
+    regxTest.SetExpression(L".*");
+    regxTest.SetExpression(L"(AB)*");
     regxTest.SetExpression(L"AB");
     regxTest.SetExpression(L"A|B|C");
     regxTest.SetExpression(L"(A*B+AC)D");

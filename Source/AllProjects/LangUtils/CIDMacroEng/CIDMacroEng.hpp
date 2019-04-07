@@ -5,16 +5,19 @@
 //
 // CREATED: 01/11/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
 //
 //  This facility implements a 'macro engine'. It defines an object oriented
 //  development language which is pseudo compiled to a high level opcode
@@ -23,8 +26,11 @@
 //  the runtime libraries required for macros to access system services.
 //
 //  The language is strictly object oriented, so it consists completely of
-//  classes, which in turn consist of methods that act on their internal
-//  state.
+//  classes.
+//
+//  The parser use a pluggable 'file resolver' system to map classes to some
+//  sort of loadable content that contains the class. That might be a file,
+//  or it might be pulling something down from a server.
 //
 // CAVEATS/GOTCHAS:
 //

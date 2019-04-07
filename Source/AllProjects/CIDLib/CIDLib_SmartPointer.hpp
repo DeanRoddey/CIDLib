@@ -5,9 +5,13 @@
 //
 // CREATED: 11/23/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -47,10 +51,10 @@
 
 namespace TSmartPtrHelpers
 {
-    CIDLIBEXP tCIDLib::TVoid CheckRef(const tCIDLib::TVoid* pToCheck);
     CIDLIBEXP tCIDLib::TVoid CheckRefNotZero(const tCIDLib::TCard4 c4ToCheck);
     CIDLIBEXP tCIDLib::TVoid LogReleaseError();
     CIDLIBEXP tCIDLib::TVoid ThrowAcquireError();
+    CIDLIBEXP tCIDLib::TVoid ThrowNullRef(const tCIDLib::TCard4 c4Line);
     CIDLIBEXP tCIDLib::TVoid ThrowReleaseError();
 }
 
@@ -124,35 +128,35 @@ template <class T> class TCntPtr
         // -------------------------------------------------------------------
         explicit operator tCIDLib::TBoolean() const
         {
-            return (m_pcdRef != nullptr);
+            return ((m_pcdRef != nullptr) && (m_pcdRef->m_pobjData != nullptr));
         }
 
         tCIDLib::TBoolean operator!() const
         {
-            return (m_pcdRef == nullptr);
+            return ((m_pcdRef == nullptr) || (m_pcdRef->m_pobjData == nullptr));
         }
 
         T* operator->()
         {
-            TSmartPtrHelpers::CheckRef(m_pcdRef);
+            CheckNullRef(CID_LINE);
             return m_pcdRef->m_pobjData;
         }
 
         const T* operator->() const
         {
-            TSmartPtrHelpers::CheckRef(m_pcdRef);
+            CheckNullRef(CID_LINE);
             return m_pcdRef->m_pobjData;
         }
 
         T& operator*()
         {
-            TSmartPtrHelpers::CheckRef(m_pcdRef);
+            CheckNullRef(CID_LINE);
             return *m_pcdRef->m_pobjData;
         }
 
         const T& operator*() const
         {
-            TSmartPtrHelpers::CheckRef(m_pcdRef);
+            CheckNullRef(CID_LINE);
             return *m_pcdRef->m_pobjData;
         }
 
@@ -214,13 +218,15 @@ template <class T> class TCntPtr
 
         T* pobjData()
         {
-            TSmartPtrHelpers::CheckRef(m_pcdRef);
+            if (!m_pcdRef)
+                return nullptr;
             return m_pcdRef->m_pobjData;
         }
 
         const T* pobjData() const
         {
-            TSmartPtrHelpers::CheckRef(m_pcdRef);
+            if (!m_pcdRef)
+                return nullptr;
             return m_pcdRef->m_pobjData;
         }
 
@@ -255,8 +261,16 @@ template <class T> class TCntPtr
 
 
         // -------------------------------------------------------------------
-        //  Private data types
+        //  Private, non-virtual methods
         // -------------------------------------------------------------------
+
+        // Called to make sure the reference is good
+        tCIDLib::TVoid CheckNullRef(const tCIDLib::TCard4 c4Line) const
+        {
+            if ((m_pcdRef == nullptr) || (m_pcdRef->m_pobjData == nullptr))
+                TSmartPtrHelpers::ThrowNullRef(c4Line);
+        }
+
 
         //
         //  This is called to release a reference. This is static so we can't do the wrong
@@ -432,8 +446,7 @@ template <class T> class TUniquePtr
 
             m_pData(nullptr)
         {
-            // Just swap the pointers, giving him our null
-            tCIDLib::Swap(m_pData, uptrSrc.m_pData);
+            *this = tCIDLib::ForceMove(uptrSrc);
         }
 
         ~TUniquePtr()
@@ -457,6 +470,13 @@ template <class T> class TUniquePtr
         //  Public operators
         // -------------------------------------------------------------------
         TUniquePtr<T>& operator=(const TUniquePtr<T>&) = delete;
+
+        TUniquePtr<T>& operator=(TUniquePtr<T>&& uptrSrc)
+        {
+            if (&uptrSrc != this)
+                tCIDLib::Swap(m_pData, uptrSrc.m_pData);
+            return *this;
+        }
 
         operator tCIDLib::TBoolean() const
         {

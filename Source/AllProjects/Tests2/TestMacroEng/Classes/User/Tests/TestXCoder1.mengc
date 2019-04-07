@@ -84,7 +84,7 @@ Methods=[Public,Final]
             m_RetVal := -1;
         EndIf;
 
-        // Now this one should fail 
+        // Now this one should fail
         CaughtIt := False;
         Try
             XCoder.ConvertFromRange(m_Buf, 2, 3, m_Test1);
@@ -95,7 +95,7 @@ Methods=[Public,Final]
         EndCatch;
 
         If (!CaughtIt)
-            m_Helper.PrintErr("/StopThrow mode didn't fail second time", m_Output, $CurLine);
+            m_Helper.PrintErr("Stop/Throw mode didn't fail second time", m_Output, $CurLine);
             m_RetVal := -1;
         EndIf;
 

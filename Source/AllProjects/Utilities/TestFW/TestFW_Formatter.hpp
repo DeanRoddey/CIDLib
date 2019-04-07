@@ -5,9 +5,13 @@
 //
 // CREATED: 01/12/2006
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -147,6 +151,7 @@ class TTFWHTMLFormatter : public TTFWFormatter
         tCIDLib::TVoid WriteGroupResults
         (
             const   tTestFW::TGroupList&    colGroupList
+            , const tTestFW::TNameList&     colGroupsRun
         );
 
         tCIDLib::TVoid WriteHeader

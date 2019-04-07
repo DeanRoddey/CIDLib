@@ -5,9 +5,13 @@
 //
 // CREATED: 12/05/2001
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -15,6 +19,10 @@
 //  is a backend program which implements a centralized configuration data
 //  repository, to allow distributed applications to keep all their config
 //  data in a centralized place, for easy maintenance.
+//
+//  It is based on a standard ORB interface. The client proxy is provided by
+//  the CIDOrbUC facility, so you don't need generate one yourself if you want
+//  to access a config server.
 //
 // CAVEATS/GOTCHAS:
 //

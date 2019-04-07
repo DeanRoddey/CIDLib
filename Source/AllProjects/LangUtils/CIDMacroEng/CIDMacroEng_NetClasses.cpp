@@ -5,9 +5,13 @@
 //
 // CREATED: 10/17/2005
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -232,10 +236,15 @@ TMEngDataSrcVal::SetSockTCP(const TIPEndPoint& ipepTar, const tCIDLib::TBoolean 
             //  Create the socket in this case and directly and pass it to the
             //  secure channel data source, who will adopt it.
             //
+            tCIDLib::TStrList colALPN;
             pcdsNew = new TCIDSChanClDataSrc
             (
-                new TClientStreamSocket(tCIDSock::ESockProtos::TCP, ipepTar)
+                L"CML Secure Channel Client"
+                , new TClientStreamSocket(tCIDSock::ESockProtos::TCP, ipepTar)
                 , tCIDLib::EAdoptOpts::Adopt
+                , TString::strEmpty()
+                , colALPN
+                , tCIDSChan::EConnOpts::None
                 , ipepTar.strHostName()
             );
         }

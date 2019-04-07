@@ -5,16 +5,22 @@
 //
 // CREATED: 04/05/2013
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This is a placeholder mostly, to play around with some SIP stuff. It's not
+//  functional at all at this point.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -39,9 +45,7 @@
 //  Include our underlying headers if not already included
 // ---------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
 #include    "CIDSock.hpp"
-
 #include    "CIDNet.hpp"
 
 

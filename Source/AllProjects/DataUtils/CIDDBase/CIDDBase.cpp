@@ -5,15 +5,18 @@
 //
 // CREATED: 09/21/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
-//  This is the main file of the facility. It provides an init function that
-//  is called by the magic main module macro that users must include in their
-//  main program file.
+//  This is the main file of the facility. It provides the lazy faulting in
+//  method for our facility object.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -26,13 +29,6 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDDBase_.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  This facility talks directly to some system APIs, so we need to force it
-//  to bring in the ODBC library, so as not to force this on everyone.
-// ---------------------------------------------------------------------------
-#pragma comment(lib, "odbc32.lib")
 
 
 // ---------------------------------------------------------------------------
@@ -55,6 +51,4 @@ TFacCIDDBase& facCIDDBase()
     }
     return *pfacCIDDBase;
 }
-
-
 

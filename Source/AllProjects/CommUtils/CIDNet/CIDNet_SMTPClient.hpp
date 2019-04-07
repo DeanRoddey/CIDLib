@@ -5,9 +5,13 @@
 //
 // CREATED: 01/29/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -130,7 +134,7 @@ class CIDNETEXP TEmailMsg : public TObject
         // -------------------------------------------------------------------
         //  Public class types and constants
         // -------------------------------------------------------------------
-        using TCursor = TBag<TString>::TCursor;
+        using TCursor = TBasicDLinkedCol<TString>::TCursor;
         static const tCIDLib::TCard4    c4MaxAttachements = 64;
 
 

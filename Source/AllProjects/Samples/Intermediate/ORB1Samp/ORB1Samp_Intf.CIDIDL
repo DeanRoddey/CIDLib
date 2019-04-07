@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<!--
+  - A shared IDL file that the client and server both use. The client generates the
+  - client proxy and the server generates the server stub.
+  -->
+<CIDIDL:Interface>
+
+    <CIDIDL:ClassIntf   CIDIDL:Name="ORB1Samp"
+                        CIDIDL:InterfaceId="E1CCC9CBCFA1FDAF-29A8F7CB04763265">
+
+        <CIDIDL:Constants>
+            <CIDIDL:Constant CIDIDL:Name="strBinding"
+                             CIDIDL:Type="TString"
+                             CIDIDL:Value="/ORB1Samp/IntfImpl"/>
+        </CIDIDL:Constants>
+
+        <CIDIDL:Methods>
+
+            <!-- Query a record by name -->
+            <CIDIDL:Method CIDIDL:Name="bQueryByName">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="strToFind" CIDIDL:Dir="In">
+                    <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="recFound" CIDIDL:Dir="Out">
+                    <CIDIDL:Object CIDIDL:Type="TORB1SampRec"/>
+                </CIDIDL:Param>
+
+            </CIDIDL:Method>
+
+            <!-- Query all with a specific status -->
+            <CIDIDL:Method CIDIDL:Name="bQueryAllStatus">
+                <CIDIDL:RetType>
+                    <CIDIDL:TBoolean/>
+                </CIDIDL:RetType>
+                <CIDIDL:Param CIDIDL:Name="eToFind" CIDIDL:Dir="In">
+                    <CIDIDL:Enumerated CIDIDL:Type="tORB1SampSh::EStatus"/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="colFound" CIDIDL:Dir="Out">
+                    <CIDIDL:TVector CIDIDL:ElemType="TORB1SampRec"/>
+                </CIDIDL:Param>
+
+            </CIDIDL:Method>
+
+        </CIDIDL:Methods>
+
+    </CIDIDL:ClassIntf>
+
+</CIDIDL:Interface>

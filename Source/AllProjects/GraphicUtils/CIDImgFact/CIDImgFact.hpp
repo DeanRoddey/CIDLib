@@ -5,13 +5,22 @@
 //
 // CREATED: 03/02/2013
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
-//  This is the main public header for the facility.
+//  This is the main public header for the image factory facility. Include
+//  this to get all of the functionality offered.
+//
+//  This facility provides a way to gen up images generically, convert them
+//  back and forth between formats, etc... So it makes it fairly easy to deal
+//  with images without having to do much work to load them and convert them.
 //
 // CAVEATS/GOTCHAS:
 //

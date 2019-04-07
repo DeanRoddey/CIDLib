@@ -5,9 +5,13 @@
 //
 // CREATED: 01/12/2007
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -219,7 +223,7 @@ TTFWHTMLFormatter::FormatResult(const   TString&                strOutPath
     //  Each group result page will contain links to the test program results
     //  page for all of the tests programs in that test.
     //
-    WriteGroupResults(colGroupList);
+    WriteGroupResults(colGroupList, colGroupsRun);
 }
 
 
@@ -296,7 +300,8 @@ tCIDLib::TVoid TTFWHTMLFormatter::WriteFooter(TTextOutStream& strmTar)
 //  group summary table
 //
 tCIDLib::TVoid
-TTFWHTMLFormatter::WriteGroupResults(const tTestFW::TGroupList& colGrpList)
+TTFWHTMLFormatter::WriteGroupResults(const  tTestFW::TGroupList&    colGroupList
+                                    , const tTestFW::TNameList&     colGroupsRun)
 {
     //
     //  For each group, we need to iterate the tests and output a details
@@ -304,11 +309,11 @@ TTFWHTMLFormatter::WriteGroupResults(const tTestFW::TGroupList& colGrpList)
     //
     TPathStr    pathCurFile;
     TString     strHeader;
-    const tCIDLib::TCard4 c4GrpCount = colGrpList.c4ElemCount();
+    const tCIDLib::TCard4 c4GrpCount = colGroupsRun.c4ElemCount();
     for (tCIDLib::TCard4 c4GIndex = 0; c4GIndex < c4GrpCount; c4GIndex++)
     {
         // Get the current group and write the group results page for it
-        const TTFWGroupInfo& tfwgiCur = colGrpList[c4GIndex];
+        const TTFWGroupInfo& tfwgiCur = tfwgiFindGrp(colGroupsRun[c4GIndex], colGroupList);
         WriteOneGroupResult(tfwgiCur);
     }
 }
@@ -453,6 +458,7 @@ TTFWHTMLFormatter::WriteOneGroupResult(const TTFWGroupInfo& tfwgiSrc)
     // Close off the table and write the standard footer
     strmTar << L"</TABLE></BLOCKQUOTE></P>";
     WriteFooter(strmTar);
+    strmTar.Flush();
 }
 
 
@@ -716,8 +722,9 @@ TTFWHTMLFormatter::WriteTestProgramResults(const TTFWTestPrgInfo& tfwtpiSrc)
                 << L"</BLOCKQUOTE>";
     }
 
-    // And write out the standard footer
+    // And write out the standard footer and flush
     WriteFooter(strmTar);
+    strmTar.Flush();
 }
 
 
@@ -774,5 +781,6 @@ TTFWHTMLFormatter::WriteTestResult( const   TTFWTestPrgInfo&    tfwtpiSrc
             << strEscape(tfwotrSrc.strOutput())
             << L"</BLOCKQUOTE>";
     WriteFooter(strmTar);
+    strmTar.Flush();
 }
 

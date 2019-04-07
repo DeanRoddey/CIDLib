@@ -5,9 +5,13 @@
 //
 // CREATED: 08/02/1997
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -134,6 +138,7 @@ template <class TElem, class TKeyOps> class THashSet
         //  Nested aliases for the node type used by a hash table and the
         //  user provided object equality function.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = THashSet<TElem, TKeyOps>;
         using TNode = THashSetNode<TElem>;
 
@@ -855,7 +860,7 @@ template <class TElem, class TKeyOps> class THashSet
             return m_apBuckets[hshElem]->objData();
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);

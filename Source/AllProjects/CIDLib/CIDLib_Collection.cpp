@@ -5,9 +5,13 @@
 //
 // CREATED: 03/23/2002
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -786,13 +790,28 @@ tCIDLib::TVoid TCollectionBase::EnablePublish(const TString& strTopicPath)
 
 
 tCIDLib::TVoid
+TCollectionBase::HashChanged(const  tCIDLib::TCh* const     pszFile
+                            , const tCIDLib::TCard4         c4Line) const
+{
+    facCIDLib().ThrowErr
+    (
+        pszFile
+        , c4Line
+        , kCIDErrs::errcCol_HashChanged
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::NotSupported
+    );
+}
+
+
+tCIDLib::TVoid
 TCollectionBase::MustClearFirst(const   tCIDLib::TCh* const pszFile
                                 , const tCIDLib::TCard4     c4Line) const
 {
     facCIDLib().ThrowErr
     (
-        CID_FILE
-        , CID_LINE
+        pszFile
+        , c4Line
         , kCIDErrs::errcCol_MustClearFirst
         , tCIDLib::ESeverities::Failed
         , tCIDLib::EErrClasses::NotSupported

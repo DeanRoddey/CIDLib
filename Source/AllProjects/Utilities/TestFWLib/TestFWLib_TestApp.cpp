@@ -5,9 +5,13 @@
 //
 // CREATED: 01/12/2007
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -215,14 +219,14 @@ tCIDLib::EExitCodes TTestFWApp::eTestThread(TThread& thrThis, tCIDLib::TVoid*)
                 tfwtCur.strSubName(), tfwtCur.strDescription()
             );
 
+            //
+            //  Create an output stream over the results object's output
+            //  string.
+            //
+            TTextStringOutStream strmOutput(&tfwotrCur.strOutput());
+
             try
             {
-                //
-                //  Create an output stream over the results object's output
-                //  string.
-                //
-                TTextStringOutStream strmOutput(&tfwotrCur.strOutput());
-
                 if (tfwtCur.c4Level() > m_c4MaxLevel)
                 {
                     //
@@ -264,16 +268,13 @@ tCIDLib::EExitCodes TTestFWApp::eTestThread(TThread& thrThis, tCIDLib::TVoid*)
             catch(const TError& errToCatch)
             {
                 tfwotrCur.eResult(tTestFWLib::ETestRes::Exception);
-                TTextStringOutStream strmOutput(&tfwotrCur.strOutput());
                 strmOutput << errToCatch << kCIDLib::EndLn;
-
                 strmOut << L" Exception occurred" << kCIDLib::EndLn;
             }
 
             catch(const TKrnlError& kerrToCatch)
             {
                 tfwotrCur.eResult(tTestFWLib::ETestRes::KrnlException);
-                TTextStringOutStream strmOutput(&tfwotrCur.strOutput());
                 strmOutput  << L"KrnlErr=" << kerrToCatch.errcId()
                             << L", HostErr=" << kerrToCatch.errcHostId()
                             << kCIDLib::EndLn;
@@ -285,6 +286,8 @@ tCIDLib::EExitCodes TTestFWApp::eTestThread(TThread& thrThis, tCIDLib::TVoid*)
                 tfwotrCur.eResult(tTestFWLib::ETestRes::SysException);
                 strmOut << L" System exception occurred" << kCIDLib::EndLn;
             }
+
+            strmOutput.Flush();
 
             // And add this to our results object
             tfwtrOutput.AddTestResult(tfwotrCur);

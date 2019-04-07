@@ -5,9 +5,13 @@
 //
 // CREATED: 03/27/1994
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -176,7 +180,7 @@ namespace CIDLib_Type
     );
 
 
-    static const tCIDLib::TMsgId amidHJustifications[tCIDLib::EHJustify::Count] =
+    static const tCIDLib::TMsgId amidHJustifications[tCIDLib::c4EnumOrd(tCIDLib::EHJustify::Count)] =
     {
         kCIDMsgs::midGen_Left
         , kCIDMsgs::midGen_Right
@@ -252,7 +256,7 @@ namespace CIDLib_Type
         apszLogFlagVals
     );
 
-    static const tCIDLib::TMsgId amidLanguages[tCIDLib::ELanguages::Count] =
+    static const tCIDLib::TMsgId amidLanguages[tCIDLib::c4EnumOrd(tCIDLib::ELanguages::Count)] =
     {
         kCIDMsgs::midLang_Afrikaans
         , kCIDMsgs::midLang_Albanian
@@ -328,7 +332,7 @@ namespace CIDLib_Type
         apszSeverVals
     );
 
-    const tCIDLib::TMsgId amidVJustifications[tCIDLib::EVJustify::Count] =
+    const tCIDLib::TMsgId amidVJustifications[tCIDLib::c4EnumOrd(tCIDLib::EVJustify::Count)] =
     {
         kCIDMsgs::midGen_Bottom
         , kCIDMsgs::midGen_Center

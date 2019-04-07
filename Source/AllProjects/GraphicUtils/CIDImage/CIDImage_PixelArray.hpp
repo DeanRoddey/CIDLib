@@ -5,9 +5,13 @@
 //
 // CREATED: 02/28/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -445,21 +449,6 @@ class CIDIMGEXP TPixelArray :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom
-        (
-                    TBinInStream&           strmToReadFrom
-        );
-
-        tCIDLib::TVoid StreamTo
-        (
-                    TBinOutStream&          strmToWriteTo
-        )   const;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private, non-virtual methods
-        // -------------------------------------------------------------------
         tCIDLib::TCard4 c4GetBoundaryPixel
         (
             const   tCIDLib::TInt4          i4XPos
@@ -474,138 +463,50 @@ class CIDIMGEXP TPixelArray :
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid CalcTransients();
-
-        tCIDLib::TVoid ConvertToCoefs
+        tCIDLib::TVoid StreamFrom
         (
-                    tCIDLib::TFloat8* const pf8ToCvt
-            , const tCIDLib::TCard4         c4SampleCnt
-            , const tCIDLib::TFloat8* const pf8Poles
-            , const tCIDLib::TCard4         c4PoleCnt
-            , const tCIDLib::TFloat8        f8Tolerance
-        )   const;
+                    TBinInStream&           strmToReadFrom
+        )   override;
 
-        tCIDLib::TFloat8 f8InterpolatePoint
+        tCIDLib::TVoid StreamTo
         (
-            const   tCIDLib::TFloat4* const pf4Coefs
-            , const tCIDLib::TCard4         c4Width
-            , const tCIDLib::TCard4         c4Height
-            , const tCIDLib::TFloat8        f8X
-            , const tCIDLib::TFloat8        f8Y
-            , const tCIDLib::TCard4         c4Degree
-        )   const;
+                    TBinOutStream&          strmToWriteTo
+        )   const override;
 
-        tCIDLib::TFloat8 f8InitAntiCausalCoefs
-        (
-                    tCIDLib::TFloat8* const pf8ToCvt
-            , const tCIDLib::TCard4         c4SampleCnt
-            , const tCIDLib::TFloat8        f8Pole
-        )   const;
 
-        tCIDLib::TFloat8 f8InitCausalCoefs
-        (
-                    tCIDLib::TFloat8* const pf8ToCvt
-            , const tCIDLib::TCard4         c4SampleCnt
-            , const tCIDLib::TFloat8        f8Pole
-            , const tCIDLib::TFloat8        f8Tolerance
-        )   const;
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        TPixelArrayImpl* ppixaiMakeNew();
 
-        tCIDLib::TVoid InterpComp
+        TPixelArrayImpl* ppixaiMakeNew
         (
-            const   tCIDLib::EClrComps      eComp
-            , const tCIDLib::TFloat4* const pf4Coefs
-            ,       tCIDLib::TCard2* const  pc2LoadBuf
-            ,       TPixelArray&            pixaToFill
-            , const tCIDLib::TCard4         c4Degree
-            , const tCIDLib::TCard2         c2MaxVal
-        )   const;
+            const   tCIDImage::EPixFmts     eFmt
+            , const tCIDImage::EBitDepths   eBitDepth
+            , const tCIDImage::ERowOrders   eRowOrder
+            , const TSize&                  szImage
+        );
 
-        tCIDLib::TVoid LoadCoefs
+        TPixelArrayImpl* ppixaiMakeNew
         (
-            const   tCIDLib::EClrComps      eComp
-            ,       tCIDLib::TFloat4* const pf4ToFill
-            ,       tCIDLib::TFloat8* const pf8Row
-            ,       tCIDLib::TFloat8* const pf8Col
-            , const tCIDLib::TCard4         c4Degree
-            , const TClrPalette&            palToUse
-        )   const;
-
-        tCIDLib::TVoid PutPixel
-        (
-            const   tCIDLib::TCard4         c4ToPut
-            , const tCIDLib::TCard4         c4XPos
-            , const tCIDLib::TCard4         c4YPos
-            , const tCIDLib::TCard4         c4Line
+            const   tCIDImage::EPixFmts     eFmt
+            , const tCIDImage::EBitDepths   eBitDepth
+            , const tCIDImage::ERowOrders   eRowOrder
+            , const TSize&                  szImage
+            ,       tCIDLib::TCard1* const  pc1Buf
+            , const tCIDLib::TCard4         c4BufSz
+            , const tCIDLib::EAdoptOpts     eAdoptOpt
         );
 
 
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_c4BufSz
-        //      The current allocated size of m_pc1Pixels. The buffer can be
-        //      be bigger than the current required size for the high/width
-        //      and format. The size required for the image data is stored in
-        //      m_c4ImageSz.
-        //
-        //  m_c4Height
-        //      The height of the array in pixels.
-        //
-        //  m_c4ImageSz
-        //      The full size of the pixel data, which is not the same as
-        //      the allocated buffer size (which is in m_c4BufSz.)
-        //
-        //  m_c4LineBytePadding
-        //      The number of bytes to which the size of each line is rounded
-        //      up to. Normaly it's 4 bytes which is what is required for
-        //      Windows to pass the data in as a bitmap.
-        //
-        //  m_c4LineWidth
-        //      The width of a scan line in bytes (including padding.)
-        //
-        //  m_c4Width
-        //      The width of the array in pixels.
-        //
-        //  m_eAdoptOpt
-        //      Indicates whether we own the pixel buffer or not. If so, then
-        //      we delete it on dtor or if we need to reallocate.
-        //
-        //  m_eBitDepth
-        //      The number of bits per pixel/sample of the image. The full
-        //      format description depends on the m_ePixFmt member.
-        //
-        //  m_eFmt
-        //      The pixel format, which tells us how to interpret the bit
-        //      depth field.
-        //
-        //  m_eRowOrder
-        //      The ordering of the rows in the image data (top to bottom or
-        //      bottom to top.)
-        //
-        //  m_pc1Pixels
-        //      The pixel array data itself. It is allocated as needed to
-        //      hold the data required.
-        //
-        //  m_c4LineWidth
-        //      The number of bytes in a padded line.
-        //
-        //  m_c4ImageSize
-        //      The size of the pixels in bytes. The size of this buffer is
-        //      stored in m_c4BufSz. We won't re-allocate unless the x/y size
-        //      is increased to the point that is required, or unless we are
-        //      forced to (which can be done to reduce memory usage.)
+        //  m_pixaiInt
+        //      Our internal pixel array implementation object.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4         m_c4BufSz;
-        tCIDLib::TCard4         m_c4Height;
-        tCIDLib::TCard4         m_c4ImageSz;
-        tCIDLib::TCard4         m_c4LineBytePadding;
-        tCIDLib::TCard4         m_c4LineWidth;
-        tCIDLib::TCard4         m_c4Width;
-        tCIDLib::EAdoptOpts     m_eAdoptOpt;
-        tCIDImage::EBitDepths   m_eBitDepth;
-        tCIDImage::EPixFmts     m_eFmt;
-        tCIDImage::ERowOrders   m_eRowOrder;
-        tCIDLib::TCard1*        m_pc1Pixels;
+        TPixelArrayImpl*    m_pixaiInt;
 
 
         // -------------------------------------------------------------------
@@ -617,5 +518,3 @@ class CIDIMGEXP TPixelArray :
 };
 
 #pragma CIDLIB_POPPACK
-
-

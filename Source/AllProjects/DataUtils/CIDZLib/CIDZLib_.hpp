@@ -5,9 +5,13 @@
 //
 // CREATED: 08/13/2004
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -294,7 +298,7 @@ namespace kCIDZLib_
         tCIDZLib_::ECompFuncs   eFunc;
     };
 
-    const StratInfo aStratTable[tCIDZLib::ECompLevels::Count] =
+    const StratInfo aStratTable[tCIDLib::c4EnumOrd(tCIDZLib::ECompLevels::Count)] =
     {
         {  0,    0,   0,    0, tCIDZLib_::ECompFuncs::Store }
       , {  4,    4,   8,    4, tCIDZLib_::ECompFuncs::Fast }

@@ -5,9 +5,13 @@
 //
 // CREATED: 10/17/2014
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -72,6 +76,68 @@ struct TSChanPlatData
 //  Local helpers
 // ---------------------------------------------------------------------------
 
+// Called to load up an ALPN buffer
+static tCIDLib::TCard4
+c4LoadALPNBuf(          tCIDLib::TCard1*    pc1Out
+                , const tCIDLib::TCard4     c4BufSz
+                , const tCIDLib::TStrList&  colNames)
+{
+    //
+    //  Set up an output stream to build up the info temporarily into. Default little endian
+    //  is correct.
+    //
+    tCIDLib::TCard4 c4Ret = 0;
+    THeapBuf mbufOutput(c4BufSz, c4BufSz);
+    {
+        TBinMBufOutStream strmTar(&mbufOutput);
+
+        // First put out a zero value that we'll fill in later with the buffer size
+        strmTar << tCIDLib::TCard4(0);
+
+        // Then we indicate that it has ALPN data
+        strmTar << tCIDLib::TCard4(SecApplicationProtocolNegotiationExt_ALPN);
+
+        //
+        //  And another one we'll come back to which contains the bytes for the actual
+        //  protocol names, only 16 bits this time.
+        //
+        strmTar << tCIDLib::TCard2(0);
+
+        //
+        //  Then for each entry, we have to transcode to UTF8, then put out the number of
+        //  bytes and then the bytes.
+        //
+        tCIDLib::TCard4 c4CurBytes;
+        TUTF8Converter tcvtUTF8;
+        THeapBuf mbufUTF8(64, c4BufSz - 20);
+        tCIDLib::TStrList::TCursor cursNames(&colNames);
+        for (; cursNames; ++cursNames)
+        {
+            // Put out the converted name bytes, followed by the bytes themselves
+            tcvtUTF8.c4ConvertTo(*cursNames, mbufUTF8, c4CurBytes);
+            strmTar << tCIDLib::TCard1(c4CurBytes);
+            strmTar.c4WriteBuffer(mbufUTF8, c4CurBytes);
+        }
+        strmTar.Flush();
+        c4Ret = strmTar.c4CurSize();
+    }
+    CIDAssert(c4Ret <= c4BufSz, L"The ALPN data is larger than the available buffer");
+
+    // Put in the overall buffer size we skipped, minus the size bytes themselves
+    mbufOutput.PutCard4(c4Ret - 4, 0);
+
+    //
+    //  Put the bytes for the actual protocols info, which is the full size minus
+    //  the two 4 byte and single 2 byte housekeeping values.
+    //
+    mbufOutput.PutCard2(tCIDLib::TCard2(c4Ret - 10), 8);
+
+    // And copy this back to the caller's buffer
+    mbufOutput.CopyOut(pc1Out, c4Ret);
+    return c4Ret;
+}
+
+
 //
 //  Maps some of the common errors to errors of our own, wo that we can provide more
 //  useful info for in the field diagnosis.
@@ -134,275 +200,9 @@ static tCIDLib::TErrCode errcMapSChanStatusToErr(const tCIDLib::TCard4 Status)
 // ---------------------------------------------------------------------------
 
 //
-//  Gets us connected to the other side and ready to start doing encrypted comm.
-//  Note that, for a client side connection the certificate info is actually the
-//  name of the target, i.e. the server side certificate must be for this target.
-//
-tCIDLib::TVoid
-TSChannel::Connect(         TCIDDataSrc&            cdsTar
-                    , const tCIDLib::TBoolean       bClient
-                    , const tCIDLib::TEncodedTime   enctEnd
-                    , const TString&                strCertInfo
-                    , const TString&                strName)
-{
-    //
-    //  If we already have data, then this is not valid. They need to terminate the
-    //  previous session first.
-    //
-    if (m_pInfo)
-    {
-        facCIDSChan().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kSChanErrs::errcSChan_AlreadyInit
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Already
-            , strName
-        );
-    }
-
-    //
-    //  Create our internal info structure. Store the pointer so that clean up
-    //  can be done if we throw. The info structure will be released and the
-    //  pointer zeroed if that happens.
-    //
-    m_pInfo = new TSChanPlatData{0};
-
-    // Remember if a client or a server side
-    m_bClient = bClient;
-
-    // Store the name for any error messages
-    m_strName = strName;
-
-    tCIDLib::TBoolean bRet = kCIDLib::False;
-    HCERTSTORE hMyCertStore = 0;
-    try
-    {
-        // If server side, load our certificate info
-        if (!bClient)
-        {
-            PCCERT_CONTEXT pCertContext = nullptr;
-
-            //
-            //  Parse the certificate info. The caller an indicate different ways for
-            //  us to load it. The facility class provides a helper to do the parsing.
-            //
-            TString  strCertType;
-            TString  strCertStore;
-            TString  strCertName;
-            if (!facCIDSChan().bParseCertInfo(strCertInfo, strCertType, strCertStore, strCertName))
-            {
-                facCIDSChan().ThrowErr
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , kSChanErrs::errcSChan_BadCertInfo
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::NotFound
-                    , m_strName
-                    , strCertInfo
-                );
-            }
-
-            // Try to create a certificate based on the info provided
-            if ((strCertType == L"mstore") || (strCertType == L"ustore"))
-            {
-                // Set up the right physical store
-                DWORD dwPStore;
-                if (strCertType == L"mstore")
-                    dwPStore = CERT_SYSTEM_STORE_LOCAL_MACHINE;
-                else
-                    dwPStore = CERT_SYSTEM_STORE_CURRENT_USER;
-
-                hMyCertStore = ::CertOpenStore
-                (
-                    CERT_STORE_PROV_SYSTEM_W
-                    , 0
-                    , 0
-                    , dwPStore
-                    , strCertStore.pszBuffer()
-                );
-
-                if (hMyCertStore == NULL)
-                {
-                    // Can't go any further
-                    facCIDSChan().ThrowKrnlErr
-                    (
-                        CID_FILE
-                        , CID_LINE
-                        , kSChanErrs::errcSChan_OpenStore
-                        , TKrnlError::kerrLast()
-                        , tCIDLib::ESeverities::Failed
-                        , tCIDLib::EErrClasses::CantDo
-                        , m_strName
-                    );
-                }
-
-                // That worked so let's look for the caller's certificate
-                pCertContext = ::CertFindCertificateInStore
-                (
-                    hMyCertStore
-                    , X509_ASN_ENCODING | PKCS_7_ASN_ENCODING
-                    , 0
-                    , CERT_FIND_SUBJECT_STR_W
-                    , strCertName.pszBuffer()
-                    , NULL
-                );
-            }
-             else if (strCertType == L"file")
-            {
-                //
-                //  Try to open the file and create a certificate from that. The
-                //  'store' in this case is the file path.
-                //
-                if (TFileSys::bExists(strCertStore))
-                {
-                    TBinaryFile bflCert(strCertStore);
-                    bflCert.Open
-                    (
-                        tCIDLib::EAccessModes::Read
-                        , tCIDLib::ECreateActs::OpenIfExists
-                        , tCIDLib::EFilePerms::Default
-                        , tCIDLib::EFileFlags::SequentialScan
-                    );
-
-                    THeapBuf mbufCert(8192UL);
-                    tCIDLib::TCard4 c4Bytes = bflCert.c4ReadBuffer
-                    (
-                        mbufCert
-                        , tCIDLib::TCard4(bflCert.c8CurSize())
-                        , tCIDLib::EAllData::FailIfNotAll
-                    );
-
-                    pCertContext = ::CertCreateCertificateContext
-                    (
-                        X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, mbufCert.pc1Data(), c4Bytes
-                    );
-                }
-            }
-             else
-            {
-                facCIDSChan().LogMsg
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , kSChanErrs::errcSChan_CertType
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::CantDo
-                    , strCertType
-                    , m_strName
-                );
-            }
-
-            // If we never got one open
-            if (pCertContext == NULL)
-            {
-                facCIDSChan().ThrowErr
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , kSChanErrs::errcSChan_OpenCert
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::NotFound
-                    , m_strName
-                    , strCertInfo
-                );
-            }
-
-            // It worked, so store the context
-            m_pInfo->pCertContext = pCertContext;
-        }
-
-        // Reset some stuff used to track data
-        m_c4DecBufSz = 0;
-
-        // Set up the credentials stuff we want
-        SCHANNEL_CRED SCCred = { 0 };
-        SCCred.dwVersion = SCHANNEL_CRED_VERSION;
-        if (m_bClient)
-        {
-            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_0_CLIENT
-                                            | SP_PROT_TLS1_1_CLIENT
-                                            | SP_PROT_TLS1_2_CLIENT;
-            SCCred.dwFlags = SCH_CRED_NO_DEFAULT_CREDS;
-        }
-         else
-        {
-            SCCred.cCreds = 1;
-            SCCred.paCred = &m_pInfo->pCertContext;
-            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_0_SERVER
-                                            | SP_PROT_TLS1_1_SERVER
-                                            | SP_PROT_TLS1_2_SERVER;
-        }
-
-        // And try to aquire a credentials handle
-        SECURITY_STATUS Status = ::AcquireCredentialsHandle
-        (
-            NULL
-            , UNISP_NAME
-            , m_bClient ? SECPKG_CRED_OUTBOUND : SECPKG_CRED_INBOUND
-            , NULL
-            , &SCCred
-            , NULL
-            , NULL
-            , &m_pInfo->CredH
-            , &m_pInfo->CertTimeout
-        );
-
-        // If we failed,then we are done
-        if (Status < 0)
-        {
-            facCIDSChan().ThrowErr
-            (
-                CID_FILE
-                , CID_LINE
-                , kSChanErrs::errcSChan_AqcCreds
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::CantDo
-                , m_strName
-                , TInteger(Status)
-            );
-        }
-
-        // Remember we got the credentials handle
-        m_pInfo->bGotCredHandle = kCIDLib::True;
-
-        //
-        //  Call a helper that does the negotiation. It needs to be separate because
-        //  we have to call this also for renegotiation.
-        //
-        if (bClient)
-        {
-            ClNegotiate(cdsTar, strCertInfo, enctEnd);
-
-            // Remember the principle in case we have to re-negotiate
-            m_strPrincipal = strCertInfo;
-        }
-         else
-        {
-            SrvNegotiate(cdsTar, enctEnd);
-        }
-    }
-
-    catch(TError& errToCatch)
-    {
-        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-        TModule::LogEventObj(errToCatch);
-
-        // Clean up any local stuff
-        if (hMyCertStore)
-            ::CertCloseStore(hMyCertStore, 0);
-
-        // And any of the info stuff that got created and rethrow
-        Cleanup();
-        throw;
-    }
-}
-
-
-//
-//
+//  This is called to terminate the connection if it is not already terminated and
+//  both our side and the other side have not closed. and then to clean up any
+//  per-platform resources.
 //
 tCIDLib::TVoid
 TSChannel::Terminate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd)
@@ -416,7 +216,18 @@ TSChannel::Terminate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd)
     //  data source still appears connected, then do the disconnect from our side.
     //
     if (!m_pInfo->bOtherSideClosed && cdsTar.bConnected())
-        DoDisconnect(cdsTar);
+    {
+        try
+        {
+            DoDisconnect(cdsTar);
+        }
+
+        catch(TError& errToCatch)
+        {
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            TModule::LogEventObj(errToCatch);
+        }
+    }
 
     // Clean up the resources stored in our internal data
     Cleanup();
@@ -723,7 +534,7 @@ TSChannel::c4ReceiveData(       TCIDDataSrc&            cdsTar
             try
             {
                 if (m_bClient)
-                    ClNegotiate(cdsTar, m_strPrincipal, enctRealEnd);
+                    ClNegotiate(cdsTar, enctRealEnd);
                 else
                     SrvNegotiate(cdsTar, enctRealEnd);
             }
@@ -842,7 +653,6 @@ tCIDLib::TVoid TSChannel::Cleanup()
 //
 tCIDLib::TVoid
 TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
-                        , const TString&                strPrincipal
                         , const tCIDLib::TEncodedTime   enctEnd)
 {
     tCIDLib::TBoolean   bDone = kCIDLib::False;
@@ -854,8 +664,8 @@ TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
     // Get the token size info for schanne
     tCIDLib::TCard4 c4TokenSize = 0;
     {
-        PSecPkgInfo pkgInfo;
-        Status = ::QuerySecurityPackageInfo(L"schannel", &pkgInfo);
+        PSecPkgInfoW pkgInfo;
+        Status = ::QuerySecurityPackageInfoW((LPWSTR)L"schannel", &pkgInfo);
         if (Status < 0)
         {
             facCIDSChan().ThrowErr
@@ -943,11 +753,28 @@ TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
         // We've consumed any carryover from the previous round now
         c4CarryOver = 0;
 
-        // Set up our I/O buffers for this round
+        // Set up our buffers for this round
         InBuffers[0].pvBuffer   = pc1In;
         InBuffers[0].cbBuffer   = c4Cnt;
-        InBuffers[0].BufferType = SECBUFFER_TOKEN;
-        InBuffers[1].pvBuffer   = 0;
+        InBuffers[0].BufferType = SECBUFFER_EMPTY;
+        if (bFirstRound && !m_colALPNList.bIsEmpty())
+        {
+            // It's the first around and we have ALPN info so start with that
+            c4Cnt = c4LoadALPNBuf(pc1In, c4TokenSize, m_colALPNList);
+            if (c4Cnt)
+            {
+                InBuffers[0].cbBuffer = c4Cnt;
+                InBuffers[0].BufferType = SECBUFFER_APPLICATION_PROTOCOLS;
+            }
+        }
+         else if (c4Cnt)
+        {
+            // We just have token info to send, so it's a token buffer
+            InBuffers[0].BufferType = SECBUFFER_TOKEN;
+        }
+
+
+        InBuffers[1].pvBuffer   = nullptr;
         InBuffers[1].cbBuffer   = 0;
         InBuffers[1].BufferType = SECBUFFER_EMPTY;
 
@@ -956,15 +783,15 @@ TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
         OutBuffers[0].BufferType= SECBUFFER_TOKEN;
 
         // And do a round
-        Status = ::InitializeSecurityContext
+        Status = ::InitializeSecurityContextW
         (
             &m_pInfo->CredH
             , m_pInfo->bGotSecContext ? &m_pInfo->CtxH : 0
-            , (SEC_WCHAR*)strPrincipal.pszBuffer()
+            , (SEC_WCHAR*)m_strPrincipal.pszBuffer()
             , c4InFlags
             , 0
             , 0
-            , bFirstRound ? 0 : &InBufList
+            , &InBufList
             , 0
             , &m_pInfo->CtxH
             , &OutBufList
@@ -1136,6 +963,279 @@ TSChannel::ClNegotiate(         TCIDDataSrc&            cdsTar
 
 
 //
+//  We have two different public connect methods, one for the server and one for the
+//  client. They take different info. They will store their info away, along with the
+//  m_bClient flag, and then call us to to the actual work.
+//
+tCIDLib::TVoid
+TSChannel::DoConnect(       TCIDDataSrc&            cdsTar
+                    , const TString&                strCertInfo
+                    , const tCIDLib::TEncodedTime   enctEnd)
+{
+    //
+    //  Create our internal info structure. Store the pointer so that clean up
+    //  can be done if we throw. The info structure will be released and the
+    //  pointer zeroed if that happens.
+    //
+    m_pInfo = new TSChanPlatData{0};
+
+    tCIDLib::TBoolean bRet = kCIDLib::False;
+    HCERTSTORE hMyCertStore = 0;
+    try
+    {
+        if (strCertInfo.bIsEmpty())
+        {
+            // If server side, then that's an error
+            if (!m_bClient)
+            {
+                facCIDSChan().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kSChanErrs::errcSChan_NoServerCert
+                    , tCIDLib::ESeverities::Failed
+                    , tCIDLib::EErrClasses::NotFound
+                    , m_strName
+                );
+            }
+        }
+         else
+        {
+            PCCERT_CONTEXT pCertContext = nullptr;
+
+            //
+            //  Parse the certificate info. The caller an indicate different ways for
+            //  us to load it. The facility class provides a helper to do the parsing.
+            //
+            TString  strCertType;
+            TString  strCertStore;
+            TString  strCertName;
+            if (!facCIDSChan().bParseCertInfo(strCertInfo, strCertType, strCertStore, strCertName))
+            {
+                facCIDSChan().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kSChanErrs::errcSChan_BadCertInfo
+                    , tCIDLib::ESeverities::Failed
+                    , tCIDLib::EErrClasses::NotFound
+                    , m_strName
+                    , strCertInfo
+                );
+            }
+
+            // Try to create a certificate based on the info provided
+            if ((strCertType == L"mstore") || (strCertType == L"ustore"))
+            {
+                // Set up the right physical store
+                DWORD dwPStore;
+                if (strCertType == L"mstore")
+                    dwPStore = CERT_SYSTEM_STORE_LOCAL_MACHINE;
+                else
+                    dwPStore = CERT_SYSTEM_STORE_CURRENT_USER;
+
+                hMyCertStore = ::CertOpenStore
+                (
+                    CERT_STORE_PROV_SYSTEM_W
+                    , 0
+                    , 0
+                    , dwPStore
+                    , strCertStore.pszBuffer()
+                );
+
+                if (hMyCertStore == NULL)
+                {
+                    // Can't go any further
+                    facCIDSChan().ThrowKrnlErr
+                    (
+                        CID_FILE
+                        , CID_LINE
+                        , kSChanErrs::errcSChan_OpenStore
+                        , TKrnlError::kerrLast()
+                        , tCIDLib::ESeverities::Failed
+                        , tCIDLib::EErrClasses::CantDo
+                        , m_strName
+                    );
+                }
+            }
+             else if (strCertType == L"file")
+            {
+                //
+                //  Try to open the file and create a certificate from that. The
+                //  'store' in this case is the file path.
+                //
+                if (TFileSys::bExists(strCertStore))
+                {
+                    hMyCertStore = ::CertOpenStore
+                    (
+                        CERT_STORE_PROV_FILENAME
+                        , X509_ASN_ENCODING
+                        , NULL
+                        , CERT_STORE_OPEN_EXISTING_FLAG
+                          | CERT_STORE_READONLY_FLAG
+                        , strCertStore.pszBuffer()
+                    );
+
+                    if (hMyCertStore == NULL)
+                    {
+                        // Can't go any further
+                        facCIDSChan().ThrowKrnlErr
+                        (
+                            CID_FILE
+                            , CID_LINE
+                            , kSChanErrs::errcSChan_OpenStore
+                            , TKrnlError::kerrLast()
+                            , tCIDLib::ESeverities::Failed
+                            , tCIDLib::EErrClasses::CantDo
+                            , m_strName
+                        );
+                    }
+                }
+            }
+             else
+            {
+                facCIDSChan().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kSChanErrs::errcSChan_CertType
+                    , tCIDLib::ESeverities::Failed
+                    , tCIDLib::EErrClasses::CantDo
+                    , strCertType
+                    , m_strName
+                );
+            }
+
+            // We got the store open, so let's try to find the named certificate
+            pCertContext = ::CertFindCertificateInStore
+            (
+                hMyCertStore
+                , X509_ASN_ENCODING | PKCS_7_ASN_ENCODING
+                , 0
+                , CERT_FIND_SUBJECT_STR_W
+                , strCertName.pszBuffer()
+                , NULL
+            );
+
+            // If we never got one open
+            if (pCertContext == NULL)
+            {
+                facCIDSChan().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kSChanErrs::errcSChan_OpenCert
+                    , tCIDLib::ESeverities::Failed
+                    , tCIDLib::EErrClasses::NotFound
+                    , m_strName
+                    , strCertInfo
+                );
+            }
+
+            // It worked, so store the context
+            m_pInfo->pCertContext = pCertContext;
+        }
+
+        // Reset some stuff used to track data
+        m_c4DecBufSz = 0;
+
+        // Set up the credentials stuff we want
+        SCHANNEL_CRED SCCred = { 0 };
+        SCCred.dwVersion = SCHANNEL_CRED_VERSION;
+        DWORD dwAcquireFlags = 0;
+        if (m_bClient)
+        {
+            SCCred.grbitEnabledProtocols =  SP_PROT_TLS1_2_CLIENT;
+
+            if (tCIDLib::bAllBitsOn(m_eOpts, tCIDSChan::EConnOpts::AllowTLS1_1))
+                SCCred.grbitEnabledProtocols |= SP_PROT_TLS1_1_CLIENT;
+
+            if (tCIDLib::bAllBitsOn(m_eOpts, tCIDSChan::EConnOpts::NoDefCreds))
+                SCCred.dwFlags = SCH_CRED_NO_DEFAULT_CREDS;
+
+            dwAcquireFlags = SECPKG_CRED_OUTBOUND;
+        }
+         else
+        {
+            SCCred.grbitEnabledProtocols = SP_PROT_TLS1_2_SERVER;
+
+            if (tCIDLib::bAllBitsOn(m_eOpts, tCIDSChan::EConnOpts::AllowTLS1_1))
+                SCCred.grbitEnabledProtocols |= SP_PROT_TLS1_1_SERVER;
+
+            dwAcquireFlags = SECPKG_CRED_INBOUND;
+        }
+
+        // If we had cert info, pass the certificate context
+        if (!strCertInfo.bIsEmpty())
+        {
+            SCCred.cCreds = 1;
+            SCCred.paCred = &m_pInfo->pCertContext;
+        }
+
+        // And try to aquire a credentials handle
+        SECURITY_STATUS Status = ::AcquireCredentialsHandleW
+        (
+            NULL
+            , (LPWSTR)UNISP_NAME
+            , dwAcquireFlags
+            , NULL
+            , &SCCred
+            , NULL
+            , NULL
+            , &m_pInfo->CredH
+            , &m_pInfo->CertTimeout
+        );
+
+        // If we failed,then we are done
+        if (Status < 0)
+        {
+            facCIDSChan().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kSChanErrs::errcSChan_AqcCreds
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::CantDo
+                , m_strName
+                , TCardinal(Status, tCIDLib::ERadices::Hex)
+            );
+        }
+
+        // Remember we got the credentials handle
+        m_pInfo->bGotCredHandle = kCIDLib::True;
+
+        //
+        //  Call a helper that does the negotiation. It needs to be separate because
+        //  we have to call this also for renegotiation.
+        //
+        if (m_bClient)
+        {
+            ClNegotiate(cdsTar, enctEnd);
+        }
+         else
+        {
+            SrvNegotiate(cdsTar, enctEnd);
+        }
+    }
+
+    catch(TError& errToCatch)
+    {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
+
+        // Clean up any local stuff
+        if (hMyCertStore)
+            ::CertCloseStore(hMyCertStore, 0);
+
+        // And any of the info stuff that got created and rethrow
+        Cleanup();
+        throw;
+    }
+}
+
+
+
+//
 //  Does a formal disconnect process. We won't wait for long, because we don't want to
 //  hold up shutdown. This is called during the termination process.
 //
@@ -1230,8 +1330,8 @@ TSChannel::SrvNegotiate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd
     // Get the token size info for schanne
     tCIDLib::TCard4 c4TokenSize = 0;
     {
-        PSecPkgInfo pkgInfo;
-        Status = ::QuerySecurityPackageInfo(L"schannel", &pkgInfo);
+        PSecPkgInfoW pkgInfo;
+        Status = ::QuerySecurityPackageInfoW((LPWSTR)L"schannel", &pkgInfo);
         if (Status < 0)
         {
             facCIDSChan().ThrowErr

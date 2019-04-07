@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Types>
+
+            <!-- Secure connection options -->
+            <CIDIDL:Enum CIDIDL:Name="EConnOpts" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="BaseName"
+                         CIDIDL:FormatMap="BaseName" CIDIDL:Type="Bmp">
+                <CIDIDL:DocText>
+                    Options for creating a secure channel connection
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="NoDefCreds"        CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="AllowTLS1_1"       CIDIDL:Value="0x01000000"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>
+
+

@@ -5,9 +5,13 @@
 //
 // CREATED: 11/16/1992
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -5045,7 +5049,6 @@ tCIDLib::EFindRes TString::eTokenExists(const tCIDLib::TCh chToken) const
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::TCh        chFill;
 
-    // And look for the token.
     if (pszFindToken
     (
         m_strbData.pszBuffer()
@@ -5056,9 +5059,15 @@ tCIDLib::EFindRes TString::eTokenExists(const tCIDLib::TCh chToken) const
         , c4Chars
         , c4TokenCnt))
     {
-        return c4TokenCnt ? tCIDLib::EFindRes::NotFound : tCIDLib::EFindRes::NoMore;
+        return tCIDLib::EFindRes::Found;
     }
-    return tCIDLib::EFindRes::Found;
+
+    // Not found, but there are still tokens present
+    if (c4TokenCnt)
+        return tCIDLib::EFindRes::NotFound;
+
+    // Not found and no more tokens are present
+    return tCIDLib::EFindRes::NoMore;
 }
 
 

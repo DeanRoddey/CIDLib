@@ -5,7 +5,7 @@
 //
 // CREATED: 03/01/2017
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
 //  This file and its contents are the property of Charmed Quark Software. It
 //  may not be redistributed in any modified form, or as part of any product

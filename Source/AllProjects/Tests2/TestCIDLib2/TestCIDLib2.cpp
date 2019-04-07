@@ -5,9 +5,13 @@
 //
 // CREATED: 01/27/2007
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -71,6 +75,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
 
     // The most fundamental stuff
     AddTest(new TTest_Types);
+    AddTest(new TTest_SafeCnt1);
     AddTest(new TTest_CntPtr1);
     AddTest(new TTest_UniquePtr);
     AddTest(new TTest_FlagJanitor);
@@ -117,6 +122,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     // AddTest(new TTest_RefVectorMoveSem);
     AddTest(new TTest_VectorLambda);
     AddTest(new TTest_VectorMoveSem);
+    AddTest(new TTest_ColAlgo1);
 
     AddTest(new TTest_ColCursors);
 
@@ -126,6 +132,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     // The pool and related classes
     AddTest(new TTest_SimplePool);
     AddTest(new TTest_SimplePoolPtr);
+    AddTest(new TTest_FixedSizePool);
 
     // Higher level stuff
     AddTest(new TTest_GenCache1);
@@ -143,7 +150,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
 
     // High level tests that can gen up some threads
     AddTest(new TTest_CntPtr2);
-    AddTest(new TTest_SafeCnt1);
+    AddTest(new TTest_SafeCnt2);
 
     // Publish/subscribe
     AddTest(new TTest_PubSub1);

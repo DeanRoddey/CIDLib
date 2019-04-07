@@ -5,9 +5,13 @@
 //
 // CREATED: 10/03/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -77,10 +81,6 @@ TCommPortCfg::TCommPortCfg( const   tCIDLib::TCard4         c4Baud
     , m_eParity(eParity)
     , m_eRTS(eRTS)
     , m_eStopBits(eStopBits)
-{
-}
-
-TCommPortCfg::~TCommPortCfg()
 {
 }
 

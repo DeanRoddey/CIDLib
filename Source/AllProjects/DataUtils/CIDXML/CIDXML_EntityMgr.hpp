@@ -5,9 +5,13 @@
 //
 // CREATED: 08/21/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -151,7 +155,7 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                     TString&                strToFill
         );
 
-        TXMLEntSpooler* pxesMakeNew
+        [[nodiscard]] TXMLEntSpooler* pxesMakeNew
         (
                     tCIDXML::TEntitySrcRef& esrFrom
             , const tCIDLib::TBoolean       bExpectDecl
@@ -159,7 +163,7 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
             , const tCIDXML::EEntityTypes   eType
         );
 
-        TXMLEntSpooler* pxesMakeNewFromInt
+        [[nodiscard]] TXMLEntSpooler* pxesMakeNewFromInt
         (
             const   TXMLEntityDecl&         xdeclSource
             , const tCIDXML::ERefFrom       eFrom

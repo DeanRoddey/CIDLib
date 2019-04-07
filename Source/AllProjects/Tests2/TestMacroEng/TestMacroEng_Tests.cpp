@@ -5,9 +5,13 @@
 //
 // CREATED: 01/25/2007
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -70,8 +74,8 @@ TTest_PathValidation::eRunTest(  TTextStringOutStream&   strmOut
     //
     struct TestInfo
     {
-        tCIDLib::TCh* const     pszPath;
-        tCIDLib::TBoolean       bShouldPass;
+        const tCIDLib::TCh* const   pszPath;
+        tCIDLib::TBoolean           bShouldPass;
     };
 
     const TestInfo aTests[] =
@@ -162,10 +166,10 @@ TTest_NumConstProbe::eRunTest(  TTextStringOutStream&   strmOut
     //
     struct TestInfo
     {
-        tCIDLib::TCh* const     pszVal;
-        tCIDMacroEng::ENumTypes    eExpType;
-        tCIDLib::TInt4          i4Radix;
-        tCIDLib::TBoolean       bExplicitSuff;
+        const tCIDLib::TCh* const   pszVal;
+        tCIDMacroEng::ENumTypes     eExpType;
+        tCIDLib::TInt4              i4Radix;
+        tCIDLib::TBoolean           bExplicitSuff;
     };
 
     // These are positive tests and should pass

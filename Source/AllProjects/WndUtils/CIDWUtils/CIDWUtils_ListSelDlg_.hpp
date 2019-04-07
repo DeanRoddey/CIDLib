@@ -7,7 +7,11 @@
 //
 // COPYRIGHT: 2015..2015, Charmed Quark Systems, Ltd
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //

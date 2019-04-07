@@ -5,15 +5,27 @@
 //
 // CREATED: 06/24/2007
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
 //  have to offer.
+//
+//  This guy provides support for extracting metadata from media files. We support
+//  AAC/MP4 and WMA files currently, But it's a framework and various other types
+//  could be supported.
+//
+//  We also have some stuff for generating unique ids based on the content of DVDs
+//  and blurays. There are various requirements for these types of things and
+//  other variations may be needed moving forward.
 //
 // CAVEATS/GOTCHAS:
 //

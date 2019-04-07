@@ -5,9 +5,13 @@
 //
 // CREATED: 08/30/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -46,7 +50,15 @@ class CIDXMLEXP TXMLContextStack : public TObject
         // -------------------------------------------------------------------
         TXMLContextStack();
 
+        TXMLContextStack(const TXMLContextStack&) = delete;
+
         ~TXMLContextStack();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLContextStack& operator=(const TXMLContextStack&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -123,13 +135,6 @@ class CIDXMLEXP TXMLContextStack : public TObject
             tCIDLib::TCard4     c4MapCount;
             tCIDLib::TCard4     c4MapMax;
         };
-
-
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLContextStack(const TXMLContextStack&);
-        tCIDLib::TVoid operator=(const TXMLContextStack&);
 
 
         // -------------------------------------------------------------------

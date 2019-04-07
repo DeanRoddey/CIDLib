@@ -5,7 +5,7 @@
 //
 // CREATED: 11/12/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
 //  This file is part of a demonstration program of the CIDLib C++
 //  Frameworks. Its contents are distributed 'as is', to provide guidance on
@@ -40,7 +40,7 @@ struct  TThreadInfo
     tCIDLib::TCard4     c4Id;
     tCIDLib::TCard4     c4SleepTime;
     tCIDLib::TBoolean   bShutdown;
-    tCIDLib::TCh*       pszError;
+    const tCIDLib::TCh* pszError;
     TKrnlMutex*         pkmtxTest;
 };
 

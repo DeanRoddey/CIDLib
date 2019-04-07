@@ -5,16 +5,45 @@
 //
 // CREATED: 09/21/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
-//  This is the header file for the CIDDBase_Statement.Cpp file. This
-//  file implements a query statement.
+//  This is the header file for the CIDDBase_Statement.Cpp file. This file
+//  implements a database query statement.
+//
+//  The statement requires a connection (actually the connection handle) which
+//  it will keep around (it's a counted object) until it is destructed so that
+//  the connection can't go away on us.
+//
+//  Though there are no virtual methods, this is just a base class so the ctors
+//  are protected. It handles the grunt work but we may want to have multiple
+//  specialized types of statements.
+//
+//  One you have done a successful query, you can bFetch() to load each successive
+//  row into the column bindings. Do this until bFetch() returns false to see them
+//  all.
+//
+//
+//  As mentioned you actually used derived statement classes to do the queries.
+//  Those classes, after a successful query, should call DoColBindings() to set
+//  up the binding objects that have been set on this statement with the columns
+//  in the query results.
+//
+//  They should call DoParmBindings() before the query, though as mentioned in the
+//  gotchas below, parameter bindings aren't yet actually supported.
 //
 // CAVEATS/GOTCHAS:
+//
+//  1)  Though the interfaces are in place to do parameter bindings, they are not
+//      yet implemented. Only column result bindings are actually supported at
+//      this time.
 //
 // LOG:
 //
@@ -91,73 +120,82 @@ class CIDDBASEEXP TDBStatement : public TObject
 
         tCIDLib::TCard1 c1ColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
 
         tCIDLib::TCard2 c2ColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
 
         tCIDLib::TCard4 c4ColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
 
         tCIDLib::TCard8 c8ColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
-
-        tCIDDBase::THandle hStatement() const;
 
         tCIDLib::TInt1 i1ColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
 
         tCIDLib::TInt2 i2ColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
 
         tCIDLib::TInt4 i4ColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
 
         tCIDLib::TInt8 i8ColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
+
+        tCIDDBase::TStmtHandle* pStatement() const
+        {
+            return m_pStatement;
+        }
 
         tCIDLib::TVoid Reset();
 
         const TString& strColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
 
         const TString& strName() const;
 
-        const TTime& tmDateColVal
+        TTime tmDateColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
 
-        const TTime& tmTimeColVal
+        TTime tmTimeColVal
         (
-            const   tCIDLib::TCard4         c4ParmInd
+            const   tCIDLib::TCard4         c4Index
         );
 
 
     protected :
         // -------------------------------------------------------------------
-        //  Hidden Constructor
+        //  Hidden constructors
         // -------------------------------------------------------------------
         TDBStatement
         (
-            const   TDBConnection&          dbconTarget
+            const   TDBConnection&          dbconnSrc
+            , const TString&                strName
+        );
+
+        TDBStatement
+        (
+            const   tCIDDBase::THConn&      hConnection
             , const TString&                strName
         );
 
@@ -174,19 +212,31 @@ class CIDDBASEEXP TDBStatement : public TObject
         // -------------------------------------------------------------------
         //  Private class types
         // -------------------------------------------------------------------
-        typedef TRefVector<TDBBinding>   TBindingList;
+        using TBindingList = TRefVector<TDBBinding>;
 
 
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bDoPlatFetch();
+
         tCIDLib::TVoid ClearCursor();
 
         tCIDLib::TVoid ClearHandleColBindings();
 
         tCIDLib::TVoid ClearHandleParmBindings();
 
-        TDBBinding* pdbbindMakeNew
+        tCIDLib::TVoid CreateStatement
+        (
+            const   tCIDDBase::TConnHandle* pConnection
+        );
+
+        tCIDLib::TVoid DestroyStatement
+        (
+            const   tCIDDBase::TConnHandle* pConnection
+        );
+
+        [[nodiscard]] TDBBinding* pdbbindMakeNew
         (
             const   TString&                strName
             , const tCIDDBase::ECppTypes    eCppType
@@ -203,24 +253,21 @@ class CIDDBASEEXP TDBStatement : public TObject
         //      The bindings currently associated with this statement. We have
         //      one list of parameter and one list of column bindings.
         //
-        //  m_cptrConn
-        //      We participate in referencing counting the connection handle
-        //      that was used to create us. They cannot be destroyed until
-        //      all statement objects that were created with it are destroyed.
-        //      So when we are created, we ref count the handle, as does the
-        //      connection object. When we all let it go, it's cleaned up.
+        //  m_hConnection
+        //      We have to insure the connection that created us cannot go away until
+        //      we are done, so we keep a (ref counted) copy of it.
         //
-        //  m_hStatement
-        //      The handle to the statement. It's opaque to the outside
-        //      world.
+        //  m_pStatement
+        //      The opaque 'handle' to a statement that each platform driver defines
+        //      for its own needs.
         //
         //  m_strName
         //      Statement name, for error reporting purposes.
         // -------------------------------------------------------------------
         TBindingList                m_colColBindings;
         TBindingList                m_colParmBindings;
-        tCIDDBase::TODBCHandleRef   m_cptrConn;
-        tCIDDBase::THandle          m_hStatement;
+        tCIDDBase::THConn           m_hConnection;
+        tCIDDBase::TStmtHandle*     m_pStatement;
         TString                     m_strName;
 
 

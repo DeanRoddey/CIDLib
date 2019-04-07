@@ -5,9 +5,13 @@
 //
 // CREATED: 11/06/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -387,8 +391,34 @@ namespace tCIDLib
 
 
     // Default equality comparator
-    template <typename T> tCIDLib::TBoolean bComp(const T& t1, const T& t2)
+    template <typename T> class TDefEqComp
     {
-        return t1 == t2;
-    }
+        public :
+            TDefEqComp() = default;
+            TDefEqComp(const TDefEqComp&) = default;
+            ~TDefEqComp() = default;
+
+            constexpr tCIDLib::TBoolean operator()(const T& t1, const T& t2) const
+            {
+                return t1 == t2;
+            }
+    };
+
+    // Default relative magnitude comparator
+    template <typename T> class TDefMagComp
+    {
+        public :
+            TDefMagComp() = default;
+            TDefMagComp(const TDefMagComp&) = default;
+            ~TDefMagComp() = default;
+
+            constexpr tCIDLib::ESortComps operator()(const T& t1, const T& t2) const
+            {
+                if (t1 < t2)
+                    return tCIDLib::ESortComps::FirstLess;
+                else if (t1 > t2)
+                    return tCIDLib::ESortComps::FirstGreater;
+                return tCIDLib::ESortComps::Equal;
+            }
+    };
 }

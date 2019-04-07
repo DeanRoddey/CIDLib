@@ -5,9 +5,13 @@
 //
 // CREATED: 09/23/2015
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -152,7 +156,7 @@ class TObjListTab : public TTabWindow, public MIPEIntf
             , const TMEngClassVal&          mecvVal
         );
 
-        tCIDLib::TVoid TObjListTab::InlineEdit
+        tCIDLib::TVoid InlineEdit
         (
             const   tCIDLib::TCard4         c4RowInd
             , const TMEngClassVal&          mecvVal

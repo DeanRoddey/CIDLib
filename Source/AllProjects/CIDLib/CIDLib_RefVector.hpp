@@ -5,9 +5,13 @@
 //
 // CREATED: 01/03/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -42,9 +46,10 @@ class TRefVector : public TRefCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Nested alias for the element comparator function
+        //  Class type aliases
         // -------------------------------------------------------------------
-        using TMyType   = TRefVector<TElem, TIndex>;
+        using TMyElemType   = TElem;
+        using TMyType       = TRefVector<TElem, TIndex>;
 
 
         // -------------------------------------------------------------------
@@ -537,7 +542,7 @@ class TRefVector : public TRefCollection<TElem>
             bPullOutElem(pnodeToOrphan, kCIDLib::True);
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockThis(this->pmtxLock());
             return new TCursor(this);
@@ -935,7 +940,7 @@ class TRefVector : public TRefCollection<TElem>
             }
         }
 
-        TMyType* pcolMakeNewOf() const
+        [[nodiscard]] TMyType* pcolMakeNewOf() const
         {
             // Make a copy with same characteristics, but not content!
             TMtxLocker lockThis(this->pmtxLock());

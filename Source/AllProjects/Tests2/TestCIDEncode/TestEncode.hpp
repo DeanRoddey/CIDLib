@@ -5,9 +5,13 @@
 //
 // CREATED: 07/15/2008
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -33,6 +37,43 @@
 // -----------------------------------------------------------------------------
 #include    "CIDEncode.hpp"
 #include    "TestFWLib.hpp"
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_ByName
+// PREFIX: tfwt
+//
+//  Tests creation of some converters by their name, making sure case doesn't matter
+// ---------------------------------------------------------------------------
+class TTest_ByName : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_ByName();
+
+        TTest_ByName(const TTest_ByName&) = delete;
+
+        ~TTest_ByName();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_ByName,TTestFWTest)
+};
 
 
 
@@ -61,7 +102,7 @@ class TTest_Convert : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -121,7 +162,7 @@ class TTest_ErrModes : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -184,7 +225,7 @@ class TTest_RoundTrip1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :

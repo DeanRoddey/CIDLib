@@ -5,9 +5,13 @@
 //
 // CREATED: 05/20/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -90,7 +94,7 @@ class CIDMACROENGEXP TMEngLiteralVal : public TMEngNamedItem
                     TString&                strToFill
         )   const;
 
-        TMEngClassVal* pmecvMakeNew
+        [[nodiscard]] TMEngClassVal* pmecvMakeNew
         (
             const   TString&                strName
         )   const;

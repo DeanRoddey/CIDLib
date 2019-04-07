@@ -5,9 +5,13 @@
 //
 // CREATED: 07/23/2004
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -39,14 +43,6 @@ RTTIDecls(TCommPortBase,TObject)
 //  CLASS: TCommPortBase
 // PREFIX: comm
 // ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TCommPortBase: Destructor
-// ---------------------------------------------------------------------------
-TCommPortBase::~TCommPortBase()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TCommPortBase: Public, non-virtual methods

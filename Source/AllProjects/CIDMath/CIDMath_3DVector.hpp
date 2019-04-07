@@ -5,16 +5,21 @@
 //
 // CREATED: 09/10/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the header for the CIDMath_3DVector.cpp file. This file
-//  implements the T3DVector class, which is a mathematical construct that
-//  represent forces, position, velocity, magnetic phenomena, etc... in a
-//  3D floating point coordinate space.
+//  implements the T3DVector class
+//
+//  This is just old code that isn't very good. It's not currently used and
+//  needs some love.
 //
 // CAVEATS/GOTCHAS:
 //

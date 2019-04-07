@@ -64,6 +64,7 @@ ERRORS=
     errcSChan_PartialMsg    5018    Got an incomplete encrypted packet. Name=%(1)
     errcSChan_OutOfSeq      5019    Got an out of sequence encrypted packet. Name=%(1)
     errcSChan_MsgAltered    5020    An encrypted packet was altered in transit. Name=%(1)
+    errcSChan_NoServerCert  5021    Certificate info must be provided for server side connections. Name=%(1)
 
     ; These are mapped to from Windows status returns
     errcSChan_Internal      5050    Internal Windows SChannel error. Name=%(1)

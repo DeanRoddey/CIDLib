@@ -5,9 +5,13 @@
 //
 // CREATED: 09/16/2002
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -64,14 +68,12 @@
 #include    "CIDLib.hpp"
 
 
-
 // ---------------------------------------------------------------------------
 //  And sub-include our core headers in the needed order
 // ---------------------------------------------------------------------------
 #include    "CIDObjStore_ErrorIds.hpp"
 #include    "CIDObjStore_MessageIds.hpp"
-#include    "CIDObjStore_Constant.hpp"
-#include    "CIDObjStore_Type.hpp"
+#include    "CIDObjStore_Shared.hpp"
 #include    "CIDObjStore_ObjStore.hpp"
 #include    "CIDObjStore_ThisFacility.hpp"
 

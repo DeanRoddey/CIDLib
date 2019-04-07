@@ -5,9 +5,13 @@
 //
 // CREATED: 01/30/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -32,13 +36,6 @@
 template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
 {
     public  :
-        // -------------------------------------------------------------------
-        //  Class types
-        // -------------------------------------------------------------------
-        using TCursor = TBasicDLinkedCol::TConstCursor<TElem>;
-        using TNCCursor = TBasicDLinkedCol::TNonConstCursor<TElem>;
-
-
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------

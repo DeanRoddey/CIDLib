@@ -5,9 +5,13 @@
 //
 // CREATED: 02/17/2001
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -145,38 +149,8 @@ TNameServerInfo::TNameServerInfo(const  TOrbObjId&  ooidSrvObject
 {
 }
 
-TNameServerInfo::TNameServerInfo(const TNameServerInfo& nsviToCopy) :
-
-    m_ooidSrvObject(nsviToCopy.m_ooidSrvObject)
-    , m_strDescription(nsviToCopy.m_strDescription)
-    , m_strExtra1(nsviToCopy.m_strExtra1)
-    , m_strExtra2(nsviToCopy.m_strExtra2)
-    , m_strExtra3(nsviToCopy.m_strExtra3)
-    , m_strExtra4(nsviToCopy.m_strExtra4)
-    , m_strNodeName(nsviToCopy.m_strNodeName)
-{
-}
-
 TNameServerInfo::~TNameServerInfo()
 {
-}
-
-// ---------------------------------------------------------------------------
-//  TNameServerInfo: Public operators
-// ---------------------------------------------------------------------------
-TNameServerInfo& TNameServerInfo::operator=(const TNameServerInfo& nsviToAssign)
-{
-    if (this != &nsviToAssign)
-    {
-        m_ooidSrvObject     = nsviToAssign.m_ooidSrvObject;
-        m_strDescription    = nsviToAssign.m_strDescription;
-        m_strExtra1         = nsviToAssign.m_strExtra1;
-        m_strExtra2         = nsviToAssign.m_strExtra2;
-        m_strExtra3         = nsviToAssign.m_strExtra3;
-        m_strExtra4         = nsviToAssign.m_strExtra4;
-        m_strNodeName       = nsviToAssign.m_strNodeName;
-    }
-    return *this;
 }
 
 
@@ -450,36 +424,8 @@ TNSRebindInfo::TNSRebindInfo(const  TString&    strParPath
     m_strFullPath.Append(strNodeName);
 }
 
-TNSRebindInfo::TNSRebindInfo(const TNSRebindInfo& nsrbiSrc) :
-
-    TNameServerInfo(nsrbiSrc)
-    , m_c4ErrCount(nsrbiSrc.m_c4ErrCount)
-    , m_enctNextRenewal(nsrbiSrc.m_enctNextRenewal)
-    , m_strFullPath(nsrbiSrc.m_strFullPath)
-    , m_strParPath(nsrbiSrc.m_strParPath)
-{
-}
-
 TNSRebindInfo::~TNSRebindInfo()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  TNSRebindInfo: Public operators
-// ---------------------------------------------------------------------------
-TNSRebindInfo&
-TNSRebindInfo::operator=(const TNSRebindInfo& nsrbiSrc)
-{
-    if (&nsrbiSrc != this)
-    {
-        TNameServerInfo::operator=(nsrbiSrc);
-        m_c4ErrCount      = nsrbiSrc.m_c4ErrCount;
-        m_enctNextRenewal = nsrbiSrc.m_enctNextRenewal;
-        m_strFullPath     = nsrbiSrc.m_strFullPath;
-        m_strParPath      = nsrbiSrc.m_strParPath;
-    }
-    return *this;
 }
 
 

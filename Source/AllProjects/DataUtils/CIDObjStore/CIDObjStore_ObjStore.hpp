@@ -5,9 +5,13 @@
 //
 // CREATED: 09/16/2002
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -42,17 +46,6 @@ class TCIDObjStoreImpl;
 class CIDOBJSTOREEXP TCIDObjStore : public TObject
 {
     public :
-        // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static tCIDLib::TVoid RecoverStore
-        (
-            const   TString&                strSrcRepo
-            , const TString&                strTarFile
-            ,       TString&                strActionLog
-        );
-
-
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
@@ -129,7 +122,6 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         (
             const   TString&                strPath
             , const TString&                strStoreName
-            , const tCIDLib::TBoolean       bRestore = kCIDLib::False
         );
 
         tCIDLib::TBoolean bKeyExists

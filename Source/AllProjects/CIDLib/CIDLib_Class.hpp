@@ -5,9 +5,13 @@
 //
 // CREATED: 04/02/1995
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -78,12 +82,12 @@ class CIDLIBEXP TClass :
             const   tCIDLib::TCh* const     pszClassName
         );
 
-        static TObject* pobjMakeNewOfClass
+        [[nodiscard]] static TObject* pobjMakeNewOfClass
         (
             const   tCIDLib::TCh* const     pszClassName
         );
 
-        static TObject* pobjMakeNewOfClass
+        [[nodiscard]] static TObject* pobjMakeNewOfClass
         (
             const   TString&                strClassName
         );
@@ -219,7 +223,7 @@ class CIDLIBEXP TClass :
             const   tCIDLib::TCard4      c4Modulus
         )   const;
 
-        TObject* pobjMakeNew() const;
+        [[nodiscard]] TObject* pobjMakeNew() const;
 
         TString strClassName() const;
 
@@ -318,7 +322,7 @@ class CIDLIBEXP TTypeFactoryKicker
 //  method of the facility class above. These automatically invoke the method
 //  and do the correct casting.
 // ---------------------------------------------------------------------------
-template <class T> T* pobjMakeNewOfClass(const tCIDLib::TCh* pszClassName)
+template <class T> [[nodiscard]] T* pobjMakeNewOfClass(const tCIDLib::TCh* pszClassName)
 {
     // Create it as a base object type first, since we know that's ok
     TObject* const pobjTmp = TClass::pobjMakeNewOfClass(pszClassName);
@@ -336,7 +340,7 @@ template <class T> T* pobjMakeNewOfClass(const tCIDLib::TCh* pszClassName)
     return pobjRet;
 }
 
-template <class T> T* pobjMakeNewOfClass(const TString& strClassName)
+template <class T> [[nodiscard]] T* pobjMakeNewOfClass(const TString& strClassName)
 {
     // Create it as a base object type first, since we know that's ok
     TObject* const pobjTmp = TClass::pobjMakeNewOfClass(strClassName);
@@ -354,7 +358,7 @@ template <class T> T* pobjMakeNewOfClass(const TString& strClassName)
     return pobjRet;
 }
 
-template <class T> T* pobjMakeNewOfClass(const TClass& clsToMake)
+template <class T> [[nodiscard]] T* pobjMakeNewOfClass(const TClass& clsToMake)
 {
     // Create it as a base object type first, since we know that's ok
     TObject* const pobjTmp = clsToMake.pobjMakeNew();

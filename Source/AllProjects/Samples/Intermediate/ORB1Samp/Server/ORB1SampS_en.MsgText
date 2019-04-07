@@ -1,0 +1,14 @@
+CTRL=
+    ErrPref=kORB1SampSErrs
+    MsgPref=kORB1SampSMsgs
+END CTRL
+
+ERRORS=
+    errcIntf_BadIndex   100   %(1) is not a valid value index
+END ERRORS
+
+
+MESSAGES=
+
+END MESSAGES
+

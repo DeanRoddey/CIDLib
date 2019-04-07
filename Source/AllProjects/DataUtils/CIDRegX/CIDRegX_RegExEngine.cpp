@@ -5,9 +5,13 @@
 //
 // CREATED: 07/28/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -376,8 +380,15 @@ TRegEx::bFullyMatches(  const   tCIDLib::TCh* const pszToTest
         );
     }
 
-    // Get the length of the string to search, and check for pathological case
+    // Get the length of the string to search
     const tCIDLib::TCard4 c4SearchLen = TRawStr::c4StrLen(pszToTest);
+
+    //
+    //  If the input is zero length, see if the expression is nullable. If not, then
+    //  we know it failed and this simplifies things below.
+    //
+    if (!c4SearchLen && !m_prxnfaPattern->bIsNullable())
+        return kCIDLib::False;
 
     //
     //  Create a fundamental deque with enough states to hold the worst
@@ -389,6 +400,7 @@ TRegEx::bFullyMatches(  const   tCIDLib::TCh* const pszToTest
     );
     fcolStates.AddAtBack(CIDRegX_Engine::c4Scan);
 
+    tCIDLib::TBoolean   bSuccess = kCIDLib::False;
     tCIDLib::TCard4     c4CurInd = 0;
     tCIDLib::TCard4     c4CurState = m_prxnfaPattern->c4State1At(0);
     while (c4CurState)
@@ -441,6 +453,10 @@ TRegEx::bFullyMatches(  const   tCIDLib::TCh* const pszToTest
             }
         }
 
+        // If no more states to process break out
+        if (fcolStates.bIsEmpty())
+            break;
+
         // Get the next state from the deque to process
         c4CurState = fcolStates.tGetFromFront();
 
@@ -453,31 +469,18 @@ TRegEx::bFullyMatches(  const   tCIDLib::TCh* const pszToTest
         if (!c4CurState)
         {
             if (c4CurInd >= c4SearchLen)
+            {
+                bSuccess = kCIDLib::True;
                 break;
-
+            }
             c4CurState = fcolStates.tGetFromFront();
         }
-
-        //
-        //  If the stack is empty, then we've completed the pattern. So
-        //  see if we are at the end of the search string. If not, then
-        //  we failed. Else we succeeded.
-        //
-        if (fcolStates.bIsEmpty())
-        {
-            if (c4CurInd <= c4SearchLen)
-                return kCIDLib::False;
-            break;
-        }
     }
-
-    return kCIDLib::True;
+    return bSuccess;
 }
 
 
-//
-//  Just a convenience to replace all sub-strings that match
-//
+// Just a convenience to replace all sub-strings that match
 tCIDLib::TBoolean
 TRegEx::bReplaceAll(        TString&            strFindIn
                     , const TString&            strRepWith
@@ -569,7 +572,7 @@ tCIDLib::TVoid TRegEx::SetExpression(const tCIDLib::TCh* const pszExpression)
     if (!m_prxnfaPattern)
         m_prxnfaPattern = new TRegExNFA(c4NewEntries);
      else
-        m_prxnfaPattern->c4MaxStates(c4NewEntries);
+        m_prxnfaPattern->c4Reset(c4NewEntries);
 
     //
     //  Zero the current index into the pattern. Do a peek in order to
@@ -606,6 +609,9 @@ tCIDLib::TVoid TRegEx::SetExpression(const tCIDLib::TCh* const pszExpression)
 
     // And add a last state which is the end state
     m_prxnfaPattern->c4AddState(0, 0, 0);
+
+    // And call complete on it
+    m_prxnfaPattern->Complete();
 }
 
 
@@ -669,12 +675,7 @@ tCIDLib::TCard4 TRegEx::c4ParseExpr()
         //  Update the second state to do the 'forward or back' state for
         //  the OR of the previous term and the newly parsed one.
         //
-        m_prxnfaPattern->UpdateStateAt
-        (
-            c4Ret
-            , c4ParseExpr()
-            , c4State1
-        );
+        m_prxnfaPattern->UpdateStateAt(c4Ret, c4ParseExpr(), c4State1);
 
         //
         //  And set the first of the states to point past the OR state
@@ -716,8 +717,15 @@ tCIDLib::TCard4 TRegEx::c4ParseFactor()
         const tCIDLib::TCard4 c4OldOfs = m_c4CurInd;
         chNext();
 
-        // Make room for an intermediate state we'll fill in below
-        m_prxnfaPattern->c4AddState();
+        //
+        //  Make room for an intermediate state we'll fill in below, and it becomes
+        //  our new state1 since this is what we want updated if there's any conditiona
+        //  at the end.
+        //
+        const tCIDLib::TCard4 c4ExprStart = m_prxnfaPattern->c4AddState();
+
+        // Our start state is now moved forward by one
+        c4State1++;
 
         // Parse the expression
         c4State2 = c4ParseExpr();
@@ -742,7 +750,7 @@ tCIDLib::TCard4 TRegEx::c4ParseFactor()
         //  Now we need to point the extra state we made room for at the
         //  entry state for this parenthesized expression.
         //
-        m_prxnfaPattern->UpdateStateAt(c4State1, c4State2, c4State2);
+        m_prxnfaPattern->UpdateStateAt(c4ExprStart, c4State2, c4State2);
 
         // Eat the close paren
         chNext();

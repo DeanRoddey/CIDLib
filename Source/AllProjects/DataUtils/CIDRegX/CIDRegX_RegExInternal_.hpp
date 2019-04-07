@@ -5,9 +5,13 @@
 //
 // CREATED: 07/28/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -43,7 +47,15 @@ class TRXCharMatcher : public TRXMatcher
             , const tCIDLib::TBoolean       bNot = kCIDLib::False
         );
 
+        TRXCharMatcher(const TRXCharMatcher&) = delete;
+
         ~TRXCharMatcher();
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TRXCharMatcher& operator=(const TRXCharMatcher&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -55,7 +67,7 @@ class TRXCharMatcher : public TRXMatcher
             , const tCIDLib::TCard4         c4CurOfs
             , const tCIDLib::TCard4         c4SearchLen
             , const tCIDLib::TBoolean       bCaseSensitive
-        )   const;
+        )   const override;
 
 
         // --------------------------------------------------------------------
@@ -68,7 +80,7 @@ class TRXCharMatcher : public TRXMatcher
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const;
+        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const override;
 
 
     private :
@@ -85,12 +97,6 @@ class TRXCharMatcher : public TRXMatcher
         tCIDLib::TBoolean   m_bNot;
         tCIDLib::TCh        m_chToMatch;
 
-
-        // --------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // --------------------------------------------------------------------
-        TRXCharMatcher(const TRXCharMatcher&);
-        tCIDLib::TVoid operator=(const TRXCharMatcher&);
 
         // --------------------------------------------------------------------
         //  Magic macros
@@ -111,7 +117,15 @@ class TRXAnyCharMatcher : public TRXMatcher
         // --------------------------------------------------------------------
         TRXAnyCharMatcher();
 
+        TRXAnyCharMatcher(const TRXAnyCharMatcher&) = delete;
+
         ~TRXAnyCharMatcher();
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TRXAnyCharMatcher& operator=(const TRXAnyCharMatcher&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -123,24 +137,17 @@ class TRXAnyCharMatcher : public TRXMatcher
             , const tCIDLib::TCard4         c4CurOfs
             , const tCIDLib::TCard4         c4SearchLen
             , const tCIDLib::TBoolean       bCaseSensitive
-        )   const;
+        )   const override;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const;
+        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const override;
 
 
     private :
-        // --------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // --------------------------------------------------------------------
-        TRXAnyCharMatcher(const TRXAnyCharMatcher&);
-        tCIDLib::TVoid operator=(const TRXAnyCharMatcher&);
-
-
         // --------------------------------------------------------------------
         //  Magic macros
         // --------------------------------------------------------------------
@@ -160,7 +167,15 @@ class TRXRangeMatcher : public TRXMatcher
         // --------------------------------------------------------------------
         TRXRangeMatcher(const tCIDLib::TBoolean bNot = kCIDLib::False);
 
+        TRXRangeMatcher(const TRXRangeMatcher&) = delete;
+
         ~TRXRangeMatcher();
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TRXRangeMatcher& operator=(const TRXRangeMatcher&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -172,7 +187,7 @@ class TRXRangeMatcher : public TRXMatcher
             , const tCIDLib::TCard4         c4CurOfs
             , const tCIDLib::TCard4         c4SearchLen
             , const tCIDLib::TBoolean       bCaseSensitive
-        )   const;
+        )   const override;
 
 
         // --------------------------------------------------------------------
@@ -191,7 +206,7 @@ class TRXRangeMatcher : public TRXMatcher
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const;
+        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const override;
 
 
     private :
@@ -204,13 +219,6 @@ class TRXRangeMatcher : public TRXMatcher
             tCIDLib::TCh    chSecond;
             TCharRngNode*   pnodeNext;
         };
-
-
-        // --------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // --------------------------------------------------------------------
-        TRXRangeMatcher(const TRXRangeMatcher&);
-        tCIDLib::TVoid operator=(const TRXRangeMatcher&);
 
 
         // --------------------------------------------------------------------
@@ -247,7 +255,15 @@ class TRXPosMatcher : public TRXMatcher
         // --------------------------------------------------------------------
         TRXPosMatcher(const tCIDLib::TBoolean bAtStart);
 
+        TRXPosMatcher(const TRXPosMatcher&) = delete;
+
         ~TRXPosMatcher();
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TRXPosMatcher& operator=(const TRXPosMatcher&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -259,14 +275,14 @@ class TRXPosMatcher : public TRXMatcher
             , const tCIDLib::TCard4         c4CurOfs
             , const tCIDLib::TCard4         c4SearchLen
             , const tCIDLib::TBoolean       bCaseSensitive
-        )   const;
+        )   const override;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const;
+        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const override;
 
 
     private :
@@ -278,13 +294,6 @@ class TRXPosMatcher : public TRXMatcher
         //      or at the end.
         // --------------------------------------------------------------------
         tCIDLib::TBoolean   m_bAtStart;
-
-
-        // --------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // --------------------------------------------------------------------
-        TRXPosMatcher(const TRXPosMatcher&);
-        tCIDLib::TVoid operator=(const TRXPosMatcher&);
 
 
         // --------------------------------------------------------------------

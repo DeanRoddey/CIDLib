@@ -5,18 +5,32 @@
 //
 // CREATED: 10/15/2011
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This facility provides core UPnP functionality. There are lots of things
+//  based on UPnP and each can define their own types of devices and services,
+//  since UPnP is extensible. This one provides core support for devices and
+//  services and search for UPnP devices.
+//
+//  It also provides support for some Sonos specific stuff, and very common
+//  A/V transport and Media Renderer services.
 //
 // CAVEATS/GOTCHAS:
+//
+//  1)  We need to give this one the 'per-platform split' treatment and split
+//      out the Win32 specific stuff into it's own Win32 sub-directory.
 //
 // LOG:
 //

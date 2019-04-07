@@ -5,19 +5,18 @@
 //
 // CREATED: 06/10/1997
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main header for the program. It brings in any other headers
-//  that are needed.
+//  that are needed. All our cpp files include this.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -35,17 +34,9 @@
 // -----------------------------------------------------------------------------
 //  Include our intra-facility headers
 // -----------------------------------------------------------------------------
-#include    "MakeDocs_Type.hpp"
 #include    "MakeDocs_ErrorIds.hpp"
 #include    "MakeDocs_MessageIds.hpp"
-
-#include    "MakeDocs_Translator.hpp"
-#include    "MakeDocs_Parser.hpp"
-#include    "MakeDocs_ClassInfo.hpp"
 #include    "MakeDocs_ThisFacility.hpp"
-
-#include    "MakeDocs_HtmlTranslator.hpp"
-#include    "MakeDocs_ParserError.hpp"
 
 
 // -----------------------------------------------------------------------------

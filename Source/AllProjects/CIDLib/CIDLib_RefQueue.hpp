@@ -5,9 +5,13 @@
 //
 // CREATED: 02/21/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -140,8 +144,9 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Typedef for our node type and equality function
+        //  Class type aliases
         // -------------------------------------------------------------------
+        using TMyElemType   = TElem;
         using TMyType       = TRefQueue<TElem>;
         using TNode         = TRefQueueNode<TElem>;
         using TObjEqFunc    = tCIDLib::TBoolean (*)(const TElem&, const TElem&);
@@ -574,7 +579,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitSpace);
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return new TCursor(this);
@@ -781,7 +786,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
         }
 
 
-        TRefQueue<TElem>* pcolMakeNewOf() const
+        [[nodiscard]] TRefQueue<TElem>* pcolMakeNewOf() const
         {
             TMtxLocker lockQueue(this->pmtxLock());
 

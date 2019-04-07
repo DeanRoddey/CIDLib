@@ -5,9 +5,13 @@
 //
 // CREATED: 12/05/2001
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -140,7 +144,7 @@ tCIDLib::TVoid TFacCIDCfgSrv::Cleanup()
     try
     {
         delete m_pevWait;
-        m_pevWait = 0;
+        m_pevWait = nullptr;
     }
 
     catch(...)

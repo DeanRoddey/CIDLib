@@ -5,9 +5,13 @@
 //
 // CREATED: 02/17/2001
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -103,10 +107,7 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
             , const TString&                strExtra4
         );
 
-        TNameServerInfo
-        (
-            const   TNameServerInfo&        nsviToCopy
-        );
+        TNameServerInfo(const TNameServerInfo&) = default;
 
         ~TNameServerInfo();
 
@@ -114,10 +115,7 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TNameServerInfo& operator=
-        (
-            const   TNameServerInfo&        nsviToAssign
-        );
+        TNameServerInfo& operator=(const TNameServerInfo&) = default;
 
 
         // -------------------------------------------------------------------
@@ -165,12 +163,12 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :
@@ -270,10 +268,7 @@ class CIDORBUCEXP TNSRebindInfo : public TNameServerInfo
             , const TString&                strExtra4
         );
 
-        TNSRebindInfo
-        (
-            const   TNSRebindInfo&          nsviToCopy
-        );
+        TNSRebindInfo(const TNSRebindInfo&) = default;
 
         ~TNSRebindInfo();
 
@@ -281,10 +276,7 @@ class CIDORBUCEXP TNSRebindInfo : public TNameServerInfo
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TNSRebindInfo& operator=
-        (
-            const   TNSRebindInfo&          nsviToAssign
-        );
+        TNSRebindInfo& operator=(const TNSRebindInfo&) = default;
 
 
         // -------------------------------------------------------------------
@@ -321,12 +313,12 @@ class CIDORBUCEXP TNSRebindInfo : public TNameServerInfo
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :

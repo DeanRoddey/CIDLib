@@ -5,9 +5,13 @@
 //
 // CREATED: 03/21/2006
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -82,7 +86,7 @@ namespace CIDDAE_Ripper
 // ---------------------------------------------------------------------------
 //  Our derivative of simple pool for DAE buffers
 // ---------------------------------------------------------------------------
-class TDAEBufPool : public TSimplePool<TDAEBuf>
+class TDAEBufPool : public TFixedSizePool<TDAEBuf>
 {
     public :
         // -------------------------------------------------------------------
@@ -90,7 +94,7 @@ class TDAEBufPool : public TSimplePool<TDAEBuf>
         // -------------------------------------------------------------------
         TDAEBufPool() :
 
-            TSimplePool
+            TFixedSizePool
             (
                 CIDDAE_Ripper::c4MaxBufs * 2
                 , L"DAE Buffer Pool"
@@ -114,13 +118,7 @@ class TDAEBufPool : public TSimplePool<TDAEBuf>
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4ElemSize(const TDAEBuf& daebSrc) override
-        {
-            return daebSrc.m_c4BufSz;
-        }
-
-        // Create a new string with the requested size
-        TDAEBuf* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
+        TDAEBuf* pelemMakeNew() override
         {
             return new TDAEBuf(CIDDAE_Ripper::c4BufSz);
         }
@@ -130,8 +128,7 @@ class TDAEBufPool : public TSimplePool<TDAEBuf>
         //  increment. If not, we just clear the string to get it ready for the
         //  next use.
         //
-        tCIDLib::TVoid
-        PrepElement(TDAEBuf& daebTar, const tCIDLib::TCard4 c4Size) override
+        tCIDLib::TVoid PrepElement(TDAEBuf& daebTar) override
         {
             daebTar.Reset(CIDDAE_Ripper::c4BufSz);
         }
@@ -818,7 +815,7 @@ tCIDLib::EExitCodes TCIDDAERipper::eWriteThread(TThread& thrThis, tCIDLib::TVoid
                     break;
                 continue;
             }
-            TSimplePoolJan<TDAEBuf> janBuf(m_psplBuffers, pdaebCur);
+            TFixedSizePoolJan<TDAEBuf> janBuf(m_psplBuffers, pdaebCur);
 
             // Ok, we got one, so let the encoder encode it
             m_pdaeeToUse->StoreChunk(pdaebCur->m_pc1StartPtr, pdaebCur->m_c4BytesRead);
@@ -902,11 +899,11 @@ TDAEBuf* TCIDDAERipper::pdaebGetChunk(TDAEBuf* const pdaebPrev)
     //  Get a buffer out of the pool. The size value doesn't matter since
     //  they are all the same and our pool ignores it.
     //
-    TDAEBuf* pdaebNew = m_psplBuffers->pobjReserveElem(0);
+    TDAEBuf* pdaebNew = m_psplBuffers->pobjReserveElem();
     if (!pdaebNew)
         return nullptr;
 
-    TSimplePoolJan<TDAEBuf> janBuf(m_psplBuffers, pdaebNew);
+    TFixedSizePoolJan<TDAEBuf> janBuf(m_psplBuffers, pdaebNew);
 
     //
     //  Ok, start setting up this guy for the new read. We'll fill it

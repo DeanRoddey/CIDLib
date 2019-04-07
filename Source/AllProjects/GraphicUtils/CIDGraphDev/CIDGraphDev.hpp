@@ -5,16 +5,24 @@
 //
 // CREATED: 05/27/1997
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
+//  This facility provides a wrapper around the Win32 graphics interface, the
+//  graphics device one, not a DirectX type. So it provides the graphics device
+//  wrapper itself (a base class plus implementations for specific needs), and
+//  wrappers around pens, fonts, lines, regions, etc...
+//
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -39,7 +47,6 @@
 //  Include the needed underlying headers.
 // ---------------------------------------------------------------------------
 #include    "CIDMath.hpp"
-
 #include    "CIDImgFact.hpp"
 
 

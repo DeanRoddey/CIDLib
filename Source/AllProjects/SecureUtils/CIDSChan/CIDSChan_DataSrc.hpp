@@ -5,9 +5,13 @@
 //
 // CREATED: 11/22/2014
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -48,16 +52,24 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         // -------------------------------------------------------------------
         TCIDSChanClDataSrc
         (
-                    TClientStreamSocket* const psockSrv
+            const   TString&                strName
+            ,       TClientStreamSocket* const psockSrv
             , const tCIDLib::EAdoptOpts     eAdopt
-            , const TString&                strPrincipal
+            , const TString&                strCertInfo
+            , const tCIDLib::TStrCollect&   colALPNList
+            , const tCIDSChan::EConnOpts    eOpts = tCIDSChan::EConnOpts::None
+            , const TString&                strPrincipal = TString::strEmpty()
         );
 
         TCIDSChanClDataSrc
         (
-            const   TIPEndPoint&            ipepTar
+            const   TString&                strName
+            , const TIPEndPoint&            ipepTar
             , const tCIDSock::ESockProtos   eProtocol
-            , const TString&                strPrincipal
+            , const TString&                strCertInfo
+            , const tCIDLib::TStrCollect&   colALPNList
+            , const tCIDSChan::EConnOpts    eOpts = tCIDSChan::EConnOpts::None
+            , const TString&                strPrincipal = TString::strEmpty()
         );
 
         TCIDSChanClDataSrc(const TCIDSChanClDataSrc&) = delete;
@@ -126,6 +138,15 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_colALPNList
+        //      The client code can provide a list of preferred protocols that will
+        //      be used in the 'application layer protocol negotiation' phase of the
+        //      secure connection process.
+        //
+        //  m_eOpts
+        //      We have to save this away to pass to the channel object when we
+        //      initialize it.
+        //
         //  m_pcdsRawData
         //      A straight data source over socket that we point at the socket we
         //      are given. This is what we pass to the secure channel for I/O. We
@@ -137,13 +158,25 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         //  m_schanSec
         //      The secure channel we will use to process the communications.
         //
+        //  m_strCertInfo
+        //      If they want a client side certificate, then this will be set to the
+        //      certificate info, else empty.
+        //
         //  m_strPrincipal
         //      This is the target we are connecting to. The certificate we get from
         //      the server must match this.
+        //
+        //  m_strName
+        //      A name that can be given to us for use in logging and such. We just
+        //      set it on the underlying secure channel.
         // -------------------------------------------------------------------
+        tCIDLib::TStrList       m_colALPNList;
+        tCIDSChan::EConnOpts    m_eOpts;
         TCIDSockStreamDataSrc*  m_pcdsRawData;
         TSChannel               m_schanSec;
+        TString                 m_strCertInfo;
         TString                 m_strPrincipal;
+        TString                 m_strName;
 };
 
 
@@ -160,9 +193,11 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
         // -------------------------------------------------------------------
         TCIDSChanSrvDataSrc
         (
-                    TServerStreamSocket* const psockSrv
+            const   TString&                strName
+            ,       TServerStreamSocket* const psockSrv
             , const tCIDLib::EAdoptOpts     eAdopt
             , const TString&                strCertInfo
+            , const tCIDSChan::EConnOpts    eOpts = tCIDSChan::EConnOpts::None
         );
 
         TCIDSChanSrvDataSrc(const TCIDSChanSrvDataSrc&) = delete;
@@ -231,6 +266,10 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_eOpts
+        //      We have to save this away to pass to the channel object when we
+        //      initialize it.
+        //
         //  m_pcdsRawData
         //      A straight data source over socket that we point at the socket we
         //      are given. This is what we pass to the secure channel for I/O. We
@@ -243,10 +282,15 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
         //      The caller provides us with a certificate info string that we pass
         //      on to the secure channel, to tell him where to find the certificate
         //      that we want to use as our server side cert.
+        //
+        //  m_strName
+        //      Client code can give us a name to be used in logged errors and such.
         // -------------------------------------------------------------------
+        tCIDSChan::EConnOpts    m_eOpts;
         TCIDSockStreamDataSrc*  m_pcdsRawData;
         TSChannel               m_schanSec;
         TString                 m_strCertInfo;
+        TString                 m_strName;
 };
 
 

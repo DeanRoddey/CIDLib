@@ -5,9 +5,13 @@
 //
 // CREATED: 11/23/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -38,6 +42,13 @@
 //  Include our underlying headers
 // ---------------------------------------------------------------------------
 #include    "CIDKernel.hpp"
+
+
+// ---------------------------------------------------------------------------
+//  Some needed forward references to deal with bootstrapping issues at this level
+// ---------------------------------------------------------------------------
+class MFormattable;
+class TString;
 
 
 // ---------------------------------------------------------------------------
@@ -74,14 +85,102 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_SmartPointer.hpp"
 #include    "CIDLib_SearchNSort.hpp"
 #include    "CIDLib_PubSub.hpp"
+#include    "CIDLib_ExpByteBuf.hpp"
+#include    "CIDLib_TextConverter.hpp"
+#include    "CIDLib_UTFConverter.hpp"
+#include    "CIDLib_BinInStream.hpp"
+#include    "CIDLib_BinOutStream.hpp"
 
+
+// ---------------------------------------------------------------------------
+//  Because of the special nature of this facility at the base of the system, order of
+//  inclusion problems arise and we don't have access to the IDL language down here.
+//  So we manually do some enum streaming macros for some of the basic enums (most of
+//  which come from the CIDKernel facility.)
+// ---------------------------------------------------------------------------
+#if !defined(CIDLIB_NOCLASSES)
+
+EnumStreamMacros(tCIDLib::EAngleTypes)
+EnumStreamMacros(tCIDLib::EAudioCues)
+EnumStreamMacros(tCIDLib::EAutoModes)
+EnumStreamMacros(tCIDLib::ECPUTypes)
+EnumStreamMacros(tCIDLib::ECreateActs)
+EnumStreamMacros(tCIDLib::EDelModes)
+EnumStreamMacros(tCIDLib::EEndianModes)
+EnumStreamMacros(tCIDLib::EEnds)
+EnumStreamMacros(tCIDLib::EErrClasses)
+EnumStreamMacros(tCIDLib::EEventStates)
+EnumStreamMacros(tCIDLib::EExitCodes)
+EnumStreamMacros(tCIDLib::EHJustify)
+EnumStreamMacros(tCIDLib::EHVOrients)
+EnumStreamMacros(tCIDLib::ELanguages)
+EnumStreamMacros(tCIDLib::ELockStates)
+EnumStreamMacros(tCIDLib::ELogMapModes)
+EnumStreamMacros(tCIDLib::EMeasures)
+EnumStreamMacros(tCIDLib::EMonths)
+EnumStreamMacros(tCIDLib::EPathParts)
+EnumStreamMacros(tCIDLib::EPressStates)
+EnumStreamMacros(tCIDLib::EPrioClasses)
+EnumStreamMacros(tCIDLib::EPrioLevels)
+EnumStreamMacros(tCIDLib::ERadices)
+EnumStreamMacros(tCIDLib::ERectlTypes)
+EnumStreamMacros(tCIDLib::ESeverities)
+EnumStreamMacros(tCIDLib::EShareStates)
+EnumStreamMacros(tCIDLib::ESpecialTimes)
+EnumStreamMacros(tCIDLib::ESymmetries)
+EnumStreamMacros(tCIDLib::ESysExcepts)
+EnumStreamMacros(tCIDLib::ETrailFmts)
+EnumStreamMacros(tCIDLib::ETriStates)
+EnumStreamMacros(tCIDLib::EVisible)
+EnumStreamMacros(tCIDLib::EVJustify)
+EnumStreamMacros(tCIDLib::EVolHWTypes)
+EnumStreamMacros(tCIDLib::EWeekDays)
+
+EnumBinStreamMacros(tCIDLib::EAdoptOpts)
+EnumBinStreamMacros(tCIDLib::EAccessModes)
+EnumBinStreamMacros(tCIDLib::EAllocTypes)
+EnumBinStreamMacros(tCIDLib::ECSSides)
+EnumBinStreamMacros(tCIDLib::EDirs)
+EnumBinStreamMacros(tCIDLib::EFileInfoFlags)
+EnumBinStreamMacros(tCIDLib::EForceOpts)
+EnumBinStreamMacros(tCIDLib::ELoadRes)
+EnumBinStreamMacros(tCIDLib::EMemAccFlags)
+EnumBinStreamMacros(tCIDLib::EModFlags)
+EnumBinStreamMacros(tCIDLib::EModTypes)
+EnumBinStreamMacros(tCIDLib::EMTStates)
+EnumBinStreamMacros(tCIDLib::ENextPrev)
+EnumBinStreamMacros(tCIDLib::EQPrios)
+EnumBinStreamMacros(tCIDLib::ERangeStates)
+EnumBinStreamMacros(tCIDLib::ERenameRes)
+EnumBinStreamMacros(tCIDLib::ESortDirs)
+EnumBinStreamMacros(tCIDLib::EStartEnd)
+EnumBinStreamMacros(tCIDLib::EStatItemTypes)
+EnumBinStreamMacros(tCIDLib::EStdFiles)
+EnumBinStreamMacros(tCIDLib::EStripModes)
+EnumBinStreamMacros(tCIDLib::EVolumeFlags)
+
+//
+//  Do a couple that are really CIDImage, but are defined in the kernel types header since
+//  we want folks to be able to use them without bringing in the CIDImage facility. And
+//  also one from CIDCtrls.
+//
+EnumBinStreamMacros(tCIDImage::EBitDepths)
+EnumBinStreamMacros(tCIDImage::EPixFmts)
+EnumBinStreamMacros(tCIDCtrls::EExtKeys)
+
+#endif
 
 #include    "CIDLib_DLinkedList.hpp"
 #include    "CIDLib_SLinkedList.hpp"
 #include    "CIDLib_CollectCursor.hpp"
 #include    "CIDLib_Collection.hpp"
 #include    "CIDLib_BasicDLinkedCol.hpp"
-#include    "CIDLib_CollectionUtils.hpp"
+
+#include    "CIDLib_StreamFmt.hpp"
+#include    "CIDLib_TextInStream.hpp"
+#include    "CIDLib_TextOutStream.hpp"
+
+#include    "CIDLib_StringTokenizer.hpp"
 #include    "CIDLib_BasicTreeCol.hpp"
 
 #include    "CIDLib_CircularBuf.hpp"
@@ -92,22 +191,10 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_FundVector.hpp"
 
 #include    "CIDLib_Enum.hpp"
-
 #include    "CIDLib_StatsCache.hpp"
 #include    "CIDLib_Facility.hpp"
-
-#include    "CIDLib_ExpByteBuf.hpp"
 #include    "CIDLib_ExpCharBuf.hpp"
-
-#include    "CIDLib_TextConverter.hpp"
-#include    "CIDLib_UTFConverter.hpp"
 #include    "CIDLib_NativeWCConverter.hpp"
-
-#include    "CIDLib_BinInStream.hpp"
-#include    "CIDLib_BinOutStream.hpp"
-#include    "CIDLib_StreamFmt.hpp"
-#include    "CIDLib_TextInStream.hpp"
-#include    "CIDLib_TextOutStream.hpp"
 
 #include    "CIDLib_Base64.hpp"
 #include    "CIDLib_BitSet.hpp"
@@ -210,6 +297,7 @@ extern CIDLIBEXP TFacCIDLib& facCIDLib();
 #include    "CIDLib_RefStack.hpp"
 #include    "CIDLib_RefVector.hpp"
 
+#include    "CIDLib_ColAlgo.hpp"
 #include    "CIDLib_SystemInfo.hpp"
 #include    "CIDLib_PubSub2.hpp"
 #include    "CIDLib_GenCacheItem.hpp"
@@ -253,7 +341,7 @@ namespace tCIDLib
     using TCard8List    = TFundVector<tCIDLib::TCard8>;
     using TFloat4List   = TFundVector<tCIDLib::TFloat4>;
     using TFloat8List   = TFundVector<tCIDLib::TFloat8>;
-    using  TChangeList  = TFundVector<tCIDLib::EChangeRes>;
+    using TChangeList   = TFundVector<tCIDLib::EChangeRes>;
     using TBoolStack    = TFundStack<tCIDLib::TBoolean>;
     using TCardStack    = TFundStack<tCIDLib::TCard4>;
     using TKVHashSet    = TKeyedHashSet<TKeyValuePair,TString,TStringKeyOps>;
@@ -265,92 +353,13 @@ namespace tCIDLib
 #include    "CIDLib_DirChange.hpp"
 #include    "CIDLib_Audio.hpp"
 #include    "CIDLib_Speech.hpp"
-#include    "CIDLib_StringTokenizer.hpp"
 #include    "CIDLib_TextQStream.hpp"
 #include    "CIDLib_Environment.hpp"
 #include    "CIDLib_ExternalProcess.hpp"
 #include    "CIDLib_UndoCore.hpp"
+#include    "CIDLib_FixedSizePool.hpp"
 #include    "CIDLib_SimplePool.hpp"
 
-
-
-// ---------------------------------------------------------------------------
-//  Because of the special nature of this facility at the base of the system, order of
-//  inclusion problems arise and we don't have access to the IDL language down here.
-//  So we manually do some enum streaming macros for some of the basic enums (most of
-//  which come from the CIDKernel facility.)
-// ---------------------------------------------------------------------------
-#if !defined(CIDLIB_NOCLASSES)
-
-EnumStreamMacros(tCIDLib::EAngleTypes)
-EnumStreamMacros(tCIDLib::EAudioCues)
-EnumStreamMacros(tCIDLib::EAutoModes)
-EnumStreamMacros(tCIDLib::ECPUTypes)
-EnumStreamMacros(tCIDLib::ECreateActs)
-EnumStreamMacros(tCIDLib::EDelModes)
-EnumStreamMacros(tCIDLib::EEndianModes)
-EnumStreamMacros(tCIDLib::EEnds)
-EnumStreamMacros(tCIDLib::EErrClasses)
-EnumStreamMacros(tCIDLib::EEventStates)
-EnumStreamMacros(tCIDLib::EExitCodes)
-EnumStreamMacros(tCIDLib::EHJustify)
-EnumStreamMacros(tCIDLib::EHVOrients)
-EnumStreamMacros(tCIDLib::ELanguages)
-EnumStreamMacros(tCIDLib::ELockStates)
-EnumStreamMacros(tCIDLib::ELogMapModes)
-EnumStreamMacros(tCIDLib::EMeasures)
-EnumStreamMacros(tCIDLib::EMonths)
-EnumStreamMacros(tCIDLib::EPathParts)
-EnumStreamMacros(tCIDLib::EPressStates)
-EnumStreamMacros(tCIDLib::EPrioClasses)
-EnumStreamMacros(tCIDLib::EPrioLevels)
-EnumStreamMacros(tCIDLib::ERadices)
-EnumStreamMacros(tCIDLib::ERectlTypes)
-EnumStreamMacros(tCIDLib::ESeverities)
-EnumStreamMacros(tCIDLib::EShareStates)
-EnumStreamMacros(tCIDLib::ESpecialTimes)
-EnumStreamMacros(tCIDLib::ESymmetries)
-EnumStreamMacros(tCIDLib::ESysExcepts)
-EnumStreamMacros(tCIDLib::ETrailFmts)
-EnumStreamMacros(tCIDLib::ETriStates)
-EnumStreamMacros(tCIDLib::EVisible)
-EnumStreamMacros(tCIDLib::EVJustify)
-EnumStreamMacros(tCIDLib::EVolHWTypes)
-EnumStreamMacros(tCIDLib::EWeekDays)
-
-EnumBinStreamMacros(tCIDLib::EAdoptOpts)
-EnumBinStreamMacros(tCIDLib::EAccessModes)
-EnumBinStreamMacros(tCIDLib::EAllocTypes)
-EnumBinStreamMacros(tCIDLib::ECSSides)
-EnumBinStreamMacros(tCIDLib::EDirs)
-EnumBinStreamMacros(tCIDLib::EFileInfoFlags)
-EnumBinStreamMacros(tCIDLib::EForceOpts)
-EnumBinStreamMacros(tCIDLib::ELoadRes)
-EnumBinStreamMacros(tCIDLib::EMemAccFlags)
-EnumBinStreamMacros(tCIDLib::EModFlags)
-EnumBinStreamMacros(tCIDLib::EModTypes)
-EnumBinStreamMacros(tCIDLib::EMTStates)
-EnumBinStreamMacros(tCIDLib::ENextPrev)
-EnumBinStreamMacros(tCIDLib::EQPrios)
-EnumBinStreamMacros(tCIDLib::ERangeStates)
-EnumBinStreamMacros(tCIDLib::ERenameRes)
-EnumBinStreamMacros(tCIDLib::ESortDirs)
-EnumBinStreamMacros(tCIDLib::EStartEnd)
-EnumBinStreamMacros(tCIDLib::EStatItemTypes)
-EnumBinStreamMacros(tCIDLib::EStdFiles)
-EnumBinStreamMacros(tCIDLib::EStripModes)
-EnumBinStreamMacros(tCIDLib::EVolumeFlags)
-
-//
-//  Do a couple that are really CIDImage, but are defined in the kernel types header since
-//  we want folks to be able to use them without bringing in the CIDImage facility. And
-//  also one from CIDCtrls.
-//
-EnumBinStreamMacros(tCIDImage::EBitDepths)
-EnumBinStreamMacros(tCIDImage::EPixFmts)
-EnumBinStreamMacros(tCIDCtrls::EExtKeys)
-
-#endif
 
 
 // ---------------------------------------------------------------------------

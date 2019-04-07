@@ -5,9 +5,13 @@
 //
 // CREATED: 07/15/2008
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -62,6 +66,7 @@ tCIDLib::TBoolean TEncodeTestApp::bInitialize(TString&)
 tCIDLib::TVoid TEncodeTestApp::LoadTests()
 {
     // Load up our tests on our parent class
+    AddTest(new TTest_ByName);
     AddTest(new TTest_Convert);
     AddTest(new TTest_ErrModes);
     AddTest(new TTest_RoundTrip1);

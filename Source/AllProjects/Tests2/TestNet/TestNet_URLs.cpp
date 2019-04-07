@@ -5,9 +5,13 @@
 //
 // CREATED: 02/02/2007
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -239,8 +243,8 @@ TTest_URLParse::eRunTest(TTextStringOutStream&  strmOut
     {
         struct TURLTest
         {
-            tCIDLib::TCh*   pszRelative;
-            tCIDLib::TCh*   pszResult;
+            const tCIDLib::TCh* const   pszRelative;
+            const tCIDLib::TCh* const   pszResult;
         };
 
         TURLTest aTests[] =

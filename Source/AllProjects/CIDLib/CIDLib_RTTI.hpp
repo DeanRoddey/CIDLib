@@ -5,9 +5,13 @@
 //
 // CREATED: 12/15/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -104,7 +108,7 @@ const TClass& Class::clsThis() \
 }
 
 #define AdvRTTIDecls(Class,ParentClass) \
-TObject* pMakeNew_##Class() {return new Class;} \
+[[nodiscard]] TObject* pMakeNew_##Class() {return new Class;} \
 static const TTypeFactoryKicker Class##Kicker(CIDLib_MakeLStr2(Class), pMakeNew_##Class); \
 const TClass& Class::clsThis() \
 { \

@@ -5,7 +5,7 @@
 //
 // CREATED: 11/12/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
 //  This file is part of a demonstration program of the CIDLib C++
 //  Frameworks. Its contents are distributed 'as is', to provide guidance on
@@ -120,14 +120,14 @@ static tCIDLib::TVoid SimpleTests()
         strmOut << CUR_LN << L"Comp/Exchg should have failed\n";
 
     //
-    //  Test add and subtract methods. They should return the known previous
-    //  value.
+    //  Test add and subtract methods. They should return the new resulting
+    //  values.
     //
-    if (kscntTest2.c4AddTo(10) != 100)
-        strmOut << CUR_LN << L"Add failed to return previous value\n";
+    if (kscntTest2.c4AddTo(10) != 110)
+        strmOut << CUR_LN << L"Add failed to return new value\n";
 
-    if (kscntTest4.i4AddTo(10) != -99)
-        strmOut << CUR_LN << L"Add failed to return previous value\n";
+    if (kscntTest4.i4AddTo(10) != -89)
+        strmOut << CUR_LN << L"Add failed to return new value\n";
 
     if (kscntTest2.c4Value() != 110)
         strmOut << CUR_LN << L"Add did not create correct new value\n";
@@ -135,11 +135,11 @@ static tCIDLib::TVoid SimpleTests()
     if (kscntTest4.i4Value() != -89)
         strmOut << CUR_LN << L"Add did not create correct new value\n";
 
-    if (kscntTest2.c4SubFrom(50) != 110)
-        strmOut << CUR_LN << L"Sub failed to return previous value\n";
+    if (kscntTest2.c4SubFrom(50) != 60)
+        strmOut << CUR_LN << L"Sub failed to return new value\n";
 
-    if (kscntTest4.i4SubFrom(20) != -89)
-        strmOut << CUR_LN << L"Sub failed to return previous value\n";
+    if (kscntTest4.i4SubFrom(20) != -109)
+        strmOut << CUR_LN << L"Sub failed to return new value\n";
 
     if (kscntTest2.c4Value() != 60)
         strmOut << CUR_LN << L"Sub did not create correct new value\n";

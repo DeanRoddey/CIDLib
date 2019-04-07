@@ -5,9 +5,13 @@
 //
 // CREATED: 09/23/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -214,12 +218,12 @@ TXMLChildCM::TXMLChildCM(TXMLCMSpecNode* const pxcsnToAdopt) :
     , m_c4EOCPosition(0)
     , m_c4LeafCount(0)
     , m_c4TransTableSize(0)
-    , m_ppc4TransTable(0)
-    , m_pbFinalFlags(0)
-    , m_pbtsFollowLists(0)
-    , m_pc4ElemList(0)
-    , m_pxcmnLeaves(0)
-    , m_pxcmnRoot(0)
+    , m_ppc4TransTable(nullptr)
+    , m_pbFinalFlags(nullptr)
+    , m_pbtsFollowLists(nullptr)
+    , m_pc4ElemList(nullptr)
+    , m_pxcmnLeaves(nullptr)
+    , m_pxcmnRoot(nullptr)
     , m_pxcsnRoot(pxcsnToAdopt)
 {
     // Lets call a private method to build the DFA data structures
@@ -250,12 +254,19 @@ TXMLChildCM::~TXMLChildCM()
 {
     // Clean up the info we had to keep around the whole time
     delete [] m_pbFinalFlags;
+    m_pbFinalFlags = nullptr;
     delete [] m_pc4ElemList;
+    m_pc4ElemList = nullptr;
     delete m_pxcsnRoot;
+    m_pxcsnRoot = nullptr;
 
     for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4TransTableSize; c4Index++)
         delete [] m_ppc4TransTable[c4Index];
     delete [] m_ppc4TransTable;
+    m_ppc4TransTable = nullptr;
+
+    // And just in case do the temp data cleanup
+    ClearTempData();
 }
 
 
@@ -292,15 +303,15 @@ TXMLChildCM::eValidate( const   tCIDLib::TCard4* const  pc4ChildIds
         // Remember the current child element id and look it up in the list
         const tCIDLib::TCard4 c4CurId = pc4ChildIds[c4FailedAt];
 
-        tCIDLib::TCard4 c4ElemInd = 0;
-        for (; c4ElemInd < m_c4ElemListSize; c4ElemInd++)
-        {
-            if (m_pc4ElemList[c4ElemInd] == c4CurId)
-                break;
-        }
+        // Do a binary search for the id in the list of unique element ids
+        tCIDLib::TCard4 c4ElemInd;
+        const tCIDLib::TBoolean bFound = TArrayOps::bBinarySearch
+        (
+            m_pc4ElemList, c4CurId, c4ElemInd, m_c4ElemListSize
+        );
 
         // If not in the list, then we failed
-        if (c4ElemInd == m_c4ElemListSize)
+        if (!bFound)
             return tCIDXML::EValidRes::Mismatch;
 
         // See if there is a legal transition from here
@@ -378,9 +389,7 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     // Create the new root node and store it in our member
     m_pxcmnRoot = new TXMLCMBinOp
     (
-        tCIDXML::ECMNodeTypes::Sequence
-        , pxcmnOrgTree
-        , pxcmnEOC
+        tCIDXML::ECMNodeTypes::Sequence, pxcmnOrgTree, pxcmnEOC
     );
 
     //
@@ -450,6 +459,14 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     }
 
     //
+    //  Sort the list now, so that later validation can use binary searching to find
+    //  a given id's state transitions, and of course our transition list below will
+    //  be based on this order now, so the index into this list is the index into the
+    //  translation table.
+    //
+    TArrayOps::TSort<tCIDLib::TCard4>(m_pc4ElemList, m_c4ElemListSize);
+
+    //
     //  And now we need to create a couple more data structures before we
     //  enter the algorithm loop. We need to have a stack of states that need
     //  to be checked, an array of boolean values that indicate which states
@@ -496,8 +513,8 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     //  we create a new one. And we need anoterh temp set pointer to hold the
     //  set that we are currently working on.
     //
-    TBitset* pbtsNew = 0;
-    const TBitset* pbtsCur = 0;
+    TBitset* pbtsNew = nullptr;
+    const TBitset* pbtsCur = nullptr;
     while (c4StackIndex < c4StackTop)
     {
         //
@@ -567,7 +584,7 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
                     m_ppc4TransTable[c4StackTop] = pc4NewTransTableEntry();
 
                     // We've used the temp set so zero it out now
-                    pbtsNew = 0;
+                    pbtsNew = nullptr;
 
                     // And bump up the stack top
                     c4StackTop++;
@@ -618,16 +635,12 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     m_c4TransTableSize = c4StackTop;
 
     //
-    //  Clean up all of the temporary data structures that are no longer
-    //  needed, now that we've built the transition tables.
+    //  Clean up all of the temporary members that are no longer needed, now that
+    //  we've built the transition tables.
     //
-    delete [] m_pxcmnLeaves;
-    m_pxcmnLeaves = 0;
-    delete [] m_pbtsFollowLists;
-    m_pbtsFollowLists = 0;
-    delete m_pxcmnRoot;
-    m_pxcmnRoot = 0;
+    ClearTempData();
 
+    // This is local only data so we have to deal with that here
     for (c4Index = 0; c4Index < c4StackTop; c4Index++)
         delete ppbtsToDoStack[c4Index];
     delete [] ppbtsToDoStack;
@@ -678,7 +691,7 @@ tCIDLib::TVoid TXMLChildCM::BuildFollowLists(TXMLCMNode* const pxcmnCur)
             //
             //  Now update each set in the list that would affected by our
             //  first/last sets. For every position which is in our left
-            //  child's last set, add allof the states in our right child's
+            //  child's last set, add all of the states in our right child's
             //  first set to the follow set for that position.
             //
             const TBitset& btsLast = pxcmnBin->pxcmnLeft()->btsLastPos();
@@ -771,7 +784,7 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
         case tCIDXML::ECMNodeTypes::Alternation :
         case tCIDXML::ECMNodeTypes::Sequence :
         {
-            TXMLCMBinOp* pxcmnBin = (TXMLCMBinOp*)pxcmnCur;
+            TXMLCMBinOp* pxcmnBin = static_cast<TXMLCMBinOp*>(pxcmnCur);
             TXMLCMNode* pxcmnLeft = pxcmnBin->pxcmnLeft();
             TXMLCMNode* pxcmnRight = pxcmnBin->pxcmnRight();
             c4LocalIndex = c4InitLeaves(pxcmnLeft, c4LocalIndex);
@@ -781,7 +794,7 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
 
         case tCIDXML::ECMNodeTypes::ZeroOrMore :
         {
-            TXMLCMUnaryOp* pxcmnUnary = (TXMLCMUnaryOp*)pxcmnCur;
+            TXMLCMUnaryOp* pxcmnUnary = static_cast<TXMLCMUnaryOp*>(pxcmnCur);
             c4LocalIndex = c4InitLeaves(pxcmnUnary->pxcmnChild(), c4LocalIndex);
             break;
         }
@@ -789,7 +802,7 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
         case tCIDXML::ECMNodeTypes::Leaf :
         {
             // If its a non-epsilon node, save it away
-            TXMLCMLeaf* pxcmnLeaf = (TXMLCMLeaf*)pxcmnCur;
+            TXMLCMLeaf* pxcmnLeaf = static_cast<TXMLCMLeaf*>(pxcmnCur);
             if (pxcmnLeaf->c4ElemId() != CIDXML_ChildCM::c4EpsilonId)
                 m_pxcmnLeaves[c4LocalIndex++] = pxcmnLeaf;
             break;
@@ -813,6 +826,33 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
 }
 
 
+//
+//  We create some data that is temporary but still stored in members for access
+//  during the DFA building process. This will clean up that stuff. It is also called
+//  from the dtor just in case.
+//
+tCIDLib::TVoid TXMLChildCM::ClearTempData()
+{
+    if (m_pxcmnLeaves)
+    {
+        delete [] m_pxcmnLeaves;
+        m_pxcmnLeaves = nullptr;
+    }
+
+    if (m_pbtsFollowLists)
+    {
+        delete [] m_pbtsFollowLists;
+        m_pbtsFollowLists = nullptr;
+    }
+
+    if (m_pxcmnRoot)
+    {
+        delete m_pxcmnRoot;
+        m_pxcmnRoot = nullptr;
+    }
+}
+
+
 tCIDLib::TCard4* TXMLChildCM::pc4NewTransTableEntry() const
 {
     //
@@ -833,7 +873,7 @@ tCIDLib::TCard4* TXMLChildCM::pc4NewTransTableEntry() const
 //
 TXMLCMNode* TXMLChildCM::pxcmnRewriteTree(const TXMLCMSpecNode* const pxcsnCur)
 {
-    TXMLCMNode* pxcmnRet = 0;
+    TXMLCMNode* pxcmnRet = nullptr;
 
     // For speed and convenience, get a copy of the node type
     const tCIDXML::ECMNodeTypes eType = pxcsnCur->eNodeType();

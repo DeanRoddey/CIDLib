@@ -5,9 +5,13 @@
 //
 // CREATED: 10/14/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -42,8 +46,9 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Nested aliases for the cursor and node types used
+        //  Nested aliases for the cursor and types used
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TBasicDLinkedRefCol<TElem>;
         using TNode = TBasicColRefNode<TElem>;
 
@@ -498,7 +503,7 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
             this->c4IncSerialNum();
         }
 
-        TConstCursor<TElem>* pcursNew() const override
+        [[nodiscard]] TConstCursor<TElem>* pcursNew() const override
         {
             TMtxLocker lockThis(this->pmtxLock());
             return new TConstCursor<TElem>(this);

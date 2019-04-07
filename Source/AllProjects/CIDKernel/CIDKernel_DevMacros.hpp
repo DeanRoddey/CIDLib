@@ -5,9 +5,13 @@
 //
 // CREATED: 11/06/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 //  DESCRIPTION:
 //
@@ -41,6 +45,7 @@
 //  to get it expanded before we pass it to the 2 version.
 // ---------------------------------------------------------------------------
 #define CIDLib_ConcatMacro(f,s) f##s
+#define CIDLib_Stringize(s) #s
 #define CIDLib_MakeLStr(s)  CIDLib_ConcatMacro(L,s)
 #define CIDLib_MakeLStr2(sp)  CIDLib_ConcatMacro(L,#sp)
 #define CIDLib_MakeLStr3(sp)  CIDLib_MakeLStr2(sp)
@@ -169,3 +174,9 @@ public : \
 #define CID_LINE __LINE__
 
 
+// ---------------------------------------------------------------------------
+//  For putting message pragma reminders into code
+// ---------------------------------------------------------------------------
+#define MakeLINEStr(M, L) M(L)
+#define $LineStr MakeLINEStr(CIDLib_Stringize, __LINE__)
+#define CodeReminder __FILE__ "(" $LineStr ") : "

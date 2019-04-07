@@ -5,15 +5,22 @@
 //
 // CREATED: 08/13/2004
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. This facility implements
 //  the ZLib compression algorithm, specialized for integration into the
 //  CIDLib libraries.
+//
+//  You create a TZLibCompressor object and use its inflate and deflate methods
+//  to compress and decompress data.
 //
 // CAVEATS/GOTCHAS:
 //

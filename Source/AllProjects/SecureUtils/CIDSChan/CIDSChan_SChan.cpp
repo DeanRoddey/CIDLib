@@ -5,9 +5,13 @@
 //
 // CREATED: 10/17/2014
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -45,6 +49,7 @@ TSChannel::TSChannel() :
 
     m_bClient(kCIDLib::False)
     , m_c4DecBufSz(0)
+    , m_eOpts(tCIDSChan::EConnOpts::None)
     , m_mbufDecBuf(32 * 1024)
     , m_pInfo(nullptr)
 {
@@ -136,6 +141,80 @@ TSChannel::c4ReadDataMS(        TCIDDataSrc&        cdsTar
         mbufToFill.Reallocate(c4ReqBytes, kCIDLib::False);
 
     return c4ReceiveData(cdsTar, mbufToFill.pc1Data(), c4ReqBytes, enctEnd, eAllData);
+}
+
+
+//
+//  We have separate client and server side connection methods. They store away the
+//  info they get, set the m_bClient flag, and then call the per-platform connection
+//  method.
+//
+tCIDLib::TVoid
+TSChannel::ClConnect(const  TString&                strName
+                    ,       TCIDDataSrc&            cdsSrc
+                    , const tCIDLib::TEncodedTime   enctEnd
+                    , const TString&                strCertInfo
+                    , const tCIDLib::TStrCollect&   colALPNList
+                    , const tCIDSChan::EConnOpts    eOpts
+                    , const TString&                strSecPrincipal)
+{
+    if (m_pInfo)
+    {
+        facCIDSChan().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kSChanErrs::errcSChan_AlreadyInit
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Already
+            , m_strName
+        );
+    }
+
+    // Make a copy of the ALPN list
+    m_colALPNList.RemoveAll();
+    if (!colALPNList.bIsEmpty())
+    {
+        TColCursor<TString>* pcursALPN = colALPNList.pcursNew();
+        TJanitor<TColCursor<TString>> janCurs(pcursALPN);
+        for (; pcursALPN->bIsValid(); pcursALPN->bNext())
+            m_colALPNList.objAdd(pcursALPN->objRCur());
+    }
+
+    // Store the other info and call the private connection method
+    m_bClient = kCIDLib::True;
+    m_eOpts = eOpts;
+    m_strName = strName;
+    m_strPrincipal = strSecPrincipal;
+    DoConnect(cdsSrc, strCertInfo, enctEnd);
+}
+
+tCIDLib::TVoid
+TSChannel::SrvConnect(  const   TString&                strName
+                        ,       TCIDDataSrc&            cdsSrc
+                        , const tCIDLib::TEncodedTime   enctEnd
+                        , const TString&                strCertInfo
+                        , const tCIDSChan::EConnOpts    eOpts)
+{
+    if (m_pInfo)
+    {
+        facCIDSChan().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kSChanErrs::errcSChan_AlreadyInit
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Already
+            , m_strName
+        );
+    }
+
+    // Store the info and call the private connection method
+    m_bClient = kCIDLib::False;
+    m_eOpts = eOpts;
+    m_strName = strName;
+    m_colALPNList.RemoveAll();
+    DoConnect(cdsSrc, strCertInfo, enctEnd);
 }
 
 

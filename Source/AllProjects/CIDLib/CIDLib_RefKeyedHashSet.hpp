@@ -5,9 +5,13 @@
 //
 // CREATED: 11/30/2002
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -159,7 +163,7 @@ template <class TElem,class TKey> class TRefKeyedHashSetNode
 //   CLASS: TRefKeyedHashSet
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem, class TKey, class TKeyOps>
+template <typename TElem, typename TKey, typename TKeyOps>
 class TRefKeyedHashSet : public TRefCollection<TElem>
 {
     public  :
@@ -181,9 +185,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Nested aliases for the node and key ops types used by a keyed hash
         //  set. And one for the key field extraction function that the
-        //  user provides. And another is provided for the object equality
-        //  function the user provides in some methods.
+        //  user provides.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TRefKeyedHashSet<TElem, TKey, TKeyOps>;
         using TNode = TRefKeyedHashSetNode<TElem,TKey> ;
         using TKeyExtract = const TKey& (*)(const TElem&);
@@ -192,7 +196,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem, class TKey, class TKeyOps> class TConstCursor :
+        template <typename TElem, typename TKey, typename TKeyOps> class TConstCursor :
 
             public TBiColCursor<TElem>
         {
@@ -500,7 +504,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         };
 
 
-        template <class TElem, class TKey, class TKeyOps> class TNonConstCursor :
+        template <typename TElem, typename TKey, typename TKeyOps> class TNonConstCursor :
 
             public TConstCursor<TElem, TKey, TKeyOps>
         {
@@ -897,7 +901,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             m_c4CurElements--;
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);
@@ -1111,6 +1115,39 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             if (!pnodeRet)
                 hshKey = m_c4HashModulus;
             return TNCCursor(this, hshKey, pnodeRet);
+        }
+
+
+        //
+        //  We have to do non-const in each collection derivative. The base collection
+        //  class doesn't know about non-const cursors so it can't do this generically.
+        //  The collection is constant here, just the elements are non-const.
+        //
+        //  DO NOT change the element in a way that would modify the hash!
+        //
+        template <typename IterCB> tCIDLib::TVoid ForEachNC(IterCB iterCB) const
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+
+            tCIDLib::THashVal   hshCurBucket = 0;
+            TNode*              pnodeCur = pnodeFindFirst(hshCurBucket);
+            while (pnodeCur)
+            {
+                if (!iterCB(pnodeCur->objData()))
+                    break;
+
+                // In debug, make sure they didn't modify the hash of this element
+                #if CID_DEBUG_ON
+                const tCIDLib::THashVal hshCheck = m_pkopsToUse->hshKey
+                (
+                    m_pfnKeyExtract(pnodeCur->objData()), m_c4HashModulus
+                );
+                if (hshCheck != hshCurBucket)
+                    this->HashChanged(CID_FILE, CID_LINE);
+                #endif
+
+                pnodeCur = pnodeFindNext(pnodeCur, hshCurBucket);
+            }
         }
 
 

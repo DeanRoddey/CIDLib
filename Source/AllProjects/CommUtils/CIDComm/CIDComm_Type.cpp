@@ -5,9 +5,13 @@
 //
 // CREATED: 08/27/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -49,7 +53,7 @@ const TString& tCIDComm::strXlatEDataBits(const tCIDComm::EDataBits eToXlat)
         );
     }
 
-    static const TString* apstrValues[tCIDComm::EDataBits::Count];
+    static const TString* apstrValues[tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Count)];
     if (!apstrValues[0])
     {
         TBaseLock lockInit;

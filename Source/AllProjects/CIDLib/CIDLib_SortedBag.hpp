@@ -5,9 +5,13 @@
 //
 // CREATED: 01/30/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -112,7 +116,7 @@ template <typename TElem> class TSortedBag : public TBag<TElem>
             //  the new element against a bunch of elements in the list that
             //  are equal.
             //
-            typename TParent::TCursor cursAdd(this);
+            typename TBasicDLinkedCol<TElem>::TCursor cursAdd(this);
             while (cursAdd)
             {
                 if (m_eDir == tCIDLib::ESortDirs::Ascending)

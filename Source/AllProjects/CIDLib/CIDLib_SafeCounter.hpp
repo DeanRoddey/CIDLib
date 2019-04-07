@@ -5,9 +5,13 @@
 //
 // CREATED: 11/11/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -72,24 +76,24 @@ class CIDLIBEXP TSafeCard4Counter : public TObject, public TKrnlSafeCard4Counter
 
         tCIDLib::TCard4 operator++()
         {
-            // Returns previous value, so add one to do prefix correctly
-            return c4AddTo(1) + 1;
+            return c4Inc();
         }
 
         tCIDLib::TCard4 operator++(int)
         {
-            return c4AddTo(1);
+            // We have to sub one for the return for post semantics
+            return c4Inc() - 1;
         }
 
         tCIDLib::TCard4 operator--()
         {
-            // Returns previous value, so sub one to do prefix correctly
-            return c4SubFrom(1) - 1;
+            return c4Dec();
         }
 
         tCIDLib::TCard4 operator--(int)
         {
-            return c4SubFrom(1);
+            // We have to add one fpr the return for post semantics
+            return c4Dec() + 1;
         }
 
 
@@ -135,24 +139,24 @@ class CIDLIBEXP TSafeInt4Counter : public TObject, public TKrnlSafeInt4Counter
 
         tCIDLib::TInt4 operator++()
         {
-            // Returns previous value, so add one to do prefix correctly
-            return i4AddTo(1) + 1;
+            return i4Inc();
         }
 
         tCIDLib::TInt4 operator++(int)
         {
-            return i4AddTo(1);
+            // Sub one for the return value for post-inc semantics
+            return i4Inc() - 1;
         }
 
         tCIDLib::TInt4 operator--()
         {
-            // Returns previous value, so sub one to do prefix correctly
-            return i4SubFrom(1) - 1;
+            return i4Dec();
         }
 
         tCIDLib::TInt4 operator--(int)
         {
-            return i4SubFrom(1);
+            // Add one tp the return value for post-inc semantics
+            return i4Dec() + 1;
         }
 
 

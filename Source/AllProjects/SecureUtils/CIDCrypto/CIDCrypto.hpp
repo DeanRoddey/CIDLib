@@ -5,16 +5,25 @@
 //
 // CREATED: 10/21/1997
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This facility provides frameworks for block and stream encryption and hashes
+//  and hash digests. And it provide some concrete implementations for Blowfish
+//  AES, MD5, SHA-1, and SHA-256.
+//
+//  And it also provides some functionality for generating unique ids.
 //
 // CAVEATS/GOTCHAS:
 //

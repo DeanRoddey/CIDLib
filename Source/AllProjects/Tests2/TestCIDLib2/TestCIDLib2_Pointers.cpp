@@ -5,9 +5,13 @@
 //
 // CREATED: 01/12/2019
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -93,7 +97,44 @@ TTest_CntPtr1::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWarni
         return tTestFWLib::ETestRes::Failed;
     }
 
+    //
+    //  Drop the reference and make sure it's now null. And it should be valid
+    //  call pobjData() on it even if null.
+    //
+    cptrTest1.DropRef();
+    if (cptrTest1.pobjData())
+    {
+        strmOut << TFWCurLn << L"Pointer not null after drop of reference";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    //
+    //  But any of the access mechanism should throw. WE need to test the
+    //  const variations also.
+    //
+    tCIDLib::TCard4 c4ErrCnt = 0;
+    try { *cptrTest1; } catch(...) { c4ErrCnt++; }
+    try { cptrTest1->bIsEmpty(); } catch(...) { c4ErrCnt++; }
+    TestConstDef(cptrTest1, c4ErrCnt);
+
+    if (c4ErrCnt != 4)
+    {
+        strmOut << TFWCurLn << L"One or more null references did not throw";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
     return eRes;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_CntPtr1: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid
+TTest_CntPtr1::TestConstDef(const TCntPtr<TString>& cptrTest, tCIDLib::TCard4& c4ErrCnt)
+{
+    try { *cptrTest; } catch(...) { c4ErrCnt++; }
+    try { cptrTest->bIsEmpty(); } catch(...) { c4ErrCnt++; }
 }
 
 

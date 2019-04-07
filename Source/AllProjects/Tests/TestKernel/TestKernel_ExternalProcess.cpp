@@ -5,7 +5,7 @@
 //
 // CREATED: 10/19/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
 //  This file is part of a demonstration program of the CIDLib C++
 //  Frameworks. Its contents are distributed 'as is', to provide guidance on
@@ -39,9 +39,9 @@ static tCIDLib::TVoid CmdLineParse()
 {
     struct CmdLineTest
     {
-        tCIDLib::TCh*   pszTest;
-        tCIDLib::TCard4 c4ExpectedCount;
-        tCIDLib::TCh*   pszParms[4];
+        const tCIDLib::TCh* pszTest;
+        tCIDLib::TCard4     c4ExpectedCount;
+        const tCIDLib::TCh* pszParms[4];
     };
 
     static CmdLineTest aTests[] =

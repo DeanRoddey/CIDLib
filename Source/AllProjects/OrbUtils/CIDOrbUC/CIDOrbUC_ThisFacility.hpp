@@ -5,9 +5,13 @@
 //
 // CREATED: 02/18/2001
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -103,7 +107,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
                 bCached = facCIDOrb().bCheckOOIDCache(strNSBinding, ooidSrv);
 
             // If cached, try to create it
-            T* porbcRet = 0;
+            T* porbcRet = nullptr;
             if (bCached)
             {
                 try
@@ -176,7 +180,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
                 bCached = facCIDOrb().bCheckOOIDCache(strNSBinding, ooidSrv);
 
             // If so, try to create it
-            T* porbcRet = 0;
+            T* porbcRet = nullptr;
             if (bCached)
             {
                 try

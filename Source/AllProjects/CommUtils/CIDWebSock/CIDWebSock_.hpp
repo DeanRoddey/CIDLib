@@ -5,9 +5,13 @@
 //
 // CREATED: 05/24/2017
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -37,21 +41,4 @@
 #include    "CIDCrypto.hpp"
 #include    "CIDEncode.hpp"
 #include    "CIDSChan.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities types namespace. It contains non-class types
-//  for use within the facility.
-// ---------------------------------------------------------------------------
-namespace tCIDWebSock_
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities constants namespace.
-// ---------------------------------------------------------------------------
-namespace kCIDWebSock_
-{
-}
 

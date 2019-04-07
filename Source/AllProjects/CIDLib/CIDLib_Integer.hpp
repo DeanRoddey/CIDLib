@@ -5,9 +5,13 @@
 //
 // CREATED: 04/15/1993
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -154,6 +158,26 @@ class CIDLIBEXP TInteger :
         (
             const   tCIDLib::TInt4          i4ToTest
         )   const;
+
+        TInteger& operator+=
+        (
+            const   TInteger&               iSrc
+        );
+
+        TInteger& operator-=
+        (
+            const   TInteger&               iSrc
+        );
+
+        TInteger& operator+=
+        (
+            const   tCIDLib::TInt4         i4Src
+        );
+
+        TInteger& operator-=
+        (
+            const   tCIDLib::TInt4         i4Src
+        );
 
 
         // -------------------------------------------------------------------
@@ -314,6 +338,26 @@ class CIDLIBEXP TInteger64 :
         (
             const   tCIDLib::TInt8&         i8ToTest
         )   const;
+
+        TInteger64& operator+=
+        (
+            const   TInteger64&             iSrc
+        );
+
+        TInteger64& operator-=
+        (
+            const   TInteger64&             iSrc
+        );
+
+        TInteger64& operator+=
+        (
+            const   tCIDLib::TInt8          i8Src
+        );
+
+        TInteger64& operator-=
+        (
+            const   tCIDLib::TInt8          i8Src
+        );
 
 
         // -------------------------------------------------------------------

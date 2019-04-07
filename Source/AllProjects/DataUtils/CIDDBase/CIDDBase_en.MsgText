@@ -39,6 +39,7 @@ ERRORS=
 
     ; Init errors
     errcInit_SQLEnvInitFailed   3000    The SQL environment could not be initialized
+    errcInit_SQLEnvNotInit      3001    The SQL environment has not been initialized yet
 
     ; Statement errors
     errcStmt_BindFailed         6500    Could not complete column binding %(1) on statement %(2). Info=%(3)

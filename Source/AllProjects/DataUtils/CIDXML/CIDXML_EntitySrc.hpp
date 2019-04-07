@@ -5,9 +5,13 @@
 //
 // CREATED: 08/20/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -67,7 +71,7 @@ class CIDXMLEXP TXMLEntitySrc : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Public, virtual methods
         // -------------------------------------------------------------------
-        virtual TBinInStream* pstrmMakeNew() const = 0;
+        virtual [[nodiscard]] TBinInStream* pstrmMakeNew() const = 0;
 
 
         // -------------------------------------------------------------------

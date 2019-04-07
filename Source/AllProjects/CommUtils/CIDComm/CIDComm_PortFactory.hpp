@@ -5,9 +5,13 @@
 //
 // CREATED: 09/12/2005
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -49,9 +53,11 @@ class CIDCOMMEXP TComPortFactory : public TObject
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
+        TComPortFactory() = delete;
+
         TComPortFactory(const TComPortFactory&) = delete;
 
-        ~TComPortFactory();
+        ~TComPortFactory() = default;
 
 
         // -------------------------------------------------------------------
@@ -80,7 +86,7 @@ class CIDCOMMEXP TComPortFactory : public TObject
             const   TString&                strPath
         )   const = 0;
 
-        virtual TCommPortBase* pcommMakeNew
+        [[nodiscard]] virtual TCommPortBase* pcommMakeNew
         (
             const   TString&                strPath
         ) = 0;

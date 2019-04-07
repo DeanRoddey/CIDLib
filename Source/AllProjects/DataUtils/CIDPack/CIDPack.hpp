@@ -5,9 +5,13 @@
 //
 // CREATED: 03/21/2015
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -18,7 +22,7 @@
 //  data later if desired.
 //
 //  The primary purpose of this facility is to support installers, so there's
-//  not support currently for incremental addition or removal of files. They
+//  no support currently for incremental addition or removal of files. They
 //  are all processed at once and the package created. Building a package doesn't
 //  depend on a seekable output stream, it's all done linearly as we go with
 //  enough data written at each step to get to the next chunk of data. There's no
@@ -34,7 +38,7 @@
 //      Package Header
 //          File 1 Header, which has size of compressed data
 //          File 1 Compressed data
-//          File 2 Header, which has size of compressed data
+//          File 2 Header
 //          File 2 Compressed data
 //          .....
 //

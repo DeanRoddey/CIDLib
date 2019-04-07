@@ -5,9 +5,13 @@
 //
 // CREATED: 01/29/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -682,7 +686,17 @@ TSMTPClient::SendMsgs(  const   tCIDLib::TCard4     c4MaxMSPer
                 );
             }
 
-            pcdsSrv = new TCIDSChanClDataSrc(psockClient, tCIDLib::EAdoptOpts::Adopt, m_strServer);
+            tCIDLib::TStrList colALPN;
+            pcdsSrv = new TCIDSChanClDataSrc
+            (
+                L"SMTP Client"
+                , psockClient
+                , tCIDLib::EAdoptOpts::Adopt
+                , TString::strEmpty()
+                , colALPN
+                , tCIDSChan::EConnOpts::None
+                , m_strServer
+            );
         }
          else
         {

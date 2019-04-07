@@ -5,9 +5,13 @@
 //
 // CREATED: 02/05/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -581,7 +585,7 @@ class CIDLIBEXP TStreamJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TStreamJanitor& operator=(const TStreamJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------
@@ -645,7 +649,7 @@ class CIDLIBEXP TStreamIndentJan
         //  Public operators
         // -------------------------------------------------------------------
         TStreamIndentJan& operator=(const TStreamIndentJan&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
     private :
@@ -700,7 +704,7 @@ class CIDLIBEXP TSafeTStrmJan
         //  Public operators
         // -------------------------------------------------------------------
         TSafeTStrmJan& operator=(const TSafeTStrmJan&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
         TTextOutStream& operator*()
         {

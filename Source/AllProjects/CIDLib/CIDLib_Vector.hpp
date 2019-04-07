@@ -5,9 +5,13 @@
 //
 // CREATED: 10/13/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -40,15 +44,16 @@ class TVector : public TCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Nested type aliases for comparator and iteration callbacks
+        //  Nested class type aliases
         // -------------------------------------------------------------------
-        using TMyType = TVector<TElem, TIndex>;
+        using TMyElemType   = TElem;
+        using TMyType       = TVector<TElem, TIndex>;
 
 
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -243,7 +248,7 @@ class TVector : public TCollection<TElem>
                 )
         };
 
-        template <class TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -635,7 +640,7 @@ class TVector : public TCollection<TElem>
             return *m_apElems[m_c4CurCount - 1];
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockCol(this->pmtxLock());
             return new TCursor(this);

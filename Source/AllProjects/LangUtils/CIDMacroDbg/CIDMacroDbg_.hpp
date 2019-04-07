@@ -5,12 +5,17 @@
 //
 // CREATED: 02/14/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
+//  Our internal header, which brings in the stuff we only need internally.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -32,7 +37,6 @@
 //  Bring in any facilities that we only need internally
 // ---------------------------------------------------------------------------
 #include    "CIDCtrls.hpp"
-
 #include    "CIDWUtils.hpp"
 
 

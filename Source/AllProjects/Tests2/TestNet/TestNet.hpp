@@ -5,9 +5,13 @@
 //
 // CREATED: 01/24/2007
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -420,19 +424,18 @@ class TTest_URLParse : public TTestFWTest
         // -------------------------------------------------------------------
         struct TURLInfo
         {
-            tCIDLib::TCh*       pszURL;
-
-            tCIDSock::EProtos   eProto;
-            tCIDLib::TIPPortNum ippnHost;
-            tCIDLib::TCh*       pszFragment;
-            tCIDLib::TCh*       pszHost;
-            tCIDLib::TCh*       pszPassword;
-            tCIDLib::TCh*       pszPath;
-            tCIDLib::TCh*       pszQuery;
-            tCIDLib::TCh*       pszUser;
-            tCIDLib::TCh*       pszFull;
-            tCIDLib::TCh*       pszFullNS;
-            tCIDLib::TCh*       pszFullExp;
+            const tCIDLib::TCh*     pszURL;
+            tCIDSock::EProtos       eProto;
+            tCIDLib::TIPPortNum     ippnHost;
+            const tCIDLib::TCh*     pszFragment;
+            const tCIDLib::TCh*     pszHost;
+            const tCIDLib::TCh*     pszPassword;
+            const tCIDLib::TCh*     pszPath;
+            const tCIDLib::TCh*     pszQuery;
+            const tCIDLib::TCh*     pszUser;
+            const tCIDLib::TCh*     pszFull;
+            const tCIDLib::TCh*     pszFullNS;
+            const tCIDLib::TCh*     pszFullExp;
         };
 
 

@@ -1,78 +1,112 @@
-#  CIDLib - A C++ Development Environment
+#  CIDLib - A C++ Development Platform
 
-CIDLib is the product of decades of work by the author. Actually, it's half of the product. The other half is a very extensive and powerful automation system called CQC (www.charmedquark.com). CIDLib is the 'bottom half' of that code base, and is a general purpose C++ development environment, on top of which CQC is built. CQC's code base remains proprietary, but I have chosen to open source the general purpose part, which comprises right around 450,000 lines of code, approximately 1100 classes. The CQC code base is about 625,000 lines, so a bit over a million lines in the whole code base.
+**What It Is**
 
-CIDLib is not just a library for this or that. It is a complete environment with build tools, project definition language, loadable text system, a virtual kernel to isolate it from the underlying OS, up through a full set of 'standard libraries', wrappers around lots of common functionality, UI framework, Object Request Broker and IDL compiler, VM based OO macro language with IDE, custom implementations of many standards (XML, PNG, ZLib, JSON, SMTP, HTTP, etc...), and lots of other functionality.
+CIDLib is a C++ development platform. For many C++ developers a point of reference would be something along the lines of the Qt product perhaps, i.e. a comprehensive set of general purpose tools and classes for creating full featured C++ applications. A primary difference is that CIDLib is not based on the standard C++ libraries (more on that below.)
 
-In many ways CIDLib is the anti-STL, anti-piecemeal, anti-modernist view of a C++ world. It doesn't use the STL at all. In fact no operating system or language headers are available outside of the virtual kernel and a small number of higher level functionality wrapper libraries. Everything is built in terms of the CIDLib interfaces for reasons of consistency, quality control, and portability.
+CIDLib contains about 1100 classes (~450,000 lines of code.) Here is a rough list of the types of functionality it provides:
 
-Of course there are many ways to skin a developer, as the saying goes. There are MANY examples of the other, more common approach out there. CIDLib is just an alternative to that for people who are interested. It's not about throwing together a bunch of disparate bits and bobs to make a program. It's about a tightly integrated, one stop shopping solution for application development. You can't use bits and pieces of CIDLib, you go all in or not at all, because it's all a tightly integrated whole (though of course it is layered, so you can choose to jump in at whatever layer suits your requirements.)
+- Build Tools, project definition system, resource compiler, loadable text system
+- 'Virtual Kernel' platform portability layer
+- Full set of standard libraries including streams, collections/cursors, memory buffers, strings, events, mutexes, sockets, threads/processes, serial ports, URLs, UPnP, secure sockets, audio streaming, speech recognition, digital audio extraction, medatada extraction, text transcoding, logging, publish/subscribe, PNG, JPEG, bitmaps, chunked files, ODBC, etc...)
+- Custom implementations of various standards such as PNG, zLib, WebSockets, HTTP, SMTP, Blowfish, AES, MD5, SHA-X, regular expressions, XML, JSON, etc...
+- A fairly extensive windowing and 'regular graphics' framework (no 3D graphics yet)
+- A very powerful ORB (Object Request Broker), IDL compiler, and a set of standard servers (name, logging, and configuration.)
+- An embeddable, virtual machine-based, OO language engine called CML (parser, VM, runtime libraries)
+- An embeddable IDE for CML editing and debugging
+- A simple but nice object store engine (for things like application configuration storage and such, als used by the configuration server mentioned above.)
+- A nice test framework
+- A file packaging system
 
-Because it doesn't use the STL and other third party bits, CIDLib can provide a very consistent architecture from bottom to top. Of course if what you need is beyond the scope CIDLib provides, that's fine. CIDLib is very much not about trying to be everything to everyone, and hence often being a huge compromise to all. It's about providing a more elegant alternative for those folks who needs fit within its scope (and that scope is quite broad.)
 
-**Gotchas**
+**Documentation**
 
-For now, the code is just being put out there as is for people to start to explore. The documentation is going to be a work in progress and is very light right now, though there are samples and various programs that can be used to see how it all works in the meantime. And I'd already begun to make some videos exploring the system and some of the technologies involved. This one in particular would be a good start:
+For now, the code is just there to explore. I needed to get it uploaded and start working against the remote repository, and figured it made sense to let people go ahead and start looking through it while I get the initial documentation done. The initial goal is to get the build process documented of course, plus high level documentation of the roadmap sort to get people aware of what's available and where it is and how it fits together and so forth. After that, detailed documentation can be dived into.
 
-https://www.youtube.com/watch?v=seXk3RbAjNU
+In the meantime, I had already begin to make some videos about some of the technologies I've created as part of this project. Those are on my personal Youtube channel here:
 
-It is obstensibly about the virtual kernel, but also provides a good overview of the functional boxes and how they are layered and such. The other videos here on my personal Youtube channel are also very relevant, though some are prior to recent modernization efforts.
+https://www.youtube.com/channel/UCAxCoATHgFBvqZhxFRnZsfw
 
-The initial goal is to get the build process documented of course, plus high level documentation of the roadmap sort to get people aware of what's available and where it is and how it fits together and so forth. After that, detailed documentation can be dived into.
+This video in particular would be a good start (Creating a 'Virtual Kernel' platform abstraction layer)
 
-The documentation will be written in XML and is built using a custom compiler. The same sort of scheme is used for the CQC documentation and it works pretty well. You will be able to build your own local version of the docs once you have CIDLib built, which you should use when possible since it obviously will match the version you have. But I'll also keep a public copy of what's done so far at the linke below, since folks need a starting place to learn how to set up the environment and build it.
+https://www.youtube.com/watch?v=seXk3RbAjNU.
 
-[to be done once there's something to put up]
+It is obstensibly about the virtual kernel, but also provides a good overview of the functional boxes and how they are layered and such. The other videos there also very relevant, though some are prior to recent modernization efforts. In particular the ones on enumerations and the ORB was prior to a huge reworking of the code base to use newer style 'enum class' enums. Otherwise they are still relevant.
 
-Of course, in a code base this large, even someone who consumes as much caffeine as myself cannot delve super-deeply into every aspect of every sub-system. So obviously some of the sub-systems could be fleshed out by others with specific interests in those areas. However, as stated in the goals section below, it should not become about itself, and become so baroque that no one can understand it. So it's not even a goal for every sub-system to be taken to the Nth degree and become incomprehensible for all but specialists.
+I've set up a sub-Reddit for discussion and questions, which is here:
 
-Keep in mind that CIDLib must continue to support CQC, which is likely to always be far and away the largest code base built on CIDLib, though I'd love for that to not be the case at some point. So the rate and type of changes allowed will be moderated by that requirement. Of course I'd very much like to move CQC forward quickly to take advantage of improvements. But it's a large and complex product and there's a limit as to how much change can be absorbed without getting dangerous. Change at the periphery will always be more digestable, e.g. new sub-systems that CQC doesn't depend on or only lightly so.
+https://www.reddit.com/r/CIDLib/
+
+
+**Acknowledgements**
+
+Though CIDLib very much tries to avoid use of any third party code beyond the OS, it does use the following:
+
+- Scintilla - A version of the Scintilla engine is wrapped and used as the CML language source editor. Your own CIDLib based applications wouldn't need it unless they used the embedded CML IDE.
+- Standard JPEG Libaries - Some of the guts of the standard JPEG libraries are wrapped to provide the JPEG file format support.
+
+Otherwise it is just OS APIs and optional OS SDKs (speech recognition, Windows Media Format, etc...)
+
+
+**The CQC Automation Platform**
+
+CIDLib underlies an even larger project of mine called CQC - The Charmed Quark Controller, which is a very powerful home automation platform. CQC is not open source, it is a proprietary product, though you might find it interesting as well. And seeing what CQC can do will perhaps give you a feeling for the power of CIDLib.
+
+https://www.charmedquark.com
+
+There are lots of CQC tutorial videos on the Charmed Quark Youtube channel:
+
+https://www.youtube.com/user/CharmedQuarkSystems
+
 
 **Portability**
 
 Though CIDLib is currently only fielded on Windows, keeping it portable has always been a goal. I have done plenty of cross platform development in the past and understand the issues fairly well. As mentioned above, CIDLib is based on a 'virtual kernel' that abstracts it from the OS. That virtual kernel is in turn split into interface plus per-platform implementations. The build tools understand this situation so that helps a lot as well.
 
-There is a Win32 implementation currently. But there is still an old Lunix implementation from a few decades ago that's still down there. It would need to be brought up to speed, but it should not be difficult to get almost all of the back end stuff buildable onto Win32 and Linux (32 bit.) And that's not in the 'conditional code all over the place' sort of way, but cleanly supporting both platforms, since 95% of the code is platform independent and written in terms of our own classes.
+There is a Win32 implementation currently. But there is still an old Linux implementation from a few decades ago that's still down there. It would need to be brought up to speed, but it should not be difficult to get almost all of the back-end stuff buildable onto Win32 and Linux (32 bit.) And that's not in the 'conditional code all over the place' sort of way, but cleanly supporting both platforms, since 95% of the non-UI code is platform independent and written in terms of our own classes.
 
-There are still a handlful of libraries that need to be given the 'split' treatment, i.e. break out the platform specific stuff from the platform independent parts. I will be giving those attention soon. Until then they are marked for build only on Win32.
+There are still a handful of libraries that need to be given the 'split' treatment, i.e. break out the platform specific stuff from the platform independent parts. I will be giving those attention soon. Until then they are marked for build only on Win32.
 
-The UI code is another story, but the important thing is getting the back end functionality on both platforms. Not that the UI code is not similarly encapsulated, but there's a lot more to UI portability than that.
+The UI code is another story, but just getting the back end functionality cleanly supported on both platforms would be a very powerful thing. Not that the UI code is not similarly encapsulated, but there's a lot more to UI portability than that.
 
-**Modern vs. Classical**
 
-This code base ultimately goes back to 1992, when I first started exploring C++, and sat down to write a string class. It has been moved forward through many changes. But, being a single author and single client code base, it has not suffered the violences that many code bases this size and of this age might have. It's still quite clean.
+**Background**
 
-I am personally flabbergasted at some of the modernist C++ views and have no desire for CIDLib to go in those directions. Having said that, a lot of 'sane modernization' work has been done on the code base recently. And many sweeps have been made through the code to make use of these changes. But of course in a code base this large it'll still take a while to complete that process. Obviously any new code can take advantage from day one.
+CIDLib and the CQC automation system that is built on it is the product of decades of work by the author, representing almost 50 man-years of work taken together. The very earliest roots go back to around 1992 on OS/2, and the first C++ compiler I had access to. I started writing a string class and it was all downhill from there.
 
-But CIDLib remain to one degree or another the anti-STL. Modernization will be done where it really makes a difference to compile time safety and doesn't introduce huge annoyances. It will not be turned into a single giant template with utterly incomprehensible errors, and it won't be turned into Javascript Jr. via use of 'auto' everywhere. Explicit expression of intentions will always be a watch-word in this code base. CIDLib is not for quick and dirty programming, it's for serious application and back end work.
+Some people seeing this will immediately start ranting about 'not invented here syndrome', but it's nothing of the sort. My personal interests are in general purpose framework development, so the whole point of it was to do this. It's what I enjoy.
 
-Given its size, it will lean more towards keeping as much non-trivial code out of line as possible, rather than moving almost everything inline or completely header based subsystems, as seems to be the vogue amongst some these days. Build times would be brutal otherwise every time something remotely fundamental is changed.
 
-And we are manly enough not to be frightened by the existence of raw pointers, at least down in the more fundamental code certainly. At higher levels a move towards more smart encapsulation has already begun. But the lower level code needs to be well optimized (though not unduly so) so that higher level code and afford to be less so.
+**Gotchas**
 
-Certainly we will not be trying to turn C++ into a non-OO language either, as many people these seem to be intent on doing.
+Of course, in a code base this large, even someone who consumes as much caffeine as myself cannot delve super-deeply into every aspect of every sub-system. So obviously some of the sub-systems could be fleshed out by others with specific interests in those areas. However, as stated in the goals section below, it should not become about itself, and become so baroque that no one can understand it. So it's not even a goal for every sub-system to be taken to the Nth degree and become incomprehensible for all but specialists.
+
+There will be a few old classes laying around that were created long ago and not touched since, because there's been no need for them all this time. Or the need for them went away. Don't, jump to conclusions that the system is garbage if you happen on one of them. There are some classes in the CIDMath facility of this type. The vector/matrix classes are just some simple bits that used to be used by a raytracing library I had at one point, for instance, and the value mapping classes might not be worth keeping.
+
+Keep in mind that CIDLib must continue to support CQC, which is likely to always be far and away the largest code base built on CIDLib, though I'd love for that to not be the case at some point. So the rate and type of changes allowed will be moderated by that requirement. Of course I'd very much like to move CQC forward quickly to take advantage of improvements. But it's a large and complex product and there's a limit as to how much change can be absorbed without getting dangerous. Change at the periphery will always be more digestable, e.g. new sub-systems that CQC doesn't depend on.
+
 
 **Goals**
 
-So the goal of CIDLib is not to see how much third party stuff can be shoved into it, or how 'modern' it can be. It is not a goal to try to make it digestable by people who haven't mastered coding on the medium to larger scale, which clearly a system like CIDLib is more oriented towards. It will not likely ever be a tool for people who want C++ to become a new Javascript.
+The primary goal of CIDLib is to provide an alternative to the status quo for those who might be interested. I understand of course that the status quo is the status quo because almost everyone lives in that neighborhood. But, some people may like to have an alternative, and this is one.
 
-It is definitely a goal to create a highly consistent, tightly integrated world of bespoke implementations of many technologies, not wrappers around third party stuff and all the complications that entails. I would hope that other developers who have interests in specific areas might get involved and provide implementations of technologies that they are expert in.
+Not being based on the standard C++/STL libraries, CIDLib is very much a different sort of beast from what is common today. It's use of templates is far lighter, which makes it much more debuggable and comprehensible in my opinion. It does not subscribe to the 'modern' notion that OOP is somehow bad, it uses OOP to huge benefit.
 
-It is not a goal to add functionality for the sake of it. It needs to be high quality and highly consistent with the style and substance of the large body of existing code. So no quick hacks of third party code, which would be somewhat difficult anyway given that we don't allow standard library/STL code.
+And, being a comprehensive system, used to create applications that are not put together from pieces and parts, that also makes it pretty different from the standard thing today. Most people have never experienced this type of system, and some actually get agitated if anyone (aka me) implies that it might be a superior way of working, at least for some folks.
 
-Among the things I'd like to see are 3D graphics/gaming support, and there's an 'advanced graphics' skeleton library ready for the 3D graphics stuff to be done in. More internet telephony stuff, there's already early some RTP/RTPC work and a skeleton SIP facility ready for when RTP/RTPC are done. Maybe to get away from having to wrap system implementations of public key crypography stuff and get a portable, bespoke implementation. And similarly for UPnP, which I would have done myself already if not for lack of time. I've already had to take over some functionality to get around issues in Window's UPnP implementation.
+Among the things I'd personally like to see added to CIDLib are:
 
-**Usage/License**
+- 3D graphics/gaming support. There is a behavior tree facility but it's just very basic stuff so far, and only very lightly used in CQC.
+- More internet telephony stuff, there's already some early RTP/RTPC work and a skeleton SIP facility ready for when RTP/RTPC are done
+- Custom public cryptography system instead of wrapping system libraries
+- Same for UPnP. I've already taken over some of the UPnP functionality.
 
-Though it is of course impossible to prevent people from abusing anything and everything for their own nefarious purposes, and though we realize that these issues are still a ways out pending documentation and such, clearly something like CIDLib will only achieve its ultimate capabilities if it remains a coherent entity. Therefore, we impose the following usage limitations:
+But of course almost anything would be possible and interesting.
 
-1. Do not host in any public way your own versions of this code, in whole or in part. This repository should be the single source for the code base.
-2. Do not host or offer (for free or sale) any modified versions of this code base or any modified binary builds of this code base. Such things are to be used for your own private development purposes only.
-3. We would request that any fixes or improvements at least be offered for inclusion back into the code base, but we realize that's obviously not always practical if that code is commercial.
-4. You may use the official builds or your own builds of this code for development of free or commercial applications of your own. You must note in the documentation that the product is built on the CIDLib code base and provide a link to this repository.
-5. The previous point applies to applications. You may also build and make available C++ libraries that are based on the official CIDLib code. If it is based on your own version of the CIDLib code, you cannot make it publically available, it must be for your own private use. We would hope you do this in the context of the official code base of course.
-6. You must NOT install any non-official builds in any system directories where they could be seen by other CIDLib based applications. Limit them to your own application's local use.
 
-**A Plea**
+**Non-Legal Niceties**
 
-This code base represents approximately 25 man years of my life, with another 25'ish in the CQC automation platform layer. It is being put out there for the common good, at great personal cost (i.e. it can now never be profited from by me.) It is very much requested that the usage rules be respected and that useful contributions be offered back, so that others can benefit from them and so that we can build an ecosystem around CIDLib that could become a very powerful thing moving forward. And hopefully some very experienced developers might be interested in getting on board in a more active way, working specifically to develop new bespoke sub-systems and helping to maintain the code and documentation.
+1. If you use my stuff, please be a mensch and give me appropriate credit
+2. If you find bugs, please send them in, in digestable chunks perferably since obviously someone who writes this much code is somewhat time constrained.
+4. If you want to contribute large stuff, i.e. new facilities, then be sure to follow the existing style and substance carefully, because I'm an OCD, paranoid, anal-retentive. It would obviously be best to coordinate with me first to make sure no time and effort are wasted.
+5. It would be very much a good thing if you didn't install any non-official builds in any system directories of user's machines, where they could be seen by other CIDLib based applications.

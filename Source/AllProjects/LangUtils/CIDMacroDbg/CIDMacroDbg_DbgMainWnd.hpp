@@ -5,9 +5,13 @@
 //
 // CREATED: 02/14/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -18,7 +22,7 @@
 //  manager control and it contains the other debugger windows within it. It
 //  provides methods to make it do things and depends on the app to provide
 //  the menu items or other means for the user to make them happen (though
-//  we provide some hot key support here.)
+//  we provide some hot key support here and the editor's popup menu.)
 //
 //  This window, being derived from the standard pane window container control,
 //  manages tiled panes. The top one is the man source viewer window, and the bottom

@@ -5,9 +5,13 @@
 //
 // CREATED: 05/26/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -54,14 +58,21 @@ TFacCIDEncode::TFacCIDEncode() :
         , kCIDLib::c4Revision
         , tCIDLib::EModFlags::HasMsgFile
     )
-    , m_pcolMap(0)
+    , m_pcolMap(nullptr)
 {
     //
     //  Create the map collection and fill it in with the standard set of
     //  mappings for the converters that we support and know have obvious
-    //  names.
+    //  names. We set the key opts to non-case sensitive so any case will
+    //  match.
     //
-    m_pcolMap = new TMapList(29, new TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey);
+    m_pcolMap = new TMapList
+    (
+        29
+        , new TStringKeyOps(kCIDLib::False)
+        , &TKeyValuePair::strExtractKey
+        , tCIDLib::EMTStates::Safe
+     );
 
 
     // Do some variations on UTF-8
@@ -207,7 +218,16 @@ TFacCIDEncode::TFacCIDEncode() :
 
 TFacCIDEncode::~TFacCIDEncode()
 {
-    delete m_pcolMap;
+    try
+    {
+        delete m_pcolMap;
+    }
+
+    catch(TError& errToCatch)
+    {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
+    }
 }
 
 
@@ -215,25 +235,17 @@ TFacCIDEncode::~TFacCIDEncode()
 //  TFacCIDEncode: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid
-TFacCIDEncode::AddMapping(  const   TString&    strName
-                            , const TString&    strClass)
+TFacCIDEncode::AddMapping(const TString& strName, const TString& strClass)
 {
-    //
-    //  We need to upper case the name, since we use a hash table it doesn't
-    //  have every possible case combination.
-    //
-    TString strActualName(strName);
-    strActualName.ToUpper();
-
     // Lock the map before we change it
     TMtxLocker lockMap(m_pcolMap->pmtxLock());
 
     // See if this name exists already. If so, then update it, else add it
-    TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strActualName);
+    TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
     if (pkvalFound)
         pkvalFound->strValue(strClass);
     else
-        m_pcolMap->objAdd(TKeyValuePair(strActualName, strClass));
+        m_pcolMap->objAdd(TKeyValuePair(strName, strClass));
 }
 
 
@@ -286,15 +298,8 @@ TFacCIDEncode::bProbeForEncoding(const  TMemBuf&        mbufSrc
 tCIDLib::TBoolean
 TFacCIDEncode::bSupportsEncoding(const TString& strToCheck) const
 {
-    //
-    //  We need to upper case the name, since we use a hash table it doesn't
-    //  have every possible case combination.
-    //
-    TString strActualName(strToCheck);
-    strActualName.ToUpper();
-
     TMtxLocker lockMap(m_pcolMap->pmtxLock());
-    return m_pcolMap->bKeyExists(strActualName);
+    return m_pcolMap->bKeyExists(strToCheck);
 }
 
 
@@ -304,16 +309,15 @@ TFacCIDEncode::GetAllEncodingNames(tCIDLib::TStrCollect& colToFill) const
     // Flush the passed collection first
     colToFill.RemoveAll();
 
-    // Lock the map while we do this
-    TMtxLocker lockMap(m_pcolMap->pmtxLock());
-
-    //
-    //  Get a read cursor for our collection, and iterate through it. For each
-    //  one, add a copy of the key string to the caller's collection.
-    //
-    TMapList::TCursor cursSrc(m_pcolMap);
-    for (; cursSrc; ++cursSrc)
-        colToFill.objAdd(cursSrc->strKey());
+    // This will be locked since our collection is thread safe
+    m_pcolMap->ForEach
+    (
+        [&colToFill](const TKeyValuePair& kvalCur)
+        {
+            colToFill.objAdd(kvalCur.strKey());
+            return kCIDLib::True;
+        }
+    );
 }
 
 
@@ -322,15 +326,10 @@ TFacCIDEncode::GetAllEncodingNames(tCIDLib::TStrCollect& colToFill) const
 //  in a managed pointer for more by value semantics. The latter just calls
 //  the former and puts the pointer in a managed pointer object.
 //
-TTextConverter* TFacCIDEncode::ptcvtMakeNew(const TString& strName) const
+TTextConverter*
+TFacCIDEncode::ptcvtMakeNew(const   TString&            strName
+                            , const tCIDLib::TBoolean   bThrowIfNot) const
 {
-    //
-    //  We need to upper case the name, since we use a hash table it doesn't
-    //  have every possible case combination.
-    //
-    TString strActualName(strName);
-    strActualName.ToUpper();
-
     //
     //  We lock the mapping list until we've gotten our value out of it.
     //  So we use a scope block to prevent locking it longer than required.
@@ -338,22 +337,38 @@ TTextConverter* TFacCIDEncode::ptcvtMakeNew(const TString& strName) const
     TString strClassName;
     {
         TMtxLocker lockMap(m_pcolMap->pmtxLock());
-        TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strActualName);
+        TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
         if (pkvalFound)
             strClassName = pkvalFound->strValue();
     }
 
-    // Never found it, so return zero
+    // Never found it, so return null or throw as required
     if (strClassName.bIsEmpty())
-        return 0;
+    {
+        if (bThrowIfNot)
+        {
+            facCIDEncode().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kEncErrs::errcName_NotFound
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::NotFound
+                , strName
+            );
+        }
+        return nullptr;
+    }
 
     // Lets try to create an object of this type dymamically and return it
     return ::pobjMakeNewOfClass<TTextConverter>(strClassName);
 }
 
-tCIDEncode::TTCvtPtr TFacCIDEncode::mptrMakeNew(const TString& strName) const
+tCIDEncode::TTCvtPtr
+TFacCIDEncode::cptrMakeNew( const   TString&            strName
+                            , const tCIDLib::TBoolean   bThrowIfNot) const
 {
-    return tCIDEncode::TTCvtPtr(ptcvtMakeNew(strName));
+    return tCIDEncode::TTCvtPtr(ptcvtMakeNew(strName, bThrowIfNot));
 }
 
 
@@ -363,16 +378,9 @@ tCIDEncode::TTCvtPtr TFacCIDEncode::mptrMakeNew(const TString& strName) const
 //
 TString TFacCIDEncode::strBaseNameFor(const TString& strName) const
 {
-    //
-    //  We need to upper case the name, since we use a hash table it doesn't
-    //  have every possible case combination.
-    //
-    TString strActualName(strName);
-    strActualName.ToUpper();
-
     TMtxLocker lockMap(m_pcolMap->pmtxLock());
 
-    TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strActualName);
+    TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
     if (!pkvalFound)
     {
         facCIDEncode().ThrowErr

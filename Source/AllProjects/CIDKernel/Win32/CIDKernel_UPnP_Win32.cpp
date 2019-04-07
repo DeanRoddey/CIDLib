@@ -5,9 +5,13 @@
 //
 // CREATED: 10/10/2011
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -120,7 +124,7 @@ class CUPnPFinderCallback : public IUPnPDeviceFinderCallback
                 return 0;
             }
 
-            tCIDLib::TCh* pszRealUID = L"";
+            const tCIDLib::TCh* pszRealUID = L"";
             HRESULT hRes = pDev->get_FriendlyName(&NameStr);
             if (!FAILED(hRes))
             {
@@ -836,7 +840,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
         {
             TCOMJanitor<IUPnPDevice> janDev(&pDev);
 
-            tCIDLib::TCh* pszRealUID = L"";
+            const tCIDLib::TCh* pszRealUID = L"";
             tCIDLib::TBoolean bRes = kCIDLib::False;
             BSTR NameStr = 0;
             BSTR TypeStr = 0;
@@ -1204,7 +1208,7 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
         {
             TCOMJanitor<IUPnPDevice> janDev(&pDev);
 
-            tCIDLib::TCh* pszRealUID = L"";
+            const tCIDLib::TCh* pszRealUID = L"";
             tCIDLib::TBoolean bRes = kCIDLib::False;
             BSTR NameStr = 0;
             BSTR TypeStr = 0;

@@ -5,9 +5,13 @@
 //
 // CREATED: 08/27/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -45,7 +49,15 @@ class CIDCOMMEXP TFacCIDComm : public TFacility
         // -------------------------------------------------------------------
         TFacCIDComm();
 
-        ~TFacCIDComm();
+        TFacCIDComm(const TFacCIDComm&) = delete;
+
+        ~TFacCIDComm() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFacCIDComm& operator=(const TFacCIDComm&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -73,12 +85,12 @@ class CIDCOMMEXP TFacCIDComm : public TFacility
             const   TString&                strFactoryId
         );
 
-        TCommPortBase* pcommMakeNew
+        [[nodiscard]] TCommPortBase* pcommMakeNew
         (
             const   TString&                strPath
         );
 
-        TComPortFactory* pfactById
+        [[nodiscard]] TComPortFactory* pfactById
         (
             const   TString&                strID
         );

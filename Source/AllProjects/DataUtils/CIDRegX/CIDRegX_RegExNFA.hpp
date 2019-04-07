@@ -5,9 +5,13 @@
 //
 // CREATED: 07/28/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -45,7 +49,15 @@ class CIDREGXEXP TRXMatcher : public TObject, public MFormattable
         // --------------------------------------------------------------------
         TRXMatcher() {}
 
+        TRXMatcher(const TRXMatcher&) = delete;
+
         ~TRXMatcher() {}
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TRXMatcher& operator=(const TRXMatcher&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -61,13 +73,6 @@ class CIDREGXEXP TRXMatcher : public TObject, public MFormattable
 
 
     private :
-        // --------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // --------------------------------------------------------------------
-        TRXMatcher(const TRXMatcher&);
-        tCIDLib::TVoid operator=(const TRXMatcher&);
-
-
         // --------------------------------------------------------------------
         //  Magic macros
         // --------------------------------------------------------------------
@@ -86,12 +91,22 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         // --------------------------------------------------------------------
         //  Constructors and Destructor
         // --------------------------------------------------------------------
+        TRegExNFA() = delete;
+
         TRegExNFA
         (
             const   tCIDLib::TCard4         c4MaxStates
         );
 
+        TRegExNFA(const TRegExNFA&) = delete;
+
         ~TRegExNFA();
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TRegExNFA& operator==(const TRegExNFA&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -101,6 +116,11 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         (
             const   tCIDLib::TCard4         c4At
         )   const;
+
+        tCIDLib::TBoolean bIsNullable() const
+        {
+            return m_bNullable;
+        }
 
         tCIDLib::TCard4 c4AddState();
 
@@ -113,7 +133,12 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
 
         tCIDLib::TCard4 c4AddStatePointedPastEnd
         (
-                    TRXMatcher* const       pmatchNew = 0
+                    TRXMatcher* const       pmatchNew = nullptr
+        );
+
+        tCIDLib::TCard4 c4Reset
+        (
+            const   tCIDLib::TCard4         c4MaxStates
         );
 
         tCIDLib::TCard4 c4StateCount() const;
@@ -121,11 +146,6 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         tCIDLib::TCard4 c4LastState() const;
 
         tCIDLib::TCard4 c4MaxStates() const;
-
-        tCIDLib::TCard4 c4MaxStates
-        (
-            const   tCIDLib::TCard4         c4NewMax
-        );
 
         tCIDLib::TCard4 c4State1At
         (
@@ -136,6 +156,8 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         (
             const   tCIDLib::TCard4         c4At
         )   const;
+
+        tCIDLib::TVoid Complete();
 
         const TRXMatcher& matchAt
         (
@@ -209,21 +231,15 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const override;
 
 
     private :
         // --------------------------------------------------------------------
-        //  Unimplemented constructors and destructor
-        // --------------------------------------------------------------------
-        TRegExNFA();
-        TRegExNFA(const TRegExNFA&);
-        tCIDLib::TVoid operator==(const TRegExNFA&);
-
-
-        // --------------------------------------------------------------------
         //  Private, non-virtual methods
         // --------------------------------------------------------------------
+        tCIDLib::TVoid CleanupMatches();
+
         tCIDLib::TVoid TestIndex
         (
             const   tCIDLib::TCard4         c4At
@@ -234,6 +250,17 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
 
         // --------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_bNullable
+        //      When Complete is called, we see if there is path through the NFA
+        //      from start to end via epsilon nodes. If so, then this expression will
+        //      match an empty input pattern.
+        //
+        //  m_bReady
+        //      After setting all states the client code must call Complete to finish
+        //      setup and we set this to indicate we are ready. We clear it upon
+        //      a call to Reset() which the client code uses to get us ready to start
+        //      setting up a new parsed expression.
         //
         //  m_c4StateCount
         //      The number of states in our NFA.
@@ -251,6 +278,8 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         //      The array of transition matchers. Each one of them is matcher
         //      object that represents a single state's match criteria.
         // --------------------------------------------------------------------
+        tCIDLib::TBoolean       m_bNullable;
+        tCIDLib::TBoolean       m_bReady;
         tCIDLib::TCard4         m_c4StateCount;
         tCIDLib::TCard4         m_c4Entries;
         tCIDLib::TCard4*        m_pc4State1;

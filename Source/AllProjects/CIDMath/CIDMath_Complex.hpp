@@ -5,15 +5,22 @@
 //
 // CREATED: 05/01/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the header for the CIDMath_Complex.cpp file, which implements
 //  the TComplex class. This class represents a standard complex floating
 //  point number, for doing math in the complex number plane.
+//
+//  This is just old code that probably isn't very good. It's not currently
+//  used and needs some love.
 //
 // CAVEATS/GOTCHAS:
 //

@@ -5,7 +5,7 @@
 //
 // CREATED: 08/13/1997
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
 //  This file is part of a demonstration program of the CIDLib C++
 //  Frameworks. Its contents are distributed 'as is', to provide guidance on
@@ -38,7 +38,7 @@
 // ----------------------------------------------------------------------------
 static tCIDLib::TVoid BasicTests()
 {
-    static tCIDLib::TCh* apszKeys[] =
+    static const tCIDLib::TCh* apszKeys[] =
     {
         L"PATH"
         , L"LIBPATH"
@@ -48,7 +48,7 @@ static tCIDLib::TVoid BasicTests()
         , L"CIDDRIVE"
     };
 
-    static tCIDLib::TCh* apszValues[] =
+    static const tCIDLib::TCh* apszValues[] =
     {
         L"C:\\TEMP;D:\\SOMEDIR;"
         , L"C:\\DLL;D:\\APP\\DLL;"

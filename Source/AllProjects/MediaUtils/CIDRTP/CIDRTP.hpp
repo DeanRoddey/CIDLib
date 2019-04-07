@@ -5,15 +5,21 @@
 //
 // CREATED: 12/20/2014
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
 //  have to offer.
+//
+//  This is experimental work and isn't functional yet.
 //
 //  An RTP session is represented by a TCIDRTPRec or TCIDRTPSend object, which is
 //  given ports for RTP/RTCP, and which is given either a data source or a data

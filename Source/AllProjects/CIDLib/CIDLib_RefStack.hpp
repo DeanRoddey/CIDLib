@@ -5,9 +5,13 @@
 //
 // CREATED: 10/14/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -40,13 +44,6 @@
 template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 {
     public  :
-        // -------------------------------------------------------------------
-        //  Class types
-        // -------------------------------------------------------------------
-        using TCursor   = TBasicDLinkedRefCol::TConstCursor<TElem>;
-        using TNCCursor = TBasicDLinkedRefCol::TNonConstCursor<TElem>;
-
-
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
@@ -109,7 +106,7 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
             }
         }
 
-        TRefStack* pcolMakeNewOf() const
+        [[nodiscard]] TRefStack* pcolMakeNewOf() const
         {
             TMtxLocker lockStack(this->pmtxLock());
 

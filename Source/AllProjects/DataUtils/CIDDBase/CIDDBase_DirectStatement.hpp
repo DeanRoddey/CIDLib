@@ -5,15 +5,28 @@
 //
 // CREATED: 09/21/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the header file for the CIDDBase_DirectStatement.Cpp file. This
 //  file implements a derivative of the base statement class, which in this
-//  case allows for direct execution.
+//  case allows for direct execution of a SQL statement string.
+//
+//  This guy has some platform specific code to do the actual execution, but
+//  the vast majority of the work is handled by the base statement class.
+//
+//  The base class reference counts the connection handle which it needs to
+//  insure stays alive for the life of this statement. You can pass the actual
+//  connection object but it just ref counts the connection's handle object.
+//  The connection object itself can be discarded after setting up any needed
+//  statements.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -44,6 +57,12 @@ class CIDDBASEEXP TDBDirStatement : public TDBStatement
             , const TString&                strName
         );
 
+        TDBDirStatement
+        (
+            const   tCIDDBase::THConn&      hConnection
+            , const TString&                strName
+        );
+
         TDBDirStatement(const TDBDirStatement&) = delete;
 
         ~TDBDirStatement();
@@ -65,6 +84,15 @@ class CIDDBASEEXP TDBDirStatement : public TDBStatement
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid DoPlatExecute
+        (
+            const   TString&                strStatement
+        );
+
+
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------

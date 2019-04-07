@@ -5,9 +5,13 @@
 //
 // CREATED: 01/27/2007
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -67,7 +71,7 @@ class TTest_CircularBuf : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -101,7 +105,7 @@ class TTest_CoordCtor : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -135,7 +139,7 @@ class TTest_CoordAcc : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -169,7 +173,7 @@ class TTest_CoordOps : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -203,7 +207,7 @@ class TTest_Area1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -237,7 +241,7 @@ class TTest_Area2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -271,7 +275,7 @@ class TTest_Area3 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -305,7 +309,7 @@ class TTest_Base641 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -364,7 +368,7 @@ class TTest_BitSeq1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -397,7 +401,7 @@ class TTest_BitSeq2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -431,7 +435,7 @@ class TTest_BitSeq3 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -465,7 +469,7 @@ class TTest_Bitset1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -475,6 +479,39 @@ class TTest_Bitset1 : public TTestFWTest
         RTTIDefs(TTest_Bitset1,TTestFWTest)
 };
 
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_ColAlgo1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_ColAlgo1 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_ColAlgo1();
+
+        ~TTest_ColAlgo1();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_ColAlgo1,TTestFWTest)
+};
 
 
 // ---------------------------------------------------------------------------
@@ -499,7 +536,7 @@ class TTest_ChunkedBinInStream : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -532,7 +569,7 @@ class TTest_ChunkedBinOutStream : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -566,7 +603,7 @@ class TTest_ChunkedTextInStream : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -600,7 +637,7 @@ class TTest_ChunkedTextOutStream : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -634,7 +671,7 @@ class TTest_ColCursors : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -667,7 +704,7 @@ class TTest_Color1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -701,7 +738,7 @@ class TTest_Color2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -735,10 +772,20 @@ class TTest_CntPtr1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid TestConstDef
+        (
+            const   TCntPtr<TString>&       cptrTest
+            ,       tCIDLib::TCard4&        c4ErrCnt
+        );
+
+
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
@@ -769,7 +816,7 @@ class TTest_CntPtr2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -827,7 +874,7 @@ class TTest_Enum1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -860,7 +907,7 @@ class TTest_EnumForEach : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -868,6 +915,39 @@ class TTest_EnumForEach : public TTestFWTest
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TTest_EnumForEach,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_FixedSizePool
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_FixedSizePool : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_FixedSizePool();
+
+        ~TTest_FixedSizePool();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_FixedSizePool,TTestFWTest)
 };
 
 
@@ -894,7 +974,7 @@ class TTest_FundVectorLambda : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -928,7 +1008,7 @@ class TTest_GenCache1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -962,7 +1042,7 @@ class TTest_GenCache2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -996,7 +1076,7 @@ class TTest_GenCache3 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1030,7 +1110,7 @@ class TTest_DirChange1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1064,7 +1144,7 @@ class TTest_FlagJanitor : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1097,7 +1177,7 @@ class TTest_LogLimiter : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1130,7 +1210,7 @@ class TTest_MemBufMove : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1163,7 +1243,7 @@ class TTest_MemBufExp : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1197,7 +1277,7 @@ class TTest_Numeric1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1231,7 +1311,7 @@ class TTest_Numeric2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1265,7 +1345,7 @@ class TTest_ObjArrayLambda : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1333,7 +1413,7 @@ class TTest_UniquePtr : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1367,7 +1447,7 @@ class TTest_PubSub1 : public TTestFWTest, public MPubSubscription
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     protected :
@@ -1422,7 +1502,7 @@ class TTest_PubSubVector : public TTestFWTest, public MPubSubscription
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     protected :
@@ -1495,7 +1575,7 @@ class TTest_RefVectorLambda : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1528,7 +1608,7 @@ class TTest_RefVectorMoveItem : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1562,7 +1642,40 @@ class TTest_SafeCnt1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_SafeCnt1,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_SafeCnt2
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_SafeCnt2 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_SafeCnt2();
+
+        ~TTest_SafeCnt2();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
 
 
     private :
@@ -1596,7 +1709,7 @@ class TTest_SafeCnt1 : public TTestFWTest
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
-        RTTIDefs(TTest_SafeCnt1,TTestFWTest)
+        RTTIDefs(TTest_SafeCnt2,TTestFWTest)
 };
 
 
@@ -1623,7 +1736,7 @@ class TTest_SimplePoolPtr : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1657,7 +1770,7 @@ class TTest_String1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1690,7 +1803,7 @@ class TTest_String2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1723,7 +1836,7 @@ class TTest_String3 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1756,7 +1869,7 @@ class TTest_StringMove : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1789,7 +1902,7 @@ class TTest_StringCat : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1822,7 +1935,7 @@ class TTest_Time1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1856,7 +1969,7 @@ class TTest_Time2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1890,7 +2003,7 @@ class TTest_Time3 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1942,7 +2055,7 @@ class TTest_Time4 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -1976,7 +2089,7 @@ class TTest_Types  : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -2010,7 +2123,7 @@ class TTest_SimplePool : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -2044,7 +2157,7 @@ class TTest_VectorLambda : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :
@@ -2077,7 +2190,7 @@ class TTest_VectorMoveSem : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   override;
 
 
     private :

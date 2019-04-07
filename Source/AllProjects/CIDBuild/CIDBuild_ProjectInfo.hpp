@@ -5,9 +5,13 @@
 //
 // CREATED: 08/21/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -94,12 +98,22 @@ class TProjectInfo
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TProjectInfo() = delete;
+
         TProjectInfo
         (
             const   TBldStr&                strName
         );
 
+        TProjectInfo(const TProjectInfo&) = delete;
+
         ~TProjectInfo();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TProjectInfo& operator=(const TProjectInfo&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -123,17 +137,11 @@ class TProjectInfo
 
         tCIDLib::TBoolean bIsSample() const;
 
-        tCIDLib::TBoolean bIncrementalLink() const;
-
         tCIDLib::TBoolean bMakeOutDir() const;
-
-        tCIDLib::TBoolean bMinimalRebuild() const;
 
         tCIDLib::TBoolean bNeedsAdminPrivs() const;
 
         tCIDLib::TBoolean bPlatformDir() const;
-
-        tCIDLib::TBoolean bPureANSI() const;
 
         tCIDLib::TBoolean bSupportsPlatform
         (
@@ -189,6 +197,12 @@ class TProjectInfo
 
         tCIDLib::TVoid LoadFileLists();
 
+        const TKeyValuePair* pkvpFindPlatOpt
+        (
+            const   TBldStr&                strPlatform
+            , const TBldStr&                strOption
+        )   const;
+
         tCIDLib::TVoid ParseContent
         (
                     TLineSpooler&           lsplSource
@@ -223,11 +237,11 @@ class TProjectInfo
 
     private :
         // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
+        //  Private class types
         // -------------------------------------------------------------------
-        TProjectInfo();
-        TProjectInfo(const TProjectInfo&);
-        tCIDLib::TVoid operator=(const TProjectInfo&);
+        using TKVPList      = TList<TKeyValuePair>;
+        using TStrList      = TList<TBldStr>;
+        using TPlatOptList  = TList<TKVPList>;
 
 
         // -------------------------------------------------------------------
@@ -280,6 +294,11 @@ class TProjectInfo
                     TLineSpooler&           lsplSource
         );
 
+        tCIDLib::TVoid ParsePlatOpts
+        (
+                    TLineSpooler&           lsplSource
+        );
+
         tCIDLib::TVoid ParseSettings
         (
                     TLineSpooler&           lsplSource
@@ -299,14 +318,6 @@ class TProjectInfo
         //      Indicates if this project is a sample project that should go out in
         //      the developer's release.
         //
-        //  m_bIncrementalLink
-        //      If the environment supports incremental linking, then this flag should
-        //      control that.
-        //
-        //  m_bMinimalRebuild
-        //      If the environment supports minimal recompilation, then this flag
-        //      should control that.
-        //
         //  m_bMsgFile
         //      This project has a message file that must be built. It is assumed to
         //      have the same name as the project and the standard extension of MsgText.
@@ -323,12 +334,10 @@ class TProjectInfo
         //      kCIDBuild, which is set by conditional compilation for each
         //      platform.
         //
-        //  m_bPureANSI
-        //      This flag indicates whether this project should be able to
-        //      be compiled with pure ANSI C++ checking. Some of the lowest
-        //      level projects cannot because they must include system and
-        //      RTL headers, but all others should. If the platform has
-        //      no concept of this, it can be ignored.
+        //  m_bPlatformInclude
+        //      This indicates whether the m_listPlatforms list is a list to include
+        //      (only build on those) or ignore (build on all but those.) Defaults to
+        //      ignore and and empty list.
         //
         //  m_bResFile
         //      This project has a resource file that must be built. It is
@@ -410,9 +419,15 @@ class TProjectInfo
         //      EXTINCLUDEPATHS block.
         //
         //  m_listPlatforms
-        //      The list of platforms that this project was indicated to
-        //      support. If none were explicitly given, then its assumed that
-        //      it supports them all.
+        //      The list of platforms that this project are eitner to be ignored
+        //      for (build on all but these) or included (only build on these) based
+        //      on the m_bPlatformInclude flag. Defaults to this being empty and
+        //      include being false (i.e. build on all platforms.)
+        //
+        //  m_listPlatOpts
+        //      A list of key/value lists. For each one, the first entry's key is
+        //      the platform name. The subsequent values are key=value pairs that
+        //      the per-platform build tools will use to set per-platform options.
         //
         //  m_strDirectory
         //      The directory under the AllProjects directory for this
@@ -478,15 +493,13 @@ class TProjectInfo
         //  m_c4DepIndex
         //      This project's index in the dependency graph. This is stored
         //      here in order to allow for much faster access to the
-        //      dependency information. It aTVoids the need for a name lookup.
+        //      dependency information. It avoids the need for a name lookup.
         // -------------------------------------------------------------------
         tCIDLib::TBoolean           m_bIsSample;
-        tCIDLib::TBoolean           m_bIncrementalLink;
-        tCIDLib::TBoolean           m_bMinimalRebuild;
         tCIDLib::TBoolean           m_bMsgFile;
         tCIDLib::TBoolean           m_bNeedsAdminPrivs;
         tCIDLib::TBoolean           m_bPlatformDir;
-        tCIDLib::TBoolean           m_bPureANSI;
+        tCIDLib::TBoolean           m_bPlatformInclude;
         tCIDLib::TBoolean           m_bResFile;
         tCIDLib::TBoolean           m_bUseSysLibs;
         tCIDLib::TBoolean           m_bVarArgs;
@@ -495,15 +508,16 @@ class TProjectInfo
         tCIDBuild::ERTLModes        m_eRTLMode;
         tCIDBuild::EProjTypes       m_eType;
         TList<TFindInfo>            m_listCpps;
-        TList<TBldStr>              m_listCustomCmds;
-        TList<TKeyValuePair>        m_listDefs;
-        TList<TBldStr>              m_listDeps;
-        TList<TBldStr>              m_listExtLibs;
+        TStrList                    m_listCustomCmds;
+        TKVPList                    m_listDefs;
+        TStrList                    m_listDeps;
+        TStrList                    m_listExtLibs;
         TList<TProjFileCopy>        m_listFileCopies;
         TList<TFindInfo>            m_listHpps;
         TList<TIDLInfo>             m_listIDLFiles;
-        TList<TBldStr>              m_listIncludePaths;
-        TList<TBldStr>              m_listPlatforms;
+        TStrList                    m_listIncludePaths;
+        TStrList                    m_listPlatforms;
+        TPlatOptList                m_listPlatOpts;
         TBldStr                     m_strCopyOutDir;
         TBldStr                     m_strDirectory;
         TBldStr                     m_strExportKeyword;

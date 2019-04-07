@@ -5,9 +5,13 @@
 //
 // CREATED: 09/01/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -67,15 +71,21 @@ template <class T> class TList
         {
             if (m_pnodeHead)
             {
+                // Run up to the last node
+                TNode* pnodeLast = m_pnodeHead;
+                while (pnodeLast->pnodeNext)
+                    pnodeLast = pnodeLast->pnodeNext;
+
+                // Create a new one and add it as the next node for the last node
                 TNode* pnodeNew = new TNode;
-                pnodeNew->pnodeNext = m_pnodeHead;
+                pnodeNew->pnodeNext = nullptr;
                 pnodeNew->ptElement = ptToAdopt;
-                m_pnodeHead = pnodeNew;
+                pnodeLast->pnodeNext = pnodeNew;
             }
              else
             {
                 m_pnodeHead = new TNode;
-                m_pnodeHead->pnodeNext = 0;
+                m_pnodeHead->pnodeNext = nullptr;
                 m_pnodeHead->ptElement = ptToAdopt;
             }
             m_c4ElemCount++;
@@ -223,7 +233,7 @@ template <class T> class TListCursor
         // -------------------------------------------------------------------
         TListCursor(const TList<T>* plistToCursor) :
 
-            m_pnodeCur(0)
+            m_pnodeCur(nullptr)
             , m_plistTarget(plistToCursor)
         {
         }
@@ -234,21 +244,45 @@ template <class T> class TListCursor
 
 
         // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        const T& operator*() const
+        {
+            return tCurElement();
+        }
+
+        T& operator*()
+        {
+            return tCurElement();
+        }
+
+        T* operator->()
+        {
+            return &tCurElement();
+        }
+
+        const T* operator->() const
+        {
+            return &tCurElement();
+        }
+
+
+        // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bNext()
         {
-            if (m_pnodeCur == 0)
+            if (m_pnodeCur == nullptr)
                 return kCIDLib::False;
 
             m_pnodeCur = m_pnodeCur->pnodeNext;
-            return (m_pnodeCur != 0);
+            return (m_pnodeCur != nullptr);
         }
 
         tCIDLib::TBoolean bResetIter()
         {
             m_pnodeCur = m_plistTarget->m_pnodeHead;
-            return (m_pnodeCur != 0);
+            return (m_pnodeCur != nullptr);
         }
 
         const T& tCurElement() const

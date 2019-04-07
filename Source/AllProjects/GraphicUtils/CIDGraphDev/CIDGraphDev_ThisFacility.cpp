@@ -5,9 +5,13 @@
 //
 // CREATED: 06/04/1997
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -95,6 +99,7 @@ TFacCIDGraphDev::TFacCIDGraphDev() :
     , rgbBlack(0,0,0)
     , rgbBlue(0, 0, 255)
     , rgbBrown(128, 128, 0)
+    , rgbCornflowerBlue(100, 149, 237)
     , rgbCyan(0, 255, 255)
     , rgbDarkBlue(0, 0, 128)
     , rgbDarkCyan(0, 128, 128)

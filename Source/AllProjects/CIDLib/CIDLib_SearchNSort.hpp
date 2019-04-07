@@ -5,9 +5,13 @@
 //
 // CREATED: 02/05/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -70,7 +74,7 @@ namespace TArrayOps
 
             tCIDLib::TBoolean bIsEmpty() const
             {
-                return (m_c4CurCount == 0);
+                return (m_c4PendingCnt == 0);
             }
 
             tCIDLib::TCard4 c4LenAt(const tCIDLib::TCard4 c4At)
@@ -161,7 +165,7 @@ namespace TArrayOps
             //
             void FreeMem()
             {
-                if (m_ptMergeMem != m_ptMergArray)
+                if (m_ptMergeMem != m_ptMergeArray)
                     delete [] m_ptMergeMem;
 
                 m_c4MemSize = c4TmpArraySz;
@@ -1334,19 +1338,19 @@ namespace TArrayOps
     //  a convenience to sort sub-files within an array. And then we have
     //  a set for doing by ref arrays.
     //
-    template <typename T, typename TComp>
+    template <typename T, typename TComp = tCIDLib::TDefMagComp<T>>
     tCIDLib::TVoid TSort(       T*                  ptArray
                         , const tCIDLib::TCard4     c4Count
-                        ,       TComp               pfnComp)
+                        ,       TComp               pfnComp = TComp())
     {
         DoTSort<T,TComp>(ptArray, c4Count, pfnComp);
     }
 
-    template <typename T, typename TComp>
+    template <typename T, typename TComp = tCIDLib::TDefMagComp<T>>
     tCIDLib::TVoid TSortSubFile(        T*                  ptArray
                                 , const tCIDLib::TCard4     c4Start
                                 , const tCIDLib::TCard4     c4Count
-                                ,       TComp               pfnComp)
+                                ,       TComp               pfnComp = TComp())
     {
         DoTSort<T,TComp>(&ptArray[c4Start], c4Count, pfnComp);
     }
@@ -1357,12 +1361,12 @@ namespace TArrayOps
     //  element was found, the return is kCIDLib::True and the index of
     //  the element is in c4Index.
     //
-    template <typename TElem, typename TCompFunc> tCIDLib::TBoolean
-    bBinarySearch(  const   TElem* const        ptElems
-                    , const TElem               tToFind
+    template <typename T, typename TComp = tCIDLib::TDefMagComp<T>> tCIDLib::TBoolean
+    bBinarySearch(  const   T* const            ptElems
+                    , const T                   tToFind
                     ,       tCIDLib::TCard4&    c4Index
                     , const tCIDLib::TCard4     c4ElemCount
-                    ,       TCompFunc           pfnComp)
+                    ,       TComp               pfnComp = TComp())
     {
         // Set up the two end points that are used to subdivide the list
         tCIDLib::TInt4 i4End = tCIDLib::TInt4(c4ElemCount) - 1;
@@ -1399,12 +1403,12 @@ namespace TArrayOps
     //  false, then c4Index is where you should insert the new one. If it's
     //  true, then that's where the match was found.
     //
-    template <typename TElem, typename TCompFunc> tCIDLib::TBoolean
-    bBinarySearch2( const   TElem* const        ptElems
-                    , const TElem&              tToFind
-                    ,       tCIDLib::TCard4&    c4Index
-                    , const tCIDLib::TCard4     c4ElemCount
-                    ,       TCompFunc           pfnComp)
+    template <typename T, typename TComp = tCIDLib::TDefMagComp<T>>
+    tCIDLib::TBoolean bBinarySearch2(const  T* const            ptElems
+                                    , const T&                  tToFind
+                                    ,       tCIDLib::TCard4&    c4Index
+                                    , const tCIDLib::TCard4     c4ElemCount
+                                    ,       TComp               pfnComp = TComp())
     {
         // Some special case checks to make the logic below safer
         tCIDLib::ESortComps eRes;
@@ -1493,13 +1497,14 @@ namespace TArrayOps
     }
 
 
-    template <typename TElem, typename TKey, typename TCompFunc> tCIDLib::TBoolean bSearch
+    template <typename TElem, typename TKey, typename TComp  = tCIDLib::TDefMagComp<T>>
+    tCIDLib::TBoolean bSearch
     (
         const   TElem* const        ptElems
         , const TKey                tToFind
         ,       tCIDLib::TCard4&    c4Index
         , const tCIDLib::TCard4     c4ElemCount
-        ,       TCompFunc           pfnComp)
+        ,       TComp               pfnComp = TComp())
     {
         // Set up the two end points that are used to subdivide the list
         tCIDLib::TInt4 i4End = tCIDLib::TInt4(c4ElemCount) - 1;
@@ -1526,5 +1531,4 @@ namespace TArrayOps
         }
         return kCIDLib::False;
     }
-
 }

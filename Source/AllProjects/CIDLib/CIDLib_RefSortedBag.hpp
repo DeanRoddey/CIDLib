@@ -5,9 +5,13 @@
 //
 // CREATED: 03/06/2001
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -104,7 +108,7 @@ template <typename TElem> class TRefSortedBag : public TRefBag<TElem>
             //  than if descending) the new object. We then insert the new
             //  element before it.
             //
-            TParent::TCursor cursAdd(this);
+            TBasicDLinkedRefCol<TElem>::TCursor cursAdd(this);
             while (cursAdd)
             {
                 if (m_eDir == tCIDLib::ESortDirs::Ascending)

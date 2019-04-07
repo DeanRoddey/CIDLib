@@ -90,7 +90,7 @@ DIALOG=
         AREA=14,10,154,9
         SYMBOL=ridDlg_Test_1003, 1003
         TEXTSYM=midDlg_Title
-        HINTS=Center 
+        HINTS=Center
     END SEPARATOR
 
     MCLISTBOX=
@@ -112,7 +112,7 @@ DIALOG=
         AREA=17,72,96,11
         SYMBOL=ridDlg_EntryFld, 1000
         CUESYM=midDlg_Title
-        HINTS=Password 
+        HINTS=Password
     END ENTRYFLD
 
     STATICIMG=
@@ -135,7 +135,7 @@ DIALOG=
         AREA=101,160,96,10
         SYMBOL=ridDlg_Test_First, 1008
         TEXTSYM=midDlg_First
-        HINTS=Group 
+        HINTS=Group
     END RADIOBUTTON
 
     RADIOBUTTON=
@@ -148,8 +148,8 @@ DIALOG=
         AREA=12,202,50,14
         SYMBOL=ridDlg_Test_OK, 1
         TEXTSYM=[MnOK]
-        HINTS=DefButton Group 
-        FLAGS=InitFocus 
+        HINTS=DefButton Group
+        FLAGS=InitFocus
     END PUSHBUTTON
 
     PUSHBUTTON=

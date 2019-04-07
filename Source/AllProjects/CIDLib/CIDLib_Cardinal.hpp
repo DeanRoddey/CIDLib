@@ -5,9 +5,13 @@
 //
 // CREATED: 04/15/1993
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -158,6 +162,25 @@ class CIDLIBEXP TCardinal :
             const   tCIDLib::TCard4         c4ToCompare
         )   const;
 
+        TCardinal& operator+=
+        (
+            const   TCardinal&              cSrc
+        );
+
+        TCardinal& operator-=
+        (
+            const   TCardinal&              cSrc
+        );
+
+        TCardinal& operator+=
+        (
+            const   tCIDLib::TCard4         c4Src
+        );
+
+        TCardinal& operator-=
+        (
+            const   tCIDLib::TCard4         c4Src
+        );
 
 
         // -------------------------------------------------------------------
@@ -325,6 +348,25 @@ class CIDLIBEXP TCardinal64 :
             const   tCIDLib::TCard8&        c8ToCompare
         )   const;
 
+        TCardinal64& operator+=
+        (
+            const   TCardinal64&            cSrc
+        );
+
+        TCardinal64& operator-=
+        (
+            const   TCardinal64&            cSrc
+        );
+
+        TCardinal64& operator+=
+        (
+            const   tCIDLib::TCard8         c8Src
+        );
+
+        TCardinal64& operator-=
+        (
+            const   tCIDLib::TCard8         c8Src
+        );
 
 
         // -------------------------------------------------------------------

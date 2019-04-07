@@ -5,9 +5,13 @@
 //
 // CREATED: 06/23/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -50,14 +54,14 @@ class CIDLIBEXP TStringTokenizer : public TObject
         static tCIDLib::TBoolean bParseQuotedCommaList
         (
             const   TString&                strText
-            ,       tCIDLib::TStrCollect&   colToFill
+            ,       TCollection<TString>&   colToFill
             ,       tCIDLib::TCard4&        c4ErrIndex
         );
 
         static tCIDLib::TBoolean bParseCSVLine
         (
             const   TString&                strText
-            ,       tCIDLib::TStrCollect&   colToFill
+            ,       TCollection<TString>&   colToFill
             ,       tCIDLib::TCard4&        c4ErrIndex
         );
 
@@ -69,7 +73,7 @@ class CIDLIBEXP TStringTokenizer : public TObject
 
         static tCIDLib::TVoid BuildQuotedCommaList
         (
-            const   tCIDLib::TStrCollect&   colValues
+            const   TCollection<TString>&   colValues
             ,       TString&                strAccum
         );
 
@@ -131,7 +135,7 @@ class CIDLIBEXP TStringTokenizer : public TObject
 
         tCIDLib::TCard4 c4BreakApart
         (
-                    tCIDLib::TStrCollect&   colToFill
+                    TCollection<TString>&   colToFill
         );
 
         tCIDLib::TCard4 c4CurToken() const;

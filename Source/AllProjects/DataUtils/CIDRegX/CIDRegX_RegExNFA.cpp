@@ -5,9 +5,13 @@
 //
 // CREATED: 07/28/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -45,23 +49,27 @@ RTTIDecls(TRegExNFA,TObject)
 // ----------------------------------------------------------------------------
 TRegExNFA::TRegExNFA(const tCIDLib::TCard4 c4InitMaxStates) :
 
-    m_c4Entries(0)
+    m_bNullable(kCIDLib::False)
+    , m_bReady(kCIDLib::False)
+    , m_c4Entries(0)
     , m_c4StateCount(0)
-    , m_pc4State1(0)
-    , m_pc4State2(0)
-    , m_pmatchTrans(0)
+    , m_pc4State1(nullptr)
+    , m_pc4State2(nullptr)
+    , m_pmatchTrans(nullptr)
 {
-    c4MaxStates(c4InitMaxStates);
+    c4Reset(c4InitMaxStates);
 }
 
 TRegExNFA::~TRegExNFA()
 {
     delete [] m_pc4State1;
-    m_pc4State1 = 0;
+    m_pc4State1 = nullptr;
     delete [] m_pc4State2;
-    m_pc4State2 = 0;
+    m_pc4State2 = nullptr;
+
+    CleanupMatches();
     delete [] m_pmatchTrans;
-    m_pmatchTrans = 0;
+    m_pmatchTrans = nullptr;
 }
 
 
@@ -176,10 +184,14 @@ tCIDLib::TCard4 TRegExNFA::c4MaxStates() const
     return m_c4Entries;
 }
 
-tCIDLib::TCard4 TRegExNFA::c4MaxStates(const tCIDLib::TCard4 c4NewMax)
+
+//
+//  This is calle to reset us to get us ready for setting up a new incmoing expression.
+//
+tCIDLib::TCard4 TRegExNFA::c4Reset(const tCIDLib::TCard4 c4MaxStates)
 {
     // Make sure its not zero
-    if (!c4NewMax)
+    if (!c4MaxStates)
     {
         facCIDRegX().ThrowErr
         (
@@ -191,7 +203,9 @@ tCIDLib::TCard4 TRegExNFA::c4MaxStates(const tCIDLib::TCard4 c4NewMax)
         );
     }
 
-    // Reset the current state count
+    // Reset our bookkeeping stuff
+    m_bReady = kCIDLib::False;
+    m_bNullable = kCIDLib::False;
     m_c4StateCount = 0;
 
     //
@@ -199,10 +213,14 @@ tCIDLib::TCard4 TRegExNFA::c4MaxStates(const tCIDLib::TCard4 c4NewMax)
     //  kill them and zero out the entry count. If the entry count is already
     //  zero, then don't bother.
     //
-    if (m_c4Entries && (c4NewMax > m_c4Entries))
+    if (m_c4Entries && (c4MaxStates > m_c4Entries))
     {
         delete [] m_pc4State1;
+        m_pc4State1 = nullptr;
         delete [] m_pc4State2;
+        m_pc4State2 = nullptr;
+
+        CleanupMatches();
         delete [] m_pmatchTrans;
         m_c4Entries = 0;
     }
@@ -213,9 +231,9 @@ tCIDLib::TCard4 TRegExNFA::c4MaxStates(const tCIDLib::TCard4 c4NewMax)
     //  visit (in which case m_c4Entries is zero), or we just deleted the
     //  old buffers above.
     //
-    if (c4NewMax > m_c4Entries)
+    if (c4MaxStates > m_c4Entries)
     {
-        m_c4Entries = c4NewMax;
+        m_c4Entries = c4MaxStates;
 
         m_pc4State1 = new tCIDLib::TCard4[m_c4Entries];
         m_pc4State2 = new tCIDLib::TCard4[m_c4Entries];
@@ -246,6 +264,84 @@ tCIDLib::TCard4 TRegExNFA::c4State2At(const tCIDLib::TCard4 c4At) const
 {
     TestIndex(c4At, CID_LINE, CID_FILE);
     return m_pc4State2[c4At];
+}
+
+
+//
+//  This has to be called after all of the states are updated. We will do some final
+//  checking and updating and set the ready flag to indicate we have a good NFA.
+//
+tCIDLib::TVoid TRegExNFA::Complete()
+{
+    // If already marked ready, they didn't reset us
+    if (m_bReady)
+    {
+        facCIDRegX().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kRegXErrs::errcRegEx_MustReset
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::CantDo
+        );
+    }
+
+    // Make sure something was set up
+    if (!m_c4StateCount)
+    {
+        facCIDRegX().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kRegXErrs::errcRegEx_NoPattern
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::CantDo
+        );
+    }
+
+    // Mark us ready
+    m_bReady = kCIDLib::True;
+
+    //
+    //  And see if we are nullable. If there is a path through the NFA that is
+    //  all epsilon nodes, then it's nullable. We have to use a stack to do this
+    //  since there are multiple possible such paths. Worst case we have to go
+    //  through both sides of every state, so 2*count is the max.
+    //
+    tCIDLib::TCardStack fcolStack(m_c4StateCount * 2);
+
+    // Start us off with the first state on the stack and nullable defaulted to false
+    m_bNullable = kCIDLib::False;
+    fcolStack.Push(m_pc4State1[0]);
+    while (!fcolStack.bIsEmpty())
+    {
+        // Get the next state off the stack
+        const tCIDLib::TCard4 c4CurState = fcolStack.tPop();
+
+        //
+        //  If this is the last state, then we made it all the way through
+        //  so break out with nullable set.
+        //
+        if (c4CurState == m_c4StateCount - 1)
+        {
+            m_bNullable = kCIDLib::True;
+            break;
+        }
+
+        if (bIsEpsilonState(c4CurState))
+        {
+            // It's an epsilon state. Push the unique out states from here
+            fcolStack.Push(m_pc4State1[c4CurState]);
+            if (m_pc4State1[c4CurState] != m_pc4State2[c4CurState])
+                fcolStack.Push(m_pc4State2[c4CurState]);
+        }
+         else
+        {
+            // We hit a non-epsilon state, if the stack is empty we failed
+            if (fcolStack.bIsEmpty())
+                break;
+        }
+    }
 }
 
 
@@ -446,7 +542,7 @@ tCIDLib::TVoid TRegExNFA::FormatTo(TTextOutStream& strmDest) const
         if (m_pmatchTrans[c4Index])
             strmDest << *m_pmatchTrans[c4Index] << kCIDLib::NewLn;
          else
-            strmDest << facCIDRegX().strMsg(kRegXMsgs::midGen_NotApplicable) << kCIDLib::NewLn;
+            strmDest << L"N/A" << kCIDLib::NewLn;
     }
 }
 
@@ -454,6 +550,16 @@ tCIDLib::TVoid TRegExNFA::FormatTo(TTextOutStream& strmDest) const
 // ----------------------------------------------------------------------------
 //  TRegExNFA: Private, non-virtual methods
 // ----------------------------------------------------------------------------
+tCIDLib::TVoid TRegExNFA::CleanupMatches()
+{
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Entries; c4Index++)
+    {
+        delete m_pmatchTrans[c4Index];
+        m_pmatchTrans[c4Index] = nullptr;
+    }
+}
+
+
 tCIDLib::TVoid TRegExNFA::TestIndex(const   tCIDLib::TCard4     c4At
                                     , const tCIDLib::TCard4     c4Line
                                     , const tCIDLib::TCh* const pszFile) const

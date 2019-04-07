@@ -5,9 +5,13 @@
 //
 // CREATED: 11/29/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -41,9 +45,9 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
-        //  Nested aliases for the cursors and node types used. We also do
-        //  one for an element comparator callback function.
+        //  Nested aliases for the cursors and types used.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TBasicDLinkedCol<TElem>;
         using TNode = TBasicColNode<TElem>;
 
@@ -491,7 +495,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
             return c4Ret;
         }
 
-        TCursor* pcursNew() const
+        [[nodiscard]] TCursor* pcursNew() const
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);
@@ -858,7 +862,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
 //  operator for those folks who want to use it. This means that collections
 //  cannot be streamed polymorphically via the base classes.
 //
-template <class TElem>
+template <typename TElem>
 TBinOutStream& operator<<(          TBinOutStream&              strmOut
                             , const TBasicDLinkedCol<TElem>&    colToStream)
 {
@@ -884,7 +888,7 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
     // If there were any elements, then stream them
     if (c4Count)
     {
-        TBasicDLinkedCol<TElem>::TCursor cursStream(&colToStream);
+        typename TBasicDLinkedCol<TElem>::TCursor cursStream(&colToStream);
         while (cursStream.bIsValid())
         {
             strmOut << cursStream.objRCur();
@@ -898,7 +902,7 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
 
 
 // We cannot lock the collection, since we might delete the mutex
-template <class TElem>
+template <typename TElem>
 TBinInStream& operator>>(TBinInStream&              strmIn
                         , TBasicDLinkedCol<TElem>&  colToStream)
 {

@@ -5,7 +5,7 @@
 //
 // CREATED: 04/06/1993
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
 //  This file is part of a demonstration program of the CIDLib C++
 //  Frameworks. Its contents are distributed 'as is', to provide guidance on
@@ -136,7 +136,7 @@ TestColCopy(TTextOutStream& strmOut, const TCol& colToTest)
     TCol colNew(colToTest);
 
     // Make sure that they are equal in both available ways
-    if (!tCIDLib::bCompareElems(colToTest, colNew, tCIDLib::bComp<TElem>))
+    if (!tCIDLib::bCompareElems(colToTest, colNew))
     {
         strmOut << CUR_LN
                 << L"bCompareCols failed for copied collection"

@@ -5,9 +5,13 @@
 //
 // CREATED: 06/16/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -453,7 +457,7 @@ template<typename TElem> class TSimplePool : public TObject
             const   TElem&                  objSrc
         ) = 0;
 
-        virtual TElem* pelemMakeNew
+        [[nodiscard]] virtual TElem* pelemMakeNew
         (
             const   tCIDLib::TCard4         c4Size
         ) = 0;
@@ -1020,7 +1024,7 @@ class TSimplePoolPtr : public TSimplePoolPtrBase<typename TElem>
         // -------------------------------------------------------------------
         TSimplePoolPtr& operator=(const TSimplePoolPtr& spptrSrc)
         {
-            TSimplePoolPtrBase::operator=(spptrSrc);
+            TSimplePoolPtrBase<TElem>::operator=(spptrSrc);
             return *this;
         }
 };
@@ -1093,7 +1097,7 @@ class TStringPool : public TSimplePool<TString>
         }
 
         // Create a new string with the requested size
-        TString* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
+        [[nodiscard]] TString* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
         {
             return new TString(c4Size);
         }
@@ -1211,7 +1215,7 @@ class THeapBufPool : public TSimplePool<THeapBuf>
         }
 
         // Create a new string with the requested size
-        THeapBuf* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
+        [[nodiscard]] THeapBuf* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
         {
             return new THeapBuf(c4Size);
         }

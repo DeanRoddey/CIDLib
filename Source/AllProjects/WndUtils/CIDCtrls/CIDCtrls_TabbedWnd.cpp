@@ -5,9 +5,13 @@
 //
 // CREATED: 05/15/2015
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -917,14 +921,11 @@ tCIDLib::TVoid TTabberWnd::ActivateNextTab()
     //  In this case we will send a notification, since they didn't explicitly activate a
     //  particular tab.
     //
-    SendSyncNotify
+    TTabEventInfo wnotChange
     (
-        TTabEventInfo
-        (
-            c4NewId, c4OldId, tCIDCtrls::ETabWEvents::Change, *m_pwndParent
-        )
-        , TTabbedWnd::nidEventId
+        c4NewId, c4OldId, tCIDCtrls::ETabWEvents::Change, *m_pwndParent
     );
+    SendSyncNotify(wnotChange, TTabbedWnd::nidEventId);
 }
 
 
@@ -1115,14 +1116,11 @@ tCIDLib::TVoid TTabberWnd::CloseAllTabs()
     }
 
     // Send a tab change notification with an id of max card for new and old tabs
-    SendSyncNotify
+    TTabEventInfo wnotChange
     (
-        TTabEventInfo
-        (
-            kCIDLib::c4MaxCard, kCIDLib::c4MaxCard, tCIDCtrls::ETabWEvents::Change, *m_pwndParent
-        )
-        , TTabbedWnd::nidEventId
+        kCIDLib::c4MaxCard, kCIDLib::c4MaxCard, tCIDCtrls::ETabWEvents::Change, *m_pwndParent
     );
+    SendSyncNotify(wnotChange, TTabbedWnd::nidEventId);
 }
 
 
@@ -1233,14 +1231,11 @@ tCIDLib::TVoid TTabberWnd::CloseTabAt(const tCIDLib::TCard4 c4At)
     //  because of an explicit request on their part for a specific tab. If there's no
     //  tab left, we send max card as the id.
     //
-    SendSyncNotify
+    TTabEventInfo wnotChange
     (
-        TTabEventInfo
-        (
-            m_c4CurTabId, kCIDLib::c4MaxCard, tCIDCtrls::ETabWEvents::Change, *m_pwndParent
-        )
-        , TTabbedWnd::nidEventId
+        m_c4CurTabId, kCIDLib::c4MaxCard, tCIDCtrls::ETabWEvents::Change, *m_pwndParent
     );
+    SendSyncNotify(wnotChange, TTabbedWnd::nidEventId);
 }
 
 tCIDLib::TVoid TTabberWnd::CloseTabById(const tCIDLib::TCard4 c4Id)
@@ -1371,17 +1366,14 @@ TTabberWnd::c4CreateTab(        TTabWindow* const       pwndToCreate
         //  NOTE that the activation could change the index, but we don't use it here
         //  at this point.
         //
-        SendSyncNotify
+        TTabEventInfo wnotChange
         (
-            TTabEventInfo
-            (
-                pwndToCreate->c4TabId()
-                , kCIDLib::c4MaxCard
-                , tCIDCtrls::ETabWEvents::Change
-                , *m_pwndParent
-            )
-            , TTabbedWnd::nidEventId
+            pwndToCreate->c4TabId()
+            , kCIDLib::c4MaxCard
+            , tCIDCtrls::ETabWEvents::Change
+            , *m_pwndParent
         );
+        SendSyncNotify(wnotChange, TTabbedWnd::nidEventId);
     }
      else
     {
@@ -1654,17 +1646,14 @@ TTabberWnd::bClick( const   tCIDCtrls::EMouseButts  eButton
                         ActivateAt(c4Index);
 
                         // Send a change event instead
-                        SendSyncNotify
+                        TTabEventInfo wnotChange
                         (
-                            TTabEventInfo
-                            (
-                                wndCur.c4TabId()
-                                , c4OldId
-                                , tCIDCtrls::ETabWEvents::Change
-                                , *m_pwndParent
-                            )
-                            , TTabbedWnd::nidEventId
+                            wndCur.c4TabId()
+                            , c4OldId
+                            , tCIDCtrls::ETabWEvents::Change
+                            , *m_pwndParent
                         );
+                        SendSyncNotify(wnotChange, TTabbedWnd::nidEventId);
                     }
                 }
             }

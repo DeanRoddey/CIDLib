@@ -5,9 +5,13 @@
 //
 // CREATED: 11/09/2002
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -766,7 +770,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
 
             //
             //  We've done the clean shutdown, and this is server side, so don't
-            //  don't linger and let up a socket. This prevents DOS attack,
+            //  don't linger and eat up a socket. This prevents DOS attack,
             //  purposeful or accidental, by large numbers of rejected connections.
             //
             psockClient->bLinger(kCIDLib::False, 0);

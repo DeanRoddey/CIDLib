@@ -5,9 +5,13 @@
 //
 // CREATED: 06/13/1993
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -883,12 +887,27 @@ tCIDLib::EConnRes
 TFileSys::eAccessRemoteShare(const  TString&            strRemPath
                             , const TString&            strUser
                             , const TString&            strPass
-                            , const tCIDLib::TBoolean   bTemporary)
+                            , const tCIDLib::TBoolean   bTemporary
+                            , const tCIDLib::TBoolean   bThrowIfNot)
 {
-    return TKrnlFileSys::eAccessRemoteShare
+    const tCIDLib::EConnRes eRes = TKrnlFileSys::eAccessRemoteShare
     (
         strRemPath.pszBuffer(), strUser.pszBuffer(), strPass.pszBuffer(), bTemporary
     );
+
+    if (eRes == tCIDLib::EConnRes::Failed)
+    {
+        facCIDLib().ThrowKrnlErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcFile_RemPathAcc
+            , TKrnlError::kerrLast()
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::CantDo
+        );
+    }
+    return eRes;
 }
 
 

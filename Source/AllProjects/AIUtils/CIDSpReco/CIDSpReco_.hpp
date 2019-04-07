@@ -5,9 +5,13 @@
 //
 // CREATED: 11/30/2016
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -29,34 +33,17 @@
 #include    "CIDSpReco.hpp"
 #include    <windows.h>
 
-__pragma(warning(push))
-__pragma(warning(disable: 4996))
+#pragma warning(push)
+#pragma warning(disable: 4996)
 #include    <sphelper.h>
-__pragma(warning(pop))
+#pragma warning(pop)
 
 
 // ---------------------------------------------------------------------------
 //  Bring in any underlying headers we only need internally
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_InternalHelpers_.hpp"
-
 #include    "CIDXML.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  Internal types namespace
-// ---------------------------------------------------------------------------
-namespace tCIDSpReco_
-{
-};
-
-
-// ---------------------------------------------------------------------------
-//  Internal constants namespace
-// ---------------------------------------------------------------------------
-namespace kCIDSpReco_
-{
-};
 
 
 // ---------------------------------------------------------------------------

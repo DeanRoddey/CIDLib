@@ -5,9 +5,13 @@
 //
 // CREATED: 09/08/2018
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -70,7 +74,7 @@ class CIDLIBEXP TEnumMap
             tCIDLib::TInt4      m_i4Value;
             tCIDLib::TInt4      m_i4AltNumVal;
             tCIDLib::TMsgId     m_midLoad;
-            TString             m_astrTextVals[ETextVals::Count];
+            TString             m_astrTextVals[tCIDLib::c4EnumOrd(ETextVals::Count)];
         };
 
 

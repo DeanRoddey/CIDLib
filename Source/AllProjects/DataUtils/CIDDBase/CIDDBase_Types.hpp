@@ -5,9 +5,13 @@
 //
 // CREATED: 09/21/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -25,16 +29,15 @@
 namespace tCIDDBase
 {
     // -----------------------------------------------------------------------
-    //  The opaque type of a SQL handle we expose
+    //  We define some opque structures that each platform driver defines internally
+    //  for its own needs. We just need them here so that we can can refer to them
+    //  in the classes that wrap these things and so that other wrapper classes can
+    //  access them.
     // -----------------------------------------------------------------------
-    typedef tCIDLib::TVoid*     THandle;
-
-
-    // -----------------------------------------------------------------------
-    //  And some other types that might need to change
-    // -----------------------------------------------------------------------
-    typedef long                TSQLIndicator;
-
+    struct TBindingInfo;
+    struct TConnHandle;
+    struct TDBEnvHandle;
+    struct TStmtHandle;
 
 
     // -----------------------------------------------------------------------

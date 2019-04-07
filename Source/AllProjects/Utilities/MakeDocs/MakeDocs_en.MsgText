@@ -36,31 +36,6 @@ END CTRL
 ; ---------------------------------------------------------------------------
 ERRORS=
 
-    ; Class doc errors
-    errcExpected               1    Expected to find the %(1) token
-    errcExpected2              2    Expected to find the %(1) or %(2) tokens
-    errcExpectedToken          3    A token (all tokens begin with '@') was expected.
-    errcTokenBadHere           4    %(1) is not a valid token in this context
-    errcEndTokenExpected       5    The method ended while in a block than requires an end token
-    errcNotInBlock             6    Found an opening block token before the previous %(1) block was ended
-    errcAlreadyInBlock         7    Nested %(1) opening block token
-    errcNoMethodName           8    @Method must be followed by a method name
-    errcBadClassName           9    The file name was %(1) but the @Class tag states %(2)
-    errcSourceNotFound        10    The source file '%(1)' cannot be found
-    errcUnknownCategory       11    '%(1)' is not a valid class category
-
-    ; Internal errors
-    errcCatItemCount          64    The category item count != EClassCats_Count!
-    errcTransBadTag           65    %(1) is not a valid value for TTranslator::ETags
-    errcTransBadSpecialChar   66    %(1) is not a special character of this %(2) translator derivative.
-    errcPrsrBadToken          67    %(1) is not a valid value for TDocParser::ETokens
-    errcBadCategory           68    %(1) is not a valid value for kMakeDocs::EClassCats
-    errcNotInClassList        69    The class '%(1)' is not in the list of valid classes
-
-    ; Replacement token errors
-    errcBadTokenLine         128    Token on line %(1) is missing '=' character
-    errcNoTokenKey           129    Token on line %(1) is missing a key value before the '='
-
 END ERRORS
 
 
@@ -70,27 +45,6 @@ END ERRORS
 MESSAGES=
 
     midError               18192    An error occured while generating docs...
-    midKrnlError           18193    A kernel error occured while generating docs...
-    midSysError            18194    A system error occured while generating docs...
-    midParseError          18195    An error occured while parsing the source file...
-    midInfo                18196    Information:
-    midLineNum             18197    "    Line #: "
-    midErrorPrefix         18198    "     Error: "
-    midUsage               18199    Usage:\r\n   MakeDocs SourceDir TargetDir [/FORCE]
-    midBlurb               18200    MakeDocs.Exe, Version: %(1)\r\nCIDLib Document Generation Utility
-    midMustBeDir           18201    %(1) must be a directory
-    midDoesNotExist        18203    %(1) does not exist
-    midDoesNotExistQ       18204    "%(1) does not exist. Create it?(Y/N): "
-    midDirMakeFailed       18205    "An error occured while creating directory.\r\n   Error: "
-    midNoFilesIn           18206    There are not files in the %(1) subdirectory"
-    midNoSubsInSource      18207    There are no subsystem directories in the source directory
-    midNoDocsInSource      18208    There are no ClassDoc files in the %(1) directory
-    midCopyingFiles        18209    Copying files from %(1) ...
-    midXlatingFiles        18210    Translating %(1) files....
-    midClassesFound        18211    %(1) classes were found
-    midKeyExists           18212    Token '%(1)' (line %(2)) is already defined, old value was overridden
-    midYes                 18213    Yes
-    midShortYes            18214    Y
 
 END MESSAGES
 

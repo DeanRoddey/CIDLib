@@ -8,11 +8,8 @@
 ;   The following defaults are used if values are not provided:
 ;
 ;   DISPLAY     = Console
-;   INCLINK     = Yes
-;   MINREBUILD  = Yes
 ;   MSGFILE     = No
 ;   PLATFORMDIR = No
-;   PUREANSI    = Yes
 ;   RESFILE     = No
 ;   RTL         = Multi/Dynamic
 ;   TYPE        = Executable
@@ -20,10 +17,12 @@
 ;   VARARGS     = No
 ;   VERSIONED   = No
 ;
+;   PLATFORMOPTS=
+;   EXCLUDEPLATS=
+;   INCLUDEPLATS=
 ;
 ;   This one is just a hint to the release creation code that this one is a
-;   sample that should be copied over to a developer's release. Only legal
-;   for an Executable type project.
+;   sample. It might be treated differently in a packaging process.
 ;
 ;   SAMPLE      = No
 ;
@@ -72,7 +71,7 @@ END PROJECT
 
 ; ----------------------------------------------------------------------------
 ;   The core library facilities and the IDL compiler. These are the first things built
-;   when starting a new build from scratch, because we have to get the IDL compiler
+;   when starting from scratch (bootstrap build), because we have to get the IDL compiler
 ;   built, then run it in order to generate the IDL based files. So none of these
 ;   facilities can use the IDL system because that would cause a circular dependency.
 ; ----------------------------------------------------------------------------
@@ -83,11 +82,17 @@ PROJECT=CIDKernel
         DISPLAY     = N/A
         MSGFILE     = Yes
         PLATFORMDIR = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+            PERMISSIVE  = Yes
+        END PLATFORM
+    END PLATFORMOPTS
 
     INCLUDEPATHS
         .\Win32\ASPI
@@ -252,9 +257,14 @@ PROJECT=CIDImage
         DIRECTORY   = GraphicUtils\CIDImage
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PLATFORMDIR = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
+
+    INCLUDEPLATS
+        Win32
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -285,7 +295,6 @@ PROJECT=CIDJPEG
         DIRECTORY   = GraphicUtils\CIDJPEG
         DISPLAY     = N/A
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -294,6 +303,12 @@ PROJECT=CIDJPEG
         CIDLib
         CIDImage
     END DEPENDENTS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     INCLUDEPATHS
         .\JLibInc
@@ -330,7 +345,6 @@ PROJECT=CIDSpReco
         DISPLAY     = N/A
         EXPORT      = CIDSPRECOEXP
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -339,6 +353,13 @@ PROJECT=CIDSpReco
         CIDAudStream
         CIDXML
     END DEPENDENTS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+            PERMISSIVE  = Yes
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -386,16 +407,21 @@ PROJECT=CIDGraphDev
         DISPLAY     = N/A
         EXPORT      = CIDGRDEVEXP
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -421,16 +447,21 @@ PROJECT=CIDCtrls
         DISPLAY     = N/A
         EXPORT      = CIDCTRLSEXP
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -457,16 +488,21 @@ PROJECT=CIDAdvGraph
         DISPLAY     = N/A
         EXPORT      = CIDADVGREXP
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
 ;        IDLFILE
@@ -490,15 +526,20 @@ PROJECT=CIDWUtils
         DIRECTORY   = WndUtils\CIDWUtils
         DISPLAY     = N/A
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     DEPENDENTS
         CIDMData
@@ -514,13 +555,18 @@ PROJECT=CIDResEd
         DIRECTORY   = Utilities\CIDResEd
         DISPLAY     = GUI
         MSGFILE     = Yes
-        PUREANSI    = No
         RESFILE     = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+           PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -548,16 +594,22 @@ PROJECT=CIDDBase
         DIRECTORY   = DataUtils\CIDDBase
         DISPLAY     = N/A
         MSGFILE     = Yes
-        PUREANSI    = No
+        PLATFORMDIR = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    ; Win32 only for now until we can address this guy's portability
-    PLATFORMS
+    ; This one has per-platform implementations but only Win32 so far
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     DEPENDENTS
         CIDKernel
@@ -585,10 +637,19 @@ PROJECT=CIDObjStore
     SETTINGS
         DIRECTORY   = DataUtils\CIDObjStore
         DISPLAY     = N/A
+        EXPORT      = CIDOBJSTOREEXP
         MSGFILE     = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDObjStore_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
 
     DEPENDENTS
         CIDLib
@@ -626,10 +687,28 @@ PROJECT=CIDSChan
         DISPLAY     = N/A
         MSGFILE     = Yes
         PLATFORMDIR = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDSChan_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
+
+    ; This one has per-platform implementations but only Win32 so far
+    INCLUDEPLATS
+        Win32
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -680,6 +759,7 @@ PROJECT=CIDSock
     END IDLFILES
 
     DEPENDENTS
+        CIDKernel
         CIDLib
         CIDCrypto
     END DEPENDENTS
@@ -797,16 +877,14 @@ END PROJECT
 ;   Media related facilities
 ; ----------------------------------------------------------------------------
 
-;
-;   A framework for streaming audio in from sources and out to targets.
-;
+;  A framework for streaming audio in from sources and out to targets.
 PROJECT=CIDAudStream
     SETTINGS
         DIRECTORY   = MediaUtils\CIDAudStream
         DISPLAY     = N/A
         EXPORT      = CIDAUDSTREAMEXP
         MSGFILE     = Yes
-        PUREANSI    = No
+        PLATFORMDIR = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -818,6 +896,17 @@ PROJECT=CIDAudStream
             NAMEEXT = Shared
         END IDLFILE
     END IDLFILES
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
+
+    ; This one has per-platform implementations but only Win32 so far
+    INCLUDEPLATS
+        Win32
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -839,15 +928,20 @@ PROJECT=CIDDAE
         DISPLAY     = N/A
         EXPORT      = CIDDAEEXP
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
 
     ; For now only Win32. Needs to have some stuff split out into per-platform
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -862,7 +956,7 @@ PROJECT=CIDDAE
     END DEPENDENTS
 
     INCLUDEPATHS
-        $(WMFSDKDIR)\Include
+        $(CID_WMFSDKDIR)\Include
     END INCLUDEPATHS
 
 END PROJECT
@@ -878,15 +972,20 @@ PROJECT=CIDMetaExtr
         DISPLAY     = N/A
         EXPORT      = CIDMETAEXTREXP
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
 
     ; For now only Win32. Needs to have some stuff split out into per-platform
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -905,9 +1004,7 @@ PROJECT=CIDMetaExtr
 END PROJECT
 
 
-;
-;  Implements the RTP/RTCP standards
-;
+; Implements the RTP/RTCP standards (just early work so far)
 PROJECT=CIDRTP
     SETTINGS
         DIRECTORY   = MediaUtils\CIDRTP
@@ -938,15 +1035,20 @@ PROJECT=CIDWebBrowser
         DIRECTORY   = WndUtils\CIDWebBrowser
         DISPLAY     = N/A
         MSGFILE     = Yes
-        PUREANSI    = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
+
+    PLATFORMOPTS
+        PLATFORM=WIN32_*
+            PUREANSI    = No
+        END PLATFORM
+    END PLATFORMOPTS
 
     DEPENDENTS
         CIDKernel
@@ -970,9 +1072,9 @@ PROJECT=CIDAppSh
     END SETTINGS
 
     ; For now only Win32. Needs to have some stuff split out into per-platform
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDXML
@@ -1028,9 +1130,9 @@ PROJECT=CIDMacroDbg
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDEncode
@@ -1050,9 +1152,9 @@ PROJECT=TestMacroDbg
         RESFILE     = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
@@ -1234,9 +1336,9 @@ PROJECT=CIDLogMon
         RESFILE     = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDOrbUC
@@ -1249,6 +1351,7 @@ END PROJECT
 ;   Some general purpose utilities
 ; ----------------------------------------------------------------------------
 PROJECT=MakeDocs
+
     SETTINGS
         DIRECTORY   = Utilities\MakeDocs
         MSGFILE     = Yes
@@ -1256,6 +1359,7 @@ PROJECT=MakeDocs
 
     DEPENDENTS
         CIDLib
+        CIDXML
     END DEPENDENTS
 END PROJECT
 
@@ -1267,18 +1371,6 @@ PROJECT=GenXMLChTable
 
     DEPENDENTS
         CIDXML
-    END DEPENDENTS
-
-END PROJECT
-
-
-PROJECT=CSSPre
-    SETTINGS
-        DIRECTORY   = Utilities\CSSPre
-    END SETTINGS
-
-    DEPENDENTS
-        CIDLib
     END DEPENDENTS
 
 END PROJECT
@@ -1538,45 +1630,20 @@ END PROJECT
 
 ; ----------------------------------------------------------------------------
 ;  Ad hoc tests, and some that test things that the test framework itself uses, so
-;  we need to make sure that the framework is basically trustworthy.
+;  we need to make sure that the framework is basically trustworthy. And a few
+;  simple UI 'tests' for randomly trying stuff.
 ; ----------------------------------------------------------------------------
-PROJECT=ShellTester
+
+PROJECT=TestKernel
     SETTINGS
-        DIRECTORY   = Tests\TestAppShell\ShellTester
+        DIRECTORY   = Tests\TestKernel
+        MSGFILE     = Yes
+        USESYSLIBS  = Yes
     END SETTINGS
 
     DEPENDENTS
-        CIDLib
+        CIDKernel
     END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestAppShell
-    SETTINGS
-        DIRECTORY   = Tests\TestAppShell
-    END SETTINGS
-
-    DEPENDENTS
-        CIDAppSh
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestCIDDBase
-    SETTINGS
-        DIRECTORY   = Tests\TestCIDDBase
-    END SETTINGS
-
-    ; For now only Win32 until CIDDBase gets sorted out for portability
-    PLATFORMS
-        Win32
-    END PLATFORMS
-
-    DEPENDENTS
-        CIDLib
-        CIDDBase
-    END DEPENDENTS
-
 END PROJECT
 
 
@@ -1601,16 +1668,15 @@ PROJECT=TestCIDCtrls
         RESFILE     = Yes
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
         ; CIDWUtils
     END DEPENDENTS
 END PROJECT
-
 
 PROJECT=TestCIDCtrls2
 
@@ -1621,15 +1687,14 @@ PROJECT=TestCIDCtrls2
         RESFILE     = No
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
     END DEPENDENTS
 END PROJECT
-
 
 PROJECT=TestScroll
 
@@ -1640,170 +1705,23 @@ PROJECT=TestScroll
         RESFILE     = No
     END SETTINGS
 
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
     END DEPENDENTS
 END PROJECT
 
-
-PROJECT=TestCIDZLib
-    SETTINGS
-        DIRECTORY   = Tests\TestCIDZLib
-        SAMPLE      = Yes
-    END SETTINGS
-
-    DEPENDENTS
-        CIDZLib
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestGestures
-
-    SETTINGS
-        DIRECTORY   = Tests\TestGestures
-        DISPLAY     = GUI
-        MSGFILE     = Yes
-        RESFILE     = Yes
-    END SETTINGS
-
-    PLATFORMS
-        Win32
-    END PLATFORMS
-
-    DEPENDENTS
-        CIDCtrls
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestKernel
-    SETTINGS
-        DIRECTORY   = Tests\TestKernel
-        MSGFILE     = Yes
-        USESYSLIBS  = Yes
-    END SETTINGS
-
-    DEPENDENTS
-        CIDKernel
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestLogSrv
-    SETTINGS
-        DIRECTORY   = Tests\TestLogSrv
-    END SETTINGS
-
-    DEPENDENTS
-        CIDMath
-        CIDOrbUC
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestLogSrv2
-    SETTINGS
-        DIRECTORY   = Tests\TestLogSrv2
-    END SETTINGS
-
-    DEPENDENTS
-        CIDOrbUC
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestOrb2
-    SETTINGS
-        DIRECTORY   = Tests\TestOrb2
-        MSGFILE     = Yes
-    END SETTINGS
-
-    IDLFILES
-        IDLFILE
-            SRCFILE = TestOrb2_TestIntf
-            GEN     = CLIENT,SERVER
-        END IDLFILE
-    END IDLFILES
-
-    DEPENDENTS
-        CIDOrb
-        CIDMath
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestOrb3
-    SETTINGS
-        DIRECTORY   = Tests\TestOrb3
-        MSGFILE     = Yes
-    END SETTINGS
-
-    IDLFILES
-        IDLFILE
-            SRCFILE = TestOrb3_Types
-            GEN     = GLOBALS
-            NAMEEXT = Types
-        END IDLFILE
-
-        IDLFILE
-            SRCFILE = TestOrb3_TestIntf
-            GEN     = CLIENT,SERVER
-            NAMEEXT = Intf
-        END IDLFILE
-    END IDLFILES
-
-    DEPENDENTS
-        CIDOrb
-    END DEPENDENTS
-END PROJECT
-
-
-;PROJECT=TestRTP
-;    SETTINGS
-;        DIRECTORY   = Tests\TestRTP
-;    END SETTINGS
-;
-;    DEPENDENTS
-;        CIDMath
-;        CIDSock
-;        CIDRTP
-;    END DEPENDENTS
-;END PROJECT
-
-
-;PROJECT=TestSocket
-;    SETTINGS
-;        DIRECTORY   = Tests\TestSocket
-;    END SETTINGS
-;
-;    DEPENDENTS
-;        CIDSock
-;    END DEPENDENTS
-;END PROJECT
-;
-;
-;PROJECT=TestSocket2
-;    SETTINGS
-;        DIRECTORY   = Tests\TestSocket2
-;    END SETTINGS
-;
-;    DEPENDENTS
-;        CIDSock
-;    END DEPENDENTS
-;END PROJECT
 
 
 ; ----------------------------------------------------------------------------
-;  Sample programs to demonstrate various aspects of CIDLib
+;  Basic Sample programs to demonstrate various aspects of CIDLib
 ; ----------------------------------------------------------------------------
 PROJECT=Beeper
     SETTINGS
-        DIRECTORY   = Samples\Beeper
+        DIRECTORY   = Samples\Basic\Beeper
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1815,7 +1733,7 @@ END PROJECT
 
 PROJECT=CDROM1
     SETTINGS
-        DIRECTORY   = Samples\CDROM1
+        DIRECTORY   = Samples\Basic\CDROM1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1830,7 +1748,7 @@ END PROJECT
 
 PROJECT=Collect1
     SETTINGS
-        DIRECTORY   = Samples\Collect1
+        DIRECTORY   = Samples\Basic\Collect1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1842,7 +1760,7 @@ END PROJECT
 
 PROJECT=Collect2
     SETTINGS
-        DIRECTORY   = Samples\Collect2
+        DIRECTORY   = Samples\Basic\Collect2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1854,7 +1772,7 @@ END PROJECT
 
 PROJECT=Collect3
     SETTINGS
-        DIRECTORY   = Samples\Collect3
+        DIRECTORY   = Samples\Basic\Collect3
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1866,7 +1784,7 @@ END PROJECT
 
 PROJECT=Collect4
     SETTINGS
-        DIRECTORY   = Samples\Collect4
+        DIRECTORY   = Samples\Basic\Collect4
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1878,7 +1796,7 @@ END PROJECT
 
 PROJECT=Crypto1
     SETTINGS
-        DIRECTORY   = Samples\Crypto1
+        DIRECTORY   = Samples\Basic\Crypto1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1890,7 +1808,7 @@ END PROJECT
 
 PROJECT=CvtImgToTrans
     SETTINGS
-        DIRECTORY   = Samples\CvtImgToTrans
+        DIRECTORY   = Samples\Basic\CvtImgToTrans
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1903,14 +1821,14 @@ END PROJECT
 
 PROJECT=DAE1
     SETTINGS
-        DIRECTORY   = Samples\DAE1
+        DIRECTORY   = Samples\Basic\DAE1
         SAMPLE      = Yes
     END SETTINGS
 
     ; For now only Win32 until CIDDAE gets sorted out for portability
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -1921,14 +1839,14 @@ END PROJECT
 
 PROJECT=DAE2
     SETTINGS
-        DIRECTORY   = Samples\DAE2
+        DIRECTORY   = Samples\Basic\DAE2
         SAMPLE      = Yes
     END SETTINGS
 
     ; For now only Win32 until CIDDAE gets sorted out for portability
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -1939,7 +1857,7 @@ END PROJECT
 
 PROJECT=EnumMons
     SETTINGS
-        DIRECTORY   = Samples\EnumMons
+        DIRECTORY   = Samples\Basic\EnumMons
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1952,7 +1870,7 @@ END PROJECT
 
 PROJECT=FileSys1
     SETTINGS
-        DIRECTORY   = Samples\FileSys1
+        DIRECTORY   = Samples\Basic\FileSys1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1964,7 +1882,7 @@ END PROJECT
 
 PROJECT=FileSys2
     SETTINGS
-        DIRECTORY   = Samples\FileSys2
+        DIRECTORY   = Samples\Basic\FileSys2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -1976,20 +1894,8 @@ END PROJECT
 
 PROJECT=FileSys3
     SETTINGS
-        DIRECTORY   = Samples\FileSys3
+        DIRECTORY   = Samples\Basic\FileSys3
         MSGFILE     = Yes
-        SAMPLE      = Yes
-    END SETTINGS
-
-    DEPENDENTS
-        CIDLib
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=FWMediaChanger
-    SETTINGS
-        DIRECTORY   = Samples\FWMediaChanger
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2001,7 +1907,7 @@ END PROJECT
 
 PROJECT=HTTPClient1
     SETTINGS
-        DIRECTORY   = Samples\HTTPClient1
+        DIRECTORY   = Samples\Basic\HTTPClient1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2015,7 +1921,7 @@ END PROJECT
 
 PROJECT=ImgCvt
     SETTINGS
-        DIRECTORY   = Samples\ImgCvt
+        DIRECTORY   = Samples\Basic\ImgCvt
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2030,7 +1936,7 @@ END PROJECT
 
 PROJECT=Locale1
     SETTINGS
-        DIRECTORY   = Samples\Locale1
+        DIRECTORY   = Samples\Basic\Locale1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2042,7 +1948,7 @@ END PROJECT
 
 PROJECT=MakePreviews
     SETTINGS
-        DIRECTORY   = Samples\MakePreviews
+        DIRECTORY   = Samples\Basic\MakePreviews
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2057,7 +1963,7 @@ END PROJECT
 
 PROJECT=HTTPSrv1
     SETTINGS
-        DIRECTORY   = Samples\HTTPSrv1
+        DIRECTORY   = Samples\Basic\HTTPSrv1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2071,7 +1977,7 @@ END PROJECT
 
 PROJECT=JSON1
     SETTINGS
-        DIRECTORY   = Samples\JSON1
+        DIRECTORY   = Samples\Basic\JSON1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2083,7 +1989,7 @@ END PROJECT
 
 PROJECT=SpReco1
     SETTINGS
-        DIRECTORY   = Samples\SpReco1
+        DIRECTORY   = Samples\Basic\SpReco1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2094,14 +2000,14 @@ END PROJECT
 
 PROJECT=MetaExtract
     SETTINGS
-        DIRECTORY   = Samples\MetaExtract
+        DIRECTORY   = Samples\Basic\MetaExtract
         SAMPLE      = Yes
     END SETTINGS
 
     ; For now only Win32 until CIDMetaExtr gets sorted out for portability
-    PLATFORMS
+    INCLUDEPLATS
         Win32
-    END PLATFORMS
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -2112,7 +2018,7 @@ END PROJECT
 
 PROJECT=Pack1
     SETTINGS
-        DIRECTORY   = Samples\Pack1
+        DIRECTORY   = Samples\Basic\Pack1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2127,7 +2033,7 @@ END PROJECT
 
 PROJECT=Process1
     SETTINGS
-        DIRECTORY   = Samples\Process1
+        DIRECTORY   = Samples\Basic\Process1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2139,7 +2045,7 @@ END PROJECT
 
 PROJECT=Process2
     SETTINGS
-        DIRECTORY   = Samples\Process2
+        DIRECTORY   = Samples\Basic\Process2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2151,7 +2057,7 @@ END PROJECT
 
 PROJECT=RandGen
     SETTINGS
-        DIRECTORY   = Samples\RandGen
+        DIRECTORY   = Samples\Basic\RandGen
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2164,7 +2070,7 @@ END PROJECT
 
 PROJECT=Reg1
     SETTINGS
-        DIRECTORY   = Samples\Reg1
+        DIRECTORY   = Samples\Basic\Reg1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2175,7 +2081,7 @@ END PROJECT
 
 PROJECT=RegEx1
     SETTINGS
-        DIRECTORY   = Samples\RegEx1
+        DIRECTORY   = Samples\Basic\RegEx1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2186,7 +2092,7 @@ END PROJECT
 
 PROJECT=RTTI1
     SETTINGS
-        DIRECTORY   = Samples\RTTI1
+        DIRECTORY   = Samples\Basic\RTTI1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2197,7 +2103,7 @@ END PROJECT
 
 PROJECT=SpGrammarComp
     SETTINGS
-        DIRECTORY   = Samples\SpGrammarComp
+        DIRECTORY   = Samples\Basic\SpGrammarComp
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2208,7 +2114,7 @@ END PROJECT
 
 PROJECT=Speech
     SETTINGS
-        DIRECTORY   = Samples\Speech
+        DIRECTORY   = Samples\Basic\Speech
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2218,43 +2124,9 @@ PROJECT=Speech
 END PROJECT
 
 
-PROJECT=TestService
-    SETTINGS
-        DIRECTORY   = Tests\TestService
-    END SETTINGS
-
-    ; For now only Win32, until services get portable
-    PLATFORMS
-        Win32
-    END PLATFORMS
-
-    DEPENDENTS
-        CIDKernel
-        CIDLib
-    END DEPENDENTS
-END PROJECT
-
-
-PROJECT=TestServiceInst
-    SETTINGS
-        DIRECTORY   = Tests\TestService\Install
-    END SETTINGS
-
-    ; For now only Win32, until services get portable
-    PLATFORMS
-        Win32
-    END PLATFORMS
-
-    DEPENDENTS
-        CIDKernel
-        CIDLib
-    END DEPENDENTS
-END PROJECT
-
-
 PROJECT=SMTP1
     SETTINGS
-        DIRECTORY   = Samples\SMTP1
+        DIRECTORY   = Samples\Basic\SMTP1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2267,7 +2139,7 @@ END PROJECT
 
 PROJECT=Sock1
     SETTINGS
-        DIRECTORY   = Samples\Sock1
+        DIRECTORY   = Samples\Basic\Sock1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2279,7 +2151,7 @@ END PROJECT
 
 PROJECT=Sock2
     SETTINGS
-        DIRECTORY   = Samples\Sock2
+        DIRECTORY   = Samples\Basic\Sock2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2291,7 +2163,7 @@ END PROJECT
 
 PROJECT=SockPing
     SETTINGS
-        DIRECTORY   = Samples\SockPing
+        DIRECTORY   = Samples\Basic\SockPing
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2303,7 +2175,7 @@ END PROJECT
 
 PROJECT=Streams1
     SETTINGS
-        DIRECTORY   = Samples\Streams1
+        DIRECTORY   = Samples\Basic\Streams1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2315,7 +2187,7 @@ END PROJECT
 
 PROJECT=Streams2
     SETTINGS
-        DIRECTORY   = Samples\Streams2
+        DIRECTORY   = Samples\Basic\Streams2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2328,7 +2200,7 @@ END PROJECT
 
 PROJECT=Streams3
     SETTINGS
-        DIRECTORY   = Samples\Streams3
+        DIRECTORY   = Samples\Basic\Streams3
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2340,7 +2212,7 @@ END PROJECT
 
 PROJECT=Streams4
     SETTINGS
-        DIRECTORY   = Samples\Streams4
+        DIRECTORY   = Samples\Basic\Streams4
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2352,7 +2224,7 @@ END PROJECT
 
 PROJECT=Streams5
     SETTINGS
-        DIRECTORY   = Samples\Streams5
+        DIRECTORY   = Samples\Basic\Streams5
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2364,7 +2236,7 @@ END PROJECT
 
 PROJECT=Streams6
     SETTINGS
-        DIRECTORY   = Samples\Streams6
+        DIRECTORY   = Samples\Basic\Streams6
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2376,7 +2248,7 @@ END PROJECT
 
 PROJECT=UPnP1
     SETTINGS
-        DIRECTORY   = Samples\UPnP1
+        DIRECTORY   = Samples\Basic\UPnP1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2390,7 +2262,7 @@ END PROJECT
 
 PROJECT=WakeOnLAN
     SETTINGS
-        DIRECTORY   = Samples\WakeOnLAN
+        DIRECTORY   = Samples\Basic\WakeOnLAN
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2402,7 +2274,7 @@ END PROJECT
 
 PROJECT=XMLDemo1
     SETTINGS
-        DIRECTORY   = Samples\XMLDemo1
+        DIRECTORY   = Samples\Basic\XMLDemo1
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2413,7 +2285,7 @@ END PROJECT
 
 PROJECT=XMLDemo2
     SETTINGS
-        DIRECTORY   = Samples\XMLDemo2
+        DIRECTORY   = Samples\Basic\XMLDemo2
         SAMPLE      = Yes
     END SETTINGS
 
@@ -2426,7 +2298,7 @@ END PROJECT
 ; For random trying stuff
 ;PROJECT=Test
 ;    SETTINGS
-;        DIRECTORY   = Samples\Test
+;        DIRECTORY   = Samples\Basic\Test
 ;        SAMPLE      = Yes
 ;    END SETTINGS
 ;
@@ -2436,98 +2308,131 @@ END PROJECT
 ;END PROJECT
 
 
-; ----------------------------------------------------------------------------
-;  A project to reuse for some videos we make to demonstrate CIDLib and whatnot
-; ----------------------------------------------------------------------------
-
-;PROJECT=VideoDemoS
-;
-;    SETTINGS
-;        DIRECTORY   = Demos\VideoDemo\Server
-;        SAMPLE      = Yes
-;        MSGFILE     = Yes
-;    END SETTINGS
-;
-;    IDLFILES
-;        IDLFILE
-;            SRCFILE = ..\VideoDemo_Intf
-;            GEN     = SERVER
-;            NAMEEXT = Intf
-;        END IDLFILE
-;    END IDLFILES
-;
-;    DEPENDENTS
-;        CIDLib
-;        CIDOrb
-;        CIDOrbUC
-;        VideoDemoSh
-;    END DEPENDENTS
-;
-;END PROJECT
-;
-;PROJECT=VideoDemoC
-;
-;    SETTINGS
-;        DIRECTORY   = Demos\VideoDemo\Client
-;        SAMPLE      = Yes
-;    END SETTINGS
-;
-;    IDLFILES
-;        IDLFILE
-;            SRCFILE = ..\VideoDemo_Intf
-;            GEN     = CLIENT
-;            NAMEEXT = Intf
-;        END IDLFILE
-;    END IDLFILES
-;
-;    DEPENDENTS
-;        CIDLib
-;        CIDOrb
-;        CIDOrbUC
-;        VideoDemoSh
-;    END DEPENDENTS
-;
-;END PROJECT
-;
-;PROJECT=VideoDemoSh
-;
-;    SETTINGS
-;        DIRECTORY   = Demos\VideoDemo\Shared
-;        DISPLAY     = N/A
-;        EXPORT      = VIDEODEMOSHEXP
-;        TYPE        = SharedLib
-;        VERSIONED   = Yes
-;    END SETTINGS
-;
-;    IDLFILES
-;        IDLFILE
-;            SRCFILE = VideoDemoSh_Types
-;            GEN     = GLOBALS
-;            NAMEEXT = Types
-;        END IDLFILE
-;    END IDLFILES
-;
-;    DEPENDENTS
-;        CIDLib
-;    END DEPENDENTS
-;
-;END PROJECT
-
 
 ; ----------------------------------------------------------------------------
-;  A reusable project for testing out things
+;  Some intermediate samples
 ; ----------------------------------------------------------------------------
-PROJECT=JunkStuff
+
+PROJECT=ORB1SampS
 
     SETTINGS
-        DIRECTORY   = Tests\JunkStuff
+        DIRECTORY   = Samples\Intermediate\ORB1Samp\Server
         SAMPLE      = Yes
+        MSGFILE     = Yes
     END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = ..\ORB1Samp_Intf
+            GEN     = SERVER
+            NAMEEXT = Intf
+        END IDLFILE
+    END IDLFILES
 
     DEPENDENTS
         CIDLib
-        CIDRegX
+        CIDOrb
+        CIDOrbUC
+        ORB1SampSh
     END DEPENDENTS
 
 END PROJECT
 
+PROJECT=ORB1SampC
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ORB1Samp\Client
+        SAMPLE      = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = ..\ORB1Samp_Intf
+            GEN     = CLIENT
+            NAMEEXT = Intf
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+        CIDOrb
+        CIDOrbUC
+        ORB1SampSh
+    END DEPENDENTS
+
+END PROJECT
+
+PROJECT=ORB1SampSh
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ORB1Samp\Shared
+        DISPLAY     = N/A
+        EXPORT      = ORB1SAMPSHEXP
+        TYPE        = SharedLib
+        VERSIONED   = Yes
+    END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = ORB1SampSh_Types
+            GEN     = GLOBALS
+            NAMEEXT = Types
+        END IDLFILE
+    END IDLFILES
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+
+END PROJECT
+
+PROJECT=ORB1Samp
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ORB1Samp
+        TYPE        = Group
+    END SETTINGS
+
+    DEPENDENTS
+        ORB1SampSh
+        ORB1SampS
+        ORB1SampC
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=Window1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Window1
+        DISPLAY     = GUI
+        MSGFILE     = No
+        RESFILE     = No
+    END SETTINGS
+
+    INCLUDEPLATS
+        Win32
+    END INCLUDEPLATS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=Window2
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Window2
+        DISPLAY     = GUI
+        MSGFILE     = No
+        RESFILE     = No
+    END SETTINGS
+
+    INCLUDEPLATS
+        Win32
+    END INCLUDEPLATS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT

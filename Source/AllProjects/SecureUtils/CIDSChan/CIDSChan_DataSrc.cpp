@@ -5,9 +5,13 @@
 //
 // CREATED: 11/22/2014
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -38,22 +42,46 @@
 //  TCIDSChanClDataSrc: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TCIDSChanClDataSrc::
-TCIDSChanClDataSrc(         TClientStreamSocket* const  psockSrc
+TCIDSChanClDataSrc( const   TString&                    strName
+                    ,       TClientStreamSocket* const  psockSrc
                     , const tCIDLib::EAdoptOpts         eAdopt
+                    , const TString&                    strCertInfo
+                    , const tCIDLib::TStrCollect&       colALPNList
+                    , const tCIDSChan::EConnOpts        eOpts
                     , const TString&                    strPrincipal) :
 
-    m_pcdsRawData(new TCIDSockStreamDataSrc(psockSrc, eAdopt))
+    m_colALPNList(colALPNList.c4ElemCount())
+    , m_eOpts(eOpts)
+    , m_pcdsRawData(new TCIDSockStreamDataSrc(psockSrc, eAdopt))
+    , m_strCertInfo(strCertInfo)
     , m_strPrincipal(strPrincipal)
+    , m_strName(strName)
 {
+    // Copy over the protocol list if any
+    if (!colALPNList.bIsEmpty())
+    {
+        TColCursor<TString>* pcursALPN = colALPNList.pcursNew();
+        TJanitor<TColCursor<TString>> janCurs(pcursALPN);
+        for (; pcursALPN->bIsValid(); pcursALPN->bNext())
+            m_colALPNList.objAdd(pcursALPN->objRCur());
+    }
 }
 
 TCIDSChanClDataSrc::
-TCIDSChanClDataSrc( const   TIPEndPoint&            ipepTar
+TCIDSChanClDataSrc( const   TString&                strName
+                    , const TIPEndPoint&            ipepTar
                     , const tCIDSock::ESockProtos   eProtocol
+                    , const TString&                strCertInfo
+                    , const tCIDLib::TStrCollect&   colALPNList
+                    , const tCIDSChan::EConnOpts    eOpts
                     , const TString&                strPrincipal) :
 
-    m_pcdsRawData(nullptr)
+    m_colALPNList(colALPNList.c4ElemCount())
+    , m_eOpts(eOpts)
+    , m_pcdsRawData(nullptr)
+    , m_strCertInfo(strCertInfo)
     , m_strPrincipal(strPrincipal)
+    , m_strName(strName)
 {
     TClientStreamSocket* psockSrc = nullptr;
     try
@@ -77,6 +105,15 @@ TCIDSChanClDataSrc( const   TIPEndPoint&            ipepTar
             }
         }
         throw;
+    }
+
+    // Copy over the protocol list if any
+    if (!colALPNList.bIsEmpty())
+    {
+        TColCursor<TString>* pcursALPN = colALPNList.pcursNew();
+        TJanitor<TColCursor<TString>> janCurs(pcursALPN);
+        for (; pcursALPN->bIsValid(); pcursALPN->bNext())
+            m_colALPNList.objAdd(pcursALPN->objRCur());
     }
 }
 
@@ -178,15 +215,18 @@ tCIDLib::TVoid TCIDSChanClDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd)
 
     //
     //  We have to use the secure channel to set up the encrypted connection. We
-    //  indicate client side and pass the principal as the certificate info.
+    //  indicate client side and pass the other info we saved away from our own ctor
+    //  to keep around until now.
     //
-    m_schanSec.Connect
+    m_schanSec.ClConnect
     (
-        *m_pcdsRawData
-        , kCIDLib::True
+        m_strName
+        , *m_pcdsRawData
         , enctEnd
+        , m_strCertInfo
+        , m_colALPNList
+        , m_eOpts
         , m_strPrincipal
-        , L"Secure Client Data Source"
     );
 }
 
@@ -210,6 +250,8 @@ TCIDSChanClDataSrc::TerminateSrc(const  tCIDLib::TEncodedTime   enctEnd
 
     catch(TError& errToCatch)
     {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
     }
 
     // And our nested data source, optionally closing it
@@ -220,6 +262,8 @@ TCIDSChanClDataSrc::TerminateSrc(const  tCIDLib::TEncodedTime   enctEnd
 
     catch(TError& errToCatch)
     {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
     }
 }
 
@@ -235,12 +279,16 @@ TCIDSChanClDataSrc::TerminateSrc(const  tCIDLib::TEncodedTime   enctEnd
 // ---------------------------------------------------------------------------
 
 TCIDSChanSrvDataSrc::
-TCIDSChanSrvDataSrc(        TServerStreamSocket* const  psockSrc
+TCIDSChanSrvDataSrc(const   TString&                    strName
+                    ,       TServerStreamSocket* const  psockSrc
                     , const tCIDLib::EAdoptOpts         eAdopt
-                    , const TString&                    strCertInfo) :
+                    , const TString&                    strCertInfo
+                    , const tCIDSChan::EConnOpts        eOpts) :
 
     m_pcdsRawData(new TCIDSockStreamDataSrc(psockSrc, eAdopt))
+    , m_eOpts(eOpts)
     , m_strCertInfo(strCertInfo)
+    , m_strName(strName)
 {
 }
 
@@ -336,15 +384,8 @@ tCIDLib::TVoid TCIDSChanSrvDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd
     // Recursively initalize our own data source first
     m_pcdsRawData->Initialize(enctEnd);
 
-    // We have to user the secure channel to set up the encrypted connection
-    m_schanSec.Connect
-    (
-        *m_pcdsRawData
-        , kCIDLib::False
-        , enctEnd
-        , m_strCertInfo
-        , L"Secure Server Data Source"
-    );
+    tCIDLib::TStrList colALPN;
+    m_schanSec.SrvConnect(m_strName, *m_pcdsRawData, enctEnd, m_strCertInfo, m_eOpts);
 }
 
 
@@ -367,6 +408,8 @@ TCIDSChanSrvDataSrc::TerminateSrc(  const   tCIDLib::TEncodedTime   enctEnd
 
     catch(TError& errToCatch)
     {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
     }
 
     // And our nested data source
@@ -377,6 +420,8 @@ TCIDSChanSrvDataSrc::TerminateSrc(  const   tCIDLib::TEncodedTime   enctEnd
 
     catch(TError& errToCatch)
     {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
     }
 }
 

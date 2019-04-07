@@ -5,16 +5,23 @@
 //
 // CREATED: 03/20/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This facility implements a regular expression engine. It's quite a basic
+//  one. I have all the guts to make a really powerful one with the DFA that
+//  is used in the XML parser. It needs time to be addressed.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -41,7 +48,6 @@
 #include    "CIDLib.hpp"
 
 
-
 // ---------------------------------------------------------------------------
 //  Now subinclude our other headers, in the needed order.
 // ---------------------------------------------------------------------------
@@ -49,7 +55,6 @@
 #include    "CIDRegX_ThisFacility.hpp"
 #include    "CIDRegX_RegExNFA.hpp"
 #include    "CIDRegX_RegExEngine.hpp"
-
 
 
 // ---------------------------------------------------------------------------

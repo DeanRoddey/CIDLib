@@ -5,9 +5,13 @@
 //
 // CREATED: 11/23/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -29,20 +33,17 @@
 #include    "CIDLib_.hpp"
 
 
-tCIDLib::TVoid TSmartPtrHelpers::CheckRef(const tCIDLib::TVoid* pToCheck)
+tCIDLib::TVoid TSmartPtrHelpers::ThrowNullRef(const tCIDLib::TCard4 c4Line)
 {
-    if (!pToCheck)
-    {
-        facCIDLib().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcSPtr_RefReleaseErr
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Internal
-        );
-    }
+    facCIDLib().ThrowKrnlErr
+    (
+        CID_FILE
+        , c4Line
+        , kCIDErrs::errcSPtr_RefReleaseErr
+        , TKrnlError::kerrLast()
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Internal
+    );
 }
 
 tCIDLib::TVoid TSmartPtrHelpers::CheckRefNotZero(const tCIDLib::TCard4 c4ToCheck)

@@ -5,16 +5,44 @@
 //
 // CREATED: 08/20/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This facilty implements an XML parser. There is a 'parser core' that does
+//  the work. It works in terms of various pluggable bits which it uses to
+//  callback with the information it is parsing.
+//
+//  Parsing is done via 'entity sources', which are is an XMl term. It basically
+//  means some parsable source of XML content. We have entities for memory
+//  buffers and files and strings. And some other facilities offer some to
+//  allow us to parse XML from other things.
+//
+//  You can use the parser directly, and handle the callbacks, which is the
+//  most efficient but not necessarily the most convenient. We also offer a
+//  'simple tree' parser which builds up the hierarchical XML data into a
+//  corresponding tree in memory, which you can poke around in as desired
+//  to find the data you want.
+//
+//  We support 'catalogs' which is a mapping scheme to map XML public ids to
+//  some pre-loaded content. We have a standard one that does what you'd mostly
+//  want to do but you can create your own if you want. This is commonly used
+//  to map the DTD public id to some internally created DTD, for instance, so
+//  that you don't have to depend on an external file for that.
+//
+//  This parser supports DTDs. You can use the DTD for validation if want or
+//  not. The parser core allows you to plug in different validators but
+//  currently there is only the DTD validator.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -39,7 +67,6 @@
 //  Include our underlying headers
 // ---------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
 
 
 // ---------------------------------------------------------------------------

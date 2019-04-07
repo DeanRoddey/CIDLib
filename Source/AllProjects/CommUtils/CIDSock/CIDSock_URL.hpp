@@ -5,22 +5,24 @@
 //
 // CREATED: 07/13/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the header for the CIDSock_URL.cpp file. This file implements
 //  the TURL class, which provides processing for URL style URIs (Universal
-//  Resource Identifiers.) URLs (Universal Resource Locators) are one type of
-//  URI which are intended to (usually, people are inconsistent about this)
-//  point to a retrievable resource on the web.
+//  Resource Identifiers.)
 //
 //  An important service of this class is to parse URLs, to return information
 //  about the components of a parsed URL, to process relative URLs based on
 //  another URL, and to create sockets which are appropriate for a particular
-//  type of URL (.e.g to return an HTTP socket for a URL in the form
+//  type of URL (.e.g to build an HTTP socket for a URL in the form
 //  http://www.foo.com.)
 //
 // CAVEATS/GOTCHAS:

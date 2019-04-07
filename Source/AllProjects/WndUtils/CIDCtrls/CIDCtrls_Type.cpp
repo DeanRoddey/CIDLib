@@ -5,9 +5,13 @@
 //
 // CREATED: 06/01/2015
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -32,7 +36,7 @@
 // ---------------------------------------------------------------------------
 //  The edge anchors enumeration
 // ---------------------------------------------------------------------------
-static const TString astrEEdgeAnchorsVals[tCIDCtrls::EEdgeAnchors::Count] =
+static const TString astrEEdgeAnchorsVals[tCIDLib::c4EnumOrd(tCIDCtrls::EEdgeAnchors::Count)] =
 {
     L"None"
     , L"MoveBottom"
@@ -72,7 +76,7 @@ const TString& tCIDCtrls::strLoadEEdgeAnchors(const tCIDCtrls::EEdgeAnchors eToX
 // ---------------------------------------------------------------------------
 //  The window themes enumeration
 // ---------------------------------------------------------------------------
-static const TString astrEWndThemesVals[tCIDCtrls::EWndThemes::Count] =
+static const TString astrEWndThemesVals[tCIDLib::c4EnumOrd(tCIDCtrls::EWndThemes::Count)] =
 {
     L"None"
     , L"MainWnd"

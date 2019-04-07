@@ -5,9 +5,13 @@
 //
 // CREATED: 12/05/2001
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -168,9 +172,7 @@ tCIDLib::TVoid TFacCIDCfgSrv::Setup()
     strTmp.eReplaceToken(facCIDSock().strIPHostName(), L'h');
     facCIDOrbUC().RegRebindObj
     (
-        m_porbsImpl->ooidThis()
-        , strTmp
-        , L"CIDLib Config Respository Object"
+        m_porbsImpl->ooidThis(), strTmp, L"CIDLib Config Respository Object"
     );
 
     //
@@ -201,9 +203,7 @@ tCIDLib::TVoid TFacCIDCfgSrv::Setup()
     strTmp.eReplaceToken(facCIDSock().strIPHostName(), L'h');
     facCIDOrbUC().RegRebindObj
     (
-        porbsAdmin->ooidThis()
-        , strTmp
-        , L"Cfg Server Core Admin Object"
+        porbsAdmin->ooidThis(), strTmp, L"Cfg Server Core Admin Object"
     );
 
     // And start the rebinder now

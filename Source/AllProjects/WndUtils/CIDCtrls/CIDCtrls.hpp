@@ -5,15 +5,23 @@
 //
 // CREATED: 06/02/1997
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
 //  have to offer.
+//
+//  This facility is the core UI framework. This stuff is all wrapped just as
+//  well as the back end stuff, but there is not much hope of making it per-platform.
+//  So guy will only be built on Win32.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -40,7 +48,6 @@
 #include    "CIDLib.hpp"
 #include    "CIDMData.hpp"
 #include    "CIDGraphDev.hpp"
-
 
 
 // ---------------------------------------------------------------------------
@@ -151,9 +158,9 @@ class TCaretJanitor;
 // Slip in some facility types
 namespace tCIDCtrls
 {
-    typedef TRefVector<const TWindow>                       TWndList;
-    typedef TRefKeyedHashSet<TWindow,TString,TStringKeyOps> TKeyedWndList;
-    typedef tCIDLib::TStrList                               THintsList;
+    using TWndList      = TRefVector<const TWindow>;
+    using TKeyedWndList = TRefKeyedHashSet<TWindow,TString,TStringKeyOps>;
+    using THintsList    = tCIDLib::TStrList;
 }
 
 

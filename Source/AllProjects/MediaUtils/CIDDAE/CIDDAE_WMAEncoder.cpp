@@ -5,9 +5,13 @@
 //
 // CREATED: 03/21/2006
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -260,11 +264,11 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
         pStreamCfg2->Release();
     }
 
-    hRes = pStreamCfg->SetStreamName(L"Audio Stream");
+    hRes = pStreamCfg->SetStreamName((WCHAR*)L"Audio Stream");
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_SetStreamName, hRes, CID_LINE);
 
-    hRes = pStreamCfg->SetConnectionName(L"Audio");
+    hRes = pStreamCfg->SetConnectionName((WCHAR*)L"Audio");
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_SetConnectionName, hRes, CID_LINE);
 

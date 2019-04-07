@@ -5,9 +5,13 @@
 //
 // CREATED: 08/30/1999
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -1180,8 +1184,8 @@ TXMLCMSpecNode* TDTDValidator::pxcsnParseCMLevel()
     //
     tCIDLib::TCh            chNext;
     tCIDXML::ECMNodeTypes   eType = tCIDXML::ECMNodeTypes::Unknown;
-    TXMLCMSpecNode*         pxcsnNew = 0;
-    TXMLCMSpecNode*         pxcsnCur = 0;
+    TXMLCMSpecNode*         pxcsnNew = nullptr;
+    TXMLCMSpecNode*         pxcsnCur = nullptr;
     while (kCIDLib::True)
     {
         //

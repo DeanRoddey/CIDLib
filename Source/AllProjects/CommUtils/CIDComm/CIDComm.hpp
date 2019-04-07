@@ -5,16 +5,33 @@
 //
 // CREATED: 08/27/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get what we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This facility implements core support for serial ports. These are supported
+//  via an abstract base class that defines the functionality that comm ports
+//  must support. Then we provide a derivative for regular local ports.
+//
+//  We also define a 'port factory' abstraction which is a means by which
+//  various types of serisl ports are made available to the program. We provide
+//  a concreate implementation for local ports.
+//
+//  This factory scheme is mostly used in CQC where it allows CQC programs to
+//  use serial ports on GC-100s, Just Add Power devices, and also to support
+//  its remote port server that allows for access to remote client ports.
+//
+//  At some point we might move some of that down to this level.
 //
 // CAVEATS/GOTCHAS:
 //

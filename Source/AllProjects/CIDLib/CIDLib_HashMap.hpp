@@ -5,9 +5,13 @@
 //
 // CREATED: 03/23/2002
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -190,6 +194,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         //  Nested aliases s for the node and key ops types used by a keyed
         //  hash map.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = THashMap<TElem, TKey, TKeyOps>;
         using TPair = TKeyObjPair<TKey,TElem>;
         using TNode = THashMapNode<TKey,TElem>;
@@ -839,7 +844,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             return m_apBuckets[hshKey]->objPair();
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);

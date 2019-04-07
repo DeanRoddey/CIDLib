@@ -5,9 +5,13 @@
 //
 // CREATED: 09/12/2005
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -44,7 +48,7 @@ class TLocalComPortFactory : public TComPortFactory
 
         TLocalComPortFactory(const TLocalComPortFactory&) = delete;
 
-        ~TLocalComPortFactory();
+        ~TLocalComPortFactory() = default;
 
 
         // -------------------------------------------------------------------
@@ -73,7 +77,7 @@ class TLocalComPortFactory : public TComPortFactory
             const   TString&                strPath
         )   const override;
 
-        TCommPortBase* pcommMakeNew
+        [[nodiscard]] TCommPortBase* pcommMakeNew
         (
             const   TString&                strPath
         )   override;

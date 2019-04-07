@@ -5,9 +5,13 @@
 //
 // CREATED: 12/05/2001
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -57,6 +61,8 @@ TFacCIDCfgSrv::TFacCIDCfgSrv() :
     , m_c4MaxClients(0)
     , m_ippnListen(kCIDOrbUC::ippnCfgSrvDefPort)
     , m_pevWait(nullptr)
+    , m_plgrLogSrv(nullptr)
+    , m_porbsImpl(nullptr)
 {
 }
 
@@ -66,7 +72,7 @@ TFacCIDCfgSrv::~TFacCIDCfgSrv()
 
 
 // ---------------------------------------------------------------------------
-//  TFacCIDCfgSrv: Public, non-virtual methods
+//  TFacCIDCfgSrv: Public, inherited methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TFacCIDCfgSrv::bHandleSignal(const tCIDLib::ESignals eSig)
 {
@@ -84,6 +90,9 @@ tCIDLib::TBoolean TFacCIDCfgSrv::bHandleSignal(const tCIDLib::ESignals eSig)
 }
 
 
+// ---------------------------------------------------------------------------
+//  TFacCIDCfgSrv: Public, non-virtual methods
+// ---------------------------------------------------------------------------
 tCIDLib::EExitCodes TFacCIDCfgSrv::eMainThread(TThread& thrThis, tCIDLib::TVoid*)
 {
     // Let our caller go

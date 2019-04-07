@@ -5,16 +5,30 @@
 //
 // CREATED: 09/21/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
 //  This is the main public header for the facility. It is the single point
 //  of contact for the outside world. By including it, they get all that we
-//  have to offer. It also insures consistent order of inclusion which
-//  is needed for the precompiled headers stuff to work.
+//  have to offer.
+//
+//  This facility provides an objectified ODBC interface. So it provides wrappers
+//  for connections, statements, column, bindings and such.
+//
+//  You must call the initialization method on the facility object to enable
+//  database support first. And you should call the terminate method to be a
+//  good citizen before you exit, or at any point where you no longer need to
+//  do database operations.
+//
+//  This lets the per-platform support do any required work to enable database
+//  support. That info is available to any other per-platform code.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -44,7 +58,6 @@
 // ---------------------------------------------------------------------------
 //  Now subinclude our other headers, in the needed order.
 // ---------------------------------------------------------------------------
-#include    "CIDDBase_Constants.hpp"
 #include    "CIDDBase_Types.hpp"
 #include    "CIDDBase_ErrorIds.hpp"
 

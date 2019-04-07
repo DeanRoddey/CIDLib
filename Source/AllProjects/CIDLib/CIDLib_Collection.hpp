@@ -5,9 +5,13 @@
 //
 // CREATED: 12/24/1995
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -567,6 +571,12 @@ class CIDLIBEXP TCollectionBase : public TObject
             const   TString&                strTopicPath
         );
 
+        tCIDLib::TVoid HashChanged
+        (
+            const   tCIDLib::TCh* const     pszFile
+            , const tCIDLib::TCard4         c4Line
+        )   const;
+
         tCIDLib::TVoid KeyNotFound
         (
              const  tCIDLib::TCh* const     pszFile
@@ -780,7 +790,7 @@ class TCollection : public TCollectionBase, public MDuplicable
             const   TElem&                  objNew
         ) = 0;
 
-        virtual TColCursor<TElem>* pcursNew() const = 0;
+        [[nodiscard]] virtual TColCursor<TElem>* pcursNew() const = 0;
 
 
         // -------------------------------------------------------------------
@@ -1030,7 +1040,7 @@ template <class TElem> class TRefCollection : public TCollectionBase
                     TElem* const            pobjToRemove
         ) = 0;
 
-        virtual TColCursor<TElem>* pcursNew() const = 0;
+        [[nodiscard]] virtual TColCursor<TElem>* pcursNew() const = 0;
 
         virtual tCIDLib::TVoid RemoveElem
         (
@@ -1318,11 +1328,11 @@ operator!=(const TRefCollection<TElem>& col1, const TRefCollection<TElem>& col2)
 //
 namespace tCIDLib
 {
-    template <typename TElem, typename TCompFunc>
+    template <typename TElem, typename TCompFunc = tCIDLib::TDefEqComp<TElem>>
     tCIDLib::TBoolean
     bCompareElems(  const   TCollection<TElem>& col1
                     , const TCollection<TElem>& col2
-                    ,       TCompFunc           pfnComp)
+                    ,       TCompFunc           pfnComp = tCIDLib::TDefEqComp<TElem>())
     {
         if (&col1 == &col2)
             return kCIDLib::True;

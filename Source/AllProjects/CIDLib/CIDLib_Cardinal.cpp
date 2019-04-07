@@ -5,9 +5,13 @@
 //
 // CREATED: 04/15/1992
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -159,6 +163,29 @@ tCIDLib::TBoolean TCardinal::operator>=(const tCIDLib::TCard4 c4ToTest) const
     return (m_c4Val >= c4ToTest);
 }
 
+TCardinal& TCardinal::operator+=(const TCardinal& cSrc)
+{
+    m_c4Val += cSrc.m_c4Val;
+    return *this;
+}
+
+TCardinal& TCardinal::operator-=(const TCardinal& cSrc)
+{
+    m_c4Val -= cSrc.m_c4Val;
+    return *this;
+}
+
+TCardinal& TCardinal::operator+=(const tCIDLib::TCard4 c4Src)
+{
+    m_c4Val += c4Src;
+    return *this;
+}
+
+TCardinal& TCardinal::operator-=(const tCIDLib::TCard4 c4Src)
+{
+    m_c4Val -= c4Src;
+    return *this;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -310,6 +337,31 @@ tCIDLib::TBoolean TCardinal64::operator>=(const tCIDLib::TCard8& c8ToTest) const
 {
     return (m_c8Val >= c8ToTest);
 }
+
+TCardinal64& TCardinal64::operator+=(const TCardinal64& cSrc)
+{
+    m_c8Val += cSrc.m_c8Val;
+    return *this;
+}
+
+TCardinal64& TCardinal64::operator-=(const TCardinal64& cSrc)
+{
+    m_c8Val -= cSrc.m_c8Val;
+    return *this;
+}
+
+TCardinal64& TCardinal64::operator+=(const tCIDLib::TCard8 c8Src)
+{
+    m_c8Val += c8Src;
+    return *this;
+}
+
+TCardinal64& TCardinal64::operator-=(const tCIDLib::TCard8 c8Src)
+{
+    m_c8Val -= c8Src;
+    return *this;
+}
+
 
 
 // ---------------------------------------------------------------------------

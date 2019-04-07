@@ -5,9 +5,13 @@
 //
 // CREATED: 09/16/2002
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -124,25 +128,13 @@ class TCIDObjStoreImpl : public TObject
 
 
         // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static tCIDLib::TVoid RecoverStore
-        (
-            const   TString&                strSrcRepo
-            , const TString&                strTarFile
-            ,       TString&                strActionLog
-        );
-
-
-
-        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TCIDObjStoreImpl
         (
             const   TString&                strPath
             , const TString&                strStoreName
-            , const tCIDLib::TBoolean       bCaseSensitiveKeys
+            , const tCIDObjStore::EFlags    eFlags
         );
 
         ~TCIDObjStoreImpl();
@@ -325,6 +317,34 @@ class TCIDObjStoreImpl : public TObject
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bLoadItemData
+        (
+            const   TOSStoreItem&           osiToLoad
+            ,       TMemBuf&                mbufDataFill
+            ,       TMemBuf&                mbufKeyFill
+        );
+
+        tCIDLib::TBoolean bLoadItemData
+        (
+            const   TOSStoreItem&           osiToLoad
+            ,       TMemBuf&                mbufDataFill
+        );
+
+        tCIDLib::TBoolean bLoadItemData
+        (
+            const   TOSStoreItem&           osiToLoad
+            ,       TMemBuf&                mbufToFill
+            ,       TMemBuf&                mbufKeyFill
+            ,       TStoreItemHdr&          hdrToFill
+        );
+
+        tCIDLib::TBoolean bLoadItemData
+        (
+            const   TOSStoreItem&           osiToLoad
+            ,       TMemBuf&                mbufToFill
+            ,       TStoreItemHdr&          hdrToFill
+        );
+
         tCIDLib::TVoid BuildIndex();
 
         tCIDLib::TCard4 c4CreateSeqData
@@ -366,34 +386,6 @@ class TCIDObjStoreImpl : public TObject
             const   tCIDLib::TCard4         c4Needed
         );
 
-        tCIDLib::TVoid LoadItemData
-        (
-            const   TOSStoreItem&           osiToLoad
-            ,       TMemBuf&                mbufDataFill
-            ,       TMemBuf&                mbufKeyFill
-        );
-
-        tCIDLib::TVoid LoadItemData
-        (
-            const   TOSStoreItem&           osiToLoad
-            ,       TMemBuf&                mbufDataFill
-        );
-
-        tCIDLib::TVoid LoadItemData
-        (
-            const   TOSStoreItem&           osiToLoad
-            ,       TMemBuf&                mbufToFill
-            ,       TMemBuf&                mbufKeyFill
-            ,       TStoreItemHdr&          hdrToFill
-        );
-
-        tCIDLib::TVoid LoadItemData
-        (
-            const   TOSStoreItem&           osiToLoad
-            ,       TMemBuf&                mbufToFill
-            ,       TStoreItemHdr&          hdrToFill
-        );
-
         tCIDLib::TVoid Open();
 
 
@@ -404,6 +396,10 @@ class TCIDObjStoreImpl : public TObject
         //      When we are created the caller tells us whether we should treat keys as
         //      case sensitive or not. If case sensitive, you could have two keys that are
         //      the same except for case, which would normally not be desirable.
+        //
+        //  m_bRecoveryMode
+        //      Makes us try to ignore errors that we can reasonably ignore and load as
+        //      much data as possible.
         //
         //  m_c4IndexVersionNum
         //      This is bumped every time the index is modified, so that the
@@ -437,6 +433,7 @@ class TCIDObjStoreImpl : public TObject
         //      resources. It should be alphanumeric, no spaces.
         // -------------------------------------------------------------------
         tCIDLib::TBoolean       m_bCaseSensitiveKeys;
+        tCIDLib::TBoolean       m_bRecoveryMode;
         tCIDLib::TCard4         m_c4IndexVersionNum;
         TFreeList               m_colFreeList;
         TStoreList              m_colStoreList;

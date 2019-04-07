@@ -5,9 +5,13 @@
 //
 // CREATED: 02/08/1996
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -132,6 +136,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Nested aliases for the cursor and node types used by a queue.
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TQueue<TElem>;
         using TNode = TQueueNode<TElem>;
 
@@ -573,7 +578,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
             return objRet;
         }
 
-        TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const override
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return new TCursor(this);

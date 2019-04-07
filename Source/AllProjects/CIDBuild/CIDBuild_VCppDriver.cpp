@@ -5,9 +5,13 @@
 //
 // CREATED: 08/29/1998
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -302,20 +306,24 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     }
 
     // If a pure ANSI project, then disable extension
-    if (m_pprojiTarget->bPureANSI())
+    const TKeyValuePair* pkvpPlatOpt;
+    pkvpPlatOpt = m_pprojiTarget->pkvpFindPlatOpt(L"WIN32_*", L"PUREANSI");
+    if (pkvpPlatOpt && pkvpPlatOpt->strValue().bIEquals(L"Yes"))
         apszArgs[c4CurArg++] = L"/Za";
 
-    apszArgs[c4CurArg++] = L"/std:c++17";
-
-    // Disable permissive mode if asked
-    if (facCIDBuild.bNonPermissive())
+    //
+    //  Non-permissive mode is the default but they can ask us to enable permissive
+    //  mode via.
+    //
+    pkvpPlatOpt = m_pprojiTarget->pkvpFindPlatOpt(L"WIN32_*", L"PERMISSIVE");
+    if (!pkvpPlatOpt || !pkvpPlatOpt->strValue().bIEquals(L"Yes"))
     {
         apszArgs[c4CurArg++] = L"/permissive-";
-
-        // For now we have to keep two phase old style behavior
         apszArgs[c4CurArg++] = L"/Zc:twoPhase-";
     }
 
+    // For now always build in C++17 mode
+    apszArgs[c4CurArg++] = L"/std:c++17";
 
     //
     //  Set the version defines. This passes the release version info from the
@@ -677,12 +685,6 @@ tCIDLib::TVoid TVCppDriver::Link(const tCIDLib::TBoolean bHaveResFile)
     if (m_bDebug)
         apszArgs[c4CurArg++] = L"/DEBUG";
 
-    //
-    //  If we are to do incremental linking, then turn it on. But only do
-    //  so if this is a debug build.
-    //
-    if (!m_pprojiTarget->bIncrementalLink() && m_bDebug)
-        apszArgs[c4CurArg++] = L"/incremental:no";
 
     //
     //  See if this one needs the underlying standard system libraries. If

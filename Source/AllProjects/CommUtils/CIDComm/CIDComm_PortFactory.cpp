@@ -5,9 +5,13 @@
 //
 // CREATED: 09/12/2005
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -40,14 +44,6 @@ RTTIDecls(TComPortFactory,TObject)
 //  CLASS: TComPortFactory
 // PREFIX: cfact
 // ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TComPortFactory: Destructor
-// ---------------------------------------------------------------------------
-TComPortFactory::~TComPortFactory()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TComPortFactory: Public, non-virtual methods

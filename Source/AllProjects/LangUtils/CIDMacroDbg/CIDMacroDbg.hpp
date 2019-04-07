@@ -5,15 +5,22 @@
 //
 // CREATED: 02/14/2003
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
-//  This is the main public header for the facility. It is the single point
-//  of contact for the outside world. By including it, they get what we
-//  have to offer.
+//  This is the main public header for the CML embeddable IDE facility. It is
+//  the single point of contact for the outside world. By including it, they
+//  get what we have to offer.
+//
+//  The functionality here would not be very typically used. It's for programs
+//  that want to let users edit and debug CML code.
 //
 // CAVEATS/GOTCHAS:
 //

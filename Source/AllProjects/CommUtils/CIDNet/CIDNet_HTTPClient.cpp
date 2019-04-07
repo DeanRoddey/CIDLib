@@ -5,9 +5,13 @@
 //
 // CREATED: 01/29/2000
 //
-// COPYRIGHT: $_CIDLib_CopyRight_$
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  $_CIDLib_CopyRight2_$
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -1637,9 +1641,16 @@ c4SendGetRedir(         TCIDDataSrcJan&         janSrc
                     }
                      else if (urlToGet.eProto() == tCIDSock::EProtos::HTTPS)
                     {
+                        tCIDLib::TStrList colALPN;
                         pcdsNew = new TCIDSChanClDataSrc
                         (
-                            psockLocal, tCIDLib::EAdoptOpts::Adopt, urlToGet.strHost()
+                            L"HTTPClient"
+                            , psockLocal
+                            , tCIDLib::EAdoptOpts::Adopt
+                            , TString::strEmpty()
+                            , colALPN
+                            , tCIDSChan::EConnOpts::None
+                            , urlToGet.strHost()
                         );
                     }
                      else
@@ -2325,9 +2336,16 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
                 }
                  else if (urlToGet.eProto() == tCIDSock::EProtos::HTTPS)
                 {
+                    tCIDLib::TStrList colALPN;
                     pcdsLocal = new TCIDSChanClDataSrc
                     (
-                        psockLocal, tCIDLib::EAdoptOpts::Adopt, urlToGet.strHost()
+                        L"HTTP Client"
+                        , psockLocal
+                        , tCIDLib::EAdoptOpts::Adopt
+                        , TString::strEmpty()
+                        , colALPN
+                        , tCIDSChan::EConnOpts::None
+                        , urlToGet.strHost()
                     );
                 }
                  else
@@ -2360,15 +2378,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         );
 
         if (pcdsLocal)
-        {
-            //
-            //  We are going to kill this socket immediately after we send, since it
-            //  is a temporary one, so put a little linger on it. Ten seconds should
-            //  be more than enough.
-            //
-            psockLocal->bLinger(kCIDLib::True, 10);
             pcdsToUse = pcdsLocal;
-        }
 
         //
         //  Break out the URL parts in their encoded forms that we need to
