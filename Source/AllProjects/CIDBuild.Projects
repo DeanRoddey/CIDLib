@@ -257,9 +257,14 @@ PROJECT=CIDImage
         DIRECTORY   = GraphicUtils\CIDImage
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PLATFORMDIR = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
+
+    INCLUDEPLATS
+        Win32
+    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib

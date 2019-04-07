@@ -45,6 +45,7 @@
 //  to get it expanded before we pass it to the 2 version.
 // ---------------------------------------------------------------------------
 #define CIDLib_ConcatMacro(f,s) f##s
+#define CIDLib_Stringize(s) #s
 #define CIDLib_MakeLStr(s)  CIDLib_ConcatMacro(L,s)
 #define CIDLib_MakeLStr2(sp)  CIDLib_ConcatMacro(L,#sp)
 #define CIDLib_MakeLStr3(sp)  CIDLib_MakeLStr2(sp)
@@ -173,3 +174,9 @@ public : \
 #define CID_LINE __LINE__
 
 
+// ---------------------------------------------------------------------------
+//  For putting message pragma reminders into code
+// ---------------------------------------------------------------------------
+#define MakeLINEStr(M, L) M(L)
+#define $LineStr MakeLINEStr(CIDLib_Stringize, __LINE__)
+#define CodeReminder __FILE__ "(" $LineStr ") : "
