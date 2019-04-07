@@ -44,6 +44,7 @@
 //  Include any needed internal headers
 // ---------------------------------------------------------------------------
 #include    "CIDImage_MessageIds.hpp"
+#include    "CIDImage_PixelArrayImpl_.hpp"
 
 
 // ---------------------------------------------------------------------------
