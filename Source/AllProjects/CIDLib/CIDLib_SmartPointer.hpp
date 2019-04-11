@@ -381,11 +381,13 @@ template <class T> class TMngPtr
 
         const T& operator*() const
         {
+            CheckNullRef(CID_LINE);
             return *m_pData;
         }
 
         T& operator*()
         {
+            CheckNullRef(CID_LINE);
             return *m_pData;
         }
 
@@ -400,6 +402,28 @@ template <class T> class TMngPtr
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        T& objData()
+        {
+            CheckNullRef(CID_LINE);
+            return *m_pData;
+        }
+
+        const T& objData() const
+        {
+            CheckNullRef(CID_LINE);
+            return *m_pData;
+        }
+
+        T* pobjData()
+        {
+            return m_pData;
+        }
+
+        const T* pobjData() const
+        {
+            return m_pData;
+        }
+
         tCIDLib::TVoid SetPointer(T* const pToSet)
         {
             m_pData = pToSet;
@@ -407,6 +431,16 @@ template <class T> class TMngPtr
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtula methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid CheckNullRef(const tCIDLib::TCard4 c4Line) const
+        {
+            if (m_pData == nullptr)
+                TSmartPtrHelpers::ThrowNullRef(c4Line);
+        }
+
+
         // -------------------------------------------------------------------
         //  Private data members
         //

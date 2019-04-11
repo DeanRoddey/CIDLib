@@ -352,6 +352,14 @@ static tCIDLib::TVoid DummyFunc()
     {
     }
 
+    // And managed pointers
+    TString strMPtrTest(L"Managed string");
+    TMngPtr<TString> mptr1(&strMPtrTest);
+    TMngPtr<TString> mptr2(mptr1);
+    if ((*mptr1 != *mptr2) || (*mptr1.pobjData() != *mptr2.pobjData()))
+    {
+    }
+
 
     // The typed memory buffer class
     TTypedMBuf<tCIDLib::TMsgIndexEntry> mbufTyped;
