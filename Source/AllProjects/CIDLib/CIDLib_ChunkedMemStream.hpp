@@ -195,7 +195,7 @@ class CIDLIBEXP TChunkedBinOutStream : public TBinOutStream
         //
         //  m_pstrmiMem
         //      We store a copy of our impl object, in addition to giving it
-        //      to our praent class to own. This prevents lots of casting.
+        //      to our parent class to own. This prevents lots of casting.
         // -------------------------------------------------------------------
         TChunkedOutStreamImpl*  m_pstrmiOut;
 
@@ -223,7 +223,7 @@ class CIDLIBEXP TChunkedTextInStream : public TTextInStream
         TChunkedTextInStream
         (
             const   TChunkedTextOutStream&  strmToSyncWith
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TChunkedTextInStream(const TChunkedTextInStream&) = delete;
@@ -279,7 +279,7 @@ class CIDLIBEXP TChunkedTextOutStream : public TTextOutStream
         TChunkedTextOutStream
         (
             const   tCIDLib::TCard4         c4MaxSize
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TChunkedTextOutStream(const TChunkedTextOutStream&) = delete;
@@ -290,7 +290,7 @@ class CIDLIBEXP TChunkedTextOutStream : public TTextOutStream
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TChunkedTextOutStream& operator=(const TChunkedTextOutStream&);
+        TChunkedTextOutStream& operator=(const TChunkedTextOutStream&) = delete;
 
 
         // -------------------------------------------------------------------

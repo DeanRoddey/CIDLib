@@ -1132,13 +1132,13 @@ template <class TElem> class TBasicColRefNode : public TDLstNode
         // -------------------------------------------------------------------
         tCIDLib::TVoid OrphanData()
         {
-            m_pobjData = 0;
+            m_pobjData = nullptr;
         }
 
         TElem* pobjOrphanData()
         {
             TElem* pobjRet = m_pobjData;
-            m_pobjData = 0;
+            m_pobjData = nullptr;
             return pobjRet;
         }
 

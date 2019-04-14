@@ -120,8 +120,8 @@ namespace tCIDColAlgo
 
     //
     //  Find the first element greater or less than the passed object to compare. The
-    //  default magnitude comparison functor is used if not indicated explicitly. It
-    //  requires that the element type provide < and > operators.
+    //  default magnitude comparison functor is used if not indicated explicitly (in
+    //  which case the element type must provide < and > operators.)
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>

@@ -138,7 +138,6 @@ static tCIDLib::TVoid BasicProcEnvTest(TTextOutStream& strmOut)
 static tCIDLib::TVoid ProcEnvTest2(TTextOutStream& strmOut)
 {
     const tCIDLib::TCh* const pszDummyKey = L"ADummyKey1";
-
     const tCIDLib::TCh* const pszDummyVal = L"A Dummy Value for Dummy Key 1";
 
     TString strValue;
@@ -200,6 +199,12 @@ static tCIDLib::TVoid ProcEnvTest2(TTextOutStream& strmOut)
     {
         strmOut << CUR_LN << L"AddOrUpdate did not update value" << kCIDLib::EndLn;
     }
+
+    // Upper case the key and it should still be there
+    TString strUpKey(pszDummyKey);
+    strUpKey.ToUpper();
+    if (!TProcEnvironment::bFind(strUpKey, strValue))
+        strmOut << CUR_LN << L"Did not find a key in all upper case" << kCIDLib::EndLn;
 }
 
 static tCIDLib::TVoid BasicEnvTest(TTextOutStream& strmOut)
@@ -217,18 +222,15 @@ static tCIDLib::TVoid BasicEnvTest(TTextOutStream& strmOut)
     {
         L"Greatest blues rock guitarist"
         , L"A white chick what can sang"
-        , L"Prentitious but interesting singer for Doors"
+        , L"Prentitious but powerful singer for Doors"
         , L"One of the Mamas and Papas"
-        , L"The soul of the beatles"
+        , L"The soul of the Beatles"
     };
 
     const tCIDLib::TCard4 c4Count = tCIDLib::c4ArrayElems(apszKeys);
 
 
-    //
-    //  Create an empty environment first and just do some basic testing
-    //  on it.
-    //
+    // Create an empty environment and just do some basic testing on it.
     TEnvironment envTest;
 
     //

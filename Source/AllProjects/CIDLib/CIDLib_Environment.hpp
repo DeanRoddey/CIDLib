@@ -35,9 +35,8 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  In order to maintain consistency across platforms, all keys are
-//      uppercased before being added to an environment. When searching, a
-//      temp upper case key is created to search with.
+//  1)  The hash set that we use to hold the values is set up with a non-case sensitve
+//      key ops object, so case of the keys doesn't matter.
 //
 // LOG:
 //
@@ -143,7 +142,7 @@ class CIDLIBEXP TProcEnvLocker : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TProcEnvLocker& operator=(const TProcEnvLocker&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
     private :
@@ -181,6 +180,11 @@ class CIDLIBEXP TEnvironment : public TObject, public MDuplicable
             const   TEnvironment&           envSrc
         );
 
+        TEnvironment
+        (
+                   TEnvironment&&           envSrc
+        );
+
         ~TEnvironment();
 
 
@@ -190,6 +194,11 @@ class CIDLIBEXP TEnvironment : public TObject, public MDuplicable
         TEnvironment& operator=
         (
             const   TEnvironment&           envSrc
+        );
+
+        TEnvironment& operator=
+        (
+                    TEnvironment&&          envSrc
         );
 
 
@@ -253,8 +262,9 @@ class CIDLIBEXP TEnvironment : public TObject, public MDuplicable
         //  Private data members
         //
         //  m_pcolEnv
-        //      This is a hash map that is used to hold the environment
-        //      variable data.
+        //      This is a hash map that is used to hold the environment variable data.
+        //      We set the key ops object on it in case insensitive mode, so case of the
+        //      keys doesn't matter.
         // -------------------------------------------------------------------
         TList*  m_pcolEnv;
 
