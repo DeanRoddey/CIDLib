@@ -1571,20 +1571,18 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         {
         }
 
-        TBasicTreeCol(const TBasicTreeCol<TElem>& colToCopy) :
+        TBasicTreeCol(const TBasicTreeCol<TElem>& colSrc) :
 
-            TCollection<TElem>(colToCopy)
-            , m_bCasePath(colToCopy.m_bCasePath)
-            , m_bSorted(colToCopy.m_bSorted)
-            , m_c4TCount(colToCopy.m_c4TCount)
-            , m_c4NTCount(colToCopy.m_c4NTCount)
+            TCollection<TElem>(colSrc)
+            , m_bCasePath(colSrc.m_bCasePath)
+            , m_bSorted(colSrc.m_bSorted)
+            , m_c4TCount(colSrc.m_c4TCount)
+            , m_c4NTCount(colSrc.m_c4NTCount)
             , m_pnodeRoot(new TNodeNT(L"Root", L"$Root$", nullptr))
         {
             // Do a recursive replication of the tree
-            ReplicateNodes(colToCopy.m_pnodeRoot, m_pnodeRoot);
+            ReplicateNodes(colSrc.m_pnodeRoot, m_pnodeRoot);
         }
-
-        TBasicTreeCol(TBasicTreeCol<TElem>&&) = delete;
 
         ~TBasicTreeCol()
         {
@@ -1606,29 +1604,27 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TBasicTreeCol<TElem>& operator=(const TBasicTreeCol<TElem>& colToAssign)
+        TBasicTreeCol<TElem>& operator=(const TBasicTreeCol<TElem>& colSrc)
         {
-            if (this != &colToAssign)
+            if (this != &colSrc)
             {
                 TMtxLocker lockThis(this->pmtxLock());
-                TMtxLocker lockSource(colToAssign.pmtxLock());
-                TParent::operator=(colToAssign);
+                TMtxLocker lockSource(colSrc.pmtxLock());
+                TParent::operator=(colSrc);
 
                 // Flush our current root node
                 m_pnodeRoot->RemoveAll();
 
-                m_bCasePath  = colToAssign.m_bCasePath;
-                m_bSorted    = colToAssign.m_bSorted;
-                m_c4NTCount  = colToAssign.m_c4NTCount;
-                m_c4TCount   = colToAssign.m_c4TCount;
+                m_bCasePath  = colSrc.m_bCasePath;
+                m_bSorted    = colSrc.m_bSorted;
+                m_c4NTCount  = colSrc.m_c4NTCount;
+                m_c4TCount   = colSrc.m_c4TCount;
 
                 // Do this AFTER setting sorted/case flags
-                ReplicateNodes(colToAssign.m_pnodeRoot, m_pnodeRoot);
+                ReplicateNodes(colSrc.m_pnodeRoot, m_pnodeRoot);
             }
             return *this;
         }
-
-        TBasicTreeCol<TElem>& operator=(TBasicTreeCol<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -88,8 +88,6 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
             );
         }
 
-        TFundDeque(TFundDeque<T>&&) = delete;
-
         ~TFundDeque()
         {
             delete [] m_ptElements;
@@ -120,8 +118,6 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
             }
             return *this;
         }
-
-        TFundDeque<T>& operator=(TFundDeque<T>&&) = delete;
 
         tCIDLib::TBoolean operator==(const TFundDeque<T>& fcolSrc)
         {

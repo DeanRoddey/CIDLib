@@ -94,13 +94,6 @@ template <class T> class TCntPtr
             }
         }
 
-        TCntPtr(TCntPtr<T>&& cptrSrc) :
-
-            m_pcdRef(nullptr)
-        {
-            m_pcdRef = TRawMem::pExchangePtr(&cptrSrc.m_pcdRef, m_pcdRef);
-        }
-
         ~TCntPtr()
         {
            if (m_pcdRef)
@@ -182,16 +175,6 @@ template <class T> class TCntPtr
                 //
                 m_pcdRef = cptrSrc.m_pcdRef;
                 ReleaseRef(kCIDLib::False, pcdSave);
-            }
-            return *this;
-        }
-
-        TCntPtr<T>& operator=(TCntPtr<T>&& cptrSrc)
-        {
-            if (&cptrSrc != this)
-            {
-                // We have to do this this thread safe-like
-                m_pcdRef = TRawMem::pExchangePtr(&cptrSrc.m_pcdRef, m_pcdRef);
             }
             return *this;
         }

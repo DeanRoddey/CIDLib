@@ -115,7 +115,6 @@ template<typename TElem> class TSimplePool : public TObject
         //  Constructors and destructor
         // -------------------------------------------------------------------
         TSimplePool(const TSimplePool&) = delete;
-
         TSimplePool(TSimplePool&&) = delete;
 
         ~TSimplePool()

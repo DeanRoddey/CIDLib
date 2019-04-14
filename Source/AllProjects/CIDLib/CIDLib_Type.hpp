@@ -321,8 +321,6 @@ template
                 m_aetArray[c4Index] = eaSrc.m_aetArray[c4Index];
         }
 
-        TEArray(TEArray&&) = delete;
-
         ~TEArray()
         {
         }

@@ -114,16 +114,18 @@ TTest_ByName::eRunTest( TTextStringOutStream&   strmOut
     }
 
     // Test a known bad name and make sure that throw and returns a null as requested
+    TTextConverter* pcvtRet;
     try
     {
-        facCIDEncode().ptcvtMakeNew(L"BogusEncoding", kCIDLib::True);
+        pcvtRet = facCIDEncode().ptcvtMakeNew(L"BogusEncoding", kCIDLib::True);
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Request to create bad encoding name did not throw"
                 << kCIDLib::DNewLn;
     }
     catch(...) { }
 
-    if (facCIDEncode().ptcvtMakeNew(L"BogusEncoding2") != nullptr)
+    pcvtRet = facCIDEncode().ptcvtMakeNew(L"BogusEncoding2");
+    if (pcvtRet != nullptr)
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Request to create bad encoding name did not return nullptr"

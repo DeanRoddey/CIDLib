@@ -84,7 +84,7 @@ TTest_FundVectorLambda::eRunTest(TTextStringOutStream&  strmOut
         {
             if (c4Cur != c4TestVal)
             {
-                strmOut << L"ForEach callback value mismatch\n\n";
+                strmOut << TFWCurLn << L"ForEach callback value mismatch\n\n";
                 eRes = tTestFWLib::ETestRes::Failed;
                 return kCIDLib::False;
             }
@@ -98,7 +98,7 @@ TTest_FundVectorLambda::eRunTest(TTextStringOutStream&  strmOut
     tCIDLib::TCard4 c4ToFind = 4;
     if (fcolTest.tFind([c4ToFind](const tCIDLib::TCard4 c4Cur) { return c4ToFind == c4Cur; }) != 4)
     {
-        strmOut << L"Could not find search value\n\n";
+        strmOut << TFWCurLn << L"Could not find search value\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 

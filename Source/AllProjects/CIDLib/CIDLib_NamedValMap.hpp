@@ -271,22 +271,18 @@ template <class TVal> class TNamedValMap : public TObject
         {
         }
 
-        TNamedValMap(TMyType&&) = delete;
-
         ~TNamedValMap() {}
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType& nvmToAssign)
+        TMyType& operator=(const TMyType& nvmSrc)
         {
-            if (this != &nvmToAssign)
-                m_colItems = nvmToAssign.m_colItems;
+            if (this != &nvmSrc)
+                m_colItems = nvmSrc.m_colItems;
             return *this;
         }
-
-        TMyType& operator=(TMyType&&) = delete;
 
         tCIDLib::TBoolean operator==(const TNamedValMap<TVal>& nvmSrc) const
         {

@@ -426,7 +426,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TBasicDLinkedCol(TBasicDLinkedCol<TElem>&& colSrc) :
 
-            TBasicDLinkedCol()
+            TBasicDLinkedCol(colSrc.eMTState())
         {
             *this = tCIDLib::ForceMove(colSrc);
         }

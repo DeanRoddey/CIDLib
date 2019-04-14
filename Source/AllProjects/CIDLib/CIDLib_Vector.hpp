@@ -512,12 +512,8 @@ class TVector : public TCollection<TElem>
         // Do the lightest setup possible then force an assign
         TVector(TMyType&& colSrc) :
 
-            TCollection<TElem>()
-            , m_apElems(new TElem*[1])
-            , m_c4CurAlloc(1)
-            , m_c4CurCount(0)
+            TVector(1, colSrc.eMTState())
         {
-            m_apElems[0] = nullptr;
             *this = tCIDLib::ForceMove(colSrc);
         }
 

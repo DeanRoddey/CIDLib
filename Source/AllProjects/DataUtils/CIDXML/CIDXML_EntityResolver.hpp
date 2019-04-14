@@ -41,11 +41,19 @@ class CIDXMLEXP MXMLEntityResolver
 {
     public  :
         // -------------------------------------------------------------------
-        //  Destructor
+        //  Constructors and destructor
         // -------------------------------------------------------------------
+        MXMLEntityResolver(const MXMLEntityResolver&) = delete;
+
         virtual ~MXMLEntityResolver()
         {
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        MXMLEntityResolver& operator=(const MXMLEntityResolver&) = delete;
 
 
     protected :
@@ -59,9 +67,7 @@ class CIDXMLEXP MXMLEntityResolver
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        MXMLEntityResolver()
-        {
-        }
+        MXMLEntityResolver() {}
 
 
         // -------------------------------------------------------------------
@@ -77,14 +83,6 @@ class CIDXMLEXP MXMLEntityResolver
         ) = 0;
 
         virtual tCIDLib::TVoid ResetResolver() = 0;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        MXMLEntityResolver(const MXMLEntityResolver&);
-        tCIDLib::TVoid operator=(const MXMLEntityResolver&);
 };
 
 #pragma CIDLIB_POPPACK

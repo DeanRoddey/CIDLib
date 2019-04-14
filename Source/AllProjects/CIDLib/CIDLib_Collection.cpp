@@ -403,19 +403,11 @@ TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
 }
 
 
-//
-//  Basically dummy move. We don't swap any stuff at our level
-TCollectionBase::TCollectionBase(TCollectionBase&& colSrc) :
-
-    m_bInBlockMode(kCIDLib::False)
-    , m_c4SerialNum(1)
-    , m_pmtxLock(nullptr)
-    , m_ppstopReport(nullptr)
-{
-}
-
+// The caller should have locked. We bump both guy's serial numbers
 TCollectionBase& TCollectionBase::operator=(TCollectionBase&& colSrc)
 {
+    m_c4SerialNum++;
+    colSrc.m_c4SerialNum++;
     return *this;
 }
 

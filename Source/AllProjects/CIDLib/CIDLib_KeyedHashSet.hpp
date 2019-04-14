@@ -735,19 +735,17 @@ class TKeyedHashSet : public TCollection<TElem>
             }
         }
 
-        // No def ctor, so do minimial setup them swap
+        // No def ctor, so do minimial setup then swap
         TKeyedHashSet(const TMyType&& colSrc) :
 
-            TCollection<TElem>(tCIDLib::EMTStates::Unsafe)
-            , m_apBuckets(nullptr)
-            , m_c4CurElements(0)
-            , m_c4HashModulus(1)
-            , m_pfnKeyExtract(colSrc.m_pfnKeyExtract)
-            , m_pkopsToUse(::pDupObject<TKeyOps>(*colSrc.m_pkopsToUse))
+            TKeyedHashSet
+            (
+                1
+                , ::pDupObject<TKeyOps>(*colSrc.m_pkopsToUse)
+                , colSrc.m_pfnKeyExtract
+                , colSrc.eMTState()
+            )
         {
-            m_apBuckets = new TNode*[m_c4HashModulus];
-            m_apBuckets[0] = nullptr;
-
             *this = tCIDLib::ForceMove(colSrc);
         }
 
@@ -808,7 +806,19 @@ class TKeyedHashSet : public TCollection<TElem>
             return *this;
         }
 
-        TMyType& operator=(TMyType&&) = delete;
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                TCollection<TElem>::operator=(tCIDLib::ForceMove(colSrc));
+                tCIDLib::Swap(colSrc.m_apBuckets, m_apBuckets);
+                tCIDLib::Swap(colSrc.m_c4CurElements, m_c4CurElements);
+                tCIDLib::Swap(colSrc.m_c4HashModulus, m_c4HashModulus);
+                tCIDLib::Swap(colSrc.m_pfnKeyExtract, m_pfnKeyExtract);
+                tCIDLib::Swap(colSrc.m_pkopsToUse, m_pkopsToUse);
+            }
+            return *this;
+        }
 
         const TElem& operator[](const TKey& objKeyToFind) const
         {

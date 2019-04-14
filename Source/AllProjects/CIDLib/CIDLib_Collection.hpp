@@ -126,20 +126,21 @@
 //
 //  You have to be very careful with move/assign. This ONLY deals with element
 //  content, it doesn't change thread safety, adoption status for by ref vectors,
-//  publish topic, etc... So we provide empty move/assign stuff at our level so
-//  that derived classes can call them or have defaults.
+//  publish topic, etc... We only provide a move assignment operator. We want derived
+//  classes, in their move ctors, to do minimal setup, then do a move assign, which
+//  allows for locking on the source.
 //
 //  It does change anything required to represent the elements in the same order
 //  (they should be considered equal by the criteria below.) So, for instance, a
 //  hash collection would adopt the source hash modulus so that it will have the
 //  same element ordering after the operation.
 //
+//  The serial number of both source and target are bumped an move op, and the src's
+//  for a move ctor.
+//
 //  As with all changes, the derived class has to deal with pub/sub if enabled.
 //  For assign, remove current elements, post a clear. Take on the new elements,
 //  and post a block mode add.
-//
-//  *   For now we are still re-adding move support back after a huge re-working
-//      of how collections work.
 //
 //  Equality
 //
@@ -456,10 +457,7 @@ class CIDLIBEXP TCollectionBase : public TObject
             const   TCollectionBase&        colSrc
         );
 
-        TCollectionBase
-        (
-                    TCollectionBase&&       colSrc
-        );
+        TCollectionBase(TCollectionBase&&) = delete;
 
         TCollectionBase& operator=
         (
@@ -694,9 +692,9 @@ class CIDLIBEXP TCollectionBase : public TObject
         //      add/remove reports if pub/sub is enabled.
         //
         //  m_c4SerialNum
-        //      This is a serial number from the collection. It is bumped up every
-        //      time a node is added or removed. Cursors watch it to know if they are
-        //      out of date.
+        //      This is a serial number from the collection. It is bumped up every time
+        //      changes are made to the element content. Cursors watch it to know if they
+        //      are out of date.
         //
         //      We start the serial number at 1! This makes it easier for code that
         //      needs to watch for changes. They can set their last serial number to
@@ -839,11 +837,7 @@ class TCollection : public TCollectionBase, public MDuplicable
         {
         }
 
-        TCollection(TCollection<TElem>&& colSrc) :
-
-            TCollectionBase(tCIDLib::ForceMove(colSrc))
-        {
-        }
+        TCollection(TCollection<TElem>&&) = delete;
 
         TCollection<TElem>& operator=(const TCollection<TElem>& colSrc)
         {
@@ -1077,11 +1071,7 @@ template <class TElem> class TRefCollection : public TCollectionBase
         {
         }
 
-        TRefCollection(TRefCollection&&  colSrc) :
-
-            TCollectionBase(tCIDLib::ForceMove(colSrc))
-        {
-        }
+        TRefCollection(TRefCollection&&) = delete;
 
         TRefCollection<TElem>& operator=(TRefCollection&& colSrc)
         {

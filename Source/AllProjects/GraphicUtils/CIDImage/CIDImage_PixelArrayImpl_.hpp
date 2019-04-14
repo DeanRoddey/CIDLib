@@ -71,8 +71,6 @@ class TPixelArrayImpl : public TObject, public MStreamable
             const   TPixelArrayImpl&        pixaiSrc
         );
 
-        TPixelArrayImpl(TPixelArrayImpl&&) = delete;
-
         ~TPixelArrayImpl();
 
 

@@ -55,7 +55,7 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
 
         TStack(TStack&& colSrc) :
 
-            TStack()
+            TStack(colSrc.eMTState())
         {
             *this = tCIDLib::ForceMove(colSrc);
         }

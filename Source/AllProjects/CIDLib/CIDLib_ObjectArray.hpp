@@ -103,7 +103,13 @@ class TObjArray : public TObject, public MDuplicable
                 m_pmtxLock = new TMutex;
         }
 
-        TObjArray(TMyType&& objaSrc) = delete;
+        // Set up a with 1 element, if the srce is thread safe we should be
+        TObjArray(TMyType&& objaSrc) :
+
+            TObjArray(1, objaSrc.eMTState())
+        {
+            *this = operator=(tCIDLib::ForceMove(objaSrc));
+        }
 
         ~TObjArray()
         {
@@ -198,7 +204,22 @@ class TObjArray : public TObject, public MDuplicable
             return *this;
         }
 
-        TMyType& operator=(TMyType&&) = delete;
+        // As always only swap content, not the lock. Both serial numbers are bumped
+        TMyType& operator=(TMyType&& objaSrc)
+        {
+            if (this != &objaSrc)
+            {
+                TMtxLocker lockUs(m_pmtxLock);
+                TMtxLocker lockSource(objaSrc.m_pmtxLock);
+
+                tCIDLib::Swap(objaSrc.m_c4ElemCount, m_c4ElemCount);
+                tCIDLib::Swap(objaSrc.m_paobjList, m_paobjList);
+
+                m_c4SerialNum++;
+                objaSrc.m_c4SerialNum++;
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------

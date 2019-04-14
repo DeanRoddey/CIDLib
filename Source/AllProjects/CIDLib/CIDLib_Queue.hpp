@@ -489,7 +489,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
         {
         }
 
-        TQueue(const TQueue<TElem>& colSrc) :
+        TQueue(const TMyType& colSrc) :
 
             TCollection<TElem>(colSrc)
         {
@@ -505,15 +505,13 @@ template <class TElem> class TQueue : public TCollection<TElem>
             }
         }
 
-        TQueue( TQueue<TElem>&&) = delete;
-
         ~TQueue() {}
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TQueue<TElem>& operator=(const TQueue<TElem>& colSrc)
+        TMyType& operator=(const TMyType& colSrc)
         {
             // Check for assignment to self
             if (this == &colSrc)
@@ -553,7 +551,6 @@ template <class TElem> class TQueue : public TCollection<TElem>
             return *this;
         }
 
-        TQueue& operator=( TQueue&&) = delete;
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
