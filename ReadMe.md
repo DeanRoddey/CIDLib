@@ -21,7 +21,9 @@ CIDLib contains about 1100 classes (~450,000 lines of code.) Here is a rough lis
 
 **Documentation**
 
-For now, the code is just there to explore. I needed to get it uploaded and start working against the remote repository, and figured it made sense to let people go ahead and start looking through it while I get the initial documentation done. The initial goal is to get the build process documented of course, plus high level documentation of the roadmap sort to get people aware of what's available and where it is and how it fits together and so forth. After that, detailed documentation can be dived into.
+For now, the code is just there to explore. I needed to get it uploaded and start working against the remote repository, and figured it made sense to let people go ahead and start looking through it while I get the initial documentation done. The build instructions are in the above Wiki pages, see Building below.
+
+The next goal some high level documentation of the roadmap sort to get people aware of what's available and where it is and how it fits together and so forth. After that, detailed documentation can be dived into.
 
 In the meantime, I had already begin to make some videos about some of the technologies I've created as part of this project. Those are on my personal Youtube channel here:
 
@@ -38,14 +40,15 @@ I've set up a sub-Reddit for discussion and questions, which is here:
 https://www.reddit.com/r/CIDLib/
 
 
-**Acknowledgements**
+**Building**
 
-Though CIDLib very much tries to avoid use of any third party code beyond the OS, it does use the following:
+As mentioned above, the build instructions are in the Wiki pages of this repository. The rest of the documentation (as it gets created) will be in the actual repository. But you'd need to build CIDLib first before you can then generate the documentation. So the build instructions need to be separate.
 
-- Scintilla - A version of the Scintilla engine is wrapped and used as the CML language source editor. Your own CIDLib based applications wouldn't need it unless they used the embedded CML IDE.
-- Standard JPEG Libaries - Some of the guts of the standard JPEG libraries are wrapped to provide the JPEG file format support.
+CIDLib isn't hard to build because it has its own build system. There are no crazily complex make files or anything. Currently there's one simple make file to build the build tool itself. After that it's all done via the CIDBuild utility.
 
-Otherwise it is just OS APIs and optional OS SDKs (speech recognition, Windows Media Format, etc...)
+It currently is setup for Visual C++ 2017. Once 2019 is more stable, we can move it forward to that. For now, 2017 is a better choice. And you can install them side by side easily enough if you need to use 2019 for some other work. CIDLib's setup will not interfere with anything else.
+
+Let me know if you have any questions or issues with the build instructions.
 
 
 **The CQC Automation Platform**
@@ -59,27 +62,37 @@ There are lots of CQC tutorial videos on the Charmed Quark Youtube channel:
 https://www.youtube.com/user/CharmedQuarkSystems
 
 
+**Acknowledgements**
+
+Though CIDLib very much tries to avoid use of any third party code beyond the OS, it does use the following:
+
+- Scintilla - A version of the Scintilla engine is wrapped and used as the CML language source editor. Your own CIDLib based applications wouldn't need it unless they used the embedded CML IDE.
+- Standard JPEG Libaries - Some of the guts of the standard JPEG libraries are wrapped to provide the JPEG file format support.
+
+Otherwise it is just OS APIs and optional OS SDKs (speech recognition, Windows Media Format, etc...)
+
+
 **Portability**
 
 Though CIDLib is currently only fielded on Windows, keeping it portable has always been a goal. I have done plenty of cross platform development in the past and understand the issues fairly well. As mentioned above, CIDLib is based on a 'virtual kernel' that abstracts it from the OS. That virtual kernel is in turn split into interface plus per-platform implementations. The build tools understand this situation so that helps a lot as well.
 
 There is a Win32 implementation currently. But there is still an old Linux implementation from a few decades ago that's still down there. It would need to be brought up to speed, but it should not be difficult to get almost all of the back-end stuff buildable onto Win32 and Linux (32 bit.) And that's not in the 'conditional code all over the place' sort of way, but cleanly supporting both platforms, since 95% of the non-UI code is platform independent and written in terms of our own classes.
 
-There are still a handful of libraries that need to be given the 'split' treatment, i.e. break out the platform specific stuff from the platform independent parts. I will be giving those attention soon. Until then they are marked for build only on Win32.
+There are still a handful of libraries that need to be given the 'split' treatment, i.e. break out the platform specific stuff from the platform independent parts. A number have already been taken care of since the code was open sourced, and the rest will follow soon.
 
 The UI code is another story, but just getting the back end functionality cleanly supported on both platforms would be a very powerful thing. Not that the UI code is not similarly encapsulated, but there's a lot more to UI portability than that.
 
 
 **Background**
 
-CIDLib and the CQC automation system that is built on it is the product of decades of work by the author, representing almost 50 man-years of work taken together. The very earliest roots go back to around 1992 on OS/2, and the first C++ compiler I had access to. I started writing a string class and it was all downhill from there.
+CIDLib and the CQC automation system that is built on it is the product of decades of work by the author, representing almost 50 man-years of work taken together. The very earliest roots go back to around 1992 on OS/2, and the first C++ compiler I had access to. I started writing a string class and it was all downhill from there. The two projects combined are currently around 1,100,000 lines of code.
 
-Some people seeing this will immediately start ranting about 'not invented here syndrome', but it's nothing of the sort. My personal interests are in general purpose framework development, so the whole point of it was to do this. It's what I enjoy.
+Some people seeing this will immediately start ranting about 'not invented here syndrome', but it's nothing of the sort. My personal interests are in general purpose framework development, so the whole point of it was to do this. It's what I enjoy. And once you have experienced C++ with the context of a unified, coherent system, you really see what it should have become.
 
 
 **Gotchas**
 
-Of course, in a code base this large, even someone who consumes as much caffeine as myself cannot delve super-deeply into every aspect of every sub-system. So obviously some of the sub-systems could be fleshed out by others with specific interests in those areas. However, as stated in the goals section below, it should not become about itself, and become so baroque that no one can understand it. So it's not even a goal for every sub-system to be taken to the Nth degree and become incomprehensible for all but specialists.
+Of course, in a code base this large, even someone who consumes as much caffeine as myself cannot delve super-deeply into every aspect of every sub-system. So obviously some of the sub-systems could be fleshed out by others with specific interests in those areas. However, as stated in the goals section below, it should not become about itself, and become so baroque that no one can understand it. So it's not even a goal for every sub-system to be taken to the Nth degree and become incomprehensible for all but specialists. It should be about the whole being greater than the sum of the parts.
 
 There will be a few old classes laying around that were created long ago and not touched since, because there's been no need for them all this time. Or the need for them went away. Don't, jump to conclusions that the system is garbage if you happen on one of them. There are some classes in the CIDMath facility of this type. The vector/matrix classes are just some simple bits that used to be used by a raytracing library I had at one point, for instance, and the value mapping classes might not be worth keeping.
 
@@ -100,6 +113,7 @@ Among the things I'd personally like to see added to CIDLib are:
 - More internet telephony stuff, there's already some early RTP/RTPC work and a skeleton SIP facility ready for when RTP/RTPC are done
 - Custom public cryptography system instead of wrapping system libraries
 - Same for UPnP. I've already taken over some of the UPnP functionality.
+- Possibly an open ended Web Server framework. CQC has a dedicated Web Server, but CIDLib would be an obvious platform to build such complex back end services on for general purpose use.
 
 But of course almost anything would be possible and interesting.
 
@@ -107,6 +121,6 @@ But of course almost anything would be possible and interesting.
 **Non-Legal Niceties**
 
 1. If you use my stuff, please be a mensch and give me appropriate credit
-2. If you find bugs, please send them in, in digestable chunks perferably since obviously someone who writes this much code is somewhat time constrained.
+2. If you find bugs, please send them in, in digestable chunks preferably since obviously someone who writes this much code is somewhat time constrained.
 4. If you want to contribute large stuff, i.e. new facilities, then be sure to follow the existing style and substance carefully, because I'm an OCD, paranoid, anal-retentive. It would obviously be best to coordinate with me first to make sure no time and effort are wasted.
 5. It would be very much a good thing if you didn't install any non-official builds in any system directories of user's machines, where they could be seen by other CIDLib based applications.
