@@ -211,7 +211,8 @@ TTest_FixedSizePool::eRunTest( TTextStringOutStream&   strmOut
     bGotIt = kCIDLib::False;
     try
     {
-        splTest.pobjReserveElem();
+        // Avoid discard warning by just assiging the result
+        TString* pstrRes = splTest.pobjReserveElem();
     }
 
     catch(...)
@@ -473,7 +474,8 @@ TTest_SimplePool::eRunTest( TTextStringOutStream&   strmOut
     bGotIt = kCIDLib::False;
     try
     {
-        splTest.pobjReserveElem(20);
+        // Avoid discard warning by just assiging the result
+        TString* pstrRes = splTest.pobjReserveElem(20);
     }
 
     catch(...)
@@ -624,10 +626,9 @@ TTest_SimplePoolPtr::eRunTest(  TTextStringOutStream&   strmOut
                                 , tCIDLib::TBoolean&    bWarning)
 {
     // A string pool with four max strings
-
     TStringPool splTest(L"Test String Pool", 4, 32);
     {
-        TStringPool::TElemPtr ptrFirst(&splTest, 64);
+        TStringPool::TElemPtr ptrFirst = splTest.spptrReserveElem(64);
 
         // We should have one fewer available
         if (splTest.c4ElemsAvail() != 3)
@@ -697,8 +698,8 @@ TTest_SimplePoolPtr::eRunTest(  TTextStringOutStream&   strmOut
 
     {
         // Allocate two separate pointers
-        TStringPool::TElemPtr ptrFirst(&splTest, 64);
-        TStringPool::TElemPtr ptrSec(&splTest, 64);
+        TStringPool::TElemPtr ptrFirst = splTest.spptrReserveElem(64);
+        TStringPool::TElemPtr ptrSec = splTest.spptrReserveElem(64);
 
         // Now we should have two available
         if (splTest.c4ElemsAvail() != 2)

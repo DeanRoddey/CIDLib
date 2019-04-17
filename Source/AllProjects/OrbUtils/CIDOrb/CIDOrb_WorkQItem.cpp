@@ -192,6 +192,6 @@ TWorkQItem::SetConnInfo(const   tCIDLib::TCard8 c8ConnId
 // ---------------------------------------------------------------------------
 TWorkQItemPtr::TWorkQItemPtr(const tCIDLib::TCard4 c4InitSz) :
 
-    TSimplePoolPtrBase(&CIDOrb_WorkQItem::splWorkQPool, c4InitSz)
+    TSimplePoolPtr(&CIDOrb_WorkQItem::splWorkQPool, c4InitSz)
 {
 }

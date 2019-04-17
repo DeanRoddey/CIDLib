@@ -30,9 +30,9 @@
 //  The reserved elements list we keep sorted by the address of the elements, so
 //  that we can quickly find an object being released.
 //
-//  The free list the derived class must be sorted by the 'size' of the elements.
-//  The derived class tells us how to determine the size of an element, since we
-//  don't know how to do that.
+//  The free list must be sorted by the size of the elements. The derived class
+//  provides us with a method that will extract the size from the elements, and we
+//  use that for sorting.
 //
 //  When an element is reserved, a minimum required size is provided. If there are
 //  free elements, we find a best match in the pool to use. Else we ask the derived
@@ -52,12 +52,15 @@
 //  janitor class is provided. It's ctor will get an element from the pool. Its
 //  dtor will give it back.
 //
-//  We also provide a smart pointer as well. There is an abstract base class that
-//  provides almost all the functionality. Then there is a common derivative of
-//  that that takes a pool and size. But, you can also do your own simple
-//  derivatives that can keep the pool as an internal detail. So your code just
-//  creates a smart pointer, passing the size, and it magically gets one. That often
-//  makes the code vastly cleaner.
+//  We also provide a smart pointer as well. You can either create a derivative of
+//  it and use that, or you can ask the pool to create instances of them. The former
+//  is convenient if your derivative has access to the pool, which may be some internal
+//  implementation detail. Your derived class' constructor can just self-reserve an
+//  element for itself. So you just need to declare an instance of the smart pointer
+//  to get an element.
+//
+//  These guys effectively are thread safe if the pool itself is thread safe, since
+//  they are just getting and returning elements via the pool interface.
 //
 //  String/Heap Buffer Pool
 //
@@ -71,6 +74,12 @@
 //  beyond this threshold, it will be reallocated back down to something small during
 //  element prep.
 //
+//
+//  Fixed Size Elements
+//
+//  If the elements are all the same size, use the TFixedSizedPool class instead which
+//  is much more efficient for such things.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -81,6 +90,236 @@
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
+
+template<typename TElem> class TSimplePool;
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TSimplePoolPtr
+// PREFIX: spptr
+//
+//  This is a smart pointer for objects in a pool. It gets an object out of a
+//  pool and makes sure it gets given back. It will reference copy the object,
+//  so it knows when the last ref is gone.
+//
+//  This guy will use the mutex of the pool to sync the ref counting. If the pool
+//  is not thread safe, then these guys are not. Typically they either both are
+//  or both are not. If that's not the case, don't use this, create your own.
+// ---------------------------------------------------------------------------
+template <typename TElem> class TSimplePoolPtr
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TSimplePoolPtr(const TSimplePoolPtr& spptrSrc) :
+
+            m_percThis(nullptr)
+        {
+            if (&spptrSrc != this)
+                TakeSource(spptrSrc);
+        }
+
+        virtual ~TSimplePoolPtr()
+        {
+            DecRefCnt();
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TSimplePoolPtr& operator=(const TSimplePoolPtr& spptrSrc)
+        {
+            if (&spptrSrc != this)
+                TakeSource(spptrSrc);
+            return *this;
+        }
+
+        operator tCIDLib::TBoolean () const
+        {
+            return (m_percThis != nullptr);
+        }
+
+        tCIDLib::TBoolean operator!() const
+        {
+            return (m_percThis == nullptr);
+        }
+
+        TElem* operator->()
+        {
+            return pobjData();
+        }
+
+        const TElem* operator->() const
+        {
+            return pobjData();
+        }
+
+        TElem& operator*()
+        {
+            return *pobjData();
+        }
+
+        const TElem& operator*() const
+        {
+            return *pobjData();
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        const TElem* pobjData() const
+        {
+            CIDAssert(m_percThis, L"The pool pointer doesn't have an object");
+            return m_percThis->m_pobjElem;
+        }
+
+        TElem* pobjData()
+        {
+            CIDAssert(m_percThis, L"The pool pointer doesn't have an object");
+            return m_percThis->m_pobjElem;
+        }
+
+        // Release it early back to the pool if we still have it
+        tCIDLib::TVoid Release()
+        {
+            DecRefCnt();
+        }
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  The pool has to be a friend to call our protected ctors
+        // -------------------------------------------------------------------
+        friend class TSimplePool<TElem>;
+
+
+        // -------------------------------------------------------------------
+        //  Hidden constructors
+        // -------------------------------------------------------------------
+        TSimplePoolPtr() :
+
+            m_percThis(nullptr)
+        {
+        }
+
+        TSimplePoolPtr(TSimplePool<TElem>* const psplSrc, const tCIDLib::TCard4 c4Size) :
+
+            m_percThis(nullptr)
+        {
+            //
+            //  If we got a pool, then get an object, and set the initial ref
+            //  count to 1. Note no sync required here. If the pool is thread
+            //  safe then the object reservation is.
+            //
+            if (psplSrc)
+            {
+                TElem* pobjElem = psplSrc->pobjReserveElem(c4Size);
+                m_percThis = new TElemRefCnt;
+                m_percThis->m_c4RefCnt = 1;
+                m_percThis->m_psplSrc = psplSrc;
+                m_percThis->m_pobjElem = pobjElem;
+            }
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  A little structure to let us wrap and ref count the objects
+        // -------------------------------------------------------------------
+        struct TElemRefCnt
+        {
+            volatile tCIDLib::TCard4    m_c4RefCnt;
+            TElem*                      m_pobjElem;
+            TSimplePool<TElem>*         m_psplSrc;
+        };
+
+
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+
+        //
+        //  Do the stuff required to release our object if we have one. If we are
+        //  the last, then release the object back to the pool, and clean up our
+        //  structure pointer.
+        //
+        tCIDLib::TVoid DecRefCnt()
+        {
+            if (!m_percThis)
+                return;
+
+            try
+            {
+                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
+
+                // We shouldn't have a pointer if the ref count is zero, but check
+                CIDAssert(m_percThis->m_c4RefCnt, L"Simple pool ptr ref cnt underflow");
+
+                m_percThis->m_c4RefCnt--;
+                if (!m_percThis->m_c4RefCnt)
+                {
+                    m_percThis->m_psplSrc->ReleaseElem(m_percThis->m_pobjElem);
+                    delete m_percThis;
+                }
+
+                // And we are letting this guy go either way
+                m_percThis = nullptr;
+            }
+
+            catch(TError& errToCatch)
+            {
+                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                throw;
+            }
+        }
+
+
+        //
+        //  Do the stuff for us to take on another pointer's object, decrementing
+        //  and releasing ours as required, and incrementing his. We know the source
+        //  cannot change other than the ref count (which cannot go to zero while we
+        //  are here since the copy we have is keeping it alive.) So we just have to
+        //  sync the ref counting.
+        //
+        tCIDLib::TVoid TakeSource(const TSimplePoolPtr& spptrSrc)
+        {
+            // Decrement ours first, releasing if needed
+            try
+            {
+                DecRefCnt();
+            }
+
+            catch(TError& errToCatch)
+            {
+                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                throw;
+            }
+
+            // And now take the source's and bump the count
+            if (spptrSrc.m_percThis)
+            {
+                m_percThis = spptrSrc.m_percThis;
+                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
+                m_percThis->m_c4RefCnt++;
+            }
+
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_percThis
+        //      If this is non-null we have a ref to an object. This is what we
+        //      copy/assign and ref count.
+        // -------------------------------------------------------------------
+        TElemRefCnt*    m_percThis;
+};
+
+
 
 
 // ---------------------------------------------------------------------------
@@ -94,21 +333,6 @@ template<typename TElem> class TSimplePool : public TObject
         //  Public types
         // -------------------------------------------------------------------
         using TElemList = TRefVector<TElem>;
-
-
-        // -------------------------------------------------------------------
-        //  We can provide a static search/sort comparitor for the reserved list,
-        //  which is always done on the address of the elements.
-        // -------------------------------------------------------------------
-        static tCIDLib::ESortComps eCompAddr(const  TElem&  elemFirst
-                                            , const TElem&  elemSec)
-        {
-            if (&elemFirst < &elemSec)
-                return tCIDLib::ESortComps::FirstLess;
-            else if (&elemFirst > &elemSec)
-                return tCIDLib::ESortComps::FirstGreater;
-            return tCIDLib::ESortComps::Equal;
-        }
 
 
         // -------------------------------------------------------------------
@@ -205,7 +429,7 @@ template<typename TElem> class TSimplePool : public TObject
 
 
         // Reserves an element from the pool, creating a new one if necessary
-        TElem* pobjReserveElem(const tCIDLib::TCard4 c4Size)
+        [[nodiscard]] TElem* pobjReserveElem(const tCIDLib::TCard4 c4Size)
         {
             // Lock if we are MT safe
             TMtxLocker mtxlSync(m_pmtxSync);
@@ -420,6 +644,23 @@ template<typename TElem> class TSimplePool : public TObject
         }
 
 
+        // Returns an empty pool pointer that you can set later
+        TSimplePoolPtr<TElem> spptrEmpty()
+        {
+            return TSimplePoolPtr<TElem>();
+        }
+
+
+        //
+        //  Create a pool pointer which will reserve an element for you and return it
+        //  automatically when the last reference is destroyed.
+        //
+        TSimplePoolPtr<TElem> spptrReserveElem(const tCIDLib::TCard4 c4Size)
+        {
+            return TSimplePoolPtr<TElem>(this, c4Size);
+        }
+
+
     protected :
         // -------------------------------------------------------------------
         //  Hidden constructors
@@ -470,6 +711,22 @@ template<typename TElem> class TSimplePool : public TObject
 
 
     private :
+        // -------------------------------------------------------------------
+        //  We can provide a static search/sort comparitor for the reserved list,
+        //  which is always done on the address of the elements.
+        // -------------------------------------------------------------------
+        static tCIDLib::ESortComps eCompAddr(const  TElem&  elemFirst
+                                            , const TElem&  elemSec)
+        {
+            if (&elemFirst < &elemSec)
+                return tCIDLib::ESortComps::FirstLess;
+            else if (&elemFirst > &elemSec)
+                return tCIDLib::ESortComps::FirstGreater;
+            return tCIDLib::ESortComps::Equal;
+        }
+
+
+
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
@@ -747,285 +1004,6 @@ template <typename TElem> class TSimplePoolJan
         // -------------------------------------------------------------------
         TElem*      m_pobjGotten;
         TPoolType*  m_psplSrc;
-};
-
-
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TSimplePoolPtrBase
-// PREFIX: spptr
-//
-//  This is a smart pointer for objects in a pool. It gets an object out of a
-//  pool and makes sure it gets given back. It will reference copy the object,
-//  so it knows when the last ref is gone.
-//
-//  This guy will use the mutex of the pool to sync the ref counting. If the pool
-//  is not thread safe, then these guys are not. Typically they either both are
-//  or both are not. If that's not the case, don't use this, create your own.
-//
-//  We first create a base class with hidden ctors, and then we create a derived
-//  class that has public ones and passes them on. This way, you can either just
-//  use that one as is, or you can create your own derivatives, which is often
-//  very useful because their ctors can have direct access to their pools and
-//  just magically self-reserve themselves.
-// ---------------------------------------------------------------------------
-template <typename TElem> class TSimplePoolPtrBase
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Public types
-        // -------------------------------------------------------------------
-        using TPoolType = TSimplePool<TElem>;
-
-
-        // -------------------------------------------------------------------
-        //  Destructor
-        // -------------------------------------------------------------------
-        virtual ~TSimplePoolPtrBase()
-        {
-            DecRefCnt();
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        operator tCIDLib::TBoolean () const
-        {
-            return (m_percThis != nullptr);
-        }
-
-        tCIDLib::TBoolean operator!() const
-        {
-            return (m_percThis == nullptr);
-        }
-
-        TElem* operator->()
-        {
-            return pobjData();
-        }
-
-        const TElem* operator->() const
-        {
-            return pobjData();
-        }
-
-        TElem& operator*()
-        {
-            return *pobjData();
-        }
-
-        const TElem& operator*() const
-        {
-            return *pobjData();
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        const TElem* pobjData() const
-        {
-            CIDAssert(m_percThis, L"The pool pointer doesn't have an object");
-            return m_percThis->m_pobjElem;
-        }
-
-        TElem* pobjData()
-        {
-            CIDAssert(m_percThis, L"The pool pointer doesn't have an object");
-            return m_percThis->m_pobjElem;
-        }
-
-        // Release it early back to the pool if we still have it
-        tCIDLib::TVoid Release()
-        {
-            DecRefCnt();
-        }
-
-
-    protected :
-        // -------------------------------------------------------------------
-        //  Hidden constructors and operators
-        // -------------------------------------------------------------------
-        TSimplePoolPtrBase() :
-
-            m_percThis(nullptr)
-        {
-        }
-
-        TSimplePoolPtrBase(TPoolType* const psplSrc, const tCIDLib::TCard4 c4Size) :
-
-            m_percThis(nullptr)
-        {
-            //
-            //  If we got a pool, then get an object, and set the initial ref
-            //  count to 1. Note no sync required here. If the pool is thread
-            //  safe then the object reservation is.
-            //
-            if (psplSrc)
-            {
-                TElem* pobjElem = psplSrc->pobjReserveElem(c4Size);
-                m_percThis = new TElemRefCnt;
-                m_percThis->m_c4RefCnt = 1;
-                m_percThis->m_psplSrc = psplSrc;
-                m_percThis->m_pobjElem = pobjElem;
-            }
-        }
-
-        TSimplePoolPtrBase(const TSimplePoolPtrBase& spptrSrc) :
-
-            m_percThis(nullptr)
-        {
-            if (&spptrSrc != this)
-                TakeSource(spptrSrc);
-        }
-
-        TSimplePoolPtrBase& operator=(const TSimplePoolPtrBase& spptrSrc)
-        {
-            if (&spptrSrc != this)
-                TakeSource(spptrSrc);
-            return *this;
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  A little structure to let us wrap and ref count the objects
-        // -------------------------------------------------------------------
-        struct TElemRefCnt
-        {
-            volatile tCIDLib::TCard4    m_c4RefCnt;
-            TElem*                      m_pobjElem;
-            TPoolType*                  m_psplSrc;
-        };
-
-
-        // -------------------------------------------------------------------
-        //  Private, non-virtual methods
-        // -------------------------------------------------------------------
-
-        //
-        //  Do the stuff required to release our object if we have one. If we are
-        //  the last, then release the object back to the pool, and clean up our
-        //  structure pointer.
-        //
-        tCIDLib::TVoid DecRefCnt()
-        {
-            if (!m_percThis)
-                return;
-
-            try
-            {
-                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
-
-                // We shouldn't have a pointer if the ref count is zero, but check
-                CIDAssert(m_percThis->m_c4RefCnt, L"Simple pool ptr ref cnt underflow");
-
-                m_percThis->m_c4RefCnt--;
-                if (!m_percThis->m_c4RefCnt)
-                {
-                    m_percThis->m_psplSrc->ReleaseElem(m_percThis->m_pobjElem);
-                    delete m_percThis;
-                }
-
-                // And we are letting this guy go either way
-                m_percThis = nullptr;
-            }
-
-            catch(TError& errToCatch)
-            {
-                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                throw;
-            }
-        }
-
-
-        //
-        //  Do the stuff for us to take on another pointer's object, decrementing
-        //  and releasing ours as required, and incrementing his. We know the source
-        //  cannot change other than the ref count (which cannot go to zero while we
-        //  are here since the copy we have is keeping it alive.) So we just have to
-        //  sync the ref counting.
-        //
-        tCIDLib::TVoid TakeSource(const TSimplePoolPtrBase& spptrSrc)
-        {
-            // Decrement ours first, releasing if needed
-            try
-            {
-                DecRefCnt();
-            }
-
-            catch(TError& errToCatch)
-            {
-                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                throw;
-            }
-
-            // And now take the source's and bump the count
-            if (spptrSrc.m_percThis)
-            {
-                m_percThis = spptrSrc.m_percThis;
-                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
-                m_percThis->m_c4RefCnt++;
-            }
-
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_percThis
-        //      If this is non-null we have a ref to an object. This is what we
-        //      copy/assign and ref count.
-        // -------------------------------------------------------------------
-        TElemRefCnt*    m_percThis;
-};
-
-
-template <typename TElem>
-class TSimplePoolPtr : public TSimplePoolPtrBase<typename TElem>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Public types
-        // -------------------------------------------------------------------
-        using TPoolType = TSimplePool<TElem>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSimplePoolPtr()
-        {
-        }
-
-        TSimplePoolPtr(TPoolType* const psplSrc, const tCIDLib::TCard4 c4Size) :
-
-            TSimplePoolPtrBase<TElem>(psplSrc, c4Size)
-        {
-        }
-
-        TSimplePoolPtr(const TSimplePoolPtr& spptrSrc) :
-
-            TSimplePoolPtrBase<TElem>(spptrSrc)
-        {
-        }
-
-        ~TSimplePoolPtr()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TSimplePoolPtr& operator=(const TSimplePoolPtr& spptrSrc)
-        {
-            TSimplePoolPtrBase<TElem>::operator=(spptrSrc);
-            return *this;
-        }
 };
 
 
