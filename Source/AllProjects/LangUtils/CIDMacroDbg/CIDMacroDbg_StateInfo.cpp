@@ -60,25 +60,8 @@ TMacroDbgStateInfo::TMacroDbgStateInfo()
 {
 }
 
-TMacroDbgStateInfo::TMacroDbgStateInfo(const TMacroDbgStateInfo& stiToCopy)
-{
-}
-
 TMacroDbgStateInfo::~TMacroDbgStateInfo()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  TMacroDbgStateInfo: Public operators
-// ---------------------------------------------------------------------------
-TMacroDbgStateInfo&
-TMacroDbgStateInfo::operator=(const TMacroDbgStateInfo& stiToAssign)
-{
-    if (this != &stiToAssign)
-    {
-    }
-    return *this;
 }
 
 

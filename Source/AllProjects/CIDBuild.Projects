@@ -282,11 +282,20 @@ PROJECT=CIDPNG
         VERSIONED   = Yes
     END SETTINGS
 
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDPNG_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
     DEPENDENTS
         CIDLib
         CIDImage
         CIDZLib
     END DEPENDENTS
+
 END PROJECT
 
 

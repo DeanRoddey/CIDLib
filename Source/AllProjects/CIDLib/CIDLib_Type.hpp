@@ -66,15 +66,19 @@ inline tCIDLib::TVoid TBinInStream_ReadArray(       TBinInStream&       strmSrc 
                                             ,       eEnumType* const    aeList \
                                             , const tCIDLib::TCard4     c4Count) \
 { \
-    if (!c4Count) return; \
-    strmSrc.ReadArray(reinterpret_cast<tCIDLib::TInt4*>(aeList), c4Count); \
+    tCIDLib::TCard4 c4Cur; \
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++) \
+    { \
+        strmSrc >> c4Cur; \
+        aeList[c4Index] = eEnumType(c4Cur); \
+    } \
 } \
 inline tCIDLib::TVoid TBinOutStream_WriteArray(         TBinOutStream&      strmTar \
                                                 , const eEnumType* const    aeList \
                                                 , const tCIDLib::TCard4     c4Count) \
 { \
-    if (!c4Count) return; \
-    strmTar.WriteArray(reinterpret_cast<const tCIDLib::TInt4*>(aeList), c4Count); \
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++) \
+        strmTar << tCIDLib::TCard4(aeList[c4Index]); \
 }
 
 

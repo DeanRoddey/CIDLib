@@ -54,8 +54,8 @@
 // ---------------------------------------------------------------------------
 //  Now subinclude our other headers, in the needed order.
 // ---------------------------------------------------------------------------
-#include    "CIDPNG_Type.hpp"
 #include    "CIDPNG_ErrorIds.hpp"
+#include    "CIDPNG_Shared.hpp"
 #include    "CIDPNG_Image.hpp"
 #include    "CIDPNG_ThisFacility.hpp"
 
@@ -64,5 +64,3 @@
 //  Export the lazy evalution method for the facility object.
 // ---------------------------------------------------------------------------
 extern CIDPNGEXP TFacCIDPNG& facCIDPNG();
-
-

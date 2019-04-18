@@ -79,10 +79,7 @@ class CIDMACRODBGEXP TCMLDbgChangeInfo : public TCtrlNotify
             , const TWindow&                wndSrc
         );
 
-        TCMLDbgChangeInfo
-        (
-            const   TCMLDbgChangeInfo&      wnotSrc
-        );
+        TCMLDbgChangeInfo(const  TCMLDbgChangeInfo&) = default;
 
         ~TCMLDbgChangeInfo();
 
@@ -90,10 +87,7 @@ class CIDMACRODBGEXP TCMLDbgChangeInfo : public TCtrlNotify
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TCMLDbgChangeInfo& operator=
-        (
-            const   TCMLDbgChangeInfo&      wnotSrc
-        );
+        TCMLDbgChangeInfo& operator=(const TCMLDbgChangeInfo&) = default;
 
 
         // -------------------------------------------------------------------

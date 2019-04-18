@@ -51,11 +51,9 @@
 #include    "CIDImage.hpp"
 
 
-
 // ---------------------------------------------------------------------------
 //  Now subinclude our other headers, in the needed order.
 // ---------------------------------------------------------------------------
-#include    "CIDJPEG_Constant.hpp"
 #include    "CIDJPEG_Type.hpp"
 #include    "CIDJPEG_ErrorIds.hpp"
 #include    "CIDJPEG_Image.hpp"

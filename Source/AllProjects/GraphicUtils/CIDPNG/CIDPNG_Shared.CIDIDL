@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum CIDIDL:Name="EChunks" CIDIDL:BinStream="Yes"
+                         CIDIDL:Type="Bmp" CIDIDL:BaseType="TCard4">
+                <CIDIDL:DocText>
+                    Our representation of the chunk types. We make it bitmapped so that
+                    we can also use it to keep up with whether we've seen specific
+                    chunks.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Header"        CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Palette"       CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Trans"         CIDIDL:Value="0x00000004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Data"          CIDIDL:Value="0x00000008"/>
+                <CIDIDL:EnumVal CIDIDL:Name="End"           CIDIDL:Value="0x00000010"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Gamma"         CIDIDL:Value="0x00100000"/>
+                <CIDIDL:EnumVal CIDIDL:Name="BgnClr"        CIDIDL:Value="0x00200000"/>
+
+                <!-- Private chunks of our own -->
+                <CIDIDL:EnumVal CIDIDL:Name="TransClr"      CIDIDL:Value="0x10000000"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="ECompTypes" CIDIDL:BinStream="Yes">
+                <CIDIDL:DocText>
+                    The supported compression schemes
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Deflate"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EInterlaces" CIDIDL:BinStream="Yes">
+                <CIDIDL:DocText>
+                    The supported interlacing schemes
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Adam7"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>

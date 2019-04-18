@@ -423,8 +423,10 @@ L"            CIDIDL:XlatMap (No|AltText|AltText2|BaseName|Name|Text) 'No'\n"
 //
 L"            CIDIDL:TextStreamMap (No|AltText|AltText2|BaseName|Name|Text) 'No'\n"
 
-// Control whether binary and inc/dec operators are generated
+// Controls whether binary streaming methods are generated
 L"            CIDIDL:BinStream (No|Yes) 'No'\n"
+
+// Controls whether inc/dec operators are generated
 L"            CIDIDL:IncDec (No|Inc|Both) 'No'\n"
 
 

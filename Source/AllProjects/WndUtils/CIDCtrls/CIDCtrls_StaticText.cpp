@@ -96,16 +96,7 @@ TStaticText::InitFromDesc(  const   TWindow&                wndParent
     if (dlgiSrc.bHasHint(kCIDCtrls::strHint_EmphVal)
     ||  dlgiSrc.bHasHint(kCIDCtrls::strHint_CurValue))
     {
-        if (eTheme == tCIDCtrls::EWndThemes::MainWnd)
-        {
-            eStyles |= tCIDCtrls::EWndStyles::Border;
-        }
-         else
-        {
-            eExStyles |= tCIDCtrls::EExWndStyles::SunkenEdge;
-            SetBgnColor(facCIDCtrls().rgbSysClr(tCIDCtrls::ESysColors::DlgCtrlFill), kCIDLib::True);
-        }
-
+        eStyles |= tCIDCtrls::EWndStyles::Border;
         if (dlgiSrc.bHasHint(kCIDCtrls::strHint_CurValue))
             eHorz = tCIDLib::EHJustify::Center;
     }
@@ -130,12 +121,19 @@ TStaticText::InitFromDesc(  const   TWindow&                wndParent
     {
         tCIDGraphDev::TFontHandle hfontUse = kCIDGraphDev::hfontInvalid;
         if (dlgiSrc.bHasHint(kCIDCtrls::strHint_Prefix)
-        ||  dlgiSrc.bHasHint(kCIDCtrls::strHint_Label))
+        ||  dlgiSrc.bHasHint(kCIDCtrls::strHint_Label)
+        ||  dlgiSrc.bHasHint(kCIDCtrls::strHint_EmphVal))
+        {
             hfontUse = TGUIFacility::gfontDefBold().hfontThis();
-        else if (dlgiSrc.bHasHint(kCIDCtrls::strHint_FinePrint))
+        }
+         else if (dlgiSrc.bHasHint(kCIDCtrls::strHint_FinePrint))
+        {
             hfontUse = TGUIFacility::gfontDefSmall().hfontThis();
-        else if (dlgiSrc.bHasHint(kCIDCtrls::strHint_Title))
+        }
+         else if (dlgiSrc.bHasHint(kCIDCtrls::strHint_Title))
+        {
             hfontUse = TGUIFacility::gfontDefTitle().hfontThis();
+        }
 
         if (hfontUse != kCIDGraphDev::hfontInvalid)
             ::SendMessage(hwndThis(), WM_SETFONT, tCIDCtrls::TWParam(hfontUse), 0);
