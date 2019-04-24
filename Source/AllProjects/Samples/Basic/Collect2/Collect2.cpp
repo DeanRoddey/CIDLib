@@ -154,108 +154,76 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     // We have to let our calling thread go first
     thrThis.Sync();
 
-    try
+    //
+    //  Create a hash map of name info objects., with a modulus of 11. We use a
+    //  lambda to provide the required key extraction callback. We get a name info
+    //  object and return a ref to the name. We tell the key ops guy to be non-
+    //  case sensitive.
+    //
+    TNameInfoList colOfNames
+    (
+        11
+        , new TStringKeyOps(kCIDLib::False)
+        , [](const TNameInfo& nmiCur) -> const TString& { return nmiCur.m_strName; }
+    );
+
+    //
+    //  Loop through our list of names and create a name info object
+    //  for each one we find. We test each one to see if its there, and
+    //  add it if not. If it is already there, we bump its counter.
+    //
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4NameCount; c4Index++)
     {
-        //
-        //  Create a hash map of name info objects., with a modulus of 11. We use a
-        //  lambda to provide the required key extraction callback. We get a name info
-        //  object and return a ref to the name. We tell the key ops guy to be non-
-        //  case sensitive.
-        //
-        TNameInfoList colOfNames
-        (
-            11
-            , new TStringKeyOps(kCIDLib::False)
-            , [](const TNameInfo& nmiCur) -> const TString& { return nmiCur.m_strName; }
-        );
+        // Find the existing element or add it if not already there
+        tCIDLib::TBoolean bAdded;
+        TNameInfo& nmiCur = colOfNames.objFindOrAdd(TString(apszNames[c4Index]), bAdded);
 
-        //
-        //  Loop through our list of names and create a name info object
-        //  for each one we find. We test each one to see if its there, and
-        //  add it if not. If it is already there, we bump its counter.
-        //
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4NameCount; c4Index++)
-        {
-            // Find the existing element or add it if not already there
-            tCIDLib::TBoolean bAdded;
-            TNameInfo& nmiCur = colOfNames.objFindOrAdd(TString(apszNames[c4Index]), bAdded);
+        // If we didn't just add it, then increment its counter
+        if (!bAdded)
+            nmiCur.m_c4Counter++;
+    }
 
-            // If we didn't just add it, then increment its counter
-            if (!bAdded)
-                nmiCur.m_c4Counter++;
-        }
+    //
+    //  Set up two stream format objects. One represents the name column
+    //  and one represents the count column. We use these to control the
+    //  output of each column.
+    //
+    TStreamFmt strmfCount(8, 0, tCIDLib::EHJustify::Right, kCIDLib::chSpace);
+    TStreamFmt strmfName(48, 0, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
 
-        //
-        //  Set up two stream format objects. One represents the name column
-        //  and one represents the count column. We use these to control the
-        //  output of each column.
-        //
-        TStreamFmt strmfCount(8, 0, tCIDLib::EHJustify::Right, kCIDLib::chSpace);
-        TStreamFmt strmfName(48, 0, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
+    //
+    //  Do a header line for the data we are going to dump out. Note
+    //  that the TTextOutStream::Spaces() thingie outputs 4 spaces, which
+    //  are not affected by the formatting. I.e. it will just output
+    //  4 spaces, regardless of the set field width. We use this to
+    //  space the columns apart. The same applies to the NewLn values
+    //  which are not affected by formatting.
+    //
+    //  ESpaces() is built upon the more generic TTextOutStream::RepChars
+    //  mechanism, which is a way to output a repeated sequence of
+    //  characters.
+    //
+    const tCIDLib::TCard4 c4Spacing = 4;
+    conOut  << kCIDLib::NewLn << strmfCount << L"Count"
+            << TTextOutStream::Spaces(c4Spacing)
+            << strmfName << L"Name" << kCIDLib::NewLn
+            << strmfCount << L"------"
+            << TTextOutStream::Spaces(c4Spacing)
+            << strmfName << L"---------------------"
+            << kCIDLib::EndLn;
 
-        //
-        //  Do a header line for the data we are going to dump out. Note
-        //  that the TTextOutStream::Spaces() thingie outputs 4 spaces, which
-        //  are not affected by the formatting. I.e. it will just output
-        //  4 spaces, regardless of the set field width. We use this to
-        //  space the columns apart. The same applies to the NewLn values
-        //  which are not affected by formatting.
-        //
-        //  ESpaces() is built upon the more generic TTextOutStream::RepChars
-        //  mechanism, which is a way to output a repeated sequence of
-        //  characters.
-        //
-        const tCIDLib::TCard4 c4Spacing = 4;
-        conOut  << kCIDLib::NewLn << strmfCount << L"Count"
+    //
+    //  Now iterate all the elements and dump their info out. Note that
+    //  the Spaces() type is not constrained by the stream formatting stuff
+    //  so it can be used to put spaces into columnar stuff conveniently.
+    //
+    TNameInfoList::TCursor cursNames(&colOfNames);
+    for (; cursNames; ++cursNames)
+    {
+        conOut  << strmfCount << cursNames->m_c4Counter
                 << TTextOutStream::Spaces(c4Spacing)
-                << strmfName << L"Name" << kCIDLib::NewLn
-                << strmfCount << L"------"
-                << TTextOutStream::Spaces(c4Spacing)
-                << strmfName << L"---------------------"
+                << strmfName << cursNames->m_strName
                 << kCIDLib::EndLn;
-
-        //
-        //  Now iterate all the elements and dump their info out. Note that
-        //  the Spaces() type is not constrained by the stream formatting stuff
-        //  so it can be used to put spaces into columnar stuff conveniently.
-        //
-        TNameInfoList::TCursor cursNames(&colOfNames);
-        for (; cursNames; ++cursNames)
-        {
-            conOut  << strmfCount << cursNames->m_c4Counter
-                    << TTextOutStream::Spaces(c4Spacing)
-                    << strmfName << cursNames->m_strName
-                    << kCIDLib::EndLn;
-        }
-    }
-
-    // Catch any CIDLib runtime errors
-    catch(const TError& errToCatch)
-    {
-        conOut  <<  L"A CIDLib runtime error occured during processing."
-                << kCIDLib::NewLn <<  L"Error: " << errToCatch.strErrText()
-                << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::RuntimeError;
-    }
-
-    //
-    //  Kernel errors should never propogate out of CIDLib, but I test
-    //  for them in my demo programs so I can catch them if they do
-    //  and fix them.
-    //
-    catch(const TKrnlError& kerrToCatch)
-    {
-        conOut  << L"A kernel error occured during processing.\nError="
-                << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::FatalError;
-    }
-
-    // Catch a general exception
-    catch(...)
-    {
-        conOut  << L"A general exception occured during processing"
-                << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::SystemException;
     }
     return tCIDLib::EExitCodes::Normal;
 }
