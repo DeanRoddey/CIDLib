@@ -29,7 +29,8 @@
 //  The hash map requires a 'key ops' object to handle hashing and comparing
 //  key objects. Since our key field is a TString, we can use a canned one
 //  that is provided by CIDLib, TStringKeyOps. We also have to provide a
-//  small function that will pull out the key from the data element.
+//  small function that will pull out the key from the data element, which we
+//  just do with a lambda.
 //
 //  This guy also demonstrates column text output using stream format objects.
 //
@@ -51,18 +52,8 @@
 
 
 // ---------------------------------------------------------------------------
-//  Local data
-//
-//  conOut
-//      This is a console object which we use in this program for our standard
-//      output. Its a specialized text stream class. We don't support
-//      redirection in this program, so we can just use a console directly.
-// ---------------------------------------------------------------------------
-static TOutConsole  conOut;
-
-
-// ---------------------------------------------------------------------------
-//  Do the magic main module code
+//  Do the magic main module code to point the main thread at a global function
+//  below.
 // ---------------------------------------------------------------------------
 tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Collect2MainThread", eMainThreadFunc))
@@ -72,12 +63,14 @@ CIDLib_MainModule(TThread(L"Collect2MainThread", eMainThreadFunc))
 //  Local, static data
 //
 //  apszNames
-//      This is just a list of dummy names that serves as test data for the
-//      program.
-//
 //  c4NameCount
-//      The count of elements in the array. We use the tCIDLib::c4ArrayElems() macro
-//      that does the usual calculation for us.
+//      This is just a list of dummy names that serves as test data for the program
+//      and the count of elements in it.
+//
+//  conOut
+//      This is a console object which we use in this program for our standard
+//      output. Its a specialized text output stream class. We don't support
+//      redirection in this program, so we can just use a console directly.
 // ---------------------------------------------------------------------------
 static const tCIDLib::TCh* apszNames[] =
 {
@@ -99,52 +92,35 @@ static const tCIDLib::TCh* apszNames[] =
     , L"Smith, John"
 };
 static const tCIDLib::TCard4 c4NameCount = tCIDLib::c4ArrayElems(apszNames);
+static TOutConsole  conOut;
 
 
 // ---------------------------------------------------------------------------
 //   CLASS: TNameInfo
 //  PREFIX: nmi
 //
-//  This is a small test class that is used as the element type for our
-//  hash map.
+//  This is a small test class that is used as the element type for our hash map.
+//  To keep it small for this sample, it just uses public members. The hash map
+//  requires equality operators for its elements.
 // ---------------------------------------------------------------------------
-class TNameInfo : public TObject
+class TNameInfo
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and Destructors
         // -------------------------------------------------------------------
-        TNameInfo() :
-
-            m_c4Counter(0)
-        {
-        }
-
-        TNameInfo(const TString& strName) :
-
-            m_c4Counter(1)
-            , m_strName(strName)
-        {
-        }
-
+        TNameInfo() = delete;
+        TNameInfo(const TNameInfo&) = default;
+        TNameInfo(const TString& strName) : m_strName(strName) { }
         ~TNameInfo() {}
 
 
         // -------------------------------------------------------------------
         //  Public operators
-        //
-        //  The hash map requires equality operators for its elements
         // -------------------------------------------------------------------
         tCIDLib::TBoolean operator==(const TNameInfo& nmiSrc) const
         {
-            if (&nmiSrc == this)
-                return kCIDLib::True;
-
-            return
-            (
-                (m_c4Counter == nmiSrc.m_c4Counter)
-                &&  (m_strName == nmiSrc.m_strName)
-            );
+            return((m_c4Counter == nmiSrc.m_c4Counter) &&  (m_strName == nmiSrc.m_strName));
         }
 
         tCIDLib::TBoolean operator!=(const TNameInfo& nmiSrc) const
@@ -154,38 +130,11 @@ class TNameInfo : public TObject
 
 
         // -------------------------------------------------------------------
-        //  Public, non-virtual methods
+        //  Data members
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4Counter() const
-        {
-            return m_c4Counter;
-        }
-
-        tCIDLib::TVoid IncCounter()
-        {
-            m_c4Counter++;
-        }
-
-        const TString& strName() const
-        {
-            return m_strName;
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        // -------------------------------------------------------------------
-        tCIDLib::TCard4     m_c4Counter;
+        tCIDLib::TCard4     m_c4Counter = 1;
         TString             m_strName;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed macro stuff
-        // -------------------------------------------------------------------
-        RTTIDefs(TNameInfo,TObject)
 };
-RTTIDecls(TNameInfo,TObject)
 
 
 // ---------------------------------------------------------------------------
@@ -199,13 +148,6 @@ using TNameInfoList = TKeyedHashSet<TNameInfo,TString,TStringKeyOps>;
 //  Local functions
 // ---------------------------------------------------------------------------
 
-// A simple key extractor for the keyed hash set
-static const TString& strKey(const TNameInfo& nmiCur)
-{
-    return nmiCur.strName();
-}
-
-
 // This is the the thread function for the main thread.
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
@@ -214,8 +156,18 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
     try
     {
-        // Create a hash map of name info objects., with a modulus of 11
-        TNameInfoList colOfNames(11, new TStringKeyOps, strKey);
+        //
+        //  Create a hash map of name info objects., with a modulus of 11. We use a
+        //  lambda to provide the required key extraction callback. We get a name info
+        //  object and return a ref to the name. We tell the key ops guy to be non-
+        //  case sensitive.
+        //
+        TNameInfoList colOfNames
+        (
+            11
+            , new TStringKeyOps(kCIDLib::False)
+            , [](const TNameInfo& nmiCur) -> const TString& { return nmiCur.m_strName; }
+        );
 
         //
         //  Loop through our list of names and create a name info object
@@ -230,7 +182,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
             // If we didn't just add it, then increment its counter
             if (!bAdded)
-                nmiCur.IncCounter();
+                nmiCur.m_c4Counter++;
         }
 
         //
@@ -253,7 +205,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //  mechanism, which is a way to output a repeated sequence of
         //  characters.
         //
-        const tCIDLib::TCard4 c4Spacing{4};
+        const tCIDLib::TCard4 c4Spacing = 4;
         conOut  << kCIDLib::NewLn << strmfCount << L"Count"
                 << TTextOutStream::Spaces(c4Spacing)
                 << strmfName << L"Name" << kCIDLib::NewLn
@@ -262,13 +214,17 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 << strmfName << L"---------------------"
                 << kCIDLib::EndLn;
 
-        // Now iterate all the elements and dump their info out
+        //
+        //  Now iterate all the elements and dump their info out. Note that
+        //  the Spaces() type is not constrained by the stream formatting stuff
+        //  so it can be used to put spaces into columnar stuff conveniently.
+        //
         TNameInfoList::TCursor cursNames(&colOfNames);
         for (; cursNames; ++cursNames)
         {
-            conOut  << strmfCount << cursNames->c4Counter()
+            conOut  << strmfCount << cursNames->m_c4Counter
                     << TTextOutStream::Spaces(c4Spacing)
-                    << strmfName << cursNames->strName()
+                    << strmfName << cursNames->m_strName
                     << kCIDLib::EndLn;
         }
     }
