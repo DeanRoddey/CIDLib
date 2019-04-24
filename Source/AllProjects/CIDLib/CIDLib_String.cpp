@@ -643,12 +643,7 @@ TString::TStrBuf::TStrBuf(const TStrBuf& strbSrc) :
         m_c4BufChars = 8;
     m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
     if (m_c4CurEnd)
-    {
-        TRawMem::CopyMemBuf
-        (
-            m_pszBuffer, strbSrc.m_pszBuffer, m_c4CurEnd * kCIDLib::c4CharBytes
-        );
-    }
+        TRawMem::CopyMemBuf(m_pszBuffer, strbSrc.m_pszBuffer, m_c4CurEnd * kCIDLib::c4CharBytes);
     m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
@@ -688,15 +683,7 @@ TString::TStrBuf::TStrBuf(TStrBuf&& strbSrc) :
 
 TString::TStrBuf::~TStrBuf()
 {
-    try
-    {
-        delete [] m_pszBuffer;
-    }
-
-    catch(...)
-    {
-        m_pszBuffer = nullptr;
-    }
+    delete [] m_pszBuffer;
 }
 
 
@@ -707,13 +694,22 @@ TString::TStrBuf& TString::TStrBuf::operator=(const TString::TStrBuf& strbSrc)
 {
     if (this != &strbSrc)
     {
-        TArrayJanitor<tCIDLib::TCh> janOld(m_pszBuffer);
-        m_pszBuffer = nullptr;
+        //
+        //  If our buffer capacity is less than the source, we need to reallocate. We also
+        //  see if the source is a lot smaller than our buffer and reallocate there as
+        //  well so as not to waste a lot of memory.
+        //
+        if ((m_c4CurEnd < strbSrc.m_c4CurEnd)
+        ||  (strbSrc.m_c4CurEnd + kCIDLib::c4Sz_8K < m_c4CurEnd))
+        {
+            TArrayJanitor<tCIDLib::TCh> janOld(m_pszBuffer);
+            m_pszBuffer = nullptr;
+
+            m_c4BufChars = strbSrc.m_c4CurEnd;
+            m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+        }
 
         m_c4CurEnd = strbSrc.m_c4CurEnd;
-        m_c4BufChars = strbSrc.m_c4CurEnd;
-        m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
-
         if (m_c4CurEnd)
         {
             TRawMem::CopyMemBuf
@@ -753,7 +749,7 @@ TString::TStrBuf::Append(const tCIDLib::TCh chToAppend, const tCIDLib::TCard4 c4
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         m_pszBuffer[m_c4CurEnd++] = chToAppend;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -800,7 +796,7 @@ TString::TStrBuf::Append(const  tCIDLib::TCh* const psz1
        m_c4CurEnd += c4Len3;
     }
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -2414,6 +2410,63 @@ TString::TStrBuf::ToZStr(       tCIDLib::TCh* const pszTarget
 // ---------------------------------------------------------------------------
 //  TString: Public, static data
 // ---------------------------------------------------------------------------
+
+// THESE PUT OUT UPPER CASE and some folks depend on that. So don't change the case
+tCIDLib::TVoid TString::FromHex(const   tCIDLib::TCard1 c1ToXlat
+                                ,       tCIDLib::TSCh&  chOne
+                                ,       tCIDLib::TSCh&  chTwo)
+{
+    tCIDLib::TCard1 c1Tmp = c1ToXlat & 0xF;
+    if (c1Tmp)
+    {
+        chTwo = (c1Tmp > 9) ? tCIDLib::TSCh(kCIDLib::chLatin_A + (c1Tmp - 10))
+                            : tCIDLib::TSCh(kCIDLib::chDigit0 + c1Tmp);
+    }
+     else
+    {
+        chTwo = tCIDLib::TSCh(kCIDLib::chDigit0);
+    }
+
+    c1Tmp = c1ToXlat >> 4;
+    if (c1Tmp & 0xF)
+    {
+        chOne = (c1Tmp > 9) ? tCIDLib::TSCh(kCIDLib::chLatin_A + (c1Tmp - 10))
+                            : tCIDLib::TSCh(kCIDLib::chDigit0 + c1Tmp);
+    }
+     else
+    {
+        chOne = tCIDLib::TSCh(kCIDLib::chDigit0);
+    }
+}
+
+tCIDLib::TVoid TString::FromHex(const   tCIDLib::TCard1 c1ToXlat
+                                ,       tCIDLib::TCh&   chOne
+                                ,       tCIDLib::TCh&   chTwo)
+{
+    tCIDLib::TCard1 c1Tmp = c1ToXlat & 0xF;
+    if (c1Tmp)
+    {
+        chTwo = (c1Tmp > 9) ? tCIDLib::TCh(kCIDLib::chLatin_A+ (c1Tmp - 10))
+                            : tCIDLib::TCh(kCIDLib::chDigit0 + c1Tmp);
+    }
+     else
+    {
+        chTwo = kCIDLib::chDigit0;
+    }
+
+    c1Tmp = c1ToXlat >> 4;
+    if (c1Tmp & 0xF)
+    {
+        chOne = (c1Tmp > 9) ? tCIDLib::TCh(kCIDLib::chLatin_A + (c1Tmp - 10))
+                            : tCIDLib::TCh(kCIDLib::chDigit0 + c1Tmp);
+    }
+     else
+    {
+        chOne = kCIDLib::chDigit0;
+    }
+}
+
+
 const TString& TString::strEmpty()
 {
     static TString* pstrEmpty = 0;
@@ -2425,6 +2478,7 @@ const TString& TString::strEmpty()
     }
     return *pstrEmpty;
 }
+
 
 
 // ---------------------------------------------------------------------------
