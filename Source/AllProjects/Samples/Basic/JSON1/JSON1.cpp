@@ -116,26 +116,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             );
             TSysInfo::strmOut() << kCIDLib::NewEndLn;
         }
-
-
-        //
-        //  Enable memory check in debug mode, then take a snap shot and
-        //  run the test again and clean up. Then dump anything still
-        //  on the heap.
-        //
-        #if CID_DEBUG_ON
-        TKrnlMemCheck kmchkTest;
-        kmchkTest.ReportToFile(L".\\dump.txt");
-        kmchkTest.TakeSnapshot();
-
-        {
-            TJSONParser jprsTest;
-            TJSONValue* pjprsnRoot = jprsTest.pjprsnParse(strmFile);
-            TJanitor<TJSONValue> janRoot(pjprsnRoot);
-        }
-
-        kmchkTest.DumpLeaks();
-        #endif
     }
 
     // Catch any CIDLib runtime errors
