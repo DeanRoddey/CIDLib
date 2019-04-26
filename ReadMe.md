@@ -2,7 +2,7 @@
 
 **What It Is**
 
-CIDLib is a C++ development platform. For many C++ developers a point of reference would be something along the lines of the Qt product perhaps, i.e. a comprehensive set of general purpose tools and classes for creating full featured C++ applications. A primary difference is that CIDLib is not based on the standard C++ libraries (more on that below.)
+CIDLib is a C++ development platform. For many C++ developers a point of reference would be something along the lines of the Qt product perhaps, i.e. a comprehensive set of general purpose tools and classes for creating full featured C++ applications. A primary difference is that CIDLib is not based on the standard C++ libraries (more on that below.) Also, very importantly, CIDLib is not really a library you would incorporate into your code base, it's a lot closer to a 'virtual operating system' that you build a code base on top of.
 
 CIDLib contains about 1100 classes (~450,000 lines of code.) Here is a rough list of the types of functionality it provides:
 
@@ -87,7 +87,7 @@ The UI code is another story, but just getting the back end functionality cleanl
 
 CIDLib and the CQC automation system that is built on it is the product of decades of work by the author, representing almost 50 man-years of work taken together. The very earliest roots go back to around 1992 on OS/2, and the first C++ compiler I had access to. I started writing a string class and it was all downhill from there. The two projects combined are currently around 1,100,000 lines of code.
 
-Some people seeing this will immediately start ranting about 'not invented here syndrome', but it's nothing of the sort. My personal interests are in general purpose framework development, so the whole point of it was to do this. It's what I enjoy. And once you have experienced C++ with the context of a unified, coherent system, you really see what it should have become.
+Some people seeing this will immediately start ranting about 'not invented here syndrome', but it's nothing of the sort. My personal interests are in general purpose framework development, so the whole point of it was to do this. It's what I enjoy. And once you have experienced C++ within the context of a unified, coherent system, you really see what it should have become.
 
 
 **Gotchas**
