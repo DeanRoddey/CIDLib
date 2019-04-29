@@ -1,0 +1,82 @@
+<!ENTITY % HelpContent '#PCDATA | Br | Bold | Code | DIV | Image | Indent | Link | List
+                        | Note | P | PgTitle  | SecTitle | SubSecTitle | Superscript
+                        | Table | Title'>
+<!ENTITY % BoolVal 'False | True'>
+<!ENTITY % YNVal 'Yes | No'>
+<!ENTITY % ParmDir 'In | Out | InOut'>
+
+
+<!--
+   - The contents of the help text element, which contains the actual help
+   - text. These are the markups we support. The appropriate processing is
+   - applied to these nodes during output.
+   -->
+<!ELEMENT   Bold        (#PCDATA)>
+<!ELEMENT   Br          EMPTY>
+<!ELEMENT   Code        (%HelpContent;)>
+<!ELEMENT   DIV         (%HelpContent;)>
+<!ATTLIST   DIV         Id CDATA #REQUIRED>
+<!ELEMENT   Image       EMPTY>
+<!ATTLIST   Image       Ref CDATA #REQUIRED
+                        Type (Inline | FloatLeft | FloatRight) 'Inline'>
+<!ELEMENT   Indent      (%HelpContent;)>
+<!ELEMENT   Link        (#PCDATA)>
+<!ATTLIST   Link        Ref CDATA #REQUIRED
+                        Id CDATA #IMPLIED
+                        Type (QLink | Page | Extern) #REQUIRED>
+<!ELEMENT   LItem       (%HelpContent;)>
+<!ATTLIST   LItem       Ref CDATA ''
+                        Type (Dash | Period | Equals | Colon) 'Dash'>
+<!ELEMENT   List        (LItem+)>
+<!ATTLIST   List        Type (Ordered | Unordered) 'Ordered'>
+<!ELEMENT   Note        (%HelpContent;)>
+<!ELEMENT   P           (%HelpContent;)>
+<!ELEMENT   PgTitle     (#PCDATA)>
+<!ELEMENT   SecTitle    (#PCDATA)>
+<!ELEMENT   SubSecTitle (#PCDATA)>
+<!ELEMENT   Superscript (#PCDATA)>
+<!ELEMENT   TableCol    (%HelpContent;)>
+<!ATTLIST   TableCol    ColSpan (1 | 2 | 3 | 4 | 5 | 6) '1'>
+<!ELEMENT   TableRow    (TableCol)+>
+<!ELEMENT   Table       (TableRow)+>
+<!ATTLIST   Table       Class CDATA #IMPLIED>
+<!ELEMENT   Title       (#PCDATA)>
+
+
+<!-- The basic chunk of help text markup used in various places -->
+<!ELEMENT   HelpText    (%HelpContent;)*>
+
+<!--
+   - Most pages are of this HelpPage type. The are just open ended help text pages used for
+   - general description, and can use all of the usual markup. The file extension for these
+   - is .cidhpage.
+   -->
+<!ELEMENT   HelpPage    (Title, HelpText)>
+
+
+<!--
+   - We also have a small file that goes into each topic directory that provides
+   - the topic title, the list of pages and sub-topic directories for that topic,
+   - and the main page for that topic, which will go at the top of the list of links.
+   -
+   - These are contained in files named CIDTopic.xml, so they always have the
+   - the same name in every topic directory.
+      -->
+<!ELEMENT   PageLink        EMPTY>
+<!ATTLIST   PageLink        Title CDATA ''
+                            FileName CDATA #REQUIRED
+                            FileExt CDATA 'cqchpage'
+                            Extra1 CDATA #IMPLIED
+                            Extra2 CDATA #IMPLIED
+                            Virtual (%YNVal;) 'No'>
+
+<!ELEMENT   SubTopicLink    EMPTY>
+<!ATTLIST   SubTopicLink    Title CDATA ''
+                            SubDir CDATA #REQUIRED>
+
+<!ELEMENT   PageMap         (PageLink*)>
+<!ELEMENT   SubTopicMap     (SubTopicLink*)>
+
+<!ELEMENT   CIDTopic        (PageMap, SubTopicMap)>
+<!ATTLIST   CIDTopic        TopicPage CDATA #REQUIRED>
+

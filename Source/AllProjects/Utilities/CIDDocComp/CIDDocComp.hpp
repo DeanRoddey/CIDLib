@@ -1,5 +1,5 @@
 //
-// FILE NAME: MakeDocs.hpp
+// FILE NAME: CIDDocComp.hpp
 //
 // AUTHOR: Dean Roddey
 //
@@ -24,22 +24,60 @@
 //
 //  $_CIDLib_Log_$
 //
+#pragma once
 
 // -----------------------------------------------------------------------------
 //  Include underlying headers.
 // -----------------------------------------------------------------------------
 #include    "CIDLib.hpp"
+#include    "CIDEncode.hpp"
+#include    "CIDXML.hpp"
+
+
+namespace tCIDDocComp
+{
+    // ------------------------------------------------------------------------
+    //  The types of general markup nodes we support in those places where we
+    //  allow open ended text content.
+    // ------------------------------------------------------------------------
+    enum ETypes
+    {
+        EType_None
+
+        , EType_Bold
+        , EType_Break
+        , EType_Code
+        , EType_DIV
+        , EType_Image
+        , EType_Indent
+        , EType_InlineNote
+        , EType_Link
+        , EType_List
+        , EType_ListItem
+        , EType_Note
+        , EType_Paragraph
+        , EType_SecTitle
+        , EType_SubSecTitle
+        , EType_Superscript
+        , EType_Table
+        , EType_TableCol
+        , EType_TableRow
+        , EType_Text
+    };
+}
 
 
 // -----------------------------------------------------------------------------
 //  Include our intra-facility headers
 // -----------------------------------------------------------------------------
-#include    "MakeDocs_ErrorIds.hpp"
-#include    "MakeDocs_MessageIds.hpp"
-#include    "MakeDocs_ThisFacility.hpp"
+#include    "CIDDocComp_ErrorIds.hpp"
+#include    "CIDDocComp_MessageIds.hpp"
+#include    "CIDDocComp_HelpNode.hpp"
+#include    "CIDDocComp_Pages.hpp"
+#include    "CIDDocComp_ThisFacility.hpp"
 
 
 // -----------------------------------------------------------------------------
 //  Export the facility object internally
 // -----------------------------------------------------------------------------
-extern TFacMakeDocs facMakeDocs;
+extern TFacCIDDocComp facCIDDocComp;

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Welcome to CIDLib</Title>
+
+    <HelpText>
+        <P>Welcome to CIDlib</P>
+
+    </HelpText>
+
+</HelpPage>

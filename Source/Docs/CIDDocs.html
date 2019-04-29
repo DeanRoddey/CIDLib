@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10"/>
+    <link rel="stylesheet" type="text/css" href="./CIDDocs.css"/>
+    <script src="./jquery.js" type="text/javascript"></script>
+    <script src="./CIDDocs.js" type="text/javascript"></script>
+</head>
+
+<body style="width:100%;text-align:center;">
+
+<!-- A div that contains all of the actual content -->
+<div id="MainContent" style="width : 95%; margin : auto; text-align: left;">
+
+    <header style="border-bottom: 1px solid #CCCCCC; margin: 8px;">
+        <img src="./Images/MainLogo.jpg"/>
+        <span style="font-size: 24px; font-weight: bold; float: right; margin-top: 20px;
+                      text-shadow : 2px 2px 5px rgba(128, 128, 128, .6); color: #3FA1DB;">
+            CQC Help Documentation
+        </span>
+        <div style="font-size: 0.8em; width : 98%; margin : auto; margin-bottom : 0.2em;">
+            <span style="font-weight : bold;">Current Path:&nbsp;</span>
+            <span id="CurHelpPath"></span>
+        </div>
+    </header>
+
+    <!--
+       - This is the dynamic div into which the actual content is loaded. The javascript
+       - init will get the initial (generated) page loaded up on startup.
+       -->
+    <div id="DynDiv" style="text-align: left; width : 900px; margin: 20px;">
+
+        <div id="StdPage">
+            <div id="LeftSide"></div>
+            <div id="RightSide"></div>
+            <div class="ClearFloats"></div>
+        </div>
+
+    </div>
+
+    <footer style="border: 1px solid #8888AA; margin-top: 16px; background: #CCCCDD;
+                    padding: 12px; text-align: right">
+        Copyright (c) 2019, Charmed Quark Systems, Ltd.
+    </footer>
+
+</div>
+
+</body>
+</html>
+

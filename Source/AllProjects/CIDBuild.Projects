@@ -1359,16 +1359,17 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;   Some general purpose utilities
 ; ----------------------------------------------------------------------------
-PROJECT=MakeDocs
+PROJECT=CIDDocComp
 
     SETTINGS
-        DIRECTORY   = Utilities\MakeDocs
+        DIRECTORY   = Utilities\CIDDocComp
         MSGFILE     = Yes
     END SETTINGS
 
     DEPENDENTS
         CIDLib
         CIDXML
+        CIDEncode
     END DEPENDENTS
 END PROJECT
 

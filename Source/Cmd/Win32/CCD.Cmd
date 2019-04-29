@@ -19,6 +19,7 @@ IF "%1"=="cidctrls" GOTO CD_CIDCTRLS
 IF "%1"=="cidctrls2" GOTO CD_CIDCTRLS2
 IF "%1"=="ciddae" GOTO CD_CIDDAE
 IF "%1"=="ciddbase" GOTO CD_CIDDBASE
+IF "%1"=="ciddoccomp" GOTO CD_CIDDOCCOMP
 IF "%1"=="cidgraphdev" GOTO CD_CIDGRAPHDEV
 IF "%1"=="cididl" GOTO CD_CIDIDL
 IF "%1"=="cidimage" GOTO CD_CIDIMAGE
@@ -126,6 +127,10 @@ GOTO EXIT
 
 :CD_CIDDBASE
 CD %CID_SRCTREE%\Source\AllProjects\DataUtils\CIDDBase
+GOTO EXIT
+
+:CD_CIDDOCCOMP
+CD %CID_SRCTREE%\Source\AllProjects\Utilities\CIDDocComp
 GOTO EXIT
 
 :CD_CIDGRAPHDEV
@@ -253,7 +258,7 @@ CD %CID_SRCTREE%\Source\AllProjects\Demos
 GOTO EXIT
 
 :CD_DOCS
-CD %CID_SRCTREE%\Source\PublicDocs
+CD %CID_SRCTREE%\Source\Docs
 GOTO EXIT
 
 :CD_LANGUTILS
