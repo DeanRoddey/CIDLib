@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE CIDIDL:Interface PUBLIC "urn:charmedquark.com:XML-CIDIDL.Dtd" "CIDIDL.DTD">
+
+<CIDIDL:Interface>
+
+    <CIDIDL:Globals>
+
+        <CIDIDL:Constants>
+
+            <CIDIDL:Constant CIDIDL:Name="strExt_HelpPage"
+                             CIDIDL:Type="TString" CIDIDL:Value="cidhpage">
+                <CIDIDL:DocText>
+                    Extensions for our help page types
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+
+
+            <CIDIDL:Constant CIDIDL:Name="strXML_ColSpan"
+                             CIDIDL:Type="TString" CIDIDL:Value="ColSpan">
+                <CIDIDL:DocText>
+                    Values we look for in the XML cotnent.
+                </CIDIDL:DocText>
+            </CIDIDL:Constant>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Extra"
+                                CIDIDL:Type="TString" CIDIDL:Value="Extra"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Extra1"
+                                CIDIDL:Type="TString"  CIDIDL:Value="Extra1"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Extra2"
+                                CIDIDL:Type="TString"  CIDIDL:Value="Extra2"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_FileExt"
+                                CIDIDL:Type="TString"  CIDIDL:Value="FileExt"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_FileName"
+                                CIDIDL:Type="TString"  CIDIDL:Value="FileName"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_HelpText"
+                                CIDIDL:Type="TString"  CIDIDL:Value="HelpText"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Id"
+                                CIDIDL:Type="TString"  CIDIDL:Value="Id"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_PageLink"
+                                CIDIDL:Type="TString"  CIDIDL:Value="PageLink"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_PageMap"
+                                CIDIDL:Type="TString"  CIDIDL:Value="PageMap"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Ref"
+                                CIDIDL:Type="TString"  CIDIDL:Value="Ref"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_SubDir"
+                                CIDIDL:Type="TString"  CIDIDL:Value="SubDir"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_SubTopicMap"
+                                CIDIDL:Type="TString"  CIDIDL:Value="SubTopicMap"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Title"
+                                CIDIDL:Type="TString"  CIDIDL:Value="Title"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_TopicPage"
+                                CIDIDL:Type="TString"  CIDIDL:Value="TopicPage"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Type"
+                                CIDIDL:Type="TString"  CIDIDL:Value="Type"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Virtual"
+                                CIDIDL:Type="TString"  CIDIDL:Value="Virtual"/>
+
+        </CIDIDL:Constants>
+
+        <CIDIDL:Types>
+
+            <CIDIDL:Enum CIDIDL:Name="ETypes">
+                <CIDIDL:DocText>
+                    The kinds of markup we support in our general help text content.
+                    These match the XML elements that represent these markup types.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Bold"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Break"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Code"/>
+                <CIDIDL:EnumVal CIDIDL:Name="DIV"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Image"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Indent"/>
+                <CIDIDL:EnumVal CIDIDL:Name="InlineNote"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Link"/>
+                <CIDIDL:EnumVal CIDIDL:Name="List"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ListItem"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Note"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Paragraph"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SecTitle"/>
+                <CIDIDL:EnumVal CIDIDL:Name="SubSecTitle"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Superscript"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Table"/>
+                <CIDIDL:EnumVal CIDIDL:Name="TableCol"/>
+                <CIDIDL:EnumVal CIDIDL:Name="TableRow"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Text"/>
+            </CIDIDL:Enum>
+
+        </CIDIDL:Types>
+
+    </CIDIDL:Globals>
+
+</CIDIDL:Interface>

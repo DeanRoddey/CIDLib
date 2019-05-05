@@ -15,6 +15,9 @@
 //
 // DESCRIPTION:
 //
+//  Here we do the usual thing for CIDLib based programs. We declare our facility object
+//  and main module entry point handler. The facility object is made visible to
+//  everyone else via the main hpp file.
 //
 // CAVEATS/GOTCHAS:
 //

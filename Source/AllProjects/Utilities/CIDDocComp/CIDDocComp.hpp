@@ -18,6 +18,14 @@
 //  This is the main header for the program. It brings in any other headers
 //  that are needed. All our cpp files include this.
 //
+//  This program is a documentation compiler for CIDLib. The documentation files
+//  are in AllProjects\Docs\CIDDocs. This compiler processes those files and spits
+//  out HTML content for accessing via a web browser. The output is under the build
+//  output directory, in a CIDDocs.out directory. Point the browser at the
+//  CIDDocs.html file as the starting point.
+//
+//  Some very simple javascript is used to manage links and page loading and such.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -34,46 +42,18 @@
 #include    "CIDXML.hpp"
 
 
-namespace tCIDDocComp
-{
-    // ------------------------------------------------------------------------
-    //  The types of general markup nodes we support in those places where we
-    //  allow open ended text content.
-    // ------------------------------------------------------------------------
-    enum ETypes
-    {
-        EType_None
-
-        , EType_Bold
-        , EType_Break
-        , EType_Code
-        , EType_DIV
-        , EType_Image
-        , EType_Indent
-        , EType_InlineNote
-        , EType_Link
-        , EType_List
-        , EType_ListItem
-        , EType_Note
-        , EType_Paragraph
-        , EType_SecTitle
-        , EType_SubSecTitle
-        , EType_Superscript
-        , EType_Table
-        , EType_TableCol
-        , EType_TableRow
-        , EType_Text
-    };
-}
-
-
 // -----------------------------------------------------------------------------
-//  Include our intra-facility headers
+//  Include our out facility for internal use
 // -----------------------------------------------------------------------------
 #include    "CIDDocComp_ErrorIds.hpp"
 #include    "CIDDocComp_MessageIds.hpp"
+#include    "CIDDocComp_Info.hpp"
+
 #include    "CIDDocComp_HelpNode.hpp"
-#include    "CIDDocComp_Pages.hpp"
+#include    "CIDDocComp_BasePage.hpp"
+#include    "CIDDocComp_Topics.hpp"
+#include    "CIDDocComp_HelpPage.hpp"
+
 #include    "CIDDocComp_ThisFacility.hpp"
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Latin1"?>
-<!DOCTYPE CQCTopic PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+<!DOCTYPE CIDTopic PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
 
-<CQCTopic TopicPage="Overview">
+<CIDTopic TopicPage="Overview">
 
     <PageMap>
         <PageLink FileName="Overview"/>
@@ -10,4 +10,4 @@
     <SubTopicMap>
     </SubTopicMap>
 
-</CQCTopic>
+</CIDTopic>

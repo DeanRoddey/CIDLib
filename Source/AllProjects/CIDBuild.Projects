@@ -1366,6 +1366,14 @@ PROJECT=CIDDocComp
         MSGFILE     = Yes
     END SETTINGS
 
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDDocComp_Info
+            GEN     = GLOBALS
+            NAMEEXT = Info
+        END IDLFILE
+    END IDLFILES
+
     DEPENDENTS
         CIDLib
         CIDXML

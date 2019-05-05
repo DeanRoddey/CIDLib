@@ -65,7 +65,7 @@
 <!ELEMENT   PageLink        EMPTY>
 <!ATTLIST   PageLink        Title CDATA ''
                             FileName CDATA #REQUIRED
-                            FileExt CDATA 'cqchpage'
+                            FileExt CDATA 'cidhpage'
                             Extra1 CDATA #IMPLIED
                             Extra2 CDATA #IMPLIED
                             Virtual (%YNVal;) 'No'>

@@ -14,9 +14,9 @@
 //
 // DESCRIPTION:
 //
-//  Any place that we allow general HTML content, we use the THelpNode class. This is a
-//  recursive containment class, that holds the XML nodes that we parse out of the file.
-//  We use this stuff to generate HTML content.
+//  Any place that we allow our general markup content, we use the THelpNode class. This
+//  is a recursive containment class, that holds the XML nodes that we parse out of the
+//  file. We use this stuff to generate HTML content.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -53,9 +53,51 @@ class THelpNode
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bIsEmpty() const;
 
+        tCIDLib::TBoolean bParse
+        (
+            const   TXMLTreeElement&        xtnodeText
+        );
+
+        tCIDLib::TBoolean bParseFromParent
+        (
+            const   TXMLTreeElement&        xtnodePar
+            , const TString&                strName
+            , const tCIDLib::TBoolean       bOptional
+        );
+
+        tCIDLib::TVoid OutputNodes
+        (
+                    TTextOutStream&         strmTar
+        )   const;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bProcessTableRow
+        (
+            const   TXMLTreeElement&        xtnodeRow
+        );
+
+        tCIDLib::TBoolean bProcessTable
+        (
+            const   TXMLTreeElement&        xtnodeTbl
+        );
+
+        tCIDLib::TVoid OutputTableRow
+        (
+                    TTextOutStream&         strmTar
+        )   const;
+
+        tCIDLib::TVoid OutputTable
+        (
+                    TTextOutStream&         strmTar
+        )   const;
+
 
         // -------------------------------------------------------------------
-        //  Public class members
+        //  Private class members
         //
         //  m_c4Extra
         //      Just an extra value for general use in a node type specific way.

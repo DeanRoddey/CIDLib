@@ -36,11 +36,6 @@ END CTRL
 ; ---------------------------------------------------------------------------
 ERRORS=
 
-    errcSrc_NoTopicFile         5000    No topic file was found in source path '%(1)'
-    errcSrc_TopicPgNotFound     5001    The topic page was not found
-    errcSrc_TopicNotFound       5002    No topic with the path '%(1)' was found
-    errcSrc_PageMapInfo         5003    The page map is missing required information
-    errcSrc_TopicMapInfo        5004    The topic map is missing required information
 
 END ERRORS
 

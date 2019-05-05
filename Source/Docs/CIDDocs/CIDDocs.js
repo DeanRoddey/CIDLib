@@ -22,26 +22,15 @@ function doInit()
     //  help is placed, so that we can post preview versions or old product
     //  versions, so we get it from the initial incoming URL.
     //
-    //  NOTE: For now it still doesn't work because of image references. We don't
-    //  want to hard code relative paths to the images, so until we can update the
-    //  docs compiler to generate the relative paths, we still have to only host this
-    //  help content under /Web2/CIDDocs
-    //
-    helpRoot = "/Web2/CIDDocs";
+    helpRoot = window.location.href.split('?')[0];
+    var to = helpRoot.lastIndexOf('/');
+    to = to == -1 ? helpRoot.length : to + 1;
+    helpRoot = helpRoot.substring(0, to - 1);
 
     // See if we have been asked to do debug mode
     debugCQSL = getParameterByName("debug");
 
-    //
-    //  If asked to, disable Ajax caching. WE have a debug introductory page that
-    //  will set this.
-    //
-    if (debugCQSL)
-    {
-        $.ajaxSetup({ cache: false });
-    }
-
-    //
+   //
     //  Get the invocation URL. If there are no query parms for a page to load, we load
     //  the default initial page. Else we load the indicated one.
     //
@@ -88,27 +77,9 @@ function doInit()
     topicURL = topicURL.replace(/\/\//g, '/');
     pageURL = pageURL.replace(/\/\//g, '/');
 
-    // Load the initial content when our document is ready.
-    $(document).ready
-    (
-        function(){
-            // Get the initial introduction page loaded
-            $("#RightSide").load(pageURL, function()
-            {
-                document.getElementById("CurHelpPath").innerText = pagePath;
-
-                if (tarBookMark !== "") {
-                    var bmElem = document.getElementById(tarBookMark);
-                    if (bmElem)
-                        bmElem.scrollIntoView();
-                }
-            });
-
-            $("#LeftSide").load(topicURL, function()
-            {
-            });
-        }
-    );
+    // Load the initial content
+    loadDIV(document.getElementById("LeftSide"), topicURL);
+    loadDIV(document.getElementById("RightSide"), pageURL);
 
     //
     //  Set up a history state pop handler so that we can reload the right stuff when
@@ -133,21 +104,14 @@ function doInit()
             topicURL = topicURL.replace(/\/\//g, '/');
             pageURL = pageURL.replace(/\/\//g, '/');
 
-            $("#RightSide").load(pageURL, function()
-            {
-                document.getElementById("CurHelpPath").innerText = pagePath;
+            loadRightSide(newTopic, newPage, newBookMark);
+            document.getElementById("CurHelpPath").innerText = pagePath;
 
-                if (newBookMark !== "") {
-                    var bmElem = document.getElementById(newBookMark);
-                    if (bmElem)
-                        bmElem.scrollIntoView();
-                }
-            });
-
-            // If the new path is different from the current path, load the index
-            $("#LeftSide").load(topicURL, function()
-            {
-            });
+            if (newBookMark !== "") {
+                var bmElem = document.getElementById(newBookMark);
+                if (bmElem)
+                    bmElem.scrollIntoView();
+            }
         }
     };
 }
@@ -213,7 +177,8 @@ function getParameterByName(name)
 
 //
 //  Called from topic index links that link to current level files. We just
-//  load the indicated page into the right side DIV.
+//  load the indicated page into the right side DIV and update the bookmarks
+//  if needed. We also update the current path display to reflect the new guy.
 //
 function loadRightSide(topicDir, pageToLoad, bookMark)
 {
@@ -241,21 +206,14 @@ function loadRightSide(topicDir, pageToLoad, bookMark)
     pagePath = pagePath.replace(/\/\//g, '/');
     newFile = newFile.replace(/\/\//g, '/');
 
-    $(document).ready
-    (
-        function(){
-            $("#RightSide").load(newFile, function()
-            {
-                document.getElementById("CurHelpPath").innerText = pagePath;
+    loadDIV(document.getElementById("RightSide"), newFile);
+    document.getElementById("CurHelpPath").innerText = pagePath;
 
-                if (bookMark !== "") {
-                    var bmElem = document.getElementById(bookMark);
-                    if (bmElem)
-                        bmElem.scrollIntoView();
-                }
-            });
-        }
-    );
+    if (bookMark !== "") {
+        var bmElem = document.getElementById(bookMark);
+        if (bmElem)
+            bmElem.scrollIntoView();
+    }
     return true;
 }
 
@@ -292,20 +250,14 @@ function loadDynDiv(topicDir, topicPage)
     topicURL = topicURL.replace(/\/\//g, '/');
     pageURL = pageURL.replace(/\/\//g, '/');
 
-    $(document).ready
-    (
-        function(){
-            $("#RightSide").load(pageURL, function()
-            {
-                document.getElementById("CurHelpPath").innerText = pagePath;
-            });
+    document.getElementById("CurHelpPath").innerText = pagePath;
+    loadDIV(document.getElementById("RightSide"), pageURL);
 
-            $("#LeftSide").load(topicURL, function()
-            {
-            });
-        }
-    );
     return true;
+}
+
+async function loadDIV(tarDIV, toload) {
+    tarDIV.innerHTML = await (await fetch(toload)).text();
 }
 
 
@@ -313,4 +265,3 @@ function loadDynDiv(topicDir, topicPage)
 //  Kick off the initialization
 // -------------------------------------------------------------------
 window.onload=doInit;
-
