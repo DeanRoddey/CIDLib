@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>CIDEncode - Text Transcoding</Title>
+
+    <HelpText>
+
+        <P>CIDEncode provides higher level text transcoding services. The CIDLib facility provides direct access to a handful of text converters (as they are called in CIDLib) for very common encodings (UTF-8, US-ASCII, UTF-16BE/LE, and native wide character.) But beyond that you would use CIDEncode to access other converters.</P>
+
+        <P>To avoid a lot of head visibility, the facility class for CIDEncode provides a factory method to gen up text converters based on their encoding names (and plenty of common naming variations.) So you pass it an encoding name and, if it supports that encoding, it allocates a converter and returns it to you. You are responsible for freeing it when done.</P>
+
+        <P>The encodings currently supported (and their naming variations) are:</P>
+
+        <Table Class="HVHeaderTable">
+            <TableRow><TableCol>Encoding</TableCol><TableCol>Alternative names</TableCol></TableRow>
+            <TableRow><TableCol>CP437</TableCol><TableCol>CP437, IBM437</TableCol></TableRow>
+            <TableRow><TableCol>CP850</TableCol><TableCol>CP850</TableCol></TableRow>
+            <TableRow><TableCol>EBCDIC-CP-US </TableCol><TableCol>EBCDIC-CP-US, CP037, CPIBM037, IBM037, EBCDIC-CP-CA, EBCDIC-CP-WT, EBCDIC-CP-NL</TableCol></TableRow>
+            <TableRow><TableCol>Latin1</TableCol><TableCol>Latin1, Latin-1, ISO-8859-1, 8859-1, CP819</TableCol></TableRow>
+            <TableRow><TableCol>Latin2</TableCol><TableCol>Latin2, Latin-2, ISO-8859-2, 8859-2, CP912, IBM912</TableCol></TableRow>
+            <TableRow><TableCol>Latin3</TableCol><TableCol>Latin3, Latin-3, ISO-8859-3, 8859-3, CP913, IBM913</TableCol></TableRow>
+            <TableRow><TableCol>Latin5</TableCol><TableCol>Latin4, Latin-4, ISO-8859-4, 8859-4, CP914, IBM914, CYRILLIC</TableCol></TableRow>
+            <TableRow><TableCol>Latin6</TableCol><TableCol>Latin6, Latin-6, ISO-8859-6, 8859-6, CP1089, IBM1089, ARABIC</TableCol></TableRow>
+            <TableRow><TableCol>UTF8</TableCol><TableCol>UTF-8, UTF_8</TableCol></TableRow>
+            <TableRow><TableCol>USASCII</TableCol><TableCol>US-ASCII, US_ASCII, ASCII</TableCol></TableRow>
+            <TableRow><TableCol>UCS4BE</TableCol><TableCol>UCS-4B, UCS-4BE, UCS4-B, UCS4-BE</TableCol></TableRow>
+            <TableRow><TableCol>UCS4LE</TableCol><TableCol>UCS-4L, UCS-4LE, UCS4-L, UCS4-LE</TableCol></TableRow>
+            <TableRow><TableCol>UTF16LE</TableCol><TableCol>UTF16LE, UTF16-LE, UTF16_LE, UTF-16LE, UTF16L,  UTF16-L, UTF-16L</TableCol></TableRow>
+            <TableRow><TableCol>UTF16BE</TableCol><TableCol>UTF16BE, UTF16-BE, UTF16_BE, UTF-16BE, UTF16B, UTF16-B, UTF-16B</TableCol></TableRow>
+            <TableRow><TableCol>Windows-1251</TableCol><TableCol>CP1251, WINDOWS-1251</TableCol></TableRow>
+            <TableRow><TableCol>Windows-1252</TableCol><TableCol>CP1252, WINDOWS-1252, CP1004</TableCol></TableRow>
+        </Table>
+
+        <P>The following encodings are not endian specific, so if you use them, they will be assumed to use the local host's endian format. So if you are on a little endian machine, they will be little endian, and vice versa. So generally you would want to avoid these unless you know the the text is in local format..</P>
+
+        <Table Class="HVHeaderTable">
+            <TableRow><TableCol>Encoding</TableCol><TableCol>Alternative names</TableCol></TableRow>
+            <TableRow><TableCol>UTF-16</TableCol><TableCol>UTF-16, UTF_16, UCS-2, UCS_2, UCS2, ISO-10646-UCS-2,CP1200</TableCol></TableRow>
+            <TableRow><TableCol>UCS-4</TableCol><TableCol>UCS-4, UCS_4, UCS4</TableCol></TableRow>
+        </Table>
+
+        <Note>There is also a $NativeWideChar$ encoding which represents the local native wide character format.</Note>
+
+    </HelpText>
+
+</HelpPage>

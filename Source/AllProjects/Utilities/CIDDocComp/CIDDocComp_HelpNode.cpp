@@ -162,6 +162,10 @@ tCIDLib::TBoolean THelpNode::bParse(const TXMLTreeElement& xtnodeText)
             {
                 hnNew.m_eType = tCIDDocComp::ETypes::InlineNote;
             }
+             else if (strQName.bCompare(L"Italic"))
+            {
+                hnNew.m_eType = tCIDDocComp::ETypes::Italic;
+            }
              else if (strQName.bCompare(L"Link"))
             {
                 hnNew.m_eType = tCIDDocComp::ETypes::Link;
@@ -321,6 +325,14 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
+            case tCIDDocComp::ETypes::Italic :
+            {
+                strmTar << L"<I>";
+                hnCur.OutputNodes(strmTar);
+                strmTar << L"</I>";
+                break;
+            }
+
             case tCIDDocComp::ETypes::Link :
             {
                 // Depending on type, add other attributes
@@ -342,11 +354,11 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 }
                  else if (hnCur.m_strType == L"Page")
                 {
-                    strmTar << L"<a onclick=\"javascript:loadDynDiv('"
+                    strmTar << L"<a onclick=\"javascript:loadTopic('"
                             << hnCur.m_strRef
                             << L"', '"
                             << hnCur.m_strID
-                            << L"');\" href='javascript:void(0)'"
+                            << L"', true);\" href='javascript:void(0)'"
                             << L">";
                 }
                  else if (hnCur.m_strType == L"Extern")
@@ -538,7 +550,7 @@ tCIDLib::TVoid THelpNode::OutputTableRow(TTextOutStream& strmTar) const
             strmTar << L"<td colspan=\"" << hnCol.m_c4Extra << L"\">";
         else
             strmTar << L"<td>";
-        OutputNodes(strmTar);
+        hnCol.OutputNodes(strmTar);
         strmTar << L"</td>";
     }
 }
@@ -559,7 +571,7 @@ tCIDLib::TVoid THelpNode::OutputTable(TTextOutStream& strmTar) const
         CIDAssert(hnRow.m_eType == tCIDDocComp::ETypes::TableRow, L"Expected a table row");
 
         strmTar << L"<tr>";
-        OutputTableRow(strmTar);
+        hnRow.OutputTableRow(strmTar);
         strmTar << L"</tr>";
     }
 

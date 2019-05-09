@@ -1,4 +1,4 @@
-<!ENTITY % HelpContent '#PCDATA | Br | Bold | Code | DIV | Image | Indent | Link | List
+<!ENTITY % HelpContent '#PCDATA | Br | Bold | Code | DIV | Image | Indent | Italic | Link | List
                         | Note | P | PgTitle  | SecTitle | SubSecTitle | Superscript
                         | Table | Title'>
 <!ENTITY % BoolVal 'False | True'>
@@ -20,6 +20,7 @@
 <!ATTLIST   Image       Ref CDATA #REQUIRED
                         Type (Inline | FloatLeft | FloatRight) 'Inline'>
 <!ELEMENT   Indent      (%HelpContent;)>
+<!ELEMENT   Italic      (#PCDATA)>
 <!ELEMENT   Link        (#PCDATA)>
 <!ATTLIST   Link        Ref CDATA #REQUIRED
                         Id CDATA #IMPLIED

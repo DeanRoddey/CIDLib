@@ -146,14 +146,11 @@ TFacCIDDocComp::eMainThread(TThread& thrThis, tCIDLib::TVoid* pData)
         LoadDTD();
 
         //
-        //  We have to create a special case root topic to start the process. His
-        //  source path is in the Src directory under our top level source path.
+        //  We have to create a special case root topic to start the process.
         //
-        TPathStr pathTopSrc(m_strSrcPath);
-        pathTopSrc.AddLevel(L"Src");
         m_cptrRoot.SetPointer
         (
-            new TTopic(L"Root", L"/", TString::strEmpty(), pathTopSrc)
+            new TTopic(L"Root", L"/", TString::strEmpty(), m_strSrcPath)
         );
 
         if (m_cptrRoot->bParse(m_xtprsToUse))

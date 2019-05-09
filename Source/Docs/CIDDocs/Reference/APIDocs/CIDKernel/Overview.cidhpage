@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>CIDKernel - The 'Virtual OS'</Title>
+
+    <HelpText>
+
+        <P>CIDKernel is not a facility you will use that often, but it's important you know what it is and why it's there. And you will use some of its features if you need to do any lower level code, and also it provides some very fundamental helper methods for common operations like bit manipulation, generic equality and comparision functions, core janitor classes, value swapping, and so forth, mostly very simple inlined and template based stuff.</P>
+
+        <Note>Note that a handful of the more fundamental facilities, those that are wrapping system services, actually have some of their basic types and constants live down here. That's because those types and constants must be visible to code at this level. So, though they will be defined in the context of the facilities they really belong to, they actually live down here. The files CIDKernel_Type.hpp has most of these, with those related to the windowing system bein gin CIDkernel_Type_Ctrls.hpp.</Note>
+
+        <P>CIDKernel is effectively a 'virtual operating system', in that it provides to the rest of CIDLib (and derived works) the same sort of services that the actual underlying operating system provides to it. Just as you don't write much non-CIDLib based code directly to the raw operating system APIs, you don't write much (or even any) of your CIDLib code to these fundamental CIDKernel APIs.</P>
+
+        <P>Part of the reason for this is related to bootstrapping. We can't use classes at this level which need to use the fundamental services provided at this level. That's a circular problem. So in fact most of the functionality provided by CIDKernel you will actually access via the CIDLib facility, which gets us around the sort of otherwise circular bootstrapping issues we'd have otherwise. And to a lesser extent some of the other lower level facilities.</P>
+
+        <P>It also is split into class interfaces, and class implementations many of which are in per-platform sub-directories, e.g. Win32. Since most of the functionality at this level consists of wrappers around underlying OS APIs, this allows us to support multiple platforms, each providing their own implementations of these classes.</P>
+
+        <Note>This isn't the only facility that deals with system APIs. Pushing everything of that sort into this layer would mean a large burden for every CIDLib based application. There are a handful of others which have some per-platform split type classes to wrap less commonly used system APIs.</Note>
+
+    </HelpText>
+
+</HelpPage>

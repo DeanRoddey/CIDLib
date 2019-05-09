@@ -71,6 +71,7 @@
                 <CIDIDL:EnumVal CIDIDL:Name="Image"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Indent"/>
                 <CIDIDL:EnumVal CIDIDL:Name="InlineNote"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Italic"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Link"/>
                 <CIDIDL:EnumVal CIDIDL:Name="List"/>
                 <CIDIDL:EnumVal CIDIDL:Name="ListItem"/>

@@ -63,23 +63,8 @@ function doInit()
         history.replaceState(stateObj, null, initURL);
     }
 
-    // Build up the left and right side URLs
-    var pagePath= tarTopic + "/" + tarPage;
-    var topicURL = helpRoot + tarTopic + "/CIDTopicIndex.html";
-    var pageURL = helpRoot + pagePath + ".html";
-
-    //
-    //  Make sure no double slashes. Do the page path twice since it can end up
-    //  with three slashes.
-    //
-    pagePath = pagePath.replace(/\/\//g, '/');
-    pagePath = pagePath.replace(/\/\//g, '/');
-    topicURL = topicURL.replace(/\/\//g, '/');
-    pageURL = pageURL.replace(/\/\//g, '/');
-
-    // Load the initial content
-    loadDIV(document.getElementById("LeftSide"), topicURL);
-    loadDIV(document.getElementById("RightSide"), pageURL);
+    // Load the initial left/right side content
+    loadTopic(tarTopic, tarPage, false);
 
     //
     //  Set up a history state pop handler so that we can reload the right stuff when
@@ -95,18 +80,13 @@ function doInit()
             var newPage = newState["page"];
             var newBookMark = newState["bookmark"];
 
-            var pagePath= newTopic + "/" + newPage;
-            var topicURL = helpRoot + newTopic + "/CIDTopicIndex.html";
-            var pageURL = helpRoot + pagePath + ".html";
+            // Load the restored left/right side URLs
+            loadTopic(newTopic, newPage, newBookMark, false);
 
-            pagePath = pagePath.replace(/\/\//g, '/');
-            pagePath = pagePath.replace(/\/\//g, '/');
-            topicURL = topicURL.replace(/\/\//g, '/');
-            pageURL = pageURL.replace(/\/\//g, '/');
+            // Show the new page path
+            document.getElementById("CurHelpPath").innerText = makePagePath(newTopic, newPage);
 
-            loadRightSide(newTopic, newPage, newBookMark);
-            document.getElementById("CurHelpPath").innerText = pagePath;
-
+            // If restoring a bookmark try to make it visible
             if (newBookMark !== "") {
                 var bmElem = document.getElementById(newBookMark);
                 if (bmElem)
@@ -183,37 +163,20 @@ function getParameterByName(name)
 function loadRightSide(topicDir, pageToLoad, bookMark)
 {
     // Set up an undo history state for thew new page
-    if (history.pushState) {
-        var stateObj = {
-            topic : topicDir,
-            page : pageToLoad,
-            bookmark : bookMark
-        };
+    pushPageHistory(topicDir, pageToLoad, bookMark);
 
-        var newURL = helpRoot + "/CIDDocs.html?topic="
-                      + topicDir + "&page=" + pageToLoad;
+    // Generate the page URL and load it to the right side DIV
+    loadDIV(document.getElementById("RightSide"), makePageURL(topicDir, pageToLoad));
 
-        if (bookMark !== "")
-            newURL += "&bookmark=" + bookMark;
-
-        history.pushState(stateObj, "CID Topic", newURL);
-    }
-
-    var pagePath = topicDir + "/" + pageToLoad
-    var newFile = helpRoot + pagePath + ".html";
-
-    pagePath = pagePath.replace(/\/\//g, '/');
-    pagePath = pagePath.replace(/\/\//g, '/');
-    newFile = newFile.replace(/\/\//g, '/');
-
-    loadDIV(document.getElementById("RightSide"), newFile);
-    document.getElementById("CurHelpPath").innerText = pagePath;
-
+    // If we have a book mark, try to make it visible
     if (bookMark !== "") {
         var bmElem = document.getElementById(bookMark);
         if (bmElem)
             bmElem.scrollIntoView();
     }
+
+    // Show the page path to the user
+    document.getElementById("CurHelpPath").innerText = makePagePath(topicDir, pageToLoad);
     return true;
 }
 
@@ -226,38 +189,71 @@ function loadRightSide(topicDir, pageToLoad, bookMark)
 //  It's also called from a click on a generated page type link, which will pass in
 //  the same info.
 //
-function loadDynDiv(topicDir, topicPage)
+function loadTopic(topicDir, topicPage, pushHistory)
 {
     // Push an undo history state for this new page
-    if (history.pushState) {
-        var stateObj = {
-            topic : topicDir,
-            page : topicPage,
-            bookmark : ""
-        };
+    if (pushHistory)
+        pushPageHistory(topicDir, topicPage, "");
 
-        var newURL = helpRoot + "/CIDDocs.html?topic="
-                     + topicDir + "&page=" + topicPage;
-        history.pushState(stateObj, "CID Topic", newURL);
-    }
-
-    var pagePath = topicDir + "/" + topicPage;
-    var topicURL = helpRoot + topicDir + "/CIDTopicIndex.html";
-    var pageURL = helpRoot + pagePath + ".html";
-
-    pagePath = pagePath.replace(/\/\//g, '/');
-    pagePath = pagePath.replace(/\/\//g, '/');
-    topicURL = topicURL.replace(/\/\//g, '/');
-    pageURL = pageURL.replace(/\/\//g, '/');
-
-    document.getElementById("CurHelpPath").innerText = pagePath;
+    // Create our left/right side URLs and load them to their respective DIVs
+    var topicURL = makeTopicURL(topicDir);
+    var pageURL = makePageURL(topicDir, topicPage);
+    loadDIV(document.getElementById("LeftSide"), topicURL);
     loadDIV(document.getElementById("RightSide"), pageURL);
+
+    // Show the page path to the user as well
+    document.getElementById("CurHelpPath").innerText = makePagePath(topicDir, topicPage);
 
     return true;
 }
 
 async function loadDIV(tarDIV, toload) {
     tarDIV.innerHTML = await (await fetch(toload)).text();
+}
+
+
+//
+//  Given a topic directory (which is the relative / style path to the topic)
+//  generate a URL for that topic.
+//
+//  And the same for a right side (page) URL. And to create the 'page path' that
+//  we display to the user.
+//
+function makeTopicURL(topicDir) {
+    var topicURL = helpRoot + topicDir + "/CIDTopicIndex.html";
+    topicURL = topicURL.replace(/\/\//g, '/');
+    return topicURL;
+}
+
+function makePageURL(topicDir, pageName) {
+    var pageURL = helpRoot + topicDir + "/" + pageName + ".html";
+    pageURL = pageURL.replace(/\/\//g, '/');
+    pageURL = pageURL.replace(/\/\//g, '/');
+    return pageURL;
+}
+
+function makePagePath(topicDir, pageName) {
+    var pagePath = topicDir + "/" + pageName;
+    pagePath = pagePath.replace(/\/\//g, '/');
+    pagePath = pagePath.replace(/\/\//g, '/');
+    return pagePath;
+}
+
+
+// Pushes a topic onto the history stack
+function pushPageHistory(topicDir, pageName, bookMark) {
+
+    if (history.pushState) {
+        var stateObj = {
+            topic : topicDir,
+            page : pageName,
+            bookmark : bookMark
+        };
+
+        var newURL = helpRoot + "/CIDDocs.html?topic="
+                     + topicDir + "&page=" + pageName;
+        history.pushState(stateObj, "CID Topic", newURL);
+    }
 }
 
 

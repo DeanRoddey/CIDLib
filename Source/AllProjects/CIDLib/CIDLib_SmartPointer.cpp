@@ -39,7 +39,7 @@ tCIDLib::TVoid TSmartPtrHelpers::ThrowNullRef(const tCIDLib::TCard4 c4Line)
     (
         CID_FILE
         , c4Line
-        , kCIDErrs::errcSPtr_RefReleaseErr
+        , kCIDErrs::errcSPtr_NoReference
         , TKrnlError::kerrLast()
         , tCIDLib::ESeverities::Failed
         , tCIDLib::EErrClasses::Internal

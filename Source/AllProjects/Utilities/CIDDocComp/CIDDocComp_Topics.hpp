@@ -62,7 +62,7 @@ class TTopic
         TTopic
         (
             const   TString&                strTitle
-            , const TString&                strTopicPath
+            , const TString&                strParTopicPath
             , const TString&                strTopicName
             , const TString&                strSrcPath
         );
@@ -131,9 +131,15 @@ class TTopic
         //      These are the recursive child topics under this one. We parse this from
         //      the topic file.
         //
-        //  m_strSrcPath
+        //  m_pathSource
         //      The file system path to our topic directory. This is set on us before
-        //      parsing.
+        //      parsing obviously.
+        //
+        //  m_strParTopicPath
+        //      This is our parent topic path. We keep this separately because the
+        //      javascript stuff works in terms of paths and pages, so every time we
+        //      need to generate an HTML link for our topic, we'd have to break this
+        //      out anyway.
         //
         //  m_strTitle
         //      The title of this topic, used in the topic list on the left. This is
@@ -154,7 +160,8 @@ class TTopic
         // -------------------------------------------------------------------
         TPageList       m_colPages;
         TSubTopicList   m_colSubTopics;
-        TString         m_strSrcPath;
+        TPathStr        m_pathSource;
+        TString         m_strParTopicPath;
         TString         m_strTitle;
         TString         m_strTopicName;
         TString         m_strTopicPath;

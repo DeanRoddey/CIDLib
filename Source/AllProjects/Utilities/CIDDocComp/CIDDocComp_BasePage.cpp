@@ -113,9 +113,13 @@ TBasePage::TBasePage(const  TString&            strExtTitle
     , m_strParSrcDir(strParSrcDir)
     , m_strParTopic(strParTopic)
 {
-    // Build up our page path
+    //
+    //  Build up our page path. We have to special case the root, so we don't end
+    //  up with double slashes.
+    //
     m_strPagePath = strParTopic;
-    m_strPagePath += kCIDLib::chForwardSlash;
+    if (m_strParTopic.chLast() != kCIDLib::chForwardSlash)
+        m_strPagePath += kCIDLib::chForwardSlash;
     m_strPagePath += strFileName;
 }
 
@@ -195,7 +199,7 @@ tCIDLib::TVoid TBasePage::GenerateOutput(const TString& strParPath) const
 
 
 tCIDLib::TVoid
-TBasePage::GenerateTopicLink(TTextOutStream& strmTar) const
+TBasePage::GenerateLink(TTextOutStream& strmTar) const
 {
     // If we got alias text, we use that as the link text, else we use the page's title.
     strmTar  << L"<a onclick=\"javascript:loadRightSide('"

@@ -37,16 +37,33 @@
 // ---------------------------------------------------------------------------
 //  TTopic: Constructors and Destructor
 // ---------------------------------------------------------------------------
+
+//
+//  We have a big special case here that the topic name will be empty for the
+//  root topic (and the parent path will be /).
+//
 TTopic::TTopic( const   TString&    strTitle
-                , const TString&    strTopicPath
+                , const TString&    strParTopicPath
                 , const TString&    strTopicName
                 , const TString&    strSrcPath) :
 
-    m_strSrcPath(strSrcPath)
+    m_pathSource(strSrcPath)
+    , m_strParTopicPath(strParTopicPath)
     , m_strTitle(strTitle)
     , m_strTopicName(strTopicName)
-    , m_strTopicPath(strTopicPath)
 {
+    // Build up our own source directory
+	if (!m_strTopicName.bIsEmpty())
+        m_pathSource.AddLevel(m_strTopicName);
+
+    // Build up our own topic path
+    m_strTopicPath = strParTopicPath;
+    if (!m_strTopicName.bIsEmpty())
+    {
+		if (m_strTopicPath.chLast() != kCIDLib::chForwardSlash)
+			m_strTopicPath += kCIDLib::chForwardSlash;
+        m_strTopicPath += strTopicName;
+    }
 }
 
 TTopic::~TTopic()
@@ -65,7 +82,7 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
     facCIDDocComp.strmOut() << L"\n   Parsing Topic: " << m_strTopicPath << kCIDLib::EndLn;
 
     // Build up the path to the topic file
-    TPathStr pathTopicFile(m_strSrcPath);
+    TPathStr pathTopicFile(m_pathSource);
     pathTopicFile.AddLevel(L"CIDTopic");
     pathTopicFile.AppendExt(L"xml");
 
@@ -161,7 +178,7 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
             {
                 THelpPage* ppgNew = new THelpPage
                 (
-                    strExtTitle, m_strSrcPath, m_strTopicPath, strFileName, strExt, bVirtual
+                    strExtTitle, m_pathSource, m_strTopicPath, strFileName, strExt, bVirtual
                 );
                 m_colPages.objAdd(TPagePtr(ppgNew));
             }
@@ -185,8 +202,6 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
         const tCIDLib::TCard4 c4Count = xtnodeTopics.c4ChildCount();
         TString strTopicName;
         TString strTitle;
-        TString strTopicPath;
-        TPathStr pathSrc;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
             const TXMLTreeNode& xtnodeCur = xtnodeTopics.xtnodeChildAt(c4Index);
@@ -207,17 +222,10 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
             }
 
             //
-            //  Let's add this one to our list. We need to build up his source directory
-            //  and topic path.
-            //
-            strTopicPath = m_strTopicPath;
-            strTopicPath += kCIDLib::chForwardSlash;
-            strTopicPath += strTopicName;
-            pathSrc = m_strSrcPath;
-            pathSrc.AddLevel(strTopicName);
+            //  Let's add this one to our list
             m_colSubTopics.objAdd
             (
-                TTopicPtr(new TTopic(strTitle, strTopicPath, strTopicName, pathSrc))
+                TTopicPtr(new TTopic(strTitle, m_strTopicPath, strTopicName, m_pathSource))
             );
         }
     }
@@ -318,13 +326,15 @@ TTopic::GenerateOutput( const   TString&    strOutPath
     //
     //  Create our output path. It is the parent output path plus our topic name
     //  which is used to create a new sub-dir. If this is the root, then we don't
-    //  do anything since its topic path is empty.
+    //  do anything since its topic name is empty.
     //
     TPathStr pathOurPath(strOutPath);
     if (!m_strTopicName.bIsEmpty())
     {
         pathOurPath.AddLevel(m_strTopicName);
-        TFileSys::MakeSubDirectory(m_strTopicName, strOutPath);
+
+        if (!TFileSys::bIsDirectory(pathOurPath))
+            TFileSys::MakeSubDirectory(m_strTopicName, strOutPath);
     }
 
     // Do our own index links page first, which will go into the left hand side
@@ -356,13 +366,13 @@ TTopic::GenerateOutput( const   TString&    strOutPath
         for (; cursPages; ++cursPages)
         {
             const TPagePtr& cptrCur = *cursPages;
-            cptrCur->GenerateOutput(strOutPath);
+            cptrCur->GenerateOutput(pathOurPath);
         }
     }
 
     // And recurse on child topics
     {
-        // Give them our output path, and they can build theirs from that
+
         TSubTopicList::TCursor cursSubs(&m_colSubTopics);
         for (; cursSubs; ++cursSubs)
         {
@@ -375,11 +385,11 @@ TTopic::GenerateOutput( const   TString&    strOutPath
 
 tCIDLib::TVoid TTopic::GenerateTopicLink(TTextOutStream& strmTar) const
 {
-    strmTar << L"<a onclick=\"javascript:loadDynDiv('"
+    strmTar << L"<a onclick=\"javascript:loadTopic('"
             << m_strTopicPath
             << L"', '/"
-            << m_strTopicName
-            << L"');\" href='javascript:void(0)'>"
+            << m_strTopicPage
+            << L"', true);\" href='javascript:void(0)'>"
             << m_strTitle
             << L"</a><br/>\n";
 }
@@ -405,7 +415,7 @@ TTopic::GenerateTopicIndex(         TTextOutStream& strmOutFl
     {
         TPagePtr cptrMain = cptrFindPage(m_strTopicPage);
         if (cptrMain)
-            cptrMain->GenerateTopicLink(strmOutFl);
+            cptrMain->GenerateLink(strmOutFl);
 
         // We want a break after this one if there's more than one
         if (m_colPages.c4ElemCount() > 1)
@@ -424,7 +434,7 @@ TTopic::GenerateTopicIndex(         TTextOutStream& strmOutFl
 
             // If not the topic page, then generate a link
             if (!cptrCur->bIsThisName(m_strTopicPage))
-                cptrCur->GenerateTopicLink(strmOutFl);
+                cptrCur->GenerateLink(strmOutFl);
         }
     }
 
@@ -450,17 +460,17 @@ TTopic::GenerateTopicIndex(         TTextOutStream& strmOutFl
     //  previous level. It invokes a javacript function that knows it is getting a
     //  topic level link.
     //
-    if (m_strTopicPath != L"/")
+    if (!m_strTopicName.bIsEmpty())
     {
         // Get the topic page for the parent topic. If not found it will show an error
         TPagePtr cptrTopic = cptrParent->cptrTopicPage();
         if (cptrTopic)
         {
-            strmOutFl   << L"<br/><a onclick=\"javascript:loadDynDiv('"
+            strmOutFl   << L"<br/><a onclick=\"javascript:loadTopic('"
                         << cptrParent->m_strTopicPath
                         << L"', '"
-                        << cptrParent->m_strTopicName
-                        << L"');\" href='javascript:void(0)'>Up</a><p/>";
+                        << cptrParent->m_strTopicPage
+                        << L"', true);\" href='javascript:void(0)'>Up</a><p/>";
         }
     }
 }

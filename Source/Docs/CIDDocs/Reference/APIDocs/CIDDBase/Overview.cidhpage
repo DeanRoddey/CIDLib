@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>CIDDBase - ODBC</Title>
+
+    <HelpText>
+
+        <P>CIDDBase provides a wrapper around the system's ODBC capabilities. Since this is more likely not to be needed, it is not wrapped in the CIDKernel layer. So this facility has per-platform implementation code.</P>
+
+        <P>The functionality is not super-extensive, but it would be enough for most applications. It will be expanded over time as required. Currently it provides this functionality:</P>
+
+        <List Type="Unordered">
+            <LItem Ref="Sources">You can query available data sources.</LItem>
+            <LItem Ref="Connections">To make a connection to a database, which is of course used in subsequent operations. These can be via ODBC sources or using connection strings.</LItem>
+            <LItem Ref="Statements">To issue SQL statements to the database, to iterate the returned rows, and to bind the returned columns to data members.</LItem>
+            <LItem Ref="Bindings">Represent bindings between the columns of returned rows and your own data members so that you can get to the resulting data rows.</LItem>
+            <LItem Ref="Transactions">Either explicit or using janitor objects for scope based transaction safety.</LItem>
+        </List>
+
+    </HelpText>
+
+</HelpPage>

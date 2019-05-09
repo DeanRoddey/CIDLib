@@ -106,7 +106,7 @@ class TBasePage
             const   TString&                strParPath
         )   const;
 
-        tCIDLib::TVoid GenerateTopicLink
+        tCIDLib::TVoid GenerateLink
         (
                     TTextOutStream&         strmTar
         )   const;

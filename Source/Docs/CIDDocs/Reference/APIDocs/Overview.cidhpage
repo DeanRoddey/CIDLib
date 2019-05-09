@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>The CIDLib API</Title>
+
+    <HelpText>
+
+        <P>This section contains the detailed documentation of the facilities that CIDLib provides and the classes, types, constants, etc... that those facilities define. So there's a lot of stuff in here, and this is where you will likely spend most of your time once you have gotten over the learning curve.</P>
+
+        <P>So the links to the left are the facilities, roughly in order of their interdependencies, so click on the facility to get an overview of what is is and what it provides, and it will provide further links to the various classes, constants, etc...</P>
+
+    </HelpText>
+
+</HelpPage>
