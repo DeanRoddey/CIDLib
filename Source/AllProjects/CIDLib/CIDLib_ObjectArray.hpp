@@ -416,6 +416,16 @@ class TObjArray : public TObject, public MDuplicable
             const tCIDLib::TCard4 c4StartAt = tCIDLib::TCard4(tStartAt);
 
             TMtxLocker lockThis(this->pmtxLock());
+
+			//
+			//	We can allow the start index to be at the item past the end. We just
+			//	don't enter the loop in that case and return not found. Since we
+			//	don't have a checking helper for that, we'll do it ourself up front.
+			//
+			if (c4StartAt == m_c4ElemCount)
+				return tNotFound;
+
+			// Otherwise, it has to be a valid index
             VerifyIndex(c4StartAt, CID_LINE);
             for (tCIDLib::TCard4 c4Ind = c4StartAt; c4Ind < m_c4ElemCount; c4Ind++)
             {

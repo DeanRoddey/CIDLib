@@ -8,6 +8,8 @@
 
         <P>You'll see this stuff in practical terms if you watch the videos and go through the sample files, but just for the record, we'll lay out the files that make up a typical CIDLib facility.</P>
 
+        <Note>Note that these are not just conventions, the build system understands these files and that's a large part of why the build system can be so straightforward. Bend as the willow tree and you will find good fortune.</Note>
+
         <P>For convenience, we'll assume this is for a facility named Magnum.</P>
 
         <List Type="Unordered">

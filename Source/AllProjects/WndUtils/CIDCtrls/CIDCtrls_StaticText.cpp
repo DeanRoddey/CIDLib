@@ -121,8 +121,7 @@ TStaticText::InitFromDesc(  const   TWindow&                wndParent
     {
         tCIDGraphDev::TFontHandle hfontUse = kCIDGraphDev::hfontInvalid;
         if (dlgiSrc.bHasHint(kCIDCtrls::strHint_Prefix)
-        ||  dlgiSrc.bHasHint(kCIDCtrls::strHint_Label)
-        ||  dlgiSrc.bHasHint(kCIDCtrls::strHint_EmphVal))
+        ||  dlgiSrc.bHasHint(kCIDCtrls::strHint_Label))
         {
             hfontUse = TGUIFacility::gfontDefBold().hfontThis();
         }
