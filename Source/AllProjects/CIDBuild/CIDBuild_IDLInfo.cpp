@@ -500,14 +500,11 @@ tCIDLib::TVoid TIDLInfo::GenerateCode(const TProjectInfo& projiSrc)
     }
 
     // Ok, lets try to invoke the IDL compiler
+    tCIDLib::TCard4 c4Flags = kCIDBuild::c4ExecFlag_None;
+    if (facCIDBuild.bLowPrio())
+        c4Flags |= kCIDBuild::c4ExecFlag_LowPrio;
     tCIDLib::TCard4 c4Result;
-    const tCIDLib::TBoolean bRes = TUtils::bExec
-    (
-        apszArgs
-        , c4ArgCount
-        , c4Result
-        , facCIDBuild.bLowPrio()
-    );
+    const tCIDLib::TBoolean bRes = TUtils::bExec(apszArgs, c4ArgCount, c4Result, c4Flags);
 
     // Space the output if verbose
     if (facCIDBuild.bVerbose())

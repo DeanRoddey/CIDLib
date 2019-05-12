@@ -126,7 +126,7 @@ tCIDLib::TBoolean
 TUtils::bExec(  const   tCIDLib::TCh* const*    apszParams
                 , const tCIDLib::TCard4         c4Count
                 ,       tCIDLib::TCard4&        c4Result
-                , const tCIDLib::TBoolean       bLowPrio)
+                , const tCIDLib::TCard4         c4Flags)
 {
     tCIDLib::TBoolean bRet = kCIDLib::False;
 
@@ -164,31 +164,40 @@ TUtils::bExec(  const   tCIDLib::TCh* const*    apszParams
         TRawStr::CatStr(szCmdLine, L" ");
     }
 
-// stdOut << szCmdLine << kCIDBuild::EndLn;
+    const tCIDLib::TBoolean bAsync = (c4Flags & kCIDBuild::c4ExecFlag_Async) != 0;
 
     tCIDLib::TCard4 c4CreateFlags = CREATE_DEFAULT_ERROR_MODE;
-    if (bLowPrio)
-        c4CreateFlags |= IDLE_PRIORITY_CLASS;
-
+    TSaveInfo SaveInfo;
     STARTUPINFO Startup = {0};
     Startup.cb = sizeof(STARTUPINFO);
-    Startup.dwFlags = STARTF_USESTDHANDLES;
-    Startup.hStdInput = ::GetStdHandle(STD_INPUT_HANDLE);
-    Startup.hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
-    Startup.hStdError = ::GetStdHandle(STD_ERROR_HANDLE);
+    if (c4Flags & kCIDBuild::c4ExecFlag_LowPrio)
+        c4CreateFlags |= IDLE_PRIORITY_CLASS;
 
-    //
-    //  To prevent the child process from freaking out our console handle
-    //  mode settings, save them and restore them.
-    //
-    TSaveInfo SaveInfo;
-    SaveInfo.hIn = ::GetStdHandle(STD_INPUT_HANDLE);
-    SaveInfo.bInCon = ::GetConsoleMode(SaveInfo.hIn, &SaveInfo.dwInFlags);
+    if (bAsync)
+    {
+        // If async, let it run in its own console
+        c4CreateFlags |= CREATE_NEW_CONSOLE;
+    }
+     else
+    {
+        // If not async, then it's sharing our console
+        Startup.dwFlags = STARTF_USESTDHANDLES;
+        Startup.hStdInput = ::GetStdHandle(STD_INPUT_HANDLE);
+        Startup.hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
+        Startup.hStdError = ::GetStdHandle(STD_ERROR_HANDLE);
 
-    SaveInfo.hOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
-    SaveInfo.bOutCon = ::GetConsoleMode(SaveInfo.hOut, &SaveInfo.dwOutFlags);
+        //
+        //  To prevent the child process from freaking out our console handle
+        //  mode settings, save them and restore them if it's a sync invocation.
+        //
+        SaveInfo.hIn = ::GetStdHandle(STD_INPUT_HANDLE);
+        SaveInfo.bInCon = ::GetConsoleMode(SaveInfo.hIn, &SaveInfo.dwInFlags);
 
-    PROCESS_INFORMATION ProcInfo;
+        SaveInfo.hOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
+        SaveInfo.bOutCon = ::GetConsoleMode(SaveInfo.hOut, &SaveInfo.dwOutFlags);
+    }
+
+    PROCESS_INFORMATION ProcInfo = { 0 };
     BOOL bRes = ::CreateProcess
     (
         0
@@ -225,24 +234,33 @@ TUtils::bExec(  const   tCIDLib::TCh* const*    apszParams
     // Get rid of the thread handle
     ::CloseHandle(ProcInfo.hThread);
 
-    // And now wait for the process to end
-    if (::WaitForSingleObject(ProcInfo.hProcess, INFINITE) == WAIT_OBJECT_0)
-        bRet = kCIDLib::True;
-    else
-        bRet = kCIDLib::False;
-
-    // Get the exit code if we succeeded
-    if (bRet)
+    if (bAsync)
     {
-        DWORD dwRes;
-        ::GetExitCodeProcess(ProcInfo.hProcess, &dwRes);
-        c4Result = dwRes;
+        // We aren't waiting for it, so just say it worked
+        bRet = kCIDLib::True;
+        c4Result = 0;
+    }
+     else
+    {
+        // It's synchronous so wait for it to end
+        if (::WaitForSingleObject(ProcInfo.hProcess, INFINITE) == WAIT_OBJECT_0)
+            bRet = kCIDLib::True;
+        else
+            bRet = kCIDLib::False;
 
-        // Restore our console settings
-        if (SaveInfo.bInCon)
-            ::SetConsoleMode(SaveInfo.hIn, SaveInfo.dwInFlags);
-        if (SaveInfo.bOutCon)
-            ::SetConsoleMode(SaveInfo.hOut, SaveInfo.dwOutFlags);
+        // Get the exit code if we succeeded
+        if (bRet)
+        {
+            DWORD dwRes;
+            ::GetExitCodeProcess(ProcInfo.hProcess, &dwRes);
+            c4Result = dwRes;
+
+            // Restore our console settings
+            if (SaveInfo.bInCon)
+                ::SetConsoleMode(SaveInfo.hIn, SaveInfo.dwInFlags);
+            if (SaveInfo.bOutCon)
+                ::SetConsoleMode(SaveInfo.hOut, SaveInfo.dwOutFlags);
+        }
     }
     return bRet;
 }

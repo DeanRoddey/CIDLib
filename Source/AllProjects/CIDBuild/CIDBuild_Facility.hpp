@@ -140,6 +140,11 @@ class TFacCIDBuild
             , const tCIDLib::TCh* const*    apszArgs
         );
 
+        const TList<TBldStr>& listDebugParms() const
+        {
+            return m_listDbgParms;
+        }
+
         const TList<TBldStr>& listExtLibs() const;
 
         const TList<TBldStr>& listExtLibPaths() const;
@@ -339,7 +344,9 @@ class TFacCIDBuild
         //
         //  m_bForce
         //      This is set by the /Force flag. It will cause all targets to
-        //      appear to be out of date.
+        //      appear to be out of date (or if used with the /Debug command will
+        //      force it not to use any previously stored debug session for that
+        //      project and start a new one with any provided parameters.)
         //
         //  m_bLowPrio
         //      The /LowPrio flag on the command line will set this. If its
@@ -395,6 +402,12 @@ class TFacCIDBuild
         //      This is set by the /HdrDump flag. It will cause us to output
         //      the header output dependency info, i.e. what is included in
         //      what.
+        //
+        //  m_lstDbgParms
+        //      If the /Debug action, then there can be a /DebugOpts followed by
+        //      any parameters that they want to pass to the program being debugged.
+        //      These must be the last since all subsequent options will be eaten
+        //      by this option.
         //
         //  m_listExtLibs
         //      These are external libraries that all projects should link
@@ -494,6 +507,7 @@ class TFacCIDBuild
         tCIDBuild::EActions     m_eAction;
         tCIDBuild::EBldModes    m_eBldMode;
         tCIDBuild::EHdrDmpModes m_eHdrDumpMode;
+        TList<TBldStr>          m_listDbgParms;
         TList<TBldStr>          m_listExtLibs;
         TList<TBldStr>          m_listExtLibPaths;
         TList<TBldStr>          m_listExtIncludePaths;

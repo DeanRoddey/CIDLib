@@ -323,6 +323,17 @@ tCIDLib::TSInt TFacCIDBuild::iMain(         tCIDLib::TCard4         c4Args
         }
 
         //
+        //  Some special case commands we can handle up front because they don't
+        //  involve invoking the build process.
+        //
+        if (m_eAction == tCIDBuild::EActions::Debug)
+        {
+            const TProjectInfo& projiTop = m_pplistProjs->projiByName(m_strTarget);
+            TToolsDriver::tdrvBuilder().bDebugProject(projiTop);
+            return 0;
+        }
+
+        //
         //  If the action indicates that we will need to output to the
         //  build target directories, make sure they all exist.
         //
@@ -894,6 +905,24 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
             {
                 m_bForce = kCIDLib::True;
             }
+             else if (!TRawStr::iCompIStr(pszCurParm, L"DebugOpts"))
+            {
+                //
+                //  We must be doing the debug action, and we will eat any subsequent
+                //  parameters. This will cause the loop to exit since we will have
+                //  run the index all the way up.
+                //
+                if (m_eAction != tCIDBuild::EActions::Debug)
+                {
+                    stdOut  << L"/DebugOpts is only valid for the Debug action"
+                            << kCIDBuild::EndLn;
+                    throw tCIDBuild::EErrors::BadParams;
+                }
+
+                c4Ind++;
+                while (c4Ind < c4Args)
+                    m_listDbgParms.Add(new TBldStr(apszArgs[c4Ind++]));
+            }
              else if (!TRawStr::iCompIStr(pszCurParm, L"HdrDump:Std"))
             {
                 m_eHdrDumpMode = tCIDBuild::EHdrDmpModes::Std;
@@ -972,6 +1001,10 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
                 if (!TRawStr::iCompIStr(&pszCurParm[7], L"Build"))
                 {
                     m_eAction = tCIDBuild::EActions::Build;
+                }
+                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"Debug"))
+                {
+                    m_eAction = tCIDBuild::EActions::Debug;
                 }
                  else if (!TRawStr::iCompIStr(&pszCurParm[7], L"MakeDeps"))
                 {
@@ -1185,7 +1218,7 @@ tCIDLib::TVoid TFacCIDBuild::ProcessVerParm(const tCIDLib::TCh* const pszVer)
 tCIDLib::TVoid TFacCIDBuild::ShowLogo()
 {
     stdOut  << L"CIDBuild.Exe, CIDLib Portable Build Utility\n"
-            << L"  Copyright (c) 1998..2018, Charmed Quark Systems\n"
+            << L"  Copyright (c) 1998..2019, Charmed Quark Systems\n"
             << L"  Compiled On: " << __DATE__ << "\n" << kCIDBuild::EndLn;
 }
 
@@ -1201,6 +1234,16 @@ tCIDLib::TVoid TFacCIDBuild::ShowParms()
                 << L"    Verbose: " << (m_bVerbose ? L"Yes" : L"No") << L"\n"
                 << L"    Version: " << m_strVersionSuffix
                 << kCIDBuild::EndLn;
+    }
+     else if  (m_eAction == tCIDBuild::EActions::Debug)
+    {
+        stdOut  << L"    Debugging program\n"
+                << L"       Target : " << m_strTarget << L"\n";
+        if (m_bForce)
+        {
+            stdOut  << L"        Force : Yes\n";
+        }
+        stdOut << kCIDBuild::EndLn;
     }
      else
     {
@@ -1235,28 +1278,32 @@ tCIDLib::TVoid TFacCIDBuild::ShowUsage()
     stdOut  << L"\nUsage:\n"
             << L"    CIDBuild [options]\n"
             << L"      Options:\n"
-            << L"        /NoLogo        - Supress logo display\n"
-            << L"        /Verbose       - Display more info\n"
-            << L"        /Action=XX     - Set action to perform (Build)\n"
-            << L"        /Mode=XX       - Set build mode to Dev or Prod (Dev)\n"
-            << L"        /Version=M.m.r - Set the release version *\n"
-            << L"        /RootDir=XX    - Set root directory of build tree *\n"
-            << L"        /Lang=xx       - Set language suffix (en)\n"
             << L"        /Target=xx     - Set the target project or directory (all)\n"
+            << L"        /Action=XX     - Set action to perform (Build)\n"
+            << L"        /Force         - For build force targets to rebuild. For debug\n"
+            << L"                         ignore any previous debug session\n"
+            << L"        /NoLogo        - Suppress logo blurb display\n"
+            << L"        /Verbose       - Display more build process info\n"
+            << L"        /DebugOpts     - Pass all parms after this to program being debugged\n"
+            << L"                         So all CIDBuild parms must come before this\n"
+            << L"        /Lang=xx       - Set language suffix (en)\n"
             << L"        /LowPrio       - Invoke compiler with lower priority\n"
             << L"        /Single        - Invoke compiler in non-parallel mode\n"
-            << L"        /NonPermissive - Invoke compiler in strict C++ mode\n"
+            << L"        /NonPermissive - Invoke compiler in strictest C++ mode. This won't\n"
+            << L"                         currently work it's for working towards that goal\n\n"
+            << L"       (Not typically used, this comes for the environment)\n"
+            << L"        /Mode=XX       - Set build mode to Dev or Prod (Dev)\n"
+            << L"        /RootDir=XX    - Set root directory of build tree.\n"
             << L"\n"
             << L"    Target:\n"
             << L"        Project to operate on. If not provided, means build\n"
             << L"        all facilities. All underlying dependent facilities\n"
             << L"        are operated on as well\n"
-            << L"        For MakeDevRel, MakeBinRel, and MakeSrcRel, this is the\n"
-            << L"        target directory to build to. Required in this case\n"
             << L"\n"
             << L"    Actions:\n"
             << L"        Build, MakeDeps, ShowProjDeps, CopyHeaders, MakeRes\n"
-            << L"        ShowProjSettings, MakeBinRel, MakeDevRel, IDLGen\n"
+            << L"        ShowProjSettings, MakeBinRel, MakeDevRel, IDLGen,\n"
+            << L"        Debug\n"
             << L"\n"
             << L"      *  Means a required option\n"
             << L"      () Means the default if not provided\n\n"

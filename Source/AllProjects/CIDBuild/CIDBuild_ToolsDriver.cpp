@@ -229,9 +229,45 @@ tCIDLib::TBoolean TToolsDriver::bBuildProject(const TProjectInfo& projiToBuild)
     m_listLibs.RemoveAll();
 
     // Clear the temp pointer now
-    m_pprojiTar = 0;
+    m_pprojiTar = nullptr;
 
     return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean TToolsDriver::bDebugProject(const TProjectInfo& projiTar)
+{
+    // It has to be an exe project
+    if  (projiTar.eType() != tCIDBuild::EProjTypes::Executable)
+    {
+        stdOut  << L"project " << projiTar.strProjectName()
+                << L" is not an executable project" << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::NotSupported;
+    }
+
+    // Try to change to the project directory. We want them all to run from there
+    if (!TUtils::bChangeDir(projiTar.strProjectDir()))
+    {
+        stdOut  << L"Could not change to project directory: "
+                << projiTar.strProjectDir() << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::NotFound;
+    }
+
+    // And let's call the virtual method
+    return bInvokeDebugger(projiTar);
+}
+
+
+tCIDLib::TVoid TToolsDriver::DebugReset(const TProjectInfo& projiTar)
+{
+    // It has to be an exe project
+    if  (projiTar.eType() != tCIDBuild::EProjTypes::Executable)
+    {
+        stdOut  << L"project " << projiTar.strProjectName()
+                << L" is not an executable project" << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::NotSupported;
+    }
+    ResetDebugInfo(projiTar);
 }
 
 

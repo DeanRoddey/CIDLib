@@ -186,6 +186,102 @@ tCIDLib::TBoolean TVCppDriver::bBuild(const TProjectInfo& projiTarget)
 }
 
 
+//
+//  A convenience to invoke the debugger
+//
+tCIDLib::TBoolean TVCppDriver::bInvokeDebugger(const TProjectInfo& projiTarget)
+{
+    //
+    //  The base class changed us to the project source directory. We just need to
+    //  invoke the debugger. First, let's just see if the target exists. If not,
+    //  can't really do much.
+    //
+    TBldStr strTarFile = facCIDBuild.strOutDir();
+    strTarFile.Append(projiTarget.strProjectName());
+    strTarFile.Append(L".exe");
+    if (!TUtils::bExists(strTarFile))
+    {
+        stdOut  << L"The output file doesn't exist, can't debug it"
+                << kCIDBuild::EndLn;
+        return kCIDLib::False;
+    }
+
+    // Build up the path to the solution file for this project
+    TBldStr strSln = facCIDBuild.strOutDir();
+    strSln.Append(projiTarget.strProjectName());
+    strSln.Append(L".sln");
+
+    // If the force flag was set, then delete it to force a new session
+    if (facCIDBuild.bForce() && TUtils::bExists(strSln))
+        TUtils::bDeleteFile(strSln);
+
+    //
+    //  We build up the parameters, which are taken as an array of string pointers.
+    //  The scenarios are either:
+    //
+    //      devenv.exe [slnfile]
+    //      devenv.exe /debugexe [tarfile] [options...]
+    //
+    //  So worst case is three plus the options count.
+    //
+    const tCIDLib::TCard4 c4MaxParms = 3 + facCIDBuild.listDebugParms().c4ElemCount();
+    const tCIDLib::TCh** apszParams = new const tCIDLib::TCh*[c4MaxParms];
+    tCIDLib::TCard4 c4ParamCnt = 0;
+    apszParams[c4ParamCnt++] = L"devenv.exe";
+
+    if (TUtils::bExists(strSln))
+    {
+        // The easy scenario, just debugger and sln file
+        apszParams[c4ParamCnt++] = strSln.pszBuffer();
+    }
+     else
+    {
+        // First is the target file with debug prefix then any passed parameters
+        apszParams[c4ParamCnt++] = L"/debugexe";
+        apszParams[c4ParamCnt++] = strTarFile.pszBuffer();
+        TListCursor<TBldStr> cursParms(&facCIDBuild.listDebugParms());
+        if (cursParms.bResetIter())
+        {
+            do
+            {
+                apszParams[c4ParamCnt++] = cursParms->pszBuffer();
+            }   while (cursParms.bNext());
+        }
+    }
+    if (c4ParamCnt > c4MaxParms)
+    {
+        stdOut << L"Debug input parameters overflow" << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::Internal;
+    }
+
+    //
+    //  And now let's invoke the debugger. Async in this case, so we won't get back
+    //  any result code.
+    //
+    const tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_Async;
+    tCIDLib::TCard4 c4Result;
+    if (!TUtils::bExec(apszParams, c4ParamCnt, c4Result, c4ExecFlags))
+    {
+        stdOut << L"Could not execute the debugger" << kCIDBuild::EndLn;
+        return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TVoid TVCppDriver::ResetDebugInfo(const TProjectInfo& projiToReset)
+{
+    //
+    //  Build up the path to the .sln file and see if it exists. If so, delete
+    //  it.
+    //
+    TBldStr strSln = facCIDBuild.strOutDir();
+    strSln.Append(L"*.sln");
+
+    if (TUtils::bExists(strSln))
+        TUtils::bDeleteFile(strSln);
+}
+
 
 // ---------------------------------------------------------------------------
 //  TVCppDriver: Private, non-virtual methods
@@ -525,8 +621,11 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         }
 
         // Ok, lets do the compilation
+        tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
+        if (facCIDBuild.bLowPrio())
+            c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
         tCIDLib::TCard4 c4Result;
-        if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, facCIDBuild.bLowPrio()))
+        if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, c4ExecFlags))
         {
             stdOut << L"Could not execute the compiler" << kCIDBuild::EndLn;
             throw tCIDBuild::EErrors::BuildError;
@@ -807,7 +906,10 @@ tCIDLib::TVoid TVCppDriver::Link(const tCIDLib::TBoolean bHaveResFile)
 
     // And invoke the link
     tCIDLib::TCard4 c4Result;
-    if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, facCIDBuild.bLowPrio()))
+    tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
+    if (facCIDBuild.bLowPrio())
+        c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
+    if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, c4ExecFlags))
     {
         stdOut << L"Could not execute the linker" << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::BuildError;
@@ -869,8 +971,11 @@ tCIDLib::TVoid TVCppDriver::LinkStatic()
     }
 
     // And invoke the link
+    tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
+    if (facCIDBuild.bLowPrio())
+        c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
     tCIDLib::TCard4 c4Result;
-    if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, facCIDBuild.bLowPrio()))
+    if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, c4ExecFlags))
     {
         stdOut << L"Could not execute the librarian" << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::BuildError;
