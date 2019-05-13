@@ -93,6 +93,23 @@
 
         <P>Though one could try to do some sort of optimistic allocation and swap, deleting the extra one if beaten to the punch, it's likely not worth it since some reasonably heavy system calls might be made in the process of creating one. And it could potentially create shared resources (directly or indirectly) that would result in name clashes if two were constructed at the same time.</P>
 
+        <SecTitle>Versioning</SecTitle>
+
+        <P>Library facilities are versioned, in the name. How that works is platform specific. For Win32, there is _M_m type bit added to the name, for major and minor version. This insures that if two CIDLib programs based on separate versions were running at the same time, they would both find the library facilities appropriate for them.</P>
+
+        <Code>
+        05/11/2019  11:13 PM     528,384 CIDOrb_5_3.dll
+        05/11/2019  11:12 PM     107,520 CIDPack_5_3.dll
+        05/11/2019  11:11 PM     124,928 CIDPNG_5_3.dll
+        05/11/2019  11:12 PM     122,368 CIDRegX_5_3.dll
+        </Code>
+
+        <Note>The assumption is that revision level releases won't break binary compatibility and so we don't want to include that in the versioning.</Note>
+
+        <P>How the versioning is done on other platforms could be different, but the above scheme is pretty straightforward and likely to work well enough on other platforms CIDLib is likely to be able to support. If so, it should be used in order to maintain consistency.</P>
+
+        <P>Other platform specific stuff can also be done by the build tools on those platforms, if it helps with integration there, such as embedded versions resources, embedded manifest files, or other means available to version stamp loadable modules. Those can operate in addition to the primary scheme used by CIDLib itself on that platform.</P>
+
     </HelpText>
 
 </HelpPage>

@@ -50,7 +50,9 @@ RTTIDecls(TPerThreadImpl, TObject)
 // ---------------------------------------------------------------------------
 //  TPerThreadData: Constructors and destructor
 // ---------------------------------------------------------------------------
-TPerThreadImpl::TPerThreadImpl()
+TPerThreadImpl::TPerThreadImpl() :
+
+    m_pkptdThis(nullptr)
 {
 }
 
@@ -64,7 +66,7 @@ TPerThreadImpl::~TPerThreadImpl()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid* TPerThreadImpl::pThis()
 {
-    tCIDLib::TVoid* pRet = 0;
+    tCIDLib::TVoid* pRet = nullptr;
     try
     {
         pRet = pUserData();
@@ -88,7 +90,7 @@ tCIDLib::TVoid* TPerThreadImpl::pThis()
 
 const tCIDLib::TVoid* TPerThreadImpl::pThis() const
 {
-    const tCIDLib::TVoid* pRet = 0;
+    const tCIDLib::TVoid* pRet = nullptr;
     try
     {
         pRet = pUserData();
@@ -112,7 +114,7 @@ const tCIDLib::TVoid* TPerThreadImpl::pThis() const
 
 tCIDLib::TVoid* TPerThreadImpl::pThis(tCIDLib::TVoid* const pToAdopt)
 {
-    tCIDLib::TVoid* pRet = 0;
+    tCIDLib::TVoid* pRet = nullptr;
     try
     {
         pRet = pUserData(pToAdopt);

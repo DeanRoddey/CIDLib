@@ -6,7 +6,7 @@
 
     <HelpText>
 
-        <P>The CIDLib facility is the lowest level one that you would generally use directly, other than some really basic inlined helpers and such from CIDKernel. CIDLib is sort of the 'standard libraries' part of the overall CIDLib system, providing the core functionality that most non-trivial programs will tend to use.</P>
+        <P>The CIDLib facility is the lowest level one that you would generally use directly, other than the fundamental types and constants, and some core inlined helpers and such from CIDKernel. CIDLib is sort of the 'standard libraries' part of the overall CIDLib system, providing the core functionality that basically programs will use to one degree or another.</P>
 
         <Note>Since there are quite a few classes here, instead of just listing every class on the left, they are broken into categories. Else it would get a bit out of hand and hard to navigate</Note>
 

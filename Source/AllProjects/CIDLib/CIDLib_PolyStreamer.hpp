@@ -66,11 +66,7 @@ class TClassInfo
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TClassInfo() :
-
-            m_c2Id(0)
-        {
-        }
+        TClassInfo() = default;
 
         TClassInfo(const TClass& clsToStore, const tCIDLib::TCard2 c2Id) :
 
@@ -79,29 +75,15 @@ class TClassInfo
         {
         }
 
-        TClassInfo(const TClassInfo& clsiToCopy) :
+        TClassInfo(const TClassInfo&)  = default;
 
-            m_c2Id(clsiToCopy.m_c2Id)
-            , m_clsRepresented(clsiToCopy.m_clsRepresented)
-        {
-        }
+        ~TClassInfo() = default;
 
-        ~TClassInfo()
-        {
-        }
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TClassInfo& operator=(const TClassInfo& clsiToAssign)
-        {
-            if (this == &clsiToAssign)
-                return *this;
-
-            m_c2Id = clsiToAssign.m_c2Id;
-            m_clsRepresented = clsiToAssign.m_clsRepresented;
-            return *this;
-        }
+        TClassInfo& operator=(const TClassInfo&) = default;
 
 
         // -------------------------------------------------------------------
@@ -128,7 +110,7 @@ class TClassInfo
         //  m_clsRepresented
         //      This is the class that this object represents
         // -------------------------------------------------------------
-        tCIDLib::TCard2 m_c2Id;
+        tCIDLib::TCard2 m_c2Id = 0;
         TClass          m_clsRepresented;
 };
 
@@ -151,26 +133,17 @@ class TClassKeyOps : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TClassKeyOps()
-        {
-        }
+        TClassKeyOps() = default;
 
-        TClassKeyOps(const TClassKeyOps&)
-        {
-        }
+        TClassKeyOps(const TClassKeyOps&) = default;
 
-        ~TClassKeyOps()
-        {
-        }
+        ~TClassKeyOps() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TClassKeyOps& operator=(const TClassKeyOps&)
-        {
-            return *this;
-        }
+        TClassKeyOps& operator=(const TClassKeyOps&) = default;
 
 
         // -------------------------------------------------------------------
@@ -255,7 +228,7 @@ template <class TElem> class TPolyStreamer : public TObject
             m_pcolClassSet->RemoveAll();
         }
 
-        TElem* pobjStreamIn()
+        [[nodiscard]] TElem* pobjStreamIn()
         {
             //
             //  Stream in the next record type. There could be a class record
@@ -469,7 +442,8 @@ template <class TElem> class TPolyStreamer : public TObject
         //  m_pstrmIn
         //  m_pstrmOut
         //      These are pointers to the streams to use for input and output.
-        //      We do not adopt them, just reference them.
+        //      We do not adopt them, just reference them. In general they should
+        //      be set to the default platform endianness.
         // -------------------------------------------------------------------
         tCIDLib::TCard2     m_c2CurId;
         TClassList*         m_pcolClassSet;

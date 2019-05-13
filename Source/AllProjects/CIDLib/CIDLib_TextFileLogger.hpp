@@ -114,8 +114,8 @@ class CIDLIBEXP TTextFileLogger : public TObject, public MLogger
         //  Private data members
         //
         //  m_bNeedsBOM
-        //      We check the converter's encoding and remember if we need to
-        //      add a BOM to new files.
+        //      We check the converter's encoding and remember if we need to add a BOM
+        //      to new files.
         //
         //  m_c8RolloverSize
         //      The size at which the current file should be closed and a
@@ -130,13 +130,13 @@ class CIDLIBEXP TTextFileLogger : public TObject, public MLogger
         //      the same access.
         //
         //  m_pstrmTarget
-        //      This is a text stream object for the target file. Errors
-        //      are formatted to this stream.
+        //      This is a text stream object for the target file to log to. We
+        //      create and own this.
         //
         //  m_pmtxSync
-        //      This is the optional named mutex that is used to sync
-        //      multiple processes logging to the same file. If one was not
-        //      provided, then no cross process synchronization is used.
+        //      This is the optional named mutex that is used to sync multiple
+        //      processes logging to the same file. If one was not provided, then
+        //      no cross process synchronization is used.
         // -------------------------------------------------------------------
         tCIDLib::TBoolean       m_bNeedsBOM;
         tCIDLib::TCard8         m_c8RolloverSize;

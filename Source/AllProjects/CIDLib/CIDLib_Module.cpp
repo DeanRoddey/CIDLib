@@ -788,7 +788,7 @@ TModule::TModule(const  TCIDModuleInfo&     modiSrc
 
     m_eModType(modiSrc.eModType())
     , m_kmodThis()
-    , m_pc1Res(0)
+    , m_pc1Res(nullptr)
     , m_strName(modiSrc.strBaseName())
 {
     // Call a common init that builds up names based on type and version info
@@ -875,7 +875,7 @@ TModule::TModule(const  TString&            strFacName
 
     m_eModType(eModType)
     , m_kmodThis()
-    , m_pc1Res(0)
+    , m_pc1Res(nullptr)
     , m_strName(strFacName)
     , m_strPath(strLoadFrom)
 {
@@ -916,6 +916,7 @@ TModule::~TModule()
     try
     {
         delete [] m_pc1Res;
+        m_pc1Res = nullptr;
     }
 
     catch(...)
@@ -1417,9 +1418,12 @@ TModule::MsgPopUp(  const   TString&        strMsg
 
 //
 //  Locate the raw data for a resource of a given type and/or resource id, within our
-//  pre-loaded resource data and return a pointer to it, and it's size. In teh first
+//  pre-loaded resource data and return a pointer to it, and it's size. In the first
 //  one, we have to match both id resource type and id. In the other one, we just look
 //  for the id, and return what resource type it is.
+//
+//  We we giving back a pointer into our loaded content, so the caller doesn't have to
+//  clean it up.
 //
 const tCIDLib::TCard1*
 TModule::pc1FindRes(        tCIDLib::TCard4&    c4ToFill
@@ -1429,7 +1433,7 @@ TModule::pc1FindRes(        tCIDLib::TCard4&    c4ToFill
 {
     // If we don't have any resources, then just return a failure
     if (!m_pc1Res)
-        return 0;
+        return nullptr;
 
     // Look at the buffer as a resource header
     const tCIDLib::TResHeader* prhFind
@@ -1467,7 +1471,7 @@ TModule::pc1FindRes(        tCIDLib::TCard4&    c4ToFill
             , TCardinal(ridToFind)
         );
     }
-    return 0;
+    return nullptr;
 }
 
 
@@ -1479,7 +1483,7 @@ TModule::pc1FindRes(        tCIDLib::EResTypes& eType
 {
     // If we don't have any resources, then just return a failure
     if (!m_pc1Res)
-        return 0;
+        return nullptr;
 
     // Look at the buffer as a resource header
     const tCIDLib::TResHeader* prhFind
@@ -1515,7 +1519,7 @@ TModule::pc1FindRes(        tCIDLib::EResTypes& eType
             , TCardinal(ridToFind)
         );
     }
-    return 0;
+    return nullptr;
 }
 
 
@@ -1935,7 +1939,7 @@ MLogger* TModule::plgrTarget()
 
         tCIDLib::TBoolean       bGotIt = kCIDLib::False;
         const tCIDLib::TCard4   c4BufMax = 512;
-        TTextConverter*         ptcvtToUse = 0;
+        TTextConverter*         ptcvtToUse = nullptr;
         tCIDLib::TCh            szInfoBuf[c4BufMax+1];
 
         //
@@ -1996,7 +2000,7 @@ MLogger* TModule::plgrTarget()
             //  named resource name. If the format is not provided but the
             //  mutex is, then it should be filename;;mutexname.
             //
-            tCIDLib::TCh* pszCtx = 0;
+            tCIDLib::TCh* pszCtx = nullptr;
             tCIDLib::TCh* pszTmp = TRawStr::pszStrTokenize(szInfoBuf, L";", &pszCtx);
             if (!pszTmp)
             {

@@ -6,9 +6,9 @@
 
     <HelpText>
 
-        <P>You'll see this stuff in practical terms if you watch the videos and go through the sample files, but just for the record, we'll lay out the files that make up a typical CIDLib facility.</P>
+        <P>You'll see this stuff in practical terms if you watch the videos and look through the cope, but just for the record, we'll lay out the files that make up a typical CIDLib facility.</P>
 
-        <Note>Note that these are not just conventions, the build system understands these files and that's a large part of why the build system can be so straightforward. Bend as the willow tree and you will find good fortune.</Note>
+        <Note>Note that these are not just conventions, the build system understands these files and that's a large part of why the build system can be so straightforward. Bend as the willow tree and you will find good fortune. But there are small variations for very simple programs such as the samples, which want to strip down as much as possible and just concentrate on the thing they are trying to demonstrate.</Note>
 
         <P>For convenience, we'll assume this is for a facility named Magnum.</P>
 
@@ -22,7 +22,7 @@
             <LItem Ref="Magnum.CIDRC">A resource file, which is used by UI oriented facilities to define menus, dialog boxes, loadable images, and so forth. A header file will be generated from this, along with a binary resource file to be used at runtime.</LItem>
         </List>
 
-        <Note>In some cases, both types of facilities will have some hpp files that they only include in some of their own cpp files, just to avoid extra build overhead or exposing stuff more than needed. But, on the whole, CIDLib facilities take the approach that simplicity is worth some build time. It avoids any requirement to test headers separately or worry about breaking existing code, since there's only one facility for public stuff and one for private stuff, which brings in any other headers necessary.</Note>
+        <Note>In some cases, both types of facilities will have some hpp files that they only include in some of their own cpp files, just to avoid extra build overhead or exposing stuff more than needed. But, on the whole, CIDLib facilities take the approach that simplicity is worth some build time. It avoids any requirement to test headers separately or having to worry about breaking existing code, since there's only one facility for public stuff and one for private stuff, which brings in any other headers necessary.</Note>
 
         <SecTitle>Generated Files</SecTitle>
 

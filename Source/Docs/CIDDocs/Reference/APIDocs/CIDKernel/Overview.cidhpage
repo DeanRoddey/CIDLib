@@ -6,17 +6,34 @@
 
     <HelpText>
 
-        <P>CIDKernel is not a facility you will use that often, but it's important you know what it is and why it's there. And you will use some of its features if you need to do any lower level code, and also it provides some very fundamental helper methods for common operations like bit manipulation, generic equality and comparision functions, core janitor classes, value swapping, and so forth, mostly very simple inlined and template based stuff.</P>
+        <P>CIDKernel is not a facility you will use that often, but it's important you know what it is and why it's there. The important factoids to understand about this facility are:</P>
 
-        <Note>Note that a handful of the more fundamental facilities, those that are wrapping system services, actually have some of their basic types and constants live down here. That's because those types and constants must be visible to code at this level. So, though they will be defined in the context of the facilities they really belong to, they actually live down here. The files CIDKernel_Type.hpp has most of these, with those related to the windowing system bein gin CIDkernel_Type_Ctrls.hpp.</Note>
+        <List Type="Unordered">
+            <LItem>CIDKernel is a sort of 'virtual operating system' that abstracts CIDLib code from the underlying platform.</LItem>
+            <LItem>With some exceptions discussed below, mostly you will use CIDKernel classes indirectly via classes in some higher level facilities that encapsulate them.</LItem>
+            <LItem>It is structured as a set of common headers and per-platform implementation files, so that each platform can provide its own implementation while retaining a single outward facing interface.</LItem>
+            <LItem>The build system understands this per-platform split scheme, which makes it fairly easy to support.</LItem>
+            <LItem>It allows each platform to map standard core CIDLib types and constants to something equivalent for that platform.</LItem>
+            <LItem>Some of the other core facilities actually have some of their types and constants defined down here because the code at this level also needs to see them. These are are in CIDKernel_Types.hpp.</LItem>
+            <LItem>For bootstrapping reasons, code at this level cannot use CIDLib's standard strings, memory buffers, collections, etc... so we have some very simple kernel level classes to provide that functionality, kept as minimal as possible</LItem>
+            <LItem>No exceptions are thrown from CIDKernel, just success/failure boolean returns are used, along with stored 'last error' information that can be gotten by the code that calls a failing method, and used to build and throw an appropiate standard CIDLib exception.</LItem>
+        </List>
 
-        <P>CIDKernel is effectively a 'virtual operating system', in that it provides to the rest of CIDLib (and derived works) the same sort of services that the actual underlying operating system provides to it. Just as you don't write much non-CIDLib based code directly to the raw operating system APIs, you don't write much (or even any) of your CIDLib code to these fundamental CIDKernel APIs.</P>
+        <P>So CIDKernel is basically split into two parts, a public interface plus cpp implementation files mostly in per-platform directories, though sometimes there is also some common functionality that can be provided purely in terms of the per-platform interfaces. Most of it you will seldom or never directly use, but of course all of the fundamental types and constants of CIDLib are defined here and used everywhere.</P>
 
-        <P>Part of the reason for this is related to bootstrapping. We can't use classes at this level which need to use the fundamental services provided at this level. That's a circular problem. So in fact most of the functionality provided by CIDKernel you will actually access via the CIDLib facility, which gets us around the sort of otherwise circular bootstrapping issues we'd have otherwise. And to a lesser extent some of the other lower level facilities.</P>
+        <P>Beyond the fundamental types and constants, most of what you will use here will be a set of mostly inlined slash templated small helper functions. For instance, swapping values, selecting a larger of smaller of two values, bit manipulation, byte swapping, raw memory buffer/string manipulation, forcing move semantics, generic equality and relative magnitude comparitors and functors, and so forth</P>
 
-        <P>It also is split into class interfaces, and class implementations many of which are in per-platform sub-directories, e.g. Win32. Since most of the functionality at this level consists of wrappers around underlying OS APIs, this allows us to support multiple platforms, each providing their own implementations of these classes.</P>
+        <P>The classes defined here are wrapped by other classes in higher level facilities, which expose that functionality using the public CIDLib strings, buffers, exceptions, etc... Most of these wrappers are in the CIDLib facility, but there are some in CIDSock, CIDComm, CIDUPnP, and some others that are exposing system level functionality that the kernel wraps.</P>
 
-        <Note>This isn't the only facility that deals with system APIs. Pushing everything of that sort into this layer would mean a large burden for every CIDLib based application. There are a handful of others which have some per-platform split type classes to wrap less commonly used system APIs.</Note>
+        <P>This also isn't the only facility that deals with per-platform system APIs. Pushing everything of that sort into this layer would mean a large burden for every CIDLib based application. So there are a handful of others which have some per-platform split type classes to wrap less commonly used system APIs (e.g. ODBC, secure sockets, audio streaming, and secure channel.) This also makes bootstrapping up support for a new platform somewhat less of a monolithic undertaking.</P>
+
+        <Note>It's possible that some of the stuff currently in the kernel layer will be moved up to per-platform directories under their respective wrapper facilities as well, to lower the minimum footprint and make the new platform implementation process more granular still.</Note>
+
+        <SecTitle>System/Language Headers</SecTitle>
+
+        <P>No system or language headers are used outside of CIDKernel and the small set of other system functionality wrapper facilities discussed above. All other code must be written in terms of our own interfaces, to insure consistency and portability. It also avoids very annoying interference by macro definitions that tend to be all over system API and language headers, which randomly rename things that happen to have the same name as the macros.</P>
+
+        <P>Obviously of course if you are doing a new wrapper facility to make some new system functionality available, that puts your facility into the above list of exceptions.</P>
 
     </HelpText>
 

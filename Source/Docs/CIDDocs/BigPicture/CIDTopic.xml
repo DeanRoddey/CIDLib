@@ -6,7 +6,9 @@
     <PageMap>
         <PageLink FileName="Overview"/>
         <PageLink FileName="Facilities" Title="CIDLib 'Facilities'"/>
-        <PageLink FileName="FacilityFiles" Title="Facilities Files"/>
+        <PageLink FileName="FacilityFiles" Title="Facility Files"/>
+        <PageLink FileName="FacilityNamespaces" Title="Facility Namespaces"/>
+        <PageLink FileName="Exceptions" Title="Exceptions"/>
         <PageLink FileName="Janitors"/>
         <PageLink FileName="Style" Title="Coding Style"/>
     </PageMap>

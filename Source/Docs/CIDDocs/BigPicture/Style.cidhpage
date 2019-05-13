@@ -6,11 +6,13 @@
 
     <HelpText>
 
-        <P>We won't dwell on this a lot, since style is a contentious issue. You can obviously use any style you want in your own code. However, CIDLib, being a single author system, has a quite consistent style throughout, and it's probably worth adopting it so as to maintain consistency. Since you aren't using a bunch of different libraries, there is that opportunity to have a completely stylistically consistent code base.</P>
+        <P>We won't dwell on this a lot, since style is a contentious issue. You can obviously use any style you want in your own code. However, CIDLib, being a single author system, has a quite consistent style throughout, and it's probably worth adopting it so as to maintain that consistency. Since you aren't using a bunch of different libraries, there is that opportunity to have a completely stylistically consistent code base.</P>
 
         <P>If you are planning on contributing any code to CIDLib, most definitely you must observe the CIDLib style carefully. In a system this large, keeping the code clean and readable and consistent is easily as important as new functionality. What good a kingdom if all the traffic signs are written in a different language?</P>
 
         <P>A formal style guideline will be done, but for now, the style should be pretty obvious if you look at any of the code since it is all pretty darn consistent. It's not dogmatic and practical concerns sometimes override normal style guidelines in limited ways. One obvious area is in the <Link Type="Page" Ref="/Reference/APIDocs/CIDKernel/" Id="/Overview">CIDKernel</Link> layer, where it is is not strictly part of the public CIDLib interface and it is constantly dealing directly with operating system APIs. And in a code base this long running, there are some older bits that may not have completely caught up with the coding style as it solidified over the years, again though mostly that would be in the really low level stuff.</P>
+
+        <P>Another is small, nested classes that are for internal use. They are often quite stylistically minimal in terms of keeping code bulk in the headers down.</P>
 
         <P>Generally though, if you've seen one CIDLib class you've sort of seen them all, since they are all very similarly structured.</P>
 
