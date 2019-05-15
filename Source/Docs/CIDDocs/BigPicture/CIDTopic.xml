@@ -10,6 +10,7 @@
         <PageLink FileName="FacilityNamespaces" Title="Facility Namespaces"/>
         <PageLink FileName="Exceptions" Title="Exceptions"/>
         <PageLink FileName="Janitors"/>
+        <PageLink FileName="Collections" Title="Collections"/>
         <PageLink FileName="Style" Title="Coding Style"/>
     </PageMap>
 

@@ -44,7 +44,7 @@ RTTIDecls(TBaseTreeNode,TObject)
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TBaseTreeNode: Publick Destructor
+//  TBaseTreeNode: Public Destructor
 // ---------------------------------------------------------------------------
 TBaseTreeNode::~TBaseTreeNode()
 {
@@ -95,6 +95,10 @@ TBaseTreeNode::TBaseTreeNode(const  tCIDLib::ETreeNodes eType
 // ---------------------------------------------------------------------------
 //  Methods of the TBasicTreeHelpers namespace
 // ---------------------------------------------------------------------------
+
+const TString TBasicTreeHelpers::strRootPath(L"/");
+const TString TBasicTreeHelpers::strRootName(L"Root");
+const TString TBasicTreeHelpers::strRootDesc(L"$Root$");
 
 tCIDLib::TVoid
 TBasicTreeHelpers::BadNode( const   tCIDLib::TCh* const pszFile

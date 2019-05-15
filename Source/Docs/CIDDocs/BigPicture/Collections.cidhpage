@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Collections/Cursors</Title>
+
+    <HelpText>
+
+        <P>CIDLib has a pretty extensive set of collections and cursors. For those coming from the standard C++ library world, collections and cursors are like standard C++ containers and iterators, though they have some substantial differences in the details. Collections contain other objects (or pointers to other objects.) The objects in the collection are refererd to as its elements.</P>
+
+        <P>Since maintaining and operating on sets of objects is a fundamental operation in most all software, collections play a huge part in most software projects. In some cases there are justifications for doing your own specialized means of containing other objects, but where possible use the built in ones and safe yourself a lot of worry and effort.</P>
+
+        <P>Like most C++ systems, as a practical matter, CIDLib's collections are template based, since they need to be able to work over many different element types, while maintaining a type safe interface. CIDLib works to push as much code out of line as possible, but still they have all the same concerns as large amounts of templated code always does.</P>
+
+        <P>There are three fundamental categories of collections in CIDLib:</P>
+
+        <List>
+            <LItem Ref="Fundamental">Fundamental collections are for non-object stuff, so booleans, ints, floats, cardinals and enumerations generally. They are simpler and lighter weight and don't depend on any particular functionality from the elements other than the basic ability to assign, copy, and compare them.</LItem>
+            <LItem Ref="By Reference">By reference collections take objects by reference, well by pointer to be strict about it. They can be told to adopt (own) those objects or not. So they can be given objects to own and clean up when they destruct, or they can be used to provide light weight alternative views into other collections or arrays without any need to copy the elements.</LItem>
+            <LItem Ref="By Value">By value collections, as you would imagine, take objects by value, so they must be able to copy and assign the elements.</LItem>
+        </List>
+
+        <P>Since there are both by value and by reference collections, there isn't any of the syntax weirdness of trying to deal with both in a single set of collections, though it is a lot of work to do them twice. And it means they both have interfaces appropriate for the way they store objects, and the by value ones don't need to have any ownership semantics.</P>
+
+        <SecTitle>Collection Types</SecTitle>
+
+        <P>There are a fairly well established set of collection types in most systems out there since they reflect the various strategies (or compromises depending on how you look at it) for storage style, how elements are accessed, ordering of the elements, etc... CIDLib follows those common types pretty closely as well.</P>
+
+        <List Type="Unordered">
+            <LItem Ref="Storage">Are the elements in contiguous memory, in a list, in tree structure, in a hash table, etc...</LItem>
+            <LItem Ref="Ordered">Some collection are ordered, meaning that it remembers the order in which you added the elements and you can retrieve them in that order, else they are unordered and there is no relationship there.</LItem>
+            <LItem Ref="Keyed">Some collections require a unique key for every element, which is used to access it, and others are anonymous only allowing access by index or no access at all. Sometimes the key is in the element itself, sometimes it is a separate thing.</LItem>
+            <LItem Ref="Access">Some collections let you directly access elements by an index or by a key. Others only allow iteration through the elements in some way. Some allow both. Some use LIFO (last in/first out) or FIFO (first in/first out) access.</LItem>
+        </List>
+
+        <P>Here is a table of the types of collections supported and how they deal with the above issues:</P>
+
+        <Table Class="HVHeaderTable">
+            <TableRow>
+                <TableCol>Type</TableCol>
+                <TableCol>Storage</TableCol>
+                <TableCol>Ordered</TableCol>
+                <TableCol>Keyed</TableCol>
+                <TableCol>Access</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Array</TableCol>
+                <TableCol>Array</TableCol>
+                <TableCol>Yes</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>Iteration/Index</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Bag</TableCol>
+                <TableCol>Linked list</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>Iteration only</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Deque</TableCol>
+                <TableCol>Linked list</TableCol>
+                <TableCol>Yes</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>LIFO/FIFO</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Hash Map</TableCol>
+                <TableCol>Hash table</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>External key</TableCol>
+                <TableCol>Iteration/Key</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Hash Set</TableCol>
+                <TableCol>Hash table</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>Element is the key</TableCol>
+                <TableCol>Iteration/Key</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Keyed Hash Set</TableCol>
+                <TableCol>Hash table</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>Key inside the element</TableCol>
+                <TableCol>Iteration/Key</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Linked List</TableCol>
+                <TableCol>Linked list</TableCol>
+                <TableCol>Yes</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>Iteration</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Queue</TableCol>
+                <TableCol>Linked List</TableCol>
+                <TableCol>If priority based</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>LIFO</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Sorted Bag</TableCol>
+                <TableCol>Linked List</TableCol>
+                <TableCol>Yes</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>Iteration</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Stack</TableCol>
+                <TableCol>Linked List</TableCol>
+                <TableCol>Yes</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>FIFO</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Vector</TableCol>
+                <TableCol>Expandable Array</TableCol>
+                <TableCol>Yes</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>Iteration/Index</TableCol>
+            </TableRow>
+        </Table>
+
+        <SecTitle>Fundamental Collections</SecTitle>
+
+        <P>There aren't as many fundamental collection types, since the needs for storing fundamental types aren't quite as broad ad for objects. But there's a very useful set of them.</P>
+
+        <List Type="Unordered">
+            <LItem>TFundArray</LItem>
+            <LItem>TFundDeque</LItem>
+            <LItem>TFundStack</LItem>
+            <LItem>TFundVector</LItem>
+        </List>
+
+        <SecTitle>By Reference Collections</SecTitle>
+
+        <P>These are the by reference collection classes:</P>
+
+        <List Type="Unordered">
+            <LItem>TBasicDLinkedRefCol</LItem>
+            <LItem>TRefBag</LItem>
+            <LItem>TRefDqueue</LItem>
+            <LItem>TRefKeyedHashSet</LItem>
+            <LItem>TRefQueue</LItem>
+            <LItem>TRefSortedBag</LItem>
+            <LItem>TRefVector</LItem>
+        </List>
+
+        <P>You typically don't use the TBasicDLinkedRefCol type directly, mostly you use it indirectly since it is used internally by some of the others. But you can use it if you just need a basic doubly linked list.</P>
+
+        <SecTitle>By Value Collections</SecTitle>
+
+        <P>These are the by value collection classes:</P>
+
+        <List Type="Unordered">
+            <LItem>TBasicDLinkedCol</LItem>
+            <LItem>TBag</LItem>
+            <LItem>TBasicTree</LItem>
+            <LItem>THashMap</LItem>
+            <LItem>THashSet</LItem>
+            <LItem>TKeyedHashSet</LItem>
+            <LItem>TObjArray</LItem>
+            <LItem>TQueue</LItem>
+            <LItem>TVector</LItem>
+        </List>
+
+        <P>You typically don't use the TBasicDLinkedCol type directly, mostly you use it indirectly since it is used internally by some of the others. But you can use it if you just need a basic doubly linked list.</P>
+
+        <Note>TObjArray isn't strictly a collection in that it doesn't derive from the common TCollection class, see Polymorphism below, but it is definitely in the same family.</Note>
+
+        <SecTitle>Polymorphism</SecTitle>
+
+        <P>Unlike some other systems' collections/containers, CIDLib's collections are polymorphic. They derive from a common base class and some operations can be done on any type of collection. There are actually two different levels of polymorphism.</P>
+
+        <List Type="Unordered">
+            <LItem Ref="TCollectionBase">This is the most fundamental class and is not templatized. So it provides common functionality that does not depend on the type of element or other template instantiation parameters. It is the common base class for fundamental, by value and by reference collection types.</LItem>
+            <LItem Ref="TFundColBase">Derives from TCollectionBase and provides a common base class for the fundamental collections, below the point of templatization</LItem>
+            <LItem Ref="TCollection/TRefCollection&lt;>">These derive from TCollectionBase but include knowledge of the element type, so they can provide common functionality that requires that information. And the value/reference split happens here.</LItem>
+        </List>
+
+    </HelpText>
+
+</HelpPage>

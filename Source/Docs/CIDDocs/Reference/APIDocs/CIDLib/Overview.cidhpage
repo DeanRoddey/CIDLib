@@ -13,7 +13,7 @@
         <P>To give some perspective, here are some of the things that are provided at this level:</P>
 
         <List Type="Unordered">
-            <LItem Ref="Core Types">Various enumerations, types, and constants are defined here. Actually, some of them are really defined in CIDKernel because it needs to see them as well. But conceptually there belong here and are in the kCIDLib/tCIDLib namespaces.</LItem>
+            <LItem Ref="Core Types">Various enumerations, types, and constants are defined here. Actually, some of them are really defined in CIDKernel because it needs to see them as well. But conceptually there belong here and are in the kCIDLib/tCIDLib <Link Type="Page" Ref="/BigPicture/" Id="/FacilityNamespaces">namespaces</Link>.</LItem>
             <LItem Ref="Text manipulation">So the things you'd expect, strings, text input and output streams, the most core text converters for ASCII and the UTF-X variations, string tokenizing</LItem>
             <LItem Ref="Collections">A pretty full featured set of collections: vectors, arrays, stacks, deques, queues, trees, linked lists, hash sets, keyed hash sets, hash maps, bags, cursors, generic algorithms over collections.</LItem>
             <LItem Ref="Smart Pointers">The usual managed, counted, and unique type smart pointers.</LItem>

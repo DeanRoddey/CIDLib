@@ -168,6 +168,10 @@ class CIDLIBEXP TBaseTreeNode : public TObject
 // ---------------------------------------------------------------------------
 namespace TBasicTreeHelpers
 {
+    CIDLIBEXP extern const TString strRootPath;
+    CIDLIBEXP extern const TString strRootName;
+    CIDLIBEXP extern const TString strRootDesc;
+
     CIDLIBEXP tCIDLib::TVoid BadNode
     (
         const   tCIDLib::TCh* const     pszFile
@@ -710,7 +714,7 @@ template <class TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
             }
 
             // And clear out our members to indicate we are empty
-            m_pnodeRoot  = 0;
+            m_pnodeRoot  = nullptr;
 
             // Bump our serial number
             m_c4SerialNum++;
@@ -1567,7 +1571,13 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             , m_bSorted(bSorted)
             , m_c4NTCount(0)
             , m_c4TCount(0)
-            , m_pnodeRoot(new TNodeNT(L"Root", L"$Root$", nullptr))
+            , m_pnodeRoot
+              (
+                new TNodeNT
+                (
+                    TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
+                )
+              )
         {
         }
 
@@ -1578,7 +1588,13 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             , m_bSorted(colSrc.m_bSorted)
             , m_c4TCount(colSrc.m_c4TCount)
             , m_c4NTCount(colSrc.m_c4NTCount)
-            , m_pnodeRoot(new TNodeNT(L"Root", L"$Root$", nullptr))
+            , m_pnodeRoot
+              (
+                new TNodeNT
+                (
+                    TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
+                )
+              )
         {
             // Do a recursive replication of the tree
             ReplicateNodes(colSrc.m_pnodeRoot, m_pnodeRoot);
@@ -2412,7 +2428,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             c4Depth = 0;
 
             // Optimize for root
-            if (strToFind == L"/")
+            if (strToFind == TBasicTreeHelpers::strRootPath)
                 return m_pnodeRoot;
 
             // If its empty, then we know we won't find it
@@ -2420,7 +2436,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             {
                 if (bThrowIfNotFound)
                     TBasicTreeHelpers::NamedNodeNotFound(CID_FILE, CID_LINE, strToFind);
-                return 0;
+                return nullptr;
             }
 
             //
