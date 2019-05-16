@@ -2330,6 +2330,22 @@ END PROJECT
 ;  Some intermediate samples
 ; ----------------------------------------------------------------------------
 
+PROJECT=ObjStore1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ObjStore1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDObjStore
+    END DEPENDENTS
+
+END PROJECT
+
+
+
 PROJECT=ORB1SampS
 
     SETTINGS
