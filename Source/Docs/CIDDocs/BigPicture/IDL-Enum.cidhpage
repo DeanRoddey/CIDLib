@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Smart Enumerations</Title>
+
+    <HelpText>
+
+        <P>CIDLib includes an ORB (Object Request Broker), which we'll get into in detail later. The ORB supports some very powerful client/server technology that many of you will make heavy use of. There is an IDL compiler that assists the ORB by generating some 'glue' code for the client and server sides of the connection.</P>
+
+        <P>However, the IDL compiler can also generate constants and enumerations. The enumerations are particularly useful, because they take C++'s quite weak enumerations and make them very powerful tools. C++ made a reasonable step forward with enumerations by the introduction of 'enum class' type enumerations, but they are still quite weak compared to what they could be.</P>
+
+        <P>The IDL generated enumerations provide these benefits:</P>
+
+        <List Type="Unordered">
+            <LItem Ref="Enumeration">Embarrasingly you can't even enumerate standard C++ enumerations. The IDL compiler can generate inc/dec operators for you that allow you to enumerate through the values.</LItem>
+            <LItem Ref="Special Values">The IDL compiler generates special min, max and count values for you, which are also very useful for iteration or creating things with one entry per enumeration value.</LItem>
+            <LItem Ref="Bitmapped">You can create bitmapped enumerations which will get bitwise AND and OR operators generated for them, making them easy to compose.</LItem>
+            <LItem Ref="Binary Streaming">The IDL compiler can generate binary streaming operators which allow the enumerations to be streamed to/from CIDLib binary streams. This also makes them passable as parameters to remote ORB based method calls.</LItem>
+            <LItem Ref="Alternate Value Map">You can define alternate numeric values, in addition to the regular ordinal value of the enumerations, and you will get methods generated to map between the two.</LItem>
+            <LItem Ref="Text Mapping">You can set up multiple text representations of each enumeration value and will get methods to map between the enum ordinal and those text values.</LItem>
+            <LItem Ref="Text Stream">The IDL compiler can generate operators for streaming enumeration values to CIDLib text streams, and you can choose which of the available text values you want it to use. You can also use loadable text so that the streaming text can be translatable.</LItem>
+            <LItem Ref="Validity Check">The IDL compiler will generate a validity check method for non-bitmapped enums which you can use to check enum values passed in to your code to see if they are valid.</LItem>
+        </List>
+
+        <P>Obivously this makes them vastly much more powerful than the basic C++ enumerations. They are generated as 'enum class' types, and you can also indicate an underlying data type if you choose to.</P>
+
+        <P>Almost all of these capabiltiies are optional and you indicate which ones you want to for each enumeration. Otherwise it would generate a lot of potentially unwanted overhead.</P>
+
+        <SecTitle>Defining Enumerations</SecTitle>
+
+        <P>The IDL compiler works on .CIDIDL files. The overall structure of those will be covered in the context of the ORB itself. But here is a typical definition for an enumeration. It creates an enumeration called EParmDirs. It indicates it wants to be able to stream these to a text stream, and to be able to map between the enumeration and text representations. It defines alternative text values for the values, and indicates it wants to use those for the streaming and translation.</P>
+
+        <Note>You can include documentation, which be emitted into the header file along with the enumeration definition.</Note>
+
+        <Code>
+        &amp;lt;CIDIDL:Enum    CIDIDL:Name="EParmDirs" CIDIDL:XlatMap="AltText"
+                        CIDIDL:TextStreamMap="AltText" CIDIDL:AltTextSrc="Inline">
+            &amp;lt;CIDIDL:DocText>
+                The types of parameters we support
+            &amp;lt;/CIDIDL:DocText>
+            &amp;lt;CIDIDL:EnumVal CIDIDL:Name="In"    CIDIDL:AltText="[In]" />
+            &amp;lt;CIDIDL:EnumVal CIDIDL:Name="Out"   CIDIDL:AltText="[Out]" />
+            &amp;lt;CIDIDL:EnumVal CIDIDL:Name="InOut" CIDIDL:AltText="[InOut]" />
+        &amp;lt;/CIDIDL:Enum>
+        </Code>
+
+        <P>This will result in the following content being generated, or the public definitions of the content.</P>
+
+        <Code>
+        namespace tCIDMacroEng
+        {
+            enum class EParmDirs
+            {
+                In
+                , Out
+                , InOut
+                , Count
+                , Min = In
+                , Max = InOut
+            };
+            EParmDirs eXlatEParmDirs
+            (
+                const TString&amp;amp; strToXlat
+                , const tCIDLib::TBoolean bThrowIfNot = kCIDLib::False
+            );
+            const TString&amp;amp; strXlatEParmDirs
+            (
+                const EParmDirs eToXlat
+                , const tCIDLib::TBoolean bThrowIfNot = kCIDLib::True
+            );
+            tCIDLib::TBoolean bIsValidEnum(const EParmDirs eVal);
+        }
+
+        TTextOutStream&amp;amp; operator&amp;lt;&amp;lt;
+        (
+            TTextOutStream&amp;amp; strmTar
+            , const tCIDMacroEng::EParmDirs eToStream
+        );
+        </Code>
+
+        <P>It generates the enumeration definition itself, including the special Count, Min, and Max values. Then it provides definitions for the string to enum and enum to string translation methods, and the enum validity check. Finally it generates the streaming operator to stream the values to any text output stream. The latter of course is a global operator and not in the facility namespace (see Facility Namespaces to the left.)</P>
+
+        <P>With this enumeration, we could do things like this, where we can translate a string to the enum type, or we can translate the enumeration to it's string form:</P>
+
+        <Code>
+        tCIDMacroEng::EParmDirs eDir = tCIDMacroEng::eXlatEParmDirs(L"[In]");
+        if (tCIDMacroEng::strXlatEParmDirs(eDir) != L"[In]")
+        {
+            // Something is majorly wrong
+        }
+        </Code>
+
+        <P>Note that the translation methods have a 'throw if not' parameter, which lets you indicate whether a failure to translate should be treated as an exception, or just an error return. In the string to enum, the default is not to, since that's not an uncommon problem given that the text is often from user provided data. For the other way it defaults to an exception since that means the caller passed an invalid enumeration which is really indicative of a program error.</P>
+
+        <Note>In the cases where an enumeration is returned and there needs to be an error option, the ::Count value is always used for that, to indicate that the returned value is not valid.</Note>
+
+
+        <SecTitle>Bitmapped Enums</SecTitle>
+
+        <P>Here is a typical bitmapped enumeration definition. In this case it is setting the value of each enumerated value, since it needs to indicate which bits each value represents. It supports streaming the values out to a text stream and formatting them to a string, in both cases using the base names of the values as the text.</P>
+
+        <Code>
+        &amp;lt;CIDIDL:Enum CIDIDL:Name="EConnOpts" CIDIDL:XlatMap="BaseName"
+                    CIDIDL:TextStreamMap="BaseName"
+                    CIDIDL:FormatMap="BaseName" CIDIDL:Type="Bmp">
+            &amp;lt;CIDIDL:DocText>
+                Options for creating a secure channel connection
+            &amp;lt;/CIDIDL:DocText>
+            &amp;lt;CIDIDL:EnumVal CIDIDL:Name="NoDefCreds"  CIDIDL:Value="0x00000001"/>
+            &amp;lt;CIDIDL:EnumVal CIDIDL:Name="AllowTLS1_1" CIDIDL:Value="0x01000000"/>
+        &amp;lt;/CIDIDL:Enum>
+        </Code>
+
+        <P>In this case the generated header content would be:</P>
+
+        <Code>
+        namespace tCIDSCan
+        {
+            enum class EConnOpts : tCIDLib::TCard4
+            {
+                NoDefCreds = 0x00000001
+                , AllowTLS1_1 = 0x01000000
+                , Count = 2
+                , None = 0
+                , AllBits = 0x1000001
+            };
+            tCIDLib::TVoid FormatEConnOpts
+            (
+                        TString&amp;amp;            strTarget
+                , const    TString&amp;amp;            strPrefix
+                , const    tCIDLib::TCh        chSepChar
+                , const    TEnumMap::ETextVals eVal = TEnumMap::ETextVals::BaseName
+            );
+            tCIDLib::TBoolean bIsValidEnum(const EConnOpts eVal);
+        }
+
+        constexpr tCIDSChan::EConnOpts
+        operator|(const tCIDSChan::EConnOpts eLHS, const tCIDSChan::EConnOpts eRHS);
+        constexpr tCIDSChan::EConnOpts&amp;amp;
+        operator|=(tCIDSChan::EConnOpts&amp;amp; eLHS, const tCIDSChan::EConnOpts eRHS);
+        constexpr tCIDSChan::EConnOpts
+        operator&amp;amp;(const tCIDSChan::EConnOpts eLHS, const tCIDSChan::EConnOpts eRHS);
+        constexpr tCIDSChan::EConnOpts&amp;amp;
+        operator&amp;amp;=(tCIDSChan::EConnOpts&amp;amp; eLHS, const tCIDSChan::EConnOpts eRHS);
+        </Code>
+
+        <Note>We get the same Xlat methods and text streaming operator as the previous example, so I left those out there for brevity</Note>
+
+        <P>In this case the special values are Count, None and AllBits, the latter two being commonly desired. We get the formatting method which can be very useful, and is widely used in the CQC automation system. It allows you to format out the values with a prefix and separators. So something like this:</P>
+
+        <Code>tCIDSChan::FormatEConnOpts(eOpts, L"List", kCIDLib::chColon, kCIDLib::Comma)</Code>
+
+        <P>would generate this output text to the target string:</P>
+
+        <Code>List: NoDefCreds, AllowTLS1_1</Code>
+
+        <Note>This method takes any of the defined text values, it just defaults to the one you indicated in the enumeration definition, the base name value in this case. So if you have defined other text representations, you could use them as well.</Note>
+
+        <P>It then creates global bitwide operators to allow us to OR and AND these enumerated values together. So we can do something like:</P>
+
+        <Code>
+            tCIDSChan::EConnOpts eOpts = tCIDSChan::EConnOpts::None;
+            if (whatever)
+                eOpts |= tCIDSChan::EConnOpts::NoDefCreds;
+            if (something)
+                eOpts |= tCIDSChan::EConnOpts::AllowTLS1_1;
+        </Code>
+
+        <Note>Note here that, despite being 'enum class' type enums we don't need any casting to do these operations.</Note>
+
+    </HelpText>
+
+</HelpPage>

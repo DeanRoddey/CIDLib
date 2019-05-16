@@ -8,7 +8,7 @@
 
         <P>In this section we will present some big picture information to get you familiar with the way CIDLib is structured and how it works. Don't over-read here to start with. You'll just end up drowning in details. Go go the videos on YouTube to get CIDLib installed and built, and start working through some of the sample programs. It will make far more sense to see it in action. Come back here to get more information on the bits and pieces you see there.</P>
 
-        <Link Type="Extern" Ref="https://www.youtube.com/">Getting Start Playlist</Link>
+        <Link Type="Extern" Ref="https://www.youtube.com/">Getting Started Playlist</Link>
 
     </HelpText>
 

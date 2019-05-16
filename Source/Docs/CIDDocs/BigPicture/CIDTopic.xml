@@ -8,6 +8,8 @@
         <PageLink FileName="Facilities" Title="CIDLib 'Facilities'"/>
         <PageLink FileName="FacilityFiles" Title="Facility Files"/>
         <PageLink FileName="FacilityNamespaces" Title="Facility Namespaces"/>
+        <PageLink FileName="IDL-Enum" Title="Smart Enums"/>
+        <PageLink FileName="BuildProcess" Title="Build Tools"/>
         <PageLink FileName="Exceptions" Title="Exceptions"/>
         <PageLink FileName="Janitors"/>
         <PageLink FileName="Collections" Title="Collections"/>

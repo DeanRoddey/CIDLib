@@ -8,8 +8,6 @@
     </PageMap>
 
     <SubTopicMap>
-        <SubTopicLink SubDir="APIDocs" Title="CIDLib API"/>
-        <SubTopicLink SubDir="Build" Title="Build Tools"/>
     </SubTopicMap>
 
 </CIDTopic>

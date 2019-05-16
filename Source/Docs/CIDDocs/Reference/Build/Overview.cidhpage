@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>The Build Tools</Title>
+
+    <HelpText>
+
+        <P>For an overview of the build process, see the <Link Type="Page" Ref="/BigPicture/" Id="/BuildProcess">Big Picture</Link> section. Here we will get into the details of the build tool and how to use it.</P>
+
+
+
+    </HelpText>
+
+</HelpPage>

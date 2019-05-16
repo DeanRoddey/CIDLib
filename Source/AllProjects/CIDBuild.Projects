@@ -1285,7 +1285,6 @@ END PROJECT
 PROJECT=CIDCfgSrv
     SETTINGS
         DIRECTORY   = OrbUtils\CIDCfgSrv
-        MSGFILE     = No
         MSGFILE     = Yes
         TYPE        = Service
     END SETTINGS
