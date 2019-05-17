@@ -413,7 +413,11 @@ template <typename TElem> class TFixedSizePool : public TObject
             m_colUsedList.pobjBinarySearch(*pelemRet, eCompAddr, c4InsertAt);
             m_colUsedList.InsertAt(pelemRet, c4InsertAt);
 
-            // And now the caller is responsible for returning it
+            //
+            //  Let the derived class prep it and return it. The caller is responsible
+            //  for returning it to us.
+            //
+            PrepElement(*pelemRet);
             return pelemRet;
         }
 

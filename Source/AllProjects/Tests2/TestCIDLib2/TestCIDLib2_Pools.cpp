@@ -163,10 +163,18 @@ TTest_FixedSizePool::eRunTest( TTextStringOutStream&   strmOut
         return tTestFWLib::ETestRes::Failed;
     }
 
-    // Now reserve five strings
+    //
+    //  Now reserve five strings. Some of these will be reused, so make sure that
+    //  they come back empty, else it's not resetting them.
+    //
     for (tCIDLib::TCard4 c4Index = 0; c4Index < 5; c4Index++)
     {
         apstrElems[c4Index] = splTest.pobjReserveElem();
+        if (!apstrElems[c4Index]->bIsEmpty())
+        {
+            strmOut << TFWCurLn << L"Pool element was not reset on reserve\n\n";
+            return tTestFWLib::ETestRes::Failed;
+        }
         *apstrElems[c4Index] = L"Test value ";
         apstrElems[c4Index]->AppendFormatted(c4Index);
     }
