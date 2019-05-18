@@ -221,21 +221,29 @@ async function loadDIV(tarDIV, toload) {
 //
 function makeTopicURL(topicDir) {
     var topicURL = helpRoot + topicDir + "/CIDTopicIndex.html";
-    topicURL = topicURL.replace(/\/\//g, '/');
+    // topicURL = topicURL.replace(/\/\//g, '/');
+    topicURL = topicURL.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
+
     return topicURL;
 }
 
 function makePageURL(topicDir, pageName) {
     var pageURL = helpRoot + topicDir + "/" + pageName + ".html";
-    pageURL = pageURL.replace(/\/\//g, '/');
-    pageURL = pageURL.replace(/\/\//g, '/');
+    // pageURL = pageURL.replace(/\/\//g, '/');
+    // pageURL = pageURL.replace(/\/\//g, '/');
+
+    pageURL = pageURL.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
+    pageURL = pageURL.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
     return pageURL;
 }
 
 function makePagePath(topicDir, pageName) {
     var pagePath = topicDir + "/" + pageName;
-    pagePath = pagePath.replace(/\/\//g, '/');
-    pagePath = pagePath.replace(/\/\//g, '/');
+    // pagePath = pagePath.replace(/\/\//g, '/');
+    // pagePath = pagePath.replace(/\/\//g, '/');
+
+    pagePath = pagePath.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
+    pagePath = pagePath.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
     return pagePath;
 }
 

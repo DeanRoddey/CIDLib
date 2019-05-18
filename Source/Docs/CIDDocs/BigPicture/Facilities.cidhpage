@@ -47,7 +47,7 @@
 
         <P>For executable facilities, again other than very simple ones such as the basic sample programs or simple utilities, the facility object is where the program is started, i.e. the initial thread is pointed at a method of this facility object. That may be all that is involved and the program runs all within the facility object. Or the facility may spawn off various other threads as required. Those threads may also be run on the facility object (to share data) or be standalone objects.</P>
 
-        <P>Here is some code from the CIDDocComp.cpp file, which is the main cpp file of the program that generates this documentation. This is how the main thread is pointed at a method of the facility class:</P>
+        <P>Here is some code from the CIDDocComp.cpp file, which is the main cpp file of the program that generates this documentation (see Facility Files to the left.) This is how the main thread is pointed at a method of the facility class:</P>
 
         <Code>
         TFacCIDDocComp facCIDDocComp;

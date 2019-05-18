@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Basic Types</Title>
+
+    <HelpText>
+
+        <P>This is mostly a topic for the reference section, but it's important for folks new to CIDLib to understand the type system used by CIDLib for the fundamental (non-class, non-enumeration) types.</P>
+
+        <P>Because CIDLib must be portable, you never use the actual C++ types directly. Well, if you are doing a facility to encapsulate system functionality sometimes you will use some internally when interacting with those system APIs, but never in actual CIDLib code. You will use a set of fundamental types in the tCIDLib namespace. The most common ones are:</P>
+
+        <List>
+            <LItem Ref="tCIDLib::TBoolean">A boolean value.</LItem>
+            <LItem Ref="tCIDLib::TCardX">Where X is 1, 2 or 4, this is an unsigned (cardinal) value of 8, 16 or 32 bits.</LItem>
+            <LItem Ref="tCIDLib::TCh">This is a native wide character. On Windows this is UTF-16 little endian.</LItem>
+            <LItem Ref="tCIDLib::FloatX">Where X is 4 or 8, this is a 4 or 8 byte floating point value.</LItem>
+            <LItem Ref="tCIDLib::TIntX">Where X is 1, 2 or 4, this is a signed (integral) value of 8, 16 or 32 bits.</LItem>
+            <LItem Ref="tCIDLib::TSCh">Not used much but a short character in the native code page.</LItem>
+            <LItem Ref="tCIDLib::TEncodedTime">A count of 100 ns ticks since midnight, Jan 1st 1970. This must be unsigned and 64 bits.</LItem>
+        </List>
+
+        <P>The per-platform code will map these, and various other, types to the appropriate type for that platform.</P>
+
+        <P>In some cases it's unlikely that a type will ever mapped to anything but a specific language defined type, like TBoolean. However, it would be ugly and extremely inconsistent not to treat all types the same. CIDLib very much strives for stylistic consistency. And, worst case, it means we can always redefine a fundamental type if need be, even using the new enum class capability to create a unique type if needed. So always, always use the CIDLib defined types.</P>
+
+        <Note>There will reference material with more information, but you can find the per-platform mappings in a file called CIDKernel\xxx\CIDKernel_PlatformTypes.hpp, where xxx is the per-platform directory of the CIDKernel facility.</Note>
+
+        <P>There are types for IP ports, window ids, thread ids, error codes, loadable message and error text ids, and some others.</P>
+
+    </HelpText>
+
+</HelpPage>

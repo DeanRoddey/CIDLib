@@ -394,6 +394,10 @@ static tCIDLib::TVoid DummyFunc()
     cursTest++;
     --cursTest;
 
+    for (cursTest.bReset(); cursTest; ++cursTest)
+    {
+    }
+
     TVector<TArea>::TNCCursor cursNCTest(&colTestCurs);
     cursNCTest++;
     --cursNCTest;

@@ -48,6 +48,23 @@
 
         <P>This is called 'orphaning' and almost all all of the janitor classes include an option to orphan whatever it is they own or have changed. So they just forget about that thing and therefore their destructor does nothing. In the cases where they actually have acquired some resource, the orphan method will return that thing so that you can store it away as appropriate</P>
 
+        <Code>
+        tCIDLib::TVoid DoSetup()
+        {
+            // Provisionally create the baffle plate object
+            TBafflePlate* pplateInit = pplateCreateNew();
+            TJanitor&amp;lt;TBafflePlate> janPlate(pplateInit);
+
+            // Try to connect the plate to its server. It may throw
+            pplateInit->ConnectToSrv();
+
+            // Other initialization
+
+            // It worked so store the plate
+            m_pplateWorking = janPlate.pobjOrphan();
+        }
+        </Code>
+
         <Note>Of course this introduces extra risk into the equation. Janitors are sort of 'spooky action at a distance' and so it's easy to miss the fact that you may have already orphaned it, and try to use the thing it is holding. Or store the thing and forget to orphan it, so that the janitor destroys/undoes it. Either of these can cause major issues. But, ultimately the benefits far outweigh the risks if reasonable caution is taken.</Note>
 
     </HelpText>

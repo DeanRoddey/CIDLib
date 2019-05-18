@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Collection Cursors</Title>
+
+    <HelpText>
+
+        <P>We roughly covered collections in the previous section, so definitely go through that first. What we left out of that page to keep it from getting too long is how collections are iterated.</P>
+
+        <List>
+            <LItem Ref="Direct">Most collections that are iterable can be iterated directly. For arrays/vectors just loop through the index. For linked lists just next node and next node to the end, and so forth.</LItem>
+            <LItem Ref="Cursor">But some cannot be directly iterated and even when they can you may want to use something more generic to do so, because that allows for some very useful capabiltiies, and that is where cursors come in.</LItem>
+        </List>
+
+        <P>When you iterate an array via a numeric index, you are just keeping track of where you are in the array and moving it forward or back. Cursors are an abstract means to do the same thing. You can create a cursor for a given collection and it basically keeps up with where it is within that collection, so you don't have to understand the iteration mechanism or even know what kind of collection you are iterating.</P>
+
+        <P>Here's a basic example of iterating a TBag collection via cursor:</P>
+
+        <Code>
+        TBag&amp;lt;TString> colBag;
+        // Strings got added to it in here somewhere
+
+        // Now let's iterate them and display them to the console
+        TBag&amp;lt;TString>::TCursor cursObjs(&amp;amp;colBag);
+        for (; cursObjs; ++cursObjs)
+            conOut &amp;lt;&amp;lt; *cursObjs &amp;lt;&amp;lt; kCIDLib::NewLn;
+        conOut &amp;lt;&amp;lt; kCIDLib::EndLn;
+        </Code>
+
+        <P>The cursor is a nested class of the collection, as is the case for all collection cursors. There is a const cursor, named TCursor which we are using here, and a non-const cursor called TNCCursor. We are just creating a TCursor and giving it a pointer to the bag collection to iterate. It has to retain a pointer so it can move through the elements, so the bag has to remain valid for the life of the cursor.</P>
+
+        <P>It then does a for loop. There's no need for the first part of the for loop because we already have set the cursor, though if you were reusing it you could reset it there. We'll look at that later. The next part is just the cursor name, which causes a boolean conversion operator to be called that returns false if the cursor is no longer valid. So once the cursor is not valid that will return false and the loop will exit.</P>
+
+        <P>Inside the loop it uses *cursObjs to dereference the cursor and get to the object inside it. You can also do cursObjs-> to access the object as well, which is pretty common for these types of classes.</P>
+
+        <P>The last just does a prefix increment operator to push the cursor to the next value. Of course you could also do it in a while loop.</P>
+
+        <Code>
+        while (cursObjs)
+        {
+            if (*cursObjs)
+                ComplainLoudly();
+            ++cursObjs;
+        }
+        </Code>
+
+        <P>Here we check at the top and increment at the bottom. You can do a do/while loop but it's a lot more cumbersome and seldom used.</P>
+
+        <Note>You can also do post-fix increment where needed, though it is considerably less performant because it has to create a copy of the cursor and return it just to then be thrown away after it is used. So use prefix any time you can.</Note>
+
+
+        <SecTitle>Cursor Validity</SecTitle>
+
+        <P>Unlike the standard C++ container iterators, CIDLib's collection cursors have the concept of validity. So you don't have to do begin()/end() and all of the various other choices that that strategy requires. As we saw above "if (cursObjs)" checks whether the cursor is pointing to a valid element or not. And it doesn't become undefined behavior if you modify the collection either. The cursor will know this and report it is no longer valid. Actually, if it can, it will remain valid, but it can't always reasonably know that.</P>
+
+        <P>Mainly it knows if you use the cursor to make the change, something like this:</P>
+
+        <Code>
+        TVector&amp;lt;TString> colList;
+        // Strings got added to it in here somewhere
+
+        // Let's find any that start with stupid
+        TVector&amp;lt;TString>::TCursor cursList(&amp;amp;colList);
+        for (; cursList; ++cursList)
+        {
+            if (cursList->bStartsWithI(L"stupid"))
+                cursList.RemoveAt(cursList);
+        }
+        </Code>
+
+        <P>So here we are using the cursor to iterate through the list and removing possibly multiple (or even all) objects. But because we do it via the cursor itself, the cursor knows that this is happening and stays valid.</P>
+
+        <P>If you changed the list such that the cursor doesn't know the next use will report that it is no longer valid.</P>
+
+        <SecTitle>Cursor Reset</SecTitle>
+
+        <P>Once a cursor is run to the end, you must reset it if you are going to reuse it for iteration again, else it is still at the end and invalid. This is the type of potential error that the compiler cannot help you with. So, on the whole, it may be best to either just create a new one each time, or to be sure to reset it before every use, by calling the bReset() method. It returns False if the collection was empty (and hence the cursor is still invalid) so that you can short circuit work that would otherwise be done</P>
+
+        <P>Note that you can call the reset in the for loop if you want.</P>
+
+        <Code>
+        for (cursList.bReset(); cursList; ++cursList)
+        {
+            if (cursList->bStartsWithI(L"stupid"))
+                cursList.RemoveAt(cursList);
+        }
+        </Code>
+
+        <P>The return value of the reset method isn't used, but the next step is to check the validity, so it'll exit immediately if the collection is empty anyway.</P>
+
+        <SecTitle>Cursor Polymorphism</SecTitle>
+
+        <P>Just like collections are polymorphic, so are cursors. So you can get a get a cursor for a collection you don't know the actual type of and iterate it. Here is an examples, where we create a generic 'remove stupidity' function that can remove it from any collection of strings:</P>
+
+        <Code>
+        static tCIDLib::TVoid RemoveStupidity(TCollection&amp;lt;TString>&amp;amp; colTar)
+        {
+            TJanitor&amp;lt;TColCursor&amp;lt;TString>> janCursor(colTar.pcursNew());
+
+            // Get a ref for more convenient syntax
+            TColCursor&amp;lt;TString>&amp;amp; cursRemove = *janCursor;
+            for (; cursRemove; ++cursRemove)
+            {
+                if (cursRemove->bStartsWithI(L"stupid"))
+                    cursRemove.RemoveAt(cursList);
+            }
+        }
+
+        TVector&amp;lt;TString> colList;
+        // Strings got added here
+
+        // And remove stupidity
+        RemoveStupdity(colList);
+        </Code>
+
+        <P>Here we have a method that takes any string based collection. We call pcursNew() on it to ask it to create a new cursor for us. We put that into a janitor so that it will get cleaned up. Then for convenient, we get a reference to it so that we can use the normal cursor syntax. After that it's just like before. On exit the cursor gets cleaned up.</P>
+
+        <SecTitle>Cursors as Element Accessors</SecTitle>
+
+        <P>If you have a class that contains a collection of things, and it provides a find method to look up one of those things, for instance, you have a number of options. You can directly expose the collection, but that's usually not optimal unless it's internal code that is very well trusted. You could return an index perhaps and let the caller pass it back in to get a reference to that element. But you might not be using a directly accessible collection to contain the things and that's multiple steps.</P>
+
+        <P>If it's really light weight you could just return a copy, and that would likely be the safest. But that's often not reasonable. And, in this case, it's not just a temporary that you can use move semantics to try to make it lighter weight to return, it's important data of the class.</P>
+
+        <P>So, often a cursor is the best choice for this type of thing. It lets you directly return the result without actually exposing the collection, or paying a high price for returning a copy. And, since CIDLib cursors support the concept of validity it can also represent 'not found' by returning an invalid cursor. That's easy to do by just returning the cursor after you've run off the end of the collection (because you didn't find the target.)</P>
+
+        <P>To hide the details from client code, alias the cursor to a class specific type. Something like this, with the details removed:</P>
+
+        <Code>
+        class TWhatever
+        {
+            public :
+                using TItemCursor = TVector&amp;lt;TItem>::TCursor;
+
+                TItemCursor cursFind(const TString&amp;amp; strFind)
+                {
+                    TItemCursor cursRet(&amp;amp;m_colItems);
+                    for (; cursRet; ++cursRet)
+                    {
+                        if (cursRet->bIsMe(strFind))
+                            break;
+                    }
+                    return cursRet;
+                }
+        }
+        </Code>
+
+        <P>So we just create a cursor for our own collection, and iterate it using a for loop. If we find the guy, we break out with the cursor still set to that entry, else we run to the end and the cursor is invalid. Either we then return that cursor.</P>
+
+        <Note>Of course the cursor either way still references the collection which must remain valid until the cursor is dropped. That's always a danger in these things, but the alternative is trying to make C++ into Java or C#, which introduces a massive amount of other moving parts, complications, and overhead with everything in sight being in a smart pointer.</Note>
+
+    </HelpText>
+
+</HelpPage>

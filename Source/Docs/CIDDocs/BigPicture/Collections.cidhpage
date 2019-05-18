@@ -65,7 +65,7 @@
                 <TableCol>Linked list</TableCol>
                 <TableCol>Yes</TableCol>
                 <TableCol>No</TableCol>
-                <TableCol>LIFO/FIFO</TableCol>
+                <TableCol>LIFO/FIFO/Iteration</TableCol>
             </TableRow>
 
             <TableRow>
@@ -105,7 +105,7 @@
                 <TableCol>Linked List</TableCol>
                 <TableCol>If priority based</TableCol>
                 <TableCol>No</TableCol>
-                <TableCol>LIFO</TableCol>
+                <TableCol>LIFO/Iteration</TableCol>
             </TableRow>
 
             <TableRow>
@@ -121,7 +121,15 @@
                 <TableCol>Linked List</TableCol>
                 <TableCol>Yes</TableCol>
                 <TableCol>No</TableCol>
-                <TableCol>FIFO</TableCol>
+                <TableCol>FIFO/Iteration</TableCol>
+            </TableRow>
+
+            <TableRow>
+                <TableCol>Tree</TableCol>
+                <TableCol>Tree</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>No</TableCol>
+                <TableCol>Iteration/Path</TableCol>
             </TableRow>
 
             <TableRow>
@@ -150,6 +158,7 @@
 
         <List Type="Unordered">
             <LItem>TBasicDLinkedRefCol</LItem>
+            <LItem>TBasicTreeCol</LItem>
             <LItem>TRefBag</LItem>
             <LItem>TRefDqueue</LItem>
             <LItem>TRefKeyedHashSet</LItem>
@@ -159,6 +168,8 @@
         </List>
 
         <P>You typically don't use the TBasicDLinkedRefCol type directly, mostly you use it indirectly since it is used internally by some of the others. But you can use it if you just need a basic doubly linked list.</P>
+
+        <Note>It's rare in CIDLib that we have a derived class that doesn't actually fully implement the interface of its base, but the TBasicTreeCol class is one. All collections implement an objAdd method (or Add if by reference) to generically add an element to it. But for a tree we don't know where to put it. So objAdd will throw if you call it on a tree. It is otherwise a valid collection derivative so there are enough benefits to justify this rare exception.</Note>
 
         <SecTitle>By Value Collections</SecTitle>
 
@@ -180,6 +191,8 @@
 
         <Note>TObjArray isn't strictly a collection in that it doesn't derive from the common TCollection class, see Polymorphism below, but it is definitely in the same family.</Note>
 
+        <Note>There is a non-templatized TSLinkedList class as well, but it's not one of our formal collection derivatives. It is sometimes used inside other things for simple linked list storage where it's easy to to internally handle casting node values to their real type, and it allows you to avoid extra code generation for something simple. There is no fully fleshed out singly linked list at this time.</Note>
+
         <SecTitle>Polymorphism</SecTitle>
 
         <P>Unlike some other systems' collections/containers, CIDLib's collections are polymorphic. They derive from a common base class and some operations can be done on any type of collection. There are actually two different levels of polymorphism.</P>
@@ -187,8 +200,22 @@
         <List Type="Unordered">
             <LItem Ref="TCollectionBase">This is the most fundamental class and is not templatized. So it provides common functionality that does not depend on the type of element or other template instantiation parameters. It is the common base class for fundamental, by value and by reference collection types.</LItem>
             <LItem Ref="TFundColBase">Derives from TCollectionBase and provides a common base class for the fundamental collections, below the point of templatization</LItem>
-            <LItem Ref="TCollection/TRefCollection&lt;>">These derive from TCollectionBase but include knowledge of the element type, so they can provide common functionality that requires that information. And the value/reference split happens here.</LItem>
+            <LItem Ref="TCollection/TRefCollection&lt;>">These derive from TCollectionBase but include knowledge of the element type, so they can provide common functionality that requires that information. And the value/reference split happens here for all of the by value/by reference concrete derivatives.</LItem>
         </List>
+
+        <P>Here is a simple example:</P>
+
+        <Code>
+        static tCIDLib::TVoid AddNew(TCollection&amp;lt;TString>&amp;amp; colTar)
+        {
+            colTar.objAdd(strDefValue);
+        }
+
+        TVector&amp;lt;TString> colItems;
+        AddNew(colItems);
+        </Code>
+
+        <P>So here we create a vector of strings, but we can pass it to AddNew which takes a TCollection of strings. objAdd is defined in TCollection, so AddNew can accept any collection with string elements (though see Collection Indices above.)</P>
 
     </HelpText>
 

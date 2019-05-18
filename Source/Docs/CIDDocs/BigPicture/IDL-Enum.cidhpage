@@ -10,6 +10,8 @@
 
         <P>However, the IDL compiler can also generate constants and enumerations. The enumerations are particularly useful, because they take C++'s quite weak enumerations and make them very powerful tools. C++ made a reasonable step forward with enumerations by the introduction of 'enum class' type enumerations, but they are still quite weak compared to what they could be.</P>
 
+        <P>Because of that many people don't really make much use of enumerations. You will see them used pretty extensively in CIDLib because they no longer have those limitations.</P>
+
         <P>The IDL generated enumerations provide these benefits:</P>
 
         <List Type="Unordered">
@@ -29,13 +31,14 @@
 
         <SecTitle>Defining Enumerations</SecTitle>
 
-        <P>The IDL compiler works on .CIDIDL files. The overall structure of those will be covered in the context of the ORB itself. But here is a typical definition for an enumeration. It creates an enumeration called EParmDirs. It indicates it wants to be able to stream these to a text stream, and to be able to map between the enumeration and text representations. It defines alternative text values for the values, and indicates it wants to use those for the streaming and translation.</P>
+        <P>The IDL compiler works on .CIDIDL files. The overall structure of those will be covered in the context of the ORB itself. But here is a typical definition for an enumeration. It creates an enumeration called EParmDirs. It indicates it wants to be able to stream these to a text stream, and to be able to map between the enumeration and text representations. It defines alternative text values for the values, and indicates it wants to use those for the streaming and translation. It also asks to have an increment operator created.</P>
 
         <Note>You can include documentation, which be emitted into the header file along with the enumeration definition.</Note>
 
         <Code>
         &amp;lt;CIDIDL:Enum    CIDIDL:Name="EParmDirs" CIDIDL:XlatMap="AltText"
-                        CIDIDL:TextStreamMap="AltText" CIDIDL:AltTextSrc="Inline">
+                        CIDIDL:TextStreamMap="AltText" CIDIDL:AltTextSrc="Inline"
+                        CIDIDL:IncDec="Inc">
             &amp;lt;CIDIDL:DocText>
                 The types of parameters we support
             &amp;lt;/CIDIDL:DocText>
@@ -72,6 +75,7 @@
             tCIDLib::TBoolean bIsValidEnum(const EParmDirs eVal);
         }
 
+        tCIDMacroEng::EParmDirs operator++(tCIDMacroEng::EParmDirs&amp;amp; eVal, int);
         TTextOutStream&amp;amp; operator&amp;lt;&amp;lt;
         (
             TTextOutStream&amp;amp; strmTar
@@ -79,7 +83,9 @@
         );
         </Code>
 
-        <P>It generates the enumeration definition itself, including the special Count, Min, and Max values. Then it provides definitions for the string to enum and enum to string translation methods, and the enum validity check. Finally it generates the streaming operator to stream the values to any text output stream. The latter of course is a global operator and not in the facility namespace (see Facility Namespaces to the left.)</P>
+        <P>It generates the enumeration definition itself, including the special Count, Min, and Max values. Then it provides definitions for the string to enum and enum to string translation methods, and the enum validity check. Finally it generates the streaming operator to stream the values to any text output stream and a post-fix increment operator. The latter of course are global operators and not in the facility namespace (see Facility Namespaces to the left.)</P>
+
+        <SecTitle>Translation</SecTitle>
 
         <P>With this enumeration, we could do things like this, where we can translate a string to the enum type, or we can translate the enumeration to it's string form:</P>
 
@@ -94,6 +100,46 @@
         <P>Note that the translation methods have a 'throw if not' parameter, which lets you indicate whether a failure to translate should be treated as an exception, or just an error return. In the string to enum, the default is not to, since that's not an uncommon problem given that the text is often from user provided data. For the other way it defaults to an exception since that means the caller passed an invalid enumeration which is really indicative of a program error.</P>
 
         <Note>In the cases where an enumeration is returned and there needs to be an error option, the ::Count value is always used for that, to indicate that the returned value is not valid.</Note>
+
+        <P>There are various translation methods, and you can assign any of the available text values to any of them. These will be detailed in the Reference section.</P>
+
+        <SecTitle>Iteration</SecTitle>
+
+        <P>We can also iterate through the values. Here is an example of a manual iteration loop. I've wrappted it a bit here to make it fit better.</P>
+
+        <Code>
+        for (tCIDMacroEng::EParmDirs eCur = tCIDMacroEng::EParmDirs::Min;
+                eCur &amp;lt;= tCIDMacroEng::EParmDirs::Min; eCur++)
+        {
+            // Do something
+        }
+        </Code>
+
+        <P>Though iteration can be done manually, there's a helper to do this that makes it much easier, just calling you back on a lambda expression:</P>
+
+        <Code>
+        tCIDLib::ForEachE&amp;lt;tCIDMacroEng::EParmDirs>
+        (
+            [](const tCIDMacroEng::EParmDirs eCur) { // Do something }
+        );
+        </Code>
+
+        <P>This capability alone makes CIDLib's enums vastly more powerful than the standard C++ enumerations. When combined with the ability to define things like object arrays or vectors with enumerated indices, it's particularly useful, see Collection Indices below.</P>
+
+        <P>There is another variation that lets you break out by returning True from the callback, True meaning 'done' basically.</P>
+
+        <Code>
+        tCIDMacroEng::EParmDirs eSelected = tCIDLib::eForEachE&amp;lt;tCIDMacroEng::EParmDirs>
+        (
+            [](const tCIDMacroEng::EParmDirs eCur) { return !bSomeTest(eCur); }
+        );
+        if (eSelected != tCIDMacroEng::EParmDirs::Count)
+        {
+            // One of the tests failed
+        }
+        </Code>
+
+        <P>The callback checks each value by passing it to bSomeTest() and negates its return. So as long as bSomeTest is passing it continues the iteration, but bails out if the test fails. The value you break out on is returned from the helper so you know what happened. If you went all the way then it will be the special ::Count value.</P>
 
 
         <SecTitle>Bitmapped Enums</SecTitle>
@@ -168,6 +214,29 @@
         </Code>
 
         <Note>Note here that, despite being 'enum class' type enums we don't need any casting to do these operations.</Note>
+
+        <SecTitle>Collection Indices</SecTitle>
+
+        <P>One big downside of 'enum class' type enums is that suddenly you can't use them as indices without casting them because they aren't automatically converted to numeric types. That's also good as well of course, since it can catch a whole class of errors. But it's seriously annoying because enums otherwise are excellent indices because they allow for named index access.</P>
+
+        <P>CIDLib helps out here by providing a means to create vector and array collection types with an enum as the index type. Then you can use that enum as an index on those collections without any casting and without losing any type safety.</P>
+
+        <Note>The gotcha, and there is always a gotcha with templates, is that the index is part of the type now, so you can't pass an array or vector with an enum index to some method that takes a normal collection parameter (either polymorphically or via a parameter otherwise of the same type but with the regular unsigned index type.) No matter how hard you try, C++ is just weak in this area.</Note>
+
+        <P>Here is an example with an object array, assuming an enumeration tMagnum::ETypes with values Small, Medium, and Large.</P>
+
+        <Code>
+        // Not we still have to set the size, another thing difficult to avoid
+        TObjArray&amp;lt;TString, tMagnum::ETypes> objaTest(tMagnum::ETypes::Count);
+        if (objaTest[tMagnum::ETypes::Medium].bIsEmpty())
+        {
+            // Do something
+        }
+
+        objaTest[tMagnum::ETypes::Small] = L"Unused";
+        </Code>
+
+        <P>So we can use the num to index the array without any casting or complaints from the compiler.</P>
 
     </HelpText>
 
