@@ -24,7 +24,7 @@
 
         <P>In some cases it's unlikely that a type will ever mapped to anything but a specific language defined type, like TBoolean. However, it would be ugly and extremely inconsistent not to treat all types the same. CIDLib very much strives for stylistic consistency. And, worst case, it means we can always redefine a fundamental type if need be, even using the new enum class capability to create a unique type if needed. So always, always use the CIDLib defined types.</P>
 
-        <Note>There will reference material with more information, but you can find the per-platform mappings in a file called CIDKernel\xxx\CIDKernel_PlatformTypes.hpp, where xxx is the per-platform directory of the CIDKernel facility.</Note>
+        <Note>There will be reference material with more information, but you can find the per-platform mappings in a file called CIDKernel\xxx\CIDKernel_PlatformTypes.hpp, where xxx is the per-platform directory of the CIDKernel facility.</Note>
 
         <P>There are types for IP ports, window ids, thread ids, error codes, loadable message and error text ids, and some others.</P>
 

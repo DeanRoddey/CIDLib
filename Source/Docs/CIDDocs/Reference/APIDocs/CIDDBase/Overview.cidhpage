@@ -10,7 +10,7 @@
 
         <P>The functionality is not super-extensive, but it would be enough for most applications. It will be expanded over time as required. Currently it provides this functionality:</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem Ref="Sources">You can query available data sources.</LItem>
             <LItem Ref="Connections">To make a connection to a database, which is of course used in subsequent operations. These can be via ODBC sources or using connection strings.</LItem>
             <LItem Ref="Statements">To issue SQL statements to the database, to iterate the returned rows, and to bind the returned columns to data members.</LItem>

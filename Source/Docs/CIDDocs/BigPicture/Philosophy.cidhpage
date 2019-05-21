@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>The Philosophy of CIDLib</Title>
+
+    <HelpText>
+
+        <P>Here again, we won't dwell too much on this stuff, and I've put it last in the list for this section, but some folks might be interested and it's worth understanding probably. Most systems have some driving philosophy. As some of us probably have experienced, sometimes perhaps it has more than one and they aren't necessarily in alignment, or they may have changed over time but not been fully applied to existing code.</P>
+
+        <P>CIDLib is perhaps a bit ununual for a project of this size in that it has a single author and hence and single set of beliefs, goals, prejudices, whatever you choose to call them. I think that's a good thing. We've got plenty of committee designed systems out there, so something different is an interesting change of pace perhaps.</P>
+
+        <P>Anyway, here are some key philosophical ideas behind why CIDLib is the way it is. Some of the most obvious ones will have been mentioned in passing elsewhere, but this just gathers them into a single spot so that you can build up maximum froth at how woefully pathetic and wrong I am. These are in no particular order of importance or other criteria.</P>
+
+        <SecTitle>All as One</SecTitle>
+
+        <P>This is been covered a bit in other places, but a fundamental philosophical tenent of CIDLib is that the pieces and parts scheme that makes up most C++ programs is not a good thing, it's just a necessity if you don't have any alternative. Other major languages have fairly broad standard libraries that deal with the kinds of things that real world applications these days need to deal with, not requiring third party libraries for things that are common these days.</P>
+
+        <P>CIDLib is about a monolithic architecture where everything is consistent. Monolithic doesn't mean you get it all or nothing, it's obviously split into separate libraries. But it's monolithic in terms of style and and architecture.</P>
+
+        <SecTitle>No STL</SecTitle>
+
+        <P>In CIDLib the standard C++/STL libraries are not used. So many people will just immediately say there's no excuse not to use them, but there are enormous reasons not to use them. Most people just have never even thought about a world without them and how much of a limitation they are. If you want to create a consistent world, you cannot use a big chunk of code onto which you cannot impose any standard functionality. And, let's face it, a lot of the standard libraries are very dated.</P>
+
+        <P>Look at the Smart Enums section to the left, for a perfect example. It would be impossible to impose such a thing on the standard libraries, so at best it would be an huge inconsistent mess. The same with things like our binary streaming system, which is vastly superior and the basis for so much powerful functionality in CIDLib. There's no way to force the standard library classes to take part in these things.</P>
+
+        <P>So it becomes a matter of significant, actually massive, compromise to use them, and I have no interest in working my life away to create a significantly compromised system.</P>
+
+        <SecTitle>Let the 10% Fend for Themselves</SecTitle>
+
+        <P>I believe that too much general purpose code, particularly over time, tends towards maximum complexity because it tries to be too many things to too many people. In particular it tries to handle more and more off the beaten path scenarios, such as really high performance constraints.</P>
+
+        <P>As we all know, and have enshrined in the "don't prematurely optimize" mantra, only a small portion of the code in any program is likely to really contribute to a significant performance increase. And, for a lot of applications, they are not really even performance constrained at all.</P>
+
+        <P>So, if I double the complexity of CIDLib to deal with that quite small extra bit of territory, that's not a good tradeoff. It means that I'm making the system harder to maintain and improve, more likely to have bugs, more likely to break with change, without really significantly expanding its applicability. That is stealing from the 90% to pay the 10%.</P>
+
+        <P>I say let the 10% use specialized tools. Eeither write something custom that deals with their particular contraints, or use something someone else with similar constraints already has written. And, similarly, for that tiny percentage of code in a given application that will actually provide a significant performance increase, deal with that specifically.</P>
+
+        <P>That may not be popular but I believe it to be an effective strategy. We all know that complexity is the real enemy in non-trivial software development, and significant optimization means very significant increases in complexity and fragility. It's not a good trade off for most of the people using the software.</P>
+
+        <SecTitle>Avoid Over-Templatization</SecTitle>
+
+        <P>The modern C++ world is overrun with templates. When you are building large software products, having massive amounts of inlined code is just not a good idea. It's also impossible to hide details and very difficult to maintain binary compatibility over even simple changes. Not to mention a lot of code bloat. And an inability to protect your intellectual property because so much of it is inlined.</P>
+
+        <P>CIDLib uses templates where they are really useful. But, otherwise, it just turns its back on the modern C++ paradigm of almost everything being a template. That makes it easier to debug, easier to understand, easier to patch in the field and make non-breaking revision releases. And you don't get the phone book for an error message if you make a mistake.</P>
+
+        <P>In actual fact, CIDLib tries to push as much code out of line as is reasonable without over-complicating things. And, even where it has to use templates it tries to push as much of that out of line as possible as well, using a base class or a helper namespace and so forth.</P>
+
+        <SecTitle>Output Parameters</SecTitle>
+
+        <P>I find the modern C++ believe that returning copies of five different things by value as a return value from a method/function in order to avoid just using an output parameter to be bizarre. Output parameters are vastly more performant in a lot of cases, and they just aren't hard to understand. Particularly in a modern era where you can see signatures and parameter names and comments and documentation on the fly, it just makes no sense to me why so many people seem to think they are somehow horrible.</P>
+
+        <P>Yes, if you are returning a single object, and it's reasonable to do so, returning a copy of it is a safer bet. It avoids ownership problems. But adding a huge amount of complexity to the whole system in order to support copy semantics, and all the gotchas that involves, and creating classes or using templates to return arbitrary numbers of parameters by value, when you could just put them in output parameters, it makes no sense to me.</P>
+
+        <P>In particular if a method gets called in a loop, using an output parameter can be enormously more efficient because the called method can often just reuse the existing content and just update it.</P>
+
+        <SecTitle>Pointers aren't Cancerous</SecTitle>
+
+        <P>Though CIDLib uses smart pointers to good effect, it doesn't pretend like any visible pointer is some sort of cancer than will kill its user within minutes. If a class allocates objects internally for its own use, then those objects are already owned and that class cleans them up. It's redundant and just adding more complexity to put them in smart pointers unless they are shared in some way.</P>
+
+        <P>Smart pointers don't magically get rid of ownership problems in C++. Nothing does. They require just as much careful use as pointers for the most part, the potential dangers are just different ones.</P>
+
+        <P>Though there are various places where more smart usage will likely be added in the future, for the most part CIDLib doesn't take the modern view that pointers, at least with the confines of an owning class, cannot be safely dealt with.</P>
+
+        <SecTitle>The Heap isn't Cancerous</SecTitle>
+
+        <P>So many people today seem to think that allocating something on the heap is going to cause the universe to implode or something. Most programs are not even going to gain a noticeable performance boost either way. And often using the heap can make a lot of things more straightforward, avoid a lot of potential undefined behavior, and still also make a lot of things faster.</P>
+
+        <P>For instance, CIDLib's 'by value' vectors actually allocate an array of pointers. The elements are heap allocated objects that are put into that array. Some modernists might gasp at the horror of that. But it has a lot of benefits. To start with it's fairly like that you access stuff far many more times than you create and destroy them. So anything that makes access a lot faster and simpler probably will make up for, or at least counter-balance, any cost related to allocation and destruction.</P>
+
+        <P>Obvious examples are that expanding a CIDLib vector won't invalidate references to elements in the vector, or invalidate cursors for that collection. It means that inserting or removing an element or range is nothing but a block move of pointers, and they also will not invalidate references though cursors will mark themselves as invalid just in case (still not undefined behavior though since they know they are invalid.) Sorting and swapping is just moving pointers around. You don't risk a stack overflow if the vector gets too big.</P>
+
+        <P>If you have some application where this is not an acceptable solution, then of course don't use a vector. But, for most of the code in most applications it's not a problem at all and may actually have better performance if there's much manipulation of the objects in the vector. And it reduces possible undefined behavior, which is a very good thing.</P>
+
+    </HelpText>
+
+</HelpPage>

@@ -16,6 +16,7 @@
         <PageLink FileName="Collections" Title="Collections"/>
         <PageLink FileName="Cursors" Title="Collection Cursors"/>
         <PageLink FileName="Style" Title="Coding Style"/>
+        <PageLink FileName="Philosophy" Title="Philosophy"/>
     </PageMap>
 
     <SubTopicMap>

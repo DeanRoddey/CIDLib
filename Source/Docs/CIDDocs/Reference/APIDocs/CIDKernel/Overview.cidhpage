@@ -8,7 +8,7 @@
 
         <P>CIDKernel is not a facility you will use that often, but it's important you know what it is and why it's there. The important factoids to understand about this facility are:</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem>CIDKernel is a sort of 'virtual operating system' that abstracts CIDLib code from the underlying platform.</LItem>
             <LItem>With some exceptions discussed below, mostly you will use CIDKernel classes indirectly via classes in some higher level facilities that encapsulate them.</LItem>
             <LItem>It is structured as a set of common headers and per-platform implementation files, so that each platform can provide its own implementation while retaining a single outward facing interface.</LItem>

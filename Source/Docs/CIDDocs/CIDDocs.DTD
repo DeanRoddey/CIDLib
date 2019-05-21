@@ -29,7 +29,7 @@
 <!ATTLIST   LItem       Ref CDATA ''
                         Type (Dash | Period | Equals | Colon) 'Dash'>
 <!ELEMENT   List        (LItem+)>
-<!ATTLIST   List        Type (Ordered | Unordered) 'Ordered'>
+<!ATTLIST   List        Type (Ordered | Unordered) 'Unordered'>
 <!ELEMENT   Note        (%HelpContent;)>
 <!ELEMENT   P           (%HelpContent;)>
 <!ELEMENT   PgTitle     (#PCDATA)>
