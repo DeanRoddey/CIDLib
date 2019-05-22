@@ -15,6 +15,7 @@
         <PageLink FileName="Janitors"/>
         <PageLink FileName="Collections" Title="Collections"/>
         <PageLink FileName="Cursors" Title="Collection Cursors"/>
+        <PageLink FileName="ORB-IDL" Title="Client/Server (ORB)"/>
         <PageLink FileName="Style" Title="Coding Style"/>
         <PageLink FileName="Philosophy" Title="Philosophy"/>
     </PageMap>

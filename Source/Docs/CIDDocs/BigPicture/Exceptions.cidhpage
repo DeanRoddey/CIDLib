@@ -74,6 +74,8 @@
         }
         </Code>
 
+        <P>You don't need to, or really want to, do this in every method. But adding it at major points along the way allows you to have a feeling for the context in which an error occurred down in some general purpose code.</P>
+
         <SecTitle>Error Ids</SecTitle>
 
         <P>Of course, since the error id is just a number, the compiler will not tell you if you call ThrowErr/LogMsg on one facility object and pass it an error id from another. It can't know you passed the wrong one. It will try to load a msg with that numerical id from the target facility.</P>
@@ -97,6 +99,23 @@
             }
         }
         </Code>
+
+
+        <SecTitle>Providing Alternatives</SecTitle>
+
+        <P>In many cases in CIDLib you will notice that a method has a trailing boolean parameter with a default value. It will be named generally 'bThrowIfNotXXX' or just 'bThrowIfNot'. The purpose of these parameters are to give you a choice as to whether you want to consider a failure in that method to be an exception type failure or if it should just return a status to indicate success or failure.</P>
+
+        <P>In many cases which of these is most appropriate depends on the context, so we try not to necessarily force a specific scheme all the time. The called method will decide which default value makes the most sense for that type of call.</P>
+
+        <P>Here is an example from the keyed has set collection class. TKey is a template parameter.</P>
+
+        <Code>
+        tCIDLib::TBoolean
+        bRemoveKey( const   TKey&amp;amp;               objKeyToRemove
+                    , const tCIDLib::TBoolean   bThrowIfNot = kCIDLib::True)
+        </Code>
+
+        <P>This method will remove a key from the hash set. Obviously sometimes this type of operation is just a 'remove it in case it exists' type deal, and in other cases it better damn well be there or something is majorly wrong. So you can choose how you want to react. The default in this case is to throw.</P>
 
     </HelpText>
 

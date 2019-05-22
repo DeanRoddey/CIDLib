@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Object Request Broker</Title>
+
+    <HelpText>
+
+        <P>If you are doing applications that involve client/server interfaces, of which of course a lot of office type systems do, and various others, then you will definitely want to look into CIDLib's Object Request Broker, or ORB as it will be called henceforth. If you aren't familiar with the concept, you can go poke around online a bit for detailed explanations, but just to provide some high level information...</P>
+
+        <P>An ORB is basically an object oriented remote procedure call system. Or that's at the heart of it, there's much more to it than that. It basically allows you to create classes that you make calls on normally, but under the hood those calls are redirected to a server that handles them and returns any results. It's a very clean way to do client server systems.</P>
+
+        <P>And, since you can just pass CIDLib objects without any extra work, that means that there's no translating back and forth to some intermediate format on both ends. The objects are directly transmitted back and forth. And this can be done even if a server is, say, Linux and the a client is Windows. It handles endianness issues for you. Just getting rid of the need to translate to some XML or JSON or other intermediate format is a massive reduction in complexity.</P>
+
+        <P>The ORB is not a simple one to one wrapper around a single interface. It is actually a queued system, that allows multiple threads in a client process to talk to a given server process using the same socket connection. The basic process is something like this:</P>
+
+        <List Type="Ordered">
+            <LItem>Client makes a call</LItem>
+            <LItem>Parameters are collected up and prepared for transmission</LItem>
+            <LItem>A check is made to see if there is already a connection to the target server, if not a connection is spun up.</LItem>
+            <LItem>The calling thread puts its call info into the queue and puts itself to sleep</LItem>
+            <LItem>The client side ORB streams this information to the server, then moves on to the next one</LItem>
+            <LItem>The server side ORB finds the target server side interface, and hands off the call information to a worker thread from a thread pool</LItem>
+            <LItem>The worker thread makes the call to the client interface and upon return packs up any return information, queues it up for return, and goes back to the pool to wait for more work</LItem>
+            <LItem>The server side ORB streams the return information back, and the client side connection handler finds the waiting thread, drops the information into his return info data, and wakes him up</LItem>
+            <LItem>The original thread now unpacks the information and returns to the original caller with any return values and output parameters.</LItem>
+        </List>
+
+        <P>So it's a bit of an excursion, but it happens very quickly. Of course this is not a system to use for high speed transaction processing, it's for client/server work. In that context, or responding to user interactions, for instance, it's very fast.</P>
+
+        <SecTitle>IDL Generated Code</SecTitle>
+
+        <P>You may have seen the IDL system mentioned in the Smart Enums section to the left. The IDL compiler takes an XML based description of types and interfaces and generates code. If you are just using it for constants and types, it just spits out some headers and a little supporting code for the smart enums if you defined any. If you use it to define interfaces, then it spits out two hpp/cpp file pairs.</P>
+
+        <List>
+            <LItem Ref="Client Proxy">A concrete class that is used by client code to make remote calls</LItem>
+            <LItem Ref="Server Stub">An abstract base class that the server will derive from to implement the server side handler.</LItem>
+        </List>
+
+        <SubSecTitle>Client Proxy</SubSecTitle>
+
+        <P>The client proxy is a concrete class. It has methods that match those defined for the interface, and the implementation of those methods handle bundling the parameters and handing them off to the ORB, then getting any returned values back out. Here is a representative example:</P>
+
+        <Code>
+        tCIDLib::TBoolean TCIDNameSrvClientProxy::bQueryNameInfo
+        (
+            const TString&amp;amp; strToQuery
+            , TString&amp;amp; strName
+            , TString&amp;amp; strDescr)
+        {
+            tCIDLib::TBoolean retVal;
+            TCmdQItem* pcqiToUse = pcqiGetCmdItem(ooidThis().oidKey());
+            TOrbCmd&amp;amp; ocmdToUse = pcqiToUse->ocmdData();
+            try
+            {
+                ocmdToUse.strmOut() &amp;lt;&amp;lt; TString(L"bQueryNameInfo");
+                ocmdToUse.strmOut() &amp;lt;&amp;lt; strNameToQuery;
+                Dispatch(30000, pcqiToUse);
+                ocmdToUse.strmIn().Reset();
+                ocmdToUse.strmIn() >> retVal;
+                ocmdToUse.strmIn() >> strName;
+                ocmdToUse.strmIn() >> strDescr;
+                GiveBackCmdItem(pcqiToUse);
+            }
+            catch(TError&amp;amp; errToCatch)
+            {
+                GiveBackCmdItem(pcqiToUse);
+                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                throw;
+            }
+            return retVal;
+        }
+        </Code>
+
+        <P>This is a all that passes in some binding in the Name Server and wants to get its name and description info out. So it has an input string parameter and two output string parameters, and boolean return to indicate if that name was found or not.</P>
+
+        <P>This particular interface, and this particular instance of this interface, has an ORB Object ID (ooid) associated with it that indentifies it uniquely. The method passes this to a helper that will let it get a command queue item from a pool, storing the id info on it in the process. It then gets the command info object out of that queue object to fill in. The command queue has input and output binary streams on it, and the output has been reset for us. So all that has to be done is to stream any outgoing infomation to the output stream and then call the Dispatch() method which will pass that info to the client side ORB engine.</P>
+
+        <P>On return, it resets the input stream and streams in the returned information, then it can give the queue item back to the pool.</P>
+
+        <Note>If the far side throws, that exception is transmitted back and Dispatch() will throw it. So exceptions propagate naturally back from the remote calls with no extra effort.</Note>
+
+        <P>This is a tiny amount of code go provide so much benefit. If there are more parameters it'll be a few more lines longer, but there won't be much difference.</P>
+
+
+        <SubSecTitle>Server Stub</SubSecTitle>
+
+        <P>On the server side, the IDL compiler generates a 'stub' class, which is an abstract base class that has virtuals for all of the defined methods of the remote interface. The server side application will create a derived class that overrides these methods and provides implementations for all of the calls. It will create an instance of that derived class and register it with the server side ORB. The stub derives from a base class that the server side ORB uses to manage all of the interfaces.</P>
+
+        <P>This server side object will have the same unique id as the client side ORB, so that the server side ORB engine can match up incoming calls to the right handler. The stub code is pretty much just the inverse of the client proxy code above, so I won't post it here.</P>
+
+
+        <SecTitle>A Powerful Stream</SecTitle>
+
+        <P>Streams are handled separately, see that topic to the left, but we will touch on here the fact that the ORB depends fundamentally on the binary streaming system of CIDLib. Because we don't use the STL or standard C++ libraries, we can create an MStreamable interface that all classes that implement that can support binary streaming. The ORB can work in terms of this interface and hence it can pass back and forth objects of any classes that implement this streamable interface.</P>
+
+        <P>This makes it very simple and clean for the ORB to do its work, unlike what you might have seen if you have looked at any ORB type products that attempt to work outside of a monolithic architecture. ORBs aren't that much used in the C++ world, partly because they are somewhat of a hack if you don't have such a consistent architecture.</P>
+
+        <P>If you look at the examples above, see how little code is required to handle moving objects across the network. It's trivially small compared to what would likely be required in other ORBs, unless perhaps they limit you to only dedicated class into which you must put your data to ship it and, then pull it out on the other side. That's a huge extra burden.</P>
+
+        <P>Since the streams handle endianness, and since all streaming of objects ultimate comes down to them streaming their fundamental members in and out, the ORB can handle different endianness on each side of an ORB connection. The ORB just creates streams in a canonical little endian mode. So all data gets flattened to little endian format. If either side has an endianness different from that, then the stream will flip the bytes accordingly.</P>
+
+
+        <SecTitle>Name Server and Bindings</SecTitle>
+
+        <P>From the above description you might wonder how the client gets connected to the server. If you remember, the client has an ORB Object ID that it passes in to tell the client side ORB engine about its interface, and it also contains connection info to find the server.</P>
+
+        <P>You can do something very simple and just have the server write out an OOID for the client to load and use. But in a real client/server scenario that's not very practical, since they are on different machines. So, the much more common scenario is to use the 'Name Server'. The Name Server itself defines an IDL interface, one of the methods of which was used in the example above. It allows servers to register their server side interfaces in a 'public place' where clients can find them. </P>
+
+        <P>In order for servers to register interfaces and clients to find them, they must agree on some scheme to uniquely represent them. This is done via a 'binding' which is a path type indentifer that it used to 'bind' interfaces in the Name Server. So it's a hierarchical, directory structure style space using / type separators, so a representative example might be:</P>
+
+        <Code>    /Acme/Weapons/Hammer</Code>
+
+        <P>There is not enforced formn to the paths, but generally they would be in the general 'reverse domain name' type of style, with the most unique (company/program name) component first, and other interfaces related to that top level thing beneath that.</P>
+
+        <P>Clients can ask for the OOID associated with a particular binding, and the Name Server will send it to them. Both sides already know the unique interface id, but the client needs to know the specific instance id and the address of the server that is hosting the server side interface. </P>
+
+        <P>Of course the more astute reader may ask, well, how do we find the Name Server. The Name Server is a special case. Both clients and servers have to know the host where it is running, and it knows the interface id. The Name Server, uniquely, has a special fixed instance id. So the client side ORB can then create on the fly an OOID for the Name Server. Once that is done, the pump is primed and other interfaces can be registered and/or found.</P>
+
+
+        <SecTitle>The Rebinder</SecTitle>
+
+        <P>No, that's not a character in The Matrix... One problem that has to be dealt with is that the Name Server could be cycled for some reason. Either it, the background service it is running under, or the machine it is on. It does not try to persist the bindings and reload them. It will have no idea what has happened while it was gone and could create a serious mess if it tried that.</P>
+
+        <P>Instead servers will register their objects both with the server side ORB and with its rebinder typically. The rebinder will periodically check the Name Server and make sure the bindings are still there. If not, it will re-bind them again. This takes a lot of tedious responsibility off of the server programs who would otherwise have to do this.</P>
+
+
+        <SecTitle>Other Servers</SecTitle>
+
+        <P>There are two other pre-fab servers, a Log Server and a Config Server. These are both quite useful. They also define IDL based interfaces so they are accessible in the standard ORB sort of way. The CIDOrbUC facility builds the client proxy classes for you so you can make calls to the facility class to get one.</P>
+
+        <P>The Log Server is supported by our logging framework. Applications can install a logger that will intercept all messages logged within that application. There are a few variations of the logging interface, but one creates a Log Server proxy for you and logs everything to the Log Server. This is used extensively in the CQC system, since we want to have a central location (master server) where all information is logged. We don't have to go out to individual machines to gather data if something goes wrong in the field. </P>
+
+        <P>The Config Server is bsaically a remote wrapper around an instance of our CIDObjStore engines. It just lets any program store basic configuration that needs to be kept on a system-wide basis. Or, you can run an instance on each machine to just serve programs on that machine, whatever works best for your needs.</P>
+
+    </HelpText>
+
+</HelpPage>
