@@ -2330,6 +2330,20 @@ END PROJECT
 ;  Some intermediate samples
 ; ----------------------------------------------------------------------------
 
+PROJECT=Interview1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Interview1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDSock
+    END DEPENDENTS
+
+END PROJECT
+
 PROJECT=ObjStore1
 
     SETTINGS
@@ -2343,8 +2357,6 @@ PROJECT=ObjStore1
     END DEPENDENTS
 
 END PROJECT
-
-
 
 PROJECT=ORB1SampS
 
