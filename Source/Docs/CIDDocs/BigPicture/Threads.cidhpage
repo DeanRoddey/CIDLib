@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Threads</Title>
+
+    <HelpText>
+
+        <P>These days it's probably fairly rare to do any sort of non-trivial application that doesn't include some amount of multi-threading. A lot of the recent changes in the standard C++ library world involves moving towards trying to disguise threading in various ways. CIDLib doesn't do this, making threading an explicit thing, but providing good tools for managing them.</P>
+
+        <P>These are the core rules for CIDLib threads:</P>
+
+        <List>
+            <LItem>All threads are owned. So every thread (other than the main thread) is owned by another thread which is responsible for stopping it upon demand.</LItem>
+            <LItem>All threads must be prepared to shut down within a very short period of time, generally a couple seconds or less. More on this below.</LItem>
+            <LItem>Every thread gets a unique name (there are helper tools to make this easy) for logging purposes primarily. Knowing what thread an error or warning is logged from can be a very important clue for diagnosis.</LItem>
+            <LItem>Never assume that the instances of any class are safe to access from multiple threads unless the class explicitly indicates that to be safe. This means for read-only access as well as making changes.</LItem>
+        </List>
+
+        <SecTitle>Thread Ownership</SecTitle>
+
+        <P>No threads in CIDLib are just started and allowed to run (well there might be one or two very simple ones down in the per-platform layer, but that's it.) Every thread is started by some parent thread and that parent thread is responsible for it. When the parent thread is asked to stop, it must stop all of the threads it has started, and so on. There might be some very specific application scenario where a different thread might ultimately become responsible for shutting down threads it didn't start, but even then those threads have legal guardians who are responsible for them.</P>
+
+        <P>This insures clean shutdown of programs, so things can't be left undone. It's a pretty basic source of errors to not stop threads and have them randomly do something bad as the program is stopping, which you never notice but which may randomly scramble some data being saved or interfere with some other shutdown operations.</P>
+
+        <P>This means that every thread that starts other threads must track them. Generally that means that they have a thread object member or a collection of thread objects or some such thing.</P>
+
+        <SecTitle>Thread Functions</SecTitle>
+
+        <P>CIDLib has a TThread class that represents threads. That class has a virtual method, eProcess() that is called when you start that thread. If you just create a TThread object, then the default implementation of eProcess() is called. That default implementation will invoke a callback object that you must provide to the thread object. This is a very common way to run threads. That callback object can represent a global function for simple programs, but more often it represents a method inside a class that creates the thread object. This is common because it allows multiple threads to share the members of that class. That gives them a convenient way to share data.</P>
+
+        <P>The other way is to derive a class from TThread and override eProcess(). This scheme creates more of a 'standalone' thread, that is self-contained, one that can do some sort of job without interacting with other threads. It can still do that as well if needed, but it is more likely just working on its own internal members, and is running its own internal logic, not logic provided by the class that created it.</P>
+
+        <P>So, if you want to create a thread that does some pre-fab job for others to create and set running to to do its thing, you'd use the latter scheme. If you need a thread to provide some functionality within a class and access that class' members, the former scheme is best.</P>
+
+        <SecTitle>Thread Shutdown</SecTitle>
+
+        <P>It may be something quite unusual to folks coming from other C++ systems, but all CIDLib threads <Italic>must</Italic> be prepared to shutdown very quickly upon request. This requires some care. It means that all methods that do something that can run for a while must do these things:</P>
+
+        <List>
+            <LItem>Accept a timeout, assuming that the process doesn't have an inherent limit, and give up once that timeout period expires</LItem>
+            <LItem>Check frequently, usually every second or so, for a shutdown request, discussed below.</LItem>
+            <LItem>Not do any blocking calls but instead start the operation and then check it every second or so until it either completes, the timeout period expires, or it is asked to shut down.</LItem>
+            <LItem>If a timeout or shutdown request, cancel the operation</LItem>
+        </List>
+
+        <P>This may sound a bit complicated but it means that CIDLib programs can always be cleanly shut down in a timely manner (often important if running as system process which may be given limited time to stop.) And it doesn't require any special knowledge of what the threads do internally to do this. All of the CIDLib code itself works this way.</P>
+
+        <P>A parent thread can ask its owned threads to stop by calling either ReqShutdownSync() or ReqShutdownNoSync(). The former will wait until the child thread has acknowledged it has seen the shutdown request and has started the shutdown process. The latter will just signal the child thread to start the shutdown process.</P>
+
+        <P>You would use the former if you just had a single child thread to stop. But if you have a list of threads, then it is far more time efficient to ask them ask them all to start shutting down at once, so that the process can be overlapped.</P>
+
+        <P>Once you have started the thread shutting down, then you wait for it to complete its shutdown process. You do this by calling bWaitForDeath() or eWaitForDeath(). They both do the same thing, one just may be more convenient in a given situation, i.e. boolean return vs. an enumerated return.</P>
+
+        <P>The child thread has two mechanisms for watching for a shutdown request. It either calls bCheckShutdownRequest() or if it is doing a sleep on each loop (to throttle itself) it can use a version of the sleep method that will tell it if it was asked to shutdown while it was sleeping, bSleep(). That will return true if the thread was asked to shut down.</P>
+
+        <P>Is is a really stripped down example of a thread loop. In this case it's one that's been pointed at a class method, so it receives a pointer to its thread object just in case. It loops until asked to shutdown. On each loop it calls a helper that will presumably wait for a second or so for a request to come in, storing it in members if it does and returning True. If it does, then a processing method is called to process it. Most likely ProcessReq() doesn't take long since we know the data is already present.</P>
+
+        <Code>
+        tCIDLib::EExitCodes
+        TSomeClass::eBgnThread(TThread&amp;amp; thrThis, const tCIDLib::TVoid* const)
+        {
+            while (!thrThis.bCheckShutdownRequest())
+            {
+                // Wait for a bit for something to show up and process it if so
+                if (bWaitReqReady())
+                    ProcessReq();
+            }
+            return tCIDLib::EExitCodes::Normal;
+        }
+        </Code>
+
+        <P>The waiting for a request provides throttling of the thread. It's always important that something in the loop is throttling it. Either because it's waiting for something with a short block, or it sleeps on each round. Otherwise it's running wild and will eat up a CPU.</P>
+
+        <P>Or, alternatively, if it isn't doing something that would naturally throttle, it would tend to be like this:</P>
+
+        <Code>
+        tCIDLib::EExitCodes
+        TSomeClass::eBgnThread(TThread&amp;amp; thrThis, const tCIDLib::TVoid* const)
+        {
+            while (!thrThis.bSleep(500))
+                UpdateCounters();
+            return tCIDLib::EExitCodes::Normal;
+        }
+        </Code>
+
+        <P>Here we assume that updating the counters is probably a very fast operation and wouldn't provide any reasonable throttling of the thread, so we call bSleep() and keep going until it returns true.</P>
+
+        <SubSecTitle>Possible Exceptions</SubSecTitle>
+
+        <P>If you really had a scenario where the above was not acceptable, though that would be very rare, then as long as the threads are for your own internal use only, you could come up with some other scheme. For instance, if the threads were blocked long term on an event waiting for something, you could use a flag that they check immediately upon being woken up. You could then set the flag and force a trigger of the event. But of course you have to be careful that the thread really was waiting on the event, or check the flag both before and after the blocking call perhaps.</P>
+
+        <P>The only realistic reason I could foresee is that the application has a huge number of threads waiting around most of the time and don't want to take the hit of having them wake up periodically, and would do something like the above instead. But a simple flag check and go back to sleep on a one to two second basis is pretty trivial in the context of modern systems. Thousands of threads doing that would likely not even cause any discernable CPU usage.</P>
+
+    </HelpText>
+
+</HelpPage>

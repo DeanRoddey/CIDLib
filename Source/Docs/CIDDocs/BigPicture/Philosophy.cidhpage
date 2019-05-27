@@ -58,7 +58,7 @@
 
         <P>And smart pointers don't magically get rid of ownership problems in C++. Nothing does. They require just as much careful use as pointers for the most part, the potential dangers are just different ones.</P>
 
-        <P>Though there are various places where more smart usage will likely be added in the future, for the most part CIDLib doesn't take the modern view that pointers, at least with the confines of an owning class, cannot be safely dealt with. And generally, if an object is providing some sort of 'factory' functionality, it returns the raw allocated object. It lets the caller use the strategy he wants to insure it gets cleaned up. The exception is when the things returned must be shared with the creator and 'given back' at some point or remain valid until both of them drop it.</P>
+        <P>Though there are various places where more smart usage will likely be added in the future, for the most part CIDLib doesn't take the modern view that pointers, at least with the confines of an owning class, cannot be safely dealt with. Generally, if an object is providing some sort of 'factory' functionality, it returns the raw allocated object. It lets the caller use the strategy he wants to insure it gets cleaned up, or given back if it's an object pool type scenario.</P>
 
         <SecTitle>The Heap isn't Cancerous</SecTitle>
 
@@ -75,6 +75,20 @@
         <P>Relative to a few of the above points, CIDLib doesn't support any sort of custom allocator scheme. This is also a massive complication that almost no users of the code would benefit from, so it's not a good trade off.</P>
 
         <P>Instead it provides 'pools', which allow you to use and return already allocated objects very efficiently and safely. These are used to good effect in CIDLib and the CQC system built on top of it. If this is not sufficient for your needs, then some other custom mechanism would be required, since again this code is in the 10% crowd. If there is a reasonably common need for any particular such mechanism, and it doesn't involve pushing a lot of complications into other code that wouldn't need it 90% of the time, it could be implemented as a standard feature.</P>
+
+        <SecTitle>Thread Safety</SecTitle>
+
+        <P>It should be assumed that the instances of any class not explicitly documented as being thread safe, should not be accessed by multiple threads without explicit synchronization of some sort.</P>
+
+        <P>You will sometimes here about 'thread compatible' vs. 'thread safe'. Thread compatible means that calls that don't change the state of the object can be called without any synchronization, but calls that change it cannot. Thread safe means that both types of calls can be made without synchronization.</P>
+
+        <P>CIDLib takes the approach that thread compatible is fools gold. Any class that doesn't explicitly deal with thread safety is likely to be changed at some point, in some way, that suddenly makes it not exactly thread compatible, and catching such an error can be brutally difficult. Therefore, CIDLib takes the position that it's thread safe or not at all.</P>
+
+        <P>Yes that does mean potentially some extra synchronization overhead, but that's trivial compared to the incredibly nasty bugs that can creep into a large code base in the fullness of time.</P>
+
+        <P>It is of course fine for specific methods of a class to be explicitly declared thread compatible because all it does is return a value of a fundamental type. But make sure that is very carefully documented, such that it's difficult to change those methods without dealing with this issue. These would often also just be inlined.</P>
+
+        <P>But you better be sure that no code accesses two of these values and makes any assumptions that their values represent any coherent relationship, because they could have been modified by another thread between the getting of one value and the getting of another. Hence why it's probably best to just bite the bullet and be hard core about this issue.</P>
 
     </HelpText>
 

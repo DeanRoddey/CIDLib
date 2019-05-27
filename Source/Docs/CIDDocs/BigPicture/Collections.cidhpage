@@ -8,7 +8,7 @@
 
         <P>CIDLib has a pretty extensive set of collections and cursors. For those coming from the standard C++ library world, collections and cursors are like standard C++ containers and iterators, though they have some substantial differences in the details. Collections contain other objects (or pointers to other objects.) The objects in the collection are refererd to as its elements.</P>
 
-        <P>Since maintaining and operating on sets of values is a fundamental operation in most all software, collections play a significant part in most software projects. In some cases there are justifications for doing your own specialized means of containing other objects, but where possible use the built in ones and safe yourself a lot of worry and effort.</P>
+        <P>Since maintaining and operating on sets of values is a fundamental operation in most all software, collections play a significant part in most software projects. In some cases there are justifications for doing your own specialized means of containing other objects, but where possible use the built in ones and save yourself a lot of worry and effort.</P>
 
         <P>Like most C++ systems, as a practical matter, CIDLib's collections are template based, since they need to be able to work over many different element types, while maintaining a type safe interface. They aren't nearly as templatized, since CIDLib works to push as much code out of line as possible, but still they have all the same concerns as large amounts of templated code always does.</P>
 
@@ -194,6 +194,28 @@
         <Note>TObjArray isn't strictly a collection in that it doesn't derive from the common TCollection class, see Polymorphism below, but it is definitely in the same family.</Note>
 
         <Note>There is a non-templatized TSLinkedList class as well, but it's not one of our formal collection derivatives. It is sometimes used inside other things for simple linked list storage where it's easy to to internally handle casting node values to their real type, and it allows you to avoid extra code generation for something simple. There is no fully fleshed out singly linked list at this time.</Note>
+
+
+        <SecTitle>Copy/Assign Semantics</SecTitle>
+
+        <P>One thing that is always tricky with fancy classes like collections is, what does copying or assigning them really mean? They may have various internal mechanisms that are very important, and how much of this stuff should be replicated in the target? Obviously in general you always want to follow the rule that after assiging or copying A to B, then A==B should be true.</P>
+
+        <P>For collections some hard choices had to be made, and the rule for collections is as below. Note that this is for non-fundamental collection types, i.e. those that hold objects:</P>
+
+        <Note>After A=B, then iterating A and B in cursor order will result in the elements being in the same order in both of them.</Note>
+
+        <P>That is all that is guaranteed. Nothing to do with the exact capacity of the collections, whether they adopt or don't adopt or anything of that nature is transferred by copy or assign. In some cases, internal details that are necessary to guarantee the same iteration order will be replicated. For instance, a hash set must have the same hash modulus in order for the elements to iterate in the same order after they are copied over and added to the target collection.</P>
+
+        <P>None of the non-fundamental collection classes have any built in quality testing anyway, so technically it doesn't matter since you can't compare collections via equality operator. But there is a tCIDLib::bCompareElems() method that will compare two collections using the above semantics. It can do so generically since equality is defined in terms of cursor iteration order, and it can polymorphically create cursors for both.</P>
+
+
+        <SecTitle>Thread Safety</SecTitle>
+
+        <P>Collections can be thread safe or not. You choose when you create one. This is one of those capabilities that is very useful, but also potentially dangerous so you have to be careful about them.</P>
+
+        <P>They will create an internal mutex and all calls to the collection will be guaranteed to be atomic. For those scenarios where all two threads share is some collection, this can be particularly convenient. Also see Thread Synchronization to the left and the section on Queues, which are a particularly powerful case.</P>
+
+        <Note>Related to the Copy/Assign Semantics section above, thread safety is not something transferred during Copy/Assign. It would be exceedingly dangerous if a thread safe collection was suddenly not thread safe after it was assigned to.</Note>
 
         <SecTitle>Polymorphism</SecTitle>
 
