@@ -8,7 +8,7 @@
 
         <P>Threads in general are covered in a separate section, see Threads to the left. Since threads are a bigger topic, synchronization is split out here to be discussed separately.</P>
 
-        <Note>We won't get into a lot of example code here, since there would be too much. This is stuff better presented in the context of the sample programs that come with CIDLib.</Note>
+        <Note>I won't get into a lot of example code here, since there would be too much. This is stuff better presented in the context of the sample programs that come with CIDLib.</Note>
 
         <P>CIDLib provides the usual mechanisms for synchronizing threads, e.g. mutexes, critical sections, and events. Publish/Subscribe is also a possible way to 'synchronize' loosely coupled threads. Mutexes are the most common means. I won't go into detail about mutexes, that's a general computer science topic and you can go dig into it separately. I'll assume here you understand how they work.</P>
 
@@ -43,9 +43,9 @@
 
         <SubSecTitle>Critical Section vs. Mutex</SubSecTitle>
 
-        <P>Critical sections and mutexes do the same thing. The only difference is that critical sections can be more efficient if the amount of time you need to lock is very short. So, if you just needed to safely add some incoming value to a counter, a critical section would be appropriate. For something longer, use a mutex.</P>
+        <P>Critical sections and mutexes do the same thing. The only difference is that critical sections can be lighter weight. But, they are really only appropriate to use if the amount of time you need to lock is very short. So, if you just needed to safely add some incoming value to a counter, or add a string to a list, a critical section would be appropriate. For something longer, use a mutex.</P>
 
-        <Note>On a given system platform, there may not be a critical section mechanism, and the platform driver for that platform may just implement it using a mutex. But, still use them where appropriate since you'll still get the benefits when there is a real distinction, but everything will still work just find if not.</Note>
+        <Note>On a given system platform, there may not be a critical section mechanism, and the platform driver for that platform may just implement it using a mutex. But, still use them where appropriate since you'll still get the benefits when there is a real distinction, but everything will still work fine if not.</Note>
 
         <P>The only difference relative to the above example is that you would use a TCritSecLocker object to do the locking.</P>
 
@@ -57,7 +57,7 @@
 
         <P>They can also wait on multiple events. The most common scenario is probably two events, one of which reflects incoming data available and the other which reflects outgoing data available. This allows you to create threads that can handle sending and receiving data in a very efficient manner, getting data to send from a queue and putting data received into a queue.</P>
 
-        <P>Sockets can be associated with a queue which will be triggered when data is available, and that is usually how the incoming event is used.</P>
+        <P>Sockets can be associated with ane event which will be triggered when data is available, and that is usually how the incoming event is used in a standard TCP/IP based server.</P>
 
 
         <SecTitle>Sync vs. Synchronize</SecTitle>
@@ -67,7 +67,7 @@
         <P>But there may be some scenarios where you want to be sure that another thread is at a particular place before you do something. Some reasons why you might want to do this might be:</P>
 
         <List>
-            <LItem>If two threads use some shared values, probably class members, as an inexpensive means of inter-thread communications, see below.</LItem>
+            <LItem>If two threads use some shared values, probably class members, as an inexpensive means of inter-thread communications, so one thread may want know if another is at a specific place before it updates those members.</LItem>
             <LItem>If two threads work together and one thread accesses the data in many places and the other just one place and not very often, it can avoid either of from having to add synchronization calls at every access.</LItem>
         </List>
 
@@ -77,7 +77,7 @@
 
         <P>WaitSync() takes a timeout, so that it can give up if the other thread doesn't get to the sync point within a reasonable amount of time. If WaitSync() times out, then the sync request is automatically cancelled.</P>
 
-        <P>A thread can call Sync() from multiple places, but there's no way for the controlling thread to know which one if them that thread is at. It just knows it is at one of them.</P>
+        <P>A thread can call Sync() from multiple places, but there's no way for the controlling thread to know which one of them that thread is at. It just knows it is at one of them. They controlled thread could set some flag to indicate this by setting it just before it calls Sync().</P>
 
         <SecTitle>Queues</SecTitle>
 

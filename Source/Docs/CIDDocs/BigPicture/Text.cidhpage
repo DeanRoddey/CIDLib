@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Text and Strings</Title>
+
+    <HelpText>
+
+        <P>Processing text is clearly fundamental to almost all software these days. I won't get into the history of code pages and Unicode and the like here. It's well documented, so poke around if you want to know the details. But the basic deal is that computers represent text as numbers. What those numbers mean is purely a matter of convention, and there are many such conventions. They are known as encodings or code pages generally. They are a well defined mapping of numbers of characters (or more generically, code points, since they may not necessarily be just alphanumeric characters or punctuation.)</P>
+
+        <P>A string is a sequence of these code points. In some cases parsing a string to find the code points is easy, because each character is a fixed number of bits or bytes. In others it's more difficult because the amount of storage required can vary depending on the particular code point.</P>
+
+        <P>You can map characters back and forth between different encodings as long as they both support all of the code points required. In some cases you may have to use substitution characters for code points not representable in the target encoding, like a space or some such.</P>
+
+        <P>Unicode is an attempt at a comprehensive mapping of numbers to code points that defines basically all of the required code points for current (and some past) human languages. It's not an encoding itself, it's just a large definition of 'this number means a dash', 'this number means the Chinese symbol for good luck', whatever.</P>
+
+        <P>Unicode defines a small set of actual encodings that can be used to store and manipulate Unicode content. UTF-16 and UTF-32 use 16 and 32 bits, respectively, to store code point data. So they are fixed size encodings, however UTF-16 may still require more than one such 'storage unit' to store a code point, for some languages. Even UTF-32 may not always be able to represent all potential code points in some cases.</P>
+
+        <SubSecTitle>Endianness</SubSecTitle>
+
+        <P>UTF-16/32, being multi-byte, of course have issues of endianness, and they may be quite inefficient for storage since often only 8 bits may actually be required to store code points for many western languages. UTF-8 is a single byte, variable length scheme that attempts to store code points using the minimum number of bytes possible. And it has no endianness issues, so that makes it a very good storage and transmission format.</P>
+
+        <SecTitle>In Memory Representation</SecTitle>
+
+        <P>This is a lot of debate about what in-memory representation to use. Some argue that UTF-8 should also be used internally within a program to represent text, because it can represent all possible code points. However, there's a big price to pay for that. You cannot just index a string to get to a particular code point (or just character for our purposes here.) You have to scan it from the start every time pretty much, unless you can know for sure it's not been changed and you have already figured out the byte offset of some existing character before the target one and can just work forward from there. Consider how much more complex programming would be if every byte could have a variable number of bits, and it's not unlike that.</P>
+
+        <P>Even if this process is hidden inside a string class, the overhead is still there (and probably made much worse by the fact that you are trying to hide it, because the application isn't doing anything to help the process.) If you don't hide it, then even the simplest of applications will have to deal with the complexities of non-fixed size characters.</P>
+
+        <P>This kind of variable length character really lends itself to making mistakes, because it's so easy to forget that you can't just index a string, or move forward by one to get to the next character or trust that the length of a string means anything in terms of how many characters. So even just getting the string length will require a full parse of the string. And it can be a massive performance issue for any text processing algorithm that needs to access arbitrary characters in a string rapidly, getting worse and worse as the size of the text grows.</P>
+
+        <P>CIDLib takes a very pragmatic approach, and uses either UTF-16 or UTF-32, whatever is the native 'wide character' format on the host system. This makes text processing natural and high performance, but it means that some non-western language aren't going to necessarily always work correctly unless you explicitly take pains to make sure that is the case. Otherwise you may treat half a character as a whole character, or split a string in the middle of a character.</P>
+
+        <P>There's no good answer here really. For someone who writes code that never has to do anything but read through strings a character at a time, they might think that UTF-8 is the only sane approach. But for a general purpose system like CIDLib, forcing a non-fixed character length on everyone would be hard to justify.</P>
+
+        <P>Windows uses UTF-16, so it is a worst case scenario. Linux uses UTF-32. It is hoped that Windows will eventually offer UTF-32 as an option as well. If so, then CIDLib will be updated to use UTF-32 as well. Though UTF-32 still may leave some languages uncovered, it will handle so many of them that it would be very difficult indeed to justify the complexities of UTF-8.</P>
+
+        <Note>It's important to note that this doesn't mean CIDLib based code can't deal with non-western text. In many cases the program isn't manipulating the text to any real degree other than to do things like read it in, copy it from here to there, maybe concatenate strings together, and format it back out or pass it to so output API for display.</Note>
+
+        <P>In such cases, no situations are arising where the danger of splitting code points comes up. The primary 'disconnect' in that case is that the length of the string is reporting UTF-16 or UTF-32 storage units, not actual code points.</P>
+
+        <P>Only if you want to do more complex manipulation of the text, which would involve non-sequential character level manpulation, splitting, inserting, etc... would you need to make sure you deal with these issues. The CIDLib TString class will not deal with them for you though.</P>
+
+        <P>So, just be aware of this issue if you want to want to work with non-western languages. Partly this comes down to the 90%/10% scenario discussed in the Philosophy section. Using UTF-8 would mean being able to handle all possible scenarios, but it would make the system far more complex and sometimes considerably less performant for the 90% who won't ever even care, because they either aren't dealing with non-western text or they never do any manipulation that would make it an issue.</P>
+
+        <Note>It would be theoretically possible to make CIDLib always use UTF-32 and to force all text to that format in and out of system API calls on Win32. But there is the issue that string literals would still be UTF-16 on Win32 no matter what, so every time you passed a string literal into some call it may end up getting converted again and again. So the overhead and extra internal complexity increase would be significant, but it's something to consider. It hasn't been done currently though.</Note>
+
+
+        <SecTitle>Storage Representation</SecTitle>
+
+        <P>If you stream a string to a binary stream, it will flatten itself to UTF-8 format. This makes it easy to share objects that contain text data between systems with different endianness and different in-memory representations. And it also minimizes storage/transmission overhead by using the most compact representation possible.</P>
+
+        <P>When you stream text to/from a text stream, you must indicate the encoding you expect the data to be in (for input) or the encoding you want to write the data to (for output.) You use text encoders for this. See the Text Encoding section to the left. </P>
+
+        <P>Unlike binary streaming above which is about objects and where the text isn't just written as raw text, text streams deal with raw text content. I.e. if you stream out text to a file, you can open it with a text editor (if it understands the target encoding of course.) There is no CIDLib specific bookkeeping data mixed in with the text.</P>
+
+    </HelpText>
+
+</HelpPage>

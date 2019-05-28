@@ -13,6 +13,8 @@
         <PageLink FileName="BuildProcess" Title="Build Tools"/>
         <PageLink FileName="Exceptions" Title="Exceptions"/>
         <PageLink FileName="Janitors"/>
+        <PageLink FileName="Text" Title="Text/Strings"/>
+        <PageLink FileName="TextEncoding" Title="Text Encoding"/>
         <PageLink FileName="Collections" Title="Collections"/>
         <PageLink FileName="Cursors" Title="Collection Cursors"/>
         <PageLink FileName="ORB-IDL" Title="Client/Server (ORB)"/>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Text Encoding</Title>
+
+    <HelpText>
+
+        <P>See the Text/Strings section to the left for general information on text in CIDLib. Here I'll get a bit more into text transcoding, which is the process of converting text from one encoding to another.</P>
+
+        <P>Internally, the text is always in the native wide character format. But when you need to read in or write out text, or receive text from/send text to some server, it will almost never be in the wide character format (because that's both endian specific and inefficient, for reasons discussed in the Text/Strings section.)</P>
+
+        <P>These days, the most commonly seen external encoding is UTF-8, because it can represent all valid Unicode code points, and it stores them with the least possible number of bytes. But you will still run into various ISO formats (such as 8859-1, 8859-2, and so forth) and of course simple ASCII text, or in the Windows world the common 1252 code page used by Windows for a long time.</P>
+
+        <P>CIDLib has an extensible transcoding system, based on the TTextConverter base class in the CIDLib facility. This defines the interface required to convert code from an external encoding to the wide character format, and vice versa. Because US-ASCII, UTF-8, UTF-16, and UTF-32 are so common, derivatives for those encodings are also provided in the CIDLib facility so that they are always available. </P>
+
+        <P>Other encodings are provided by the CIDEncode facility, so include that if you need to support other encodings. CIDEncode doesn't support a huge range of encodings, since it's getting more and more common for UTF-8 to be used for storage and transmission of text. But, it supports a good number of encodings you may need, and others can be added if necessary.</P>
+
+        <P>You don't directly create text converter objects for these CIDEncode based converters, instead the CIDEncoding facility object, facCIDEncode(), acts as a factory for creating them. You just provide the encoding name (and it supports many common variations of each encodings name) and it will generate an object for you (if supported) and return a pointer to it. You are responsible for cleaning it up when done with it. You can also ack to get it already encapsulated in a counted pointer if that's more convenient for you.</P>
+
+        <P>The facility object also provides some other very useful functionality, such as probing a memory buffer and trying to determine if it is obviously one of a set of recognizable encodings. For instance, stored UTF-x code will often start with a 'byte order mark' to indicate what form of UTF it is, and that can be recognized. Currently those are the only ones that stand a reasonable chance of being recognized in an arbitrary block of encoded text. Otherwise it would require that it start with some known text, such as is the case in XML.</P>
+
+        <SecTitle>Thread Safety</SecTitle>
+
+        <P>On the whole, text converters work purely on the data passed to them and have no state of their own, hence they can be used by multiple threads simultaneously. But don't just assume that, check the documentation for the specific converter class. On the other hand, that also means that they are so light weight that having one of them for each producer/consumder of encoded text isn't much of a burden either.</P>
+
+        <P>See the discussion on Thread Safety in the Philosophy section to the left for more discussion of this issue.</P>
+
+        <SecTitle>Chunked Processing</SecTitle>
+
+        <P>One reason for the above thread safe design is because they can't assume that they are just being fed text from some single, contiguous source, or even sequential chunks from such. They may get chunks of text that are unrelated and cannot assume any context across such calls. They must treat each chunk individually.</P>
+
+        <P>That in turn means that you cannot assume, when converting in from an external encoding, that all the bytes you pass will be converted. If that chunk happens to end in the middle of a code point, only the bytes up through the last fully represented code point can be processed. So you always have to be prepared to 'carry over' text from one chunk to the next one if you don't pass an entire valid chunk of content at once. They always tell you how many input bytes they actually processed.</P>
+
+    </HelpText>
+
+</HelpPage>

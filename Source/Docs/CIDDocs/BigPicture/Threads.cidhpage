@@ -11,10 +11,10 @@
         <P>These are the core rules for CIDLib threads:</P>
 
         <List>
-            <LItem>All threads are owned. So every thread (other than the main thread) is owned by another thread which is responsible for stopping it upon demand.</LItem>
-            <LItem>All threads must be prepared to shut down within a very short period of time, generally a couple seconds or less. More on this below.</LItem>
-            <LItem>Every thread gets a unique name (there are helper tools to make this easy) for logging purposes primarily. Knowing what thread an error or warning is logged from can be a very important clue for diagnosis.</LItem>
-            <LItem>Never assume that the instances of any class are safe to access from multiple threads unless the class explicitly indicates that to be safe. This means for read-only access as well as making changes.</LItem>
+            <LItem>All threads are owned. So every thread (other than the main thread) is owned by another thread which is responsible for stopping it upon demand</LItem>
+            <LItem>All threads must be prepared to shut down within a very short period of time, generally a couple seconds or less</LItem>
+            <LItem>Every thread gets a unique name (there are helper tools to make this easy) for logging purposes primarily. Knowing what thread an error or warning is logged from can be a very important clue for diagnosis</LItem>
+            <LItem>Never assume that the instances of any class are safe to access from multiple threads unless the class explicitly indicates that to be safe. This means for read-only access as well as making changes</LItem>
         </List>
 
         <SecTitle>Thread Ownership</SecTitle>
@@ -27,11 +27,11 @@
 
         <SecTitle>Thread Functions</SecTitle>
 
-        <P>CIDLib has a TThread class that represents threads. That class has a virtual method, eProcess() that is called when you start that thread. If you just create a TThread object, then the default implementation of eProcess() is called. That default implementation will invoke a callback object that you must provide to the thread object. This is a very common way to run threads. That callback object can represent a global function for simple programs, but more often it represents a method inside a class that creates the thread object. This is common because it allows multiple threads to share the members of that class. That gives them a convenient way to share data.</P>
+        <P>CIDLib has a TThread class that represents threads. That class has a virtual method, eProcess() that is called when you start that thread. If you just create a TThread object, then the default implementation of eProcess() is called. That default implementation will invoke a callback object that you must provide to the thread object. This is a very common way to run threads. That callback object can represent a global function for simple programs, but more often it represents a method inside a class that creates the thread object. This is common because it gives multiple threads  a convenient way to share data, i.e. members of the same class.</P>
 
         <P>The other way is to derive a class from TThread and override eProcess(). This scheme creates more of a 'standalone' thread, that is self-contained, one that can do some sort of job without interacting with other threads. It can still do that as well if needed, but it is more likely just working on its own internal members, and is running its own internal logic, not logic provided by the class that created it.</P>
 
-        <P>So, if you want to create a thread that does some pre-fab job for others to create and set running to to do its thing, you'd use the latter scheme. If you need a thread to provide some functionality within a class and access that class' members, the former scheme is best.</P>
+        <P>So, if you want to create a thread that does some pre-fab job, for others to create and set running to to do its thing, you'd use the latter scheme. If you need a thread to provide some functionality within a class and access that class' members, the former scheme is best.</P>
 
         <SecTitle>Thread Shutdown</SecTitle>
 
@@ -39,22 +39,22 @@
 
         <List>
             <LItem>Accept a timeout, assuming that the process doesn't have an inherent limit, and give up once that timeout period expires</LItem>
-            <LItem>Check frequently, usually every second or so, for a shutdown request, discussed below.</LItem>
-            <LItem>Not do any blocking calls but instead start the operation and then check it every second or so until it either completes, the timeout period expires, or it is asked to shut down.</LItem>
-            <LItem>If a timeout or shutdown request, cancel the operation</LItem>
+            <LItem>Check frequently, usually every second or so, for a shutdown request, discussed below</LItem>
+            <LItem>Not do any blocking calls but instead start the operation and then check it every second or so until it either completes, the timeout period expires, or it is asked to shut down</LItem>
+            <LItem>If a timeout or shutdown request, cancel the operation if appropriate</LItem>
         </List>
 
         <P>This may sound a bit complicated but it means that CIDLib programs can always be cleanly shut down in a timely manner (often important if running as system process which may be given limited time to stop.) And it doesn't require any special knowledge of what the threads do internally to do this. All of the CIDLib code itself works this way.</P>
 
         <P>A parent thread can ask its owned threads to stop by calling either ReqShutdownSync() or ReqShutdownNoSync(). The former will wait until the child thread has acknowledged it has seen the shutdown request and has started the shutdown process. The latter will just signal the child thread to start the shutdown process.</P>
 
-        <P>You would use the former if you just had a single child thread to stop. But if you have a list of threads, then it is far more time efficient to ask them ask them all to start shutting down at once, so that the process can be overlapped.</P>
+        <P>You would use the former if you just had a single child thread to stop. But if you have a list of threads, then it is far more time efficient to ask them ask them all to start shutting down at once, so that the process can be overlapped. Even for a single thread you could signal it to start shutting down, do other shutdown work in parallel, then wait at the end to make sure the shutdown is complete. Of course that assumes you don't do anything that would pull the rug out from under the child thread until you make sure it's down.</P>
 
         <P>Once you have started the thread shutting down, then you wait for it to complete its shutdown process. You do this by calling bWaitForDeath() or eWaitForDeath(). They both do the same thing, one just may be more convenient in a given situation, i.e. boolean return vs. an enumerated return.</P>
 
-        <P>The child thread has two mechanisms for watching for a shutdown request. It either calls bCheckShutdownRequest() or if it is doing a sleep on each loop (to throttle itself) it can use a version of the sleep method that will tell it if it was asked to shutdown while it was sleeping, bSleep(). That will return true if the thread was asked to shut down.</P>
+        <P>The child thread has two mechanisms for watching for a shutdown request. It either calls bCheckShutdownRequest(); or, if it is doing a sleep on each loop to throttle itself, it can use a version of the sleep method that will tell it if it was asked to shutdown while it was sleeping, bSleep(). That will return true if the thread was asked to shut down.</P>
 
-        <P>Is is a really stripped down example of a thread loop. In this case it's one that's been pointed at a class method, so it receives a pointer to its thread object just in case. It loops until asked to shutdown. On each loop it calls a helper that will presumably wait for a second or so for a request to come in, storing it in members if it does and returning True. If it does, then a processing method is called to process it. Most likely ProcessReq() doesn't take long since we know the data is already present.</P>
+        <P>Below is a really stripped down example of a thread loop. In this case it's one that's been pointed at a class method, so it receives a pointer to its thread object. It loops until asked to shutdown. On each loop it calls a helper that will presumably wait for a second or so for a request to come in, storing it in members if it does and returning True. If it does, then a processing method is called to process it. Most likely ProcessReq() doesn't take long since we know the data is already present.</P>
 
         <Code>
         tCIDLib::EExitCodes
@@ -72,7 +72,7 @@
 
         <P>The waiting for a request provides throttling of the thread. It's always important that something in the loop is throttling it. Either because it's waiting for something with a short block, or it sleeps on each round. Otherwise it's running wild and will eat up a CPU.</P>
 
-        <P>Or, alternatively, if it isn't doing something that would naturally throttle, it would tend to be like this:</P>
+        <P>Alternatively, if it isn't doing something that would naturally throttle, it would tend to be like this:</P>
 
         <Code>
         tCIDLib::EExitCodes
@@ -88,9 +88,34 @@
 
         <SubSecTitle>Possible Exceptions</SubSecTitle>
 
-        <P>If you really had a scenario where the above was not acceptable, though that would be very rare, then as long as the threads are for your own internal use only, you could come up with some other scheme. For instance, if the threads were blocked long term on an event waiting for something, you could use a flag that they check immediately upon being woken up. You could then set the flag and force a trigger of the event. But of course you have to be careful that the thread really was waiting on the event, or check the flag both before and after the blocking call perhaps.</P>
+        <P>If you really had a scenario where the above was not acceptable, though that would be very rare, then as long as the threads are for your own internal use only, you could come up with some other scheme. For instance, if the threads were blocked long term on an event waiting for something, you could use a flag that they check immediately upon being woken up. You could then set the flag and force a trigger of the event. But of course you have to be careful that the thread really was waiting on the event, or check the flag both before and after the blocking call perhaps (or use the built in sync mechanism, see Thread Synchronization on the left.)</P>
 
-        <P>The only realistic reason I could foresee is that the application has a huge number of threads waiting around most of the time and don't want to take the hit of having them wake up periodically, and would do something like the above instead. But a simple flag check and go back to sleep on a one to two second basis is pretty trivial in the context of modern systems. Thousands of threads doing that would likely not even cause any discernable CPU usage.</P>
+        <P>The only realistic reason I could foresee is that the application has a huge number of threads waiting around most of the time and don't want to take the hit of having them wake up periodically, and would do something like the above instead. But a simple flag check and go back to sleep on a one to two second basis is very trivial in the context of modern systems. Thousands of threads doing that would likely not even cause any discernable CPU usage.</P>
+
+
+        <SecTitle>Thread Safety</SecTitle>
+
+        <P>As most everyone knows, C++ is not a language for the weak hearted, particularly when it comes to threading. You need to plan and design carefully when threads are involved. It's not as hard as people make out, as long as you know the issues and do the right thing, but it can be brutally difficult to diagnose threading issues if you don't. And no amount of trying to hide the fact that threads are involved will change that appreciably.</P>
+
+        <P>In general, any given class sits in one of three ways relative to threading:</P>
+
+        <List>
+            <LItem Ref="Thread Safe">The class either provides no means by which you could ever have any issues with multi-thread access, or it synchronizes access to its internals to prevent such</LItem>
+            <LItem Ref="Thread Compatible">The class is safe to call from multiple threads for read-only access, but not for updates</LItem>
+            <LItem Ref="Thread Unsafe">The thread is fundamentally unsafe to use in any way from multi-threads</LItem>
+        </List>
+
+        <P>As a general rule, CIDLib takes the approach that the middle option is useless, with some very simple exceptions. Though it is often safe enough to have multiple threads calling getters on the instances of a class, in most cases something is going to be updating those objects as well, and even though simultaneous reads won't interfere with each other, you still need to synchronize if there is any sort of updating going on.</P>
+
+        <P>Also, even if you determine that a given class can be used in a thread compatible way, in the fullness of time a change that would break that contract subtly is very easy to make without being caught by anyone for years potentially. These types of errors are notoriously difficult to figure out.</P>
+
+        <P>Therefore CIDLib takes the position that a class is either thread safe and explicitly documented as such, or it should be assumed to be completely un-thread safe. This will of course mean some extra synchronization in some cases, but that's cheap compared to the possible soul destroying pain that can occur in the field otherwise.</P>
+
+        <SubSecTitle>Exceptions to the Rule</SubSecTitle>
+
+        <P>It is possible that a class that you have for your own internal use in your code can be made thread compatible and you are welcome to take that risk since its your code. Any code for use by others that is part of CIDLib though must follow the above approach.</P>
+
+        <P>And of course if a class has a simple in-line getter that just returns a fundamental type, it will be safe enough to call it without sync. But, be absolutely sure you don't depend on any particular relationship between two values gotten this way, because it's completely possible that they were updated after you read the first one, but before you read the next one.</P>
 
     </HelpText>
 
