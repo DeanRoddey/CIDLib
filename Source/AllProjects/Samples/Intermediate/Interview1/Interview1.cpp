@@ -350,19 +350,10 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //
         //  Now we can sort all of the sequences by the sequence id, to get all dups
         //  adjacent. We are just sorting 64 bit values here, so it's not very heavy
-        //  even though the list might be sort of large.
+        //  even though the list might be sort of large. We use a standard comparator
+        //  here.
         //
-        fcolAllSeqsList.Sort
-        (
-            [](const tCIDLib::TCard8& c81, const tCIDLib::TCard8 c82) -> tCIDLib::ESortComps
-            {
-                if (c81 < c82)
-                    return tCIDLib::ESortComps::FirstLess;
-                else if (c81 > c82)
-                    return tCIDLib::ESortComps::FirstGreater;
-                return tCIDLib::ESortComps::Equal;
-            }
-        );
+        fcolAllSeqsList.Sort(tCIDLib::eComp<tCIDLib::TCard8>);
 
         //
         //  And finally we can just count adjacent dups to get the count for each
