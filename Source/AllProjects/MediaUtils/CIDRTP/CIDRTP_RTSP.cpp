@@ -426,7 +426,7 @@ TCIDRTSPSrv::TCIDRTSPSrv() :
     m_colSessions
     (
       109
-      , new TStringKeyOps
+      , TStringKeyOps()
       , &TCIDRTSPSrv::strKey
       , tCIDLib::EMTStates::Safe
     )

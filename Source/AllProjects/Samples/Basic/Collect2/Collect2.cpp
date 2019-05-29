@@ -163,7 +163,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     TNameInfoList colOfNames
     (
         11
-        , new TStringKeyOps(kCIDLib::False)
+        , TStringKeyOps(kCIDLib::False)
         , [](const TNameInfo& nmiCur) -> const TString& { return nmiCur.m_strName; }
     );
 

@@ -56,7 +56,7 @@ TCIDObjStoreImpl::TCIDObjStoreImpl( const   TString&                strPath
     m_colStoreList
     (
         kCIDObjStore_::c4Modulus
-        , new TStringKeyOps(tCIDLib::bAllBitsOn(eFlags, tCIDObjStore::EFlags::CaseSensitive))
+        , TStringKeyOps(tCIDLib::bAllBitsOn(eFlags, tCIDObjStore::EFlags::CaseSensitive))
         , &TOSStoreItem::strKey
     )
     , m_bCaseSensitiveKeys(tCIDLib::bAllBitsOn(eFlags, tCIDObjStore::EFlags::CaseSensitive))
@@ -497,7 +497,7 @@ TCIDObjStoreImpl::c4QuerySubScopes( const   TString&              strScope
         //  to do wrt to case sensitive keys, we set the key ops to treat keys case
         //  sensitively or not for dup testing.
         //
-        tCIDLib::TStrHashSet colDups(109UL, new TStringKeyOps(m_bCaseSensitiveKeys));
+        tCIDLib::TStrHashSet colDups(109UL, TStringKeyOps(m_bCaseSensitiveKeys));
 
         for (; cursStore; ++cursStore)
         {

@@ -48,6 +48,7 @@ class TFundArray : public TFundColBase, public MDuplicable
         //  Class types
         // -------------------------------------------------------------------
         using TMyType = TFundArray<TElem, TIndex>;
+        using TMyElemType = TElem;
 
 
         // -------------------------------------------------------------------

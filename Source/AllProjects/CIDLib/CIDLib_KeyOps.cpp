@@ -32,13 +32,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  Do our standard RTTI macros
-// ---------------------------------------------------------------------------
-RTTIDecls(TStringKeyOps,TObject)
-
-
-
-// ---------------------------------------------------------------------------
 //   CLASS: TStringKeyOps
 //  PREFIX: kops
 // ---------------------------------------------------------------------------
@@ -46,38 +39,10 @@ RTTIDecls(TStringKeyOps,TObject)
 // ---------------------------------------------------------------------------
 //  TStringKeyOps: Constructors and destructor
 // ---------------------------------------------------------------------------
-TStringKeyOps::TStringKeyOps() :
-
-    m_bCase(kCIDLib::True)
-{
-}
-
 TStringKeyOps::TStringKeyOps(const tCIDLib::TBoolean bCase) :
 
     m_bCase(bCase)
 {
-}
-
-
-TStringKeyOps::TStringKeyOps(const TStringKeyOps& kopsSrc) :
-
-    m_bCase(kopsSrc.m_bCase)
-{
-}
-
-TStringKeyOps::~TStringKeyOps()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TStringKeyOps: Public operators
-// ---------------------------------------------------------------------------
-TStringKeyOps& TStringKeyOps::operator=(const TStringKeyOps& kopsSrc)
-{
-    if (this != &kopsSrc)
-        m_bCase = kopsSrc.m_bCase;
-    return *this;
 }
 
 

@@ -3880,7 +3880,7 @@ TMEngStrListVal::bFromSource(TMEngStrListVal& mecvSrc, const EFromTypes eType)
         (
             tCIDLib::EAdoptOpts::NoAdopt
             , 67
-            , new TStringKeyOps
+            , TStringKeyOps()
             , &strBogusKeyExtract
         );
 

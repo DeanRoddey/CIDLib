@@ -59,7 +59,7 @@ static tCIDLib::TVoid TestSetBasics(TTextOutStream& strmOut)
     tCIDLib::TBoolean bCaughtIt;
 
     // Create a hash set of TString objects
-    tCIDLib::TStrHashSet colTest(c4HashModulus, new TStringKeyOps);
+    tCIDLib::TStrHashSet colTest(c4HashModulus, TStringKeyOps());
 
     // Add in one element, then try to add it again. It should be rejected
     colTest.objAdd(TString(L"Test String Value"));
@@ -109,7 +109,7 @@ static tCIDLib::TVoid TestSetBasics(TTextOutStream& strmOut)
 static tCIDLib::TVoid TestSetStreaming(TTextOutStream& strmOut)
 {
     // Create a hash set of string objects
-    tCIDLib::TStrHashSet colTest(17, new TStringKeyOps);
+    tCIDLib::TStrHashSet colTest(17, TStringKeyOps());
 
     // Put some values into it
     colTest.objAdd(L"Key1");

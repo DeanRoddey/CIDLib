@@ -206,7 +206,6 @@ template class TStack<TArea>;
 template class TStackJan<TArea>;
 
 
-
 static tCIDLib::ESortComps
 eCompTest(const tCIDLib::TCard4& c41, const tCIDLib::TCard4& c42)
 {
@@ -219,6 +218,9 @@ eCompTest(const tCIDLib::TCard4& c41, const tCIDLib::TCard4& c42)
 
 static tCIDLib::TVoid DummyFunc()
 {
+    tCIDLib::TBasicPair<TArea, TString> pairTmp;
+    pairTmp.m_tF.Set(0, 1, 2, 3);
+
     TArrayJanitor<tCIDLib::TCard4> janBuf(10);
 
     TVector<TString> colOne;
@@ -276,8 +278,8 @@ static tCIDLib::TVoid DummyFunc()
     );
 
 
-    tCIDLib::TKVHashSet col1(7, new TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
-    tCIDLib::TKVHashSet col2(7, new TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
+    tCIDLib::TKVHashSet col1(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
+    tCIDLib::TKVHashSet col2(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
     if (tCIDLib::bCompareElems(col1, col2, TKeyValuePair::bComp))
     {
     }
@@ -332,7 +334,7 @@ static tCIDLib::TVoid DummyFunc()
     (
         tCIDLib::EAdoptOpts::NoAdopt
         , 23
-        , new TStringKeyOps(kCIDLib::False)
+        , TStringKeyOps(kCIDLib::False)
         , &TKeyValuePair::strExtractKey
     );
     colRKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
@@ -340,7 +342,7 @@ static tCIDLib::TVoid DummyFunc()
     TKeyedHashSet<TKeyValuePair, TString, TStringKeyOps>
     colKHS
     (
-        23, new TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
+        23, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
     );
     colKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
 
@@ -380,6 +382,9 @@ static tCIDLib::TVoid DummyFunc()
         [](const tCIDLib::TBoolean bCur) { return kCIDLib::True; }
     );
 
+    TFundVector<tCIDLib::TCard8> fcolCard8s;
+    tCIDLib::TCard8 c8MaxDup
+        = tCIDColAlgo::tFindMaxFundSeqDup<TFundVector<tCIDLib::TCard8>>(fcolCard8s);
 
     TTextStringOutStream strmTest(1024UL);
     TMutex mtxSync;

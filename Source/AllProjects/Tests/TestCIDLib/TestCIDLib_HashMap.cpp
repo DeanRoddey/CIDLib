@@ -66,7 +66,7 @@ static tCIDLib::TVoid TestSetBasics(TTextOutStream& strmOut)
     tCIDLib::TBoolean bCaughtIt;
 
     // Create a hash ste of TString objects
-    THashMapOfTArea colTest(c4HashModulus, new TStringKeyOps);
+    THashMapOfTArea colTest(c4HashModulus, TStringKeyOps());
 
     // Add in one element, then try to add it again. It should be rejected
     colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3, 4)));
@@ -99,7 +99,7 @@ static tCIDLib::TVoid TestSetBasics(TTextOutStream& strmOut)
 static tCIDLib::TVoid TestSetCommon(TTextOutStream& strmOut)
 {
     // Create a hash ste of TString objects
-    THashMapOfTArea colTest(c4HashModulus, new TStringKeyOps);
+    THashMapOfTArea colTest(c4HashModulus, TStringKeyOps());
 
     //
     //  Add in the elements, creating a unique value for each one, which
@@ -133,7 +133,7 @@ static tCIDLib::TVoid TestSetCommon(TTextOutStream& strmOut)
 
 static tCIDLib::TVoid TestSetStreaming(TTextOutStream& strmOut)
 {
-    THashMapOfTArea colTest(17, new TStringKeyOps);
+    THashMapOfTArea colTest(17, TStringKeyOps());
 
     // Put some values into it
     colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3, 4)));

@@ -48,6 +48,7 @@ class TFundVector : public TFundColBase, public MDuplicable
         //  Class types
         // -------------------------------------------------------------------
         using TMyType = TFundVector<TElem, TIndex>;
+        using TMyElemType = TElem;
 
 
         // -------------------------------------------------------------------

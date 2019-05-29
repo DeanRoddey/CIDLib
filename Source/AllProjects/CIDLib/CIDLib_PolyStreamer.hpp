@@ -118,7 +118,7 @@ class TClassInfo
 // ---------------------------------------------------------------------------
 //  A key ops object for a TClass object
 // ---------------------------------------------------------------------------
-class TClassKeyOps : public TObject, public MDuplicable
+class TClassKeyOps
 {
     public :
         // -------------------------------------------------------------------
@@ -128,22 +128,6 @@ class TClassKeyOps : public TObject, public MDuplicable
         {
             return clsiSrc.clsRepresented();
         }
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TClassKeyOps() = default;
-
-        TClassKeyOps(const TClassKeyOps&) = default;
-
-        ~TClassKeyOps() = default;
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TClassKeyOps& operator=(const TClassKeyOps&) = default;
 
 
         // -------------------------------------------------------------------
@@ -160,14 +144,6 @@ class TClassKeyOps : public TObject, public MDuplicable
         {
             return clsToHash.hshInternal();
         }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Magic macros
-        // -------------------------------------------------------------------
-        TemplateRTTIDefs(TClassKeyOps, TObject)
-        DefPolyDup(TClassKeyOps)
 };
 
 
@@ -193,7 +169,7 @@ template <class TElem> class TPolyStreamer : public TObject
             m_pcolClassSet = new TKeyedHashSet<TClassInfo,TClass,TClassKeyOps>
             (
                 kCIDLib::c4ClassModulus
-                , new TClassKeyOps
+                , TClassKeyOps()
                 , &TClassKeyOps::clsGetKey
             );
         }

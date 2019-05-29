@@ -160,25 +160,9 @@ class TWndMapItem
 
 
 // A simple key ops handler for our window map item class, whcih doesn't have to do much
-class TWndMapItemKeyOps : public TObject
+class TWndMapItemKeyOps
 {
     public :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TWndMapItemKeyOps() {}
-
-        TWndMapItemKeyOps(const TWndMapItemKeyOps&) {}
-
-        ~TWndMapItemKeyOps() {}
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TWndMapItemKeyOps& operator=(const TWndMapItemKeyOps& kopsToAssign) { return *this; }
-
-
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
@@ -193,16 +177,7 @@ class TWndMapItemKeyOps : public TObject
         {
             return tCIDLib::TCard4(wmihToHash.m_hwndThis) % c4Modulus;
         }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TWndMapItemKeyOps, TObject)
-        DefPolyDup(TWndMapItemKeyOps)
 };
-RTTIDecls(TWndMapItemKeyOps, TObject)
 
 
 // ---------------------------------------------------------------------------
@@ -225,7 +200,7 @@ namespace CIDCtrls_Window
     (
         tCIDLib::EAdoptOpts::Adopt
         , 1024
-        , new TWndMapItemKeyOps
+        , TWndMapItemKeyOps()
         , &TWndMapItem::wmihKey
     );
 }
@@ -3765,7 +3740,7 @@ TWindow::RegisterNamedWnd(const TString& strName, TWindow* const pwndToReg)
         (
             tCIDLib::EAdoptOpts::NoAdopt
             , 29
-            , new TStringKeyOps
+            , TStringKeyOps()
             , &TWindow::strExtractName
         );
     };
@@ -7924,7 +7899,7 @@ TWindow* TWindow::pwndFindOwner(const tCIDLib::TBoolean bThrowIfNot) const
                 , tCIDLib::EErrClasses::AppError
             );
         }
-        return 0;
+        return nullptr;
     }
 
     // We have a parent window, see if it one of our windows
@@ -7949,7 +7924,7 @@ TWindow* TWindow::pwndFindParent(const tCIDLib::TBoolean bThrowIfNot) const
                 , tCIDLib::EErrClasses::AppError
             );
         }
-        return 0;
+        return nullptr;
     }
 
     // We have a parent window, see if it one of our windows

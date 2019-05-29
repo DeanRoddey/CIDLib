@@ -79,6 +79,7 @@
 #include    "CIDMData_Shared.hpp"
 #include    "CIDMData_AttrData.hpp"
 #include    "CIDMData_ChunkedFile.hpp"
+#include    "CIDMData_UniqueString.hpp"
 
 // Slip in some more facility types
 namespace tCIDMData

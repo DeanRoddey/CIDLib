@@ -35,7 +35,6 @@
 //  Do our RTTI macros
 // ---------------------------------------------------------------------------
 RTTIDecls(TMD5Hash,TObject)
-RTTIDecls(TMD5KeyOps,TObject)
 
 
 namespace CIDCrypto_MD5Hash
@@ -48,37 +47,6 @@ namespace CIDCrypto_MD5Hash
     // -----------------------------------------------------------------------
     const tCIDLib::TCard4   c4HyphenOfs  = 16;
 }
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TMD5KeyOps
-//  PREFIX: kops
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TMD5KeyOps: Constructors and destructor
-// ---------------------------------------------------------------------------
-TMD5KeyOps::TMD5KeyOps()
-{
-}
-
-TMD5KeyOps::~TMD5KeyOps()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TMD5KeyOps: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::THashVal
-TMD5KeyOps::hshKey( const   TMD5Hash&       mhashToHash
-                    , const tCIDLib::TCard4 c4Modulus) const
-{
-    // Just ask the hash object to hash itself
-    return mhashToHash.hshCalcHash(c4Modulus);
-}
-
 
 
 

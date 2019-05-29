@@ -355,7 +355,7 @@ TTreeView::TTreeView() :
     (
         tCIDLib::EAdoptOpts::Adopt
         , 109
-        , new TStringKeyOps(kCIDLib::False)
+        , TStringKeyOps(kCIDLib::False)
         , &TTreeMapItem::strKey
     );
 }

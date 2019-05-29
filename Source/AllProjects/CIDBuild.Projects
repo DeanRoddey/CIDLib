@@ -2339,7 +2339,7 @@ PROJECT=Interview1
 
     DEPENDENTS
         CIDLib
-        CIDSock
+        CIDMData
     END DEPENDENTS
 
 END PROJECT

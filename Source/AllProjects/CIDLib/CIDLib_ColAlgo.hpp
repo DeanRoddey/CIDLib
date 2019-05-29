@@ -239,6 +239,47 @@ namespace tCIDColAlgo
         }
         return c4RemCount;
     }
+
+
+    //
+    //  Given an indexable fundamental collection (vector or array) that is sorted,
+    //  this guy will find the value that has the most dups. If not sorted it will
+    //  not collect them all up, it's just looking for sequential dups.
+    //
+    template <typename TCol, typename TElem = TCol::TMyElemType>
+    TElem tFindMaxFundSeqDup(const TCol& fcolSrc)
+    {
+        TElem tLastBest = TElem(0);
+        const tCIDLib::TCard4 c4Count = fcolSrc.c4ElemCount();
+        if (c4Count)
+        {
+            tCIDLib::TCard4 c4LastBestCount = 0;
+            tCIDLib::TCard4 c4Index = 0;
+            while (c4Index < c4Count)
+            {
+                const TElem tCur = fcolSrc[c4Index++];
+                tCIDLib::TCard4 c4RunCount = 1;
+                while (c4Index < c4Count)
+                {
+                    // If not the same, we are done for this one, else bump values
+                    const TElem tNext = fcolSrc[c4Index];
+                    if (tNext != tCur)
+                        break;
+
+                    c4RunCount++;
+                    c4Index++;
+                }
+
+                // If this count is better than the last, then take this one
+                if (c4RunCount > c4LastBestCount)
+                {
+                    c4LastBestCount = c4RunCount;
+                    tLastBest = tCur;
+                }
+            }
+        }
+        return tLastBest;
+    }
 }
 
 #pragma CIDLIB_POPPACK

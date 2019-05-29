@@ -63,7 +63,7 @@ static const TPathStr& pathGetKey(const TFindBuf& fndbData)
 static tCIDLib::TVoid TestMapCommon(TTextOutStream& strmOut)
 {
     // Create a hash of THashData objects
-    TKeyedHashSetOfTFindBuf colTest(17, new TStringKeyOps, pathGetKey);
+    TKeyedHashSetOfTFindBuf colTest(17, TStringKeyOps(), pathGetKey);
 
     // Check any params that common testing does not do
     if (colTest.c4HashModulus() != 17)
@@ -97,7 +97,7 @@ static tCIDLib::TVoid TestMapCommon(TTextOutStream& strmOut)
 static tCIDLib::TVoid TestMapBasics(TTextOutStream& strmOut)
 {
     // Create a map of our test type.
-    TKeyedHashSetOfTFindBuf colTest(17, new TStringKeyOps, pathGetKey);
+    TKeyedHashSetOfTFindBuf colTest(17, TStringKeyOps(), pathGetKey);
 
     // Check any params that common testing does not do
     if (colTest.c4HashModulus() != 17)
@@ -182,8 +182,8 @@ static tCIDLib::TVoid TestMapBasics(TTextOutStream& strmOut)
     //  different order, and then compare them.
     //
     {
-        tCIDLib::TKVHashSet col1(7, new TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey);
-        tCIDLib::TKVHashSet col2(7, new TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey);
+        tCIDLib::TKVHashSet col1(7, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey);
+        tCIDLib::TKVHashSet col2(7, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey);
 
         // Should be equal if they are both empty
         if (!tCIDLib::bCompareElems(col1, col2, TKeyValuePair::bComp))
@@ -214,7 +214,7 @@ static tCIDLib::TVoid TestMapStreaming(TTextOutStream& strmOut)
     typedef tCIDLib::TKVHashSet TTestCol;
 
     // Create a hash set of key/value pair objects.
-    TTestCol colTest(17, new TStringKeyOps, &TKeyValuePair::strExtractKey);
+    TTestCol colTest(17, TStringKeyOps(), &TKeyValuePair::strExtractKey);
 
     // Put some values into it
     colTest.objAdd(TKeyValuePair(L"Key1", L"Value1"));
