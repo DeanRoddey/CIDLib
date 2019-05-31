@@ -53,6 +53,7 @@
 #include    "CIDDocComp_BasePage.hpp"
 #include    "CIDDocComp_Topics.hpp"
 #include    "CIDDocComp_HelpPage.hpp"
+#include    "CIDDocComp_CppClass.hpp"
 
 #include    "CIDDocComp_ThisFacility.hpp"
 

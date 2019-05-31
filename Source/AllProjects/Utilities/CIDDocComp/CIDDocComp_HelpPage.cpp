@@ -35,18 +35,21 @@
 // ---------------------------------------------------------------------------
 //  THelpPage: Constructors and Destructor
 // ---------------------------------------------------------------------------
-THelpPage::THelpPage(const  TString&                strTitle
+THelpPage::THelpPage(const  TString&                strExtTitle
                     , const TString&                strParSrcDir
                     , const TString&                strParTopic
                     , const TString&                strFileName
-                    , const TString&                strFileExt
                     , const tCIDLib::TBoolean       bVirtual) :
 
-    TBasePage(strTitle, strParSrcDir, strParTopic, strFileName, strFileExt, bVirtual)
-{
-}
-
-THelpPage::~THelpPage()
+    TBasePage
+    (
+        strExtTitle
+        , strParSrcDir
+        , strParTopic
+        , strFileName
+        , kCIDDocComp::strExt_HelpPage
+        , bVirtual
+    )
 {
 }
 
@@ -57,7 +60,10 @@ THelpPage::~THelpPage()
 tCIDLib::TBoolean
 THelpPage::bParse(TTopic& topicParent, const TXMLTreeElement& xtnodeRoot)
 {
-    // For us it's all in a HelpText element, which our help node member will parse out
+    // Get our inteneral title text
+    QueryElemText(xtnodeRoot, kCIDDocComp::strXML_Title, m_strIntTitle);
+
+    // The rest is all in a HelpText element, which our help node member will parse out
     tCIDLib::TCard4 c4At;
     const TXMLTreeElement& xtnodeHelp = xtnodeRoot.xtnodeFindElement
     (
@@ -69,6 +75,10 @@ THelpPage::bParse(TTopic& topicParent, const TXMLTreeElement& xtnodeRoot)
 
 tCIDLib::TVoid THelpPage::OutputContent(TTextOutStream& strmTar) const
 {
-    // WE just delegate to our help text node
+    strmTar << L"<p><span class='PageHdr'>"
+            << m_strIntTitle
+            << L"</span></p>";
+
+    // The rest is all in our generic help node
     m_hnContent.OutputNodes(strmTar);
 }

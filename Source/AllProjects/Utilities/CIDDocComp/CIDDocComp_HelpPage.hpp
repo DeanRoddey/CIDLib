@@ -41,15 +41,14 @@ class THelpPage : public TBasePage
 
         THelpPage
         (
-            const   TString&                strTitle
+            const   TString&                strExtTitle
             , const TString&                strParSrcDir
             , const TString&                strParTopic
             , const TString&                strFileName
-            , const TString&                strFileExt
             , const tCIDLib::TBoolean       bVirtual
         );
 
-        ~THelpPage();
+        ~THelpPage() = default;
 
 
     private :
@@ -72,7 +71,13 @@ class THelpPage : public TBasePage
         //  Private data members
         //
         //  m_hnContent
-        //      For these types of pages, it's all just general help text markup.
+        //      For these types of pages, other than the title, it's all just
+        //      general markup.
+        //
+        //  m_strIntTitle
+        //      This is our internal title (used at the top of the page) and is gotten
+        //      from the page file itself, as opposed to the external title.
         // -------------------------------------------------------------------
         THelpNode   m_hnContent;
+        TString     m_strIntTitle;
 };

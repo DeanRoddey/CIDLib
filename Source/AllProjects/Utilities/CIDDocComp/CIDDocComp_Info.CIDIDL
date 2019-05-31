@@ -7,12 +7,14 @@
 
         <CIDIDL:Constants>
 
-            <CIDIDL:Constant CIDIDL:Name="strExt_HelpPage"
-                             CIDIDL:Type="TString" CIDIDL:Value="cidhpage">
+            <CIDIDL:Constant CIDIDL:Name="strExt_CppCPage"
+                             CIDIDL:Type="TString" CIDIDL:Value="cidhcls">
                 <CIDIDL:DocText>
                     Extensions for our help page types
                 </CIDIDL:DocText>
             </CIDIDL:Constant>
+            <CIDIDL:Constant CIDIDL:Name="strExt_HelpPage"
+                             CIDIDL:Type="TString" CIDIDL:Value="cidhpage"/>
 
 
             <CIDIDL:Constant CIDIDL:Name="strXML_ColSpan"
@@ -35,6 +37,8 @@
                                 CIDIDL:Type="TString"  CIDIDL:Value="HelpText"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_Id"
                                 CIDIDL:Type="TString"  CIDIDL:Value="Id"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Keywords"
+                                CIDIDL:Type="TString"  CIDIDL:Value="Keywords"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_PageLink"
                                 CIDIDL:Type="TString"  CIDIDL:Value="PageLink"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_PageMap"

@@ -47,18 +47,19 @@
 <!-- The basic chunk of help text markup used in various places -->
 <!ELEMENT   HelpText    (%HelpContent;)*>
 
+
 <!--
-   - Most pages are of this HelpPage type. The are just open ended help text pages used for
-   - general description, and can use all of the usual markup. The file extension for these
-   - is .cidhpage.
+   - Every page can have  a list of keywords that used to generate a glossary
+   - section. It's just a list of comma separated phrases as the body of the
+   - element.
    -->
-<!ELEMENT   HelpPage    (Title, HelpText)>
+<!ELEMENT   Keywords    (#PCDATA)>
 
 
 <!--
-   - We also have a small file that goes into each topic directory that provides
+   - We  have a small file that goes into each topic directory that provides
    - the topic title, the list of pages and sub-topic directories for that topic,
-   - and the main page for that topic, which will go at the top of the list of links.
+   - and the main page for that topic, which goes at the top of the list of links.
    -
    - These are contained in files named CIDTopic.xml, so they always have the
    - the same name in every topic directory.
@@ -80,4 +81,25 @@
 
 <!ELEMENT   CIDTopic        (PageMap, SubTopicMap)>
 <!ATTLIST   CIDTopic        TopicPage CDATA #REQUIRED>
+
+
+
+<!--
+   - Most pages are of this HelpPage type. The are just open ended help text pages used for
+   - general description, and can use all of the usual markup. The file extension for these
+   - is .cidhpage.
+   -->
+<!ELEMENT   HelpPage    (Title, HelpText, Keywords?)>
+
+
+<!--
+   - A C++ class. This is a fairly extensive bit and where most of the non-generic
+   - help text will go.
+   -->
+<!ELEMENT   CppClass    (KeyWords?)>
+<!ATTLIST   CppClass    Class NMTOKEN #REQUIRED
+                        Parent NMTOKEN #REQUIRED
+                        Duplicable (%YNVal;) 'No'
+                        Formattable (%YNVal;) 'No'
+                        Streamable (%YNVal;) 'No'>
 

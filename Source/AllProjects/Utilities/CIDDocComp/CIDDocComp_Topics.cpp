@@ -178,7 +178,15 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
             {
                 THelpPage* ppgNew = new THelpPage
                 (
-                    strExtTitle, m_pathSource, m_strTopicPath, strFileName, strExt, bVirtual
+                    strExtTitle, m_pathSource, m_strTopicPath, strFileName, bVirtual
+                );
+                m_colPages.objAdd(TPagePtr(ppgNew));
+            }
+             else if (strExt.bCompareI(kCIDDocComp::strExt_CppCPage))
+            {
+                THelpPage* ppgNew = new THelpPage
+                (
+                    strExtTitle, m_pathSource, m_strTopicPath, strFileName, bVirtual
                 );
                 m_colPages.objAdd(TPagePtr(ppgNew));
             }

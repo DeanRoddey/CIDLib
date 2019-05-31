@@ -154,12 +154,25 @@ TBasePage::bParseFile(TTopic& topicParent, TXMLTreeParser& xtprsToUse)
 
     const TXMLTreeElement& xtnodeRoot = xtprsToUse.xtdocThis().xtnodeRoot();
 
-    // Get any stuff we do at this level
-    QueryElemText(xtnodeRoot, kCIDDocComp::strXML_Title, m_strIntTitle);
+    //
+    //  Do any stuff we handled at this level. All pages can optionally have a
+    //  keywords section.
+    //
+    tCIDLib::TCard4 c4At;
+    const TXMLTreeElement* pxtnodeKWs = xtnodeRoot.pxtnodeFindElement(L"Keywords", 0, c4At);
+    if (pxtnodeKWs)
+    {
+        // Get the body text of this element, which is a comma separated list of phrases
+        TString strKWs;
+        QueryElemText(*pxtnodeKWs, kCIDDocComp::strXML_Keywords, strKWs);
 
-    // If the external title was empty, then use our internal for that as well
-    if (m_strExtTitle.bIsEmpty())
-        m_strExtTitle = m_strIntTitle;
+        if (!TStringTokenizer::bParseCSVLine(strKWs, m_colKeywords, c4At))
+        {
+            facCIDDocComp.strmErr() << L"Invalid keyword content at offset "
+                                    << c4At << kCIDLib::EndLn;
+            return kCIDLib::False;
+        }
+    }
 
     // And then invoke the virtual for the derived class to parse his stuff
     return bParse(topicParent, xtnodeRoot);
@@ -185,10 +198,7 @@ tCIDLib::TVoid TBasePage::GenerateOutput(const TString& strParPath) const
 
     // Spit out any common stuff
     strmTar << L"<!DOCTYPE html>\n"
-            << L"<html>\n<body>\n"
-            << L"<p><span class='PageHdr'>"
-            << m_strIntTitle
-            << L"</span></p>";
+            << L"<html>\n<body>\n";
 
     // Now invoke the virtual for the derived class to do his thing
     OutputContent(strmTar);
@@ -201,7 +211,7 @@ tCIDLib::TVoid TBasePage::GenerateOutput(const TString& strParPath) const
 tCIDLib::TVoid
 TBasePage::GenerateLink(TTextOutStream& strmTar) const
 {
-    // If we got alias text, we use that as the link text, else we use the page's title.
+    // Generate a link to load our page content into the right hand side
     strmTar  << L"<a onclick=\"javascript:loadRightSide('"
             << m_strParTopic
             << L"', '/" << m_strFileName

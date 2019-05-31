@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass   Class="TString" Parent="TObject"
+            Formattable="Yes" Duplicable="Yes" Streamable="Yes">
+
+
+
+</CppClass>

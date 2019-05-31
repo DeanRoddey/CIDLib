@@ -123,7 +123,7 @@ class TBasePage
             , const TString&                strParTopic
             , const TString&                strFileName
             , const TString&                strFileExt
-            , const tCIDLib::TBoolean       bVirtual
+            , const tCIDLib::TBoolean       bVirtual = kCIDLib::False
         );
 
 
@@ -151,6 +151,10 @@ class TBasePage
         //      programmatically. This flag being set means there is no real file
         //      to try to parse.
         //
+        //  m_colKeywords
+        //      Any keywords defined for this page (used for glossary generation.)
+        //      Most pages have them but they are optional.
+        //
         //  m_strFileExt
         //      The extension for this file, which controls whate type of derived
         //      page class this will be (the owning topic will create us based on
@@ -159,14 +163,10 @@ class TBasePage
         //  m_strExtTitle
         //      This is our external title. This is what is set in the topic file
         //      that references us, so this is used in the left hand panel as the
-        //      text for the link (see m_strIntTitle.)
+        //      text for the link.
         //
         //  m_strFileName
         //      The base part of the file name, no extension or path, for this page.
-        //
-        //  m_strIntTitle
-        //      This is our internal title (used at the top of the page) and is gotten
-        //      from the page file itself, as opposed to the external title.
         //
         //  m_strPagePath
         //      The help topic type path to this page, which is our parent's topic
@@ -181,10 +181,10 @@ class TBasePage
         //      Our parent's topic path.
         // -------------------------------------------------------------------
         tCIDLib::TBoolean   m_bVirtual;
+        tCIDLib::TStrList   m_colKeywords;
         TString             m_strExtTitle;
         TString             m_strFileExt;
         TString             m_strFileName;
-        TString             m_strIntTitle;
         TString             m_strPagePath;
         TString             m_strParSrcDir;
         TString             m_strParTopic;
