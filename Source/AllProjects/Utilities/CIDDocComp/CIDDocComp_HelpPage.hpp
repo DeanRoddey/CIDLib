@@ -55,10 +55,11 @@ class THelpPage : public TBasePage
         // -------------------------------------------------------------------
         //  private, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bParse
+        tCIDLib::TVoid Parse
         (
-                    TTopic&                     topicParent
-            , const TXMLTreeElement&            xtnodeRoot
+                    TTopic&                 topicParent
+            , const TXMLTreeElement&        xtnodeRoot
+            ,       TParseCtx&              ctxToUse
         )   override;
 
         tCIDLib::TVoid OutputContent

@@ -807,7 +807,7 @@ class TCollection : public TCollectionBase, public MDuplicable
         //  pointer or lambda. We use a cursor so it will work for any of our
         //  collection derivatives.
         //
-        template <typename IterCB> tCIDLib::TVoid ForEach(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
             TColCursor<TElem>* pcursEach = pcursNew();
@@ -815,9 +815,10 @@ class TCollection : public TCollectionBase, public MDuplicable
             while (pcursEach->bIsValid())
             {
                 if (!iterCB(pcursEach->objRCur()))
-                    break;
+                    return kCIDLib::False;
                 pcursEach->bNext();
             }
+            return kCIDLib::True;
         }
 
 
@@ -1047,7 +1048,7 @@ template <class TElem> class TRefCollection : public TCollectionBase
         //  pointer or lambda. We use a cursor so it will work for any of our
         //  collection derivatives.
         //
-        template <typename IterCB> tCIDLib::TVoid ForEach(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
             TColCursor<TElem>* pcursEach = pcursNew();
@@ -1055,9 +1056,10 @@ template <class TElem> class TRefCollection : public TCollectionBase
             while (pcursEach->bIsValid())
             {
                 if (!iterCB(pcursEach->objRCur()))
-                    break;
+                    return kCIDLib::False;
                 pcursEach->bNext();
             }
+            return kCIDLib::True;
         }
 
 

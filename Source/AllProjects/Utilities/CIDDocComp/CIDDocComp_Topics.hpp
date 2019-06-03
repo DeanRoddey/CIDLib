@@ -80,9 +80,9 @@ class TTopic
             return strDirName.bCompareI(m_strTopicName);
         }
 
-        tCIDLib::TBoolean bParse
+        tCIDLib::TVoid Parse
         (
-                    TXMLTreeParser&         xtprsToUse
+                    TParseCtx&              ctxToUse
         );
 
         TPagePtr cptrFindPage

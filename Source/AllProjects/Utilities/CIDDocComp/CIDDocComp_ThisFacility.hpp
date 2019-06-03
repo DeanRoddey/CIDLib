@@ -61,18 +61,8 @@ class TFacCIDDocComp : public TFacility
 
         TTextOutStream& strmOut()
         {
-            return *m_pstrmOut;
+            return TSysInfo::strmOut();
         }
-
-        TTextOutStream& strmErr()
-        {
-            return m_strmErr;
-        }
-
-        tCIDLib::TVoid ShowXMLParseErr
-        (
-            const   TString&                strPathSrc
-        );
 
 
     private :
@@ -85,45 +75,31 @@ class TFacCIDDocComp : public TFacility
             , const TString&                strTar
         );
 
-        tCIDLib::TVoid LoadDTD();
+        tCIDLib::TVoid LoadDTD
+        (
+                    TParseCtx&              ctxToUse
+        );
 
 
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_bVerbose
-        //      Defaults to false, can be set via the /Verbose command line option.
-        //      That will cause it to dump out diagnostic stuff to help figure out
-        //      issues in the help content.
-        //
         //  m_cptrRoot
         //      The top-most topic object, which isn't a real one, it just provides the
         //      root for the hierarchy to kick start it.
         //
-        //  m_pstrmOut
-        //      If in verbose mode this is set to the standard output stream. Else it's
-        //      s set to a string based text string so that we just eat the output
-        //      (though still have it if an error occurs, so we can dump it out.)
+        //  m_ctxParse
+        //      Our parse contect object that we pass into the parse calls.
         //
         //  m_strSrcPath
         //  m_strTarPath
         //      The source and target paths that we figure out when we first start up and
         //      put here for further reference.
-        //
-        //  m_strmErr
-        //      The output stream for errors, which will show up even if we are not
-        //      in verbose mode (where m_pstrmOut is nullptr.)
-        //
-        //  m_xtprsToUse
-        //      Our XML parser that we set up and reuse for all of the files.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bVerbose;
         TTopic::TTopicPtr   m_cptrRoot;
-        TTextOutStream*     m_pstrmOut;
+        TParseCtx           m_ctxParse;
         TString             m_strSrcPath;
         TString             m_strTarPath;
-        TTextFileOutStream  m_strmErr;
-        TXMLTreeParser      m_xtprsToUse;
 
 
         // -------------------------------------------------------------------

@@ -112,7 +112,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                     conOut  << L"\nFound " << colFound.c4ElemCount() << L" records\n"
                             << L"------------------------\n";
 
-                    colFound.ForEach
+                    colFound.bForEach
                     (
                         [&](const TORB1SampRec& recCur)
                         {

@@ -75,6 +75,67 @@ const tCIDLib::TCh*     TSysInfo::s_pszLogInfo;
 //  TSysInfo: Public, static methods
 // ---------------------------------------------------------------------------
 
+//
+//  See if we have a command line parameter that matches that passed find string.
+//  if s
+tCIDLib::TBoolean
+TSysInfo::bFindCmdLineParm( const   TString&            strFind
+                            , const tCIDLib::TBoolean   bCase)
+{
+    if (!CIDLib_SystemInfo::bInitDone)
+        DoInit();
+
+    const tCIDLib::TCard4 c4Count = s_pcolCmdLineParms->c4ElemCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TString& strCur = s_pcolCmdLineParms->objAt(c4Index);
+
+        tCIDLib::TBoolean bMatch;
+        if (bCase)
+            bMatch = strCur.bCompare(strFind);
+        else
+            bMatch = strCur.bCompareI(strFind);
+
+        if (bMatch)
+            return kCIDLib::True;
+    }
+    return kCIDLib::False;
+}
+
+
+//
+//  Same as above but looks for one that starts with a prefix and removes that
+//  prefix from the returned value if found.
+//
+tCIDLib::TBoolean
+TSysInfo::bFindCmdLinePref( const   TString&            strPref
+                            ,       TString&            strToFill
+                            , const tCIDLib::TBoolean   bCase)
+{
+    if (!CIDLib_SystemInfo::bInitDone)
+        DoInit();
+
+    const tCIDLib::TCard4 c4Count = s_pcolCmdLineParms->c4ElemCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TString& strCur = s_pcolCmdLineParms->objAt(c4Index);
+
+        tCIDLib::TBoolean bMatch;
+        if (bCase)
+            bMatch = strCur.bStartsWith(strPref);
+        else
+            bMatch = strCur.bStartsWithI(strPref);
+
+        if (bMatch)
+        {
+            strToFill.CopyInSubStr(strPref, strPref.c4Length());
+            return kCIDLib::False;
+        }
+    }
+    return kCIDLib::False;
+}
+
+
 // Returns a basic check if the current user is an administrator
 tCIDLib::TBoolean TSysInfo::bIsHostAdmin()
 {

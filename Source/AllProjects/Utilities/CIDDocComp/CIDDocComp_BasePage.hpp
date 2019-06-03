@@ -90,10 +90,10 @@ class TBasePage
             return strName.bCompareI(m_strFileName);
         }
 
-        tCIDLib::TBoolean bParseFile
+        tCIDLib::TVoid ParseFile
         (
                     TTopic&                 topicParent
-            ,       TXMLTreeParser&         xtprsToUse
+            ,       TParseCtx&              ctxToUse
         );
 
         tCIDLib::TBoolean bVirtual() const
@@ -122,7 +122,7 @@ class TBasePage
             , const TString&                strParSrcDir
             , const TString&                strParTopic
             , const TString&                strFileName
-            , const TString&                strFileExt
+            , const tCIDDocComp::EPageTypes eType
             , const tCIDLib::TBoolean       bVirtual = kCIDLib::False
         );
 
@@ -131,10 +131,11 @@ class TBasePage
         // -------------------------------------------------------------------
         //  Private, virtual methods
         // -------------------------------------------------------------------
-        virtual tCIDLib::TBoolean bParse
+        virtual tCIDLib::TVoid Parse
         (
-                    TTopic&                     topicParent
-            , const TXMLTreeElement&            xtnodeRoot
+                    TTopic&                 topicParent
+            , const TXMLTreeElement&        xtnodeRoot
+            ,       TParseCtx&              ctxToUse
         ) = 0;
 
         virtual tCIDLib::TVoid OutputContent
@@ -154,6 +155,10 @@ class TBasePage
         //  m_colKeywords
         //      Any keywords defined for this page (used for glossary generation.)
         //      Most pages have them but they are optional.
+        //
+        //  m_eType
+        //      The type of page, which is directly translated from the PageType
+        //      attribute of the topic entry for the page.
         //
         //  m_strFileExt
         //      The extension for this file, which controls whate type of derived
@@ -180,12 +185,12 @@ class TBasePage
         //  m_strParTopic
         //      Our parent's topic path.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bVirtual;
-        tCIDLib::TStrList   m_colKeywords;
-        TString             m_strExtTitle;
-        TString             m_strFileExt;
-        TString             m_strFileName;
-        TString             m_strPagePath;
-        TString             m_strParSrcDir;
-        TString             m_strParTopic;
+        tCIDLib::TBoolean       m_bVirtual;
+        tCIDLib::TStrList       m_colKeywords;
+        tCIDDocComp::EPageTypes m_eType;
+        TString                 m_strExtTitle;
+        TString                 m_strFileName;
+        TString                 m_strPagePath;
+        TString                 m_strParSrcDir;
+        TString                 m_strParTopic;
 };

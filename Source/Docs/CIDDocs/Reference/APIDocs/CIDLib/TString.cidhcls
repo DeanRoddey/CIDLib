@@ -1,9 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
 
-<CppClass   Class="TString" Parent="TObject"
-            Formattable="Yes" Duplicable="Yes" Streamable="Yes">
+<CppClass   Class="TString" Parent="TObject" Flags="Fmt Dup BStrm">
+
+    <Desc>
+        TString is a fundamental class, since it is how you manage text strings in CIDLib. It's internal representation is an array of native wide characters.
+    </Desc>
+
+    <PubIntf>
+        <!-- Static public methods -->
+        <StaticMeths>
+
+            <Desc>
+                These are just some helper methods. Some are pre-fab comparators and the others are just some simple conversion helpers.
+            </Desc>
+
+            <Method Names="bComp bCompI" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    These are static comparators for the incredibly common requirement to provide an equality callback parameter for two strings. It returns true if the two strings are equal. The I version is case insensitive.
+                </Desc>
+                <MethParams>
+                    <MethParam Name="str1" Type="TString" PBy="CRef"/>
+                    <MethParam Name="str2" Type="TString" PBy="CRef"/>
+                </MethParams>
+            </Method>
+
+            <Method Names="c1ToHex" RetType="tCIDLib::TCard1">
+                <Desc>
+                    Assumes the passed character is a hex digit (a-f or 0-9, either case) and converts it to its binary byte equivalent. If not a valid hex digit it will throw an exception.
+                </Desc>
+                <MethParams>
+                    <MethParam Name="chToXlat" Type="tCIDLib::TSch" PBy="Val"/>
+                </MethParams>
+            </Method>
+
+            <Method Names="c1ToHex" RetType="tCIDLib::TCard1">
+                <Desc>
+                    Same as above but takes a wide character
+                </Desc>
+                <MethParams>
+                    <MethParam Name="chToXlat" Type="tCIDLib::TCh" PBy="Val"/>
+                </MethParams>
+            </Method>
+
+        </StaticMeths>
 
 
+        <!-- Non-virtual public methods -->
+        <NVirtMeths>
+
+            <Method Names="bExtractNthToken" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    Extracts the c4Index'th token from this string, tokenizing it using the passed separator character. The resulting tokens can be optionally stripped of any leading/trailing whitespace.
+                </Desc>
+                <MethParams>
+                    <MethParam  Name="c4Index" Type="tCIDLib::TCard4" PBy="Val"/>
+                    <MethParam  Name="chSepChar" Type="tCIDLib::TCh" PBy="Val"/>
+                    <MethParam  Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bStripWS" Type="tCIDLib::TBoolean" PBy="Val"
+                                DefVal="kCIDLib::True"/>
+                </MethParams>
+            </Method>
+
+        </NVirtMeths>
+
+
+    </PubIntf>
 
 </CppClass>

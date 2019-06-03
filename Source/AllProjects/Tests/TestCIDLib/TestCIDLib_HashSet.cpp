@@ -90,7 +90,7 @@ static tCIDLib::TVoid TestSetBasics(TTextOutStream& strmOut)
 
     // Test the foreach callback stuff
     tCIDLib::TCard4 c4CBCount = 0;
-    colTest.ForEach
+    colTest.bForEach
     (
         [&c4CBCount](const TString& strCur) -> tCIDLib::TBoolean
         {

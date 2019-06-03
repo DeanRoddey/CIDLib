@@ -83,7 +83,7 @@ TTest_ObjArrayLambda::eRunTest( TTextStringOutStream&   strmOut
     // Iterate the original and update another one with the same values
     TObjArray<TSize> objaComp(16);
     tCIDLib::TCard4 c4LoopVal = 0;
-    objaTest.ForEach
+    objaTest.bForEach
     (
         [&objaComp, &c4LoopVal](const TSize& szCur)
         {

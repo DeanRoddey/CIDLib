@@ -72,7 +72,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         facCIDCtrls().QueryMonitors(colMons);
 
         strmOut << L"\n\nAvailable Monitors\n----------------------------\n";
-        colMons.ForEach
+        colMons.bForEach
         (
             [&strmOut](const TGUIMonInfo& gmiCur)
             {

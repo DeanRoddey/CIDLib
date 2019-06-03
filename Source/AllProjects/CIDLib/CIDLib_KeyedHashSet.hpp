@@ -1121,7 +1121,7 @@ class TKeyedHashSet : public TCollection<TElem>
         //
         //  DO NOT change the element in a way that would modify the hash!
         //
-        template <typename IterCB> tCIDLib::TVoid ForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
 
@@ -1130,7 +1130,7 @@ class TKeyedHashSet : public TCollection<TElem>
             while (pnodeCur)
             {
                 if (!iterCB(pnodeCur->objData()))
-                    break;
+                    return kCIDLib::False;
 
                 // In debug, make sure they didn't modify the hash of this element
                 #if CID_DEBUG_ON
@@ -1144,6 +1144,7 @@ class TKeyedHashSet : public TCollection<TElem>
 
                 pnodeCur = pnodeFindNext(pnodeCur, hshCurBucket);
             }
+            return kCIDLib::True;
         }
 
 

@@ -46,7 +46,7 @@ TORB1SampIntfImpl::bQueryByName(const   TString&        strToFind
                                 ,       TORB1SampRec&   recFound)
 {
     tCIDLib::TBoolean bRet = kCIDLib::False;
-    m_colPatients.ForEach
+    m_colPatients.bForEach
     (
         [&bRet, &recFound, &strToFind](const TORB1SampRec& recCur)
         {
@@ -63,7 +63,7 @@ TORB1SampIntfImpl::bQueryAllStatus(const    tORB1SampSh::EStatus   eToFind
                                     ,       TVector<TORB1SampRec>&   colFound)
 {
     colFound.RemoveAll();
-    m_colPatients.ForEach
+    m_colPatients.bForEach
     (
         [eToFind, &colFound](const TORB1SampRec& recCur)
         {

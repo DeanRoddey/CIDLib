@@ -234,7 +234,7 @@ static tCIDLib::TVoid DummyFunc()
     {
     }
     colOne.AddXCopies(TString::strEmpty(), 4);
-    colOne.ForEach([] (const TString& strCur) -> tCIDLib::TBoolean { return kCIDLib::True; });
+    colOne.bForEach([] (const TString& strCur) -> tCIDLib::TBoolean { return kCIDLib::True; });
 
     TStringPool splStrings(L"Test", 8);
     THeapBufPool splHeapBufs(L"Test", 8);
@@ -297,7 +297,7 @@ static tCIDLib::TVoid DummyFunc()
     strmIn >> objaEnumed;
 
     tCIDLib::TCard4 c4Count = 0;
-    objaEnumed.ForEach
+    objaEnumed.bForEach
     (
         [&c4Count] (const TArea& areaCur)
         {
@@ -309,11 +309,11 @@ static tCIDLib::TVoid DummyFunc()
 
     // Force some of the enum based collection stuff to be generated
     TVector<TArea, tCIDLib::EErrClasses> colArea;
-    colArea.ForEachNC([] (TArea& areaCur) { return kCIDLib::True; });
+    colArea.bForEachNC([] (TArea& areaCur) { return kCIDLib::True; });
 
     TRefVector<TArea> colRefArea(tCIDLib::EAdoptOpts::Adopt);
     TRefVector<TArea> colRefArea2(tCIDLib::EAdoptOpts::Adopt);
-    colRefArea.ForEachNC([] (TArea& areaCur) { return kCIDLib::True; });
+    colRefArea.bForEachNC([] (TArea& areaCur) { return kCIDLib::True; });
     if (tCIDLib::bCompareElems(colRefArea, colRefArea2, TString::bComp)
     ||  !tCIDLib::bCompareElems(colRefArea, colRefArea2, TString::bComp))
     {
@@ -324,10 +324,10 @@ static tCIDLib::TVoid DummyFunc()
     }
 
     TQueue<TString> colStrQ;
-    colStrQ.ForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
+    colStrQ.bForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
 
     TRefQueue<TString> colStrRQ(tCIDLib::EAdoptOpts::Adopt);
-    colStrRQ.ForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
+    colStrRQ.bForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
 
     TRefKeyedHashSet<TKeyValuePair, TString, TStringKeyOps>
     colRKHS
@@ -337,14 +337,14 @@ static tCIDLib::TVoid DummyFunc()
         , TStringKeyOps(kCIDLib::False)
         , &TKeyValuePair::strExtractKey
     );
-    colRKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
+    colRKHS.bForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
 
     TKeyedHashSet<TKeyValuePair, TString, TStringKeyOps>
     colKHS
     (
         23, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
     );
-    colKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
+    colKHS.bForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
 
 
     // Unique pointer template expansion to make sure it's good
@@ -371,13 +371,13 @@ static tCIDLib::TVoid DummyFunc()
 
     // Fundamental collections
     TFundArray<tCIDLib::TBoolean> fcolArray(8);
-    fcolArray.ForEach
+    fcolArray.bForEach
     (
         [](const tCIDLib::TBoolean bCur) { return kCIDLib::True; }
     );
 
     TFundVector<tCIDLib::TBoolean> fcolVector(8);
-    fcolVector.ForEach
+    fcolVector.bForEach
     (
         [](const tCIDLib::TBoolean bCur) { return kCIDLib::True; }
     );

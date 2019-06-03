@@ -62,7 +62,7 @@ static tCIDLib::TVoid TestCallBack(TTextOutStream& strmOut)
         colTest.objPushTop(TCardinal(c4Index+1));
 
     // Do the callback, which should bump each one up
-    colTest.ForEachNC
+    colTest.bForEachNC
     (
         [](TCardinal& cTest) { cTest.c4Val(cTest.c4Val() + 1); return kCIDLib::True; }
     );
@@ -84,7 +84,7 @@ static tCIDLib::TVoid TestCallBack(TTextOutStream& strmOut)
     // Now test the const version
      tCIDLib::TCard4  c4Counter = 0;
     c4Counter = 0;
-    colTest.ForEach
+    colTest.bForEach
     (
         [&c4Counter](const TCardinal& cTest)
         { c4Counter += cTest.c4Val(); return kCIDLib::True; }
@@ -99,7 +99,7 @@ static tCIDLib::TVoid TestCallBack(TTextOutStream& strmOut)
 
     // Do it again with a lambda
     tCIDLib::TCard4 c4LocalCnt = 0;
-    colTest.ForEach
+    colTest.bForEach
     (
         [&c4LocalCnt](const TCardinal& cVal) -> tCIDLib::TBoolean
         {

@@ -573,6 +573,30 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
 
         tCIDXML::EElemTextTypes eTextType() const;
 
+        //
+        //  Call back each element node, breaking out on false return. Can be
+        //  a function pointer or lambda. We return true if we went all the way
+        //  to the end.
+        //
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
+        {
+            const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+            {
+                const TXMLTreeNode& xtnodeCur = *m_pcolChildren->pobjAt(c4Index);
+                if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Element)
+                {
+                    const tCIDLib::TBoolean bRet = iterCB
+                    (
+                        static_cast<const TXMLTreeElement&>(xtnodeCur)
+                    );
+                    if (!bRet)
+                        return bRet;
+                }
+            }
+            return kCIDLib::True;
+        }
+
         const TXMLTreeElement* pxtnodeFindElement
         (
             const   TString&                strQName

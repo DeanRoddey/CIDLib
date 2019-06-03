@@ -20,15 +20,132 @@
 //  scopes we need nested enums, nested fundamental types, aliases, data members,
 //  and methods.
 //
-//  For methods we don't have separate sections for static, virtual, non-virtual
-//  and so forth. Those are just attributes of the methods. When it's type do do
-//  the output, we find the methods of the various types as required.
-//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
 //
 #pragma once
+
+
+// ---------------------------------------------------------------------------
+//  Some small helper structs to hold info related to methods, with a parser
+//  method that lets them parse their content out of a passed XML element. Each
+//  layer calls the contained layers to parse our way down the hierarchy.
+// ---------------------------------------------------------------------------
+struct TMethodParam
+{
+    static tCIDLib::TBoolean bIsDirParm
+    (
+        const   tCIDDocComp::EParmPB    eTest
+    );
+
+    tCIDLib::TVoid Parse
+    (
+        const   TXMLTreeElement&        xtnodeGrp
+        ,       TParseCtx&              ctxToUse
+    );
+    tCIDLib::TVoid OutputContent
+    (
+                TTextOutStream&         strmTar
+        , const tCIDLib::TBoolean       bIndent
+    )   const;
+
+    tCIDDocComp::EParmPB    m_ePassBy = tCIDDocComp::EParmPB::Count;
+    tCIDDocComp::EParmDirs  m_eDir = tCIDDocComp::EParmDirs::Count;
+    TString                 m_strDefVal;
+    TString                 m_strName;
+    TString                 m_strType;
+};
+
+
+class TMethod
+{
+    public :
+        tCIDLib::TVoid Parse
+        (
+            const   TXMLTreeElement&        xtnodeMeth
+            ,       TParseCtx&              ctxToUse
+        );
+        tCIDLib::TVoid OutputContent
+        (
+                    TTextOutStream&         strmTar
+        )   const;
+
+        //
+        //  Attrs is stuff like const, constexpr, nodiscard, anything else like
+        //  that. AnyDirs is set if any of the parameters are non-const Ref or
+        //  pointer to ref, or other where we want to indicate the direction.
+        //
+        tCIDLib::TBoolean       m_bAnyDirs = kCIDLib::False;
+        tCIDDocComp::EMethAttrs m_eAttrs = tCIDDocComp::EMethAttrs::None;
+        tCIDLib::TStrList       m_colNames;
+        TVector<TMethodParam>   m_colParams;
+        THelpNode               m_hnDescr;
+        TString                 m_strRetType;
+
+    private :
+        tCIDLib::TVoid OutputSignature
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strName
+        )   const;
+};
+
+
+// One each for static, virtual, override, non-virtual
+struct TMethodGrp
+{
+    tCIDLib::TBoolean bIsEmpty() const
+    {
+        return m_colMethods.bIsEmpty() && m_hnDescr.bIsEmpty();
+    }
+
+    tCIDLib::TVoid Parse
+    (
+        const   TXMLTreeElement&        xtnodeMeths
+        ,       TParseCtx&              ctxToUse
+    );
+    tCIDLib::TVoid OutputContent
+    (
+                TTextOutStream&         strmTar
+    )   const;
+
+    TVector<TMethod>        m_colMethods;
+    THelpNode               m_hnDescr;
+};
+
+
+//
+//  We have one of these each for public, protected, and private stuff. The empty
+//  method lets the output code know if needs to do a section for this visibility
+//  type.
+//
+struct TMemberGrp
+{
+    TMemberGrp() = delete;
+    TMemberGrp(const tCIDDocComp::EVisTypes eVisType)
+
+        : m_eVisType(eVisType)
+    {
+    }
+
+    tCIDLib::TBoolean bIsEmpty() const;
+    tCIDLib::TVoid Parse
+    (
+        const   TXMLTreeElement&        xtnodeMems
+        ,       TParseCtx&              ctxToUse
+    );
+    tCIDLib::TVoid OutputContent
+    (
+                TTextOutStream&         strmTar
+    )   const;
+
+    tCIDDocComp::EVisTypes  m_eVisType;
+    TMethodGrp              m_methgNVirtMethods;
+    TMethodGrp              m_methgOverMethods;
+    TMethodGrp              m_methgStatMethods;
+    TMethodGrp              m_methgVirtMethods;
+};
 
 
 // ---------------------------------------------------------------------------
@@ -58,10 +175,16 @@ class TCppClassPage : public TBasePage
         // -------------------------------------------------------------------
         //  Private, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bParse
+        tCIDLib::TBoolean bFlagOn
         (
-                    TTopic&                     topicParent
-            , const TXMLTreeElement&            xtnodeRoot
+            const   tCIDDocComp::EClsFlags  eCheck
+        )   const;
+
+        tCIDLib::TVoid Parse
+        (
+                    TTopic&                 topicParent
+            , const TXMLTreeElement&        xtnodeRoot
+            ,       TParseCtx&              ctxToUse
         )   override;
 
         tCIDLib::TVoid OutputContent
@@ -71,20 +194,49 @@ class TCppClassPage : public TBasePage
 
 
         // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid ParseMemberGrp
+        (
+            const   TXMLTreeElement&        xtnodeGrp
+            ,       TMemberGrp&             memgTar
+            ,       TParseCtx&              ctxToUse
+        );
+
+        tCIDLib::TVoid OutputMemberGrp
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strTitle
+            , const TMemberGrp&             memgSrc
+        )   const;
+
+
+
+
+        // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_bDuplicable
-        //  m_bFormattable
-        //  m_bStreamable
-        //      These are flags that indicate if this class supports any of the
-        //      big three mixin interfaces.
+        //  m_eFlags
+        //      These indicate various optional things that the class may or may
+        //      not implement.
+        //
+        //  m_hnDesc
+        //      The overall class description
+        //
+        //  m_memgXXX
+        //      We have storage for the public, protected, and private members.
         //
         //  m_strClass
         //  m_strParClass
+        //      Our class and our parent class. Parent class can be empty since not
+        //      everything derives from TObject, and of course TObject doesn't have a
+        //      parent.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bDuplicable;
-        tCIDLib::TBoolean   m_bFormattable;
-        tCIDLib::TBoolean   m_bStreamable;
-        TString             m_strClass;
-        TString             m_strParClass;
+        tCIDDocComp::EClsFlags  m_eFlags = tCIDDocComp::EClsFlags::None;
+        TMemberGrp              m_memgPublic;
+        TMemberGrp              m_memgProtected;
+        TMemberGrp              m_memgPrivate;
+        THelpNode               m_hnDesc;
+        TString                 m_strClass;
+        TString                 m_strParClass;
 };

@@ -35,11 +35,11 @@
 // ---------------------------------------------------------------------------
 //  THelpPage: Constructors and Destructor
 // ---------------------------------------------------------------------------
-THelpPage::THelpPage(const  TString&                strExtTitle
-                    , const TString&                strParSrcDir
-                    , const TString&                strParTopic
-                    , const TString&                strFileName
-                    , const tCIDLib::TBoolean       bVirtual) :
+THelpPage::THelpPage(const  TString&            strExtTitle
+                    , const TString&            strParSrcDir
+                    , const TString&            strParTopic
+                    , const TString&            strFileName
+                    , const tCIDLib::TBoolean   bVirtual) :
 
     TBasePage
     (
@@ -47,7 +47,7 @@ THelpPage::THelpPage(const  TString&                strExtTitle
         , strParSrcDir
         , strParTopic
         , strFileName
-        , kCIDDocComp::strExt_HelpPage
+        , tCIDDocComp::EPageTypes::HelpPage
         , bVirtual
     )
 {
@@ -57,8 +57,10 @@ THelpPage::THelpPage(const  TString&                strExtTitle
 // ---------------------------------------------------------------------------
 //  THelpPage: Private, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean
-THelpPage::bParse(TTopic& topicParent, const TXMLTreeElement& xtnodeRoot)
+tCIDLib::TVoid
+THelpPage::Parse(       TTopic&             topicParent
+                , const TXMLTreeElement&    xtnodeRoot
+                ,       TParseCtx&          ctxToUse)
 {
     // Get our inteneral title text
     QueryElemText(xtnodeRoot, kCIDDocComp::strXML_Title, m_strIntTitle);
@@ -69,7 +71,7 @@ THelpPage::bParse(TTopic& topicParent, const TXMLTreeElement& xtnodeRoot)
     (
         kCIDDocComp::strXML_HelpText, 0, c4At
     );
-    return m_hnContent.bParse(xtnodeHelp);
+    m_hnContent.Parse(xtnodeHelp, ctxToUse);
 }
 
 

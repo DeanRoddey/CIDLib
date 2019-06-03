@@ -770,7 +770,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
         }
 
 
-        template <typename IterCB> tCIDLib::TVoid ForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
             TQueueNode<TElem>* pnodeCur = static_cast<TQueueNode<TElem>*>
@@ -780,9 +780,10 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             while (pnodeCur)
             {
                 if (!iterCB(pnodeCur->objData()))
-                    break;
+                    return kCIDLib::False;
                 pnodeCur = static_cast<TQueueNode<TElem>*>(pnodeCur->pnodeNext());
             }
+            return kCIDLib::True;
         }
 
 

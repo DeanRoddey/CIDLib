@@ -40,7 +40,7 @@
 THelpNode::THelpNode() :
 
     m_c4Extra(0)
-    , m_eType(tCIDDocComp::ETypes::None)
+    , m_eType(tCIDDocComp::EMUTypes::None)
 {
 }
 
@@ -61,7 +61,7 @@ tCIDLib::TBoolean THelpNode::bIsEmpty() const
     return
     (
         m_colNodes.bIsEmpty()
-        || ((m_eType == tCIDDocComp::ETypes::Text) && m_strText.bIsEmpty())
+        || ((m_eType == tCIDDocComp::EMUTypes::Text) && m_strText.bIsEmpty())
     );
 }
 
@@ -71,10 +71,11 @@ tCIDLib::TBoolean THelpNode::bIsEmpty() const
 //  itself and another that takes a parent node and the name of the XML element
 //  to get, so we get that and call the first version.
 //
-tCIDLib::TBoolean
-THelpNode::bParseFromParent(const   TXMLTreeElement&    xtnodePar
+tCIDLib::TVoid
+THelpNode::ParseFromParent( const   TXMLTreeElement&    xtnodePar
                             , const TString&            strName
-                            , const tCIDLib::TBoolean   bOptional)
+                            , const tCIDLib::TBoolean   bOptional
+                            ,       TParseCtx&          ctxToUse)
 {
     tCIDLib::TCard4 c4At;
     const TXMLTreeElement* pxtnodeCur = xtnodePar.pxtnodeFindElement(strName, 0, c4At);
@@ -82,20 +83,23 @@ THelpNode::bParseFromParent(const   TXMLTreeElement&    xtnodePar
     {
         if (!bOptional)
         {
-            facCIDDocComp.strmErr() << L"Could not find element '" << strName
-                                    << L"' in parent node '" << xtnodePar.strQName()
-                                    << L"'"
-                                    << kCIDLib::NewEndLn;
-            return kCIDLib::False;
+            ctxToUse.AddErrorMsg
+            (
+                L"Could not find element '%(1)' in parent node '%(2)'"
+                , strName
+                , xtnodePar.strQName()
+            );
+            return;
         }
-        return kCIDLib::True;
+        return;
     }
 
     // Now just call the other version and return its return
-    return bParse(*pxtnodeCur);
+    Parse(*pxtnodeCur, ctxToUse);
 }
 
-tCIDLib::TBoolean THelpNode::bParse(const TXMLTreeElement& xtnodeText)
+tCIDLib::TVoid
+THelpNode::Parse(const TXMLTreeElement& xtnodeText, TParseCtx& ctxToUse)
 {
     m_colNodes.RemoveAll();
 
@@ -111,7 +115,7 @@ tCIDLib::TBoolean THelpNode::bParse(const TXMLTreeElement& xtnodeText)
         if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Text)
         {
             // It's got to just be a regular text node
-            hnNew.m_eType = tCIDDocComp::ETypes::Text;
+            hnNew.m_eType = tCIDDocComp::EMUTypes::Text;
             hnNew.m_strText = static_cast<const TXMLTreeText&>(xtnodeCur).strText();
         }
          else if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Element)
@@ -128,24 +132,24 @@ tCIDLib::TBoolean THelpNode::bParse(const TXMLTreeElement& xtnodeText)
             tCIDLib::TBoolean bGetType = kCIDLib::False;
             if (strQName.bCompare(L"Bold"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Bold;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Bold;
             }
              else if (strQName.bCompare(L"Br"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Break;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Break;
             }
              else if (strQName.bCompare(L"Code"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Code;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Code;
             }
              else if (strQName.bCompare(L"DIV"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::DIV;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::DIV;
                 bGetID = kCIDLib::True;
             }
              else if (strQName.bCompare(L"Image"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Image;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Image;
 
                 //
                 //  We use the ref to hold the image path, and type to hold the
@@ -156,19 +160,19 @@ tCIDLib::TBoolean THelpNode::bParse(const TXMLTreeElement& xtnodeText)
             }
              else if (strQName.bCompare(L"Indent"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Indent;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Indent;
             }
              else if (strQName.bCompare(L"InlineNote"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::InlineNote;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::InlineNote;
             }
              else if (strQName.bCompare(L"Italic"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Italic;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Italic;
             }
              else if (strQName.bCompare(L"Link"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Link;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Link;
 
                 //
                 //  We get all of the available values. For quick links or external links, we
@@ -184,7 +188,7 @@ tCIDLib::TBoolean THelpNode::bParse(const TXMLTreeElement& xtnodeText)
             }
              else if (strQName.bCompare(L"LItem"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::ListItem;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::ListItem;
 
                 //
                 //  We use the Ref= attribute to hold prefix text. This will
@@ -196,46 +200,42 @@ tCIDLib::TBoolean THelpNode::bParse(const TXMLTreeElement& xtnodeText)
             }
              else if (strQName.bCompare(L"List"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::List;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::List;
                 bGetType = kCIDLib::True;
             }
              else if (strQName.bCompare(L"Note"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Note;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Note;
             }
              else if (strQName.bCompare(L"P"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Paragraph;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Paragraph;
             }
              else if (strQName.bCompare(L"SecTitle"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::SecTitle;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::SecTitle;
             }
              else if (strQName.bCompare(L"SubSecTitle"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::SubSecTitle;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::SubSecTitle;
             }
              else if (strQName.bCompare(L"Superscript"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Superscript;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Superscript;
             }
              else if (strQName.bCompare(L"Table"))
             {
-                hnNew.m_eType = tCIDDocComp::ETypes::Table;
+                hnNew.m_eType = tCIDDocComp::EMUTypes::Table;
 
                 // Call a helper to process the class
-                if (!hnNew.bProcessTable(xtnodeElem))
-                    return kCIDLib::False;
+                hnNew.ProcessTable(xtnodeElem, ctxToUse);
 
                 // We have eaten the children, so don't do them below
                 bGetChildren = kCIDLib::False;
             }
              else
             {
-                facCIDDocComp.strmOut()
-                    << L"'" << strQName << L"' is not a known markup type"
-                    << kCIDLib::NewEndLn;
-                return kCIDLib::False;
+                ctxToUse.AddErrorMsg(L"'%(1)' is not a known markup type", strQName);
             }
 
             // If indicated, get some well known attributes
@@ -250,10 +250,9 @@ tCIDLib::TBoolean THelpNode::bParse(const TXMLTreeElement& xtnodeText)
 
             // If the current node has children, then recurse
             if (bGetChildren && xtnodeElem.c4ChildCount())
-                hnNew.bParse(xtnodeElem);
+                hnNew.Parse(xtnodeElem, ctxToUse);
         }
     }
-    return kCIDLib::True;
 }
 
 
@@ -267,7 +266,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
 
         switch(hnCur.m_eType)
         {
-            case tCIDDocComp::ETypes::Bold :
+            case tCIDDocComp::EMUTypes::Bold :
             {
                 strmTar << L"<B>";
                 hnCur.OutputNodes(strmTar);
@@ -275,13 +274,13 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::Break :
+            case tCIDDocComp::EMUTypes::Break :
             {
                 strmTar << L"<br/>";
                 break;
             }
 
-            case tCIDDocComp::ETypes::Code :
+            case tCIDDocComp::EMUTypes::Code :
             {
                 strmTar << L"\n<PRE>\n";
                 hnCur.OutputNodes(strmTar);
@@ -289,7 +288,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::DIV :
+            case tCIDDocComp::EMUTypes::DIV :
             {
                 strmTar << L"\n<DIV id='"
                         << hnCur.m_strID
@@ -299,7 +298,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::Image :
+            case tCIDDocComp::EMUTypes::Image :
             {
                 strmTar << L"<p></p><div style='width: 100%; text-align: center;'>"
                         << L"<img ";
@@ -317,7 +316,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::Indent :
+            case tCIDDocComp::EMUTypes::Indent :
             {
                 strmTar << L"<blockquote>";
                 hnCur.OutputNodes(strmTar);
@@ -325,7 +324,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::Italic :
+            case tCIDDocComp::EMUTypes::Italic :
             {
                 strmTar << L"<I>";
                 hnCur.OutputNodes(strmTar);
@@ -333,7 +332,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::Link :
+            case tCIDDocComp::EMUTypes::Link :
             {
                 // Depending on type, add other attributes
                 if (hnCur.m_strType == L"QLink")
@@ -377,7 +376,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::List :
+            case tCIDDocComp::EMUTypes::List :
             {
                 if (hnCur.m_strType == L"Ordered")
                     strmTar << L"<ol>";
@@ -391,7 +390,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::ListItem :
+            case tCIDDocComp::EMUTypes::ListItem :
             {
                 strmTar << L"<li>";
                 // If there's prefix text, do that
@@ -413,7 +412,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::Note :
+            case tCIDDocComp::EMUTypes::Note :
             {
                 strmTar << L"<div class=\"BarredNote\">";
                 hnCur.OutputNodes(strmTar);
@@ -421,7 +420,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::Paragraph :
+            case tCIDDocComp::EMUTypes::Paragraph :
             {
                 strmTar << L"<p>";
                 hnCur.OutputNodes(strmTar);
@@ -429,7 +428,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::SecTitle :
+            case tCIDDocComp::EMUTypes::SecTitle :
             {
                 strmTar << L"<p><span class='SecHdr'>";
                 hnCur.OutputNodes(strmTar);
@@ -437,7 +436,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::SubSecTitle :
+            case tCIDDocComp::EMUTypes::SubSecTitle :
             {
                 strmTar << L"<p><span class='SubSecHdr'>";
                 hnCur.OutputNodes(strmTar);
@@ -445,7 +444,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::Superscript :
+            case tCIDDocComp::EMUTypes::Superscript :
             {
                 strmTar << L"<span class=\"Superscript\">";
                 hnCur.OutputNodes(strmTar);
@@ -453,13 +452,13 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 break;
             }
 
-            case tCIDDocComp::ETypes::Text :
+            case tCIDDocComp::EMUTypes::Text :
             {
                 strmTar << hnCur.m_strText;
                 break;
             }
 
-            case tCIDDocComp::ETypes::Table :
+            case tCIDDocComp::EMUTypes::Table :
             {
                 // Call a helper for this
                 hnCur.OutputTable(strmTar);
@@ -468,8 +467,8 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
             }
 
             default :
-                facCIDDocComp.strmErr()
-                        << L"Unknown help text node type" << kCIDLib::EndLn;
+                facCIDDocComp.strmOut()
+                        << L"        Unknown help text node type" << kCIDLib::EndLn;
                 break;
         };
     }
@@ -486,7 +485,8 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
 //  a fair bit of stuff. We allow markup inside row columns, so we recurse to get the
 //  column content.
 //
-tCIDLib::TBoolean THelpNode::bProcessTableRow(const TXMLTreeElement& xtnodeRow)
+tCIDLib::TVoid
+THelpNode::ProcessTableRow(const TXMLTreeElement& xtnodeRow, TParseCtx& ctxToUse)
 {
     const tCIDLib::TCard4 c4Count = xtnodeRow.c4ChildCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -495,20 +495,19 @@ tCIDLib::TBoolean THelpNode::bProcessTableRow(const TXMLTreeElement& xtnodeRow)
 
         // Add a new node to fill in and set its type to table column
         THelpNode& hnCol = m_colNodes.objAdd(THelpNode());
-        hnCol.m_eType = tCIDDocComp::ETypes::TableCol;
+        hnCol.m_eType = tCIDDocComp::EMUTypes::TableCol;
 
         // Store the column span
         hnCol.m_c4Extra = xtnodeCol.xtattrNamed(kCIDDocComp::strXML_ColSpan).c4ValueAs();
 
         // And recurse to get that content
-        if (!hnCol.bParse(xtnodeCol))
-            return kCIDLib::False;
+        hnCol.Parse(xtnodeCol, ctxToUse);
     }
-    return kCIDLib::True;
 }
 
 
-tCIDLib::TBoolean THelpNode::bProcessTable(const TXMLTreeElement& xtnodeTbl)
+tCIDLib::TVoid
+THelpNode::ProcessTable(const TXMLTreeElement& xtnodeTbl, TParseCtx& ctxToUse)
 {
     // Get the class if it is present, and store it as the type of the table node
     xtnodeTbl.bAttrExists(L"Class", m_strType);
@@ -521,14 +520,11 @@ tCIDLib::TBoolean THelpNode::bProcessTable(const TXMLTreeElement& xtnodeTbl)
 
         // Add a new node to fill in and set its type to table row
         THelpNode& hnRow = m_colNodes.objAdd(THelpNode());
-        hnRow.m_eType = tCIDDocComp::ETypes::TableRow;
+        hnRow.m_eType = tCIDDocComp::EMUTypes::TableRow;
 
         // And now lt's process the columns of this row
-        if (!hnRow.bProcessTableRow(xtnodeRow))
-            return kCIDLib::False;
+        hnRow.ProcessTableRow(xtnodeRow, ctxToUse);
     }
-
-    return kCIDLib::True;
 }
 
 
@@ -543,7 +539,7 @@ tCIDLib::TVoid THelpNode::OutputTableRow(TTextOutStream& strmTar) const
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const THelpNode& hnCol = m_colNodes[c4Index];
-        CIDAssert(hnCol.m_eType == tCIDDocComp::ETypes::TableCol, L"Expected a table column");
+        CIDAssert(hnCol.m_eType == tCIDDocComp::EMUTypes::TableCol, L"Expected a table column");
 
         // Recurse to output the info
         if (hnCol.m_c4Extra > 1)
@@ -568,7 +564,7 @@ tCIDLib::TVoid THelpNode::OutputTable(TTextOutStream& strmTar) const
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const THelpNode& hnRow = m_colNodes[c4Index];
-        CIDAssert(hnRow.m_eType == tCIDDocComp::ETypes::TableRow, L"Expected a table row");
+        CIDAssert(hnRow.m_eType == tCIDDocComp::EMUTypes::TableRow, L"Expected a table row");
 
         strmTar << L"<tr>";
         hnRow.OutputTableRow(strmTar);

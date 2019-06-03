@@ -65,6 +65,13 @@ class CIDLIBEXP TStringTokenizer : public TObject
             ,       tCIDLib::TCard4&        c4ErrIndex
         );
 
+        static tCIDLib::TBoolean bParseSpacedTokens
+        (
+            const   TString&                strText
+            ,       TCollection<TString>&   colToFill
+            , const tCIDLib::TBoolean       bAppend = kCIDLib::False
+        );
+
         static tCIDLib::TVoid BuildQuotedCommaList
         (
             const   TString&                strToAdd

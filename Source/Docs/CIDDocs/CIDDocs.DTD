@@ -4,6 +4,7 @@
 <!ENTITY % BoolVal 'False | True'>
 <!ENTITY % YNVal 'Yes | No'>
 <!ENTITY % ParmDir 'In | Out | InOut'>
+<!ENTITY % PageTypes 'HelpPage | CppClass'>
 
 
 <!--
@@ -55,6 +56,8 @@
    -->
 <!ELEMENT   Keywords    (#PCDATA)>
 
+<!-- A general description element which just contains general help content -->
+<!ELEMENT   Desc        (%HelpContent;)>
 
 <!--
    - We  have a small file that goes into each topic directory that provides
@@ -67,7 +70,7 @@
 <!ELEMENT   PageLink        EMPTY>
 <!ATTLIST   PageLink        Title CDATA ''
                             FileName CDATA #REQUIRED
-                            FileExt CDATA 'cidhpage'
+                            PageType (%PageTypes;) 'HelpPage'
                             Extra1 CDATA #IMPLIED
                             Extra2 CDATA #IMPLIED
                             Virtual (%YNVal;) 'No'>
@@ -94,12 +97,56 @@
 
 <!--
    - A C++ class. This is a fairly extensive bit and where most of the non-generic
-   - help text will go.
+   - help text will go. Our hierarchy is:
+   -
+   -  Visibility (public, protected, private)
+   -      Methods (grouped by virtual, non-virtual, override, and static)
+   -      Data
+   -      Types
+   -
+   -  So methods have a separate grouping inside the visibility based blocks.
+   -
+   -  We declare PubIntf, ProtIntf, and PrivIntf, all with the same content, so
+   -  that it's clear to the program. And he models his data on this structure.
    -->
-<!ELEMENT   CppClass    (KeyWords?)>
+<!ENTITY % ParmAcc 'CPtr | CPtrC | CRef | Ref | Ptr | PtrCRef | PtrRef | Val'>
+
+<!ELEMENT   Constant    EMPTY>
+<!ELEMENT   Constants   (Constant+)>
+
+<!ELEMENT   Member      EMPTY>
+<!ELEMENT   Members     (Member+)>
+
+<!-- Type is -->
+<!ELEMENT   MethParam   EMPTY>
+<!ATTLIST   MethParam   Name CDATA #REQUIRED
+                        Type CDATA #REQUIRED
+                        PBy (%ParmAcc;) 'Val'
+                        Dir (In | Out | InOut) 'In'
+                        DefVal CDATA #IMPLIED>
+<!ELEMENT   MethParams  (MethParam+)>
+
+<!ELEMENT   Method      (Desc, MethParams*)>
+<!ATTLIST   Method      Names NMTOKENS #REQUIRED
+                        RetType CDATA ''
+                        Attrs NMTOKENS 'NoAttrs'>
+
+<!ELEMENT   StaticMeths (Desc?, Method+)>
+<!ELEMENT   VirtMeths   (Desc?, Method+)>
+<!ELEMENT   OverMeths   (Desc?, Method+)>
+<!ELEMENT   NVirtMeths  (Desc?, Method+)>
+
+<!ELEMENT   DataType    EMPTY>
+<!ELEMENT   DataTypes   (DataType+)>
+
+<!ELEMENT   PubIntf     (DataTypes?, Constants?, StaticMeths?
+                        , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>
+<!ELEMENT   ProtIntf    (DataTypes?, Constants?, StaticMeths?
+                        , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>
+<!ELEMENT   PrivIntf    (DataTypes?, Constants?, StaticMeths?
+                        , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>
+
+<!ELEMENT   CppClass    (Desc, PubIntf?, ProtIntf?, PrivIntf?, Keywords?)>
 <!ATTLIST   CppClass    Class NMTOKEN #REQUIRED
                         Parent NMTOKEN #REQUIRED
-                        Duplicable (%YNVal;) 'No'
-                        Formattable (%YNVal;) 'No'
-                        Streamable (%YNVal;) 'No'>
-
+                        Flags NMTOKENS 'NoFlags'>

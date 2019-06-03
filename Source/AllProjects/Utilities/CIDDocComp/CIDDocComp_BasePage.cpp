@@ -99,16 +99,16 @@ TBasePage::~TBasePage()
 // ---------------------------------------------------------------------------
 //  TBasePage: Hidden constructors
 // ---------------------------------------------------------------------------
-TBasePage::TBasePage(const  TString&            strExtTitle
-                    , const TString&            strParSrcDir
-                    , const TString&            strParTopic
-                    , const TString&            strFileName
-                    , const TString&            strFileExt
-                    , const tCIDLib::TBoolean   bVirtual) :
+TBasePage::TBasePage(const  TString&                strExtTitle
+                    , const TString&                strParSrcDir
+                    , const TString&                strParTopic
+                    , const TString&                strFileName
+                    , const tCIDDocComp::EPageTypes eType
+                    , const tCIDLib::TBoolean       bVirtual) :
 
     m_bVirtual(bVirtual)
+    , m_eType(eType)
     , m_strExtTitle(strExtTitle)
-    , m_strFileExt(strFileExt)
     , m_strFileName(strFileName)
     , m_strParSrcDir(strParSrcDir)
     , m_strParTopic(strParTopic)
@@ -128,31 +128,26 @@ TBasePage::TBasePage(const  TString&            strExtTitle
 //  TBasePage: Public, virtual methods
 // ---------------------------------------------------------------------------
 
-tCIDLib::TBoolean
-TBasePage::bParseFile(TTopic& topicParent, TXMLTreeParser& xtprsToUse)
+tCIDLib::TVoid
+TBasePage::ParseFile(TTopic& topicParent, TParseCtx& ctxToUse)
 {
-    facCIDDocComp.strmOut()
-            << L"\n   Parsing File: "
-            << m_strPagePath << kCIDLib::EndLn;
+    if (ctxToUse.bVerbose())
+        facCIDDocComp.strmOut() << L"      " << m_strPagePath << kCIDLib::EndLn;
+
+    // Push us onto the topic stack for this scope
+    TParseStackJan janStack(&ctxToUse, m_strPagePath);
 
     // Build up our source path
     TPathStr pathSrc = m_strParSrcDir;
     pathSrc.AddLevel(m_strFileName);
-    pathSrc.AppendExt(m_strFileExt);
 
-    const tCIDLib::TBoolean bRes = xtprsToUse.bParseRootEntity
-    (
-        pathSrc
-        , tCIDXML::EParseOpts::Validate
-        , tCIDXML::EParseFlags::TagsNText
-    );
-    if (!bRes)
-    {
-        facCIDDocComp.ShowXMLParseErr(pathSrc);
-        return kCIDLib::False;
-    }
+    // Use Load here, which gets us the text that holds the file extension
+    pathSrc.AppendExt(tCIDDocComp::strLoadEPageTypes(m_eType));
 
-    const TXMLTreeElement& xtnodeRoot = xtprsToUse.xtdocThis().xtnodeRoot();
+    // If the parse fails, we are done for this guy, else get the root and process
+    if (!ctxToUse.bParseXML(pathSrc))
+        return;
+    const TXMLTreeElement& xtnodeRoot = ctxToUse.xtnodeRoot();
 
     //
     //  Do any stuff we handled at this level. All pages can optionally have a
@@ -163,19 +158,19 @@ TBasePage::bParseFile(TTopic& topicParent, TXMLTreeParser& xtprsToUse)
     if (pxtnodeKWs)
     {
         // Get the body text of this element, which is a comma separated list of phrases
-        TString strKWs;
-        QueryElemText(*pxtnodeKWs, kCIDDocComp::strXML_Keywords, strKWs);
+        QueryElemText(*pxtnodeKWs, kCIDDocComp::strXML_Keywords, ctxToUse.m_strTmp1);
 
-        if (!TStringTokenizer::bParseCSVLine(strKWs, m_colKeywords, c4At))
+        if (!TStringTokenizer::bParseCSVLine(ctxToUse.m_strTmp1, m_colKeywords, c4At))
         {
-            facCIDDocComp.strmErr() << L"Invalid keyword content at offset "
-                                    << c4At << kCIDLib::EndLn;
-            return kCIDLib::False;
+            ctxToUse.AddErrorMsg
+            (
+                L"Invalid keyword content at offset %(1)", TCardinal(c4At)
+            );
         }
     }
 
     // And then invoke the virtual for the derived class to parse his stuff
-    return bParse(topicParent, xtnodeRoot);
+    Parse(topicParent, xtnodeRoot, ctxToUse);
 }
 
 
@@ -219,3 +214,5 @@ TBasePage::GenerateLink(TTextOutStream& strmTar) const
             << m_strExtTitle
             << L"</a><br/>\n";
 }
+
+

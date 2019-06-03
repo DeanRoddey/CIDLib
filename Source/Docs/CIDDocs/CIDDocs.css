@@ -76,6 +76,12 @@ li {
     font-size : 0.75em;
 }
 
+/* A small note to put under some other text, so a little top margin */
+.SmallDropNote {
+    font-size : 0.75em;
+    margin-top : 1em;
+}
+
 
 /* A super-script */
 .Superscript {
@@ -164,6 +170,7 @@ table.H2VHeaderTable tr:first-child + tr {
 }
 
 table.H2VHeaderTable tr td:first-child {
+    border : 0px;
     background-color : #DDDDDD;
     font-weight : bold;
     text-align : center;
@@ -176,10 +183,7 @@ table.CppClsHdrTable {
 }
 
 table.CppClsHdrTable tr td {
-
     border : 0px;
-
-    /* Override defaults */
     padding-left : 0px;
     padding-Right : 0px;
     font-weight : normal;
@@ -188,7 +192,6 @@ table.CppClsHdrTable tr td {
 
 table.CppClsHdrTable tr td:first-child {
 
-    border : 0px;
     font-weight: bold;
     color : #555555;
     text-align : right;

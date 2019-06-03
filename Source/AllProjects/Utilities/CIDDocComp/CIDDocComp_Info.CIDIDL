@@ -7,30 +7,22 @@
 
         <CIDIDL:Constants>
 
-            <CIDIDL:Constant CIDIDL:Name="strExt_CppCPage"
-                             CIDIDL:Type="TString" CIDIDL:Value="cidhcls">
-                <CIDIDL:DocText>
-                    Extensions for our help page types
-                </CIDIDL:DocText>
-            </CIDIDL:Constant>
-            <CIDIDL:Constant CIDIDL:Name="strExt_HelpPage"
-                             CIDIDL:Type="TString" CIDIDL:Value="cidhpage"/>
-
-
             <CIDIDL:Constant CIDIDL:Name="strXML_ColSpan"
                              CIDIDL:Type="TString" CIDIDL:Value="ColSpan">
                 <CIDIDL:DocText>
                     Values we look for in the XML cotnent.
                 </CIDIDL:DocText>
             </CIDIDL:Constant>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_DefValue"
+                                CIDIDL:Type="TString" CIDIDL:Value="DefVal"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Desc"
+                                CIDIDL:Type="TString" CIDIDL:Value="Desc"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_Extra"
                                 CIDIDL:Type="TString" CIDIDL:Value="Extra"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_Extra1"
                                 CIDIDL:Type="TString"  CIDIDL:Value="Extra1"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_Extra2"
                                 CIDIDL:Type="TString"  CIDIDL:Value="Extra2"/>
-            <CIDIDL:Constant    CIDIDL:Name="strXML_FileExt"
-                                CIDIDL:Type="TString"  CIDIDL:Value="FileExt"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_FileName"
                                 CIDIDL:Type="TString"  CIDIDL:Value="FileName"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_HelpText"
@@ -43,6 +35,8 @@
                                 CIDIDL:Type="TString"  CIDIDL:Value="PageLink"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_PageMap"
                                 CIDIDL:Type="TString"  CIDIDL:Value="PageMap"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_PageType"
+                                CIDIDL:Type="TString"  CIDIDL:Value="PageType"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_Ref"
                                 CIDIDL:Type="TString"  CIDIDL:Value="Ref"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_SubDir"
@@ -62,7 +56,96 @@
 
         <CIDIDL:Types>
 
-            <CIDIDL:Enum CIDIDL:Name="ETypes">
+            <CIDIDL:Enum CIDIDL:Name="EClsFlags" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:Type="Bmp">
+                <CIDIDL:DocText>
+                    The overall class element has a set of bitmap flags that indicate various possible attributes of that class. We can't use None for
+                    no flags since it's used to report a failure to translate a value,
+                    so we define NoFlags. XML doesn't allow an empty NMTOKENS attr
+                    so we have to have something as a default in the DTD.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Dup" CIDIDL:Value="0x0001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Fmt" CIDIDL:Value="0x0002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="BStrm" CIDIDL:Value="0x0004"/>
+
+                <CIDIDL:EnumVal CIDIDL:Name="NoFlags" CIDIDL:Value="0x1000"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMethAttrs" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="Text" CIDIDL:LoadMap="Text"
+                         CIDIDL:Type="Bmp">
+                <CIDIDL:DocText>
+                    The method element has a multi-token attribute that we use to
+                    indicate the various attributes of a method. The base name is
+                    the XML value and the text is the C++ value (if any)
+
+                    Ctor/dtor is to allow us to mark mark those since they have special
+                    display requirements when we format them out.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Const"     CIDIDL:Text="const"         CIDIDL:Value="0x0001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="ConstExpr" CIDIDL:Text="constexpr"     CIDIDL:Value="0x0002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NoDiscard" CIDIDL:Text="[[nodiscard]]" CIDIDL:Value="0x0004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NoExcept"  CIDIDL:Text="noexcept"      CIDIDL:Value="0x0008"/>
+
+                <CIDIDL:EnumVal CIDIDL:Name="Ctor"      CIDIDL:Text=""              CIDIDL:Value="0x0100"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Dtor"      CIDIDL:Text=""              CIDIDL:Value="0x0200"/>
+
+                <CIDIDL:EnumVal CIDIDL:Name="NoAttrs"   CIDIDL:Text=""              CIDIDL:Value="0x1000"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EPageTypes" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="Text" CIDIDL:LoadMap="Text">
+                <CIDIDL:DocText>
+                    The types of pages we support. These values are the same as those
+                    in the DTD, so we can map directly from that to this.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"      CIDIDL:Text=""/>
+                <CIDIDL:EnumVal CIDIDL:Name="CppClass"  CIDIDL:Text="cidhcls"/>
+                <CIDIDL:EnumVal CIDIDL:Name="HelpPage"  CIDIDL:Text="cidhpage"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EParmDirs" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="BaseName">
+                <CIDIDL:DocText>
+                    The possible directions of parameters.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="In"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Out"/>
+                <CIDIDL:EnumVal CIDIDL:Name="InOut"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EParmPB" CIDIDL:XlatMap="BaseName">
+                <CIDIDL:DocText>
+                    The possible ways the parameter can be passed by.
+
+                        CPtr    - const pointer
+                        CPtrC   - const pointer to a const
+                        CRef    - const reference
+                        Ref     - non-const reference
+                        Ptr     - non-const pointer
+                        PtrCRef - A reference to a pointer to a const
+                        PtrRef  - A reference to a pointer to non-const
+                        Value   - by value
+
+                    These name is the same as what is in the XML, so we can translate
+                    directly.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="CPtr"/>
+                <CIDIDL:EnumVal CIDIDL:Name="CPtrC"/>
+                <CIDIDL:EnumVal CIDIDL:Name="CRef"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Ref"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Ptr"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PtrCRef"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PtrRef"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Val"/>
+            </CIDIDL:Enum>
+
+
+            <CIDIDL:Enum CIDIDL:Name="EMUTypes">
                 <CIDIDL:DocText>
                     The kinds of markup we support in our general help text content.
                     These match the XML elements that represent these markup types.
@@ -90,6 +173,15 @@
                 <CIDIDL:EnumVal CIDIDL:Name="Text"/>
             </CIDIDL:Enum>
 
+            <CIDIDL:Enum CIDIDL:Name="EVisTypes" CIDIDL:XlatMap="BaseName"
+                         CIDIDL:TextStreamMap="Text" CIDIDL:LoadMap="Text">
+                <CIDIDL:DocText>
+                    The standard C++ class/structure visibility types
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Public"    CIDIDL:Text="public"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Protected" CIDIDL:Text="protected"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Private"   CIDIDL:Text="private"/>
+            </CIDIDL:Enum>
         </CIDIDL:Types>
 
     </CIDIDL:Globals>

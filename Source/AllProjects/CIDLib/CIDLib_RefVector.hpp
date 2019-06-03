@@ -709,14 +709,15 @@ class TRefVector : public TRefCollection<TElem>
         }
 
 
-        template <typename IterCB> tCIDLib::TVoid ForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
             {
                 if (!iterCB(*m_apElems[c4Index]))
-                    break;
+                    return kCIDLib::False;
             }
+            return kCIDLib::True;
         }
 
 

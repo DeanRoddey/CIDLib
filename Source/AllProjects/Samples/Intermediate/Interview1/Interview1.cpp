@@ -207,7 +207,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         {
             // A list with one 64 bit value per unique customer
             TFundArray<tCIDLib::TCard8> fcolCustSeqList(ustrCustomers.c4StringCount());
-            colAccessItems.ForEach
+            colAccessItems.bForEach
             (
                 [&] (const TAccessItem& itemCur)
                 {
