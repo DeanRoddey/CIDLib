@@ -74,8 +74,7 @@ tCIDLib::TBoolean THelpNode::bIsEmpty() const
 tCIDLib::TVoid
 THelpNode::ParseFromParent( const   TXMLTreeElement&    xtnodePar
                             , const TString&            strName
-                            , const tCIDLib::TBoolean   bOptional
-                            ,       TParseCtx&          ctxToUse)
+                            , const tCIDLib::TBoolean   bOptional)
 {
     tCIDLib::TCard4 c4At;
     const TXMLTreeElement* pxtnodeCur = xtnodePar.pxtnodeFindElement(strName, 0, c4At);
@@ -83,7 +82,7 @@ THelpNode::ParseFromParent( const   TXMLTreeElement&    xtnodePar
     {
         if (!bOptional)
         {
-            ctxToUse.AddErrorMsg
+            facCIDDocComp.AddErrorMsg
             (
                 L"Could not find element '%(1)' in parent node '%(2)'"
                 , strName
@@ -95,11 +94,11 @@ THelpNode::ParseFromParent( const   TXMLTreeElement&    xtnodePar
     }
 
     // Now just call the other version and return its return
-    Parse(*pxtnodeCur, ctxToUse);
+    Parse(*pxtnodeCur);
 }
 
 tCIDLib::TVoid
-THelpNode::Parse(const TXMLTreeElement& xtnodeText, TParseCtx& ctxToUse)
+THelpNode::Parse(const TXMLTreeElement& xtnodeText)
 {
     m_colNodes.RemoveAll();
 
@@ -137,6 +136,11 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText, TParseCtx& ctxToUse)
              else if (strQName.bCompare(L"Br"))
             {
                 hnNew.m_eType = tCIDDocComp::EMUTypes::Break;
+            }
+             else if (strQName.bCompare(L"ClassRef"))
+            {
+                hnNew.m_eType = tCIDDocComp::EMUTypes::ClassRef;
+                bGetRef = kCIDLib::True;
             }
              else if (strQName.bCompare(L"Code"))
             {
@@ -228,14 +232,14 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText, TParseCtx& ctxToUse)
                 hnNew.m_eType = tCIDDocComp::EMUTypes::Table;
 
                 // Call a helper to process the class
-                hnNew.ProcessTable(xtnodeElem, ctxToUse);
+                hnNew.ProcessTable(xtnodeElem);
 
                 // We have eaten the children, so don't do them below
                 bGetChildren = kCIDLib::False;
             }
              else
             {
-                ctxToUse.AddErrorMsg(L"'%(1)' is not a known markup type", strQName);
+                facCIDDocComp.AddErrorMsg(L"'%(1)' is not a known markup type", strQName);
             }
 
             // If indicated, get some well known attributes
@@ -250,7 +254,7 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText, TParseCtx& ctxToUse)
 
             // If the current node has children, then recurse
             if (bGetChildren && xtnodeElem.c4ChildCount())
-                hnNew.Parse(xtnodeElem, ctxToUse);
+                hnNew.Parse(xtnodeElem);
         }
     }
 }
@@ -277,6 +281,21 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
             case tCIDDocComp::EMUTypes::Break :
             {
                 strmTar << L"<br/>";
+                break;
+            }
+
+            case tCIDDocComp::EMUTypes::ClassRef :
+            {
+                //
+                //  This is not for formatting but to allow us to automatically
+                //  generate links to classes that are referred to in general text.
+                //  This will save a vast amount of grunt work.
+                //
+                //  So we need to call the facility class to find the path info
+                //  for the class we stored in m_strText. Then we automatically
+                //  generate the link here.
+                //
+                facCIDDocComp.GenerateClassLink(strmTar, hnCur.m_strRef);
                 break;
             }
 
@@ -475,6 +494,16 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
 }
 
 
+// Just add create a single text node
+tCIDLib::TVoid THelpNode::SetToText(const tCIDLib::TCh* const pszToSet)
+{
+    m_colNodes.RemoveAll();
+    THelpNode& hnNew = m_colNodes.objAdd(THelpNode());
+    hnNew.m_eType = tCIDDocComp::EMUTypes::Text;
+    hnNew.m_strText = pszToSet;
+}
+
+
 
 // ---------------------------------------------------------------------------
 //  THelpNode: Private, non-virtual methods
@@ -485,8 +514,7 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
 //  a fair bit of stuff. We allow markup inside row columns, so we recurse to get the
 //  column content.
 //
-tCIDLib::TVoid
-THelpNode::ProcessTableRow(const TXMLTreeElement& xtnodeRow, TParseCtx& ctxToUse)
+tCIDLib::TVoid THelpNode::ProcessTableRow(const TXMLTreeElement& xtnodeRow)
 {
     const tCIDLib::TCard4 c4Count = xtnodeRow.c4ChildCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -501,13 +529,12 @@ THelpNode::ProcessTableRow(const TXMLTreeElement& xtnodeRow, TParseCtx& ctxToUse
         hnCol.m_c4Extra = xtnodeCol.xtattrNamed(kCIDDocComp::strXML_ColSpan).c4ValueAs();
 
         // And recurse to get that content
-        hnCol.Parse(xtnodeCol, ctxToUse);
+        hnCol.Parse(xtnodeCol);
     }
 }
 
 
-tCIDLib::TVoid
-THelpNode::ProcessTable(const TXMLTreeElement& xtnodeTbl, TParseCtx& ctxToUse)
+tCIDLib::TVoid THelpNode::ProcessTable(const TXMLTreeElement& xtnodeTbl)
 {
     // Get the class if it is present, and store it as the type of the table node
     xtnodeTbl.bAttrExists(L"Class", m_strType);
@@ -523,7 +550,7 @@ THelpNode::ProcessTable(const TXMLTreeElement& xtnodeTbl, TParseCtx& ctxToUse)
         hnRow.m_eType = tCIDDocComp::EMUTypes::TableRow;
 
         // And now lt's process the columns of this row
-        hnRow.ProcessTableRow(xtnodeRow, ctxToUse);
+        hnRow.ProcessTableRow(xtnodeRow);
     }
 }
 

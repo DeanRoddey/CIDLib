@@ -36,6 +36,7 @@ END CTRL
 ; ---------------------------------------------------------------------------
 ERRORS=
 
+    errcGen_ClassLink       1000    Could not find linked class %(1)
 
 END ERRORS
 

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass   Class="TStrCat" Prefix="scat" Parent="N/A">
+
+    <Desc>
+        <P>This provides an efficient way to concat two or three strings and/or characters together and to pass the resulting string off to someone. Mostly it's used by the <ClassRef Ref="TString"/> class which has a constructor that takes one of these. This lets you easily create a string that is a concatenation of other strings. The string object just steals the resulting buffer from the the string cat object, so there's no need to copy the text again.</P>
+
+        <P>Obviously this could have been done via move semantics, but since this is what this class exists to do, it's annoying to have to force a move. So it just provides a method to steal the buffer, which anything that accepts one will know to call.</P>
+    </Desc>
+
+    <PubIntf>
+
+        <Ctors>
+            <Method Name="TStrCat">
+                <Desc>
+                    There are actually two other versions that take three and four strings, rsepectively. So you can concatenate up to four strings using this form of the constructor.
+                </Desc>
+                <MethVar >
+                    <MethParams>
+                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+        </Ctors>
+
+    </PubIntf>
+
+</CppClass>

@@ -57,11 +57,11 @@ THelpPage::THelpPage(const  TString&            strExtTitle
 // ---------------------------------------------------------------------------
 //  THelpPage: Private, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid
-THelpPage::Parse(       TTopic&             topicParent
-                , const TXMLTreeElement&    xtnodeRoot
-                ,       TParseCtx&          ctxToUse)
+tCIDLib::TVoid THelpPage::Parse(TTopic& topicParent, const TXMLTreeElement& xtnodeRoot)
 {
+    // Push us onto the context stack for this scope
+    TCtxStackJan janStack(*this);
+
     // Get our inteneral title text
     QueryElemText(xtnodeRoot, kCIDDocComp::strXML_Title, m_strIntTitle);
 
@@ -71,12 +71,15 @@ THelpPage::Parse(       TTopic&             topicParent
     (
         kCIDDocComp::strXML_HelpText, 0, c4At
     );
-    m_hnContent.Parse(xtnodeHelp, ctxToUse);
+    m_hnContent.Parse(xtnodeHelp);
 }
 
 
 tCIDLib::TVoid THelpPage::OutputContent(TTextOutStream& strmTar) const
 {
+    // Push us onto the context stack for this scope
+    TCtxStackJan janStack(*this);
+
     strmTar << L"<p><span class='PageHdr'>"
             << m_strIntTitle
             << L"</span></p>";

@@ -128,14 +128,10 @@ TBasePage::TBasePage(const  TString&                strExtTitle
 //  TBasePage: Public, virtual methods
 // ---------------------------------------------------------------------------
 
-tCIDLib::TVoid
-TBasePage::ParseFile(TTopic& topicParent, TParseCtx& ctxToUse)
+tCIDLib::TVoid TBasePage::ParseFile(TTopic& topicParent)
 {
-    if (ctxToUse.bVerbose())
+    if (facCIDDocComp.bVerbose())
         facCIDDocComp.strmOut() << L"      " << m_strPagePath << kCIDLib::EndLn;
-
-    // Push us onto the topic stack for this scope
-    TParseStackJan janStack(&ctxToUse, m_strPagePath);
 
     // Build up our source path
     TPathStr pathSrc = m_strParSrcDir;
@@ -145,9 +141,9 @@ TBasePage::ParseFile(TTopic& topicParent, TParseCtx& ctxToUse)
     pathSrc.AppendExt(tCIDDocComp::strLoadEPageTypes(m_eType));
 
     // If the parse fails, we are done for this guy, else get the root and process
-    if (!ctxToUse.bParseXML(pathSrc))
+    if (!facCIDDocComp.bParseXML(pathSrc))
         return;
-    const TXMLTreeElement& xtnodeRoot = ctxToUse.xtnodeRoot();
+    const TXMLTreeElement& xtnodeRoot = facCIDDocComp.xtnodeRoot();
 
     //
     //  Do any stuff we handled at this level. All pages can optionally have a
@@ -158,11 +154,11 @@ TBasePage::ParseFile(TTopic& topicParent, TParseCtx& ctxToUse)
     if (pxtnodeKWs)
     {
         // Get the body text of this element, which is a comma separated list of phrases
-        QueryElemText(*pxtnodeKWs, kCIDDocComp::strXML_Keywords, ctxToUse.m_strTmp1);
+        QueryElemText(*pxtnodeKWs, kCIDDocComp::strXML_Keywords, facCIDDocComp.m_strTmp1);
 
-        if (!TStringTokenizer::bParseCSVLine(ctxToUse.m_strTmp1, m_colKeywords, c4At))
+        if (!TStringTokenizer::bParseCSVLine(facCIDDocComp.m_strTmp1, m_colKeywords, c4At))
         {
-            ctxToUse.AddErrorMsg
+            facCIDDocComp.AddErrorMsg
             (
                 L"Invalid keyword content at offset %(1)", TCardinal(c4At)
             );
@@ -170,7 +166,7 @@ TBasePage::ParseFile(TTopic& topicParent, TParseCtx& ctxToUse)
     }
 
     // And then invoke the virtual for the derived class to parse his stuff
-    Parse(topicParent, xtnodeRoot, ctxToUse);
+    Parse(topicParent, xtnodeRoot);
 }
 
 
@@ -203,8 +199,7 @@ tCIDLib::TVoid TBasePage::GenerateOutput(const TString& strParPath) const
 }
 
 
-tCIDLib::TVoid
-TBasePage::GenerateLink(TTextOutStream& strmTar) const
+tCIDLib::TVoid TBasePage::GenerateLink(TTextOutStream& strmTar) const
 {
     // Generate a link to load our page content into the right hand side
     strmTar  << L"<a onclick=\"javascript:loadRightSide('"

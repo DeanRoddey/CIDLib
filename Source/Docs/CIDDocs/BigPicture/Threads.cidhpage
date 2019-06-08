@@ -86,6 +86,8 @@
 
         <P>Here we assume that updating the counters is probably a very fast operation and wouldn't provide any reasonable throttling of the thread, so we call bSleep() and keep going until it returns true.</P>
 
+        <Note><Bold>DO NOT</Bold> use the shutdown request as a loop exit mechanism. The shutdown request flag will stay set, and when you return from what method that loop was part of, the calling method will see it, and so on, and you will kill the thread. It is only for actually shutting down the thread. You can actually reset the flag but that is for really exception situations where some calling code wants to purposefully stop a shutdown that it knows may be invoked by code it is calling (in some way not maybe intended by the called code.)</Note>
+
         <SubSecTitle>Possible Exceptions</SubSecTitle>
 
         <P>If you really had a scenario where the above was not acceptable, though that would be very rare, then as long as the threads are for your own internal use only, you could come up with some other scheme. For instance, if the threads were blocked long term on an event waiting for something, you could use a flag that they check immediately upon being woken up. You could then set the flag and force a trigger of the event. But of course you have to be careful that the thread really was waiting on the event, or check the flag both before and after the blocking call perhaps (or use the built in sync mechanism, see Thread Synchronization on the left.)</P>

@@ -93,7 +93,6 @@ class TBasePage
         tCIDLib::TVoid ParseFile
         (
                     TTopic&                 topicParent
-            ,       TParseCtx&              ctxToUse
         );
 
         tCIDLib::TBoolean bVirtual() const
@@ -104,12 +103,23 @@ class TBasePage
         tCIDLib::TVoid GenerateOutput
         (
             const   TString&                strParPath
+
         )   const;
 
         tCIDLib::TVoid GenerateLink
         (
                     TTextOutStream&         strmTar
         )   const;
+
+        const TString& strPagePath() const
+        {
+            return m_strPagePath;
+        }
+
+        const TString& strPageName() const
+        {
+            return m_strFileName;
+        }
 
 
     protected :
@@ -135,7 +145,6 @@ class TBasePage
         (
                     TTopic&                 topicParent
             , const TXMLTreeElement&        xtnodeRoot
-            ,       TParseCtx&              ctxToUse
         ) = 0;
 
         virtual tCIDLib::TVoid OutputContent

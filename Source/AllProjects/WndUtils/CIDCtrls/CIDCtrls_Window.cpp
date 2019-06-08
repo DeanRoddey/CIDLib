@@ -608,7 +608,7 @@ TWindow::CheckHandlerRegParms(  const   TWindow* const  pwndSrc
 // Lazy eval for the null window object
 TWindow& TWindow::Nul_TWindow()
 {
-    static TWindow* pwndNull = 0;
+    static TWindow* pwndNull = nullptr;
     if (!pwndNull)
     {
         TBaseLock lockInit;
@@ -624,7 +624,10 @@ TWindow& TWindow::Nul_TWindow()
 //
 TWindow* TWindow::pwndGetWndLinkPtr(const tCIDCtrls::TWndHandle hwndSrc)
 {
-    TWndMapItem* pwmiCur = CIDCtrls_Window::colWndItemMap.pobjFindByKey(hwndSrc, kCIDLib::False);
+    TWndMapItem* pwmiCur = CIDCtrls_Window::colWndItemMap.pobjFindByKey
+    (
+        hwndSrc, kCIDLib::False
+    );
     if (pwmiCur)
         return pwmiCur->m_pwndWnd;
 
@@ -1811,7 +1814,7 @@ TWindow::bTrackArea(const   TPoint&             pntStart
                         pszId = IDC_SIZEALL;
                         break;
                 }
-                ::SetCursor(::LoadCursor(NULL, pszId));
+                ::SetCursor(::LoadCursorW(NULL, pszId));
             }
              else
             {
@@ -2093,7 +2096,7 @@ tCIDLib::TCard4 TWindow::c4MaxScrollPos(const tCIDLib::TBoolean bHorz) const
     Info.cbSize = sizeof(SCROLLINFO);
     Info.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
 
-    if (!GetScrollInfo(hwndSafe(), bHorz ? SB_HORZ : SB_VERT, &Info))
+    if (!::GetScrollInfo(hwndSafe(), bHorz ? SB_HORZ : SB_VERT, &Info))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         facCIDCtrls().ThrowKrnlErr
@@ -3588,7 +3591,7 @@ TWindow::QueryScrollInfo(const  tCIDLib::TBoolean   bHorz
     Info.cbSize = sizeof(SCROLLINFO);
     Info.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
 
-    if (!GetScrollInfo(hwndSafe(), bHorz ? SB_HORZ : SB_VERT, &Info))
+    if (!::GetScrollInfo(hwndSafe(), bHorz ? SB_HORZ : SB_VERT, &Info))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         facCIDCtrls().ThrowKrnlErr

@@ -518,10 +518,6 @@ TStringTokenizer::TStringTokenizer( const   TString* const      pstrToTokenize
     Reset();
 }
 
-TStringTokenizer::~TStringTokenizer()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TStringTokenizer: Public, non-virtual methods

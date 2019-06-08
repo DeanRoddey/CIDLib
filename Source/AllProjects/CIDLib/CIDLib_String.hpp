@@ -264,6 +264,11 @@ class CIDLIBEXP TString :
             const   tCIDLib::TCh*           pszInitValue
         );
 
+        explicit TString
+        (
+            const   tCIDLib::TSCh* const    pszInitValue
+        );
+
         TString
         (
             const   tCIDLib::TCh* const     pszInitValue
@@ -284,8 +289,7 @@ class CIDLIBEXP TString :
 
         TString
         (
-            const   tCIDLib::TMsgId         midToLoad
-            , const TFacility&              facSource
+            const   MFormattable&           fmtblInitValue
         );
 
         TString
@@ -296,7 +300,8 @@ class CIDLIBEXP TString :
 
         TString
         (
-            const   MFormattable&           fmtblInitValue
+            const   tCIDLib::TMsgId         midToLoad
+            , const TFacility&              facSource
         );
 
         TString
@@ -327,11 +332,6 @@ class CIDLIBEXP TString :
             , const MFormattable&           fmtblToken4 = MFormattable::Nul_MFormattable()
         );
 
-        explicit TString
-        (
-            const   tCIDLib::TSCh* const    pszInit
-        );
-
         TString
         (
             const   TStrCat&                scatSrc
@@ -347,7 +347,7 @@ class CIDLIBEXP TString :
                     TString&&               strSrc
         );
 
-        ~TString();
+        ~TString() = default;
 
 
         // -------------------------------------------------------------------

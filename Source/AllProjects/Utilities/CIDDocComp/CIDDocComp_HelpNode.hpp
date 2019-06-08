@@ -56,7 +56,6 @@ class THelpNode
         tCIDLib::TVoid Parse
         (
             const   TXMLTreeElement&        xtnodeText
-            ,       TParseCtx&              ctxToUse
         );
 
         tCIDLib::TVoid ParseFromParent
@@ -64,13 +63,17 @@ class THelpNode
             const   TXMLTreeElement&        xtnodePar
             , const TString&                strName
             , const tCIDLib::TBoolean       bOptional
-            ,       TParseCtx&              ctxToUse
         );
 
         tCIDLib::TVoid OutputNodes
         (
                     TTextOutStream&         strmTar
         )   const;
+
+        tCIDLib::TVoid SetToText
+        (
+            const   tCIDLib::TCh* const     pszToSet
+        );
 
 
     private :
@@ -80,13 +83,11 @@ class THelpNode
         tCIDLib::TVoid ProcessTableRow
         (
             const   TXMLTreeElement&        xtnodeRow
-            ,       TParseCtx&              ctxTpIse
         );
 
         tCIDLib::TVoid ProcessTable
         (
             const   TXMLTreeElement&        xtnodeTbl
-            ,       TParseCtx&              ctxTpIse
         );
 
         tCIDLib::TVoid OutputTableRow

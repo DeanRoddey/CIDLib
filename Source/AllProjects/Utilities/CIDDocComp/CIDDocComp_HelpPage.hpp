@@ -59,7 +59,6 @@ class THelpPage : public TBasePage
         (
                     TTopic&                 topicParent
             , const TXMLTreeElement&        xtnodeRoot
-            ,       TParseCtx&              ctxToUse
         )   override;
 
         tCIDLib::TVoid OutputContent

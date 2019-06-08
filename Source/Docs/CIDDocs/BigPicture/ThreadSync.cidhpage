@@ -43,11 +43,11 @@
 
         <SubSecTitle>Critical Section vs. Mutex</SubSecTitle>
 
-        <P>Critical sections and mutexes do the same thing. The only difference is that critical sections can be lighter weight. But, they are really only appropriate to use if the amount of time you need to lock is very short. So, if you just needed to safely add some incoming value to a counter, or add a string to a list, a critical section would be appropriate. For something longer, use a mutex.</P>
+        <P>Critical sections and mutexes do the same thing. The only difference is that critical sections can be lighter weight. But, they are really only appropriate to use if the amount of time you need to lock is very short and there is not very often any contention (i.e. the time locked is very short and threads aren't hitting that locked path rapidly so most of the time a thread doing the lock just gets right in.) So, if you just needed to safely add some incoming value to a counter, or add a string to a list, a critical section would be appropriate. For something longer, use a mutex.</P>
 
-        <Note>On a given system platform, there may not be a critical section mechanism, and the platform driver for that platform may just implement it using a mutex. But, still use them where appropriate since you'll still get the benefits when there is a real distinction, but everything will still work fine if not.</Note>
+        <Note>On a given system platform, there may not be a critical section mechanism, and the platform driver for that platform may just implement it using a mutex. But, still use them where appropriate since you'll still get the benefits when there is a real distinction, and everything will still work fine either way.</Note>
 
-        <P>The only difference relative to the above example is that you would use a TCritSecLocker object to do the locking.</P>
+        <P>The only difference relative to the above example is that you would use a TCritSecLocker object to do the locking instead of a TMtxLocker as you would for a mutex.</P>
 
         <SubSecTitle>Events and Semaphores</SubSecTitle>
 

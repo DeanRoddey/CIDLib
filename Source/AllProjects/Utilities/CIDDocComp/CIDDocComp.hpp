@@ -49,7 +49,11 @@
 #include    "CIDDocComp_MessageIds.hpp"
 #include    "CIDDocComp_Info.hpp"
 
-#include    "CIDDocComp_ParseCtx.hpp"
+namespace tCIDDocComp
+{
+    using TSpecMeths = TFundVector<tCIDDocComp::ESpecMeths>;
+}
+
 #include    "CIDDocComp_HelpNode.hpp"
 #include    "CIDDocComp_BasePage.hpp"
 #include    "CIDDocComp_Topics.hpp"

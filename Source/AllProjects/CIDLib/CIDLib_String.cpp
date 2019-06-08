@@ -479,9 +479,6 @@ TStrCat::TStrCat(const  tCIDLib::TCh* const psz1
     m_pszBuf[m_c4Len] = kCIDLib::chNull;
 }
 
-
-
-
 // If by chance we never got to give it away, delete it
 TStrCat::~TStrCat()
 {
@@ -2696,10 +2693,6 @@ TString::TString(const TString& strSrc) :
 TString::TString(TString&& strSrc) :
 
     m_strbData(tCIDLib::ForceMove(strSrc.m_strbData))
-{
-}
-
-TString::~TString()
 {
 }
 

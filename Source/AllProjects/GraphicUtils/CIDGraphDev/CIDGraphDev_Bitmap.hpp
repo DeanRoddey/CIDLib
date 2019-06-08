@@ -16,16 +16,75 @@
 // DESCRIPTION:
 //
 //  This is the header for the CIDLib_Bitmap.cpp file. This file implements
-//  the TBitmap class, which encapsulates a bitmap in memory. The actual
-//  bitmap bits are maintained by the system, though this class provides
-//  methods to get copies of the palette and pixel bits.
+//  the TBitmap class, which encapsulates a Windows bitmap (the graphics
+//  object, not the file format, the file format class, TBitmapImage, is in
+//  the CIDImage facility.)
 //
-//  Any derivative of TCIDImage, from CIDImage, can be used to construct
-//  a TBitmap object. This allows you to read in from storage any supported
-//  image format, turn it into a bitmap, and use it for drawing, drawing on,
-//  etc... If you query back out the header, palette, and bit data, you can
-//  use the image classes to write the data back out again in the desired
-//  image format.
+//  Portability
+//
+//  Like the other  graphics object (devices, bitmaps, brushes, pens, etc...)
+//  and the UI controls, though we fully encapsulate them, we aren't trying to
+//  make these portable at this time. Read/writing images, and manipulation of
+//  the image content via TPixelArray, is portable since it doesn't involve any
+//  actual UI functionality. But this guy is currenctly just a Win32 bitmap
+//  wrapper.
+//
+//  Portability is greatly complicated by the requirement of Win32 for bitmaps
+//  to be pre-multiplied. The hbmpFromImage() static method, which is used
+//  internally here to convert raw image data to bitmaps, will do pre-mul if
+//  there is an alpha channel. So typically the deal is that you only deal with
+//  non-pre-multiplied data in TPixelArray objects (and TCIDImage derivatives
+//  which use a pixel array internally.) Once it's turned into a graphical
+//  bitmap object it needs to be in drawable condition.
+//
+//
+//  Copying/Value Semantics
+//
+//  This class actually maintains a reference counted bitmap handle object,
+//  so that we can support copy semantics cheaply. But, it does mean you have
+//  to be careful that you force a deep copy if you really want to create a
+//  copy of the actual bits!
+//
+//  Memory vs. Device
+//
+//  Bitmaps can be device or memory based. It may end up being memory based
+//  just because the device can't handle the format. But, if you need it to be
+//  memory based, be sure to force it to be. Otehrwise, it might end up on
+//  the device.
+//
+//  If you create in memory, then you can access the pixel data via a TPixelArray
+//  object and directly manipulate the pixel data. If the bitmap is memory based
+//  then you must actually extract the pixel data to a separate pixel array. You
+//  can then manipulate it and push it back in if desired.
+//
+//  Creation
+//
+//  You can create bitmaps in many ways, from an image file, from an in-memory
+//  TCIDImage derived class, based on another bitmap, a manually indicated
+//  format, with a size plus a compatible graphics device whose bit format should
+//  be used, or from a bitmap resource attached to a library/executable module.
+//
+//  Serial Number
+//
+//  This class provides a serial number that client code can use to track
+//  changes. This class cannot manage that serial number since it cannot know
+//  when changes have actually been made. It's just for the application's use.
+//  CQC uses it extensively, for instance.
+//
+//  Drawing
+//
+//  The TGraphicDevice (and derivatives) provide APIs for drawing these onto
+//  graphics output devices. We also implement MDrawable for a generic drawing
+//  interface if that's useful.
+//
+//  And we also provide an 'advance drawing' method that combines a lot of very
+//  common bitmap drawing operations in a single call. It handles scaling or
+//  clipping, transparency (alpha or masked color based), and tiling all at
+//  once. This can be a big help for programs that need to deal with various
+//  types of bitmaps and drawing scenarios. It doesn't support any raster ops,
+//  just source copy.
+//
+//
 //
 //  We also provide a small class, TSysBmpInfo, which is used to return lists
 //  of system bitmaps to apps. Apps who want to persist the use of a system
@@ -39,7 +98,12 @@
 //
 //  1)  The bitmap handle is available as a practical matter for those folks
 //      who must interface with third party code. But use it carefully since
-//      the handle will be destroyed when this object is destroyed.
+//      the handle will be destroyed when this object is destroyed. If you
+//      want your own copy of it, see #2 below.
+//
+//  2)  This underlying bitmap is actually an internally ref counted handle
+//      object. YOU MUST force a deep copy to create a new copy of the
+//      underlying pixel data.
 //
 // LOG:
 //
@@ -90,12 +154,12 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
 
         static tCIDGraphDev::TBmpHandle hbmpDupHandle
         (
-            const   tCIDGraphDev::TBmpHandle     hbmpToDup
+            const   tCIDGraphDev::TBmpHandle hbmpToDup
         );
 
         static const tCIDLib::TCh* pszToName
         (
-            const   tCIDGraphDev::ESysBmps    eBmp
+            const   tCIDGraphDev::ESysBmps  eBmp
         );
 
 
@@ -106,7 +170,7 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
 
         TBitmap
         (
-            const   tCIDGraphDev::ESysBmps eBitmap
+            const   tCIDGraphDev::ESysBmps  eBitmap
         );
 
         TBitmap
@@ -171,7 +235,7 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
 
         TBitmap
         (
-            const   TBitmap&                bmpToCopy
+            const   TBitmap&                bmpSrc
         );
 
         ~TBitmap();
@@ -182,7 +246,7 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
         // -------------------------------------------------------------------
         TBitmap& operator=
         (
-            const   TBitmap&                bmpToAssign
+            const   TBitmap&                bmpSrc
         );
 
         // -------------------------------------------------------------------
@@ -355,7 +419,7 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
 
         tCIDLib::TVoid Set
         (
-            const   tCIDGraphDev::ESysBmps eBitmap
+            const   tCIDGraphDev::ESysBmps  eBitmap
         );
 
 
@@ -496,7 +560,7 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
         // -------------------------------------------------------------------
         tCIDLib::TVoid LoadSysBmp
         (
-            const   tCIDGraphDev::ESysBmps    eToLoad
+            const   tCIDGraphDev::ESysBmps  eToLoad
         );
 
 

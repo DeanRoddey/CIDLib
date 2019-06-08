@@ -39,6 +39,60 @@
 RTTIDecls(TFacCIDDocComp, TFacility)
 
 
+
+// -----------------------------------------------------------------------------
+//   CLASS: TCtxStackJan
+//  PREFIX: jan
+// -----------------------------------------------------------------------------
+TCtxStackJan::TCtxStackJan(const TTopic& topicToPush)
+{
+    facCIDDocComp.m_colSrcStack.objPush
+    (
+        TFacCIDDocComp::TSrcStackItem
+        {
+            tCIDDocComp::ESrcTypes::Topic
+            , TString::strEmpty()
+            , topicToPush.strTopicPath()
+            , TString::strEmpty()
+        }
+    );
+}
+
+TCtxStackJan::TCtxStackJan(const THelpPage& pgToPush)
+{
+    facCIDDocComp.m_colSrcStack.objPush
+    (
+        TFacCIDDocComp::TSrcStackItem
+        {
+            tCIDDocComp::ESrcTypes::HelpPage
+            , pgToPush.strPageName()
+            , pgToPush.strPagePath()
+            , TString::strEmpty()
+        }
+    );
+}
+
+TCtxStackJan::TCtxStackJan(const TCppClassPage& pgToPush)
+{
+    facCIDDocComp.m_colSrcStack.objPush
+    (
+        TFacCIDDocComp::TSrcStackItem
+        {
+            tCIDDocComp::ESrcTypes::CppClass
+            , pgToPush.strClass()
+            , pgToPush.strPagePath()
+            , pgToPush.strPrefix()
+        }
+    );
+}
+
+TCtxStackJan::~TCtxStackJan()
+{
+    facCIDDocComp.m_colSrcStack.TrashTop();
+}
+
+
+
 // ---------------------------------------------------------------------------
 //   CLASS: TFacCIDDocComp
 //  PREFIX: fac
@@ -58,6 +112,9 @@ TFacCIDDocComp::TFacCIDDocComp() :
         , kCIDLib::c4Revision
         , tCIDLib::EModFlags::HasMsgFile
     )
+    , m_bPostParse(kCIDLib::False)
+    , m_bVerbose(TSysInfo::bFindCmdLineParm(L"/verbose"))
+    , m_colClassByName(tCIDLib::EAdoptOpts::NoAdopt)
 {
 }
 
@@ -70,13 +127,80 @@ TFacCIDDocComp::~TFacCIDDocComp()
 //  TFacCIDDocComp: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 
+//
+//  Every time a topic pages a Cpp class, it will call here so we can add it to
+//  our list that we will sort for use during output.
+//
+tCIDLib::TVoid TFacCIDDocComp::AddClass(TCppClassPage* const ppgToAdd)
+{
+    CIDAssert(!m_bPostParse, L"Only valid during the parsing phase");
+    m_colClassByName.Add(ppgToAdd);
+}
+
+
+
+// Called by parsing code to add an error to our error list
+tCIDLib::TVoid
+TFacCIDDocComp::AddErrorMsg(const   TString&        strMsg
+                            , const MFormattable&   mfmtblToken1
+                            , const MFormattable&   mfmtblToken2)
+{
+    TString strErr = strMsg;
+    if (!MFormattable::bIsNullObject(mfmtblToken1))
+        strErr.eReplaceToken(mfmtblToken1, kCIDLib::chDigit1);
+    if (!MFormattable::bIsNullObject(mfmtblToken2))
+        strErr.eReplaceToken(mfmtblToken1, kCIDLib::chDigit2);
+
+    m_colErrs.objAdd
+    (
+        TKeyValuePair(m_colSrcStack.objPeek().m_strPath, strErr)
+    );
+}
+
+
+//
+//  For each new file seen, this is called. We use the same parser for all of them,
+//  which means that they have to first parse the files, then deal with any nested
+//  references after they have fully processed the current one, because this is
+//  going to whack any previous info.
+//
+//  This is really only an issue for topic files, which hve lists of other files to
+//  parse (and sub-dirs to process.) They load up those two lists first, then they
+//  continue.
+//
+tCIDLib::TBoolean TFacCIDDocComp::bParseXML(const TString& strFile)
+{
+    const tCIDLib::TBoolean bRes = m_xtprsToUse.bParseRootEntity
+    (
+        strFile
+        , tCIDXML::EParseOpts::Validate
+        , tCIDXML::EParseFlags::TagsNText
+    );
+    if (!bRes)
+    {
+        TTextStringOutStream strmFmt(1024UL);
+        const TXMLTreeParser::TErrInfo& errCur = m_xtprsToUse.erriFirst();
+        strmFmt << L"XML Error: "
+                << errCur.strText() << kCIDLib::NewLn
+                << L"    - " << errCur.c4Line()
+                << kCIDLib::chPeriod << errCur.c4Column()
+                << L" [" << errCur.strSystemId() << L"]";
+
+        strmFmt.Flush();
+        AddErrorMsg(strmFmt.strData());
+    }
+    return bRes;
+}
+
+
+
 tCIDLib::EExitCodes
 TFacCIDDocComp::eMainThread(TThread& thrThis, tCIDLib::TVoid* pData)
 {
     // We have to let our calling thread go first
     thrThis.Sync();
 
-    if (m_ctxParse.bVerbose())
+    if (m_bVerbose)
         strmOut() << L"CIDLib Documentation Compiler" << kCIDLib::NewEndLn;
 
     // We output into a directory under the result directory
@@ -119,7 +243,7 @@ TFacCIDDocComp::eMainThread(TThread& thrThis, tCIDLib::TVoid* pData)
     try
     {
         // Tell the context object to load the DTD into his XML parser
-        m_ctxParse.LoadDTD(m_strSrcPath);
+        LoadDTD(m_strSrcPath);
 
         // We have to create a special case root topic to start the process.
         m_cptrRoot.SetPointer
@@ -128,13 +252,13 @@ TFacCIDDocComp::eMainThread(TThread& thrThis, tCIDLib::TVoid* pData)
         );
 
         // And kick off the parse of the whole hierarchy
-        m_cptrRoot->Parse(m_ctxParse);
+        m_cptrRoot->Parse();
 
         // If we got errors, then show them, else do the output
-        if (m_ctxParse.bGotErrors())
+        if (bGotErrors())
         {
             strmOut() << L"\nErrors occurred during the parse:\n\n";
-            m_ctxParse.ShowErrors(strmOut());
+            ShowErrors(strmOut());
         }
          else
         {
@@ -179,6 +303,9 @@ TFacCIDDocComp::eMainThread(TThread& thrThis, tCIDLib::TVoid* pData)
                 TFileSys::MakeSubDirectory(L"Images", m_strTarPath);
             CopyDir(pathCopySrc, pathCopyTar);
 
+            // Do post parse processing on the contex object
+            PostParseProc();
+
             //
             //  And now invoke the output generation on the root topic. For this one
             //  there is no parent, so pass an empty pointer. We also have to pass
@@ -203,6 +330,237 @@ TFacCIDDocComp::eMainThread(TThread& thrThis, tCIDLib::TVoid* pData)
     strmOut() << kCIDLib::FlushIt;
     return tCIDLib::EExitCodes::Normal;
 }
+
+
+// We have to do these fairly often manually, so this saves a lot of trouble
+tCIDLib::TVoid
+TFacCIDDocComp::FormatDeemphText(TTextOutStream& strmTar, const TString& strText)
+{
+    strmTar << L"<span class=\"DeemphCode\">" << strText << L"</span>";
+}
+
+tCIDLib::TVoid
+TFacCIDDocComp::FormatDeemphText(       TTextOutStream& strmTar
+                                , const TString&        strText1
+                                , const TString&        strText2)
+{
+    strmTar << L"<span class=\"DeemphCode\">" << strText1 << strText2 << L"</span>";
+}
+
+tCIDLib::TVoid
+TFacCIDDocComp::FormatDeemphText(       TTextOutStream&     strmTar
+                                , const TString&            strText1
+                                , const TString&            strText2
+                                , const tCIDLib::TCh* const pszText3)
+{
+    strmTar << L"<span class=\"DeemphCode\">" << strText1
+            << strText2 << pszText3 << L"</span>";
+}
+
+
+tCIDLib::TVoid
+TFacCIDDocComp::FormatEmphText(TTextOutStream& strmTar, const TString& strText)
+{
+    strmTar << L"<span class=\"EmphCode\">" << strText << L"</span>";
+}
+
+tCIDLib::TVoid
+TFacCIDDocComp::FormatEmphText(         TTextOutStream& strmTar
+                                , const TString&        strText1
+                                , const TString&        strText2)
+{
+    strmTar << L"<span class=\"EmphCode\">" << strText1 << strText2 << L"</span>";
+}
+
+tCIDLib::TVoid
+TFacCIDDocComp::FormatEmphText(         TTextOutStream&     strmTar
+                                , const TString&            strText1
+                                , const TString&            strText2
+                                , const tCIDLib::TCh* const pszText3)
+{
+    strmTar << L"<span class=\"EmphCode\">" << strText1 << strText2
+            << pszText3 << L"</span>";
+}
+
+
+
+//
+//  This is called during output any time a ClassRef node is seen, and we generate
+//  a page link for that class.
+//
+tCIDLib::TVoid
+TFacCIDDocComp::GenerateClassLink(TTextOutStream& strmTar, const TString& strClass) const
+{
+    CIDAssert(m_bPostParse, L"Online valid in post-parse phase");
+
+    //
+    //  Ask the parse context for the page for this class na dlet it generate a link
+    //  to itself
+    //
+    const TCppClassPage* ppgTar = ppgFindByClass(strClass);
+    ppgTar->GenerateLink(strmTar);
+}
+
+
+
+//
+//  Called to load our DTD text and add it to our parser as a preloaded entity,
+//  so that the individual XML files don't have to deal with pointing themselves
+//  at an actual DTD file (with all of the nesting going on it's a pain.) And it
+//  will speed things up as well.
+//
+//  But it keeps the DTD external so we can quickly make changes and test them.
+//
+tCIDLib::TVoid TFacCIDDocComp::LoadDTD(const TString& strSrcPath)
+{
+    // Build up the full path name
+    TPathStr pathDTD(strSrcPath);
+    pathDTD.AddLevel(L"CIDDocs.DTD");
+
+    TTextFileInStream strmDTD
+    (
+        pathDTD
+        , tCIDLib::ECreateActs::OpenIfExists
+        , tCIDLib::EFilePerms::Default
+        , tCIDLib::EFileFlags::SequentialScan
+        , tCIDLib::EAccessModes::Excl_Read
+        , facCIDEncode().ptcvtMakeNew(L"Latin1")
+    );
+
+    //
+    //  Read in the lines and add them to a string. The file doesn't have the
+    //  entity header line, so we add that, indicating our internal string
+    //  format as the encoding.
+    //
+    TString strDTDText(32 * 1024UL);
+    strDTDText = L"<?xml encoding='$NativeWideChar$'?>\n";
+
+    TString strLine(128UL);
+    while (!strmDTD.bEndOfStream())
+    {
+        strmDTD >> strLine;
+        strDTDText.Append(strLine);
+        strDTDText.Append(L"\n");
+    }
+
+    m_xtprsToUse.AddMapping
+    (
+        new TMemBufEntitySrc
+        (
+            L"http://www.charmedquark.com/CIDLib/CIDHelpDocs.DTD"
+            , L"urn:charmedquark.com:CIDLib-Documentation.DTD"
+            , strDTDText
+        )
+    );
+}
+
+
+//
+//  Find the passed class in our list. It is sorted by now so we do a binary search.
+//  This is only valid for post-parse after we have sorted the list.
+//
+const TCppClassPage* TFacCIDDocComp::ppgFindByClass(const TString& strToFind) const
+{
+    CIDAssert(m_bPostParse, L"Online valid in post-parse phase");
+
+    // Let's do a binary search for this class
+    tCIDLib::TCard4 c4At;
+    const TCppClassPage* ppgTar = m_colClassByName.pobjKeyedBinarySearch
+    (
+        strToFind
+        , [](const TString& strKey, const TCppClassPage& pg2) -> tCIDLib::ESortComps
+          {
+              return strKey.eCompare(pg2.strClass());
+          }
+        , c4At
+    );
+
+    if (!ppgTar)
+    {
+        facCIDDocComp.ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDDocsErrs::errcGen_ClassLink
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::NotFound
+            , strToFind
+        );
+    }
+    return ppgTar;
+}
+
+
+//
+//  After parsing, but before output generation, this is called to let us do
+//  any required swizzling of content.
+//
+tCIDLib::TVoid TFacCIDDocComp::PostParseProc()
+{
+    m_bPostParse = kCIDLib::True;
+
+    //
+    //  Make sure the source stack is empty, since the output phase will start
+    //  using it again to maintain output context.
+    //
+    m_colSrcStack.RemoveAll();
+
+    // Let's sort our by class class list now that we know it's complete
+    m_colClassByName.Sort
+    (
+        [](const TCppClassPage& pg1, const TCppClassPage& pg2)
+        {
+            return pg1.strClass().eCompare(pg2.strClass());
+        }
+    );
+}
+
+
+const TString& TFacCIDDocComp::strCurClass() const
+{
+    CIDAssert(!m_colSrcStack.bIsEmpty(), L"The source stack is empty");
+    const TSrcStackItem& siCur = m_colSrcStack.objPeek();
+    CIDAssert
+    (
+        siCur.m_eType == tCIDDocComp::ESrcTypes::CppClass
+        , L"The top of the stack is not a class page"
+    );
+    return siCur.m_strName;
+}
+
+const TString& TFacCIDDocComp::strCurClassPref() const
+{
+    CIDAssert(!m_colSrcStack.bIsEmpty(), L"The source stack is empty");
+    const TSrcStackItem& siCur = m_colSrcStack.objPeek();
+    CIDAssert
+    (
+        siCur.m_eType == tCIDDocComp::ESrcTypes::CppClass
+        , L"The top of the stack is not a class page"
+    );
+    return siCur.m_strExtra;
+}
+
+
+// Format any errors we collected to the passed output stream
+tCIDLib::TVoid TFacCIDDocComp::ShowErrors(TTextOutStream& strmOut)
+{
+    TString strLastSrc;
+    m_colErrs.bForEach
+    (
+        [&strLastSrc, &strmOut](const TKeyValuePair& kvalCur)
+        {
+            if (kvalCur.strKey() != strLastSrc)
+            {
+                strmOut << L"  " << kvalCur.strKey() << kCIDLib::NewLn;
+                strLastSrc = kvalCur.strKey();
+            }
+            strmOut << L"    " << kvalCur.strValue() << kCIDLib::NewLn;
+            return kCIDLib::True;
+        }
+    );
+    strmOut.Flush();
+}
+
 
 
 // ---------------------------------------------------------------------------

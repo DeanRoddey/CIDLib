@@ -76,17 +76,17 @@ TTopic::~TTopic()
 // ---------------------------------------------------------------------------
 
 // We parse our stuff, then recurse as required
-tCIDLib::TVoid TTopic::Parse(TParseCtx& ctxToUse)
+tCIDLib::TVoid TTopic::Parse()
 {
     // Output the topic path we are parsing
-    if (ctxToUse.bVerbose())
+    if (facCIDDocComp.bVerbose())
     {
         facCIDDocComp.strmOut() << L"\n   "
                                 << m_strTopicPath << kCIDLib::EndLn;
     }
 
-    // Push us onto the topic stack
-    TParseStackJan janStack(&ctxToUse, m_strTopicPath);
+    // Push us onto the context stack
+    TCtxStackJan janStack(*this);
 
     // Build up the path to the topic file
     TPathStr pathTopicFile(m_pathSource);
@@ -94,11 +94,11 @@ tCIDLib::TVoid TTopic::Parse(TParseCtx& ctxToUse)
     pathTopicFile.AppendExt(L"xml");
 
     // Parse out all our info first
-    if (!ctxToUse.bParseXML(pathTopicFile))
+    if (!facCIDDocComp.bParseXML(pathTopicFile))
         return;
 
     // It parsed OK, so get the root node and let's start pulling our info out
-    const TXMLTreeElement& xtnodeRoot = ctxToUse.xtnodeRoot();
+    const TXMLTreeElement& xtnodeRoot = facCIDDocComp.xtnodeRoot();
     m_strTopicPage = xtnodeRoot.xtattrNamed(L"TopicPage").strValue();
 
     // Parse the pages and add those to the list of pages for this topic
@@ -133,18 +133,18 @@ tCIDLib::TVoid TTopic::Parse(TParseCtx& ctxToUse)
             ||  !xtnodeElem.bAttrExists(kCIDDocComp::strXML_PageType, strPageType))
             {
                 // Can't continue processing this one
-                ctxToUse.AddErrorMsg(L"The file name and page type are required");
+                facCIDDocComp.AddErrorMsg(L"The file name and page type are required");
                 continue;
             }
 
             const tCIDDocComp::EPageTypes eType = tCIDDocComp::eXlatEPageTypes(strPageType);
 
             //
-            //  The external title can be empty, in which case the internal title from the
-            //  page file will be used for this.
+            //  If they don't provide a separate title for the link, then we
+            //  use the file name.
             //
             if (!xtnodeElem.bAttrExists(kCIDDocComp::strXML_Title, strExtTitle))
-                strExtTitle.Clear();
+                strExtTitle = strFileName;
 
             // Extra stuff is optional
             if (!xtnodeElem.bAttrExists(kCIDDocComp::strXML_Extra1, strExtra1))
@@ -158,7 +158,7 @@ tCIDLib::TVoid TTopic::Parse(TParseCtx& ctxToUse)
             {
                 if (!strVirtual.bToBoolean(bVirtual))
                 {
-                    ctxToUse.AddErrorMsg
+                    facCIDDocComp.AddErrorMsg
                     (
                         L"Could not convert '%(1)' value to a boolean"
                         , kCIDDocComp::strXML_Virtual
@@ -185,10 +185,13 @@ tCIDLib::TVoid TTopic::Parse(TParseCtx& ctxToUse)
                     strExtTitle, m_pathSource, m_strTopicPath, strFileName
                 );
                 m_colPages.objAdd(TPagePtr(ppgNew));
+
+                // Also add it to the main 'by name' list of the facility
+                facCIDDocComp.AddClass(ppgNew);
             }
              else
             {
-                ctxToUse.AddErrorMsg
+                facCIDDocComp.AddErrorMsg
                 (
                     L"'%(1)' is not a known help file type"
                     , tCIDDocComp::strLoadEPageTypes(eType)
@@ -207,20 +210,23 @@ tCIDLib::TVoid TTopic::Parse(TParseCtx& ctxToUse)
 
         xtnodeTopics.bForEach
         (
-            [&ctxToUse, this](const TXMLTreeElement& xtnodeCur)
+            [this](const TXMLTreeElement& xtnodeCur)
             {
-                if (xtnodeCur.bAttrExists(kCIDDocComp::strXML_SubDir, ctxToUse.m_strTmp1)
-                &&  xtnodeCur.bAttrExists(kCIDDocComp::strXML_Title, ctxToUse.m_strTmp2))
+                if (xtnodeCur.bAttrExists(kCIDDocComp::strXML_SubDir, facCIDDocComp.m_strTmp1))
                 {
+                    // We can have a separate title. If not, we use the sub-dir name
+                    if (!xtnodeCur.bAttrExists(kCIDDocComp::strXML_Title, facCIDDocComp.m_strTmp2))
+                        facCIDDocComp.m_strTmp2 = facCIDDocComp.m_strTmp1;
+
                     m_colSubTopics.objAdd
                     (
                         TTopicPtr
                         (
                             new TTopic
                             (
-                                ctxToUse.m_strTmp2
+                                facCIDDocComp.m_strTmp2
                                 , m_strTopicPath
-                                , ctxToUse.m_strTmp1
+                                , facCIDDocComp.m_strTmp1
                                 , m_pathSource
                             )
                         )
@@ -229,7 +235,7 @@ tCIDLib::TVoid TTopic::Parse(TParseCtx& ctxToUse)
                  else
                 {
                     // Can't continue processing this one
-                    ctxToUse.AddErrorMsg(L"The topic sub-dir and title are required");
+                    facCIDDocComp.AddErrorMsg(L"The topic sub-dir and title are required");
                 }
                 return kCIDLib::True;
             }
@@ -246,7 +252,7 @@ tCIDLib::TVoid TTopic::Parse(TParseCtx& ctxToUse)
         {
             TPagePtr& cptrCur = *cursPages;
             if (!cptrCur->bVirtual())
-                cptrCur->ParseFile(*this, ctxToUse);
+                cptrCur->ParseFile(*this);
         }
     }
 
@@ -256,7 +262,7 @@ tCIDLib::TVoid TTopic::Parse(TParseCtx& ctxToUse)
         for (; cursSubs; ++cursSubs)
         {
             TTopicPtr& cptrCur = *cursSubs;
-            cptrCur->Parse(ctxToUse);
+            cptrCur->Parse();
         }
     }
 }
@@ -317,11 +323,15 @@ TTopic::TPagePtr TTopic::cptrTopicPage() const
 }
 
 
+//
 tCIDLib::TVoid
 TTopic::GenerateOutput( const   TString&    strOutPath
                         , const TTopicPtr&  cptrParent
                         , const TTopicPtr&  cptrUs) const
 {
+    // Push us onto the context stack for this scope
+    TCtxStackJan janStack(*this);
+
     //
     //  Create our output path. It is the parent output path plus our topic name
     //  which is used to create a new sub-dir. If this is the root, then we don't
