@@ -133,13 +133,16 @@ namespace tCIDLib
     }
 }
 
-tCIDLib::TVoid tCIDLib::ThrowAssert(const TString& strErr)
+tCIDLib::TVoid
+tCIDLib::ThrowAssert(const  TString&            strErr
+                    , const tCIDLib::TCh* const pszFile
+                    , const tCIDLib::TCard4     c4Line)
 {
     throw TLogEvent
     (
         L"CIDLib"
-        , CID_FILE
-        , CID_LINE
+        , pszFile
+        , c4Line
         , kCIDErrs::errcDbg_AssertFailed
         , strErr
         , tCIDLib::ESeverities::Failed
@@ -148,15 +151,18 @@ tCIDLib::TVoid tCIDLib::ThrowAssert(const TString& strErr)
 }
 
 tCIDLib::TVoid
-tCIDLib::ThrowAssert(const TString& strErr, const MFormattable& mfbtlToken1)
+tCIDLib::ThrowAssert(const  TString&            strErr
+                    , const tCIDLib::TCh* const pszFile
+                    , const tCIDLib::TCard4     c4Line
+                    , const MFormattable&       mfbtlToken1)
 {
     TString strMsg(strErr);
     strMsg.eReplaceToken(mfbtlToken1, kCIDLib::chDigit1);
     throw TLogEvent
     (
         L"CIDLib"
-        , CID_FILE
-        , CID_LINE
+        , pszFile
+        , c4Line
         , kCIDErrs::errcDbg_AssertFailed
         , strMsg
         , tCIDLib::ESeverities::Failed

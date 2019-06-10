@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TDirChangeInfo" Prefix="dchi" Parent="TObject">
+
+    <Desc>
+        <P>TDirChangeInfo is a very simple class that is used by the directory content change reporting system, see TDirChangeMon to the left. When changes occur in a directory being monitored, that change has to be reported to any code that has asked to be informed. An instance of this class is created and sent along to those monitors.</P>
+
+        <P>The information is simple, usually just a change type enumeration and the name of the directory/file that was affected. If it's a rename type change, then the new name of the effective directory/file is also passed.</P>
+
+        <P>The available change events are:</P>
+        <List>
+            <LItem Ref="Added">A new file or sub-directory was added. The name is in m_strName.</LItem>
+            <LItem Ref="Removed">A file or sub-directory was removed. The name is in m_strName.</LItem>
+            <LItem Ref="Modified">A file or the contents of a sub-directory was changed</LItem>
+            <LItem Ref="Renamed">A file or sub-directory was changed. The old name is in m_strName and the new name is in m_strNew.</LItem>
+            <LItem Ref="OutOfSync">Too many changes have occurred to report, so you should manully resync the contents of the monitored directory.</LItem>
+        </List>
+    </Desc>
+
+    <PubIntf>
+        <Ctors DefMethods="CopyCtor Dtor">
+
+            <Method Name="TDirChangeInfo">
+                <Desc>
+                    The default constructor just sets the change type to none, so it needs to be subsequently set up for use. The other accepts a change type. It is assumed that this is for a change that doesn't need any other information.
+                </Desc>
+                <MethVar><MethParams/></MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam Name="eChange" Type="tCIDLib::EDirChanges"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+        </Ctors>
+
+        <Operators DefMethods="AssignOp"/>
+
+        <Members>
+            <Member Name="m_eChange" Type="tCIDLib::EDirChanges" AccType="Val">
+                <Desc>The type of change being reported. See class comments above for the available changes.</Desc>
+            </Member>
+            <Member Name="m_strName" Type="TString" AccType="Val">
+                <Desc>If the change involves a file or directory, this is its name.</Desc>
+            </Member>
+            <Member Name="m_strNew" Type="TString" AccType="Val">
+                <Desc>If the change involves a change in name, then the m_strName has the original name and this has the new name.</Desc>
+            </Member>
+        </Members>
+    </PubIntf>
+
+</CppClass>

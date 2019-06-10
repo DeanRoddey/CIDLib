@@ -74,11 +74,16 @@ class TFacCIDDocComp : public TFacility
             const   TString&                strMsg
             , const MFormattable&           mfmtblToken1 = MFormattable::Nul_MFormattable()
             , const MFormattable&           mfmtblToken2 = MFormattable::Nul_MFormattable()
-        );
+        )   const;
 
         tCIDLib::TBoolean bGotErrors() const
         {
             return m_colErrs.c4ElemCount() != 0;
+        }
+
+        tCIDLib::TBoolean bNoClassRefWarn() const
+        {
+            return m_bNoClassRefWarn;
         }
 
         tCIDLib::TBoolean bParseXML
@@ -150,6 +155,12 @@ class TFacCIDDocComp : public TFacility
             , const TString&                strClass
         )   const;
 
+        tCIDLib::TVoid GenerateFacLink
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strFacName
+        )   const;
+
         tCIDLib::TVoid LoadDTD
         (
             const   TString&                strSrcPath
@@ -209,6 +220,8 @@ class TFacCIDDocComp : public TFacility
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bParseParams();
+
         tCIDLib::TVoid CopyDir
         (
             const   TString&                strSrc
@@ -220,6 +233,11 @@ class TFacCIDDocComp : public TFacility
 
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_bNoClassRefWarn
+        //      Sometimes we add class references before we have those classes yet
+        //      defined. This is set via /NoClassRefWarn and will suppress those errors
+        //      temporarily when needed.
         //
         //  m_bPostParse
         //      Once the parsing is done, PostParseProc() is called. We update some
@@ -233,7 +251,8 @@ class TFacCIDDocComp : public TFacility
         //
         //  m_colErrs
         //      The parsing code calls into here to store errors during the parsing
-        //      process.
+        //      process. Has to be mutable since we need to report errors that might
+        //      occur in otherwise const methods.
         //
         //  m_colClassByName
         //      Each new class page is added to this non-adopting list, which will be
@@ -259,10 +278,11 @@ class TFacCIDDocComp : public TFacility
         //  m_xtprsToUse
         //      We keep a single parser around and reuse it
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean   m_bNoClassRefWarn;
         tCIDLib::TBoolean   m_bPostParse;
         tCIDLib::TBoolean   m_bVerbose;
         TClassNameList      m_colClassByName;
-        TErrList            m_colErrs;
+        mutable TErrList    m_colErrs;
         TSrcStack           m_colSrcStack;
         TTopic::TTopicPtr   m_cptrRoot;
         TString             m_strSrcPath;

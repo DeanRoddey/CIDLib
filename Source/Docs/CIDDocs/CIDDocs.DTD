@@ -1,4 +1,4 @@
-<!ENTITY % HelpContent '#PCDATA | Br | Bold | ClassRef | Code | DIV | Image
+<!ENTITY % HelpContent '#PCDATA | Br | Bold | ClassRef | Code | DIV | FacRef | Image
                         | Indent | Italic | Link | List | Note | P | PgTitle
                         | SecTitle | SubSecTitle | Superscript | Table | Title'>
 <!ENTITY % BoolVal 'False | True'>
@@ -19,6 +19,8 @@
 <!ELEMENT   Code        (%HelpContent;)>
 <!ELEMENT   DIV         (%HelpContent;)>
 <!ATTLIST   DIV         Id CDATA #REQUIRED>
+<!ELEMENT   FacRef      EMPTY>
+<!ATTLIST   FacRef      Ref NMTOKEN #REQUIRED>
 <!ELEMENT   Image       EMPTY>
 <!ATTLIST   Image       Ref CDATA #REQUIRED
                         Type (Inline | FloatLeft | FloatRight) 'Inline'>
@@ -103,7 +105,11 @@
    - Any text dscription is in the body of the element, and it can point out any
    - important values if desired.
    -->
-<!ELEMENT   Enum        (Desc?)>
+<!ELEMENT   EnumVal     EMPTY>
+<!ATTLIST   EnumVal     Name NMTOKEN #REQUIRED
+                        Value CDATA #IMPLIED>
+<!ELEMENT   EnumVals    (EnumVal+)>
+<!ELEMENT   Enum        (Desc, EnumVals?)>
 <!ATTLIST   Enum        Name NMTOKEN #REQUIRED>
 <!ELEMENT   Enums       (Enum+)>
 
@@ -121,10 +127,10 @@
    -  We declare PubIntf, ProtIntf, and PrivIntf, all with the same content, so
    -  that it's clear to the program. And he models his data on this structure.
    -->
-<!ENTITY % RefType 'None | CPtr | CPtrC | CRef | MRef
-                    | Ref | Ptr | PtrCRef | PtrRef | Val | Void'>
+<!ENTITY % RefType 'None | CPtr | CPtrC | CRef | MRef | Ref
+                    | Ptr | PtrC | PtrCRef | PtrRef | Val | Void'>
 
-<!ELEMENT   Alias       EMPTY>
+<!ELEMENT   Alias       (Desc)>
 <!ATTLIST   Alias       Name CDATA #REQUIRED
                         Type CDATA #REQUIRED>
 <!ELEMENT   Aliases     (Alias+)>
@@ -136,7 +142,7 @@
 <!ELEMENT   Constants   (Constant+)>
 
 <!-- We don't do private members, but there are some public and protected ones -->
-<!ELEMENT   Member      EMPTY>
+<!ELEMENT   Member      (Desc)>
 <!ATTLIST   Member      Name CDATA #REQUIRED
                         Type CDATA #REQUIRED
                         AccType (%RefType;) #REQUIRED
@@ -155,13 +161,12 @@
 <!-- If no attrs, the containing method's attrs are used -->
 <!ELEMENT   MethVar     (MethParams*)>
 <!ATTLIST   MethVar     Attrs NMTOKENS #IMPLIED
-                        RetType CDATA #IMPLIED
-                        RetBy (%RefType;) 'Void'>
+                        RetBy (%RefType;) #IMPLIED>
 
 <!ELEMENT   Method      (Desc, MethVar+)>
 <!ATTLIST   Method      Name CDATA #REQUIRED
-                        RetType CDATA #IMPLIED
-                        RetBy (%RefType;) 'Void'
+                        RetType CDATA ''
+                        RetBy (%RefType;) #IMPLIED
                         Attrs NMTOKENS 'NoAttrs'>
 
 <!ELEMENT   StaticMeths (Desc?, Method+)>
@@ -188,3 +193,4 @@
                         Prefix NMTOKEN #REQUIRED
                         VirtDtor (%YNVal;) 'No'
                         Flags NMTOKENS 'NoFlags'>
+

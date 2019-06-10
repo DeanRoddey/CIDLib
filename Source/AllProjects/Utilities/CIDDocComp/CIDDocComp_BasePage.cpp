@@ -199,15 +199,19 @@ tCIDLib::TVoid TBasePage::GenerateOutput(const TString& strParPath) const
 }
 
 
+//
+//  THIS IS FOR USE by the topics  to generate links to load the right hand
+//  side, where we know the left hand side is already the correct one, since
+//  this link is fro that left hand side. We can't use this for general page
+//  links from other sections, since those need to also load the left side
+//  topic that contains that page.
+//
 tCIDLib::TVoid TBasePage::GenerateLink(TTextOutStream& strmTar) const
 {
-    // Generate a link to load our page content into the right hand side
     strmTar  << L"<a onclick=\"javascript:loadRightSide('"
             << m_strParTopic
             << L"', '/" << m_strFileName
             << L"', '');\" href='javascript:void(0)'>"
             << m_strExtTitle
-            << L"</a><br/>\n";
+            << L"</a>\n";
 }
-
-

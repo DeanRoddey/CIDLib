@@ -121,6 +121,11 @@ class TBasePage
             return m_strFileName;
         }
 
+        const TString& strParTopic() const
+        {
+            return m_strParTopic;
+        }
+
 
     protected :
         // -------------------------------------------------------------------

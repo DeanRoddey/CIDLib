@@ -479,10 +479,32 @@ TStrCat::TStrCat(const  tCIDLib::TCh* const psz1
     m_pszBuf[m_c4Len] = kCIDLib::chNull;
 }
 
+TStrCat::TStrCat(TStrCat&& scatSrc) :
+
+    m_c4Len(0)
+    , m_pszBuf(nullptr)
+{
+    *this = tCIDLib::ForceMove(scatSrc);
+}
+
 // If by chance we never got to give it away, delete it
 TStrCat::~TStrCat()
 {
     delete [] m_pszBuf;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TStrCat: Public operators
+// ---------------------------------------------------------------------------
+TStrCat& TStrCat::operator=(TStrCat&& scatSrc)
+{
+    if (&scatSrc != this)
+    {
+        tCIDLib::Swap(m_c4Len, scatSrc.m_c4Len);
+        tCIDLib::Swap(m_pszBuf, scatSrc.m_pszBuf);
+    }
+    return *this;
 }
 
 

@@ -112,8 +112,6 @@ class CIDLIBEXP TUTFConverter : public TTextConverter
         // -------------------------------------------------------------------
         tCIDLib::EBaseTextFmts eBaseFmt() const override;
 
-        tCIDLib::TVoid Reset() override;
-
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods

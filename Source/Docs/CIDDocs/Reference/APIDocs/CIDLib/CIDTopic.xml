@@ -4,12 +4,18 @@
 <CIDTopic TopicPage="Overview">
 
     <PageMap>
+
         <PageLink FileName="Overview"/>
 
         <PageLink FileName="MFormattable" PageType="CppClass"/>
+        <PageLink FileName="TDirChangeInfo" PageType="CppClass"/>
+        <PageLink FileName="TMemBuf" PageType="CppClass"/>
         <PageLink FileName="TStrCat" PageType="CppClass"/>
         <PageLink FileName="TString" PageType="CppClass"/>
         <PageLink FileName="TStringTokenizer" PageType="CppClass"/>
+        <PageLink FileName="TTextConverter" PageType="CppClass"/>
+        <PageLink FileName="TTime" PageType="CppClass"/>
+
     </PageMap>
 
     <SubTopicMap>

@@ -580,6 +580,10 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
         //
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
+            // IF there were no children, this guy can be null
+            if (!m_pcolChildren)
+                return kCIDLib::True;
+
             const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
             for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
             {

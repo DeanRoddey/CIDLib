@@ -611,6 +611,7 @@ TXMLTreeElement::~TXMLTreeElement()
     // Release childen first appropriately
     ReleaseChildren();
     delete m_pcolChildren;
+    m_pcolChildren = nullptr;
 }
 
 
@@ -766,7 +767,7 @@ TXMLTreeElement::pxtnodeFindElement(const   TString&         strQName
                                     , const tCIDLib::TCard4  c4Instance) const
 {
     tCIDLib::TCard4 c4InstCnt = 0;
-    const TXMLTreeElement* pxtnodeRet = 0;
+    const TXMLTreeElement* pxtnodeRet = nullptr;
     if (m_pcolChildren)
     {
         const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
@@ -805,7 +806,7 @@ TXMLTreeElement::pxtnodeFindElement(const   TString&            strQName
                                     , const tCIDLib::TCard4     c4Instance)
 {
     tCIDLib::TCard4 c4InstCnt = 0;
-    TXMLTreeElement* pxtnodeRet = 0;
+    TXMLTreeElement* pxtnodeRet = nullptr;
     if (m_pcolChildren)
     {
         const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();

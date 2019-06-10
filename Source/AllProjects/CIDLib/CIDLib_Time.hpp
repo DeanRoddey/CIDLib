@@ -19,29 +19,8 @@
 //  that extends from 01/01/1970. Its raw form, gotten via enctTime(), is the
 //  number of 100 nanosecond intervals since that base time.
 //
-//  When expanding to (or setting from) the individual details, the values
-//  are:
-//
-//  Year = 1 based year
-//  Month = The month enum
-//  Day = 1 based day
-//
-//  Hour/Min/Sec/millis = zero based values
-//
 // CAVEATS/GOTCHAS:
 //
-//  1)  Time values (in the 100 nanosecond relative stamp form) cannot be
-//      negative ever. If you want to find the difference between two
-//      times and they might be negative, us the enctDifference() method
-//      to get the difference.
-//
-//  2)  The default format string for a TTime object is gotten from the
-//      default locale, except for when the ESpecialTime_CurrentUTC special
-//      time is constructed from. In this case, its set to the standard
-//      ctime format.
-//
-//  3)  The formatting tokens recognized in the format strings are documented
-//      in the class reference.
 //
 // LOG:
 //
@@ -105,7 +84,7 @@ class CIDLIBEXP TTime :
 
         static tCIDLib::TEncodedTime enctNowPlusDays
         (
-            const   tCIDLib::TCard4         c4Hours
+            const   tCIDLib::TCard4         c4Days
         );
 
         static tCIDLib::TEncodedTime enctNowPlusHours
@@ -312,7 +291,7 @@ class CIDLIBEXP TTime :
             , const tCIDLib::TCard4         c4Hours = 0UL
             , const tCIDLib::TCard4         c4Minutes = 0UL
             , const tCIDLib::TCard4         c4Seconds = 0UL
-            , const tCIDLib::TCard4         c4Hundredths = 0UL
+            , const tCIDLib::TCard4         c4Millis = 0UL
         );
 
         ~TTime();

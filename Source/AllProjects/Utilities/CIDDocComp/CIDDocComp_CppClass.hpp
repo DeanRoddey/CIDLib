@@ -28,6 +28,41 @@
 
 
 // ---------------------------------------------------------------------------
+//  An alias definition, used by classes and facility namespaces.
+// ---------------------------------------------------------------------------
+struct TAlias
+{
+    THelpNode   m_hnDesc;
+    TString     m_strName;
+    TString     m_strType;
+};
+
+class TAliases
+{
+    public :
+        tCIDLib::TBoolean bIsEmpty() const
+        {
+            return m_colList.bIsEmpty();
+        }
+
+        tCIDLib::TVoid Parse
+        (
+            const   TXMLTreeElement&        xtnodeSrc
+        );
+
+        tCIDLib::TVoid OutputContent
+        (
+                    TTextOutStream&         strmTar
+            , const tCIDDocComp::EVisTypes  eVisType
+        )   const;
+
+    private :
+        TVector<TAlias>     m_colList;
+};
+
+
+
+// ---------------------------------------------------------------------------
 //  A constant definition. Mostly for a class but we might use it elsewhere.
 // ---------------------------------------------------------------------------
 struct TConstDef
@@ -49,6 +84,43 @@ struct TEnumDef
     THelpNode   m_hnDesc;
     TString     m_strName;
 };
+
+
+// ---------------------------------------------------------------------------
+//  We document public and protected members. We need a name, a type, and
+//  descriptive text.
+// ---------------------------------------------------------------------------
+struct TMember
+{
+    tCIDDocComp::EParmPB    m_eAccType = tCIDDocComp::EParmPB::Count;
+    THelpNode               m_hnDesc;
+    TString                 m_strName;
+    TString                 m_strType;
+};
+
+class TMembers
+{
+    public :
+        tCIDLib::TBoolean bIsEmpty() const
+        {
+            return m_colList.bIsEmpty();
+        }
+
+        tCIDLib::TVoid Parse
+        (
+            const   TXMLTreeElement&        xtnodeSrc
+        );
+
+        tCIDLib::TVoid OutputContent
+        (
+                    TTextOutStream&         strmTar
+            , const tCIDDocComp::EVisTypes  eVisType
+        )   const;
+
+    private :
+        TVector<TMember>    m_colList;
+};
+
 
 
 // ---------------------------------------------------------------------------
@@ -215,6 +287,8 @@ class TMemberGrp
         )   const;
 
         tCIDDocComp::EVisTypes  m_eVisType;
+        TAliases                m_memgAliases;
+        TMembers                m_memgMembers;
         TMethodGrp              m_methgCtors;
         TMethodGrp              m_methgNVirtMethods;
         TMethodGrp              m_methgOperators;

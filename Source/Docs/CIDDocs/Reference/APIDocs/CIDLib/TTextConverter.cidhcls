@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TTextConverter" Parent="TObject" Prefix="tcvt" Flags="Dup">
+
+    <Desc>
+        <P>TTextConverter is the base class all of text converters. Text converters handle translating between the internal, Unicode, wide character text format and the various external text encodings that you might have to deal with. See <Link Type="Page" Ref="/BigPicture/" Id="/TextEncoding">Text Encoding</Link> in the Big Picture section for more information on this subject.</P>
+
+        <Note>All derived classes must take into account the fact that the native wide character type (tCIDLib::TCh) is not always a 16 bit value in memory. On some platforms it can be a 32 bit value. The CIDLIB_WCISUTF16 token is defined if the native wide character is a UTF-16 type. Also the kCIDLib::c4CharBytes value will be set to the number of bytes of the local wide character size. Always use this if you need to calculate memory requirements for x number of characters, which will be (x*kCIDLib::c4CharBytes) on the local system.</Note>
+
+        <SubSecTitle>Conversion Directions</SubSecTitle>
+
+        <P>The 'From' methods are converting from an encoding to the internal wide character format. The 'To' methods are the opposite, converting from wide characters to the target encoding. The From methods take bytes and create characters, while the To methods take characters and create bytes.</P>
+
+        <SubSecTitle>Chunked Conversion</SubSecTitle>
+
+        <P>In some case when converting text inwards (from the encoding to the internal native wide format), you will have all of the raw source bytes and can just do it all in a single pass. In other cases that will not be true and you will need to convert chunks at a time. When doing this, keep in mind that you may get chunks that end in the middle of a source character, if the source format is multi-byte.</P>
+
+        <P>If this happens, you will need to carry any remaining bytes over to the next start of the next chunk, else you will get out of sync and make a mess. The 'convert from' methods tell you both how many characters were created and how many source bytes were eaten, so that you can deal with this.</P>
+
+        <SubSecTitle>Invalid/Unrepresentable Text</SubSecTitle>
+
+        <P>There is always the chance that, when internalizing data in from the encoded format to the wide character format, that there can be bad data. It might be corrupted or badly encoded or not in the encoding that the program was told to assume. When going the other way, it's always possible that you have wide characters that just can't be represented in the target encoding.</P>
+
+        <P>The options supported by the CIDLib text encoding system are discussed in the Big Picture section on <Link Type="Page" Ref="/BigPicture/" Id="/TextEncoding">Text Encoding.</Link></P>
+
+    </Desc>
+
+    <PubIntf>
+        <Ctors DelMethods="DefCtor" DefMethods="Dtor"/>
+
+        <!-- Virtual public methods -->
+        <VirtMeths>
+            <Method Name="eBaseFmt" RetType="tCIDLib::EBaseTextFmts" Attrs="Pure">
+                <Desc>
+                    Returns the base format of the encoding represented by this converter. It tells you if the format is single byte, multi-byte, or two/four byte little or big endian. You may need this information in some special cases.
+                </Desc>
+                <MethVar><MethParams/></MethVar>
+            </Method>
+        </VirtMeths>
+
+        <NVirtMeths>
+            <Method Name="c4ConvertFrom" RetType="tCIDLib::TCard4">
+                <Desc>
+                    <P>Converts up to c4MaxChars charactres from the incoming source data buffer, which must be at least c4SrcBytes in size. It will convert as many characters as it can, until it runs out of full bytes in the source or maxes out the target capacity. The number of bytes eaten is the return value and the number of characters stored to the output is put into c4OutChars.</P>
+
+                    <P>You can convert from a raw buffer, or a <ClassRef Ref="TMemBuf"/> object, and you can convert to a raw buffer or a <ClassRef Ref="TString"/> object.</P>
+
+                    <P>When using a raw character buffers of course you must be careful that they at least as big as you say they are or bad things will happen! When converting to a string, you have an append/overwrite option so that you can either let successive chunks accumulate or you can reset the target string so that it only contains the output of that call.</P>
+
+                    <Note>Not all of the source bytes may be consumed. If either the max output chars is hit, or the source contains a final, partial character, there will be remaining source bytes that need to be carried forward to the next pass.</Note>
+                </Desc>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
+                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
+                        <MethParam  Name="c4MaxChars" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="c4OutChars" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
+                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                        <MethParam  Name="eAppendOver" Type="tCIDLib::EAppendOver" DefVal="tCIDLib::EAppendOver::Overwrite"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="mbufSrc" Type="TMemBuf" PBy="CRef"/>
+                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                        <MethParam  Name="eAppendOver" Type="tCIDLib::EAppendOver" DefVal="tCIDLib::EAppendOver::Overwrite"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4ConvertOneTo" RetType="tCIDLib::TCard4">
+                <Desc>
+                    <P>Converts a single native wide character to the output encoding and puts the resulting bytes into the provided output buffer. The number of bytes output is returned.</P>
+
+                    <P>You indicate how many bytes are available in the target. If there are not enough for the needed conversion, it returns 0 to indicate no bytes were stored.</P>
+                </Desc>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="chSrc" Type="tCIDLib::TCh"/>
+                        <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
+                        <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4ConvertTo" RetType="tCIDLib::TCard4">
+                <Desc>
+                    <P>Converts internal, wide characters to the target encoding and puts the results in the provided output buffer. The number of characters processed is returned, and the number of bytes stored to the output buffer is put into c4OutBytes.</P>
+
+                    <P>The issue of partial characters doesn't occur here as it does the in 'From' versions. But it's always possible that all of the source characters are not consumed because the target output became full. So you still have to be prepared to carry those source characters over to a next pass.</P>
+
+                    <P>You can convert from a raw char buffer or a <ClassRef Ref="TString"/> object. You can convert to a raw byte buffer, an expandable byte buffer object or a memory buffer object.</P>
+                </Desc>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="pchSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                        <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="pc1ToFill" Type="tCIDLib::TCard1" PBy="PtrC" Dir="Out"/>
+                        <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="pchSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                        <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="expbToFill" Type="TExpByteBuf" PBy="Ref" Dir="Out"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="pchSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                        <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="mbufToFill" Type="TMemBuf" PBy="Ref" Dir="Out"/>
+                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="strSrc" Type="tCIDLib::TCh" PBy="CRef"/>
+                        <MethParam  Name="mbufToFill" Type="TMemBuf" PBy="Ref" Dir="Out"/>
+                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+            <Method Name="chConvertOneFrom" RetType="tCIDLib::TCh">
+                <Desc>
+                    <P>Extracts a single character from the source buffer. It returns the converted character if successful, else a null character (kCIDLib::chNull.) If successful, it indicates how many bytes it ate from the source buffer.</P>
+                </Desc>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
+                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+            <Method Name="chRepChar" RetType="tCIDLib::TCh">
+                <Desc>
+                    <P>Gets or sets the replacement character. This is used when a bad or unrepresentable character is encountered. See eErrorAction() below for more details.</P>
+                </Desc>
+                <MethVar Attrs="const"><MethParams/></MethVar>
+                <MethVar>
+                    <MethParams><MethParam  Name="chToSet" Type="tCIDLib::TCh"/></MethParams>
+                </MethVar>
+            </Method>
+
+            <Method Name="eErrorAction" RetType="tCIDLib::ETCvtActions">
+                <Desc>
+                    <P>Gets or sets the error action. This is used when converting text and bad or unrepresentable character is encountered. The possibilities are: </P>
+                    <List>
+                        <LItem Ref="Throw">Just give up immediately and throw an exception.</LItem>
+                        <LItem Ref="StopThenThrow">Deliver the successfully converted text up to that point, then throw next time.</LItem>
+                        <LItem Ref="Replace">Replace the bad character with the replacement character.</LItem>
+                    </List>
+
+                    <P>Note that replace is only used for converting encoded data to the internal wide character format. For outgoing, an error will occur if data cannot be successfully converted.</P>
+                </Desc>
+                <MethVar Attrs="const">
+                    <MethParams/>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="eToSet" Type="tCIDLib::ETCvtActions"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+            <Method Name="strEncoding" RetType="TString" RetBy="CRef">
+                <Desc>
+                    <P>Provides access to the encoding that this converter supports.</P>
+                </Desc>
+                <MethVar Attrs="const"><MethParams/></MethVar>
+            </Method>
+
+        </NVirtMeths>
+    </PubIntf>
+
+    <ProtIntf>
+        <Ctors DefMethods="CopyCtor">
+
+            <Method  Name="TTextConverter">
+                <Desc>
+                    The derived class calls this and passes on the encoding for which he is responsible. This way, we can make the encoding name available via this base class.
+                </Desc>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="strEncodingName" Type="TString" PBy="CRef"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+        </Ctors>
+
+        <Operators DefMethods="AssignOp"/>
+
+        <VirtMeths>
+            <Desc>
+                <P>These are obviously the same as the main From/To methods above. When the outside world calls those methods, this class will take chunks of the incoming data at a time and pass them to the derived class by calling these methods. The only difference is that these have an extra bStop parameter, see below about that.</P>
+
+                <P>This class correctly handles any partial characters and such, pushing them around to the front of the buffer for the next time.</P>
+
+                <P>The derived classes are responsible for dealing with bad data and honoring the error action and replacement character values.</P>
+
+                <P>If for some reason the converter needs the conversion to stop, it can set the bStop parameter. This is not an error, it just stops the conversion operation that this block is part of and returns what has been done so far. The code calling the converter has to deal with fact that not all requested bytes were converted.</P>
+            </Desc>
+
+            <Method  Name="c4BlockFrom" RetType="tCIDLib::TCard4" Attrs="Pure">
+                <Desc>
+                    <P>The derived class overrides this to convert a block of text from the encoding to the internal wide character format. The base class will call this as required to convert text.</P>
+                </Desc>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="pc1Src" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
+                        <MethParam  Name="c4MaxChars" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="c4OutChars" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                        <MethParam  Name="bStop" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4BlockTo" RetType="tCIDLib::TCard4">
+                <Desc>
+                    <P>The derived class overrides this and handles converting blocks of wide characters to the target encoding format. The base class will call this as required to convert data.</P>
+                </Desc>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                        <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="pc1ToFill" Type="tCIDLib::TCard1" PBy="PtrC" Dir="Out"/>
+                        <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
+                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                        <MethParam  Name="bStop" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+        </VirtMeths>
+
+    </ProtIntf>
+
+</CppClass>

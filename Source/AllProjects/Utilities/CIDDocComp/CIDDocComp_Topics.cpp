@@ -424,9 +424,12 @@ TTopic::GenerateTopicIndex(         TTextOutStream& strmOutFl
     {
         TPagePtr cptrMain = cptrFindPage(m_strTopicPage);
         if (cptrMain)
+        {
             cptrMain->GenerateLink(strmOutFl);
+            strmOutFl << L"<br/>";
+        }
 
-        // We want a break after this one if there's more than one
+        // We want an extra break after this one if there's more than one
         if (m_colPages.c4ElemCount() > 1)
             strmOutFl << L"<br/>";
     }
@@ -443,7 +446,10 @@ TTopic::GenerateTopicIndex(         TTextOutStream& strmOutFl
 
             // If not the topic page, then generate a link
             if (!cptrCur->bIsThisName(m_strTopicPage))
+            {
                 cptrCur->GenerateLink(strmOutFl);
+                strmOutFl << L"<br/>";
+            }
         }
     }
 

@@ -151,6 +151,11 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText)
                 hnNew.m_eType = tCIDDocComp::EMUTypes::DIV;
                 bGetID = kCIDLib::True;
             }
+             else if (strQName.bCompare(L"FacRef"))
+            {
+                hnNew.m_eType = tCIDDocComp::EMUTypes::FacRef;
+                bGetRef = kCIDLib::True;
+            }
              else if (strQName.bCompare(L"Image"))
             {
                 hnNew.m_eType = tCIDDocComp::EMUTypes::Image;
@@ -289,11 +294,8 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                 //
                 //  This is not for formatting but to allow us to automatically
                 //  generate links to classes that are referred to in general text.
-                //  This will save a vast amount of grunt work.
-                //
-                //  So we need to call the facility class to find the path info
-                //  for the class we stored in m_strText. Then we automatically
-                //  generate the link here.
+                //  This will save a vast amount of grunt work. The facility class
+                //  has a helper to build a class link from the class name.
                 //
                 facCIDDocComp.GenerateClassLink(strmTar, hnCur.m_strRef);
                 break;
@@ -314,6 +316,19 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                         << L"'>";
                 hnCur.OutputNodes(strmTar);
                 strmTar << L"</DIV>\n";
+                break;
+            }
+
+            case tCIDDocComp::EMUTypes::FacRef :
+            {
+                //
+                //  This is not for formatting but to allow us to automatically
+                //  generate links to facilities that are referred to in general text.
+                //  This will save a vast amount of grunt work. The facility class
+                //  has a helper to build a link based on the facility name that was
+                //  stored in the ref member.
+                //
+                facCIDDocComp.GenerateFacLink(strmTar, hnCur.m_strRef);
                 break;
             }
 

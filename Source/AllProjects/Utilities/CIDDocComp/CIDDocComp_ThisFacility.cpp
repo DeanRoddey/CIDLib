@@ -139,11 +139,15 @@ tCIDLib::TVoid TFacCIDDocComp::AddClass(TCppClassPage* const ppgToAdd)
 
 
 
-// Called by parsing code to add an error to our error list
+//
+//  Called by parsing code to add an error to our error list. The error list is
+//  mutable since this has to be called from some otherwise const methods as
+//  well.
+//
 tCIDLib::TVoid
 TFacCIDDocComp::AddErrorMsg(const   TString&        strMsg
                             , const MFormattable&   mfmtblToken1
-                            , const MFormattable&   mfmtblToken2)
+                            , const MFormattable&   mfmtblToken2) const
 {
     TString strErr = strMsg;
     if (!MFormattable::bIsNullObject(mfmtblToken1))
@@ -211,6 +215,10 @@ TFacCIDDocComp::eMainThread(TThread& thrThis, tCIDLib::TVoid* pData)
         return tCIDLib::EExitCodes::BadEnvironment;
     }
 
+    // Check any parameters
+    if (!bParseParams())
+        return tCIDLib::EExitCodes::BadParameters;
+
     // Create the target path if it doesn't exist
     pathTmp.AddLevel(L"CIDDocs.Out");
     TFileSys::MakePath(pathTmp);
@@ -254,13 +262,8 @@ TFacCIDDocComp::eMainThread(TThread& thrThis, tCIDLib::TVoid* pData)
         // And kick off the parse of the whole hierarchy
         m_cptrRoot->Parse();
 
-        // If we got errors, then show them, else do the output
-        if (bGotErrors())
-        {
-            strmOut() << L"\nErrors occurred during the parse:\n\n";
-            ShowErrors(strmOut());
-        }
-         else
+        // If no errors so far, try the output
+        if (!bGotErrors())
         {
             //
             //  Copy any files to the top level target directory that we just use
@@ -317,14 +320,28 @@ TFacCIDDocComp::eMainThread(TThread& thrThis, tCIDLib::TVoid* pData)
 
         // Now let's drop the root topic to clean everything up
         m_cptrRoot.DropRef();
+
+        // If we got any errors show them.
+        if (!m_colErrs.bIsEmpty())
+        {
+            strmOut() << L"\nErrors occurred:\n\n";
+            ShowErrors(strmOut());
+			strmOut().Flush();
+            return tCIDLib::EExitCodes::RuntimeError;
+        }
     }
 
     catch(const TError& errToCatch)
     {
         strmOut()   << L"        An exception occurred. Error=\n"
                     << errToCatch<< kCIDLib::NewEndLn;
-        strmOut().Flush();
         return tCIDLib::EExitCodes::RuntimeError;
+    }
+
+    catch(...)
+    {
+        strmOut()   << L"        A system exception occurred." <<  kCIDLib::NewEndLn;
+        return tCIDLib::EExitCodes::SystemException;
     }
 
     strmOut() << kCIDLib::FlushIt;
@@ -386,21 +403,50 @@ TFacCIDDocComp::FormatEmphText(         TTextOutStream&     strmTar
 
 //
 //  This is called during output any time a ClassRef node is seen, and we generate
-//  a page link for that class.
+//  a page link for that class. We can't call the page's own link generator method,
+//  since that is just for generating left hand side links to load just the right
+//  side. This needs to load the page but also the topic for that page.
 //
 tCIDLib::TVoid
 TFacCIDDocComp::GenerateClassLink(TTextOutStream& strmTar, const TString& strClass) const
 {
     CIDAssert(m_bPostParse, L"Online valid in post-parse phase");
 
-    //
-    //  Ask the parse context for the page for this class na dlet it generate a link
-    //  to itself
-    //
     const TCppClassPage* ppgTar = ppgFindByClass(strClass);
-    ppgTar->GenerateLink(strmTar);
+    if (ppgTar)
+    {
+        strmTar << L"<a onclick=\"javascript:loadTopic('"
+                << ppgTar->strParTopic()
+                << L"', '/" << ppgTar->strPageName()
+                << L"', true);\" href='javascript:void(0)'>"
+                << strClass
+                << L"</a>\n";
+    }
+     else
+    {
+        strmTar << strClass;
+    }
 }
 
+
+//
+//  This is called during output any time a FcRef node is seen, and we generate
+//  a page link for that facility. This is a full load of both sides, loading the
+//  overview page into the right. In this case w know the paths since they are all
+//  in a single topic.
+//
+tCIDLib::TVoid
+TFacCIDDocComp::GenerateFacLink(TTextOutStream& strmTar, const TString& strFacName) const
+{
+    CIDAssert(m_bPostParse, L"Online valid in post-parse phase");
+
+    strmTar << L"<a onclick=\"javascript:loadTopic('"
+                << L"/Reference/APIDocs/" << strFacName
+                << L"', '/Overview"
+                << L"', true);\" href='javascript:void(0)'>"
+                << strFacName
+                << L"</a>\n";
+}
 
 
 //
@@ -477,15 +523,10 @@ const TCppClassPage* TFacCIDDocComp::ppgFindByClass(const TString& strToFind) co
 
     if (!ppgTar)
     {
-        facCIDDocComp.ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDDocsErrs::errcGen_ClassLink
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::NotFound
-            , strToFind
-        );
+        if (!m_bNoClassRefWarn)
+            AddErrorMsg(L"The class %(1) was not found in the class list", strToFind);
+
+        return nullptr;
     }
     return ppgTar;
 }
@@ -516,6 +557,14 @@ tCIDLib::TVoid TFacCIDDocComp::PostParseProc()
 }
 
 
+//
+//  This is really ONLY for the cpp class page to call so that it can get access
+//  to the current class info without having to pass it down through all of the
+//  layers of the class data structures. All topics and pages push themselves,
+//  well only Cpp pages during the output process, so when a cpp class file is
+//  being parsed, it's own info is going to be on the top of the source stack.
+//  So this is a convenient way to get to his own information.
+//
 const TString& TFacCIDDocComp::strCurClass() const
 {
     CIDAssert(!m_colSrcStack.bIsEmpty(), L"The source stack is empty");
@@ -566,6 +615,26 @@ tCIDLib::TVoid TFacCIDDocComp::ShowErrors(TTextOutStream& strmOut)
 // ---------------------------------------------------------------------------
 //  TFacCIDDocComp: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+
+// Parses our parameters and stores the results away
+tCIDLib::TBoolean TFacCIDDocComp::bParseParams()
+{
+    TSysInfo::TCmdLineCursor cursParms = TSysInfo::cursCmdLineParms();
+    for (; cursParms; ++cursParms)
+    {
+        if (cursParms->bCompareI(L"/NoClassRefWarn"))
+        {
+            m_bNoClassRefWarn = kCIDLib::True;
+        }
+         else
+        {
+            strmOut()   << *cursParms << L" is not a valid command line parameter"
+                        << kCIDLib::NewEndLn;
+        }
+    }
+    return kCIDLib::True;
+}
+
 
 tCIDLib::TVoid
 TFacCIDDocComp::CopyDir(const TString& strSrc, const TString& strTar)

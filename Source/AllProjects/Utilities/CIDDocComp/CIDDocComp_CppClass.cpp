@@ -26,6 +26,228 @@
 // ----------------------------------------------------------------------------
 #include    "CIDDocComp.hpp"
 
+
+// ----------------------------------------------------------------------------
+//  Local helper functions
+// ----------------------------------------------------------------------------
+
+//
+//  Formats out a 'parameter pass-by' value, though it's also used for members,
+//  constants, and return types.
+//
+static tCIDLib::TVoid
+FormatAccType(          TTextOutStream&         strmTar
+                , const TString&                strType
+                , const tCIDDocComp::EParmPB    eType
+                , const tCIDDocComp::EParmDirs  eDir = tCIDDocComp::EParmDirs::Count)
+{
+    strmTar << L"<span class=\"DeemphCode\">";
+
+    // If asked to show the direction, see if it's one of those types and do that
+    if (eDir != tCIDDocComp::EParmDirs::Count)
+    {
+        if ((eType == tCIDDocComp::EParmPB::Ref)
+        ||  (eType == tCIDDocComp::EParmPB::Ptr)
+        ||  (eType == tCIDDocComp::EParmPB::PtrC))
+        {
+            strmTar << eDir << kCIDLib::chSpace;
+        }
+    }
+
+    switch(eType)
+    {
+        case tCIDDocComp::EParmPB::CPtr :
+            strmTar << L"const " << strType << L"*";
+            break;
+
+        case tCIDDocComp::EParmPB::CPtrC :
+            strmTar << L"const " << strType << L"* const";
+            break;
+
+        case tCIDDocComp::EParmPB::CRef :
+            strmTar << L"const " << strType << L"&";
+            break;
+
+        case tCIDDocComp::EParmPB::MRef :
+            strmTar << strType << L"&&";
+            break;
+
+        case tCIDDocComp::EParmPB::Ref :
+            strmTar << strType << L"&";
+            break;
+
+        case tCIDDocComp::EParmPB::Ptr :
+            strmTar << strType << L"*";
+            break;
+
+        case tCIDDocComp::EParmPB::PtrC :
+            strmTar << strType << L"* const";
+            break;
+
+        case tCIDDocComp::EParmPB::PtrCRef :
+            strmTar << L"const " << strType << L"*&";
+            break;
+
+        case tCIDDocComp::EParmPB::PtrRef :
+            strmTar << strType << L"*&";
+            break;
+
+        case tCIDDocComp::EParmPB::Val :
+            strmTar << strType;
+            break;
+
+        case tCIDDocComp::EParmPB::Void :
+            strmTar << kCIDDocComp::strType_Void;
+            break;
+
+        default :
+            break;
+    };
+    strmTar << L"</span>";
+}
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TAliases
+//  PREFIX: memg
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TAliases: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TAliases::Parse(const TXMLTreeElement& xtnodeSrc)
+{
+    // It's just a list of Alias elements
+    xtnodeSrc.bForEach
+    (
+        [this](const TXMLTreeElement& xtnodeCur)
+        {
+            TAlias& aliasNew = m_colList.objAdd(TAlias());
+
+            // If the 0th one is a description process that
+            if (xtnodeCur.c4ChildCount())
+                aliasNew.m_hnDesc.Parse(xtnodeCur.xtnodeChildAtAsElement(0));
+
+            aliasNew.m_strName = xtnodeCur.xtattrNamed(L"Name").strValue();
+            aliasNew.m_strType = xtnodeCur.xtattrNamed(L"Type").strValue();
+            return kCIDLib::True;
+        }
+    );
+}
+
+tCIDLib::TVoid
+TAliases::OutputContent(        TTextOutStream&         strmTar
+                        , const tCIDDocComp::EVisTypes  eVisType) const
+{
+    // If we don't have any, do nothing
+    if (m_colList.bIsEmpty())
+        return;
+
+    strmTar << L"<p><span class='SecHdr'>" << eVisType << L" Aliases</span></p>";
+
+    m_colList.bForEach
+    (
+        [&strmTar](const TAlias& aliasCur)
+        {
+            strmTar << L"<pre>";
+            facCIDDocComp.FormatDeemphText(strmTar, L"using ");
+            facCIDDocComp.FormatEmphText(strmTar, aliasCur.m_strName);
+            facCIDDocComp.FormatDeemphText(strmTar, L" = ", aliasCur.m_strType);
+            strmTar << L"</pre>";
+
+            //
+            //  If any descriptive text, do that in a block quote, else just
+            //  put out a break.
+            //
+            if (!aliasCur.m_hnDesc.bIsEmpty())
+            {
+                strmTar << L"<blockquote>";
+                aliasCur.m_hnDesc.OutputNodes(strmTar);
+                strmTar << L"</blockquote>";
+            }
+             else
+            {
+                strmTar << L"<br/>";
+            }
+            return kCIDLib::True;
+        }
+    );
+}
+
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TMembers
+//  PREFIX: memg
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TMembers: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TMembers::Parse(const TXMLTreeElement& xtnodeSrc)
+{
+    // It's just a list of Member elements
+    xtnodeSrc.bForEach
+    (
+        [this](const TXMLTreeElement& xtnodeCur)
+        {
+            TMember& memberNew = m_colList.objAdd(TMember());
+
+            // If the 0th one is a description process that
+            if (xtnodeCur.c4ChildCount())
+                memberNew.m_hnDesc.Parse(xtnodeCur.xtnodeChildAtAsElement(0));
+
+            memberNew.m_eAccType = tCIDDocComp::eXlatEParmPB
+            (
+                xtnodeCur.xtattrNamed(L"AccType").strValue()
+            );
+            memberNew.m_strName = xtnodeCur.xtattrNamed(L"Name").strValue();
+            memberNew.m_strType = xtnodeCur.xtattrNamed(L"Type").strValue();
+            return kCIDLib::True;
+        }
+    );
+}
+
+tCIDLib::TVoid
+TMembers::OutputContent(        TTextOutStream&         strmTar
+                        , const tCIDDocComp::EVisTypes  eVisType) const
+{
+    // If we don't have any, do nothing
+    if (m_colList.bIsEmpty())
+        return;
+
+    strmTar << L"<p><span class='SecHdr'>" << eVisType << L" Data Members</span></p>";
+
+   m_colList.bForEach
+    (
+        [&strmTar](const TMember& memberCur)
+        {
+            strmTar << L"<pre>";
+            FormatAccType(strmTar, memberCur.m_strType, memberCur.m_eAccType);
+            strmTar << kCIDLib::chSpace;
+            facCIDDocComp.FormatEmphText(strmTar, memberCur.m_strName);
+            strmTar << L"</pre>";
+
+            //
+            //  If any descriptive text, do that in a block quote, else just
+            //  put out a break.
+            //
+            if (!memberCur.m_hnDesc.bIsEmpty())
+            {
+                strmTar << L"<blockquote>";
+                memberCur.m_hnDesc.OutputNodes(strmTar);
+                strmTar << L"</blockquote>";
+            }
+             else
+            {
+                strmTar << L"<br/>";
+            }
+            return kCIDLib::True;
+        }
+    );
+}
+
+
 // ---------------------------------------------------------------------------
 //   CLASS: TMethodParam
 //  PREFIX: methp
@@ -59,59 +281,20 @@ TMethodParam::OutputContent(        TTextOutStream&     strmTar
                             , const tCIDLib::TBoolean   bIndent
                             , const tCIDLib::TCard4     c4Index) const
 {
-    // Output the type in deemph and the name emph
-    strmTar << L"<span class=\"DeemphCode\">";
+    // Format out the type info and its access and direction info
+    FormatAccType(strmTar, m_strType, m_ePassBy, m_eDir);
 
-    switch(m_ePassBy)
-    {
-        case tCIDDocComp::EParmPB::CPtr :
-            strmTar << L"const " << m_strType << L"*";
-            break;
-
-        case tCIDDocComp::EParmPB::CPtrC :
-            strmTar << L"const " << m_strType << L"* const";
-            break;
-
-        case tCIDDocComp::EParmPB::CRef :
-            strmTar << L"const " << m_strType << L"&";
-            break;
-
-        case tCIDDocComp::EParmPB::MRef :
-            strmTar << m_strType << L"&&";
-            break;
-
-        case tCIDDocComp::EParmPB::Ref :
-            strmTar << m_eDir << kCIDLib::chSpace << m_strType << L"&";
-            break;
-
-        case tCIDDocComp::EParmPB::Ptr :
-            strmTar << m_eDir << kCIDLib::chSpace << m_strType << L"*";
-            break;
-
-        case tCIDDocComp::EParmPB::PtrCRef :
-            strmTar << L"const " << m_strType << L"*&";
-            break;
-
-        case tCIDDocComp::EParmPB::PtrRef :
-            strmTar << m_strType << L"*&";
-            break;
-
-        case tCIDDocComp::EParmPB::Val :
-            strmTar << L"const " << m_strType;
-            break;
-
-        default :
-            break;
-    };
-
-    strmTar << L"</span>"
-            << L"<span class=\"EmphCode\"> " << m_strName;
+    strmTar << L"<span class=\"EmphCode\"> " << m_strName
+            << L"</span>";
 
     // if we have a default value, show that
     if (!m_strDefVal.bIsEmpty())
-        strmTar << L" = " << m_strDefVal;
-
-    strmTar << L"</span>";
+    {
+        strmTar << L"</span>"
+                << L"<span class=\"DeemphCode\"> = </span>"
+                << L"<span class=\"EmphCode\">" << m_strDefVal
+                << L"</span>";
+    }
 }
 
 
@@ -161,45 +344,24 @@ TMethodVar::Parse(  const   TXMLTreeElement&        xtnodeSrc
     // Add to these any method/method group level attributes
     m_eAttrs |= eMethAttrs;
 
-    //
-    //  Get the return type for this variation, if one is set. Else use the one
-    //  set on our containing method. The same for the return by type.
-    //
-    if (!xtnodeSrc.bAttrExists(L"RetType", m_strRetType))
-        m_strRetType = strRetType;
-    m_eRetBy = tCIDDocComp::eXlatEParmPB(xtnodeSrc.xtattrNamed(L"RetBy").strValue());
-    if (m_eRetBy == tCIDDocComp::EParmPB::None)
-        m_eRetBy = eRetBy;
-
-    // If the return by was not set by the method or us, then bad
-    if (m_eRetBy == tCIDDocComp::EParmPB::None)
-    {
-        facCIDDocComp.AddErrorMsg
-        (
-            L"The return by type was not set for method %(1)", facCIDDocComp.strCurClass()
-        );
-    }
+    // Save the return info we got
+    m_eRetBy = eRetBy;
+    m_strRetType = strRetType;
 
     //
-    //  If a constructor we don't need any return info. Otherwise, we have to have
-    //  a return type. If the return by isn't void, we have to an expilcit type.
+    //  But they can override the return type (mostly for const vs. non-const
+    //  of what's otherwise just a variation.
     //
-    if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Ctor))
+    if (xtnodeSrc.bAttrExists(L"RetBy", facCIDDocComp.m_strTmp1))
     {
-        // Make sure it's void
-        if ((m_eRetBy != tCIDDocComp::EParmPB::Void) || !m_strRetType.bIsEmpty())
-        {
-            facCIDDocComp.AddErrorMsg
-            (
-                L"Constructor for %(1) has a return type", facCIDDocComp.strCurClass()
-            );
-        }
+        m_eRetBy = tCIDDocComp::eXlatEParmPB(facCIDDocComp.m_strTmp1);
+        if (m_eRetBy == tCIDDocComp::EParmPB::Count)
+            facCIDDocComp.AddErrorMsg(L"Bad override of method return byte");
     }
-     else
-    {
-        if (m_eRetBy == tCIDDocComp::EParmPB::Void)
-            m_strRetType = kCIDDocComp::strType_Void;
-    }
+
+	// If the return by isn't None, then we have to have a type
+    if ((m_eRetBy != tCIDDocComp::EParmPB::None) && m_strRetType.bIsEmpty())
+        facCIDDocComp.AddErrorMsg(L"No return type was indicated");
 
     // Our child is a method parameters element, but we may not have one
     if (xtnodeSrc.c4ChildCount())
@@ -221,18 +383,27 @@ tCIDLib::TVoid
 TMethodVar::OutputContent(TTextOutStream& strmTar, const TString& strName) const
 {
     // Do any that go before the type
-    if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Explicit))
-        strmTar << L"explicit ";
-    if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Static))
-        strmTar << L"static ";
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::ConstExpr))
         strmTar << L"constexpr ";
+    if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Explicit))
+        strmTar << L"explicit ";
+    if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::NoDiscard))
+        strmTar << L"[[nodiscard]] ";
+    if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Static))
+        strmTar << L"static ";
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Virtual))
         strmTar << L"virtual ";
 
     // Do the return type
     if (!m_strRetType.bIsEmpty())
-        strmTar << m_strRetType << kCIDLib::chSpace;
+    {
+        //
+        //  For return types, constants, and members, we can use the same code.
+        //  We just use a local for that.
+        //
+        FormatAccType(strmTar, m_strRetType, m_eRetBy);
+        strmTar << kCIDLib::chSpace;
+    }
 
     // The name, emphasized
     facCIDDocComp.FormatEmphText(strmTar, strName);
@@ -302,10 +473,6 @@ TMethod::Parse(const TXMLTreeElement& xtnodeSrc, const tCIDDocComp::EMethAttrs e
     // The name is the same for all variations, so we store that
     m_strName = xtnodeSrc.xtattrNamed(L"Name").strValue();
 
-    // We can have return info for all variations defined here
-    xtnodeSrc.bAttrExists(L"RetType", m_strRetType);
-    m_eRetBy = tCIDDocComp::eXlatEParmPB(xtnodeSrc.xtattrNamed(L"RetBy").strValue());
-
     // Process the ovearll method level attributes, which may or may not be present
     m_eMethAttrs = tCIDDocComp::EMethAttrs::None;
 
@@ -337,6 +504,64 @@ TMethod::Parse(const TXMLTreeElement& xtnodeSrc, const tCIDDocComp::EMethAttrs e
 
     // Add to these any group level attributes
     m_eMethAttrs |= eGrpAttrs;
+
+    // Get the return type
+    m_strRetType = xtnodeSrc.xtattrNamed(L"RetType").strValue();
+
+    // If we have the a return by take that, else let's try to figure out a default
+    m_eRetBy = tCIDDocComp::EParmPB::None;
+    if (xtnodeSrc.bAttrExists(L"RetBy", facCIDDocComp.m_strTmp1))
+    {
+        m_eRetBy = tCIDDocComp::eXlatEParmPB(facCIDDocComp.m_strTmp1);
+
+        //
+        //  If no return type, then return by has to be none. If void then return by
+        //  has to be void also. Else return by cannot be none or void.
+        //
+        if (m_strRetType.bIsEmpty())
+        {
+            if (m_eRetBy != tCIDDocComp::EParmPB::None)
+                facCIDDocComp.AddErrorMsg(L"If no return type, return by has to be None");
+        }
+         else if ((m_strRetType == kCIDDocComp::strType_Void)
+              &&  (m_eRetBy != tCIDDocComp::EParmPB::Void))
+        {
+            facCIDDocComp.AddErrorMsg(L"If no return type is void, return by must be");
+        }
+         else if ((m_eRetBy == tCIDDocComp::EParmPB::None)
+              ||  (m_eRetBy == tCIDDocComp::EParmPB::Void))
+        {
+            facCIDDocComp.AddErrorMsg(L"Return by cannot be none/void if a return type is defined");
+        }
+    }
+     else
+    {
+        if (m_strRetType.bIsEmpty())
+        {
+            if (tCIDLib::bAllBitsOn(m_eMethAttrs, tCIDDocComp::EMethAttrs::Ctor))
+            {
+                // Constructors have none
+                m_eRetBy = tCIDDocComp::EParmPB::None;
+            }
+             else
+            {
+                // Go with void
+                m_eRetBy = tCIDDocComp::EParmPB::Void;
+                m_strRetType = kCIDDocComp::strType_Void;
+            }
+        }
+         else
+        {
+            //
+            //  If void, set the return by to void, else to value. These are the
+            //  common scenarios we want to default.
+            //
+            if (m_strRetType == kCIDDocComp::strType_Void)
+                m_eRetBy = tCIDDocComp::EParmPB::Void;
+            else
+                m_eRetBy = tCIDDocComp::EParmPB::Val;
+        }
+    }
 
     // Next we have a list of method variations
     xtnodeSrc.bForEach
@@ -437,12 +662,7 @@ tCIDLib::TVoid TMethodGrp::OutputContent(TTextOutStream& strmTar) const
 {
     // If there's a description first, then output that
     if (!m_hnDescr.bIsEmpty())
-    {
         m_hnDescr.OutputNodes(strmTar);
-
-        // Separate this from the first method below it with a break
-        strmTar << L"<br/>";
-    }
 
     // And then do the methods
     m_colMethods.bForEach
@@ -466,7 +686,12 @@ tCIDLib::TVoid TMethodGrp::OutputContent(TTextOutStream& strmTar) const
                 return kCIDLib::True;
             }
         );
-        strmTar << L"</pre><blockquote>Defaulted constructors and operators</blockquote>";
+        strmTar << L"</pre><blockquote>Defaulted ";
+        if (tCIDLib::bAllBitsOn(m_eGrpAttrs, tCIDDocComp::EMethAttrs::Ctor))
+            strmTar << L"constructors";
+        else
+            strmTar << L"operators";
+        strmTar << L"</blockquote>";
     }
 
     if (!m_fcolDelMethods.bIsEmpty())
@@ -480,7 +705,12 @@ tCIDLib::TVoid TMethodGrp::OutputContent(TTextOutStream& strmTar) const
                 return kCIDLib::True;
             }
         );
-        strmTar << L"</pre><blockquote>Deleted constructors and operators</blockquote>";
+        strmTar << L"</pre><blockquote>Deleted ";
+        if (tCIDLib::bAllBitsOn(m_eGrpAttrs, tCIDDocComp::EMethAttrs::Ctor))
+            strmTar << L"constructors";
+        else
+            strmTar << L"operators";
+        strmTar << L"</blockquote>";
     }
 }
 
@@ -627,7 +857,9 @@ tCIDLib::TBoolean TMemberGrp::bIsEmpty() const
 {
     return
     (
-        m_methgCtors.bIsEmpty()
+        m_memgAliases.bIsEmpty()
+        && m_memgMembers.bIsEmpty()
+        && m_methgCtors.bIsEmpty()
         && m_methgNVirtMethods.bIsEmpty()
         && m_methgOperators.bIsEmpty()
         && m_methgOverMethods.bIsEmpty()
@@ -647,8 +879,9 @@ tCIDLib::TVoid TMemberGrp::Parse(const TXMLTreeElement& xtnodeGrp)
         [&](const TXMLTreeElement& xtnodeElem)
         {
             const TString& strName = xtnodeElem.strQName();
-            if (strName == L"DataTypes")
+            if (strName == L"Aliases")
             {
+                m_memgAliases.Parse(xtnodeElem);
             }
              else if (strName == L"Constants")
             {
@@ -679,6 +912,7 @@ tCIDLib::TVoid TMemberGrp::Parse(const TXMLTreeElement& xtnodeGrp)
             }
              else if (strName == L"Members")
             {
+                m_memgMembers.Parse(xtnodeElem);
             }
              else
             {
@@ -691,6 +925,10 @@ tCIDLib::TVoid TMemberGrp::Parse(const TXMLTreeElement& xtnodeGrp)
 
 tCIDLib::TVoid TMemberGrp::OutputContent(TTextOutStream& strmTar) const
 {
+    // Do the aliases first if any
+    m_memgAliases.OutputContent(strmTar, m_eVisType);
+
+    // Do the various method groups
     if (!m_methgStatMethods.bIsEmpty())
     {
         strmTar << L"<p><span class='SecHdr'>"
@@ -708,9 +946,6 @@ tCIDLib::TVoid TMemberGrp::OutputContent(TTextOutStream& strmTar) const
         TStreamIndentJan janIndent(&strmTar, 4);
         m_methgCtors.OutputContent(strmTar);
     }
-
-    // Special case for the dtor
-
 
     if (!m_methgOperators.bIsEmpty())
     {
@@ -747,7 +982,12 @@ tCIDLib::TVoid TMemberGrp::OutputContent(TTextOutStream& strmTar) const
         TStreamIndentJan janIndent(&strmTar, 4);
         m_methgNVirtMethods.OutputContent(strmTar);
     }
+
+    // If we have any members, do those
+    m_memgMembers.OutputContent(strmTar, m_eVisType);
 }
+
+
 
 
 
@@ -957,13 +1197,14 @@ tCIDLib::TVoid TCppClassPage::LoadMixinMethods()
         s_methDuplicate.m_strName = L"pobjDuplicate";
         s_methDuplicate.m_hnDescr.SetToText
         (
-            L"Allocates a duplicate of this object from the stack and returns "
-            L"the newly allocated object. The caller is responsible for releasing "
-            L"the object at some point. See the MDuplicable mixin class."
+            L"Allocates a duplicate of this object and returns the newly allocated "
+            L"object. The caller is responsible for releasing the object at some point. "
+            "See the MDuplicable mixin class."
         );
         TMethodVar& mvarDup = s_methDuplicate.m_colMethVars.objAdd(TMethodVar());
 
-        mvarDup.m_strRetType = L"TObject*";
+        mvarDup.m_strRetType = L"TObject";
+        mvarDup.m_eRetBy = tCIDDocComp::EParmPB::Ptr;
         mvarDup.m_eAttrs = tCIDDocComp::EMethAttrs::Override;
     }
 
@@ -977,6 +1218,7 @@ tCIDLib::TVoid TCppClassPage::LoadMixinMethods()
         );
         TMethodVar& mvarDup = s_methFormatTo.m_colMethVars.objAdd(TMethodVar());
         mvarDup.m_strRetType = L"tCIDLib::TVoid";
+        mvarDup.m_eRetBy = tCIDDocComp::EParmPB::Void;
         TMethodParam& methpNew = mvarDup.m_colParams.objAdd(TMethodParam());
         methpNew.m_eDir = tCIDDocComp::EParmDirs::In;
         methpNew.m_ePassBy = tCIDDocComp::EParmPB::Ref;
@@ -994,6 +1236,7 @@ tCIDLib::TVoid TCppClassPage::LoadMixinMethods()
         );
         TMethodVar& mvarCur = s_methStreamFrom.m_colMethVars.objAdd(TMethodVar());
         mvarCur.m_strRetType = L"tCIDLib::TVoid";
+        mvarCur.m_eRetBy = tCIDDocComp::EParmPB::Void;
         TMethodParam& methpNew = mvarCur.m_colParams.objAdd(TMethodParam());
         methpNew.m_eDir = tCIDDocComp::EParmDirs::In;
         methpNew.m_ePassBy = tCIDDocComp::EParmPB::Ref;
@@ -1010,6 +1253,7 @@ tCIDLib::TVoid TCppClassPage::LoadMixinMethods()
         );
         TMethodVar& mvarCur = s_methStreamTo.m_colMethVars.objAdd(TMethodVar());
         mvarCur.m_strRetType = L"tCIDLib::TVoid";
+        mvarCur.m_eRetBy = tCIDDocComp::EParmPB::Void;
         TMethodParam& methpNew = mvarCur.m_colParams.objAdd(TMethodParam());
         methpNew.m_eDir = tCIDDocComp::EParmDirs::In;
         methpNew.m_ePassBy = tCIDDocComp::EParmPB::Ref;

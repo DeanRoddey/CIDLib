@@ -899,10 +899,6 @@ tCIDLib::TVoid TTextOutStream::Reset()
     // Then reset the underlying binary stream
     m_pstrmOut->Reset();
 
-    // And reset the text converter if any
-    if (m_ptcvtThis)
-        m_ptcvtThis->Reset();
-
     // And reset our newline state flags
     m_bSawOD = kCIDLib::False;
     m_bIndentNext = kCIDLib::False;

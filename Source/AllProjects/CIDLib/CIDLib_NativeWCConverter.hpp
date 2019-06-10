@@ -73,8 +73,6 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
         // -------------------------------------------------------------------
         tCIDLib::EBaseTextFmts eBaseFmt() const override;
 
-        tCIDLib::TVoid Reset() override;
-
 
     protected :
         // -------------------------------------------------------------------

@@ -126,6 +126,7 @@
                 <CIDIDL:EnumVal CIDIDL:Name="ClassRef"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Code"/>
                 <CIDIDL:EnumVal CIDIDL:Name="DIV"/>
+                <CIDIDL:EnumVal CIDIDL:Name="FacRef"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Image"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Indent"/>
                 <CIDIDL:EnumVal CIDIDL:Name="InlineNote"/>
@@ -172,7 +173,7 @@
                 <CIDIDL:DocText>
                     The possible ways the parameter can be passed by or a value
                     returned.
-
+                        None    - For Constructors
                         CPtr    - const pointer
                         CPtrC   - const pointer to a const
                         CRef    - const reference
@@ -183,10 +184,7 @@
                         PtrRef  - A reference to a pointer to non-const
                         Value   - by value
 
-                        Void    - For ctors means just no value. Else means a
-                                  void return which doesn't require indicating
-                                  the type expilcitly. This is the default to
-                                  save some work.
+                        Void    - No return or parameter
 
                     These name is the same as what is in the XML, so we can translate
                     directly. None is used to indicate not set, so it's an error if we
@@ -199,10 +197,10 @@
                 <CIDIDL:EnumVal CIDIDL:Name="MRef"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Ref"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Ptr"/>
+                <CIDIDL:EnumVal CIDIDL:Name="PtrC"/>
                 <CIDIDL:EnumVal CIDIDL:Name="PtrCRef"/>
                 <CIDIDL:EnumVal CIDIDL:Name="PtrRef"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Val"/>
-
                 <CIDIDL:EnumVal CIDIDL:Name="Void"/>
             </CIDIDL:Enum>
 

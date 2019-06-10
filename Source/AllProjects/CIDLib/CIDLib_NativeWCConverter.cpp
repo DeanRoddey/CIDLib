@@ -95,12 +95,6 @@ tCIDLib::EBaseTextFmts TNativeWCConverter::eBaseFmt() const
 }
 
 
-tCIDLib::TVoid TNativeWCConverter::Reset()
-{
-    // This is a no-op for us
-}
-
-
 // ---------------------------------------------------------------------------
 // TNativeWCConverter: Protected, inherited methods
 // ---------------------------------------------------------------------------

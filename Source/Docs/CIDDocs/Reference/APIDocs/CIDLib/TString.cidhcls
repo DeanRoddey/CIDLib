@@ -20,7 +20,7 @@
 
         <SubSecTitle>Formatting Values</SubSecTitle>
 
-        <P>Though text output streams are best for extensive formatting of content to text, there are enormous numbres of scenarios where some basic formatting of values is needed, so this class provides a good bit of support for that, allowing you to format fundamental values and objects (that implement MFormattable) in a number of ways. You do this via the SetFormatted() and AppendFormatted() methods. The set versions just clear the string first.</P>
+        <P>Though text output streams are best for extensive formatting of content to text, there are enormous numbres of scenarios where some basic formatting of values is needed, so this class provides a good bit of support for that, allowing you to format fundamental values and objects (that implement <ClassRef Ref="MFormattable"/>) in a number of ways. You do this via the SetFormatted() and AppendFormatted() methods. The set versions just clear the string first.</P>
 
         <P>They allow you to control radix, numeric grouping size, group separators, decimal digit separators, number of decimal digits and so forth.</P>
 
@@ -72,12 +72,12 @@
                 </Desc>
                 <MethVar>
                     <MethParams>
-                        <MethParam Name="chToXlat" Type="tCIDLib::TSch" PBy="Val"/>
+                        <MethParam Name="chToXlat" Type="tCIDLib::TSch"/>
                     </MethParams>
                 </MethVar>
                 <MethVar>
                     <MethParams>
-                        <MethParam Name="chToXlat" Type="tCIDLib::TCh" PBy="Val"/>
+                        <MethParam Name="chToXlat" Type="tCIDLib::TCh"/>
                     </MethParams>
                 </MethVar>
             </Method>
@@ -120,7 +120,7 @@
                 </MethVar>
                 <MethVar>
                     <MethParams>
-                        <MethParam  Name="c4BufSz" Type="tCIDLib::TCard4" PBy="Val"/>
+                        <MethParam  Name="c4BufSz" Type="tCIDLib::TCard4"/>
                     </MethParams>
                 </MethVar>
             </Method>
@@ -131,7 +131,7 @@
                 </Desc>
                 <MethVar Attrs="Explicit">
                     <MethParams>
-                        <MethParam  Name="chInit" Type="tCIDLib::TCh" PBy="Val"/>
+                        <MethParam  Name="chInit" Type="tCIDLib::TCh"/>
                     </MethParams>
                 </MethVar>
                 <MethVar>
@@ -153,13 +153,13 @@
                 <MethVar>
                     <MethParams>
                         <MethParam  Name="pszInit" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                        <MethParam  Name="c4Extra" Type="tCIDLib::TCard" PBy="Val"/>
+                        <MethParam  Name="c4Extra" Type="tCIDLib::TCard"/>
                     </MethParams>
                 </MethVar>
                 <MethVar>
                     <MethParams>
                         <MethParam  Name="strInit" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="c4Extra" Type="tCIDLib::TCard" PBy="Val"/>
+                        <MethParam  Name="c4Extra" Type="tCIDLib::TCard"/>
                     </MethParams>
                 </MethVar>
             </Method>
@@ -173,7 +173,7 @@
                 <MethVar>
                     <MethParams>
                         <MethParam  Name="pszInit" Type="tCIDLib::TCh" PBy="Ptr"/>
-                        <MethParam  Name="EAdopt" Type="tCIDLib::EAdoptOpts" PBy="Val"/>
+                        <MethParam  Name="EAdopt" Type="tCIDLib::EAdoptOpts"/>
                     </MethParams>
                 </MethVar>
             </Method>
@@ -209,13 +209,13 @@
                 </Desc>
                 <MethVar>
                     <MethParams>
-                        <MethParam  Name="midLoad" Type="tCIDLib::TMsgId" PBy="Val"/>
+                        <MethParam  Name="midLoad" Type="tCIDLib::TMsgId"/>
                         <MethParam  Name="facSrc" Type="TFacility" PBy="CRef"/>
                     </MethParams>
                 </MethVar>
                 <MethVar>
                     <MethParams>
-                        <MethParam  Name="midLoad" Type="tCIDLib::TMsgId" PBy="Val"/>
+                        <MethParam  Name="midLoad" Type="tCIDLib::TMsgId"/>
                         <MethParam  Name="facSrc" Type="TFacility" PBy="CRef"/>
                         <MethParam  Name="mfmtblToken1" Type="MFormattable" PBy="CRef"/>
                         <MethParam  Name="mfmtblToken2" Type="MFormattable" PBy="CRef"

@@ -6,25 +6,122 @@
     <Desc>
         <P>This provides an efficient way to concat two or three strings and/or characters together and to pass the resulting string off to someone. Mostly it's used by the <ClassRef Ref="TString"/> class which has a constructor that takes one of these. This lets you easily create a string that is a concatenation of other strings. The string object just steals the resulting buffer from the the string cat object, so there's no need to copy the text again.</P>
 
-        <P>Obviously this could have been done via move semantics, but since this is what this class exists to do, it's annoying to have to force a move. So it just provides a method to steal the buffer, which anything that accepts one will know to call.</P>
+        <P>Obviously you might use it in other places in a similar way. </P>
     </Desc>
 
     <PubIntf>
 
-        <Ctors>
+        <Ctors DelMethods="DefCtor CopyCtor">
             <Method Name="TStrCat">
                 <Desc>
-                    There are actually two other versions that take three and four strings, rsepectively. So you can concatenate up to four strings using this form of the constructor.
+                    These constructors allow you to concatenate one or more strings and/or characters together. There are variations that take raw string pointers to avoid the creation of temporary string objects to some degree.
                 </Desc>
-                <MethVar >
+                <MethVar>
                     <MethParams>
                         <MethParam  Name="str1" Type="TString" PBy="CRef"/>
                         <MethParam  Name="str2" Type="TString" PBy="CRef"/>
                     </MethParams>
                 </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
+                        <MethParam  Name="str3" Type="TString" PBy="CRef"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
+                        <MethParam  Name="str3" Type="TString" PBy="CRef"/>
+                        <MethParam  Name="str4" Type="TString" PBy="CRef"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                        <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                        <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
+                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                        <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                        <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    </MethParams>
+                </MethVar>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                        <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
+                        <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+            <Method Name="TStrCat">
+                <Desc>
+                    Takes the source object's buffer and leaves it with a null pointer so that it doesn't have anything to release.
+                </Desc>
+                <MethVar >
+                    <MethParams>
+                        <MethParam  Name="scatSrc" Type="TStrCat" PBy="MRef"/>
+                    </MethParams>
+                </MethVar>
             </Method>
 
         </Ctors>
+
+        <Operators DelMethods="AssignOp">
+
+            <Method Name="operator=">
+                <Desc>
+                    Takes the source object's buffer and leaves it with a null pointer so that it doesn't have anything to release.
+                </Desc>
+                <MethVar >
+                    <MethParams>
+                        <MethParam  Name="scatSrc" Type="TStrCat" PBy="MRef"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+        </Operators>
+
+        <NVirtMeths>
+
+            <Method Name="pszStealBuf" RetType="tCIDLib::TCh" RetBy="PtrC"
+                    Attrs="NoDiscard">
+                <Desc>
+                    <P>Returns this object's accumulated text buffer and leaves this object without one. The length of the buffer is given back via the c4Len parameter, which may allow for more efficient use of the returned buffer. The caller is responsible for eventually freeing the returned buffer.</P>
+
+                    <Note>It's possible the return could be nullptr if someone else has already called this method.</Note>
+                </Desc>
+                <MethVar>
+                    <MethParams>
+                        <MethParam  Name="c4Len" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    </MethParams>
+                </MethVar>
+            </Method>
+
+        </NVirtMeths>
 
     </PubIntf>
 

@@ -4,7 +4,7 @@
 <CppClass Class="MFormattable" Prefix="mfmtbl" Parent="N/A">
 
     <Desc>
-        <P>MFormattable is one of the fundamental mixin interfaces. Any class that implements this interface can be formatted to a text output stream. The class must implement the FormatTo() method. There is a generic &amp;lt;&amp;lt; operator for text output streams that takes an MFormattable object, so any class that mixes in this interface will be accepted by that streaming operator.</P>
+        <P>MFormattable is one of the fundamental mixin interfaces. Any class that implements this interface can be formatted to a text output stream. The class must implement the FormatTo() method. There is a generic &amp;lt;&amp;lt; operator for text output streams that takes an MFormattable object, so any class that mixes in this interface will be accepted by that streaming operator and can format itself out to a text stream.</P>
     </Desc>
 
     <PubIntf>
@@ -18,13 +18,13 @@
 
         <!-- Virtual public methods -->
         <VirtMeths>
-            <Method Attrs="Pure Virtual" Name="FormatTo">
+            <Method Attrs="Pure" Name="FormatTo">
                 <Desc>
                     <P>The class that implements this interface must override this method and format its content out to the passed stream.</P>
                 </Desc>
                 <MethVar>
                     <MethParams>
-                        <MethParam Name="strmDest" Type="TTextOutStream" PBy="Ref"/>
+                        <MethParam Name="strmDest" Type="TTextOutStream" PBy="Ref" Dir="In"/>
                     </MethParams>
                 </MethVar>
             </Method>

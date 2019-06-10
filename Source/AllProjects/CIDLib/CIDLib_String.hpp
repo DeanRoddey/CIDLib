@@ -146,13 +146,29 @@ class CIDLIBEXP TStrCat
             , const tCIDLib::TCh* const     psz2
         );
 
+        TStrCat
+        (
+                    TStrCat&&               scatSrc
+        );
+
         ~TStrCat();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStrCat& operator=(const TStrCat&) = delete;
+
+        TStrCat& operator=
+        (
+                    TStrCat&&               scatSrc
+        );
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCh* pszStealBuf
+        [[nodiscard]] tCIDLib::TCh* pszStealBuf
         (
                     tCIDLib::TCard4&        c4Len
         )   const;
@@ -176,12 +192,6 @@ class CIDLIBEXP TString :
     public TObject, public MFormattable, public MDuplicable, public MStreamable
 {
     public  :
-        // -------------------------------------------------------------------
-        //  Public, static data
-        // -------------------------------------------------------------------
-        static const TString& strEmpty();
-
-
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
@@ -242,6 +252,8 @@ class CIDLIBEXP TString :
             ,       tCIDLib::TCh&           chOne
             ,       tCIDLib::TCh&           chTwo
         );
+
+        static const TString& strEmpty();
 
 
         // -------------------------------------------------------------------

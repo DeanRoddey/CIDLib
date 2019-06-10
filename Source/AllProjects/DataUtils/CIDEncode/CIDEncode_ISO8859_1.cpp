@@ -117,12 +117,6 @@ tCIDLib::EBaseTextFmts TLatin1Converter::eBaseFmt() const
 }
 
 
-tCIDLib::TVoid TLatin1Converter::Reset()
-{
-    // This is a no-op for us
-}
-
-
 // ---------------------------------------------------------------------------
 //  TLatinConverter: Protected, inherited methods
 // ---------------------------------------------------------------------------
