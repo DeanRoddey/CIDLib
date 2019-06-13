@@ -33,9 +33,7 @@
 //   CLASS: TStreamFmt
 //  PREFIX: strmf
 // ---------------------------------------------------------------------------
-class CIDLIBEXP TStreamFmt :
-
-    public TObject, public MDuplicable
+class CIDLIBEXP TStreamFmt : public TObject, public MDuplicable
 {
     public  :
         // -------------------------------------------------------------------

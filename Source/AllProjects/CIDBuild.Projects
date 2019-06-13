@@ -282,11 +282,20 @@ PROJECT=CIDPNG
         VERSIONED   = Yes
     END SETTINGS
 
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDPNG_Shared
+            GEN     = GLOBALS
+            NAMEEXT = Shared
+        END IDLFILE
+    END IDLFILES
+
     DEPENDENTS
         CIDLib
         CIDImage
         CIDZLib
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1276,7 +1285,6 @@ END PROJECT
 PROJECT=CIDCfgSrv
     SETTINGS
         DIRECTORY   = OrbUtils\CIDCfgSrv
-        MSGFILE     = No
         MSGFILE     = Yes
         TYPE        = Service
     END SETTINGS
@@ -1350,16 +1358,25 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;   Some general purpose utilities
 ; ----------------------------------------------------------------------------
-PROJECT=MakeDocs
+PROJECT=CIDDocComp
 
     SETTINGS
-        DIRECTORY   = Utilities\MakeDocs
+        DIRECTORY   = Utilities\CIDDocComp
         MSGFILE     = Yes
     END SETTINGS
+
+    IDLFILES
+        IDLFILE
+            SRCFILE = CIDDocComp_Info
+            GEN     = GLOBALS
+            NAMEEXT = Info
+        END IDLFILE
+    END IDLFILES
 
     DEPENDENTS
         CIDLib
         CIDXML
+        CIDEncode
     END DEPENDENTS
 END PROJECT
 
@@ -2312,6 +2329,34 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;  Some intermediate samples
 ; ----------------------------------------------------------------------------
+
+PROJECT=Interview1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Interview1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMData
+    END DEPENDENTS
+
+END PROJECT
+
+PROJECT=ObjStore1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ObjStore1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDObjStore
+    END DEPENDENTS
+
+END PROJECT
 
 PROJECT=ORB1SampS
 

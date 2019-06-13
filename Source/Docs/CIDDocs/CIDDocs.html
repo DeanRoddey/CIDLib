@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10"/>
+    <link rel="stylesheet" type="text/css" href="./CIDDocs.css"/>
+    <script src="./CIDDocs.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+<!-- A div that contains all of the actual content -->
+<div id="MainContent">
+
+    <header>
+        <div id="HeaderTop">
+            <img src="./Images/MainLogo.jpg"/>
+            <span id="HeaderTitle">CIDLib C++ Documentation</span>
+        </div>
+
+        <div id="CurPath">
+            <span style="font-weight : bold;">Current Path:&nbsp;</span>
+            <span id="CurHelpPath"></span>
+        </div>
+    </header>
+
+    <!--
+       - This is the dynamic div into which the actual content is loaded. The
+       - javascript init will get the initial (generated) page loaded up on
+       - startup.
+       -->
+    <div id="DynDiv">
+
+        <div id="StdPage">
+            <div id="LeftSide"></div>
+            <div id="RightSide"></div>
+        </div>
+    </div>
+
+    <footer>
+        Copyright (c) 2019, Charmed Quark Systems, Ltd.
+    </footer>
+
+</div>
+
+</body>
+</html>
+

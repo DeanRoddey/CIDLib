@@ -75,7 +75,7 @@ TSysBuf::TSysBuf() :
     m_c4Size(kCIDLib::c4MemPageSize)
     , m_c4MaxSize(kCIDLib::c4DefMaxBufferSz)
     , m_eAccess(tCIDLib::EMemAccFlags::ReadWrite)
-    , m_pc1Data(0)
+    , m_pc1Data(nullptr)
 {
     //
     //  Create the buffer. It will be lazily committed since the initial
@@ -100,7 +100,7 @@ TSysBuf::TSysBuf(   const   TString&                strInitData
     m_c4Size(0)
     , m_c4MaxSize(c4MaxSize)
     , m_eAccess(eAccessFlags)
-    , m_pc1Data(0)
+    , m_pc1Data(nullptr)
 {
     // Calc the source bytes we need to copy
     const tCIDLib::TCard4 c4SrcSize = strInitData.c4Length() * kCIDLib::c4CharBytes;
@@ -152,7 +152,7 @@ TSysBuf::TSysBuf(   const   tCIDLib::TCh* const     pszInitData
     m_c4Size(0)
     , m_c4MaxSize(c4MaxSize)
     , m_eAccess(eAccessFlags)
-    , m_pc1Data(0)
+    , m_pc1Data(nullptr)
 {
     // Calc the source bytes we need to copy
     const tCIDLib::TCard4 c4SrcSize
@@ -205,7 +205,7 @@ TSysBuf::TSysBuf(   const   tCIDLib::TCard4         c4Size
     m_c4Size(c4Size)
     , m_c4MaxSize(c4Size)
     , m_eAccess(eAccessFlags)
-    , m_pc1Data(0)
+    , m_pc1Data(nullptr)
 {
     // Validate the size, which cannot be zero
     ValidateSizes(c4Size, c4Size);
@@ -230,7 +230,7 @@ TSysBuf::TSysBuf(   const   tCIDLib::TCard4         c4Size
     m_c4Size(c4Size)
     , m_c4MaxSize(c4MaxSize)
     , m_eAccess(eAccessFlags)
-    , m_pc1Data(0)
+    , m_pc1Data(nullptr)
 {
     //
     //  If we have a non-zero size, and zero max size, then default the
@@ -310,7 +310,7 @@ TSysBuf& TSysBuf::operator=(const TSysBuf& mbufToAssign)
                 , tCIDLib::EErrClasses::CantDo
             );
         }
-        m_pc1Data = 0;
+        m_pc1Data = nullptr;
     }
 
     // Do our parent first
@@ -562,7 +562,7 @@ tCIDLib::TVoid TSysBuf::StreamTo(TBinOutStream& strmToWriteTo) const
 //
 tCIDLib::TVoid TSysBuf::Create()
 {
-    tCIDLib::TVoid* pBuf = 0;
+    tCIDLib::TVoid* pBuf = nullptr;
 
     // Do a sanity check on the buffer
     if (!m_c4MaxSize)

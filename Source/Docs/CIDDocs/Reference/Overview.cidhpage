@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Reference Material</Title>
+
+    <HelpText>
+
+        <P>This section is where we get into the nitty gritty details. There's not a lot of higher level information here, that's in the Big Picture section and the other sections that it points you to to delve into various subjects. Those will refer you to this section for the details.</P>
+
+        <P>The big one of course is the CIDLib API section, which contains a list of all of the facilities and the classes they implement. That's where you will spend most of your time when actually coding CIDLib based systems.</P>
+
+    </HelpText>
+
+</HelpPage>

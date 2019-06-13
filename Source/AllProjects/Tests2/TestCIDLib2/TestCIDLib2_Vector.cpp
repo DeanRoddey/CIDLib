@@ -15,8 +15,7 @@
 //
 // DESCRIPTION:
 //
-//  This file contains tests related to the by reference vector collection
-//  test.
+//  This file contains tests related to the by value vector collection.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -83,7 +82,7 @@ TTest_VectorLambda::eRunTest(TTextStringOutStream&  strmOut
 
     // Iterate the values and check them
     tCIDLib::TCard4 c4LoopVal = 0;
-    colTest.ForEach
+    colTest.bForEach
     (
         [&c4LoopVal, &strVal, &eRes, &strmOut](const TString& strCur)
         {
@@ -91,7 +90,7 @@ TTest_VectorLambda::eRunTest(TTextStringOutStream&  strmOut
             strVal.AppendFormatted(c4LoopVal++);
             if (strVal != strCur)
             {
-                strmOut << L"ForEach callback got out of sequence value\n\n";
+                strmOut << TFWCurLn << L"ForEach callback got out of sequence value\n\n";
                 eRes = tTestFWLib::ETestRes::Failed;
             }
             return kCIDLib::True;
@@ -103,7 +102,7 @@ TTest_VectorLambda::eRunTest(TTextStringOutStream&  strmOut
     strVal.AppendFormatted(2UL);
     if (colTest.tFind([&strVal](const TString& strCur) { return strVal == strCur; }) != 2)
     {
-        strmOut << L"tFind did not find the test value\n\n";
+        strmOut << TFWCurLn << L"tFind did not find the test value\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
@@ -159,14 +158,14 @@ TTest_VectorMoveSem::eRunTest(  TTextStringOutStream&   strmOut
     tCIDLib::TStrList colMoveCtor(tCIDLib::ForceMove(colTest));
     if (colMoveCtor.c4ElemCount() != 16)
     {
-        strmOut << L"Move ctor did not move elements to new collection\n\n";
+        strmOut << TFWCurLn << L"Move ctor did not move elements to new collection\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
     // And the original should be empty now
     if (colTest.c4ElemCount() != 0)
     {
-        strmOut << L"Move ctor did not empty source collection\n\n";
+        strmOut << TFWCurLn << L"Move ctor did not empty source collection\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
@@ -177,7 +176,7 @@ TTest_VectorMoveSem::eRunTest(  TTextStringOutStream&   strmOut
         strVal.AppendFormatted(c4Index);
         if (colMoveCtor[c4Index] != strVal)
         {
-            strmOut << L"Move ctor copy is out of sequence\n\n";
+            strmOut << TFWCurLn << L"Move ctor copy is out of sequence\n\n";
             eRes = tTestFWLib::ETestRes::Failed;
             break;
         }
@@ -191,14 +190,14 @@ TTest_VectorMoveSem::eRunTest(  TTextStringOutStream&   strmOut
     colSafe = tCIDLib::ForceMove(colMoveCtor);
     if (!colSafe.bIsMTSafe())
     {
-        strmOut << L"Move operator overwrote thread safety\n\n";
+        strmOut << TFWCurLn << L"Move operator overwrote thread safety\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
     // The move one should now be empty
     if (colMoveCtor.c4ElemCount() != 0)
     {
-        strmOut << L"Move operator did not empty source collection\n\n";
+        strmOut << TFWCurLn << L"Move operator did not empty source collection\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
@@ -209,10 +208,18 @@ TTest_VectorMoveSem::eRunTest(  TTextStringOutStream&   strmOut
         strVal.AppendFormatted(c4Index);
         if (colSafe[c4Index] != strVal)
         {
-            strmOut << L"Move ctor copy is out of sequence\n\n";
+            strmOut << TFWCurLn << L"Move ctor copy is out of sequence\n\n";
             eRes = tTestFWLib::ETestRes::Failed;
             break;
         }
+    }
+
+    // Move construct one from a thread safe src, which should also be thread safe
+    tCIDLib::TStrList colNewSafe(tCIDLib::ForceMove(colSafe));
+    if (colNewSafe.eMTState() != tCIDLib::EMTStates::Safe)
+    {
+        strmOut << TFWCurLn << L"Move ctor did not copy over thread safety\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
     }
 
     return eRes;

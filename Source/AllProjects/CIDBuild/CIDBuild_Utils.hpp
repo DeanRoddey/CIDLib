@@ -91,7 +91,7 @@ namespace TUtils
         const   tCIDLib::TCh* const *       apszParams
         , const tCIDLib::TCard4             c4Count
         ,       tCIDLib::TCard4&            c4Result
-        , const tCIDLib::TBoolean           bLowPrio = kCIDLib::False
+        , const tCIDLib::TCard4             c4Flags
     );
 
     tCIDLib::TBoolean bFindNVParts

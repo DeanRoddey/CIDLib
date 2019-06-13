@@ -106,11 +106,6 @@ tCIDLib::EBaseTextFmts TUCS4Converter::eBaseFmt() const
 }
 
 
-tCIDLib::TVoid TUCS4Converter::Reset()
-{
-}
-
-
 // ---------------------------------------------------------------------------
 //  TUCS4Converter: Protected, inherited methods
 // ---------------------------------------------------------------------------

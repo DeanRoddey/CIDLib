@@ -15,8 +15,8 @@
 //
 // DESCRIPTION:
 //
-//  This file implements the TBitmap class, which is the platform independent
-//  abstraction for a host bitmap.
+//  This file implements the TBitmap class, which is a wrapper around a
+//  Windows bitmap.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -48,7 +48,7 @@ namespace CIDGraphDev_Bitmap
     // ---------------------------------------------------------------------------
     struct TBmpMap
     {
-        tCIDGraphDev::ESysBmps    eBmp;
+        tCIDGraphDev::ESysBmps  eBmp;
         tCIDLib::TResId         ridThis;
         const tCIDLib::TCh*     pszName;
     };
@@ -1872,9 +1872,9 @@ TBitmap::TBitmap(const  tCIDGraphDev::TBmpHandle    hbmpSrc
 //  still refers to the same underlying bitmap as the original. If you want
 //  a copy of your own, call DeepCopy().
 //
-TBitmap::TBitmap(const TBitmap& bmpToCopy) :
+TBitmap::TBitmap(const TBitmap& bmpSrc) :
 
-    m_cptrHandle(bmpToCopy.m_cptrHandle)
+    m_cptrHandle(bmpSrc.m_cptrHandle)
 {
 }
 
@@ -1905,10 +1905,10 @@ TBitmap::~TBitmap()
 // ---------------------------------------------------------------------------
 //  TBitmap: Public operators
 // ---------------------------------------------------------------------------
-TBitmap& TBitmap::operator=(const TBitmap& bmpToAssign)
+TBitmap& TBitmap::operator=(const TBitmap& bmpSrc)
 {
-    if (this != &bmpToAssign)
-        m_cptrHandle  = bmpToAssign.m_cptrHandle;
+    if (this != &bmpSrc)
+        m_cptrHandle  = bmpSrc.m_cptrHandle;
     return *this;
 }
 
@@ -3105,7 +3105,7 @@ tCIDLib::TVoid TBitmap::LoadSysBmp(const tCIDGraphDev::ESysBmps eToLoad)
     }
      else
     {
-        hbmpTmp = ::LoadBitmapW(0, MAKEINTRESOURCE(ridBmp));
+        hbmpTmp = ::LoadBitmapW(0, MAKEINTRESOURCEW(ridBmp));
         if (hbmpTmp == kCIDGraphDev::hbmpInvalid)
         {
             TKrnlError::SetLastHostError(::GetLastError());

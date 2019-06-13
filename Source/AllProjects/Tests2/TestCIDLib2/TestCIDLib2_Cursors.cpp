@@ -366,7 +366,7 @@ TTest_ColCursors::eRunTest( TTextStringOutStream&   strmOut
 
     // Do hash sets
     {
-        tCIDLib::TStrHashSet colTest(29, new TStringKeyOps);
+        tCIDLib::TStrHashSet colTest(29, TStringKeyOps());
         colTest.objAdd(TString(L"Value 1"));
         colTest.objAdd(TString(L"Value 2"));
         colTest.objAdd(TString(L"Value 3"));
@@ -426,7 +426,7 @@ TTest_ColCursors::eRunTest( TTextStringOutStream&   strmOut
     {
         tCIDLib::TKVHashSet colTest
         (
-            29, new TStringKeyOps, TKeyValuePair::strExtractKey
+            29, TStringKeyOps(), TKeyValuePair::strExtractKey
         );
         colTest.objAdd(TKeyValuePair(L"Key 1", L"Value 1"));
         colTest.objAdd(TKeyValuePair(L"Key 2", L"Value 2"));
@@ -529,7 +529,7 @@ TTest_ColCursors::eRunTest( TTextStringOutStream&   strmOut
         (
             tCIDLib::EAdoptOpts::Adopt
             , 29
-            , new TStringKeyOps
+            , TStringKeyOps()
             , TKeyValuePair::strExtractKey
         );
         colTest.Add(new TKeyValuePair(L"Key 1", L"Value 1"));

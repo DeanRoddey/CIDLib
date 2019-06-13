@@ -105,8 +105,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         using TVolInfoCol = TKeyedHashSet<TVolumeInfo, TString, TStringKeyOps>;
         using TVolFailureCol = TKeyedHashSet<TVolFailureInfo, TString, TStringKeyOps>;
 
-        TVolInfoCol colVols(29, new TStringKeyOps, strVolInfoKey);
-        TVolFailureCol  colFails(29, new TStringKeyOps, strVolFailureKey);
+        TVolInfoCol colVols(29, TStringKeyOps(), strVolInfoKey);
+        TVolFailureCol  colFails(29, TStringKeyOps(), strVolFailureKey);
 
         // Ask the file system class for a list of all of the  available volumes.
         if (!TFileSys::c4QueryAvailableVolumes(colVols, colFails, kCIDLib::True, kCIDLib::False))

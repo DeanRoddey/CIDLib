@@ -133,13 +133,16 @@ namespace tCIDLib
     }
 }
 
-tCIDLib::TVoid tCIDLib::ThrowAssert(const TString& strErr)
+tCIDLib::TVoid
+tCIDLib::ThrowAssert(const  TString&            strErr
+                    , const tCIDLib::TCh* const pszFile
+                    , const tCIDLib::TCard4     c4Line)
 {
     throw TLogEvent
     (
         L"CIDLib"
-        , CID_FILE
-        , CID_LINE
+        , pszFile
+        , c4Line
         , kCIDErrs::errcDbg_AssertFailed
         , strErr
         , tCIDLib::ESeverities::Failed
@@ -148,15 +151,18 @@ tCIDLib::TVoid tCIDLib::ThrowAssert(const TString& strErr)
 }
 
 tCIDLib::TVoid
-tCIDLib::ThrowAssert(const TString& strErr, const MFormattable& mfbtlToken1)
+tCIDLib::ThrowAssert(const  TString&            strErr
+                    , const tCIDLib::TCh* const pszFile
+                    , const tCIDLib::TCard4     c4Line
+                    , const MFormattable&       mfbtlToken1)
 {
     TString strMsg(strErr);
     strMsg.eReplaceToken(mfbtlToken1, kCIDLib::chDigit1);
     throw TLogEvent
     (
         L"CIDLib"
-        , CID_FILE
-        , CID_LINE
+        , pszFile
+        , c4Line
         , kCIDErrs::errcDbg_AssertFailed
         , strMsg
         , tCIDLib::ESeverities::Failed
@@ -206,7 +212,6 @@ template class TStack<TArea>;
 template class TStackJan<TArea>;
 
 
-
 static tCIDLib::ESortComps
 eCompTest(const tCIDLib::TCard4& c41, const tCIDLib::TCard4& c42)
 {
@@ -219,6 +224,9 @@ eCompTest(const tCIDLib::TCard4& c41, const tCIDLib::TCard4& c42)
 
 static tCIDLib::TVoid DummyFunc()
 {
+    tCIDLib::TBasicPair<TArea, TString> pairTmp;
+    pairTmp.m_tF.Set(0, 1, 2, 3);
+
     TArrayJanitor<tCIDLib::TCard4> janBuf(10);
 
     TVector<TString> colOne;
@@ -232,7 +240,7 @@ static tCIDLib::TVoid DummyFunc()
     {
     }
     colOne.AddXCopies(TString::strEmpty(), 4);
-    colOne.ForEach([] (const TString& strCur) -> tCIDLib::TBoolean { return kCIDLib::True; });
+    colOne.bForEach([] (const TString& strCur) -> tCIDLib::TBoolean { return kCIDLib::True; });
 
     TStringPool splStrings(L"Test", 8);
     THeapBufPool splHeapBufs(L"Test", 8);
@@ -276,8 +284,8 @@ static tCIDLib::TVoid DummyFunc()
     );
 
 
-    tCIDLib::TKVHashSet col1(7, new TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
-    tCIDLib::TKVHashSet col2(7, new TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
+    tCIDLib::TKVHashSet col1(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
+    tCIDLib::TKVHashSet col2(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
     if (tCIDLib::bCompareElems(col1, col2, TKeyValuePair::bComp))
     {
     }
@@ -295,7 +303,7 @@ static tCIDLib::TVoid DummyFunc()
     strmIn >> objaEnumed;
 
     tCIDLib::TCard4 c4Count = 0;
-    objaEnumed.ForEach
+    objaEnumed.bForEach
     (
         [&c4Count] (const TArea& areaCur)
         {
@@ -307,11 +315,11 @@ static tCIDLib::TVoid DummyFunc()
 
     // Force some of the enum based collection stuff to be generated
     TVector<TArea, tCIDLib::EErrClasses> colArea;
-    colArea.ForEachNC([] (TArea& areaCur) { return kCIDLib::True; });
+    colArea.bForEachNC([] (TArea& areaCur) { return kCIDLib::True; });
 
     TRefVector<TArea> colRefArea(tCIDLib::EAdoptOpts::Adopt);
     TRefVector<TArea> colRefArea2(tCIDLib::EAdoptOpts::Adopt);
-    colRefArea.ForEachNC([] (TArea& areaCur) { return kCIDLib::True; });
+    colRefArea.bForEachNC([] (TArea& areaCur) { return kCIDLib::True; });
     if (tCIDLib::bCompareElems(colRefArea, colRefArea2, TString::bComp)
     ||  !tCIDLib::bCompareElems(colRefArea, colRefArea2, TString::bComp))
     {
@@ -322,33 +330,41 @@ static tCIDLib::TVoid DummyFunc()
     }
 
     TQueue<TString> colStrQ;
-    colStrQ.ForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
+    colStrQ.bForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
 
     TRefQueue<TString> colStrRQ(tCIDLib::EAdoptOpts::Adopt);
-    colStrRQ.ForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
+    colStrRQ.bForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
 
     TRefKeyedHashSet<TKeyValuePair, TString, TStringKeyOps>
     colRKHS
     (
         tCIDLib::EAdoptOpts::NoAdopt
         , 23
-        , new TStringKeyOps(kCIDLib::False)
+        , TStringKeyOps(kCIDLib::False)
         , &TKeyValuePair::strExtractKey
     );
-    colRKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
+    colRKHS.bForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
 
     TKeyedHashSet<TKeyValuePair, TString, TStringKeyOps>
     colKHS
     (
-        23, new TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
+        23, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
     );
-    colKHS.ForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
+    colKHS.bForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
 
 
     // Unique pointer template expansion to make sure it's good
     TUniquePtr<TString> uptrTest1(new TString(L"This is a test"));
     TUniquePtr<TString> uptrTest2(tCIDLib::ForceMove(uptrTest1));
     if (uptrTest1 || !uptrTest2->bCompare(L"This is a test"))
+    {
+    }
+
+    // And managed pointers
+    TString strMPtrTest(L"Managed string");
+    TMngPtr<TString> mptr1(&strMPtrTest);
+    TMngPtr<TString> mptr2(mptr1);
+    if ((*mptr1 != *mptr2) || (*mptr1.pobjData() != *mptr2.pobjData()))
     {
     }
 
@@ -361,17 +377,20 @@ static tCIDLib::TVoid DummyFunc()
 
     // Fundamental collections
     TFundArray<tCIDLib::TBoolean> fcolArray(8);
-    fcolArray.ForEach
+    fcolArray.bForEach
     (
         [](const tCIDLib::TBoolean bCur) { return kCIDLib::True; }
     );
 
     TFundVector<tCIDLib::TBoolean> fcolVector(8);
-    fcolVector.ForEach
+    fcolVector.bForEach
     (
         [](const tCIDLib::TBoolean bCur) { return kCIDLib::True; }
     );
 
+    TFundVector<tCIDLib::TCard8> fcolCard8s;
+    tCIDLib::TCard8 c8MaxDup
+        = tCIDColAlgo::tFindMaxFundSeqDup<TFundVector<tCIDLib::TCard8>>(fcolCard8s);
 
     TTextStringOutStream strmTest(1024UL);
     TMutex mtxSync;
@@ -385,6 +404,10 @@ static tCIDLib::TVoid DummyFunc()
     TVector<TArea>::TCursor cursTest(&colTestCurs);
     cursTest++;
     --cursTest;
+
+    for (cursTest.bReset(); cursTest; ++cursTest)
+    {
+    }
 
     TVector<TArea>::TNCCursor cursNCTest(&colTestCurs);
     cursNCTest++;
@@ -404,6 +427,9 @@ static tCIDLib::TVoid DummyFunc()
     if ((colNVM1 == colNVM2) || (colNVM1 != colNVM2))
     {
     }
+
+    TVector<const TString> colConstStr;
+    const TString& strNC = colConstStr[0];
 }
 #endif
 

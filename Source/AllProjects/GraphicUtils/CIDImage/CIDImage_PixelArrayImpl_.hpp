@@ -71,8 +71,6 @@ class TPixelArrayImpl : public TObject, public MStreamable
             const   TPixelArrayImpl&        pixaiSrc
         );
 
-        TPixelArrayImpl(TPixelArrayImpl&&) = delete;
-
         ~TPixelArrayImpl();
 
 
@@ -87,7 +85,7 @@ class TPixelArrayImpl : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid ApplyAlphaChannel
+        virtual tCIDLib::TVoid ApplyAlphaChannel
         (
             const   TPixelArrayImpl&        pixaiAlpha
             , const TArea&                  areaSrc
@@ -97,13 +95,13 @@ class TPixelArrayImpl : public TObject, public MStreamable
             , const tCIDLib::TBoolean       bForceBW
         );
 
-        tCIDLib::TBoolean bIsSameFormat
+        virtual tCIDLib::TBoolean bIsSameFormat
         (
             const   TPixelArrayImpl&        pixaiToCheck
             , const tCIDLib::TBoolean       bIncludeSz
         )   const;
 
-        tCIDLib::TBoolean bPalToRGB
+        virtual tCIDLib::TBoolean bPalToRGB
         (
             const   TClrPalette&            palToUse
             , const tCIDLib::TBoolean       bTransClr
@@ -112,31 +110,227 @@ class TPixelArrayImpl : public TObject, public MStreamable
             , const TRGBClr&                rgbRepClr
         );
 
-        tCIDLib::TBoolean bRGBToRGBA
+        virtual tCIDLib::TBoolean bRGBToRGBA
         (
             const   tCIDLib::TCard4         c4TransClr
             , const tCIDLib::TBoolean       bRepTrans
             , const TRGBClr&                rgbRepClr
         );
 
-        tCIDLib::TVoid BSplineScaleTo
+        virtual tCIDLib::TVoid BSplineScaleTo
         (
                     TPixelArrayImpl&        pixaiToFill
             , const TClrPalette&            palToUse
             , const tCIDLib::TCard4         c4SplineDegree
         )   const;
 
-        tCIDLib::TCard4 c4At
+        virtual tCIDLib::TCard4 c4At
         (
             const   tCIDLib::TCard4         c4XPos
             , const tCIDLib::TCard4         c4YPos
         )   const;
 
-        tCIDLib::TCard4 c4At
+        virtual tCIDLib::TCard4 c4At
         (
             const   TQ1Point&               pntPos
         );
 
+        virtual tCIDLib::TCard4 c4Unused
+        (
+            const   TClrPalette&            palToUse
+        )   const;
+
+        virtual tCIDLib::TVoid CvtToGrayScale
+        (
+                    TClrPalette&            palToUse
+        );
+
+        virtual tCIDLib::TVoid ExtractAlphaChannel
+        (
+                    TPixelArrayImpl&        pixaiAlpha
+        )   const;
+
+        virtual tCIDLib::TVoid FlipHorizontally();
+
+        virtual tCIDLib::TVoid FlipHorizontally
+        (
+            const   tCIDLib::TCard4         c4StartCol
+            , const tCIDLib::TCard4         c4EndCol
+        );
+
+        virtual tCIDLib::TVoid FlipRowOrder();
+
+        virtual tCIDLib::TVoid ForceRowOrder
+        (
+            const   tCIDImage::ERowOrders   eRowOrder
+        );
+
+        virtual tCIDLib::TVoid FlipVertically();
+
+        virtual tCIDLib::TVoid FlipVertically
+        (
+            const   tCIDLib::TCard4         c4StartRow
+            , const tCIDLib::TCard4         c4EndRow
+        );
+
+        virtual tCIDLib::TVoid GaussianBlur
+        (
+            const   tCIDLib::TCard4         c4Order
+            ,       TPixelArrayImpl* const  ppixaiTmp = nullptr
+        );
+
+        virtual tCIDLib::TVoid GaussianBlur
+        (
+            const   tCIDLib::TCard4         c4Order
+            , const tCIDLib::TCard4         c4MaxWidth
+            , const tCIDLib::TCard4         c4MaxHeight
+            ,       TPixelArrayImpl* const  ppixaiTmp = nullptr
+        );
+
+        virtual tCIDLib::TVoid InvertAlphaChannel();
+
+        virtual tCIDLib::TVoid LoadCompRow
+        (
+                    tCIDLib::TFloat8* const pf8ToLoad
+            , const tCIDLib::TCard4         c4Row
+            , const tCIDLib::EClrComps      eComp
+            , const TClrPalette&            palToUse
+        )   const;
+
+        virtual tCIDLib::TVoid MakeMask
+        (
+                    TPixelArrayImpl&        pixaiToFill
+            , const tCIDLib::TCard4         c4ClrVal
+            , const tCIDLib::TBoolean       bInvert = kCIDLib::False
+        )   const;
+
+        virtual tCIDLib::TVoid MakeScaled
+        (
+                    TPixelArrayImpl&        pixaiThumb
+            , const TClrPalette&            palClrs
+            , const tCIDLib::TBoolean       bTransClr
+            , const tCIDLib::TCard4         c4TransClr
+            , const tCIDLib::TCard4         c4Degree
+        )   const;
+
+        virtual const tCIDLib::TCard1* pc1RowPtr
+        (
+            const   tCIDLib::TCard4         c4Row
+        )   const;
+
+        virtual tCIDLib::TCard1* pc1RowPtr
+        (
+            const   tCIDLib::TCard4         c4Row
+        );
+
+        virtual tCIDLib::TVoid Premultiply();
+
+        virtual tCIDLib::TVoid PutAt
+        (
+            const   tCIDLib::TCard4         c4ToPut
+            , const tCIDLib::TCard4         c4XPos
+            , const tCIDLib::TCard4         c4YPos
+        );
+
+        virtual tCIDLib::TVoid PutAt
+        (
+            const   tCIDLib::TCard4         c4ToPut
+            , const TQ1Point&               pntPos
+        );
+
+        virtual tCIDLib::TVoid QueryRGBAt
+        (
+            const   TPoint&                 pntAt
+            , const TClrPalette&            palToUse
+            ,       TRGBClr&                rgbToFill
+        )   const;
+
+        virtual tCIDLib::TVoid ReplaceClr
+        (
+            const   tCIDLib::TCard4         c4ToRep
+            , const tCIDLib::TCard4         c4RepClr
+        );
+
+        virtual tCIDLib::TVoid Reset
+        (
+            const   tCIDImage::EPixFmts     eFmt
+            , const tCIDImage::EBitDepths   eBitDepth
+            , const tCIDImage::ERowOrders   eRowOrder
+            , const TSize&                  szImage
+            , const tCIDLib::TBoolean       bForceRealloc = kCIDLib::False
+        );
+
+        virtual tCIDLib::TVoid Reset
+        (
+            const   tCIDImage::EPixFmts     eFmt
+            , const tCIDImage::EBitDepths   eBitDepth
+            , const tCIDLib::TBoolean       bForceRealloc = kCIDLib::False
+        );
+
+        virtual tCIDLib::TVoid Reset
+        (
+            const   TSize&                  szImage
+            , const tCIDLib::TBoolean       bForceRealloc = kCIDLib::False
+        );
+
+        virtual tCIDLib::TVoid Reset
+        (
+            const   TCIDImage&              imgSource
+            , const tCIDLib::TBoolean       bForceRealloc = kCIDLib::False
+        );
+
+        virtual tCIDLib::TVoid ScaleAlpha
+        (
+                    tCIDLib::EDirs          eDir
+            , const tCIDLib::TCard4         c4StartInd
+            , const tCIDLib::TCard4         c4EndInd
+        );
+
+        virtual tCIDLib::TVoid SetAll
+        (
+            const   tCIDLib::TCard4         c4ToSet
+        );
+
+        virtual tCIDLib::TVoid SetAllAlpha
+        (
+            const   tCIDLib::TCard4         c4ToSet
+        );
+
+        virtual tCIDLib::TVoid SetAlphaAt
+        (
+            const   tCIDLib::TCard4         c4ToSet
+            , const TArea&                  areaTar
+        );
+
+        virtual tCIDLib::TVoid SetAlphaFromColor();
+
+        virtual tCIDLib::TVoid SetAlphaFromColor
+        (
+            const   tCIDLib::TCard4         c4TransClr
+        );
+
+        virtual tCIDLib::TVoid SetEmptyTrans();
+
+        virtual tCIDLib::TVoid SetTextAlpha
+        (
+            const   tCIDLib::TCard4         c4TextClr
+            , const tCIDLib::TCard4         c4TransClr
+            , const tCIDLib::TBoolean       bPremul
+        );
+
+        virtual tCIDLib::TVoid StoreCompRow
+        (
+                    tCIDLib::TCard2* const  pc2ToStore
+            , const tCIDLib::TCard4         c4Row
+            , const tCIDLib::EClrComps      eComp
+        );
+
+        virtual tCIDLib::TVoid ZeroAll();
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
         tCIDLib::TCard4 c4BitsPer() const;
 
         tCIDLib::TCard4 c4Height() const
@@ -159,16 +353,6 @@ class TPixelArrayImpl : public TObject, public MStreamable
             return m_c4Width;
         }
 
-        tCIDLib::TCard4 c4Unused
-        (
-            const   TClrPalette&            palToUse
-        )   const;
-
-        tCIDLib::TVoid CvtToGrayScale
-        (
-                    TClrPalette&            palToUse
-        );
-
         tCIDImage::EBitDepths eBitDepth() const
         {
             return m_eBitDepth;
@@ -184,74 +368,6 @@ class TPixelArrayImpl : public TObject, public MStreamable
             return m_eRowOrder;
         }
 
-        tCIDLib::TVoid ExtractAlphaChannel
-        (
-                    TPixelArrayImpl&        pixaiAlpha
-        )   const;
-
-        tCIDLib::TVoid FlipHorizontally();
-
-        tCIDLib::TVoid FlipHorizontally
-        (
-            const   tCIDLib::TCard4         c4StartCol
-            , const tCIDLib::TCard4         c4EndCol
-        );
-
-        tCIDLib::TVoid FlipRowOrder();
-
-        tCIDLib::TVoid ForceRowOrder
-        (
-            const   tCIDImage::ERowOrders   eRowOrder
-        );
-
-        tCIDLib::TVoid FlipVertically();
-
-        tCIDLib::TVoid FlipVertically
-        (
-            const   tCIDLib::TCard4         c4StartRow
-            , const tCIDLib::TCard4         c4EndRow
-        );
-
-        tCIDLib::TVoid GaussianBlur
-        (
-            const   tCIDLib::TCard4         c4Order
-            ,       TPixelArrayImpl* const  ppixaiTmp = nullptr
-        );
-
-        tCIDLib::TVoid GaussianBlur
-        (
-            const   tCIDLib::TCard4         c4Order
-            , const tCIDLib::TCard4         c4MaxWidth
-            , const tCIDLib::TCard4         c4MaxHeight
-            ,       TPixelArrayImpl* const  ppixaiTmp = nullptr
-        );
-
-        tCIDLib::TVoid InvertAlphaChannel();
-
-        tCIDLib::TVoid LoadCompRow
-        (
-                    tCIDLib::TFloat8* const pf8ToLoad
-            , const tCIDLib::TCard4         c4Row
-            , const tCIDLib::EClrComps      eComp
-            , const TClrPalette&            palToUse
-        )   const;
-
-        tCIDLib::TVoid MakeMask
-        (
-                    TPixelArrayImpl&        pixaiToFill
-            , const tCIDLib::TCard4         c4ClrVal
-            , const tCIDLib::TBoolean       bInvert = kCIDLib::False
-        )   const;
-
-        tCIDLib::TVoid MakeScaled
-        (
-                    TPixelArrayImpl&        pixaiThumb
-            , const TClrPalette&            palClrs
-            , const tCIDLib::TBoolean       bTransClr
-            , const tCIDLib::TCard4         c4TransClr
-            , const tCIDLib::TCard4         c4Degree
-        )   const;
-
         const tCIDLib::TCard1* pc1Buffer() const
         {
             return m_pc1Pixels;
@@ -262,121 +378,7 @@ class TPixelArrayImpl : public TObject, public MStreamable
             return m_pc1Pixels;
         }
 
-        const tCIDLib::TCard1* pc1RowPtr
-        (
-            const   tCIDLib::TCard4         c4Row
-        )   const;
-
-        tCIDLib::TCard1* pc1RowPtr
-        (
-            const   tCIDLib::TCard4         c4Row
-        );
-
-        tCIDLib::TVoid Premultiply();
-
-        tCIDLib::TVoid PutAt
-        (
-            const   tCIDLib::TCard4         c4ToPut
-            , const tCIDLib::TCard4         c4XPos
-            , const tCIDLib::TCard4         c4YPos
-        );
-
-        tCIDLib::TVoid PutAt
-        (
-            const   tCIDLib::TCard4         c4ToPut
-            , const TQ1Point&               pntPos
-        );
-
-        tCIDLib::TVoid QueryRGBAt
-        (
-            const   TPoint&                 pntAt
-            , const TClrPalette&            palToUse
-            ,       TRGBClr&                rgbToFill
-        )   const;
-
-        tCIDLib::TVoid ReplaceClr
-        (
-            const   tCIDLib::TCard4         c4ToRep
-            , const tCIDLib::TCard4         c4RepClr
-        );
-
-        tCIDLib::TVoid Reset
-        (
-            const   tCIDImage::EPixFmts     eFmt
-            , const tCIDImage::EBitDepths   eBitDepth
-            , const tCIDImage::ERowOrders   eRowOrder
-            , const TSize&                  szImage
-            , const tCIDLib::TBoolean       bForceRealloc = kCIDLib::False
-        );
-
-        tCIDLib::TVoid Reset
-        (
-            const   tCIDImage::EPixFmts     eFmt
-            , const tCIDImage::EBitDepths   eBitDepth
-            , const tCIDLib::TBoolean       bForceRealloc = kCIDLib::False
-        );
-
-        tCIDLib::TVoid Reset
-        (
-            const   TSize&                  szImage
-            , const tCIDLib::TBoolean       bForceRealloc = kCIDLib::False
-        );
-
-        tCIDLib::TVoid Reset
-        (
-            const   TCIDImage&              imgSource
-            , const tCIDLib::TBoolean       bForceRealloc = kCIDLib::False
-        );
-
         TSize szImage() const;
-
-        tCIDLib::TVoid ScaleAlpha
-        (
-                    tCIDLib::EDirs          eDir
-            , const tCIDLib::TCard4         c4StartInd
-            , const tCIDLib::TCard4         c4EndInd
-        );
-
-        tCIDLib::TVoid SetAll
-        (
-            const   tCIDLib::TCard4         c4ToSet
-        );
-
-        tCIDLib::TVoid SetAllAlpha
-        (
-            const   tCIDLib::TCard4         c4ToSet
-        );
-
-        tCIDLib::TVoid SetAlphaAt
-        (
-            const   tCIDLib::TCard4         c4ToSet
-            , const TArea&                  areaTar
-        );
-
-        tCIDLib::TVoid SetAlphaFromColor();
-
-        tCIDLib::TVoid SetAlphaFromColor
-        (
-            const   tCIDLib::TCard4         c4TransClr
-        );
-
-        tCIDLib::TVoid SetEmptyTrans();
-
-        tCIDLib::TVoid SetTextAlpha
-        (
-            const   tCIDLib::TCard4         c4TextClr
-            , const tCIDLib::TCard4         c4TransClr
-            , const tCIDLib::TBoolean       bPremul
-        );
-
-        tCIDLib::TVoid StoreCompRow
-        (
-                    tCIDLib::TCard2* const  pc2ToStore
-            , const tCIDLib::TCard4         c4Row
-            , const tCIDLib::EClrComps      eComp
-        );
-
-        tCIDLib::TVoid ZeroAll();
 
 
     protected :

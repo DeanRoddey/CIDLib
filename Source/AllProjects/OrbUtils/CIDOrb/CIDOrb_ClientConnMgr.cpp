@@ -879,15 +879,18 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
         if (TStatsCache::bSetIfHigher(m_sciClientHWMark, c4Count))
         {
             // Always log since this is critical for post-mortem
-            facCIDOrb().LogMsg
-            (
-                CID_FILE
-                , CID_LINE
-                , kOrbMsgs::midStatus_ClientHWMInc
-                , tCIDLib::ESeverities::Status
-                , tCIDLib::EErrClasses::AppStatus
-                , TCardinal(c4Count)
-            );
+            if (facCIDOrb().bLogInfo())
+            {
+                facCIDOrb().LogMsg
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kOrbMsgs::midStatus_ClientHWMInc
+                    , tCIDLib::ESeverities::Info
+                    , tCIDLib::EErrClasses::AppStatus
+                    , TCardinal(c4Count)
+                );
+            }
         }
 
         //

@@ -405,7 +405,7 @@ namespace CIDIDL_CppGenerator
 // ---------------------------------------------------------------------------
 TCppGenerator::TCppGenerator() :
 
-    m_colMethNameList(23, new TStringKeyOps)
+    m_colMethNameList(23, TStringKeyOps())
     , m_strmHeader(new TUSASCIIConverter)
     , m_strmImpl(new TUSASCIIConverter)
     , m_strmXHeader(1024UL)
@@ -1467,9 +1467,9 @@ TCppGenerator::GenMethod(const  TString&            strName
                                 << mparmCur.strName()
                                 << kCIDLib::chOpenParen
                                 << mparmCur.tinfoThis().strModulus()
-                                << L", new "
+                                << L", "
                                 << mparmCur.tinfoThis().strKeyOps()
-                                << L", &"
+                                << L"(), &"
                                 << mparmCur.tinfoThis().strAuxType()
                                 << L"::"
                                 << mparmCur.tinfoThis().strKeyExtract()

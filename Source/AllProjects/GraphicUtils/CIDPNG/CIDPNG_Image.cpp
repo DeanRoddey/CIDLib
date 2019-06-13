@@ -842,7 +842,7 @@ TPNGImage::eParseChunkHdr(  TBinInStream&       strmToReadFrom
     c4ChunkId = c4GetNext(strmToReadFrom, c4CRC);
 
     // Convert the marker to a chunk header enum, or unknown if we don't know it
-    tCIDPNG::EChunks eRet = tCIDPNG::EChunks::Unknown;
+    tCIDPNG::EChunks eRet = tCIDPNG::EChunks::None;
     switch(c4ChunkId)
     {
         case CIDPNG_Image::c4Chunk_BgnClr :

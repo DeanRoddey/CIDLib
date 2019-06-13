@@ -100,7 +100,7 @@ TUPnPAsyncFinder::TUPnPAsyncFinder() :
       (
         tCIDLib::EAdoptOpts::Adopt
         , 109
-        , new TStringKeyOps
+        , TStringKeyOps()
         , &TUPnPAsyncFinderItem::strKey
         , tCIDLib::EMTStates::Safe
       )

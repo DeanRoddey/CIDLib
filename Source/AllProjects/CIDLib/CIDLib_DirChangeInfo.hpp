@@ -47,21 +47,15 @@ class CIDLIBEXP TDirChangeInfo : public TObject
             const tCIDLib::EDirChanges  eChange
         );
 
-        TDirChangeInfo
-        (
-            const   TDirChangeInfo&     dchiSrc
-        );
+        TDirChangeInfo(const TDirChangeInfo&) = default;
 
-        ~TDirChangeInfo();
+        ~TDirChangeInfo() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operator
         // -------------------------------------------------------------------
-        TDirChangeInfo& operator=
-        (
-            const   TDirChangeInfo&     dchiSrc
-        );
+        TDirChangeInfo& operator=(const TDirChangeInfo&) = default;
 
 
         // -------------------------------------------------------------------

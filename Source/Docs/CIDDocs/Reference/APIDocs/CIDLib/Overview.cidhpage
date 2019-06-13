@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>CIDLib - The Foundation</Title>
+
+    <HelpText>
+
+        <P>The CIDLib facility is the lowest level one that you would generally use directly, other than the fundamental types and constants, and some core inlined helpers and such from CIDKernel. CIDLib is sort of the 'standard libraries' part of the overall CIDLib system, providing the core functionality that basically programs will use to one degree or another.</P>
+
+        <Note>Since there are quite a few classes here, instead of just listing every class on the left, they are broken into categories. Else it would get a bit out of hand and hard to navigate</Note>
+
+        <P>To give some perspective, here are some of the things that are provided at this level:</P>
+
+        <List>
+            <LItem Ref="Core Types">Various enumerations, types, and constants are defined here. Actually, some of them are really defined in CIDKernel because it needs to see them as well. But conceptually there belong here and are in the kCIDLib/tCIDLib <Link Type="Page" Ref="/BigPicture/" Id="/FacilityNamespaces">namespaces</Link>.</LItem>
+            <LItem Ref="Text manipulation">So the things you'd expect, strings, text input and output streams, the most core text converters for ASCII and the UTF-X variations, string tokenizing</LItem>
+            <LItem Ref="Collections">A pretty full featured set of collections: vectors, arrays, stacks, deques, queues, trees, linked lists, hash sets, keyed hash sets, hash maps, bags, cursors, generic algorithms over collections.</LItem>
+            <LItem Ref="Smart Pointers">The usual managed, counted, and unique type smart pointers.</LItem>
+            <LItem Ref="File System">The usual stuff, files, file system searching and manipulation, raw binary file I/O, file path manipulation.</LItem>             <LItem Ref="Streams">CIDLib has very useful text and binary streams. At this level they are implemented over files, strings, and memory buffers.</LItem>
+            <LItem Ref="Threads/Processes">CIDLib has good support for threading, with very well structured mechanisms for synchronization. And of course the usual synchronization mechanisms: mutexes, events, criticial sections, semaphores, safe counters, wait lists.</LItem>
+            <LItem Ref="Searching/Sorting">Core search/sort algorithms are provided, though in many cases you'd use them via the collections.</LItem>
+            <LItem Ref="Pub/Sub">A nice intra-facility publish/subscribe system is available for async communications between threads and/or application subsystems.</LItem>
+            <LItem Ref="Workhorse Classes">Various workhorse classes that many applications tend to need: key/value pairs, bit sets, bit sequences, circular buffers, colors, areas, points, times/dates, memory buffers, Base64, system information.</LItem>
+            <LItem Ref="Core Interfaces">Some core mixin interfaces are defined here for text converters, duplicable objects, streamable objects, formattable objects, loggers, data sources, undo, RTTI.</LItem>
+        </List>
+
+    </HelpText>
+
+</HelpPage>

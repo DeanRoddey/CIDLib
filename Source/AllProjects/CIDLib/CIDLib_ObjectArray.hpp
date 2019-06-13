@@ -103,7 +103,13 @@ class TObjArray : public TObject, public MDuplicable
                 m_pmtxLock = new TMutex;
         }
 
-        TObjArray(TMyType&& objaSrc) = delete;
+        // Set up a with 1 element, if the srce is thread safe we should be
+        TObjArray(TMyType&& objaSrc) :
+
+            TObjArray(1, objaSrc.eMTState())
+        {
+            *this = operator=(tCIDLib::ForceMove(objaSrc));
+        }
 
         ~TObjArray()
         {
@@ -198,7 +204,22 @@ class TObjArray : public TObject, public MDuplicable
             return *this;
         }
 
-        TMyType& operator=(TMyType&&) = delete;
+        // As always only swap content, not the lock. Both serial numbers are bumped
+        TMyType& operator=(TMyType&& objaSrc)
+        {
+            if (this != &objaSrc)
+            {
+                TMtxLocker lockUs(m_pmtxLock);
+                TMtxLocker lockSource(objaSrc.m_pmtxLock);
+
+                tCIDLib::Swap(objaSrc.m_c4ElemCount, m_c4ElemCount);
+                tCIDLib::Swap(objaSrc.m_paobjList, m_paobjList);
+
+                m_c4SerialNum++;
+                objaSrc.m_c4SerialNum++;
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
@@ -267,24 +288,26 @@ class TObjArray : public TObject, public MDuplicable
 
 
         // Call back for each element. Can be a lambda or function
-        template <typename IterCB> tCIDLib::TVoid ForEach(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             TMtxLocker lockThis(m_pmtxLock);
             for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
             {
                 if (!iterCB(m_paobjList[c4Ind]))
-                    break;
+                    return kCIDLib::False;
             }
+            return kCIDLib::True;
         }
 
-        template <typename IterCB> tCIDLib::TVoid ForEach(IterCB iterCB)
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB)
         {
             TMtxLocker lockThis(m_pmtxLock);
             for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
             {
                 if (!iterCB(m_paobjList[c4Ind]))
-                    break;
+                    return kCIDLib::False;
             }
+            return kCIDLib::True;
         }
 
 
@@ -395,6 +418,16 @@ class TObjArray : public TObject, public MDuplicable
             const tCIDLib::TCard4 c4StartAt = tCIDLib::TCard4(tStartAt);
 
             TMtxLocker lockThis(this->pmtxLock());
+
+			//
+			//	We can allow the start index to be at the item past the end. We just
+			//	don't enter the loop in that case and return not found. Since we
+			//	don't have a checking helper for that, we'll do it ourself up front.
+			//
+			if (c4StartAt == m_c4ElemCount)
+				return tNotFound;
+
+			// Otherwise, it has to be a valid index
             VerifyIndex(c4StartAt, CID_LINE);
             for (tCIDLib::TCard4 c4Ind = c4StartAt; c4Ind < m_c4ElemCount; c4Ind++)
             {

@@ -1128,7 +1128,7 @@ TJSONCont::pjprsnValByName( const   TString&            strToFind
                             , const tCIDLib::TBoolean   bThrowIfNot)
 {
     TJSONValue* pjprsnRet = nullptr;
-    m_colValues.ForEachNC
+    m_colValues.bForEachNC
     (
         [&strToFind, &pjprsnRet](TJSONValue& jprsnCur) -> tCIDLib::TBoolean
         {

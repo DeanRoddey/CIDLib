@@ -36,7 +36,7 @@
 //  Magic macros
 // ---------------------------------------------------------------------------
 RTTIDecls(TTest_ObjArrayLambda, TTestFWTest)
-// RTTIDecls(TTest_ObjArrayMoveSem, TTestFWTest)
+RTTIDecls(TTest_ObjArrayMoveSem, TTestFWTest)
 
 
 
@@ -83,7 +83,7 @@ TTest_ObjArrayLambda::eRunTest( TTextStringOutStream&   strmOut
     // Iterate the original and update another one with the same values
     TObjArray<TSize> objaComp(16);
     tCIDLib::TCard4 c4LoopVal = 0;
-    objaTest.ForEach
+    objaTest.bForEach
     (
         [&objaComp, &c4LoopVal](const TSize& szCur)
         {
@@ -113,7 +113,7 @@ TTest_ObjArrayLambda::eRunTest( TTextStringOutStream&   strmOut
 
 
 
-/*
+
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_ObjArrayMoveSem
 // PREFIX: tfwt
@@ -167,7 +167,7 @@ TTest_ObjArrayMoveSem::eRunTest(  TTextStringOutStream&   strmOut
 
     if (objaTest.tElemCount() != 1)
     {
-        strmOut << TFWCurLn << L"Move ctor did not reset source item count\n\n";
+        strmOut << TFWCurLn << L"Move ctor did not take source item count\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
@@ -183,6 +183,33 @@ TTest_ObjArrayMoveSem::eRunTest(  TTextStringOutStream&   strmOut
         }
     }
 
+    // Create another and assign to it
+    TObjArray<TSize> objaAssign(2);
+    objaAssign = tCIDLib::ForceMove(objaMoveCtor);
+
+    if (objaMoveCtor.tElemCount() != 2)
+    {
+        strmOut << TFWCurLn << L"Move operator did not take source item count\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (objaAssign.tElemCount() != 16)
+    {
+        strmOut << TFWCurLn << L"Move operator did not move items to new array\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // And again check that the elements showed up as expected
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < 16; c4Index++)
+    {
+        szVal.Set(c4Index, c4Index);
+        if (objaAssign[c4Index] != szVal)
+        {
+            strmOut << TFWCurLn << L"Move operator copy is out of sequence\n\n";
+            eRes = tTestFWLib::ETestRes::Failed;
+            break;
+        }
+    }
+
     return eRes;
 }
-*/

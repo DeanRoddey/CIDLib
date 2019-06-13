@@ -20,11 +20,6 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  Note that all derived classes must take into account the fact that
-//      the native wide character type (tCIDLib::TCh) is not always a 16
-//      bit value in memory. On some platforms it can be a 32 bit value.
-//      The CIDLIB_WCISUTF16 token is defined if the native wide character is
-//      a UTF-16 type.
 //
 // LOG:
 //
@@ -50,15 +45,13 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         TTextConverter() = delete;
 
-        ~TTextConverter();
+        ~TTextConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public, virtual methods
         // -------------------------------------------------------------------
         virtual tCIDLib::EBaseTextFmts eBaseFmt() const = 0;
-
-        virtual tCIDLib::TVoid Reset() = 0;
 
 
         // -------------------------------------------------------------------

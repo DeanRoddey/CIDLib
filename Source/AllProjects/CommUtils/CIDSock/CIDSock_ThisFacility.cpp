@@ -143,7 +143,7 @@ namespace CIDSock_ThisFacility
     TIPCache colNameCache
     (
         173
-        , new TStringKeyOps
+        , TStringKeyOps()
         , &TIPLookupItem::strKey
         , tCIDLib::EMTStates::Safe
     );

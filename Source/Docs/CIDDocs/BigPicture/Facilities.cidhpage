@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>CIDLib 'Facilities'</Title>
+
+    <HelpText>
+
+        <P>CIDLib is structured into 'facilities' which is the CIDLib term for an executable or load library module (e.g. a DLL on Windows.) These can have different names on different platforms so we use our own generic term.</P>
+
+        <P>A facility is also something more than that. Other than for trivial programs (executable facilities), each facility has a facility class, and a singleton instance of that class is created, which is the 'facility object'. The executable's facility object is often the only global data object created other than simple constants. It provides access to any facility-wide, always available functionality. It sometimes provides 'object factory' type functionality as well.</P>
+
+        <P>So this is a very common theme throughout CIDLib, references to the facility class or facility object. It will be typically in an xxx_ThisFacility.hpp and cpp file, where xxx is the name of the facility, and the actual object will be instantiated in xxx.cpp, i.e. the main cpp file of the facility. See the Facility Files section to the left.</P>
+
+        <P>Each facility creates a derivative of one of the underlying facility classes, either TFacility or TGUIFacility, depending on whether it is one that deals in UI functionality or not. The derived classes sometimes have very little of their own functionality, sometimes none and are just passing along setup information to the base class via constructor. Others can have quite a bit of functionality exposed.</P>
+
+        <Note>By strict convention, library facilities always have a facility object. If they literally have no functionality to add, they can just directly create a TFacility or TGUIFacility object, but they should have one and most of them do create their own derived facility class.</Note>
+
+        <P>Here is the constructor for the CIDDocComp facility, the program that generates this documentation you are reading:</P>
+
+        <Code>
+        TFacCIDDocComp::TFacCIDDocComp() :
+
+            TFacility
+            (
+                L"CIDDocComp"
+                , tCIDLib::EModTypes::Exe
+                , kCIDLib::c4MajVersion
+                , kCIDLib::c4MinVersion
+                , kCIDLib::c4Revision
+                , tCIDLib::EModFlags::HasMsgFile
+            )
+            , m_bVerbose(kCIDLib::False)
+            , m_strmErr(tCIDLib::EStdFiles::StdErr)
+            , m_pstrmOut(nullptr)
+        {
+        }
+        </Code>
+
+        <P>It is indicating the name of this facility (which will be used to generate a platform specific actual name where needed), the type which is an executable, version information and some flags to indicate whether some optional functionality is to be enabled.</P>
+
+        <P>Those basic facility classes are in turn derived from TModule, which is the fundamental class that represents a loadable module (exe/dll in Windows.) That class provides methods for manipulating modules, though for the most part that's not required. CQC uses this stuff for dynamically loading driver facilities, for instance.</P>
+
+        <Note>Facilties are also the unit of logging and exception throwing in CIDLib, meaning that all the code within a given facility that logs msgs or throw exceptions will do so by calling methods on their own facility object. It will add more of its own information to the message or exception, handle loading translatable text, and then log/throw the information. More on this later when we get into error report stuff.</Note>
+
+        <SecTitle>Program Entry Point</SecTitle>
+
+        <P>For executable facilities, again other than very simple ones such as the basic sample programs or simple utilities, the facility object is where the program is started, i.e. the initial thread is pointed at a method of this facility object. That may be all that is involved and the program runs all within the facility object. Or the facility may spawn off various other threads as required. Those threads may also be run on the facility object (to share data) or be standalone objects.</P>
+
+        <P>Here is some code from the CIDDocComp.cpp file, which is the main cpp file of the program that generates this documentation (see Facility Files to the left.) This is how the main thread is pointed at a method of the facility class:</P>
+
+        <Code>
+        TFacCIDDocComp facCIDDocComp;
+        CIDLib_MainModule
+        (
+            TThread
+            (
+                L"MainThread"
+                , TMemberFunc&amp;lt;TFacCIDDocComp>(&amp;amp;facCIDDocComp, &amp;amp;TFacCIDDocComp::eMainThread)
+            )
+        )
+        </Code>
+
+        <P>First the global facility object is created. Then a macro is involved. It takes a thread name, which must be unique for the application, and a TMemberFunc object, which gets the target object (the facility object) and the method within it to target. That information is used to construct a thread object which will be associated with the main program thread for you.</P>
+
+        <SecTitle>Lazy Faulting</SecTitle>
+
+        <P>To avoid various complications related to global objects in library type modules, the facility objects in library facilities are lazily faulted in. The main cpp/hpp file will provide a method to access the facility object, which will fault it in upon being accessed.</P>
+
+        <P>For executable facilities, the facility object must be an actual global object because the main thread has to be pointed at it, hence there's no way to fault it in because there's no thread yet running CIDLib code to do so. And no need to either since no CIDLib threads that could access it are running prior to its construction.</P>
+
+        <Note>There can be a bit of potential weirdness involved if the facility object, while being faulted in, calls some code from its constructor that in turns calls the lazy faulting in method. So the constructors of library facilities typically should be brief and do little. They can in turn fault in other contained functionality upon first use if need be.</Note>
+
+        <P>Here is the standard scheme for faulting in such facility objects:</P>
+
+        <Code>
+        TFacCIDCrypto&amp;amp; facCIDCrypto()
+        {
+            static TFacCIDCrypto* pfacCIDCrypto = nullptr;
+            if (!pfacCIDCrypto)
+            {
+                TBaseLock lockInit;
+                if (!pfacCIDCrypto)
+                    pfacCIDCrypto = new TFacCIDCrypto;
+            }
+            return *pfacCIDCrypto;
+        }
+        </Code>
+
+        <P>So the lazy evaluation method creates an internal static pointer set to null. When called, it will first see if the pointer is null. If so, it locks the 'base lock', then it checks again. If still null then no other thread could have beaten us to it, so we call the constructor and store the pointer.</P>
+
+        <P>The base lock will be discussed more later, but basically it is a means to allow for clean synchronized bootstrapping. It's only used for very fundamental things like this since it is an application-wide resource. It is provided by the per-platform code using whatever is the most appropriate mechanism for that platform. This of course is another reason that library facility object constructors should be quick and to the point, because they will be holding the base lock.</P>
+
+        <P>Though one could try to do some sort of optimistic allocation and swap, deleting the extra one if beaten to the punch, it's likely not worth it since some reasonably heavy system calls might be made in the process of creating one. And it could potentially create shared resources (directly or indirectly) that would result in name clashes if two were constructed at the same time.</P>
+
+        <SecTitle>Versioning</SecTitle>
+
+        <P>Library facilities are versioned, in the name. How that works is platform specific. For Win32, there is an _M_m type bit added to the name, for major and minor version. This insures that if two CIDLib programs based on separate versions were running at the same time, they would both find the library facilities appropriate for them.</P>
+
+        <Code>
+        05/11/2019  11:13 PM     528,384 CIDOrb_5_3.dll
+        05/11/2019  11:12 PM     107,520 CIDPack_5_3.dll
+        05/11/2019  11:11 PM     124,928 CIDPNG_5_3.dll
+        05/11/2019  11:12 PM     122,368 CIDRegX_5_3.dll
+        </Code>
+
+        <Note>The assumption is that revision level releases won't break binary compatibility and so we don't want to include that in the versioning.</Note>
+
+        <P>How the versioning is done on other platforms could be different, but the above scheme is pretty straightforward and likely to work well enough on other platforms CIDLib is likely to be able to support. If so, it should be used in order to maintain consistency. But the building up of a facility file name from a base name and version information is something handled by per-platform code, so there is some leeway there if need be. As long as it creates a name that it understands if it gets it back later in some operation that requires finding or loading the file, then it will work.</P>
+
+        <P>Other platform specific stuff can also be done by the build tools on those platforms, if it helps with integration there, such as embedded versions resources, embedded manifest files, or other means available to version stamp loadable modules. Those can operate in addition to the primary scheme used by CIDLib itself on that platform.</P>
+
+    </HelpText>
+
+</HelpPage>

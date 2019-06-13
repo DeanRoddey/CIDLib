@@ -98,13 +98,13 @@ static const TString& strGetEntitySrcKey(const tCIDXML::TEntitySrcRef& esrSrc)
 // ---------------------------------------------------------------------------
 TXMLStdCatalog::TXMLStdCatalog() :
 
-    m_colIdMap(109, new TStringKeyOps, strGetEntitySrcKey)
+    m_colIdMap(109, TStringKeyOps(), strGetEntitySrcKey)
 {
 }
 
 TXMLStdCatalog::TXMLStdCatalog(tCIDXML::TEntitySrcRef& esrToParse) :
 
-    m_colIdMap(109, new TStringKeyOps, strGetEntitySrcKey)
+    m_colIdMap(109, TStringKeyOps(), strGetEntitySrcKey)
 {
     //
     //  Parse the source and load our collection. Throws if it fails. If will

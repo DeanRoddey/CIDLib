@@ -51,8 +51,9 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
 
         TBag(TBag&& colSrc) :
 
-            TParent(tCIDLib::ForceMove(colSrc))
+            TBag(colSrc.eMTState())
         {
+            *this = operator=(tCIDLib::ForceMove(colSrc));
         }
 
         ~TBag()

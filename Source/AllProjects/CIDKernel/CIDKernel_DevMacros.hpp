@@ -178,5 +178,5 @@ public : \
 //  For putting message pragma reminders into code
 // ---------------------------------------------------------------------------
 #define MakeLINEStr(M, L) M(L)
-#define $LineStr MakeLINEStr(CIDLib_Stringize, __LINE__)
-#define CodeReminder __FILE__ "(" $LineStr ") : "
+#define CodeRemLine MakeLINEStr(CIDLib_Stringize, __LINE__)
+#define CodeReminder __FILE__ "(" CodeRemLine ") : "

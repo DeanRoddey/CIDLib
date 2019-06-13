@@ -46,8 +46,8 @@ TTextFileLogger::TTextFileLogger() :
     m_bNeedsBOM(kCIDLib::False)
     , m_c8RolloverSize(kCIDLib::c8MaxCard)
     , m_eAccess(tCIDLib::EAccessModes::Excl_OutStream)
-    , m_pmtxSync(0)
-    , m_pstrmTarget(0)
+    , m_pmtxSync(nullptr)
+    , m_pstrmTarget(nullptr)
 {
 }
 
@@ -59,8 +59,8 @@ TTextFileLogger::TTextFileLogger(const  tCIDLib::TCh* const     pszFile
     m_bNeedsBOM(kCIDLib::False)
     , m_c8RolloverSize(kCIDLib::c8MaxCard)
     , m_eAccess(eAccess)
-    , m_pmtxSync(0)
-    , m_pstrmTarget(0)
+    , m_pmtxSync(nullptr)
+    , m_pstrmTarget(nullptr)
 {
     // Open the text file stream
     Open(pszFile, ptcvtToAdopt, rsnMutex);
@@ -74,8 +74,8 @@ TTextFileLogger::TTextFileLogger(const  TString&                strFile
     m_bNeedsBOM(kCIDLib::False)
     , m_c8RolloverSize(kCIDLib::c8MaxCard)
     , m_eAccess(eAccess)
-    , m_pmtxSync(0)
-    , m_pstrmTarget(0)
+    , m_pmtxSync(nullptr)
+    , m_pstrmTarget(nullptr)
 {
     // Open the text file stream
     Open(strFile, ptcvtToAdopt, rsnMutex);

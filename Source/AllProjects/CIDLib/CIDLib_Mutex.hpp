@@ -67,6 +67,7 @@ class CIDLIBEXP TMutex : public TObject, public MFormattable
         );
 
         TMutex(const TMutex&) = delete;
+        TMutex(TMutex&&) = delete;
 
         ~TMutex();
 
@@ -75,6 +76,7 @@ class CIDLIBEXP TMutex : public TObject, public MFormattable
         //  Public operators
         // -------------------------------------------------------------------
         TMutex& operator=(const TMutex&) = delete;
+        TMutex& operator=(TMutex&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -104,7 +106,7 @@ class CIDLIBEXP TMutex : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const;
+        )   const   override;
 
 
     private :

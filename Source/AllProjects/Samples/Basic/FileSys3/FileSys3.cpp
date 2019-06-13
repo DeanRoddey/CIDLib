@@ -268,7 +268,7 @@ static tCIDLib::TVoid RenameFiles(  const   TFileCol&   colFiles
     //  quickly whether a target name is in use. Tell the key ops not to be
     //  case sensitive, so it will catch names that just differ in case.
     //
-    tCIDLib::TStrHashSet colUsed(29, new TStringKeyOps(kCIDLib::False));
+    tCIDLib::TStrHashSet colUsed(29, TStringKeyOps(kCIDLib::False));
 
     // And loop through the source files
     for (; cursFiles; ++cursFiles)

@@ -146,34 +146,10 @@ TCMLDbgChangeInfo::TCMLDbgChangeInfo(const TString& strNewState, const TWindow& 
 {
 }
 
-TCMLDbgChangeInfo::TCMLDbgChangeInfo(const TCMLDbgChangeInfo& wnotSrc) :
-
-    TCtrlNotify(wnotSrc)
-    , m_c4LineNum(wnotSrc.m_c4LineNum)
-    , m_eEvent(wnotSrc.m_eEvent)
-    , m_strCurFile(wnotSrc.m_strCurFile)
-{
-}
-
 TCMLDbgChangeInfo::~TCMLDbgChangeInfo()
 {
 }
 
-
-// ---------------------------------------------------------------------------
-//  TCMLDbgChangeInfo: Public operators
-// ---------------------------------------------------------------------------
-TCMLDbgChangeInfo& TCMLDbgChangeInfo::operator=(const TCMLDbgChangeInfo& wnotSrc)
-{
-    if (this != &wnotSrc)
-    {
-        TParent::operator=(wnotSrc);
-        m_c4LineNum = wnotSrc.m_c4LineNum;
-        m_eEvent = wnotSrc.m_eEvent;
-        m_strCurFile = wnotSrc.m_strCurFile;
-    }
-    return *this;
-}
 
 // ---------------------------------------------------------------------------
 //  TCMLDbgChangeInfo: Public, non-virtual methods

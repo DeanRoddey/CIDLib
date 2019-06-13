@@ -95,7 +95,7 @@ class CIDLIBEXP TSysBuf : public TMemBuf
         // -------------------------------------------------------------------
         TSysBuf& operator=
         (
-            const   TSysBuf&                mbufToAssign
+            const   TSysBuf&                mbufSrc
         );
 
         tCIDLib::TBoolean operator==

@@ -56,6 +56,19 @@ class CIDLIBEXP TSysInfo : public TObject
             #endif
         }
 
+        static tCIDLib::TBoolean bFindCmdLineParm
+        (
+            const   TString&                strFind
+            , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
+        );
+
+        static tCIDLib::TBoolean bFindCmdLinePref
+        (
+            const   TString&                strPrefix
+            ,       TString&                strToFill
+            , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
+        );
+
         static tCIDLib::TBoolean bIsHostAdmin();
 
         static tCIDLib::TBoolean bInstallMode();

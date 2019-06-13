@@ -82,7 +82,7 @@ TTest_RefVectorLambda::eRunTest(TTextStringOutStream&   strmOut
 
     // Iterate the values and check them
     tCIDLib::TCard4 c4LoopVal = 0;
-    colTest.ForEach
+    colTest.bForEach
     (
         [&c4LoopVal, &strVal, &eRes, &strmOut](const TString& strCur)
         {
@@ -90,7 +90,7 @@ TTest_RefVectorLambda::eRunTest(TTextStringOutStream&   strmOut
             strVal.AppendFormatted(c4LoopVal++);
             if (strVal != strCur)
             {
-                strmOut << L"ForEach callback got out of sequence value\n\n";
+                strmOut << TFWCurLn << L"ForEach callback got out of sequence value\n\n";
                 eRes = tTestFWLib::ETestRes::Failed;
             }
             return kCIDLib::True;
@@ -102,7 +102,7 @@ TTest_RefVectorLambda::eRunTest(TTextStringOutStream&   strmOut
     strVal.AppendFormatted(5UL);
     if (colTest.tFind([&strVal](const TString& strCur) { return strVal == strCur; }) != 5)
     {
-        strmOut << L"tFind did not find the test value\n\n";
+        strmOut << TFWCurLn << L"tFind did not find the test value\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 

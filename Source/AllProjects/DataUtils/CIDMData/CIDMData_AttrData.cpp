@@ -1155,25 +1155,16 @@ tCIDLib::TVoid TAttrData::SetEditTypes()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TAttrData::StreamFrom(TBinInStream& strmToReadFrom)
 {
-    // Our stuff should start with a frame marker
-    strmToReadFrom.CheckForFrameMarker(CID_FILE, CID_LINE);
-
-    // And next should be the format version
-    tCIDLib::TCard2 c2FmtVersion;
-    strmToReadFrom  >> c2FmtVersion;
-    if (!c2FmtVersion || (c2FmtVersion > CIDMData_AttrData::c2FmtVersion))
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_UnknownFmtVersion
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(c2FmtVersion)
-            , clsThis()
-        );
-    }
+    // Check for a frame marker and valid format version
+    const tCIDLib::TCard2 c2FmtVersion = TBinInStream::c2CheckFmtVersion
+    (
+        strmToReadFrom
+        , tCIDLib::EStreamMarkers::Frame
+        , CIDMData_AttrData::c2FmtVersion
+        , clsThis()
+        , CID_FILE
+        , CID_LINE
+    );
 
     // Do a reset
     ClearValue();

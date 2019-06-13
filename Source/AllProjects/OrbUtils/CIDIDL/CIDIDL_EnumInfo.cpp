@@ -1183,18 +1183,28 @@ TCGenEnumInfo::FormatEnumImpl(TTextOutStream& strmTar, const TString& strEnclosi
 
         strmTar << L"TBinInStream& operator>>(TBinInStream& strmSrc, "
                 << strFullType << L"& eVal)\n{\n    "
-                << L"eVal = (" << strEnclosing << L"::" << m_strTypeName
-                << L")strmSrc.c4ReadEnum();\n    return strmSrc;\n}\n";
+                << L"eVal = " << strFullType
+                << L"(strmSrc.c4ReadEnum());\n    return strmSrc;\n}\n";
 
         strmTar << L"tCIDLib::TVoid TBinInStream_ReadArray(TBinInStream& strmSrc, "
                 << strFullType
-                << L"* const aeList, const tCIDLib::TCard4 c4Count)\n{    \n"
-                << L"    if (c4Count)\n        strmSrc.ReadArray((tCIDLib::TCard4*)aeList, c4Count);\n}\n";
+                << L"* const aeList, const tCIDLib::TCard4 c4Count)\n"
+                << L"{\n"
+                << L"    tCIDLib::TCard4 c4Cur;\n"
+                << L"    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)\n"
+                << L"    {\n"
+                << L"        strmSrc >> c4Cur;\n"
+                << L"        aeList[c4Index] = " << strFullType << L"(c4Cur);\n"
+                << L"    }\n"
+                << L"}\n";
 
         strmTar << L"tCIDLib::TVoid TBinOutStream_WriteArray(TBinOutStream& strmTar, const "
                 << strFullType
-                << L"* const aeList, const tCIDLib::TCard4 c4Count)\n{\n"
-                << L"    if (c4Count)\n        strmTar.WriteArray(reinterpret_cast<const tCIDLib::TCard4*>(aeList), c4Count);\n}\n";
+                << L"* const aeList, const tCIDLib::TCard4 c4Count)\n"
+                << L"{\n"
+                << L"    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)\n"
+                << L"        strmTar << tCIDLib::TCard4(aeList[c4Index]);\n"
+                << L"}\n";
     }
 
     // Do the valid enum method

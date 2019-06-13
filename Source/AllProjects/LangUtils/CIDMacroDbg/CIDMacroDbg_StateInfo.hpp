@@ -46,10 +46,7 @@ class CIDMACRODBGEXP TMacroDbgStateInfo : public TObject, public MStreamable
         // -------------------------------------------------------------------
         TMacroDbgStateInfo();
 
-        TMacroDbgStateInfo
-        (
-            const   TMacroDbgStateInfo&     stiSrc
-        );
+        TMacroDbgStateInfo(const TMacroDbgStateInfo&) = default;
 
         ~TMacroDbgStateInfo();
 
@@ -57,10 +54,7 @@ class CIDMACRODBGEXP TMacroDbgStateInfo : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TMacroDbgStateInfo& operator=
-        (
-            const   TMacroDbgStateInfo&     stiSrcr
-        );
+        TMacroDbgStateInfo& operator=(const TMacroDbgStateInfo&) = default;
 
 
         // -------------------------------------------------------------------

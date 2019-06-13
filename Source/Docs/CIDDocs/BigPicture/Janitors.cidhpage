@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Janitors</Title>
+
+    <HelpText>
+
+        <P>There is a fairly fundamental concept in C++ called RIIA, which stands for 'Resource Initialization Is Acquisition'. As with most such things it's a somewhat pretentious name, but basically it means that we can take advantage of the fact that C++ allows you to create objects within method/function scope and that those objects will get destroyed when they go out of scope.</P>
+
+        <P>The most common application for this is to handle automatic cleanup of heap allocated (new'd) objects, and not have to worry about how they get cleaned up in the presence of exceptions or early exit and so forth. And in some cases they actually do allocate (acquire) the objects that they will manage during their own constructors.</P>
+
+        <P>However this concept goes far, far beyond this fairly limited (though very powerful) application. It can be leveraged to handle so many different sorts of scenarios where something is not just allocated, but just changed in some way, and to insure it gets put back how it was. And often they are not themselves acquiring anything, they are just applying some sort of change to something else on a scoped basis.</P>
+
+        <P>Hence in CIDLib they are referred to as 'janitors' because ultimately what they do is to make sure things get 'cleaned up' upon exiting whatever scope they are declared in. Some of the ways that janitors are used in CIDLib are:</P>
+
+        <List>
+            <LItem>Locking mutexes and critical sections for the life of some scope, which is arguably just as powerful a use as cleaning up dynamically allocated objects.</LItem>
+            <LItem>Setting variables to some value and making sure they get set back, such as setting a flag to true for some scope and making sure it gets put back to whatever it was before, or temporarily modifying a numeric value such as an 'entry count'.</LItem>
+            <LItem>Indenting text stream output across some scope.</LItem>
+            <LItem>Forcing the 'wait' cursor in the UI framework across some operation</LItem>
+            <LItem>Applying GUI resources (fonts, brushes, clipping regions, etc...) to a graphics device in some scope.</LItem>
+            <LItem>In the Undo framework, to make sure something gets removed from the undo stack if it is not committed before scope exit.</LItem>
+            <LItem>Getting objects out of object pools for the life of a scope</LItem>
+            <LItem>Pushing something onto a stack and making sure it gets popped back off</LItem>
+            <LItem>Suppressing things like signal processing in some scope.</LItem>
+            <LItem>To insure that database transations are cancelled if they don't reach the point of being committed..</LItem>
+        </List>
+
+        <P>And there are quite a number more such uses. As you can see it's a very, very powerful concept. C++ is not a language for the casual developer, but this is one way in which C++ does have a nice safety advantage.</P>
+
+        <Code>
+        tCIDLib::TVoid TSomeClass::SomeMethod()
+        {
+            // Make sure the 'active flag is set while in here
+            TBoolJanitor janActive(&amp;amp;m_bActive, kCIDLib::True);
+
+
+            // It will be set back to its previous value on exit of this scope
+        }
+        </Code>
+
+        <Note>Of course the above example wouldn't be good for a method that could be called by multiple threads. For that you'd want to use a thread safe counter instead.</Note>
+
+        <SecTitle>Early Release</SecTitle>
+
+        <P>Obviously not all scenarios where you might want to use a janitor are ones where you really want the thing acquired or changed to be undone. You may be making that change in a way that you want to stick, but only if everything goes well. If anything fails, an exception or early return, you want the janitor to clean up after you. But, if all goes well, you need to tell the janitor not to clean up.</P>
+
+        <P>This is called 'orphaning' and almost all all of the janitor classes include an option to orphan whatever it is they own or have changed. So they just forget about that thing and therefore their destructor does nothing. In the cases where they actually have acquired some resource, the orphan method will return that thing so that you can store it away as appropriate</P>
+
+        <Code>
+        tCIDLib::TVoid DoSetup()
+        {
+            // Provisionally create the baffle plate object
+            TBafflePlate* pplateInit = pplateCreateNew();
+            TJanitor&amp;lt;TBafflePlate> janPlate(pplateInit);
+
+            // Try to connect the plate to its warp drive. It may throw
+            pplateInit->ConnectToWarp();
+
+            // Other initialization
+
+            // It worked so store the plate
+            m_pplateWorking = janPlate.pobjOrphan();
+        }
+        </Code>
+
+        <Note>Of course this introduces extra risk into the equation. Janitors are sort of 'spooky action at a distance' and so it's easy to miss the fact that you may have already orphaned it, and try to use the thing it is holding. Or store the thing and forget to orphan it, so that the janitor destroys/undoes it. Either of these can cause major issues. But, ultimately the benefits far outweigh the risks if reasonable caution is taken.</Note>
+
+    </HelpText>
+
+</HelpPage>

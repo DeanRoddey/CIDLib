@@ -94,13 +94,6 @@ template <class T> class TCntPtr
             }
         }
 
-        TCntPtr(TCntPtr<T>&& cptrSrc) :
-
-            m_pcdRef(nullptr)
-        {
-            m_pcdRef = TRawMem::pExchangePtr(&cptrSrc.m_pcdRef, m_pcdRef);
-        }
-
         ~TCntPtr()
         {
            if (m_pcdRef)
@@ -182,16 +175,6 @@ template <class T> class TCntPtr
                 //
                 m_pcdRef = cptrSrc.m_pcdRef;
                 ReleaseRef(kCIDLib::False, pcdSave);
-            }
-            return *this;
-        }
-
-        TCntPtr<T>& operator=(TCntPtr<T>&& cptrSrc)
-        {
-            if (&cptrSrc != this)
-            {
-                // We have to do this this thread safe-like
-                m_pcdRef = TRawMem::pExchangePtr(&cptrSrc.m_pcdRef, m_pcdRef);
             }
             return *this;
         }
@@ -381,11 +364,13 @@ template <class T> class TMngPtr
 
         const T& operator*() const
         {
+            CheckNullRef(CID_LINE);
             return *m_pData;
         }
 
         T& operator*()
         {
+            CheckNullRef(CID_LINE);
             return *m_pData;
         }
 
@@ -400,6 +385,28 @@ template <class T> class TMngPtr
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        T& objData()
+        {
+            CheckNullRef(CID_LINE);
+            return *m_pData;
+        }
+
+        const T& objData() const
+        {
+            CheckNullRef(CID_LINE);
+            return *m_pData;
+        }
+
+        T* pobjData()
+        {
+            return m_pData;
+        }
+
+        const T* pobjData() const
+        {
+            return m_pData;
+        }
+
         tCIDLib::TVoid SetPointer(T* const pToSet)
         {
             m_pData = pToSet;
@@ -407,6 +414,16 @@ template <class T> class TMngPtr
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtula methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid CheckNullRef(const tCIDLib::TCard4 c4Line) const
+        {
+            if (m_pData == nullptr)
+                TSmartPtrHelpers::ThrowNullRef(c4Line);
+        }
+
+
         // -------------------------------------------------------------------
         //  Private data members
         //

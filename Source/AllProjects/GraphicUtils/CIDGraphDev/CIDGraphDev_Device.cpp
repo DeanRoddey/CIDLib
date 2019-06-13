@@ -176,7 +176,7 @@ static tCIDLib::TVoid LoadDDraw()
         return;
 
     // Try to load the DLL. If it fails, we are done
-    CIDGraphDev_Device::hDDraw = ::LoadLibrary(L"ddraw.dll");
+    CIDGraphDev_Device::hDDraw = ::LoadLibraryW(L"ddraw.dll");
     if (!CIDGraphDev_Device::hDDraw)
     {
         // Don't try again
@@ -519,7 +519,7 @@ TGraphDrawDev::areaString(  const   TString&            strText
     }
 
     SIZE SizeInfo;
-    if (!::GetTextExtentPoint32
+    if (!::GetTextExtentPoint32W
     (
         hdevThis()
         , strTmp.pszBuffer()
@@ -3154,7 +3154,7 @@ TGraphDrawDev::DrawStringFX(const   TString&                strText
         //  the blur more in proportion to the font.
         //
         tCIDLib::TCard4 c4Order = 2;
-        TEXTMETRIC OurMetrics;
+        TEXTMETRICW OurMetrics;
         if (::GetTextMetricsW(hdevThis(), &OurMetrics))
         {
             if (OurMetrics.tmHeight < 20)
@@ -3232,7 +3232,7 @@ TGraphDrawDev::DrawStringFX(const   TString&                strText
     if (bReflect)
     {
         pixaDraw.FlipVertically(areaZTar.i4Y(), areaZTar.i4Bottom());
-        pixaDraw.ScaleAlpha(tCIDLib::EDirs::Down, areaZTar.i4Y(), areaZTar.i4Bottom());
+        pixaDraw.ScaleAlpha(tCIDLib::EDirs::Down, areaZTar.i4Y(), c4ReflRows);// areaZTar.i4Bottom());
 
         TArea areaReflSrc(areaZTar);
         areaReflSrc.c4Height(c4ReflRows);
@@ -4905,7 +4905,7 @@ TGraphDrawDev::QueryCharOffsets(const   TString&            strSource
 
     if (c4Index)
     {
-        if (!::GetTextExtentPoint32
+        if (!::GetTextExtentPoint32W
         (
             hdevTarget
             , strSource.pszBuffer()

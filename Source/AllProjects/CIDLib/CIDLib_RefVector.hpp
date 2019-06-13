@@ -709,14 +709,15 @@ class TRefVector : public TRefCollection<TElem>
         }
 
 
-        template <typename IterCB> tCIDLib::TVoid ForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
             {
                 if (!iterCB(*m_apElems[c4Index]))
-                    break;
+                    return kCIDLib::False;
             }
+            return kCIDLib::True;
         }
 
 
@@ -1464,6 +1465,16 @@ class TRefVector : public TRefCollection<TElem>
             const tCIDLib::TCard4 c4StartAt = tCIDLib::TCard4(tStartAt);
 
             TMtxLocker lockThis(this->pmtxLock());
+
+			//
+			//	We can allow the start index to be at the item past the end. We just
+			//	don't enter the loop in that case and return not found. Since we
+			//	don't have a checking helper for that, we'll do it ourself up front.
+			//
+			if (c4StartAt == m_c4CurCount)
+				return tNotFound;
+
+			// Otherwise, it has to be a valid index
             this->CheckIndex(c4StartAt, m_c4CurCount, CID_FILE, CID_LINE);
             for (tCIDLib::TCard4 c4Ind = c4StartAt; c4Ind < m_c4CurCount; c4Ind++)
             {

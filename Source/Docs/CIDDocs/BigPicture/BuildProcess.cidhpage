@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Building CIDLib</Title>
+
+    <HelpText>
+
+        <P>There is some starter information in the Wiki content of the CIDLib repository, to help folks get started. Once they get CIDLib built, they can build this documentation for local use. This section will replicate that content somewhat but go into a little more details. The nitty-gritty details are available in the <Link Type="Page" Ref="/Reference/Build/" Id="/Overview">reference</Link> section.</P>
+
+        <P>CIDLib provides its own build tool, called CIDBuild. As with any decision it has various consequences. Some obvious ones are:</P>
+
+        <List>
+            <LItem Ref="Simplicity">Because CIDLib has its own build tool, that tool understands all of the project structure and file naming conventions used, so it is very easy to set up a new project to build.</LItem>
+            <LItem Ref="Inflexibility">As always, you can choose simple or flexible. In order to get the simplicity you must follow the CIDLib conventions, and it's not easy to bring in a bunch of outside content.</LItem>
+            <LItem Ref="Convenience">Not only does CIDBuild understand project structure and such, it also understands the loadable resources system and the ORB (Object Request Broker) system and so forth. This makes it very convenient to use tools that otherwise would require a fair amount of twitchy setup.</LItem>
+            <LItem Ref="Portability">CIDBuild is designed to support CIDLib's portability and so it keepss hard platform specific issues out of the build setup. The inflexibilty plays dividends here because we can push the details down into the actual per-platform build tool extensions, keeping the actual project definition content very simple and quite generic.</LItem>
+        </List>
+
+        <P>Since we have per-platform (and per-compiler) build tools drivers and each project can pass along per-platform flags to these drivers, there is some flexibility in terms of how those drivers process the generic project definition information.</P>
+
+        <SecTitle>Command Line Based</SecTitle>
+
+        <P>For portability reasons CIDLib's build process is command line based. You can of course use an IDE for debugging, and a GUI based editor for editing, but the build process itself is command line based. It's fairly simple and for the most part you will only use a handful of commands in day to day development.</P>
+
+        <SecTitle>Project Definition</SecTitle>
+
+        <P>CIDLib's build system is based around projects, which mostly map directly to CIDLib facilities, see the link to the left. But there are other project types as well, for file copying for instance.</P>
+
+        <P>There is a single project definition file per code base (repository), which defines all of the projects and their build settings. It is called CIDBuild.Projects and it will be in the Source\AllProjects directory. We won't get into the details of the project definition system here, that is for the <Link Type="Page" Ref="/Reference/Build/" Id="/Overview">reference</Link> section, but we'll take a look at some of the key aspects of it.</P>
+
+        <P>Here is a fairly typical definition for a project. This is for an executable facility, this particular one is typically run under a background service, so it normally has no UI at all, though it can be run (in debug mode) as a command line program for ease of development.</P>
+
+        <Code>
+        PROJECT=CIDCfgSrv
+            SETTINGS
+                DIRECTORY   = OrbUtils\CIDCfgSrv
+                MSGFILE     = Yes
+                TYPE        = Service
+            END SETTINGS
+
+            IDLFILES
+                IDLFILE
+                    SRCFILE = ..\CfgServer
+                    GEN     = SERVER
+                    NAMEEXT = Cfg
+                END IDLFILE
+            END IDLFILES
+
+            DEPENDENTS
+                CIDOrbUC
+                CIDObjStore
+            END DEPENDENTS
+        END PROJECT
+        </Code>
+
+        <P>There is always a settings section first that provides the basic information about the project. It gives the directory relative to AllProjects, and then indicates only those standard attributes where it deviates from the defaults. In this case it says it has loadable text and that it is a service type program. That's all that's needed in terms of general information.</P>
+
+        <P>It then indicates that it uses the IDL compiler to generate some content, in this case it needs to use the IDL compiler generate the server side stub for the remote interface used to talk to this server. This is very commony also used just to generate constants and smart enumerations as well, even if no remote interfaces are involved, see the Smart Enums link to the left.</P>
+
+        <P>Then it indicates those projects in this code base that it is dependent on. Dependencies on external projects from another code base are done differently, but there aren't any in CIDLib since it is the foundation on which everything else would be built.</P>
+
+        <P>Here is one for a GUI application, which is the log monitor program that you can use to monitor messages being sent to the centralized log server.</P>
+
+        <Code>
+        PROJECT=CIDLogMon
+            SETTINGS
+                DIRECTORY   = OrbUtils\CIDLogMon
+                DISPLAY     = GUI
+                MSGFILE     = Yes
+                RESFILE     = Yes
+            END SETTINGS
+
+            INCLUDEPLATS
+                Win32
+            END INCLUDEPLATS
+
+            DEPENDENTS
+                CIDOrbUC
+                CIDCtrls
+            END DEPENDENTS
+        END PROJECT
+        </Code>
+
+        <P>This one is slightly different in that it indicates it is a GUI based program, and it also indicates it has GUI resources that need to be built. And it uses the INCLUDEPLATS option to indicate it should only be built on the Win32 platform, at least for now.</P>
+
+        <P>That's about all that is typically involved. You can look through the CIDBuild.Projects file and see all of the projects. The build info for the many facilities of CIDLib (which includes all the tests and samples and such and comments) is only about 2500 lines long. I would imagine that that would be considerably bigger using a tool like CMake or the like.</P>
+
+        <SecTitle>Project Dependencies</SecTitle>
+
+        <P>The DEPENDENTS section seen above tells CIDBuild all of the project level dependencies required. When you target a facility for rebuild, unless you explicitly say otherwise, it will build anything in the dependency tree of that target project, at least any that need to be rebuilt.</P>
+
+        <P>So this is all very easily handled and you don't have to worry about whether things are going to get rebuilt. If you know you have only made changes in the target facility, you can use the /NR switch (no recursion) to suppress checking the underlying projects, which can take a bit of time for the higher level facilities that tend to depend on a lot of stuff.</P>
+
+        <SecTitle>Header Dependencies</SecTitle>
+
+        <P>CIDBuild supports header dependency analysis as well. The convention is that all system headers are included using angle brackets and all CIDLib/user headers are included using quotes. CIDBuild will find all of the includes that use quotes and create a dependency file for you. It will be in the output directory for that facility and be named [facility].Depend, where [facility] is the name of the facility.</P>
+
+        <P>You must regenerate header dependencies any time you make changes that would affect them. The process is far too heavy weight to do automatically on every build. You do this using the command:</P>
+
+        <Code>CIDBuild /action=makedeps</Code>
+
+        <P>If you know the file is purely an internal detail of a facility, and couldn't affect anyone else, then you can add /NR to not recursively regenerate the dependencies, which can save a good bit of time.</P>
+
+        <P>CIDBuild uses these dependency files to decide what project source files need to be rebuilt. The specific tools drivers can use this information however they deem best. The Visual C++ driver passes all of the affected files to the compiler at once and enables parallel building to try to get them done as quickly as possible. It will start as many instances as you have CPUs, minus one to avoid making the machine too unresponsive during builds.</P>
+
+        <SecTitle>Code Generation</SecTitle>
+
+        <P>CIDBuild knows about things like loadable resources and the IDL system. So it will also process those things as required. These will (if modified) sometimes spit out new header files. So any of these code generation operations that are needed will be done automatically before any build or header dependency analysis passes.</P>
+
+        <P>You can force these processes individually as well to speed up your turn around time. So:</P>
+
+        <Code>
+        CIDBuild /action=idlgen
+        CIDBuild /action=makeres
+        </Code>
+
+        <P>To force IDL file updates or to force loadable resource updates, respectively.</P>
+
+        <SecTitle>Implicit vs. Explicit Targets</SecTitle>
+
+        <P>If you are in the directory of a project, and you don't indicate a target project, it will assume you want to apply it to the project in that directory. This is often very convenient, but it can sometimes bite you if you really intended to apply the operation to the whole code base. You can always set the target to All, which is a magic value to force all projects to be evaluated regardless of where you are.</P>
+
+        <Code>CIDBuild /action=makedeps /target=All</Code>
+
+        <Note>Only being directly in a project directory is treated this way. If you are in a common directory above a set of sibling projects, it won't find everything under that directory and try to build it. See Group Targets below for an option for that.</Note>
+
+
+        <SecTitle>Group Targets</SecTitle>
+
+        <P>Though the support is currently somewhat limited, CIDBuild also supports group targets. The purpose of these is when you have a group of facilities that might not directly be dependent on each other but you want to make sure all get rebuilt. So you can set up a group project that just includes the other projects as dependencies. The build tool will invoke the requested process on each of them. Note though that this may also redundantly process common projects.</P>
+
+        <P>Here is an example where a set of tests, which are all actually independent executables, can all be rebuilt at once (and anything any of them depend on if you don't use the /NR option.)</P>
+
+        <Code>
+        PROJECT=Tests2
+            SETTINGS
+                DIRECTORY   = Tests2
+                TYPE        = Group
+            END SETTINGS
+
+            DEPENDENTS
+                TestAI
+                TestCIDLib2
+                TestMathLib
+                TestCIDEncode
+                TestRegX
+                TestCrypto
+                TestXML
+                TestCIDMData
+                TestNet
+                TestObjStore
+                TestORB
+                StressTests
+            END DEPENDENTS
+
+        END PROJECT
+        </Code>
+
+    </HelpText>
+
+</HelpPage>

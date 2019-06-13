@@ -134,10 +134,10 @@ class TWorkQItem : public TObject, public MRefCounted
 //   CLASS: TWorkQItemPtr
 //  PREFIX: wqip
 //
-//  We just need a simple derivative of the simple pool pointer base class. The only
-//  thing we have to implement is the constructor that does the reservation.
+//  For convenience, we create a derivative of the simple pool pointer class which
+//  can gen up instances of itself since the public ctor has access to the pool.
 // ---------------------------------------------------------------------------
-class TWorkQItemPtr : public TSimplePoolPtrBase<TWorkQItem>
+class TWorkQItemPtr : public TSimplePoolPtr<TWorkQItem>
 {
     public :
         // -------------------------------------------------------------------

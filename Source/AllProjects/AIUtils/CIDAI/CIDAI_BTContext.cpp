@@ -50,13 +50,13 @@ const TString& TAIBTCtxVar::strVarKey(const TAIBTCtxVar& ctxvSrc)
 // ---------------------------------------------------------------------------
 TAIBTCtxVar::TAIBTCtxVar() :
 
-    m_colMembers(109, new TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey)
+    m_colMembers(109, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey)
 {
 }
 
 TAIBTCtxVar::TAIBTCtxVar(const  TString& strKey) :
 
-    m_colMembers(109, new TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey)
+    m_colMembers(109, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey)
     , m_strKey(strKey)
 {
 }
@@ -262,7 +262,7 @@ TAIBTCtxVar::TypeCastErr(const TString& strValKey, const tCIDLib::TCh* const psz
 // ---------------------------------------------------------------------------
 TAIBTCtx::TAIBTCtx() :
 
-    m_colVars(109, new TStringKeyOps(kCIDLib::False), &TAIBTCtxVar::strVarKey)
+    m_colVars(109, TStringKeyOps(kCIDLib::False), &TAIBTCtxVar::strVarKey)
 {
 }
 

@@ -29,7 +29,7 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  The static methods tdrvBuilder() handles the lazy creation of the
+//  1)  The static method tdrvBuilder() handles the lazy creation of the
 //      the actual concrete derivative for the target build environment.
 //      This requires a little conditional code for each platform and target
 //      platform. In order to make things cleaner, he directly includes all
@@ -57,6 +57,8 @@ class TDepInfo
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TDepInfo() = delete;
+
         TDepInfo
         (
             const   TBldStr&                strFileName
@@ -67,30 +69,46 @@ class TDepInfo
 
 
         // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TDepInfo& operator==(const TDepInfo&) = delete;
+
+
+        // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid AddHppDependent
-        (
-                    TFindInfo* const        pfndiHpp
-        );
+        tCIDLib::TVoid TDepInfo::AddHppDependent(TFindInfo* const pfndiHpp)
+        {
+            //
+            //  Note that we set up this list not to adopt, so this is just
+            //  referencing the Hpp find info that is really owned by the ToolsDriver
+            //  object.
+            //
+            m_listHpps.Add(pfndiHpp);
+        }
 
-        const TFindInfo& fndiThis() const;
+        const TFindInfo& TDepInfo::fndiThis() const
+        {
+            return m_fndiCpp;
+        }
 
-        const TList<TFindInfo>& listHpps() const;
+        const TList<TFindInfo>& TDepInfo::listHpps() const
+        {
+            return m_listHpps;
+        }
 
-        const TBldStr& strFileName() const;
+        const TBldStr& TDepInfo::strFileName() const
+        {
+            return m_fndiCpp.strFileName();
+        }
 
-        const TBldStr& strObjFileName() const;
+        const TBldStr& TDepInfo::strObjFileName() const
+        {
+            return m_strObjFile;
+        }
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TDepInfo();
-        tCIDLib::TVoid operator==(const TDepInfo&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -130,7 +148,15 @@ class TToolsDriver
         // -------------------------------------------------------------------
         //  Public Constructors and Destructor
         // -------------------------------------------------------------------
+        TToolsDriver(const TToolsDriver&) = delete;
+
         ~TToolsDriver();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TToolsDriver& operator=(const TToolsDriver&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -139,6 +165,16 @@ class TToolsDriver
         tCIDLib::TBoolean bBuildProject
         (
             const   TProjectInfo&           projiToBuild
+        );
+
+        tCIDLib::TBoolean bDebugProject
+        (
+            const   TProjectInfo&           projiToDebug
+        );
+
+        tCIDLib::TVoid DebugReset
+        (
+            const   TProjectInfo&           projiToDebug
         );
 
 
@@ -163,6 +199,16 @@ class TToolsDriver
             const   TProjectInfo&           projiTarget
         ) = 0;
 
+        virtual tCIDLib::TBoolean bInvokeDebugger
+        (
+            const   TProjectInfo&           projiTarget
+        ) = 0;
+
+        virtual tCIDLib::TVoid ResetDebugInfo
+        (
+            const   TProjectInfo&           projiToReset
+        ) = 0;
+
 
         // -------------------------------------------------------------------
         //  Protected, non-virtual methods
@@ -178,11 +224,20 @@ class TToolsDriver
             const   TBldStr&                strCppName
         );
 
-        const TList<TDepInfo>& listCpps() const;
+        const TList<TDepInfo>& TToolsDriver::listCpps() const
+        {
+            return m_listCpps;
+        }
 
-        const TList<TFindInfo>& listHpps() const;
+        const TList<TFindInfo>& TToolsDriver::listHpps() const
+        {
+            return m_listHpps;
+        }
 
-        const TList<TFindInfo>& listLibs() const;
+        const TList<TFindInfo>& TToolsDriver::listLibs() const
+        {
+            return m_listLibs;
+        }
 
         tCIDLib::TVoid PostLink
         (
@@ -191,15 +246,7 @@ class TToolsDriver
         );
 
 
-
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TToolsDriver(const TToolsDriver&);
-        tCIDLib::TVoid operator=(const TToolsDriver&);
-
-
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
@@ -290,56 +337,3 @@ class TToolsDriver
 
 };
 
-
-// ---------------------------------------------------------------------------
-//  TDepInfo: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TVoid TDepInfo::AddHppDependent(TFindInfo* const pfndiHpp)
-{
-    //
-    //  Note that we set up this list not to adopt, so this is just
-    //  referencing the Hpp find info that is really owned by the ToolsDriver
-    //  object.
-    //
-    m_listHpps.Add(pfndiHpp);
-}
-
-inline const TFindInfo& TDepInfo::fndiThis() const
-{
-    return m_fndiCpp;
-}
-
-inline const TList<TFindInfo>& TDepInfo::listHpps() const
-{
-    return m_listHpps;
-}
-
-inline const TBldStr& TDepInfo::strFileName() const
-{
-    return m_fndiCpp.strFileName();
-}
-
-inline const TBldStr& TDepInfo::strObjFileName() const
-{
-    return m_strObjFile;
-}
-
-
-
-// ---------------------------------------------------------------------------
-//  TToolsDriver: Protected, non-virtual methods
-// ---------------------------------------------------------------------------
-inline const TList<TDepInfo>& TToolsDriver::listCpps() const
-{
-    return m_listCpps;
-}
-
-inline const TList<TFindInfo>& TToolsDriver::listHpps() const
-{
-    return m_listHpps;
-}
-
-inline const TList<TFindInfo>& TToolsDriver::listLibs() const
-{
-    return m_listLibs;
-}

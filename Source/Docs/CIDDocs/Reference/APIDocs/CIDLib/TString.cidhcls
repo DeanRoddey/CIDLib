@@ -1,0 +1,1236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass   Class="TString" Prefix="str" Parent="TObject" Flags="Fmt Dup BStrm">
+
+    <Desc>
+        <P>TString is a fundamental class, since it is how you manage text strings in CIDLib. It's internal representation is an array of native wide characters.</P>
+
+        <P>There is no maximum capacity, so you must enforce such things if that is needed. It expands to contain the required number of characters. You can ask it to reserve extra characters beyond the initial content if you know is will be needed. You can also reallocate it if you know you are about to considerably expand it.</P>
+
+        <Note>Be sure to understand the issues of <Link Type="Page" Ref="/BigPicture" Id="/Text">text representation</Link> and <Link Type="Page" Ref="/BigPicture" Id="/TextEncoding">text encoding</Link> in the Big Picture section.</Note>
+
+        <SubSecTitle>Null Termination</SubSecTitle>
+
+        <P>This class doesn't depend on a null terminator like a raw string, since it maintains a length member. That makes it vastly more efficient. However, any time you access the raw pointer, a null terminator will be added to it since most likely you are accessing it in order to pass it to some system API or the like, which expects a null terminator.</P>
+
+        <Note>Don't expect that null terminated form to last across any other calls. If you modify the string after getting the raw buffer pointer, it is possible it may not be null terminated anymore. Probably it will be, but don't assume so. It is best to call pszBuffer() each time you want to pass the raw pointer to something.</Note>
+
+        <P>And, any time you copy out from this string to a raw character buffer, a null pointer will be appended, so you <Bold>must</Bold> be sure to leave room for it. The general rule is to either allocate the buffer one character larger than the number of characters you want to store. Or, if it already is allocated, pass in the current size minus one as the max characters it can hold. That will insure that the buffer isn't overrun.</P>
+
+        <P>For the most part, raw character buffer type output parameters are avoided here for these reasons. But sometimes there are legitimate needs for such things if you are interfacing to some external system or supporting a third party data format.</P>
+
+        <P>Unless explicitly stated otherwise, any raw character pointers you provide as input (wide or short character) is assumed to be null terminated.</P>
+
+        <P>Internally, this class always allocates the buffer one larger than whatever capacity it is expanded to, so that there is always room to add a null termination when you access the raw buffer.</P>
+
+        <SubSecTitle>Constructing from Multiple Strings</SubSecTitle>
+
+        <P>One of the nice conveniences a class like this would typically provide is to take one, two, three, maybe four string parameters and concatenate them all together into this string. But, because this class implements the <ClassRef Ref="MFormattable"/> mixin, anything that takes a mixture of strings and formattable objects can be ambiguous. And we have a few of those that are very useful for very common (and otherwise very wordy) job of loading translatable text and doing token replacement on the loaded text all in one shot.</P>
+
+        <P>So, we provide simple <ClassRef Ref="TStrCat"/> class that handles string concatenation in a parameter passing sort of way. We have a constructor that takes a TStrCat object, and you can use that to create a string from multiple source strings. This is very efficient. The TString object just steals the created buffer of the TStrCat object.</P>
+
+        <P>It also allows for some other variations like two source strings that will be concatenated with a separator character in the middle. For heavier formatting of text you would have to use the append methods of this class (see below) or create a text output stream over a string and use that.</P>
+
+
+        <SubSecTitle>Formatting Values</SubSecTitle>
+
+        <P>Though text output streams are best for extensive formatting of content to text, there are many scenarios where just some relatively basic formatting of values is needed, so this class provides a good bit of support for that, allowing you to format fundamental values and objects (that implement <ClassRef Ref="MFormattable"/>) in a number of ways. You do this via the SetFormatted() and AppendFormatted() methods. The set versions just clear the string first, then append.</P>
+
+        <P>They allow you to control radix, numeric grouping size, group separators, decimal digit separators, number of decimal digits and so forth.</P>
+
+        <P>You can also use the FormatToFld() method to place some already formatted text into another string in a field of a specific width, justified left, center or right within that field. Trying to add that all into a single formatting method would have been too much. So, if you want a controlled format justified within a field, you have to do it in two separate steps using this class.</P>
+
+        <P>This class also allows you to convert the string contents to the various fundamental types, which is a very common thing to do. There are very convenient versions that will throw if the conversion cannot be done, and versions that return a status that you can react to.</P>
+
+        <SubSecTitle>Token Replacement</SubSecTitle>
+
+        <P>Though you can, as mentioned above, load translatable text and do token replacement all in one operation, there are also methods here that accept all of the fundamental types and anything that implements MFormattable to replace a token in a string. The <Link Type="Page" Ref="/BigPicture/" Id="/StringTokens">token replacement</Link> system allows you to control the field width and justification of the formatted value within that field. However, you don't get the same control over the format as you do with the Set/AppendFormatted() methods mentioend above.</P>
+
+    </Desc>
+
+    <PubIntf>
+        <!-- Static public methods -->
+        <StaticMeths>
+
+            <Desc>
+                These are just some helper methods. Some are pre-fab comparators and the others are just some simple conversion helpers.
+            </Desc>
+
+            <Method Name="bComp" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    A static comparator method that can be passed where such things are needed for two strings, avoiding the need for a lambda or template. The comparison is case sensitive.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="str1" Type="TString" PBy="CRef"/>
+                    <MethParam Name="str2" Type="TString" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bCompI" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    Same as above, but with a case insensitive comparison.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="str1" Type="TString" PBy="CRef"/>
+                    <MethParam Name="str2" Type="TString" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c1ToHex" RetType="tCIDLib::TCard1">
+                <Desc>
+                    <P>Assumes the passed character is a hex digit (a-f or 0-9, either case) and converts it to its binary byte equivalent. If not a valid hex digit it will throw an exception.</P>
+
+                    <P>One takes a short character and the other a wide character.</P>
+                </Desc>
+                <MethVar><MethParam Name="chToXlat" Type="tCIDLib::TSch"/></MethVar>
+                <MethVar><MethParam Name="chToXlat" Type="tCIDLib::TCh"/></MethVar>
+            </Method>
+
+            <Method Name="FromHex" RetType="tCIDLib::TVoid">
+                <Desc>
+                    <P>Given a byte, converts it to two characters that represent the hex encoded value of that byte. So, given the byte value 0xF1, it will return two characters 'F' and '1'. This one takes short characters in the local code page.</P>
+
+                    <P>The first character is the high order nibble and the second is the low. It is leading zero filled, so if the value is &amp;lt; 0x10, then first character wil be '0'.</P>
+
+                    <P>We have one that takes short characters and another that takes wide characters.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c1Byte" Type="tCIDLib::TCard1"/>
+                    <MethParam Name="chFirst" Type="tCIDLib::TSCh" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="chSec" Type="tCIDLib::TSCh" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="c1Byte" Type="tCIDLib::TCard1"/>
+                    <MethParam Name="chFirst" Type="tCIDLib::TCh" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="chSec" Type="tCIDLib::TCh" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+        </StaticMeths>
+
+
+        <!-- Public constructors and destructor -->
+        <Ctors>
+            <Method Name="TString">
+                <Desc>
+                    <P>The default constructor creates a small capacity string with zero initial length. If you are going to expand it and know ahead of time, use the version that takes an initial capacity.</P>
+
+                    <P>You can also set an initial buffer size. This is more efficient if you know that you are going to need some particular size or roughly what size it needs to be, since it avoids buffer expansion.</P>
+                </Desc>
+                <MethVar/>
+                <MethVar><MethParam  Name="c4BufSz" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="TString">
+                <Desc>
+                    These variations construct a string from a raw wide or short character string or fro a character.
+                </Desc>
+                <MethVar Attrs="Explicit">
+                    <MethParam  Name="chInit" Type="tCIDLib::TCh"/>
+                </MethVar>
+                <MethVar><MethParam  Name="pszInit" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+                <MethVar><MethParam  Name="pszInit" Type="tCIDLib::TSCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="TString">
+                <Desc>
+                    <P>These variations provide initial content either as a raw wide character string or another string object, but also let you set extra capacity above and beyond what is needed for the initial value.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="pszInit" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="c4Extra" Type="tCIDLib::TCard"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strInit" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4Extra" Type="tCIDLib::TCard"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="TString">
+                <Desc>
+                    <P>Allows you to pass in a pre-existing, heap allocate raw string, which this object take as its initial string buffer and will clean it up when this string destructs. <Italic>Clearly the passed string must not be owned by anyone else.</Italic></P>
+
+                    <P>This method takes an adopt options value. It must always be set to the Adopt value, but we have to have it to clearly distinguish this constructor from the one that just copies the text. Otherwise the only difference would be the constness of the passed text which would be too easy to miss.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="pszInit" Type="tCIDLib::TCh" PBy="Ptr"/>
+                    <MethParam  Name="EAdopt" Type="tCIDLib::EAdoptOpts"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="TString">
+                <Desc>
+                    <P>This constructor will format out the passed formattable object and make that the initial content of this string object. This is a bit heavy since it must allocate a text output stream over th etop of this string object and use that to format out the object, so not something to call large numbers of times in a loop. You'd do better in that case creating your own stream for the formatting.</P>
+
+                    <P>Another variation lets your provide a stream format object that will control some more formatting options, putting it into a field of a specific width and controlling some other options.</P>
+                </Desc>
+                <MethVar><MethParam  Name="fmtblSrc" Type="MFormattable" PBy="CRef"/></MethVar>
+                <MethVar>
+                    <MethParam  Name="fmtblSrc" Type="MFormattable" PBy="CRef"/>
+                    <MethParam  Name="strmfToUse" Type="TStreamFmt" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="TString">
+                <Desc>
+                    <P>These constructors will load a translatable text message from the indicated facility. The message id must be valid for the passed facility. The first one assumes just the text itself is desired. Another variation allows you to provide replacement values that will replace tokens in the loaded text. You can pass from 1 to 4 tokens, which will replace the tokens %(1) to %(4).</P>
+
+                    <P>There are other versions that take an existing string with replacement tokens, instead of loading the main text from a facility, either as a raw string or a string object.</P>
+
+                    <P>For more about replacement tokens, see <Link Type="Page" Ref="/BigPicture/" Id="/StringTokens">here</Link>.</P>
+
+                    <P>Any object that implements the MFormattable mixin can be passed as a replacement value.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="midLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam  Name="facSrc" Type="TFacility" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="midLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam  Name="facSrc" Type="TFacility" PBy="CRef"/>
+                    <MethParam  Name="mfmtblToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam  Name="mfmtblToken2" Type="MFormattable" PBy="CRef"
+                                DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam  Name="mfmtblToken3" Type="MFormattable" PBy="CRef"
+                                DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam  Name="mfmtblToken4" Type="MFormattable" PBy="CRef"
+                                DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strSrc" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="mfmtblToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam  Name="mfmtblToken2" Type="MFormattable" PBy="CRef"
+                                DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam  Name="mfmtblToken3" Type="MFormattable" PBy="CRef"
+                                DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam  Name="mfmtblToken4" Type="MFormattable" PBy="CRef"
+                                DefVal="MFormattable::Nul_MFormattable()"/>
+
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszSrc" Type="TString" PBy="CPtrC"/>
+                    <MethParam  Name="mfmtblToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam  Name="mfmtblToken2" Type="MFormattable" PBy="CRef"
+                                DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam  Name="mfmtblToken3" Type="MFormattable" PBy="CRef"
+                                DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam  Name="mfmtblToken4" Type="MFormattable" PBy="CRef"
+                                DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="TString">
+                <Desc>
+                    <P>This constructor takes a TStrCat object. See the class comments above. This lets you construct this string from multiple source values that will be concatenated together.</P>
+                </Desc>
+                <MethVar><MethParam  Name="scatSrc" Type="TSCat" PBy="CRef"/></MethVar>
+            </Method>
+
+
+            <Method Name="TString">
+                <Desc>
+                    <P>These are the copy and move constructors. The copy constructor just updates this object's text content based on that of the source's. If needed, it expands this string's capacity to hold the source's text.</P>
+
+                    <P>The move constructor will steal the source string's buffer, leaving it with an empty, minimal sized buffer.</P>
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="MRef"/></MethVar>
+            </Method>
+
+        </Ctors>
+
+
+        <!-- Public operators -->
+        <Operators>
+            <Method Name="operator=" RetType="TString" RetBy="Ref">
+                <Desc>
+                    Assigns the passed raw text to this string. This string buffer will be expanded as needed to accomodate the text. It will not be down-sized if the source is smaller.
+                </Desc>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="operator=" RetType="TString" RetBy="Ref">
+                <Desc>
+                    The assignment and move operators. The assignment operator just copies the source text to our buffer, expanding it if needed. The move operator just swaps buffers between us and the source string.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="MRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator==" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    Equality operator. This one has to do case sensitive comparisons, so only use it if that is appropriate. Else use the bCompare/bCompareI type methods. Note that the short character versions will require an on the fly internalization and so must be in the local code page, and should generally be avoided anyway.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TSCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="operator!=" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    Inequality operator. This has to do case sensitive comparisons, so only use it if that is appropriate. Else use the bCompare/bCompareI type methods. Note that the short character versions will require an on the fly internalization and so must be in the local code page, and should generally be avoided anyway.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TSCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="operator+=">
+                <Desc>
+                    These operators are shortcuts for common append operations, making it very syntactically compact to append strings and characters to this string.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+                <MethVar><MethParam  Name="chSrc" Type="tCIDLib::TCh"/></MethVar>
+            </Method>
+
+            <Method Name="operator&amp;lt;" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Compares this string to the source string, returning true if this one would sort before the source.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="operator&amp;lt;=" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Compares this string to the source string, returning true if this one is equal to or would sort before the source.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="operator>" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Compares this string to the source string, returning true if this one would sort after the source.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="operator>=" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Compares this string to the source string, returning true if this one is equal to or would sort after the source.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="operator[]" Attrs="Const" RetType="tCIDLib::TCh">
+                <Desc>
+                    Provides indexed access to characters. Of course, in a UTF-16 environment this could possibly put you in the middle of a multi-code point character, so it has to be used with care. This one provides const access to the character cannot be modfied.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="c4Index" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="operator[]" RetType="tCIDLib::TCh" RetBy="Ref">
+                <Desc>
+                    Same as above, but provides a non-const reference to the character so that it can be directly set. The same concerns as above exist with respect to UTF-16 based platforms.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="c4Index" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+        </Operators>
+
+
+        <!-- Non-virtual public methods -->
+        <NVirtMeths>
+            <Method Name="Append">
+                <Desc>
+                    These methods allow you to append the most common stuff to this string, including a single string, two strings, one to three raw strings, or a count of characters. For the raw pointers there's just a single version with the 2nd and third parameters just having null default values. The character version can be convenient for appending things like a line of dashes and the like.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar>
+                    <MethParam  Name="strSrc1" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strSrc2" Type="TString" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="pszSrc2" Type="tCIDLib::TCh" PBy="CPtrC" DefVal="nullptr"/>
+                    <MethParam  Name="pszSrc3" Type="tCIDLib::TCh" PBy="CPtrC" DefVal="nullptr"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="chSrc" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="AppendFormatted">
+                <Desc>
+                    <P>These methods support the appending of all the fundamental types or any object that implements the MFormattable mixin to this string. So the value is formatted to text and append, with type specific control over the formatting.</P>
+
+                    <P>The numeric ones allow you to control the radix, group size, and the character to use for the group separator if doing groups. If the size is zero, then no grouping is done. If the group separator is the null character, but grouping is enabled, then the local specific group character is used. The defaulted parameter result in an ungrouped decimal radix format.</P>
+
+                    <P>For the integral ones, you can also indicate the negative sign to use, which defaults to the almost always desired hyphen-minus character. For floating points you can indicate how many decimal places.</P>
+
+                    <P>For MFormattable objects, a temporary string stream will be created, and the object streamed to it. The resulted text is then appended. So this is not the most efficient means to do this, but in many cases you'd just end up doing the same yourself, and this is more convenient.</P>
+
+                    <Note>For brevity we represent all the 1, 2, 4 and 8 byte cardinal and integral values with an X, since they are the same other than the value to be converted.</Note>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="cxToFmt" Type="tCIDLib::TCardx"/>
+                    <MethParam  Name="eRadix" Type="tCIDLib::ERadices" DefVal="tCIDLib::ERadices::Dec"/>
+                    <MethParam  Name="c4GrpSize" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="chGrpSep" Type="tCIDLib::TCh" DefVal="kCIDLib::chNull"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="f8ToFmt" Type="tCIDLib::TFloat8"/>
+                    <MethParam  Name="c4DecPlaces" Type="tCIDLib::TCard4" DefVal="2"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="f8ToFmt" Type="tCIDLib::TFloat8"/>
+                    <MethParam  Name="c4DecPlaces" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="chNegSign" Type="tCIDLib::TCh" />
+                    <MethParam  Name="chDecimal" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="c4GrpSize" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="chGrpSep" Type="tCIDLib::TCh"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="ixToFmt" Type="tCIDLib::TIntx"/>
+                    <MethParam  Name="eRadix" Type="tCIDLib::ERadices" DefVal="tCIDLib::ERadices::Dec"/>
+                    <MethParam  Name="chNegSign" Type="tCIDLib::TCh" DefVal="kCIDLib::chHyphenMinus"/>
+                    <MethParam  Name="c4GrpSize" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="chGrpSep" Type="tCIDLib::TCh" DefVal="kCIDLib::chNull"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="mfmtblSrc" Type="MFormattable" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="AppendSubStr">
+                <Desc>
+                    These methods allow you extract a substring from the passed source string and append it to this string. It starts at the indicated start index and extracts c4Len characters. If the length is c4MaxCard, then it goes to the end of the source string, which is the default.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strSrc" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4Start" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4Len" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxCard"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszSrc" Type="TString" PBy="CPtrC"/>
+                    <MethParam  Name="c4Start" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4Len" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxCard"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bCapAtChar" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    Terminates this string at the first instance of the indicated character. Returns kCIDLib::True if it found the character, else kCIDLib::False and this string wasn't changed.
+                </Desc>
+                <MethVar><MethParam  Name="chAt" Type="tCIDLib::TCh"/></MethVar>
+            </Method>
+
+            <Method Name="bCompare" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Compares this string to the passed one, case sensitive. This is effectively the same as the == operator. Returns kCIDLib::True if they are equal.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="TString" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="bCompareI" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Compares this string to the passed string, case insensitively. The == operator is case sensitive, so often it's not what is desired. Returns kCIDLib::True if they are equal.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="TString" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="bCompareN" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Compares up to N characters of this string to the passed string, case insensitively. If they are both equal to either the end of both (if both are shorter than N), or up to N number of characters it returns kCIDLib::True.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strSrc" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszSrc" Type="TString" PBy="CPtrC"/>
+                    <MethParam  Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bCompareNI" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    This is a combination of the N and I versions above, comparing up to N characters, case insensitively.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strSrc" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszSrc" Type="TString" PBy="CPtrC"/>
+                    <MethParam  Name="c4Count" Type="tCIDLib::TCard4"/>
+                 </MethVar>
+            </Method>
+
+            <Method Name="bContainsChar" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Returns kCIDLib::True if this string contains at least one instance of the passed character.
+                </Desc>
+                <MethVar><MethParam  Name="chToFind" Type="tCIDLib::TCh"/></MethVar>
+            </Method>
+
+            <Method Name="bContainsSubstr" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Returns kCIDLib::True if this string contains at least one instance of the passed string within it. The check can be case sensitive or insensitive.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strToFind" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bEndsWith" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Returns kCIDLib::True if this string ends with the passed string. This is a case sensitive comparison. See below for an insensitive version.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strToFind" Type="TString" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszToFind" Type="TString" PBy="CPtrC"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bEndsWithI" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Same as above but this time it is case insensitive.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strToFind" Type="TString" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszToFind" Type="TString" PBy="CPtrC"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bExtractNthToken" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>Extracts the c4Index'th token from this string, tokenizing it using the passed separator character. The resulting tokens can be optionally stripped of any leading/trailing whitespace. Returns true if an Nth parameter exists.</P>
+
+                    <P>Only use this for occasional access to string tokens. If you need to do more, use the <ClassRef Ref="TStringTokenizer"/> class to pre-tokenize it up front.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="c4Index" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="chSepChar" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bStripWS" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bFindTokenList" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Scans this string and finds all <Link Type="Page" Ref="/BigPicture/" Id="/StringTokens">replacement tokens</Link>. For each one, it adds the character for that token to the passed output string. Returns kCIDLib::True if any were found.
+                </Desc>
+                <MethVar><MethParam  Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/></MethVar>
+            </Method>
+
+            <Method Name="bFirstOccurrence" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>Finds the first occurance of a character or substring within this string. If successful, the index where it was found is given back in c4Pos. It can be case sensitive or insensitive, with the former being the default.</P>
+
+                    <P>For the substring varation, there is a bAnyChar parameter. It defaults to kCIDLib::False, which means find the whole substring. Otherwise, it will look for any character in the substring parameter. So it's like calling the first version for every character in the substring parameter (stopping when it gets the first match, if any.)</P>
+
+                    <P>If successful, c4Pos is updated. You can then call bNextOccurrence to continue searching if you wish, passing c4Pos back in as the starting point.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="chToFind" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="c4Pos" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strToFind" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4Pos" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bAnyChar" Type="tCIDLib::TBoolean" DefVal="kCIDLib::True"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bIsAlpha" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Returns kCIDLib::True if all of the characters of this string are alphabetical.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bIsAlphaNum" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Returns kCIDLib::True if all of the characters of this string are alpha-numeric.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bIsEmpty" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Returns kCIDLib::True if this string's length is currently zero.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bLastOccurrence" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    This method is the same as bFirstOccurrence above, except it finds the last occurrence of the character, sub-string, or characters, and you would call bPrevOccurrence to continue searching in this case, passing back c4Pos from the previous operation.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="chToFind" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="c4Pos" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strToFind" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4Pos" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bAnyChar" Type="tCIDLib::TBoolean" DefVal="kCIDLib::True"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bNextOccurrence" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    After a successful call to bFirstOccurrence, you can call this to continue the search. You pass back in the c4Pos value you got before, and you can continue calling this method until it returns kCIDLib::False, each time passing back in the previous position. The parameters are the same.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="chToFind" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="c4Pos" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strToFind" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4Pos" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bAnyChar" Type="tCIDLib::TBoolean" DefVal="kCIDLib::True"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bPrevOccurrence" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    After a successful call to bLastOccurrence, you can call this to continue the search. You pass back in the c4Pos value you got before, and you can continue calling this method until it returns kCIDLib::False, each time passing back in the previous position. The parameters are the same.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="chToFind" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="c4Pos" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strToFind" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4Pos" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bAnyChar" Type="tCIDLib::TBoolean" DefVal="kCIDLib::True"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bReplaceChar" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    This method replaces all instances of the chFind character with the chReplaceWith character.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="chFind" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="chReplaceWith" Type="tCIDLib::TCh"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bReplaceSubStr" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>This method will replace either the next or all subsequent instances of the passed substring, starting at the c4StartAt index. If only replacing one instance, it will update c4StartAt with the index of the next one found so that you can continue the process one at a time if you choose to. If replacing all, then the output value of c4StartAt doesn't have much meaning. It will reflect where the last substring was found, but that's not relative to the original string, it's relative to the string contents after the previous replacements, if any.</P>
+
+                    <P>The replace with string can be empty, to just remove the located substrings. The search can be case sensitve or insensitive with the former being the default.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strToReplace" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strReplaceWith" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4StartAt" Type="tCIDLib::TCard4" PBy="Ref" Dir="InOut"/>
+                    <MethParam  Name="bReplaceAll" Type="tCIDLib::TBoolean"/>
+                    <MethParam  Name="bCaseSensitive" Type="tCIDLib::TBoolean"
+                                DefVal="kCIDLib::True"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bSplit" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>Splits this string at the first instance of the divider character, moving all the characters after the divider character to the second half string. If the divider character isn't found, then kCIDLib::False is returned and this string is not modified.</P>
+
+                    <P>This can be called in a back and forth manner to continually split a string, though of course it does require copying the trailing characters forward to the output string every time, so it's not as efficient as a <ClassRef Ref="TStringTokenizer"/>, but reasonable for a small number of splits on a fairly short string.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strSecondHalf" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="chDivider" Type="tCIDLib::TCh"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bStartsWith" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Returns kCIDLib::True if this string starts with the passed string. This is a case sensitive comparison. See below for an insensitive version.
+                </Desc>
+                <MethVar><MethParam  Name="strToFind" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszToFind" Type="TString" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="bStartssWithI" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Same as above but this time it is case insensitive.
+                </Desc>
+                <MethVar><MethParam  Name="strToFind" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszToFind" Type="TString" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="bToBoolean" RetType="tCIDLib::TBoolean" Attrs="Const NoExcept">
+                <Desc>
+                    Tries to convert the contents of this string to a boolean value, returning whether it was successful or not. The text of this string can be false/true, 0/1, yes/no, or off/on, case insensitive. Anything else is rejected.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="bToFill" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bToCardX" RetType="tCIDLib::TBoolean" Attrs="Const NoExcept">
+                <Desc>
+                    Tries to convert the contents of this string to a tCIDLib::TCardX value in the indicated radix, and returns whether it was successful or not. X in this case stands for the 1, 2, 4, or 8 byte cardinal types, just to avoid redundancy here. They are identical other than the output type.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="cxToFill" Type="tCIDLib::TCardX" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="eRadix" Type="tCIDLib::ERadices" DefVal="tCIDLib::ERadices::Auto"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bToFloatX" RetType="tCIDLib::TBoolean" Attrs="Const NoExcept">
+                <Desc>
+                    Tries to convert the contents of this string to a tCIDLib::TFloatX value, and returns whether it was successful or not. X in this case stands for the 4 or 8 byte floating point types, just to avoid redundancy here. They are identical other than the output type.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="fxToFill" Type="tCIDLib::TFloatX" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bToIntX" RetType="tCIDLib::TBoolean" Attrs="Const NoExcept">
+                <Desc>
+                    Tries to convert the contents of this string to a tCIDLib::TIntX value in the indicated radix, and returns whether it was successful or not. X in this case stands for the 1, 2, 4, or 8 byte integral types, just to avoid redundancy here. They are identical other than the output type.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="ixToFill" Type="tCIDLib::TIntX" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="eRadix" Type="tCIDLib::ERadices" DefVal="tCIDLib::ERadices::Auto"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bTokenExists" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    Scans this string to see if at least one instance of the indicated <Link Type="Page" Ref="/BigPicture/" Id="/StringTokens">replacement token</Link> exists.
+                </Desc>
+                <MethVar><MethParam Name="chToFind" Type="tCIDLib::TCh"/></MethVar>
+            </Method>
+
+            <Method Name="c4BufChars" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>
+                    Returns the current buffer allocation size of this string, in characters, not in bytes. In bytes it will be this value times kCIDLib::c4CharBytes.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="c4Length" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>
+                    Returns the current number of characters in this string's buffer. For UTF-16 based systems, this is really the number of code points, and the number of actual Unicode characters may be less than this if there are any characters that require more than a single 16 bit code point.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="c4Val" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>
+                    Tries to convert the contents of this string to a tCIDLib::TCard4 value in the indicated radix. If that fails, it throws an exception.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="eRadix" Type="tCIDLib::ERadices" DefVal="tCIDLib::ERadices::Auto"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c8Val" RetType="tCIDLib::TCard8" Attrs="Const">
+                <Desc>
+                    Tries to convert the contents of this string to a tCIDLib::TCard8 in the indicated radix. If that fails, it throws an exception.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="eRadix" Type="tCIDLib::ERadices" DefVal="tCIDLib::ERadices::Auto"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="chAt" RetType="tCIDLib::TCh" Attrs="Const">
+                <Desc>
+                    This does the same thing as the const version of the [] operator, returning the character at the indicated index. On UTF-16 based systems, this is actually accessing code points. If any charactres require more than one code point, this could return half of an actual character.
+                </Desc>
+                <MethVar><MethParam Name="c4At" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="chFirst" RetType="tCIDLib::TCh" Attrs="Const">
+                <Desc>
+                    Returns the first character of this string. It's basically the same as calling the [] operator with an index of zero. It will throw if the string is empty.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="chLast" RetType="tCIDLib::TCh" Attrs="Const">
+                <Desc>
+                    Returns the last character of this string. Unlike chFirst() above, this will return a null character (kCIDLib::chNull) if the string is empty.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="CapAt">
+                <Desc>
+                    This will truncate this string at the indicated index. If the index is invalid, an exception will be thrown. It is OK if the c4At index is one past the end, i.e. where there is already a null terminator character anyway.
+                </Desc>
+                <MethVar><MethParam Name="c4At" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="Clear">
+                <Desc>
+                    This method will set this string to zero length. it will not reallocate the buffer, it just sets the current length to zero.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="CopyInSubStr">
+                <Desc>
+                    This method will set this string's content to a substring extracted from the passed source string. It will copy in c4Len characters, starting from the start index. If the length is kCIDlib::c4MaxCard, it goes to the end of the source string. Otherwise, if the start plus length exceeds the string length, an exception is thrown.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strSrc" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4Start" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Len" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxCard"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="CopyOutSubStr" Attrs="Const">
+                <Desc>
+                    <P>This method will set the target string's content to a substring extracted from this string. It will copy out c4Len characters, starting from the start index. If the length is kCIDlib::c4MaxCard, it goes to the end of this string. Otherwise, if the start plus length exceeds the string length, an exception is thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strTarget" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4Start" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Len" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxCard"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Cut">
+                <Desc>
+                    <P>This method will cut c4Len characters out of this string starting at the start index. The length can be kCIDLib::c4MaxCard which will just cut to the end, though of course you could just all CapAt() in that case as well.</P>
+
+                    <P>If the start plus length would exceed the length of the string, an exception will be thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Start" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Len" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxCard"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="CutUpTo">
+                <Desc>
+                    <P>This method will cut characters from the start up to the first instance of the passed character, if any. If not, then this string is not changed.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="chToFind" Type="tCIDLib::TCh"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="DeleteLast">
+                <Desc>
+                    <P>This method will delete the last character in the string, if it is not already empty.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="eCompare" Attrs="Const" RetType="tCIDLib::ESortComps">
+                <Desc>
+                    Compares this string to the passed string, case sensitively, and returns a relative magnitude indicator.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="eCompareI" Attrs="Const" RetType="tCIDLib::ESortComps">
+                <Desc>
+                    Same as eCompare above but does a case insensitive comparison.
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+            </Method>
+
+            <Method Name="eCompareN" Attrs="Const" RetType="tCIDLib::ESortComps">
+                <Desc>
+                    Compares up to N characters of this string and the passed source string, case sensitively. Any characters are that are ignored. If both are shorter than N then it is the same as calling eCompare above.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strSrc" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4MaxComp" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam Name="c4MaxComp" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="eCompareNI" Attrs="Const" RetType="tCIDLib::ESortComps">
+                <Desc>
+                    The same as eCompareN above, but does a case insensitive comparison.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strSrc" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4MaxComp" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam Name="c4MaxComp" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="eReplaceToken" RetType="tCIDLib::EFindRes">
+                <Desc>
+                    <P>These methods will <Link Type="Page" Ref="/BigPicture/" Id="/StringTokens">replace a token</Link> in this string with any of the fundamental types or anything that implements the MFormattable interface.</P>
+
+                    <P>The token system provides you with some formatting options, and these methods provide some other basic formatting options as well. You can control the radix of integral/cardinal values and the decimal digits of floating points.</P>
+
+                    <P>The return indicates one of three possibilities:</P>
+                    <List>
+                        <LItem Ref="NotFound">No token of that type was found</LItem>
+                        <LItem Ref="Found">A token was found and replaced, and there are more of that type available.</LItem>
+                        <LItem Ref="NoMore">A token was fuond and replaced, but it was the last of that type</LItem>
+                    </List>
+
+                    <P>Typically, if you want to make sure a token was replaced, just make sure the response is not NotFound. But you can use the other responses in certain circumstances, such as looping through a string and replacing all instances of a particular token, and possibly wanting to deal separately with the final one.</P>
+
+                    <Note>To cut down on verbosity, we use an X below to represent the 1, 2, 4, or 8 byte variations on the fundamental types. TString isn't explcitly available as a possible value because it implements MFormattable and so is already dealt with.</Note>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="chVal" Type="tCIDLib::TCh"/>
+                    <MethParam Name="chToken" Type="tCIDLib::TCh"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="cXVal" Type="tCIDLib::TCardX"/>
+                    <MethParam Name="chToken" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="eRadix" Type="tCIDLib::ERadices"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="f8Val" Type="tCIDLib::TFloat8"/>
+                    <MethParam Name="chToken" Type="tCIDLib::TCh"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="iXVal" Type="tCIDLib::TIntX"/>
+                    <MethParam Name="chToken" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="eRadix" Type="tCIDLib::ERadices"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pszVal" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam Name="chToken" Type="tCIDLib::TCh"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="mfmtblVal" Type="MFormattable"/>
+                    <MethParam Name="chToken" Type="tCIDLib::TCh"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="eTokenExists" RetType="tCIDLib::EFindRes" Attrs="Const">
+                <Desc>
+                    Checks to see if the passed replacement token exists in this string. The return value is the same as in the eReplaceToken() method variations above, and it basically does the same thing except it just doesn't do the actual replacement.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="chToFind" Type="tCIDLib::TCh"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ExportChars" Attrs="Const">
+                <Desc>
+                    <P>This method will 'export' characters from this string to a provided target raw string buffer. This doesn't add a null termination character. So it's more for just getting the characters into a buffer to treat as raw data, not as a string.</P>
+
+                    <P>It will copy out c4Len characters from the start index. In this case, the start index as last, and is defaulted to zero, so you often just need to provide a length if you are exporting from the start of the buffer. If the start plus length exceed the length of this string, an exception will be thrown.</P>
+
+                    <Note>This makes it an exception to the guidelines in the Null Termination section of the class comments above.</Note>
+
+                    <P>Keep in mind that, on UTF-16 based systems, you may have to be careful that you don't export starting in the middle of a multi-code point character.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pszTarget" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
+                    <MethParam Name="c4Len" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Start" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FormatToFld" Attrs="Const">
+                <Desc>
+                    <P>This method will place the contents of the passed string into this string, replacing any previous contents. The new contents will be justified within a field of an indicated width. This is often useful for simple columnar displays. If the width is zero, then it's set to the same width as the source string contents.</P>
+
+                    <P>If the contents of the source string aren't as wide as the target field, then any unused characters are filled with the chFill character. It defaults to a space which is the most common choice generally. If the contents of the source are wider than the field, then the content will be truncated, on one or both ends depending on justification.</P>
+
+                    <P>You can also have it add a fixed number of trailing spaces after the field, which can be useful to create fixed spacing between multiple columns of content in each row.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strSource" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4Width" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam Name="eJustify" Type="tCIDLib::EHJustify" DefVal="tCIDLib::EHJustify::Left"/>
+                    <MethParam Name="chFill" Type="tCIDLib::TCh" DefVal="kCIDLib::chSpace"/>
+                    <MethParam Name="c4TrailingSp" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FromZStr">
+                <Desc>
+                    <P>This method will set the contents of this string from a provided raw wide character string. This is somewhat like the assignment operator, but this one allows you to control how many source characters to take. The default is zero which means take all of it, which is the same as the assignment operator.</P>
+
+                    <P>If the passed source pointer is null, then this string will be set to a special value that indicates a null pointer.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FromShortZStr">
+                <Desc>
+                    <P>This is the same as FromZStr above, but takes a short character string instead (in the local code page.) It must be converted of course, so this is to be avoided except where you must get short character data in from the outside world.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pszSrc" Type="tCIDLib::TSCh" PBy="CPtrC"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="f8Val" Attrs="Const" RetType="tCIDLib::TFloat8">
+                <Desc>
+                    This method will convert the contents of this string into an 8 byte floating point value. If it cannot be converted, then an exception will be thrown.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="i4Val" Attrs="Const" RetType="tCIDLib::TInt4">
+                <Desc>
+                    This method will convert the contents of this string into a 4 byte integral value. If it cannot be converted, then an exception will be thrown.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="i8Val" Attrs="Const" RetType="tCIDLib::TInt8">
+                <Desc>
+                    This method will convert the contents of this string into an 8 byte integral value. If it cannot be converted, then an exception will be thrown.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="ImportChars">
+                <Desc>
+                    <P>This method will 'import' characters into this string. This is similar to  FromZStr, but it doesn't depend on the source actually being a null terminated string. You must provide a number of characters to import, based on knowledge of what is in the buffer.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pszSource" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Insert">
+                <Desc>
+                    <P>This method will insert characters from the source string (object or raw buffer) into this string at a specific index. You can also insert a single character.</P>
+
+                    <P>Of course these require that any characters after the insertion point be moved up, so it can be somewhat heavy for large strings, remembering that every character can be 2 or 4 bytes. And keep in mind that, on UTF-16 based systems, you may have to be sure you are not inserting into the middle of a multi-code point character.</P>
+
+                    <P>The index can be at the end of the string, i.e. at the null terminator; but, if beyond that, an exception will be thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strSource" Type="tCIDLib::TCh" PBy="CRef"/>
+                    <MethParam Name="c4AtIndex" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pszSource" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam Name="c4AtIndex" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="chSource" Type="tCIDLib::TCh"/>
+                    <MethParam Name="c4AtIndex" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="LoadFromMsg">
+                <Desc>
+                    <P>This method will load a translatable text string associated with the passed facility object into this string object, replacing any previous content. It can also optionally replace up to four <Link Type="Page" Ref="/BigPicture/" Id="/StringTokens">replacement tokens</Link> in the process, which is a very commonly used capability that saves a huge amount of grunt work.</P>
+
+                    <Note>Bear in mind that this method has no way of correcting you if you pass a message id defined by one facility but pass a different <Link Type="Page" Ref="/BigPicture/" Id="/Facilities">facility object</Link>. If you do that, it may not fail, it may just load the wrong text.</Note>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="midToLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="facSrc" Type="TFacility" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="midToLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="facSrc" Type="TFacility" PBy="CRef"/>
+                    <MethParam Name="mftblVal1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mftblVal2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable"/>
+                    <MethParam Name="mftblVal3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable"/>
+                    <MethParam Name="mftblVal4" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="pszBuffer" Attrs="Const" RetType="tCIDLib::TCh" RetBy="CPtr">
+                <Desc>
+                    <P>Provides access to the raw character buffer. See the Null Termination section in the main class comments above. The buffer will be null terminated, but be careful about modifying the string and continuing to use this pointer. It's possible it may end up no longer null terminated. Best to get it as needed if you are modifying the contents at the asme time, just to pass into system calls and the like that require a raw pointer.</P>
+
+                    <P>It is const so you can't change it. That would be disasterous so don't try to cast off the constness and start making changes unless you want an unstable system.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="pszBufferAt" Attrs="Const" RetType="tCIDLib::TCh" RetBy="CPtr">
+                <Desc>
+                    <P>Same concerns as pszBuffer() above, but this one just lets you get a pointer to somewhere within the buffer other than the start. If the index is beyond the end of the string, an exception will occur. It's OK if it is the current length, which will point you at the terminating null for an empty string.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="pszDupBuffer" Attrs="Const NoDiscard" RetType="tCIDLib::TCh" RetBy="Ptr">
+                <Desc>
+                    <P>This method will duplicate the current buffer, allocating another buffer of the same size (plus one for a null terminator), coping the contents into the new buffer, and returning that buffer to you. You are responsible for cleaning it up.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="pszEnd" Attrs="Const" RetType="tCIDLib::TCh" RetBy="CPtr">
+                <Desc>
+                    <P>Returns a pointer to the end of the character buffer, i.e. at the null pointer. I'm not even sure anymore why this exists or what use it would have, but it's there. Maybe to do some sort of calculation relative to a pointer somewhere else within the buffer or smoe such thing.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+
+            <Method Name="Prepend">
+                <Desc>
+                    <P>These methods allow you to prepend a character or the contents of another string to the beginning of this string. Of course this requires moving all of the existing contents forward and reallocating buffer potentially. In some cases it may be cheaper to just allocate another string of known required length and copy both into it.</P>
+
+                    <P>In actual fact this is currently just implemented as a call to Insert with an insert index of zero.</P>
+                </Desc>
+                <MethVar><MethParam  Name="strSrc" Type="TString" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/></MethVar>
+                <MethVar><MethParam  Name="chSrc" Type="tCIDLib::TCh"/></MethVar>
+            </Method>
+
+            <Method Name="PutAt">
+                <Desc>
+                    <P>This will insert the passed character at the passed index. This is exactly the same as calling using the non-const variation of the [] operator. Which one you use is purely a matter of personal preference.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Index" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="chToPut" Type="tCIDLib::TCh"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Reallocate">
+                <Desc>
+                    <P>This method will reallocate the character buffer to a new capacity, if the new value is larger than the existing capacity. If it does reallocate, you can choose whether to preserve the old content or discard it. Always discard it if that's doable, since it's that much more efficient, but the default is to preserve to be safe.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4NewSize" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="bPreserveOld" Type="tCIDLib::TBoolean" DefVal="kCIDLib::True"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="SetFormatted">
+                <Desc>
+                    <Note>This method is exactly the same as AppendFormatted. In fact, these do nothing but set this string's length to zero and then call the equivalent Append version. Since there are a lot of them, I will save space and just refer you to the append versions above.</Note>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="SetLast">
+                <Desc>
+                    <P>This method will update the last character of this string, by setting it to the passed character. If this string is empty, nothing will be done. That is somewhat out of character relative to all other methods here which throw if the end of the buffer if exceeded.</P>
+
+                    <P>It is legal to pass a null character (kCIDLib::chNull.) The current length of this string will be decremented by one to reflect this.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="chToSet" Type="tCIDLib::TCh"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Strip">
+                <Desc>
+                    <P>This method allows you to strip characters from this string in various ways. You can remove them from the beginning, the end, and/or the middle. You can strip a contiguous sequence of strippable characters totally or replace them with a single replacement character.</P>
+
+                    <P>You indicate which scenarios you want using the bitmapped enum, tCIDLib::EStripModes. The options bits it provides are:</P>
+
+                    <List>
+                        <LItem Ref="Leading">Strip leading characters</LItem>
+                        <LItem Ref="Trailing">Strip trailing character</LItem>
+                        <LItem Ref="Middle">Strip inside the string, actual effect depends on Total option.</LItem>
+                        <LItem Ref="Total">Controls how Middle works, see below.</LItem>
+                        <LItem Ref="Full">Combines Leading, Trailing, and Middle but not Total</LItem>
+                        <LItem Ref="Complete">Combines Leading, Trailing, and Middle and Total</LItem>
+                    </List>
+
+                    <P>If Middle is set, it causes characters to be stripped from inside the string. If Total is not set, then any contiguous sequence of strippable characters is removed and replaced with a single instance of the chRepChar replacement character. If Total is set, they are stripped out completedly. You could use this, for instance, to reduce any sequence of whitespace characters to a single space</P>
+
+                    <P>You provide a list of characters to strip, passing them in as a string. If you only want to strip one character, pass in a single character string.</P>
+
+                    <P>There are some convenience methods below that do some of these scenarios for you with less verbiage.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pszToStrip" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam Name="eStripMode" Type="tCIDLib::EStripModes"/>
+                    <MethParam Name="chRepChar" Type="tCIDLib::TCh"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strToStrip" Type="tCIDLib::TCh" PBy="CRef"/>
+                    <MethParam Name="eStripMode" Type="tCIDLib::EStripModes"/>
+                    <MethParam Name="chRepChar" Type="tCIDLib::TCh"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="StripWhitespace">
+                <Desc>
+                    Calls Strip above for you, passing in a list of white space characters to be stripped and setting the Leading/Trailing flags. The internal contents of the string are not modified.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="ToLower">
+                <Desc>
+                    <P>This method will convert characters of this string to their lower case equivalents if not already thus. The default parameters will cause it to affect the whole string, but you can set them to affect only a sub-section.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Start" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam Name="c4Len" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxCard"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ToUpper">
+                <Desc>
+                    <P>This method will convert characters of this string to their upper case equivalents if not already thus. The default parameters will cause it to affect the whole string, but you can set them to affect only a sub-section.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Start" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam Name="c4Len" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxCard"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ToZStr" Attrs="Const">
+                <Desc>
+                    <P>This method will copy out the contents of this string to the passed raw character buffer, or at least as much of it as will fit in the stated buffer size. It will be null terminated so at most only c4MaxChars-1 characters will be copied over.</P>
+
+                    <P>You can start somewhere other than the start of this string by setting c4StartInd. It defaults to zero since that's the most likely scenario.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pszTarget" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
+                    <MethParam Name="c4MaxChars" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4StartInd" Type="tCIDLib::TCard4"  DefVal="0"/>
+                </MethVar>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

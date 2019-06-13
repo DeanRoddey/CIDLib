@@ -59,7 +59,7 @@ TGetParmsDlg::TGetParmsDlg() :
 
 TGetParmsDlg::~TGetParmsDlg()
 {
-    // Call our own destroy method. We don't own the display value
+    // Call our own destroy method
     Destroy();
 }
 

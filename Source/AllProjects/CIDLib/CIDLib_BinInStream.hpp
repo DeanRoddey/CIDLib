@@ -145,6 +145,25 @@ class CIDLIBEXP TBinInStream : public TObject
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
+        static tCIDLib::TCard2 c2CheckFmtVersion
+        (
+                    TBinInStream&           strmSrc
+            , const tCIDLib::TCard2         c2MaxVersion
+            , const TClass&                 clsCaller
+            , const tCIDLib::TCh* const     pszFile
+            , const tCIDLib::TCard4         c4Line
+        );
+
+        static tCIDLib::TCard2 c2CheckFmtVersion
+        (
+                    TBinInStream&           strmSrc
+            , const tCIDLib::EStreamMarkers eMarker
+            , const tCIDLib::TCard2         c2MaxVersion
+            , const TClass&                 clsCaller
+            , const tCIDLib::TCh* const     pszFile
+            , const tCIDLib::TCard4         c4Line
+        );
+
         static tCIDLib::TVoid CheckRelationship
         (
              const   TObject* const         pobjTest

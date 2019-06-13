@@ -685,7 +685,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
         TRefKeyedHashSet(const  tCIDLib::EAdoptOpts eAdopt
                         , const tCIDLib::TCard4     c4Modulus
-                        ,       TKeyOps* const      pkopsToAdopt
+                        , const TKeyOps&            kopsToUse
                         ,       TKeyExtract         pfnKeyExtract
                         , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
@@ -695,7 +695,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             , m_c4HashModulus(c4Modulus)
             , m_eAdopt(eAdopt)
             , m_pfnKeyExtract(pfnKeyExtract)
-            , m_pkopsToUse(pkopsToAdopt)
+            , m_kopsToUse(kopsToUse)
         {
             try
             {
@@ -712,7 +712,6 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             catch(...)
             {
                 delete [] m_apBuckets;
-                delete pkopsToAdopt;
                 throw;
             }
         }
@@ -724,9 +723,6 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         {
             // Flush the collection, destroying user data if we are adopting
             RemoveAllElems(m_eAdopt == tCIDLib::EAdoptOpts::Adopt);
-
-            // Delete the key ops object
-            delete m_pkopsToUse;
 
             // And delete the bucket list itself
             delete [] m_apBuckets;
@@ -857,10 +853,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
             // Get the hash of the element
             const TKey& objKey = m_pfnKeyExtract(*pobjToOrphan);
-            const tCIDLib::THashVal hshElem = m_pkopsToUse->hshKey
+            const tCIDLib::THashVal hshElem = m_kopsToUse.hshKey
             (
-                objKey
-                , m_c4HashModulus
+                objKey, m_c4HashModulus
             );
 
             // Search the bucket if its not empty
@@ -869,10 +864,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             while (pnodeToOrphan)
             {
                 // If this key matches, then break out
-                if (m_pkopsToUse->bCompKeys
+                if (m_kopsToUse.bCompKeys
                 (
-                    m_pfnKeyExtract(pnodeToOrphan->objData())
-                    , objKey))
+                    m_pfnKeyExtract(pnodeToOrphan->objData()), objKey))
                 {
                     break;
                 }
@@ -926,11 +920,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
             // Get the hash of the element
             const TKey& objKey = m_pfnKeyExtract(*pobjToRemove);
-            const tCIDLib::THashVal hshElem = m_pkopsToUse->hshKey
-            (
-                objKey
-                , m_c4HashModulus
-            );
+            const tCIDLib::THashVal hshElem = m_kopsToUse.hshKey(objKey, m_c4HashModulus);
 
             // Search the bucket if its not empty
             TNode* pnodePrev = nullptr;
@@ -938,13 +928,8 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             while (pnodeToRemove)
             {
                 // If this key matches, then break out
-                if (m_pkopsToUse->bCompKeys
-                (
-                    m_pfnKeyExtract(pnodeToRemove->objData())
-                    , objKey))
-                {
+                if (m_kopsToUse.bCompKeys(m_pfnKeyExtract(pnodeToRemove->objData()), objKey))
                     break;
-                }
 
                 pnodePrev = pnodeToRemove;
                 pnodeToRemove = pnodeToRemove->pnodeNext();
@@ -1022,10 +1007,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             TMtxLocker lockSync(this->pmtxLock());
 
             // Get the hash of the element
-            const tCIDLib::THashVal hshElem = m_pkopsToUse->hshKey
+            const tCIDLib::THashVal hshElem = m_kopsToUse.hshKey
             (
-                objKeyToRemove
-                , m_c4HashModulus
+                objKeyToRemove, m_c4HashModulus
             );
 
             // Search the bucket if its not empty
@@ -1034,10 +1018,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             while (pnodeToRemove)
             {
                 // If this key matches, then break out
-                if (m_pkopsToUse->bCompKeys
+                if (m_kopsToUse.bCompKeys
                 (
-                    m_pfnKeyExtract(pnodeToRemove->objData())
-                    , objKeyToRemove))
+                    m_pfnKeyExtract(pnodeToRemove->objData()), objKeyToRemove))
                 {
                     break;
                 }
@@ -1125,7 +1108,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         //
         //  DO NOT change the element in a way that would modify the hash!
         //
-        template <typename IterCB> tCIDLib::TVoid ForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
 
@@ -1134,11 +1117,11 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             while (pnodeCur)
             {
                 if (!iterCB(pnodeCur->objData()))
-                    break;
+                    return kCIDLib::False;
 
                 // In debug, make sure they didn't modify the hash of this element
                 #if CID_DEBUG_ON
-                const tCIDLib::THashVal hshCheck = m_pkopsToUse->hshKey
+                const tCIDLib::THashVal hshCheck = m_kopsToUse.hshKey
                 (
                     m_pfnKeyExtract(pnodeCur->objData()), m_c4HashModulus
                 );
@@ -1148,6 +1131,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
                 pnodeCur = pnodeFindNext(pnodeCur, hshCurBucket);
             }
+            return kCIDLib::True;
         }
 
 
@@ -1157,7 +1141,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             TMtxLocker lockSync(this->pmtxLock());
 
             // Get the hash of the element
-            const tCIDLib::THashVal hshElem = m_pkopsToUse->hshKey
+            const tCIDLib::THashVal hshElem = m_kopsToUse.hshKey
             (
                 keyToFind, m_c4HashModulus
             );
@@ -1168,10 +1152,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             while (pnodeToRemove)
             {
                 // If this key matches, then break out
-                if (m_pkopsToUse->bCompKeys
+                if (m_kopsToUse.bCompKeys
                 (
-                    m_pfnKeyExtract(pnodeToRemove->objData())
-                    , keyToFind))
+                    m_pfnKeyExtract(pnodeToRemove->objData()), keyToFind))
                 {
                     break;
                 }
@@ -1460,12 +1443,12 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         TNode* pnodeFind(const TKey& objKeyToFind, tCIDLib::THashVal& hshElem) const
         {
             // Get the hash of the element
-            hshElem = m_pkopsToUse->hshKey(objKeyToFind, m_c4HashModulus);
+            hshElem = m_kopsToUse.hshKey(objKeyToFind, m_c4HashModulus);
 
             TNode* pnodeCur = m_apBuckets[hshElem];
             while (pnodeCur)
             {
-                if (m_pkopsToUse->bCompKeys(m_pfnKeyExtract(pnodeCur->objData())
+                if (m_kopsToUse.bCompKeys(  m_pfnKeyExtract(pnodeCur->objData())
                                             , objKeyToFind))
                 {
                     break;
@@ -1549,21 +1532,20 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         //  m_eAdopt
         //      Indicates whether we are to adopt our element.
         //
+        //  m_kopsToUse
+        //      A key ops object that provides all of the operations that
+        //      we have to do on key field objects.
+        //
         //  m_pfnKeyExtract
         //      The key extraction function provided by the user. It pulls
         //      out a reference to the key field from the data field.
-        //
-        //  m_pkopsToUse
-        //      A key ops object that provides all of the operations that
-        //      we have to do on key field objects. We own and destruct it
-        //      when we destruct.
         // -------------------------------------------------------------------
         TNode**             m_apBuckets;
         tCIDLib::TCard4     m_c4CurElements;
         tCIDLib::TCard4     m_c4HashModulus;
         tCIDLib::EAdoptOpts m_eAdopt;
+        TKeyOps             m_kopsToUse;
         TKeyExtract         m_pfnKeyExtract;
-        TKeyOps*            m_pkopsToUse;
 };
 
 #pragma CIDLIB_POPPACK

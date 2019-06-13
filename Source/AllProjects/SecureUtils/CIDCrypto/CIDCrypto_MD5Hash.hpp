@@ -129,25 +129,9 @@ class CIDCRYPTEXP TMD5Hash : public TMsgHash
 //   CLASS: TMD5KeyOps
 //  PREFIX: kops
 // ---------------------------------------------------------------------------
-class CIDCRYPTEXP TMD5KeyOps : public TObject, public MDuplicable
+class CIDCRYPTEXP TMD5KeyOps
 {
     public :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TMD5KeyOps();
-
-        TMD5KeyOps(const TMD5KeyOps&) = default;
-
-        ~TMD5KeyOps();
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMD5KeyOps& operator=(const TMD5KeyOps&) = default;
-
-
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
@@ -157,21 +141,12 @@ class CIDCRYPTEXP TMD5KeyOps : public TObject, public MDuplicable
             return (mhash1 == mhash2);
         }
 
-        tCIDLib::THashVal hshKey
-        (
-            const   TMD5Hash&               mhashToHash
-            , const tCIDLib::TCard4         c4Modulus
-        )   const;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TMD5KeyOps, TObject)
-        DefPolyDup(TMD5KeyOps)
+        tCIDLib::THashVal hshKey(   const   TMD5Hash&       mhashToHash
+                                    , const tCIDLib::TCard4 c4Modulus) const
+        {
+            return mhashToHash.hshCalcHash(c4Modulus);
+        }
 };
-
 
 #pragma CIDLIB_POPPACK
 

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Welcome to CIDLib</Title>
+
+    <HelpText>
+
+        <P>Welcome to the CIDLib C++ Development Environment. CIDLib is a comprehensive C++ system for the development of software systems of significant size and complexity. CIDLib is comprised of about 450,000 lines of code, in about 1100 classes. Just to jump right in with an overview to help you decide if CIDLib is of potential interest to you, here are some of the features it includes:</P>
+
+        <List>
+            <LItem>Build Tools, project definition system, resource compiler, loadable text system</LItem>
+            <LItem>'Virtual Kernel' platform portability layer</LItem>
+            <LItem>Full set of standard libraries including streams, collections/cursors, memory buffers, strings, events, mutexes, sockets, threads/processes, serial ports, URLs, UPnP, secure sockets, audio streaming, speech recognition, digital audio extraction, medatada extraction, text transcoding, logging, publish/subscribe, bitmaps, chunked files, ODBC, object store, file packaging, image processing, and lots more.</LItem>
+            <LItem>Custom implementations of various standards such as PNG, zLib, WebSockets, HTTP, SMTP, Blowfish, AES, MD5, SHA-X, regular expressions, XML, JSON, and much more.</LItem>
+            <LItem>A fairly extensive windowing and 'regular graphics' framework (no 3D graphics yet)</LItem>
+            <LItem>A very powerful ORB (Object Request Broker), IDL compiler, and a set of standard servers (name, logging, and configuration.)</LItem>
+            <LItem>An embeddable, virtual machine-based, OO language engine called CML (parser, VM, runtime libraries)</LItem>
+            <LItem>An embeddable IDE for CML editing and debugging</LItem>
+            <LItem>A nice test framework</LItem>
+        </List>
+
+        <SecTitle>What CIDLib is Not</SecTitle>
+
+        <P>It's important also to understand what CIDLib is not. It's not a pieces and parts system. Because C++ has no comprehensive standard libraries, unlike many more modern languages, people in the C++ world tend to take an approach that it's actually a good thing to create programs by sewing bits and pieces together.</P>
+
+        <P>I believe that is making a silk purse out of a sow's ear as the old saying goes. I think that this lack of a comprehensive system puts C++ at a disadvantage relative to other languages, and CIDLib is about totally the opposite. CIDLib is closer to a 'virtual operating system' than a library you throw into your own product.</P>
+
+        <P>This approach is not something done lightly. It's necessary in order to create a system in which <Italic>all</Italic> code in the system can take part in various standards and capabilities. This cannot be done in a pieces and parts system.</P>
+
+        <P>For the same reason, and probably even more controversially, CIDLib does not use the standard C++ libraries. It is also impossible to create a fully integrated system if you use the standard C++ libraries because you cannot impose any standard functionality on that code. That will inevitably lead to a compromised and awkward system where there are many special cases.</P>
+
+        <P>It is also not intended to be incredibly flexible in terms of build infrastructure, in the way that systems based on the pieces and parts scheme are. They can be incredibly complicated and annoying, due to their need to deal with almost any enventuality.</P>
+
+        <SecTitle>What You Get In Return</SecTitle>
+
+        <P>In return you get a system that is of a whole, where there are not ten different styles and schemes, where there is no 'impedance mismatch' getting information into and out of various subsystems, where all classes can implement common functionality that allows them to participate in very powerful higher level capabilities.</P>
+
+        <P>You also get a system, if you are willing to live within its rules, that is trivially easy to configure for building, because the build infrastructure only needs to support CIDLib's way of doing things.</P>
+
+        <P>So few people in the C++ world get to experience such an environment, because there really isn't anything widely used that fits that description, to my knowledge anyway. The more commonly used systems (e.g. Boost/QT) that would be considered roughly the equivalent of CIDLib are based on the standard C++ libraries and/or the pieces and parts philosophy.</P>
+
+        <SecTitle>Platform Support</SecTitle>
+
+        <P>CIDLib is very abstracted from the underlying platform and very much intended to be a multi-platform system. But at this time, it only supports Win32. There used to be a Linux driver long ago, but it hasn't been used in a long time and would have to be caught back up.</P>
+
+        <P>As you will see reading through this documentation and watching the CIDLib Youtube videos, CIDLib is based on a 'virtual kernel' and no language or operating system headers are seen outside of that. Therefore all the rest of the code is completely written in terms of our own interfaces. The build system also inherently understands the multi-platform strategies of CIDLib, avoiding a lot of complexity that would otherwise be involved.</P>
+
+        <P>I would hope that we could get some experienced Linux folks interested in getting the old Linux driver updated.</P>
+
+        <Note>The UI stuff is also well encapsulated, but I'd not hold out any real hope of making that stuff portable. The non-UI code though should be not just portable but multi-platform with minimal need to deal with per-platform issues. I'm sure there will be some kinks initially, but they should not be too hard to take care of.</Note>
+
+    </HelpText>
+
+</HelpPage>

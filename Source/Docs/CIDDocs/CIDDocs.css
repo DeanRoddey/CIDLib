@@ -1,0 +1,283 @@
+/*
+ * This file contains the CSS for the generated content. There is a main
+ * HTML file that contains the common stuff, header, menu, footer, etc...
+ * and a dynamic div that the actual content gets loaded into. It just
+ * does its own styles since they have nothing to do with the standardized
+ * stuff used on the generated content.
+ *
+ * We do set a couple things on the body, so that it doesn't have to be
+ * done all over the place.
+ */
+
+body {
+    /* We set a base text size here and everything else is relative */
+    font : Normal 9pt Verdana, sans-serif;
+    color : #000000;
+    background-color : #FFFFFF;
+    width : 100%;
+    height : 100%;
+    margin : 0;
+    padding : 0;
+}
+
+
+header {
+    border-bottom: 1px solid #CCCCCC;
+    margin: 8px;
+}
+
+#HeaderTop {
+    display : flex;
+    flex-direction : row;
+    justify-content : space-between;
+    align-items: center;
+    width : 100%;
+}
+
+#HeaderTitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    text-shadow : 2px 2px 5px rgba(128, 128, 128, .6);
+    color: #3FA1DB;
+}
+
+#CurPath {
+    font-size: 0.8em;
+    width : 98%;
+    margin : auto;
+    margin-bottom : 0.2em;
+}
+
+#MainContent {
+    width : 98%;
+    margin : auto;
+}
+
+
+#DynDiv {
+    width : 100%;
+}
+
+/*
+ * All of the pages are two sided. On the left is a div that holds links to any
+ * sub-topics/pages directly under that particular topic, and the right side
+ * contains the help for the currently selected item from the left.
+ */
+ #StdPage {
+    display : flex;
+    flex-direction: row;
+    height: 100%;
+    width : 100%;
+}
+
+#LeftSide {
+    min-width : 12em;
+    padding : 1em 4em 1em 2em;
+    border-right : 1px solid #CCCCCC;
+    overflow : hidden;
+}
+
+#RightSide{
+    padding-left : 4em;
+    padding-right : 4em;
+}
+
+
+footer {
+    border: 1px solid #8888AA;
+    margin-top: 16px;
+    background: #CCCCDD;
+    padding: 12px;
+    text-align: right
+}
+
+
+/* A help page main title */
+.PageHdr {
+    font: Normal 2.5em Calibri Light, sans-serif;
+    margin-left: -16px;
+    text-shadow : 2px 2px 4px rgba(128, 128, 128, .4);
+    font-weight : bold;
+    color: #777777;
+}
+
+
+/*
+ * Style links. Set the line height so that they can't force uneven line
+ * spacing.
+ */
+a:link {
+    color: #666666;
+    display: inline-block;
+    padding-bottom : 3px;
+    line-height : 1em;
+}
+
+a:visited {
+    color: #222222;
+    line-height : 1em;
+}
+
+/* Make sure images have some top/bottom margin */
+img {
+    margin-top : 16px;
+    margin-bottom : 16px;
+}
+
+/* Don't let lists run into the following content */
+li {
+    padding-bottom : 4px;
+}
+
+/* The optional prefix of a list item */
+.ListItemPref {
+    color : #555555;
+    font-size : 0.95em;
+    font-weight : bold;
+}
+
+
+
+/* A major help page section title */
+.SecHdr {
+    font: Normal 1.6em Calibri Light, sans-serif;
+    color : #666666;
+    font-weight : bold;
+    margin-left : -1em;
+    margin-top : 1em;
+    text-shadow : 2px 2px 4px rgba(128, 128, 128, .3);
+}
+
+/* A minor (sub-section) level title */
+.SubSecHdr {
+    font: Normal 1.1em Verdana, sans-serif;
+    font-weight : bold;
+    color : #555555;
+}
+
+/* A small note size */
+.SmallNote {
+    font-size : 0.75em;
+}
+
+/* A small note to put under some other text, so a little top margin */
+.SmallDropNote {
+    font-size : 0.75em;
+    margin-top : 1em;
+}
+
+
+/* A super-script */
+.Superscript {
+    font-size: .7em;
+    line-height: 0.5em;
+    vertical-align: baseline;
+    position: relative;
+    top: -0.4em;
+}
+
+
+/*
+ * This is used instead of the usual dotted note type of thing. It has a border
+ * to the left with padding all around.
+ */
+.BarredNote {
+    font-style : italic;
+    border-left : 4px solid #CCCCCC;
+    padding : 1em 5em 1em 1em;
+    display : table-cell;
+    vertical-align : middle;
+}
+
+
+/*
+ * Code is partly emphasized and partly de-emphasized, to draw
+ * attention to the important stuff, mostly identifiers.
+ */
+.EmphCode {
+    font-weight : bold;
+}
+
+.DeemphCode {
+    color : #555555;
+}
+
+
+/* A class we can add to a div to add a little vertical spacing */
+.TrailingSpace {
+    margin-bottom: 1.8em;
+}
+
+
+/* Common table attributes */
+table {
+    border : 1px solid #777777;
+}
+
+table tr td{
+    border : 1px solid #777777;
+    padding-left : 10px;
+    padding-right : 10px;
+    padding-top : 2px;
+    padding-bottom : 2px;
+}
+
+
+/* A table that has headers for columns and rows */
+table.HVHeaderTable tr:first-child {
+    background-color : #DDDDDD;
+    font-weight : bold;
+    color : #555555;
+}
+
+table.HVHeaderTable tr td:first-child {
+    background-color : #DDDDDD;
+    font-weight : bold;
+    color : #555555;
+}
+
+
+/* A table that has two header rows, and one column header */
+table.H2VHeaderTable tr:first-child {
+    background-color : #DDDDDD;
+    font-weight : bold;
+    color : #555555;
+}
+
+table.H2VHeaderTable tr:first-child + tr {
+    font-weight : bold;
+    background-color : #DDDDDD;
+    color : #555555;
+}
+
+table.H2VHeaderTable tr td:first-child {
+    border : 0px;
+    background-color : #DDDDDD;
+    font-weight : bold;
+    text-align : center;
+    color : #555555;
+}
+
+
+table.CppClsHdrTable {
+    border : 0px;
+}
+
+table.CppClsHdrTable tr td {
+    border : 0px;
+    padding-left : 0px;
+    padding-Right : 0px;
+    font-weight : normal;
+    vertical-align : top;
+}
+
+table.CppClsHdrTable tr td:first-child {
+
+    font-weight: bold;
+    color : #555555;
+    text-align : right;
+    vertical-align : top;
+}
+
+

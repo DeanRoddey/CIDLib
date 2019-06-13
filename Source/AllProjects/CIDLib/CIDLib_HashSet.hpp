@@ -627,14 +627,14 @@ template <class TElem, class TKeyOps> class THashSet
         THashSet<TElem,TKeyOps>() = delete;
 
         THashSet(   const   tCIDLib::TCard4     c4Modulus
-                    ,       TKeyOps* const      pkopsToAdopt
+                    , const TKeyOps&            kopsToUse
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             TCollection<TElem>(eMTSafe)
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
-            , m_pkopsToUse(pkopsToAdopt)
+            , m_kopsToUse(kopsToUse)
         {
             // Allocate and initialize the bucket table
             m_apBuckets = new TNode*[c4Modulus];
@@ -652,11 +652,8 @@ template <class TElem, class TKeyOps> class THashSet
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(colSrc.m_c4HashModulus)
-            , m_pkopsToUse(nullptr)
+            , m_kopsToUse(colSrc.m_kopsToUse)
         {
-            // Dup the key ops object. This is polymorphic, so its fine
-            m_pkopsToUse = pDupObject<TKeyOps>(*colSrc.m_pkopsToUse);
-
             try
             {
                 // Allocate and initialize the list table
@@ -681,24 +678,15 @@ template <class TElem, class TKeyOps> class THashSet
 
             catch(...)
             {
-                delete m_pkopsToUse;
                 delete [] m_apBuckets;
                 throw;
             }
         }
 
-        // No default ctor, so do minimal setup then swap
         THashSet(TMyType&& colSrc) :
 
-            TCollection<TElem>(tCIDLib::EMTStates::Unsafe)
-            , m_apBuckets(nullptr)
-            , m_c4CurElements(0)
-            , m_c4HashModulus(1)
-            , m_pkopsToUse(pDupObject<TKeyOps>(*colSrc.m_pkopsToUse))
+            THashSet(1, colSrc.m_kopsToUse, colSrc.eMTState())
         {
-            m_apBuckets = new TNode*[m_c4HashModulus];
-            m_apBuckets[0] = nullptr;
-
             *this = tCIDLib::ForceMove(colSrc);
         }
 
@@ -706,9 +694,6 @@ template <class TElem, class TKeyOps> class THashSet
         {
             // Flush the collection
             RemoveAll();
-
-            // Delete the comparator
-            delete m_pkopsToUse;
 
             // And delete the hash bucket pointer array
             delete [] m_apBuckets;
@@ -751,9 +736,9 @@ template <class TElem, class TKeyOps> class THashSet
             if (colSrc.c4ElemCount())
                 RepNodes(colSrc);
 
-            // And now take his current elements value and dup the key ops
+            // And now take his current elements value and copy the key ops
             m_c4CurElements = colSrc.m_c4CurElements;
-            m_pkopsToUse = ::pDupObject<TKeyOps>(*colSrc.m_pkopsToUse);
+            m_kopsToUse = colSrc.m_kopsToUse;
 
             // Invalidate any cursors
             this->c4IncSerialNum();
@@ -766,6 +751,7 @@ template <class TElem, class TKeyOps> class THashSet
         {
             if (&colSrc != this)
             {
+                TCollection<TElem>::operator=(tCIDLib::ForceMove(colSrc));
                 tCIDLib::Swap(m_apBuckets, colSrc.m_apBuckets);
                 tCIDLib::Swap(m_c4CurElements, colSrc.m_c4CurElements);
                 tCIDLib::Swap(m_c4HashModulus, colSrc.m_c4HashModulus);
@@ -890,17 +876,14 @@ template <class TElem, class TKeyOps> class THashSet
             TMtxLocker lockSync(this->pmtxLock());
 
             // Get the hash of the element
-            const tCIDLib::THashVal hshElem = m_pkopsToUse->hshKey
-            (
-                objToRemove, m_c4HashModulus
-            );
+            const tCIDLib::THashVal hshElem = m_kopsToUse.hshKey(objToRemove, m_c4HashModulus);
 
             // Search the bucket if its not empty
             TNode* pnodeFind = m_apBuckets[hshElem];
             while (pnodeFind)
             {
                 // If this object matches, then break out
-                if (m_pkopsToUse->bCompKeys(pnodeFind->objData(), objToRemove))
+                if (m_kopsToUse.bCompKeys(pnodeFind->objData(), objToRemove))
                     break;
                 pnodeFind = pnodeFind->pnodeNext();
             }
@@ -1279,7 +1262,7 @@ template <class TElem, class TKeyOps> class THashSet
         TNode* pnodeFind(const TElem& objToFind, tCIDLib::THashVal& hshElem) const
         {
             // Get the hash of the element
-            hshElem = m_pkopsToUse->hshKey(objToFind, m_c4HashModulus);
+            hshElem = m_kopsToUse.hshKey(objToFind, m_c4HashModulus);
 
             // If this bucket is empty, then obviously not here
             TNode* pnodeCur = nullptr;
@@ -1289,7 +1272,7 @@ template <class TElem, class TKeyOps> class THashSet
                 pnodeCur = m_apBuckets[hshElem];
                 while (pnodeCur)
                 {
-                    if (m_pkopsToUse->bCompKeys(pnodeCur->objData(), objToFind))
+                    if (m_kopsToUse.bCompKeys(pnodeCur->objData(), objToFind))
                         break;
                     pnodeCur = pnodeCur->pnodeNext();
                 }
@@ -1385,14 +1368,14 @@ template <class TElem, class TKeyOps> class THashSet
         //      The modulus divisor for the hash. This is also the number
         //      elements allocated for the m_apBuckets array.
         //
-        //  m_pkopsToUse
+        //  m_kopsToUse
         //      The key ops object to use. It handles hashing and comparing
         //      the 'key' field, which is the whole object in this collection.
         // -------------------------------------------------------------------
         TNode**             m_apBuckets;
         tCIDLib::TCard4     m_c4CurElements;
         tCIDLib::TCard4     m_c4HashModulus;
-        TKeyOps*            m_pkopsToUse;
+        TKeyOps             m_kopsToUse;
 };
 
 #pragma CIDLIB_POPPACK

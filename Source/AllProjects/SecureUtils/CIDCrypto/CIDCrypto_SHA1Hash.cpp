@@ -35,39 +35,6 @@
 //  Do our RTTI macros
 // ---------------------------------------------------------------------------
 RTTIDecls(TSHA1Hash,TObject)
-RTTIDecls(TSHA1KeyOps,TObject)
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TSHA1KeyOps
-//  PREFIX: kops
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TSHA1KeyOps: Constructors and destructor
-// ---------------------------------------------------------------------------
-TSHA1KeyOps::TSHA1KeyOps()
-{
-}
-
-TSHA1KeyOps::~TSHA1KeyOps()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TSHA1KeyOps: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::THashVal
-TSHA1KeyOps::hshKey(const   TSHA1Hash&       mhashToHash
-                    , const tCIDLib::TCard4 c4Modulus) const
-{
-    // Just ask the hash object to hash itself
-    return mhashToHash.hshCalcHash(c4Modulus);
-}
-
-
 
 
 // ---------------------------------------------------------------------------

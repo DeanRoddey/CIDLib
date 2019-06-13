@@ -67,12 +67,22 @@ class TChunkedMemStreamImplInfo
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TChunkedMemStreamImplInfo() = delete;
+
         TChunkedMemStreamImplInfo
         (
             const   tCIDLib::TCard4         c4MaxSize
         );
 
+        TChunkedMemStreamImplInfo(const TChunkedMemStreamImplInfo&) = delete;
+
         ~TChunkedMemStreamImplInfo();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TChunkedMemStreamImplInfo& operator=(const TChunkedMemStreamImplInfo&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -115,14 +125,6 @@ class TChunkedMemStreamImplInfo
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TChunkedMemStreamImplInfo();
-        TChunkedMemStreamImplInfo(const TChunkedMemStreamImplInfo&);
-        tCIDLib::TVoid operator=(const TChunkedMemStreamImplInfo&);
-
-
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
@@ -696,33 +698,43 @@ class TChunkedInStreamImpl : public TInStreamImpl
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TChunkedInStreamImpl() = delete;
+
         TChunkedInStreamImpl
         (
             const   TChunkedOutStreamImpl&  strmiToSyncTo
         );
 
+        TChunkedInStreamImpl(const TChunkedInStreamImpl&) = delete;
+
         ~TChunkedInStreamImpl();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TChunkedInStreamImpl& operator=(const TChunkedInStreamImpl&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsOpen() const;
+        tCIDLib::TBoolean bIsOpen() const override;
 
         tCIDLib::TCard4 c4ReadBytes
         (
                     tCIDLib::TVoid* const   pBuffer
             , const tCIDLib::TCard4         c4BytesToRead
-        );
+        )   override;
 
-        tCIDLib::TCard8 c8CurPos() const;
+        tCIDLib::TCard8 c8CurPos() const override;
 
-        tCIDLib::TVoid Reset();
+        tCIDLib::TVoid Reset() override;
 
         tCIDLib::TVoid SkipForwardBy
         (
             const   tCIDLib::TCard4         c4SkipBy
-        );
+        )   override;
 
 
         // -------------------------------------------------------------------
@@ -737,14 +749,6 @@ class TChunkedInStreamImpl : public TInStreamImpl
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented Constructors and Operators
-        // -------------------------------------------------------------------
-        TChunkedInStreamImpl();
-        TChunkedInStreamImpl(const TChunkedInStreamImpl&);
-        tCIDLib::TVoid operator=(const TChunkedInStreamImpl&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -772,6 +776,10 @@ class TChunkedOutStreamImpl : public TOutStreamImpl
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TChunkedOutStreamImpl() = delete;
+
+        TChunkedOutStreamImpl(const TChunkedOutStreamImpl&) = delete;
+
         TChunkedOutStreamImpl
         (
             const   tCIDLib::TCard4         c4MaxSize
@@ -781,21 +789,27 @@ class TChunkedOutStreamImpl : public TOutStreamImpl
 
 
         // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TChunkedOutStreamImpl& operator=(const TChunkedOutStreamImpl&) = delete;
+
+
+        // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsOpen() const;
+        tCIDLib::TBoolean bIsOpen() const override;
 
         tCIDLib::TCard4 c4WriteBytes
         (
             const   tCIDLib::TVoid* const   pBuffer
             , const tCIDLib::TCard4         c4BytesToWrite
-        );
+        )   override;
 
-        tCIDLib::TCard8 c8CurPos() const;
+        tCIDLib::TCard8 c8CurPos() const override;
 
-        tCIDLib::TVoid Reset();
+        tCIDLib::TVoid Reset() override;
 
-        tCIDLib::TVoid SeekToEnd();
+        tCIDLib::TVoid SeekToEnd() override;
 
 
         // -------------------------------------------------------------------
@@ -832,14 +846,6 @@ class TChunkedOutStreamImpl : public TOutStreamImpl
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented Constructors and Operators
-        // -------------------------------------------------------------------
-        TChunkedOutStreamImpl();
-        TChunkedOutStreamImpl(const TChunkedOutStreamImpl&);
-        tCIDLib::TVoid operator=(const TChunkedOutStreamImpl&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //

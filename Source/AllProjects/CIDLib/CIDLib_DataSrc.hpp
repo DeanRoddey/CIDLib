@@ -197,7 +197,7 @@ class CIDLIBEXP TCIDDataSrc
 
     protected :
         // -------------------------------------------------------------------
-        //  Protected Constructors
+        //  Hidden constructors
         // -------------------------------------------------------------------
         TCIDDataSrc();
 

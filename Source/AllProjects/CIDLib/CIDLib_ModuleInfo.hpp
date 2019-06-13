@@ -140,7 +140,7 @@ class CIDLIBEXP TCIDModuleInfo :
 
     private             :
         // -------------------------------------------------------------------
-        //  Public data members
+        //  Private data members
         //
         //  m_c4MajVersion
         //  m_c4MinVersion

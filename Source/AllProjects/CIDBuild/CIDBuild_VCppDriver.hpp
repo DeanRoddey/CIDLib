@@ -63,6 +63,16 @@ class TVCppDriver : public TToolsDriver
             const   TProjectInfo&           projiTarget
         )   override;
 
+        tCIDLib::TBoolean bInvokeDebugger
+        (
+            const   TProjectInfo&           projiTarget
+        )   override;
+
+        tCIDLib::TVoid ResetDebugInfo
+        (
+            const   TProjectInfo&           projiToReset
+        )   override;
+
 
     private :
         // -------------------------------------------------------------------
@@ -92,7 +102,7 @@ class TVCppDriver : public TToolsDriver
         //  Private data members
         //
         //  m_bDebug
-        //      We just get a quick access, TBooleanean, flag for whether we are
+        //      We just get a quick access, TBoolean, flag for whether we are
         //      in debug or production mode. This makes things more
         //      convenient.
         //

@@ -1096,6 +1096,7 @@ TUPnPContDirService::c4BrowseFavorites( const   tCIDLib::TCard4         c4StartA
 
     tCIDLib::TCard4 c4RetCnt = 0;
     DoBrowse(L"FV:2", kCIDLib::True, c4StartAt, c4ToGet, c4RetCnt, c4Total, i4UpdateID);
+
     TXMLTreeParser xtprsItems;
     if (bParseXML(xtprsItems, m_colOutParms[0], L"favorites list"))
     {
@@ -1134,13 +1135,23 @@ TUPnPContDirService::c4BrowseFavorites( const   tCIDLib::TCard4         c4StartA
 
             if (pxtnodeName
             &&  pxtnodeMeta
-            &&  pxtnodeRes)
+            &&  pxtnodeRes
+            &&  pxtnodeName->c4ChildCount()
+            &&  pxtnodeRes->c4ChildCount())
             {
+                // We can live with meta not being set
+                const TString& strMeta
+                (
+                    pxtnodeMeta->c4ChildCount()
+                    ? pxtnodeMeta->xtnodeChildAtAsText(0).strText()
+                    : TString::strEmpty()
+                );
+
                 kvalsNew.Set
                 (
                     pxtnodeName->xtnodeChildAtAsText(0).strText()
                     , pxtnodeRes->xtnodeChildAtAsText(0).strText()
-                    , pxtnodeMeta->xtnodeChildAtAsText(0).strText()
+                    , strMeta
                 );
                 colToFill.objAdd(kvalsNew);
             }

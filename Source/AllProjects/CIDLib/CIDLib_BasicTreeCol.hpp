@@ -168,6 +168,10 @@ class CIDLIBEXP TBaseTreeNode : public TObject
 // ---------------------------------------------------------------------------
 namespace TBasicTreeHelpers
 {
+    CIDLIBEXP extern const TString strRootPath;
+    CIDLIBEXP extern const TString strRootName;
+    CIDLIBEXP extern const TString strRootDesc;
+
     CIDLIBEXP tCIDLib::TVoid BadNode
     (
         const   tCIDLib::TCh* const     pszFile
@@ -710,7 +714,7 @@ template <class TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
             }
 
             // And clear out our members to indicate we are empty
-            m_pnodeRoot  = 0;
+            m_pnodeRoot  = nullptr;
 
             // Bump our serial number
             m_c4SerialNum++;
@@ -1567,24 +1571,34 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             , m_bSorted(bSorted)
             , m_c4NTCount(0)
             , m_c4TCount(0)
-            , m_pnodeRoot(new TNodeNT(L"Root", L"$Root$", nullptr))
+            , m_pnodeRoot
+              (
+                new TNodeNT
+                (
+                    TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
+                )
+              )
         {
         }
 
-        TBasicTreeCol(const TBasicTreeCol<TElem>& colToCopy) :
+        TBasicTreeCol(const TBasicTreeCol<TElem>& colSrc) :
 
-            TCollection<TElem>(colToCopy)
-            , m_bCasePath(colToCopy.m_bCasePath)
-            , m_bSorted(colToCopy.m_bSorted)
-            , m_c4TCount(colToCopy.m_c4TCount)
-            , m_c4NTCount(colToCopy.m_c4NTCount)
-            , m_pnodeRoot(new TNodeNT(L"Root", L"$Root$", nullptr))
+            TCollection<TElem>(colSrc)
+            , m_bCasePath(colSrc.m_bCasePath)
+            , m_bSorted(colSrc.m_bSorted)
+            , m_c4TCount(colSrc.m_c4TCount)
+            , m_c4NTCount(colSrc.m_c4NTCount)
+            , m_pnodeRoot
+              (
+                new TNodeNT
+                (
+                    TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
+                )
+              )
         {
             // Do a recursive replication of the tree
-            ReplicateNodes(colToCopy.m_pnodeRoot, m_pnodeRoot);
+            ReplicateNodes(colSrc.m_pnodeRoot, m_pnodeRoot);
         }
-
-        TBasicTreeCol(TBasicTreeCol<TElem>&&) = delete;
 
         ~TBasicTreeCol()
         {
@@ -1606,29 +1620,27 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TBasicTreeCol<TElem>& operator=(const TBasicTreeCol<TElem>& colToAssign)
+        TBasicTreeCol<TElem>& operator=(const TBasicTreeCol<TElem>& colSrc)
         {
-            if (this != &colToAssign)
+            if (this != &colSrc)
             {
                 TMtxLocker lockThis(this->pmtxLock());
-                TMtxLocker lockSource(colToAssign.pmtxLock());
-                TParent::operator=(colToAssign);
+                TMtxLocker lockSource(colSrc.pmtxLock());
+                TParent::operator=(colSrc);
 
                 // Flush our current root node
                 m_pnodeRoot->RemoveAll();
 
-                m_bCasePath  = colToAssign.m_bCasePath;
-                m_bSorted    = colToAssign.m_bSorted;
-                m_c4NTCount  = colToAssign.m_c4NTCount;
-                m_c4TCount   = colToAssign.m_c4TCount;
+                m_bCasePath  = colSrc.m_bCasePath;
+                m_bSorted    = colSrc.m_bSorted;
+                m_c4NTCount  = colSrc.m_c4NTCount;
+                m_c4TCount   = colSrc.m_c4TCount;
 
                 // Do this AFTER setting sorted/case flags
-                ReplicateNodes(colToAssign.m_pnodeRoot, m_pnodeRoot);
+                ReplicateNodes(colSrc.m_pnodeRoot, m_pnodeRoot);
             }
             return *this;
         }
-
-        TBasicTreeCol<TElem>& operator=(TBasicTreeCol<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -2416,7 +2428,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             c4Depth = 0;
 
             // Optimize for root
-            if (strToFind == L"/")
+            if (strToFind == TBasicTreeHelpers::strRootPath)
                 return m_pnodeRoot;
 
             // If its empty, then we know we won't find it
@@ -2424,7 +2436,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             {
                 if (bThrowIfNotFound)
                     TBasicTreeHelpers::NamedNodeNotFound(CID_FILE, CID_LINE, strToFind);
-                return 0;
+                return nullptr;
             }
 
             //

@@ -116,12 +116,13 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
 
     // Collection tests
     AddTest(new TTest_ObjArrayLambda);
-    // AddTest(new TTest_ObjArrayMoveSem);
+    AddTest(new TTest_ObjArrayMoveSem);
     AddTest(new TTest_RefVectorLambda);
     AddTest(new TTest_RefVectorMoveItem);
     // AddTest(new TTest_RefVectorMoveSem);
     AddTest(new TTest_VectorLambda);
     AddTest(new TTest_VectorMoveSem);
+    AddTest(new TTest_DequeMoveSem);
     AddTest(new TTest_ColAlgo1);
 
     AddTest(new TTest_ColCursors);

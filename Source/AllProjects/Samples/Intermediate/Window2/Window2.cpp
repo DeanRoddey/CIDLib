@@ -126,7 +126,7 @@ class TClientWnd : public TWindow
         tCIDLib::TBoolean bPaint(       TGraphDrawDev&  gdevToUse
                                 , const TArea&          areaUpdate) override
         {
-            m_colPoints.ForEach
+            m_colPoints.bForEach
             (
                 [&gdevToUse, &areaUpdate](const TClickPnt& cpntCur)
                 {

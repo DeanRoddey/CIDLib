@@ -799,10 +799,10 @@ TDlgDesc::ChildrenFromRaw(  const   tCIDCtrls::TRawDlgDesc& rdlgdSrc
         prdlgiCur = tCIDLib::pOffsetPtr<const tCIDCtrls::TRawDlgItem>
         (
             prdlgiCur
-            , sizeof(tCIDCtrls::TRawDlgItem)
-              + ((prdlgiCur->c4HintsLen + 1) * kCIDLib::c4CharBytes)
-              + ((prdlgiCur->c4ItemTypeLen + 1) * kCIDLib::c4CharBytes)
-              + ((prdlgiCur->c4ImageLen + 1) * kCIDLib::c4CharBytes)
+            , tCIDLib::TCard4(sizeof(tCIDCtrls::TRawDlgItem))
+              + ((prdlgiCur->c4HintsLen + 1UL) * kCIDLib::c4CharBytes)
+              + ((prdlgiCur->c4ItemTypeLen + 1UL) * kCIDLib::c4CharBytes)
+              + ((prdlgiCur->c4ImageLen + 1UL) * kCIDLib::c4CharBytes)
         );
     }
 }

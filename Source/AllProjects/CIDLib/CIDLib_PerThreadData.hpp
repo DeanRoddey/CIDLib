@@ -88,8 +88,8 @@ class CIDLIBEXP TPerThreadImpl : public TObject, public TKrnlPerThreadData
         //  Private data members
         //
         //  m_pkptdThis
-        //      This is the kernel object that gives us access to the
-        //      underlying system's per-thread data services.
+        //      This is the kernel object that gives us access to the underlying
+        //      system's per-thread data services.
         // -------------------------------------------------------------------
         TKrnlPerThreadData* m_pkptdThis;
 
@@ -132,9 +132,29 @@ template <class T> class TPerThreadDataFor : public TPerThreadImpl
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        explicit operator tCIDLib::TBoolean() const
+        {
+            return bIsSet();
+        }
+
         T* operator->()
         {
             return static_cast<T*>(pThis());
+        }
+
+        const T* operator->() const
+        {
+            return static_cast<T*>(pThis());
+        }
+
+        T& operator*()
+        {
+            return *static_cast<T*>(pThis());
+        }
+
+        const T& operator*() const
+        {
+            return *static_cast<T*>(pThis());
         }
 
 
@@ -154,7 +174,7 @@ template <class T> class TPerThreadDataFor : public TPerThreadImpl
         tCIDLib::TBoolean bIsSet() const
         {
             // Return true if something is stored here
-            return (pThis() != 0);
+            return (pThis() != nullptr);
         }
 
         T& objThis()

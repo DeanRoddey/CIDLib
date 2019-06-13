@@ -342,18 +342,21 @@ TEnvironment& TEnvironment::Nul_TEnvironment()
 // ---------------------------------------------------------------------------
 //  TEnvironment: Constructors and Destructor
 // ---------------------------------------------------------------------------
+
+// Make sure key ops is in non-case sensitive mode
 TEnvironment::TEnvironment(const tCIDLib::TBoolean bInherit) :
 
-    m_pcolEnv(nullptr)
-{
-    m_pcolEnv = new tCIDLib::TKVHashSet
+    m_pcolEnv
     (
-        CIDLib_Environment::c4Modulus
-        , new TStringKeyOps
-        , strGetKey
-        , tCIDLib::EMTStates::Unsafe
-    );
-
+        new tCIDLib::TKVHashSet
+        (
+            CIDLib_Environment::c4Modulus
+            , TStringKeyOps(kCIDLib::False)
+            , strGetKey
+            , tCIDLib::EMTStates::Unsafe
+        )
+    )
+{
     //
     //  If the bInherit parm is set, then we need to query a snapshot of
     //  the environment and load ourself up with the same info.
@@ -397,12 +400,26 @@ TEnvironment::TEnvironment(const tCIDLib::TBoolean bInherit) :
     }
 }
 
-TEnvironment::TEnvironment(const TEnvironment& envToCopy) :
+TEnvironment::TEnvironment(const TEnvironment& envSrc) :
 
     m_pcolEnv(nullptr)
 {
     // Copy construct a new hash map that replicates the source's
-    m_pcolEnv = new tCIDLib::TKVHashSet(*envToCopy.m_pcolEnv);
+    m_pcolEnv = new tCIDLib::TKVHashSet(*envSrc.m_pcolEnv);
+}
+
+// Just create the smallest possible hash set then swap
+TEnvironment::TEnvironment(TEnvironment&& envSrc) :
+
+    m_pcolEnv
+    (
+        new tCIDLib::TKVHashSet
+        (
+            1, TStringKeyOps(kCIDLib::False), strGetKey, tCIDLib::EMTStates::Unsafe
+        )
+    )
+{
+    *this = operator=(tCIDLib::ForceMove(envSrc));
 }
 
 TEnvironment::~TEnvironment()
@@ -415,12 +432,18 @@ TEnvironment::~TEnvironment()
 // ---------------------------------------------------------------------------
 //  TEnvironment: Public operators
 // ---------------------------------------------------------------------------
-TEnvironment& TEnvironment::operator=(const TEnvironment& envToAssign)
+TEnvironment& TEnvironment::operator=(const TEnvironment& envSrc)
 {
-    if (this == &envToAssign)
-        return *this;
+    if (&envSrc != this)
+        *m_pcolEnv = *envSrc.m_pcolEnv;
+    return *this;
+}
 
-    *m_pcolEnv = *envToAssign.m_pcolEnv;
+// We just swap our lists
+TEnvironment& TEnvironment::operator=(TEnvironment&& envSrc)
+{
+    if (&envSrc != this)
+        tCIDLib::Swap(m_pcolEnv, envSrc.m_pcolEnv);
     return *this;
 }
 
@@ -431,26 +454,18 @@ TEnvironment& TEnvironment::operator=(const TEnvironment& envToAssign)
 tCIDLib::TVoid
 TEnvironment::Add(const TString& strKey, const TString& strNewValue)
 {
-    // Uppercase they key before we add it
-    TString strUpKey(strKey);
-    strUpKey.ToUpper();
-
-    m_pcolEnv->objAdd(TKeyValuePair(strUpKey, strNewValue));
+    m_pcolEnv->objAdd(TKeyValuePair(strKey, strNewValue));
 }
 
 
 tCIDLib::TBoolean
 TEnvironment::bAddIfNew(const TString& strKey, const TString& strValue)
 {
-    // Uppercase they key before we add it
-    TString strUpKey(strKey);
-    strUpKey.ToUpper();
-
-    TKeyValuePair* pkvalTmp = m_pcolEnv->pobjFindByKey(strUpKey);
+    TKeyValuePair* pkvalTmp = m_pcolEnv->pobjFindByKey(strKey);
     if (!pkvalTmp)
     {
         // It's not there currently, so add it
-        m_pcolEnv->objAdd(TKeyValuePair(strUpKey, strValue));
+        m_pcolEnv->objAdd(TKeyValuePair(strKey, strValue));
         return kCIDLib::True;
     }
     return kCIDLib::False;
@@ -460,18 +475,14 @@ TEnvironment::bAddIfNew(const TString& strKey, const TString& strValue)
 tCIDLib::TBoolean
 TEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue)
 {
-    // Uppercase they key before we add it
-    TString strUpKey(strKey);
-    strUpKey.ToUpper();
-
-    TKeyValuePair* pkvalTmp = m_pcolEnv->pobjFindByKey(strUpKey);
+    TKeyValuePair* pkvalTmp = m_pcolEnv->pobjFindByKey(strKey);
     if (pkvalTmp)
     {
         pkvalTmp->strValue(strNewValue);
         return kCIDLib::False;
     }
 
-    m_pcolEnv->objAdd(TKeyValuePair(strUpKey, strNewValue));
+    m_pcolEnv->objAdd(TKeyValuePair(strKey, strNewValue));
     return kCIDLib::True;
 }
 
@@ -479,13 +490,9 @@ TEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue)
 tCIDLib::TBoolean
 TEnvironment::bFind(const TString& strKey, TString& strToFill) const
 {
-    // Uppercase they key before we search
-    TString strUpKey(strKey);
-    strUpKey.ToUpper();
-
     try
     {
-        strToFill = m_pcolEnv->objFindByKey(strUpKey).strValue();
+        strToFill = m_pcolEnv->objFindByKey(strKey).strValue();
     }
 
     catch(TError& errToCatch)
@@ -507,10 +514,7 @@ TEnvironment::bFind(const TString& strKey, TString& strToFill) const
 
 tCIDLib::TBoolean TEnvironment::bKeyExists(const TString& strKey) const
 {
-    // Uppercase they key before we add it
-    TString strUpKey(strKey);
-    strUpKey.ToUpper();
-    return (m_pcolEnv->pobjFindByKey(strUpKey) != 0);
+    return (m_pcolEnv->pobjFindByKey(strKey) != nullptr);
 }
 
 
@@ -522,11 +526,7 @@ tCIDLib::TCard4 TEnvironment::c4Entries() const
 
 tCIDLib::TCard4 TEnvironment::chCharsInValue(const TString& strKey)
 {
-    // Uppercase they key before we search
-    TString strUpKey(strKey);
-    strUpKey.ToUpper();
-
-    const TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strUpKey);
+    const TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strKey);
     return kvalFind.strValue().c4Length();
 }
 
@@ -545,11 +545,7 @@ tCIDLib::TVoid TEnvironment::RemoveAll()
 
 const TString& TEnvironment::strFind(const TString& strKey) const
 {
-    // Uppercase they key before we search
-    TString strUpKey(strKey);
-    strUpKey.ToUpper();
-
-    const TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strUpKey);
+    const TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strKey);
     return kvalFind.strValue();
 }
 
@@ -557,10 +553,6 @@ const TString& TEnvironment::strFind(const TString& strKey) const
 tCIDLib::TVoid TEnvironment::Update(const   TString&    strKey
                                     , const TString&    strNewValue)
 {
-    // Uppercase they key before we try to find it
-    TString strUpKey(strKey);
-    strUpKey.ToUpper();
-
-    TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strUpKey);
+    TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strKey);
     kvalFind.strValue(strNewValue);
 }

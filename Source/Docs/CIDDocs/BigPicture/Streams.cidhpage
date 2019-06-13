@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Streams</Title>
+
+    <HelpText>
+
+        <P>Folks coming from the standard C++ libraries may not have that great an opinion of streams in the C++ sense. The streaming system in the standard libraries is, to be charitable, old and weak and probably should have been put out to pasture long ago if not for backwards compatibility reasons. Streams in CIDLib are a whole other world. They are very powerful and are put to very good use, being part of fundamental, system-wide capabilities that are used throughout most CIDLib based programs.</P>
+
+        <SecTitle>Stream Types</SecTitle>
+
+        <P>As with the standard libraries or any other libraries, you always need a number of different types of streams. You have to deal with input and output, binary and text content, and streaming to/from various things such as sockets, files, memory buffers, and strings.</P>
+
+        <P>CIDLib takes a fairly different approach to these issues relative to the standard C++ libraries.</P>
+
+        <SubSecTitle>Text vs. Binary</SubSecTitle>
+
+        <P>In CIDLib there is a strict separation between text streams and binary streams. Text streams deal purely in terms of formatted text content and binary streams deal in terms of byte data ultimately, and never the twain shall meet. This avoids a lot of complications that the standard streams involve, with all of their mode flags and such.</P>
+
+        <Note>The text streams do use binary streams under the hood as a buffered I/O system so that they can be efficient without having to recreate capabilities that the binary streams already offer.</Note>
+
+        <P>It's important to understand that, if you write, say, a TString object to a binary output stream, you are flattening an object along with all of the housekeeping data of that object. When you write a string object to a text output stream, the text content of that string is written out (after being converted to the selected encoding, see Text Encoding to the left.)</P>
+
+        <SubSecTitle>Input vs. Output</SubSecTitle>
+
+        <P>CIDLib also uses separate input vs. ouput streams. We don't do the standard library thing of using multiple inheritance to create combined in/out streams. That of course raises the issue of how you deal with reading and writing the same data source/sink.</P>
+
+        <P>In some cases that's just inherently the case. For file based streams, if you open the same file for input and output, you are already reading/writing the same file. In other cases we support this by allowing you to create an input stream in terms of an output stream. That will tie the data source/sinks (see Stream Implementations below) of the two together.</P>
+
+        <P>Of course you still have to coordinate your use of them or you can make a mess, just as you can with reading/writing files in an uncoordinated way in general. For the most part this is not an issue, since the bulk of applications will only be reading or writing at any given time. But, if you need to do both, just be aware of the issues, particularly you need to consider caching, which is discussed below. In this scenario, there are separate input and output caches.</P>
+
+        <Note>Generally speaking the strategy would be to always flush the output stream after you do any writing, before you then start reading. Then do a reset on the input stream to make it reset itself at the start (and discard any cached data it previously read.) Then you can safely read from the input stream, and be sure you'll see anything that has been written so far.</Note>
+
+        <SecTitle>Stream Implementations</SecTitle>
+
+        <P>Based on the above, you probably won't be surprised to know that there are four actual stream classes: TBinInStream, TBinOutStream, TTextInStream and TTextOutStream. These are just framework type classes that have no means to actually read or write data. They just implement the overall  logic of the stream. They actually work in terms of internal 'stream impl' objects that provide support for streaming to/from files, memory buffers, strings, sockets, etc...</P>
+
+        <P>For convenience there are derivatives of these four classes for each type of impl (TTextFileInStream, TBinMBufOutStream, etc...) But all they really do is just construct the right type of implementation object and set it on their parent class. After that they aren't really doing anything. They usually some type specific methods to access the raw stream data, but they are otherwise just self-documenting conveniences.</P>
+
+        <P>As mentioned above, we have separate input and outputs streams that can be tied together to handle both reading and writing the same sink/source. That tying together actually happens at the stream impl level. Since the impl objects manage the actual data source/sink that makes sense of course.</P>
+
+        <SecTitle>Caching</SecTitle>
+
+        <P>One of the most annoying, yet necessary, aspects of most streaming systems is caching. When you write data to a stream, it doesn't immediately send that data to the target data sink. Since streaming typically involves small bits of data at a time (a boolean value, an area object, a little text, etc...) pushing that data out every time would be really bad for performance.</P>
+
+        <P>And, similarly, when you read data from an input stream, it doesn't just read the number of bytes you request, it reads that plus some amount more which it caches and uses to service subsequent calls until it can no longer do so, then it loads up its cache again. Otherwise it would constantly be going out to the file or socket or whatever.</P>
+
+        <P>The difference in performance is often very signficant, so it's almost always a desirable strategy. But it endlessly bites us, because we forget that not all data may have yet been written out. Or we forget that the current read position of the file is not necessarily where we are currently reading from.</P>
+
+        <P>There's not much to do for it but just suck it up and be careful. Flush output streams at regular intervals where it makes sense, usually after some coherent set of related bits of information have been written, current record, etc... And for input streams, be aware that the actual position in the file may be some number of K bytes beyond where the stream is reporting the current position is.</P>
+
+        <Note>Note that when an output stream goes out of scope and destructs it <Bold>will not</Bold> flush any remaining data. This is a hard call to make because it would be awfully convenient. But it could be unsafe. Streams are one of the places where failure to complete I/O operations are not uncommon, and there would be no way to handle a failure to complete the flushing of the data in the destructor of the stream itself. So flush output streams before you destroy them.</Note>
+
+
+        <SecTitle>Streams as Enablers</SecTitle>
+
+        <P>In CIDLib streams are particularly powerful because they participate in some fundamental capabilities. One of the most powerful is that any class that implements the <ClassRef Ref="MStreamable"/> mixin interface can be binarily streamed. This means that we can create generic code that can read/write objects without having to know what they are. We can just have global &amp;lt;&amp;lt; and >> binary stream operators that take MStreamable objects.</P>
+
+        <P>One of the biggest uses of this capability is in the <Link Type="Page" Ref="/BigPicture/" Id="/ORB-IDL">Object Request Broker</Link>, or ORB. Instances of any classes that implement MStreamable can be passed back and forth across remote method calls without any muss or fuss. This is a huge advantage over any ORB type system that doesn't have the benefit of a single, coherent binary streaming architecture.</P>
+
+        <P>And of course it also means that it becomes very convenient to store objects to disk  binarily, avoiding all of the complexities of having to convert them to some other format (so that you can stream them back in later.) With CIDLib's streaming system, just stream out the objects, and then create an object of the same type and stream back into it later.</P>
+
+        <P>For instance, the <FacRef Ref="CIDObjStore"/> facility provides a simple (NoSql type) object database that you can conveniently store objects in, using path style keys for access. CQC makes extensive use of this capability on the back end for user configuration data and on the front end for things like last window positions, last directory accessed, etc...</P>
+
+        <P>Another way you may use this capability is perhaps sharing data between two processes via shared memory. Instead of some tedious manual manipulation of separate values in a structure, yu can just create a binary output stream over the buffer, stream out the data, and then signal the other side data is available. It can then create a binary output stream over that buffer, and stream into an object of the same sort to read the data in.</P>
+
+        <P>Obviously if you were doing really high speed data sharing, you might not do it this way, but the data in such cases would also not likely be highly structured anyway. A good example where it works well is the CIDLib test framework, in which the invoked test process has to report back a fairly complex set of test results. Binary streaming makes this simple to do, whereas it would be annoyingly tedious otherwise.</P>
+
+
+        <SecTitle>Binary Object Versioning</SecTitle>
+
+        <P>One thing you have to be concerned about with binary streaming of objects is how to deal with changes to classes that have been previously streamed. This is handled using format version numbers. This is not enforced, but it is a convention used very consistently throughout CIDLib and CQC. You store a format version number along with the object. When you are reading it back, you can check the format version, compare it to the current format version, and remove, upgrade, change data as required as you read the object in.</P>
+
+        <P>This has been used very successfully by CQC over two decades for clean backwards data compatibility while retaining the convenience of simple binary storage of objects. Only in the simplest of classes has this been skipped, for efficiency since a large number of them might get created (e.g. points, areas, key/value pairs, colors.) But, to be honest, regret has arisen in all of these cases at some time, and it's almost impossible to undo that decision once made. So do the right thing and version all classes that are binarily streamable.</P>
+
+        <Note>The format version is <Bold>always</Bold> a tCIDLib::TCard2 value. Consistency here reaps a lot of benefits, such as the ability to use helper methods to validate them, as seen below.</Note>
+
+        <P>Here is an example of a fictitious class's override of the input streaming method of MStreamable:</P>
+
+        <Code>
+        tCIDLib::TVoid TMagnum::StreamFrom(TBinInStream&amp;amp; strmToReadFrom)
+        {
+            const tCIDLib::TCard2 c2FmtVersion = TBinInStream::c2CheckFmtVersion
+            (
+                strmToReadFrom
+                , tCIDLib::EStreamMarkers::StartObject
+                , TMagnum::c2FmtVersion
+                , clsThis()
+                , CID_FILE
+                , CID_LINE
+            );
+
+            if (c2FmtVersion &amp;lt; 2)
+            {
+                // Read in the old byte value and convert to a 2 byte vvalue
+                tCIDLib::TCard1 c1Tmp;
+                strmToReadFrom >> c1Tmp;
+                m_c2Counter = c1Tmp;
+            }
+             else
+            {
+                strmToReadFrom >> m_c2Counter;
+            }
+            strmToReadFrom.CheckForEndMarker(CID_FILE, CID_LINE);
+        }
+        </Code>
+
+        <P>Here we call a standard helper method that will do two things. It will make sure that the next thing in the stream is a standard StartObject marker. If so, then it will read in the format version that should follow it, and will check that it is non-zero and less than or equal to the passed max version (which would be the latest version understood by the code.) If not an exception is thrown. If so then we get back the stored format version and use that to upgrade some old data if needed or to just read in the data if it is up to date. At the end we make sure it ends with an EndObject marker.</P>
+
+        <P>Markers are no guarantee of catching data corruption, but they help. So generally you will write start and end object markers around your class's data when streaming out, and look for those when streaming back in. If you stream other substantial stuff, e.g. a collection of objects, you might choose to stream a frame marker between each one just as a sanity check.</P>
+
+        <Note>If you are dealing with a third party format, then it would provide its own format versioning typically, and you don't want to add any of your own housekeeping data to such files. In these cases you would only read/write fundamental types as dictated by the third party format.</Note>
+
+
+        <SecTitle>Data Endianness</SecTitle>
+
+        <P>Another issue with binary streaming of objects is how to deal with the endianness of data if it is going to be shared across platforms. The answer to this issue is that, ultimately, all binary streaming come down to the reading/writing of fundamental types (booleans, enums, integrals, cardinals, floating point, and text content. So, if you can handle managing the endianness when those values are streamed in and out, you can provide cross platform portability in a natural way.</P>
+
+        <P>Streams have an endianness assigned to them, with little endian being the default if you don't set it explicitly. If that is different from the local endianness on the machine where the code is running, then the data will be swapped as it is read and written. As long as you choose a canonical endianness that you know the data is stored in, then you can always read it back in by setting the stream to the known endianness of the data.</P>
+
+        <P>The ORB always uses little endian format as its canonical format, for instance, as does the <FacRef Ref="CIDObjStore"/> database. Both client and server sides of the ORB engine do this, and so any data read and written across the network via the ORB will be appropriately swapped on the way in and out.</P>
+
+        <Note>Another place where this comes into play is if you want to use a binary stream to read/write a third party format, which may or may not be in the same endianness as the local system the code is running on. In those cases you would set the stream to the known endianness format of the third party format.</Note>
+
+        <P>Floating point values are the odd man out, which have no fixed representation. Those are handled by the streams making calls to the per-platform code to read/write floating point values. The IEEE format is the canonical storage format of the streams in this case, so floating point values are converted to that and back from that as needed.</P>
+
+        <Note>If you are using streams for storing or sharing objects purely for internal purposes, i.e. it would never go across the network or get used in any cross platform way, then you could be more efficient by setting the endianness of the stream to the local endianness, to avoid byte swapping. So a program that might run on Windows and Linux, but only store data for local use on either, could just set the stream to the reported system endianness without regards to what platform it is on.</Note>
+
+
+        <SecTitle>Text Encodings</SecTitle>
+
+        <P>Another place where the standard library streams are weak is in text encodings. And, as usual, CIDLib's streams are very strong in this area. All text streams are given a text converter, which output streams use to externalize data on the way out, and input streams use to internalize on the way in. This makes it very easy to read and write content of different encodings. Every text stream can have its own encoding set, unlike the standard streams which has a single program-wide encoding.</P>
+
+        <P>See the Text Encoding section to the left for more details on text encodings.</P>
+
+        <Note>If you don't provide a text converter, then a UTF-8 one will be created. So typically you should be careful to provide the appropriate type. Some stream types know what type of converter is required and will set one for you. For instance, there is a special converter (<ClassRef Ref="TNativeWCConverter"/>) that works in terms of the local wide character type. It is automatically used when you create a text stream over a TString object, since that's the format of the characters in string objects. So, in that case, it is really just acting as a 'pass-through' converter.</Note>
+
+        <P>If you create a text stream over a memory buffer or file, then you are just reading in and writing out text in the selected encoding. So that's generally how you would read/write text files like JSON or XML. The text output streams don't add any extra housekeeping data to the output, and text input streams don't expect to find any.</P>
+
+
+        <SecTitle>Streaming Enums</SecTitle>
+
+        <P>As discussed in the section on Smart Enums to the left, you can use the IDL system to create eumerations that are both binarily and textually streamable. For text streaming, you can define which of the configured text values for an enum is used when the compiler sees a &amp;lt;&amp;lt; operator for that type of enum, and that text will be streamed out.</P>
+
+        <P>For binary streaming, all enums are streamed out as a 32 bit signed value, with the appropriate byte swapping of course. So the output stream will cast it to a tCIDLib::TInt4 value and write that out. The input stream will stream it into a TInt4 value and then cast that to the enum value. This avoids the very tricky issue of the size of enums changing if you add more values to it.</P>
+
+        <Note>This means that CIDLib enums cannot be larger that 32 bits. For regular enums this isn't an issue, but be careful of this for bitmapped enums. Don't add more bits than can be represented.</Note>
+
+    </HelpText>
+
+</HelpPage>

@@ -121,7 +121,7 @@ TCIDMacroEngine::TCIDMacroEngine() :
       (
         tCIDLib::EAdoptOpts::NoAdopt
         , 29
-        , new TStringKeyOps
+        , TStringKeyOps()
         , &TMEngClassInfo::strKey
       )
     , m_colClassesById(tCIDLib::EAdoptOpts::Adopt, 128)

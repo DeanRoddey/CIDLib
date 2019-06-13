@@ -54,8 +54,9 @@ template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
 
         TDeque(TDeque&& colSrc) :
 
-            TParent(tCIDLib::ForceMove(colSrc))
+            TParent(colSrc.eMTState())
         {
+            *this = operator=(tCIDLib::ForceMove(colSrc));
         }
 
         ~TDeque()

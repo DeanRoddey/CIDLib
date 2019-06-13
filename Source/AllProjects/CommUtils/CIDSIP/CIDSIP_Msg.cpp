@@ -48,7 +48,7 @@ RTTIDecls(TSIPMsg,TObject)
 TSIPMsg::TSIPMsg() :
 
     m_c4ContLen(0)
-    , m_colHdrLines(29, new TStringKeyOps, &TKeyValuePair::strExtractKey)
+    , m_colHdrLines(29, TStringKeyOps(), &TKeyValuePair::strExtractKey)
 {
 }
 

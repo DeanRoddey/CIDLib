@@ -91,6 +91,7 @@ namespace tCIDBuild
         , ShowProjDeps
         , ShowProjSettings
         , CopyHeaders
+        , Debug
         , MakeRes
         , MakeBinRelease
         , MakeDevRelease
@@ -332,6 +333,14 @@ namespace kCIDBuild
     //      target.
     // -----------------------------------------------------------------------
     const tCIDLib::TCh* const pszAllProjects  = L"All";
+
+
+    // -----------------------------------------------------------------------
+    //  Flags for TUtils::bExec
+    // -----------------------------------------------------------------------
+    const tCIDLib::TCard4   c4ExecFlag_None     = 0;
+    const tCIDLib::TCard4   c4ExecFlag_Async    = 0x00000001;
+    const tCIDLib::TCard4   c4ExecFlag_LowPrio  = 0x00000002;
 
 
     // -----------------------------------------------------------------------

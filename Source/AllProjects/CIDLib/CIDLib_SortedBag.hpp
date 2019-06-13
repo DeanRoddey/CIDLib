@@ -89,8 +89,6 @@ template <typename TElem> class TSortedBag : public TBag<TElem>
             return *this;
         }
 
-        TMyType& operator=(TMyType&&) = delete;
-
 
         // -------------------------------------------------------------------
         //  Public, inherited methods

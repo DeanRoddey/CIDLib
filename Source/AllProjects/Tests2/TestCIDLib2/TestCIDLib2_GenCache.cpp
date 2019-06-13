@@ -148,7 +148,7 @@ TTest_GenCache2::eRunTest(  TTextStringOutStream&   strmOut
     //
     tCIDLib::TGenCache colCache
     (
-        109, new TStringKeyOps, &TCIDGenCacheItem::strGenKey
+        109, TStringKeyOps(), &TCIDGenCacheItem::strGenKey
     );
 
     // Should be empty
@@ -244,7 +244,7 @@ TTest_GenCache3::eRunTest(  TTextStringOutStream&   strmOut
     //
     tCIDLib::TGenCache colCache
     (
-        109, new TStringKeyOps(kCIDLib::False), &TCIDGenCacheItem::strGenKey
+        109, TStringKeyOps(kCIDLib::False), &TCIDGenCacheItem::strGenKey
     );
 
 

@@ -853,6 +853,41 @@ class TTest_CntPtr2 : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_DequeMoveSem
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_DequeMoveSem : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_DequeMoveSem();
+
+        ~TTest_DequeMoveSem();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_DequeMoveSem,TTestFWTest)
+};
+
+
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TTest_Enum1
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
@@ -1356,7 +1391,6 @@ class TTest_ObjArrayLambda : public TTestFWTest
 };
 
 
-/*
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_ObjArrayMoveSem
 // PREFIX: tfwt
@@ -1388,7 +1422,6 @@ class TTest_ObjArrayMoveSem : public TTestFWTest
         // -------------------------------------------------------------------
         RTTIDefs(TTest_ObjArrayMoveSem,TTestFWTest)
 };
-*/
 
 
 // ---------------------------------------------------------------------------

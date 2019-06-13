@@ -175,54 +175,85 @@ class CIDLIBEXP TRGBClr :
             const   tCIDLib::TInt4          i4Offset
         );
 
-        tCIDLib::TCard1 c1Alpha() const;
+        tCIDLib::TCard1 c1Alpha() const
+        {
+            return m_c1Alpha;
+        }
 
-        tCIDLib::TCard1 c1Alpha
-        (
-            const   tCIDLib::TCard1         c1Blue
-        );
+        tCIDLib::TCard1 c1Alpha(const tCIDLib::TCard1 c1Alpha)
+        {
+            m_c1Alpha = c1Alpha;
+            return m_c1Alpha;
+        }
 
-        tCIDLib::TCard1 c1Blue() const;
+        tCIDLib::TCard1 c1Blue() const
+        {
+            return m_c1Blue;
+        }
 
-        tCIDLib::TCard1 c1Blue
-        (
-            const   tCIDLib::TCard1         c1Blue
-        );
+        tCIDLib::TCard1 c1Blue(const tCIDLib::TCard1 c1Blue)
+        {
+            m_c1Blue = c1Blue;
+            return c1Blue;
+        }
 
         tCIDLib::TCard1 c1ClrComp
         (
             const   tCIDLib::EClrComps      eComp
         )   const;
 
-        tCIDLib::TCard1 c1Green() const;
+        tCIDLib::TCard1 c1Green() const
+        {
+            return m_c1Green;
+        }
 
-        tCIDLib::TCard1 c1Green
-        (
-            const   tCIDLib::TCard1         c1Green
-        );
+        tCIDLib::TCard1 c1Green(const tCIDLib::TCard1 c1Green)
+        {
+            m_c1Green = c1Green;
+            return c1Green;
+        }
 
         tCIDLib::TCard1 c1MaxComponent() const;
 
         tCIDLib::TCard1 c1MinComponent() const;
 
-        tCIDLib::TCard1 c1Red() const;
+        tCIDLib::TCard1 c1Red() const
+        {
+            return m_c1Red;
+        }
 
-        tCIDLib::TCard1 c1Red
-        (
-            const   tCIDLib::TCard1         c1Red
-        );
+        tCIDLib::TCard1 c1Red(const tCIDLib::TCard1 c1Red)
+        {
+            m_c1Red = c1Red;
+            return c1Red;
+        }
 
-        tCIDLib::TCard4 c4Alpha() const;
+        tCIDLib::TCard4 c4Alpha() const
+        {
+            return m_c1Alpha;
+        }
 
-        tCIDLib::TCard4 c4Blue() const;
+        tCIDLib::TCard4 c4Blue() const
+        {
+            return m_c1Blue;
+        }
 
-        tCIDLib::TCard4 c4Color() const;
+        tCIDLib::TCard4 c4Color() const
+        {
+            return *((const tCIDLib::TCard4*)&m_c1Red);
+        }
 
-        tCIDLib::TCard4 c4Green() const;
+        tCIDLib::TCard4 c4Green() const
+        {
+            return m_c1Green;
+        }
 
         tCIDLib::TCard4 c4Magnitude() const;
 
-        tCIDLib::TCard4 c4Red() const;
+        tCIDLib::TCard4 c4Red() const
+        {
+            return m_c1Red;
+        }
 
         tCIDLib::TFloat4 f4Alpha() const;
 
@@ -284,7 +315,13 @@ class CIDLIBEXP TRGBClr :
             const   tCIDLib::TFloat4        f4ToSet
         );
 
-        tCIDLib::TVoid ToBlack();
+        tCIDLib::TVoid ToBlack()
+        {
+            m_c1Red = 0;
+            m_c1Green = 0;
+            m_c1Blue = 0;
+            m_c1Alpha = 0;
+        }
 
         tCIDLib::TVoid ToHSV
         (
@@ -373,84 +410,3 @@ class CIDLIBEXP TRGBClr :
 };
 
 #pragma CIDLIB_POPPACK
-
-// ---------------------------------------------------------------------------
-//  TRGBClr: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TCard1 TRGBClr::c1Alpha() const
-{
-    return m_c1Alpha;
-}
-
-inline tCIDLib::TCard1 TRGBClr::c1Alpha(const tCIDLib::TCard1 c1Alpha)
-{
-    m_c1Alpha = c1Alpha;
-    return m_c1Alpha;
-}
-
-inline tCIDLib::TCard1 TRGBClr::c1Blue() const
-{
-    return m_c1Blue;
-}
-
-inline tCIDLib::TCard1 TRGBClr::c1Blue(const tCIDLib::TCard1 c1Blue)
-{
-    m_c1Blue = c1Blue;
-    return c1Blue;
-}
-
-inline tCIDLib::TCard1 TRGBClr::c1Green() const
-{
-    return m_c1Green;
-}
-
-inline tCIDLib::TCard1 TRGBClr::c1Green(const tCIDLib::TCard1 c1Green)
-{
-    m_c1Green = c1Green;
-    return c1Green;
-}
-
-inline tCIDLib::TCard1 TRGBClr::c1Red() const
-{
-    return m_c1Red;
-}
-
-inline tCIDLib::TCard1 TRGBClr::c1Red(const tCIDLib::TCard1 c1Red)
-{
-    m_c1Red = c1Red;
-    return c1Red;
-}
-
-inline tCIDLib::TCard4 TRGBClr::c4Alpha() const
-{
-    return m_c1Alpha;
-}
-
-inline tCIDLib::TCard4 TRGBClr::c4Blue() const
-{
-    return m_c1Blue;
-}
-
-inline tCIDLib::TCard4 TRGBClr::c4Color() const
-{
-    return *((const tCIDLib::TCard4*)&m_c1Red);
-}
-
-inline tCIDLib::TCard4 TRGBClr::c4Green() const
-{
-    return m_c1Green;
-}
-
-inline tCIDLib::TCard4 TRGBClr::c4Red() const
-{
-    return m_c1Red;
-}
-
-inline tCIDLib::TVoid TRGBClr::ToBlack()
-{
-    m_c1Red = 0;
-    m_c1Green = 0;
-    m_c1Blue = 0;
-    m_c1Alpha = 0;
-}
-

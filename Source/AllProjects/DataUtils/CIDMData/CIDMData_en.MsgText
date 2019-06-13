@@ -51,6 +51,9 @@ ERRORS=
     errcChFl_MetaKeyAlready     504     Meta value key '%(1)' already exists on this file
     errcChFl_BadChunkIndex      505     %(1) is not a valid chunk index, count=%(2)
 
+    ; Unique string errors
+    errcUStr_InvalidId          12000   The unique string id must be from 1 to %(2)
+
 END ERRORS
 
 

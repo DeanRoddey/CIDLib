@@ -252,25 +252,16 @@ tCIDLib::TVoid TResourceName::FormatTo(TTextOutStream& strmDest) const
 
 tCIDLib::TVoid TResourceName::StreamFrom(TBinInStream& strmToReadFrom)
 {
-    // We should get a start object marker
-    strmToReadFrom.CheckForStartMarker(CID_FILE, CID_LINE);
-
-    // Check the format version
-    tCIDLib::TCard2 c2FmtVersion;
-    strmToReadFrom  >> c2FmtVersion;
-    if (c2FmtVersion != CIDLib_ResourceName::c2FmtVersion)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_UnknownFmtVersion
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(c2FmtVersion)
-            , clsThis()
-        );
-    }
+    // Check for a start marker and valid format version
+    const tCIDLib::TCard2 c2FmtVersion = TBinInStream::c2CheckFmtVersion
+    (
+        strmToReadFrom
+        , tCIDLib::EStreamMarkers::StartObject
+        , CIDLib_ResourceName::c2FmtVersion
+        , clsThis()
+        , CID_FILE
+        , CID_LINE
+    );
 
     // Stream in the three name parts
     TString strCompany;

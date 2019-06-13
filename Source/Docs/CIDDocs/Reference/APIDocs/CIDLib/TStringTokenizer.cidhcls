@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TStringTokenizer" Prefix="stok" Parent="TObject">
+
+    <Desc>
+        <P>This class does what you would expect from the name, it allows you to break text up into separate tokens based on various criteria. It can act as an iterator to iterate through tokens, and it also has some helpers to just pull out all of the tokens at once into a collection of strings.</P>
+
+        <P>It also has some helper static method that will parse some well known formats, such as CSV or quoted comma strings, and return all the tokens in a string collection as well.</P>
+    </Desc>
+
+</CppClass>

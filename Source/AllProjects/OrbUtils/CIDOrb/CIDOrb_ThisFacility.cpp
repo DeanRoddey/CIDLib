@@ -115,7 +115,7 @@ TFacCIDOrb::TFacCIDOrb() :
     , m_c4ReplyOverhead(0)
     , m_c4TimeoutAdjust(0)
     , m_c8LastNSCookie(0)
-    , m_colNSCache(173, new TStringKeyOps, tCIDLib::EMTStates::Safe)
+    , m_colNSCache(173, TStringKeyOps(), tCIDLib::EMTStates::Safe)
     , m_enctNextForcedNS(0)
     , m_enctTimeoutAdjust(0)
     , m_poccmSrv(nullptr)
@@ -1239,14 +1239,14 @@ TFacCIDOrb::StoreObjIDCache(const   TString&    strBindingName
 tCIDLib::TVoid TFacCIDOrb::Terminate()
 {
     // If in verbose logging mode, log that we started the termination
-    if (bLogStatus())
+    if (bLogInfo())
     {
         LogMsg
         (
             CID_FILE
             , CID_LINE
             , kOrbMsgs::midStatus_TermStarted
-            , tCIDLib::ESeverities::Status
+            , tCIDLib::ESeverities::Info
             , tCIDLib::EErrClasses::AppStatus
         );
     }
@@ -1269,7 +1269,7 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
                 CID_FILE
                 , CID_LINE
                 , kOrbMsgs::midStatus_ClientTermDone
-                , tCIDLib::ESeverities::Status
+                , tCIDLib::ESeverities::Info
                 , tCIDLib::EErrClasses::AppStatus
             );
         }
@@ -1389,7 +1389,7 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
             CID_FILE
             , CID_LINE
             , kOrbMsgs::midStatus_TermDone
-            , tCIDLib::ESeverities::Status
+            , tCIDLib::ESeverities::Info
             , tCIDLib::EErrClasses::AppStatus
         );
     }
