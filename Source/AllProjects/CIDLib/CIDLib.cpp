@@ -427,6 +427,9 @@ static tCIDLib::TVoid DummyFunc()
     if ((colNVM1 == colNVM2) || (colNVM1 != colNVM2))
     {
     }
+
+    TVector<const TString> colConstStr;
+    const TString& strNC = colConstStr[0];
 }
 #endif
 

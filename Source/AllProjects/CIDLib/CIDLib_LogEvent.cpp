@@ -948,25 +948,17 @@ tCIDLib::TVoid TLogEvent::FormatTo(TTextOutStream& strmToWriteTo) const
 
 tCIDLib::TVoid TLogEvent::StreamFrom(TBinInStream& strmToReadFrom)
 {
-    // Check for the start object marker
-    strmToReadFrom.CheckForStartMarker(CID_FILE, CID_LINE);
+    // Check for a start marker and valid format version
+    const tCIDLib::TCard2 c2FmtVersion = TBinInStream::c2CheckFmtVersion
+    (
+        strmToReadFrom
+        , tCIDLib::EStreamMarkers::StartObject
+        , CIDLib_LogEvent::c2FmtVersion
+        , clsThis()
+        , CID_FILE
+        , CID_LINE
+    );
 
-    // Check the format version
-    tCIDLib::TCard2 c2FmtVersion;
-    strmToReadFrom  >> c2FmtVersion;
-    if (!c2FmtVersion || (c2FmtVersion > CIDLib_LogEvent::c2FmtVersion))
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_UnknownFmtVersion
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(c2FmtVersion)
-            , clsThis()
-        );
-    }
 
     // Stream out our raft of members
     tCIDLib::TCard2 c2Flags;

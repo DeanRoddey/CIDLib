@@ -16,9 +16,10 @@
         <PageLink FileName="Janitors"/>
         <PageLink FileName="Text" Title="Text/Strings"/>
         <PageLink FileName="TextEncoding" Title="Text Encoding"/>
-        <PageLink FileName="StringTokens" Title="Text Replacement Tokens"/>
+        <PageLink FileName="StringTokens" Title="Token Replacement"/>
         <PageLink FileName="Collections"/>
         <PageLink FileName="Cursors" Title="Collection Cursors"/>
+        <PageLink FileName="Streams"/>
         <PageLink FileName="ORB-IDL" Title="Client/Server (ORB)"/>
         <PageLink FileName="Threads"/>
         <PageLink FileName="ThreadSync" Title="Thread Synchronization"/>

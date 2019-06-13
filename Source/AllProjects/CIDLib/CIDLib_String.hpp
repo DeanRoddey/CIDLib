@@ -1192,7 +1192,7 @@ class CIDLIBEXP TString :
             return m_strbData.pszBufferAt(c4At);
         }
 
-        tCIDLib::TCh* pszDupBuffer() const
+        [[nodiscard]] tCIDLib::TCh* pszDupBuffer() const
         {
             return m_strbData.pszDupBuffer();
         }
@@ -1217,8 +1217,8 @@ class CIDLIBEXP TString :
             m_strbData.Insert(pszPrepend, 0);
         }
 
-        tCIDLib::TVoid PutAt(const   tCIDLib::TCard4 c4Index
-                            , const tCIDLib::TCh   chToPut)
+        tCIDLib::TVoid PutAt(const  tCIDLib::TCard4 c4Index
+                            , const tCIDLib::TCh    chToPut)
         {
             m_strbData.PutAt(c4Index, chToPut);
         }
@@ -1324,30 +1324,18 @@ class CIDLIBEXP TString :
             m_strbData.SetLast(chNew);
         }
 
-        tCIDLib::TVoid StreamInConverted
-        (
-                    TBinInStream&           strmSrc
-            ,       TTextConverter&         tcvtToUse
-        );
-
-        tCIDLib::TVoid StreamOutConverted
-        (
-                    TBinOutStream&          strmTarget
-            ,       TTextConverter&         tcvtToUse
-        );
-
         tCIDLib::TVoid
-        Strip(  const   tCIDLib::TCh* const     pszChars
-                , const tCIDLib::EStripModes    eStripMode = tCIDLib::EStripModes::LeadTrail
-                , const tCIDLib::TCh            chRepChar = kCIDLib::chSpace)
+        Strip(  const   tCIDLib::TCh* const pszChars
+                , const tCIDLib::EStripModes eStripMode = tCIDLib::EStripModes::LeadTrail
+                , const tCIDLib::TCh        chRepChar = kCIDLib::chSpace)
         {
             m_strbData.Strip(pszChars, eStripMode, chRepChar);
         }
 
         tCIDLib::TVoid
-        Strip(  const   TString&                strChars
-                , const tCIDLib::EStripModes    eStripMode = tCIDLib::EStripModes::LeadTrail
-                , const tCIDLib::TCh            chRepChar = kCIDLib::chSpace)
+        Strip(  const   TString&            strChars
+                , const tCIDLib::EStripModes eStripMode = tCIDLib::EStripModes::LeadTrail
+                , const tCIDLib::TCh        chRepChar = kCIDLib::chSpace)
         {
             m_strbData.Strip(strChars.m_strbData.pszBuffer(), eStripMode, chRepChar);
         }

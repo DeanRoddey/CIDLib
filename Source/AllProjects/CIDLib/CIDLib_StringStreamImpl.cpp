@@ -63,7 +63,7 @@ TStringStreamImplInfo::~TStringStreamImplInfo()
     if (eAdopted == tCIDLib::EAdoptOpts::Adopt)
     {
         delete pstrData;
-        pstrData = 0;
+        pstrData = nullptr;
     }
 }
 
@@ -178,9 +178,7 @@ TStringInStreamImpl::c4ReadBytes(       tCIDLib::TVoid* const   pBuffer
     const tCIDLib::TCh* pszTmp = m_pstrIn->pszBuffer();
     TRawMem::CopyMemBuf
     (
-        pBuffer
-        , &pszTmp[m_c4CurPos]
-        , c4Actual * kCIDLib::c4CharBytes
+        pBuffer, &pszTmp[m_c4CurPos], c4Actual * kCIDLib::c4CharBytes
     );
 
     // Adjust the current position by the chars read

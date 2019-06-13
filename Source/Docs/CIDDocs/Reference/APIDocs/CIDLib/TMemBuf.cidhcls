@@ -23,17 +23,8 @@
                 <Desc>
                     The const version returns the byte at the indicated index by value. The non-const version returns a reference so that you can set the value.
                 </Desc>
-                <MethVar RetBy="Ref">
-                    <MethParams>
-                        <MethParam Name="c4Index" Type="tCIDLib::TCard4"/>
-                    </MethParams>
-                </MethVar>
-
-                <MethVar Attrs="Const">
-                    <MethParams>
-                        <MethParam Name="c4Index" Type="tCIDLib::TCard4"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar RetBy="Ref"><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar Attrs="Const"><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
             </Method>
         </Operators>
 
@@ -47,13 +38,13 @@
                     <P>You could call this to write out some known used number of bytes and later do a StreamFrom(), via the >> operator of course, and it will work since they do the same thing in terms of the data format. The buffer will stream in the number of bytes this call streamed out.</P>
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam Name="strmToWriteTo" Type="TBinOutStream" PBy="Ref" Dir="Out"/>
-                        <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
-                    </MethParams>
+                    <MethParam Name="strmToWriteTo" Type="TBinOutStream" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
                 </MethVar>
             </Method>
+
         </VirtMeths>
+
     </PubIntf>
 
 </CppClass>

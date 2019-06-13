@@ -17,63 +17,45 @@
                     These constructors allow you to concatenate one or more strings and/or characters together. There are variations that take raw string pointers to avoid the creation of temporary string objects to some degree.
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
-                    </MethParams>
+                    <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="str2" Type="TString" PBy="CRef"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="str3" Type="TString" PBy="CRef"/>
-                    </MethParams>
+                    <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="str2" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="str3" Type="TString" PBy="CRef"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="str3" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="str4" Type="TString" PBy="CRef"/>
-                    </MethParams>
+                    <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="str2" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="str3" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="str4" Type="TString" PBy="CRef"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
-                    </MethParams>
+                    <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
-                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
-                    </MethParams>
+                    <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
+                    <MethParam  Name="str2" Type="TString" PBy="CRef"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                        <MethParam  Name="str2" Type="TString" PBy="CRef"/>
-                    </MethParams>
+                    <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="str2" Type="TString" PBy="CRef"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="str1" Type="TString" PBy="CRef"/>
-                        <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                    </MethParams>
+                    <MethParam  Name="str1" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                        <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                    </MethParams>
+                    <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                        <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
-                        <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                    </MethParams>
+                    <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
+                    <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
                 </MethVar>
             </Method>
 
@@ -81,11 +63,7 @@
                 <Desc>
                     Takes the source object's buffer and leaves it with a null pointer so that it doesn't have anything to release.
                 </Desc>
-                <MethVar >
-                    <MethParams>
-                        <MethParam  Name="scatSrc" Type="TStrCat" PBy="MRef"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam  Name="scatSrc" Type="TStrCat" PBy="MRef"/></MethVar>
             </Method>
 
         </Ctors>
@@ -96,11 +74,7 @@
                 <Desc>
                     Takes the source object's buffer and leaves it with a null pointer so that it doesn't have anything to release.
                 </Desc>
-                <MethVar >
-                    <MethParams>
-                        <MethParam  Name="scatSrc" Type="TStrCat" PBy="MRef"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam  Name="scatSrc" Type="TStrCat" PBy="MRef"/></MethVar>
             </Method>
 
         </Operators>
@@ -115,9 +89,7 @@
                     <Note>It's possible the return could be nullptr if someone else has already called this method.</Note>
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="c4Len" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                    </MethParams>
+                    <MethParam  Name="c4Len" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
                 </MethVar>
             </Method>
 

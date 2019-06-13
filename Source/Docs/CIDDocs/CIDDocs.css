@@ -185,7 +185,7 @@ li {
 .BarredNote {
     font-style : italic;
     border-left : 4px solid #CCCCCC;
-    padding : 1em 0 1em 2em;
+    padding : 1em 5em 1em 1em;
     display : table-cell;
     vertical-align : middle;
 }
@@ -201,6 +201,12 @@ li {
 
 .DeemphCode {
     color : #555555;
+}
+
+
+/* A class we can add to a div to add a little vertical spacing */
+.TrailingSpace {
+    margin-bottom: 1.8em;
 }
 
 

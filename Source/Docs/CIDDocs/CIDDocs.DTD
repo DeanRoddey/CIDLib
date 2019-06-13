@@ -156,10 +156,9 @@
                         PBy (%RefType;) 'Val'
                         Dir (In | Out | InOut) 'In'
                         DefVal CDATA #IMPLIED>
-<!ELEMENT   MethParams  (MethParam*)>
 
 <!-- If no attrs, the containing method's attrs are used -->
-<!ELEMENT   MethVar     (MethParams*)>
+<!ELEMENT   MethVar     (MethParam*)>
 <!ATTLIST   MethVar     Attrs NMTOKENS #IMPLIED
                         RetBy (%RefType;) #IMPLIED>
 

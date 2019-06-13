@@ -39,6 +39,7 @@ static tCIDLib::TVoid
 FormatAccType(          TTextOutStream&         strmTar
                 , const TString&                strType
                 , const tCIDDocComp::EParmPB    eType
+                , const tCIDLib::TBoolean       bParmMode
                 , const tCIDDocComp::EParmDirs  eDir = tCIDDocComp::EParmDirs::Count)
 {
     strmTar << L"<span class=\"DeemphCode\">";
@@ -93,6 +94,9 @@ FormatAccType(          TTextOutStream&         strmTar
             break;
 
         case tCIDDocComp::EParmPB::Val :
+            // If in parameter mode, by value implies const value
+            if (bParmMode)
+                strmTar << L"const ";
             strmTar << strType;
             break;
 
@@ -216,14 +220,16 @@ TMembers::OutputContent(        TTextOutStream&         strmTar
     if (m_colList.bIsEmpty())
         return;
 
-    strmTar << L"<p><span class='SecHdr'>" << eVisType << L" Data Members</span></p>";
+    strmTar << L"<p><span class='SecHdr'>"
+            << tCIDDocComp::strXlatEVisTypes(eVisType)
+            << L" Data Members</span></p>";
 
    m_colList.bForEach
     (
         [&strmTar](const TMember& memberCur)
         {
             strmTar << L"<pre>";
-            FormatAccType(strmTar, memberCur.m_strType, memberCur.m_eAccType);
+            FormatAccType(strmTar, memberCur.m_strType, memberCur.m_eAccType, kCIDLib::False);
             strmTar << kCIDLib::chSpace;
             facCIDDocComp.FormatEmphText(strmTar, memberCur.m_strName);
             strmTar << L"</pre>";
@@ -282,7 +288,7 @@ TMethodParam::OutputContent(        TTextOutStream&     strmTar
                             , const tCIDLib::TCard4     c4Index) const
 {
     // Format out the type info and its access and direction info
-    FormatAccType(strmTar, m_strType, m_ePassBy, m_eDir);
+    FormatAccType(strmTar, m_strType, m_ePassBy, kCIDLib::True, m_eDir);
 
     strmTar << L"<span class=\"EmphCode\"> " << m_strName
             << L"</span>";
@@ -363,11 +369,10 @@ TMethodVar::Parse(  const   TXMLTreeElement&        xtnodeSrc
     if ((m_eRetBy != tCIDDocComp::EParmPB::None) && m_strRetType.bIsEmpty())
         facCIDDocComp.AddErrorMsg(L"No return type was indicated");
 
-    // Our child is a method parameters element, but we may not have one
+    // If we have any children, they are parameters of this variation
     if (xtnodeSrc.c4ChildCount())
     {
-        const TXMLTreeElement& xtnodeParams = xtnodeSrc.xtnodeChildAtAsElement(0);
-        xtnodeParams.bForEach
+        xtnodeSrc.bForEach
         (
             [&](const TXMLTreeElement& xtnodeCur)
             {
@@ -401,7 +406,7 @@ TMethodVar::OutputContent(TTextOutStream& strmTar, const TString& strName) const
         //  For return types, constants, and members, we can use the same code.
         //  We just use a local for that.
         //
-        FormatAccType(strmTar, m_strRetType, m_eRetBy);
+        FormatAccType(strmTar, m_strRetType, m_eRetBy, kCIDLib::False);
         strmTar << kCIDLib::chSpace;
     }
 
@@ -409,11 +414,25 @@ TMethodVar::OutputContent(TTextOutStream& strmTar, const TString& strName) const
     facCIDDocComp.FormatEmphText(strmTar, strName);
 
     //
-    //  If it has two parameters or less, we'll do it on one line. Else we wrap
-    //  and indent the parameters.
+    //  Decide if we want to wrap the parameters or put the whole thing on one
+    //  line. If it's just a single paramater, then we always do one line. If it's
+    //  two and none of them have default values, we do one line. Else we wrap.
     //
+    //  So first check for default values. Break out as soon as we see one, which
+    //  means the for each returns false, which we negate to true.
+    //
+    const tCIDLib::TBoolean bHaveDefVals = !m_colParams.bForEach
+    (
+        [&bHaveDefVals](const TMethodParam& methpCur)
+        {
+            return methpCur.m_strDefVal.bIsEmpty();
+        }
+    );
     const tCIDLib::TCard4 c4PCnt = m_colParams.c4ElemCount();
-    const tCIDLib::TBoolean bWrapped(c4PCnt > 2);
+    const tCIDLib::TBoolean bWrapped
+    (
+        (c4PCnt > 2) || ((c4PCnt == 2) && bHaveDefVals)
+    );
     if (bWrapped)
         strmTar << L"<br/>(<br/>    ";
     else
@@ -441,7 +460,10 @@ TMethodVar::OutputContent(TTextOutStream& strmTar, const TString& strName) const
         strmTar << L"<br/>";
     strmTar << L")";
 
-    // Do any attributes that go after the end
+    //
+    //  Do any attributes that go after the end. Order them such that if more than one
+    //  are set (in any legal combination) they will make sense as displayed.
+    //
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Const))
         strmTar << L" const";
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Override))
@@ -450,6 +472,8 @@ TMethodVar::OutputContent(TTextOutStream& strmTar, const TString& strName) const
         strmTar << L" = default";
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Delete))
         strmTar << L" = delete";
+    if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::NoExcept))
+        strmTar << L" noexcept";
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Pure))
         strmTar << L" = 0";
 }
@@ -586,25 +610,27 @@ TMethod::Parse(const TXMLTreeElement& xtnodeSrc, const tCIDDocComp::EMethAttrs e
 
 tCIDLib::TVoid TMethod::OutputContent(TTextOutStream& strmTar) const
 {
-    // Output all of the method variations, in a preformatted block
+    //  Output all of the method variations, in a preformatted block.
     strmTar << L"<pre>";
     m_colMethVars.bForEach
     (
         [&](const TMethodVar& mvarCur)
         {
-            mvarCur.OutputContent(strmTar, m_strName);
-
             // Put a break after each one
-            strmTar << L"<br/>";
+            mvarCur.OutputContent(strmTar, m_strName);
+            strmTar << L"</br>";
             return kCIDLib::True;
         }
     );
     strmTar << L"</pre>";
 
-    // Indent the general text and output that
+    //
+    //  Indent the general text and output that. Add a special div after it to
+    //  create a little vertical spacing.
+    //
     strmTar << L"<blockquote>";
     m_hnDescr.OutputNodes(strmTar);
-    strmTar << L"</blockquote>" << kCIDLib::NewLn;
+    strmTar << L"</blockquote><div class=\"TrailingSpace\"></div>" << kCIDLib::NewLn;
 }
 
 
@@ -1214,7 +1240,8 @@ tCIDLib::TVoid TCppClassPage::LoadMixinMethods()
         s_methFormatTo.m_hnDescr.SetToText
         (
             L"Formats this object to the passed text output stream. It is up to "
-            L"the class to determine the appropriate formatting scheme. See the MFormattable mixin class"
+            L"the class to determine the appropriate formatting scheme. See the "
+            L"MFormattable mixin class"
         );
         TMethodVar& mvarDup = s_methFormatTo.m_colMethVars.objAdd(TMethodVar());
         mvarDup.m_strRetType = L"tCIDLib::TVoid";
@@ -1232,7 +1259,10 @@ tCIDLib::TVoid TCppClassPage::LoadMixinMethods()
         s_methStreamFrom.m_strName = L"StreamFrom";
         s_methStreamFrom.m_hnDescr.SetToText
         (
-            L"Streams into this object the context previousyl streamed out by a call to StreamTo by an object of this type. This is not called directly, it's used by the global >> operator that is defined in terms of the MStreamable mixin class."
+            L"Streams into this object the context previously streamed out by a "
+            L"call to StreamTo by an object of this type. This is not called "
+            L"directly, it's used by a global >> operator that is defined in "
+            L"terms of the MStreamable mixin class."
         );
         TMethodVar& mvarCur = s_methStreamFrom.m_colMethVars.objAdd(TMethodVar());
         mvarCur.m_strRetType = L"tCIDLib::TVoid";
@@ -1249,7 +1279,10 @@ tCIDLib::TVoid TCppClassPage::LoadMixinMethods()
         s_methStreamTo.m_strName = L"StreamTo";
         s_methStreamTo.m_hnDescr.SetToText
         (
-            L"Streams out this object to the passed binary output stream, flattening it out for later reading back in via a call to StreamFrom. This is not called directly, it is used by the global << operator defined in terms of the MStreamable mixin class."
+            L"Streams out this object to the passed binary output stream, flattening "
+            L"it out for later reading back in via a call to StreamFrom. This is not "
+            L"called directly, it is used by a global << operator defined in terms "
+            L"of the MStreamable mixin class."
         );
         TMethodVar& mvarCur = s_methStreamTo.m_colMethVars.objAdd(TMethodVar());
         mvarCur.m_strRetType = L"tCIDLib::TVoid";

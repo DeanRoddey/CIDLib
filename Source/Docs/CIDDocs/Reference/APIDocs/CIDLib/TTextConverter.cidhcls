@@ -35,7 +35,7 @@
                 <Desc>
                     Returns the base format of the encoding represented by this converter. It tells you if the format is single byte, multi-byte, or two/four byte little or big endian. You may need this information in some special cases.
                 </Desc>
-                <MethVar><MethParams/></MethVar>
+                <MethVar></MethVar>
             </Method>
         </VirtMeths>
 
@@ -51,29 +51,23 @@
                     <Note>Not all of the source bytes may be consumed. If either the max output chars is hit, or the source contains a final, partial character, there will be remaining source bytes that need to be carried forward to the next pass.</Note>
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
-                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
-                        <MethParam  Name="c4MaxChars" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="c4OutChars" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                    </MethParams>
+                    <MethParam  Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
+                    <MethParam  Name="c4MaxChars" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4OutChars" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
-                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
-                        <MethParam  Name="eAppendOver" Type="tCIDLib::EAppendOver" DefVal="tCIDLib::EAppendOver::Overwrite"/>
-                    </MethParams>
+                    <MethParam  Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="eAppendOver" Type="tCIDLib::EAppendOver" DefVal="tCIDLib::EAppendOver::Overwrite"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="mbufSrc" Type="TMemBuf" PBy="CRef"/>
-                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
-                        <MethParam  Name="eAppendOver" Type="tCIDLib::EAppendOver" DefVal="tCIDLib::EAppendOver::Overwrite"/>
-                    </MethParams>
+                    <MethParam  Name="mbufSrc" Type="TMemBuf" PBy="CRef"/>
+                    <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="eAppendOver" Type="tCIDLib::EAppendOver" DefVal="tCIDLib::EAppendOver::Overwrite"/>
                 </MethVar>
             </Method>
 
@@ -84,11 +78,9 @@
                     <P>You indicate how many bytes are available in the target. If there are not enough for the needed conversion, it returns 0 to indicate no bytes were stored.</P>
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="chSrc" Type="tCIDLib::TCh"/>
-                        <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
-                        <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
-                    </MethParams>
+                    <MethParam  Name="chSrc" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
+                    <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
                 </MethVar>
             </Method>
 
@@ -101,35 +93,27 @@
                     <P>You can convert from a raw char buffer or a <ClassRef Ref="TString"/> object. You can convert to a raw byte buffer, an expandable byte buffer object or a memory buffer object.</P>
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="pchSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                        <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="pc1ToFill" Type="tCIDLib::TCard1" PBy="PtrC" Dir="Out"/>
-                        <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                    </MethParams>
+                    <MethParam  Name="pchSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="pc1ToFill" Type="tCIDLib::TCard1" PBy="PtrC" Dir="Out"/>
+                    <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="pchSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                        <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="expbToFill" Type="TExpByteBuf" PBy="Ref" Dir="Out"/>
-                    </MethParams>
+                    <MethParam  Name="pchSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="expbToFill" Type="TExpByteBuf" PBy="Ref" Dir="Out"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="pchSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                        <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="mbufToFill" Type="TMemBuf" PBy="Ref" Dir="Out"/>
-                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                    </MethParams>
+                    <MethParam  Name="pchSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="mbufToFill" Type="TMemBuf" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
                 </MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="strSrc" Type="tCIDLib::TCh" PBy="CRef"/>
-                        <MethParam  Name="mbufToFill" Type="TMemBuf" PBy="Ref" Dir="Out"/>
-                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                    </MethParams>
+                    <MethParam  Name="strSrc" Type="tCIDLib::TCh" PBy="CRef"/>
+                    <MethParam  Name="mbufToFill" Type="TMemBuf" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
                 </MethVar>
             </Method>
 
@@ -138,11 +122,9 @@
                     <P>Extracts a single character from the source buffer. It returns the converted character if successful, else a null character (kCIDLib::chNull.) If successful, it indicates how many bytes it ate from the source buffer.</P>
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
-                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                    </MethParams>
+                    <MethParam  Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
                 </MethVar>
             </Method>
 
@@ -150,10 +132,8 @@
                 <Desc>
                     <P>Gets or sets the replacement character. This is used when a bad or unrepresentable character is encountered. See eErrorAction() below for more details.</P>
                 </Desc>
-                <MethVar Attrs="const"><MethParams/></MethVar>
-                <MethVar>
-                    <MethParams><MethParam  Name="chToSet" Type="tCIDLib::TCh"/></MethParams>
-                </MethVar>
+                <MethVar Attrs="const"></MethVar>
+                <MethVar><MethParam  Name="chToSet" Type="tCIDLib::TCh"/></MethVar>
             </Method>
 
             <Method Name="eErrorAction" RetType="tCIDLib::ETCvtActions">
@@ -167,21 +147,15 @@
 
                     <P>Note that replace is only used for converting encoded data to the internal wide character format. For outgoing, an error will occur if data cannot be successfully converted.</P>
                 </Desc>
-                <MethVar Attrs="const">
-                    <MethParams/>
-                </MethVar>
-                <MethVar>
-                    <MethParams>
-                        <MethParam  Name="eToSet" Type="tCIDLib::ETCvtActions"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar Attrs="const"></MethVar>
+                <MethVar><MethParam  Name="eToSet" Type="tCIDLib::ETCvtActions"/></MethVar>
             </Method>
 
             <Method Name="strEncoding" RetType="TString" RetBy="CRef">
                 <Desc>
                     <P>Provides access to the encoding that this converter supports.</P>
                 </Desc>
-                <MethVar Attrs="const"><MethParams/></MethVar>
+                <MethVar Attrs="const"></MethVar>
             </Method>
 
         </NVirtMeths>
@@ -194,11 +168,7 @@
                 <Desc>
                     The derived class calls this and passes on the encoding for which he is responsible. This way, we can make the encoding name available via this base class.
                 </Desc>
-                <MethVar>
-                    <MethParams>
-                        <MethParam  Name="strEncodingName" Type="TString" PBy="CRef"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam  Name="strEncodingName" Type="TString" PBy="CRef"/></MethVar>
             </Method>
         </Ctors>
 
@@ -220,14 +190,12 @@
                     <P>The derived class overrides this to convert a block of text from the encoding to the internal wide character format. The base class will call this as required to convert text.</P>
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="pc1Src" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                        <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
-                        <MethParam  Name="c4MaxChars" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="c4OutChars" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                        <MethParam  Name="bStop" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
-                    </MethParams>
+                    <MethParam  Name="pc1Src" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
+                    <MethParam  Name="c4MaxChars" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4OutChars" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bStop" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
                 </MethVar>
             </Method>
 
@@ -236,14 +204,12 @@
                     <P>The derived class overrides this and handles converting blocks of wide characters to the target encoding format. The base class will call this as required to convert data.</P>
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                        <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="pc1ToFill" Type="tCIDLib::TCard1" PBy="PtrC" Dir="Out"/>
-                        <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                        <MethParam  Name="bStop" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
-                    </MethParams>
+                    <MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="pc1ToFill" Type="tCIDLib::TCard1" PBy="PtrC" Dir="Out"/>
+                    <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bStop" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
                 </MethVar>
             </Method>
 

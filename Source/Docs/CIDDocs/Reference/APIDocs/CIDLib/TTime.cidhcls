@@ -128,108 +128,78 @@
 
             <Method Name="bDST">
                 <Desc>Returns true if day savings time is active locally.</Desc>
-                <MethVar><MethParams/></MethVar>
+                <MethVar></MethVar>
             </Method>
 
             <Method Name="bIsLeapYear" RetType="tCIDLib::TBoolean">
                 <Desc>Returns true if the passed year is a leap year.</Desc>
-                <MethVar>
-                    <MethParams>
-                        <MethParam Name="c4ToCheck" Type="tCIDLib::TCard4"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam Name="c4ToCheck" Type="tCIDLib::TCard4"/></MethVar>
             </Method>
 
             <Method Name="c4CvtToJulian" RetType="tCIDLib::TCard4">
                 <Desc>Converts the passed day to a Julian date.</Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam Name="c4Year" Type="tCIDLib::TCard4"/>
-                        <MethParam Name="eMonth" Type="tCIDLib::EMonths"/>
-                        <MethParam Name="c4Day" Type="tCIDLib::TCard4"/>
-                    </MethParams>
+                    <MethParam Name="c4Year" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="eMonth" Type="tCIDLib::EMonths"/>
+                    <MethParam Name="c4Day" Type="tCIDLib::TCard4"/>
                 </MethVar>
             </Method>
 
             <Method Name="c4MaxDaysForMonth" RetType="tCIDLib::TCard4">
                 <Desc>Returns the number of days in the indicate month of the indicated year, taking into account leap years.</Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam Name="eMonth" Type="tCIDLib::EMonths"/>
-                        <MethParam Name="c4Year" Type="tCIDLib::TCard4"/>
-                    </MethParams>
+                    <MethParam Name="eMonth" Type="tCIDLib::EMonths"/>
+                    <MethParam Name="c4Year" Type="tCIDLib::TCard4"/>
                 </MethVar>
             </Method>
 
             <Method Name="c4Millis" RetType="tCIDLib::TCard4">
                 <Desc>Returns the current running millisecond time stamp. Be aware that this can wrap every 30'ish days or so. So there's a chance you could get a really big time if you are subtracting a previous stamp from a later one to calculate some time. Use the 64 bit version below to avoid that.</Desc>
-                <MethVar><MethParams/></MethVar>
+                <MethVar></MethVar>
             </Method>
 
             <Method Name="c8Millis" RetType="tCIDLib::TCard8">
                 <Desc>Returns the current running millisecond time stamp as a 64 bit value. Unlike the 32 bit version above, this one isn't going wrap around in your lifetime, so it is safer to use where you get a stamp, do something, then get another stamp and calculate an elapsed time.</Desc>
-                <MethVar><MethParams/></MethVar>
+                <MethVar></MethVar>
             </Method>
 
             <Method Name="CurNTPTime">
                 <Desc>Returns the NTP style current time, which is seconds plus fractional sections since 1970 in UTC time zone.</Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam Name="c4Secs" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                        <MethParam Name="c4Fract" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
-                        <MethParam Name="bNWOrder" Type="tCIDLib::TBoolean"/>
-                    </MethParams>
+                    <MethParam Name="c4Secs" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4Fract" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="bNWOrder" Type="tCIDLib::TBoolean"/>
                 </MethVar>
             </Method>
 
             <Method Name="enctNow" RetType="tCIDLib::TEncodedTime">
                 <Desc>Returns the local system time stamp. This isn't the time stamp in this object, since this is a static method, it's the system time.</Desc>
-                <MethVar><MethParams/></MethVar>
+                <MethVar></MethVar>
             </Method>
 
             <Method Name="enctNowPlusDays" RetType="tCIDLib::TEncodedTime">
                 <Desc>Returns the local system time stamp plus the indicated number of days.</Desc>
-                <MethVar>
-                    <MethParams>
-                        <MethParam Name="c4Days" Type="tCIDLib::TCard4"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam Name="c4Days" Type="tCIDLib::TCard4"/></MethVar>
             </Method>
 
             <Method Name="enctNowPlusHours" RetType="tCIDLib::TEncodedTime">
                 <Desc>Returns the local system time stamp plus the indicted number of hours.</Desc>
-                <MethVar>
-                    <MethParams>
-                        <MethParam Name="c4Hours" Type="tCIDLib::TCard4"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam Name="c4Hours" Type="tCIDLib::TCard4"/></MethVar>
             </Method>
 
             <Method Name="enctNowPlusMSs" RetType="tCIDLib::TEncodedTime">
                 <Desc>Returns the local system time stamp plus the indicted number of milliseconds.</Desc>
-                <MethVar>
-                    <MethParams>
-                        <MethParam Name="c4Millis" Type="tCIDLib::TCard4"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam Name="c4Millis" Type="tCIDLib::TCard4"/></MethVar>
             </Method>
 
             <Method Name="enctNowPlusMins" RetType="tCIDLib::TEncodedTime">
                 <Desc>Returns the local system time stamp plus the indicted number of minutes.</Desc>
-                <MethVar>
-                    <MethParams>
-                        <MethParam Name="c4Minutes" Type="tCIDLib::TCard4"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam Name="c4Minutes" Type="tCIDLib::TCard4"/></MethVar>
             </Method>
 
             <Method Name="enctNowPlusSecs" RetType="tCIDLib::TEncodedTime">
                 <Desc>Returns the local system time stamp plus the indicted number of seconds.</Desc>
-                <MethVar>
-                    <MethParams>
-                        <MethParam Name="c4Secs" Type="tCIDLib::TCard4"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam Name="c4Secs" Type="tCIDLib::TCard4"/></MethVar>
             </Method>
 
         </StaticMeths>
@@ -246,38 +216,24 @@
 
                     <P>The copy constructor also copies any default format string.</P>
                 </Desc>
-                <MethVar><MethParams/></MethVar>
+                <MethVar></MethVar>
+                <MethVar><MethParam  Name="eSpecial" Type="tCIDLib::ESpecialTimes"/></MethVar>
                 <MethVar>
-                    <MethParams>
-                        <MethParam  Name="eSpecial" Type="tCIDLib::ESpecialTimes"/>
-                    </MethParams>
+                    <MethParam  Name="c4Year" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="eMonth" Type="tCIDLib::EMonths"/>
+                    <MethParam  Name="c4Day" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4Hours" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="c4Minutes" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="c4Seconds" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="c4Millis" Type="tCIDLib::TCard4" DefVal="0"/>
                 </MethVar>
-                <MethVar>
-                    <MethParams>
-                        <MethParam  Name="c4Year" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="eMonth" Type="tCIDLib::EMonths"/>
-                        <MethParam  Name="c4Day" Type="tCIDLib::TCard4"/>
-                        <MethParam  Name="c4Hours" Type="tCIDLib::TCard4" DefVal="0"/>
-                        <MethParam  Name="c4Minutes" Type="tCIDLib::TCard4" DefVal="0"/>
-                        <MethParam  Name="c4Seconds" Type="tCIDLib::TCard4" DefVal="0"/>
-                        <MethParam  Name="c4Millis" Type="tCIDLib::TCard4" DefVal="0"/>
-                    </MethParams>
-                </MethVar>
-                <MethVar>
-                    <MethParams>
-                        <MethParam  Name="enctInit" Type="tCIDLib::TEncodedTime"/>
-                    </MethParams>
-                </MethVar>
-                <MethVar>
-                    <MethParams>
-                        <MethParam  Name="tmSrc" Type="TTime" PBy="CRef"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar><MethParam  Name="enctInit" Type="tCIDLib::TEncodedTime"/></MethVar>
+                <MethVar><MethParam  Name="tmSrc" Type="TTime" PBy="CRef"/></MethVar>
             </Method>
 
             <Method Name="~TTime">
                 <Desc>Cleans up any format string if one got created.</Desc>
-                <MethVar><MethParams/></MethVar>
+                <MethVar></MethVar>
             </Method>
 
         </Ctors>

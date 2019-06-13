@@ -23,9 +23,7 @@
                     <P>The class that implements this interface must override this method and format its content out to the passed stream.</P>
                 </Desc>
                 <MethVar>
-                    <MethParams>
-                        <MethParam Name="strmDest" Type="TTextOutStream" PBy="Ref" Dir="In"/>
-                    </MethParams>
+                    <MethParam Name="strmDest" Type="TTextOutStream" PBy="Ref" Dir="In"/>
                 </MethVar>
             </Method>
         </VirtMeths>

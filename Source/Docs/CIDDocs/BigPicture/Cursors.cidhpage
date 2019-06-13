@@ -6,14 +6,11 @@
 
     <HelpText>
 
-        <P>We roughly covered collections in the previous section, so definitely go through that first. What we left out of that page to keep it from getting too long is how collections are iterated.</P>
+        <P>We covered collections in the previous section, so definitely go through that first. What we left out of that page to keep it from getting too long is the concept of cursors. We discussed a couple iteration mechanisms there, which were direct iteration (such as via index), and using the 'for each' callback mechanism. Both of those are very useful, but not always possible or the best option.</P>
 
-        <List>
-            <LItem Ref="Direct">Most collections that provide direct element access can be iterated directly. For arrays/vectors just loop through the index. For linked lists just next node and next node to the end, and so forth.</LItem>
-            <LItem Ref="Cursor">But some cannot be directly iterated and even when they can you may want to use something more generic to do so, because that allows for some very useful capabiltiies, and that is where cursors come in.</LItem>
-        </List>
+        <P>When you iterate an array via an index, you are just keeping track of where you are in the array and moving it forward or back. Cursors are an abstract means to do the same thing, but they can keep track of any arbitrary positional information as required for a given collection type. So they provide a means to step through the elements of a collection in the same way, but even for collections that have no natural iteration mechanism.</P>
 
-        <P>When you iterate an array via a numeric index, you are just keeping track of where you are in the array and moving it forward or back. Cursors are an abstract means to do the same thing, but they can keep track of any arbitrary positional information. You can create a cursor for a given collection and it basically keeps up with where it is within that collection, so you don't have to understand the iteration mechanism or even know what kind of collection you are iterating.</P>
+        <P>Therefore, you can create a cursor for a collection and it keeps up with where it is within that collection and knows how to move forward (or backwards if supported) an element at a time. You don't have to understand the iteration mechanism or even know what kind of collection you are iterating, since cursors are polymorphic as well.</P>
 
         <P>Here's a basic example of iterating a TBag collection via cursor:</P>
 
@@ -50,24 +47,17 @@
         <Note>You can also do post-fix increment where needed, though it is considerably less performant because it has to create a copy of the cursor and return it just to then be thrown away after it is used. So use prefix any time you can.</Note>
 
 
-        <SecTitle>Cursor Constness</SecTitle>
-
-        <P>It was mentioned above that each collection has a const and non-const nested cursor class. That doesn't mean const in the C++ sense. A cursor that is const in the C++ sense cannot be used for anything but to access the element it points to (if it is valid.) It can't be reset or iterated with.</P>
-
-        <P>The other sense of cursor constness has to do with what you can do with the element it references. A const cursor in that sense only provides const access to the element, while the non-const cursor lets you modify the element. There probably should be some other term used for latter, but it might be too late for that now.</P>
-
-
         <SecTitle>Cursor Validity</SecTitle>
 
         <P>Unlike the standard C++ container iterators, CIDLib's collection cursors have the concept of validity. So you don't have to do begin()/end() and all of the various other choices that that strategy requires. As we saw above "if (cursObjs)" checks whether the cursor is pointing to a valid element or not. And it doesn't become undefined behavior if you modify the collection either. The cursor will know this and report it is no longer valid. Actually, if it can, it will remain valid, but it can't always reasonably know that.</P>
 
-        <P>Mainly it knows if you use the cursor to make the change, something like this:</P>
+        <P>Mainly it can stay valid if you use the cursor itself to make the change, something like this:</P>
 
         <Code>
         TVector&amp;lt;TString> colList;
         // Strings got added to it in here somewhere
 
-        // Let's find any that start with stupid
+        // Let's remove any that start with 'stupid'
         TVector&amp;lt;TString>::TCursor cursList(&amp;amp;colList);
         for (; cursList; ++cursList)
         {
@@ -78,7 +68,8 @@
 
         <P>So here we are using the cursor to iterate through the list and removing possibly multiple (or even all) objects. But because we do it via the cursor itself, the cursor knows that this is happening and stays valid.</P>
 
-        <P>If you changed the list such that the cursor doesn't know, the next use will report that it is no longer valid and throw if you don't check that first.</P>
+        <P>If you changed the list such that the cursor doesn't know, the next use will report that it is no longer valid and throw if you don't check its validity first.</P>
+
 
         <SecTitle>Cursor Reset</SecTitle>
 
@@ -96,16 +87,41 @@
 
         <P>The return value of the reset method isn't used, but the next step is to check the validity, so it'll exit immediately if the collection is empty anyway.</P>
 
+        <P>If there is considerable setup to do if you are going to process elements, then you can use the reset method to see if you need to do anything:</P>
+
+        <Code>
+        if (cursList.bReset())
+        {
+            // We have elements so do setup work
+
+            // Then iterate and do whatever you need to do
+            for (; cursList; ++cursList)
+            {
+            }
+        }
+        </Code>
+
+
+        <SecTitle>Cursor Constness</SecTitle>
+
+        <P>It was mentioned above that each collection has a const and non-const nested cursor class. That doesn't mean const in the C++ sense. A cursor that is const in the C++ sense cannot be used for anything but to access the element it points to (if it is valid.) It can't be reset or iterated with. So it might be used to return a cursor to a located element or something like that, but which cannot be used to otherwise iterate the collection.</P>
+
+        <P>The other sense of cursor constness has to do with what you can do with the element it references. A const cursor in that sense only provides const access to the element, while the non-const cursor lets you modify the element. There probably should be some other term used for the latter meaning, but it might be too late for that now.</P>
+
+        <P>The nested non-const cursor type is always TCursorNC, and the nested const cursor type is always TCursor.</P>
+
+
         <SecTitle>Cursor Polymorphism</SecTitle>
 
-        <P>Just like collections are polymorphic, so are cursors. So you can get a get a cursor for a collection you don't know the actual type of and iterate it. Here is an example, where we create a generic 'remove stupidity' function that can remove it from any collection of strings:</P>
+        <P>Just like collections are polymorphic, so are cursors. So you can get a get a cursor for a collection you don't know the actual type of and iterate it. Here is an example, where we create a generic 'remove stupidity' function that can remove 'stupid' strings from any collection of strings:</P>
 
         <Code>
         static tCIDLib::TVoid RemoveStupidity(TCollection&amp;lt;TString>&amp;amp; colTar)
         {
+            // Get an allocated cursor and put it into a janitor
             TJanitor&amp;lt;TColCursor&amp;lt;TString>> janCursor(colTar.pcursNew());
 
-            // Get a ref for more convenient syntax
+            // Get a ref for more convenient syntax then iterator normally
             TColCursor&amp;lt;TString>&amp;amp; cursRemove = *janCursor;
             for (; cursRemove; ++cursRemove)
             {
@@ -113,21 +129,17 @@
                     cursRemove.RemoveAt(cursList);
             }
         }
-
-        TVector&amp;lt;TString> colList;
-        // Strings got added here
-
-        // And remove stupidity
-        RemoveStupdity(colList);
         </Code>
 
         <P>Here we have a method that takes any string based collection. We call pcursNew() on it to ask it to create a new cursor for us. We put that into a janitor so that it will get cleaned up. Then for convenience, we get a reference to it so that we can use the normal cursor syntax. After that it's just like before. On exit the cursor gets cleaned up.</P>
+
+        <P>We couldn't directly iterate the collection since we don't even know what it really is. And we couldn't use the 'for each' scheme since we can't modify the collection using that method. So polymorphic cursors are very useful for this type of generic cursor functionality that doesn't have to become yet another template. This can be out of line code.</P>
 
         <SecTitle>Cursors as Element Accessors</SecTitle>
 
         <P>If you have a class that contains a collection of things, and it provides a find method to look up one of those things, for instance, you have a number of options. You can directly expose the collection, but that's usually not optimal unless it's internal code that is very well trusted. You could return an index perhaps and let the caller pass it back in to get a reference to that element. But you might not be using a directly accessible collection to contain the things and that's multiple steps.</P>
 
-        <P>If the elements are really light weight you could just return a copy, and that would likely be the safest. But that's often not reasonable. And, in this case, it's not just a temporary that you can use move semantics to try to make it lighter weight to return, it's important data of the class.</P>
+        <P>If the elements are really light weight you could just return a copy, and that would likely be the safest. But that's often not reasonable. And, in this case, it's not just a temporary that you can use move semantics to try to make it lighter weight to return, since that would modify the original.</P>
 
         <P>So, often a cursor is the best choice for this type of thing. It lets you directly return the result without actually exposing the collection, or paying a high price for returning a copy. And, since CIDLib cursors support the concept of validity it can also represent 'not found' by returning an invalid cursor. That's easy to do by just returning the cursor after you've run off the end of the collection (because you didn't find the target.)</P>
 
@@ -156,7 +168,7 @@
 
         <P>You could also just return a cursor to the collection and let them do their own iteration, for searching or processing each element or whatever. It's a const cursor in this case so they can't use it to modify the element, and they can't use it to modify the collection since they don't have access to that. Note we returned the const cursor as a const value as well, so it cannot be reset and used for iteration.</P>
 
-        <Note>Still though, all of the above means That the cursor still references the collection, which should remain valid until the cursor is dropped. That's always a danger in these things, but the alternative is trying to make C++ into Javascript or C#, which introduces a massive amount of other moving parts, complications, and overhead with everything in sight being in a smart pointer. And nothing prevents the caller from casting off the constness if they really want to, resetting the cursor, and using it to iterate the list directly.</Note>
+        <Note>Still though, all of the above means that the cursor still references the collection, which should remain valid until the cursor is dropped. That's always a danger in these things, but the alternative is trying to make C++ into Javascript or C#, which introduces a massive amount of other moving parts, complications, and overhead with everything in sight being in a smart pointer. And nothing prevents the caller from casting off the constness if they really want to, resetting the cursor, and using it to iterate the list directly.</Note>
 
     </HelpText>
 

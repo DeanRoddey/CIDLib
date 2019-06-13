@@ -141,7 +141,7 @@
             </TableRow>
         </Table>
 
-        <SecTitle>Fundamental Collections</SecTitle>
+        <SubSecTitle>Fundamental Collections</SubSecTitle>
 
         <P>There aren't as many fundamental collection types, since the needs for storing fundamental types aren't quite as broad as for objects. But there's a very useful set of them.</P>
 
@@ -152,7 +152,7 @@
             <LItem>TFundVector</LItem>
         </List>
 
-        <SecTitle>By Reference Collections</SecTitle>
+        <SubSecTitle>By Reference Collections</SubSecTitle>
 
         <P>These are the by reference collection classes:</P>
 
@@ -171,7 +171,7 @@
 
         <Note>It's rare in CIDLib that we have a derived class that doesn't actually fully implement the interface of its base, but the TBasicTreeCol class is one. All collections implement an objAdd method (or Add if by reference) to generically add an element to it. But for a tree we don't know where to put it. So objAdd will throw if you call it on a tree. It is otherwise a valid collection derivative so there are enough benefits to justify this rare exception.</Note>
 
-        <SecTitle>By Value Collections</SecTitle>
+        <SubSecTitle>By Value Collections</SubSecTitle>
 
         <P>These are the by value collection classes:</P>
 
@@ -209,6 +209,53 @@
 
         <P>None of the non-fundamental collection classes have any built in equality testing anyway, so technically it doesn't matter since you can't compare collections via equality operator. We don't want to force all elements to support equality testing. But there is a tCIDLib::bCompareElems() method that will compare two collections using the above semantics. It can do so generically (non-templatized) since equality is defined in terms of cursor iteration order, and it can polymorphically create cursors for the provided collections.</P>
 
+        <SecTitle>Iteration</SecTitle>
+
+        <P>More on iteration will be covered in the Collection Cursors section (see to the left), but there are some non-cursor oriented ways to iterate collections. As discussed there some collections have natural iteration capabilities, such as vectors/arrays which can just be iterated with an index using the [] operator. Though some post-modernists may turn up their noses at this scheme, it's often very convenient. Linked lists have the ability to get the root node and move to the next node until you hit the end.</P>
+
+        <Code>
+        TVector&amp;lt;TWhatever> colList;
+        // some objects are added here
+        const tCIDLib::TCard4 c4Count = colList.c4ElemCount();
+        for (tCIDLib::TCard4 c4Index = 0; c4Index &amp;lt; c4Count; c4Index++)
+        {
+            TWhatever&amp;amp; weCur = colList[c4Index];
+            weCur.DoSomething();
+        }
+        </Code>
+
+        <P>Others don't have any means to directly access elements in a way that you can step through them. For those you need some other mechanism. Cursors are one such, but another is the bForEach and bForEachNC methods. These are callback based schemes where you provide a callback and it will call that for each element in the collection. There is no particular guaranteed order though for ordered collections it will be in that natural order, and otherwise typically will be in cursor order.</P>
+
+        <Code>
+        tCIDLib::TVoid
+        TMagnum::CalcContArea(TCollection&amp;lt;TArea>&amp;amp; colList, TArea&amp;amp; areaCont)
+        {
+            areaCont.ZeroAll();
+            colList.bForEach
+            (
+                [this](const TArea&amp;amp; areaCur)
+                {
+                    areaCont |= areaCur;
+                    return kCIDLib::True;
+                }
+            );
+        }
+        </Code>
+
+        <P>In this example we have a method that can accept any sort of collection of TArea objects and will calculate the full containing area of all of them. Since bForEach() is supported at the TCollection level, it can accept any collection of areas.</P>
+
+        <P>Note that the callback returns a boolean. As long as you return True, then the iteration will continue. You can return False to break out of the loop if desired. The return from bForEach() indicates whether you went all the way to the end (True) or not (False.) So you can take action if something stopped the iteration, for instance maybe you were searching for something and found it.</P>
+
+        <Note>If you want to be able to modify the elements, then use bForEachNC (which means non-const) and then the callback element will not be const and you can modify them. Obviously be careful of this in ordered collections since you could invalidate the ordering, e.g. changing the key in a hashed collection would make that element no longer findable because it's key wouldn't generate the same hash modulus.</Note>
+
+        <P>This type of iteration will automatically take advantage of the thread safety of the collection, see below. You don't need to lock the collection from the outside to iterate it thread safely. The for each method will lock the collection (if it is thread safe) and then do the callback loop. So the loop will be atomic in that case.</P>
+
+
+        <SecTitle>Const'ness</SecTitle>
+
+        <P>With collections the concept of const becomes a little weird. Ideally the concept of the const'ness of the collection would be completely separate from the const'ness of the elements inside it, but that can get tricky. CIDLib's handling of this is not as clean as it in theory could possibly be, but works pretty well.</P>
+
+        <P>If the collection itself is const, it will only give you const access to the elements, just to be safe. If you want to modify the elements you should use a non-const collection. However, if the collection is declared with a const element type, the elements will always be const even if accessed via a non-const collection.</P>
 
         <SecTitle>Thread Safety</SecTitle>
 

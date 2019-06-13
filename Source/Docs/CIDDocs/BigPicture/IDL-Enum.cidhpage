@@ -15,7 +15,7 @@
         <P>The IDL generated enumerations provide these benefits:</P>
 
         <List>
-            <LItem Ref="Iteration">Embarrasingly you can't even enumerate standard C++ enumerations. The IDL compiler can generate inc/dec operators for you that allow you to enumerate through the values.</LItem>
+            <LItem Ref="Iteration">Embarrasingly you can't even enumerate standard C++ enumerations. The IDL compiler can generate inc/dec operators for you that allow you to enumerate through the values. There is also a 'for each' mechanism simliar to that supported by collections, which works in terms of the ++ operator.</LItem>
             <LItem Ref="Special Values">The IDL compiler generates special min, max and count values for you, which are also very useful for iteration or creating things with one entry per enumeration value.</LItem>
             <LItem Ref="Bitmapped">You can create bitmapped enumerations which will get bitwise AND and OR operators generated for them, making them easy to compose.</LItem>
             <LItem Ref="Binary Streaming">The IDL compiler can generate binary streaming operators which allow the enumerations to be streamed to/from CIDLib binary streams. This also makes them passable as parameters to remote ORB based method calls.</LItem>
@@ -83,7 +83,7 @@
         );
         </Code>
 
-        <P>It generates the enumeration definition itself, including the special Count, Min, and Max values. Then it provides definitions for the string to enum and enum to string translation methods, and the enum validity check. Finally it generates the streaming operator to stream the values to any text output stream and a post-fix increment operator. The latter of course are global operators and not in the facility namespace (see Facility Namespaces to the left.)</P>
+        <P>It generates the enumeration definition itself, including the special Count, Min, and Max values. Then it provides definitions for the 'string to enum' and 'enum to string' translation methods that were configured for this enum, and the enum validity check. Finally it generates the streaming operator to stream the values to any text output stream and a post-fix increment operator. The latter of course are global operators and not in the facility namespace (see Facility Namespaces to the left.)</P>
 
         <SecTitle>Translation</SecTitle>
 
@@ -97,7 +97,7 @@
         }
         </Code>
 
-        <P>Note that the translation methods have a 'throw if not' parameter, which lets you indicate whether a failure to translate should be treated as an exception, or just an error return. In the string to enum, the default is not to, since that's not an uncommon problem given that the text is often from user provided data. For the other way it defaults to an exception since that means the caller passed an invalid enumeration which is really indicative of a program error. If you choose not to throw, the text it spits out will be a ??? type value to indicate unknown.</P>
+        <P>Note that the translation methods have a 'throw if not' parameter, which lets you indicate whether a failure to translate should be treated as an exception, or just an error return. In the string to enum, the default is not to, since that's not an uncommon problem given that the text is often from user provided data. If it fails, the ::Count value is returned. For the other way it defaults to an exception since that means the caller passed an invalid enumeration which is really indicative of a program error. If you choose not to throw, the text it spits out will be a ??? type value to indicate unknown.</P>
 
         <Note>In the cases where an enumeration is returned and there needs to be an error option, the ::Count value is always used for that, to indicate that the returned value is not valid.</Note>
 
@@ -141,9 +141,13 @@
 
         <P>The callback checks each value by passing it to bSomeTest() and negates its return. So as long as bSomeTest is passing it continues the iteration, but bails out if the test fails. The value you break out on is returned from the helper so you know what happened. If you went all the way then it will be the special ::Count value.</P>
 
-        <P>Of course you could have also done the check this way:</P>
+        <P>Of course you could have also done the check this way. If it came back on the special Count value, that will not be considered a legal value.</P>
 
-        <Code>    if (!tCIDMacroEng::bIsValidEnum(eSelected))</Code>
+        <Code>
+        if (!tCIDMacroEng::bIsValidEnum(eSelected))
+        {
+        }
+        </Code>
 
 
         <SecTitle>Bitmapped Enums</SecTitle>
@@ -199,22 +203,30 @@
 
         <P>In this case the special values are Count, None and AllBits, the latter two being commonly desired. We get the formatting method which can be very useful, and is widely used in the CQC automation system. It allows you to format out the values with a prefix and separators. So something like this:</P>
 
-        <Code>tCIDSChan::FormatEConnOpts(eOpts, L"List", kCIDLib::chColon, kCIDLib::Comma)</Code>
+        <Code>    tCIDSChan::FormatEConnOpts(eOpts, L"List", kCIDLib::chColon, kCIDLib::Comma)</Code>
 
         <P>would generate this output text to the target string:</P>
 
-        <Code>List: NoDefCreds, AllowTLS1_1</Code>
+        <Code>    List: NoDefCreds, AllowTLS1_1</Code>
 
         <Note>This format method takes any of the defined text values, it just defaults to the one you indicated in the enumeration definition, the base name value in this case. So if you have defined other text representations, you could use them as well.</Note>
 
         <P>It then creates global bitwide operators to allow us to OR and AND these enumerated values together. So we can do something like this, without any need for casting despite the fact that these are 'enum class' type enums:</P>
 
         <Code>
-            tCIDSChan::EConnOpts eOpts = tCIDSChan::EConnOpts::None;
-            if (whatever)
-                eOpts |= tCIDSChan::EConnOpts::NoDefCreds;
-            if (something)
-                eOpts |= tCIDSChan::EConnOpts::AllowTLS1_1;
+        tCIDSChan::EConnOpts eOpts = tCIDSChan::EConnOpts::None;
+        if (whatever)
+            eOpts |= tCIDSChan::EConnOpts::NoDefCreds;
+        if (something)
+            eOpts |= tCIDSChan::EConnOpts::AllowTLS1_1;
+        </Code>
+
+        <P>We don't try to create boolean OR and AND type operators for checking bits. For that you should use the tCIDLib::bAllBitsOn() and tCIDLib::EAnyBitsOn() templates, which will do those types of checks.</P>
+
+        <Code>
+        if (tCIDLib::bAllBitsOn(eOpts, tCIDSChan::EConnOpts::NoDefCreds))
+        {
+        }
         </Code>
 
 

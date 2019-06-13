@@ -48,6 +48,52 @@ RTTIDecls(TBinInStream,TObject)
 // ---------------------------------------------------------------------------
 //  TBinInStream: Public static methods
 // ---------------------------------------------------------------------------
+
+//
+//  Does the verion common version of roughly checking the validity of the format
+//  version of an object as it is being streamed in. When this is called, the next
+//  thing to be streamed in is the TCard2 format version. If not at least basically
+//  valid (> 0 <= maxvalue), then we throw the standard unknown format version error.
+//
+tCIDLib::TCard2
+TBinInStream::c2CheckFmtVersion(        TBinInStream&           strmSrc
+                                , const tCIDLib::TCard2         c2MaxVersion
+                                , const TClass&                 clsCaller
+                                , const tCIDLib::TCh* const     pszFile
+                                , const tCIDLib::TCard4         c4Line)
+{
+    tCIDLib::TCard2 c2FmtVersion;
+    strmSrc >> c2FmtVersion;
+    if (!c2FmtVersion || (c2FmtVersion > c2MaxVersion))
+    {
+        facCIDLib().ThrowErr
+        (
+            pszFile
+            , c4Line
+            , kCIDErrs::errcGen_UnknownFmtVersion
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , TCardinal(c2FmtVersion)
+            , clsCaller
+        );
+    }
+    return c2FmtVersion;
+}
+
+// Like above but here we also check a stream marker then the format version
+tCIDLib::TCard2
+TBinInStream::c2CheckFmtVersion(        TBinInStream&           strmSrc
+                                , const tCIDLib::EStreamMarkers eMarker
+                                , const tCIDLib::TCard2         c2MaxVersion
+                                , const TClass&                 clsCaller
+                                , const tCIDLib::TCh* const     pszFile
+                                , const tCIDLib::TCard4         c4Line)
+{
+    strmSrc.CheckForMarker(eMarker, pszFile, c4Line);
+    return c2CheckFmtVersion(strmSrc, c2MaxVersion, clsCaller, pszFile, c4Line);
+}
+
+
 tCIDLib::TVoid
 TBinInStream::CheckRelationship(const   TObject* const  pobjTest
                                 , const TClass&         clsTest)

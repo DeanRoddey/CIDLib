@@ -25,12 +25,8 @@
                 <Desc>
                     The default constructor just sets the change type to none, so it needs to be subsequently set up for use. The other accepts a change type. It is assumed that this is for a change that doesn't need any other information.
                 </Desc>
-                <MethVar><MethParams/></MethVar>
-                <MethVar>
-                    <MethParams>
-                        <MethParam Name="eChange" Type="tCIDLib::EDirChanges"/>
-                    </MethParams>
-                </MethVar>
+                <MethVar></MethVar>
+                <MethVar><MethParam Name="eChange" Type="tCIDLib::EDirChanges"/></MethVar>
             </Method>
 
         </Ctors>
