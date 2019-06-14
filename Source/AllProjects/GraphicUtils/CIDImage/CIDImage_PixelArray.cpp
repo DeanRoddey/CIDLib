@@ -1096,9 +1096,10 @@ TSize TPixelArray::szImage() const
 //  first, and then slower.
 //
 tCIDLib::TVoid
-TPixelArray::ScaleAlpha(        tCIDLib::EDirs  eDir
-                        , const tCIDLib::TCard4 c4StartInd
-                        , const tCIDLib::TCard4 c4EndInd)
+TPixelArray::ScaleAlpha(        tCIDLib::EDirs      eDir
+                        , const tCIDLib::TCard4     c4StartInd
+                        , const tCIDLib::TCard4     c4EndInd
+                        , const tCIDLib::TBoolean   bPremultiply)
 {
     // If the start/end are reversed, flip them
     tCIDLib::TCard4 c4Low;
@@ -1121,7 +1122,7 @@ TPixelArray::ScaleAlpha(        tCIDLib::EDirs  eDir
         return;
     }
 
-    m_pixaiInt->ScaleAlpha(eDir, c4Low, c4High);
+    m_pixaiInt->ScaleAlpha(eDir, c4Low, c4High, bPremultiply);
 }
 
 

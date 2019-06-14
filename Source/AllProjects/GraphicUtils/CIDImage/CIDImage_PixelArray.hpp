@@ -397,6 +397,7 @@ class CIDIMGEXP TPixelArray :
                     tCIDLib::EDirs          eDir
             , const tCIDLib::TCard4         c4StartInd
             , const tCIDLib::TCard4         c4EndInd
+            , const tCIDLib::TBoolean       bPremultiply
         );
 
         tCIDLib::TVoid SetAll

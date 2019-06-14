@@ -3232,7 +3232,12 @@ TGraphDrawDev::DrawStringFX(const   TString&                strText
     if (bReflect)
     {
         pixaDraw.FlipVertically(areaZTar.i4Y(), areaZTar.i4Bottom());
-        pixaDraw.ScaleAlpha(tCIDLib::EDirs::Down, areaZTar.i4Y(), c4ReflRows);// areaZTar.i4Bottom());
+
+        // Tell it to pre-multiply as it goes
+        pixaDraw.ScaleAlpha
+        (
+            tCIDLib::EDirs::Down, areaZTar.i4Y(), c4ReflRows, kCIDLib::True
+        );
 
         TArea areaReflSrc(areaZTar);
         areaReflSrc.c4Height(c4ReflRows);
