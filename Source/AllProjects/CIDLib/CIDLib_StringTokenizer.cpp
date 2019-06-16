@@ -205,7 +205,7 @@ bParseQuotedCommaList(  const   TString&                strText
 //
 //  This method will break out a standard CSV type of line into a collection
 //  of strings. It's a comma separated list, but any one of the values may
-//  be quoted. The values cannot have double quotes inside of them.
+//  be quoted. The values cannot have commas inside of them.
 //
 tCIDLib::TBoolean
 TStringTokenizer::bParseCSVLine(const   TString&                strText

@@ -1738,7 +1738,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
          else
         {
             //
-            //  Adjust our time to zulu time, if non-zero fofset. We basically do
+            //  Adjust our time to zulu time, if non-zero offset. We basically do
             //  the opposit of the sign of the TZ offset, to bring it back to zero.
             //  Even if they want local time, we have to do this first anyway, for
             //  sanity's sake, to make the conversion easier.

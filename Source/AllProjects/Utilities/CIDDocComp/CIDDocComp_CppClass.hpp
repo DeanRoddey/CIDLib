@@ -139,6 +139,7 @@ struct TMethodParam
         , const tCIDLib::TCard4         c4Index
     )   const;
 
+    tCIDLib::TBoolean       m_bRetain = kCIDLib::False;
     tCIDDocComp::EParmPB    m_ePassBy = tCIDDocComp::EParmPB::Count;
     tCIDDocComp::EParmDirs  m_eDir = tCIDDocComp::EParmDirs::Count;
     TString                 m_strDefVal;

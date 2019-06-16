@@ -262,10 +262,6 @@ PROJECT=CIDImage
         VERSIONED   = Yes
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDLib
         CIDMath

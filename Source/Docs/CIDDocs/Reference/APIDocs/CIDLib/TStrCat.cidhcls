@@ -81,7 +81,7 @@
 
         <NVirtMeths>
 
-            <Method Name="pszStealBuf" RetType="tCIDLib::TCh" RetBy="PtrC"
+            <Method Name="pszStealBuf" RetType="tCIDLib::TCh" RetBy="Ptr"
                     Attrs="NoDiscard">
                 <Desc>
                     <P>Returns this object's accumulated text buffer and leaves this object without one. The length of the buffer is given back via the c4Len parameter, which may allow for more efficient use of the returned buffer. The caller is responsible for eventually freeing the returned buffer.</P>

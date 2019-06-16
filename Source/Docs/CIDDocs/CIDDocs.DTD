@@ -155,6 +155,7 @@
                         Type CDATA #REQUIRED
                         PBy (%RefType;) 'Val'
                         Dir (In | Out | InOut) 'In'
+                        Retained (%YNVal;) 'No'
                         DefVal CDATA #IMPLIED>
 
 <!-- If no attrs, the containing method's attrs are used -->

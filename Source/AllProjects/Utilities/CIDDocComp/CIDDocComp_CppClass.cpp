@@ -40,19 +40,35 @@ FormatAccType(          TTextOutStream&         strmTar
                 , const TString&                strType
                 , const tCIDDocComp::EParmPB    eType
                 , const tCIDLib::TBoolean       bParmMode
+                , const tCIDLib::TBoolean       bRetained = kCIDLib::False
                 , const tCIDDocComp::EParmDirs  eDir = tCIDDocComp::EParmDirs::Count)
 {
     strmTar << L"<span class=\"DeemphCode\">";
 
-    // If asked to show the direction, see if it's one of those types and do that
-    if (eDir != tCIDDocComp::EParmDirs::Count)
+    // If the retained flag is set or the direction needs to be displayed, do that
+    if (bRetained
+    ||  ((eDir != tCIDDocComp::EParmDirs::Count)
+    &&   ((eType == tCIDDocComp::EParmPB::Ref)
+    ||    (eType == tCIDDocComp::EParmPB::Ptr)
+    ||    (eType == tCIDDocComp::EParmPB::PtrC))))
     {
-        if ((eType == tCIDDocComp::EParmPB::Ref)
-        ||  (eType == tCIDDocComp::EParmPB::Ptr)
-        ||  (eType == tCIDDocComp::EParmPB::PtrC))
+        strmTar << kCIDLib::chOpenBracket;
+        if (bRetained)
+            strmTar << L"retained";
+
+        // If asked to show the direction, see if it's one of those types and do that
+        if (eDir != tCIDDocComp::EParmDirs::Count)
         {
-            strmTar << eDir << kCIDLib::chSpace;
+            if ((eType == tCIDDocComp::EParmPB::Ref)
+            ||  (eType == tCIDDocComp::EParmPB::Ptr)
+            ||  (eType == tCIDDocComp::EParmPB::PtrC))
+            {
+                if (bRetained)
+                    strmTar << kCIDLib::chSpace;
+                strmTar << eDir;
+            }
         }
+        strmTar << L"] ";
     }
 
     switch(eType)
@@ -268,6 +284,9 @@ tCIDLib::TVoid TMethodParam::Parse(const TXMLTreeElement& xtnodeSrc)
     m_strName = xtnodeSrc.xtattrNamed(L"Name").strValue();
     m_strType = xtnodeSrc.xtattrNamed(L"Type").strValue();
 
+    // The retained flag is defaulted so always present, but mostly just set to No
+    m_bRetain = xtnodeSrc.xtattrNamed(L"Retained").bValueAs();
+
     // We can have an default value
     xtnodeSrc.bAttrExists(kCIDDocComp::strXML_DefValue, m_strDefVal);
 
@@ -288,7 +307,7 @@ TMethodParam::OutputContent(        TTextOutStream&     strmTar
                             , const tCIDLib::TCard4     c4Index) const
 {
     // Format out the type info and its access and direction info
-    FormatAccType(strmTar, m_strType, m_ePassBy, kCIDLib::True, m_eDir);
+    FormatAccType(strmTar, m_strType, m_ePassBy, kCIDLib::True, m_bRetain, m_eDir);
 
     strmTar << L"<span class=\"EmphCode\"> " << m_strName
             << L"</span>";
@@ -388,6 +407,8 @@ tCIDLib::TVoid
 TMethodVar::OutputContent(TTextOutStream& strmTar, const TString& strName) const
 {
     // Do any that go before the type
+    if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Friend))
+        strmTar << L"friend ";
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::ConstExpr))
         strmTar << L"constexpr ";
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Explicit))
@@ -712,12 +733,7 @@ tCIDLib::TVoid TMethodGrp::OutputContent(TTextOutStream& strmTar) const
                 return kCIDLib::True;
             }
         );
-        strmTar << L"</pre><blockquote>Defaulted ";
-        if (tCIDLib::bAllBitsOn(m_eGrpAttrs, tCIDDocComp::EMethAttrs::Ctor))
-            strmTar << L"constructors";
-        else
-            strmTar << L"operators";
-        strmTar << L"</blockquote>";
+        strmTar << L"</pre><blockquote>These methods get default implementations</blockquote>";
     }
 
     if (!m_fcolDelMethods.bIsEmpty())
@@ -731,12 +747,7 @@ tCIDLib::TVoid TMethodGrp::OutputContent(TTextOutStream& strmTar) const
                 return kCIDLib::True;
             }
         );
-        strmTar << L"</pre><blockquote>Deleted ";
-        if (tCIDLib::bAllBitsOn(m_eGrpAttrs, tCIDDocComp::EMethAttrs::Ctor))
-            strmTar << L"constructors";
-        else
-            strmTar << L"operators";
-        strmTar << L"</blockquote>";
+        strmTar << L"</pre><blockquote>These methods have been deleted and are not available</blockquote>";
     }
 }
 
@@ -1231,7 +1242,7 @@ tCIDLib::TVoid TCppClassPage::LoadMixinMethods()
 
         mvarDup.m_strRetType = L"TObject";
         mvarDup.m_eRetBy = tCIDDocComp::EParmPB::Ptr;
-        mvarDup.m_eAttrs = tCIDDocComp::EMethAttrs::Override;
+        mvarDup.m_eAttrs = tCIDDocComp::EMethAttrs::Override | tCIDDocComp::EMethAttrs::NoDiscard;
     }
 
     // Do Formatable interface

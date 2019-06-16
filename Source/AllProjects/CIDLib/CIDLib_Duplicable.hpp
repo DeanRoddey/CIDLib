@@ -88,7 +88,7 @@ class CIDLIBEXP MDuplicable
 
         virtual const TClass& clsParent() const = 0;
 
-        virtual TObject* pobjDuplicate() const = 0;
+        [[nodiscard]] virtual TObject* pobjDuplicate() const = 0;
 
 
     protected :
