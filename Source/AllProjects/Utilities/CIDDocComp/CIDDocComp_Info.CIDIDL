@@ -105,6 +105,7 @@
                 <CIDIDL:EnumVal CIDIDL:Name="Virtual"   CIDIDL:Text="virtual"       CIDIDL:Value="0x00000080"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Override"  CIDIDL:Text="override"      CIDIDL:Value="0x00000100"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Friend"    CIDIDL:Text="friend"        CIDIDL:Value="0x00000200"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Template"  CIDIDL:Text="Template"      CIDIDL:Value="0x00000400"/>
 
                 <CIDIDL:EnumVal CIDIDL:Name="Default"   CIDIDL:Text=""              CIDIDL:Value="0x00100000"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Delete"    CIDIDL:Text=""              CIDIDL:Value="0x00200000"/>

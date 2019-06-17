@@ -392,9 +392,9 @@ class CIDLIBEXP TTime :
         (
             const   TString&                strSrc
             , const TCompList&              fcolCompList
-            , const tCIDLib::TCh            chDateSep = 0
-            , const tCIDLib::TCh            chTimeSep = 0
-            , const tCIDLib::TCh            chTZSep = 0
+            , const tCIDLib::TCh            chDateSep = kCIDLib::chNull
+            , const tCIDLib::TCh            chTimeSep = kCIDLib::chNull
+            , const tCIDLib::TCh            chTZSep = kCIDLib::chNull
         );
 
         tCIDLib::TCard4 c4AsTimeInfo
@@ -524,9 +524,9 @@ class CIDLIBEXP TTime :
         (
             const   TString&                strSrc
             , const TCompList&              fcolCompList
-            , const tCIDLib::TCh            chDateSep = 0
-            , const tCIDLib::TCh            chTimeSep = 0
-            , const tCIDLib::TCh            chTZSep = 0
+            , const tCIDLib::TCh            chDateSep = kCIDLib::chNull
+            , const tCIDLib::TCh            chTimeSep = kCIDLib::chNull
+            , const tCIDLib::TCh            chTZSep = kCIDLib::chNull
         );
 
         tCIDLib::TVoid SetToNow();

@@ -335,7 +335,8 @@ tCIDLib::TVoid
 TMethodVar::Parse(  const   TXMLTreeElement&        xtnodeSrc
                     , const TString&                strRetType
                     , const tCIDDocComp::EParmPB    eRetBy
-                    , const tCIDDocComp::EMethAttrs eMethAttrs)
+                    , const tCIDDocComp::EMethAttrs eMethAttrs
+                    , const TString&                strTmplParms)
 {
     // Process the attributes, whcih may or may not be present
     m_eAttrs = tCIDDocComp::EMethAttrs::None;
@@ -369,9 +370,10 @@ TMethodVar::Parse(  const   TXMLTreeElement&        xtnodeSrc
     // Add to these any method/method group level attributes
     m_eAttrs |= eMethAttrs;
 
-    // Save the return info we got
+    // Save the return info and template parms stuff we got
     m_eRetBy = eRetBy;
     m_strRetType = strRetType;
+    m_strTmplParms = strTmplParms;
 
     //
     //  But they can override the return type (mostly for const vs. non-const
@@ -406,6 +408,10 @@ TMethodVar::Parse(  const   TXMLTreeElement&        xtnodeSrc
 tCIDLib::TVoid
 TMethodVar::OutputContent(TTextOutStream& strmTar, const TString& strName) const
 {
+    // If a template do the
+    if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Template))
+        strmTar << L"template&lt;" << m_strTmplParms << L"> ";
+
     // Do any that go before the type
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Friend))
         strmTar << L"friend ";
@@ -520,7 +526,6 @@ TMethod::Parse(const TXMLTreeElement& xtnodeSrc, const tCIDDocComp::EMethAttrs e
 
     // Process the ovearll method level attributes, which may or may not be present
     m_eMethAttrs = tCIDDocComp::EMethAttrs::None;
-
     if (xtnodeSrc.bAttrExists(L"Attrs", facCIDDocComp.m_strTmp1))
     {
         if (TStringTokenizer::bParseSpacedTokens(facCIDDocComp.m_strTmp1, facCIDDocComp.m_colTmp))
@@ -549,6 +554,9 @@ TMethod::Parse(const TXMLTreeElement& xtnodeSrc, const tCIDDocComp::EMethAttrs e
 
     // Add to these any group level attributes
     m_eMethAttrs |= eGrpAttrs;
+
+    // If there are template parameters, get them
+    xtnodeSrc.bAttrExists(L"TmplParms", m_strTmplParms);
 
     // Get the return type
     m_strRetType = xtnodeSrc.xtattrNamed(L"RetType").strValue();
@@ -622,7 +630,7 @@ TMethod::Parse(const TXMLTreeElement& xtnodeSrc, const tCIDDocComp::EMethAttrs e
             {
                 // Has to be a method variation
                 TMethodVar& mvarNew = m_colMethVars.objAdd(TMethodVar());
-                mvarNew.Parse(xtnodeCur, m_strRetType, m_eRetBy, m_eMethAttrs);
+                mvarNew.Parse(xtnodeCur, m_strRetType, m_eRetBy, m_eMethAttrs, m_strTmplParms);
             }
             return kCIDLib::True;
         }

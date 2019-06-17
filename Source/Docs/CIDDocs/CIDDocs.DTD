@@ -167,7 +167,8 @@
 <!ATTLIST   Method      Name CDATA #REQUIRED
                         RetType CDATA ''
                         RetBy (%RefType;) #IMPLIED
-                        Attrs NMTOKENS 'NoAttrs'>
+                        Attrs NMTOKENS 'NoAttrs'
+                        TmplParms CDATA #IMPLIED>
 
 <!ELEMENT   StaticMeths (Desc?, Method+)>
 <!ELEMENT   Ctors       (Desc?, Method*)>

@@ -47,7 +47,7 @@ class CIDLIBEXP TMemBuf :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TMemBuf();
+        ~TMemBuf() = default;
 
 
         // -------------------------------------------------------------------
@@ -87,13 +87,6 @@ class CIDLIBEXP TMemBuf :
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid AppendFrom
-        (
-            const   TMemBuf&                mbufSrc
-            , const tCIDLib::TCard4         c4AppendAt
-            , const tCIDLib::TCard4         c4SrcBytes
-        );
-
         tCIDLib::TBoolean bAt
         (
             const   tCIDLib::TCard4         c4Index
@@ -163,41 +156,41 @@ class CIDLIBEXP TMemBuf :
 
         tCIDLib::TVoid CopyIn
         (
-            const   tCIDLib::TVoid* const   pData
-            , const tCIDLib::TCard4         c4DataSz
+            const   tCIDLib::TVoid* const   pSrc
+            , const tCIDLib::TCard4         c4Count
             , const tCIDLib::TCard4         c4StartInd = 0
         );
 
         tCIDLib::TVoid CopyIn
         (
             const   TMemBuf&                mbufSrc
-            , const tCIDLib::TCard4         c4DataSz
+            , const tCIDLib::TCard4         c4Count
             , const tCIDLib::TCard4         c4StartInd = 0
         );
 
         tCIDLib::TVoid CopyOut
         (
-                    tCIDLib::TVoid* const   pData
-            , const tCIDLib::TCard4         c4DataSz
+                    tCIDLib::TVoid* const   pTar
+            , const tCIDLib::TCard4         c4Count
             , const tCIDLib::TCard4         c4StartInd = 0
         )   const;
 
         tCIDLib::TVoid CopyOut
         (
-                    TMemBuf&                mbufSrc
-            , const tCIDLib::TCard4         c4DataSz
+                    TMemBuf&                mbufTar
+            , const tCIDLib::TCard4         c4Count
             , const tCIDLib::TCard4         c4StartInd = 0
         )   const;
 
         tCIDLib::ESortComps eCompare
         (
-            const   TMemBuf&                mbufToComp
+            const   TMemBuf&                mbufSrc
             , const tCIDLib::TCard4         c4Count
         )   const;
 
         tCIDLib::ESortComps eCompare
         (
-            const   tCIDLib::TCard1* const  pc1ToComp
+            const   tCIDLib::TCard1* const  pc1Src
             , const tCIDLib::TCard4         c4Count
         )   const;
 
@@ -226,7 +219,7 @@ class CIDLIBEXP TMemBuf :
 
         tCIDLib::TVoid HexEncode
         (
-            const   tCIDLib::TCard4         c4Bytes
+            const   tCIDLib::TCard4         c4Count
             , const tCIDLib::TCh            chSepChar
             , const tCIDLib::TBoolean       bAppend
             , const tCIDLib::TBoolean       bLowerCase
@@ -272,12 +265,12 @@ class CIDLIBEXP TMemBuf :
 
         template <class T> const T* pDataAs() const
         {
-            return reinterpret_cast<const T*>(pc1QueryBuf());
+            return reinterpret_cast<const T*>(pc1CheckRange(CID_LINE, 0, sizeof(T)));
         }
 
         template <class T> T* pDataAs()
         {
-            return reinterpret_cast<T*>(pc1QueryBuf());
+            return reinterpret_cast<T*>(pc1CheckRange(CID_LINE, 0, sizeof(T)));
         }
 
         const tCIDLib::TCard1* pc1Data() const;
@@ -304,9 +297,9 @@ class CIDLIBEXP TMemBuf :
             return reinterpret_cast<T*>(pc1DataAt(c4At));
         }
 
-        TBinInStream* pstrmMakeReadable();
+        [[nodiscard]] TBinInStream* pstrmMakeReadable();
 
-        TBinOutStream* pstrmMakeWriteable();
+        [[nodiscard]] TBinOutStream* pstrmMakeWritable();
 
         tCIDLib::TVoid PutBool
         (
@@ -503,12 +496,14 @@ class CIDLIBEXP TMemBuf :
             , const tCIDLib::TCard4         c4ExpandIncrement
         );
 
-        tCIDLib::TVoid ValidateParms
-        (
-            const   tCIDLib::TCard4         c4Size
-            , const tCIDLib::TCard4         c4MaxSize
-            , const tCIDLib::TCard4         c4ExpandIncrement
-        );
+        tCIDLib::TVoid ValidateParms(const  tCIDLib::TCard4 c4Size
+                                    , const tCIDLib::TCard4 c4MaxSize
+                                    , const tCIDLib::TCard4 c4ExpandIncrement)
+        {
+            // Just a combination of the other validating methods
+            ValidateSizes(c4Size, c4MaxSize);
+            ValidateExpInc(c4Size, c4MaxSize, c4ExpandIncrement);
+        }
 
         tCIDLib::TVoid ValidateSizes
         (
@@ -586,16 +581,5 @@ class CIDLIBEXP TMemBuf :
 };
 
 #pragma CIDLIB_POPPACK
-
-
-inline tCIDLib::TVoid
-TMemBuf::ValidateParms( const   tCIDLib::TCard4 c4Size
-                        , const tCIDLib::TCard4 c4MaxSize
-                        , const tCIDLib::TCard4 c4ExpandIncrement)
-{
-    // Call the other versions that check the various parts
-    ValidateSizes(c4Size, c4MaxSize);
-    ValidateExpInc(c4Size, c4MaxSize, c4ExpandIncrement);
-}
 
 

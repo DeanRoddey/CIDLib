@@ -163,6 +163,7 @@ class TMethodVar
             , const TString&                strRetType
             , const tCIDDocComp::EParmPB    eRetBy
             , const tCIDDocComp::EMethAttrs eGrpAttrs
+            , const TString&                strTmplParms
         );
         tCIDLib::TVoid OutputContent
         (
@@ -175,6 +176,7 @@ class TMethodVar
         tCIDDocComp::EMethAttrs m_eAttrs = tCIDDocComp::EMethAttrs::None;
         tCIDDocComp::EParmPB    m_eRetBy = tCIDDocComp::EParmPB::None;
         TString                 m_strRetType;
+        TString                 m_strTmplParms;
 };
 
 
@@ -204,6 +206,7 @@ class TMethod
         THelpNode               m_hnDescr;
         TString                 m_strName;
         TString                 m_strRetType;
+        TString                 m_strTmplParms;
 };
 
 
