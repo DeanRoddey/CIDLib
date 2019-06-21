@@ -43,24 +43,24 @@
 namespace tCIDColAlgo
 {
     //
-    //  Given an accumulator type T, and a collection of those, call += on each value
-    //  in the collection and return the result. We don't know what += means in this
-    //  case, we just call it. They have to provide us with an initial value to start
-    //  with.
+    //  Given a collection and an initial value, call += for each value in the
+    //  collection, adding them to the incoming value, which we return as the
+    //  new value.
     //
-    template <typename T> T tAccumulate(const TCollection<T>& colSrc, const T& tInitVal)
+    template <typename TCol, typename TElem = TCol::TMyElemType>
+    TElem tAccumulate(const TCol& colSrc, const TElem& tInitVal)
     {
-        T retVal = tInitVal;
-        TColCursor<T>* pcursIter = colSrc.pcursNew();
-        TJanitor<TColCursor<T>> janCursor(pcursIter);
-
+        TElem retVal = tInitVal;
         try
         {
-            while (pcursIter->bIsValid())
-            {
-                retVal += pcursIter->objRCur();
-                pcursIter->bNext();
-            }
+            colSrc.bForEach
+            (
+                [&retVal](const TElem& tCur) -> tCIDLib::TBoolean
+                {
+                    retVal += tCur;
+                    return kCIDLib::True;
+                }
+            );
         }
 
         catch(TError& errToCatch)
