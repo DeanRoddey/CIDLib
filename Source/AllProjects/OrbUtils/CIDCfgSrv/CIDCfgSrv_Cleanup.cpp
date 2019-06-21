@@ -128,7 +128,8 @@ tCIDLib::TVoid TFacCIDCfgSrv::Cleanup()
     //
     //  And stop the logger thread on the log server logger now. This
     //  will give him some time to get the last few logged things out.
-    //  Anything after this will get lost.
+    //  Anything after this will get lost. We told TModule to adopt it
+    //  so we don't have to delete it.
     //
     try
     {

@@ -44,56 +44,14 @@ RTTIDecls(TOrbServerBase,TObject)
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TOrbServerBase: Public destructor
-// ---------------------------------------------------------------------------
-TOrbServerBase::~TOrbServerBase()
-{
-}
-
-
-
-// ---------------------------------------------------------------------------
-//  TOrbServerBase: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::TBoolean TOrbServerBase::bCleanup() const
-{
-    return m_bCleanup;
-}
-
-
-tCIDLib::TCard4 TOrbServerBase::c4DecEnteredCount()
-{
-    // We want to return the post-dec count so use prefix
-    return --m_scntEntered;
-}
-
-
-tCIDLib::TCard4 TOrbServerBase::c4EnteredCount() const
-{
-    return m_scntEntered.c4Value();
-}
-
-
-tCIDLib::TCard4 TOrbServerBase::c4IncEnteredCount()
-{
-    // We want to return the post-inc count so use prefix
-    return ++m_scntEntered;
-}
-
-
-const TOrbObjId& TOrbServerBase::ooidThis() const
-{
-    return m_ooidThis;
-}
-
-
-// ---------------------------------------------------------------------------
 //  TOrbServerBase: Protected constructors
 // ---------------------------------------------------------------------------
 
 //
 //  We create an object id for this instance. We use the passed interface id
-//  and client proxy class. We provide a new unique instance id.
+//  and client proxy class. We provide a new unique instance id. The derived
+//  class tells us the name of the client proxy class that was generated for
+//  this interface.
 //
 TOrbServerBase::TOrbServerBase( const   TString&    strInterfaceId
                                 , const TString&    strClientProxyClass) :
@@ -170,15 +128,6 @@ tCIDLib::TVoid TOrbServerBase::Terminate()
     //  Just provided in case we need to add some init in the future. All
     //  derived classes should call us if they override.
     //
-}
-
-
-// ---------------------------------------------------------------------------
-//  TOrbServerBase: Protected, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::TVoid TOrbServerBase::SetCleanupFlag()
-{
-    m_bCleanup = kCIDLib::True;
 }
 
 

@@ -7,9 +7,15 @@
 
         <PageLink FileName="Overview"/>
 
+        <PageLink FileName="MDuplicable" PageType="CppClass"/>
         <PageLink FileName="MFormattable" PageType="CppClass"/>
+        <PageLink FileName="MLogger" PageType="CppClass"/>
+        <PageLink FileName="TCollectionBase" PageType="CppClass"/>
         <PageLink FileName="TDirChangeInfo" PageType="CppClass"/>
         <PageLink FileName="TMemBuf" PageType="CppClass"/>
+        <PageLink FileName="TModule" PageType="CppClass"/>
+        <PageLink FileName="TMutex" PageType="CppClass"/>
+        <PageLink FileName="TMtxLocker" PageType="CppClass"/>
         <PageLink FileName="TStrCat" PageType="CppClass"/>
         <PageLink FileName="TString" PageType="CppClass"/>
         <PageLink FileName="TStringTokenizer" PageType="CppClass"/>

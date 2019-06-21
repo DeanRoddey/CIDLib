@@ -35,7 +35,7 @@
 //  CLASS: TPubSubAsyncSub
 // PREFIX: psasub
 // ---------------------------------------------------------------------------
-class CIDLIBEXP TPubSubAsyncSub : public TObject, public MPubSubscription
+class CIDLIBEXP TPubSubAsyncSub : public TObject, private MPubSubscription
 {
     public  :
         // -------------------------------------------------------------------

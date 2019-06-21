@@ -4,19 +4,24 @@
 <CppClass Class="MFormattable" Prefix="mfmtbl" Parent="N/A">
 
     <Desc>
-        <P>MFormattable is one of the fundamental mixin interfaces. Any class that implements this interface can be formatted to a text output stream. The class must implement the FormatTo() method. There is a generic &amp;lt;&amp;lt; operator for text output streams that takes an MFormattable object, so any class that mixes in this interface will be accepted by that streaming operator and can format itself out to a text stream.</P>
+        <P>MFormattable is one of the fundamental mixin interfaces. Any class that implements this interface can be formatted to a text output stream. The class must implement the FormatTo() method. There is a generic &amp;lt;&amp;lt; operator for text output streams that takes an MFormattable object, so any class that mixes in this interface will be accepted by that streaming operator, which will call FormatTo() on this intrface so that the object can format itself out to the text stream.</P>
     </Desc>
 
     <PubIntf>
-        <Ctors DefMethods="AssignOp CopyCtor">
+        <Ctors>
              <!-- The dtor is virtual so we have to do it separatekly -->
             <Method Name="~MFormattable" Attrs="Virtual">
                 <Desc>Just required for syntax reasons</Desc>
                 <MethVar/>
             </Method>
         </Ctors>
+    </PubIntf>
 
-        <!-- Virtual public methods -->
+    <ProtIntf>
+        <Ctors DefMethods="CopyCtor DefCtor"/>
+
+        <Operators DefMethods="AssignOp"/>
+
         <VirtMeths>
             <Method Attrs="Pure" Name="FormatTo">
                 <Desc>
@@ -27,12 +32,7 @@
                 </MethVar>
             </Method>
         </VirtMeths>
-    </PubIntf>
 
-    <ProtIntf>
-        <Ctors DefMethods="CopyCtor DefCtor"/>
-
-        <Operators DefMethods="AssignOp"/>
     </ProtIntf>
 
 </CppClass>

@@ -237,7 +237,7 @@ class CIDLIBEXP TMtxLocker
 
         tCIDLib::TVoid Orphan()
         {
-            m_pmtxToLock = 0;
+            m_pmtxToLock = nullptr;
             m_bLocked = kCIDLib::False;
         }
 

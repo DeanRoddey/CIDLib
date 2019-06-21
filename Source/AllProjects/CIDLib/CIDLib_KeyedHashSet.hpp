@@ -919,7 +919,7 @@ class TKeyedHashSet : public TCollection<TElem>
             return new TCursor(this);
         }
 
-        TObject* pobjDuplicate() const
+        [[nodiscard]] TObject* pobjDuplicate() const
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TMyType(*this);

@@ -479,11 +479,9 @@ class CIDLIBEXP TMemBuf :
         virtual tCIDLib::TVoid Realloc
         (
             const   tCIDLib::TCard4         c4NewSize
-            , const tCIDLib::TBoolean       bPreserve = kCIDLib::True
+            , const tCIDLib::TBoolean       bPreserve
         )   const = 0;
 
-
-        tCIDLib::TVoid ValidateParms();
 
 
         // -------------------------------------------------------------------

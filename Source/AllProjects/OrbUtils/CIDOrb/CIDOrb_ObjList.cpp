@@ -49,8 +49,8 @@ TOrbSObjList::TOrbSObjList() :
 
     m_c4BucketInd(kCIDOrb::c4IdModulus)
     , m_c4ElemCount(0)
-    , m_pabiList(0)
-    , m_pbiIter(0)
+    , m_pabiList(nullptr)
+    , m_pbiIter(nullptr)
 {
     m_pabiList = new TBucketItem*[kCIDOrb::c4IdModulus];
     TRawMem::SetMemBuf
@@ -326,7 +326,7 @@ TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind)
 
     // If the bucket is empty, we are done
     if (!m_pabiList[hshKey])
-        return 0;
+        return nullptr;
 
     // There are entries here, so search the bucket
     TBucketItem* pbiCur = m_pabiList[hshKey];
@@ -337,7 +337,7 @@ TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind)
 
         pbiCur = pbiCur->pbiNext;
     }
-    return 0;
+    return nullptr;
 }
 
 const TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind) const
@@ -364,7 +364,7 @@ const TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind) const
 
     // If the bucket is empty, we are done
     if (!m_pabiList[hshKey])
-        return 0;
+        return nullptr;
 
     // There are entries here, so search the bucket
     TBucketItem* pbiCur = m_pabiList[hshKey];
@@ -375,7 +375,7 @@ const TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind) const
 
         pbiCur = pbiCur->pbiNext;
     }
-    return 0;
+    return nullptr;
 }
 
 
@@ -401,7 +401,7 @@ TOrbServerBase* TOrbSObjList::porbsOrphan(TOrbServerBase* const porbsToOrphan)
 
     // If the bucket is empty, we its not present
     if (!m_pabiList[hshToOrphan])
-        return kCIDLib::False;
+        return nullptr;
 
     //
     //  Search for this object, by pointer value. We have to keep up with
@@ -420,7 +420,7 @@ TOrbServerBase* TOrbSObjList::porbsOrphan(TOrbServerBase* const porbsToOrphan)
     }
 
     if (!pbiCur)
-        return 0;
+        return nullptr;
 
     if (!pbiPrev)
         m_pabiList[hshToOrphan] = pbiCur->pbiNext;
@@ -475,7 +475,7 @@ tCIDLib::TVoid TOrbSObjList::RemoveAll()
 
             pbiCur = pbiNext;
         }
-        m_pabiList[c4Index] = 0;
+        m_pabiList[c4Index] = nullptr;
     }
 
     // Reset the element count now

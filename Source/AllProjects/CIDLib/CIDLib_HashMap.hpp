@@ -842,7 +842,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             return new TCursor(this);
         }
 
-        TObject* pobjDuplicate() const override
+        [[nodiscard]] TObject* pobjDuplicate() const override
         {
             return new TMyType(*this);
         }

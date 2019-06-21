@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Publish/Subscribe</Title>
+
+    <HelpText>
+
+        <P>CIDLib supports a general purpose, intra-process, publish/subscribe system. In this sort of system, some bit of code can 'publish a topic' and other code can subscribe to that topic. The publisher can send messages related to that topic, and those will be passed to any topic subscribers. Subscribers can subscribe to more than one topic and there can be more than publisher for a given topic. So it can be one to one, one to many, or many to many in nature, though only one way (publisher to subscriber.)</P>
+
+        <Note>This is intra- not inter-process. So it's just for use within a program.</Note>
+
+        <P>There are lots of uses for this type of system. There are two primary benefits. One is that it can provide what is typically called 'loose coupling'. This means that two pieces of code, which aren't really all that aware of each other, can be loosely linked by letting one know when particular things happen in the other. They both just have to know the message format.</P>
+
+        <P>Even if not loosely coupled, it also allows for something often referred to as 'reactive design'. There are a lot of benefits to this, in some situations. For instance, some of the CIDLib collections support the pub/sub system, and will publish messages that report on any changes to the collection's contents. So, instead of proactively putting checks all throughout your code to inform other parties about any changes to a collection, you can <Italic>reactively</Italic> handle them via subscription messages. This means that the burden of catching all changes is pushed down into one place, the collection itself, and can be leveraged by many others for cheap.</P>
+
+        <P>Depending on which of the benefits above you looking to get, possibly both, there are different concerns which we will get into more below.</P>
+
+
+        <SecTitle>Topics</SecTitle>
+
+        <P>A topic in this case is represented by a 'topic path' which is just a path-like hierarchical text value that uniquely represents that topic within the process. Anyone who knows the topic path can subscribe to that topic. You should make the topics non-trivial so that they are unique. A reverse DNS style scheme is a reasonable way to do it, or /company/product/subsystem/topic or something of that nature.</P>
+
+        <P>When you register a topic, a <ClassRef Ref="TPubSubTopic"/> object is created and added to a list of available topics, down inside the pub/sub system, and a copy is returned to you. If the registration is successful, you can use the topic object to publish messages. The object you get is actually a reference counting wrapper around the real topic object, because we need to keep that alive for as long as any publishers are active.</P>
+
+        <P>There can be multiple publishers for a topic. Though in theory they can share a single topic object, as a practical matter, it's best for each of them to have their own. Just copy construct one to create a new copy. Topic objects are thread safe, but there again probably best to let each publishing thread have its own copy. Just hand one copy off to each thread. This insures that reference counting does its work correctly, since any code or thread that is still publishing to that topic will insure the topic stays alive.</P>
+
+        <P>When you create a topic, you indicate the type of the class that you will be using as published messages for that topic. You can only have one one message type per topic, though they are referenced counted allocated objects, so technically you could send anything derived from that type. Subscribers obviously need to understand this and deal with the various types it could be.</P>
+
+        <Code>
+        TPubSubTopic m_pstopChanges;
+
+        m_pstopChanges = TPubSubTopic::pstopCreateTopic
+        (
+            L"/bubba.com/Config/Changes", TBubbaMsg::clsThis()
+        );
+        </Code>
+
+        <P>Here we have a pub/sub topic as a member. At some point later we create a topic and store the topic object in that member. We indicate that the messages we send will be TBubbaMsg objects.</P>
+
+        <Note>You cannot register the same topic twice, so you need to have some coherent scheme for managing topic registration if you are going to have multiple publishers for the same topic. If you try to register a topic that is already present, an exception will occur. You have to just copy the original topic object instead.</Note>
+
+        <P>When the last topic object for a topic is dropped, it will be deregistered. Subscribers are not informed of this. They just won't get any more messages. This is the same as if they subscribe before the topic is created. They just won't get any messages until the publisher creates the topic and starts publishing messages. You can though ask that the subscription fail if the topic doesn't exist.</P>
+
+
+
+        <SecTitle>Subscription Options</SecTitle>
+
+        <P>The basic subscription scheme is that the subscriber implements a mixin class (<ClassRef Ref="MPubSubscription"/>) and registers itself with one or more topics via that interface. When messages are published to those topics, each subscriber in turn is called with the message. When all of them have been called, the message is discarded. So this is a synchronous delivery scheme. The subscriber gets a callback via the subscription mixin, handles it and returns.</P>
+
+        <P>As long as that is an acceptable setup, it is the simplest and most straightforward way to do it.</P>
+
+        <Code>
+        class TWhatever : private MPubSubscription
+        {
+            public :
+                TWhatever()
+                {
+                    // Register us for a topic
+                    SubScribeToTopic(kMagnum::strTopic_Events, kCIDLib::False);
+                }
+
+                ~TWhatever()
+                {
+                    // Unsubscribe from the topic explicitly
+                    UnsubscribeFromTopic(kMagnum::strTopic_Events);
+                }
+
+            protected :
+                tCIDLib::TVoid ProcessPubMsg(const TPubSubMsg&amp;amp; psmsgIn) override
+                {
+                    // Access the contained TMagnumEv object that the above topic sends
+                    const TMagnumEv&amp;amp; mevNew = psmsgIn.objMsgAs&amp;lt;TMagnumEv>();
+
+                    // If a baffle plate event, bump the event counter
+                    if (mevNew.bIsBafflePlateEv())
+                        m_c4BaffleEvents++;
+                }
+        };
+        </Code>
+
+        <Note>Note the private inheritance above. Since this class is subscribing and unsubscribing itself, no one else needs to know he implements the subscription mixin.</Note>
+
+        <P>We are assuming here that there are not multiple threads involved, so the publisher is not going to call us from another thread. And, even if it happened, we are just incrementing a fundamental value, and even that is probably more of an advisory type counter than something that needs to be absolute. But, otherwise, we might have needed to do some locking.</P>
+
+        <P>The above sort of breaks down if the subscribers cannot very quickly process the messages, and it can get sticky if the two sides are in different threads, which would require the callback being thread safe (see the second on deadlocks below.) It generally means that the subscriber can't do anything that could block or take time (remote call for instance), unless the publisher is specifically designed to deal with that.</P>
+
+        <P>This can be avoided by the subscriber just queuing up the incoming messages and processing them later on another thread. At that point the delivery mechanism has become asynchronous. Multiple threads can easily be involved as long as the queue itself is thread safe. This is a much more loosely coupled scenario, but it also means that any data shared by the publisher and subscriber could be different by the time the subscriber gets around to processing a given message. I.e. if a message is sent out that a new item was added, the subscriber cannot assume that item is still there when it asynchronously processes that message later.</P>
+
+        <P>So this asynchronous scheme works better where the two sides don't really share any data, and the subscriber can work purely on the received message information. Or, worst case, the subscriber can immediate grab shared information at the time of message receipt, add the message and his own data to another object, and queue that for later processing.</P>
+
+        <P>A common application for the async scheme would be something like a scrolling event list, where all the subscriber needs is the events in order and it just displays them. It doesn't care if it's completely in sync with the publisher of the events and doesn't share any data with him.</P>
+
+        <SubSecTitle>Async Subscriber Helper</SubSecTitle>
+
+        <P>Since async delivery is a common scenario and probably the preferred one most of the time, we provide a pre-fab implementation of this scheme. The <ClassRef Ref="TPubSubAsyncSub"/> class implements the subscription mixin and creates a thread safe queue. When it gets incoming messages it just queues them up. So you can create one of these objects as a member and subscribe it to topics. Then just call its bGetNextMsg method to consume messages from that queue.</P>
+
+        <Code>
+        class TWhatever
+        {
+            public :
+                TWhatever()
+                {
+                    // Register our async handler for the topic
+                    m_psasubEvents.SubScribeTo(L"/magnum.com/Events/Queue", kCIDLib::False);
+                }
+
+            protected :
+                // A call to get the next queued event and process it, waiting up to 250ms
+                tCIDLib::TVoid ProcessNextEv()
+                {
+                    if (m_psasubEvents.bGetNextMsg(m_pssubEvent, 250))
+                    {
+                        const TMagnumEv&amp;amp; mevNew = m_pssubEvent.objMsgAs&amp;lt;TMagnumEv>();
+                        if (mevNew.bIsBafflePlateEv())
+                            m_c4BaffleEvents++;
+                    }
+                }
+
+            private :
+                TPubSubAsyncSub m_psasubEvents;
+                TPubSubMsg      m_pssubEvent;
+        };
+        </Code>
+
+
+
+        <SubSecTitle>Unsubscribing</SubSecTitle>
+
+        <P>You can explicitly unsubscribe from a topic at any time. If you don't, then the destructor of the <ClassRef Ref="MPubSubscription"/> mixin class will do it. Generally it would be optimal to do it explicitly, just for code explicitness.</P>
+
+        <Note>As a rule it makes no sense to enable publishing unless there are actually subscribers, since it's just wasted overhead. But, if you do publish messages when there are no subscribers, they are just dropped. It's not an error. For general purpose code that supports publishing, allow client code to indicate when it wants to make use of that and only publish if so. Of course if you only publish a trivial message every minute, it won't make much difference one way or another.</Note>
+
+
+        <SecTitle>Thread Safety</SecTitle>
+
+        <P>The management of the registration and deregistration of topics, the subscription and desubscription to topics, and the addition of messages to the topic's internal queue are all  guaranteed atomic. If you use the pre-fab async subscription mechanism, that is thread safe. because it is async and uses a thread safe queue.</P>
+
+        <P>The message objects are const, so they are read only. They should be written such that it is safe for multiple threads to read their contents simultaneously, since they are reference counted and all subscribers are seeing the same actual message instance, in order to avoid having to copy them to every subscriber. It also allows non-copyable content to be passed in topic messages, which may be important in some cases.</P>
+
+        <Note>This is one example where CIDLib explicitly requires 'thread compatible' objects, whereas it generally takes the approach that everything should either be explicitly thread safe or not and involve external synchronization. See Threads to the left. The benefits here are sufficient to warrant this exception, but care must be taken. For the most part, it would be best to limit the content of topic messages to fundamental types and strings.</Note>
+
+        <P>If you choose to handle callbacks yourself, and there are multiple thread involved, then the burden is on you to insure that it's safe for other threads to invoke callbacks into your handler class at any time. And be sure that you don't block them unless that is explicitly allowed by the publisher.</P>
+
+
+        <SecTitle>Deadlock Scenarios</SecTitle>
+
+        <P>The publish/subscribe system, because it is one of those 'spooky action at a distance' type mechanisms, which ties together bits of code that are not otherwise coordindated in any way, can cause very unintended consequences, particularly if you use it in the synchronous manner.</P>
+
+        <P>The problem is that you can call some method, which in turns calls something else which causes a message to be published, which your same object that started this whole process is subscribed to. So this causes a reentrant call back to your object, possibly from another thread. Your callback now tries to lock so that it can update something. But the original calling thread may have already locked, and this is now a deadlock.</P>
+
+        <P>You have to be very careful about such things if doing synchronous subscription handling. Asynchronous handling avoids these issues.</P>
+
+
+        <SecTitle>Issues Summary</SecTitle>
+
+        <P>So, based on all of the above, just to summarize in a more concise way, here are the core issues to consider when using publish/subscribe.</P>
+
+        <List>
+            <LItem>Don't block the publisher unless it is specifically designed to work that way. In most cases that would be bad.</LItem>
+            <LItem>Don't use synchronous subscription across multiple threads unless you take care to synchronize anything you access in the subscription callback.</LItem>
+            <LItem>Be aware of the potential in the above point for deadlock scenarios.</LItem>
+            <LItem>If you use asynchronous subscription, be aware that the state of any data that caused a message to be sent may have changed by the time you process that message.</LItem>
+            <LItem>If you must access shared data in a subscriber, then use synchronous subscription, lock and grab any information you need from the shared data upon receipt of a message, then queue that information for later asychronous use.</LItem>
+            <LItem>Where it's not unduely piggy, have the publisher pass along enough information that there is no need to go back and access any shared data.</LItem>
+            <LItem>Given each publisher it's own copy of the topic object, not because they aren't thread safe but for reference counting purposes, to insure the topic stays alive until all publishers drop their topic objects.</LItem>
+        </List>
+
+    </HelpText>
+
+</HelpPage>

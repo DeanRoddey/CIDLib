@@ -148,7 +148,7 @@ tCIDLib::TVoid TFacCIDCfgSrv::Setup()
     //          to the log server.)
     //
     m_plgrLogSrv = new TLogSrvLogger(strPath());
-    TModule::InstallLogger(m_plgrLogSrv);
+    TModule::InstallLogger(m_plgrLogSrv, tCIDLib::EAdoptOpts::Adopt);
 
     //
     //  Init the client and server side of the ORB. We are a server to

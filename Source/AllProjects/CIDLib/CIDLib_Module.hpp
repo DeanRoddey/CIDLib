@@ -127,7 +127,8 @@ class CIDLIBEXP TModule : public TObject
 
         static tCIDLib::TVoid InstallLogger
         (
-                    MLogger* const          plgrToAdopt
+                    MLogger* const          plgrToSet
+            , const tCIDLib::EAdoptOpts     eAdopt
         );
 
         static tCIDLib::TVoid LogEventObj
@@ -139,6 +140,8 @@ class CIDLIBEXP TModule : public TObject
         (
             const   TCollection<TLogEvent>& colToLog
         );
+
+        static tCIDLib::TVoid OrphanLogger();
 
         static tCIDLib::TVoid ParseVersionStr
         (
@@ -197,6 +200,7 @@ class CIDLIBEXP TModule : public TObject
         );
 
         TModule(const TModule&) = delete;
+        TModule(TModule&&) = delete;
 
         ~TModule();
 
@@ -205,6 +209,7 @@ class CIDLIBEXP TModule : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TModule& operator=(const TModule&) = delete;
+        TModule& operator=(TModule&&) = delete;
 
 
         // -------------------------------------------------------------------

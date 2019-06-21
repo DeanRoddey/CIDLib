@@ -16,7 +16,8 @@
 // DESCRIPTION:
 //
 //  This is the header for the CIDOrb_ThisFacility.cpp file, which implements
-//  the facility class for this facility.
+//  the standard CIDLib style facility class for CIDOrb. It provides some helper
+//  methods that various players within this facility need.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -84,9 +85,15 @@ class CIDORBEXP TFacCIDOrb : public TFacility
             const   TOrbObjId&              ooidToCheck
         )   const;
 
-        tCIDLib::TCard4 c4CmdOverhead() const;
+        tCIDLib::TCard4 c4CmdOverhead() const
+        {
+            return m_c4CmdOverhead;
+        }
 
-        tCIDLib::TCard4 c4ReplyOverhead() const;
+        tCIDLib::TCard4 c4ReplyOverhead() const
+        {
+            return m_c4ReplyOverhead;
+        }
 
         tCIDLib::TCard4 c4TimeoutAdjust() const;
 
@@ -272,12 +279,11 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //      id cache.
         //
         //  m_colObjList
-        //      This is our list of server objects. Its a specialized collection
-        //      class, which is optimized for our needs.
+        //      This is our list of server objects. Its a specialized collection class
+        //      which is optimized for our needs.
         //
         //  m_colNSCache
-        //      A cache of object ids that we maintain for often accessed
-        //      servers.
+        //      A cache of object ids that we maintain for often accessed servers.
         //
         //  m_crsAddrInfo
         //  m_crsObjList
@@ -346,16 +352,4 @@ class CIDORBEXP TFacCIDOrb : public TFacility
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// Inlined methods
-inline tCIDLib::TCard4 TFacCIDOrb::c4CmdOverhead() const
-{
-    return m_c4CmdOverhead;
-}
-
-inline tCIDLib::TCard4 TFacCIDOrb::c4ReplyOverhead() const
-{
-    return m_c4ReplyOverhead;
-}
 

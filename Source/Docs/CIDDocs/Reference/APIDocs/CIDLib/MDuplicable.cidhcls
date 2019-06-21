@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="MDuplicable" Prefix="mdup" Parent="N/A">
+
+    <Desc>
+        <P>MDuplicable is one of the fundamental mixin interfaces. Any class that implements this interface can be polymorphically duplicated, which is a very useful thing in some circumstances. It means you can duplicate a heterogeneous list of objects as along as they all implement this interface.</P>
+
+        <P>In most cases all the derived class is is doing is calling its own copy constructor on itself.
+         There is a macro, DefPolyDup(type), that you can use to provide this functionality easily. The class just passes its own type, so that the macro can generate a call to the copy constructor.</P>
+    </Desc>
+
+    <PubIntf>
+        <Ctors>
+             <!-- The dtor is virtual so we have to do it separatekly -->
+            <Method Name="~MDuplicable" Attrs="Virtual">
+                <Desc>Just required for syntax reasons</Desc>
+                <MethVar/>
+            </Method>
+        </Ctors>
+
+        <!-- Virtual public methods -->
+        <VirtMeths>
+            <Method Attrs="Pure NoDiscard" Name="pobjDuplicate" RetType="TObject" RetBy="Ptr" >
+                <Desc>
+                    <P>The class that implements this interface must override this method, create a copy of itself and return it. The caller is responsible for freeing it.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+        </VirtMeths>
+    </PubIntf>
+
+    <ProtIntf>
+        <Ctors DefMethods="CopyCtor DefCtor CopyCtor"/>
+
+        <Operators DefMethods="AssignOp"/>
+    </ProtIntf>
+
+</CppClass>

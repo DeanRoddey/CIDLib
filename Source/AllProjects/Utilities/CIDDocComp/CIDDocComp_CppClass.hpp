@@ -383,6 +383,10 @@ class TCppClassPage : public TBasePage
         //      Our class and our parent class. Parent class can be empty since not
         //      everything derives from TObject, and of course TObject doesn't have a
         //      parent.
+        //
+        //  m_strTmplParms
+        //      If this clas is a template, these are the class template parameters,
+        //      just as a single string to be put inside the angle brackets.
         // -------------------------------------------------------------------
         tCIDDocComp::EClsFlags      m_eFlags = tCIDDocComp::EClsFlags::None;
         TMemberGrp                  m_memgPublic;
@@ -392,6 +396,7 @@ class TCppClassPage : public TBasePage
         TString                     m_strClass;
         TString                     m_strParClass;
         TString                     m_strPrefix;
+        TString                     m_strTmplParms;
 
         static tCIDLib::TBoolean    s_bStatsDone;
         static TMethod              s_methDuplicate;

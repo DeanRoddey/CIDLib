@@ -193,5 +193,6 @@
                         Parent CDATA #REQUIRED
                         Prefix NMTOKEN #REQUIRED
                         VirtDtor (%YNVal;) 'No'
-                        Flags NMTOKENS 'NoFlags'>
+                        Flags NMTOKENS 'NoFlags'
+                        TmplParms CDATA #IMPLIED>
 

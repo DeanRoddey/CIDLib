@@ -2477,3 +2477,19 @@ PROJECT=Window2
         CIDCtrls
     END DEPENDENTS
 END PROJECT
+
+
+; ----------------------------------------------------------------------------
+;  A junk project for temporary work. Only enabled when needed.
+; ----------------------------------------------------------------------------
+;PROJECT=Tmp
+;    SETTINGS
+;        DIRECTORY   = Samples\Tmp
+;        SAMPLE      = Yes
+;        ENABLED     = No
+;    END SETTINGS
+;
+;    DEPENDENTS
+;        CIDLib
+;    END DEPENDENTS
+;END PROJECT

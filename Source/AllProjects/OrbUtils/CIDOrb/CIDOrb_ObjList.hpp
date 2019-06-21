@@ -21,7 +21,6 @@
 //  quite right for what we want to do, and we need maximum performance in
 //  this case.
 //
-//
 // CAVEATS/GOTCHAS:
 //
 // LOG:

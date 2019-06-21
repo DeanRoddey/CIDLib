@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TCollectionBase" Prefix="col" Parent="TObject">
+
+    <Desc>
+        <P>TCollectionBase is the base class for all of the non-fundamental <Link Type="Page" Ref="/BigPicture" Id="/Collections">collections.</Link> It provides the basic interface that all of the collections can implement. This is all stuff that doesn't depend on the element types or other templatized aspects of the derived classes, so this one can handle any out of line functionality that is common to collections.</P>
+
+        <P>It also provides basic information about the collection that all of them must provide, such as are they empty, are they thread safe, the current element count. It also provides a RemoveAll so that clearing out a collection can be done generically.</P>
+
+        <P>Publish/subscribe is enabled at this level, since it doesn't depend on any templatized bits. See the collections info linked to above for information on pub/sub in collections.</P>
+
+        <P>And, finally, collections can be multi-thread safe (lockable) and we manage the mutex at this level, so that collections can be generically locked. If you use a <ClassRef Ref="TMtxLocker"/> object, which you should to lock on a scoped basis, it doesn't matter if the mutex is created or not. If it's null the locker will just do nothing. So you can write generic code that can be thread safe if the collection is, else not.</P>
+    </Desc>
+
+    <PubIntf>
+        <StaticMeths>
+
+            <Method Name="BadStoredCount">
+                <Desc>
+                    <P>This is a helper that is used by some global operators defined by some of the collections for streaming. This is a common thing to validate the stored number of elements (that are going to be read back in) and throw if bad, so we push this common check out of line. This is public because those are global operators and too many to make them friends.</P>
+
+                    <P>The collection passes us his type so we can include that in the thrown exception info.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="clsCol" Type="TClass" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+        </StaticMeths>
+
+        <Ctors>
+            <Method Name="~TCollectionBase">
+                <Desc>Cleans up the mutex if this collection is lockable. If a pub/sub topic was registered on this collection the topic is cleaned up.</Desc>
+                <MethVar/>
+            </Method>
+        </Ctors>
+
+
+        <VirtMeths>
+            <Method Name="bIsEmpty" RetType="tCIDLib::TBoolean" Attrs="Const Pure">
+                <Desc>The derived class should return kCIDLib::True if it is empty, i.e. has no elements in it.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="c4ElemCount" RetType="tCIDLib::TCard4" Attrs="Const Pure">
+                <Desc>The derived class should return how many elements it currently contains.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="RemoveAll" Attrs="Pure">
+                <Desc>The derived class should remove all of its elements, doing whatever is appropriate for that type of collection, and reset itself to an empty state.</Desc>
+                <MethVar/>
+            </Method>
+        </VirtMeths>
+
+
+        <NVirtMeths>
+            <Method Name="bIsFull" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns true if the element count of this collection is equal or greater to the passed limit value.</Desc>
+                <MethVar><MethParam Name="c4Limit" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="bIsMTSafe" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns true if this collection was created thread safe, which means it can be locked of course.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bPublishEnabled" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns true if this <Link Type="Page" Ref="/BigPicture/" Id="/PubSub">change publishing</Link> has been enabled on this collection. If so, it will report any changes made to its contents.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="c4SerialNum" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>Returns the serial number for this collection. The serial number is bumped any time the contents of the collection are modified, to make it easier to track changes.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="CheckIsFull" Attrs="Const">
+                <Desc>Similar to bIsFull() above, but this one throws if the current size is at or beyond the passed limit. You provide a descriptive text value that will go into the exception info for better diagnostics.</Desc>
+                <MethVar>
+                    <MethParam Name="c4Limit" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="pszDescr" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="eMTState" RetType="tCIDLib::EMTStates" Attrs="Const">
+                <Desc>Returns the multi-thread safe state of this collection, which indicates whether it as a mutex or not.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="pmtxLock" RetType="TMutex" Attrs="Const" RetBy="Ptr">
+                <Desc>
+                    <P>Provides access to this collection's mutex. Don't keep this pointer around, it's just so that you can use a scoped <ClassRef Ref="TMtxLocker"/> object to lock the collection from the outside if you need to do more than one operation atomically. For single operations it will be done for you.</P>
+
+                    <P>If the collection is not multi-thread safe, this will be null. That's OK if you are just passing it to a locker, which will just do nothing, so you can lock without regards to whether the collection is thread safe or not.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="Lock" Attrs="Const">
+                <Desc>
+                    <P>If you need to lock the collection from the outside, you should typically favor passing pmtxLock() above to a <ClassRef Ref="TMtxLocker"/> for scoped locking. But, if for some reason that's not practical, you can use Lock and Unlock (below) to do it yourself. Just be sure you get it unlocked even if exceptions occur!</P>
+
+                    <P>You pass a milliseconds that you are willing to wait to get the lock. If it is not forthcoming in that time, this method will throw. It defaults to kCIDLib::c4MaxWait, which is an indefinite wait.</P>
+
+                    <Note>This is constant because you have to be able to lock for read as well as write when dealing with thread safe collections.</Note>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4WaitMS" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxWait"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="PublishBlockChanged">
+                <Desc>
+                    <P>As discussed in the Big Picture section on <Link Type="Page" Ref="/BigPicture/" Id="/Collections">collections</Link>, some collections support publish/subscribe. It discusses the issues of making large changes to the collection and how it is not always possible for the collection itself to know if you have modified elements, if you do so directly on the element itself.</P>
+
+                    <P>So, for any collections you enable publishgin on, you need to force the reporting of such changes if you make them. If you are going to change a contiguous block of elements, this is the most efficient way to report that, rather than reporting one element at a time. You provide a start at index and a count of elements from there that you modified. Even if you didn't modify every element, this is still far cheaper than individual reports for a substantial number of elements.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4At" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+
+            <Method Name="PublishElemChanged">
+                <Desc>
+                    <P>See PublishBockChanged above. This is similar except it is to report that you made direct changes to a single collection element. Of course the recipient has to be aware that, if accepting subscription messages async, that this index may no longer be valid in this collection by the time he gets the message.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4At" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="PublishReload">
+                <Desc>
+                    <P>See PublishBockChanged and PublishElemChanged above. You can use this method to report a reload of the collection. I.e. you removed any previous contents and loaded new contents. This is far and away the cheapest way to report this, since the recipients of the message know they can just discard any current info and start collecting info again.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="strTopicPath" RetType="TString" RetBy="CRef">
+                <Desc>
+                    <P>As discussed in the Big Picture section on <Link Type="Page" Ref="/BigPicture/" Id="/Collections">collections</Link>, some collections support publish/subscribe. This is done by enabling publishing and setting a desired topic path on the collection for it to publish its messages under.</P>
+
+                    <P>If publishing has not been enabled on this collection, then the topic path will be empty. Else it will contains the path that this collection is using and you can use that to subscribe to it.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="Unlock">
+                <Desc>
+                    <P>If you need to lock the collection from the outside, you should typically favor passing pmtxLock() above to a <ClassRef Ref="TMtxLocker"/> for scoped locking. But, if for some reason that's not practical, you can use Lock (above) and Unlock to do it yourself. Just be sure you get it unlocked even if exceptions occur!</P>
+
+                    <Note>This is constant because you have to be able to lock for read as well as write when dealing with thread safe collections.</Note>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+    <ProtIntf>
+
+        <StaticMeths>
+            <Method Name="bWaitForData">
+                <Desc>
+                    <P>This is a helper that is only used by the two queue oriented derivatives so far. Queues are used to manage thread pools so we need a way for threads to block, waiting for elements to show up for them to read out and process.</P>
+
+                    <P>The collection passes us a mutex locker that is set up on his mutex, so it's currently locked. He passes a refererence to himself, and how many milliseconds he wants to wait. He passes us the wait list that he uses internally to manage waiting threads, so that we can do the same.</P>
+
+                    <P>We can either throw if we don't get an element within the wait time, or we can just return a boolean status.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="mtxQueue" Type="TMtxLocker" PBy="Ref" Dir="In"/>
+                    <MethParam Name="colSrc" Type="TCollectionBase" PBy="CRef"/>
+                    <MethParam Name="c4WaitMS" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="twlWaitList" Type="TThreadWaitList" PBy="Ref" Dir="In"/>
+                    <MethParam Name="bThrowIfNot" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+            </Method>
+        </StaticMeths>
+
+        <Ctors>
+
+            <Method Name="TCollectionBase">
+                <Desc>
+                    <P>At this level, for default construction the derived class passes on the user provided or internally set thread safety setting for this collection, which causes us to create a mutex or not. The default is unsafe if they don't explicitly indicate. The serial number is set to 1.</P>
+
+                    <P>For copying, at this level, we don't know anything about elements. If the source is thread safe, this one is created thread safe also. The serial number is not copied, since this is a different collection, so it is set to 1. But the derived class or user code can copy it over if that's important.</P>
+
+                    <P>For move, it's the same as copy. There's nothing at this level that should get moved, it's primarily the elements that are the concern. We do make this one thread safe if the source is.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="eMTState" Type="tCIDLib::EMTStates" DefVal="tCIDLib::EMTStates::Unsafe"/>
+                </MethVar>
+                <MethVar><MethParam Name="colSrc" Type="TCollectionBase" PBy="CRef"/></MethVar>
+                <MethVar><MethParam Name="colSrc" Type="TCollectionBase" PBy="MRef"/></MethVar>
+            </Method>
+
+        </Ctors>
+
+        <Operators>
+
+            <Method Name="operator=">
+                <Desc>
+                    <P>At this level, for assignment the only thing that happens is that this collection's serial number is bumped. For move, both serial numbers are bumped.</P>
+
+                    <P>No topic or mutex stuff is copied over. Both retain their original settings for those, which is important. Assigning a collection should not change the thread safety or publishing of either. It's just for getting the elements over.</P>
+                </Desc>
+                <MethVar><MethParam Name="colSrc" Type="TCollectionBase" PBy="CRef"/></MethVar>
+                <MethVar><MethParam Name="colSrc" Type="TCollectionBase" PBy="MRef"/></MethVar>
+            </Method>
+
+        </Operators>
+
+    </ProtIntf>
+
+</CppClass>

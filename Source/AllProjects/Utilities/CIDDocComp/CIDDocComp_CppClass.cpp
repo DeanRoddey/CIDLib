@@ -817,6 +817,15 @@ TMethodGrp::OutputSpecMethod(       TTextOutStream&         strmTar
             strmTar << L")";
             break;
 
+        case tCIDDocComp::ESpecMeths::NewOp :
+            facCIDDocComp.FormatDeemphText(strmTar, L"tCIDLib::TVoid* ");
+            facCIDDocComp.FormatEmphText(strmTar,  L"operator new");
+            strmTar << L"(";
+            facCIDDocComp.FormatDeemphText(strmTar,  L"const size_t ");
+            facCIDDocComp.FormatEmphText(strmTar,  L"size");
+            strmTar << L")";
+            break;
+
         default :
             facCIDDocComp.AddErrorMsg(L"Unknown special method type");
             break;
@@ -1122,6 +1131,14 @@ TCppClassPage::Parse(           TTopic&             topicParent
             return kCIDLib::True;
         }
     );
+
+    // We may have template params
+    if (!xtnodeClass.bAttrExists(L"TmplParms", m_strTmplParms))
+    {
+        // If  the template class flag is on, then this is bad
+        if (tCIDLib::bAllBitsOn(m_eFlags, tCIDDocComp::EClsFlags::Template))
+            facCIDDocComp.AddErrorMsg(L"Template Class flag is set, but not template parms provided");
+    }
 
     tCIDLib::TCard4 c4At;
     const TXMLTreeElement& xtnodeDesc = xtnodeClass.xtnodeFindElement

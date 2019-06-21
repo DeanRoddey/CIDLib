@@ -759,6 +759,16 @@ template <class TElem, class TKeyOps> class THashSet
             return *this;
         }
 
+        const TElem& operator[](const TString& strToFind) const
+        {
+            return this->objFind(strToFind);
+        }
+
+        TElem& operator[](const TString& strToFind)
+        {
+            return this->objFind(strToFind);
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
@@ -852,7 +862,7 @@ template <class TElem, class TKeyOps> class THashSet
             return new TCursor(this);
         }
 
-        TObject* pobjDuplicate() const override
+        [[nodiscard]] TObject* pobjDuplicate() const override
         {
             return new THashSet<TElem,TKeyOps>(*this);
         }

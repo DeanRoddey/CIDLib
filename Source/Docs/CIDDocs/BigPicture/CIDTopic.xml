@@ -23,6 +23,7 @@
         <PageLink FileName="ORB-IDL" Title="Client/Server (ORB)"/>
         <PageLink FileName="Threads"/>
         <PageLink FileName="ThreadSync" Title="Thread Synchronization"/>
+        <PageLink FileName="PubSub" Title="Publish/Subscribe"/>
         <PageLink FileName="Style" Title="Coding Style"/>
         <PageLink FileName="Philosophy"/>
     </PageMap>

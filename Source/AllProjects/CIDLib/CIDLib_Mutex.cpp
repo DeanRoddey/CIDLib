@@ -113,10 +113,7 @@ TMutex::TMutex( const   TResourceName&          rsnToUse
                 , const tCIDLib::ECreateActs eAction) :
 
     m_bNamed(kCIDLib::True)
-    , m_kmtxImpl
-      (
-        rsnToUse.strFullName(tCIDLib::ENamedRscTypes::Mutex).pszBuffer()
-      )
+    , m_kmtxImpl(rsnToUse.strFullName(tCIDLib::ENamedRscTypes::Mutex).pszBuffer())
     , m_rsnThis(rsnToUse)
 {
     tCIDLib::TBoolean bCreated;
@@ -129,10 +126,7 @@ TMutex::TMutex( const   TResourceName&          rsnToUse
                 , const tCIDLib::ECreateActs eAction) :
 
     m_bNamed(kCIDLib::True)
-    , m_kmtxImpl
-      (
-        rsnToUse.strFullName(tCIDLib::ENamedRscTypes::Mutex).pszBuffer()
-      )
+    , m_kmtxImpl(rsnToUse.strFullName(tCIDLib::ENamedRscTypes::Mutex).pszBuffer())
     , m_rsnThis(rsnToUse)
 {
     InitNamed(bCreated, eInitState, eAction);
@@ -142,17 +136,14 @@ TMutex::~TMutex()
 {
     if (!m_kmtxImpl.bClose())
     {
-        //
-        //  If we get an error, log it but don't throw out of the destructor
-        //  so we use a warning message.
-        //
-        facCIDLib().ThrowKrnlErr
+        // Not much we can do but log it
+        facCIDLib().LogKrnlErr
         (
             CID_FILE
             , CID_LINE
             , kCIDErrs::errcMtx_Close
             , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Warn
+            , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Internal
             , m_rsnThis.strFullName(tCIDLib::ENamedRscTypes::Mutex)
         );

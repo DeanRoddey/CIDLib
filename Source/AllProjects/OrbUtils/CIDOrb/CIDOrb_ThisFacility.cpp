@@ -89,7 +89,7 @@ namespace CIDOrb_ThisFacility
 //
 //  Note that the name server exists really at the CIDOrbUC facility level,
 //  but we have a special requirement to watch for it being accessed for
-//  object id caching reasons. So it's defined down here.
+//  object id caching reasons. So its binding is defined down here.
 // ---------------------------------------------------------------------------
 const TString TFacCIDOrb::strCmd_Ping(L"$$$IntOrbCmd_Ping");
 const TString TFacCIDOrb::strFauxNSBinding(L"/CIDLib/FakeNSBinding");

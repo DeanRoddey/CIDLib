@@ -437,4 +437,42 @@
         </NVirtMeths>
     </PubIntf>
 
+    <ProtIntf>
+        <!-- Non-virtual public methods -->
+        <VirtMeths>
+
+            <Method Name="pc1QueryBuf" RetType="tCIDLib::TCard1" Attrs="Pure">
+                <Desc>
+                    <P>The derived buffer class must override this and return a pointer to its buffer. This is used internally in this class to access the buffer and by the methods we provide to make the buffer accessible to the outside. There's one for const access and one for non-const.</P>
+                </Desc>
+                <MethVar RetBy="Ptr"/>
+                <MethVar RetBy="CPtr" Attrs="Const"/>
+            </Method>
+
+            <Method Name="pc1QueryBufInfo" RetType="tCIDLib::TCard1" Attrs="Pure">
+                <Desc>
+                    <P>Same as above but also includes the current size info for the buffer, which is commonyl needed if the buffer is being accessed..</P>
+                </Desc>
+                <MethVar RetBy="Ptr">
+                    <MethParam Name="c4CurSize" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4MaxSize" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar RetBy="CPtr" Attrs="Const">
+                    <MethParam Name="c4CurSize" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4MaxSize" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Realloc" Attrs="Const Pure">
+                <Desc>
+                    <P>This is called by the public Reallocate() after it verifies the info and that something actually needs to be done. The derived class overrides this and reallocates the buffer, preserving previous content if asked to..</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4NewSize" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="bPreserve" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+            </Method>
+        </VirtMeths>
+    </ProtIntf>
+
 </CppClass>

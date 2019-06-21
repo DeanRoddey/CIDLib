@@ -1462,7 +1462,7 @@ class TTest_UniquePtr : public TTestFWTest
 //  CLASS: TTest_PubSub
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_PubSub1 : public TTestFWTest, public MPubSubscription
+class TTest_PubSub1 : public TTestFWTest, private MPubSubscription
 {
     public  :
         // -------------------------------------------------------------------
@@ -1517,7 +1517,7 @@ class TTest_PubSub1 : public TTestFWTest, public MPubSubscription
 //  CLASS: TTest_PubSubVector
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_PubSubVector : public TTestFWTest, public MPubSubscription
+class TTest_PubSubVector : public TTestFWTest, private MPubSubscription
 {
     public  :
         // -------------------------------------------------------------------

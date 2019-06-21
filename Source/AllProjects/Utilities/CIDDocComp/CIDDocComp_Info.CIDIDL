@@ -66,14 +66,12 @@
             <CIDIDL:Enum CIDIDL:Name="EClsFlags" CIDIDL:XlatMap="BaseName"
                          CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
-                    The overall class element has a set of bitmap flags that indicate various possible attributes of that class. We can't use None for
-                    no flags since it's used to report a failure to translate a value,
-                    so we define NoFlags. XML doesn't allow an empty NMTOKENS attr
-                    so we have to have something as a default in the DTD.
+                    The overall class element has a set of bitmap flags that indicate various possible attributes of that class. We can't use None for no flags since it's used to report a failure to translate a value, so we define NoFlags. XML doesn't allow an empty NMTOKENS attr so we have to have something as a default in the DTD.
                 </CIDIDL:DocText>
                 <CIDIDL:EnumVal CIDIDL:Name="Dup" CIDIDL:Value="0x0001"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Fmt" CIDIDL:Value="0x0002"/>
                 <CIDIDL:EnumVal CIDIDL:Name="BStrm" CIDIDL:Value="0x0004"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Template" CIDIDL:Value="0x0008"/>
 
                 <CIDIDL:EnumVal CIDIDL:Name="NoFlags" CIDIDL:Value="0x1000"/>
             </CIDIDL:Enum>
@@ -220,6 +218,7 @@
                 <CIDIDL:EnumVal CIDIDL:Name="DefCtor"/>
                 <CIDIDL:EnumVal CIDIDL:Name="MoveCtor"/>
                 <CIDIDL:EnumVal CIDIDL:Name="MoveOp"/>
+                <CIDIDL:EnumVal CIDIDL:Name="NewOp"/>
             </CIDIDL:Enum>
 
 

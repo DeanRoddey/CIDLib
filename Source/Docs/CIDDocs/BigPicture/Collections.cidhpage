@@ -197,7 +197,7 @@
         <Note>There is a non-templatized TSLinkedList class as well, but it's not one of our formal collection derivatives. It is sometimes used inside other things for simple linked list storage where it's easy to to internally handle casting node values to their real type, and it allows you to avoid extra code generation for something simple. There is no fully fleshed out singly linked list at this time.</Note>
 
 
-        <SecTitle>Copy/Assign Semantics</SecTitle>
+        <SecTitle>Copy/Assign/Move and Equality</SecTitle>
 
         <P>One thing that is always tricky with fancy classes like collections is, what does copying or assigning them really mean? They may have various internal mechanisms that are very important, and how much of this stuff should be replicated in the target? Obviously in general you always want to follow the rule that after assiging or copying A to B, then A==B should be true.</P>
 
@@ -208,6 +208,11 @@
         <P>That is all that is guaranteed. Nothing to do with the exact capacity of the collections, whether they adopt or don't adopt or anything of that nature is transferred by copy or assign. In some cases, internal details that are necessary to guarantee the same iteration order will be replicated. For instance, a hash set must have the same hash modulus in order for the elements to iterate in the same order after they are copied over and added to the target collection.</P>
 
         <P>None of the non-fundamental collection classes have any built in equality testing anyway, so technically it doesn't matter since you can't compare collections via equality operator. We don't want to force all elements to support equality testing. But there is a tCIDLib::bCompareElems() method that will compare two collections using the above semantics. It can do so generically (non-templatized) since equality is defined in terms of cursor iteration order, and it can polymorphically create cursors for the provided collections.</P>
+
+        <P>The serial numbers of both source and destination are bumped in a move, and the target's is bumped in copy/assign.</P>
+
+        <P>If publish/subscribe is enabled (see below), bulk load/remove operations are reported for the target in copy/assign and for both in a move.</P>
+
 
         <SecTitle>Iteration</SecTitle>
 
@@ -257,6 +262,7 @@
 
         <P>If the collection itself is const, it will only give you const access to the elements, just to be safe. If you want to modify the elements you should use a non-const collection. However, if the collection is declared with a const element type, the elements will always be const even if accessed via a non-const collection.</P>
 
+
         <SecTitle>Thread Safety</SecTitle>
 
         <P>Collections can be thread safe or not. You choose when you create one. This is one of those capabilities that is very useful, but also potentially dangerous so you have to be careful about them.</P>
@@ -270,6 +276,7 @@
         <Code>    TMtxLocker mtxlSync(m_colMyList.pmtxLock());</Code>
 
         <P>If a class has a collection that must be thread safe, and it has some other light sync requirements on other members, it can either create a separate mutex and use that. Or create the collection thread safe and use it to manage access to the other members as well. The latter means you only need explicit locking around the non-collection members. That may be seen as a good or bad thing by different folks.</P>
+
 
         <SecTitle>Polymorphism</SecTitle>
 
@@ -298,6 +305,33 @@
         <P>On the whole methods that take collections as parameters should try to accept a TCollection&amp;lt;> or TRefCollection&amp;lt;> parameter, since that allows for maximum flexibility. It does mean that the called method can only access elements via a cursor, since it doesn't know how to directly access elements (even if that's possible for the type actually passed.) But, if the called method requires some specific access scheme or collection type of course it would accept only that type.</P>
 
         <P>For instance, the above example can only add elements through the generic objAdd() or Add() methods, which don't allow it to control where in the collection the new element will be placed, so that might not provide for sufficient control.</P>
+
+
+        <SecTitle>Publish/Subscribe</SecTitle>
+
+        <P>Collections can support the <Link Type="Page" Ref="/BigPicture/" Id="/PubSub">publish/subscribe framework</Link>, so that client code can subscribe to changes. That makes it much easier to track changes in the collection than trying to insure that they put checks at every point in their own code where the collection might be changed.</P>
+
+        <P>TCollectionBase has a pointer to a published topic object, which it will create if asked to by the derived class. It doesn't directly expose that setup method since not all collections support pub/sub yet. So the derived class calls EnablePublish() to enable it. It's assumed that, if pub/sub is enabled that someone is listening, so posting events isn't a waste of time, so no need to bother constantly checking if there are any subscribers. DisablePubSub() can be called to close the topic.</P>
+
+        <P>A collection can only support one topic. So EnablePublish takes a desired topic path, but if publishing is already enabled it returns the already set up path, so the caller can use that instead. If it wasn't already set up, the passed in path is used. If you care, you can compare them to see if your path was used. We have another version that just takes the path to use and throws if it is already enabled under another path. If it's already enabled under the same path it just returns since you can just use your desired path already.</P>
+
+        <P>The messages published by collections contain a <ClassRef Ref="TColPubSubInfo"/> object. It contains an event type and some index/count values that are relevant depending on the event.</P>
+
+        <SubSecTitle>Direct Element Changes</SubSecTitle>
+
+        <P>If you directly change an element, the collection cannot know about that. So you must report these changes yourself. It only matters on collections that you have enabled publishing of course. If you do this to collections passed in to you, it's best to do this just case. You can check if publishing is enabled first of course. The TCollectionBase class provides a PublishElemChanged() method that makes it easy for you to report such changes.</P>
+
+
+        <SubSecTitle>Bulk Operations with Pub/Sub</SubSecTitle>
+
+        <P>There is a <Italic>huge</Italic> gotcha here. Each item added or removed or changed generates a message. If you spit out 100K items into a collection at once, that will cause 100K msgs, which isn't practical (and will throw since the subcriber's queue isn't nearly that big.)  There is no clean way to automagically deal with this, because already published msgs cannot be gotten back and there's no way to know that client code is about to iterate the collection and remove or modify a bunch of elements. The client code MUST cooperate or it's going to get full subscription queue errors.</P>
+
+        <P>So they have to call the BlockModeStart() method on TCollectionBase, do the bulk operation, then call BlockModeEnd() with the start/count values of what it modified. Or, if they are not contiguous they must pass c4MaxCard for the start value, which just sends a Reordered event (effectively, hey, reload again.)</P>
+
+        <P>There's just no way around it. A flag is set between Start/End to prevent any messages from being published. Obviously you have to worry about exceptions that would leave the flag set, so a janitor class is provided (<ClassRef Ref="TColBlockModeJan"/>.) It will set the flag and remember the start index. It can be ticked each time one is added/removed to bump a counter. When it dtors, it will call BlockModeEnd and publish a block operation message.</P>
+
+        <P>If a copy/assign is done with the block mode flag set, it is just cleared. A full report will be issued anyway with the new content.</P>
+
 
         <SecTitle>Prefab Algorithms</SecTitle>
 

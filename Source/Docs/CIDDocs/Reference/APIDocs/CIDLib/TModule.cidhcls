@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TModule" Prefix="mod" Parent="TObject">
+
+    <Desc>
+        <P>TModule objects represent loadable modules, executables or libraries (DLLs in Windows world.) Though you don't need to directly load modules yourself hardly ever, you will interact with modules (and their derived variations called <Link Type="Page" Ref="/BigPicture/" Id="/Facilities">facilities</Link> quite often, for logging, throwing exceptions, and loading resources associated with a given loadable module (particularly translatable text.)</P>
+    </Desc>
+
+    <PubIntf>
+        <StaticMeths>
+
+            <Method Name="bLoadOSMsg" RetType="tCIDLib::TBoolean">
+                <Desc>Loads the indicated operating system specific error message. This is handled by the per-platform code, so the TOSErrCode type is a per-platform defined type. If found, this method returns kCIDLib::True and the passed string is filled in with the text.</Desc>
+                <MethVar>
+                    <MethParam Name="errcId" Type="tCIDLib::TOSErCode"/>
+                    <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="BuildRawModName">
+                <Desc>
+                    <P>Given the information about a conforming CIDLib module, this will work with the <FacRef Ref="CIDKernel"/> layer to build the correct local platform path for the module.</P>
+
+                    <P>The first two are basically the same as the first two constructors below, but just taking the parameters related to creating the module name.</P>
+
+                    <P>The next two take the same parameters as the first two, but add two output strings. These are filled in with the path to the preferred language file for the local machine and the default language file for the local machine. This information is gotten from system locale info. These strings can be used to load one of the message files if desired.</P>
+
+                    <P>The last two are the kitchen sink versions which provide all of the above, but lets you indicate the preferred and default language files you want ot get the path to, plus it automatically gives you back the path to the English language file. There should always at least be an English language file, which will be the fallback if the preferred and default language files are not available.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strBaseName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4MajVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4MinVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar><MethParam Name="modiSrc" Type="TCIDModuleInfo" PBy="CRef"/></MethVar>
+                <MethVar>
+                    <MethParam Name="strBaseName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4MajVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4MinVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strPrefMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strDefMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="modiSrc" Type="TCIDModuleInfo" PBy="CRef"/>
+                    <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strPrefMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strDefMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strBaseName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4MajVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4MinVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="ePrefLang" Type="tCIDLib::ELanguages"/>
+                    <MethParam Name="eDefLang" Type="tCIDLib::ELanguages"/>
+                    <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strPrefMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strDefMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strEnMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="modiSrc" Type="TCIDModuleInfo" PBy="CRef"/>
+                    <MethParam Name="ePrefLang" Type="tCIDLib::ELanguages"/>
+                    <MethParam Name="eDefLang" Type="tCIDLib::ELanguages"/>
+                    <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strPrefMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strDefMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="strEnMsgs" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c8ParseVersionStr" RetType="tCIDLib::TCard8">
+                <Desc>
+                    <P>CIDLib uses a standard version scheme, with major, minor and revision values. This method will parse a formatted version of that string and return the encoded version, which is in a tCIDLib::TCard8 value. It actually can parse one that has all thread values or one that just has the major/minor values, depending on the bFullVersion parameter.</P>
+
+                    <P>The formatted version is a dotted notation, so either 1.2.3 or 1.2, depending on full version or not.</P>
+
+                    <P>The encoded version has the major version in the high 16 bits, the minor version in the next 16, and the revision in the low 32 bits.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strToParse" Type="TString" PBy="CRef"/>
+                    <MethParam Name="bFullVersion" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="InstallLogger">
+                <Desc>
+                    <P>This method will allow you to install a program-wide <Link Type="Page" Ref="/BigPicture/" Id="/LogFramework">logger</Link> object. The passed object must implement the <ClassRef Ref="MLogger"/> interface.</P>
+
+                    <P>This object can be optionally adopted, meaning the module implementation takes responsibility for it and will free it either at the end, or if another logger object is set to replace it. Or, it can not be adopted, which is useful if you want to have, say, your main program facility object implement MLogger and handle logged messages.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pmlogToSet" Type="MLogger" PBy="Ptr"/>
+                    <MethParam Name="eAdopt" Type="tCIDLib::EAdoptOpts"/>
+                </MethVar>
+            </Method>
+
+        </StaticMeths>
+
+        <Ctors DelMethods="DefCtor CopyCtor MoveCtor">
+
+            <Method Name="TModule">
+                <Desc>
+                    <P>You won't use these constructors most likely, but they can be used to load a module dynamically, or to get a module object for a module that is already loaded.</P>
+
+                    <P>For the first version, you provide the base name of the module and the version to load. Those are used to build the per-platform name of the module to load. The module type indicates if its an executable or library type, which also influences how the real module name is created. This is used to load a conforming CIDLib based module, which has a specific name format on each platform.</P>
+
+                    <P>The second version does the same as the first but that information is provided in a <ClassRef Ref="TCIDModuleInfo"/> object instead of as separate values.</P>
+
+                    <P>The third version takes an already built full path to the module to load. This one can be used to load non-CIDLib compliant modules. Just indicate that it has no loadable resources. The module type in this case is just advisory to the per-platform code in case there are differences in how executable vs library modules are loaded.</P>
+
+                    <P>The last version is the same as the one above, but it just takes the path and facility name string separately as a convenience. The name must still be fully formed,as in the above constructor, since no version info is being provided.</P>
+
+                    <P>The flags indicate if this module is supposed to have various resources that need to be loaded, such as loadable text or other resources.</P>
+
+                    <P>If the bLoad flag is set, then the module will be loaded. Otherwise it will only be looked for as an already loaded module. In the latter case you are just getting a TModule object in order to interact with it.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strBaseName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="c4MajVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4MinVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="eFlags" Type="tCIDLib::EModFlags"/>
+                    <MethParam Name="bLoad" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="modiLoad" Type="TCIDModuleInfo" PBy="CRef"/>
+                    <MethParam Name="bLoad" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFullPath" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="eFlags" Type="tCIDLib::EModFlags"/>
+                    <MethParam Name="bLoad" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFullName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="strFromPath" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="eFlags" Type="tCIDLib::EModFlags"/>
+                    <MethParam Name="bLoad" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="~TModule">
+                <Desc>Releases any loaded resources that were cached.</Desc>
+                <MethVar/>
+            </Method>
+        </Ctors>
+
+        <Operators DelMethods="AssignOp MoveOp"/>
+
+        <!-- Virtual public methods -->
+        <NVirtMeths>
+            <Method Name="bHasMessageFile" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns whether this module has loaded text resources or not.</Desc>
+                <MethVar/>
+            </Method>
+
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+
+</CppClass>
