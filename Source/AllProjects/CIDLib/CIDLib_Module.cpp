@@ -1619,11 +1619,14 @@ TModule::pszLoadCIDMsg(const tCIDLib::TMsgId midToLoad) const
 }
 
 
-TString TModule::strMsg(const tCIDLib::TMsgId midToLoad) const
+TString
+TModule::strMsg(const   tCIDLib::TMsgId     midToLoad
+                , const tCIDLib::TCard4     c4ExtraSpace) const
 {
-    TString strRet(kCIDLib::pszEmptyZStr, 1024);
-    bLoadCIDMsg(midToLoad, strRet);
-    return strRet;
+    // Get the text, put it into string object, and return that by value
+    tCIDLib::TBoolean bRet;
+    const tCIDLib::TCh* pszMsg = m_kmodThis.pszLoadCIDFacMsg(midToLoad, bRet);
+    return TString(pszMsg, c4ExtraSpace);
 }
 
 TString TModule::strMsg(const   tCIDLib::TMsgId midToLoad
@@ -1632,16 +1635,27 @@ TString TModule::strMsg(const   tCIDLib::TMsgId midToLoad
                         , const MFormattable&   fmtblToken3
                         , const MFormattable&   fmtblToken4) const
 {
-    TString strRet(kCIDLib::pszEmptyZStr, 1024);
-    bLoadCIDMsg
-    (
-        midToLoad
-        , strRet
-        , fmtblToken1
-        , fmtblToken2
-        , fmtblToken3
-        , fmtblToken4
-    );
+    //
+    //  Same as above, but leave some room for tokens. It might still not be enough
+    //  and the string has to expand, but we can prevent a lot of expansions without
+    //  making the string a lot bigger than it needs to be.
+    //
+    tCIDLib::TBoolean bRet;
+    const tCIDLib::TCh* pszMsg = m_kmodThis.pszLoadCIDFacMsg(midToLoad, bRet);
+    TString strRet(pszMsg, 64);
+
+    // And now do token replacement if we got the real msg
+    if (bRet)
+    {
+        if (!MFormattable::bIsNullObject(fmtblToken1))
+            strRet.eReplaceToken(fmtblToken1, L'1');
+        if (!MFormattable::bIsNullObject(fmtblToken2))
+            strRet.eReplaceToken(fmtblToken2, L'2');
+        if (!MFormattable::bIsNullObject(fmtblToken3))
+            strRet.eReplaceToken(fmtblToken3, L'3');
+        if (!MFormattable::bIsNullObject(fmtblToken4))
+            strRet.eReplaceToken(fmtblToken4, L'4');
+    }
     return strRet;
 }
 

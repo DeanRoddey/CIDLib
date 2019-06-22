@@ -4,14 +4,27 @@
 <CppClass Class="TModule" Prefix="mod" Parent="TObject">
 
     <Desc>
-        <P>TModule objects represent loadable modules, executables or libraries (DLLs in Windows world.) Though you don't need to directly load modules yourself hardly ever, you will interact with modules (and their derived variations called <Link Type="Page" Ref="/BigPicture/" Id="/Facilities">facilities</Link> quite often, for logging, throwing exceptions, and loading resources associated with a given loadable module (particularly translatable text.)</P>
+        <P>TModule objects represent loadable modules, executables or libraries (DLLs in Windows world.) Though you don't need to directly load modules yourself hardly ever, you will interact with modules quite often, though indirectly mostly via their derived variations called <Link Type="Page" Ref="/BigPicture/" Id="/Facilities">facilities</Link>. Each facility creates a facility object, and you will use those for logging, throwing exceptions, and loading resources associated with the underlying module.</P>
+
+        <P>Since loadable resources are defined at a per-project level, and projects represent libraries or excecutables, and facilities represent those libraries or executables at runtime, all loadable resources are accessed via facilities, which in turn uses functionality provided at this one step lower module level.</P>
+
+        <P>One of the most commonly loaded resources is translatable text. Each library/exectuable project can define translatable text messages to be loaded at runtime. The module/facility classes provide very convenient methods for loading them and updating replacement tokens in the loaded text with runtime information. This is a very common activity in non-trivial applications, which typically want to be translatable.</P>
+
+        <P>The other very common thing you will use facilities for (and indirectly this underlying module class) is to <Link Type="Page" Ref="/BigPicture/" Id="/Log-Except">log messages and throw errors.</Link> Both of these leverage the above loadable text and token replacement capabilities as well. CIDLib also supports a very flexible <Link Type="Page" Ref="/BigPicture/" Id="/LogFramework">logging framework</Link> which works through this class.</P>
+
+        <P>The logging and throwing helper methods will add other info for you such as the calling thread's name, the module name, and the process name.</P>
+
+        <SubSecTitle>File and Line</SubSecTitle>
+
+        <P>The logging and throwing helper methods below take a file name and line number. Use the CID_FILE and CID_LINE values to provide these. This allows for tools/platform magic if it's ever required.</P>
+
     </Desc>
 
     <PubIntf>
         <StaticMeths>
 
             <Method Name="bLoadOSMsg" RetType="tCIDLib::TBoolean">
-                <Desc>Loads the indicated operating system specific error message. This is handled by the per-platform code, so the TOSErrCode type is a per-platform defined type. If found, this method returns kCIDLib::True and the passed string is filled in with the text.</Desc>
+                <Desc>Loads the indicated operating system specific error message. This is handled by the per-platform code, so the TOSErrCode type is a per-platform defined type. If found, this method returns kCIDLib::True and the passed string is filled in with the text. This is something really only needed in low level code that wraps system services.</Desc>
                 <MethVar>
                     <MethParam Name="errcId" Type="tCIDLib::TOSErCode"/>
                     <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
@@ -26,7 +39,7 @@
 
                     <P>The next two take the same parameters as the first two, but add two output strings. These are filled in with the path to the preferred language file for the local machine and the default language file for the local machine. This information is gotten from system locale info. These strings can be used to load one of the message files if desired.</P>
 
-                    <P>The last two are the kitchen sink versions which provide all of the above, but lets you indicate the preferred and default language files you want ot get the path to, plus it automatically gives you back the path to the English language file. There should always at least be an English language file, which will be the fallback if the preferred and default language files are not available.</P>
+                    <P>The last two are the kitchen sink versions which provide all of the above, but lets you indicate the preferred and default language files you want to get the path to, plus it automatically gives you back the path to the English language file. There should always at least be an English language file, which will be the fallback if the preferred and default language files are not available.</P>
                 </Desc>
                 <MethVar>
                     <MethParam Name="strBaseName" Type="TString" PBy="CRef"/>
@@ -78,9 +91,9 @@
                 <Desc>
                     <P>CIDLib uses a standard version scheme, with major, minor and revision values. This method will parse a formatted version of that string and return the encoded version, which is in a tCIDLib::TCard8 value. It actually can parse one that has all thread values or one that just has the major/minor values, depending on the bFullVersion parameter.</P>
 
-                    <P>The formatted version is a dotted notation, so either 1.2.3 or 1.2, depending on full version or not.</P>
+                    <P>The formatted version is a dotted notation, so either 1.2.3 or 1.2, depending on full version or not. The encoded version has the major version in the high 16 bits, the minor version in the next 16, and the revision in the low 32 bits.</P>
 
-                    <P>The encoded version has the major version in the high 16 bits, the minor version in the next 16, and the revision in the low 32 bits.</P>
+                    <Note>There are otehr versions below which return the broken out values instead of the encoded format.</Note>
                 </Desc>
                 <MethVar>
                     <MethParam Name="strToParse" Type="TString" PBy="CRef"/>
@@ -98,6 +111,55 @@
                     <MethParam Name="pmlogToSet" Type="MLogger" PBy="Ptr"/>
                     <MethParam Name="eAdopt" Type="tCIDLib::EAdoptOpts"/>
                 </MethVar>
+            </Method>
+
+            <Method Name="LogEventObj">
+                <Desc>
+                    <P>This is a helper method you can use if you already have a TLogEvent (or its aliased evil cousin, TError) object built and want to log it. Normally you would use the LogMsg() and ThrowErr() methods below, but sometimes you already have one. The most common reason is when logging a caught exception.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="logevToLog" Type="TLogEvent" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="LogEventObjs">
+                <Desc>
+                    <P>Similar to LogEventObj() above, but this one takes a list of log event objects to log all at once. This is would be quite rarely used, but it's there just in case, since it could potentially be a lot more efficient than doing them all as singles.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="colToLog" Type="TCollection&amp;lt;TLogEvent>" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="OrphanLogger">
+                <Desc>
+                    <P>If any logger has been installed, it is just forgotten about. Even if we were told to adopt it, it's not deleted, and the caller becomes responsible for cleaning it up if that is appropriate. This will stop any logging. If the existing installed logger object needs any type specific termination or cleanup work, the caller must do that himself since we know nothing about that.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="ParseVersionStr">
+                <Desc>
+                    <P>These are similar to c8ParseVerionStr() above, but in this case instead of returning the encoded binary format of the version it just returns the broken out values. One will return just the major/minor values, and the other will look for a revision level as well (which must be there or an exception will occur.)</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strToParse" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4MajVer" Type="tCIDLib::TCard" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4MinVer" Type="tCIDLib::TCard" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strToParse" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4MajVer" Type="tCIDLib::TCard" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4MinVer" Type="tCIDLib::TCard" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4Revision" Type="tCIDLib::TCard" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="pmtxLogSync" RetType="TMutex" RetBy="Ptr">
+                <Desc>
+                    Though you should never really need to use this, this provides access to the mutex that is used to synchronize calls to the installed logger. This is really for internal CIDLib use.
+                </Desc>
+                <MethVar/>
             </Method>
 
         </StaticMeths>
@@ -162,10 +224,307 @@
                 <MethVar/>
             </Method>
 
+            <Method Name="bLoadCIDMsg" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>Loads a text string resource attached to this module. It is represented by a message id. It can also actualy be an error id as well, since they are basically treated the same from a text loading perspective.</P>
+
+                    <P>In the first case, the string has no replacement tokens, or you aren't trying to replace them if they are there. In the second, you can provide up to four values which will replace, respectively, the tokens %(1), %(2), %(3), and %(4). The positions of those tokens in the text is irrelevant, only the order of the values matters. This is necessary of course since different languages may order the sentence components different.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="midToLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="midToLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="mfmtbToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mfmtbToken2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="eModType" RetType="tCIDLib::EModTypes" Attrs="Const">
+                <Desc>Returns the type of this module. Not generally something you need to know dynamically, but it might be useful for some logged messages or thrown errors and such.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="kmodThis" RetType="TKrnlModule" RetBy="CRef" Attrs="Const">
+                <Desc>Really only for internal CIDLib use, this provides access to the underlying <FacRef Ref="CIDKernel"/> platform wrapper object for this module.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="LogKrnlErr" Attrs="Const">
+                <Desc>
+                    <P>This is mostly for internal use by code that (indirectly) wraps platform APIs by way of the <FacRef Ref="CIDKernel"/> facility. If they get a failure response back from a kernel layer method, they want to log (or throw, which is below) an error of their own about what failed, but also log the underlying CIDKernel error info.</P>
+
+                    <P>There are two versions, as in the message loading stuff above, one which loads the  text for the passed error code, and another that does that plus does token replacement all in one call.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="errcToThrow" Type="tCIDLib::TErrCode"/>
+                    <MethParam Name="kerrToLog" Type="TKrnlError" PBy="CRef"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="errcToThrow" Type="tCIDLib::TErrCode"/>
+                    <MethParam Name="kerrToLog" Type="TKrnlError" PBy="CRef"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses"/>
+                    <MethParam Name="mfmtbToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mfmtbToken2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="LogMsg" Attrs="Const">
+                <Desc>
+                    <P>This is an often used method that logs a message via loadable text attached to this module. It's similar to the other log/throw methods here. It takes the id of a message attached to this module. It can just load it or load it and do token replacement all at once. </P>
+
+                    <P>Though this is for logging messages, you can also pass an error id if you want to log an error instead of throwing it.</P>
+
+                    <P>For practical purposes we provide versions that just take a direct string to log instead of loading a loadable text value. In that case the message id will just be a generic one added automatically.</P>
+
+                    <P>Some variations provide an 'aux text' parameter which you can use to pass extra contents info without having to format it into the actual logged message, something that can become unwieldy in some cases.</P>
+
+                    <P>The severity level can be used for severity based filtering, both in the actually logging process, CIDLib supports a log threshold you can set, and later after the fact when perusing log output.</P>
+
+                    <P>The error class is more for just general indication of the type of error, and can be used for filtering logged content after the fact. It's not used here for filtering of outgoing messages. Some code may check if an error is of a certain class instead of checking for a particular error, such as a loss of connection error class.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="strToLog" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::AppStatus"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="strToLog" Type="TString" PBy="CRef"/>
+                    <MethParam Name="strAuxText" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::AppStatus"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="midToLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::AppStatus"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="midToLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="strAuxText" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::AppStatus"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="midToLog" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses"/>
+                    <MethParam Name="mfmtbToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mfmtbToken2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="strToLog" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses"/>
+                    <MethParam Name="mfmtbToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mfmtbToken2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="midToLog" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="strAuxText" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses"/>
+                    <MethParam Name="mfmtbToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mfmtbToken2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="pc1FindRes" RetType="tCIDLib::TCard1" RetBy="CPtr" Attrs="Const">
+                <Desc>
+                    <P>Really only for internal CIDLib use, this method is used to load a particular loadable resource by its resource id and return information about it. One looks for a particular resource type with that id, and fails if it either isn't found, or it is found isn't of the required type. The other version returns what type it is.</P>
+
+                    <P>If successful, both return the byte size of the raw resource content, which can be used to allocate a buffer to read the data into, or to parse the content out.</P>
+
+                    <P>It can either return a status indicating if it worked or not, or throw if the resource is not found or is of the wrong type, based on bErrIfNotFound.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Size" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="ridToload" Type="tCIDLib::TResId"/>
+                    <MethParam Name="eType" Type="tCIDLib::EResTypes"/>
+                    <MethParam Name="bErrIfNotFound" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="eType" Type="tCIDLib::EResTypes" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4Size" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="ridToload" Type="tCIDLib::TResId"/>
+                    <MethParam Name="bErrIfNotFound" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="pfnGetFuncPtr" RetType="tCIDLib::FuncPtr" Attrs="Const">
+                <Desc>
+                    <P>You aren't like to use this. But if you need to load modules dynamically and then access an entry point dynamically, you can use this to do that. It returns a generic function pointer that you will have to cast to a function pointer with the correct parameters and return type and such.</P>
+
+                    <P>The function name is a short character string, i.e. local code page since it may not be possible to load a function with a wide string name.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pszFuncName" Type="tCIDLib::TSCh" PBy="CPtrC"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="pszLoadCIDMsg" RetType="tCIDLib::TCh" RetBy="CPtr" Attrs="Const">
+                <Desc>
+                    <P>The first variation is only for internal use. Given a previously loaded and decoded load text message index, and the id of a message inside it, return a pointer to the raw message text, in place within the message index data, i.e. doesn't require pulling the text out, so it's very light.</P>
+
+                    <P>The other two varations are more normal ones that assume we are dealing with this module's loaded text and uses the internally loaded message index.</P>
+
+                    <P>bLoaded is set if it was able to find the message id. If the message id wasn't found, it still returns a pointer to a string, but it's just a generic one saying that a requested message could not be found. So, if it does get displayed, the user will see the message and hopefully report it.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="miSrc" Type="tCIDLib::TMsgIndex" PBy="CRef"/>
+                    <MethParam Name="midToload" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="bLoaded" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="midToload" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="bLoaded" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="midToload" Type="tCIDLib::TMsgId"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="strMsg" RetType="TString" RetBy="CRef" Attrs="Const">
+                <Desc>
+                    <P>These are similar to pszLoadCIDMsg above but return a <ClassRef Ref="TString"/> object by value with the text in it. If you already have a string, it's probably more efficient to just assign the above raw pointer version to it than to create a temp and return as this one does. But, if this is considerably more convenient to use, it's available.</P>
+
+                    <P>The first version lets you reserve extra space beyond what the loaded text requires, if you know you are going to add to it. This can avoid buffer reallocation.</P>
+
+                    <P>These don't indicate success or failure. You just either get the message or you get the default 'message not found' text.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="midToload" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="c4Extra" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="midToload" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="mfmtbToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mfmtbToken2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="strPath" RetType="TString" RetBy="CRef" Attrs="Const">
+                <Desc>Returns the path to the library or executable file that this module represents. Of course this is going to be empty if this is being used for dynamic loading and the module hasn't been loaded yet.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="strName" RetType="TString" RetBy="CRef" Attrs="Const">
+                <Desc>Returns the base name of the library or executable file that this module represents. Of course this is going to be empty if this is being used for dynamic loading and the module hasn't been loaded yet.</Desc>
+                <MethVar/>
+            </Method>
+
+
+            <Method Name="ThrowErr" Attrs="Const">
+                <Desc>
+                    <P>In terms of parameters and loading of text and such, these are pretty much the same as the LogMsg() method above. As discussed in <Link Type="Page" Ref="/BigPicture/" Id="/Log-Except">the Big Picture</Link> section, logging and errors are tightly linked because they use the same class. So these effectively create the same objects as the LogMsg() methods, but in this case they throw them instead of log them.</P>
+
+                    <P>One difference here is that there are no variations that just take a string. These all require an error id, which will be used to load the associated text from this module. The reason being that this an exception and it has to identify itself as a specific exception to anyone who catches it.</P>
+
+                    <P>And of course take error ids instead of message ids, and in this case it must be an error id, it can't be a message id. Unlike LogMsg() above which can equally well log an error or a message.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="errcToThrow" Type="tCIDLib::TErrCode"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::AppStatus"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="errcToThrow" Type="tCIDLib::TErrCode"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses"/>
+                    <MethParam Name="mfmtbToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mfmtbToken2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="errcToThrow" Type="tCIDLib::TErrCode"/>
+                    <MethParam Name="strAuxText" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::AppStatus"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="errcToThrow" Type="tCIDLib::TErrCode"/>
+                    <MethParam Name="strAuxText" Type="tCIDLib::TMsgId"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses"/>
+                    <MethParam Name="mfmtbToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mfmtbToken2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ThrowKrnlErr" Attrs="Const">
+                <Desc>
+                    <P>These are like the LogKrnlErr() methods above except in this case they throw instead of of log. Like those, these are for low level code that deals with <FacRef Ref="CIDKernel"/> objects and wants to throw an error in response to getting a failure status from a CIDKernel method, passing along the kernel level error info.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="errcToThrow" Type="tCIDLib::TErrCode"/>
+                    <MethParam Name="kerrToLog" Type="TKrnlError" PBy="CRef"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="errcToThrow" Type="tCIDLib::TErrCode"/>
+                    <MethParam Name="kerrToLog" Type="TKrnlError" PBy="CRef"/>
+                    <MethParam Name="eSeverity" Type="tCIDLib::ESeverities"/>
+                    <MethParam Name="eClass" Type="tCIDLib::EErrClasses"/>
+                    <MethParam Name="mfmtbToken1" Type="MFormattable" PBy="CRef"/>
+                    <MethParam Name="mfmtbToken2" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                    <MethParam Name="mfmtbToken3" Type="MFormattable" PBy="CRef" DefVal="MFormattable::Nul_MFormattable()"/>
+                </MethVar>
+            </Method>
 
         </NVirtMeths>
 
     </PubIntf>
-
 
 </CppClass>

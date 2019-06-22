@@ -15,19 +15,23 @@
 //
 // DESCRIPTION:
 //
-//  This file implements the TString class, which (suprise) implements a
-//  wrapper for XMLCh based strings. The string is maintained null terminated,
-//  so that it can be passed to system APIs, but the length is also maintained
-//  at all times. So appends or other ops that require access to the end of
-//  the string are very fast.
+//  This file implements the TString class, which (suprise) implements a wrapper
+//  for an array of (wide) characters strings. The string is maintained null
+//  terminated at least any time you look at the raw buffer, so that it can be
+//  passed to system APIs, but the length is also  maintained at all times. So
+//  appends or other ops that require access to the end of the string are very fast.
 //
 //  TStrBuf is the object that actually contains the string buffer. It provides
 //  a simple set of fundamental operations via which all string manipulations
 //  can be done. Each TString object has one of these objects, via which it
-//  manages the actual string data. At this time, these buffer objects are not
-//  reference counted, but it might be in the future. Using this buffer object
-//  will allow us to implement copy on write, ref counted buffers later if
-//  we decide to.
+//  manages the actual string data.
+//
+//  At this time, these buffer objects are not reference counted, but it might be
+//  in the future. Using this buffer object will allow us to implement copy on
+//  write, ref counted buffers later if we decide to. Or, at some point we may
+//  just decide it's not worth it and get rid of the extra layer and move the raw
+//  buffer up to TString itself. But the extra encapsulation does help with
+//  maintaining control over the buffer either way.
 //
 //  String capacity is not considered part of equality between strings, only the
 //  current length and actual character content. So the capacity can be changed
@@ -41,10 +45,10 @@
 //  2)  Only const access is provided to the raw buffer, for passing to system
 //      APIs internally (or in your code if you must wrap some third party
 //      code.) Because we may move to a ref counted buffer at some point in
-//      the future, direct access cannot be allowed.
+//      the future, direct access is not safe.
 //
-//  3)  Basically almost all of the TString class is made up of inlined
-//      methods which just delegate to the string buffer object.
+//  3)  Lots of the TString class is made up of inlined methods which just
+//      delegate to the string buffer object.
 //
 // LOG:
 //

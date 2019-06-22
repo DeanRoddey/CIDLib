@@ -410,6 +410,7 @@ class CIDLIBEXP TModule : public TObject
         TString strMsg
         (
             const   tCIDLib::TMsgId         midToLoad
+            , const tCIDLib::TCard4         c4ExtraSpace = 0
         )   const;
 
         TString strMsg
