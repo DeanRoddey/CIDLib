@@ -1587,6 +1587,39 @@ class TTest_PubSubVector : public TTestFWTest, private MPubSubscription
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_RawBits
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_RawBits : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_RawBits();
+
+        ~TTest_RawBits();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_RawBits, TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TTest_RefVectorLambda
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------

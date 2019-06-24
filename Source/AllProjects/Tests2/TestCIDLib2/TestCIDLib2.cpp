@@ -75,6 +75,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
 
     // The most fundamental stuff
     AddTest(new TTest_Types);
+    AddTest(new TTest_RawBits);
     AddTest(new TTest_SafeCnt1);
     AddTest(new TTest_CntPtr1);
     AddTest(new TTest_UniquePtr);

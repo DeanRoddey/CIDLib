@@ -8,7 +8,7 @@
 
         <P>This is mostly a topic for the reference section, but it's important for folks new to CIDLib to understand the type system used by CIDLib for the fundamental (non-class, non-enumeration) types.</P>
 
-        <P>Because CIDLib must be portable, you never use the actual C++ types directly. Well, if you are doing a facility to encapsulate system functionality sometimes you will use some internally when interacting with those system APIs, but never in actual CIDLib code. You will use a set of fundamental types in the tCIDLib namespace. The most common ones are:</P>
+        <P>Because CIDLib must be portable, you never use the actual C++ types directly. Well, if you are doing a facility to encapsulate system functionality sometimes you will use some internally when interacting with those system APIs, but never in actual CIDLib based programs. You will use a set of fundamental types in the tCIDLib namespace. The most common ones are:</P>
 
         <List>
             <LItem Ref="tCIDLib::TBoolean">A boolean value.</LItem>
@@ -22,7 +22,7 @@
 
         <P>The per-platform code will map these, and various other, types to the appropriate type for that platform.</P>
 
-        <P>In some cases it's unlikely that a type will ever mapped to anything but a specific language defined type, like TBoolean. However, it would be ugly and extremely inconsistent not to treat all types the same. CIDLib very much strives for stylistic consistency. And, worst case, it means we can always redefine a fundamental type if need be, even using the new enum class capability to create a unique type if needed. So always, always use the CIDLib defined types.</P>
+        <P>In some cases it's unlikely that a type will ever mapped to anything but a specific language defined type, like TBoolean. However, it would be ugly and extremely inconsistent not to treat all types the same. CIDLib very much strives for stylistic consistency. And, worst case, it means we can always redefine a fundamental type if need be. So always, always use the CIDLib defined types.</P>
 
         <Note>There will be reference material with more information, but you can find the per-platform mappings in a file called CIDKernel\xxx\CIDKernel_PlatformTypes.hpp, where xxx is the per-platform directory of the CIDKernel facility.</Note>
 
