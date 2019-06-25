@@ -5680,7 +5680,10 @@ TWindow::mresDispatch(  const   TWindow&            wndThis
         }
 
         // Call the underlying control procedure and return his return
-        return ::CallWindowProc(m_pfOrgProc, wndThis.hwndSafe(), wmsgCur, wParam, lParam);
+        return ::CallWindowProc
+        (
+            (WNDPROC)m_pfOrgProc, wndThis.hwndSafe(), wmsgCur, wParam, lParam
+        );
     }
 
 
@@ -7857,7 +7860,7 @@ TWindow::mresCallSubClass(  const   tCIDCtrls::TWndMsg  wmsgCur
                             , const tCIDCtrls::TWParam  wParam
                             , const tCIDCtrls::TLParam  lParam)
 {
-    return ::CallWindowProc(m_pfOrgProc, hwndSafe(), wmsgCur, wParam, lParam);
+    return ::CallWindowProc((WNDPROC)m_pfOrgProc, hwndSafe(), wmsgCur, wParam, lParam);
 }
 
 
@@ -7996,7 +7999,7 @@ TWindow::RegWndClass(const  tCIDLib::TCh* const pszName
 
     // This is done the same regardless of the above
     wcData.lpszClassName = pszName;
-    wcData.lpfnWndProc = mresCIDCtrlsDispatch;
+    wcData.lpfnWndProc = (WNDPROC)mresCIDCtrlsDispatch;
     wcData.hInstance = hInstance;
 
     if (bDblClicks)

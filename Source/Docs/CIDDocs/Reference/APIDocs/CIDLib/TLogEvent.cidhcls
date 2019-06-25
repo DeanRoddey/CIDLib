@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass   Class="TLogEvent" Prefix="logev" Parent="TObject" Flags="Dup BStrm Fmt">
+
+    <Desc>
+        <P>This class represents two things. It is both the representation of a logged message and an exception, as discussed in the Big Picture section <Link Type="Page" Ref="/BigPicture/" Id="/Log-Except">here</Link>. There is an alias that maps this class also to the TError class, so a logged msg and an exception are literally the same thing. This is a very convenient thing, because it becomes easy to log errors, or to choose to either throw or log something depending on circumstances.</P>
+
+        <P>Though you can create these, almost always you call methods on the <Link Type="Page" Ref="/BigPicture/" Id="/Facilities">facility</Link> class of the particular facility and pass it information from which it builds one of these for you, adding more information along the way. If you do create one, use the CID_FILE and CID_LINE values to set the file name and line number. This allows per-platform code to play any magic that might be required. And, in any other methods of this class takes a file name or line, use them for that as well.</P>
+
+        <Note>You will also see below sometimes tCIDLib::TMsgId and sometimes tCIDLib::TErrCode, which are the types for loadable text and error codes, being used. They are also  interchangeable. The latter is only used below for stuff that is directly related to exceptions. But you can pass an error code anywhere a message id is taken.</Note>
+
+        <P>You can use these to log/throw a generic msg/error and just pass a string. But for throwing exceptions, you really should throw an error associated with a facility and have the text loaded from that, because otherwise downstream code cannot check the error type easily.</P>
+
+        <P>Only use the id'less versions for temporary or debug-only logging.</P>
+
+        <SubSecTitle>Error Ids</SubSecTitle>
+
+        <P>Though there is a main error (or possibly message) id, since we also have to deal with underlying <FacRef Ref="CIDKernel"/> and even host errors, there are up to three codes potentially associated with these objects.</P>
+
+        <List>
+            <LItem Ref="OS Error">If the error occurred due to an underlying operating system error, this will be set, else zero.</LItem>
+            <LItem Ref="Kernel Error">If the error occurred while interacting with a CIDKernel object, then this will be set, and the OS error may also be set since CIDKernel primarily wraps OS services.</LItem>
+            <LItem Ref="CIDLib Error">The CIDLib level error (or message id) that is being discussed above. If may be the only one if the underlying error was not kernel or OS related, or it may be in addition to them.</LItem>
+        </List>
+
+        <P>These are hierarchical. You can have CIDLib level errors by themselves. You can have a CIDLib level error plus an underlying CIDKernel error that occurred. Or you can have a CIDLib level error plus an underlying CIDKernel error plus an underlying OS error that caused the CIDKernel error to occur.</P>
+
+        <P>To the degree that your code deal with specific errors at all, it will be the CIDLib level errors. Rarely would you ever want to check for CIDKernel or OS level error codes, which is not as portable.</P>
+    </Desc>
+
+    <PubIntf>
+
+        <Ctors>
+            <Method Name="TLogEvent">
+                <Desc>
+                    These constructors mostly map to the TModule methods that log messages and throw exceptions, with just the addition of a facility name, which is added for you typically by the facility object by which you log or throw one of these. Other information is added by these constructors, such as process and thread name, so they don't need to be passed.
+                </Desc>
+                <MethVar/>
+                <MethVar>
+                    <MethParam  Name="strFacName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="strMsgText" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="eSev" Type="tCIDLib::ESeverities" DefVal="tCIDLib::ESeverities::Status"/>
+                    <MethParam  Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::None"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strFacName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="strMsgText" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strAuxText" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="eSev" Type="tCIDLib::ESeverities" DefVal="tCIDLib::ESeverities::Status"/>
+                    <MethParam  Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::None"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strFacName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="midLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam  Name="strMsgText" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="eSev" Type="tCIDLib::ESeverities" DefVal="tCIDLib::ESeverities::Status"/>
+                    <MethParam  Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::None"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strFacName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="midLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam  Name="strMsgText" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strAuxText" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="eSev" Type="tCIDLib::ESeverities" DefVal="tCIDLib::ESeverities::Status"/>
+                    <MethParam  Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::None"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strFacName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="midLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam  Name="kerrIds" Type="TKrnlError" PBy="CRef"/>
+                    <MethParam  Name="strMsgText" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="eSev" Type="tCIDLib::ESeverities" DefVal="tCIDLib::ESeverities::Status"/>
+                    <MethParam  Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::None"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strFacName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strFileName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4LineNum" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="midLoad" Type="tCIDLib::TMsgId"/>
+                    <MethParam  Name="kerrIds" Type="TKrnlError" PBy="CRef"/>
+                    <MethParam  Name="strMsgText" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="strAuxText" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="eSev" Type="tCIDLib::ESeverities" DefVal="tCIDLib::ESeverities::Status"/>
+                    <MethParam  Name="eClass" Type="tCIDLib::EErrClasses" DefVal="tCIDLib::EErrClasses::None"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="logevSrc" Type="TLogEvent" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="~TLogEvent">
+                <Desc>
+                    Does any cleanup necessary. Currently this is just the aux text member which is faulted in only if aux text is ever set.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+        </Ctors>
+
+        <Operators>
+
+            <Method Name="operator=">
+                <Desc>
+                    We provide this to copy the source's aux text if it was ever set, or to get rid of ours if the source has none.
+                </Desc>
+                <MethVar><MethParam  Name="logevSrc" Type="TLogEvent" PBy="CRef"/></MethVar>
+            </Method>
+
+        </Operators>
+
+        <NVirtMeths>
+
+            <Method Name="AddStackLevel">
+                <Desc>Adds the passed file and line to the stack trace of this exception object.</Desc>
+                <MethVar>
+                    <MethParam  Name="strFile" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="c4Line" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="AdvFormat" Attrs="Const">
+                <Desc>
+                    <P>You can dump these to a text output stream, since this class implements MFormattable, but this method lets you control the format of the time stamp. When you dump to a text output stream a default time stamp format is used, which may not be optimal for your display needs.</P>
+
+                    <P>You pass a <ClassRef Ref="TTime"/> object which you have set up with the appropriate time format and it will be set to the event's time and then dumped to the stream. This also means that, if you are formatting a round of these, you can pass the time object back in repeatedly and be more efficient.</P>
+
+                    <P>FormatAt() just calls this with a time object it sets up with a default value.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strmOut" Type="TTextOutStream" PBy="Ref" Dir="In"/>
+                    <MethParam  Name="tmFmt" Type="TTime" PBy="Ref" Dir="In"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bAnyArror" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>Returns kCIDLib::True if any of the errors (CIDLib, CIDKernel, or host OS) errors are non-zero.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bCheckEvent" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>Returns kCIDLib::True if this object represents the indicated error (or it could be message) code from the indicated facility. This is generally used in exception handlers to check for a specific error where that is necessary.</Desc>
+                <MethVar>
+                    <MethParam  Name="strName" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="errcToCheck" Type="tCIDLib::TErrCode"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="pszName" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="errcToCheck" Type="tCIDLib::TErrCode"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bHasAuxText" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>Returns kCIDLib::True if this object has any aux text. Since the aux text string is faulted in upon use, this can avoid doing that if none has been set. Otherwise you just force the faulting in an empty string.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bLogged" RetType="tCIDLib::TBoolean">
+                <Desc>When an object is logged, this flag will be set so that you can know later if this has been done already. So these allow getting and setting the logged flag.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="bToSet" Type="tCIDLib::TBoolean"/></MethVar>
+            </Method>
+
+            <Method Name="bReported" RetType="tCIDLib::TBoolean">
+                <Desc>This is a convenience for use by client code, CIDLib doesn't do it. It can be used to mark such objects as to whether a logged message or error has been reported to the user already or not.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="bToSet" Type="tCIDLib::TBoolean"/></MethVar>
+            </Method>
+
+            <Method Name="bSameError" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>Returns kCIDLib::True if the passed object represents the same error (or logged message) as this one. This is not the same as equality. That would include time logged and other things. This just compares the facility names and the error/message ids. In the case of the ids, that includes all three of them.</Desc>
+                <MethVar><MethParam Name="logevToCheck" Type="TLogEvent" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="c4LineNum" RetType="tCIDLib::TCard4">
+                <Desc>Get or set the line number for this error or message.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="c4ToSet" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="enctLogged" RetType="tCIDLib::TEncodedTime">
+                <Desc>Get or set the time stamp for when this object was created.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="enctToSet" Type="tCIDLib::TEncodedTime"/></MethVar>
+            </Method>
+
+            <Method Name="errcHost" RetType="tCIDLib::TOSErrCode">
+                <Desc>Get or set the low level, OS specific error code for this this object.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="errcToSet" Type="tCIDLib::TOSErrCode"/></MethVar>
+            </Method>
+
+            <Method Name="errcId" RetType="tCIDLib::TErrCode">
+                <Desc>Get or set the high level, CIDLib level error code (or message id.)</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="errcToSet" Type="tCIDLib::TErrCode"/></MethVar>
+            </Method>
+
+            <Method Name="errcKrnlId" RetType="tCIDLib::TErrCode">
+                <Desc>Get or set the CIDKernel level error code.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="errcToSet" Type="tCIDLib::TErrCode"/></MethVar>
+            </Method>
+
+            <Method Name="eClass" RetType="tCIDLib::EErrClasses">
+                <Desc>Get or set the error class.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="eToSet" Type="tCIDLib::EErrClasses"/></MethVar>
+            </Method>
+
+            <Method Name="eSeverity" RetType="tCIDLib::ESeverities">
+                <Desc>Get or set the severity level.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="eToSet" Type="tCIDLib::ESeverities"/></MethVar>
+            </Method>
+
+            <Method Name="Reset">
+                <Desc>Resets this object back to an empty state, clearing out any previously set information.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="strAuxText" RetType="TString" RetBy="CRef">
+                <Desc>Get or set the aux text for this object. If none has been set yet, this will fault in the aux text string member.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="strErrText" RetType="TString" RetBy="CRef">
+                <Desc>Get or set the main error (message) text for this object.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="strFacName" RetType="TString" RetBy="CRef">
+                <Desc>Get or set the facility name for this object. This one is typically set for you by the facility object you log/throw via.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="strFileName" RetType="TString" RetBy="CRef">
+                <Desc>Get or set the path of the file which threw or logged this object.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="strHostName" RetType="TString" RetBy="CRef">
+                <Desc>Get or set the the name of the host running the program which threw or logged this object. This might seem useless but remember that we support a centralized log server, and also that exceptions can be thrown back across <Link Type="Page" Ref="/BigPicture/" Id="/ORB-IDL">ORB</Link> based remote calls.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="strProcess" RetType="TString" RetBy="CRef">
+                <Desc>Get or set the name of the process which threw or logged this object.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="strStackTrace" RetType="TString" RetBy="CRef" Attrs="Const">
+                <Desc>Get the stack trace info. THis is a newline separated list of file/line values.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="strThread" RetType="TString" RetBy="CRef">
+                <Desc>Get or set the name of the thread which threw or logged this object.</Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="SetLogged">
+                <Desc>Get set the logged flag to indicate that this object has already been logged. The logging stuff in <ClassRef Ref="TModule"/> will set this when it passes the object off to the logger.</Desc>
+                <MethVar/>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

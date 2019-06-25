@@ -29,6 +29,15 @@
 
 
 // ---------------------------------------------------------------------------
+//  We used to do this in the build. But if using an IDE that validates, it
+//  won't see build flags and hence the IDE will get ASCII versions of all of
+//  the system headers. So we define them here.
+// ---------------------------------------------------------------------------
+#define UNICODE 1
+#define _UNICODE 1
+
+
+// ---------------------------------------------------------------------------
 //  Win32 platform is always little endian. Big endian platforms will instead
 //  define the CIDLIB_BIGENDIAN token.
 // ---------------------------------------------------------------------------

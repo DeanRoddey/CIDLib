@@ -33,11 +33,11 @@
                 </MethVar>
                 <MethVar>
                     <MethParam  Name="str1" Type="TString" PBy="CRef"/>
-                    <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
+                    <MethParam  Name="ch1" Type="tCIDLib::TCh"/>
                 </MethVar>
                 <MethVar>
                     <MethParam  Name="str1" Type="TString" PBy="CRef"/>
-                    <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
+                    <MethParam  Name="ch1" Type="tCIDLib::TCh"/>
                     <MethParam  Name="str2" Type="TString" PBy="CRef"/>
                 </MethVar>
                 <MethVar>
@@ -54,7 +54,7 @@
                 </MethVar>
                 <MethVar>
                     <MethParam  Name="psz1" Type="tCIDLib::TCh" PBy="CPtrC"/>
-                    <MethParam  Name="ch1" Type="tCIDLib::TCh" PBy="Val"/>
+                    <MethParam  Name="ch1" Type="tCIDLib::TCh"/>
                     <MethParam  Name="psz2" Type="tCIDLib::TCh" PBy="CPtrC"/>
                 </MethVar>
             </Method>

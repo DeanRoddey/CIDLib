@@ -51,21 +51,15 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
         // -------------------------------------------------------------------
         TNativeWCConverter();
 
-        TNativeWCConverter
-        (
-            const   TNativeWCConverter&     tcvtToCopy
-        );
+        TNativeWCConverter(const TNativeWCConverter&) = default;
 
-        ~TNativeWCConverter();
+        ~TNativeWCConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TNativeWCConverter& operator=
-        (
-            const   TNativeWCConverter&     tcvtToAssign
-        );
+        TNativeWCConverter& operator=(const TNativeWCConverter&) = default;
 
 
         // -------------------------------------------------------------------

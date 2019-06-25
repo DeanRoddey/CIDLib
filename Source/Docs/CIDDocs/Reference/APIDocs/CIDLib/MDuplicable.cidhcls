@@ -31,7 +31,7 @@
     </PubIntf>
 
     <ProtIntf>
-        <Ctors DefMethods="CopyCtor DefCtor CopyCtor"/>
+        <Ctors DefMethods="CopyCtor DefCtor"/>
 
         <Operators DefMethods="AssignOp"/>
     </ProtIntf>

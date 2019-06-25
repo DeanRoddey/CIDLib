@@ -1166,11 +1166,10 @@ TCppClassPage::Parse(           TTopic&             topicParent
 
     //
     //  If we implement any of the standard mixins, spit out the pre-fab method
-    //  definitions that we previously set up. These are all in the protected
-    //  section.
+    //  definitions that we previously set up.
     //
     if (bFlagOn(tCIDDocComp::EClsFlags::Dup))
-        m_memgProtected.m_methgOverMethods.m_colMethods.objAdd(s_methDuplicate);
+        m_memgPublic.m_methgOverMethods.m_colMethods.objAdd(s_methDuplicate);
 
     if (bFlagOn(tCIDDocComp::EClsFlags::Fmt))
         m_memgProtected.m_methgOverMethods.m_colMethods.objAdd(s_methFormatTo);
