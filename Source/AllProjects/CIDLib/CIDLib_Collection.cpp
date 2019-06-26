@@ -67,16 +67,6 @@ TColPubSubInfo::TColPubSubInfo(const EEvents eEvent, const tCIDLib::TCard4 c4Ind
 }
 
 
-TColPubSubInfo::TColPubSubInfo(const EEvents eEvent, const TString& strKey) :
-
-    m_c4Index1(0)
-    , m_c4Index2(0)
-    , m_eEvent(eEvent)
-    , m_strKey(strKey)
-{
-}
-
-
 TColPubSubInfo::TColPubSubInfo( const   EEvents         eEvent
                                 , const tCIDLib::TCard4 c4Index1
                                 , const tCIDLib::TCard4 c4Index2) :
@@ -85,27 +75,6 @@ TColPubSubInfo::TColPubSubInfo( const   EEvents         eEvent
     , m_c4Index2(c4Index2)
     , m_eEvent(eEvent)
 {
-}
-
-
-TColPubSubInfo::~TColPubSubInfo()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TColPubSubInfo: Public operators
-// ---------------------------------------------------------------------------
-TColPubSubInfo& TColPubSubInfo::operator=(const TColPubSubInfo& colpsiSrc)
-{
-    if (&colpsiSrc != this)
-    {
-        m_c4Index1  = colpsiSrc.m_c4Index1;
-        m_c4Index2  = colpsiSrc.m_c4Index2;
-        m_eEvent    = colpsiSrc.m_eEvent;
-        m_strKey    = colpsiSrc.m_strKey;
-    }
-    return *this;
 }
 
 
@@ -929,12 +898,6 @@ tCIDLib::TVoid TCollectionBase::PublishAdd(const  tCIDLib::TCard4 c4At)
         m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemAdded, c4At));
 }
 
-tCIDLib::TVoid TCollectionBase::PublishAdd(const  TString& strKey)
-{
-    if (m_ppstopReport && !m_bInBlockMode)
-        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemAdded, strKey));
-}
-
 tCIDLib::TVoid
 TCollectionBase::PublishBlockAdded(const  tCIDLib::TCard4 c4At, const tCIDLib::TCard4 c4Count)
 {
@@ -983,12 +946,6 @@ tCIDLib::TVoid TCollectionBase::PublishRemove(const tCIDLib::TCard4 c4At)
 {
     if (m_ppstopReport && !m_bInBlockMode)
         m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemRemoved, c4At));
-}
-
-tCIDLib::TVoid TCollectionBase::PublishRemove(const  TString& strKey)
-{
-    if (m_ppstopReport)
-        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemRemoved, strKey));
 }
 
 tCIDLib::TVoid TCollectionBase::PublishReorder()

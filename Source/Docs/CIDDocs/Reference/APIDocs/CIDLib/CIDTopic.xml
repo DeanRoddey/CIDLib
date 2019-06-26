@@ -11,7 +11,9 @@
         <PageLink FileName="MFormattable" PageType="CppClass"/>
         <PageLink FileName="MStreamable" PageType="CppClass"/>
         <PageLink FileName="MLogger" PageType="CppClass"/>
+        <PageLink FileName="TCIDModuleInfo" PageType="CppClass"/>
         <PageLink FileName="TCollectionBase" PageType="CppClass"/>
+        <PageLink FileName="TColPubSubInfo" PageType="CppClass"/>
         <PageLink FileName="TDirChangeInfo" PageType="CppClass"/>
         <PageLink FileName="TLogEvent" PageType="CppClass"/>
         <PageLink FileName="TMemBuf" PageType="CppClass"/>

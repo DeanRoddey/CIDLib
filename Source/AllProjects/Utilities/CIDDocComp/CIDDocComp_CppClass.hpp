@@ -76,13 +76,43 @@ struct TConstDef
 
 
 // ---------------------------------------------------------------------------
-//  For enums we just give the name and description. If individual values must
-//  be called out, it can be done in the descriptive text.
+//  For enums we get the name and description, and then a list of values and their
+//  names and descriptions.
 // ---------------------------------------------------------------------------
-struct TEnumDef
+struct TEnumVal
 {
     THelpNode   m_hnDesc;
     TString     m_strName;
+};
+
+struct TEnumDef
+{
+    TVector<TEnumVal>   m_colVals;
+    THelpNode           m_hnDesc;
+    TString             m_strName;
+};
+
+class TEnums
+{
+    public :
+        tCIDLib::TBoolean bIsEmpty() const
+        {
+            return m_colList.bIsEmpty();
+        }
+
+        tCIDLib::TVoid Parse
+        (
+            const   TXMLTreeElement&        xtnodeSrc
+        );
+
+        tCIDLib::TVoid OutputContent
+        (
+                    TTextOutStream&         strmTar
+            , const tCIDDocComp::EVisTypes  eVisType
+        )   const;
+
+    private :
+        TVector<TEnumDef>   m_colList;
 };
 
 
@@ -210,6 +240,8 @@ class TMethod
 };
 
 
+
+
 // ---------------------------------------------------------------------------
 //  With each visibility scope, we have one of these each for static, virtual,
 //  override, and non-methods.
@@ -248,6 +280,11 @@ class  TMethodGrp
             , const tCIDDocComp::ESpecMeths eMeth
             , const tCIDLib::TBoolean       bDefault
         )   const;
+
+        tCIDLib::TVoid ParseGetSet
+        (
+            const   TXMLTreeElement&        xtnodeMeth
+        );
 
         tCIDLib::TVoid ParseSpecMethods
         (
@@ -292,6 +329,7 @@ class TMemberGrp
 
         tCIDDocComp::EVisTypes  m_eVisType;
         TAliases                m_memgAliases;
+        TEnums                  m_memgEnums;
         TMembers                m_memgMembers;
         TMethodGrp              m_methgCtors;
         TMethodGrp              m_methgNVirtMethods;

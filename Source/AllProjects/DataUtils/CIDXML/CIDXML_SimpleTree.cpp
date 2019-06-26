@@ -1233,6 +1233,7 @@ TXMLTreeElement::xtnodeNthElement(  const   tCIDLib::TCard4     c4Index
 }
 
 
+
 // ---------------------------------------------------------------------------
 //  TXMLTreeElement: Hidden Constructors
 // ---------------------------------------------------------------------------

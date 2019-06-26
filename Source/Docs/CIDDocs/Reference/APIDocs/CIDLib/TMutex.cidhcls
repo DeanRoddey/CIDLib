@@ -50,10 +50,9 @@
         <!-- Non-virtual public methods -->
         <NVirtMeths>
 
-            <Method Name="bIsNamed" RetType="tCIDLib::TBoolean" Attrs="Const">
-                <Desc>Returns whether this is a named mutex or an anonymous one.</Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="bIsNamed" RetType="tCIDLib::TBoolean">
+                Returns whether this is a named mutex or an anonymous one.
+            </GetSet>
 
             <Method Name="bTryLock" RetType="tCIDLib::TBoolean">
                 <Desc>
@@ -82,12 +81,9 @@
                 <MethVar/>
             </Method>
 
-            <Method Name="rsnName" RetType="TResourceName" RetBy="CRef">
-                <Desc>
-                    <P>Returns the resource name of this mutex. If this mutex is not a named one, then this object will just contain empty data. Use bIsNamed() above to know if this is going to provide useful data.</P>
-                </Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="rsnName" RetType="TResourceName" RetBy="CRef">
+                Returns the resource name of this mutex. If this mutex is not a named one, then this object will just contain empty data. Use bIsNamed() above to know if this is going to provide useful data.
+            </GetSet>
 
         </NVirtMeths>
 

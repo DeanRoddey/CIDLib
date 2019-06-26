@@ -35,12 +35,8 @@
 
         <VirtMeths>
             <Method Attrs="Pure" Name="LogEvent">
-                <Desc>
-                    <P>The class that implements this interface must override this method and send the incoming object to whatever target it supports. This must be done either very quickly or asynchronously, see the class comments above.</P>
-                </Desc>
-                <MethVar>
-                    <MethParam Name="logevSrc" Type="TLogEvent" PBy="CRef"/>
-                </MethVar>
+                <Desc>The class that implements this interface must override this method and send the incoming object to whatever target it supports. This must be done either very quickly or asynchronously, see the class comments above.</Desc>
+                <MethVar><MethParam Name="logevSrc" Type="TLogEvent" PBy="CRef"/></MethVar>
             </Method>
         </VirtMeths>
 

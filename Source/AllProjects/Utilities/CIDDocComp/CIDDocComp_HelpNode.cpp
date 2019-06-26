@@ -190,7 +190,7 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText)
                 //  So we actually need to get the type here ourself, so that we know whether
                 //  the id is needed or not.
                 //
-                hnNew.m_strType = xtnodeElem.xtattrNamed(L"Type").strValue();
+                hnNew.m_strType = xtnodeElem.strAttr(L"Type");
                 if (hnNew.m_strType == L"Page")
                     bGetID = kCIDLib::True;
                 bGetRef = kCIDLib::True;
@@ -249,13 +249,13 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText)
 
             // If indicated, get some well known attributes
             if (bGetID)
-                hnNew.m_strID = xtnodeElem.xtattrNamed(kCIDDocComp::strXML_Id).strValue();
+                hnNew.m_strID = xtnodeElem.strAttr(kCIDDocComp::strXML_Id);
 
             if (bGetRef)
-                hnNew.m_strRef = xtnodeElem.xtattrNamed(kCIDDocComp::strXML_Ref).strValue();
+                hnNew.m_strRef = xtnodeElem.strAttr(kCIDDocComp::strXML_Ref);
 
             if (bGetType)
-                hnNew.m_strType = xtnodeElem.xtattrNamed(kCIDDocComp::strXML_Type).strValue();
+                hnNew.m_strType = xtnodeElem.strAttr(kCIDDocComp::strXML_Type);
 
             // If the current node has children, then recurse
             if (bGetChildren && xtnodeElem.c4ChildCount())

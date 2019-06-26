@@ -148,8 +148,8 @@ tCIDLib::TVoid TAliases::Parse(const TXMLTreeElement& xtnodeSrc)
             if (xtnodeCur.c4ChildCount())
                 aliasNew.m_hnDesc.Parse(xtnodeCur.xtnodeChildAtAsElement(0));
 
-            aliasNew.m_strName = xtnodeCur.xtattrNamed(L"Name").strValue();
-            aliasNew.m_strType = xtnodeCur.xtattrNamed(L"Type").strValue();
+            aliasNew.m_strName = xtnodeCur.strAttr(L"Name");
+            aliasNew.m_strType = xtnodeCur.strAttr(L"Type");
             return kCIDLib::True;
         }
     );
@@ -197,6 +197,104 @@ TAliases::OutputContent(        TTextOutStream&         strmTar
 
 
 // ---------------------------------------------------------------------------
+//   CLASS: TEnums
+//  PREFIX: memg
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TEnums: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TEnums::Parse(const TXMLTreeElement& xtnodeSrc)
+{
+    xtnodeSrc.bForEach
+    (
+        [this](const TXMLTreeElement& xtnodeEnum)
+        {
+            TEnumDef& enumNew = m_colList.objAdd(TEnumDef());
+            enumNew.m_strName = xtnodeEnum.strAttr(L"Name");
+
+            // Now parse out this one as an enum value
+            xtnodeEnum.bForEach
+            (
+                [this, &enumNew](const TXMLTreeElement& xtnodeVal)
+                {
+                    if (xtnodeVal.strQName() == kCIDDocComp::strXML_Desc)
+                    {
+                        enumNew.m_hnDesc.Parse(xtnodeVal);
+                    }
+                     else
+                    {
+                        // Has to be an enum value
+                        TEnumVal& enumvNew = enumNew.m_colVals.objAdd(TEnumVal());
+                        enumvNew.m_strName = xtnodeVal.strAttr(L"Name");
+                        enumvNew.m_hnDesc.Parse(xtnodeVal);
+                    }
+                    return kCIDLib::True;
+                }
+            );
+            return kCIDLib::True;
+        }
+    );
+}
+
+tCIDLib::TVoid
+TEnums::OutputContent(          TTextOutStream&         strmTar
+                        , const tCIDDocComp::EVisTypes  eVisType) const
+{
+    // If we don't have any, do nothing
+    if (m_colList.bIsEmpty())
+        return;
+
+    strmTar << L"<p><span class='SecHdr'>" << eVisType << L" Enumerations</span></p>";
+
+    m_colList.bForEach
+    (
+        [&strmTar](const TEnumDef& enumCur)
+        {
+            strmTar << L"<pre>enum class "
+                    << enumCur.m_strName
+                    << L"\n{\n";
+            enumCur.m_colVals.bForEachI
+            (
+                [&strmTar](const TEnumVal& evalCur, const tCIDLib::TCard4 c4Index)
+                {
+                    strmTar << L"    ";
+                    if (c4Index)
+                        strmTar << L", ";
+
+                    // We put this in a tool tip
+                    strmTar << L"<div class=\"ToolTip\">"
+                            << evalCur.m_strName
+                            << L"<div class=\"ToolTipPopup\"><div class=\"ToolTipText\">";
+                    evalCur.m_hnDesc.OutputNodes(strmTar);
+                    strmTar << L"</div></div></div>"
+                            << kCIDLib::NewLn;
+                    return kCIDLib::True;
+                }
+            );
+            strmTar << L"}\n</pre>";
+
+            //
+            //  If any descriptive text, do that in a block quote, else just
+            //  put out a break.
+            //
+            if (!enumCur.m_hnDesc.bIsEmpty())
+            {
+                strmTar << L"<blockquote>";
+                enumCur.m_hnDesc.OutputNodes(strmTar);
+                strmTar << L"</blockquote>";
+            }
+             else
+            {
+                strmTar << L"<br/>";
+            }
+            return kCIDLib::True;
+        }
+    );
+}
+
+
+// ---------------------------------------------------------------------------
 //   CLASS: TMembers
 //  PREFIX: memg
 // ---------------------------------------------------------------------------
@@ -217,12 +315,9 @@ tCIDLib::TVoid TMembers::Parse(const TXMLTreeElement& xtnodeSrc)
             if (xtnodeCur.c4ChildCount())
                 memberNew.m_hnDesc.Parse(xtnodeCur.xtnodeChildAtAsElement(0));
 
-            memberNew.m_eAccType = tCIDDocComp::eXlatEParmPB
-            (
-                xtnodeCur.xtattrNamed(L"AccType").strValue()
-            );
-            memberNew.m_strName = xtnodeCur.xtattrNamed(L"Name").strValue();
-            memberNew.m_strType = xtnodeCur.xtattrNamed(L"Type").strValue();
+            memberNew.m_eAccType = tCIDDocComp::eXlatEParmPB(xtnodeCur.strAttr(L"AccType"));
+            memberNew.m_strName = xtnodeCur.strAttr(L"Name");
+            memberNew.m_strType = xtnodeCur.strAttr(L"Type");
             return kCIDLib::True;
         }
     );
@@ -281,8 +376,8 @@ TMembers::OutputContent(        TTextOutStream&         strmTar
 tCIDLib::TVoid TMethodParam::Parse(const TXMLTreeElement& xtnodeSrc)
 {
     // The name and type we have to just take as is
-    m_strName = xtnodeSrc.xtattrNamed(L"Name").strValue();
-    m_strType = xtnodeSrc.xtattrNamed(L"Type").strValue();
+    m_strName = xtnodeSrc.strAttr(L"Name");
+    m_strType = xtnodeSrc.strAttr(L"Type");
 
     // The retained flag is defaulted so always present, but mostly just set to No
     m_bRetain = xtnodeSrc.xtattrNamed(L"Retained").bValueAs();
@@ -291,12 +386,12 @@ tCIDLib::TVoid TMethodParam::Parse(const TXMLTreeElement& xtnodeSrc)
     xtnodeSrc.bAttrExists(kCIDDocComp::strXML_DefValue, m_strDefVal);
 
     // Get the pass by and convert it
-    m_ePassBy = tCIDDocComp::eXlatEParmPB(xtnodeSrc.xtattrNamed(L"PBy").strValue());
+    m_ePassBy = tCIDDocComp::eXlatEParmPB(xtnodeSrc.strAttr(L"PBy"));
     if (!tCIDDocComp::bIsValidEnum(m_ePassBy))
         facCIDDocComp.AddErrorMsg(L"Invalid parameter pass-by type");
 
     // And the parameter direction
-    m_eDir = tCIDDocComp::eXlatEParmDirs(xtnodeSrc.xtattrNamed(L"Dir").strValue());
+    m_eDir = tCIDDocComp::eXlatEParmDirs(xtnodeSrc.strAttr(L"Dir"));
     if (!tCIDDocComp::bIsValidEnum(m_eDir))
         facCIDDocComp.AddErrorMsg(L"Invalid parameter direction type");
 }
@@ -515,51 +610,12 @@ TMethodVar::OutputContent(TTextOutStream& strmTar, const TString& strName) const
 // ----------------------------------------------------------------------------
 //  TMethod: Public, non-virtual methods
 // ----------------------------------------------------------------------------
+
 tCIDLib::TVoid
 TMethod::Parse(const TXMLTreeElement& xtnodeSrc, const tCIDDocComp::EMethAttrs eGrpAttrs)
 {
-    // First child is general description
-    m_hnDescr.Parse(xtnodeSrc.xtnodeChildAtAsElement(0));
-
-    // The name is the same for all variations, so we store that
-    m_strName = xtnodeSrc.xtattrNamed(L"Name").strValue();
-
-    // Process the ovearll method level attributes, which may or may not be present
-    m_eMethAttrs = tCIDDocComp::EMethAttrs::None;
-    if (xtnodeSrc.bAttrExists(L"Attrs", facCIDDocComp.m_strTmp1))
-    {
-        if (TStringTokenizer::bParseSpacedTokens(facCIDDocComp.m_strTmp1, facCIDDocComp.m_colTmp))
-        {
-            m_eMethAttrs = tCIDDocComp::EMethAttrs::None;
-            tCIDLib::TBoolean bRes = facCIDDocComp.m_colTmp.bForEach
-            (
-                [this](const TString& strCur)
-                {
-                    const tCIDDocComp::EMethAttrs eAttr = tCIDDocComp::eXlatEMethAttrs(strCur);
-                    if (eAttr == tCIDDocComp::EMethAttrs::None)
-                        facCIDDocComp.AddErrorMsg(L"Invalid method attribute '%(1)'", strCur);
-
-                    // It will be the no-attrs value if none are ever set
-                    if (eAttr != tCIDDocComp::EMethAttrs::NoAttrs)
-                        m_eMethAttrs |= eAttr;
-                    return kCIDLib::True;
-                }
-            );
-        }
-        else
-        {
-            facCIDDocComp.AddErrorMsg(L"Failed to parse method attributes");
-        }
-    }
-
-    // Add to these any group level attributes
-    m_eMethAttrs |= eGrpAttrs;
-
-    // If there are template parameters, get them
-    xtnodeSrc.bAttrExists(L"TmplParms", m_strTmplParms);
-
-    // Get the return type
-    m_strRetType = xtnodeSrc.xtattrNamed(L"RetType").strValue();
+    m_strName = xtnodeSrc.strAttr(L"Name");
+    m_strRetType = xtnodeSrc.strAttr(L"RetType");
 
     // If we have the a return by take that, else let's try to figure out a default
     m_eRetBy = tCIDDocComp::EParmPB::None;
@@ -615,6 +671,43 @@ TMethod::Parse(const TXMLTreeElement& xtnodeSrc, const tCIDDocComp::EMethAttrs e
                 m_eRetBy = tCIDDocComp::EParmPB::Val;
         }
     }
+
+    // First child is general description
+    m_hnDescr.Parse(xtnodeSrc.xtnodeChildAtAsElement(0));
+
+    // Process the ovearll method level attributes, which may or may not be present
+    m_eMethAttrs = tCIDDocComp::EMethAttrs::None;
+    if (xtnodeSrc.bAttrExists(L"Attrs", facCIDDocComp.m_strTmp1))
+    {
+        if (TStringTokenizer::bParseSpacedTokens(facCIDDocComp.m_strTmp1, facCIDDocComp.m_colTmp))
+        {
+            m_eMethAttrs = tCIDDocComp::EMethAttrs::None;
+            tCIDLib::TBoolean bRes = facCIDDocComp.m_colTmp.bForEach
+            (
+                [this](const TString& strCur)
+                {
+                    const tCIDDocComp::EMethAttrs eAttr = tCIDDocComp::eXlatEMethAttrs(strCur);
+                    if (eAttr == tCIDDocComp::EMethAttrs::None)
+                        facCIDDocComp.AddErrorMsg(L"Invalid method attribute '%(1)'", strCur);
+
+                    // It will be the no-attrs value if none are ever set
+                    if (eAttr != tCIDDocComp::EMethAttrs::NoAttrs)
+                        m_eMethAttrs |= eAttr;
+                    return kCIDLib::True;
+                }
+            );
+        }
+        else
+        {
+            facCIDDocComp.AddErrorMsg(L"Failed to parse method attributes");
+        }
+    }
+
+    // Add to these any group level attributes
+    m_eMethAttrs |= eGrpAttrs;
+
+    // If there are template parameters, get them
+    xtnodeSrc.bAttrExists(L"TmplParms", m_strTmplParms);
 
     // Next we have a list of method variations
     xtnodeSrc.bForEach
@@ -698,14 +791,21 @@ TMethodGrp::Parse(const TXMLTreeElement& xtnodeSrc)
             {
                 m_hnDescr.Parse(xtnodeCur);
             }
-             else
+             else if (xtnodeCur.strQName() == kCIDDocComp::strXML_GetSet)
             {
-                //
-                //  Has to be a method. We pass him our group level attributes to
-                //  add to any explicit ones.
-                //
+                ParseGetSet(xtnodeCur);
+            }
+             else if (xtnodeCur.strQName() == kCIDDocComp::strXML_Method)
+            {
                 TMethod& methNew = m_colMethods.objAdd(TMethod());
                 methNew.Parse(xtnodeCur, m_eGrpAttrs);
+            }
+             else
+            {
+                CIDAssert2X
+                (
+                    L"Unknown child element of method group: %(1)", xtnodeSrc.strQName()
+                );
             }
             return kCIDLib::True;
         }
@@ -841,6 +941,107 @@ TMethodGrp::OutputSpecMethod(       TTextOutStream&         strmTar
 }
 
 
+//
+//  We handle the special case getter/setting definition and spit out methods of
+//  a semi-fixed form.
+//
+tCIDLib::TVoid TMethodGrp::ParseGetSet(const TXMLTreeElement& xtnodeSrc)
+{
+    const TString& strName = xtnodeSrc.strAttr(L"Name");
+    const TString& strRetType = xtnodeSrc.strAttr(L"RetType");
+
+    // If not set, we assume a by value return type, which is very common
+    tCIDDocComp::EParmPB eRetBy = tCIDDocComp::EParmPB::Val;
+    if (xtnodeSrc.bAttrExists(L"RetBy", facCIDDocComp.m_strTmp1))
+        eRetBy = tCIDDocComp::eXlatEParmPB(facCIDDocComp.m_strTmp1);
+
+    // We must have a return type and return by cannot be None for this scenario
+    if (strRetType.bIsEmpty() || (eRetBy == tCIDDocComp::EParmPB::None))
+    {
+        facCIDDocComp.AddErrorMsg(L"A getter/setter must have a return type");
+        return;
+    }
+
+    // Translate the get/set directions supported
+    const tCIDDocComp::EGSDirs eDirs = tCIDDocComp::eXlatEGSDirs(xtnodeSrc.strAttr(L"Dir"));
+    if (eDirs == tCIDDocComp::EGSDirs::Count)
+    {
+        facCIDDocComp.AddErrorMsg(L"Unknown getter/setter direction type");
+        return;
+    }
+
+    // This much is the same either way
+    TMethod& methGet = m_colMethods.objAdd(TMethod());
+    methGet.m_strName = strName;
+
+    //
+    //  If it has any descriptive text, then process that. Else, generate a default
+    //  one.
+    //
+    if (xtnodeSrc.c4ChildCount())
+    {
+        //
+        //  The help text is a direct child of us, and this guy parses help text starting
+        //  with the chidren of the passed node.
+        //
+        methGet.m_hnDescr.Parse(xtnodeSrc);
+    }
+     else
+    {
+        if (eDirs == tCIDDocComp::EGSDirs::Get)
+            facCIDDocComp.m_strTmp1 = L"Returns the current value of the m_";
+        else if (eDirs == tCIDDocComp::EGSDirs::Set)
+            facCIDDocComp.m_strTmp1 = L"Sets the current value of the ";
+        else
+            facCIDDocComp.m_strTmp1 = L"Get or set the current value of the m_";
+        facCIDDocComp.m_strTmp1 += strName;
+        facCIDDocComp.m_strTmp1 += L" member";
+        methGet.m_hnDescr.SetToText(facCIDDocComp.m_strTmp1.pszBuffer());
+    }
+
+    // Then add method variations for the directions supported
+    if ((eDirs == tCIDDocComp::EGSDirs::Both)
+    ||  (eDirs == tCIDDocComp::EGSDirs::Get))
+    {
+        TMethodVar& mvarNew = methGet.m_colMethVars.objAdd(TMethodVar());
+        mvarNew.m_eRetBy = eRetBy;
+        mvarNew.m_strRetType = strRetType;
+        mvarNew.m_eAttrs = tCIDDocComp::EMethAttrs::Const;
+    }
+
+    if ((eDirs == tCIDDocComp::EGSDirs::Both)
+    ||  (eDirs == tCIDDocComp::EGSDirs::Set))
+    {
+        TMethodVar& mvarNew = methGet.m_colMethVars.objAdd(TMethodVar());
+        mvarNew.m_eRetBy = eRetBy;
+        mvarNew.m_strRetType = strRetType;
+        mvarNew.m_eAttrs = tCIDDocComp::EMethAttrs::None;
+        TMethodParam& mparmNew = mvarNew.m_colParams.objAdd(TMethodParam());
+        mparmNew.m_ePassBy = eRetBy;
+        mparmNew.m_strType = strRetType;
+
+        //
+        //  We need a name, which requires the type prefix. WE basically take chars
+        //  from the method type until we hit an upper-case letter.
+        //
+        const tCIDLib::TCard4 c4Count = strName.c4Length();
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+        {
+            if (TRawStr::bIsDigit(strName[c4Index])
+            ||  TRawStr::bIsLower(strName[c4Index]))
+            {
+                mparmNew.m_strName += strName[c4Index];
+            }
+             else
+            {
+                break;
+            }
+        }
+        mparmNew.m_strName += L"ToSet";
+    }
+}
+
+
 tCIDLib::TVoid
 TMethodGrp::ParseSpecMethods(const  TXMLTreeElement&            xtnodePar
                             , const  TString&                   strAttr
@@ -883,6 +1084,7 @@ TMethodGrp::ParseSpecMethods(const  TXMLTreeElement&            xtnodePar
 
 
 
+
 // ---------------------------------------------------------------------------
 //   CLASS: TMemberGrp
 //  PREFIX: memg
@@ -912,6 +1114,7 @@ tCIDLib::TBoolean TMemberGrp::bIsEmpty() const
     return
     (
         m_memgAliases.bIsEmpty()
+        && m_memgEnums.bIsEmpty()
         && m_memgMembers.bIsEmpty()
         && m_methgCtors.bIsEmpty()
         && m_methgNVirtMethods.bIsEmpty()
@@ -943,6 +1146,10 @@ tCIDLib::TVoid TMemberGrp::Parse(const TXMLTreeElement& xtnodeGrp)
              else if (strName == L"Ctors")
             {
                 m_methgCtors.Parse(xtnodeElem);
+            }
+             else if (strName == L"Enums")
+            {
+                m_memgEnums.Parse(xtnodeElem);
             }
              else if (strName == L"NVirtMeths")
             {
@@ -981,6 +1188,9 @@ tCIDLib::TVoid TMemberGrp::OutputContent(TTextOutStream& strmTar) const
 {
     // Do the aliases first if any
     m_memgAliases.OutputContent(strmTar, m_eVisType);
+
+    // Then enums
+    m_memgEnums.OutputContent(strmTar, m_eVisType);
 
     // Do the various method groups
     if (!m_methgStatMethods.bIsEmpty())
@@ -1106,12 +1316,12 @@ TCppClassPage::Parse(           TTopic&             topicParent
     TCtxStackJan janStack(*this);
 
     // First we need to get out our class name, parent class, and prefix
-    m_strClass = xtnodeClass.xtattrNamed(L"Class").strValue();
-    m_strParClass = xtnodeClass.xtattrNamed(L"Parent").strValue();
-    m_strPrefix = xtnodeClass.xtattrNamed(L"Prefix").strValue();
+    m_strClass = xtnodeClass.strAttr(L"Class");
+    m_strParClass = xtnodeClass.strAttr(L"Parent");
+m_strPrefix = xtnodeClass.strAttr(L"Prefix");
 
     // Get the boolean flags out and parse them
-    const TString& strFlags = xtnodeClass.xtattrNamed(L"Flags").strValue();
+    const TString& strFlags = xtnodeClass.strAttr(L"Flags");
     if (!TStringTokenizer::bParseSpacedTokens(strFlags, facCIDDocComp.m_colTmp))
         facCIDDocComp.AddErrorMsg(L"Failed to parse class flags");
 
@@ -1227,6 +1437,9 @@ tCIDLib::TVoid TCppClassPage::OutputContent(TTextOutStream& strmTar) const
 
     // Next should be the descriptive text.
     m_hnDesc.OutputNodes(strmTar);
+
+    // Do a little divider
+    strmTar << L"<div class=\"HorzDivCont\"><div class=\"HorzDiv\"></div></div>";
 
     //  Output any non-empty member groups
     if (!m_memgPublic.bIsEmpty())

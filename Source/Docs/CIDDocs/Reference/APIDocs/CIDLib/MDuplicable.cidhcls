@@ -22,9 +22,7 @@
         <!-- Virtual public methods -->
         <VirtMeths>
             <Method Attrs="Pure NoDiscard" Name="pobjDuplicate" RetType="TObject" RetBy="Ptr" >
-                <Desc>
-                    <P>The class that implements this interface must override this method, create a copy of itself and return it. The caller is responsible for freeing it.</P>
-                </Desc>
+                <Desc>The class that implements this interface must override this method, create a copy of itself and return it. The caller is responsible for freeing it.</Desc>
                 <MethVar/>
             </Method>
         </VirtMeths>

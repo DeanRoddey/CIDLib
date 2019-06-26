@@ -61,20 +61,18 @@
                 <MethVar><MethParam Name="c4Limit" Type="tCIDLib::TCard4"/></MethVar>
             </Method>
 
-            <Method Name="bIsMTSafe" RetType="tCIDLib::TBoolean" Attrs="Const">
-                <Desc>Returns true if this collection was created thread safe, which means it can be locked of course.</Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="bIsMTSafe" RetType="tCIDLib::TBoolean">
+                Returns true if this collection was created thread safe, which means it can be locked of course.
+            </GetSet>
 
             <Method Name="bPublishEnabled" RetType="tCIDLib::TBoolean" Attrs="Const">
                 <Desc>Returns true if this <Link Type="Page" Ref="/BigPicture/" Id="/PubSub">change publishing</Link> has been enabled on this collection. If so, it will report any changes made to its contents.</Desc>
                 <MethVar/>
             </Method>
 
-            <Method Name="c4SerialNum" RetType="tCIDLib::TCard4" Attrs="Const">
-                <Desc>Returns the serial number for this collection. The serial number is bumped any time the contents of the collection are modified, to make it easier to track changes.</Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="c4SerialNum" RetType="tCIDLib::TCard4">
+                Returns the serial number for this collection. The serial number is bumped any time the contents of the collection are modified, to make it easier to track changes.
+            </GetSet>
 
             <Method Name="CheckIsFull" Attrs="Const">
                 <Desc>Similar to bIsFull() above, but this one throws if the current size is at or beyond the passed limit. You provide a descriptive text value that will go into the exception info for better diagnostics.</Desc>
@@ -84,10 +82,9 @@
                 </MethVar>
             </Method>
 
-            <Method Name="eMTState" RetType="tCIDLib::EMTStates" Attrs="Const">
-                <Desc>Returns the multi-thread safe state of this collection, which indicates whether it as a mutex or not.</Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="eMTState" RetType="tCIDLib::EMTStates">
+                Returns the multi-thread safe state of this collection, which indicates whether it as a mutex or not.
+            </GetSet>
 
             <Method Name="pmtxLock" RetType="TMutex" Attrs="Const" RetBy="Ptr">
                 <Desc>

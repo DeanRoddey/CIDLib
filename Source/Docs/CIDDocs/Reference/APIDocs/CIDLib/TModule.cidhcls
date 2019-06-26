@@ -244,10 +244,9 @@
                 </MethVar>
             </Method>
 
-            <Method Name="eModType" RetType="tCIDLib::EModTypes" Attrs="Const">
-                <Desc>Returns the type of this module. Not generally something you need to know dynamically, but it might be useful for some logged messages or thrown errors and such.</Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="eModType" RetType="tCIDLib::EModTypes">
+                Returns the type of this module. Not generally something you need to know dynamically, but it might be useful for some logged messages or thrown errors and such.
+            </GetSet>
 
             <Method Name="kmodThis" RetType="TKrnlModule" RetBy="CRef" Attrs="Const">
                 <Desc>Really only for internal CIDLib use, this provides access to the underlying <FacRef Ref="CIDKernel"/> platform wrapper object for this module.</Desc>
@@ -443,11 +442,9 @@
                 <MethVar/>
             </Method>
 
-            <Method Name="strName" RetType="TString" RetBy="CRef" Attrs="Const">
-                <Desc>Returns the base name of the library or executable file that this module represents. Of course this is going to be empty if this is being used for dynamic loading and the module hasn't been loaded yet.</Desc>
-                <MethVar/>
-            </Method>
-
+            <GetSet Name="strName" RetType="TString" RetBy="CRef">
+                Returns the base name of the library or executable file that this module represents. Of course this is going to be empty if this is being used for dynamic loading and the module hasn't been loaded yet.
+            </GetSet>
 
             <Method Name="ThrowErr" Attrs="Const">
                 <Desc>

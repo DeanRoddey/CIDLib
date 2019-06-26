@@ -59,6 +59,21 @@ header {
     width : 100%;
 }
 
+/* A horizontal line divider */
+.HorzDivCont {
+    height : 7px;
+    width : 100%;
+    display : flex;
+    align-items: center;
+}
+
+.HorzDiv {
+    width : 85%;
+    border-bottom : 1px solid #8888AA;
+    margin : 0;
+}
+
+
 /*
  * All of the pages are two sided. On the left is a div that holds links to any
  * sub-topics/pages directly under that particular topic, and the right side
@@ -137,6 +152,65 @@ li {
     font-weight : bold;
 }
 
+
+/*
+ * A good bit of stuff to create a tooltip on hover, so that we can do
+ * things like show just the core info but let them get more by hovering.
+ */
+.ToolTip {
+    position: relative;
+    display: inline-block;
+  }
+
+
+.ToolTip .ToolTipPopup {
+    visibility: hidden;
+    background-color: #555;
+    color: #fff;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -50%;
+
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.ToolTip .ToolTipPopup {
+    display : flex;
+    align-content: center;
+    align-items: center;
+    max-width : 40em;
+}
+
+.ToolTip .ToolTipText {
+    width : 95%;
+    height : 95%;
+    word-wrap: break-word;
+}
+
+/* Tooltip arrow */
+.ToolTip .ToolTipPopup::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.ToolTip:hover .ToolTipPopup {
+    visibility: visible;
+    opacity: 1;
+}
 
 
 /* A major help page section title */

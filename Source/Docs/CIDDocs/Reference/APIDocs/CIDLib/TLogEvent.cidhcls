@@ -182,102 +182,73 @@
                 <MethVar><MethParam Name="logevToCheck" Type="TLogEvent" PBy="CRef"/></MethVar>
             </Method>
 
-            <Method Name="c4LineNum" RetType="tCIDLib::TCard4">
-                <Desc>Get or set the line number for this error or message.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="c4ToSet" Type="tCIDLib::TCard4"/></MethVar>
-            </Method>
+            <GetSet Name="c4LineNum" RetType="tCIDLib::TCard4" Dir="Both">
+                Get or set the line number for this error or message.
+            </GetSet>
 
-            <Method Name="enctLogged" RetType="tCIDLib::TEncodedTime">
-                <Desc>Get or set the time stamp for when this object was created.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="enctToSet" Type="tCIDLib::TEncodedTime"/></MethVar>
-            </Method>
+            <GetSet Name="enctLogged" RetType="tCIDLib::TEncodedTime" Dir="Both">
+                Get or set the time stamp for when this object was created.
+            </GetSet>
 
-            <Method Name="errcHost" RetType="tCIDLib::TOSErrCode">
-                <Desc>Get or set the low level, OS specific error code for this this object.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="errcToSet" Type="tCIDLib::TOSErrCode"/></MethVar>
-            </Method>
+            <GetSet Name="errcHost" RetType="tCIDLib::TOSErrCode" Dir="Both">
+                Get or set the low level, OS specific error code for this this object.
+            </GetSet>
 
-            <Method Name="errcId" RetType="tCIDLib::TErrCode">
-                <Desc>Get or set the high level, CIDLib level error code (or message id.)</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="errcToSet" Type="tCIDLib::TErrCode"/></MethVar>
-            </Method>
+            <GetSet Name="errcId" RetType="tCIDLib::TErrCode" Dir="Both">
+                Get or set the high level, CIDLib level error code (or message id.)
+            </GetSet>
 
-            <Method Name="errcKrnlId" RetType="tCIDLib::TErrCode">
-                <Desc>Get or set the CIDKernel level error code.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="errcToSet" Type="tCIDLib::TErrCode"/></MethVar>
-            </Method>
+            <GetSet Name="errcKrnlId" RetType="tCIDLib::TErrCode" Dir="Both">
+                Get or set the CIDKernel level error code.
+            </GetSet>
 
-            <Method Name="eClass" RetType="tCIDLib::EErrClasses">
-                <Desc>Get or set the error class.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="eToSet" Type="tCIDLib::EErrClasses"/></MethVar>
-            </Method>
+            <GetSet Name="eClass" RetType="tCIDLib::EErrClasses" Dir="Both">
+                Get or set the error class of this object.
+            </GetSet>
 
-            <Method Name="eSeverity" RetType="tCIDLib::ESeverities">
-                <Desc>Get or set the severity level.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="eToSet" Type="tCIDLib::ESeverities"/></MethVar>
-            </Method>
+            <GetSet Name="eSeverity" RetType="tCIDLib::ESeverities" Dir="Both">
+                Get or set the severity level of this object.
+            </GetSet>
 
             <Method Name="Reset">
                 <Desc>Resets this object back to an empty state, clearing out any previously set information.</Desc>
                 <MethVar/>
             </Method>
 
-            <Method Name="strAuxText" RetType="TString" RetBy="CRef">
-                <Desc>Get or set the aux text for this object. If none has been set yet, this will fault in the aux text string member.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
-            </Method>
+            <GetSet Name="strAuxText" RetType="TString" RetBy="CRef" Dir="Both">
+                Get or set the aux text for this object. If none has been set yet, this will fault in the aux text string member.
+            </GetSet>
 
-            <Method Name="strErrText" RetType="TString" RetBy="CRef">
-                <Desc>Get or set the main error (message) text for this object.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
-            </Method>
+            <GetSet Name="strErrText" RetType="TString" RetBy="CRef" Dir="Both">
+                Get or set the main error (message) text for this object.
+            </GetSet>
 
-            <Method Name="strFacName" RetType="TString" RetBy="CRef">
-                <Desc>Get or set the facility name for this object. This one is typically set for you by the facility object you log/throw via.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
-            </Method>
+            <GetSet Name="strFacName" RetType="TString" RetBy="CRef" Dir="Both">
+                Get or set the facility name for this object. This one is typically set for you by the facility object you log/throw via.
+            </GetSet>
 
-            <Method Name="strFileName" RetType="TString" RetBy="CRef">
-                <Desc>Get or set the path of the file which threw or logged this object.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
-            </Method>
+            <GetSet Name="strFileName" RetType="TString" RetBy="CRef" Dir="Both">
+                Get or set the path of the file which threw or logged this object.
+            </GetSet>
 
-            <Method Name="strHostName" RetType="TString" RetBy="CRef">
-                <Desc>Get or set the the name of the host running the program which threw or logged this object. This might seem useless but remember that we support a centralized log server, and also that exceptions can be thrown back across <Link Type="Page" Ref="/BigPicture/" Id="/ORB-IDL">ORB</Link> based remote calls.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
-            </Method>
+            <GetSet Name="strHostName" RetType="TString" RetBy="CRef" Dir="Both">
+                Get or set the name of the host that logged or threw this object
+            </GetSet>
 
-            <Method Name="strProcess" RetType="TString" RetBy="CRef">
-                <Desc>Get or set the name of the process which threw or logged this object.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
-            </Method>
+            <GetSet Name="strProcess" RetType="TString" RetBy="CRef" Dir="Both">
+                Get or set the name of the process which threw or logged this object.
+            </GetSet>
 
-            <Method Name="strStackTrace" RetType="TString" RetBy="CRef" Attrs="Const">
-                <Desc>Get the stack trace info. THis is a newline separated list of file/line values.</Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="strStackTrace" RetType="TString" RetBy="CRef">
+                Get the stack trace info. THis is a newline separated list of file/line values.
+            </GetSet>
 
-            <Method Name="strThread" RetType="TString" RetBy="CRef">
-                <Desc>Get or set the name of the thread which threw or logged this object.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
-            </Method>
+            <GetSet Name="strThread" RetType="TString" RetBy="CRef">
+                Get or set the name of the thread which threw or logged this object.
+            </GetSet>
 
             <Method Name="SetLogged">
-                <Desc>Get set the logged flag to indicate that this object has already been logged. The logging stuff in <ClassRef Ref="TModule"/> will set this when it passes the object off to the logger.</Desc>
+                <Desc>Set the logged flag to indicate that this object has already been logged. The logging stuff in <ClassRef Ref="TModule"/> will set this when it passes the object off to the logger.</Desc>
                 <MethVar/>
             </Method>
 

@@ -79,45 +79,6 @@ class CIDLIBEXP TColPubSubInfo : public TObject
     public  :
         // -------------------------------------------------------------------
         //  Public types
-        //
-        //  These events use these members, else they don't use any:
-        //
-        //      BlockAdded
-        //          Index1  - Index of first item added
-        //          Index2  - Count of items added after that
-        //
-        //      BlockChanged
-        //          Index1  - Index of first item changed
-        //          Index2  - Count of items changed after that
-        //
-        //      BlockRemoved
-        //          Index1  - Index of first item removed
-        //          Index2  - Count of items removed after that
-        //
-        //      ElemAdded
-        //          Index1  - Index where it was added
-        //
-        //      ElemChanged
-        //          Index1 - Index of element changed
-        //
-        //      ElemMoved
-        //          Index1  - Where it was originally
-        //          Index2  - Where it ended up
-        //
-        //      ElemChanged
-        //      ElemRemoved
-        //          Index1  - Index of element modified or removed
-        //
-        //      Loaded
-        //          The previous contents has been replaced with new contents
-        //          Index1 - The count of elements newly added
-        //
-        //      Reordered
-        //          The elements are the same but the order has been affected
-        //
-        //      Swapped
-        //          Index1  - Index of element moved to index 2
-        //          Index2  - Index of element moved to index 1
         // -------------------------------------------------------------------
         enum class EEvents
         {
@@ -150,28 +111,19 @@ class CIDLIBEXP TColPubSubInfo : public TObject
         TColPubSubInfo
         (
             const   EEvents                 eEvent
-            , const TString&                stRKey
-        );
-
-        TColPubSubInfo
-        (
-            const   EEvents                 eEvent
             , const tCIDLib::TCard4         c4Index1
             , const tCIDLib::TCard4         c4Index2
         );
 
-        TColPubSubInfo(const TColPubSubInfo&) = delete;
+        TColPubSubInfo(const TColPubSubInfo&) = default;
 
-        ~TColPubSubInfo();
+        ~TColPubSubInfo() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TColPubSubInfo& operator=
-        (
-            const   TColPubSubInfo&         colpsiSrc
-        );
+        TColPubSubInfo& operator=(const TColPubSubInfo&) = default;
 
 
         // -------------------------------------------------------------------
@@ -192,12 +144,6 @@ class CIDLIBEXP TColPubSubInfo : public TObject
             return m_eEvent;
         }
 
-        const TString& strKey() const
-        {
-            return m_strKey;
-        }
-
-
     private :
         // -------------------------------------------------------------------
         //  Private data members
@@ -209,14 +155,10 @@ class CIDLIBEXP TColPubSubInfo : public TObject
         //
         //  m_eEvent
         //      The event being reported
-        //
-        //  m_strKey
-        //      Used for add/remove in key based collections.
         // -------------------------------------------------------------------
         tCIDLib::TCard4 m_c4Index1;
         tCIDLib::TCard4 m_c4Index2;
         EEvents         m_eEvent;
-        TString         m_strKey;
 
 
         // -------------------------------------------------------------------
@@ -527,11 +469,6 @@ class CIDLIBEXP TCollectionBase : public TObject
             const   tCIDLib::TCard4         c4At
         );
 
-        tCIDLib::TVoid PublishAdd
-        (
-            const   TString&                strKey
-        );
-
         tCIDLib::TVoid PublishBlockAdded
         (
             const   tCIDLib::TCard4         c4At
@@ -555,11 +492,6 @@ class CIDLIBEXP TCollectionBase : public TObject
         tCIDLib::TVoid PublishRemove
         (
             const   tCIDLib::TCard4         c4At
-        );
-
-        tCIDLib::TVoid PublishRemove
-        (
-            const   TString&                strRemove
         );
 
         tCIDLib::TVoid PublishReorder();

@@ -130,35 +130,25 @@
                 </MethVar>
             </Method>
 
-            <Method Name="chRepChar" RetType="tCIDLib::TCh">
-                <Desc>
-                    <P>Gets or sets the replacement character. This is used when a bad or unrepresentable character is encountered. See eErrorAction() below for more details. It's legal to change the replacement character at any time.</P>
-                </Desc>
-                <MethVar Attrs="const"></MethVar>
-                <MethVar><MethParam  Name="chToSet" Type="tCIDLib::TCh"/></MethVar>
-            </Method>
+            <GetSet Name="chRepChar" RetType="tCIDLib::TCh" Dir="Both">
+                Gets or sets the replacement character. This is used when a bad or unrepresentable character is encountered. See eErrorAction() below for more details. It's legal to change the replacement character at any time
+            </GetSet>
 
-            <Method Name="eErrorAction" RetType="tCIDLib::ETCvtActions">
-                <Desc>
-                    <P>Gets or sets the error action. This is used when converting text and bad or unrepresentable character is encountered. The possibilities are: </P>
-                    <List>
-                        <LItem Ref="Throw">Just give up immediately and throw an exception.</LItem>
-                        <LItem Ref="StopThenThrow">Deliver the successfully converted text up to that point, then throw next time.</LItem>
-                        <LItem Ref="Replace">Replace the bad character with the replacement character.</LItem>
-                    </List>
+            <GetSet Name="eErrorAction" RetType="tCIDLib::ETCvtActions" Dir="Both">
+                <P>Gets or sets the error action. This is used when converting text and bad or unrepresentable character is encountered. The possibilities are: </P>
 
-                    <P>Note that replace is only used for converting encoded data to the internal wide character format. For outgoing, an error will occur if data cannot be successfully converted.</P>
-                </Desc>
-                <MethVar Attrs="const"></MethVar>
-                <MethVar><MethParam  Name="eToSet" Type="tCIDLib::ETCvtActions"/></MethVar>
-            </Method>
+                <List>
+                    <LItem Ref="Throw">Just give up immediately and throw an exception.</LItem>
+                    <LItem Ref="StopThenThrow">Deliver the successfully converted text up to that point, then throw next time.</LItem>
+                    <LItem Ref="Replace">Replace the bad character with the replacement character.</LItem>
+                </List>
 
-            <Method Name="strEncoding" RetType="TString" RetBy="CRef">
-                <Desc>
-                    <P>Provides access to the encoding that this converter supports.</P>
-                </Desc>
-                <MethVar Attrs="const"></MethVar>
-            </Method>
+                <P>Note that replace is only used for converting encoded data to the internal wide character format. For outgoing, an error will occur if data cannot be successfully converted.</P>
+            </GetSet>
+
+            <GetSet Name="strEncoding" RetType="TString" RetBy="CRef">
+                Provides access to the encoding that this converter supports.
+            </GetSet>
 
         </NVirtMeths>
     </PubIntf>

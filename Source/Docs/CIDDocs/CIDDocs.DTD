@@ -105,11 +105,10 @@
    - Any text dscription is in the body of the element, and it can point out any
    - important values if desired.
    -->
-<!ELEMENT   EnumVal     EMPTY>
+<!ELEMENT   EnumVal     (%HelpContent;)>
 <!ATTLIST   EnumVal     Name NMTOKEN #REQUIRED
                         Value CDATA #IMPLIED>
-<!ELEMENT   EnumVals    (EnumVal+)>
-<!ELEMENT   Enum        (Desc, EnumVals?)>
+<!ELEMENT   Enum        (Desc, EnumVal+)>
 <!ATTLIST   Enum        Name NMTOKEN #REQUIRED>
 <!ELEMENT   Enums       (Enum+)>
 
@@ -170,6 +169,12 @@
                         Attrs NMTOKENS 'NoAttrs'
                         TmplParms CDATA #IMPLIED>
 
+<!ELEMENT   GetSet      (%HelpContent;)>
+<!ATTLIST   GetSet      Name CDATA #REQUIRED
+                        RetType CDATA #REQUIRED
+                        Dir (Set | Get | Both) 'Get'
+                        RetBy (%RefType;) #IMPLIED>
+
 <!ELEMENT   StaticMeths (Desc?, Method+)>
 <!ELEMENT   Ctors       (Desc?, Method*)>
 <!ATTLIST   Ctors       DelMethods NMTOKENS 'None'
@@ -179,7 +184,7 @@
                         DefMethods NMTOKENS 'None'>
 <!ELEMENT   VirtMeths   (Desc?, Method+)>
 <!ELEMENT   OverMeths   (Desc?, Method+)>
-<!ELEMENT   NVirtMeths  (Desc?, Method+)>
+<!ELEMENT   NVirtMeths  (Desc?, (Method | GetSet)*)>
 
 <!ELEMENT   PubIntf     (Aliases?, Enums?, Constants?, StaticMeths?, Ctors?, Operators?
                         , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>

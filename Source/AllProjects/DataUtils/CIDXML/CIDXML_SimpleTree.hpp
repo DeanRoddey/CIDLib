@@ -581,21 +581,44 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             // IF there were no children, this guy can be null
-            if (!m_pcolChildren)
-                return kCIDLib::True;
-
-            const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+            if (m_pcolChildren)
             {
-                const TXMLTreeNode& xtnodeCur = *m_pcolChildren->pobjAt(c4Index);
-                if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Element)
+                const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
+                for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
                 {
-                    const tCIDLib::TBoolean bRet = iterCB
-                    (
-                        static_cast<const TXMLTreeElement&>(xtnodeCur)
-                    );
-                    if (!bRet)
-                        return bRet;
+                    const TXMLTreeNode& xtnodeCur = *m_pcolChildren->pobjAt(c4Index);
+                    if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Element)
+                    {
+                        const tCIDLib::TBoolean bRet = iterCB
+                        (
+                            static_cast<const TXMLTreeElement&>(xtnodeCur)
+                        );
+                        if (!bRet)
+                            return bRet;
+                    }
+                }
+            }
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
+        {
+            // If there were no children, this guy can be null
+            if (m_pcolChildren)
+            {
+                const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
+                for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+                {
+                    const TXMLTreeNode& xtnodeCur = *m_pcolChildren->pobjAt(c4Index);
+                    if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Element)
+                    {
+                        const tCIDLib::TBoolean bRet = iterCB
+                        (
+                            static_cast<const TXMLTreeElement&>(xtnodeCur), c4Index
+                        );
+                        if (!bRet)
+                            return bRet;
+                    }
                 }
             }
             return kCIDLib::True;
@@ -679,6 +702,11 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
             const   tCIDLib::TCard4         c4Count
             ,       tCIDLib::TCard4&        c4FoundAt
         )   const;
+
+        const TString& strAttr(const TString& strName) const
+        {
+           return xtattrNamed(strName).strValue();
+        }
 
 
     protected :

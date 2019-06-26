@@ -99,7 +99,7 @@ tCIDLib::TVoid TTopic::Parse()
 
     // It parsed OK, so get the root node and let's start pulling our info out
     const TXMLTreeElement& xtnodeRoot = facCIDDocComp.xtnodeRoot();
-    m_strTopicPage = xtnodeRoot.xtattrNamed(L"TopicPage").strValue();
+    m_strTopicPage = xtnodeRoot.strAttr(L"TopicPage");
 
     // Parse the pages and add those to the list of pages for this topic
     tCIDLib::TCard4 c4At;

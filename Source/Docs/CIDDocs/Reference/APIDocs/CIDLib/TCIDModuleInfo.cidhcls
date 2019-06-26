@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TCIDModuleInfo" Prefix="modi" Parent="TObject" Flags="Fmt BStrm">
+
+    <Desc>
+        <P>TCIDModuleInfo contains the information required to load a loadable module (executable or library) or to find one already loaded. The <ClassRef Ref="TModule"/> class provides methods for doing these things. It can take the values as separate parameters or bundled up in one of these objects.</P>
+
+        <P>The primary reason for the bundling is if you wanted to store such info away or pass it around. This is a more convenient mechanism for that than individual values.</P>
+    </Desc>
+
+    <PubIntf>
+        <Ctors DefMethods="CopyCtor Dtor">
+
+            <Method Name="TCIDModuleInfo">
+                <Desc>
+                    <P>The default ctor sets up the object with empty info, so you must call Set() on it before using it or an error will occur.</P>
+
+                    <P>The other two set up the object for use. The second one is for libraries, which are always versioned, and the third one is for executables which are not versioned.</P>
+                </Desc>
+                <MethVar/>
+                <MethVar>
+                    <MethParam Name="strBaseName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="c4MajVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4MinVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="eFlags" Type="tCIDLib::EModFlags"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strBaseName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="eFlags" Type="tCIDLib::EModFlags"/>
+                </MethVar>
+            </Method>
+        </Ctors>
+
+        <Operators DefMethods="AssignOp">
+
+            <Method Name="operator==">
+                <Desc>Nothing special, just compares the members.</Desc>
+                <MethVar><MethParam Name="modiSrc" Type="TCIDModuleInfo" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator!=">
+                <Desc>Just calls operator== above negates the result.</Desc>
+                <MethVar><MethParam Name="modiSrc" Type="TCIDModuleInfo" PBy="CRef"/></MethVar>
+            </Method>
+
+        </Operators>
+
+        <NVirtMeths>
+            <GetSet Name="c4MajVersion" RetType="tCIDLib::TCard4"/>
+            <GetSet Name="c4MinVersion" RetType="tCIDLib::TCard4"/>
+            <GetSet Name="eModFlags" RetType="tCIDLib::EModFlags"/>
+            <GetSet Name="eModTypes" RetType="tCIDLib::EModTypes"/>
+            <GetSet Name="strBaseName" RetType="TString" RetBy="CRef"/>
+
+            <Method Name="Set">
+                <Desc>
+                    <P>If you don't set up the object in the constructor, then you need to call one of these to get it ready for use, or to reset it for another use.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strBaseName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="c4MajVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4MinVer" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="eFlags" Type="tCIDLib::EModFlags"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strBaseName" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eModType" Type="tCIDLib::EModTypes"/>
+                    <MethParam Name="eFlags" Type="tCIDLib::EModFlags"/>
+                </MethVar>
+            </Method>
+        </NVirtMeths>
+    </PubIntf>
+
+</CppClass>

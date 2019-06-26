@@ -32,12 +32,16 @@
                                 CIDIDL:Type="TString"  CIDIDL:Value="Extra2"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_FileName"
                                 CIDIDL:Type="TString"  CIDIDL:Value="FileName"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_GetSet"
+                                CIDIDL:Type="TString"  CIDIDL:Value="GetSet"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_HelpText"
                                 CIDIDL:Type="TString"  CIDIDL:Value="HelpText"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_Id"
                                 CIDIDL:Type="TString"  CIDIDL:Value="Id"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_Keywords"
                                 CIDIDL:Type="TString"  CIDIDL:Value="Keywords"/>
+            <CIDIDL:Constant    CIDIDL:Name="strXML_Method"
+                                CIDIDL:Type="TString"  CIDIDL:Value="Method"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_PageLink"
                                 CIDIDL:Type="TString"  CIDIDL:Value="PageLink"/>
             <CIDIDL:Constant    CIDIDL:Name="strXML_PageMap"
@@ -66,7 +70,11 @@
             <CIDIDL:Enum CIDIDL:Name="EClsFlags" CIDIDL:XlatMap="BaseName"
                          CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
-                    The overall class element has a set of bitmap flags that indicate various possible attributes of that class. We can't use None for no flags since it's used to report a failure to translate a value, so we define NoFlags. XML doesn't allow an empty NMTOKENS attr so we have to have something as a default in the DTD.
+                    The overall class element has a set of bitmap flags that indicate
+                    various possible attributes of that class. We can't use None for
+                    no flags since it's used to report a failure to translate a value,
+                    so we define NoFlags. XML doesn't allow an empty NMTOKENS attr so
+                    we have to have something as a default in the DTD.
                 </CIDIDL:DocText>
                 <CIDIDL:EnumVal CIDIDL:Name="Dup" CIDIDL:Value="0x0001"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Fmt" CIDIDL:Value="0x0002"/>
@@ -76,6 +84,16 @@
                 <CIDIDL:EnumVal CIDIDL:Name="NoFlags" CIDIDL:Value="0x1000"/>
             </CIDIDL:Enum>
 
+
+            <CIDIDL:Enum CIDIDL:Name="EGSDirs" CIDIDL:XlatMap="BaseName">
+                <CIDIDL:DocText>
+                    Used in getter/setter config to indicate which directions are supported
+                    for that particular member.
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="Get"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Set"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Both"/>
+            </CIDIDL:Enum>
 
             <CIDIDL:Enum CIDIDL:Name="EMethAttrs" CIDIDL:XlatMap="BaseName"
                          CIDIDL:TextStreamMap="Text" CIDIDL:LoadMap="Text"

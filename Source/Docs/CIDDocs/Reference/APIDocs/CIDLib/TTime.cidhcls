@@ -560,13 +560,9 @@
                 <MethVar><MethParam  Name="tmRHS" Type="TTime" PBy="CRef"/></MethVar>
             </Method>
 
-            <Method Name="enctTime" RetType="tCIDLib::TEncodedTime">
-                <Desc>
-                    <P>Get or set this object's time stamp.</P>
-                </Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam  Name="enctSrc" Type="tCIDLib::TEncodedTime"/></MethVar>
-            </Method>
+            <GetSet Name="enctTime" RetType="tCIDLib::TEncodedTime" Dir="Both">
+                Get or set this object's time stamp.
+            </GetSet>
 
             <Method Name="FormatAsElapsed" Attrs="Const">
                 <Desc>
@@ -736,11 +732,9 @@
                 </MethVar>
             </Method>
 
-            <Method Name="strDefaultFormat" RetType="TString" RetBy="CRef">
-                <Desc>Get or set this object's default format string.</Desc>
-                <MethVar Attrs="Const"/>
-                <MethVar><MethParam  Name="strToSet" Type="TString" PBy="CRef"/></MethVar>
-            </Method>
+            <GetSet Name="strDefaultFormat" RetType="TString" RetBy="CRef" Dir="Both">
+                Get or set this object's default format string.
+            </GetSet>
 
             <Method Name="UTCToLocal">
                 <Desc>Converts this object's time stamp to local time. It is assumed that the time stamp is currently in UTC.</Desc>

@@ -139,19 +139,13 @@
                 </MethVar>
             </Method>
 
-            <Method Name="c4MaxSize" RetType="tCIDLib::TCard4" Attrs="Const">
-                <Desc>
-                    <P>Returns the currently set maximum expansion size of this buffer.</P>
-                </Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="c4MaxSize" RetType="tCIDLib::TCard4">
+                Returns the currently set maximum expansion size of this buffer.
+            </GetSet>
 
-            <Method Name="c4Size" RetType="tCIDLib::TCard4" Attrs="Const">
-                <Desc>
-                    <P>Returns the current allocation size of this buffer.</P>
-                </Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="c4Size" RetType="tCIDLib::TCard4">
+                Returns the current allocation size of this buffer.
+            </GetSet>
 
             <Method Name="c8At" RetType="tCIDLib::TCard8" Attrs="Const">
                 <Desc>
