@@ -170,7 +170,8 @@ class CIDORBEXP TFacCIDOrb : public TFacility
 
         tCIDLib::TVoid RegisterObject
         (
-                    TOrbServerBase* const   porbsToAdopt
+                    TOrbServerBase* const   porbsToReg
+            , const tCIDLib::EAdoptOpts     eAdopt
         );
 
         tCIDLib::TVoid RemoveFromOIDCache

@@ -391,7 +391,7 @@ TTest_ORBLoopback::eRunTest(TTextStringOutStream&   strmOut
     tCIDLib::TBoolean bInitCalled = kCIDLib::False;
     tCIDLib::TBoolean bTermCalled = kCIDLib::False;
     TLoopbackImpl* porbsTest = new TLoopbackImpl(&bInitCalled, &bTermCalled);
-    facCIDOrb().RegisterObject(porbsTest);
+    facCIDOrb().RegisterObject(porbsTest, tCIDLib::EAdoptOpts::Adopt);
 
     // At this point the init method should have been called
     if (!bInitCalled)

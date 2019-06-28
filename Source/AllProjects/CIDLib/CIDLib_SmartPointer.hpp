@@ -199,14 +199,14 @@ template <class T> class TCntPtr
             ReleaseRef(kCIDLib::False, pcdTmp);
         }
 
-        T* pobjData()
+        [[nodiscard]] T* pobjData()
         {
             if (!m_pcdRef)
                 return nullptr;
             return m_pcdRef->m_pobjData;
         }
 
-        const T* pobjData() const
+        [[nodiscard]] const T* pobjData() const
         {
             if (!m_pcdRef)
                 return nullptr;
@@ -385,24 +385,24 @@ template <class T> class TMngPtr
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        T& objData()
+        [[nodiscard]] T& objData()
         {
             CheckNullRef(CID_LINE);
             return *m_pData;
         }
 
-        const T& objData() const
+        [[nodiscard]] const T& objData() const
         {
             CheckNullRef(CID_LINE);
             return *m_pData;
         }
 
-        T* pobjData()
+        [[nodiscard]] T* pobjData()
         {
             return m_pData;
         }
 
-        const T* pobjData() const
+        [[nodiscard]] const T* pobjData() const
         {
             return m_pData;
         }
@@ -529,7 +529,7 @@ template <class T> class TUniquePtr
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        T* pOrphan()
+        [[nodiscard]] T* pOrphan()
         {
             T* pRet = m_pData;
             m_pData = nullptr;

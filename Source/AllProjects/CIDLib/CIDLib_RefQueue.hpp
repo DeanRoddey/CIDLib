@@ -98,7 +98,7 @@ template <class TElem> class TRefQueueNode : public TDLstNode
             return m_pobjData;
         }
 
-        TElem* pobjOrphan()
+        [[nodiscard]] TElem* pobjOrphan()
         {
             TElem* pobjRet = m_pobjData;
             m_pobjData = nullptr;
@@ -568,8 +568,11 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             if (!pnodeToRemove)
                 this->NotMemberNode(CID_FILE, CID_LINE);
 
-            // Orphan the object out of the node, then remove the node.
-            pnodeToRemove->pobjOrphan();
+            //
+            //  Orphan the object out of the node, then remove the node. We have to
+            //  supress the no-discard error by cast to voide
+            //
+            static_cast<void>(pnodeToRemove->pobjOrphan());
             m_llstQueue.RemoveNode(pnodeToRemove);
 
             // Bump the serial number to invalidate cursors
@@ -796,7 +799,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
         }
 
 
-        TElem*
+        [[nodiscard]] TElem*
         pobjGetNext(const   tCIDLib::TCard4     c4Millis = kCIDLib::c4MaxCard
                     , const tCIDLib::TBoolean   bThrowTimeout = kCIDLib::True)
         {
@@ -872,7 +875,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             return pobjRet;
         }
 
-        TElem*
+        [[nodiscard]] TElem*
         pobjGetHighestPrio(const tCIDLib::TCard4 c4Millis = kCIDLib::c4MaxCard)
         {
             // Lock the queue
@@ -929,7 +932,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             return pobjRet;
         }
 
-        TElem* pobjOrphanNewest()
+        [[nodiscard]] TElem* pobjOrphanNewest()
         {
             TMtxLocker lockQueue(this->pmtxLock());
 

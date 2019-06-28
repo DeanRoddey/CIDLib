@@ -162,7 +162,7 @@ tCIDLib::TVoid TFacCIDCfgSrv::Setup()
     //  new index created.
     //
     m_porbsImpl = new TCIDCfgServerImpl;
-    facCIDOrb().RegisterObject(m_porbsImpl);
+    facCIDOrb().RegisterObject(m_porbsImpl, tCIDLib::EAdoptOpts::Adopt);
 
     //
     //  Store our object on the auto rebinder. Tell it to do a deferred
@@ -198,7 +198,7 @@ tCIDLib::TVoid TFacCIDCfgSrv::Setup()
     //  and auto rebinder. Use deferred binding mode.
     //
     TCIDCoreAdminImpl* porbsAdmin = new TCIDCoreAdminImpl;
-    facCIDOrb().RegisterObject(porbsAdmin);
+    facCIDOrb().RegisterObject(porbsAdmin, tCIDLib::EAdoptOpts::Adopt);
     strTmp = TCIDCfgSrvServerBase::strAdminBinding;
     strTmp.eReplaceToken(facCIDSock().strIPHostName(), L'h');
     facCIDOrbUC().RegRebindObj

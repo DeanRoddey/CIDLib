@@ -129,7 +129,7 @@ template <class TElem,class TKey> class TRefKeyedHashSetNode
             return m_pobjData;
         }
 
-        TElem* pobjOrphan()
+        [[nodiscard]] TElem* pobjOrphan()
         {
             TElem* pobjRet = m_pobjData;
             m_pobjData = nullptr;
@@ -1136,7 +1136,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
 
         // If the key exists, extract the associated element
-        TElem* pobjExtract(const TKey& keyToFind)
+        [[nodiscard]] TElem* pobjExtract(const TKey& keyToFind)
         {
             TMtxLocker lockSync(this->pmtxLock());
 

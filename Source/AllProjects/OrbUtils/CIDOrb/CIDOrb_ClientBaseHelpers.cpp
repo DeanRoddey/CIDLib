@@ -790,8 +790,11 @@ TCmdQItem* TSrvTarget::pcqiExtractReply(const tCIDLib::TCard4 c4SeqId)
         // If it's our guy, remember it and remove from list
         if (pcqiCur->c4SequenceId() == c4SeqId)
         {
-            pcqiRet = pcqiCur;
-            m_colRepList.pobjOrphanAt(c4Index);
+            //
+            //  Suppress no-discard warning by assigning return from the orphan
+            //  call instead of using the current pointer we already have.
+            //
+            pcqiRet = m_colRepList.pobjOrphanAt(c4Index);
         }
          else if (pcqiCur->eStage() == tCIDOrb::ECmdStages::Orphaned)
         {
@@ -801,7 +804,7 @@ TCmdQItem* TSrvTarget::pcqiExtractReply(const tCIDLib::TCard4 c4SeqId)
             //  has already gone away and will not change the stage after we
             //  set it free.
             //
-            m_colRepList.pobjOrphanAt(c4Index);
+            m_colRepList.OrphanElemAt(c4Index);
             pcqiCur->eStage(tCIDOrb::ECmdStages::Free);
         }
          else

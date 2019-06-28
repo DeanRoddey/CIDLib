@@ -941,6 +941,16 @@ class TRefVector : public TRefCollection<TElem>
             }
         }
 
+        tCIDLib::TVoid OrphanElemAt(const tCIDLib::TCard4 c4At)
+        {
+            //
+            //  Just lock and call the helper than pulls an element out at a particular
+            //  index. Cast to avoid to prevent a nodiscard warning.
+            //
+            TMtxLocker lockThis(this->pmtxLock());
+            static_cast<void>(pobjPullOutElemAt(c4At));
+        }
+
         [[nodiscard]] TMyType* pcolMakeNewOf() const
         {
             // Make a copy with same characteristics, but not content!
@@ -1227,13 +1237,13 @@ class TRefVector : public TRefCollection<TElem>
             return m_apElems[m_c4CurCount - 1];
         }
 
-        TElem* pobjOrphanAt(const TIndex tAt)
+        [[nodiscard]] TElem* pobjOrphanAt(const TIndex tAt)
         {
             TMtxLocker lockThis(this->pmtxLock());
             return pobjPullOutElemAt(tCIDLib::TCard4(tAt));
         }
 
-        TElem* pobjOrphanAt(TNCCursor& cursAt)
+        [[nodiscard]] TElem* pobjOrphanAt(TNCCursor& cursAt)
         {
             TMtxLocker lockThis(this->pmtxLock());
 
@@ -1252,7 +1262,7 @@ class TRefVector : public TRefCollection<TElem>
             return pobjRet;
         }
 
-        TElem* pobjOrphanLast()
+        [[nodiscard]] TElem* pobjOrphanLast()
         {
             TMtxLocker lockThis(this->pmtxLock());
 
@@ -1506,8 +1516,8 @@ class TRefVector : public TRefCollection<TElem>
                 return kCIDLib::False;
             }
 
-            // We have the index now, so call the 'at' version
-            pobjPullOutElemAt(c4Index);
+            // We have to supress the no dicard error here by cast to void
+            static_cast<void>(pobjPullOutElemAt(c4Index));
             return kCIDLib::True;
         }
 
@@ -1534,8 +1544,9 @@ class TRefVector : public TRefCollection<TElem>
             }
         }
 
-        TElem* pobjPullOutElemAt(const  tCIDLib::TCard4     c4At
-                                , const tCIDLib::TBoolean   bNoPublish = kCIDLib::False)
+        [[nodiscard]] TElem*
+        pobjPullOutElemAt(  const   tCIDLib::TCard4     c4At
+                            , const tCIDLib::TBoolean   bNoPublish = kCIDLib::False)
         {
             // Check for bounds error
             this->CheckIndex(c4At, m_c4CurCount, CID_FILE, CID_LINE);

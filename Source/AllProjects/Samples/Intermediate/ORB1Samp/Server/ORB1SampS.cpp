@@ -69,7 +69,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         // Create an instance of our interface and register with the ORB
         conOut << L"Registering interface with the ORB" << kCIDLib::EndLn;
         TORB1SampIntfImpl* porbsImpl = new TORB1SampIntfImpl();
-        facCIDOrb().RegisterObject(porbsImpl);
+        facCIDOrb().RegisterObject(porbsImpl, tCIDLib::EAdoptOpts::Adopt);
 
         // Register it with the ORB's rebinder to make sure is stays bound
         conOut << L"Registering interfaces with Name Server" << kCIDLib::EndLn;

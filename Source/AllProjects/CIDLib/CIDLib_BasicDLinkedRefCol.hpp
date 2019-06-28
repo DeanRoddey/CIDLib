@@ -626,7 +626,8 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
             }
         }
 
-        TElem* pobjGetFromBottom(const tCIDLib::TBoolean bThrowIfNot = kCIDLib::True)
+        [[nodiscard]] TElem*
+        pobjGetFromBottom(const tCIDLib::TBoolean bThrowIfNot = kCIDLib::True)
         {
             TMtxLocker lockThis(this->pmtxLock());
 
@@ -660,7 +661,8 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
             return pobjRet;
         }
 
-        TElem* pobjGetFromTop(const tCIDLib::TBoolean bThrowIfNot = kCIDLib::True)
+        [[nodiscard]] TElem*
+        pobjGetFromTop(const tCIDLib::TBoolean bThrowIfNot = kCIDLib::True)
         {
             TMtxLocker lockThis(this->pmtxLock());
 
