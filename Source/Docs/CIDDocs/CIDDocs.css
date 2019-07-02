@@ -154,62 +154,40 @@ li {
 
 
 /*
- * A good bit of stuff to create a tooltip on hover, so that we can do
- * things like show just the core info but let them get more by hovering.
+ * An expandable div for things like enums, where we don't want to show
+ * the text for each item unless they ask to see it. So we expand the
+ * descriptive text when they hover over the name of the value.
  */
-.ToolTip {
-    position: relative;
-    display: inline-block;
-  }
 
-
-.ToolTip .ToolTipPopup {
-    visibility: hidden;
-    background-color: #555;
-    color: #fff;
-    border-radius: 6px;
-
-    /* Position the tooltip text */
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -50%;
-
-    /* Fade in tooltip */
-    opacity: 0;
-    transition: opacity 0.3s;
+.ExpandItem .ExpandItemText {
+    height : 0px;
+    opacity : 0;
 }
 
-.ToolTip .ToolTipPopup {
-    display : flex;
-    align-content: center;
-    align-items: center;
-    max-width : 40em;
+.ExpandItemText {
+    margin-left : 4em;
+    line-height: 1;
 }
 
-.ToolTip .ToolTipText {
-    width : 95%;
-    height : 95%;
-    word-wrap: break-word;
+.ExpandItem:hover .ExpandItemText {
+    opacity : 1;
+    height : auto;
+    transition : opacity 0.5s;
 }
 
-/* Tooltip arrow */
-.ToolTip .ToolTipPopup::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
+.ExpandItems {
+    margin-left: 2em;
+    margin-right : 16em;
+    padding : 0;
+
 }
 
-/* Show the tooltip text when you mouse over the tooltip container */
-.ToolTip:hover .ToolTipPopup {
-    visibility: visible;
-    opacity: 1;
+.ExpandItem {
+    line-height: 0;
+}
+
+.ExpandItem:hover {
+    cursor: pointer;
 }
 
 
@@ -275,6 +253,15 @@ li {
 
 .DeemphCode {
     color : #555555;
+}
+
+
+/*
+ * A magic indenting node that our generic help text class outputs around the
+ * recursive contents it contains. This indents all such text over.
+ */
+.HelpTextCont {
+    margin-left : 24px;
 }
 
 

@@ -80,6 +80,7 @@ class   TPixelArrayImpl;
 class   TPixelArray;
 class   TCIDImage;
 
+
 // ---------------------------------------------------------------------------
 //  Facility constants
 // ---------------------------------------------------------------------------
@@ -104,6 +105,21 @@ namespace kCIDImage
 #include    "CIDImage_PixelArray.hpp"
 #include    "CIDImage_Image.hpp"
 #include    "CIDImage_BitmapImage.hpp"
+
+
+// ---------------------------------------------------------------------------
+//  Facility types
+// ---------------------------------------------------------------------------
+namespace tCIDImage
+{
+    // -----------------------------------------------------------------------
+    //  Smart pointers to images, which are often allocated because they are
+    //  polymoprhic.
+    // -----------------------------------------------------------------------
+    using TCntImgPtr = TCntPtr<TCIDImage>;
+    using TUImgPtr = TUniquePtr<TCIDImage>;
+}
+
 
 // ---------------------------------------------------------------------------
 //  Export our facility object lazy evaluator function.

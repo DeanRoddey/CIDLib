@@ -118,7 +118,11 @@ TResourceName::TResourceName(   const   TString&            strCompany
         , pidOfName
       )
 {
-    // Use something different from the one set above, to force an update
+    //
+    //  Use something different from the one set above, to force an update. The
+    //  actual type doesn't matter. It will get updated again if client calls
+    //  strFullName() with a different type.
+    //
     strFullName(tCIDLib::ENamedRscTypes::Mutex);
 }
 

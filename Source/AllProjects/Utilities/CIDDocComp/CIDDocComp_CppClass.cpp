@@ -181,9 +181,7 @@ TAliases::OutputContent(        TTextOutStream&         strmTar
             //
             if (!aliasCur.m_hnDesc.bIsEmpty())
             {
-                strmTar << L"<blockquote>";
-                aliasCur.m_hnDesc.OutputNodes(strmTar);
-                strmTar << L"</blockquote>";
+                aliasCur.m_hnDesc.OutputHelpText(strmTar);
             }
              else
             {
@@ -251,28 +249,27 @@ TEnums::OutputContent(          TTextOutStream&         strmTar
     (
         [&strmTar](const TEnumDef& enumCur)
         {
-            strmTar << L"<pre>enum class "
+            strmTar << L"<div style=\"font-size : smaller;\">enum class <b>"
                     << enumCur.m_strName
-                    << L"\n{\n";
+                    << L"</b><br/>{<div class=\"ExpandItems\">";
+
+            strmTar << L"<div>&nbsp;</div>";
             enumCur.m_colVals.bForEachI
             (
                 [&strmTar](const TEnumVal& evalCur, const tCIDLib::TCard4 c4Index)
                 {
-                    strmTar << L"    ";
-                    if (c4Index)
-                        strmTar << L", ";
-
                     // We put this in a tool tip
-                    strmTar << L"<div class=\"ToolTip\">"
-                            << evalCur.m_strName
-                            << L"<div class=\"ToolTipPopup\"><div class=\"ToolTipText\">";
-                    evalCur.m_hnDesc.OutputNodes(strmTar);
-                    strmTar << L"</div></div></div>"
-                            << kCIDLib::NewLn;
+                    strmTar << L"<div class=\"ExpandItem\">";
+                    if (c4Index)
+                        strmTar << L",&nbsp;";
+                    strmTar << evalCur.m_strName
+                            << L"<div class=\"ExpandItemText\">";
+                    evalCur.m_hnDesc.OutputHelpText(strmTar);
+                    strmTar << L"</div></div>";
                     return kCIDLib::True;
                 }
             );
-            strmTar << L"}\n</pre>";
+            strmTar << L"</div>}</div><br/>";
 
             //
             //  If any descriptive text, do that in a block quote, else just
@@ -280,9 +277,7 @@ TEnums::OutputContent(          TTextOutStream&         strmTar
             //
             if (!enumCur.m_hnDesc.bIsEmpty())
             {
-                strmTar << L"<blockquote>";
-                enumCur.m_hnDesc.OutputNodes(strmTar);
-                strmTar << L"</blockquote>";
+                enumCur.m_hnDesc.OutputHelpText(strmTar);
             }
              else
             {
@@ -351,9 +346,7 @@ TMembers::OutputContent(        TTextOutStream&         strmTar
             //
             if (!memberCur.m_hnDesc.bIsEmpty())
             {
-                strmTar << L"<blockquote>";
-                memberCur.m_hnDesc.OutputNodes(strmTar);
-                strmTar << L"</blockquote>";
+                memberCur.m_hnDesc.OutputHelpText(strmTar);
             }
              else
             {
@@ -750,9 +743,8 @@ tCIDLib::TVoid TMethod::OutputContent(TTextOutStream& strmTar) const
     //  Indent the general text and output that. Add a special div after it to
     //  create a little vertical spacing.
     //
-    strmTar << L"<blockquote>";
-    m_hnDescr.OutputNodes(strmTar);
-    strmTar << L"</blockquote><div class=\"TrailingSpace\"></div>" << kCIDLib::NewLn;
+    m_hnDescr.OutputHelpText(strmTar);
+    strmTar << L"<div class=\"TrailingSpace\"></div>" << kCIDLib::NewLn;
 }
 
 
@@ -817,7 +809,7 @@ tCIDLib::TVoid TMethodGrp::OutputContent(TTextOutStream& strmTar) const
 {
     // If there's a description first, then output that
     if (!m_hnDescr.bIsEmpty())
-        m_hnDescr.OutputNodes(strmTar);
+        m_hnDescr.OutputHelpText(strmTar);
 
     // And then do the methods
     m_colMethods.bForEach
@@ -841,7 +833,9 @@ tCIDLib::TVoid TMethodGrp::OutputContent(TTextOutStream& strmTar) const
                 return kCIDLib::True;
             }
         );
-        strmTar << L"</pre><blockquote>These methods get default implementations</blockquote>";
+        strmTar << L"</pre>"
+                   L"<div class=\"HelpTextCont\">"
+                   L"These methods get default implementations</div>";
     }
 
     if (!m_fcolDelMethods.bIsEmpty())
@@ -855,7 +849,9 @@ tCIDLib::TVoid TMethodGrp::OutputContent(TTextOutStream& strmTar) const
                 return kCIDLib::True;
             }
         );
-        strmTar << L"</pre><blockquote>These methods have been deleted and are not available</blockquote>";
+        strmTar << L"</pre>"
+                   L"<div class=\"HelpTextCont\">"
+                   L"These methods have been deleted and are not available</div>";
     }
 }
 
@@ -1436,7 +1432,7 @@ tCIDLib::TVoid TCppClassPage::OutputContent(TTextOutStream& strmTar) const
     strmTar << L"</table></blockquote><Br/>";
 
     // Next should be the descriptive text.
-    m_hnDesc.OutputNodes(strmTar);
+    m_hnDesc.OutputHelpText(strmTar);
 
     // Do a little divider
     strmTar << L"<div class=\"HorzDivCont\"><div class=\"HorzDiv\"></div></div>";

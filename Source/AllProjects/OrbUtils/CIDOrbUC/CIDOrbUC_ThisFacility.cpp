@@ -346,6 +346,7 @@ TFacCIDOrbUC::bNSScopeExists(tCIDOrbUC::TNSrvProxy& orbcNS, const TString& strTo
     return bRet;
 }
 
+
 tCIDLib::TIPPortNum TFacCIDOrbUC::ippnNS() const
 {
     return m_ippnNS;

@@ -1389,6 +1389,7 @@ PROJECT=GenXMLChTable
 END PROJECT
 
 
+
 ; ----------------------------------------------------------------------------
 ;   The test framework and the library shared by the framework and the test
 ;   programs.
@@ -2486,10 +2487,10 @@ END PROJECT
 ;    SETTINGS
 ;        DIRECTORY   = Samples\Tmp
 ;        SAMPLE      = Yes
-;        ENABLED     = No
 ;    END SETTINGS
 ;
 ;    DEPENDENTS
 ;        CIDLib
+;        CIDImgFact
 ;    END DEPENDENTS
 ;END PROJECT

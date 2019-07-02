@@ -85,5 +85,5 @@ tCIDLib::TVoid THelpPage::OutputContent(TTextOutStream& strmTar) const
             << L"</span></p>";
 
     // The rest is all in our generic help node
-    m_hnContent.OutputNodes(strmTar);
+    m_hnContent.OutputHelpText(strmTar);
 }

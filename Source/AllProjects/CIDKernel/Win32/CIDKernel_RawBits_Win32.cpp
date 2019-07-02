@@ -32,7 +32,7 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
-#include    "intrin.h"
+#include    <intrin.h>
 
 
 //

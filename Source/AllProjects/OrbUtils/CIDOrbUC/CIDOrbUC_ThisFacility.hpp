@@ -381,6 +381,11 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
         tCIDLib::TVoid StopRebinder() noexcept;
 
+        tCIDLib::TVoid UnbindObjs
+        (
+            const   tCIDLib::TStrCollect&   colBindings
+        );
+
         tCIDLib::TVoid UpdateExtraNSVal
         (
             const   TString&                strNodePath
