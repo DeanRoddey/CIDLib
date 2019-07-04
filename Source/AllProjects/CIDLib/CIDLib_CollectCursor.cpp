@@ -46,46 +46,14 @@ RTTIDecls(TCursorBase,TObject)
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TCursorBase: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TCursorBase::~TCursorBase()
-{
-}
-
-
-// ---------------------------------------------------------------------------
 //  TCursorBase: Hidden constructors and operators
 // ---------------------------------------------------------------------------
-TCursorBase::TCursorBase() :
-
-    m_c4SerialNum(0)
-{
-}
-
 TCursorBase::TCursorBase(const tCIDLib::TCard4 c4SerialNum) :
 
     m_c4SerialNum(c4SerialNum)
 {
 }
 
-TCursorBase::TCursorBase(const TCursorBase& cursSrc) :
-
-    m_c4SerialNum(cursSrc.m_c4SerialNum)
-{
-}
-
-TCursorBase& TCursorBase::operator=(const TCursorBase& cursSrc)
-{
-    if (&cursSrc != this)
-        m_c4SerialNum   = cursSrc.m_c4SerialNum;
-    return *this;
-}
-
-
-
-// ---------------------------------------------------------------------------
-//  TCursorBase: Public operators
-// ---------------------------------------------------------------------------
 tCIDLib::TBoolean TCursorBase::operator==(const TCursorBase& cursSrc) const
 {
     if (&cursSrc == this)

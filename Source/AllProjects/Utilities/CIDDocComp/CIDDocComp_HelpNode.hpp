@@ -68,6 +68,7 @@ class THelpNode
         tCIDLib::TVoid OutputHelpText
         (
                     TTextOutStream&         strmTar
+            , const tCIDLib::TBoolean       bIndented = kCIDLib::True
         )   const;
 
         tCIDLib::TVoid SetToText

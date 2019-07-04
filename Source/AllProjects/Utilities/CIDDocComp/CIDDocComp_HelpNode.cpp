@@ -67,11 +67,15 @@ tCIDLib::TBoolean THelpNode::bIsEmpty() const
 
 
 // We output a magic indenting wrapper node, then call the recursive private method
-tCIDLib::TVoid THelpNode::OutputHelpText(TTextOutStream& strmTar) const
+tCIDLib::TVoid
+THelpNode::OutputHelpText(          TTextOutStream&     strmTar
+                            , const tCIDLib::TBoolean   bIndented) const
 {
-    strmTar << L"<div class=\"HelpTextCont\">";
+    if (bIndented)
+        strmTar << L"<div class=\"HelpTextCont\">";
     OutputNodes(strmTar);
-    strmTar << L"</div>";
+    if (bIndented)
+        strmTar << L"</div>";
 }
 
 
@@ -277,7 +281,7 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText)
 
 
 // Just add create a single text node
-tCIDLib::TVoid THelpNode::SetToText(const tCIDLib::TCh* const pszToSet)
+tCIDLib::TVoid THelpNode::SetToText(const  tCIDLib::TCh* const     pszToSet)
 {
     m_colNodes.RemoveAll();
     THelpNode& hnNew = m_colNodes.objAdd(THelpNode());

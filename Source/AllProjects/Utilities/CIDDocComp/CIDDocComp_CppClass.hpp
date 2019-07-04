@@ -403,8 +403,14 @@ class TCppClassPage : public TBasePage
         // -------------------------------------------------------------------
         tCIDLib::TVoid LoadMixinMethods();
 
+
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_colTmplParams
+        //      If it's a template, we get template parameters. It's a key/value
+        //      list. Mostly it's just values, but some template parms can have
+        //      default values. If this is empty, it's not a template.
         //
         //  m_eFlags
         //      These indicate various optional things that the class may or may
@@ -421,12 +427,9 @@ class TCppClassPage : public TBasePage
         //      Our class and our parent class. Parent class can be empty since not
         //      everything derives from TObject, and of course TObject doesn't have a
         //      parent.
-        //
-        //  m_strTmplParms
-        //      If this clas is a template, these are the class template parameters,
-        //      just as a single string to be put inside the angle brackets.
         // -------------------------------------------------------------------
         tCIDDocComp::EClsFlags      m_eFlags = tCIDDocComp::EClsFlags::None;
+        tCIDLib::TKVPList           m_colTmplParams;
         TMemberGrp                  m_memgPublic;
         TMemberGrp                  m_memgProtected;
         TMemberGrp                  m_memgPrivate;
@@ -434,7 +437,6 @@ class TCppClassPage : public TBasePage
         TString                     m_strClass;
         TString                     m_strParClass;
         TString                     m_strPrefix;
-        TString                     m_strTmplParms;
 
         static tCIDLib::TBoolean    s_bStatsDone;
         static TMethod              s_methDuplicate;

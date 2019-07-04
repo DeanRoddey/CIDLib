@@ -581,7 +581,7 @@ TKrnlUPnPService::bInvokeAct(const  tCIDLib::TCh* const         pszCmdName
     }
 
     // Get out any output parameters if any
-    if (!OutArgs.vt == VT_EMPTY)
+    if (OutArgs.vt != VT_EMPTY)
     {
         HRESULT hRes2;
         LONG lLBound;
@@ -635,11 +635,8 @@ TKrnlUPnPService::bInvokeAct(const  tCIDLib::TCh* const         pszCmdName
         }
     }
 
-    ::SafeArrayDestroy(pArray);
     ::VariantClear(&OutArgs);
     ::VariantClear(&RetVal);
-
-    InArgs.vt = VT_EMPTY;
     ::VariantClear(&InArgs);
 
     return bRet;

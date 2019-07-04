@@ -56,7 +56,7 @@ class CIDLIBEXP TCursorBase : public TObject
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TCursorBase();
+        ~TCursorBase() = default;
 
 
         // -------------------------------------------------------------------
@@ -86,22 +86,16 @@ class CIDLIBEXP TCursorBase : public TObject
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TCursorBase();
+        TCursorBase() = default;
 
         TCursorBase
         (
             const   tCIDLib::TCard4         c4SerialNum
         );
 
-        TCursorBase
-        (
-            const   TCursorBase&            cursSrc
-        );
+        TCursorBase(const TCursorBase&) = default;
 
-        TCursorBase& operator=
-        (
-            const   TCursorBase&            cursSrc
-        );
+        TCursorBase& operator=(const TCursorBase&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -161,7 +155,7 @@ class CIDLIBEXP TCursorBase : public TObject
         //      it is out of date with respect to the collection it is
         //      cursoring.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4     m_c4SerialNum;
+        tCIDLib::TCard4     m_c4SerialNum = 0;
 
 
         // -------------------------------------------------------------------
@@ -222,11 +216,6 @@ template <typename TElem> class TColCursor : public TCursorBase
             return !TColCursor::operator==(cursSrc);
         }
 
-        //
-        //  To support pre-increment polymorphically, but there has to be a
-        //  version in the derived classes as well, to avoid name masking of
-        //  the post-increment ones that can only be done there.
-        //
         TColCursor<TElem>& operator++()
         {
             this->bNext();
@@ -247,7 +236,7 @@ template <typename TElem> class TColCursor : public TCursorBase
         {
             // If not set yet...
             if (!m_pcolBaseCurs)
-                return kCIDLib::False;
+                return kCIDLib::True;
 
             // Lock the collection
             TMtxLocker lockCol(m_pcolBaseCurs->pmtxLock());

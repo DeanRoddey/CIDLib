@@ -193,11 +193,15 @@
 <!ELEMENT   PrivIntf    (Aliases?, Enums?, Constants?, StaticMeths?, Ctors?, Operators?
                         , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>
 
-<!ELEMENT   CppClass    (Desc, PubIntf?, ProtIntf?, PrivIntf?, Keywords?)>
+<!ELEMENT   TmplParam   EMPTY>
+<!ATTLIST   TmplParam   Name CDATA #REQUIRED
+                        DefVal CDATA ''>
+<!ELEMENT   TmplParams  (TmplParam+)>
+
+<!ELEMENT   CppClass    (Desc, TmplParams?, PubIntf?, ProtIntf?, PrivIntf?, Keywords?)>
 <!ATTLIST   CppClass    Class NMTOKEN #REQUIRED
                         Parent CDATA #REQUIRED
                         Prefix NMTOKEN #REQUIRED
                         VirtDtor (%YNVal;) 'No'
-                        Flags NMTOKENS 'NoFlags'
-                        TmplParms CDATA #IMPLIED>
+                        Flags NMTOKENS 'NoFlags'>
 

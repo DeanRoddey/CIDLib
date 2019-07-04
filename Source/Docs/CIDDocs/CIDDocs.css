@@ -167,6 +167,7 @@ li {
 .ExpandItemText {
     margin-left : 4em;
     line-height: 1;
+    background-color: #eeeeee;
 }
 
 .ExpandItem:hover .ExpandItemText {
@@ -177,9 +178,7 @@ li {
 
 .ExpandItems {
     margin-left: 2em;
-    margin-right : 16em;
     padding : 0;
-
 }
 
 .ExpandItem {

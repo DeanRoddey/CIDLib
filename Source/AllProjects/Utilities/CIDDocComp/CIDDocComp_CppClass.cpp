@@ -514,7 +514,10 @@ TMethodVar::OutputContent(TTextOutStream& strmTar, const TString& strName) const
     if (tCIDLib::bAllBitsOn(m_eAttrs, tCIDDocComp::EMethAttrs::Virtual))
         strmTar << L"virtual ";
 
-    // Do the return type
+    //
+    //  Do the return type. But check for a retry by of None, which is valid for
+    //  constructors and things like conversion operators.
+    //
     if (!m_strRetType.bIsEmpty())
     {
         //
@@ -807,9 +810,9 @@ TMethodGrp::Parse(const TXMLTreeElement& xtnodeSrc)
 
 tCIDLib::TVoid TMethodGrp::OutputContent(TTextOutStream& strmTar) const
 {
-    // If there's a description first, then output that
+    // If there's overall group description text, then output that
     if (!m_hnDescr.bIsEmpty())
-        m_hnDescr.OutputHelpText(strmTar);
+        m_hnDescr.OutputHelpText(strmTar, kCIDLib::False);
 
     // And then do the methods
     m_colMethods.bForEach
@@ -1314,7 +1317,7 @@ TCppClassPage::Parse(           TTopic&             topicParent
     // First we need to get out our class name, parent class, and prefix
     m_strClass = xtnodeClass.strAttr(L"Class");
     m_strParClass = xtnodeClass.strAttr(L"Parent");
-m_strPrefix = xtnodeClass.strAttr(L"Prefix");
+    m_strPrefix = xtnodeClass.strAttr(L"Prefix");
 
     // Get the boolean flags out and parse them
     const TString& strFlags = xtnodeClass.strAttr(L"Flags");
@@ -1339,14 +1342,36 @@ m_strPrefix = xtnodeClass.strAttr(L"Prefix");
     );
 
     // We may have template params
-    if (!xtnodeClass.bAttrExists(L"TmplParms", m_strTmplParms))
+    tCIDLib::TCard4 c4At;
+    const TXMLTreeElement* pxtnodeTPs
+    (
+        xtnodeClass.pxtnodeFindElement(L"TmplParams", 0, c4At)
+    );
+    if (pxtnodeTPs)
+    {
+        // Add each one to our template parms collection
+        pxtnodeTPs->bForEach
+        (
+            [this](const TXMLTreeElement& xtnodePT)
+            {
+                this->m_colTmplParams.objAdd
+                (
+                    TKeyValuePair
+                    (
+                        xtnodePT.strAttr(L"Name"), xtnodePT.strAttr(L"DefVal")
+                    )
+                );
+                return kCIDLib::True;
+            }
+        );
+    }
+     else
     {
         // If  the template class flag is on, then this is bad
         if (tCIDLib::bAllBitsOn(m_eFlags, tCIDDocComp::EClsFlags::Template))
-            facCIDDocComp.AddErrorMsg(L"Template Class flag is set, but not template parms provided");
+            facCIDDocComp.AddErrorMsg(L"Template flag is set, but no template parms provided");
     }
 
-    tCIDLib::TCard4 c4At;
     const TXMLTreeElement& xtnodeDesc = xtnodeClass.xtnodeFindElement
     (
         kCIDDocComp::strXML_Desc, 0, c4At
@@ -1431,8 +1456,38 @@ tCIDLib::TVoid TCppClassPage::OutputContent(TTextOutStream& strmTar) const
 
     strmTar << L"</table></blockquote><Br/>";
 
+    //
+    //  Before the descriptive text, if this is a template, we want to output
+    //  the full signature with template parameters.
+    //
+    if (!m_colTmplParams.bIsEmpty())
+    {
+        const tCIDLib::TBoolean bWrap(m_colTmplParams.c4ElemCount() > 2);
+        strmTar << L"<pre>template class&lt;";
+        if (bWrap)
+            strmTar << kCIDLib::NewLn;
+        m_colTmplParams.bForEachI
+        (
+            [&strmTar, bWrap]
+            (const TKeyValuePair& kvalCur, const tCIDLib::TCard4 c4Index)
+            {
+                if (bWrap)
+                    strmTar << L"    ";
+                if (c4Index)
+                    strmTar << L", ";
+                strmTar << L"typename " << kvalCur.strKey();
+                if (!kvalCur.strValue().bIsEmpty())
+                    strmTar << L" = " << kvalCur.strValue();
+                return kCIDLib::True;
+            }
+        );
+        if (bWrap)
+            strmTar << kCIDLib::NewLn;
+        strmTar << L"> <b>" << m_strClass << L"</b></pre>";
+    }
+
     // Next should be the descriptive text.
-    m_hnDesc.OutputHelpText(strmTar);
+    m_hnDesc.OutputHelpText(strmTar, kCIDLib::False);
 
     // Do a little divider
     strmTar << L"<div class=\"HorzDivCont\"><div class=\"HorzDiv\"></div></div>";

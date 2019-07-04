@@ -176,7 +176,7 @@ static tCIDLib::TVoid LoadDDraw()
         return;
 
     // Try to load the DLL. If it fails, we are done
-    CIDGraphDev_Device::hDDraw = ::LoadLibraryW(L"ddraw.dll");
+    CIDGraphDev_Device::hDDraw = ::LoadLibrary(L"ddraw.dll");
     if (!CIDGraphDev_Device::hDDraw)
     {
         // Don't try again
@@ -471,7 +471,7 @@ TArea TGraphDrawDev::areaMLText(const   TString&        strText
         i4Len = tCIDLib::TInt4(c4Len);
 
     // This will update the rectangle to hold the new bottom
-    ::DrawTextExW
+    ::DrawTextEx
     (
         hdevThis()
         , (tCIDLib::TCh*)strText.pszBufferAt(c4Start)
@@ -2331,7 +2331,7 @@ TGraphDrawDev::DrawMText(const  TString&            strText
     //
     TRegionJanitor janClip(this, areaFormat, tCIDGraphDev::EClipModes::And);
 
-    ::DrawTextExW
+    ::DrawTextEx
     (
         hdevThis()
         , (tCIDLib::TCh*)strText.pszBuffer()
@@ -2499,7 +2499,7 @@ TGraphDrawDev::DrawString(  const   TString&        strText
     //  This simple version just draws at the current position, using the
     //  current text attributes.
     //
-    if (!::TextOutW(hdevThis(), pntAlign.i4X(), pntAlign.i4Y(), strText.pszBufferAt(c4StartAt), c4Len))
+    if (!::TextOut(hdevThis(), pntAlign.i4X(), pntAlign.i4Y(), strText.pszBufferAt(c4StartAt), c4Len))
     {
         if (!bDevErrToIgnore())
         {
@@ -3155,7 +3155,7 @@ TGraphDrawDev::DrawStringFX(const   TString&                strText
         //
         tCIDLib::TCard4 c4Order = 2;
         TEXTMETRICW OurMetrics;
-        if (::GetTextMetricsW(hdevThis(), &OurMetrics))
+        if (::GetTextMetrics(hdevThis(), &OurMetrics))
         {
             if (OurMetrics.tmHeight < 20)
                 c4Order = 1;

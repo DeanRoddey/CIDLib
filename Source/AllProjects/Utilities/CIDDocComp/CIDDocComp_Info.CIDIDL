@@ -202,7 +202,7 @@
                         PtrRef  - A reference to a pointer to non-const
                         Value   - by value
 
-                        Void    - No return or parameter
+                        Void    - Only for returns really, to indicate no return
 
                     These name is the same as what is in the XML, so we can translate
                     directly. None is used to indicate not set, so it's an error if we
@@ -220,6 +220,7 @@
                 <CIDIDL:EnumVal CIDIDL:Name="PtrRef"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Val"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Void"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Unused"/>
             </CIDIDL:Enum>
 
 
