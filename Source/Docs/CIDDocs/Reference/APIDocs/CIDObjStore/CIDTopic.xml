@@ -4,13 +4,10 @@
 <CIDTopic TopicPage="Overview">
 
     <PageMap>
-        <PageLink FileName="Overview"/>
+        <PageLink FileName="Overview" Title="Overview"/>
     </PageMap>
 
     <SubTopicMap>
-        <SubTopicLink SubDir="BigPicture" Title="Big Picture"/>
-        <SubTopicLink SubDir="Reference" Title="Reference Material"/>
-        <SubTopicLink SubDir="Samples" Title="Sample Programs"/>
     </SubTopicMap>
 
 </CIDTopic>

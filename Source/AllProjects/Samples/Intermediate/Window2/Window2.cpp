@@ -249,35 +249,6 @@ class TTestFrameWnd : public TFrameWnd
         //  Protected, inherited methods
         // -------------------------------------------------------------------
 
-        //
-        //  If not in min state and the size changed, then adjust our client window
-        //  if it has been created.
-        //
-        tCIDLib::TVoid AreaChanged( const   TArea&                  areaPrev
-                                    , const TArea&                  areaNew
-                                    , const tCIDCtrls::EPosStates   ePosState
-                                    , const tCIDLib::TBoolean       bOrgChanged
-                                    , const tCIDLib::TBoolean       bSizeChanged
-                                    , const tCIDLib::TBoolean       bStateChanged) override
-        {
-            //  Call our parent first
-            TParent::AreaChanged
-            (
-                areaPrev, areaNew, ePosState, bOrgChanged, bSizeChanged, bStateChanged
-            );
-
-            if (bSizeChanged && (ePosState != tCIDCtrls::EPosStates::Minimized))
-            {
-                if (m_pwndClient)
-                {
-                    // Get the client area and size the client to fit again
-                    TArea areaClient;
-                    QueryClientArea(areaClient, kCIDLib::False);
-                    m_pwndClient->SetSizePos(areaClient, kCIDLib::True);
-                }
-            }
-        }
-
         // We have to handle this to create our client window
         tCIDLib::TBoolean bCreated() override
         {
@@ -289,6 +260,12 @@ class TTestFrameWnd : public TFrameWnd
             QueryClientArea(areaClient, kCIDLib::False);
             m_pwndClient = new TClientWnd();
             m_pwndClient->CreateClient(*this, areaClient);
+
+            //
+            //  Tell our parent class this is our 'client' window and it will keep it
+            //  sized to fit for us.
+            //
+            SetClientId(m_pwndClient->widThis());
 
             return kCIDLib::True;
         }

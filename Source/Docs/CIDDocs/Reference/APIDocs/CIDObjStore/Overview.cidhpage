@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>CIDObjStore</Title>
+
+    <HelpText>
+
+        <P>CIDObjStore is a simple, embeddable 'no sql' type of object 'database'. It's not a database really, since it doesn't offer any extensive manipulation capabilities. It's primarily a convenient way for programs to store things like options, last window positions, user preferences, last directories opened, etc...</P>
+
+        <P>In the 'no sql' way of things it is key/value based, or key/object. It uses CIDLib's binary streaming system to make it easy to store objects and stream them back in. So there's no complicated conversion into and out of the store. Any class that implements <ClassRef Ref="MStreamable"/> can be stored.</P>
+
+        <Note>However, that also means that, unlike a relational database, there's no mechanism to extract or update individual values from stored objects. The object store has no idea how to access the contents of the objects it stores. They must be extracted by the programs that understand the classes involved.</Note>
+
+        <P>CIDObjStore is not hyper-optimized as real databases tend to be. The performance is pretty good since it maintains an in-memory map of the keys and where they are in the object store. It can move objects around if needed instead of expanding the store. And it maintains a free space list for reuse. But it's not something you are going to use manage your galactic collection of internet posts or anything of that sort.</P>
+
+        <SubSecTitle>Scopes</SubSecTitle>
+
+        <P>Those the store is not hierarchical, it's just a flat list of keys, effectively those keys do form a hierarchy if any of them are related. I.e. /Users/Admins and /Users/Normal effectively form a hierarchy under a 'scope' named /Users.</P>
+
+        <P>The engine allows you to find all objects or sub-scopes within a particular 'scope', even though it's really sort of a virtual scope.</P>
+
+        <SubSecTitle>Direct Objects</SubSecTitle>
+
+        <P>Though typically you will store objects in the database by passing them (via the MStreamable interface (see above), you can store binary blobs of pre-streamed or third part data. You are just responsible for reading it back out as a blob and resurrecting the data appropriately.</P>
+
+        <P>It offers the basic sorts of capabilities you would expect:</P>
+
+        <List>
+            <LItem>Create and destroy object stores.</LItem>
+            <LItem>Read and write objects to the store</LItem>
+            <LItem>Search for objects by key, to see if they exist</LItem>
+            <LItem>Find all objects under a particular 'scope', see comments above</LItem>
+            <LItem>Delete objects or scopes from the store</LItem>
+            <LItem>Back up store to another file</LItem>
+            <LItem>Validate the integrity of the store</LItem>
+        </List>
+
+    </HelpText>
+
+</HelpPage>

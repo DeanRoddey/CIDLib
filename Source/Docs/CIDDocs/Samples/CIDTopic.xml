@@ -5,12 +5,10 @@
 
     <PageMap>
         <PageLink FileName="Overview"/>
+        <PageLink FileName="Basic" Title="Basic Samples"/>
+        <PageLink FileName="Intermediate" Title="Intermediate Samples"/>
     </PageMap>
 
-    <SubTopicMap>
-        <SubTopicLink SubDir="BigPicture" Title="Big Picture"/>
-        <SubTopicLink SubDir="Reference" Title="Reference Material"/>
-        <SubTopicLink SubDir="Samples" Title="Sample Programs"/>
-    </SubTopicMap>
+    <SubTopicMap/>
 
 </CIDTopic>

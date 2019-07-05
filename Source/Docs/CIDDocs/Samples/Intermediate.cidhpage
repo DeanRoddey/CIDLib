@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Intermediate Sample Programs</Title>
+
+    <HelpText>
+
+        <P>This section provides an overview of the intermediate sample program, what each one is intended to teach you, and what CIDLib features it demonstrates.</P>
+
+        <P>The intermediate programs are still not necessarily full fledged applications, in that they aren't going to include as much robustification and they may not always create <Link Type="Page" Ref="/BigPicture/" Id="/Facilities">facility objects</Link>. But they are more ambitious and full featured than the basic ones.</P>
+
+        <P>We also start to introduce some UI programs at this level.</P>
+
+        <SubSecTitle>Interview1</SubSecTitle>
+
+        <P>This program does one of those types of programs often asked in interviews. Given a list of URLS, the customers who accessed them, and a time each was accessed, find the most common three URL contiguous sequence (i.e. by a single customer.) This guy demonstrates <Link Type="Page" Ref="/BigPicture/" Id="Collections">collections</Link>, sorting of collections, and managing lists of unique strings.</P>
+
+        <SubSecTitle>ObjStore1</SubSecTitle>
+
+        <P>CIDLib includes a simple <Link Type="Page" Ref="/Reference/APIDocs/CIDObjStore/" Id="/Overview">object store engine</Link> you can embed in your applications. It is key based, so a sort of No-Sql scheme, though not a database in the traditional sense. This sample demonstrates creating an object store, adding objects to it, finding existing objects, read those objects back in, deleting objects, etc... So the basic sorts of steps that any program using the object store would need to do.</P>
+
+        <SubSecTitle>ORB1Samp</SubSecTitle>
+
+        <P>The <Link Type="Page" Ref="/BigPicture/" Id="/ORB-IDL">Object Request Broker</Link>, or ORB for short, is a very powerful mechanism for creating client/server applications in CIDLib. It allows you to create very complex remote interfaces with minimal effort. This sample creates a client, a server, and a shared third library facility that defines a 'record' class that they share.</P>
+
+        <SubSecTitle>Window1</SubSecTitle>
+
+        <P>This sample is basically the GUI version of a "Hello, World" application. It creates a frame window, creates it, shows it, and enters the message loop until you exit. So this would be the most basic aspects of creating a UI based CIDLib program.</P>
+
+        <SubSecTitle>Window2</SubSecTitle>
+
+        <P>This sample demonstrates the creation of a custom window, of the sort you might create if you wanted to make a graphical editor program or allow a user to manipulate graphical objects. It creates a main frame window, which creates a little custom window that it makes the 'client window'. It watches for clicks and draws a circle where you click. If you click an existing circle it removes that one. It handles the painting callback and draws an circles that intersect the invalidated area.</P>
+
+        <SubSecTitle>Window3</SubSecTitle>
+
+        <P>This sample takes the previous one a bit further. It breaks out the little 'editor' window and makes it a CIDLib control type window. It uses the resource description language to define a dialog layout. It uses this to create the child controls for the program. They are the editor window, a couple buttons, and a couple static text controls. So this is more what a regular UI application would be that's just using existing controls, not creating custom ones, or at least any it is creating are separate, standalone controls.</P>
+
+        <P>It also demonstrates how applications register for notifications from controls. It handles clicks from the buttons. And the editor window is expanded to support sending out a notification for the number of circles currently displayed which the program displays.</P>
+
+
+    </HelpText>
+
+</HelpPage>

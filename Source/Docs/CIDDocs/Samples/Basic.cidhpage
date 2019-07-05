@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Basic Sample Programs</Title>
+
+    <HelpText>
+
+        <P>This section provides an overview of the basic sample program, what each one is intended to teach you, and what CIDLib features it demonstrates.</P>
+
+    </HelpText>
+
+</HelpPage>

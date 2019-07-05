@@ -12,6 +12,7 @@
         <SubTopicLink SubDir="CIDLib"/>
         <SubTopicLink SubDir="CIDDBase"/>
         <SubTopicLink SubDir="CIDEncode"/>
+        <SubTopicLink SubDir="CIDObjStore"/>
     </SubTopicMap>
 
 </CIDTopic>

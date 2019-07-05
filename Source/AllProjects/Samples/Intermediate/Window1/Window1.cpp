@@ -55,11 +55,11 @@ class TTestFrameWnd : public TFrameWnd
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TTestFrameWnd() {}
+        TTestFrameWnd() = default;
 
         TTestFrameWnd(const TTestFrameWnd&) = delete;
 
-        ~TTestFrameWnd() {}
+        ~TTestFrameWnd() = default;
 
 
     private :
