@@ -1,5 +1,5 @@
 //
-// CID_FILE NAME: Window1.cpp
+// CID_FILE NAME: Window2.cpp
 //
 // AUTHOR: Dean Roddey
 //

@@ -2479,6 +2479,23 @@ PROJECT=Window2
     END DEPENDENTS
 END PROJECT
 
+PROJECT=Window3
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Window3
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        RESFILE     = Yes
+    END SETTINGS
+
+    INCLUDEPLATS
+        Win32
+    END INCLUDEPLATS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
 
 ; ----------------------------------------------------------------------------
 ;  A junk project for temporary work. Only enabled when needed.
