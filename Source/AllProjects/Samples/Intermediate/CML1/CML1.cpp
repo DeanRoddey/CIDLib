@@ -89,7 +89,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //  Give the parser and macro engine error handlers a stream to send
         //  errors to. We just use our local output console. In a more realistic
         //  scenario we might give it a memory or string based stream so that we
-        //  can display the errors in a popup or something.
+        //  can display the errors in a popup or something. Or use handlers that
+        //  queue them up for later processing
         //
         TMEngStrmPrsErrHandler  meehParser;
         TMEngStrmErrHandler     meehEngine;
@@ -103,8 +104,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         //
         //  The parse will set up the macro engine and gives us back a pointer
-        //  to the main class class, the one we need to create. We give the
-        //  error handle and class manager to use.
+        //  to the main class info class, the type we need to create. We give
+        //  it the error handler and class manager to use.
         //
         TMEngClassInfo* pmeciMain;
         if (!meprsCust.bParse(  L"MEng.User.Customize"
@@ -150,9 +151,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         // Let's display the name and address the CML code set
         strmOut << L"Name="
-                << reinterpret_cast<TMEngStringVal*>(colParms[0])->strValue()
+                << static_cast<TMEngStringVal*>(colParms[0])->strValue()
                 << L"\nAddr="
-                << reinterpret_cast<TMEngStringVal*>(colParms[1])->strValue()
+                << static_cast<TMEngStringVal*>(colParms[1])->strValue()
                 << kCIDLib::NewEndLn;
     }
 
