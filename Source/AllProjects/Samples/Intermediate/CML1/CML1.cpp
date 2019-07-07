@@ -141,7 +141,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         meCustom.AddStringParm(colParms, L"Addr", kCIDLib::False);
 
         // And now run the macro, passing the parameters
-        if (!meCustom.i4Run(*pmecvTarget, colParms, 0) != 0)
+        if (meCustom.i4Run(*pmecvTarget, colParms, 0) != 0)
         {
             strmOut << L"The macro failed to run" << kCIDLib::NewEndLn;
             return tCIDLib::EExitCodes::RuntimeError;
