@@ -29,21 +29,17 @@
 
 // ---------------------------------------------------------------------------
 //  If we are under MS VC++, then this section handles all of the stuff that
-//  is specific to it.
+//  is specific to it. Note that we pick up the UNICODE define from the
+//  CIDKernel platform defines header since that needs to be visible all the
+//  time for IDE syntax validatino purposes.
 // ---------------------------------------------------------------------------
 #if defined(_MSC_VER)
-
 #if defined(PLATFORM_WIN32_WIN7)
-#define UNICODE
-#define _UNICODE
 #else
 #error Unknown target platform for VC++
 #endif
-
 #else
-
 #error Unknown target platform
-
 #endif
 
 
