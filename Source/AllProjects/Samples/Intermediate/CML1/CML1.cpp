@@ -86,16 +86,14 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         TMEngFixedBaseFileResolver mefrLocal(strCurDir, L"Files");
 
         //
-        //  Give the parser and macro engine error handlers a stream to send
-        //  errors to. We just use our local output console. In a more realistic
-        //  scenario we might give it a memory or string based stream so that we
-        //  can display the errors in a popup or something. Or use handlers that
-        //  queue them up for later processing
+        //  Create error handlers for the parser and engine, which in this
+        //  case are just simple ones that dump to an output stream, and
+        //  use our local output stream for that. In more realistic
+        //  scenarios we'd use one that queues them for display or spools
+        //  to a window or something.
         //
-        TMEngStrmPrsErrHandler  meehParser;
-        TMEngStrmErrHandler     meehEngine;
-        meehParser.SetStream(&strmOut);
-        meehEngine.SetStream(&strmOut);
+        TMEngStrmPrsErrHandler  meehParser(&strmOut);
+        TMEngStrmErrHandler     meehEngine(&strmOut);
 
         // Set the error handler and file resolver on the macro engine
         TMacroEngParser meprsCust;
