@@ -162,6 +162,12 @@ class CIDMACROENGEXP TMEngFixedBaseClassMgr
             const   TString&                strBasePath
         );
 
+        TMEngFixedBaseClassMgr
+        (
+            const   TString&                strBasePath
+            , const TString&                strSubDir
+        );
+
         TMEngFixedBaseClassMgr(const TMEngFixedBaseClassMgr&) = delete;
 
         ~TMEngFixedBaseClassMgr();

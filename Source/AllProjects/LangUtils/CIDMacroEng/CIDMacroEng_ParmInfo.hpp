@@ -22,6 +22,9 @@
 //  the class if of the data type, and the in/out designation for the
 //  parameter.
 //
+//  We have some helpers for adding very common parameter types to a list
+//  of parameters.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -50,12 +53,12 @@ class CIDMACROENGEXP TMEngParmInfo : public TMEngNamedItem
         (
             const   TString&                strName
             , const tCIDLib::TCard2         c2ClassId
-            , const tCIDMacroEng::EParmDirs    eDir
+            , const tCIDMacroEng::EParmDirs eDir
         );
 
         TMEngParmInfo
         (
-            const   TMEngParmInfo&          mepiToCopy
+            const   TMEngParmInfo&          mepiSrc
         );
 
         ~TMEngParmInfo();
@@ -66,17 +69,17 @@ class CIDMACROENGEXP TMEngParmInfo : public TMEngNamedItem
         // -------------------------------------------------------------------
         tCIDLib::TBoolean operator==
         (
-            const   TMEngParmInfo&          mepiToCompare
+            const   TMEngParmInfo&          mepiSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TMEngParmInfo&          mepiToCompare
+            const   TMEngParmInfo&          mepiSrc
         )   const;
 
         TMEngParmInfo& operator=
         (
-            const   TMEngParmInfo&          mepiToAssign
+            const   TMEngParmInfo&          mepiSrc
         );
 
 
@@ -104,7 +107,7 @@ class CIDMACROENGEXP TMEngParmInfo : public TMEngNamedItem
         //      The direction indicator for the parameter.
         // -------------------------------------------------------------------
         tCIDLib::TCard2         m_c2ClassId;
-        tCIDMacroEng::EParmDirs    m_eDir;
+        tCIDMacroEng::EParmDirs m_eDir;
 
 
         // -------------------------------------------------------------------

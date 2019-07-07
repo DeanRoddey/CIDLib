@@ -135,6 +135,13 @@ TMEngFixedBaseClassMgr::TMEngFixedBaseClassMgr(const TString& strBasePath) :
 {
 }
 
+TMEngFixedBaseClassMgr::
+TMEngFixedBaseClassMgr(const TString& strBasePath, const TString& strSubDir) :
+
+    m_strBasePath(TPathStr(strBasePath, strSubDir))
+{
+}
+
 TMEngFixedBaseClassMgr::~TMEngFixedBaseClassMgr()
 {
 }

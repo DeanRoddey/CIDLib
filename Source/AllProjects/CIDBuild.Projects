@@ -2327,6 +2327,21 @@ END PROJECT
 ;  Some intermediate samples
 ; ----------------------------------------------------------------------------
 
+PROJECT=CML1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\CML1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMacroEng
+    END DEPENDENTS
+
+END PROJECT
+
+
 PROJECT=Interview1
 
     SETTINGS

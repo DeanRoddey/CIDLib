@@ -203,6 +203,44 @@ TCIDMacroEngine::~TCIDMacroEngine()
 // ---------------------------------------------------------------------------
 //  TCIDMacroEngine: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+tCIDLib::TVoid
+TCIDMacroEngine::AddBoolParm(       TParmList&          colTar
+                            , const TString&            strName
+                            , const tCIDLib::TBoolean   bConst)
+{
+    const TMEngClassInfo& meciBool = meciFind(L"MEng.Boolean");
+    colTar.Add
+    (
+        meciBool.pmecvMakeStorage
+        (
+            strName
+            , *this
+            , bConst ? tCIDMacroEng::EConstTypes::Const
+                     : tCIDMacroEng::EConstTypes::NonConst
+        )
+    );
+}
+
+tCIDLib::TVoid
+TCIDMacroEngine::AddStringParm(         TParmList&          colTar
+                                , const TString&            strName
+                                , const tCIDLib::TBoolean   bConst)
+{
+    const TMEngClassInfo& meciString = meciFind(L"MEng.String");
+    colTar.Add
+    (
+        meciString.pmecvMakeStorage
+        (
+            strName
+            , *this
+            , bConst ? tCIDMacroEng::EConstTypes::Const
+                     : tCIDMacroEng::EConstTypes::NonConst
+        )
+    );
+}
+
+
 tCIDLib::TBoolean
 TCIDMacroEngine::bAreEquivCols( const   tCIDLib::TCard2     c2ClassId1
                                 , const tCIDLib::TCard2     c2ClassId2

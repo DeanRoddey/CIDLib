@@ -73,6 +73,20 @@ class CIDMACROENGEXP TCIDMacroEngine : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TVoid AddBoolParm
+        (
+                    TParmList&              colOut
+            , const TString&                strName
+            , const tCIDLib::TBoolean       bConst
+        );
+
+        tCIDLib::TVoid AddStringParm
+        (
+                    TParmList&              colOut
+            , const TString&                strName
+            , const tCIDLib::TBoolean       bConst
+        );
+
         tCIDLib::TBoolean bAreEquivCols
         (
             const   tCIDLib::TCard2         c2ClassId1
