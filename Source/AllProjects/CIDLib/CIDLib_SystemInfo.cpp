@@ -578,6 +578,56 @@ tCIDLib::TVoid TSysInfo::SetNSAddr( const   TString&            strDNSAddr
 }
 
 
+//
+//  This does a standard CIDLib style command line parameter parse. It will
+//  check each parameter. If it starts with an / it considers that an option.
+//  If it's in the form /x=y, then it's an option with a value. Otherwise it's
+//  just a value. It strips them down to key/value pairs, removing the slash
+//  and equal signs. It fills in a collection of key/value/flag objects. If
+//  one is an option, it set the flag, else it clears it.
+//
+tCIDLib::TCard4 TSysInfo::c4StdCmdLineParse(tCIDLib::TKVPFCollect& colToFill)
+{
+    colToFill.RemoveAll();
+
+    TString strCurParm;
+    TString strVal;
+    TSysInfo::TCmdLineCursor cursParms = cursCmdLineParms();
+    for (; cursParms; ++cursParms)
+    {
+        strCurParm = *cursParms;
+
+        if (strCurParm[0] == kCIDLib::chForwardSlash)
+        {
+            // Cut the slash off
+            strCurParm.Cut(0, 1);
+
+            //
+            //  Split it on an equal sign if it has one. If so, it's an option with a
+            //  value, else an option without one.
+            //
+            if (strCurParm.bSplit(strVal, kCIDLib::chEquals))
+            {
+                // An option with a value
+                colToFill.objAdd(TKeyValFPair(strCurParm, strVal, kCIDLib::True));
+            }
+             else
+            {
+                // An option but no value
+                colToFill.objAdd(TKeyValFPair(strCurParm, TString::strEmpty(), kCIDLib::True));
+            }
+        }
+         else
+        {
+            // Not an option type
+            colToFill.objAdd(TKeyValFPair(strCurParm, TString::strEmpty()));
+        }
+    }
+    return colToFill.c4ElemCount();
+}
+
+
+
 // ---------------------------------------------------------------------------
 //  TSysInfo: Hidden Constructors and Destructor
 // ---------------------------------------------------------------------------

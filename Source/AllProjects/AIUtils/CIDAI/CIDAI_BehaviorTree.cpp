@@ -331,7 +331,7 @@ TAIBehaviorTree::pbtnodeFindTree(const  TString&            strTreeName
 // Pop the top node from the call stack
 tCIDLib::TVoid TAIBehaviorTree::PopNode()
 {
-    m_colCallStack.pobjPop();
+    m_colCallStack.TrashTop();
 }
 
 
