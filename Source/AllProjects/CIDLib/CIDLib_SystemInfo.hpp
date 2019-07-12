@@ -171,6 +171,12 @@ class CIDLIBEXP TSysInfo : public TObject
             , const tCIDLib::TIPPortNum     ippnToUse
         );
 
+        // The tCIDLib::TKeyValFPair alias isn't created yet, so can't use it
+        static tCIDLib::TCard4 c4StdCmdLineParse
+        (
+                    TCollection<TKeyValFPair>&  colToFill
+        );
+
 
     protected :
         // -------------------------------------------------------------------

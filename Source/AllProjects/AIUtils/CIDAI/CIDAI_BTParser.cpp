@@ -173,8 +173,8 @@ tCIDLib::TVoid TCIDAIBTParser::EndTag(const TXMLElemDecl& xdeclElem)
 {
     if (xdeclElem.strFullName() == s_strElem_BTNode)
     {
-        // Pop the node stack now. We are done with this one
-        m_colNodeStack.pobjPop();
+        // Discard the node now. We are done with this one
+        m_colNodeStack.TrashTop();
     }
      else if (xdeclElem.strFullName() == s_strElem_NodeParams)
     {

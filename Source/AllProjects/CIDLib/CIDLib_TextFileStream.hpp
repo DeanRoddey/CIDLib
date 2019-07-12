@@ -144,7 +144,7 @@ class CIDLIBEXP TTextFileOutStream : public TTextOutStream
         // -------------------------------------------------------------------
         explicit TTextFileOutStream
         (
-                    TTextConverter* const   ptcvtToAdopt = 0
+                    TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextFileOutStream
@@ -154,13 +154,13 @@ class CIDLIBEXP TTextFileOutStream : public TTextOutStream
             , const tCIDLib::EFilePerms     ePerms
             , const tCIDLib::EFileFlags     eFlags
             , const tCIDLib::EAccessModes   eAccess
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextFileOutStream
         (
             const   tCIDLib::EStdFiles      eFile
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextFileOutStream(const TTextFileOutStream&) = delete;
