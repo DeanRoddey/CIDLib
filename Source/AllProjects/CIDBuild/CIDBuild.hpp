@@ -46,7 +46,7 @@
     #include    "../CIDKernel/Linux/CIDKernel_PlatformDefines.hpp"
     #include    "../CIDKernel/Linux/CIDKernel_PlatformTypes.hpp"
     #include    "../CIDKernel/Linux/CIDKernel_PlatformConstants.hpp"
-    #define     CIDBUILD_SHORTMAIN 1
+    #define     CIDBUILD_WIDEMAIN 1
 #else
     #error Unknown platform define
 #endif
@@ -367,6 +367,15 @@ namespace kCIDBuild
 #include    "CIDBuild_BinFile.hpp"
 #include    "CIDBuild_TextFile.hpp"
 
+// ---------------------------------------------------------------------------
+//  Export global data
+//
+//  stdOut
+//      The standard output text stream that the program uses to output its
+//      info.
+// ---------------------------------------------------------------------------
+extern TTextFile    stdOut;
+
 #include    "CIDBuild_MsgIdInfo.hpp"
 #include    "CIDBuild_FindInfo.hpp"
 #include    "CIDBuild_KeyValuePair.hpp"
@@ -390,13 +399,8 @@ namespace kCIDBuild
 //
 //  facCIDBuild
 //      The facility object for this program.
-//
-//  stdOut
-//      The standard output text stream that the program uses to output its
-//      info.
 // ---------------------------------------------------------------------------
 extern TFacCIDBuild facCIDBuild;
-extern TTextFile    stdOut;
 
 
 // ---------------------------------------------------------------------------

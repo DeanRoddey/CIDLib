@@ -27,26 +27,10 @@
 //
 
 
-#include <errno.h>
-#include <fcntl.h>
-#include <glob.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <wchar.h>
-#include <wctype.h>
-
 // ---------------------------------------------------------------------------
 //  Define our endianness
 // ---------------------------------------------------------------------------
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-#define CIDBUILD_LITTLEENDIAN
-#else
-#define CIDBUILD_BIGENDIAN
-#endif
+
 
 // ---------------------------------------------------------------------------
 //  Define the packing mechanism
