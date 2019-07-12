@@ -63,8 +63,8 @@ TTextFile       stdOut(tCIDLib::EStdFiles::StdOut);
 //
 //  RETURN: 0 if successful, else 1.
 //
-#if defined(CIDBUILD_SHORTMAIN)
-tCIDLib::TSInt main(tCIDLib::SIn4 iArgs, tCIDLib::TSCh** apszArgs)
+#if defined(PLATFORM_LINUX)
+tCIDLib::TSInt main(tCIDLib::TSInt iArgs, tCIDLib::TSCh** apszArgs)
 {
     //
     //  We are all Unicode internally, so we have to create a transcoded

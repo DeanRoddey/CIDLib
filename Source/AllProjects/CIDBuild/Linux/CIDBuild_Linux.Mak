@@ -45,15 +45,15 @@ endif
 
 
 # Set up build flags for the build mode
-ifeq ($CID_BUILDMODE), Dev)
-	BUILD_FLAGS := -g -DBLDMODE_DEV
+ifeq ($(CID_BUILDMODE), Dev)
+	BUILD_FLAGS := -c -g -DBLDMODE_DEV -D_DEBUG
 	LINK_FLAGS := -g
 else
-	BUILD_FLAGS := -O3 -DBLDMODE_PROD
+	BUILD_FLAGS := -c -O3 -DBLDMODE_PROD
 	LINK_FLAGS := -O3
 endif
 
-BUILD_FLAGS += -DPLATFORM_LINUX -std=c++17 -m32
+BUILD_FLAGS += -DPLATFORM_LINUX -std=c++17 -m32 
 
 # The list of headers. We just use them all for each file
 HPP_FILES=\
@@ -131,19 +131,16 @@ SRC_FILES := $(addsuffix $(SRC_EXT), $(SRC_STEMS))
 #showlist :
 #	@echo $(SRC_FILES)
 
-#all : dirs $(CID_RESDIR)/CIDBuild
+all : dirs $(CID_RESDIR)/CIDBuild
 
-#$(CID_RESDIR)/CIDBuild : $(OBJ_FILES)
-#	@echo "g++ $(LINK_FLAGS) -o $(CID_RESDIR)/CIDBuild $*"
+$(CID_RESDIR)/CIDBuild : $(OBJ_FILES)
+	g++ $(LINK_FLAGS) -o $(CID_RESDIR)/CIDBuild $*"
 
-#$(OUR_OUTDIR)/%.o: ./%.cpp
-#	gcc $(BUILD_FLAGS) $< -o $@
-
-$(OUR_OUTDIR)/CIDBuild.o: ./CIDBuild.cpp
-	gcc $(BUILD_FLAGS) $< -o $@
+$(OUR_OUTDIR)/%.o: ./%.cpp
+	g++ $(BUILD_FLAGS) $<
 
 $(OUR_OUTDIR)/%.o: ./Linux/%.cpp
-	@echo "gcc $(BUILD_FLAGS) $< -o $@"	
+	g++ $(BUILD_FLAGS) $<
 
 # Make sure our output directories are created
 dirs :

@@ -34,23 +34,28 @@ namespace kCIDLib
     //  File system constants
     // -----------------------------------------------------------------------
     const tCIDLib::TCard4           c4MaxPathLen    = 255;
-    const tCIDLib::TCh              chPathSeparator = L'/';
-    const tCIDLib::TCh* const       szPathSeparator = L"/";
-    const tCIDLib::TCh* const       szBadPathChars  = L"/;|<>";
     const tCIDLib::TCh* const       pszAllFilesSpec = L"*";
     const tCIDLib::TCh* const       pszAllDirsSpec  = L"*";
-    const tCIDLib::TCh              chExtSeparator  = L'.';
-    const tCIDLib::TCh* const       szExtSeparator  = L".";
     const tCIDLib::TCh* const       szWhitespace    = L"\r\n\t\a\f\v ";
+    const tCIDLib::TCh* const       szExtSeparator  = L".";
     const tCIDLib::TCh* const       szExeExtension  = L"";
-    const tCIDLib::TCh* const       szLibraryPrefix = L"lib";
-    const tCIDLib::TCh* const       szLibrarySuffix = L".so";
+    const tCIDLib::TCh* const       szLibExtension  = L".so";    
+    const tCIDLib::TCh              chMultiPathSep  = L':';
+    const tCIDLib::TCh* const       szMultiPathSep  = L":";
+    const tCIDLib::TCh              chPathSep       = L'/';
+    const tCIDLib::TCh* const       szSysExePath    = L"PATH";
+    const tCIDLib::TCh* const       szSysLibPath    = L"PATH";
 
 
     // -----------------------------------------------------------------------
     //  Memory related constants
     // -----------------------------------------------------------------------
     const tCIDLib::TCard4           c4MemPageSize   = 4096;
+
+    // -----------------------------------------------------------------------
+    //  Our native character encoding
+    // -----------------------------------------------------------------------
+    const tCIDLib::TCh* const       pszNativeEncoding = L"UTF-32";
 
 
     // -----------------------------------------------------------------------
@@ -77,4 +82,20 @@ namespace kCIDLib
     const tCIDLib::TSCh             schMaxSChar     = char(0x7F);
     const tCIDLib::TCard4           c4CharBytes     = sizeof(wchar_t);
     const tCIDLib::TCh              chMaxChar       = wchar_t(0xFFFFFFFF);
+
+
+    // -----------------------------------------------------------------------
+    //  Max handles we can wait on at once. It's one less than the max so
+    //  that we can have a slot for our own internal use.
+    // -----------------------------------------------------------------------
+    const tCIDLib::TCard4           c4MaxWaitHandles = 63;
+}
+
+
+namespace kCIDSock
+{
+    // -----------------------------------------------------------------------
+    //  Socket related constants
+    // -----------------------------------------------------------------------
+    const tCIDLib::TCard4       c4MaxSelect     = 64;
 }
