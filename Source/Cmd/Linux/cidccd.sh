@@ -13,10 +13,10 @@ function setdir() {
 
     chdir=""
     case $tardir in
-        "cidbuild") chdir=${CID_SRCTREE}/AllProjects/CIDBuild
+        "cidbuild") chdir=${CID_SRCTREE}/Source/AllProjects/CIDBuild
         ;;
 
-        "cmd") chdir=${CID_SRCTREE}/Cmd/Linux
+        "cmd") chdir=${CID_SRCTREE}/Source/Cmd/Linux
         ;;
 
         "src") chdir=${CID_SRCTREE}/Source

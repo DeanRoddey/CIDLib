@@ -27,11 +27,12 @@
 //
 
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
 #define CIDLIB_LITTLEENDIAN
 #else
 #define CIDLIB_BIGENDIAN
 #endif
+
 
 // ---------------------------------------------------------------------------
 //  Use the CPU defines provided by the compiler to drive the CIDLib CPU
@@ -69,7 +70,16 @@
 #define CIDLIBPACK  4
 
 #define CIDLIB_PACK(v)  pack(push, v)
+
 #define CIDLIB_POPPACK  pack(pop)
+
+
+// ---------------------------------------------------------------------------
+//  This one is used to force local data to be correctly cache aligned, which
+//  is required if it is going to be interlocked exchanged.
+// ---------------------------------------------------------------------------
+#define CID_CACHEALIGN __attribute__ ((aligned(32)))
+
 
 // ---------------------------------------------------------------------------
 //  Define our version of the magic main module macro. We need to grab argc
@@ -84,9 +94,26 @@ int main(int argc, char** argv) \
     extern char** CIDKernel_SystemInfo_Linux_argv; \
     CIDKernel_SystemInfo_Linux_argc = argc; \
     CIDKernel_SystemInfo_Linux_argv = argv; \
-    CIDLib_Init(); \
     TThread* pthrToStart = new thrCtor; \
     CIDLib_MakePrimary(pthrToStart); \
+    CIDLib_Init(); \
     pthrToStart->Start(); \
     return pthrToStart->eWaitForDeath(); \
 }
+
+
+
+// ---------------------------------------------------------------------------
+//  This macro is used to check for debug being on or off. This is done for
+//  flexibility, instead of doing the ifdef(x) everywhere. This is driven
+//  by the make file for CIDBuild and by the tool driver that CIDBuild invokes
+//  for the actual code.
+// ---------------------------------------------------------------------------
+#if     (_DEBUG)
+#define CID_DEBUG_ON        1
+#define CID_DEBUG_OFF       0
+#else
+#define CID_DEBUG_ON        0
+#define CID_DEBUG_OFF       1
+#endif
+

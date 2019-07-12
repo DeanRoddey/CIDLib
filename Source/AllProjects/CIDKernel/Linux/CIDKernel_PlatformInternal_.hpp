@@ -63,22 +63,16 @@
 #include <sys/utsname.h>
 #include <sys/vfs.h>
 #include <sys/wait.h>
-#include <term.h>
+// #include <term.h>
 #include <termios.h>
 #include <utime.h>
 #include <wchar.h>
 #include <wctype.h>
 
 // Including these last eliminates some warnings
-#include <readline/history.h>
-#include <readline/readline.h>
+//#include <readline/history.h>
+// #include <readline/readline.h>
 
-// This is necessary because the file <readline/rlstdc.h>
-// destroys anyone who is not gcc!
-#if defined(__KCC)
-#undef inline
-#undef const
-#endif
 
 //
 // Forward delcarations

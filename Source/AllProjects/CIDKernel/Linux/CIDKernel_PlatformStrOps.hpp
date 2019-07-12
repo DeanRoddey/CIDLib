@@ -33,18 +33,9 @@
 //  $_CIDLib_Log_$
 //
 
-#if defined(__KCC)
-#define CIDStrOp_ChToLower(c)       ::towctrans(c, static_cast<wctrans_t>(__ctype_tolower))
-#else
+
 #define CIDStrOp_ChToLower(c)       towlower(c)
-#endif
-
-#if defined(__KCC)
-#define CIDStrOp_ChToUpper(c)       ::towctrans(c, static_cast<wctrans_t>(__ctype_toupper))
-#else
 #define CIDStrOp_ChToUpper(c)       towupper(c)
-#endif
-
 #define CIDStrOp_CnvtFloat(s,ep)    ::wcstod(s,ep)
 #define CIDStrOp_FmtFloat(v,p,d,s)  ::fcvt(v,p,d,s)
 #define CIDStrOp_IsAlpha(c)         ::iswalpha(c)
