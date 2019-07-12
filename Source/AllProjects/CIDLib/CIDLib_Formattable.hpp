@@ -50,8 +50,6 @@ class CIDLIBEXP MFormattable
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        MFormattable() = default;
-
         virtual ~MFormattable() = default;
 
 
@@ -73,6 +71,7 @@ class CIDLIBEXP MFormattable
         //  Hidden but available so that our derived classes can have default
         //  generated copy and assignment.
         // -------------------------------------------------------------------
+        MFormattable() = default;
         MFormattable(const MFormattable&) = default;
         MFormattable& operator=(const MFormattable&) = default;
 

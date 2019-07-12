@@ -35,18 +35,21 @@
 // ---------------------------------------------------------------------------
 //  THelpPage: Constructors and Destructor
 // ---------------------------------------------------------------------------
-THelpPage::THelpPage(const  TString&                strTitle
-                    , const TString&                strParSrcDir
-                    , const TString&                strParTopic
-                    , const TString&                strFileName
-                    , const TString&                strFileExt
-                    , const tCIDLib::TBoolean       bVirtual) :
+THelpPage::THelpPage(const  TString&            strExtTitle
+                    , const TString&            strParSrcDir
+                    , const TString&            strParTopic
+                    , const TString&            strFileName
+                    , const tCIDLib::TBoolean   bVirtual) :
 
-    TBasePage(strTitle, strParSrcDir, strParTopic, strFileName, strFileExt, bVirtual)
-{
-}
-
-THelpPage::~THelpPage()
+    TBasePage
+    (
+        strExtTitle
+        , strParSrcDir
+        , strParTopic
+        , strFileName
+        , tCIDDocComp::EPageTypes::HelpPage
+        , bVirtual
+    )
 {
 }
 
@@ -54,21 +57,33 @@ THelpPage::~THelpPage()
 // ---------------------------------------------------------------------------
 //  THelpPage: Private, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean
-THelpPage::bParse(TTopic& topicParent, const TXMLTreeElement& xtnodeRoot)
+tCIDLib::TVoid THelpPage::Parse(TTopic& topicParent, const TXMLTreeElement& xtnodeRoot)
 {
-    // For us it's all in a HelpText element, which our help node member will parse out
+    // Push us onto the context stack for this scope
+    TCtxStackJan janStack(*this);
+
+    // Get our inteneral title text
+    QueryElemText(xtnodeRoot, kCIDDocComp::strXML_Title, m_strIntTitle);
+
+    // The rest is all in a HelpText element, which our help node member will parse out
     tCIDLib::TCard4 c4At;
     const TXMLTreeElement& xtnodeHelp = xtnodeRoot.xtnodeFindElement
     (
         kCIDDocComp::strXML_HelpText, 0, c4At
     );
-    return m_hnContent.bParse(xtnodeHelp);
+    m_hnContent.Parse(xtnodeHelp);
 }
 
 
 tCIDLib::TVoid THelpPage::OutputContent(TTextOutStream& strmTar) const
 {
-    // WE just delegate to our help text node
-    m_hnContent.OutputNodes(strmTar);
+    // Push us onto the context stack for this scope
+    TCtxStackJan janStack(*this);
+
+    strmTar << L"<p><span class='PageHdr'>"
+            << m_strIntTitle
+            << L"</span></p>";
+
+    // The rest is all in our generic help node
+    m_hnContent.OutputHelpText(strmTar);
 }

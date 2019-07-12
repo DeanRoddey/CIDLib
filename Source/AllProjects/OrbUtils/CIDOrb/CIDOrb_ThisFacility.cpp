@@ -89,7 +89,7 @@ namespace CIDOrb_ThisFacility
 //
 //  Note that the name server exists really at the CIDOrbUC facility level,
 //  but we have a special requirement to watch for it being accessed for
-//  object id caching reasons. So it's defined down here.
+//  object id caching reasons. So its binding is defined down here.
 // ---------------------------------------------------------------------------
 const TString TFacCIDOrb::strCmd_Ping(L"$$$IntOrbCmd_Ping");
 const TString TFacCIDOrb::strFauxNSBinding(L"/CIDLib/FakeNSBinding");
@@ -115,7 +115,7 @@ TFacCIDOrb::TFacCIDOrb() :
     , m_c4ReplyOverhead(0)
     , m_c4TimeoutAdjust(0)
     , m_c8LastNSCookie(0)
-    , m_colNSCache(173, new TStringKeyOps, tCIDLib::EMTStates::Safe)
+    , m_colNSCache(173, TStringKeyOps(), tCIDLib::EMTStates::Safe)
     , m_enctNextForcedNS(0)
     , m_enctTimeoutAdjust(0)
     , m_poccmSrv(nullptr)
@@ -358,10 +358,11 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
     //  the list, we can release the list again and let other business
     //  continue. No other threads will see this as an available object.
     //
+    tCIDLib::EAdoptOpts eAdopt;
     TOrbServerBase* porbsTarget = nullptr;
     {
         TCritSecLocker lockObjList(&m_crsObjList);
-        porbsTarget = m_colObjList.porbsOrphan(porbsToDereg);
+        porbsTarget = m_colObjList.porbsOrphan(porbsToDereg, eAdopt);
     }
     TStatsCache::c8DecCounter(m_sciRegisteredObjs);
 
@@ -378,6 +379,9 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
             , porbsToDereg->ooidThis()
         );
     }
+
+    // Put a janitor on it that will delete it if we adopted it
+    TJanitor<TOrbServerBase> janTarget(porbsTarget, eAdopt == tCIDLib::EAdoptOpts::Adopt);
 
     //
     //  Ok, now we have to wait for all threads to exit the object, since
@@ -400,7 +404,7 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
             //
             //  We can only assume that the remaining threads are blocked
             //  on something (which they should not be doing), so we just
-            //  have to delete the object anyway.
+            //  have to just continue.
             //
             facCIDOrb().LogMsg
             (
@@ -445,8 +449,7 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
         );
     }
 
-    // And delete the object
-    delete porbsTarget;
+    // The janitor will clean it up if that's appropriate
 }
 
 
@@ -960,7 +963,9 @@ TFacCIDOrb::RefreshObjIDCache(  const   TString&    strBindingName
 //  should already have been set on it. We will call it's initialize method,
 //  and then add it to the object list.
 //
-tCIDLib::TVoid TFacCIDOrb::RegisterObject(TOrbServerBase* const porbsToAdopt)
+tCIDLib::TVoid
+TFacCIDOrb::RegisterObject(         TOrbServerBase* const   porbsToReg
+                            , const tCIDLib::EAdoptOpts     eAdopt)
 {
     #if CID_DEBUG_ON
     if (!m_bServerInit)
@@ -975,7 +980,7 @@ tCIDLib::TVoid TFacCIDOrb::RegisterObject(TOrbServerBase* const porbsToAdopt)
         );
     }
 
-    if (!porbsToAdopt)
+    if (!porbsToReg)
     {
         facCIDOrb().ThrowErr
         (
@@ -989,15 +994,15 @@ tCIDLib::TVoid TFacCIDOrb::RegisterObject(TOrbServerBase* const porbsToAdopt)
     #endif
 
     //
-    //  Put a janitor on it, in case it throws during init. If its gets
-    //  past this init, we'll orphan it out of the janitor in our list.
+    //  If we are adopting it, make sure we get it cleaned up if it fails the
+    //  init. If not, we pass a null and just leave it alone if init throws.
     //
-    TJanitor<TOrbServerBase> janTmp(porbsToAdopt);
-    porbsToAdopt->Initialize();
+    TJanitor<TOrbServerBase> janTmp(porbsToReg, eAdopt == tCIDLib::EAdoptOpts::Adopt);
+    porbsToReg->Initialize();
 
     {
         TCritSecLocker lockObjList(&m_crsObjList);
-        m_colObjList.Add(janTmp.pobjOrphan());
+        m_colObjList.Add(janTmp.pobjOrphan(), eAdopt);
     }
     TStatsCache::c8IncCounter(m_sciRegisteredObjs);
 }

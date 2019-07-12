@@ -21,7 +21,6 @@
 //  quite right for what we want to do, and we need maximum performance in
 //  this case.
 //
-//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -62,6 +61,7 @@ class CIDORBEXP TOrbSObjList : public TObject
         tCIDLib::TVoid Add
         (
                     TOrbServerBase* const   porbsToAdd
+            , const tCIDLib::EAdoptOpts     eAdopt
         );
 
         tCIDLib::TBoolean bNext();
@@ -92,6 +92,7 @@ class CIDORBEXP TOrbSObjList : public TObject
         TOrbServerBase* porbsOrphan
         (
                     TOrbServerBase* const   porbsToOrphan
+            ,       tCIDLib::EAdoptOpts&    eAdopt
         );
 
         tCIDLib::TVoid RemoveAll();
@@ -103,6 +104,7 @@ class CIDORBEXP TOrbSObjList : public TObject
         // -------------------------------------------------------------------
         struct TBucketItem
         {
+            tCIDLib::EAdoptOpts eAdopt;
             TOrbServerBase*     porbsThis;
             TBucketItem*        pbiNext;
         };

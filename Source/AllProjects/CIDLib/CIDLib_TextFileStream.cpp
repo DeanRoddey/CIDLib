@@ -55,20 +55,20 @@ RTTIDecls(TTextFileOutStream,TTextOutStream)
 TTextFileInStream::TTextFileInStream(TTextConverter* const ptcvtToAdopt) :
 
     TTextInStream(ptcvtToAdopt)
-    , m_pstrmIn(0)
+    , m_pstrmIn(nullptr)
 {
 }
 
 TTextFileInStream::
 TTextFileInStream(  const   TString&                strFileName
-                    , const tCIDLib::ECreateActs eAction
+                    , const tCIDLib::ECreateActs    eAction
                     , const tCIDLib::EFilePerms     ePerms
                     , const tCIDLib::EFileFlags     eFlags
                     , const tCIDLib::EAccessModes   eAccess
                     ,       TTextConverter* const   ptcvtToAdopt) :
 
     TTextInStream(ptcvtToAdopt)
-    , m_pstrmIn(0)
+    , m_pstrmIn(nullptr)
 {
     Open(strFileName, eAction, ePerms, eFlags, eAccess);
 }
@@ -78,7 +78,7 @@ TTextFileInStream(  const   tCIDLib::EStdFiles      eFile
                     ,       TTextConverter* const   ptcvtToAdopt) :
 
     TTextInStream(ptcvtToAdopt)
-    , m_pstrmIn(0)
+    , m_pstrmIn(nullptr)
 {
     Open(eFile);
 }
@@ -218,20 +218,20 @@ tCIDLib::TVoid TTextFileInStream::ThrowNotReady(const tCIDLib::TCard4 c4Line) co
 TTextFileOutStream::TTextFileOutStream(TTextConverter* const ptcvtToAdopt) :
 
     TTextOutStream(ptcvtToAdopt)
-    , m_pstrmOut(0)
+    , m_pstrmOut(nullptr)
 {
 }
 
 TTextFileOutStream::
 TTextFileOutStream( const   TString&                strFileName
-                    , const tCIDLib::ECreateActs eAction
+                    , const tCIDLib::ECreateActs    eAction
                     , const tCIDLib::EFilePerms     ePerms
                     , const tCIDLib::EFileFlags     eFlags
                     , const tCIDLib::EAccessModes   eAccess
                     ,       TTextConverter* const   ptcvtToAdopt) :
 
     TTextOutStream(ptcvtToAdopt)
-    , m_pstrmOut(0)
+    , m_pstrmOut(nullptr)
 {
     Open(strFileName, eAction, ePerms, eFlags, eAccess);
 }
@@ -240,7 +240,7 @@ TTextFileOutStream::
 TTextFileOutStream( const   tCIDLib::EStdFiles      eFile
                     ,       TTextConverter* const   ptcvtToAdopt) :
     TTextOutStream(ptcvtToAdopt)
-    , m_pstrmOut(0)
+    , m_pstrmOut(nullptr)
 {
     Open(eFile);
 }

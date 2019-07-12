@@ -43,24 +43,24 @@
 namespace tCIDColAlgo
 {
     //
-    //  Given an accumulator type T, and a collection of those, call += on each value
-    //  in the collection and return the result. We don't know what += means in this
-    //  case, we just call it. They have to provide us with an initial value to start
-    //  with.
+    //  Given a collection and an initial value, call += for each value in the
+    //  collection, adding them to the incoming value, which we return as the
+    //  new value.
     //
-    template <typename T> T tAccumulate(const TCollection<T>& colSrc, const T& tInitVal)
+    template <typename TCol, typename TElem = TCol::TMyElemType>
+    TElem tAccumulate(const TCol& colSrc, const TElem& tInitVal)
     {
-        T retVal = tInitVal;
-        TColCursor<T>* pcursIter = colSrc.pcursNew();
-        TJanitor<TColCursor<T>> janCursor(pcursIter);
-
+        TElem retVal = tInitVal;
         try
         {
-            while (pcursIter->bIsValid())
-            {
-                retVal += pcursIter->objRCur();
-                pcursIter->bNext();
-            }
+            colSrc.bForEach
+            (
+                [&retVal](const TElem& tCur) -> tCIDLib::TBoolean
+                {
+                    retVal += tCur;
+                    return kCIDLib::True;
+                }
+            );
         }
 
         catch(TError& errToCatch)
@@ -238,6 +238,47 @@ namespace tCIDColAlgo
             }
         }
         return c4RemCount;
+    }
+
+
+    //
+    //  Given an indexable fundamental collection (vector or array) that is sorted,
+    //  this guy will find the value that has the most dups. If not sorted it will
+    //  not collect them all up, it's just looking for sequential dups.
+    //
+    template <typename TCol, typename TElem = TCol::TMyElemType>
+    TElem tFindMaxFundSeqDup(const TCol& fcolSrc)
+    {
+        TElem tLastBest = TElem(0);
+        const tCIDLib::TCard4 c4Count = fcolSrc.c4ElemCount();
+        if (c4Count)
+        {
+            tCIDLib::TCard4 c4LastBestCount = 0;
+            tCIDLib::TCard4 c4Index = 0;
+            while (c4Index < c4Count)
+            {
+                const TElem tCur = fcolSrc[c4Index++];
+                tCIDLib::TCard4 c4RunCount = 1;
+                while (c4Index < c4Count)
+                {
+                    // If not the same, we are done for this one, else bump values
+                    const TElem tNext = fcolSrc[c4Index];
+                    if (tNext != tCur)
+                        break;
+
+                    c4RunCount++;
+                    c4Index++;
+                }
+
+                // If this count is better than the last, then take this one
+                if (c4RunCount > c4LastBestCount)
+                {
+                    c4LastBestCount = c4RunCount;
+                    tLastBest = tCur;
+                }
+            }
+        }
+        return tLastBest;
     }
 }
 

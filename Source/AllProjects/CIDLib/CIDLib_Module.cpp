@@ -16,7 +16,7 @@
 // DESCRIPTION:
 //
 //  TModule is the basic public class that represents a loadable file,
-//  a DLL or Exe module.
+//  a library or executable module.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -59,9 +59,13 @@ namespace CIDLib_Module
     //      just works as a reentrancy counter on the logging current thread,
     //      which is what we want.
     //
+    //  eAdoptLogger
+    //      Indicates whether we own the installed logger (if any) or not.
+    //
     //  plgrCurrent
     //      This is the current logger that we send all errors and messages
-    //      logged through this process to. We don't own it.
+    //      logged through this process to. We don't own it. We may own it or not
+    //      depending on the eAdoptLogger value.
     //
     //  pszTitle1
     //  pszTitle2
@@ -79,7 +83,8 @@ namespace CIDLib_Module
     volatile tCIDLib::TBoolean  bInitLogger = kCIDLib::False;
     volatile tCIDLib::TBoolean  bInitMsgs = kCIDLib::False;
     tCIDLib::TCard4             c4EntryCount = 0;
-    MLogger*                    plgrCurrent = 0;
+    tCIDLib::EAdoptOpts         eAdoptLogger = tCIDLib::EAdoptOpts::NoAdopt;
+    MLogger*                    plgrCurrent = nullptr;
     const tCIDLib::TCh*         pszTitle1 = kCIDLib_::pszTitle1;
     const tCIDLib::TCh*         pszTitle2 = kCIDLib_::pszTitle2;
     const tCIDLib::TCh*         pszExceptDuringLog = kCIDLib_::pszExceptDuringLog;
@@ -430,13 +435,49 @@ TModule::c8ParseVersionStr( const   TString&            strToParse
 }
 
 
-tCIDLib::TVoid TModule::InstallLogger(MLogger* const plgrToAdopt)
+//
+//  We just drop the logger. Whoever called this is responsible for cleaning up the logger
+//  object of it was dynamically allocated.
+//
+tCIDLib::TVoid TModule::OrphanLogger()
 {
     TMtxLocker lockLog(pmtxLogSync());
 
-    // Store the new logger
-    CIDLib_Module::plgrCurrent = plgrToAdopt;
-    CIDLib_Module::bInitLogger = kCIDLib::True;
+    CIDLib_Module::eAdoptLogger = tCIDLib::EAdoptOpts::NoAdopt;
+    CIDLib_Module::plgrCurrent = nullptr;
+    CIDLib_Module::bInitLogger = kCIDLib::False;
+}
+
+
+tCIDLib::TVoid
+TModule::InstallLogger(MLogger* const plgrToSet, const tCIDLib::EAdoptOpts eAdopt)
+{
+    TMtxLocker lockLog(pmtxLogSync());
+
+    // If we have a previous logger, and we adopted it, then delete it
+    if (CIDLib_Module::plgrCurrent && (CIDLib_Module::eAdoptLogger == tCIDLib::EAdoptOpts::Adopt))
+    {
+        try
+        {
+            delete CIDLib_Module::plgrCurrent;
+        }
+
+        catch(...)
+        {
+        }
+
+        CIDLib_Module::eAdoptLogger = tCIDLib::EAdoptOpts::NoAdopt;
+        CIDLib_Module::plgrCurrent = nullptr;
+        CIDLib_Module::bInitLogger = kCIDLib::False;
+    }
+
+
+    // Store the new logger. If not null, set the logger initialized flag
+    CIDLib_Module::eAdoptLogger = eAdopt;
+    CIDLib_Module::plgrCurrent = plgrToSet;
+
+    if (CIDLib_Module::plgrCurrent)
+        CIDLib_Module::bInitLogger = kCIDLib::True;
 }
 
 
@@ -1578,11 +1619,14 @@ TModule::pszLoadCIDMsg(const tCIDLib::TMsgId midToLoad) const
 }
 
 
-TString TModule::strMsg(const tCIDLib::TMsgId midToLoad) const
+TString
+TModule::strMsg(const   tCIDLib::TMsgId     midToLoad
+                , const tCIDLib::TCard4     c4ExtraSpace) const
 {
-    TString strRet(kCIDLib::pszEmptyZStr, 1024);
-    bLoadCIDMsg(midToLoad, strRet);
-    return strRet;
+    // Get the text, put it into string object, and return that by value
+    tCIDLib::TBoolean bRet;
+    const tCIDLib::TCh* pszMsg = m_kmodThis.pszLoadCIDFacMsg(midToLoad, bRet);
+    return TString(pszMsg, c4ExtraSpace);
 }
 
 TString TModule::strMsg(const   tCIDLib::TMsgId midToLoad
@@ -1591,16 +1635,27 @@ TString TModule::strMsg(const   tCIDLib::TMsgId midToLoad
                         , const MFormattable&   fmtblToken3
                         , const MFormattable&   fmtblToken4) const
 {
-    TString strRet(kCIDLib::pszEmptyZStr, 1024);
-    bLoadCIDMsg
-    (
-        midToLoad
-        , strRet
-        , fmtblToken1
-        , fmtblToken2
-        , fmtblToken3
-        , fmtblToken4
-    );
+    //
+    //  Same as above, but leave some room for tokens. It might still not be enough
+    //  and the string has to expand, but we can prevent a lot of expansions without
+    //  making the string a lot bigger than it needs to be.
+    //
+    tCIDLib::TBoolean bRet;
+    const tCIDLib::TCh* pszMsg = m_kmodThis.pszLoadCIDFacMsg(midToLoad, bRet);
+    TString strRet(pszMsg, 64);
+
+    // And now do token replacement if we got the real msg
+    if (bRet)
+    {
+        if (!MFormattable::bIsNullObject(fmtblToken1))
+            strRet.eReplaceToken(fmtblToken1, L'1');
+        if (!MFormattable::bIsNullObject(fmtblToken2))
+            strRet.eReplaceToken(fmtblToken2, L'2');
+        if (!MFormattable::bIsNullObject(fmtblToken3))
+            strRet.eReplaceToken(fmtblToken3, L'3');
+        if (!MFormattable::bIsNullObject(fmtblToken4))
+            strRet.eReplaceToken(fmtblToken4, L'4');
+    }
     return strRet;
 }
 
@@ -1973,16 +2028,14 @@ MLogger* TModule::plgrTarget()
             tCIDLib::TBoolean bOk;
             const tCIDLib::TCh* pszBadFormat = facCIDLib().pszLoadCIDMsg
             (
-                kCIDErrs::errcMod_BadLogInfoFmt
-                , bOk
+                kCIDErrs::errcMod_BadLogInfoFmt, bOk
             );
             if (!bOk)
                 pszBadFormat = kCIDLib_::pszBadLocalLog;
 
             const tCIDLib::TCh* pszErrOpenLgr = facCIDLib().pszLoadCIDMsg
             (
-                kCIDErrs::errcMod_ErrOpenLgr
-                , bOk
+                kCIDErrs::errcMod_ErrOpenLgr, bOk
             );
             if (!bOk)
                 pszErrOpenLgr = kCIDLib_::pszErrCreatingLgr;
@@ -2097,7 +2150,8 @@ MLogger* TModule::plgrTarget()
                 // Set the rollover size to something reasonable
                 plgrNew->c8RolloverSize(0x10000);
 
-                // And store the pointer now
+                // And store the pointer now and indicate we adopt it
+                CIDLib_Module::eAdoptLogger = tCIDLib::EAdoptOpts::Adopt;
                 CIDLib_Module::plgrCurrent = plgrNew;
             }
 

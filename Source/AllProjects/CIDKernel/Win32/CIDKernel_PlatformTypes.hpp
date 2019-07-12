@@ -203,7 +203,7 @@ namespace tCIDCtrls
     using TWndCoord         = tCIDLib::TInt4;   // wcr
     using TWndSize          = tCIDLib::TCard4;  // wsz
     using TWndMsg           = unsigned int;     // wmsg
-    using TMsgResult        = tCIDLib::TInt4;   // mres
+    using TMsgResult        = long;             // mres
     using TTimerId          = tCIDLib::TCard4;  // tmid
     using TWndId            = tCIDLib::TCard4;  // wid
     using TWndHandle        = HWND__*;          // hwnd

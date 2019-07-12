@@ -185,12 +185,6 @@ TUTFConverter::EEncodings TUTFConverter::eEncoding() const
 }
 
 
-tCIDLib::TVoid TUTFConverter::Reset()
-{
-    // Its a no-op for us
-}
-
-
 // ---------------------------------------------------------------------------
 //  TUTFConverter: Private, inherited methods
 // ---------------------------------------------------------------------------

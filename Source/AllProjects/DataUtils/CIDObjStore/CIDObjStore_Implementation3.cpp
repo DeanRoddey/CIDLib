@@ -463,7 +463,7 @@ TCIDObjStoreImpl::ValidateStore(TTextOutStream* const pstrmOut)
     //  We'll use a hash set to make sure that we don't have any duplicate keys in the
     //  store, treating them case sensitively or not depending on how we were created.
     //
-    tCIDLib::TStrHashSet colUnique(109, new TStringKeyOps(m_bCaseSensitiveKeys));
+    tCIDLib::TStrHashSet colUnique(109, TStringKeyOps(m_bCaseSensitiveKeys));
 
     // Read the header
     TStoreHdr hdrStore;

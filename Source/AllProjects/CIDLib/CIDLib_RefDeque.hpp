@@ -99,13 +99,13 @@ template <class TElem> class TRefDeque :  public TBasicDLinkedRefCol<TElem>
             return this->pobjPeekAtTop();
         }
 
-        TElem* pobjPopBottom()
+        [[nodiscard]] TElem* pobjPopBottom()
         {
             // Delegate to our parent
             return this->pobjGetFromBottom();
         }
 
-        TElem* pobjPopTop()
+        [[nodiscard]] TElem* pobjPopTop()
         {
             // Delegate to our parent
             return this->pobjGetFromTop();

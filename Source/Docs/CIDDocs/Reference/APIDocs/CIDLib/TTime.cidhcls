@@ -1,0 +1,748 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TTime" Prefix="tm" Parent="TObject" Flags="Dup BStrm Fmt">
+
+    <Desc>
+        <P>The time class is pretty fundamental to most applications. It provides the obvious capability of getting the current time in various ways. But it also provides extensive support for formatting times to text, for parsing text formatted time stamps, calculating time differentials, Julian date support, breaking out the individual year, month, hour, etc... components of times, sunrise/sunset calculations, and so forth...</P>
+
+        <SubSecTitle>Base Time</SubSecTitle>
+
+        <P>Times in CIDLib are of the Unix type, in the sense that they are based from midnight on January 1st, 1970. The raw representation is as 100ns ticks from that base time, in a 64 bit value. So, if you set a time object to a time stamp of 0 and format it out, you will get that Jan 1970 date.</P>
+
+        <P>Typically you will use the tCIDLib::TEncodedTime for such raw stamps, though it is just an alias for TCard8 and is interoperable with such.</P>
+
+        <Note>Time stamp values (in the 100 nanosecond form) cannot be negative ever. If you want to find the difference between two times and the result might be negative, use the enctDifference() method to get the difference. If you use the -= operator such that it causes a negative value to be stored on the time object, an exception will be thrown. Typically this isn't an issue since you will often be calculating offsets from some known base time, but be careful otherwise.</Note>
+
+        <P>We have one static helper to convert to a native time stamp, which you might need to interact with some system API. Otherwise, all such raw time stamps are assumed to be CIDLib style stamps as described above.</P>
+
+        <SubSecTitle>Time Components</SubSecTitle>
+
+        <P>Times are represented as the based time stamp type described above, but obviously you often need to operate on them in more human consumable form, i.e. as year, day, month, hour, seccond, etc... So this class provides methods to convert between these two forms.</P>
+
+        <P>When expanding to (or setting from) the individual details, the values are:</P>
+
+        <List>
+            <LItem Ref="Year">1 based year number</LItem>
+            <LItem Ref="Month">The tCIDLib::EMonths enum</LItem>
+            <LItem Ref="Day">1 based day number</LItem>
+            <LItem Ref="Hour">Zero based 24 hour format</LItem>
+            <LItem Ref="Min/Sec">Zero based, so 0 to 59.</LItem>
+            <LItem Ref="Millis">0 to 999 of course</LItem>
+        </List>
+
+        <P>You can convert between the stamp and just the date oriented values, just the time oriented values, or all of them.</P>
+
+        <SubSecTitle>Special Times</SubSecTitle>
+
+        <P>You can construct a time object from one of the tCIDLib::ESpecialTimes enumerations, to get special values like current time, midnight of the current day, and so forth. The default constructor just sets the base time, in order to be efficient. If you should construct a large array of time objects, it would be wasteful to calculate the current time on them all, for instance, when you might not even need the current time. And, there's no guarantee they'd all calculate the same initial time either, since it could change during the process.</P>
+
+        <SubSecTitle>Formatting Times</SubSecTitle>
+
+        <P>You can format times in any way you want, using a pattern string that tells the time object where to put each available time component (year, time zone, AM/PM, and so forth) in the resulting formatted time.</P>
+
+        <P>This can be done by passing in a format string to the FormatToStr() method, but of course much of the time you want to format time objects by streaming them out to a text output stream. In that case, there is no syntax for providing a format pattern, so the time stamp allows you to set a pattern to be used by default in such situations. Just call strDefaultFormat() to get or set this default format string.</P>
+
+        <P>This class provides a number of very common prefab formatting patterns via public, static methods. Most programs would never need anything beyond these. They are the ones with names like str24HHMM() or strCTime() and so forth.</P>
+
+        <P>Generally no default format is set unless you set one, since they may never be needed and that would just be useless overhead. One exception is if you construct from the tCIDLib::ESpecialTimes enum, it will be set to something that makes reasonable sense for that type of time. E.g. the current date has no need for time components. For UTC or base time it sets the full CTime format. For the others it sets the local specific time or date format.</P>
+
+        <P>If you stream a time object to a text output stream and have never set a default format, it will just set the the local specific time format.</P>
+
+        <P>The formatting strings use the standard CIDLib <Link Type="Page" Ref="/BigPicture" Id="/StringTokens">replacement tokens.</Link> These available tokens are:</P>
+
+        <List>
+            <LItem Ref=":">Localized time separator character</LItem>
+            <LItem Ref="/">Localized date separator character</LItem>
+            <LItem Ref="a">Localized abbreviated day of the week name</LItem>
+            <LItem Ref="A">Localized full day of the week name</LItem>
+            <LItem Ref="D">Day of the month as a number</LItem>
+            <LItem Ref="d">Localized name of the day of the week</LItem>
+            <LItem Ref="e">Total elapsed seconds</LItem>
+            <LItem Ref="E">Total elapsed minutes</LItem>
+            <LItem Ref="H">Hour in 24 hour terms</LItem>
+            <LItem Ref="h">Hour in 12 hour terms</LItem>
+            <LItem Ref="l">Milliseconds</LItem>
+            <LItem Ref="M">Month as a number</LItem>
+            <LItem Ref="m">Localized abbreviated month name</LItem>
+            <LItem Ref="n">Localized full month name</LItem>
+            <LItem Ref="P">Localized AM/PM designation</LItem>
+            <LItem Ref="p">Single letter AM/PM designation</LItem>
+            <LItem Ref="s">Seconds</LItem>
+            <LItem Ref="S">Raw time stamp value (elapsed 100ns intervals)</LItem>
+            <LItem Ref="T">Localized time zone name</LItem>
+            <LItem Ref="t">Local time zone offset from UTC, in minutes</LItem>
+            <LItem Ref="u">Minutes as a zero based number</LItem>
+            <LItem Ref="x">Elapsed days, hours, and minutes in two digit leading zero format and locale specific separators, e.g. 01:21:04.</LItem>
+            <LItem Ref="X">Same as 'x', but leaves out the days if the elapsed days are zero.</LItem>
+            <LItem Ref="Y">The year as a 4 digit, 1-based value</LItem>
+            <LItem Ref="y">The trailing two digits of the year</LItem>
+            <LItem Ref="z">Calculates the elapsed hours, minutes and seconds, and formats them out in two digit, leading zero form with local specific separators, e.g. 03:15:08.</LItem>
+            <LItem Ref="Z">Same as 'z' but will leave out the hours if the hour value is zero.</LItem>
+        </List>
+
+        <P>So a formatting string like this "%(m) %(Y)" might create a resulting formatted time like "Feb 2010".</P>
+
+        <SubSecTitle>Parsing Times</SubSecTitle>
+
+        <P>Formatting out times is probably much more common, but some applications need to parse time stamps. This can be an annoyingly tedious process, so this class provides some nice capabilities for time stamp parsing. Of course it cannot just magically figure out any time, since there are so many possibilities. So this is handled by allowing you to provide a list of time components that should be expected, in the order that they should be encountered.</P>
+
+        <P>The time components are represented by the tCIDLib::ETimeComps enumeration. Each one tells the parser, next you should expect a time zone, or a month number, or a day name in short form and so forth. So you can easily create a sequence of components to represent any sort of time stamp you might need to parse.</P>
+
+        <P>The time components are:</P>
+        <List>
+            <LItem Ref="ISO8601TZ">An ISO-8601 time zone indicator</LItem>
+            <LItem Ref="AMPM">An AM/PM indicator in local specific format</LItem>
+            <LItem Ref="Colon">A colon</LItem>
+            <LItem Ref="DateSep">A date separator, optionally local specific</LItem>
+            <LItem Ref="DayName">A day name in locale specific format</LItem>
+            <LItem Ref="DayNum">A day number, within the month, 0 based</LItem>
+            <LItem Ref="Hour12">A 12 hour style hour</LItem>
+            <LItem Ref="Hour24">A 24 hour style hour</LItem>
+            <LItem Ref="Hyphen">A hyphen separator</LItem>
+            <LItem Ref="Minute">A minute number, 0 to 59</LItem>
+            <LItem Ref="MonthName">A month in locale specific format</LItem>
+            <LItem Ref="MonthNum">A month number, 1 to 12</LItem>
+            <LItem Ref="Punct">Any single punctuation not covered specifically already</LItem>
+            <LItem Ref="Second">A second number, 0 to 59</LItem>
+            <LItem Ref="Space">One or more whitespace characters</LItem>
+            <LItem Ref="T">The T separator of an 8601 time</LItem>
+            <LItem Ref="TimeSep">A time separator, optionally locale specific</LItem>
+            <LItem Ref="TZ">A numeric time zone indicator, numeric or one of the symbolic names</LItem>
+            <LItem Ref="TZSep">A time zone separator, optionally locale specific</LItem>
+            <LItem Ref="Year2">A year in 2 digit form</LItem>
+            <LItem Ref="Year4">A year in 4 digit form</LItem>
+        </List>
+
+        <P>As with the prefab formatting patterns, there are also pre-fab parsing component lists. These are the fcolFullDate(), fcolDDMMYYYY(), and so forth public static methods. Likely these will serve the needs of most programs.</P>
+
+        <Note>There is a special bParseFrom8601() method because it's a tricky format that has a lot of variations.</Note>
+    </Desc>
+
+    <PubIntf>
+        <Aliases>
+            <Alias Name="TCompList" Type="TFundVector&amp;lt;tCIDLib::ETimeComps>">
+                <Desc>The TCompList type is used in the parsing of text formatted time stamps, to build up a list of components to expect in the formatted time being parsed.</Desc>
+            </Alias>
+        </Aliases>
+
+        <StaticMeths>
+
+            <Method Name="bDST">
+                <Desc>Returns true if day savings time is active locally.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bIsLeapYear" RetType="tCIDLib::TBoolean">
+                <Desc>Returns true if the passed year is a leap year.</Desc>
+                <MethVar><MethParam Name="c4ToCheck" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="c4CvtToJulian" RetType="tCIDLib::TCard4">
+                <Desc>Converts the passed day to a Julian date.</Desc>
+                <MethVar>
+                    <MethParam Name="c4Year" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="eMonth" Type="tCIDLib::EMonths"/>
+                    <MethParam Name="c4Day" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4MaxDaysForMonth" RetType="tCIDLib::TCard4">
+                <Desc>Returns the number of days in the indicate month of the indicated year, taking into account leap years.</Desc>
+                <MethVar>
+                    <MethParam Name="eMonth" Type="tCIDLib::EMonths"/>
+                    <MethParam Name="c4Year" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4Millis" RetType="tCIDLib::TCard4">
+                <Desc>Returns the current running millisecond time stamp. Be aware that this can wrap every 30'ish days or so. So there's a chance you could get a really big time if you are subtracting a previous stamp from a later one to calculate some time. Use the 64 bit version below to avoid that.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="c8Millis" RetType="tCIDLib::TCard8">
+                <Desc>Returns the current running millisecond time stamp as a 64 bit value. Unlike the 32 bit version above, this one isn't going wrap around in your lifetime, so it is safer to use where you get a stamp, do something, then get another stamp and calculate an elapsed time.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="CalcRiseSetTimes">
+                <Desc>
+                    <P>These methods calculate local sun rise and set times for a given date that you provide. I.e. these are not calculating today's sunrise/sunset times, they are for calculating these things for arbitrary dates.</P>
+
+                    <P>You can also provide a time zone in two of the variations, to get the times  in some other arbitrary time zone offset. Otherwise, the times will be in the local time zone.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="tmOn" Type="TTime" PBy="CRef"/>
+                    <MethParam Name="f8Latitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam Name="f8Longitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam Name="c4RiseHour" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4RiseMin" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4SetHour" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4SetMin" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="tmOn" Type="TTime" PBy="CRef"/>
+                    <MethParam Name="i4TZOffset" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="f8Latitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam Name="f8Longitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam Name="c4RiseHour" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4RiseMin" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4SetHour" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4SetMin" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="c4Year" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="eMonth" Type="tCIDLib::EMonths"/>
+                    <MethParam Name="c4Day" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="i4TZOffset" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="f8Latitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam Name="f8Longitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam Name="c4RiseHour" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4RiseMin" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4SetHour" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4SetMin" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="CurNTPTime">
+                <Desc>Returns the NTP style current time, which is seconds plus fractional sections since 1970 in UTC time zone.</Desc>
+                <MethVar>
+                    <MethParam Name="c4Secs" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4Fract" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="bNWOrder" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="enctNow" RetType="tCIDLib::TEncodedTime">
+                <Desc>Returns the local system time stamp. This isn't the time stamp in this object, since this is a static method, it's the system time.</Desc>
+                <MethVar></MethVar>
+            </Method>
+
+            <Method Name="enctNowPlusDays" RetType="tCIDLib::TEncodedTime">
+                <Desc>Returns the local system time stamp plus the indicated number of days.</Desc>
+                <MethVar><MethParam Name="c4Days" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="enctNowPlusHours" RetType="tCIDLib::TEncodedTime">
+                <Desc>Returns the local system time stamp plus the indicted number of hours.</Desc>
+                <MethVar><MethParam Name="c4Hours" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="enctNowPlusMSs" RetType="tCIDLib::TEncodedTime">
+                <Desc>Returns the local system time stamp plus the indicted number of milliseconds.</Desc>
+                <MethVar><MethParam Name="c4Millis" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="enctNowPlusMins" RetType="tCIDLib::TEncodedTime">
+                <Desc>Returns the local system time stamp plus the indicted number of minutes.</Desc>
+                <MethVar><MethParam Name="c4Minutes" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="enctNowPlusSecs" RetType="tCIDLib::TEncodedTime">
+                <Desc>Returns the local system time stamp plus the indicted number of seconds.</Desc>
+                <MethVar><MethParam Name="c4Secs" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="enctNowUTC" RetType="tCIDLib::TEncodedTime">
+                <Desc>Returns the local system time stamp in UTC form. This isn't the time stamp in this object, since this is a static method, it's the system time.</Desc>
+                <MethVar></MethVar>
+            </Method>
+
+            <Method Name="CvtFromJulian">
+                <Desc>Converts the passed Julian date to its corresponding day, month, and year. It can be a cardinal type Julian or a floating point which includes a factional day, though that won't make any difference here since we are only resolving down to the day.</Desc>
+                <MethVar>
+                    <MethParam Name="c4Julian" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Year" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="eMonth" Type="tCIDLib::EMonths" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4Day" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="f8Julian" Type="tCIDLib::TFloat8"/>
+                    <MethParam Name="c4Year" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="eMonth" Type="tCIDLib::EMonths" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4Day" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="fcolXXXX" RetType="TCompList" RetBy="CRef">
+                <Desc>XXX here stands for the many variations of this method, each of which returns a component list pre-configured for parsing a common time format. You can pass these to bParseFromText() to tell it how to parse a formatted time. See the main class documentaiton above.</Desc>
+                <MethVar></MethVar>
+            </Method>
+
+            <Method Name="i4Offset" RetType="tCIDLib::TInt4">
+                <Desc>Returns the local time zone offset in minutes, which can be positive or negative relative to UTC.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="LocalToNative">
+                <Desc>Converts a CIDLib style type stamp in UTC form to a local native time stamp (e.g. on windows a 100ns offset from 1601) also in UTC form.</Desc>
+                <MethVar>
+                    <MethParam Name="enctLocalUTC" Type="tCIDLib::TEncodedTime"/>
+                    <MethParam Name="enctNative" Type="tCIDLib::TEncodedTime" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="LocalToUTC">
+                <Desc>Converts a local (time zone) CIDLib style type stamp to the UTC time zone, i.e. it just adjusts for the difference in time zone.</Desc>
+                <MethVar>
+                    <MethParam Name="enctLocal" Type="tCIDLib::TEncodedTime"/>
+                    <MethParam Name="enctUTC" Type="tCIDLib::TEncodedTime" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="strXXX" RetType="TString" RetBy="CRef">
+                <Desc>XXX here represents a number of variations of methods that return pre-fab formatting strings that control how TTime objects format their time stamps. See the main class comments above for details.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="UTCToLocal">
+                <Desc>The opposite of LocalToUTC above. This converts a UTC time to the local time zone, just adjusting for time zone offset between the two.</Desc>
+                <MethVar>
+                    <MethParam Name="enctUTC" Type="tCIDLib::TEncodedTime"/>
+                    <MethParam Name="enctLocal" Type="tCIDLib::TEncodedTime" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+        </StaticMeths>
+
+        <Ctors>
+
+            <Method Name="TTime">
+                <Desc>
+                    <P>The default constructor creates a default time object, whose time stamp is set to the base time as discussed above in the class comments.</P>
+
+                    <P>Another takes a special times enum to allow you to construct directly to some very common times (current time, midnight of this day, current UTC, etc...)</P>
+
+                    <P>Another allows you to construct from the separate date/time component values. And one takes a raw 100ns encoded time value to set the initial time stamp value directly.</P>
+
+                    <P>The copy constructor also copies any default format string.</P>
+                </Desc>
+                <MethVar/>
+                <MethVar><MethParam  Name="eSpecial" Type="tCIDLib::ESpecialTimes"/></MethVar>
+                <MethVar>
+                    <MethParam  Name="c4Year" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="eMonth" Type="tCIDLib::EMonths"/>
+                    <MethParam  Name="c4Day" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4Hours" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="c4Minutes" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="c4Seconds" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="c4Millis" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+                <MethVar><MethParam  Name="enctInit" Type="tCIDLib::TEncodedTime"/></MethVar>
+                <MethVar><MethParam  Name="tmSrc" Type="TTime" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="~TTime">
+                <Desc>Cleans up any format string if one got created.</Desc>
+                <MethVar/>
+            </Method>
+
+        </Ctors>
+
+        <Operators>
+
+            <Method Name="operator=">
+                <Desc>
+                    We have one assignment operator that takes another time object. This one takes the time stamp and the formatting string if has been set. We have another one that takes a raw time stamp, and just updates this object's time stamp to match.
+                </Desc>
+                <MethVar><MethParam  Name="enctSrc" Type="tCIDLib::TEncodedTime"/></MethVar>
+                <MethVar><MethParam  Name="tmSrc" Type="TTime" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator==" Attrs="Const">
+                <Desc>
+                    Compares this object's time stamp to the source object's time stamp. Time stamps are compared as well. If neither has set one, that's considered equal. If only one has, that's unequal. And if both have, then we just compare them.
+                </Desc>
+                <MethVar><MethParam  Name="tmSrc" Type="TTime" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator!=" Attrs="Const">
+                <Desc>Just calls operator== above and negates the returned value.</Desc>
+                <MethVar><MethParam  Name="tmSrc" Type="TTime" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator+=">
+                <Desc>
+                    Adds the source time stamp to this object's time stamp. Though in theory this could cause a wrap around, in any practical scenario that's not going to happen. You aren't typically using this to add actual times, but to add a time offset to to a time or an offset to another offset.
+                </Desc>
+                <MethVar><MethParam  Name="tmSrc" Type="TTime" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="enctSrc" Type="tCIDLib::TEncodedTime"/></MethVar>
+            </Method>
+
+            <Method Name="operator-=">
+                <Desc>
+                    Subtracts the source time stamp from this object's time stamp. The result cannot be negative or an underflow exception will be thrown.
+                </Desc>
+                <MethVar><MethParam  Name="tmSrc" Type="TTime" PBy="CRef"/></MethVar>
+                <MethVar><MethParam  Name="enctSrc" Type="tCIDLib::TEncodedTime"/></MethVar>
+            </Method>
+
+            <Method Name="operator+" Attrs="Friend" RetType="TTime">
+                <Desc>
+                    Adds the stamps of two time objects and returns a new time object that holds the result.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="tmLHS" Type="TTime" PBy="CRef"/>
+                    <MethParam  Name="tmRHS" Type="TTime" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="operator-" Attrs="Friend" RetType="TTime">
+                <Desc>
+                    Subtracts the stamples of two time objects and returns a new time object that holds the result. The same concerns with underflow apply here as with the member version of this method above.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="tmLHS" Type="TTime" PBy="CRef"/>
+                    <MethParam  Name="tmRHS" Type="TTime" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="operator>" Attrs="Friend" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    Compares the time stamps of two time objects and returns kCIDLib::True if the first is greater.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="tmLHS" Type="TTime" PBy="CRef"/>
+                    <MethParam  Name="tmRHS" Type="TTime" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="operator>=" Attrs="Friend" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    Compares the time stamps of two time objects and returns kCIDLib::True if the first is greater or equal.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="tmLHS" Type="TTime" PBy="CRef"/>
+                    <MethParam  Name="tmRHS" Type="TTime" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="operator&amp;lt;" Attrs="Friend" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    Compares the time stamps of two time objects and returns kCIDLib::True if the first is less.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="tmLHS" Type="TTime" PBy="CRef"/>
+                    <MethParam  Name="tmRHS" Type="TTime" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="operator&amp;lt;=" Attrs="Friend" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    Compares the time stamps of two time objects and returns kCIDLib::True if the first is less or equal.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="tmLHS" Type="TTime" PBy="CRef"/>
+                    <MethParam  Name="tmRHS" Type="TTime" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+        </Operators>
+
+        <NVirtMeths>
+
+            <Method Name="bInPM" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if the time stamp falls into the PM side of the 12 hour range.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bParseFrom8601" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>A specialized parser for the fairly complicated 8601 style time stamp. You can also use the time component based scheme if you know the specific layout of the time stamp. This one will work out the format on its own. It returns kCIDLib::True if it found a valid 8601 time, and sets this object's the resulting time stamp.</P>
+
+                    <Note>If the formatted time has a time zone, then that is used. If not, it is assumed to be UTC time.</Note>
+
+                    <P>If the bToLocal parameter is set, then the time stamp will be converted to the local time zone before storing it.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strToParse" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="bToLocal" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bParseFromText" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>A generalized time parsing mechanism based on the 'time components' discussed in the main class comments above. You provide a list of time components that tell this method how to interpret the passed formatted time.</P>
+
+                    <P>You can also provide specific values for the various separators. They default to th enull character, which means the local specific values are used. If you provide any, then anywhere that type of separate time component is used, this method will look for the separate you provide instead of the local specific one.</P>
+
+                    <P>This version returns a success/failure indicator. There is another version below that throws if the parse fails. Use whichever one works best in a given situation.</P>
+
+                    <P>If successful, the resulting time stamp is set as this object's time stamp.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strToParse" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="fcolComps" Type="TCompList" PBy="CRef"/>
+                    <MethParam  Name="chDateSep" Type="tCIDLib::TCh" DefVal="kCIDLib::chNull"/>
+                    <MethParam  Name="chTimeSep" Type="tCIDLib::TCh" DefVal="kCIDLib::chNull"/>
+                    <MethParam  Name="chTZSep" Type="tCIDLib::TCh" DefVal="kCIDLib::chNull"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4AsTimeInfo" RetType="tCIDLib::TCard4">
+                <Desc>
+                    <P>Breaks out this object's time stamp to get the time parts and returns them. The return value is the milliseconds.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="c4Hour" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4Minutes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4Seconds" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4ToJulian" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>
+                    <P>Returns this object's time stamp as a Julian date</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="ClipToHour">
+                <Desc>
+                    <P>Rounds this object's time stamp to the next lowest hour, i.e. discards minutes, seconds, and milliseconds.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="ClipToMinutes">
+                <Desc>
+                    <P>Rounds this object's time stamp to the next lowest minute, i.e. discards seconds and milliseconds.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="ClipToSeconds">
+                <Desc>
+                    <P>Rounds this object's time stamp to the next lowest second, i.e. discards  milliseconds.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="eAsDateInfo" RetType="tCIDLib::EWeekDays" Attrs="Const">
+                <Desc>
+                    <P>Breaks out this object's time stamp to get the date parts and returns them. The return value is the day of the week that this day falls on.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="c4Year" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="eMonth" Type="tCIDLib::EMonths" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4Day" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="eDayOfWeek" RetType="tCIDLib::EWeekDays" Attrs="Const">
+                <Desc>
+                    <P>Returns the day of the week that this object's time stamp represents.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="eExpandDetails" RetType="tCIDLib::EWeekDays" Attrs="Const">
+                <Desc>
+                    <P>This is effectively a combination of c4AsTimeInfo and eAsDateInfo above, returning all of the broken out values that this object's time stamp represents. It also gives back the raw time stamp itself.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="c4Year" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="eMonth" Type="tCIDLib::EMonths" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4Day" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4Hour" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4Minute" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4Second" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="c4Millis" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="enctStamp" Type="tCIDLib::TEncodedTime" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="enctDifference" RetType="tCIDLib::TEncodedTime" Attrs="Const">
+                <Desc>
+                    <P>Returns the difference between this object's time stamp and the passed one. It does not protect against underflow, so check that yourself first if it could be an issue.</P>
+                </Desc>
+                <MethVar><MethParam  Name="tmRHS" Type="TTime" PBy="CRef"/></MethVar>
+            </Method>
+
+            <GetSet Name="enctTime" RetType="tCIDLib::TEncodedTime" Dir="Both">
+                Get or set this object's time stamp.
+            </GetSet>
+
+            <Method Name="FormatAsElapsed" Attrs="Const">
+                <Desc>
+                    <P>Formats this object's time stamp as an elapsed time. This is obviously only useful for offset type time stamps, not real times. You provide a separator character to use. Days are only shown if bShowDays is set, else only hours and minutes are shown.</P>
+
+                    <P>All values are two digits, using a leading zero if needed. So, if you call this for an offset that represents 18 hours and 50 minutes, with a colon as the separator and bShowDays set, then the output would be:</P>
+
+                    <Code>    00:18:50</Code>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strTarget" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="chSepChar" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="bShowDays" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FormatAsElapsed2" Attrs="Const">
+                <Desc>
+                    <P>Similar to above, but this one shows hours, minutes, and seconds instead of days, hours and minutes. If bShowHours is not set, then hours aren't shown unless they are non-zero.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strTarget" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="chSepChar" Type="tCIDLib::TCh"/>
+                    <MethParam  Name="bShowHours" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FormatToStr" Attrs="Const">
+                <Desc>
+                    <P>These methods will format this object's time stamp to the passed string. It will either use the already set format string, or you can provide one to use (ignoring any previously set one.) The format string is based on CIDLib <Link Type="Page" Ref="/BigPicture/" Id="/StringTokens">replacement tokens</Link> and is discussed in the main class comments above.</P>
+
+                    <P>You can choose to append to the target string, or clear it first so that the formatted time replaces any exising content. The latter is the default.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strTarget" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="eAppend" Type="tCIDLib::EAppendOver" DefVal="tCIDLib::EAppendOver::Overwrite"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam  Name="strTarget" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="strFormat" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="eAppend" Type="tCIDLib::EAppendOver" DefVal="tCIDLib::EAppendOver::Overwrite"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FromDetails">
+                <Desc>
+                    This is basically the reverse of eExpandDetails. In this case, we are taking the details of all of the time stamp components and creating a new time stamp for this object.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="c4Year" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="eMonth" Type="tCIDLib::EMonths"/>
+                    <MethParam  Name="c4Day" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4Hour" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="c4Minute" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="c4Second" Type="tCIDLib::TCard4" DefVal="0"/>
+                    <MethParam  Name="c4Millis" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FromJulian">
+                <Desc>Sets this object's time stamp from the passed Julian date. It can be either a cardinal date or a floating point that includes an offset within the day.</Desc>
+                <MethVar><MethParam  Name="c4Julian" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar><MethParam  Name="f8Julian" Type="tCIDLib::TFloat8"/></MethVar>
+            </Method>
+
+            <Method Name="FromTimeDetails">
+                <Desc>
+                    Like FromDetails() above, but only takes the time bits. So this is usually used to create an offset type time stamp.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="c4Hour" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4Minute" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4Second" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4Millis" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ForwardByDays">
+                <Desc>
+                    Moves this object's time stamp forward by the indicated number of days.
+                </Desc>
+                <MethVar><MethParam  Name="c4Count" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="ForwardByMonths">
+                <Desc>
+                    <P>Moves this object's time stamp forward by the indicated number of months. This is often more useful than trying to do these types of things in a calendar style, since it's not affected by leap years.</P>
+
+                    <P>However, if you want to insure you are in the same day of the month some months later, you would have to do it calendar style and account for the possibility that the target day may not exist if its a leap year.</P>
+                </Desc>
+                <MethVar><MethParam  Name="c4Count" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="ForwardByYears">
+                <Desc>
+                    <P>Moves this object's time stamp forward by the indicated number of minutes. This is often more useful than trying to do these types of things in a calendar style, since it's not affected by leap years.</P>
+
+                    <P>However, if you want to insure you are in the same day some years later, you would have to do it calendar style and account for the possibility that the target day may not exist if its a leap year.</P>
+                </Desc>
+                <MethVar><MethParam  Name="c4Count" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="LocalToUTC">
+                <Desc>Converts this object's time stamp to UTC. It is assumed that the time stamp is in local time.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="ParseFromText">
+                <Desc>
+                    <P>This is the same as bParseFromText() above, except that this one throws if there's a parsing error, instead of returning a success/failure status.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="strToParse" Type="TString" PBy="CRef"/>
+                    <MethParam  Name="fcolComps" Type="TCompList" PBy="CRef"/>
+                    <MethParam  Name="chDateSep" Type="tCIDLib::TCh" DefVal="kCIDLib::chNull"/>
+                    <MethParam  Name="chTimeSep" Type="tCIDLib::TCh" DefVal="kCIDLib::chNull"/>
+                    <MethParam  Name="chTZSep" Type="tCIDLib::TCh" DefVal="kCIDLib::chNull"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="SetToNow">
+                <Desc>Sets this object's time stamp to the current local time.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="SetToNowPlusXXX">
+                <Desc>Sets this object's time stamp to the current local time plus the passed count of days, hours, minutes, millieconds or seconds.</Desc>
+                <MethVar><MethParam  Name="c4Count" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="SetTo">
+                <Desc>Sets this object's time stamp to one of the special times. See the main class comments above about special times.</Desc>
+                <MethVar><MethParam Name="eSpecial" Type="tCIDLib::ESpecialTimes"/></MethVar>
+            </Method>
+
+            <Method Name="SetToSunrise">
+                <Desc>Sets this object's time stamp to the sunrise time for this day at the indicated latitude and longitude, converted to the local time zone.</Desc>
+                <MethVar>
+                    <MethParam  Name="f8Latitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam  Name="f8Longitude" Type="tCIDLib::TFloat8"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="SetToSunset">
+                <Desc>Sets this object's time stamp to the sunset time for this day at the indicated latitude and longitude, converted to the local time zone.</Desc>
+                <MethVar>
+                    <MethParam  Name="f8Latitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam  Name="f8Longitude" Type="tCIDLib::TFloat8"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="SetToSunriseAt">
+                <Desc>Sets this object's time stamp to the sunrise time for this day at the indicated latitude and longitude, converted to the passed time zone.</Desc>
+                <MethVar>
+                    <MethParam  Name="f8Latitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam  Name="f8Longitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam  Name="i4TimeZone" Type="tCIDLib::TInt4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="SetToSunsetAt">
+                <Desc>Sets this object's time stamp to the sunset time for this day at the indicated latitude and longitude, converted to the passed time zone.</Desc>
+                <MethVar>
+                    <MethParam  Name="f8Latitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam  Name="f8Longitude" Type="tCIDLib::TFloat8"/>
+                    <MethParam  Name="i4TimeZone" Type="tCIDLib::TInt4"/>
+                </MethVar>
+            </Method>
+
+            <GetSet Name="strDefaultFormat" RetType="TString" RetBy="CRef" Dir="Both">
+                Get or set this object's default format string.
+            </GetSet>
+
+            <Method Name="UTCToLocal">
+                <Desc>Converts this object's time stamp to local time. It is assumed that the time stamp is currently in UTC.</Desc>
+                <MethVar/>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

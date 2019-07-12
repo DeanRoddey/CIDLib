@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TCursorBase" Prefix="curs" Parent="TObject">
+
+    <Desc>
+        <P>TCursorBase, as you might guess, is the base class for all <Link Type="Page" Ref="/BigPicture/" Id="/Cursors">collection cursors</Link>. Just as collections are polymorhpic, so are cursors, so you can accept a cursor generically as long as it is for the same collection element type, and iterator the collection without knowing what it actually is. And you can get a cursor from a collection (via the <ClassRef Ref="TCollection"/> or <ClassRef Ref="TRefCollection"/> base classes.</P>
+
+        <P>You won't use this class directly, it just provides the abstract interface that all of the actual cursor classes must implement. At this level, the element type is not known, because this is not a templated class. The next level up is <ClassRef Ref="TColCursor"/>, which is a template derived from this class. So it provides the actual base interface you will use.</P>
+
+        <Note>At this level iteration is only one direction, forward. There is also a <ClassRef Ref="TBiCursor"/> derivate that adds iteration in the other direction. Any collection types that can support bi-directional iteration will support those types of cursors.</Note>
+
+        <SubSecTitle>Cursor Invalidation</SubSecTitle>
+
+        <P>Cursors maintain a serial number that they get from the collection. When you associate a cursor with a collection (or you call bReset() on one that already is) the cursor will remember the collection's current serial number. If the collection is modified, it's serial number will get out of sync with the one stored here in the cursor. That will invalidate this cursor, so you never have to worry about accidentally using a cursor that is not valid anymore.</P>
+
+        <P>If you modify the collection using this cursor, then the cursor will remain in sync, since it knows that the cursor has not changed behind its bakc. Otherwise you will either need to call bReset() or stop using the invalidated cursor or an exception will occur. bReset() will set the cursor back to the start of the collection and store the new serial number.</P>
+    </Desc>
+
+    <PubIntf>
+        <Ctors DefMethods="Dtor"/>
+
+        <VirtMeths>
+
+            <Method Name="bIsEmpty" Attrs="Pure Const" RetType="tCIDLib::TBoolean" >
+                <Desc>Returns kCIDLib::True if the collection this cursor is associated with is empty.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bIsValid" Attrs="Pure Const" RetType="tCIDLib::TBoolean" >
+                <Desc>Returns kCIDLib::True if ths cursor is still valid. If not, then you must either reset to get back into sync or not use it, else it will throw an exception. This could be because it is now moved beyond one end of the collection or because it has not yet been associated with a collection.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bNext"  Attrs="Pure" RetType="tCIDLib::TBoolean" >
+                <Desc>If the cursor is not assicated with a collection yet, this will cause an exception. Else it will return kCIDLib::False if it is already at the end of the collection, or it will move to the next element and return kCIDLib::True to indicate you can derefence it to get the new element.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bReset" Attrs="Pure" RetType="tCIDLib::TBoolean" >
+                <Desc>If the cursor is not assicated with a collection yet, this will cause an exception. Else it move this cursor back to the start of the collection so it can be used to iterate the collection again. Ther return value is kCIDLib::True if there were any elements in the collection. If not, then there's no point iterating, or allocating any resources you would have used during iteration. So that can help you short circuit work as well.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="c4ElemCount" Attrs="Pure Const" RetType="tCIDLib::TCard4" >
+                <Desc>If the cursor is not assicated with a collection yet, this will cause an exception. Else it will return the count of elements in the collection it is associated with. You won't have any means at this level to know what that means relative to the current cursor position. And if the collection is not an ordered type, there won't be any real relationship there.</Desc>
+                <MethVar/>
+            </Method>
+
+        </VirtMeths>
+
+        <NVirtMeths>
+
+            <GetSet Name="c4SerialNum" RetType="tCIDLib::TCard4">
+                Returns the last serial number it stored from the associated collection. See the class comments above about cursor invalidation.
+            </GetSet>
+
+        </NVirtMeths>
+    </PubIntf>
+
+    <ProtIntf>
+        <Ctors DefMethods="DefCtor CopyCtor"/>
+
+        <Operators DefMethods="AssignOp">
+
+            <Method Name="operator==" Attrs="Const" RetType="tCIDLib::TBoolean" >
+                <Desc>Returns kCIDLib::True if this cursor has the same serial number as the source. That's the only info we have at this level.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="operator!=" Attrs="Const" RetType="tCIDLib::TBoolean" >
+                <Desc>Just negates the return of the assignment operator above.</Desc>
+                <MethVar/>
+            </Method>
+
+        </Operators>
+
+    </ProtIntf>
+
+</CppClass>

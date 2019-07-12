@@ -1462,7 +1462,7 @@ class TTest_UniquePtr : public TTestFWTest
 //  CLASS: TTest_PubSub
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_PubSub1 : public TTestFWTest, public MPubSubscription
+class TTest_PubSub1 : public TTestFWTest, private MPubSubscription
 {
     public  :
         // -------------------------------------------------------------------
@@ -1517,7 +1517,7 @@ class TTest_PubSub1 : public TTestFWTest, public MPubSubscription
 //  CLASS: TTest_PubSubVector
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_PubSubVector : public TTestFWTest, public MPubSubscription
+class TTest_PubSubVector : public TTestFWTest, private MPubSubscription
 {
     public  :
         // -------------------------------------------------------------------
@@ -1583,6 +1583,39 @@ class TTest_PubSubVector : public TTestFWTest, public MPubSubscription
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TTest_PubSubVector,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_RawBits
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_RawBits : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_RawBits();
+
+        ~TTest_RawBits();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_RawBits, TTestFWTest)
 };
 
 

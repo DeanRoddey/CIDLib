@@ -165,7 +165,7 @@ TLogEvent::TLogEvent() :
     , m_errcId(0)
     , m_errcKrnlId(0)
     , m_eSeverity(tCIDLib::ESeverities::Info)
-    , m_pstrAuxText(0)
+    , m_pstrAuxText(nullptr)
     , m_strHostName(TSysInfo::strIPHostName())
 {
 }
@@ -186,7 +186,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(0)
     , m_errcKrnlId(0)
     , m_eSeverity(eSev)
-    , m_pstrAuxText(0)
+    , m_pstrAuxText(nullptr)
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
@@ -232,7 +232,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(0)
     , m_errcKrnlId(0)
     , m_eSeverity(eSev)
-    , m_pstrAuxText(0)
+    , m_pstrAuxText(nullptr)
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
@@ -282,7 +282,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(0)
     , m_eSeverity(eSeverity)
-    , m_pstrAuxText(0)
+    , m_pstrAuxText(nullptr)
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
@@ -331,7 +331,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(0)
     , m_eSeverity(eSeverity)
-    , m_pstrAuxText(0)
+    , m_pstrAuxText(nullptr)
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
@@ -379,7 +379,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(kerrIds.errcId())
     , m_eSeverity(eSeverity)
-    , m_pstrAuxText(0)
+    , m_pstrAuxText(nullptr)
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
@@ -429,7 +429,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(kerrIds.errcId())
     , m_eSeverity(eSeverity)
-    , m_pstrAuxText(0)
+    , m_pstrAuxText(nullptr)
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
@@ -458,29 +458,29 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     m_strProcess = TProcess::strProcessName();
 }
 
-TLogEvent::TLogEvent(const TLogEvent& logevToCopy) :
+TLogEvent::TLogEvent(const TLogEvent& logevSrc) :
 
-    m_bLogged(logevToCopy.m_bLogged)
+    m_bLogged(logevSrc.m_bLogged)
     , m_bReported(kCIDLib::False)
-    , m_c4LineNum(logevToCopy.m_c4LineNum)
-    , m_eClass(logevToCopy.m_eClass)
-    , m_enctLogged(logevToCopy.m_enctLogged)
-    , m_errcHostId(logevToCopy.m_errcHostId)
-    , m_errcId(logevToCopy.m_errcId)
-    , m_errcKrnlId(logevToCopy.m_errcKrnlId)
-    , m_eSeverity(logevToCopy.m_eSeverity)
-    , m_pstrAuxText(0)
-    , m_strErrText(logevToCopy.m_strErrText)
-    , m_strFacName(logevToCopy.m_strFacName)
-    , m_strFileName(logevToCopy.m_strFileName)
-    , m_strHostName(logevToCopy.m_strHostName)
-    , m_strProcess(logevToCopy.m_strProcess)
-    , m_strStackTrace(logevToCopy.m_strStackTrace)
-    , m_strThread(logevToCopy.m_strThread)
+    , m_c4LineNum(logevSrc.m_c4LineNum)
+    , m_eClass(logevSrc.m_eClass)
+    , m_enctLogged(logevSrc.m_enctLogged)
+    , m_errcHostId(logevSrc.m_errcHostId)
+    , m_errcId(logevSrc.m_errcId)
+    , m_errcKrnlId(logevSrc.m_errcKrnlId)
+    , m_eSeverity(logevSrc.m_eSeverity)
+    , m_pstrAuxText(nullptr)
+    , m_strErrText(logevSrc.m_strErrText)
+    , m_strFacName(logevSrc.m_strFacName)
+    , m_strFileName(logevSrc.m_strFileName)
+    , m_strHostName(logevSrc.m_strHostName)
+    , m_strProcess(logevSrc.m_strProcess)
+    , m_strStackTrace(logevSrc.m_strStackTrace)
+    , m_strThread(logevSrc.m_strThread)
 {
     // Copy the aux text if any
-    if (logevToCopy.m_pstrAuxText)
-        m_pstrAuxText = new TString(*logevToCopy.m_pstrAuxText);
+    if (logevSrc.m_pstrAuxText)
+        m_pstrAuxText = new TString(*logevSrc.m_pstrAuxText);
 }
 
 TLogEvent::~TLogEvent()
@@ -493,35 +493,35 @@ TLogEvent::~TLogEvent()
 // ---------------------------------------------------------------------------
 //  TLogEvent: Public, virtual methods
 // ---------------------------------------------------------------------------
-TLogEvent& TLogEvent::operator=(const TLogEvent& logevToAssign)
+TLogEvent& TLogEvent::operator=(const TLogEvent& logevSrc)
 {
-    if (this != &logevToAssign)
+    if (this != &logevSrc)
     {
-        m_bLogged       = logevToAssign.m_bLogged;
-        m_bReported     = logevToAssign.m_bReported;
-        m_c4LineNum     = logevToAssign.m_c4LineNum;
-        m_eClass        = logevToAssign.m_eClass;
-        m_eSeverity     = logevToAssign.m_eSeverity;
-        m_enctLogged    = logevToAssign.m_enctLogged;
-        m_errcHostId    = logevToAssign.m_errcHostId;
-        m_errcId        = logevToAssign.m_errcId;
-        m_errcKrnlId    = logevToAssign.m_errcKrnlId;
-        m_strErrText    = logevToAssign.m_strErrText;
-        m_strFacName    = logevToAssign.m_strFacName;
-        m_strFileName   = logevToAssign.m_strFileName;
-        m_strHostName   = logevToAssign.m_strHostName;
-        m_strProcess    = logevToAssign.m_strProcess;
-        m_strStackTrace  = logevToAssign.m_strStackTrace;
-        m_strThread     = logevToAssign.m_strThread;
+        m_bLogged       = logevSrc.m_bLogged;
+        m_bReported     = logevSrc.m_bReported;
+        m_c4LineNum     = logevSrc.m_c4LineNum;
+        m_eClass        = logevSrc.m_eClass;
+        m_eSeverity     = logevSrc.m_eSeverity;
+        m_enctLogged    = logevSrc.m_enctLogged;
+        m_errcHostId    = logevSrc.m_errcHostId;
+        m_errcId        = logevSrc.m_errcId;
+        m_errcKrnlId    = logevSrc.m_errcKrnlId;
+        m_strErrText    = logevSrc.m_strErrText;
+        m_strFacName    = logevSrc.m_strFacName;
+        m_strFileName   = logevSrc.m_strFileName;
+        m_strHostName   = logevSrc.m_strHostName;
+        m_strProcess    = logevSrc.m_strProcess;
+        m_strStackTrace = logevSrc.m_strStackTrace;
+        m_strThread     = logevSrc.m_strThread;
 
         // Copy over the aux text if any
-        if (logevToAssign.m_pstrAuxText)
+        if (logevSrc.m_pstrAuxText)
         {
             // Fault in one if we don't have one, else assign
             if (!m_pstrAuxText)
-                m_pstrAuxText = new TString(*logevToAssign.m_pstrAuxText);
+                m_pstrAuxText = new TString(*logevSrc.m_pstrAuxText);
             else
-                *m_pstrAuxText = *logevToAssign.m_pstrAuxText;
+                *m_pstrAuxText = *logevSrc.m_pstrAuxText;
         }
          else
         {
@@ -538,9 +538,7 @@ TLogEvent& TLogEvent::operator=(const TLogEvent& logevToAssign)
 //  TLogEvent: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 
-//
-//  Adds a new stack dump line to the stack dump
-//
+// Adds a new stack dump line to the stack dump
 tCIDLib::TVoid
 TLogEvent::AddStackLevel(const TString& strFile, const tCIDLib::TCard4 c4Line)
 {
@@ -948,25 +946,17 @@ tCIDLib::TVoid TLogEvent::FormatTo(TTextOutStream& strmToWriteTo) const
 
 tCIDLib::TVoid TLogEvent::StreamFrom(TBinInStream& strmToReadFrom)
 {
-    // Check for the start object marker
-    strmToReadFrom.CheckForStartMarker(CID_FILE, CID_LINE);
+    // Check for a start marker and valid format version
+    const tCIDLib::TCard2 c2FmtVersion = TBinInStream::c2CheckFmtVersion
+    (
+        strmToReadFrom
+        , tCIDLib::EStreamMarkers::StartObject
+        , CIDLib_LogEvent::c2FmtVersion
+        , clsThis()
+        , CID_FILE
+        , CID_LINE
+    );
 
-    // Check the format version
-    tCIDLib::TCard2 c2FmtVersion;
-    strmToReadFrom  >> c2FmtVersion;
-    if (!c2FmtVersion || (c2FmtVersion > CIDLib_LogEvent::c2FmtVersion))
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_UnknownFmtVersion
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-            , TCardinal(c2FmtVersion)
-            , clsThis()
-        );
-    }
 
     // Stream out our raft of members
     tCIDLib::TCard2 c2Flags;

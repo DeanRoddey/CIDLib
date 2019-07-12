@@ -108,13 +108,17 @@ namespace tCIDLib
 {
     CIDLIBEXP tCIDLib::TVoid ThrowAssert
     (
-        const   TString&        strErr
+        const   TString&            strErr
+        , const tCIDLib::TCh* const pszFile
+        , const tCIDLib::TCard4     c4Line
     );
 
     CIDLIBEXP tCIDLib::TVoid ThrowAssert
     (
-        const   TString&        strErr
-        , const MFormattable&   mfmtblToken1
+        const   TString&            strErr
+        , const tCIDLib::TCh* const pszFile
+        , const tCIDLib::TCard4     c4Line
+        , const MFormattable&       mfmtblToken1
     );
 }
 
@@ -125,13 +129,15 @@ namespace tCIDLib
 //  above so that it's visible here.
 // ---------------------------------------------------------------------------
 #if CID_DEBUG_ON
-    #define CIDAssert(test,msg) if (!(test)) { tCIDLib::ThrowAssert(msg); }
+    #define CIDAssert(test,msg) \
+    if (!(test)) { tCIDLib::ThrowAssert(msg, CID_FILE, CID_LINE); }
 
-    #define CIDAssertX(test,msg,tok1) if (!(test)) { tCIDLib::ThrowAssert(msg, tok1); }
+    #define CIDAssertX(test,msg,tok1) \
+    if (!(test)) { tCIDLib::ThrowAssert(msg, CID_FILE, CID_LINE, tok1); }
 
-    #define CIDAssert2(msg)  tCIDLib::ThrowAssert(msg);
+    #define CIDAssert2(msg)  tCIDLib::ThrowAssert(msg, CID_FILE, CID_LINE);
 
-    #define CIDAssert2X(msg,tok1)  tCIDLib::ThrowAssert(msg, tok1);
+    #define CIDAssert2X(msg,tok1)  tCIDLib::ThrowAssert(msg, CID_FILE, CID_LINE, tok1);
 
 #else
     #define CIDAssert(test,msg)

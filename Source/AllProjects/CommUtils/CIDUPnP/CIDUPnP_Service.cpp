@@ -54,7 +54,7 @@ TUPnPService::TUPnPService() :
     , m_c4SerialNum(1)
     , m_colVarList
       (
-        109, new TStringKeyOps, &TKeyValuePair::strExtractKey, tCIDLib::EMTStates::Safe
+        109, TStringKeyOps(), &TKeyValuePair::strExtractKey, tCIDLib::EMTStates::Safe
       )
     , m_pkupnpsThis(nullptr)
 {

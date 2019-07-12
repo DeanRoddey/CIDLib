@@ -16,7 +16,16 @@
 // DESCRIPTION:
 //
 //  This is the header for the internal base implementation class for pixel arrays.
-//  This
+//  This guy provides usable, portable implementations of the various algorithms that
+//  pixel arrays have to support. But each platform can create derivatives of this and
+//  override those that it can do better using local resources, such as GPU, or using
+//  local graphics operations that indirectly benefit from GPU. However, it shouldn't
+//  bring in system UI resources if it can avoid it because this is for image data
+//  processing, not directly for UI. This stuff can be used in the background under
+//  services and such.
+//
+//  Initially, they can just create one of these and return it and get somethign working
+//  quickly (once I've finished getting rid of the ASM stuff.)
 //
 // CAVEATS/GOTCHAS:
 //
@@ -284,6 +293,7 @@ class TPixelArrayImpl : public TObject, public MStreamable
                     tCIDLib::EDirs          eDir
             , const tCIDLib::TCard4         c4StartInd
             , const tCIDLib::TCard4         c4EndInd
+            , const tCIDLib::TBoolean       bPremultiply
         );
 
         virtual tCIDLib::TVoid SetAll

@@ -70,33 +70,6 @@ TDirChangeInfo::TDirChangeInfo(const tCIDLib::EDirChanges  eChange) :
 {
 }
 
-TDirChangeInfo::TDirChangeInfo(const TDirChangeInfo& dchiSrc) :
-
-    m_eChange(dchiSrc.m_eChange)
-    , m_strName(dchiSrc.m_strName)
-    , m_strNew(dchiSrc.m_strNew)
-{
-}
-
-TDirChangeInfo::~TDirChangeInfo()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TDirChangeInfo: Public operator
-// ---------------------------------------------------------------------------
-TDirChangeInfo& TDirChangeInfo::operator=(const TDirChangeInfo& dchiSrc)
-{
-    if (&dchiSrc != this)
-    {
-        m_eChange   = dchiSrc.m_eChange;
-        m_strName   = dchiSrc.m_strName;
-        m_strNew    = dchiSrc.m_strNew;
-    }
-    return *this;
-}
-
 
 
 

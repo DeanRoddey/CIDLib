@@ -101,7 +101,6 @@ ERRORS=
     errcCol_NullHead            770     The linked list head pointer was nul
     errcCol_NodeNotFound        771     Node is not a member of the collection
     errcCol_TooManyNodes        772     The maximum collection node count has been exceeded. Max=%(1)
-    errcCol_NewMaxTooSmall      773     The new max node count, %(1), is less than the current number of nodes: %(2)
     errcCol_CursorNotValid      774     The %(1) cursor is not pointing to a valid node of its collection
     errcCol_IsEmpty             775     The %(1) collection is empty
     errcCol_NotMyCursor         776     The passed %(1) cursor does not belong to this %(2) collection
@@ -126,7 +125,6 @@ ERRORS=
     errcCol_ChangedKey          795     A keyed collection does not allow the key to be modified during element update
     errcCol_BadStoredCount      796     Got a bad element count when streaming in the %(1) collection
     errcCol_ZeroSize            797     Zero is not a valid max size for a collection
-    errcCol_InitBeyondMax       798     The initial collection alloc %(1) is greater than the max of %(2)
     errcCol_CantExpand          799     The collection cannot be expanded to %(1) elements. Max=%(2)
     errcCol_CurBeyondAlloc      800     The current size (%(1)) is larger than the current allocation (%(2)) on the %(3) collection
     errcCol_NeitherNonAdopt     801     One of the collections involved must be non-adopting

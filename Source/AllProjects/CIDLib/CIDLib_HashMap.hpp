@@ -615,14 +615,14 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         THashMap<TElem,TKey,TKeyOps>() = delete;
 
         THashMap(   const   tCIDLib::TCard4     c4Modulus
-                    ,       TKeyOps* const      pkopsToAdopt
+                    , const TKeyOps&            kopsToUse
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             TMapCollection<TElem, TKey>(eMTSafe)
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
-            , m_pkopsToUse(pkopsToAdopt)
+            , m_kopsToUse(kopsToUse)
         {
             try
             {
@@ -639,7 +639,6 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             catch(...)
             {
                 delete [] m_apBuckets;
-                delete pkopsToAdopt;
                 throw;
             }
         }
@@ -650,11 +649,8 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(colSrc.m_c4HashModulus)
-            , m_pkopsToUse(nullptr)
+            , m_kopsToUse(colSrc.m_kopsToUse)
         {
-            // Dup the key ops object. This is polymorphic, so its fine
-            m_pkopsToUse = ::pDupObject<TKeyOps>(*colSrc.m_pkopsToUse);
-
             try
             {
                 // Allocate and initialize the bucket array
@@ -679,7 +675,6 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
             catch(...)
             {
-                delete m_pkopsToUse;
                 delete [] m_apBuckets;
                 throw;
             }
@@ -689,9 +684,6 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         {
             // Flush the collection
             RemoveAll();
-
-            // Delete the key ops object
-            delete m_pkopsToUse;
 
             // And delete the bucket list itself
             delete [] m_apBuckets;
@@ -734,7 +726,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
                 // And now take his current elements value and dup the key ops
                 m_c4CurElements = colSrc.m_c4CurElements;
-                m_pkopsToUse = ::pDupObject<TKeyOps>(*colSrc.m_pkopsToUse);
+                m_kopsToUse = colSrc.m_kopsToUse;
 
                 // Invalidate any cursors
                 this->c4IncSerialNum();
@@ -850,7 +842,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             return new TCursor(this);
         }
 
-        TObject* pobjDuplicate() const override
+        [[nodiscard]] TObject* pobjDuplicate() const override
         {
             return new TMyType(*this);
         }
@@ -890,7 +882,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             TMtxLocker lockSync(this->pmtxLock());
 
             // Get the hash of the element
-            const tCIDLib::THashVal hshKey = m_pkopsToUse->hshKey
+            const tCIDLib::THashVal hshKey = m_kopsToUse.hshKey
             (
                 objKeyToRemove, m_c4HashModulus
             );
@@ -900,7 +892,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             while (pnodeToRem)
             {
                 // If this key matches, then break out
-                if (m_pkopsToUse->bCompKeys(pnodeToRem->objKey(), objKeyToRemove))
+                if (m_kopsToUse.bCompKeys(pnodeToRem->objKey(), objKeyToRemove))
                     break;
                 pnodeToRem = pnodeToRem->pnodeNext();
             }
@@ -1283,7 +1275,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         TNode* pnodeFind(const TKey& objKeyToFind, tCIDLib::THashVal& hshKey) const
         {
             // Get the hash of the element
-            hshKey = m_pkopsToUse->hshKey(objKeyToFind, m_c4HashModulus);
+            hshKey = m_kopsToUse.hshKey(objKeyToFind, m_c4HashModulus);
 
             // If this bucket is empty, then obviously not here
             if (!m_apBuckets[hshKey])
@@ -1293,7 +1285,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             TNode* pnodeCur = m_apBuckets[hshKey];
             while (pnodeCur)
             {
-                if (m_pkopsToUse->bCompKeys(pnodeCur->objKey(), objKeyToFind))
+                if (m_kopsToUse.bCompKeys(pnodeCur->objKey(), objKeyToFind))
                     return pnodeCur;
                 pnodeCur = pnodeCur->pnodeNext();
             }
@@ -1386,15 +1378,14 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         //      The modulus divisor for the hash. This is also the number
         //      elements allocated for the m_alstTable array.
         //
-        //  m_pkopsToUse
+        //  m_kopsToUse
         //      A key ops object that provides all of the operations that
-        //      we have to do on key field objects. We own and destruct it
-        //      when we destruct.
+        //      we have to do on key field objects.
         // -------------------------------------------------------------------
         TNode**             m_apBuckets;
         tCIDLib::TCard4     m_c4CurElements;
         tCIDLib::TCard4     m_c4HashModulus;
-        TKeyOps*            m_pkopsToUse;
+        TKeyOps             m_kopsToUse;
 };
 
 

@@ -82,7 +82,7 @@ TAIBehaviorTree::TAIBehaviorTree(const TString& strName) :
       (
         tCIDLib::EAdoptOpts::Adopt
         , 109
-        , new TStringKeyOps(kCIDLib::False)
+        , TStringKeyOps(kCIDLib::False)
         , TAIBTRootNode::strRootNodeKey
       )
     , m_strName(strName)
@@ -150,7 +150,7 @@ tCIDLib::TVoid TAIBehaviorTree::CompileToFile(TBinOutStream& strmTar)
     if (cursTrees.bReset())
     {
         // We need a string hash set to keep up with the trees we've done so far
-        tCIDLib::TStrHashSet colTreesDone(109, new TStringKeyOps(kCIDLib::False));
+        tCIDLib::TStrHashSet colTreesDone(109, TStringKeyOps(kCIDLib::False));
 
         //
         //  Let's now start the process. At this level, we just loop through the trees.

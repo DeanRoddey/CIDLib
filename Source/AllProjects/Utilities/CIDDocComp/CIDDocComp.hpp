@@ -43,16 +43,22 @@
 
 
 // -----------------------------------------------------------------------------
-//  Include our out facility for internal use
+//  Public includes
 // -----------------------------------------------------------------------------
 #include    "CIDDocComp_ErrorIds.hpp"
 #include    "CIDDocComp_MessageIds.hpp"
 #include    "CIDDocComp_Info.hpp"
 
+namespace tCIDDocComp
+{
+    using TSpecMeths = TFundVector<tCIDDocComp::ESpecMeths>;
+}
+
 #include    "CIDDocComp_HelpNode.hpp"
 #include    "CIDDocComp_BasePage.hpp"
 #include    "CIDDocComp_Topics.hpp"
 #include    "CIDDocComp_HelpPage.hpp"
+#include    "CIDDocComp_CppClass.hpp"
 
 #include    "CIDDocComp_ThisFacility.hpp"
 

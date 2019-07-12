@@ -160,25 +160,9 @@ class TWndMapItem
 
 
 // A simple key ops handler for our window map item class, whcih doesn't have to do much
-class TWndMapItemKeyOps : public TObject
+class TWndMapItemKeyOps
 {
     public :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TWndMapItemKeyOps() {}
-
-        TWndMapItemKeyOps(const TWndMapItemKeyOps&) {}
-
-        ~TWndMapItemKeyOps() {}
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TWndMapItemKeyOps& operator=(const TWndMapItemKeyOps& kopsToAssign) { return *this; }
-
-
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
@@ -193,16 +177,7 @@ class TWndMapItemKeyOps : public TObject
         {
             return tCIDLib::TCard4(wmihToHash.m_hwndThis) % c4Modulus;
         }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TWndMapItemKeyOps, TObject)
-        DefPolyDup(TWndMapItemKeyOps)
 };
-RTTIDecls(TWndMapItemKeyOps, TObject)
 
 
 // ---------------------------------------------------------------------------
@@ -225,7 +200,7 @@ namespace CIDCtrls_Window
     (
         tCIDLib::EAdoptOpts::Adopt
         , 1024
-        , new TWndMapItemKeyOps
+        , TWndMapItemKeyOps()
         , &TWndMapItem::wmihKey
     );
 }
@@ -633,7 +608,7 @@ TWindow::CheckHandlerRegParms(  const   TWindow* const  pwndSrc
 // Lazy eval for the null window object
 TWindow& TWindow::Nul_TWindow()
 {
-    static TWindow* pwndNull = 0;
+    static TWindow* pwndNull = nullptr;
     if (!pwndNull)
     {
         TBaseLock lockInit;
@@ -649,7 +624,10 @@ TWindow& TWindow::Nul_TWindow()
 //
 TWindow* TWindow::pwndGetWndLinkPtr(const tCIDCtrls::TWndHandle hwndSrc)
 {
-    TWndMapItem* pwmiCur = CIDCtrls_Window::colWndItemMap.pobjFindByKey(hwndSrc, kCIDLib::False);
+    TWndMapItem* pwmiCur = CIDCtrls_Window::colWndItemMap.pobjFindByKey
+    (
+        hwndSrc, kCIDLib::False
+    );
     if (pwmiCur)
         return pwmiCur->m_pwndWnd;
 
@@ -1836,7 +1814,7 @@ TWindow::bTrackArea(const   TPoint&             pntStart
                         pszId = IDC_SIZEALL;
                         break;
                 }
-                ::SetCursor(::LoadCursor(NULL, pszId));
+                ::SetCursor(::LoadCursorW(NULL, pszId));
             }
              else
             {
@@ -2118,7 +2096,7 @@ tCIDLib::TCard4 TWindow::c4MaxScrollPos(const tCIDLib::TBoolean bHorz) const
     Info.cbSize = sizeof(SCROLLINFO);
     Info.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
 
-    if (!GetScrollInfo(hwndSafe(), bHorz ? SB_HORZ : SB_VERT, &Info))
+    if (!::GetScrollInfo(hwndSafe(), bHorz ? SB_HORZ : SB_VERT, &Info))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         facCIDCtrls().ThrowKrnlErr
@@ -3613,7 +3591,7 @@ TWindow::QueryScrollInfo(const  tCIDLib::TBoolean   bHorz
     Info.cbSize = sizeof(SCROLLINFO);
     Info.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
 
-    if (!GetScrollInfo(hwndSafe(), bHorz ? SB_HORZ : SB_VERT, &Info))
+    if (!::GetScrollInfo(hwndSafe(), bHorz ? SB_HORZ : SB_VERT, &Info))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         facCIDCtrls().ThrowKrnlErr
@@ -3765,7 +3743,7 @@ TWindow::RegisterNamedWnd(const TString& strName, TWindow* const pwndToReg)
         (
             tCIDLib::EAdoptOpts::NoAdopt
             , 29
-            , new TStringKeyOps
+            , TStringKeyOps()
             , &TWindow::strExtractName
         );
     };
@@ -5702,7 +5680,10 @@ TWindow::mresDispatch(  const   TWindow&            wndThis
         }
 
         // Call the underlying control procedure and return his return
-        return ::CallWindowProc(m_pfOrgProc, wndThis.hwndSafe(), wmsgCur, wParam, lParam);
+        return ::CallWindowProc
+        (
+            (WNDPROC)m_pfOrgProc, wndThis.hwndSafe(), wmsgCur, wParam, lParam
+        );
     }
 
 
@@ -7879,7 +7860,7 @@ TWindow::mresCallSubClass(  const   tCIDCtrls::TWndMsg  wmsgCur
                             , const tCIDCtrls::TWParam  wParam
                             , const tCIDCtrls::TLParam  lParam)
 {
-    return ::CallWindowProc(m_pfOrgProc, hwndSafe(), wmsgCur, wParam, lParam);
+    return ::CallWindowProc((WNDPROC)m_pfOrgProc, hwndSafe(), wmsgCur, wParam, lParam);
 }
 
 
@@ -7924,7 +7905,7 @@ TWindow* TWindow::pwndFindOwner(const tCIDLib::TBoolean bThrowIfNot) const
                 , tCIDLib::EErrClasses::AppError
             );
         }
-        return 0;
+        return nullptr;
     }
 
     // We have a parent window, see if it one of our windows
@@ -7949,7 +7930,7 @@ TWindow* TWindow::pwndFindParent(const tCIDLib::TBoolean bThrowIfNot) const
                 , tCIDLib::EErrClasses::AppError
             );
         }
-        return 0;
+        return nullptr;
     }
 
     // We have a parent window, see if it one of our windows
@@ -8018,7 +7999,7 @@ TWindow::RegWndClass(const  tCIDLib::TCh* const pszName
 
     // This is done the same regardless of the above
     wcData.lpszClassName = pszName;
-    wcData.lpfnWndProc = mresCIDCtrlsDispatch;
+    wcData.lpfnWndProc = (WNDPROC)mresCIDCtrlsDispatch;
     wcData.hInstance = hInstance;
 
     if (bDblClicks)

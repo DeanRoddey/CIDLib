@@ -163,7 +163,7 @@ tCIDLib::TVoid TFacCIDLogSrv::Setup()
     //  the rebinder.
     //
     m_porbsImpl = new TCIDLogServerImpl;
-    facCIDOrb().RegisterObject(m_porbsImpl);
+    facCIDOrb().RegisterObject(m_porbsImpl, tCIDLib::EAdoptOpts::Adopt);
     facCIDOrbUC().RegRebindObj
     (
         m_porbsImpl->ooidThis()
@@ -173,7 +173,7 @@ tCIDLib::TVoid TFacCIDLogSrv::Setup()
 
     // Register an instance of our core admin implementation
     TCIDCoreAdminImpl* porbsAdmin = new TCIDCoreAdminImpl;
-    facCIDOrb().RegisterObject(porbsAdmin);
+    facCIDOrb().RegisterObject(porbsAdmin, tCIDLib::EAdoptOpts::Adopt);
     facCIDOrbUC().RegRebindObj
     (
         porbsAdmin->ooidThis()

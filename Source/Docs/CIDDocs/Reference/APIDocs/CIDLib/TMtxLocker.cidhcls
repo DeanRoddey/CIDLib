@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TMtxLocker" Prefix="mtxl" Parent="N/A">
+
+    <Desc>
+        <P>TMtxLocker is a locking <Link Type="Page" Ref="/BigPicture/" Id="/Janitors">janitor</Link> for <ClassRef Ref="TMutex"/> objects. It can be used to lock a mutex on a scoped basis in an exception safe way.</P>
+
+        <P>It takes a pointer to a mutex, which must remain alive as long as the locker is, which it will lock (or try to with a timeout.) If it gets the lock, it will unlock the mutex in its destructor, unless you tell it to orphan or release the mutex before it destructs.</P>
+
+        <P>For practical purposes, you can pass a null mutex pointer. If you do that, the locker just does nothing. This allows you to use them in situations where locking may be optional. <Link Type="Page" Ref="/BigPicture/" Id="/Collections">Collections</Link> are one place where this is true.</P>
+
+        <Note>If you call one of the lock methods to lock after the constructor, even if there is no mutex set, the locked flag is still set, so that it goes through the motions of being locked, and can be treated the same whether it has a mutex or not. But of course either way it is not providing any synchronization if there is no mutex set.</Note>
+
+        <P>For more complex scenarios, you can also tell the locker to release the mutex. If it then subsequently destructs, it will do nothing. But you can also then re-acquire the mutex again via the locker, so that it now it is active once more and will unlock when it destructs. This allows you to temporarily release the mutex without losing the benefits of a locking janitor.</P>
+    </Desc>
+
+    <PubIntf>
+        <Ctors DelMethods="DefCtor CopyCtor">
+
+            <Method Name="TMtxLocker">
+                <Desc>
+                    <P>We have one that takes the mutex and a timeout. The other takes the same plus a boolean that indicates whether it should lock initially or not. This allows you to create the locker but not commit initially to getting the lock, or to optionally do a locking operation.</P>
+
+                    <P>In both cases the default value for the timeout is kCIDLib::c4MaxWait, for an indefinite wait time. Else, you provide a timeout and the ctor will throw if it fails to get the lock.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pmtxLock" Type="TMutex" PBy="PtrC" Retained="Yes"/>
+                    <MethParam Name="c4Timeout" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxWait"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pmtxLock" Type="TMutex" PBy="PtrC" Retained="Yes"/>
+                    <MethParam Name="bDoLock" Type="tCIDLib::TBoolean"/>
+                    <MethParam Name="c4Timeout" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxWait"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="~TMtxLocker">
+                <Desc>If the mutex is non-null and still locked by this locker, then it is released, else nothing happens.</Desc>
+                <MethVar/>
+            </Method>
+        </Ctors>
+
+        <Operators DelMethods="AssignOp NewOp"/>
+
+        <!-- Non-virtual public methods -->
+        <NVirtMeths>
+
+            <Method Name="bLock" RetType="tCIDLib::TBoolean">
+                <Desc>This can be called after the fact to lock the mutex if it was not locked in the constructor, or after having released the mutex, to reacquire it. You provide a milliseconds timeout to wait before giving up. Unlike the constructor, this one just returns a success or failure status instead of throwing.</Desc>
+                <MethVar>
+                    <MethParam Name="c4Timeout" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bLocked" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Indicates whether this locker currently has a locked mutex or not.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="Lock">
+                <Desc>Like bLock() above, but throws if it fails to get the lock instead of returning a status. The timeout in this case defaults to kCIDLib::c4MaxWait for an indefinite timeout.</Desc>
+                <MethVar>
+                    <MethParam Name="c4Timeout" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxWait"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Orphan">
+                <Desc>Drops the pointer to the mutex, if one is currently set, so that the destructor will take no action. This locker cannot be relocked after this since it owns no mutex to lock.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="Release">
+                <Desc>If this locker has a valid mutex pointer, and has a lock on that mutex, the lock is released and this locker is marked as not having a lock. So the destructor will do nothing. You can in this case though reacquire the lock by calling one of the lock methdo above, since the pointer to the mutex was not dropped.</Desc>
+                <MethVar/>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

@@ -479,13 +479,32 @@ TStrCat::TStrCat(const  tCIDLib::TCh* const psz1
     m_pszBuf[m_c4Len] = kCIDLib::chNull;
 }
 
+TStrCat::TStrCat(TStrCat&& scatSrc) :
 
-
+    m_c4Len(0)
+    , m_pszBuf(nullptr)
+{
+    *this = tCIDLib::ForceMove(scatSrc);
+}
 
 // If by chance we never got to give it away, delete it
 TStrCat::~TStrCat()
 {
     delete [] m_pszBuf;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TStrCat: Public operators
+// ---------------------------------------------------------------------------
+TStrCat& TStrCat::operator=(TStrCat&& scatSrc)
+{
+    if (&scatSrc != this)
+    {
+        tCIDLib::Swap(m_c4Len, scatSrc.m_c4Len);
+        tCIDLib::Swap(m_pszBuf, scatSrc.m_pszBuf);
+    }
+    return *this;
 }
 
 
@@ -824,7 +843,7 @@ tCIDLib::TVoid TString::TStrBuf::Append(const TStrBuf& strbToAppend)
 
     m_c4CurEnd = c4Needed;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -914,7 +933,7 @@ TString::TStrBuf::AppendSubStr( const   TStrBuf&        strbAppend
     // And update the current length
     m_c4CurEnd += c4ActualLen;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -1049,7 +1068,7 @@ tCIDLib::TBoolean
 TString::TStrBuf::bCheckPrefix( const  tCIDLib::TCh* const  pszToCheck
                                 , const tCIDLib::TBoolean   bCaseSensitive) const
 {
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
     const tCIDLib::TCh* pszUs = m_pszBuffer;
     const tCIDLib::TCh* pszThem = pszToCheck;
 
@@ -1093,7 +1112,7 @@ TString::TStrBuf::bCheckPrefix( const   TString::TStrBuf&   strbToCheck
         return kCIDLib::False;
 
     // Oh well, check the strings
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
     const tCIDLib::TCh* pszUs = m_pszBuffer;
     const tCIDLib::TCh* pszThem = strbToCheck.m_pszBuffer;
 
@@ -1138,7 +1157,7 @@ TString::TStrBuf::bCheckSuffix( const  tCIDLib::TCh* const  pszToCheck
         return kCIDLib::False;
 
     // Set up pointers to run up
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
     const tCIDLib::TCh* pszUs = m_pszBuffer + (m_c4CurEnd - c4SrcLen);
     const tCIDLib::TCh* pszThem = pszToCheck;
 
@@ -1176,7 +1195,7 @@ TString::TStrBuf::bCheckSuffix( const   TString::TStrBuf&   strbToCheck
         return kCIDLib::False;
 
     // Oh well, check the strings
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
     const tCIDLib::TCh* pszUs = m_pszBuffer + (m_c4CurEnd - c4SrcLen);
     const tCIDLib::TCh* pszThem = strbToCheck.m_pszBuffer;
 
@@ -1279,7 +1298,7 @@ tCIDLib::TVoid TString::TStrBuf::CapAt(const tCIDLib::TCard4 c4Index)
     if (c4Index <= m_c4CurEnd)
     {
         m_c4CurEnd = c4Index;
-        m_pszBuffer[m_c4CurEnd] = 0;
+        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
         return;
     }
 
@@ -1300,7 +1319,7 @@ tCIDLib::TVoid TString::TStrBuf::CapAt(const tCIDLib::TCard4 c4Index)
 tCIDLib::TVoid TString::TStrBuf::Clear()
 {
     m_c4CurEnd = 0;
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -1330,14 +1349,18 @@ TString::TStrBuf::Cut(const tCIDLib::TCard4 c4Start, const tCIDLib::TCard4 c4Len
         );
     }
 
-    tCIDLib::TCard4 c4ActualLen = c4Len;
-    if ((c4ActualLen == kCIDLib::c4MaxCard)
-    ||  ((c4Start + c4ActualLen) == m_c4CurEnd))
+    //
+    //  We can short circuit if we are cutting to the end. It could have
+    //  just been a call to CapAt really.
+    //
+    if ((c4Len == kCIDLib::c4MaxCard)
+    ||  ((c4Start + c4Len) == m_c4CurEnd))
     {
         m_c4CurEnd = c4Start;
         return;
     }
-     else if ((c4Start + c4ActualLen) > m_c4CurEnd)
+
+    if ((c4Start + c4Len) > m_c4CurEnd)
     {
         facCIDLib().ThrowErr
         (
@@ -1354,16 +1377,16 @@ TString::TStrBuf::Cut(const tCIDLib::TCard4 c4Start, const tCIDLib::TCard4 c4Len
 
     // Copy the text at c4Start+c4ActualLen down to c4Start
     tCIDLib::TCh* pszDest = &m_pszBuffer[c4Start];
-    tCIDLib::TCh* pszSrc  = &m_pszBuffer[c4Start + c4ActualLen];
+    tCIDLib::TCh* pszSrc  = &m_pszBuffer[c4Start + c4Len];
     tCIDLib::TCh* pszEnd  = &m_pszBuffer[m_c4CurEnd];
     while (pszSrc < pszEnd)
         *pszDest++ = *pszSrc++;
 
-    // Adjust the end by the actual length
-    m_c4CurEnd -= c4ActualLen;
+    // Adjust the end by the length
+    m_c4CurEnd -= c4Len;
 
     // And cap the string
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -1374,7 +1397,7 @@ TString::TStrBuf::Cut(const tCIDLib::TCard4 c4Start, const tCIDLib::TCard4 c4Len
 tCIDLib::TVoid TString::TStrBuf::CutUpTo(const tCIDLib::TCh chFind)
 {
     // Make sure we are capped and then search
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
     tCIDLib::TCh* pszMatch = TRawStr::pszFindChar
     (
         m_pszBuffer, chFind, 0, kCIDLib::True
@@ -1403,7 +1426,7 @@ tCIDLib::TVoid TString::TStrBuf::DeleteLast()
     // Just put a 0 in the last character and dec the length
     m_c4CurEnd--;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -1449,15 +1472,10 @@ TString::TStrBuf::FromZStr( const   tCIDLib::TCh* const pszSrc
     if (c4ActualCount > m_c4BufChars)
         Reallocate(c4ActualCount + 16, kCIDLib::False);
 
-    TRawMem::CopyMemBuf
-    (
-        m_pszBuffer
-        , pszActual
-        , c4ActualCount * kCIDLib::c4CharBytes
-    );
+    TRawMem::CopyMemBuf(m_pszBuffer, pszActual, c4ActualCount * kCIDLib::c4CharBytes);
     m_c4CurEnd = c4ActualCount;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -1517,7 +1535,7 @@ TString::TStrBuf::FormatToFld(  const   TStrBuf&            strbSrc
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4TrailingSp; c4Index++)
         m_pszBuffer[m_c4CurEnd++] = kCIDLib::chSpace;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -1544,7 +1562,7 @@ TString::TStrBuf::ImportChars(  const   tCIDLib::TCh* const pszSrc
     );
     m_c4CurEnd = c4SrcCount;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -1613,7 +1631,7 @@ tCIDLib::TVoid TString::TStrBuf::Insert(const   tCIDLib::TCh* const pszInsert
     // Adjust the current end up by the insert length
     m_c4CurEnd += c4InsertLen;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -1676,7 +1694,7 @@ tCIDLib::TVoid TString::TStrBuf::Insert(const   TStrBuf&        strbSrc
     // Adjust the current end up by the insert length
     m_c4CurEnd += strbSrc.m_c4CurEnd;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -1984,7 +2002,7 @@ TString::TStrBuf::Replace(  const   tCIDLib::TCard4     c4RepStart
         m_c4CurEnd += c4ActualLen - c4TargetLen;
     }
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -2028,7 +2046,7 @@ tCIDLib::TVoid TString::TStrBuf::Set(const tCIDLib::TCh* const pszSrc)
     // And be sure to update the new end
     m_c4CurEnd = c4SrcLen;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -2056,7 +2074,7 @@ TString::TStrBuf::Set(const TStrBuf& strbNewValue)
     // And be sure to update the new end
     m_c4CurEnd = strbNewValue.m_c4CurEnd;
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -2200,7 +2218,7 @@ TString::TStrBuf::Strip(const   tCIDLib::TCh* const     pszStripChars
     TRawStr::StripStr(m_pszBuffer, pszStripChars, eMode, chRepChar);
     m_c4CurEnd = TRawStr::c4StrLen(m_pszBuffer);
 
-    m_pszBuffer[m_c4CurEnd] = 0;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -2696,10 +2714,6 @@ TString::TString(const TString& strSrc) :
 TString::TString(TString&& strSrc) :
 
     m_strbData(tCIDLib::ForceMove(strSrc.m_strbData))
-{
-}
-
-TString::~TString()
 {
 }
 

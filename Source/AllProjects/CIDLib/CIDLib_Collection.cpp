@@ -67,16 +67,6 @@ TColPubSubInfo::TColPubSubInfo(const EEvents eEvent, const tCIDLib::TCard4 c4Ind
 }
 
 
-TColPubSubInfo::TColPubSubInfo(const EEvents eEvent, const TString& strKey) :
-
-    m_c4Index1(0)
-    , m_c4Index2(0)
-    , m_eEvent(eEvent)
-    , m_strKey(strKey)
-{
-}
-
-
 TColPubSubInfo::TColPubSubInfo( const   EEvents         eEvent
                                 , const tCIDLib::TCard4 c4Index1
                                 , const tCIDLib::TCard4 c4Index2) :
@@ -85,27 +75,6 @@ TColPubSubInfo::TColPubSubInfo( const   EEvents         eEvent
     , m_c4Index2(c4Index2)
     , m_eEvent(eEvent)
 {
-}
-
-
-TColPubSubInfo::~TColPubSubInfo()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TColPubSubInfo: Public operators
-// ---------------------------------------------------------------------------
-TColPubSubInfo& TColPubSubInfo::operator=(const TColPubSubInfo& colpsiSrc)
-{
-    if (&colpsiSrc != this)
-    {
-        m_c4Index1  = colpsiSrc.m_c4Index1;
-        m_c4Index2  = colpsiSrc.m_c4Index2;
-        m_eEvent    = colpsiSrc.m_eEvent;
-        m_strKey    = colpsiSrc.m_strKey;
-    }
-    return *this;
 }
 
 
@@ -119,115 +88,6 @@ TColPubSubInfo& TColPubSubInfo::operator=(const TColPubSubInfo& colpsiSrc)
 // ---------------------------------------------------------------------------
 //  TCollectionBase: Public, static methods
 // ---------------------------------------------------------------------------
-//
-//  A common helper to wait for data to show up in a collection, which uses
-//  a wait list to manage waiters. This is something that is done by some
-//  types of collections, so we want to get it out of the templatized code
-//  as much as possible, since it's a good bit of code.
-//
-//  They will have locked themselves before they call us, and they pass us
-//  a mutex locker. Upon return, we will have gotten lock back. We return
-//  true if we got out because something was available, else false. If we
-//  return true, the caller has the lock at that point and can take the
-//  available one. If they tell us to throw if we don't get one, then we
-//  won't return False, we'll throw.
-//
-//  They pass us a ref to themselves, so that we can check whether they are
-//  empty or not. This is base collection functionality so we can work for
-//  any type of collection.
-//
-tCIDLib::TBoolean
-TCollectionBase::bWaitForData(          TMtxLocker&         lockQueue
-                                , const TCollectionBase&    colSrc
-                                , const tCIDLib::TCard4     c4WaitMSs
-                                ,       TThreadWaitList&    twlWaitList
-                                , const tCIDLib::TBoolean   bThrowIfNot)
-{
-    //
-    //  Loop until we get some data. We have to do this because we can never guarantee
-    //  that when we are awakened, that some other thread hasn't beat us to the punch
-    //  and got the data already.
-    //
-    //  If they indicated wait forever, set the end time to zero, so we can quickly
-    //  check for that below.
-    //
-    tCIDLib::TEncodedTime enctCur = TTime::enctNow();
-    const tCIDLib::TEncodedTime enctEnd
-    (
-        (c4WaitMSs == kCIDLib::c4MaxCard) ? 0
-                                          : (enctCur + (kCIDLib::enctOneMilliSec * c4WaitMSs))
-    );
-
-    //
-    //  Loop while the collection is empty. Get the count first before we enter the
-    //  loop, since we can avoid doing any work at all if not.
-    //
-    tCIDLib::TCard4 c4Count = colSrc.c4ElemCount();
-    while (!c4Count)
-    {
-        //
-        //  Assume wait forever, but if the end time is set, let's
-        //  calc how many millis left to wait. It might be zero,
-        //  and that's fine.
-        //
-        tCIDLib::TCard4 c4MillisLeft = kCIDLib::c4MaxCard;
-        if (enctEnd)
-        {
-            c4MillisLeft = tCIDLib::TCard4
-            (
-                (enctEnd - enctCur) / kCIDLib::enctOneMilliSec
-            );
-        }
-
-        //
-        //  Put ourselves on the thread wait list. We use version of
-        //  the method that takes a lock. It will release the lock
-        //  after this thread is put on the wait list, but before this
-        //  thread blocks. And it will reaquire the list upon wake up
-        //  before it returns.
-        //
-        //  When we wake up, if the list isn't empty, then we can
-        //  take it.
-        //
-        twlWaitList.bWaitOnList
-        (
-            lockQueue, kCIDLib::c4TWLReason_WaitData, c4MillisLeft
-        );
-
-        //
-        //  If there's nothing in the queue, and we aren't just waiting
-        //  forever, then we need to see if we are out of time and
-        //  update the end time. If we have one, then we'll berak out
-        //  above. If we don't have one yet, but we are waiting for
-        //  ever, then we don't need to check for timeout.
-        //
-        c4Count = colSrc.c4ElemCount();
-        if (!c4Count && enctEnd)
-        {
-            // If we are out of time, then give up
-            enctCur = TTime::enctNow();
-            if (enctCur >= enctEnd)
-            {
-                if (bThrowIfNot)
-                {
-                    facCIDLib().ThrowErr
-                    (
-                        CID_FILE
-                        , CID_LINE
-                        , kCIDErrs::errcCol_IsEmpty
-                        , tCIDLib::ESeverities::Failed
-                        , tCIDLib::EErrClasses::Timeout
-                        , colSrc.clsIsA()
-                    );
-                }
-                return kCIDLib::False;
-            }
-        }
-    }
-    return kCIDLib::True;
-}
-
-
 tCIDLib::TVoid TCollectionBase::BadStoredCount(const TClass& clsCol)
 {
     facCIDLib().ThrowErr
@@ -264,22 +124,6 @@ TCollectionBase::~TCollectionBase()
             TModule::LogEventObj(errToCatch);
         }
     }
-}
-
-
-// We don't lock since we are called from derived versions that do that already
-TCollectionBase& TCollectionBase::operator=(const TCollectionBase& colSrc)
-{
-    if (this != &colSrc)
-    {
-        //
-        //  If we are in block mode, the have to just clear it. This shouldn't
-        //  happen, but if it does there's not much else we can do.
-        //
-        if (m_bInBlockMode)
-            m_bInBlockMode = kCIDLib::False;
-    }
-    return *this;
 }
 
 
@@ -373,6 +217,119 @@ tCIDLib::TVoid TCollectionBase::PublishReload()
 
 
 // ---------------------------------------------------------------------------
+//  TCollectionBase: Public, static methods
+// ---------------------------------------------------------------------------
+//
+//  A common helper to wait for data to show up in a collection, which uses
+//  a wait list to manage waiters. This is something that is done by some
+//  types of collections, so we want to get it out of the templatized code
+//  as much as possible, since it's a good bit of code.
+//
+//  They will have locked themselves before they call us, and they pass us
+//  a mutex locker. Upon return, we will have gotten lock back. We return
+//  true if we got out because something was available, else false. If we
+//  return true, the caller has the lock at that point and can take the
+//  available one. If they tell us to throw if we don't get one, then we
+//  won't return False, we'll throw.
+//
+//  They pass us a ref to themselves, so that we can check whether they are
+//  empty or not. This is base collection functionality so we can work for
+//  any type of collection.
+//
+tCIDLib::TBoolean
+TCollectionBase::bWaitForData(          TMtxLocker&         mtxlQueue
+                                , const TCollectionBase&    colSrc
+                                , const tCIDLib::TCard4     c4WaitMSs
+                                ,       TThreadWaitList&    twlWaitList
+                                , const tCIDLib::TBoolean   bThrowIfNot)
+{
+    //
+    //  Loop until we get some data. We have to do this because we can never guarantee
+    //  that when we are awakened, that some other thread hasn't beat us to the punch
+    //  and got the data already.
+    //
+    //  If they indicated wait forever, set the end time to zero, so we can quickly
+    //  check for that below.
+    //
+    tCIDLib::TEncodedTime enctCur = TTime::enctNow();
+    const tCIDLib::TEncodedTime enctEnd
+    (
+        (c4WaitMSs == kCIDLib::c4MaxCard) ? 0
+                                          : (enctCur + (kCIDLib::enctOneMilliSec * c4WaitMSs))
+    );
+
+    //
+    //  Loop while the collection is empty. Get the count first before we enter the
+    //  loop, since we can avoid doing any work at all if not.
+    //
+    tCIDLib::TCard4 c4Count = colSrc.c4ElemCount();
+    while (!c4Count)
+    {
+        //
+        //  Assume wait forever, but if the end time is set, let's
+        //  calc how many millis left to wait. It might be zero,
+        //  and that's fine.
+        //
+        tCIDLib::TCard4 c4MillisLeft = kCIDLib::c4MaxCard;
+        if (enctEnd)
+        {
+            c4MillisLeft = tCIDLib::TCard4
+            (
+                (enctEnd - enctCur) / kCIDLib::enctOneMilliSec
+            );
+        }
+
+        //
+        //  Put ourselves on the thread wait list. We use version of
+        //  the method that takes a lock. It will release the lock
+        //  after this thread is put on the wait list, but before this
+        //  thread blocks. And it will reaquire the list upon wake up
+        //  before it returns.
+        //
+        //  When we wake up, if the list isn't empty, then we can
+        //  take it.
+        //
+        twlWaitList.bWaitOnList
+        (
+            mtxlQueue, kCIDLib::c4TWLReason_WaitData, c4MillisLeft
+        );
+
+        //
+        //  If there's nothing in the queue, and we aren't just waiting
+        //  forever, then we need to see if we are out of time and
+        //  update the end time. If we have one, then we'll berak out
+        //  above. If we don't have one yet, but we are waiting for
+        //  ever, then we don't need to check for timeout.
+        //
+        c4Count = colSrc.c4ElemCount();
+        if (!c4Count && enctEnd)
+        {
+            // If we are out of time, then give up
+            enctCur = TTime::enctNow();
+            if (enctCur >= enctEnd)
+            {
+                if (bThrowIfNot)
+                {
+                    facCIDLib().ThrowErr
+                    (
+                        CID_FILE
+                        , CID_LINE
+                        , kCIDErrs::errcCol_IsEmpty
+                        , tCIDLib::ESeverities::Failed
+                        , tCIDLib::EErrClasses::Timeout
+                        , colSrc.clsIsA()
+                    );
+                }
+                return kCIDLib::False;
+            }
+        }
+    }
+    return kCIDLib::True;
+}
+
+
+
+// ---------------------------------------------------------------------------
 //  TCollectionBase: Hidden constructors and operators
 // ---------------------------------------------------------------------------
 TCollectionBase::TCollectionBase(const tCIDLib::EMTStates eMTSafe) :
@@ -389,7 +346,8 @@ TCollectionBase::TCollectionBase(const tCIDLib::EMTStates eMTSafe) :
 
 //
 //  We don't copy any pub/sub topic if the source has one. The derived class has to
-//  enable it for this instance if he wants reporting.
+//  enable it for this instance if he wants reporting. If the source is thread safe
+//  we make this one thread safe.
 //
 TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
 
@@ -402,12 +360,47 @@ TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
         m_pmtxLock = new TMutex;
 }
 
+TCollectionBase::TCollectionBase(TCollectionBase&& colSrc) :
+
+    m_bInBlockMode(kCIDLib::False)
+    , m_c4SerialNum(1)
+    , m_pmtxLock(nullptr)
+    , m_ppstopReport(nullptr)
+{
+    if (colSrc.m_pmtxLock)
+        m_pmtxLock = new TMutex;
+}
+
+
+//
+//  The caller should have locked. We bump our serial number. We prevent any messing with
+//  the lock or topic stuff, otherwise we'd get just a copy and it would be a mess.
+//
+TCollectionBase& TCollectionBase::operator=(const TCollectionBase& colSrc)
+{
+    if (this != &colSrc)
+    {
+        //
+        //  If we are in block mode, the have to just clear it. This shouldn't
+        //  happen, but if it does there's not much else we can do.
+        //
+        if (m_bInBlockMode)
+            m_bInBlockMode = kCIDLib::False;
+
+        m_c4SerialNum++;
+    }
+    return *this;
+}
+
 
 // The caller should have locked. We bump both guy's serial numbers
 TCollectionBase& TCollectionBase::operator=(TCollectionBase&& colSrc)
 {
-    m_c4SerialNum++;
-    colSrc.m_c4SerialNum++;
+    if (this != &colSrc)
+    {
+        m_c4SerialNum++;
+        colSrc.m_c4SerialNum++;
+    }
     return *this;
 }
 
@@ -905,12 +898,6 @@ tCIDLib::TVoid TCollectionBase::PublishAdd(const  tCIDLib::TCard4 c4At)
         m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemAdded, c4At));
 }
 
-tCIDLib::TVoid TCollectionBase::PublishAdd(const  TString& strKey)
-{
-    if (m_ppstopReport && !m_bInBlockMode)
-        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemAdded, strKey));
-}
-
 tCIDLib::TVoid
 TCollectionBase::PublishBlockAdded(const  tCIDLib::TCard4 c4At, const tCIDLib::TCard4 c4Count)
 {
@@ -959,12 +946,6 @@ tCIDLib::TVoid TCollectionBase::PublishRemove(const tCIDLib::TCard4 c4At)
 {
     if (m_ppstopReport && !m_bInBlockMode)
         m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemRemoved, c4At));
-}
-
-tCIDLib::TVoid TCollectionBase::PublishRemove(const  TString& strKey)
-{
-    if (m_ppstopReport)
-        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemRemoved, strKey));
 }
 
 tCIDLib::TVoid TCollectionBase::PublishReorder()

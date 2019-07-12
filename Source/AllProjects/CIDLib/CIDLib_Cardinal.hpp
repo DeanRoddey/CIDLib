@@ -226,7 +226,7 @@ class CIDLIBEXP TCardinal :
 
     private             :
         // -------------------------------------------------------------------
-        //  Public data members
+        //  Private data members
         //
         //  m_c4Val
         //      Storage for the data value.
@@ -412,7 +412,7 @@ class CIDLIBEXP TCardinal64 :
 
     private             :
         // -------------------------------------------------------------------
-        //  Public data members
+        //  Private data members
         //
         //  m_c8Val
         //      Storage for the data value.

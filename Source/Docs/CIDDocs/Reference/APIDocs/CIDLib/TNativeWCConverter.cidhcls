@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TNativeWCConverter" Parent="TTextConverter" Prefix="tcvt" Flags="Dup">
+
+    <Desc>
+        <P>This is a derivative of the base text convert class, see TTextConverter to the left. This one works in terms of the native wide character format, i.e. what you get when a string like L"Testing" is compiled.</P>
+
+        <P>For now, because TString internally uses the native wide character format, this mostly serves as a passthrough, since the converters convert to/from the native format.</P>
+
+        <Note>This may change if we move to always using UTF-32 or UTF-8 as our internal format.</Note>
+    </Desc>
+
+    <PubIntf>
+        <Ctors DefMethods="CopyCtor Dtor"/>
+
+        <Operators DefMethods="AssignOp"/>
+
+        <OverMeths>
+            <Method Name="eBaseFmt" RetType="tCIDLib::EBaseTextFmts" Attrs="Override">
+                <Desc>
+                    We override this to return our base format indicator, which in our cases is a platform driven thing since this is the native wide character. At least for now anyway. If we move to always using UTF-32 or even always using UTF-8, then this will change.
+                </Desc>
+                <MethVar/>
+            </Method>
+        </OverMeths>
+    </PubIntf>
+
+    <ProtIntf>
+
+        <OverMeths>
+            <Method  Name="c4BlockFrom" RetType="tCIDLib::TCard4">
+                <Desc>
+                    We just need to override this and convert as many bytes as we can from the source encoding to our supported encoding, see the base class for details.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="pc1Src" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcBytes" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="pszToFill" Type="tCIDLib::TCh" PBy="PtrC" Dir="Out"/>
+                    <MethParam  Name="c4MaxChars" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4OutChars" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bStop" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4BlockTo" RetType="tCIDLib::TCard4">
+                <Desc>
+                    We just need to override this and convert as many bytes as we can from the source encoding to our supported encoding, see the base class for details.
+                </Desc>
+                <MethVar>
+                    <MethParam  Name="pszSrc" Type="tCIDLib::TCh" PBy="CPtrC"/>
+                    <MethParam  Name="c4SrcChars" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="pc1ToFill" Type="tCIDLib::TCard1" PBy="PtrC" Dir="Out"/>
+                    <MethParam  Name="c4MaxBytes" Type="tCIDLib::TCard4"/>
+                    <MethParam  Name="c4OutBytes" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam  Name="bStop" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+        </OverMeths>
+
+    </ProtIntf>
+
+</CppClass>

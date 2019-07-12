@@ -37,7 +37,7 @@ class   TClass;
 
 // ---------------------------------------------------------------------------
 //  CLASS: MDuplicable
-// PREFIX: dup
+// PREFIX: mdup
 // ---------------------------------------------------------------------------
 class CIDLIBEXP MDuplicable
 {
@@ -47,25 +47,25 @@ class CIDLIBEXP MDuplicable
         // -------------------------------------------------------------------
         static tCIDLib::TVoid TestCanDupTo
         (
-            const   MDuplicable&            dupToCast
+            const   MDuplicable&            mdupToCast
             , const TClass&                 clsToCastTo
         );
 
         static tCIDLib::TVoid TestCanDupTo
         (
-            const   MDuplicable* const      pdupToCast
+            const   MDuplicable* const      pmdupToCast
             , const TClass&                 clsToCastTo
         );
 
         static tCIDLib::TVoid TestCanDupTo
         (
-            const   MDuplicable&            dupToCast
+            const   MDuplicable&            mdupToCast
             , const tCIDLib::TCh* const     pszTypeName
         );
 
         static tCIDLib::TVoid TestCanDupTo
         (
-            const   MDuplicable* const      pdupToCast
+            const   MDuplicable* const      pmdupToCast
             , const tCIDLib::TCh* const     pszTypeName
         );
 
@@ -88,7 +88,7 @@ class CIDLIBEXP MDuplicable
 
         virtual const TClass& clsParent() const = 0;
 
-        virtual TObject* pobjDuplicate() const = 0;
+        [[nodiscard]] virtual TObject* pobjDuplicate() const = 0;
 
 
     protected :
@@ -114,18 +114,18 @@ class CIDLIBEXP MDuplicable
 // ---------------------------------------------------------------------------
 //  Inlines for polymorphic duplication
 // ---------------------------------------------------------------------------
-template <class T> T* pDupObject(const MDuplicable& dupToDup)
+template <class T> T* pDupObject(const MDuplicable& mdupToDup)
 {
     // Optimize because this is a quick hashed compare
-    MDuplicable::TestCanDupTo(dupToDup, T::clsThis());
-    return static_cast<T*>(dupToDup.pobjDuplicate());
+    MDuplicable::TestCanDupTo(mdupToDup, T::clsThis());
+    return static_cast<T*>(mdupToDup.pobjDuplicate());
 }
 
-template <class T> T* pDupObject(const MDuplicable* const pdupToDup)
+template <class T> T* pDupObject(const MDuplicable* const pmdupToDup)
 {
     // Optimize because this is a quick hashed compare
-    MDuplicable::TestCanDupTo(pdupToDup, T::clsThis());
-    return static_cast<T*>(pdupToDup->pobjDuplicate());
+    MDuplicable::TestCanDupTo(pmdupToDup, T::clsThis());
+    return static_cast<T*>(pmdupToDup->pobjDuplicate());
 }
 
 

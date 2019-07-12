@@ -44,34 +44,28 @@
 //   CLASS: TStringKeyOps
 //  PREFIX: kops
 // ---------------------------------------------------------------------------
-class CIDLIBEXP TStringKeyOps : public TObject, public MDuplicable
+class CIDLIBEXP TStringKeyOps
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TStringKeyOps();
+        TStringKeyOps() = default;
 
         explicit TStringKeyOps
         (
             const   tCIDLib::TBoolean       bCase
         );
 
-        TStringKeyOps
-        (
-            const   TStringKeyOps&          kopsSrc
-        );
+        TStringKeyOps(const TStringKeyOps&) = default;
 
-        ~TStringKeyOps();
+        ~TStringKeyOps() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TStringKeyOps& operator=
-        (
-            const   TStringKeyOps&          kopsSrc
-        );
+        TStringKeyOps& operator=(const TStringKeyOps&) = default;
 
 
         // -------------------------------------------------------------------
@@ -105,15 +99,39 @@ class CIDLIBEXP TStringKeyOps : public TObject, public MDuplicable
         //      purely for temp use. it has to be mutable because the hash method
         //      is const.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bCase;
+        tCIDLib::TBoolean   m_bCase = kCIDLib::True;
         mutable TString     m_strTmp;
+};
 
 
+// ---------------------------------------------------------------------------
+//   CLASS: TNumKeyOps
+//  PREFIX: kops
+// ---------------------------------------------------------------------------
+template <typename T> class TNumKeyOps
+{
+    public :
         // -------------------------------------------------------------------
-        //  Do any needed macros
+        //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        RTTIDefs(TStringKeyOps, TObject)
-        DefPolyDup(TStringKeyOps)
+        tCIDLib::TBoolean bCompKeys(const   T&  t1
+                                    , const T&  t2) const
+        {
+            if (t1 < t2)
+                return tCIDLib::ESortComps::FirstLess;
+            else if (t1 > t2)
+                return tCIDLib::ESortComps::FirstGreater;
+            return tCIDLib::ESortComps::Equal;
+        }
+
+        tCIDLib::THashVal hshKey(const T& tVal, const tCIDLib::TCard4 c4Modulus) const
+        {
+            //
+            //  We just mod divide it after casting our modulus to T type, then we
+            //  cast the result back to the hash value type.
+            //
+            return tCIDLib::THashVal(tVal % T(c4Modulus));
+        }
 };
 
 #pragma CIDLIB_POPPACK

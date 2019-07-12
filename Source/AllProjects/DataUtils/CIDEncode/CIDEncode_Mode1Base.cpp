@@ -127,12 +127,6 @@ tCIDLib::EBaseTextFmts TMode1EncodingBase::eBaseFmt() const
 }
 
 
-tCIDLib::TVoid TMode1EncodingBase::Reset()
-{
-    // This is a no-op for us
-}
-
-
 // ---------------------------------------------------------------------------
 //  TMode1EncodingBase: Hidden Constructors and Operators
 // ---------------------------------------------------------------------------

@@ -67,14 +67,6 @@ TMemBuf& TMemBuf::Nul_TMemBuf()
 
 
 // ---------------------------------------------------------------------------
-//  TMemBuf: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TMemBuf::~TMemBuf()
-{
-}
-
-
-// ---------------------------------------------------------------------------
 //  TMemBuf: Public operators
 // ---------------------------------------------------------------------------
 tCIDLib::TCard1& TMemBuf::operator[](const tCIDLib::TCard4 c4Ind)
@@ -115,30 +107,6 @@ tCIDLib::TBoolean TMemBuf::operator!=(const TMemBuf& mbufToTest) const
 // ---------------------------------------------------------------------------
 //  TMemBuf: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TMemBuf::AppendFrom( const   TMemBuf&        mbufSrc
-                                    , const tCIDLib::TCard4 c4AppendAt
-                                    , const tCIDLib::TCard4 c4SrcBytes)
-{
-    if (!c4SrcBytes)
-        return;
-
-    // Check our buffer to append the indicated bytes at the index given
-    tCIDLib::TCard1* pc1Buf = pc1CheckRange
-    (
-        CID_LINE
-        , c4AppendAt
-        , c4SrcBytes
-    );
-
-    //
-    //  Verify that the source buffer has the bytes indicated, and then copy
-    //  them over.
-    //
-    const tCIDLib::TCard1* pc1SrcBuf = mbufSrc.pc1CheckRange(CID_LINE, 0, c4SrcBytes);
-    TRawMem::CopyMemBuf(&pc1Buf[c4AppendAt], pc1SrcBuf, c4SrcBytes);
-}
-
-
 tCIDLib::TBoolean TMemBuf::bAt(const tCIDLib::TCard4 c4Ind) const
 {
     const tCIDLib::TCard1* pc1Buf = pc1CheckRange
@@ -629,7 +597,7 @@ TBinInStream* TMemBuf::pstrmMakeReadable()
     return new TBinInStream(new TMemInStreamImpl(this));
 }
 
-TBinOutStream* TMemBuf::pstrmMakeWriteable()
+TBinOutStream* TMemBuf::pstrmMakeWritable()
 {
     return new TBinOutStream(new TMemOutStreamImpl(this));
 }
@@ -1021,6 +989,7 @@ TMemBuf::ValidateExpInc(const   tCIDLib::TCard4 c4Size
         );
     }
 }
+
 
 tCIDLib::TVoid
 TMemBuf::ValidateSizes( const   tCIDLib::TCard4 c4Size

@@ -99,13 +99,13 @@ template <class TVal> class TNamedValMap : public TObject
                 // -----------------------------------------------------------
                 TNVMItem() :
 
-                    m_colPairs(29, new TStringKeyOps, &TPair::objExtractKey)
+                    m_colPairs(29, TStringKeyOps(), &TPair::objExtractKey)
                 {
                 }
 
                 TNVMItem(const TString& strKey) :
 
-                    m_colPairs(29, new TStringKeyOps, &TPair::objExtractKey)
+                    m_colPairs(29, TStringKeyOps(), &TPair::objExtractKey)
                     , m_strKey(strKey)
                 {
                 }
@@ -261,7 +261,7 @@ template <class TVal> class TNamedValMap : public TObject
         // -------------------------------------------------------------------
         TNamedValMap() :
 
-            m_colItems(29, new TStringKeyOps, &TNVMItem<TVal>::strKey)
+            m_colItems(29, TStringKeyOps(), &TNVMItem<TVal>::strKey)
         {
         }
 

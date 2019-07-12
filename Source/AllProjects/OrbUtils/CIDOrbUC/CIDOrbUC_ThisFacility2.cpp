@@ -219,6 +219,32 @@ tCIDLib::TVoid TFacCIDOrbUC::StopRebinder() noexcept
 
 
 //
+//  This is a convenience method that applications can call to unbind a set of
+//  bingings all at once. Typically it would do all of the application level ones
+//  it has registered, since this would usually be done in the process of
+//  shutting down.
+//
+//  We throw if anything anything fails. Since we indicate not to thrown for basic
+//  issues like the binding not being there, anything else is likely to stop any
+//  further progress.
+//
+tCIDLib::TVoid TFacCIDOrbUC::UnbindObjs(const tCIDLib::TStrCollect& colBindings)
+{
+    tCIDOrbUC::TNSrvProxy orbcNS = facCIDOrbUC().orbcNameSrvProxy(3000);
+    colBindings.bForEach
+    (
+        [this, &colBindings, &orbcNS](const TString& strBinding) -> tCIDLib::TBoolean
+        {
+            // Probably it's in the rebinder so remove it
+            bDeregRebindObj(strBinding, kCIDLib::False);
+            orbcNS->RemoveBinding(strBinding, kCIDLib::False);
+            return kCIDLib::True;
+        }
+    );
+}
+
+
+//
 //  The caller wants to update one of the extra values for a binding. If
 //  the update of the NS works, we update our local copy of the object.
 //

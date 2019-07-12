@@ -78,7 +78,7 @@ TTest_FundVectorLambda::eRunTest(TTextStringOutStream&  strmOut
     // Loop through them and compare the values
     TFundVector<tCIDLib::TCard4> fcolComp(8);
     tCIDLib::TCard4 c4TestVal = 0;
-    fcolTest.ForEach
+    fcolTest.bForEach
     (
         [&fcolComp, &c4TestVal, &eRes, &strmOut](const tCIDLib::TCard4 c4Cur)
         {

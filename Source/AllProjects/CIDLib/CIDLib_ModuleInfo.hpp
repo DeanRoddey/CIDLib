@@ -61,45 +61,54 @@ class CIDLIBEXP TCIDModuleInfo :
             , const tCIDLib::EModFlags      eFlags
         );
 
-        TCIDModuleInfo
-        (
-            const   TCIDModuleInfo&         modiToCopy
-        );
+        TCIDModuleInfo(const TCIDModuleInfo&) = default;
 
-        ~TCIDModuleInfo();
+        ~TCIDModuleInfo() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TCIDModuleInfo& operator=
-        (
-            const   TCIDModuleInfo&         modiToAssign
-        );
+        TCIDModuleInfo& operator=(const TCIDModuleInfo&) = default;
 
         tCIDLib::TBoolean operator==
         (
-            const   TCIDModuleInfo&         modiToCompare
+            const   TCIDModuleInfo&         modiSrc
         )   const;
 
-        tCIDLib::TBoolean operator!=
-        (
-            const   TCIDModuleInfo&         modiToCompare
-        )   const;
+        tCIDLib::TBoolean operator!=(const TCIDModuleInfo& modiSrc) const
+        {
+            return !operator==(modiSrc);
+        }
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4MajVersion() const;
+        tCIDLib::TCard4 c4MajVersion() const
+        {
+            return m_c4MajVersion;
+        }
 
-        tCIDLib::TCard4 c4MinVersion() const;
+        tCIDLib::TCard4 c4MinVersion() const
+        {
+            return m_c4MinVersion;
+        }
 
-        tCIDLib::EModFlags eFlags() const;
+        tCIDLib::EModFlags eFlags() const
+        {
+            return m_eFlags;
+        }
 
-        tCIDLib::EModTypes eModType() const;
+        tCIDLib::EModTypes eModType() const
+        {
+            return m_eModType;
+        }
 
-        const TString& strBaseName() const;
+        const TString& strBaseName() const
+        {
+            return m_strBaseName;
+        }
 
         tCIDLib::TVoid Set
         (
@@ -140,7 +149,7 @@ class CIDLIBEXP TCIDModuleInfo :
 
     private             :
         // -------------------------------------------------------------------
-        //  Public data members
+        //  Private data members
         //
         //  m_c4MajVersion
         //  m_c4MinVersion

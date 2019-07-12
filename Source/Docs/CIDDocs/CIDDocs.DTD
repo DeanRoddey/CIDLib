@@ -1,9 +1,10 @@
-<!ENTITY % HelpContent '#PCDATA | Br | Bold | Code | DIV | Image | Indent | Italic | Link | List
-                        | Note | P | PgTitle  | SecTitle | SubSecTitle | Superscript
-                        | Table | Title'>
+<!ENTITY % HelpContent '#PCDATA | Br | Bold | ClassRef | Code | DIV | FacRef | Image
+                        | Indent | Italic | Link | List | Note | P | PgTitle
+                        | SecTitle | SubSecTitle | Superscript | Table | Title'>
 <!ENTITY % BoolVal 'False | True'>
 <!ENTITY % YNVal 'Yes | No'>
 <!ENTITY % ParmDir 'In | Out | InOut'>
+<!ENTITY % PageTypes 'HelpPage | CppClass'>
 
 
 <!--
@@ -13,9 +14,13 @@
    -->
 <!ELEMENT   Bold        (#PCDATA)>
 <!ELEMENT   Br          EMPTY>
+<!ELEMENT   ClassRef    EMPTY>
+<!ATTLIST   ClassRef    Ref NMTOKEN #REQUIRED>
 <!ELEMENT   Code        (%HelpContent;)>
 <!ELEMENT   DIV         (%HelpContent;)>
 <!ATTLIST   DIV         Id CDATA #REQUIRED>
+<!ELEMENT   FacRef      EMPTY>
+<!ATTLIST   FacRef      Ref NMTOKEN #REQUIRED>
 <!ELEMENT   Image       EMPTY>
 <!ATTLIST   Image       Ref CDATA #REQUIRED
                         Type (Inline | FloatLeft | FloatRight) 'Inline'>
@@ -29,7 +34,7 @@
 <!ATTLIST   LItem       Ref CDATA ''
                         Type (Dash | Period | Equals | Colon) 'Dash'>
 <!ELEMENT   List        (LItem+)>
-<!ATTLIST   List        Type (Ordered | Unordered) 'Ordered'>
+<!ATTLIST   List        Type (Ordered | Unordered) 'Unordered'>
 <!ELEMENT   Note        (%HelpContent;)>
 <!ELEMENT   P           (%HelpContent;)>
 <!ELEMENT   PgTitle     (#PCDATA)>
@@ -47,32 +52,35 @@
 <!-- The basic chunk of help text markup used in various places -->
 <!ELEMENT   HelpText    (%HelpContent;)*>
 
+
 <!--
-   - Most pages are of this HelpPage type. The are just open ended help text pages used for
-   - general description, and can use all of the usual markup. The file extension for these
-   - is .cidhpage.
+   - Every page can have  a list of keywords that used to generate a glossary
+   - section. It's just a list of comma separated phrases as the body of the
+   - element.
    -->
-<!ELEMENT   HelpPage    (Title, HelpText)>
+<!ELEMENT   Keywords    (#PCDATA)>
 
+<!-- A general description element which just contains general help content -->
+<!ELEMENT   Desc        (%HelpContent;)>
 
 <!--
-   - We also have a small file that goes into each topic directory that provides
+   - We  have a small file that goes into each topic directory that provides
    - the topic title, the list of pages and sub-topic directories for that topic,
-   - and the main page for that topic, which will go at the top of the list of links.
+   - and the main page for that topic, which goes at the top of the list of links.
    -
    - These are contained in files named CIDTopic.xml, so they always have the
    - the same name in every topic directory.
       -->
 <!ELEMENT   PageLink        EMPTY>
-<!ATTLIST   PageLink        Title CDATA ''
+<!ATTLIST   PageLink        Title CDATA #IMPLIED
                             FileName CDATA #REQUIRED
-                            FileExt CDATA 'cidhpage'
+                            PageType (%PageTypes;) 'HelpPage'
                             Extra1 CDATA #IMPLIED
                             Extra2 CDATA #IMPLIED
                             Virtual (%YNVal;) 'No'>
 
 <!ELEMENT   SubTopicLink    EMPTY>
-<!ATTLIST   SubTopicLink    Title CDATA ''
+<!ATTLIST   SubTopicLink    Title CDATA #IMPLIED
                             SubDir CDATA #REQUIRED>
 
 <!ELEMENT   PageMap         (PageLink*)>
@@ -80,4 +88,120 @@
 
 <!ELEMENT   CIDTopic        (PageMap, SubTopicMap)>
 <!ATTLIST   CIDTopic        TopicPage CDATA #REQUIRED>
+
+
+
+<!--
+   - Most pages are of this HelpPage type. The are just open ended help text pages used for
+   - general description, and can use all of the usual markup. The file extension for these
+   - is .cidhpage.
+   -->
+<!ELEMENT   HelpPage    (Title, HelpText, Keywords?)>
+
+
+<!--
+   - Enums can be defined in classes or namespaces. We don't document the invidual
+   - values here. Everyone uses an IDE that will show them the values these days.
+   - Any text dscription is in the body of the element, and it can point out any
+   - important values if desired.
+   -->
+<!ELEMENT   EnumVal     (%HelpContent;)>
+<!ATTLIST   EnumVal     Name NMTOKEN #REQUIRED
+                        Value CDATA #IMPLIED>
+<!ELEMENT   Enum        (Desc, EnumVal+)>
+<!ATTLIST   Enum        Name NMTOKEN #REQUIRED>
+<!ELEMENT   Enums       (Enum+)>
+
+<!--
+   - A C++ class. This is a fairly extensive bit and where most of the non-generic
+   - help text will go. Our hierarchy is:
+   -
+   -  Visibility (public, protected, private)
+   -      Methods (grouped by virtual, non-virtual, override, and static)
+   -      Data
+   -      Types
+   -
+   -  So methods have a separate grouping inside the visibility based blocks.
+   -
+   -  We declare PubIntf, ProtIntf, and PrivIntf, all with the same content, so
+   -  that it's clear to the program. And he models his data on this structure.
+   -->
+<!ENTITY % RefType 'None | CPtr | CPtrC | CRef | MRef | Ref
+                    | Ptr | PtrC | PtrCRef | PtrRef | Val | Void'>
+
+<!ELEMENT   Alias       (Desc)>
+<!ATTLIST   Alias       Name CDATA #REQUIRED
+                        Type CDATA #REQUIRED>
+<!ELEMENT   Aliases     (Alias+)>
+
+<!ELEMENT   Constant    (Desc?)>
+<!ATTLIST   Constant    Name NMTOKEN #REQUIRED
+                        Type CDATA #REQUIRED
+                        AccType (%RefType;) #REQUIRED>
+<!ELEMENT   Constants   (Constant+)>
+
+<!-- We don't do private members, but there are some public and protected ones -->
+<!ELEMENT   Member      (Desc)>
+<!ATTLIST   Member      Name CDATA #REQUIRED
+                        Type CDATA #REQUIRED
+                        AccType (%RefType;) #REQUIRED
+                        DefVal CDATA #IMPLIED>
+<!ELEMENT   Members     (Member+)>
+
+<!-- Type is -->
+<!ELEMENT   MethParam   EMPTY>
+<!ATTLIST   MethParam   Name CDATA #REQUIRED
+                        Type CDATA #REQUIRED
+                        PBy (%RefType;) 'Val'
+                        Dir (In | Out | InOut) 'In'
+                        Retained (%YNVal;) 'No'
+                        DefVal CDATA #IMPLIED>
+
+<!-- If no attrs, the containing method's attrs are used -->
+<!ELEMENT   MethVar     (MethParam*)>
+<!ATTLIST   MethVar     Attrs NMTOKENS #IMPLIED
+                        RetBy (%RefType;) #IMPLIED>
+
+<!ELEMENT   Method      (Desc, MethVar+)>
+<!ATTLIST   Method      Name CDATA #REQUIRED
+                        RetType CDATA ''
+                        RetBy (%RefType;) #IMPLIED
+                        Attrs NMTOKENS 'NoAttrs'
+                        TmplParms CDATA #IMPLIED>
+
+<!ELEMENT   GetSet      (%HelpContent;)>
+<!ATTLIST   GetSet      Name CDATA #REQUIRED
+                        RetType CDATA #REQUIRED
+                        Dir (Set | Get | Both) 'Get'
+                        RetBy (%RefType;) #IMPLIED>
+
+<!ELEMENT   StaticMeths (Desc?, Method+)>
+<!ELEMENT   Ctors       (Desc?, Method*)>
+<!ATTLIST   Ctors       DelMethods NMTOKENS 'None'
+                        DefMethods NMTOKENS 'None'>
+<!ELEMENT   Operators   (Desc?, Method*)>
+<!ATTLIST   Operators   DelMethods NMTOKENS 'None'
+                        DefMethods NMTOKENS 'None'>
+<!ELEMENT   VirtMeths   (Desc?, Method+)>
+<!ELEMENT   OverMeths   (Desc?, Method+)>
+<!ELEMENT   NVirtMeths  (Desc?, (Method | GetSet)*)>
+
+<!ELEMENT   PubIntf     (Aliases?, Enums?, Constants?, StaticMeths?, Ctors?, Operators?
+                        , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>
+<!ELEMENT   ProtIntf    (Aliases?, Enums?, Constants?, StaticMeths?, Ctors?, Operators?
+                        , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>
+<!ELEMENT   PrivIntf    (Aliases?, Enums?, Constants?, StaticMeths?, Ctors?, Operators?
+                        , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>
+
+<!ELEMENT   TmplParam   EMPTY>
+<!ATTLIST   TmplParam   Name CDATA #REQUIRED
+                        DefVal CDATA ''>
+<!ELEMENT   TmplParams  (TmplParam+)>
+
+<!ELEMENT   CppClass    (Desc, TmplParams?, PubIntf?, ProtIntf?, PrivIntf?, Keywords?)>
+<!ATTLIST   CppClass    Class NMTOKEN #REQUIRED
+                        Parent CDATA #REQUIRED
+                        Prefix NMTOKEN #REQUIRED
+                        VirtDtor (%YNVal;) 'No'
+                        Flags NMTOKENS 'NoFlags'>
 

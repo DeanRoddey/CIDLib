@@ -205,7 +205,7 @@ bParseQuotedCommaList(  const   TString&                strText
 //
 //  This method will break out a standard CSV type of line into a collection
 //  of strings. It's a comma separated list, but any one of the values may
-//  be quoted. The values cannot have double quotes inside of them.
+//  be quoted. The values cannot have commas inside of them.
 //
 tCIDLib::TBoolean
 TStringTokenizer::bParseCSVLine(const   TString&                strText
@@ -377,6 +377,60 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
 
 
 //
+//  This method will break out whitespace space separated tokens. It can optionally
+//  append strings to the collection or reset it first, defaults to reset.
+//
+tCIDLib::TBoolean
+TStringTokenizer::bParseSpacedTokens(const  TString&                strText
+                                    ,       tCIDLib::TStrCollect&   colToFill
+                                    , const tCIDLib::TBoolean       bAppend)
+{
+    if (!bAppend)
+        colToFill.RemoveAll();
+    if (strText.bIsEmpty())
+        return kCIDLib::True;
+
+    tCIDLib::TBoolean bInWS = TRawStr::bIsSpace(strText[0]);
+    TString strTmp;
+    const tCIDLib::TCard4 c4Len = strText.c4Length();
+    for (tCIDLib::TCard4 c4Ind = 0; c4Ind < c4Len; c4Ind++)
+    {
+        const tCIDLib::TCh chCur = strText[c4Ind];
+        if (bInWS)
+        {
+            // Move forward till we hit a non-space
+            if (!TRawStr::bIsSpace(chCur))
+            {
+                strTmp.Clear();
+                strTmp += chCur;
+                bInWS = kCIDLib::False;
+            }
+        }
+         else
+        {
+            // Move forward until we hit a space
+            if (TRawStr::bIsSpace(chCur))
+            {
+                colToFill.objAdd(strTmp);
+                bInWS = kCIDLib::False;
+                strTmp.Clear();
+            }
+             else
+            {
+                strTmp += chCur;
+            }
+        }
+    }
+
+    // If we ended on non-WS and the temp string isn't empty, it's a trailing one
+    if (!bInWS && !strTmp.bIsEmpty())
+        colToFill.objAdd(strTmp);
+
+    return kCIDLib::True;
+}
+
+
+//
 //  A helper for building up quoted comma list type values. Basically we
 //  add the quotes and commas and escape any internal quotes. We have another
 //  that takes a list of values and just calls the first one repeatedly.
@@ -462,10 +516,6 @@ TStringTokenizer::TStringTokenizer( const   TString* const      pstrToTokenize
     , m_strWhitespace(pszWhitespace)
 {
     Reset();
-}
-
-TStringTokenizer::~TStringTokenizer()
-{
 }
 
 

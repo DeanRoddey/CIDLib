@@ -12,10 +12,10 @@
 
         <P>For convenience, we'll assume this is for a facility named Magnum.</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem Ref="Magnum.hpp">The public header of the facility. For library facilities is the only thing that any users of the facility need to include. For executables, all its own cpp files include this to get all of the public functionality, so it brings in all of the public headers of the facility and passes them on. It also exports the facility object, or the facility object lazy evaluation function..</LItem>
             <LItem Ref="Magnum.cpp">The primary implementation file. It may do other things but it always declares the facility object, or faults it in for library facilities.</LItem>
-            <LItem Ref="Magnum_.hpp">A private header file only used for library facilities, this is what the library's own cpp files include. It includes the public header plus any stuff only needed internally, so as not to push it on downstream code.</LItem>
+            <LItem Ref="Magnum_.hpp">A private header file only used for library facilities, this is what the library's own cpp files include. It includes the public header plus any stuff only needed internally (either underlying facilities or its own internal only headers), so as not to push that stuff on downstream code.</LItem>
             <LItem Ref="Magnum_ThisFacility.?pp">If the facility needs to implement its own facility class derivative, it does it here.</LItem>
             <LItem Ref="Magnum_xxx.CIDIDL">A facility may have one or more CIDIDL files, which are source files for the CIDLib IDL compiler. These will spit out some number of other hpp/cpp files, depending on what is defined in the IDL file. It's commonly used to generate types and constants, but also is used by the Object Request Broker system.</LItem>
             <LItem Ref="Magnum_en.MsgText">If the facility has loadable text, then it has to at least have an English language version of the file. It can have others, which will be chosen based on the current locale.</LItem>
@@ -24,16 +24,40 @@
 
         <Note>In some cases, both types of facilities will have some hpp files that they only include in some of their own cpp files, just to avoid extra build overhead or exposing stuff more than needed. But, on the whole, CIDLib facilities take the approach that simplicity is worth some build time. It avoids any requirement to test headers separately or having to worry about breaking existing code, since there's only one facility for public stuff and one for private stuff, which brings in any other headers necessary.</Note>
 
+        <P>In some cases you might think that you don't need to use a private facility header, even for a library facility, since there are no internal headers to expose. But do it anyway. If you use the IDL compiler it will generate references to the internal header in any cpp files it generates and other tools might as well. So go ahead and just do it, even if it does nothing more than include the public header.</P>
+
         <SecTitle>Generated Files</SecTitle>
 
         <P>All of the files above are ones that you create. But, depending on the facility, you may get some generated files. If you have loadable text, UI resources (menus, dialogs, etc...) or you use the IDL compiler, they will all cause other files to be generated.</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem Ref="Magnum_MessageIds.hpp">If you have any loadable text files, this header will be generated to give access to the ids of those loadable strings. If they are only needed internally in library facilities, include it into the private header. Else included it in the public header.</LItem>
-            <LItem Ref="Magnum_ErrorIds.hpp">Also driven by the translatable text files, which allow you to separately define messages and errors. Sometimes errors need to be publically seen while messages only need to be used internally. So separate headers are generated.</LItem>
+            <LItem Ref="Magnum_ErrorIds.hpp">Also driven by the translatable text files, which allow you to separately define messages and errors. Sometimes errors need to be publicly seen while messages only need to be used internally. So separate headers are generated.</LItem>
             <LItem Ref="Magnum_ResourceIds.hpp">If you have a UI resource file, this will be generated to provide access to the ids of those loadable resources. As with loadable text, if you only need to access these internally (and that's a good thing if possible) then include it in the private header, else in the public header.</LItem>
-            <LItem Ref="Magnum_xxx.hpp/cpp">The IDL compiler will generate cpp and hpp files, and the xxx part is something you control via the project settings for that facility. As usual, include the headers either publically or privately as need dictates.</LItem>
+            <LItem Ref="Magnum_xxx.hpp/cpp">The IDL compiler will generate cpp and hpp files, and the xxx part is something you control via the project settings for that facility. As usual, include the headers either publicly or privately as need dictates.</LItem>
         </List>
+
+        <SecTitle>Header Include Style</SecTitle>
+
+        <P>This is metioned elsehwere related to the build tools, but it's important to note that your own headers (and other CIDLib headers) always use quotes, while any system headers (only used internally within those facilities that wrap system services) use angle brackets. This allows the CIDBuild tool to know the difference between headers it needs to scan for dependencies and headers it can ignore.</P>
+
+        <Code>
+        #include &amp;lt;windows.h>
+        #include "CIDCrypto.hpp"
+        </Code>
+
+        <SecTitle>File Name Case</SecTitle>
+
+        <P>Because Linux is case sensitive, it is very important to follow a consistent scheme for file naming. As shown above the main part of the file name is mixed case. But the extensions need to follow strict standards that aren't always the same. They are:</P>
+
+        <List>
+            <LItem>C++ files use lower case hpp and cpp extensions</LItem>
+            <LItem>IDL files use an all upper case CIDIDL extension</LItem>
+            <LItem>Loadable text files use a mixed case MsgText extension</LItem>
+            <LItem>Load UI resource files use an all upper case CIDRC extension</LItem>
+        </List>
+
+        <P>Any generated files will always get the right extension, but any files you create you need to be sure use the right case. It's easy on Windows to get this wrong and never even think about it.</P>
 
     </HelpText>
 

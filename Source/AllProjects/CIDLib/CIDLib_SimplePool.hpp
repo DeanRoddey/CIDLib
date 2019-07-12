@@ -628,12 +628,14 @@ template<typename TElem> class TSimplePool : public TObject
                 );
             }
 
+
             //
             //  Let's put it back into the free list at its size sorted position,
-            //  and orphan from the used list
+            //  and orphan from the used list. We have to suppress the nodiscard
+            //  warning from the orphan call, so we pass it to AddToFreeList()
+            //  instead of the original parameter version.
             //
-            AddToFreeList(pobjToRelease);
-            m_colUsedList.pobjOrphanAt(c4AtUsed);
+            AddToFreeList(m_colUsedList.pobjOrphanAt(c4AtUsed));
 
             // Make sure combined count hasn't gone past max
             CIDAssert

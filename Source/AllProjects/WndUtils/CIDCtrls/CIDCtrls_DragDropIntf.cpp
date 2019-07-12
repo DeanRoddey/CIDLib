@@ -47,7 +47,7 @@ class CDropTarget : public IDropTarget
 
             m_scntRef(1)
             , m_bAllowDrop(FALSE)
-            , m_colExts(73, new TStringKeyOps(kCIDLib::False))
+            , m_colExts(73, TStringKeyOps(kCIDLib::False))
             , m_pmdadTarget(pmdadTarget)
         {
         }

@@ -153,6 +153,11 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
 
         TMenuBar* pmenuCur();
 
+        TGenericWnd* pwndInstallGenericClientWnd
+        (
+            const   tCIDCtrls::TWndId       widToUse
+        );
+
         tCIDLib::TVoid RemoveMenu();
 
         tCIDLib::TVoid RestoreMenuBar();
@@ -260,8 +265,13 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
 
 
         // -------------------------------------------------------------------
-        //  Protected, non-virtula methods
+        //  Protected, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TVoid SetClientId
+        (
+            const   tCIDCtrls::TWndId       widToSet
+        );
+
         tCIDCtrls::TWndId widNext();
 
 
@@ -333,6 +343,11 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
         //      sized to by the user. If it's empty, then no limitation is
         //      applied.
         //
+        //  m_widClient
+        //      This is set to the window of the client window. If this is non-zero,
+        //      then we will keep this window sized to fit the available part of the
+        //      client area.
+        //
         //  m_widNext
         //      Since these types of windows almost always create children, we provide
         //      an easy way for them to assign unique ids.
@@ -350,6 +365,7 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
         TStatusBar*                 m_pwndStatusBar;
         TSize                       m_szMaximum;
         TSize                       m_szMinimum;
+        tCIDCtrls::TWndId           m_widClient;
         tCIDCtrls::TWndId           m_widNext;
 
 

@@ -19,29 +19,8 @@
 //  that extends from 01/01/1970. Its raw form, gotten via enctTime(), is the
 //  number of 100 nanosecond intervals since that base time.
 //
-//  When expanding to (or setting from) the individual details, the values
-//  are:
-//
-//  Year = 1 based year
-//  Month = The month enum
-//  Day = 1 based day
-//
-//  Hour/Min/Sec/millis = zero based values
-//
 // CAVEATS/GOTCHAS:
 //
-//  1)  Time values (in the 100 nanosecond relative stamp form) cannot be
-//      negative ever. If you want to find the difference between two
-//      times and they might be negative, us the enctDifference() method
-//      to get the difference.
-//
-//  2)  The default format string for a TTime object is gotten from the
-//      default locale, except for when the ESpecialTime_CurrentUTC special
-//      time is constructed from. In this case, its set to the standard
-//      ctime format.
-//
-//  3)  The formatting tokens recognized in the format strings are documented
-//      in the class reference.
 //
 // LOG:
 //
@@ -94,6 +73,43 @@ class CIDLIBEXP TTime :
 
         static tCIDLib::TCard8 c8Millis();
 
+        static tCIDLib::TVoid CalcRiseSetTimes
+        (
+            const   TTime&                  tmOn
+            , const tCIDLib::TFloat8        f8Latitude
+            , const tCIDLib::TFloat8        f8Longitude
+            ,       tCIDLib::TCard4&        c4RiseHour
+            ,       tCIDLib::TCard4&        c4RiseMin
+            ,       tCIDLib::TCard4&        c4SetHour
+            ,       tCIDLib::TCard4&        c4SetMin
+        );
+
+        static tCIDLib::TVoid CalcRiseSetTimes
+        (
+            const   TTime&                  tmOn
+            , const tCIDLib::TFloat8        f8TZOffset
+            , const tCIDLib::TFloat8        f8Latitude
+            , const tCIDLib::TFloat8        f8Longitude
+            ,       tCIDLib::TCard4&        c4RiseHour
+            ,       tCIDLib::TCard4&        c4RiseMin
+            ,       tCIDLib::TCard4&        c4SetHour
+            ,       tCIDLib::TCard4&        c4SetMin
+        );
+
+        static tCIDLib::TVoid CalcRiseSetTimes
+        (
+            const   tCIDLib::TCard4         c4Year
+            , const tCIDLib::EMonths        eMonth
+            , const tCIDLib::TCard4         c4Day
+            , const tCIDLib::TFloat8        f8TZOffset
+            , const tCIDLib::TFloat8        f8Latitude
+            , const tCIDLib::TFloat8        f8Longitude
+            ,       tCIDLib::TCard4&        c4RiseHour
+            ,       tCIDLib::TCard4&        c4RiseMin
+            ,       tCIDLib::TCard4&        c4SetHour
+            ,       tCIDLib::TCard4&        c4SetMin
+        );
+
         static tCIDLib::TVoid CurNTPTime
         (
                     tCIDLib::TCard4&        c4Secs
@@ -105,7 +121,7 @@ class CIDLIBEXP TTime :
 
         static tCIDLib::TEncodedTime enctNowPlusDays
         (
-            const   tCIDLib::TCard4         c4Hours
+            const   tCIDLib::TCard4         c4Days
         );
 
         static tCIDLib::TEncodedTime enctNowPlusHours
@@ -240,43 +256,6 @@ class CIDLIBEXP TTime :
 
         static const TString& strYYYYMMDD_NoSep();
 
-        static tCIDLib::TVoid CalcRiseSetTimes
-        (
-            const   TTime&                  tmOn
-            , const tCIDLib::TFloat8        f8Latitude
-            , const tCIDLib::TFloat8        f8Longitude
-            ,       tCIDLib::TCard4&        c4RiseHour
-            ,       tCIDLib::TCard4&        c4RiseMin
-            ,       tCIDLib::TCard4&        c4SetHour
-            ,       tCIDLib::TCard4&        c4SetMin
-        );
-
-        static tCIDLib::TVoid CalcRiseSetTimes
-        (
-            const   TTime&                  tmOn
-            , const tCIDLib::TFloat8        f8TZOffset
-            , const tCIDLib::TFloat8        f8Latitude
-            , const tCIDLib::TFloat8        f8Longitude
-            ,       tCIDLib::TCard4&        c4RiseHour
-            ,       tCIDLib::TCard4&        c4RiseMin
-            ,       tCIDLib::TCard4&        c4SetHour
-            ,       tCIDLib::TCard4&        c4SetMin
-        );
-
-        static tCIDLib::TVoid CalcRiseSetTimes
-        (
-            const   tCIDLib::TCard4         c4Year
-            , const tCIDLib::EMonths        eMonth
-            , const tCIDLib::TCard4         c4Day
-            , const tCIDLib::TFloat8        f8TZOffset
-            , const tCIDLib::TFloat8        f8Latitude
-            , const tCIDLib::TFloat8        f8Longitude
-            ,       tCIDLib::TCard4&        c4RiseHour
-            ,       tCIDLib::TCard4&        c4RiseMin
-            ,       tCIDLib::TCard4&        c4SetHour
-            ,       tCIDLib::TCard4&        c4SetMin
-        );
-
         static tCIDLib::TVoid UTCToLocal
         (
             const   tCIDLib::TEncodedTime&  enctUTC
@@ -312,7 +291,7 @@ class CIDLIBEXP TTime :
             , const tCIDLib::TCard4         c4Hours = 0UL
             , const tCIDLib::TCard4         c4Minutes = 0UL
             , const tCIDLib::TCard4         c4Seconds = 0UL
-            , const tCIDLib::TCard4         c4Hundredths = 0UL
+            , const tCIDLib::TCard4         c4Millis = 0UL
         );
 
         ~TTime();
@@ -321,25 +300,25 @@ class CIDLIBEXP TTime :
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean operator==
-        (
-            const   TTime&                  tmToCompare
-        )   const;
-
-        tCIDLib::TBoolean operator!=
-        (
-            const   TTime&                  tmToCompare
-        )   const;
-
         TTime& operator=
         (
-            const   TTime&                  tmToAssign
+            const   TTime&                  tmSrc
         );
 
         TTime& operator=
         (
             const   tCIDLib::TEncodedTime&  enctToSet
         );
+
+        tCIDLib::TBoolean operator==
+        (
+            const   TTime&                  tmSrc
+        )   const;
+
+        tCIDLib::TBoolean operator!=
+        (
+            const   TTime&                  tmSrc
+        )   const;
 
         tCIDLib::TVoid operator+=
         (
@@ -353,12 +332,12 @@ class CIDLIBEXP TTime :
 
         tCIDLib::TVoid operator-=
         (
-            const   TTime&                  tmToSubtract
+            const   TTime&                  tmSrc
         );
 
         tCIDLib::TVoid operator-=
         (
-            const   tCIDLib::TEncodedTime&  enctToSubtract
+            const   tCIDLib::TEncodedTime&  enctSrc
         );
 
         friend TTime CIDLIBEXP operator+
@@ -413,9 +392,9 @@ class CIDLIBEXP TTime :
         (
             const   TString&                strSrc
             , const TCompList&              fcolCompList
-            , const tCIDLib::TCh            chDateSep = 0
-            , const tCIDLib::TCh            chTimeSep = 0
-            , const tCIDLib::TCh            chTZSep = 0
+            , const tCIDLib::TCh            chDateSep = kCIDLib::chNull
+            , const tCIDLib::TCh            chTimeSep = kCIDLib::chNull
+            , const tCIDLib::TCh            chTZSep = kCIDLib::chNull
         );
 
         tCIDLib::TCard4 c4AsTimeInfo
@@ -545,9 +524,9 @@ class CIDLIBEXP TTime :
         (
             const   TString&                strSrc
             , const TCompList&              fcolCompList
-            , const tCIDLib::TCh            chDateSep = 0
-            , const tCIDLib::TCh            chTimeSep = 0
-            , const tCIDLib::TCh            chTZSep = 0
+            , const tCIDLib::TCh            chDateSep = kCIDLib::chNull
+            , const tCIDLib::TCh            chTimeSep = kCIDLib::chNull
+            , const tCIDLib::TCh            chTZSep = kCIDLib::chNull
         );
 
         tCIDLib::TVoid SetToNow();

@@ -1010,13 +1010,13 @@ TTime::UTCToLocal(  const   tCIDLib::TEncodedTime&  enctUTC
 // ---------------------------------------------------------------------------
 TTime::TTime() :
 
-    m_pstrDefFormat(0)
+    m_pstrDefFormat(nullptr)
 {
 }
 
 TTime::TTime(const tCIDLib::ESpecialTimes eSpecial) :
 
-    m_pstrDefFormat(0)
+    m_pstrDefFormat(nullptr)
 {
     if (!m_ktmsThis.bSetTo(eSpecial))
     {
@@ -1071,7 +1071,7 @@ TTime::TTime(const tCIDLib::ESpecialTimes eSpecial) :
 TTime::TTime(const TTime& tmToCopy) :
 
     m_ktmsThis(tmToCopy.m_ktmsThis)
-    , m_pstrDefFormat(0)
+    , m_pstrDefFormat(nullptr)
 {
     // If the source had a default format we have to do ours
     if (tmToCopy.m_pstrDefFormat)
@@ -1084,9 +1084,9 @@ TTime::TTime(   const   tCIDLib::TCard4     c4Year
                 , const tCIDLib::TCard4     c4Hours
                 , const tCIDLib::TCard4     c4Minutes
                 , const tCIDLib::TCard4     c4Seconds
-                , const tCIDLib::TCard4     c4Hundredths) :
+                , const tCIDLib::TCard4     c4Millis) :
 
-    m_pstrDefFormat(0)
+    m_pstrDefFormat(nullptr)
 {
     if (!m_ktmsThis.bFromDetails
     (
@@ -1096,7 +1096,7 @@ TTime::TTime(   const   tCIDLib::TCard4     c4Year
         , c4Hours
         , c4Minutes
         , c4Seconds
-        , c4Hundredths))
+        , c4Millis))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -1112,7 +1112,7 @@ TTime::TTime(   const   tCIDLib::TCard4     c4Year
 
 TTime::TTime(const tCIDLib::TEncodedTime enctTime) :
 
-    m_pstrDefFormat(0)
+    m_pstrDefFormat(nullptr)
 {
     StoreValue(enctTime);
 }
@@ -1120,7 +1120,7 @@ TTime::TTime(const tCIDLib::TEncodedTime enctTime) :
 TTime::~TTime()
 {
     delete m_pstrDefFormat;
-    m_pstrDefFormat = 0;
+    m_pstrDefFormat = nullptr;
 }
 
 
@@ -1193,7 +1193,7 @@ TTime& TTime::operator=(const TTime& tmToAssign)
 
     // Clean up any existing format string
     delete m_pstrDefFormat;
-    m_pstrDefFormat = 0;
+    m_pstrDefFormat = nullptr;
 
     //
     //  If the source has a default string, then we need to make our own
@@ -1738,7 +1738,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
          else
         {
             //
-            //  Adjust our time to zulu time, if non-zero fofset. We basically do
+            //  Adjust our time to zulu time, if non-zero offset. We basically do
             //  the opposit of the sign of the TZ offset, to bring it back to zero.
             //  Even if they want local time, we have to do this first anyway, for
             //  sanity's sake, to make the conversion easier.

@@ -70,7 +70,7 @@ namespace CIDCtrls_GUIFacility
     TKeyedHashSet<TBmpCacheItem, TString, TStringKeyOps> colBmpCache
     (
         29
-        , new TStringKeyOps
+        , TStringKeyOps()
         , &TBmpCacheItem::strKey
         , tCIDLib::EMTStates::Safe
     );
@@ -99,7 +99,7 @@ namespace CIDCtrls_GUIFacility
     TKeyedHashSet<TIconCacheItem, TString, TStringKeyOps> colIconCache
     (
         29
-        , new TStringKeyOps
+        , TStringKeyOps()
         , &TIconCacheItem::strKey
         , tCIDLib::EMTStates::Safe
     );
@@ -126,7 +126,7 @@ namespace CIDCtrls_GUIFacility
     static TKeyedHashSet<TAppImgCacheItem, TString, TStringKeyOps> colAppImgCache
     (
         29
-        , new TStringKeyOps
+        , TStringKeyOps()
         , &TAppImgCacheItem::strKey
         , tCIDLib::EMTStates::Safe
     );

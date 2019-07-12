@@ -1,5 +1,5 @@
 //
-// CID_FILE NAME: Window1.cpp
+// CID_FILE NAME: Window2.cpp
 //
 // AUTHOR: Dean Roddey
 //
@@ -83,7 +83,7 @@ class TClientWnd : public TWindow
 
         TClientWnd(const TClientWnd&) = delete;
 
-        ~TClientWnd() {}
+        ~TClientWnd() = default;
 
 
         // -------------------------------------------------------------------
@@ -121,12 +121,14 @@ class TClientWnd : public TWindow
         //
         //  We need to redraw any circles that intersect the update area. We aren't
         //  super-strict, we just check if an area that encloses the circle intersects
-        //  the update area.
+        //  the update area. The base class will handle the bgn erase fill and we don't
+        //  suppress that for this simple program, though you might for something that
+        //  is more actively updating, to avoid flicker.
         //
-        tCIDLib::TBoolean bPaint(       TGraphDrawDev&  gdevToUse
-                                , const TArea&          areaUpdate) override
+        tCIDLib::TBoolean
+        bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate) override
         {
-            m_colPoints.ForEach
+            m_colPoints.bForEach
             (
                 [&gdevToUse, &areaUpdate](const TClickPnt& cpntCur)
                 {
@@ -139,9 +141,9 @@ class TClientWnd : public TWindow
         }
 
         //
-        //  If it's a left down click, either draw a new circle at the clicked point and
-        //  add it to the list, or remove it from the list and redraw it away if there is
-        //  already a circle there.
+        //  If it's a left down click, either draw a new circle at the clicked
+        //  point and add it to the list, or remove it from the list and redraw
+        //  it away if there is already a circle there.
         //
         tCIDLib::TBoolean bClick(const  tCIDCtrls::EMouseButts  eButton
                                 , const tCIDCtrls::EMouseClicks eClickType
@@ -164,12 +166,19 @@ class TClientWnd : public TWindow
                 if (cursPoints.bIsValid())
                 {
                     //
-                    //  Invalidate the area, then remove it form the list. We can't
-                    //  just redraw in the bgn color since it might overlap another
-                    //  circle.
+                    //  We need to remove this guy. We can't just fill its area with
+                    //  the bgn color since it might be partially under another circle.
                     //
-                    InvalidateArea(cursPoints->m_areaTest);
+                    //  Also, we are doing a sync redraw, so we have to remove the point
+                    //  first or we will just redraw it again. But that means we also
+                    //  have to get the update area out before we remove the point.
+                    //
+                    //  We could just invalidate for an async update, but it's less
+                    //  efficient for interactive stuff.
+                    //
+                    const TArea areaUpdate = cursPoints->m_areaTest;
                     m_colPoints.RemoveAt(cursPoints);
+                    Redraw(areaUpdate, tCIDCtrls::ERedrawFlags::ImmedErase);
                 }
                  else
                 {
@@ -180,6 +189,8 @@ class TClientWnd : public TWindow
                 // Say we handled this click
                 return kCIDLib::True;
             }
+
+            // Not one of ours
             return kCIDLib::False;
         }
 
@@ -194,7 +205,7 @@ class TClientWnd : public TWindow
         class TClickPnt
         {
             public :
-                TClickPnt() {}
+                TClickPnt() = default;
                 TClickPnt(const TPoint& pntAt) : m_pntAt(pntAt)
                 {
                     // Set up a hit testing area that encloses the circle
@@ -228,44 +239,15 @@ class TTestFrameWnd : public TFrameWnd
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TTestFrameWnd() {}
+        TTestFrameWnd() = default;
         TTestFrameWnd(const TTestFrameWnd&) = delete;
-        ~TTestFrameWnd() {}
+        ~TTestFrameWnd() = default;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-
-        //
-        //  If not in min state and the size changed, then adjust our client window
-        //  if it has been created.
-        //
-        tCIDLib::TVoid AreaChanged( const   TArea&                  areaPrev
-                                    , const TArea&                  areaNew
-                                    , const tCIDCtrls::EPosStates   ePosState
-                                    , const tCIDLib::TBoolean       bOrgChanged
-                                    , const tCIDLib::TBoolean       bSizeChanged
-                                    , const tCIDLib::TBoolean       bStateChanged) override
-        {
-            //  Call our parent first
-            TParent::AreaChanged
-            (
-                areaPrev, areaNew, ePosState, bOrgChanged, bSizeChanged, bStateChanged
-            );
-
-            if (bSizeChanged && (ePosState != tCIDCtrls::EPosStates::Minimized))
-            {
-                if (m_pwndClient)
-                {
-                    // Get the client area and size the client to fit again
-                    TArea areaClient;
-                    QueryClientArea(areaClient, kCIDLib::False);
-                    m_pwndClient->SetSizePos(areaClient, kCIDLib::True);
-                }
-            }
-        }
 
         // We have to handle this to create our client window
         tCIDLib::TBoolean bCreated() override
@@ -278,6 +260,12 @@ class TTestFrameWnd : public TFrameWnd
             QueryClientArea(areaClient, kCIDLib::False);
             m_pwndClient = new TClientWnd();
             m_pwndClient->CreateClient(*this, areaClient);
+
+            //
+            //  Tell our parent class this is our 'client' window and it will keep it
+            //  sized to fit for us.
+            //
+            SetClientId(m_pwndClient->widThis());
 
             return kCIDLib::True;
         }

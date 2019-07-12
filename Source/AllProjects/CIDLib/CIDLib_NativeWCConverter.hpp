@@ -51,29 +51,21 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
         // -------------------------------------------------------------------
         TNativeWCConverter();
 
-        TNativeWCConverter
-        (
-            const   TNativeWCConverter&     tcvtToCopy
-        );
+        TNativeWCConverter(const TNativeWCConverter&) = default;
 
-        ~TNativeWCConverter();
+        ~TNativeWCConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TNativeWCConverter& operator=
-        (
-            const   TNativeWCConverter&     tcvtToAssign
-        );
+        TNativeWCConverter& operator=(const TNativeWCConverter&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
         tCIDLib::EBaseTextFmts eBaseFmt() const override;
-
-        tCIDLib::TVoid Reset() override;
 
 
     protected :

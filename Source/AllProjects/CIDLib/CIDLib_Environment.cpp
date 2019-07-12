@@ -351,7 +351,7 @@ TEnvironment::TEnvironment(const tCIDLib::TBoolean bInherit) :
         new tCIDLib::TKVHashSet
         (
             CIDLib_Environment::c4Modulus
-            , new TStringKeyOps(kCIDLib::False)
+            , TStringKeyOps(kCIDLib::False)
             , strGetKey
             , tCIDLib::EMTStates::Unsafe
         )
@@ -415,7 +415,7 @@ TEnvironment::TEnvironment(TEnvironment&& envSrc) :
     (
         new tCIDLib::TKVHashSet
         (
-            1, new TStringKeyOps(kCIDLib::False), strGetKey, tCIDLib::EMTStates::Unsafe
+            1, TStringKeyOps(kCIDLib::False), strGetKey, tCIDLib::EMTStates::Unsafe
         )
     )
 {

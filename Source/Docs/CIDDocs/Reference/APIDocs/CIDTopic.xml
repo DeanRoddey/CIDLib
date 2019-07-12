@@ -8,10 +8,11 @@
     </PageMap>
 
     <SubTopicMap>
-        <SubTopicLink SubDir="CIDKernel" Title="CIDKernel"/>
-        <SubTopicLink SubDir="CIDLib" Title="CIDLib"/>
-        <SubTopicLink SubDir="CIDDBase" Title="CIDDBase"/>
-        <SubTopicLink SubDir="CIDEncode" Title="CIDEncode"/>
+        <SubTopicLink SubDir="CIDKernel"/>
+        <SubTopicLink SubDir="CIDLib"/>
+        <SubTopicLink SubDir="CIDDBase"/>
+        <SubTopicLink SubDir="CIDEncode"/>
+        <SubTopicLink SubDir="CIDObjStore"/>
     </SubTopicMap>
 
 </CIDTopic>

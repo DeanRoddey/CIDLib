@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>The Logging Framework</Title>
+
+    <HelpText>
+
+        <P>CIDLib, being oriented towards larger projects, distributed systems, enterprise systems and so forth, takes logging very seriously. In a large distributed system, if you don't have a way to gather information on the health of that system, supporting it and diagnosing issues in the field will be a nightmare. So logging must be fundamental to thse types of projects.</P>
+
+        <P>Even more importantly is the ability collect logged information to a central place where it can be gotten to remotely (both for the local system administrators but also for you if needed for remote diagnosis.) Neither of you will be much interesting in going to every individual machine to try to gather information.</P>
+
+        <P>On the other hand, you may also have other logging needs, such being on a device where you cannot persist the log information to disc, perhaps because there isn't one or because the storage is remote and not available occasionally. So you might need to hold some amount in memory or always log to memory using a circular buffer. Perhaps you need to log to two different targets.</P>
+
+        <P>There are various scenarios to consider, and CIDLib deals with this by defining a logging framework and a pluggable logger interface that you can use to implement various types of loggers. CIDLib comes with a common set that will typically serve your needs, but you can create others if required. Just plug the desired one in and all logged messages will be sent to it.</P>
+
+        <P>All loggers must implement the <ClassRef Ref="MLogger"/> interface, so see that for more details on how loggers are implemented.</P>
+
+        <SecTitle>Logging and Facilities</SecTitle>
+
+        <P>As discussed in Logging/Exceptions, both are already tied to the facility system for various reasons. Therefore the logging framework is also handled in the same way, though using the underlying <ClassRef Ref="TModule"/> class from which all facility classes derive. There are static methods on that class that allow you to install a logger object. And there are others that the facility classes call to pass on logging and exception objects that they have built at your request. The TModule class will see if a logger is installed and, if so, pass the objects on to it to be processed.</P>
+
+        <P>Here is an example from the CQC Admin Interface program, which creates a logger that logs to the CIDLib Log Server (see Logging and the ORB below) and installs it. Since it a dynamically allocated object, we just tell him to adopt it so he will become responsible for it and clean it up when appropriate.</P>
+
+        <Code>
+        plgrLogSrv = new TLogSrvLogger(facCQCKit().strLocalLogDir());
+        TModule::InstallLogger(plgrLogSrv, tCIDLib::EAdoptOpts::Adopt);
+        </Code>
+
+        <P>It takes a local file path as a backup to store data to if the Log Server is not available. When it becomes available again, it will spool up the stored information.</P>
+
+        <Note>If we were to, say, implement MLogger in our main program facility object and register it as the logger, we would obviously tell it <Italic>not</Italic> to adopt, since we don't want him trying to delete our facility object.</Note>
+
+        <SecTitle>Logging and the ORB</SecTitle>
+
+        <P>One of the most useful logger implementations is the one that uses the ORB (see "Client/Server (ORB)" to the left) to log to the CIDLib Log Server. The Log Server can accept logged messages from any clients in the network and store them for later retrieval (also using an ORB interface to access them from anywhere in the network.)</P>
+
+        <P>This scheme is used extensively in CQC, for instance, which makes problem diagnosis in the field vastly simpler than it would otherwise be.</P>
+
+        <SecTitle>Sync vs. Async</SecTitle>
+
+        <P>Simple loggers, such as one that writes to a local text or binary file, can just synchronously log messages. They will happen so quickly that it won't interfere wtih the calling code to any significant degree. However, any logger, such as the Log Server logger, which might experience delays or not be able to immediately deliver the infromation, should just queue the message and use an internal spooling thread to send the messages to the server as opportunity allows.</P>
+
+        <Note>Of course you should still be careful about logging from performance critical code. And you shouldn't be doing high speed logging either. The logging system is not for collecting real time infromation, it's for collecting information for problem diagnosis in the field.</Note>
+
+        <P>Obviously we have to be very careful about doing any logging or allowing an exceptions to propagate from within the code used to implement a logger. This could cause a circular loop and bring everything down. So use the simplest mechanisms available, even <FacRef Ref="CIDKernel"/> features if possible, to avoid such problems.</P>
+
+    </HelpText>
+
+</HelpPage>

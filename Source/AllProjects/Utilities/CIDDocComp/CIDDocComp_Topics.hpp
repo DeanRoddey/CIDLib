@@ -80,10 +80,7 @@ class TTopic
             return strDirName.bCompareI(m_strTopicName);
         }
 
-        tCIDLib::TBoolean bParse
-        (
-                    TXMLTreeParser&         xtprsToUse
-        );
+        tCIDLib::TVoid Parse();
 
         TPagePtr cptrFindPage
         (
@@ -108,6 +105,11 @@ class TTopic
         (
                     TTextOutStream&         strmOut
         )   const;
+
+        const TString& strTopicPath() const
+        {
+            return m_strTopicPath;
+        }
 
 
     private :

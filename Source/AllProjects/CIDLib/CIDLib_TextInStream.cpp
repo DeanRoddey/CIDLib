@@ -635,10 +635,6 @@ tCIDLib::TVoid TTextInStream::Reset()
 
     // And reset the implementation amd the text converter if any
     m_pstrmIn->Reset();
-
-    // And reset the text converter if any
-    if (m_ptcvtThis)
-        m_ptcvtThis->Reset();
 }
 
 

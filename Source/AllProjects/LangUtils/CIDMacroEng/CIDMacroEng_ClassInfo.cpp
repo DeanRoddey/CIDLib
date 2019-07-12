@@ -922,18 +922,18 @@ TMEngClassInfo::TMEngClassInfo( const   TString&                strName
     , m_c2NextMemberId(0)
     , m_c2NextMethodId(0)
     , m_c2ParentClassId(0)
-    , m_colDirectives(29, new TStringKeyOps, &TKeyValuePair::strExtractKey)
-    , m_colImports(29, new TStringKeyOps, &TImportItem::strKey)
+    , m_colDirectives(29, TStringKeyOps(), &TKeyValuePair::strExtractKey)
+    , m_colImports(29, TStringKeyOps(), &TImportItem::strKey)
     , m_colLiterals
       (
         tCIDLib::EAdoptOpts::Adopt
         , 29
-        , new TStringKeyOps
+        , TStringKeyOps()
         , &TMEngLiteralVal::strKey
       )
-    , m_colMembers(29, new TStringKeyOps, &TMEngMemberInfo::strKey)
+    , m_colMembers(29, TStringKeyOps(), &TMEngMemberInfo::strKey)
     , m_colMembersById(tCIDLib::EAdoptOpts::NoAdopt, 16)
-    , m_colMethods(29, new TStringKeyOps, &TMEngMethodInfo::strKey)
+    , m_colMethods(29, TStringKeyOps(), &TMEngMethodInfo::strKey)
     , m_colMethodsById(tCIDLib::EAdoptOpts::NoAdopt, 16)
     , m_colMethodImpls(tCIDLib::EAdoptOpts::Adopt, 16)
     , m_eExtend(eExtend)
@@ -958,15 +958,15 @@ TMEngClassInfo::TMEngClassInfo( const   TString&                strName
     , m_c2NextMemberId(0)
     , m_c2NextMethodId(0)
     , m_c2ParentClassId(0)
-    , m_colDirectives(29, new TStringKeyOps, &TKeyValuePair::strExtractKey)
-    , m_colImports(29, new TStringKeyOps, &TImportItem::strKey)
+    , m_colDirectives(29, TStringKeyOps(), &TKeyValuePair::strExtractKey)
+    , m_colImports(29, TStringKeyOps(), &TImportItem::strKey)
     , m_colLiterals
       (
-        tCIDLib::EAdoptOpts::Adopt, 29, new TStringKeyOps, &TMEngLiteralVal::strKey
+        tCIDLib::EAdoptOpts::Adopt, 29, TStringKeyOps(), &TMEngLiteralVal::strKey
       )
-    , m_colMembers(29, new TStringKeyOps, &TMEngMemberInfo::strKey)
+    , m_colMembers(29, TStringKeyOps(), &TMEngMemberInfo::strKey)
     , m_colMembersById(tCIDLib::EAdoptOpts::NoAdopt, 16)
-    , m_colMethods(29, new TStringKeyOps, &TMEngMethodInfo::strKey)
+    , m_colMethods(29, TStringKeyOps(), &TMEngMethodInfo::strKey)
     , m_colMethodsById(tCIDLib::EAdoptOpts::NoAdopt, 16)
     , m_colMethodImpls(tCIDLib::EAdoptOpts::Adopt, 16)
     , m_eExtend(eExtend)

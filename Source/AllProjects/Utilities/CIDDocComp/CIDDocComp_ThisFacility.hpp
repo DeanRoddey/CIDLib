@@ -35,6 +35,17 @@ class TFacCIDDocComp : public TFacility
 {
     public  :
         // -------------------------------------------------------------------
+        //  Public class members
+        //
+        //  These are just for short term use by the parsing code to avoid a lot
+        //  of constant creation and destruction.
+        // -------------------------------------------------------------------
+        tCIDLib::TStrList       m_colTmp;
+        TString                 m_strTmp1;
+        TString                 m_strTmp2;
+
+
+        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TFacCIDDocComp();
@@ -53,32 +64,164 @@ class TFacCIDDocComp : public TFacility
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TVoid AddClass
+        (
+                    TCppClassPage* const    ppgToAdd
+        );
+
+        tCIDLib::TVoid AddErrorMsg
+        (
+            const   TString&                strMsg
+            , const MFormattable&           mfmtblToken1 = MFormattable::Nul_MFormattable()
+            , const MFormattable&           mfmtblToken2 = MFormattable::Nul_MFormattable()
+        )   const;
+
+        tCIDLib::TBoolean bGotErrors() const
+        {
+            return m_colErrs.c4ElemCount() != 0;
+        }
+
+        tCIDLib::TBoolean bNoClassRefWarn() const
+        {
+            return m_bNoClassRefWarn;
+        }
+
+        tCIDLib::TBoolean bParseXML
+        (
+            const   TString&                strFile
+        );
+
+        tCIDLib::TBoolean bPostParse() const
+        {
+            return m_bPostParse;
+        }
+
+        tCIDLib::TBoolean bVerbose() const
+        {
+            return m_bVerbose;
+        }
+
         tCIDLib::EExitCodes eMainThread
         (
                     TThread&                thrThis
             ,       tCIDLib::TVoid*         pData
         );
 
+        tCIDLib::TVoid FormatDeemphText
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strText
+        );
+
+        tCIDLib::TVoid FormatDeemphText
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strText1
+            , const TString&                strText2
+        );
+
+        tCIDLib::TVoid FormatDeemphText
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strText1
+            , const TString&                strText2
+            , const tCIDLib::TCh* const     pszText3
+        );
+
+        tCIDLib::TVoid FormatEmphText
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strText
+        );
+
+        tCIDLib::TVoid FormatEmphText
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strText1
+            , const TString&                strText2
+        );
+
+        tCIDLib::TVoid FormatEmphText
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strText1
+            , const TString&                strText2
+            , const tCIDLib::TCh* const     pszText3
+        );
+
+        tCIDLib::TVoid GenerateClassLink
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strClass
+        )   const;
+
+        tCIDLib::TVoid GenerateFacLink
+        (
+                    TTextOutStream&         strmTar
+            , const TString&                strFacName
+        )   const;
+
+        tCIDLib::TVoid LoadDTD
+        (
+            const   TString&                strSrcPath
+        );
+
+        const TCppClassPage* ppgFindByClass
+        (
+            const   TString&                strToFind
+        )   const;
+
+        tCIDLib::TVoid PostParseProc();
+
+        const TString& strCurClass() const;
+
+        const TString& strCurClassPref() const;
+
         TTextOutStream& strmOut()
         {
-            return *m_pstrmOut;
+            return TSysInfo::strmOut();
         }
 
-        TTextOutStream& strmErr()
-        {
-            return m_strmErr;
-        }
-
-        tCIDLib::TVoid ShowXMLParseErr
+        tCIDLib::TVoid ShowErrors
         (
-            const   TString&                strPathSrc
+                    TTextOutStream&         strmOut
         );
+
+        const TXMLTreeElement& xtnodeRoot() const
+        {
+            return m_xtprsToUse.xtdocThis().xtnodeRoot();
+        }
+
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  The janitor below has to be our friend
+        // -------------------------------------------------------------------
+        friend class TCtxStackJan;
 
 
     private :
         // -------------------------------------------------------------------
+        //  Private class types
+        // -------------------------------------------------------------------
+        using TClassNameList    = TRefVector<TCppClassPage>;
+        using TErrList          = TVector<TKeyValuePair>;
+        struct TSrcStackItem
+        {
+            tCIDDocComp::ESrcTypes  m_eType;
+            TString                 m_strName;
+            TString                 m_strPath;
+            TString                 m_strExtra;
+        };
+        using TSrcStack         = TStack<TSrcStackItem>;
+
+
+        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bParseParams();
+
         tCIDLib::TVoid CopyDir
         (
             const   TString&                strSrc
@@ -91,40 +234,60 @@ class TFacCIDDocComp : public TFacility
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_bNoClassRefWarn
+        //      Sometimes we add class references before we have those classes yet
+        //      defined. This is set via /NoClassRefWarn and will suppress those errors
+        //      temporarily when needed.
+        //
+        //  m_bPostParse
+        //      Once the parsing is done, PostParseProc() is called. We update some
+        //      info and set this. We use this to insure some things are only called
+        //      in the right phase.
+        //
         //  m_bVerbose
         //      Defaults to false, can be set via the /Verbose command line option.
         //      That will cause it to dump out diagnostic stuff to help figure out
         //      issues in the help content.
         //
+        //  m_colErrs
+        //      The parsing code calls into here to store errors during the parsing
+        //      process. Has to be mutable since we need to report errors that might
+        //      occur in otherwise const methods.
+        //
+        //  m_colClassByName
+        //      Each new class page is added to this non-adopting list, which will be
+        //      sorted at the end. This provides a means to automatically resolve
+        //      class references during output, so we don't have to hand create all
+        //      those links. We provide a method to add classes, and one to find the
+        //      the link info for a class.
+        //
+        //  m_colSrcStack
+        //      During parsing and output generation, the context stack janitor
+        //      below is used to keep up with the currently active topic or class
+        //      or other page type.
+        //
         //  m_cptrRoot
         //      The top-most topic object, which isn't a real one, it just provides the
         //      root for the hierarchy to kick start it.
-        //
-        //  m_pstrmOut
-        //      If in verbose mode this is set to the standard output stream. Else it's
-        //      s set to a string based text string so that we just eat the output
-        //      (though still have it if an error occurs, so we can dump it out.)
         //
         //  m_strSrcPath
         //  m_strTarPath
         //      The source and target paths that we figure out when we first start up and
         //      put here for further reference.
         //
-        //  m_strmErr
-        //      The output stream for errors, which will show up even if we are not
-        //      in verbose mode (where m_pstrmOut is nullptr.)
-        //
         //  m_xtprsToUse
-        //      Our XML parser that we set up and reuse for all of the files.
+        //      We keep a single parser around and reuse it
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean   m_bNoClassRefWarn;
+        tCIDLib::TBoolean   m_bPostParse;
         tCIDLib::TBoolean   m_bVerbose;
+        TClassNameList      m_colClassByName;
+        mutable TErrList    m_colErrs;
+        TSrcStack           m_colSrcStack;
         TTopic::TTopicPtr   m_cptrRoot;
-        TTextOutStream*     m_pstrmOut;
         TString             m_strSrcPath;
         TString             m_strTarPath;
-        TTextFileOutStream  m_strmErr;
         TXMLTreeParser      m_xtprsToUse;
-
 
         // -------------------------------------------------------------------
         //  Magic macros
@@ -132,3 +295,21 @@ class TFacCIDDocComp : public TFacility
         RTTIDefs(TFacCIDDocComp, TFacility)
 };
 
+
+// -----------------------------------------------------------------------------
+//   CLASS: TCtxStackJan
+//  PREFIX: jan
+// -----------------------------------------------------------------------------
+class TCtxStackJan
+{
+    public :
+        TCtxStackJan() = delete;
+
+        TCtxStackJan(const TTopic& topicToPush);
+        TCtxStackJan(const THelpPage& pgToPush);
+        TCtxStackJan(const TCppClassPage& pgToPush);
+
+        TCtxStackJan(const TCtxStackJan&) = delete;
+
+        ~TCtxStackJan();
+};

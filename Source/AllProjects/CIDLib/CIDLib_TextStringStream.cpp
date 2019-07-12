@@ -56,7 +56,7 @@ TTextStringInStream::TTextStringInStream(const  TString* const      pstrToUse
                                         , const tCIDLib::EAdoptOpts eAdopt) :
 
     TTextInStream(new TNativeWCConverter)
-    , m_pstrmiIn(0)
+    , m_pstrmiIn(nullptr)
 {
     // Create an impl object for the passed string and store it
     m_pstrmiIn = new TStringInStreamImpl(pstrToUse, eAdopt);
@@ -68,11 +68,10 @@ TTextStringInStream::TTextStringInStream(const  TString* const      pstrToUse
     AdoptStream(new TBinInStream(m_pstrmiIn));
 }
 
-TTextStringInStream::
-TTextStringInStream(const TTextStringOutStream& strmToSyncWith) :
+TTextStringInStream::TTextStringInStream(const TTextStringOutStream& strmToSyncWith) :
 
     TTextInStream(new TNativeWCConverter)
-    , m_pstrmiIn(0)
+    , m_pstrmiIn(nullptr)
 {
     // Create and store our implementation object
     m_pstrmiIn = new TStringInStreamImpl(*strmToSyncWith.m_pstrmiOut);
@@ -123,7 +122,7 @@ TTextStringOutStream::TTextStringOutStream(         TString* const      pstrToUs
                                             , const tCIDLib::TBoolean   bAppend) :
 
     TTextOutStream(strmfToUse, new TNativeWCConverter)
-    , m_pstrmiOut(0)
+    , m_pstrmiOut(nullptr)
 {
     // We want the newline format to be just LF
     eNewLineType(tCIDLib::ENewLineTypes::LF);
@@ -143,7 +142,7 @@ TTextStringOutStream::TTextStringOutStream(         TString* const      pstrToUs
                                             , const tCIDLib::TBoolean   bAppend) :
 
     TTextOutStream(new TNativeWCConverter)
-    , m_pstrmiOut(0)
+    , m_pstrmiOut(nullptr)
 {
     // We want the newline format to be just LF
     eNewLineType(tCIDLib::ENewLineTypes::LF);
@@ -162,7 +161,7 @@ TTextStringOutStream::TTextStringOutStream( const   tCIDLib::TCard4 c4InitChars
                                             , const TStreamFmt&     strmfToUse) :
 
     TTextOutStream(strmfToUse, new TNativeWCConverter)
-    , m_pstrmiOut(0)
+    , m_pstrmiOut(nullptr)
 {
     // We want the newline format to be just LF
     eNewLineType(tCIDLib::ENewLineTypes::LF);
@@ -183,7 +182,7 @@ TTextStringOutStream::TTextStringOutStream( const   tCIDLib::TCard4 c4InitChars
 TTextStringOutStream::TTextStringOutStream(const tCIDLib::TCard4 c4InitChars) :
 
     TTextOutStream(new TNativeWCConverter)
-    , m_pstrmiOut(0)
+    , m_pstrmiOut(nullptr)
 {
     // We want the newline format to be just LF
     eNewLineType(tCIDLib::ENewLineTypes::LF);

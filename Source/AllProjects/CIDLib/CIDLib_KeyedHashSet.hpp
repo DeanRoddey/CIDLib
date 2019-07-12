@@ -657,7 +657,7 @@ class TKeyedHashSet : public TCollection<TElem>
         TKeyedHashSet<TElem, TKey, TKeyOps>() = delete;
 
         TKeyedHashSet(  const   tCIDLib::TCard4     c4Modulus
-                        ,       TKeyOps* const      pkopsToAdopt
+                        , const TKeyOps&            kopsToAdopt
                         ,       TKeyExtract         pfnKeyExtract
                         , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
@@ -666,7 +666,7 @@ class TKeyedHashSet : public TCollection<TElem>
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
             , m_pfnKeyExtract(pfnKeyExtract)
-            , m_pkopsToUse(pkopsToAdopt)
+            , m_kopsToUse(kopsToAdopt)
         {
             try
             {
@@ -683,7 +683,6 @@ class TKeyedHashSet : public TCollection<TElem>
             catch(...)
             {
                 delete [] m_apBuckets;
-                delete pkopsToAdopt;
                 throw;
             }
         }
@@ -695,11 +694,8 @@ class TKeyedHashSet : public TCollection<TElem>
             , m_c4CurElements(0)
             , m_c4HashModulus(colSrc.m_c4HashModulus)
             , m_pfnKeyExtract(colSrc.m_pfnKeyExtract)
-            , m_pkopsToUse(nullptr)
+            , m_kopsToUse(colSrc.m_kopsToUse)
         {
-            // Dup the key ops object. This is polymorphic, so its fine
-            m_pkopsToUse = ::pDupObject<TKeyOps>(*colSrc.m_pkopsToUse);
-
             try
             {
                 // Allocate and initialize the bucket array
@@ -729,7 +725,6 @@ class TKeyedHashSet : public TCollection<TElem>
 
             catch(...)
             {
-                delete m_pkopsToUse;
                 delete [] m_apBuckets;
                 throw;
             }
@@ -740,10 +735,7 @@ class TKeyedHashSet : public TCollection<TElem>
 
             TKeyedHashSet
             (
-                1
-                , ::pDupObject<TKeyOps>(*colSrc.m_pkopsToUse)
-                , colSrc.m_pfnKeyExtract
-                , colSrc.eMTState()
+                1, colSrc.m_kopsToUse, colSrc.m_pfnKeyExtract, colSrc.eMTState()
             )
         {
             *this = tCIDLib::ForceMove(colSrc);
@@ -753,9 +745,6 @@ class TKeyedHashSet : public TCollection<TElem>
         {
             // Flush the collection
             RemoveAll();
-
-            // Delete the key ops object
-            delete m_pkopsToUse;
 
             // And delete the bucket list itself
             delete [] m_apBuckets;
@@ -798,7 +787,7 @@ class TKeyedHashSet : public TCollection<TElem>
 
                 // And now take his current elements value and dup the key ops
                 m_c4CurElements = colSrc.m_c4CurElements;
-                m_pkopsToUse = ::pDupObject<TKeyOps>(*colSrc.m_pkopsToUse);
+                m_kopsToUse = colSrc.m_kopsToUse;
 
                 // Invalidate any cursors
                 this->c4IncSerialNum();
@@ -815,7 +804,7 @@ class TKeyedHashSet : public TCollection<TElem>
                 tCIDLib::Swap(colSrc.m_c4CurElements, m_c4CurElements);
                 tCIDLib::Swap(colSrc.m_c4HashModulus, m_c4HashModulus);
                 tCIDLib::Swap(colSrc.m_pfnKeyExtract, m_pfnKeyExtract);
-                tCIDLib::Swap(colSrc.m_pkopsToUse, m_pkopsToUse);
+                tCIDLib::Swap(colSrc.m_kopsToUse, m_kopsToUse);
             }
             return *this;
         }
@@ -930,7 +919,7 @@ class TKeyedHashSet : public TCollection<TElem>
             return new TCursor(this);
         }
 
-        TObject* pobjDuplicate() const
+        [[nodiscard]] TObject* pobjDuplicate() const
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TMyType(*this);
@@ -954,10 +943,9 @@ class TKeyedHashSet : public TCollection<TElem>
             TMtxLocker lockSync(this->pmtxLock());
 
             // Get the hash of the element
-            const tCIDLib::THashVal hshElem = m_pkopsToUse->hshKey
+            const tCIDLib::THashVal hshElem = m_kopsToUse.hshKey
             (
-                keyToFind
-                , m_c4HashModulus
+                keyToFind, m_c4HashModulus
             );
 
             // Search the bucket if its not empty
@@ -966,7 +954,7 @@ class TKeyedHashSet : public TCollection<TElem>
             while (pnodeToRemove)
             {
                 // If this key matches, then break out
-                if (m_pkopsToUse->bCompKeys
+                if (m_kopsToUse.bCompKeys
                 (
                     m_pfnKeyExtract(pnodeToRemove->objData())
                     , keyToFind))
@@ -1036,10 +1024,9 @@ class TKeyedHashSet : public TCollection<TElem>
             TMtxLocker lockSync(this->pmtxLock());
 
             // Get the hash of the element
-            const tCIDLib::THashVal hshElem = m_pkopsToUse->hshKey
+            const tCIDLib::THashVal hshElem = m_kopsToUse.hshKey
             (
-                objKeyToRemove
-                , m_c4HashModulus
+                objKeyToRemove, m_c4HashModulus
             );
 
             // Search the bucket if its not empty
@@ -1048,7 +1035,7 @@ class TKeyedHashSet : public TCollection<TElem>
             while (pnodeToRemove)
             {
                 // If this key matches, then break out
-                if (m_pkopsToUse->bCompKeys
+                if (m_kopsToUse.bCompKeys
                 (
                     m_pfnKeyExtract(pnodeToRemove->objData())
                     , objKeyToRemove))
@@ -1134,7 +1121,7 @@ class TKeyedHashSet : public TCollection<TElem>
         //
         //  DO NOT change the element in a way that would modify the hash!
         //
-        template <typename IterCB> tCIDLib::TVoid ForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
 
@@ -1143,11 +1130,11 @@ class TKeyedHashSet : public TCollection<TElem>
             while (pnodeCur)
             {
                 if (!iterCB(pnodeCur->objData()))
-                    break;
+                    return kCIDLib::False;
 
                 // In debug, make sure they didn't modify the hash of this element
                 #if CID_DEBUG_ON
-                const tCIDLib::THashVal hshCheck = m_pkopsToUse->hshKey
+                const tCIDLib::THashVal hshCheck = m_kopsToUse.hshKey
                 (
                     m_pfnKeyExtract(pnodeCur->objData()), m_c4HashModulus
                 );
@@ -1157,6 +1144,7 @@ class TKeyedHashSet : public TCollection<TElem>
 
                 pnodeCur = pnodeFindNext(pnodeCur, hshCurBucket);
             }
+            return kCIDLib::True;
         }
 
 
@@ -1352,7 +1340,7 @@ class TKeyedHashSet : public TCollection<TElem>
                 this->KeyNotFound(CID_FILE, CID_LINE);
 
             // Don't let them change the key
-            if (!m_pkopsToUse->bCompKeys(m_pfnKeyExtract(pnodeRep->objData())
+            if (!m_kopsToUse.bCompKeys( m_pfnKeyExtract(pnodeRep->objData())
                                         , m_pfnKeyExtract(objNewValue)))
             {
                 facCIDLib().ThrowErr
@@ -1529,7 +1517,7 @@ class TKeyedHashSet : public TCollection<TElem>
             TNode* pnodeCur = m_apBuckets[hshBucket];
             while (pnodeCur)
             {
-                if (m_pkopsToUse->bCompKeys(m_pfnKeyExtract(pnodeCur->objData()), objKey))
+                if (m_kopsToUse.bCompKeys(m_pfnKeyExtract(pnodeCur->objData()), objKey))
                     return pnodeCur;
                 pnodeCur = pnodeCur->pnodeNext();
             }
@@ -1539,11 +1527,11 @@ class TKeyedHashSet : public TCollection<TElem>
         // Finds the passed key and returns the node and the key hash
         TNode* pnodeFind(const TKey& objKeyToFind, tCIDLib::THashVal& hshElem) const
         {
-            hshElem = m_pkopsToUse->hshKey(objKeyToFind, m_c4HashModulus);
+            hshElem = m_kopsToUse.hshKey(objKeyToFind, m_c4HashModulus);
             TNode* pnodeCur = m_apBuckets[hshElem];
             while (pnodeCur)
             {
-                if (m_pkopsToUse->bCompKeys(m_pfnKeyExtract(pnodeCur->objData())
+                if (m_kopsToUse.bCompKeys(  m_pfnKeyExtract(pnodeCur->objData())
                                             , objKeyToFind))
                 {
                     break;
@@ -1660,20 +1648,20 @@ class TKeyedHashSet : public TCollection<TElem>
         //      The modulus divisor for the hash. This is also the number
         //      elements allocated for the m_alstTable array.
         //
-        //  m_pfnKeyExtract
-        //      The key extraction function provided by the user. It pulls
-        //      out a reference to the key field from the data field.
-        //
-        //  m_pkopsToUse
+        //  m_kopsToUse
         //      A key ops object that provides all of the operations that
         //      we have to do on key field objects. We own and destruct it
         //      when we destruct.
+        //
+        //  m_pfnKeyExtract
+        //      The key extraction function provided by the user. It pulls
+        //      out a reference to the key field from the data field.
         // -------------------------------------------------------------------
         TNode**             m_apBuckets;
         tCIDLib::TCard4     m_c4CurElements;
         tCIDLib::TCard4     m_c4HashModulus;
+        TKeyOps             m_kopsToUse;
         TKeyExtract         m_pfnKeyExtract;
-        TKeyOps*            m_pkopsToUse;
 };
 
 

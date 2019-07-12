@@ -324,7 +324,7 @@ tCIDLib::TVoid TFacTestCIDLib::ShowSystemInfo()
             << TSysInfo::c4CmdLineParmCount() << kCIDLib::NewLn;
 
     tCIDLib::TCard4 c4Index{0};
-    TSysInfo::colCmdLineParms().ForEach
+    TSysInfo::colCmdLineParms().bForEach
     (
         [&c4Index, &strmTar](const TString& strCur)
         {

@@ -77,7 +77,7 @@ TMutex* CIDLib_PubSub::pmtxSync()
             pcolSubList = new TSubList(tCIDLib::EAdoptOpts::NoAdopt, 256);
             pcolTopicList = new TTopicList
             (
-                109, new TStringKeyOps(kCIDLib::False), &TPubSubTopic::strKey
+                109, TStringKeyOps(kCIDLib::False), &TPubSubTopic::strKey
             );
             enctNextScavenge = TTime::enctNowPlusMins(5);
 

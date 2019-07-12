@@ -28,8 +28,8 @@
 // ---------------------------------------------------------------------------
 //  Includes
 // ---------------------------------------------------------------------------
-#include    <Windows.h>
 #include    "CIDWebBrowser_.hpp"
+#include    <Windows.h>
 #include    "CIDKernel_InternalHelpers_.hpp"
 #include    "CIDWebBrowser_EmbedBrowser.h"
 

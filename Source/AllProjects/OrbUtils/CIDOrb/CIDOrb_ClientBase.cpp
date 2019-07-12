@@ -1067,8 +1067,11 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
             // If this is our guy, process it
             if (psrvtCur->m_ipepServer == ipepServer)
             {
-                // Orphan it out of the cache
-                CIDOrb_ClientBase::pcolCache->pobjOrphanAt(c4Index);
+                //
+                //  Orphan it out of the cache. Suppress nodiscard error by setting
+                //  the current pointer again from the orphan call.
+                //
+                psrvtCur = CIDOrb_ClientBase::pcolCache->pobjOrphanAt(c4Index);
                 TStatsCache::c8DecCounter(CIDOrb_ClientBase::sciSrvCache);
 
                 //

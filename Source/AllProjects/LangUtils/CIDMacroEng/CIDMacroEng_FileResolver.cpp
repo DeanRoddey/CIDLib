@@ -79,6 +79,13 @@ TMEngFixedBaseFileResolver::TMEngFixedBaseFileResolver(const TString& strBasePat
 {
 }
 
+TMEngFixedBaseFileResolver::
+TMEngFixedBaseFileResolver(const TString& strBasePath, const TString& strSubDir) :
+
+    m_strBasePath(TPathStr(strBasePath, strSubDir))
+{
+}
+
 TMEngFixedBaseFileResolver::~TMEngFixedBaseFileResolver()
 {
 }

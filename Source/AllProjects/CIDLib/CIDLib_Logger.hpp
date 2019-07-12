@@ -66,7 +66,7 @@ class CIDLIBEXP MLogger
         // -------------------------------------------------------------------
         virtual tCIDLib::TVoid LogEvent
         (
-            const   TLogEvent&              logevToLog
+            const   TLogEvent&              logevSrc
         ) = 0;
 
 
@@ -74,7 +74,7 @@ class CIDLIBEXP MLogger
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        MLogger() {}
+        MLogger() = default;
 };
 
 #pragma CIDLIB_POPPACK

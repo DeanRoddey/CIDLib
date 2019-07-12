@@ -90,10 +90,9 @@ class TBasePage
             return strName.bCompareI(m_strFileName);
         }
 
-        tCIDLib::TBoolean bParseFile
+        tCIDLib::TVoid ParseFile
         (
                     TTopic&                 topicParent
-            ,       TXMLTreeParser&         xtprsToUse
         );
 
         tCIDLib::TBoolean bVirtual() const
@@ -104,12 +103,28 @@ class TBasePage
         tCIDLib::TVoid GenerateOutput
         (
             const   TString&                strParPath
+
         )   const;
 
         tCIDLib::TVoid GenerateLink
         (
                     TTextOutStream&         strmTar
         )   const;
+
+        const TString& strPagePath() const
+        {
+            return m_strPagePath;
+        }
+
+        const TString& strPageName() const
+        {
+            return m_strFileName;
+        }
+
+        const TString& strParTopic() const
+        {
+            return m_strParTopic;
+        }
 
 
     protected :
@@ -122,8 +137,8 @@ class TBasePage
             , const TString&                strParSrcDir
             , const TString&                strParTopic
             , const TString&                strFileName
-            , const TString&                strFileExt
-            , const tCIDLib::TBoolean       bVirtual
+            , const tCIDDocComp::EPageTypes eType
+            , const tCIDLib::TBoolean       bVirtual = kCIDLib::False
         );
 
 
@@ -131,10 +146,10 @@ class TBasePage
         // -------------------------------------------------------------------
         //  Private, virtual methods
         // -------------------------------------------------------------------
-        virtual tCIDLib::TBoolean bParse
+        virtual tCIDLib::TVoid Parse
         (
-                    TTopic&                     topicParent
-            , const TXMLTreeElement&            xtnodeRoot
+                    TTopic&                 topicParent
+            , const TXMLTreeElement&        xtnodeRoot
         ) = 0;
 
         virtual tCIDLib::TVoid OutputContent
@@ -151,6 +166,14 @@ class TBasePage
         //      programmatically. This flag being set means there is no real file
         //      to try to parse.
         //
+        //  m_colKeywords
+        //      Any keywords defined for this page (used for glossary generation.)
+        //      Most pages have them but they are optional.
+        //
+        //  m_eType
+        //      The type of page, which is directly translated from the PageType
+        //      attribute of the topic entry for the page.
+        //
         //  m_strFileExt
         //      The extension for this file, which controls whate type of derived
         //      page class this will be (the owning topic will create us based on
@@ -159,14 +182,10 @@ class TBasePage
         //  m_strExtTitle
         //      This is our external title. This is what is set in the topic file
         //      that references us, so this is used in the left hand panel as the
-        //      text for the link (see m_strIntTitle.)
+        //      text for the link.
         //
         //  m_strFileName
         //      The base part of the file name, no extension or path, for this page.
-        //
-        //  m_strIntTitle
-        //      This is our internal title (used at the top of the page) and is gotten
-        //      from the page file itself, as opposed to the external title.
         //
         //  m_strPagePath
         //      The help topic type path to this page, which is our parent's topic
@@ -180,12 +199,12 @@ class TBasePage
         //  m_strParTopic
         //      Our parent's topic path.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bVirtual;
-        TString             m_strExtTitle;
-        TString             m_strFileExt;
-        TString             m_strFileName;
-        TString             m_strIntTitle;
-        TString             m_strPagePath;
-        TString             m_strParSrcDir;
-        TString             m_strParTopic;
+        tCIDLib::TBoolean       m_bVirtual;
+        tCIDLib::TStrList       m_colKeywords;
+        tCIDDocComp::EPageTypes m_eType;
+        TString                 m_strExtTitle;
+        TString                 m_strFileName;
+        TString                 m_strPagePath;
+        TString                 m_strParSrcDir;
+        TString                 m_strParTopic;
 };

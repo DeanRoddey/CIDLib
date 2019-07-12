@@ -49,8 +49,8 @@ TOrbSObjList::TOrbSObjList() :
 
     m_c4BucketInd(kCIDOrb::c4IdModulus)
     , m_c4ElemCount(0)
-    , m_pabiList(0)
-    , m_pbiIter(0)
+    , m_pabiList(nullptr)
+    , m_pbiIter(nullptr)
 {
     m_pabiList = new TBucketItem*[kCIDOrb::c4IdModulus];
     TRawMem::SetMemBuf
@@ -72,8 +72,12 @@ TOrbSObjList::~TOrbSObjList()
 // ---------------------------------------------------------------------------
 //  TOrbSObjList: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TOrbSObjList::Add(TOrbServerBase* const porbsToAdd)
+tCIDLib::TVoid
+TOrbSObjList::Add(TOrbServerBase* const porbsToAdd, const tCIDLib::EAdoptOpts eAdopt)
 {
+    // Make sure it gets cleaned up if something gones wrong and we are adopting
+    TJanitor<TOrbServerBase> janTmp(porbsToAdd, eAdopt == tCIDLib::EAdoptOpts::Adopt);
+
     // Get its hash out, since they pre-hash themselves
     const tCIDLib::THashVal hshToAdd = porbsToAdd->ooidThis().hshKey();
 
@@ -102,8 +106,9 @@ tCIDLib::TVoid TOrbSObjList::Add(TOrbServerBase* const porbsToAdd)
     if (!pbiCur)
     {
         TBucketItem* pbiNew = new TBucketItem;
-        pbiNew->porbsThis = porbsToAdd;
+        pbiNew->eAdopt = eAdopt;
         pbiNew->pbiNext = nullptr;
+        pbiNew->porbsThis = janTmp.pobjOrphan();
         m_pabiList[hshToAdd] = pbiNew;
     }
      else
@@ -136,9 +141,9 @@ tCIDLib::TVoid TOrbSObjList::Add(TOrbServerBase* const porbsToAdd)
 
         // Ok, we survived, so patch the new one on the end
         TBucketItem* pbiNew = new TBucketItem;
-        pbiNew->porbsThis = porbsToAdd;
+        pbiNew->pbiNext = pbiNew;
         pbiNew->pbiNext = nullptr;
-        pbiCur->pbiNext = pbiNew;
+        pbiNew->porbsThis = janTmp.pobjOrphan();
     }
 
     m_c4ElemCount++;
@@ -226,13 +231,29 @@ tCIDLib::TCard4 TOrbSObjList::c4ElemCount() const
 
 tCIDLib::TBoolean TOrbSObjList::bRemove(TOrbServerBase* const porbsToRemove)
 {
-    // Call the orphan method to get the object out of the list
-    TOrbServerBase* porbsRemove = porbsOrphan(porbsToRemove);
+    //
+    //  Call the orphan method to get the object out of the list. He'll tell us
+    //  whether it was marked as adopted or not.
+    //
+    tCIDLib::EAdoptOpts eAdopt;
+    TOrbServerBase* porbsRemove = porbsOrphan(porbsToRemove, eAdopt);
     if (!porbsRemove)
         return kCIDLib::False;
 
-    // We found it, so delete it and return success
-    delete porbsRemove;
+    // We found it. If we adopted this one, then clean it up
+    if (eAdopt == tCIDLib::EAdoptOpts::Adopt)
+    {
+        try
+        {
+            delete porbsRemove;
+        }
+
+        catch(TError& errToCatch)
+        {
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            throw;
+        }
+    }
     return kCIDLib::True;
 }
 
@@ -326,7 +347,7 @@ TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind)
 
     // If the bucket is empty, we are done
     if (!m_pabiList[hshKey])
-        return 0;
+        return nullptr;
 
     // There are entries here, so search the bucket
     TBucketItem* pbiCur = m_pabiList[hshKey];
@@ -337,7 +358,7 @@ TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind)
 
         pbiCur = pbiCur->pbiNext;
     }
-    return 0;
+    return nullptr;
 }
 
 const TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind) const
@@ -364,7 +385,7 @@ const TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind) const
 
     // If the bucket is empty, we are done
     if (!m_pabiList[hshKey])
-        return 0;
+        return nullptr;
 
     // There are entries here, so search the bucket
     TBucketItem* pbiCur = m_pabiList[hshKey];
@@ -375,11 +396,16 @@ const TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind) const
 
         pbiCur = pbiCur->pbiNext;
     }
-    return 0;
+    return nullptr;
 }
 
 
-TOrbServerBase* TOrbSObjList::porbsOrphan(TOrbServerBase* const porbsToOrphan)
+//
+//  Since we are orphaning, the original adoption setting doesn't matter. If it
+//  was adopted, the caller is assuming responsibility.
+//
+TOrbServerBase*
+TOrbSObjList::porbsOrphan(TOrbServerBase* const porbsToOrphan, tCIDLib::EAdoptOpts& eAdopt)
 {
     // Get its hash out, since they pre-hash themselves
     const tCIDLib::THashVal hshToOrphan = porbsToOrphan->ooidThis().hshKey();
@@ -401,7 +427,7 @@ TOrbServerBase* TOrbSObjList::porbsOrphan(TOrbServerBase* const porbsToOrphan)
 
     // If the bucket is empty, we its not present
     if (!m_pabiList[hshToOrphan])
-        return kCIDLib::False;
+        return nullptr;
 
     //
     //  Search for this object, by pointer value. We have to keep up with
@@ -420,14 +446,15 @@ TOrbServerBase* TOrbSObjList::porbsOrphan(TOrbServerBase* const porbsToOrphan)
     }
 
     if (!pbiCur)
-        return 0;
+        return nullptr;
 
     if (!pbiPrev)
         m_pabiList[hshToOrphan] = pbiCur->pbiNext;
     else
         pbiPrev->pbiNext = pbiCur->pbiNext;
 
-    // Get the object out and delete the bucket object
+    // Get the data and adoption status out, then delete the bucket object
+    eAdopt = pbiCur->eAdopt;
     TOrbServerBase* porbsRet = pbiCur->porbsThis;
     delete pbiCur;
 
@@ -467,15 +494,27 @@ tCIDLib::TVoid TOrbSObjList::RemoveAll()
         TBucketItem* pbiCur = m_pabiList[c4Index];
         while (pbiCur)
         {
+            // Remember the next before we trash the current
             TBucketItem* pbiNext = pbiCur->pbiNext;
 
-            // Clean up the user data and the bucket item
-            delete pbiCur->porbsThis;
+            // If adopted, delete the user data, then kill the bucket item
+            if (pbiCur->eAdopt == tCIDLib::EAdoptOpts::Adopt)
+            {
+                try
+                {
+                    delete pbiCur->porbsThis;
+                }
+
+                catch(...)
+                {
+                }
+            }
             delete pbiCur;
 
+            // And now we can move forward
             pbiCur = pbiNext;
         }
-        m_pabiList[c4Index] = 0;
+        m_pabiList[c4Index] = nullptr;
     }
 
     // Reset the element count now

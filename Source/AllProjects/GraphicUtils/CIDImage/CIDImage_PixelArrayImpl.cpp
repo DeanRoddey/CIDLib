@@ -241,13 +241,21 @@ TPixelArrayImpl::ApplyAlphaChannel( const   TPixelArrayImpl&    pixaiAlpha
     //  the pixels we care about.
     //
     tCIDLib::TCard4 c4SrcHSkip = tCIDLib::TCard4(areaSrc.i4X());
-    if (c4SrcHSkip < 0)
-        c4SrcHSkip = 0;
-
     if (pixaiAlpha.m_eFmt == tCIDImage::EPixFmts::TrueAlpha)
+    {
         c4SrcHSkip *= 4;
-    else if (pixaiAlpha.m_eFmt == tCIDImage::EPixFmts::TrueClr)
+    }
+     else if (pixaiAlpha.m_eFmt == tCIDImage::EPixFmts::TrueClr)
+    {
         c4SrcHSkip *= 3;
+    }
+     else if (pixaiAlpha.m_eFmt == tCIDImage::EPixFmts::GrayAlpha)
+    {
+        if (pixaiAlpha.m_eBitDepth == tCIDImage::EBitDepths::Eight)
+            c4SrcHSkip *= 2;
+        else
+            c4SrcHSkip *= 4;
+    }
 
     const tCIDLib::TCard4 c4TarHSkip = tCIDLib::TCard4(areaUpdate.i4X()) * 4;
 
@@ -257,151 +265,131 @@ TPixelArrayImpl::ApplyAlphaChannel( const   TPixelArrayImpl&    pixaiAlpha
 
     //
     //  Get raw pointers to both pixel buffers, but start them off at the
-    //  first row we actually are going to do.
+    //  first row/col we are going to actually do. Then we can move forward
+    //  a padded row at a time on each outter loop to get to the starting r/c
+    //  for the next row.
     //
     const tCIDLib::TCard1* pc1Src
     (
-        pixaiAlpha.pc1Buffer() + (c4SPerRow * areaSrc.i4Y())
+        pixaiAlpha.pc1Buffer() + ((c4SPerRow * areaSrc.i4Y()) + c4SrcHSkip)
     );
 
-    const tCIDLib::TCard1* pc1Dest
+    tCIDLib::TCard1* pc1Dest
     (
-        m_pc1Pixels + (c4TPerRow * areaUpdate.i4Y())
+        m_pc1Pixels + ((c4TPerRow * areaUpdate.i4Y()) + c4TarHSkip)
     );
 
     // And the count of rows and colums we will do
     const tCIDLib::TCard4 c4Cols = areaUpdate.c4Width();
     const tCIDLib::TCard4 c4Rows = areaUpdate.c4Height();
 
-    //
-    //  Ok, we are good. So let's loop through them both. We know that they
-    //  both have specific formats, and are byte oriented, so we can do a
-    //  pretty efficient inline asm loop here. Set the destination on the
-    //  alpha channel byte, and we'll then move it up by 4 bytes each time
-    //
     if ((pixaiAlpha.m_eFmt == tCIDImage::EPixFmts::GrayScale)
     &&  (pixaiAlpha.m_eBitDepth == tCIDImage::EBitDepths::Eight))
     {
-        __asm
+        if (!bForceBW && !bPremultiply)
         {
-            // Save the registers we'll use
-            PUSH    eax
-            PUSH    ebx
-            PUSH    ecx
-            PUSH    edx
-            PUSH    esi
-            PUSH    edi
+            // If neither of the special cases, we can do a particularly tight loop here
+            pc1Dest += 3;
+            for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < c4Rows; c4RowInd++)
+            {
+                const tCIDLib::TCard1* pc1CurSrc = pc1Src;
+                tCIDLib::TCard1* pc1CurDest = pc1Dest;
+                for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < c4Cols; c4ColInd++)
+                {
+                    *pc1CurDest = *pc1CurSrc;
+                    pc1CurDest += 4;
+                    pc1CurSrc++;
+                }
 
-            // Set up src, dest pointers
-            MOV     esi, pc1Src
-            MOV     edi, pc1Dest
+                pc1Src += c4SPerRow;
+                pc1Dest += c4TPerRow;
+            }
+        }
+         else if (bForceBW && !bPremultiply)
+        {
+            // If just forcing B&W, that's almost as efficient
+            pc1Dest += 3;
+            for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < c4Rows; c4RowInd++)
+            {
+                const tCIDLib::TCard1* pc1CurSrc = pc1Src;
+                tCIDLib::TCard1* pc1CurDest = pc1Dest;
 
-            // Do the rows we pull from the source
-            MOV     ecx, c4Rows
-            Loop1:
+                // Move the destination up to the alpha byte
+                for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < c4Cols; c4ColInd++)
+                {
+                    tCIDLib::TCard1 c1Alpha = *pc1CurSrc;
+                    if (c1Alpha)
+                        c1Alpha = 0xFF;
+                    *pc1CurDest = c1Alpha;
+                    pc1CurDest += 4;
+                    pc1CurSrc++;
+                }
 
-            // Save the row loop counter, and src/dest pointers
-            PUSH    ecx
-            PUSH    esi
-            PUSH    edi
+                pc1Src += c4SPerRow;
+                pc1Dest += c4TPerRow;
+            }
+        }
+         else
+        {
+            // It's the worst case with possibly both optional mods
+            for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < c4Rows; c4RowInd++)
+            {
+                const tCIDLib::TCard1* pc1CurSrc = pc1Src;
+                tCIDLib::TCard1* pc1CurDest = pc1Dest;
 
-            // Skip over any pre-pixels
-            ADD     esi, c4SrcHSkip
-            ADD     edi, c4TarHSkip
+                for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < c4Cols; c4ColInd++)
+                {
+                    // Get the next available src alpha byte and B&W if needed
+                    tCIDLib::TCard1 c1Alpha = *pc1CurSrc++;
+                    if (bForceBW && c1Alpha)
+                        c1Alpha = 0xFF;
 
-            // And, do the pixels we pull from the source for this row
-            MOV     ecx, c4Cols
-            Loop1b:
+                    //
+                    //  If the alpha is FF, no need to pre-multiply it won't change anything
+                    //  and if zero the result is always zero.
+                    //
+                    if (bPremultiply)
+                    {
+                        if (c1Alpha == 0)
+                        {
+                            *pc1CurDest++ = 0;
+                            *pc1CurDest++ = 0;
+                            *pc1CurDest++ = 0;
+                        }
+                         else if (c1Alpha != 0xFF)
+                        {
+                            tCIDLib::TCard2 c2Val = *pc1CurDest;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1CurDest++ = tCIDLib::TCard1(c2Val);
 
-            // Load an alpha value
-            LODSB
+                            c2Val = *pc1CurDest;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1CurDest++ = tCIDLib::TCard1(c2Val);
 
-            // See if we need to do the pre-multiply. If not, skip it
-            CMP     bPremultiply, 0
-            JE      Loop1NoPM
+                            c2Val = *pc1CurDest;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1CurDest++ = tCIDLib::TCard1(c2Val);
+                        }
+                         else
+                        {
+                            pc1CurDest += 3;
+                        }
+                    }
+                     else
+                    {
+                        pc1CurDest += 3;
+                    }
 
-            // If forceing BW, then any non-zero value is 255
-            CMP     bForceBW, 0
-            JE      NoForce1
+                    // Now we can store the alpha and move dest to the next pixel
+                    *pc1CurDest++ = c1Alpha;
+                }
 
-            CMP     al, 0
-            JE      NoForce1
-            MOV     al, 255
-
-            NoForce1:
-
-            // If alpha is 0xFF, then don't bother, it won't change the value
-            CMP     al, 255
-            JE      Loop1NoPM
-
-            //
-            //  We do need to remultiply, so put the divisor into bh and
-            //  the alpha into bl.
-            //
-            MOV     bl, al
-            MOV     bh, 255
-
-            //
-            //  Pre-multiply each of the output array's color values by the
-            //  alpha. So we multiply each byte by the alpha, and divide
-            //  by 255.
-            //
-            MOV     ah, 0
-            MOV     al, BYTE PTR [edi]
-            MUL     bl
-            DIV     bh
-            MOV     BYTE PTR [edi], al
-            INC     edi
-
-            MOV     ah, 0
-            MOV     al, BYTE PTR [edi]
-            MUL     bl
-            DIV     bh
-            MOV     BYTE PTR [edi], al
-            INC     edi
-
-            MOV     ah, 0
-            MOV     al, BYTE PTR [edi]
-            MUL     bl
-            DIV     bh
-            MOV     BYTE PTR [edi], al
-            INC     edi
-
-            // Move the alpha back to al and jump to store
-            MOV     al, bl
-            JMP     Loop1Store
-
-            Loop1NoPM :
-            // Not pre-multiplying, so just move EDI forward. Alpha is in al
-            ADD     edi, 3
-
-            // Finally store the actual alpha, which leaves us on the next pixel
-            Loop1Store:
-            STOSB
-
-            DEC     ecx
-            JNZ     Loop1b
-
-            // We've done a row, so get back the base row pointers
-            POP     edi
-            POP     esi
-
-            // Move them forward by the padded row widths
-            ADD     edi, c4TPerRow
-            ADD     esi, c4SPerRow
-
-            // Now pop the row loop counter off and loop
-            POP     ecx
-            DEC     ecx
-            JNZ     Loop1
-
-            // Restore the saved registers
-            POP     edi
-            POP     esi
-            POP     edx
-            POP     ecx
-            POP     ebx
-            POP     eax
+                pc1Src += c4SPerRow;
+                pc1Dest += c4TPerRow;
+            }
         }
     }
      else if ((pixaiAlpha.m_eBitDepth == tCIDImage::EBitDepths::Eight)
@@ -409,138 +397,103 @@ TPixelArrayImpl::ApplyAlphaChannel( const   TPixelArrayImpl&    pixaiAlpha
           ||   (pixaiAlpha.m_eFmt == tCIDImage::EPixFmts::TrueClr)))
     {
         // The number of bytes we move forward for each source pixel
-        tCIDLib::TCard4 c4SrcInc = 3;
+        tCIDLib::TCard4 c4ExtraSrc = 0;
         if (pixaiAlpha.m_eFmt == tCIDImage::EPixFmts::TrueAlpha)
-            c4SrcInc++;
+            c4ExtraSrc++;
 
-        __asm
+        if (bPremultiply)
         {
-            // Save the registers we'll use
-            PUSH    eax
-            PUSH    ebx
-            PUSH    ecx
-            PUSH    edx
-            PUSH    esi
-            PUSH    edi
+            for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < c4Rows; c4RowInd++)
+            {
+                const tCIDLib::TCard1* pc1CurSrc = pc1Src;
+                tCIDLib::TCard1* pc1CurDest = pc1Dest;
 
-            // Set up src, dest pointers
-            MOV     esi, pc1Src
-            MOV     edi, pc1Dest
+                // We have to average the source pixels to create an alpha
+                for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < c4Cols; c4ColInd++)
+                {
+                    tCIDLib::TCard4 c4CurPix = *pc1CurSrc++;
+                    c4CurPix += *pc1CurSrc++;
+                    c4CurPix += *pc1CurSrc++;
+                    c4CurPix /= 3;
+                    tCIDLib::TCard1 c1Alpha = tCIDLib::TCard1(c4CurPix);
 
-            // Do the outer loop of rows, using the lesser of the sizes
-            MOV     ecx, c4Rows
-            Loop2:
+                    if (c1Alpha && bForceBW)
+                        c1Alpha = 0xFF;
 
-            // Save row loop counter
-            PUSH    ecx
+                    if (bPremultiply)
+                    {
+                        if (c1Alpha == 0)
+                        {
+                            *pc1CurDest++ = 0;
+                            *pc1CurDest++ = 0;
+                            *pc1CurDest++ = 0;
+                        }
+                         else if (c1Alpha != 0xFF)
+                        {
+                            tCIDLib::TCard2 c2Val = *pc1CurDest;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1CurDest++ = tCIDLib::TCard1(c2Val);
 
-            // Remember the current row source and destination values
-            PUSH    esi
-            PUSH    edi
+                            c2Val = *pc1CurDest;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1CurDest++ = tCIDLib::TCard1(c2Val);
 
-            // Skip over any pre-pixels in source/dest
-            ADD     esi, c4SrcHSkip
-            ADD     edi, c4TarHSkip
+                            c2Val = *pc1CurDest;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1CurDest++ = tCIDLib::TCard1(c2Val);
+                        }
+                         else
+                        {
+                            pc1CurDest += 3;
+                        }
+                    }
+                     else
+                    {
+                        pc1CurDest += 3;
+                    }
 
-            // And, do the pixels we pull from the source
-            MOV     ecx, c4Cols
-            Loop2b:
+                    // Now we can store the alpha and move to the next pixels
+                    *pc1CurDest++ = c1Alpha;
+                    pc1CurSrc += c4ExtraSrc;
+                }
 
-            // Accumulate the three color bytes of the source
-            MOV     bx, 0
-            MOV     ax, 0
-            MOV     al, BYTE PTR[esi]
-            ADD     bx, ax
-            MOV     al, BYTE PTR[esi + 1]
-            ADD     bx, ax
-            MOV     al, BYTE PTR[esi + 2]
-            ADD     bx, ax
+                pc1Src += c4SPerRow;
+                pc1Dest += c4TPerRow;
+            }
+        }
+         else
+        {
+            // We can optimize reasonably well if not pre-multiplying
+            pc1Dest += 3;
+            for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < c4Rows; c4RowInd++)
+            {
+                const tCIDLib::TCard1* pc1CurSrc = pc1Src;
+                tCIDLib::TCard1* pc1CurDest = pc1Dest;
 
-            // Now divide by 3 to get the alpha value. It will be in AL
-            MOV     ax, bx
-            MOV     bl, 3
-            DIV     bl
+                for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < c4Cols; c4ColInd++)
+                {
+                    tCIDLib::TCard4 c4CurPix = *pc1CurDest;
+                    c4CurPix += *pc1CurDest++;
+                    c4CurPix += *pc1CurDest++;
+                    c4CurPix /= 3;
+                    tCIDLib::TCard1 c1Alpha = tCIDLib::TCard1(c4CurPix);
 
-            // See if we need to do the pre-multiply. If not, skip it
-            CMP     bPremultiply, 0
-            JE      Loop2NoPM
+                    if (c1Alpha && bForceBW)
+                        c1Alpha = 0xFF;
 
-            // If forcing BW, then any non-zero value is 255
-            CMP     bForceBW, 0
-            JE      NoForce2
+                    // Now we can store the alpha and move to the next pixels
+                    *pc1CurDest = c1Alpha;
 
-            CMP     al, 0
-            JE      NoForce2
-            MOV     al, 255
+                    pc1CurDest += 4;
+                    pc1CurSrc += c4ExtraSrc;
+                }
 
-            NoForce2:
-
-            // If alpha is 0xFF, then don't bother, it won't change the value
-            CMP     al, 255
-            JE      Loop2NoPM
-
-            // Have to do it, Move the alpha to bl and FF to bh
-            MOV     bl, al
-            MOV     bh, 255
-
-            MOV     ah, 0
-            MOV     al, BYTE PTR [edi]
-            MUL     bl
-            DIV     bh
-            MOV     BYTE PTR [edi], al
-            INC     edi
-
-            MOV     ah, 0
-            MOV     al, BYTE PTR [edi]
-            MUL     bl
-            DIV     bh
-            MOV     BYTE PTR [edi], al
-            INC     edi
-
-            MOV     ah, 0
-            MOV     al, BYTE PTR [edi]
-            MUL     bl
-            DIV     bh
-            MOV     BYTE PTR [edi], al
-            INC     edi
-
-            // Move alpha to al and jump now to the store
-            MOV     al, bl
-            JMP     Loop2Store
-
-            // Not multipying, so just move EDI up to the alpha byte
-            Loop2NoPM:
-            ADD     edi, 3
-
-            // Finally store the alpha, which leaves us on the next target pixel
-            Loop2Store:
-            STOSB
-
-            // Move up to the next src pixel and go do another
-            ADD     esi, c4SrcInc
-            DEC     ecx
-            JNZ     Loop2b
-
-            // We've done a row, so get back the base row pointers
-            POP     edi
-            POP     esi
-
-            // Move them forward by the padded row widths
-            ADD     edi, c4TPerRow
-            ADD     esi, c4SPerRow
-
-            // Now pop the outer loop counter off and loop
-            POP     ecx
-            DEC     ecx
-            JNZ     Loop2
-
-            // Restore the saved registers
-            POP     edi
-            POP     esi
-            POP     edx
-            POP     ecx
-            POP     ebx
-            POP     eax
+                pc1Src += c4SPerRow;
+                pc1Dest += c4TPerRow;
+            }
         }
     }
      else
@@ -1127,79 +1080,27 @@ tCIDLib::TVoid TPixelArrayImpl::CvtToGrayScale(TClrPalette& palToUse)
 tCIDLib::TVoid TPixelArrayImpl::ExtractAlphaChannel(TPixelArrayImpl& pixaiAlpha) const
 {
     // Get raw pointers to both pixel buffers
-    const tCIDLib::TCard1* pc1Tar = pixaiAlpha.pc1Buffer();
-    tCIDLib::TCard1* pc1Src = m_pc1Pixels;
+    tCIDLib::TCard1* pc1Tar = pixaiAlpha.pc1Buffer();
+    const tCIDLib::TCard1* pc1Src = m_pc1Pixels;
 
     // Get the bytes per row of both into locals for easier access below
     const tCIDLib::TCard4 c4TPerRow = pixaiAlpha.m_c4LineWidth;
     const tCIDLib::TCard4 c4SPerRow = m_c4LineWidth;
 
-    //
-    //  It's 8 bit, so prety simple. We run through the source pixels,
-    //  move up to the 4th byte of each pixel, read that in, and store
-    //  it in the output row.
-    //
-    __asm
+    // Move the src up 3 bytes so it's always starting on the alpha pixel
+    pc1Src += 3;
+    for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < m_c4Height; c4RowInd++)
     {
-        // Save the registers we'll use
-        PUSH    eax
-        PUSH    ebx
-        PUSH    ecx
-        PUSH    edx
-        PUSH    esi
-        PUSH    edi
+        const tCIDLib::TCard1* pc1CurSrc = pc1Src;
+        tCIDLib::TCard1* pc1CurTar = pc1Tar;
+        for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < m_c4Width; c4ColInd++)
+        {
+            *pc1CurTar++ = *pc1CurSrc;
+            pc1CurSrc += 4;
+        }
 
-        // Set up src, dest pointers
-        MOV     esi, pc1Src
-        MOV     edi, pc1Tar
-
-        // Do the outer loop of rows
-        MOV     ebx, this
-        MOV     ecx, [ebx]this.m_c4Height
-
-        Loop1:
-
-        // And, do the inner loop
-        PUSH    ecx
-        MOV     ebx, this
-        MOV     ecx, [ebx]this.m_c4Width
-
-        // Remember the current row source and destination values
-        PUSH    esi
-        PUSH    edi
-
-        Loop1b:
-
-        // Move up to the alpha byte in the source
-        ADD     esi, 3
-
-        // Load the alpha byte into al, and store to target
-        LODSB
-        STOSB
-
-        // And do the next pixel
-        LOOP    Loop1b
-
-        // We've done a row, so get back the base row pointers
-        POP     edi
-        POP     esi
-
-        // Move them forward by the padded row widths
-        ADD     edi, c4TPerRow
-        ADD     esi, c4SPerRow
-
-        // Now pop the outer loop counter off and loop
-        POP     ecx
-
-        LOOP    Loop1
-
-        // Restore the saved registers
-        POP     edi
-        POP     esi
-        POP     edx
-        POP     ecx
-        POP     ebx
-        POP     eax
+        pc1Tar += c4TPerRow;
+        pc1Src += c4SPerRow;
     }
 }
 
@@ -1312,21 +1213,25 @@ TPixelArrayImpl::FlipVertically(const   tCIDLib::TCard4 c4StartRow
         c4High = c4Low;
     }
 
-    // Just on the off chance we have a single line, do nothing
-    if (c4High - c4Low < 2)
+    // If the low is beyond our last row, do nothing though technically it's an error
+    if (c4Low >= m_c4Height)
         return;
 
     // If the high one is beyond our height, clip it back
     if (c4High >= m_c4Height)
         c4High = m_c4Height - 1;
 
+    // If we end up with a single line, nothing to do
+    if (c4High == c4Low)
+        return;
+
     // Create a line buffer so that we can move lines around
     tCIDLib::TCard1* pc1Buf = new tCIDLib::TCard1[m_c4LineWidth];
     TArrayJanitor<tCIDLib::TCard1> janBuf(pc1Buf);
 
     // Set up the initial buffer addresses
-    const tCIDLib::TCard1* pc1Low = m_pc1Pixels + (c4StartRow * m_c4LineWidth);
-    const tCIDLib::TCard1* pc1High = m_pc1Pixels + (c4EndRow * m_c4LineWidth);
+    tCIDLib::TCard1* pc1Low = m_pc1Pixels + (c4StartRow * m_c4LineWidth);
+    tCIDLib::TCard1* pc1High = m_pc1Pixels + (c4EndRow * m_c4LineWidth);
     const tCIDLib::TCard4  c4RowCnt = m_c4LineWidth;
 
     //
@@ -1334,66 +1239,35 @@ TPixelArrayImpl::FlipVertically(const   tCIDLib::TCard4 c4StartRow
     //  until we swapped the last one or we hit the center (odd number of
     //  lines) line that doesn't need any swapping.
     //
-    __asm
+    //  c4High has to be at least 1, so it cannot underflow, even if we just have
+    //  two lines.
+    //
+    while (c4High > c4Low)
     {
-        // Save the registers we'll use
-        PUSH    eax
-        PUSH    ebx
-        PUSH    ecx
-        PUSH    edx
-        PUSH    esi
-        PUSH    edi
+        tCIDLib::TCard1* pc1T = pc1Buf;
+        tCIDLib::TCard1* pc1H = pc1High;
 
-        Loop1:
-
-        // Copy the current high line to the temp buffer
-        MOV     ecx, c4RowCnt
-        MOV     edi, pc1Buf
-        MOV     esi, pc1High
-        REP MOVSB
+        // Copy the high to the temp buffer
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4LineWidth; c4Index++)
+            *pc1T++ = *pc1H++;
 
         // Copy the low to the high
-        MOV     ecx, c4RowCnt
-        MOV     esi, pc1Low
-        MOV     edi, pc1High
-        REP MOVSB
+        tCIDLib::TCard1* pc1L = pc1Low;
+        pc1H = pc1High;
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4LineWidth; c4Index++)
+            *pc1H++ = *pc1L++;
 
-        // And move the temp to the low
-        MOV     ecx, c4RowCnt
-        MOV     esi, pc1Buf
-        MOV     edi, pc1Low
-        REP MOVSB
+        // And now the temp to the low
+        pc1L = pc1Low;
+        pc1T = pc1Buf;
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4LineWidth; c4Index++)
+            *pc1L++ = *pc1T++;
 
-        // Adjust the high down one row
-        MOV     eax, pc1High
-        SUB     eax, c4RowCnt
-        MOV     pc1High, eax
-
-        // If it is equal to low, break out, save it first for the next check
-        MOV     ebx, eax
-        SUB     eax, pc1Low
-        JZ      LoopComplete
-
-        // Not yet, so move the low up and check again
-        MOV     eax, pc1Low
-        ADD     eax, c4RowCnt
-        MOV     pc1Low, eax
-        SUB     eax, ebx
-        JZ      LoopComplete
-
-        // They still haven't hit each other, so go again
-        JMP     Loop1
-
-        // We are done, so restore regs and get out
-        LoopComplete:
-
-        // Restore the saved registers
-        POP     edi
-        POP     esi
-        POP     edx
-        POP     ecx
-        POP     ebx
-        POP     eax
+        // Move our indices and base pointers inward a line
+        c4High--;
+        c4Low++;
+        pc1High -= m_c4LineWidth;
+        pc1Low += m_c4LineWidth;
     }
 }
 
@@ -1812,86 +1686,16 @@ tCIDLib::TVoid TPixelArrayImpl::InvertAlphaChannel()
 {
     // Get a pointers to our raw pixel buffer
     tCIDLib::TCard1* pc1Src = m_pc1Pixels;
-
-    // Get the bytes per row
-    const tCIDLib::TCard4 c4PerRow = m_c4LineWidth;
-
-    //
-    //  It's 8 bit, so prety simple. We run through the source pixels,
-    //  move up to the 4th byte of each pixel, read that in, invert it
-    //  and store it back.
-    //
-    __asm
+    for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < m_c4Height; c4RowInd++)
     {
-        // Save the registers we'll use
-        PUSH    eax
-        PUSH    ebx
-        PUSH    ecx
-        PUSH    edx
-        PUSH    esi
-        PUSH    edi
-
-        // Set up src, dest pointers to the source place
-        MOV     esi, pc1Src
-        MOV     edi, pc1Src
-
-        // Do the outer loop of rows
-        MOV     ebx, this
-        MOV     ecx, [ebx]this.m_c4Height
-
-        Loop2:
-
-        // And, do the inner loop
-        PUSH    ecx
-        MOV     ebx, this
-        MOV     ecx, [ebx]this.m_c4Width
-
-        // Remember the current row source and destination values
-        PUSH    esi
-        PUSH    edi
-
-        Loop2b:
-
-        // Move up to the alpha byte in both
-        ADD     esi, 3
-        ADD     edi, 3
-
-        // Load the alpha byte into al
-        LODSB
-
-        // Move it into ah and put FF into al
-        MOV     ah, al
-        MOV     al, 0xFF
-
-        // Now we invert by subtracting alpha from FF, leaving result in al
-        SUB     al, ah
-
-        // Now store it back
-        STOSB
-
-        // And do the next pixel
-        LOOP    Loop2b
-
-        // We've done a row, so get back the base row pointers
-        POP     edi
-        POP     esi
-
-        // Move them forward by the padded row widths
-        ADD     edi, c4PerRow
-        ADD     esi, c4PerRow
-
-        // Now pop the outer loop counter off and loop
-        POP     ecx
-
-        LOOP    Loop2
-
-        // Restore the saved registers
-        POP     edi
-        POP     esi
-        POP     edx
-        POP     ecx
-        POP     ebx
-        POP     eax
+        // Start on the alpha byte so we can just move forward a pixel at a time
+        tCIDLib::TCard1* pc1Cur = pc1Src + 3;
+        for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < m_c4Width; c4ColInd++)
+        {
+            *pc1Cur = 0xFF - *pc1Cur;
+            pc1Cur += 4;
+        }
+        pc1Src += m_c4LineWidth;
     }
 }
 
@@ -2066,18 +1870,76 @@ tCIDLib::TVoid TPixelArrayImpl::MakeMask(       TPixelArrayImpl&    pixaiToFill
 
     //
     //  Ok, lets loop through our pixels. For each one that is equal to the
-    //  mask color, set it on (or off, if inverting.)
+    //  mask color, set it on (or off, if inverting.) We optimize the true/color
+    //  and true/alpha scenarios since they are the ones most likely used.
     //
-    tCIDLib::TCard4 c4PosVal = bInvert ? 0 : 1;
-    tCIDLib::TCard4 c4NegVal = bInvert ? 1 : 0;
-    for (tCIDLib::TCard4 c4Row = 0; c4Row < m_c4Height; c4Row++)
+    if ((m_eFmt == tCIDImage::EPixFmts::TrueAlpha)
+    &&  (m_eBitDepth == tCIDImage::EBitDepths::Eight))
     {
-        for (tCIDLib::TCard4 c4Col = 0; c4Col < m_c4Width; c4Col++)
+        const tCIDLib::TCard1* pc1Src = m_pc1Pixels;
+        for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < m_c4Height; c4RowInd++)
         {
-            if ((c4GetPixel(c4Col, c4Row, CID_LINE) == c4ClrVal))
-                pixaiToFill.PutAt(c4PosVal, c4Col, c4Row);
-            else
-                pixaiToFill.PutAt(c4NegVal, c4Col, c4Row);
+            tCIDLib::TCard1* pc1Tar = pixaiToFill.pc1RowPtr(c4RowInd);
+            const tCIDLib::TCard1* pc1CurSrc = pc1Src;
+            for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < m_c4Width; c4ColInd++)
+            {
+                // Get the current color out and see if it's the one we want
+                tCIDLib::TCard4 c4Clr = *(pc1CurSrc + 2);
+                c4Clr <<= 8;
+                c4Clr |= *(pc1CurSrc + 1);
+                c4Clr <<= 8;
+                c4Clr |= *pc1CurSrc;
+
+                if (c4Clr == c4Clr)
+                    pc1Tar[c4ColInd / 8] |= tCIDLib::TCard1(0x1) << (7 - (c4ColInd % 8));
+
+                pc1CurSrc += 4;
+            }
+
+            // Move to the next src scan line
+            pc1Src += m_c4LineWidth;
+        }
+    }
+     else if ((m_eFmt == tCIDImage::EPixFmts::TrueClr)
+          &&  (m_eBitDepth == tCIDImage::EBitDepths::Eight))
+    {
+        const tCIDLib::TCard1* pc1Src = m_pc1Pixels;
+        for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < m_c4Height; c4RowInd++)
+        {
+            tCIDLib::TCard1* pc1Tar = pixaiToFill.pc1RowPtr(c4RowInd);
+            const tCIDLib::TCard1* pc1CurSrc = pc1Src;
+            for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < m_c4Width; c4ColInd++)
+            {
+                // Get the current color out and see if it's the one we want
+                tCIDLib::TCard4 c4Clr = *(pc1CurSrc + 2);
+                c4Clr <<= 8;
+                c4Clr |= *(pc1CurSrc + 1);
+                c4Clr <<= 8;
+                c4Clr |= *pc1CurSrc;
+
+                if (c4Clr == c4Clr)
+                    pc1Tar[c4ColInd / 8] |= tCIDLib::TCard1(0x1) << (7 - (c4ColInd % 8));
+
+                pc1CurSrc += 3;
+            }
+
+            // Move to the next src scan line
+            pc1Src += m_c4LineWidth;
+        }
+    }
+     else
+    {
+        tCIDLib::TCard4 c4PosVal = bInvert ? 0 : 1;
+        tCIDLib::TCard4 c4NegVal = bInvert ? 1 : 0;
+        for (tCIDLib::TCard4 c4Row = 0; c4Row < m_c4Height; c4Row++)
+        {
+            for (tCIDLib::TCard4 c4Col = 0; c4Col < m_c4Width; c4Col++)
+            {
+                if ((c4GetPixel(c4Col, c4Row, CID_LINE) == c4ClrVal))
+                    pixaiToFill.PutAt(c4PosVal, c4Col, c4Row);
+                else
+                    pixaiToFill.PutAt(c4NegVal, c4Col, c4Row);
+            }
         }
     }
 }
@@ -2188,104 +2050,53 @@ tCIDLib::TCard1* TPixelArrayImpl::pc1RowPtr(const tCIDLib::TCard4 c4Row)
 //
 tCIDLib::TVoid TPixelArrayImpl::Premultiply()
 {
-    // The amount we skip forward for each row, with padding, and our pointer
-    const tCIDLib::TCard4 c4PerRow = m_c4LineWidth;
-    const tCIDLib::TCard1* pc1Dest = m_pc1Pixels;
-
-    __asm
+    tCIDLib::TCard1* pc1Dest = m_pc1Pixels;
+    for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < m_c4Height; c4RowInd++)
     {
-        // Save the registers we'll use
-        PUSH    eax
-        PUSH    ebx
-        PUSH    ecx
-        PUSH    edx
-        PUSH    edi
+        tCIDLib::TCard1* pc1Cur = pc1Dest;
+        for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < m_c4Width; c4ColInd++)
+        {
+            // Get the alpha out first
+            const tCIDLib::TCard1 c1Alpha = *(pc1Cur + 3);
 
-        // Set up src, dest both to us
-        MOV     edi, pc1Dest
+            //
+            //  If it's zero just zero the pixel. If it's 0xFF, do nothing since
+            //  it won't have any effect. Else do the pre-mul.
+            //
+            if (c1Alpha == 0)
+            {
+                *pc1Cur++ = 0;
+                *pc1Cur++ = 0;
+                *pc1Cur++ = 0;
+                pc1Cur++;
+            }
+             else if (c1Alpha == 0xFF)
+            {
+                pc1Cur += 4;
+            }
+             else
+            {
+                tCIDLib::TCard2 c2Val = *pc1Cur;
+                c2Val *= c1Alpha;
+                c2Val /= 0xFF;
+                *pc1Cur++ = tCIDLib::TCard1(c2Val);
 
-        // Do the outer loop of rows
-        MOV     ebx, this
-        MOV     ecx, [ebx]this.m_c4Height
+                c2Val = *pc1Cur;
+                c2Val *= c1Alpha;
+                c2Val /= 0xFF;
+                *pc1Cur++ = tCIDLib::TCard1(c2Val);
 
-        LoopRow:
+                c2Val = *pc1Cur;
+                c2Val *= c1Alpha;
+                c2Val /= 0xFF;
+                *pc1Cur++ = tCIDLib::TCard1(c2Val);
 
-        // Save row loop counter
-        PUSH    ecx
+                pc1Cur++;
+            }
+        }
 
-        // Remember the base row pointer
-        PUSH    edi
-
-        // And do this line's worth
-        MOV     ebx, this
-        MOV     ecx, [ebx]this.m_c4Width
-
-        LoopCol:
-
-        // Get the the alpha for this pixel
-        MOV     al, BYTE PTR [edi + 3]
-
-        // If alpha is 0xFF, then don't bother, it won't change the value
-        CMP     al, 255
-        JE      LoopPixelEnd
-
-        // If non-zero, we have to do the multiplies
-        CMP     al, 0
-        JNE     LoopDoMull
-
-        // Else just set all the color bytes to zero
-        MOV     BYTE PTR [edi], 0
-        MOV     BYTE PTR [edi + 1], 0
-        MOV     BYTE PTR [edi + 2], 0
-        JMP     LoopPixelEnd
-
-        // Have to do it, so move the alpha to bl and the divisor to bh
-        LoopDoMull:
-        MOV     bl, al
-        MOV     bh, 255
-
-        MOV     ah, 0
-        MOV     al, BYTE PTR [edi]
-        MUL     bl
-        DIV     bh
-        MOV     BYTE PTR [edi], al
-
-        MOV     ah, 0
-        MOV     al, BYTE PTR [edi + 1]
-        MUL     bl
-        DIV     bh
-        MOV     BYTE PTR [edi + 1], al
-
-        MOV     ah, 0
-        MOV     al, BYTE PTR [edi + 2]
-        MUL     bl
-        DIV     bh
-        MOV     BYTE PTR [edi + 2], al
-
-        LoopPixelEnd:
-
-        // Move raw pointer up to the next pixel
-        ADD     edi, 4
-        DEC     ecx
-        JNZ     LoopCol
-
-        // We've done a row, so get back the base row pointer
-        POP     edi
-
-        // Move forward by the padded row width
-        ADD     edi, c4PerRow
-
-        // Now pop the outer loop counter off and loop
-        POP     ecx
-        DEC     ecx
-        JNZ     LoopRow
-
-        // Restore the saved registers
-        POP     edi
-        POP     edx
-        POP     ecx
-        POP     ebx
-        POP     eax
+        // Move our base pointer up a line
+        pc1Dest += m_c4LineWidth;
     }
 }
 
@@ -2487,10 +2298,13 @@ TSize TPixelArrayImpl::szImage() const
 //  transparent. It's done in a non-linear way, so it ramps down quickly at
 //  first, and then slower.
 //
+//  If asked, we'll pre-multiply the color components as well.
+//
 tCIDLib::TVoid
-TPixelArrayImpl::ScaleAlpha(        tCIDLib::EDirs  eDir
-                            , const tCIDLib::TCard4 c4StartInd
-                            , const tCIDLib::TCard4 c4EndInd)
+TPixelArrayImpl::ScaleAlpha(        tCIDLib::EDirs      eDir
+                            , const tCIDLib::TCard4     c4StartInd
+                            , const tCIDLib::TCard4     c4EndInd
+                            , const tCIDLib::TBoolean   bPremultiply)
 {
     // Copy to some locals since we mway want to flip them based on direction
     tCIDLib::TCard4 c4Low = c4StartInd;
@@ -2535,7 +2349,6 @@ TPixelArrayImpl::ScaleAlpha(        tCIDLib::EDirs  eDir
             break;
     };
 
-    tCIDLib::TFloat4 f4Mul;
     if (bHorz)
     {
         #pragma message(CodeReminder "Implement horz alpha scaling")
@@ -2566,116 +2379,43 @@ TPixelArrayImpl::ScaleAlpha(        tCIDLib::EDirs  eDir
             if (m_eFmt == tCIDImage::EPixFmts::TrueAlpha)
             {
                 tCIDLib::TCard1* pc1Row = m_pc1Pixels + (c4Low * m_c4LineWidth);
-                tCIDLib::TCard2  c2Tmp = 0;
-                __asm
+                while (c4Low != c4High)
                 {
-                    PUSH    eax
-                    PUSH    ebx
-                    PUSH    ecx
-                    PUSH    edx
-                    PUSH    esi
-                    PUSH    edi
+                    const tCIDLib::TCard1 c1Alpha = tCIDLib::TCard1
+                    (
+                        (1.0 - TMathLib::f4Sine(f4CurRad)) * 0xFF
+                    );
+                    f4CurRad += f4IncPer;
 
-                    // We get the pixel count in edx for fast access
-                    MOV     ebx, this
-                    MOV     edx, [ebx]this.m_c4Width
+                    tCIDLib::TCard1* pc1Cur = pc1Row;
+                    for (tCIDLib::TCard4 c4HInd = 0; c4HInd < m_c4Width; c4HInd++)
+                    {
+                        if (bPremultiply)
+                        {
+                            tCIDLib::TCard2 c2Val = *pc1Cur;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1Cur++ = tCIDLib::TCard1(c2Val);
 
-                    // Load up starting pointer
-                    MOV     esi, pc1Row
+                            c2Val = *pc1Cur;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1Cur++ = tCIDLib::TCard1(c2Val);
 
-                    OuterLoop:
+                            c2Val = *pc1Cur;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1Cur++ = tCIDLib::TCard1(c2Val);
+                        }
+                         else
+                        {
+                            pc1Cur += 3;
+                        }
 
-                    // When high and low are equal, we are done
-                    MOV     eax, c4Low
-                    MOV     ebx, c4High
-                    SUB     eax, ebx
-                    JZ      LoopComplete
-
-                    // Push the current row pointer and get the dest set up
-                    PUSH    esi
-                    MOV     edi, esi
-
-                    // Update radians for next time leave another copy on stack
-                    FLD     f4CurRad
-                    FLD     ST(0)
-                    FLD     f4IncPer
-                    FADD
-                    FSTP    f4CurRad
-
-                    //
-                    //  f4CurRad is incrementd and original val is on ST0
-                    //  Get the sign of this value, and subtract it from 1.
-                    //  This is our multiplier for this round
-                    //
-                    FSIN
-                    FLD1
-                    FXCH
-                    FSUB
-
-                    // And load up loop counter for this loop
-                    MOV     ecx, edx
-                    MOV     eax, 0
-                    HorzLoop:
-
-                    // Load each byte, multiply and store
-                    FLD     ST(0)
-                    LODSB
-                    MOV     c2Tmp, ax
-                    FILD    c2Tmp
-                    FMUL
-                    FISTP   c2Tmp
-                    MOV     ax, c2Tmp
-                    STOSB
-
-                    FLD     ST(0)
-                    LODSB
-                    MOV     c2Tmp, ax
-                    FILD    c2Tmp
-                    FMUL
-                    FISTP   c2Tmp
-                    MOV     ax, c2Tmp
-                    STOSB
-
-                    FLD     ST(0)
-                    LODSB
-                    MOV     c2Tmp, ax
-                    FILD    c2Tmp
-                    FMUL
-                    FISTP   c2Tmp
-                    MOV     ax, c2Tmp
-                    STOSB
-
-                    FLD     ST(0)
-                    LODSB
-                    MOV     c2Tmp, ax
-                    FILD    c2Tmp
-                    FMUL
-                    FISTP   c2Tmp
-                    MOV     ax, c2Tmp
-                    STOSB
-
-                    LOOP    HorzLoop
-
-                    // Get radians off the stack and restore base row ptr
-                    FSTP    ST(0)
-                    POP     esi
-
-                    // And adjust it and the low index
-                    ADD     esi, i4BufOfs
-                    MOV     eax, c4Low
-                    ADD     eax, i4IndOfs
-                    MOV     c4Low, eax
-
-                    JMP     OuterLoop
-
-                    LoopComplete:
-
-                    POP     edi
-                    POP     esi
-                    POP     edx
-                    POP     ecx
-                    POP     ebx
-                    POP     eax
+                        *pc1Cur++ = c1Alpha;
+                    }
+                    pc1Row += i4BufOfs;
+                    c4Low += i4IndOfs;
                 }
             }
              else if (m_eFmt == tCIDImage::EPixFmts::GrayAlpha)
@@ -2683,15 +2423,23 @@ TPixelArrayImpl::ScaleAlpha(        tCIDLib::EDirs  eDir
                 tCIDLib::TCard1* pc1Row = m_pc1Pixels + (c4Low * m_c4LineWidth);
                 while (c4Low != c4High)
                 {
-                    f4Mul = 1.0F - TMathLib::f4Sine(f4CurRad);
-                    f4CurRad -= f4IncPer;
+                    const tCIDLib::TCard1 c1Alpha = tCIDLib::TCard1
+                    (
+                        (1.0 - TMathLib::f4Sine(f4CurRad)) * 0xFF
+                    );
+                    f4CurRad += f4IncPer;
                     tCIDLib::TCard1* pc1Pix = pc1Row;
                     for (tCIDLib::TCard4 c4HInd = 0; c4HInd < m_c4Width; c4HInd++)
                     {
-                        *pc1Pix = tCIDLib::TCard1(*pc1Pix * f4Mul);
+                        if (bPremultiply)
+                        {
+                            tCIDLib::TCard2 c2Val = *pc1Pix;
+                            c2Val *= c1Alpha;
+                            c2Val /= 0xFF;
+                            *pc1Pix = tCIDLib::TCard1(c2Val);
+                        }
                         pc1Pix++;
-                        *pc1Pix = tCIDLib::TCard1(*pc1Pix * f4Mul);
-                        pc1Pix++;
+                        *pc1Pix++ = c1Alpha;
                     }
                     pc1Row += i4BufOfs;
                     c4Low += i4IndOfs;
@@ -2706,15 +2454,23 @@ TPixelArrayImpl::ScaleAlpha(        tCIDLib::EDirs  eDir
             );
             while (c4Low != c4High)
             {
-                f4Mul = 1.0F - TMathLib::f4Sine(f4CurRad);
-                f4CurRad -= f4IncPer;
+                const tCIDLib::TCard2 c2Alpha = tCIDLib::TCard2
+                (
+                    (1.0 - TMathLib::f4Sine(f4CurRad)) * 0xFFFF
+                );
+                f4CurRad += f4IncPer;
                 tCIDLib::TCard2* pc2Pix = pc2Row;
                 for (tCIDLib::TCard4 c4HInd = 0; c4HInd < m_c4Width; c4HInd++)
                 {
-                    *pc2Pix = tCIDLib::TCard2(*pc2Pix * f4Mul);
+                    if (bPremultiply)
+                    {
+                        tCIDLib::TCard4 c4Tmp = *pc2Pix;
+                        c4Tmp *= c2Alpha;
+                        c4Tmp /= 0xFFFF;
+                        *pc2Pix = tCIDLib::TCard2(c4Tmp);
+                    }
                     pc2Pix++;
-                    *pc2Pix = tCIDLib::TCard2(*pc2Pix * f4Mul);
-                    pc2Pix++;
+                    *pc2Pix++ = c2Alpha;
                 }
                 pc2Row = tCIDLib::pOffsetNCPtr(pc2Row, i4BufOfs);
                 c4Low += i4IndOfs;
@@ -2875,196 +2631,95 @@ TPixelArrayImpl::SetAlphaAt(const   tCIDLib::TCard4 c4Alpha
 //
 //  And we have another version that will go through the array and set the
 //  alpha to transparent for any pixelst that match a passed transaprency
-//  color.
+//  color. It only works for true/alpha.
 //
 tCIDLib::TVoid TPixelArrayImpl::SetAlphaFromColor()
 {
-    const tCIDLib::TCard4 c4Cols = m_c4Width;
-    const tCIDLib::TCard4 c4Rows = m_c4Width;
-    const tCIDLib::TCard4 c4BytesPerRow = m_c4LineWidth;
-
-    //
-    //  We can optimize here since there are really only 3 scenarios, 8 bit
-    //  gray/alpha, 16 bit gray/alpha, and true alpha. So we do each one
-    //  separately.
-    //
+    tCIDLib::TCard1* pc1Dest = m_pc1Pixels;
     if (tCIDLib::c4EnumOrd(m_eBitDepth) == 8)
     {
         if (m_eFmt == tCIDImage::EPixFmts::TrueAlpha)
         {
-            // Optimize this highest value version with assembly
-            const tCIDLib::TCard4 c4HCnt = m_c4Width;
-            __asm
+            for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < m_c4Height; c4RowInd++)
             {
-                PUSH    eax
-                PUSH    ebx
-                PUSH    ecx
-                PUSH    edx
-                PUSH    esi
-
-                // And get the initial vertical loop counter
-                MOV     ebx, this
-                MOV     ecx, c4Rows
-
-                // Load up starting pointer
-                MOV     esi, [ebx]this.m_pc1Pixels
-
-                // Do the rows
-                VertLoop:
-
-                // Save the base pointer for this row, and the counter
-                PUSH    ecx
-                PUSH    esi
-
-                // Do this row
-                MOV     ecx, c4Cols
-                HorzLoop:
-
-                MOV     ebx, 0
-                MOV     eax, 0
-                LODSB
-                ADD     ebx, eax
-                LODSB
-                ADD     ebx, eax
-                LODSB
-                ADD     ebx, eax
-                MOV     eax, ebx
-                MOV     ebx, 3
-                DIV     bl
-                MOV     [esi], al
-                INC     esi
-
-                DEC     ecx
-                JNZ     HorzLoop
-
-                // Get the base row pointer and just to the next one
-                POP     esi
-                ADD     esi, c4BytesPerRow
-
-                // Get the outer loop counter back and loop
-                POP     ecx
-                DEC     ecx
-                JNZ     VertLoop
-
-                POP     esi
-                POP     edx
-                POP     ecx
-                POP     ebx
-                POP     eax
+                tCIDLib::TCard1* pc1Cur = pc1Dest;
+                for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < m_c4Width; c4ColInd++)
+                {
+                    //
+                    //  Add up the color components of the current color, divide by
+                    //  three and store that as the alpha byte.
+                    //
+                    tCIDLib::TCard4 c4Clr = *pc1Cur++;
+                    c4Clr += *pc1Cur++;
+                    c4Clr += *pc1Cur++;
+                    c4Clr /= 3;
+                    *pc1Cur++ = tCIDLib::TCard1(c4Clr);
+                }
+                pc1Dest += m_c4LineWidth;
             }
         }
          else if (m_eFmt == tCIDImage::EPixFmts::GrayAlpha)
         {
             for (tCIDLib::TCard4 c4VInd = 0; c4VInd < m_c4Height; c4VInd++)
             {
-                tCIDLib::TCard1* pc1Ptr = pc1RowPtr(c4VInd);
+                tCIDLib::TCard1* pc1Cur = pc1Dest;
                 for (tCIDLib::TCard4 c4HInd = 0; c4HInd < m_c4Width; c4HInd++)
                 {
-                    *(pc1Ptr + 1) = *pc1Ptr;
-                    pc1Ptr += 2;
+                    const tCIDLib::TCard1 c1Color = *pc1Cur++;
+                    *pc1Cur++ = c1Color;
                 }
+                pc1Dest += m_c4LineWidth;
             }
+        }
+         else
+        {
+            CIDAssert2(L"Unknown format for SetAlphaFromColor");
         }
     }
      else
     {
         for (tCIDLib::TCard4 c4VInd = 0; c4VInd < m_c4Height; c4VInd++)
         {
-            tCIDLib::TCard2* pc2Ptr = reinterpret_cast<tCIDLib::TCard2*>(pc1RowPtr(c4VInd));
+            tCIDLib::TCard2* pc2Ptr = reinterpret_cast<tCIDLib::TCard2*>(pc1Dest);
             for (tCIDLib::TCard4 c4HInd = 0; c4HInd < m_c4Width; c4HInd++)
             {
-                *(pc2Ptr - 1) = *pc2Ptr;
-                pc2Ptr += 2;
+                const tCIDLib::TCard2 c2Color = *pc2Ptr++;
+                *pc2Ptr++ = c2Color;
             }
+            pc1Dest += m_c4LineWidth;
         }
     }
 }
 
-
 tCIDLib::TVoid TPixelArrayImpl::SetAlphaFromColor(const tCIDLib::TCard4 c4TransClr)
 {
+    CIDAssert
+    (
+        (m_eBitDepth == tCIDImage::EBitDepths::Eight)
+        && (m_eFmt == tCIDImage::EPixFmts::TrueAlpha)
+        , L"SetAlphaFromColor(trans) only supports true/alpha format"
+    );
     const tCIDLib::TCard4 c4Cols = m_c4Width;
     const tCIDLib::TCard4 c4Rows = m_c4Height;
     const tCIDLib::TCard4 c4BytesPerRow = m_c4LineWidth;
 
-    __asm
+    tCIDLib::TCard1* pc1Dest = m_pc1Pixels;
+    for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < m_c4Height; c4RowInd++)
     {
-        PUSH    eax
-        PUSH    ebx
-        PUSH    ecx
-        PUSH    edx
-        PUSH    esi
-        PUSH    edi
+        tCIDLib::TCard1* pc1Cur = pc1Dest;
+        for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < m_c4Width; c4ColInd++)
+        {
+            tCIDLib::TCard4 c4Clr = *(pc1Cur + 2);
+            c4Clr <<= 8;
+            c4Clr |= *(pc1Cur + 1);
+            c4Clr <<= 8;
+            c4Clr |= *pc1Cur++;
 
-        // And get the initial vertical loop counter
-        MOV     ebx, this
-        MOV     ecx, c4Rows
-
-        // Load up starting pointer
-        MOV     esi, [ebx]this.m_pc1Pixels
-
-        // Do the rows
-        VertLoop:
-
-        // Save the base pointer for this row, and the counter
-        PUSH    ecx
-        PUSH    esi
-
-        // Do this row
-        MOV     ecx, c4Cols
-        HorzLoop:
-
-        // Load the first three values of this pixel, as the color
-        MOV     ebx, 0
-        LODSB
-        MOV     bl, al
-
-        MOV     eax, 0
-        LODSB
-        SHL     eax, 8
-        OR      ebx, eax
-
-        MOV     eax, 0
-        LODSB
-        SHL     eax, 16
-        OR      ebx, eax
-
-        //
-        //  Set al based on whether this matches our trans color or not.
-        //  Assume not, since most typically don't.
-        //
-        MOV     al, 0
-        CMP     ebx, c4TransClr
-        JZ      NotTrans
-
-        MOV     al, 0xFF
-        NotTrans:
-
-        // Store this value, and we are now on the next pixel
-        MOV     edi, esi
-        STOSB
-
-        // Move the source up to the next pixel now as well
-        ADD     esi, 1
-
-        DEC     ecx
-        JNZ     HorzLoop
-
-        // Get the base row pointer and adjust to the next one
-        POP     esi
-        ADD     esi, c4BytesPerRow
-
-        // Get the outer loop counter back and loop
-        POP     ecx
-        DEC     ecx
-        JNZ     VertLoop
-
-        POP     edi
-        POP     esi
-        POP     edx
-        POP     ecx
-        POP     ebx
-        POP     eax
+            if (c4Clr == c4TransClr)
+                *pc1Cur = 0;
+            pc1Cur++;
+        }
+        pc1Dest += m_c4LineWidth;
     }
 }
 
@@ -3090,225 +2745,75 @@ tCIDLib::TVoid TPixelArrayImpl::SetEmptyTrans()
 }
 
 
-
+//
+//  This is only legal for true/alpha format.
+//
 tCIDLib::TVoid
 TPixelArrayImpl::SetTextAlpha(  const   tCIDLib::TCard4     c4TextClr
-                            , const tCIDLib::TCard4     c4TransClr
-                            , const tCIDLib::TBoolean   bPremul)
+                                , const tCIDLib::TCard4     c4TransClr
+                                , const tCIDLib::TBoolean   bPremul)
 {
-    const tCIDLib::TCard4 c4Cols = m_c4Width;
-    const tCIDLib::TCard4 c4Rows = m_c4Height;
-    const tCIDLib::TCard4 c4BytesPerRow = m_c4LineWidth;
-    const tCIDLib::TCard1 c1SubAlpha = 0x10;
+    const tCIDLib::TCard1 c1AliasAlpha = 0x10;
 
-    // Do a separate version if premul vs. non-premul
-    if (bPremul)
+    tCIDLib::TCard1* pc1Dest = m_pc1Pixels;
+    for (tCIDLib::TCard4 c4RowInd = 0; c4RowInd < m_c4Height; c4RowInd++)
     {
-        __asm
+        tCIDLib::TCard1* pc1Cur = pc1Dest;
+        for (tCIDLib::TCard4 c4ColInd = 0; c4ColInd < m_c4Width; c4ColInd++)
         {
-            PUSH    eax
-            PUSH    ebx
-            PUSH    ecx
-            PUSH    edx
-            PUSH    esi
-            PUSH    edi
-
-            // And get the initial vertical loop counter
-            MOV     ebx, this
-            MOV     ecx, c4Rows
-
-            // Load up starting pointer
-            MOV     esi, [ebx]this.m_pc1Pixels
-
-            // Do the rows
-            VertLoop:
-
-            // Save the base pointer for this row, and the counter
-            PUSH    ecx
-            PUSH    esi
-
-            // Do this row
-            MOV     ecx, c4Cols
-            HorzLoop:
-
-            // Remember the output as the current input initially
-            MOV     edi, esi
-
-            // Load the first three values of this pixel, as the color
-            MOV     ebx, 0
-            LODSB
-            MOV     bl, al
-
-            MOV     eax, 0
-            LODSB
-            SHL     eax, 8
-            OR      ebx, eax
-
-            MOV     eax, 0
-            LODSB
-            SHL     eax, 16
-            OR      ebx, eax
-
             //
-            //  If it's the trans color, set al to 0. If it's the text color
-            //  set it to 0xFF. Else set a low fixed alpha. In the case of FF
-            //  we don't need to pre-mul since it won't matter. Else pre-mul.
+            //  Get the current color out and see if it's the text color or
+            //  trans color, or other.
             //
-            CMP     ebx, c4TransClr
-            JE      IsTrans
+            tCIDLib::TCard4 c4Clr = *(pc1Cur + 2);
+            c4Clr <<= 8;
+            c4Clr |= *(pc1Cur + 1);
+            c4Clr <<= 8;
+            c4Clr |= *pc1Cur;
 
-            CMP     ebx, c4TextClr
-            JE      IsText
+            if (c4Clr == c4TransClr)
+            {
+                // Set everything to zero
+                *reinterpret_cast<tCIDLib::TCard4*>(pc1Cur) = 0;
+                pc1Cur += 4;
+            }
+                else if (c4Clr == c4TextClr)
+            {
+                // Keep it as is, set the transparency to 0xFF
+                *(pc1Cur + 3) = 0xFF;
+                pc1Cur += 4;
+            }
+                else
+            {
+                // Set a low transparency and pre-multiply if asked to
+                if (bPremul)
+                {
+                    tCIDLib::TCard2 c2Tmp = *pc1Cur;
+                    c2Tmp *= c1AliasAlpha;
+                    c2Tmp /= 0xFF;
+                    *pc1Cur++ = tCIDLib::TCard1(c2Tmp);
 
-            // Back source up and pre-mul the bytes and store them back out
-            SUB     esi, 3
-            MOV     bl, c1SubAlpha
-            MOV     bh, 255
+                    c2Tmp = *pc1Cur;
+                    c2Tmp *= c1AliasAlpha;
+                    c2Tmp /= 0xFF;
+                    *pc1Cur++ = tCIDLib::TCard1(c2Tmp);
 
-            MOV     ah, 0
-            LODSB
-            MUL     bl
-            DIV     bh
-            STOSB
+                    c2Tmp = *pc1Cur;
+                    c2Tmp *= c1AliasAlpha;
+                    c2Tmp /= 0xFF;
+                    *pc1Cur++ = tCIDLib::TCard1(c2Tmp);
+                }
+                    else
+                {
+                    pc1Cur += 3;
+                }
 
-            MOV     ah, 0
-            LODSB
-            MUL     bl
-            DIV     bh
-            STOSB
-
-            MOV     ah, 0
-            LODSB
-            MUL     bl
-            DIV     bh
-            STOSB
-
-            MOV     al, c1SubAlpha
-            STOSB
-            JMP     EndHLoop
-
-            IsTrans:
-            // Zero alpha and color all at once, no store
-            MOV     eax, 0
-            STOSD
-            JMP     EndHLoop
-
-            // In this, no pre-mul is needed, move up to alpha and store
-            IsText:
-            ADD     edi, 3
-            MOV     al, 0xFF
-            STOSB
-
-            // Move the source up to the next pixel now as well
-            EndHLoop:
-            ADD     esi, 1
-            LOOP    HorzLoop
-
-            // Get the base row pointer and just to the next one
-            POP     esi
-            ADD     esi, c4BytesPerRow
-
-            // Get the outer loop counter back and loop
-            POP     ecx
-            LOOP    VertLoop
-
-            POP     edi
-            POP     esi
-            POP     edx
-            POP     ecx
-            POP     ebx
-            POP     eax
+                *pc1Cur = c1AliasAlpha;
+            }
         }
-    }
-     else
-    {
-        __asm
-        {
-            PUSH    eax
-            PUSH    ebx
-            PUSH    ecx
-            PUSH    edx
-            PUSH    esi
-            PUSH    edi
 
-            // And get the initial vertical loop counter
-            MOV     ebx, this
-            MOV     ecx, c4Rows
-
-            // Load up starting pointer
-            MOV     esi, [ebx]this.m_pc1Pixels
-
-            // Do the rows
-            VertLoop2:
-
-            // Save the base pointer for this row, and the counter
-            PUSH    ecx
-            PUSH    esi
-
-            // Do this row
-            MOV     ecx, c4Cols
-            HorzLoop2:
-
-            // Load the first three values of this pixel, as the color
-            MOV     ebx, 0
-            LODSB
-            MOV     bl, al
-
-            MOV     eax, 0
-            LODSB
-            SHL     eax, 8
-            OR      ebx, eax
-
-            MOV     eax, 0
-            LODSB
-            SHL     eax, 16
-            OR      ebx, eax
-
-            //
-            //  If it's the trans color, set al to 0. If it's the text color
-            //  set it to 0xFF. Else set a low fixed alpha. In the case of FF
-            //  we don't need to pre-mul since it won't matter. Else pre-mul.
-            //
-            CMP     ebx, c4TransClr
-            JE      IsTrans2
-
-            CMP     ebx, c4TextClr
-            JE      IsText2
-
-            MOV     al, c1SubAlpha
-            JMP     EndHLoop2
-
-            IsTrans2:
-            MOV     al, 0
-            JMP     EndHLoop2
-
-            // In this, no pre-mul is needed, move up to alpha and store
-            IsText2:
-            MOV     al, 0xFF
-
-            // Store the alpha, and move to the next source pixel
-            EndHLoop2:
-            MOV     edi, esi
-            STOSB
-
-            ADD     esi, 1
-            LOOP    HorzLoop2
-
-            // Get the base row pointer and just to the next one
-            POP     esi
-            ADD     esi, c4BytesPerRow
-
-            // Get the outer loop counter back and loop
-            POP     ecx
-            LOOP    VertLoop2
-
-            POP     edi
-            POP     esi
-            POP     edx
-            POP     ecx
-            POP     ebx
-            POP     eax
-        }
+        // Move to the next scan line
+        pc1Dest += m_c4LineWidth;
     }
 }
 
@@ -3325,8 +2830,8 @@ TPixelArrayImpl::SetTextAlpha(  const   tCIDLib::TCard4     c4TextClr
 //
 tCIDLib::TVoid
 TPixelArrayImpl::StoreCompRow(          tCIDLib::TCard2* const  pc2ToStore
-                            , const tCIDLib::TCard4         c4Row
-                            , const tCIDLib::EClrComps      eComp)
+                                , const tCIDLib::TCard4         c4Row
+                                , const tCIDLib::EClrComps      eComp)
 {
     tCIDLib::TCard4 c4Shift;
     tCIDLib::TCard4 c2Cur;
@@ -3609,8 +3114,8 @@ tCIDLib::TVoid TPixelArrayImpl::StreamTo(TBinOutStream& strmToWriteTo) const
 //
 tCIDLib::TCard4
 TPixelArrayImpl::c4GetBoundaryPixel(const   tCIDLib::TInt4  i4XPos
-                                , const tCIDLib::TInt4  i4YPos
-                                , const tCIDLib::TCard4 c4Line) const
+                                    , const tCIDLib::TInt4  i4YPos
+                                    , const tCIDLib::TCard4 c4Line) const
 {
     if ((i4XPos < 0) || (i4YPos < 0))
         return 0;
@@ -3627,8 +3132,8 @@ TPixelArrayImpl::c4GetBoundaryPixel(const   tCIDLib::TInt4  i4XPos
 //
 tCIDLib::TCard4
 TPixelArrayImpl::c4GetPixel(const   tCIDLib::TCard4 c4XPos
-                        , const tCIDLib::TCard4 c4YPos
-                        , const tCIDLib::TCard4 c4Line) const
+                            , const tCIDLib::TCard4 c4YPos
+                            , const tCIDLib::TCard4 c4Line) const
 {
     if ((c4XPos >= m_c4Width)
     ||  (c4YPos >= m_c4Height))
@@ -3817,10 +3322,10 @@ tCIDLib::TVoid TPixelArrayImpl::CalcTransients()
 //
 tCIDLib::TVoid
 TPixelArrayImpl::ConvertToCoefs(        tCIDLib::TFloat8* const pf8ToCvt
-                            , const tCIDLib::TCard4         c4SampleCnt
-                            , const tCIDLib::TFloat8* const pf8Poles
-                            , const tCIDLib::TCard4         c4PoleCnt
-                            , const tCIDLib::TFloat8        f8Tolerance) const
+                                , const tCIDLib::TCard4         c4SampleCnt
+                                , const tCIDLib::TFloat8* const pf8Poles
+                                , const tCIDLib::TCard4         c4PoleCnt
+                                , const tCIDLib::TFloat8        f8Tolerance) const
 {
     tCIDLib::TFloat8 f8Lambda = 1.0;
 
@@ -3870,16 +3375,16 @@ TPixelArrayImpl::ConvertToCoefs(        tCIDLib::TFloat8* const pf8ToCvt
 
 
 //
-//  Used in Bicubic spline scaling. Interpolates a point based on the incomgin
+//  Used in Bicubic spline scaling. Interpolates a point based on the incoming
 //  coefficient array.
 //
 tCIDLib::TFloat8
 TPixelArrayImpl::f8InterpolatePoint(const   tCIDLib::TFloat4* const pf4Coefs
-                                , const tCIDLib::TCard4         c4Width
-                                , const tCIDLib::TCard4         c4Height
-                                , const tCIDLib::TFloat8        f8X
-                                , const tCIDLib::TFloat8        f8Y
-                                , const tCIDLib::TCard4         c4Degree) const
+                                    , const tCIDLib::TCard4         c4Width
+                                    , const tCIDLib::TCard4         c4Height
+                                    , const tCIDLib::TFloat8        f8X
+                                    , const tCIDLib::TFloat8        f8Y
+                                    , const tCIDLib::TCard4         c4Degree) const
 {
     // Compute the interpolation indexes
     tCIDLib::TInt4 i4I;
@@ -4094,9 +3599,9 @@ TPixelArrayImpl::f8InitAntiCausalCoefs(         tCIDLib::TFloat8* const pf8ToCvt
 
 tCIDLib::TFloat8
 TPixelArrayImpl::f8InitCausalCoefs(         tCIDLib::TFloat8* const pf8ToCvt
-                                , const tCIDLib::TCard4         c4SampleCnt
-                                , const tCIDLib::TFloat8        f8Pole
-                                , const tCIDLib::TFloat8        f8Tolerance) const
+                                    , const tCIDLib::TCard4         c4SampleCnt
+                                    , const tCIDLib::TFloat8        f8Pole
+                                    , const tCIDLib::TFloat8        f8Tolerance) const
 {
     tCIDLib::TInt4 i4Horizon = tCIDLib::TInt4(c4SampleCnt);
     if (f8Tolerance > 0.0)
@@ -4237,11 +3742,11 @@ TPixelArrayImpl::InterpComp(const   tCIDLib::EClrComps      eComp
 
 tCIDLib::TVoid
 TPixelArrayImpl::LoadCoefs( const   tCIDLib::EClrComps      eComp
-                        ,       tCIDLib::TFloat4* const pf4ToFill
-                        ,       tCIDLib::TFloat8* const pf8Row
-                        ,       tCIDLib::TFloat8* const pf8Col
-                        , const tCIDLib::TCard4         c4Degree
-                        , const TClrPalette&            palToUse) const
+                            ,       tCIDLib::TFloat4* const pf4ToFill
+                            ,       tCIDLib::TFloat8* const pf8Row
+                            ,       tCIDLib::TFloat8* const pf8Col
+                            , const tCIDLib::TCard4         c4Degree
+                            , const TClrPalette&            palToUse) const
 {
     CIDAssert
     (
@@ -4343,9 +3848,9 @@ TPixelArrayImpl::LoadCoefs( const   tCIDLib::EClrComps      eComp
 
 tCIDLib::TVoid
 TPixelArrayImpl::PutPixel(  const   tCIDLib::TCard4 c4ToPut
-                        , const tCIDLib::TCard4 c4XPos
-                        , const tCIDLib::TCard4 c4YPos
-                        , const tCIDLib::TCard4 c4Line)
+                            , const tCIDLib::TCard4 c4XPos
+                            , const tCIDLib::TCard4 c4YPos
+                            , const tCIDLib::TCard4 c4Line)
 {
     if ((c4XPos >= m_c4Width)
     ||  (c4YPos >= m_c4Height))

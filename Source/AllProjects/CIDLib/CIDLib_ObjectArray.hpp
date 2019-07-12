@@ -288,24 +288,26 @@ class TObjArray : public TObject, public MDuplicable
 
 
         // Call back for each element. Can be a lambda or function
-        template <typename IterCB> tCIDLib::TVoid ForEach(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             TMtxLocker lockThis(m_pmtxLock);
             for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
             {
                 if (!iterCB(m_paobjList[c4Ind]))
-                    break;
+                    return kCIDLib::False;
             }
+            return kCIDLib::True;
         }
 
-        template <typename IterCB> tCIDLib::TVoid ForEach(IterCB iterCB)
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB)
         {
             TMtxLocker lockThis(m_pmtxLock);
             for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
             {
                 if (!iterCB(m_paobjList[c4Ind]))
-                    break;
+                    return kCIDLib::False;
             }
+            return kCIDLib::True;
         }
 
 

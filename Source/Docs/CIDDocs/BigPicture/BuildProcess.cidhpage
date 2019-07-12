@@ -10,26 +10,26 @@
 
         <P>CIDLib provides its own build tool, called CIDBuild. As with any decision it has various consequences. Some obvious ones are:</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem Ref="Simplicity">Because CIDLib has its own build tool, that tool understands all of the project structure and file naming conventions used, so it is very easy to set up a new project to build.</LItem>
             <LItem Ref="Inflexibility">As always, you can choose simple or flexible. In order to get the simplicity you must follow the CIDLib conventions, and it's not easy to bring in a bunch of outside content.</LItem>
-            <LItem Ref="Convenience">Not only does CIDBuild understand project structure and such, it also understands the loadable resources system and the ORB (Object Request Broker) system and so forth. This make sit very convenient to use tools that otherwise would require a fair amount of twitchy setup.</LItem>
-            <LItem Ref="Portability">CIDBuild is designed to support CIDLib's portability and so it works hard platform specific issues out of the build setup. The inflexibilty plays dividends here because we can push the details down into the actual per-platform build tool extensions, keeping the actual project definition content very simple and generic.</LItem>
+            <LItem Ref="Convenience">Not only does CIDBuild understand project structure and such, it also understands the loadable resources system and the ORB (Object Request Broker) system and so forth. This makes it very convenient to use tools that otherwise would require a fair amount of twitchy setup.</LItem>
+            <LItem Ref="Portability">CIDBuild is designed to support CIDLib's portability and so it keepss hard platform specific issues out of the build setup. The inflexibilty plays dividends here because we can push the details down into the actual per-platform build tool extensions, keeping the actual project definition content very simple and quite generic.</LItem>
         </List>
 
-        <P>Since we do have per-platform (and per-compiler) build extensions, there is of course some flexibility in terms of how those extensions process the generic project definition information. And there is a simple way to pass along per-platform 'directives' to the tools for each project.</P>
+        <P>Since we have per-platform (and per-compiler) build tools drivers and each project can pass along per-platform flags to these drivers, there is some flexibility in terms of how those drivers process the generic project definition information.</P>
 
-        <P>Command Line Based</P>
+        <SecTitle>Command Line Based</SecTitle>
 
-        <P>For portability reasons CIDLib's build proces is command line based. You can of course use an IDE for debugging, and a GUI based editor for editing, but the build process itself is command line based. It's fairly simple and for the most part you will only use a handful of commands in day to day development.</P>
+        <P>For portability reasons CIDLib's build process is command line based. You can of course use an IDE for debugging, and a GUI based editor for editing, but the build process itself is command line based. It's fairly simple and for the most part you will only use a handful of commands in day to day development.</P>
 
         <SecTitle>Project Definition</SecTitle>
 
-        <P>CIDLib's build system is based around projects, which mostly map directly to CIDLib <Link Type="Page" Ref="/BigPicture/" Id="/Facilities">facilities.</Link> But there are other project types as well, for file copying for instance.</P>
+        <P>CIDLib's build system is based around projects, which mostly map directly to CIDLib facilities, see the link to the left. But there are other project types as well, for file copying for instance.</P>
 
-        <P>There is a single project definition file per code base (or repository), which defines all of the projects and their build settings. It is called CIDBuild.Projects and it will be in the Source\AllProjects directory. We won't get into the details of the project definition system here, that is for the <Link Type="Page" Ref="/Reference/Build/" Id="/Overview">reference</Link> section, but we'll take a look at some of the key aspects of it.</P>
+        <P>There is a single project definition file per code base (repository), which defines all of the projects and their build settings. It is called CIDBuild.Projects and it will be in the Source\AllProjects directory. We won't get into the details of the project definition system here, that is for the <Link Type="Page" Ref="/Reference/Build/" Id="/Overview">reference</Link> section, but we'll take a look at some of the key aspects of it.</P>
 
-        <P>Here is a fairly typical definition for a project. This is for an executable facility which is typically run under a background service, so it normally has no UI at all, though it can be run (in debug mode) as a command line program for ease of development.</P>
+        <P>Here is a fairly typical definition for a project. This is for an executable facility, this particular one is typically run under a background service, so it normally has no UI at all, though it can be run (in debug mode) as a command line program for ease of development.</P>
 
         <Code>
         PROJECT=CIDCfgSrv
@@ -56,7 +56,7 @@
 
         <P>There is always a settings section first that provides the basic information about the project. It gives the directory relative to AllProjects, and then indicates only those standard attributes where it deviates from the defaults. In this case it says it has loadable text and that it is a service type program. That's all that's needed in terms of general information.</P>
 
-        <P>It then indicates that it uses the IDL compiler to generate some content, in this case it needs to use the IDL compiler generate the server side stub for the remote interface used to talk to this service. We'll get more into this later, but this is very commony also used just to generate constants and smart enumerations as well, even if no remote interfaces are involved.</P>
+        <P>It then indicates that it uses the IDL compiler to generate some content, in this case it needs to use the IDL compiler generate the server side stub for the remote interface used to talk to this server. This is very commony also used just to generate constants and smart enumerations as well, even if no remote interfaces are involved, see the Smart Enums link to the left.</P>
 
         <P>Then it indicates those projects in this code base that it is dependent on. Dependencies on external projects from another code base are done differently, but there aren't any in CIDLib since it is the foundation on which everything else would be built.</P>
 
@@ -122,6 +122,40 @@
         <P>If you are in the directory of a project, and you don't indicate a target project, it will assume you want to apply it to the project in that directory. This is often very convenient, but it can sometimes bite you if you really intended to apply the operation to the whole code base. You can always set the target to All, which is a magic value to force all projects to be evaluated regardless of where you are.</P>
 
         <Code>CIDBuild /action=makedeps /target=All</Code>
+
+        <Note>Only being directly in a project directory is treated this way. If you are in a common directory above a set of sibling projects, it won't find everything under that directory and try to build it. See Group Targets below for an option for that.</Note>
+
+
+        <SecTitle>Group Targets</SecTitle>
+
+        <P>Though the support is currently somewhat limited, CIDBuild also supports group targets. The purpose of these is when you have a group of facilities that might not directly be dependent on each other but you want to make sure all get rebuilt. So you can set up a group project that just includes the other projects as dependencies. The build tool will invoke the requested process on each of them. Note though that this may also redundantly process common projects.</P>
+
+        <P>Here is an example where a set of tests, which are all actually independent executables, can all be rebuilt at once (and anything any of them depend on if you don't use the /NR option.)</P>
+
+        <Code>
+        PROJECT=Tests2
+            SETTINGS
+                DIRECTORY   = Tests2
+                TYPE        = Group
+            END SETTINGS
+
+            DEPENDENTS
+                TestAI
+                TestCIDLib2
+                TestMathLib
+                TestCIDEncode
+                TestRegX
+                TestCrypto
+                TestXML
+                TestCIDMData
+                TestNet
+                TestObjStore
+                TestORB
+                StressTests
+            END DEPENDENTS
+
+        END PROJECT
+        </Code>
 
     </HelpText>
 

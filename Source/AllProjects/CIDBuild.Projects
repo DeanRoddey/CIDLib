@@ -262,10 +262,6 @@ PROJECT=CIDImage
         VERSIONED   = Yes
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDLib
         CIDMath
@@ -1393,6 +1389,7 @@ PROJECT=GenXMLChTable
 END PROJECT
 
 
+
 ; ----------------------------------------------------------------------------
 ;   The test framework and the library shared by the framework and the test
 ;   programs.
@@ -2330,6 +2327,35 @@ END PROJECT
 ;  Some intermediate samples
 ; ----------------------------------------------------------------------------
 
+PROJECT=CML1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\CML1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMacroEng
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=Interview1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Interview1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMData
+    END DEPENDENTS
+
+END PROJECT
+
 PROJECT=ObjStore1
 
     SETTINGS
@@ -2343,8 +2369,6 @@ PROJECT=ObjStore1
     END DEPENDENTS
 
 END PROJECT
-
-
 
 PROJECT=ORB1SampS
 
@@ -2469,3 +2493,36 @@ PROJECT=Window2
         CIDCtrls
     END DEPENDENTS
 END PROJECT
+
+PROJECT=Window3
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Window3
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        RESFILE     = Yes
+    END SETTINGS
+
+    INCLUDEPLATS
+        Win32
+    END INCLUDEPLATS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+; ----------------------------------------------------------------------------
+;  A junk project for temporary work. Only enabled when needed.
+; ----------------------------------------------------------------------------
+;PROJECT=Tmp
+;    SETTINGS
+;        DIRECTORY   = Samples\Tmp
+;        SAMPLE      = Yes
+;    END SETTINGS
+;
+;    DEPENDENTS
+;        CIDLib
+;        CIDImgFact
+;    END DEPENDENTS
+;END PROJECT

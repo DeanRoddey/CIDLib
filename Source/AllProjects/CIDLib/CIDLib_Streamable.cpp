@@ -46,13 +46,13 @@
 // ---------------------------------------------------------------------------
 MStreamable& MStreamable::Nul_MStreamable()
 {
-    static TPoint* pstrmblNull = nullptr;
-    if (!pstrmblNull)
+    static TPoint* pmstrmblNull = nullptr;
+    if (!pmstrmblNull)
     {
         TBaseLock lockInit;
-        if (!pstrmblNull)
-            TRawMem::pExchangePtr(&pstrmblNull, new TPoint);
+        if (!pmstrmblNull)
+            TRawMem::pExchangePtr(&pmstrmblNull, new TPoint);
     }
-    return *pstrmblNull;
+    return *pmstrmblNull;
 }
 

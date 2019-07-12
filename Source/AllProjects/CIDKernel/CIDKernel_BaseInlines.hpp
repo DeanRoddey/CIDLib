@@ -292,6 +292,23 @@ namespace tCIDLib
     }
 
 
+    //
+    //  A simple generic pair of values of arbitrary type. Any required functionality
+    //  of the members is the business of the user. But they have to be assignable
+    //  at least.
+    //
+    template <typename F, typename S> struct TBasicPair
+    {
+        TBasicPair() = default;
+        TBasicPair(const F& fVal, const S& sVal) :
+            m_tF(fVal)
+            , m_tS(sVal)
+        {
+        }
+        F m_tF;
+        S m_tS;
+    };
+
 
     // Default relative magnitude comparator for sorting
     template <typename T> tCIDLib::ESortComps eComp(const T& t1, const T& t2)

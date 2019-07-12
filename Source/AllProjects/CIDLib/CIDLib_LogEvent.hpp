@@ -77,7 +77,7 @@ class CIDLIBEXP TLogEvent :
             const   TString&                strFacName
             , const TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
-            , const tCIDLib::TErrCode       errcId
+            , const tCIDLib::TMsgId         midLoad
             , const TString&                strErrText
             , const TString&                strAuxText
             , const tCIDLib::ESeverities    eSeverity
@@ -89,7 +89,7 @@ class CIDLIBEXP TLogEvent :
             const   TString&                strFacName
             , const TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
-            , const tCIDLib::TErrCode       errcId
+            , const tCIDLib::TMsgId         midLoad
             , const TString&                strErrText
             , const tCIDLib::ESeverities    eSeverity
             , const tCIDLib::EErrClasses    eClass
@@ -100,7 +100,7 @@ class CIDLIBEXP TLogEvent :
             const   TString&                strFacName
             , const TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
-            , const tCIDLib::TErrCode       errcId
+            , const tCIDLib::TMsgId         midLoad
             , const TKrnlError&             kerrIds
             , const TString&                strErrText
             , const TString&                strAuxText
@@ -113,7 +113,7 @@ class CIDLIBEXP TLogEvent :
             const   TString&                strFacName
             , const TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
-            , const tCIDLib::TErrCode       errcId
+            , const tCIDLib::TMsgId         midLoad
             , const TKrnlError&             kerrIds
             , const TString&                strErrText
             , const tCIDLib::ESeverities    eSeverity
@@ -122,7 +122,7 @@ class CIDLIBEXP TLogEvent :
 
         TLogEvent
         (
-            const   TLogEvent&              errToCopy
+            const   TLogEvent&              logevSrc
         );
 
         ~TLogEvent();
@@ -133,7 +133,7 @@ class CIDLIBEXP TLogEvent :
         // -------------------------------------------------------------------
         TLogEvent& operator=
         (
-            const   TLogEvent&              errToAssign
+            const   TLogEvent&              logevSrc
         );
 
 

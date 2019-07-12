@@ -11,11 +11,21 @@
         <PageLink FileName="FacilityNamespaces" Title="Facility Namespaces"/>
         <PageLink FileName="IDL-Enum" Title="Smart Enums"/>
         <PageLink FileName="BuildProcess" Title="Build Tools"/>
-        <PageLink FileName="Exceptions" Title="Exceptions"/>
+        <PageLink FileName="Log-Except" Title="Logging/Exceptions"/>
+        <PageLink FileName="LogFramework"  Title="Logging Framework"/>
         <PageLink FileName="Janitors"/>
-        <PageLink FileName="Collections" Title="Collections"/>
+        <PageLink FileName="Text" Title="Text/Strings"/>
+        <PageLink FileName="TextEncoding" Title="Text Encoding"/>
+        <PageLink FileName="StringTokens" Title="Token Replacement"/>
+        <PageLink FileName="Collections"/>
         <PageLink FileName="Cursors" Title="Collection Cursors"/>
+        <PageLink FileName="Streams"/>
+        <PageLink FileName="ORB-IDL" Title="Client/Server (ORB)"/>
+        <PageLink FileName="Threads"/>
+        <PageLink FileName="ThreadSync" Title="Thread Synchronization"/>
+        <PageLink FileName="PubSub" Title="Publish/Subscribe"/>
         <PageLink FileName="Style" Title="Coding Style"/>
+        <PageLink FileName="Philosophy"/>
     </PageMap>
 
     <SubTopicMap>

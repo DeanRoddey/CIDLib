@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="MStreamable" Prefix="mstrmbl" Parent="N/A">
+
+    <Desc>
+        <P>MStreamable is one of the fundamental mixin interfaces. Any class that implements this interface can be streamed to/from CIDLib's binary streams. This is a core concept that enables a lot of very useful capabilities.</P>
+
+        <P>See the Big Picture section for more details on <Link Type="Page" Ref="/BigPicture/" Id="/Streams">streams.</Link></P>
+    </Desc>
+
+    <PubIntf>
+        <Ctors>
+             <!-- The dtor is virtual so we have to do it separatekly -->
+            <Method Name="~MStreamable" Attrs="Virtual">
+                <Desc>Just required for syntax reasons</Desc>
+                <MethVar/>
+            </Method>
+        </Ctors>
+
+    </PubIntf>
+
+    <ProtIntf>
+        <Ctors DefMethods="CopyCtor DefCtor"/>
+        <Operators DefMethods="AssignOp"/>
+
+        <!-- Virtual public methods -->
+        <VirtMeths>
+
+            <Method Attrs="Pure" Name="StreamFrom">
+                <Desc>This method handles streaming in this object from the provided binary input stream. Classes that implement this interface override this and stream themselves in.</Desc>
+                <MethVar>
+                    <MethParam Name="strmToReadFrom" Type="TBinInStream" PBy="Ref" Dir="In"/>
+                </MethVar>
+            </Method>
+
+            <Method Attrs="Pure" Name="StreamTo">
+                <Desc>This method handles streaming out this object to the provided binary output stream. Classes that implement this interface override this and stream themselves out.</Desc>
+                <MethVar>
+                    <MethParam Name="strmToWriteTo" Type="TBinOutStream" PBy="Ref" Dir="In"/>
+                </MethVar>
+            </Method>
+
+        </VirtMeths>
+    </ProtIntf>
+
+</CppClass>

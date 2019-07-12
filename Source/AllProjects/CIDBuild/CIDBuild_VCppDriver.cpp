@@ -338,16 +338,14 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     //
     apszArgs[c4CurArg++] = L"/arch:SSE2";
 
-    // We always want wchar_t to be an intrinsic type
+    //
+    //  We always want wchar_t to be an intrinsic type. Note that we don't define
+    //  UNICODE here. The reason being that we want that to be done in a platform
+    //  header so that the IDE will see it and select the right versions of everything
+    //  for syntax highlighting and such. So that's done in the platform defines
+    //  header.
+    //
     apszArgs[c4CurArg++] = L"/Zc:wchar_t";
-
-    //
-    //  We always build for UNICODE mode. These are for the platform headers,
-    //  and have no affect on the CIDLib code itself.
-    //
-    apszArgs[c4CurArg++] = L"/DUNICODE";
-    apszArgs[c4CurArg++] = L"/D_UNICODE";
-
 
     //
     //  Set some stuff according to the platforms we support. These are used

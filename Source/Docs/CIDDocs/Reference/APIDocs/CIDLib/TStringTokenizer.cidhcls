@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TStringTokenizer" Prefix="stok" Parent="TObject">
+
+    <Desc>
+        <P>This class does what you would expect from the name, it allows you to break text up into separate tokens based on various criteria. It can act as an iterator to iterate through tokens, and it also has some helpers to just pull out all of the tokens at once into a collection of strings.</P>
+
+        <P>It also has some helper static method that will parse some well known formats, such as CSV or quoted comma strings, and just fully tokenize a string and give back a collection of token strings. In the other direction it has some helpers to help build up those common formats mentioned above, handling escaping and such.</P>
+
+        <SecTitle>Supported Formats</SecTitle>
+
+        <P>This class supports a few different tokenized string formats. For the main functionality of the class, which is as an iterator of separated tokens, it just is dealing with tokens separated by at least one character from a list of possible 'whitespace' characters. But we also support some other formats via the static helpers mentioned above.</P>
+
+        <SubSecTitle>CSV Format</SubSecTitle>
+
+        <P>CSV means comma separated values. This is a common format that various programs can export and import. Here are the rules:</P>
+
+        <List>
+            <LItem>It is legal for the list to be empty, in which case the parse will be successful, but the list will be empty.</LItem>
+            <LItem>Values can be quoted or not</LItem>
+            <LItem>Any value that has a comma in it must be quoted or it will be treated as two separate values</LItem>
+            <LItem>If there is a trailing comma, then there will be a final empty value in the list, since that implies a final value even if an empty one</LItem>
+        </List>
+
+        <P>So an example might be:</P>
+        <Code>    Value 1, "Value 2", Value 3</Code>
+
+
+        <SubSecTitle>Quoted Comma Lists</SubSecTitle>
+
+        <P>The 'quoted comma list' format is fairly widely used in CIDLib and even more so in CQC. This format is like a CSV but each of the comma separated values is quoted using double quotes. The rules are:</P>
+
+        <List>
+            <LItem>It is legal for the list to be empty, in which case the parse will be successful, but the list will be empty.</LItem>
+            <LItem>Values must be quoted with double quotes</LItem>
+            <LItem>It is not legal to have quotes inside of values unless they are escaped with a leading backslash</LItem>
+            <LItem>They can have commas in them since the values are quoted, so there is no ambiguity</LItem>
+            <LItem>Values can be empty of course</LItem>
+        </List>
+
+        <P>An example would be:</P>
+        <Code>    "Value 1", "Value 2", "", "Last \"Value\""</Code>
+
+
+        <SubSecTitle>Space Separated</SubSecTitle>
+
+        <P>We also support the very simple space separated format. It is just a set of space separated tokens that cannot have spaces in them else they are treated as separe tokens. There is no escapement mechanism for spaces inside the values. As for the others it's legal for the string to be empty, which will succeed but return an empty list.</P>
+
+
+        <Note>If you use the helper methods to parse and build these types of strings, the escapement stuff will be done for you.</Note>
+
+        <Note>Normally we would use the alias tCIDLib::TStrCollect instead of TCollection&amp;lt;TString>. But, for this header there would be an order of inclusion issue so it uses the latter out of necessity.</Note>
+
+    </Desc>
+
+    <PubIntf>
+        <!-- Static public methods -->
+        <StaticMeths>
+
+            <Desc>
+                These are helper methods that fully parse out a whole string to get all the tokens, or help you build up strings of tokens in various formats. The build/parse methods are particularly useful since they deal with any sort of escapement issues.
+            </Desc>
+
+
+            <Method Name="bParseQuoteCommaList" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>This method will parse the passed string as a quoted comma list, pull out all of the quoted values and return them (without quotes) as a collection of strings. If a failure occurs it returns kCIDLib::False and c4ErrInd is set to the index at which the parse failed.</P>
+
+                    <P>It is legal for the list to be empty, in which case it will return kCIDLib::True but the list will be empty.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strToParse" Type="TString" PBy="CRef"/>
+                    <MethParam Name="colToFill" Type="TCollect&amp;lt;TString>" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4ErrInd" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bParseCSVLine" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>This method will parse the passed string as a line of CSVs (comma separated values.) It will pull out all of the values and return them as a collection of strings. If a failure occurs it returns kCIDLib::False and c4ErrInd is set to the index at which the parse failed.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strToParse" Type="TString" PBy="CRef"/>
+                    <MethParam Name="colToFill" Type="TCollect&amp;lt;TString>" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4ErrInd" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bParseSpacedToken" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>This method will parse the passed string as a set of space separated values. It will pull out all of the values and return them as a collection of strings. It can optionally append the values to the output collection or replace any previous contents.</P>
+
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strToParse" Type="TString" PBy="CRef"/>
+                    <MethParam Name="colToFill" Type="TCollect&amp;lt;TString>" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4ErrInd" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="BuildQuotedCommaList">
+                <Desc>
+                    <P>This method helps you with building up quoted comma list strings. Just start with an empty accumulator string and call this for each value you want to add. The string to add will be quoted (and escaped if required) and added to the accumulator string.</P>
+
+                    <P>Another option is available that just takes all of the values as some collection of strings and does the whole operation at once, which is often covenient.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strToAdd" Type="TString" PBy="CRef"/>
+                    <MethParam Name="strAccum" Type="TString" PBy="Ref"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="colValues" Type="TCollect&amp;lt;TString>" PBy="CRef"/>
+                    <MethParam Name="strAccum" Type="TString" PBy="Ref"/>
+                </MethVar>
+            </Method>
+
+        </StaticMeths>
+
+        <Ctors DelMethods="CopyCtor AssignOp" DefMethods="Dtor">
+
+            <Method Name="TStringTokenizer">
+                <Desc>
+                    <P>The default constructor does nothing but initialize members. You will have to call Reset on this object to give it something to work on. If you call the token getting methods they will all just return kCIDLib::False since they think they are already at the end of the source string, which they are since it's empty.</P>
+
+                    <P>Then there are versions that go ahead and set up the tokenizer with a source string and whitespace characters to use for token separation. One takes a string object for whitespace and anothe r raw wide character string.</P>
+
+                    <P>The source string is not modified but it is passed as a pointer because this object must retain it during the tokenization process. So the source must stay alive as long as this object is referencing it. Our destructor will do nothing to the source string, so as long as you don't do any more tokenization calls it's safe, but resetting it would be safer if the source string is going away.</P>
+                </Desc>
+                <MethVar/>
+                <MethVar>
+                    <MethParam Name="pstrSrc" Type="TString" PBy="CPtrC" Retained="Yes"/>
+                    <MethParam Name="strWhitespece" Type="TString" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pstrSrc" Type="TString" PBy="CPtrC" Retained="Yes"/>
+                    <MethParam Name="pszWhitespace" Type="TString" PBy="CPtrC" Dir="In"/>
+                </MethVar>
+            </Method>
+
+        </Ctors>
+
+        <NVirtMeths>
+
+            <Method Name="bEatNextToken" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>This method will just eat and discard the next token. As with bGetNextToken() the return indicates whether a token was actually consumed.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bGetNextToken" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>This method will see if another token is available. If so, it will copy the contents of that token to the output string and return kCIDLib::True. You must have either called one of the constructors that sets up the source and whitespace strings, or have called one of the Reset() variations that does the same, else there won't be anything to parse.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strTarget" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bGetRestOfLine" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>This method will returns the remainder of the source line that hasn't been tokenized yet. That includes any 'whitespace' (separator) characters as well, even if they are all whiespace characters. No more tokenization is done, it just returns from the character after the last consumed token up to the end. If there are any characters left, they are put into the target string and kCIDLib::True is returned.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strToFill" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bMoreTokens" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>This method will tell you if there are more tokens available without you having to actually consume the next one, which may be important sometimes.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bPeekNextToken" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>This method is the same as bGetNextToken() except it doesn't actually consume the token.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strTarget" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bPeekRestOfLine" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>This method is the same as bGetRestOfLine() except it doesn't actually consume the rest of the line.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strTarget" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4BreakApart" RetType="tCIDLib::TCard4">
+                <Desc>
+                    <P>This method will do bGetNextToken() internally, putting each resulting token into the passed collection of strings.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="colTarget" Type="TCollection&amp;lt;TString>" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4CurToken" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>
+                    <P>This method will return the 0 based index of the next token that will be consumed if bGetNextToken() is called. So, after a rest it will be zero. After consuming the first token it goes to one, and so forth.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="Reset">
+                <Desc>
+                    <P>These methods are analogous to the constructors, but you can call them after the fact to reset this tokenizer either to re-tokenize the same string, or a new one, or to change what is considered a whitespace character.</P>
+
+                    <P>The one with no parameters just resets this tokenizer to an empty state, dropping any references to previously set strings. The other two, as with the constructors, take a source string that must remain valid until after this object is destructed or reset again to drop the reference.</P>
+                </Desc>
+                <MethVar/>
+                <MethVar>
+                    <MethParam Name="pstrSrc" Type="TString" PBy="CPtrC" Retained="Yes"/>
+                    <MethParam Name="strWhitespace" Type="TString" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pstrSrc" Type="TString" PBy="CPtrC" Retained="Yes"/>
+                    <MethParam Name="pszWhitespace" Type="TString" PBy="CPtrC" Dir="In"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="strSrcText" RetType="TString" Attrs="Const" RetBy="CRef">
+                <Desc>
+                    <P>This method just provides access to the last source string that was set. Not generally needed, but if you passed a tokenizer to something that doesn't know what the original string was, it might have use of this.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="strWhitespace" RetType="TString" RetBy="CRef">
+                <Desc>
+                    <P>This method allows you to see or set the list of whitespace characters. It is legal to change the whitespace character list at any time, which might be important if parsing a string that has different separator characters at different points.</P>
+                </Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar><MethParam Name="strWhitespace" Type="TString" PBy="CRef"/></MethVar>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

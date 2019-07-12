@@ -53,37 +53,48 @@ class THelpNode
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bIsEmpty() const;
 
-        tCIDLib::TBoolean bParse
+        tCIDLib::TVoid Parse
         (
             const   TXMLTreeElement&        xtnodeText
         );
 
-        tCIDLib::TBoolean bParseFromParent
+        tCIDLib::TVoid ParseFromParent
         (
             const   TXMLTreeElement&        xtnodePar
             , const TString&                strName
             , const tCIDLib::TBoolean       bOptional
         );
 
-        tCIDLib::TVoid OutputNodes
+        tCIDLib::TVoid OutputHelpText
         (
                     TTextOutStream&         strmTar
+            , const tCIDLib::TBoolean       bIndented = kCIDLib::True
         )   const;
+
+        tCIDLib::TVoid SetToText
+        (
+            const   tCIDLib::TCh* const     pszToSet
+        );
 
 
     private :
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bProcessTableRow
+        tCIDLib::TVoid ProcessTableRow
         (
             const   TXMLTreeElement&        xtnodeRow
         );
 
-        tCIDLib::TBoolean bProcessTable
+        tCIDLib::TVoid ProcessTable
         (
             const   TXMLTreeElement&        xtnodeTbl
         );
+
+        tCIDLib::TVoid OutputNodes
+        (
+                    TTextOutStream&         strmTar
+        )   const;
 
         tCIDLib::TVoid OutputTableRow
         (
@@ -120,11 +131,11 @@ class THelpNode
         //      Option info that is used per-node, to indicate variations that that
         //      type of node can support.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4     m_c4Extra;
-        TVector<THelpNode>  m_colNodes;
-        tCIDDocComp::ETypes m_eType;
-        TString             m_strRef;
-        TString             m_strID;
-        TString             m_strText;
-        TString             m_strType;
+        tCIDLib::TCard4         m_c4Extra;
+        TVector<THelpNode>      m_colNodes;
+        tCIDDocComp::EMUTypes   m_eType;
+        TString                 m_strRef;
+        TString                 m_strID;
+        TString                 m_strText;
+        TString                 m_strType;
 };

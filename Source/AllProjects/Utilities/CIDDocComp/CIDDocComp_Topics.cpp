@@ -76,10 +76,17 @@ TTopic::~TTopic()
 // ---------------------------------------------------------------------------
 
 // We parse our stuff, then recurse as required
-tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
+tCIDLib::TVoid TTopic::Parse()
 {
     // Output the topic path we are parsing
-    facCIDDocComp.strmOut() << L"\n   Parsing Topic: " << m_strTopicPath << kCIDLib::EndLn;
+    if (facCIDDocComp.bVerbose())
+    {
+        facCIDDocComp.strmOut() << L"\n   "
+                                << m_strTopicPath << kCIDLib::EndLn;
+    }
+
+    // Push us onto the context stack
+    TCtxStackJan janStack(*this);
 
     // Build up the path to the topic file
     TPathStr pathTopicFile(m_pathSource);
@@ -87,23 +94,14 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
     pathTopicFile.AppendExt(L"xml");
 
     // Parse out all our info first
-    tCIDLib::TBoolean bRes = xtprsToUse.bParseRootEntity
-    (
-        pathTopicFile
-        , tCIDXML::EParseOpts::Validate
-        , tCIDXML::EParseFlags::TagsNText
-    );
-    if (!bRes)
-    {
-        facCIDDocComp.ShowXMLParseErr(pathTopicFile);
-        return kCIDLib::False;
-    }
+    if (!facCIDDocComp.bParseXML(pathTopicFile))
+        return;
 
     // It parsed OK, so get the root node and let's start pulling our info out
-    const TXMLTreeElement& xtnodeRoot = xtprsToUse.xtdocThis().xtnodeRoot();
-    m_strTopicPage = xtnodeRoot.xtattrNamed(L"TopicPage").strValue();
+    const TXMLTreeElement& xtnodeRoot = facCIDDocComp.xtnodeRoot();
+    m_strTopicPage = xtnodeRoot.strAttr(L"TopicPage");
 
-    // Parse the pages and add those to our page list.
+    // Parse the pages and add those to the list of pages for this topic
     tCIDLib::TCard4 c4At;
     {
         c4At = 0;
@@ -115,7 +113,7 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
         tCIDLib::TBoolean bVirtual;
         TString strExtra1;
         TString strExtra2;
-        TString strExt;
+        TString strPageType;
         TString strFileName;
         TString strExtTitle;
         TString strVirtual;
@@ -132,23 +130,21 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
             //  These are required
             //
             if (!xtnodeElem.bAttrExists(kCIDDocComp::strXML_FileName, strFileName)
-            ||  !xtnodeElem.bAttrExists(kCIDDocComp::strXML_FileExt, strExt))
+            ||  !xtnodeElem.bAttrExists(kCIDDocComp::strXML_PageType, strPageType))
             {
-                facCIDDocComp.strmErr()
-                    << L"The file name and extension are required"
-                    << kCIDLib::EndLn;
-                bRes = kCIDLib::False;
-
                 // Can't continue processing this one
+                facCIDDocComp.AddErrorMsg(L"The file name and page type are required");
                 continue;
             }
 
+            const tCIDDocComp::EPageTypes eType = tCIDDocComp::eXlatEPageTypes(strPageType);
+
             //
-            //  The external title can be empty, in which case the internal title from the
-            //  page file will be used for this.
+            //  If they don't provide a separate title for the link, then we
+            //  use the file name.
             //
             if (!xtnodeElem.bAttrExists(kCIDDocComp::strXML_Title, strExtTitle))
-                strExtTitle.Clear();
+                strExtTitle = strFileName;
 
             // Extra stuff is optional
             if (!xtnodeElem.bAttrExists(kCIDDocComp::strXML_Extra1, strExtra1))
@@ -162,11 +158,11 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
             {
                 if (!strVirtual.bToBoolean(bVirtual))
                 {
-                    facCIDDocComp.strmErr()
-                        << L"Could not convert '" << kCIDDocComp::strXML_Virtual
-                        << L"' value to a boolean" << kCIDLib::EndLn;
-
-                    bRes = kCIDLib::False;
+                    facCIDDocComp.AddErrorMsg
+                    (
+                        L"Could not convert '%(1)' value to a boolean"
+                        , kCIDDocComp::strXML_Virtual
+                    );
                 }
             }
 
@@ -174,20 +170,32 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
             //  Based on extension type, let's gen up the right type of page and
             //  add it to our list.
             //
-            if (strExt.bCompareI(kCIDDocComp::strExt_HelpPage))
+            if (eType == tCIDDocComp::EPageTypes::HelpPage)
             {
                 THelpPage* ppgNew = new THelpPage
                 (
-                    strExtTitle, m_pathSource, m_strTopicPath, strFileName, strExt, bVirtual
+                    strExtTitle, m_pathSource, m_strTopicPath, strFileName, bVirtual
                 );
                 m_colPages.objAdd(TPagePtr(ppgNew));
             }
+             else if (eType == tCIDDocComp::EPageTypes::CppClass)
+            {
+                TCppClassPage* ppgNew = new TCppClassPage
+                (
+                    strExtTitle, m_pathSource, m_strTopicPath, strFileName
+                );
+                m_colPages.objAdd(TPagePtr(ppgNew));
+
+                // Also add it to the main 'by name' list of the facility
+                facCIDDocComp.AddClass(ppgNew);
+            }
              else
             {
-                facCIDDocComp.strmErr()
-                    << L"'" << strExt << L"' is not a known help file type"
-                    << kCIDLib::EndLn;
-                bRes = kCIDLib::False;
+                facCIDDocComp.AddErrorMsg
+                (
+                    L"'%(1)' is not a known help file type"
+                    , tCIDDocComp::strLoadEPageTypes(eType)
+                );
             }
         }
     }
@@ -199,35 +207,39 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
         (
             kCIDDocComp::strXML_SubTopicMap, 0, c4At
         );
-        const tCIDLib::TCard4 c4Count = xtnodeTopics.c4ChildCount();
-        TString strTopicName;
-        TString strTitle;
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-        {
-            const TXMLTreeNode& xtnodeCur = xtnodeTopics.xtnodeChildAt(c4Index);
-            if (xtnodeCur.eType() != tCIDXML::ENodeTypes::Element)
-                continue;
 
-            const TXMLTreeElement& xtnodeElem = xtnodeTopics.xtnodeChildAtAsElement(c4Index);
-            if (!xtnodeElem.bAttrExists(kCIDDocComp::strXML_SubDir, strTopicName)
-            ||  !xtnodeElem.bAttrExists(kCIDDocComp::strXML_Title, strTitle))
+        xtnodeTopics.bForEach
+        (
+            [this](const TXMLTreeElement& xtnodeCur)
             {
-                facCIDDocComp.strmErr()
-                    << L"The topic sub-dir and title are required"
-                    << kCIDLib::EndLn;
-                bRes = kCIDLib::False;
+                if (xtnodeCur.bAttrExists(kCIDDocComp::strXML_SubDir, facCIDDocComp.m_strTmp1))
+                {
+                    // We can have a separate title. If not, we use the sub-dir name
+                    if (!xtnodeCur.bAttrExists(kCIDDocComp::strXML_Title, facCIDDocComp.m_strTmp2))
+                        facCIDDocComp.m_strTmp2 = facCIDDocComp.m_strTmp1;
 
-                // Can't continue processing this one
-                continue;
+                    m_colSubTopics.objAdd
+                    (
+                        TTopicPtr
+                        (
+                            new TTopic
+                            (
+                                facCIDDocComp.m_strTmp2
+                                , m_strTopicPath
+                                , facCIDDocComp.m_strTmp1
+                                , m_pathSource
+                            )
+                        )
+                    );
+                }
+                 else
+                {
+                    // Can't continue processing this one
+                    facCIDDocComp.AddErrorMsg(L"The topic sub-dir and title are required");
+                }
+                return kCIDLib::True;
             }
-
-            //
-            //  Let's add this one to our list
-            m_colSubTopics.objAdd
-            (
-                TTopicPtr(new TTopic(strTitle, m_strTopicPath, strTopicName, m_pathSource))
-            );
-        }
+        );
     }
 
     //
@@ -240,12 +252,7 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
         {
             TPagePtr& cptrCur = *cursPages;
             if (!cptrCur->bVirtual())
-            {
-                if (!cptrCur->bParseFile(*this, xtprsToUse))
-                {
-
-                }
-            }
+                cptrCur->ParseFile(*this);
         }
     }
 
@@ -255,11 +262,9 @@ tCIDLib::TBoolean TTopic::bParse(TXMLTreeParser& xtprsToUse)
         for (; cursSubs; ++cursSubs)
         {
             TTopicPtr& cptrCur = *cursSubs;
-            cptrCur->bParse(xtprsToUse);
+            cptrCur->Parse();
         }
     }
-
-    return bRes;
 }
 
 
@@ -310,19 +315,23 @@ TTopic::TPagePtr TTopic::cptrTopicPage() const
     TPagePtr cptrRet = cptrFindPage(m_strTopicPage);
     if (!cptrRet)
     {
-        facCIDDocComp.strmErr()
-            << L"No topic page was found for topic '" << m_strTopicPage << L"'"
-            << kCIDLib::EndLn;
+        facCIDDocComp.strmOut() << L"        No topic page was found for topic '"
+                                << m_strTopicPage << L"'"
+                                << kCIDLib::EndLn;
     }
     return cptrRet;
 }
 
 
+//
 tCIDLib::TVoid
 TTopic::GenerateOutput( const   TString&    strOutPath
                         , const TTopicPtr&  cptrParent
                         , const TTopicPtr&  cptrUs) const
 {
+    // Push us onto the context stack for this scope
+    TCtxStackJan janStack(*this);
+
     //
     //  Create our output path. It is the parent output path plus our topic name
     //  which is used to create a new sub-dir. If this is the root, then we don't
@@ -415,9 +424,12 @@ TTopic::GenerateTopicIndex(         TTextOutStream& strmOutFl
     {
         TPagePtr cptrMain = cptrFindPage(m_strTopicPage);
         if (cptrMain)
+        {
             cptrMain->GenerateLink(strmOutFl);
+            strmOutFl << L"<br/>";
+        }
 
-        // We want a break after this one if there's more than one
+        // We want an extra break after this one if there's more than one
         if (m_colPages.c4ElemCount() > 1)
             strmOutFl << L"<br/>";
     }
@@ -434,7 +446,10 @@ TTopic::GenerateTopicIndex(         TTextOutStream& strmOutFl
 
             // If not the topic page, then generate a link
             if (!cptrCur->bIsThisName(m_strTopicPage))
+            {
                 cptrCur->GenerateLink(strmOutFl);
+                strmOutFl << L"<br/>";
+            }
         }
     }
 

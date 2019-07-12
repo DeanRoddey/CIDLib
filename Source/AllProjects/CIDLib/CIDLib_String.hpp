@@ -15,19 +15,23 @@
 //
 // DESCRIPTION:
 //
-//  This file implements the TString class, which (suprise) implements a
-//  wrapper for XMLCh based strings. The string is maintained null terminated,
-//  so that it can be passed to system APIs, but the length is also maintained
-//  at all times. So appends or other ops that require access to the end of
-//  the string are very fast.
+//  This file implements the TString class, which (suprise) implements a wrapper
+//  for an array of (wide) characters strings. The string is maintained null
+//  terminated at least any time you look at the raw buffer, so that it can be
+//  passed to system APIs, but the length is also  maintained at all times. So
+//  appends or other ops that require access to the end of the string are very fast.
 //
 //  TStrBuf is the object that actually contains the string buffer. It provides
 //  a simple set of fundamental operations via which all string manipulations
 //  can be done. Each TString object has one of these objects, via which it
-//  manages the actual string data. At this time, these buffer objects are not
-//  reference counted, but it might be in the future. Using this buffer object
-//  will allow us to implement copy on write, ref counted buffers later if
-//  we decide to.
+//  manages the actual string data.
+//
+//  At this time, these buffer objects are not reference counted, but it might be
+//  in the future. Using this buffer object will allow us to implement copy on
+//  write, ref counted buffers later if we decide to. Or, at some point we may
+//  just decide it's not worth it and get rid of the extra layer and move the raw
+//  buffer up to TString itself. But the extra encapsulation does help with
+//  maintaining control over the buffer either way.
 //
 //  String capacity is not considered part of equality between strings, only the
 //  current length and actual character content. So the capacity can be changed
@@ -41,10 +45,10 @@
 //  2)  Only const access is provided to the raw buffer, for passing to system
 //      APIs internally (or in your code if you must wrap some third party
 //      code.) Because we may move to a ref counted buffer at some point in
-//      the future, direct access cannot be allowed.
+//      the future, direct access is not safe.
 //
-//  3)  Basically almost all of the TString class is made up of inlined
-//      methods which just delegate to the string buffer object.
+//  3)  Lots of the TString class is made up of inlined methods which just
+//      delegate to the string buffer object.
 //
 // LOG:
 //
@@ -146,13 +150,29 @@ class CIDLIBEXP TStrCat
             , const tCIDLib::TCh* const     psz2
         );
 
+        TStrCat
+        (
+                    TStrCat&&               scatSrc
+        );
+
         ~TStrCat();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStrCat& operator=(const TStrCat&) = delete;
+
+        TStrCat& operator=
+        (
+                    TStrCat&&               scatSrc
+        );
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCh* pszStealBuf
+        [[nodiscard]] tCIDLib::TCh* pszStealBuf
         (
                     tCIDLib::TCard4&        c4Len
         )   const;
@@ -176,12 +196,6 @@ class CIDLIBEXP TString :
     public TObject, public MFormattable, public MDuplicable, public MStreamable
 {
     public  :
-        // -------------------------------------------------------------------
-        //  Public, static data
-        // -------------------------------------------------------------------
-        static const TString& strEmpty();
-
-
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
@@ -243,6 +257,8 @@ class CIDLIBEXP TString :
             ,       tCIDLib::TCh&           chTwo
         );
 
+        static const TString& strEmpty();
+
 
         // -------------------------------------------------------------------
         //  Constructors and Destructor.
@@ -262,6 +278,11 @@ class CIDLIBEXP TString :
         TString
         (
             const   tCIDLib::TCh*           pszInitValue
+        );
+
+        explicit TString
+        (
+            const   tCIDLib::TSCh* const    pszInitValue
         );
 
         TString
@@ -284,8 +305,7 @@ class CIDLIBEXP TString :
 
         TString
         (
-            const   tCIDLib::TMsgId         midToLoad
-            , const TFacility&              facSource
+            const   MFormattable&           fmtblInitValue
         );
 
         TString
@@ -296,7 +316,8 @@ class CIDLIBEXP TString :
 
         TString
         (
-            const   MFormattable&           fmtblInitValue
+            const   tCIDLib::TMsgId         midToLoad
+            , const TFacility&              facSource
         );
 
         TString
@@ -327,11 +348,6 @@ class CIDLIBEXP TString :
             , const MFormattable&           fmtblToken4 = MFormattable::Nul_MFormattable()
         );
 
-        explicit TString
-        (
-            const   tCIDLib::TSCh* const    pszInit
-        );
-
         TString
         (
             const   TStrCat&                scatSrc
@@ -347,7 +363,7 @@ class CIDLIBEXP TString :
                     TString&&               strSrc
         );
 
-        ~TString();
+        ~TString() = default;
 
 
         // -------------------------------------------------------------------
@@ -1180,7 +1196,7 @@ class CIDLIBEXP TString :
             return m_strbData.pszBufferAt(c4At);
         }
 
-        tCIDLib::TCh* pszDupBuffer() const
+        [[nodiscard]] tCIDLib::TCh* pszDupBuffer() const
         {
             return m_strbData.pszDupBuffer();
         }
@@ -1205,8 +1221,8 @@ class CIDLIBEXP TString :
             m_strbData.Insert(pszPrepend, 0);
         }
 
-        tCIDLib::TVoid PutAt(const   tCIDLib::TCard4 c4Index
-                            , const tCIDLib::TCh   chToPut)
+        tCIDLib::TVoid PutAt(const  tCIDLib::TCard4 c4Index
+                            , const tCIDLib::TCh    chToPut)
         {
             m_strbData.PutAt(c4Index, chToPut);
         }
@@ -1312,30 +1328,18 @@ class CIDLIBEXP TString :
             m_strbData.SetLast(chNew);
         }
 
-        tCIDLib::TVoid StreamInConverted
-        (
-                    TBinInStream&           strmSrc
-            ,       TTextConverter&         tcvtToUse
-        );
-
-        tCIDLib::TVoid StreamOutConverted
-        (
-                    TBinOutStream&          strmTarget
-            ,       TTextConverter&         tcvtToUse
-        );
-
         tCIDLib::TVoid
-        Strip(  const   tCIDLib::TCh* const     pszChars
-                , const tCIDLib::EStripModes    eStripMode = tCIDLib::EStripModes::LeadTrail
-                , const tCIDLib::TCh            chRepChar = kCIDLib::chSpace)
+        Strip(  const   tCIDLib::TCh* const pszChars
+                , const tCIDLib::EStripModes eStripMode = tCIDLib::EStripModes::LeadTrail
+                , const tCIDLib::TCh        chRepChar = kCIDLib::chSpace)
         {
             m_strbData.Strip(pszChars, eStripMode, chRepChar);
         }
 
         tCIDLib::TVoid
-        Strip(  const   TString&                strChars
-                , const tCIDLib::EStripModes    eStripMode = tCIDLib::EStripModes::LeadTrail
-                , const tCIDLib::TCh            chRepChar = kCIDLib::chSpace)
+        Strip(  const   TString&            strChars
+                , const tCIDLib::EStripModes eStripMode = tCIDLib::EStripModes::LeadTrail
+                , const tCIDLib::TCh        chRepChar = kCIDLib::chSpace)
         {
             m_strbData.Strip(strChars.m_strbData.pszBuffer(), eStripMode, chRepChar);
         }

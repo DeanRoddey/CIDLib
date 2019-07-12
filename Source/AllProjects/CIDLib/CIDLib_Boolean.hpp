@@ -122,7 +122,7 @@ class CIDLIBEXP TBoolean :
 
     private             :
         // -------------------------------------------------------------------
-        //  Public data members
+        //  Private data members
         //
         //  m_bVal
         //      Storage for the data value.

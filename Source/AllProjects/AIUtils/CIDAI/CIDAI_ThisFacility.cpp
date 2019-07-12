@@ -64,7 +64,7 @@ TFacCIDAI::TFacCIDAI() :
       (
         tCIDLib::EAdoptOpts::Adopt
         , 109
-        , new TStringKeyOps(kCIDLib::False)
+        , TStringKeyOps(kCIDLib::False)
         , &TAIBTNodeFact::strKey
       )
 {

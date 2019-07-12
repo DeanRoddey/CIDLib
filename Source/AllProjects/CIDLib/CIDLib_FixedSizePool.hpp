@@ -523,9 +523,13 @@ template <typename TElem> class TFixedSizePool : public TObject
                 );
             }
 
-            //  Let's put it back into the free list and orphan from the used list
-            m_colUsedList.pobjOrphanAt(c4AtUsed);
-            m_colFreeList.Add(pobjToRelease);
+            //
+            //  Let's put it back into the free list and orphan from the used list.
+            //  We have to suppress the nodiscard warning from the orphan call, which
+            //  we can do by just pass that to Add instead of the incoming value.
+            //  They are the same object.
+            //
+            m_colFreeList.Add(m_colUsedList.pobjOrphanAt(c4AtUsed));
 
             // Make sure combined count hasn't gone past max
             CIDAssert

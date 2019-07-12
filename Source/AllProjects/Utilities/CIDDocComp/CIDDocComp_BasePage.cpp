@@ -99,16 +99,16 @@ TBasePage::~TBasePage()
 // ---------------------------------------------------------------------------
 //  TBasePage: Hidden constructors
 // ---------------------------------------------------------------------------
-TBasePage::TBasePage(const  TString&            strExtTitle
-                    , const TString&            strParSrcDir
-                    , const TString&            strParTopic
-                    , const TString&            strFileName
-                    , const TString&            strFileExt
-                    , const tCIDLib::TBoolean   bVirtual) :
+TBasePage::TBasePage(const  TString&                strExtTitle
+                    , const TString&                strParSrcDir
+                    , const TString&                strParTopic
+                    , const TString&                strFileName
+                    , const tCIDDocComp::EPageTypes eType
+                    , const tCIDLib::TBoolean       bVirtual) :
 
     m_bVirtual(bVirtual)
+    , m_eType(eType)
     , m_strExtTitle(strExtTitle)
-    , m_strFileExt(strFileExt)
     , m_strFileName(strFileName)
     , m_strParSrcDir(strParSrcDir)
     , m_strParTopic(strParTopic)
@@ -128,41 +128,45 @@ TBasePage::TBasePage(const  TString&            strExtTitle
 //  TBasePage: Public, virtual methods
 // ---------------------------------------------------------------------------
 
-tCIDLib::TBoolean
-TBasePage::bParseFile(TTopic& topicParent, TXMLTreeParser& xtprsToUse)
+tCIDLib::TVoid TBasePage::ParseFile(TTopic& topicParent)
 {
-    facCIDDocComp.strmOut()
-            << L"\n   Parsing File: "
-            << m_strPagePath << kCIDLib::EndLn;
+    if (facCIDDocComp.bVerbose())
+        facCIDDocComp.strmOut() << L"      " << m_strPagePath << kCIDLib::EndLn;
 
     // Build up our source path
     TPathStr pathSrc = m_strParSrcDir;
     pathSrc.AddLevel(m_strFileName);
-    pathSrc.AppendExt(m_strFileExt);
 
-    const tCIDLib::TBoolean bRes = xtprsToUse.bParseRootEntity
-    (
-        pathSrc
-        , tCIDXML::EParseOpts::Validate
-        , tCIDXML::EParseFlags::TagsNText
-    );
-    if (!bRes)
+    // Use Load here, which gets us the text that holds the file extension
+    pathSrc.AppendExt(tCIDDocComp::strLoadEPageTypes(m_eType));
+
+    // If the parse fails, we are done for this guy, else get the root and process
+    if (!facCIDDocComp.bParseXML(pathSrc))
+        return;
+    const TXMLTreeElement& xtnodeRoot = facCIDDocComp.xtnodeRoot();
+
+    //
+    //  Do any stuff we handled at this level. All pages can optionally have a
+    //  keywords section.
+    //
+    tCIDLib::TCard4 c4At;
+    const TXMLTreeElement* pxtnodeKWs = xtnodeRoot.pxtnodeFindElement(L"Keywords", 0, c4At);
+    if (pxtnodeKWs)
     {
-        facCIDDocComp.ShowXMLParseErr(pathSrc);
-        return kCIDLib::False;
+        // Get the body text of this element, which is a comma separated list of phrases
+        QueryElemText(*pxtnodeKWs, kCIDDocComp::strXML_Keywords, facCIDDocComp.m_strTmp1);
+
+        if (!TStringTokenizer::bParseCSVLine(facCIDDocComp.m_strTmp1, m_colKeywords, c4At))
+        {
+            facCIDDocComp.AddErrorMsg
+            (
+                L"Invalid keyword content at offset %(1)", TCardinal(c4At)
+            );
+        }
     }
 
-    const TXMLTreeElement& xtnodeRoot = xtprsToUse.xtdocThis().xtnodeRoot();
-
-    // Get any stuff we do at this level
-    QueryElemText(xtnodeRoot, kCIDDocComp::strXML_Title, m_strIntTitle);
-
-    // If the external title was empty, then use our internal for that as well
-    if (m_strExtTitle.bIsEmpty())
-        m_strExtTitle = m_strIntTitle;
-
     // And then invoke the virtual for the derived class to parse his stuff
-    return bParse(topicParent, xtnodeRoot);
+    Parse(topicParent, xtnodeRoot);
 }
 
 
@@ -185,10 +189,7 @@ tCIDLib::TVoid TBasePage::GenerateOutput(const TString& strParPath) const
 
     // Spit out any common stuff
     strmTar << L"<!DOCTYPE html>\n"
-            << L"<html>\n<body>\n"
-            << L"<p><span class='PageHdr'>"
-            << m_strIntTitle
-            << L"</span></p>";
+            << L"<html>\n<body>\n";
 
     // Now invoke the virtual for the derived class to do his thing
     OutputContent(strmTar);
@@ -198,14 +199,19 @@ tCIDLib::TVoid TBasePage::GenerateOutput(const TString& strParPath) const
 }
 
 
-tCIDLib::TVoid
-TBasePage::GenerateLink(TTextOutStream& strmTar) const
+//
+//  THIS IS FOR USE by the topics  to generate links to load the right hand
+//  side, where we know the left hand side is already the correct one, since
+//  this link is fro that left hand side. We can't use this for general page
+//  links from other sections, since those need to also load the left side
+//  topic that contains that page.
+//
+tCIDLib::TVoid TBasePage::GenerateLink(TTextOutStream& strmTar) const
 {
-    // If we got alias text, we use that as the link text, else we use the page's title.
     strmTar  << L"<a onclick=\"javascript:loadRightSide('"
             << m_strParTopic
             << L"', '/" << m_strFileName
             << L"', '');\" href='javascript:void(0)'>"
             << m_strExtTitle
-            << L"</a><br/>\n";
+            << L"</a>\n";
 }

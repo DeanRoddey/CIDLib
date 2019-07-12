@@ -2,34 +2,34 @@
 <!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
 
 <HelpPage>
-    <Title>Collections/Cursors</Title>
+    <Title>Collections</Title>
 
     <HelpText>
 
-        <P>CIDLib has a pretty extensive set of collections and cursors. For those coming from the standard C++ library world, collections and cursors are like standard C++ containers and iterators, though they have some substantial differences in the details. Collections contain other objects (or pointers to other objects.) The objects in the collection are refererd to as its elements.</P>
+        <P>CIDLib has a pretty extensive set of collections and cursors. For those coming from the standard C++ library world, collections and cursors are like standard C++ containers and iterators, though they have some substantial differences in the details. Collections contain other objects (which they inherently own) or pointers to other objects (which they may or may not own.) The objects in the collection are referred to as its elements.</P>
 
-        <P>Since maintaining and operating on sets of objects is a fundamental operation in most all software, collections play a huge part in most software projects. In some cases there are justifications for doing your own specialized means of containing other objects, but where possible use the built in ones and safe yourself a lot of worry and effort.</P>
+        <P>Since maintaining and operating on sets of values is a fundamental operation in most all software, collections play a significant part in most software projects. In some cases there are justifications for doing your own specialized means of containing other objects, but where possible use the built in ones and save yourself a lot of effort.</P>
 
-        <P>Like most C++ systems, as a practical matter, CIDLib's collections are template based, since they need to be able to work over many different element types, while maintaining a type safe interface. CIDLib works to push as much code out of line as possible, but still they have all the same concerns as large amounts of templated code always does.</P>
+        <P>Like most C++ systems, as a practical matter, CIDLib's collections are template based, since they need to be able to work over many different element types, while maintaining a type safe interface. They aren't nearly as templatized as the STL ones, since CIDLib works to push as much code out of line as possible, but still they have all the same concerns as large amounts of templated code always does.</P>
 
         <P>There are three fundamental categories of collections in CIDLib:</P>
 
         <List>
-            <LItem Ref="Fundamental">Fundamental collections are for non-object stuff, so booleans, ints, floats, cardinals and enumerations generally. They are simpler and lighter weight and don't depend on any particular functionality from the elements other than the basic ability to assign, copy, and compare them.</LItem>
-            <LItem Ref="By Reference">By reference collections take objects by reference, well by pointer to be strict about it. They can be told to adopt (own) those objects or not. So they can be given objects to own and clean up when they destruct, or they can be used to provide light weight alternative views into other collections or arrays without any need to copy the elements.</LItem>
-            <LItem Ref="By Value">By value collections, as you would imagine, take objects by value, so they must be able to copy and assign the elements.</LItem>
+            <LItem Ref="Fundamental">Fundamental collections are for non-object stuff, so booleans, ints, floats, cardinals and enumerations generally. They are simpler and lighter weight and it's a given that the elements support the required copy, assign, and comparison functionality</LItem>
+            <LItem Ref="By Reference">By reference collections take objects by reference, well, by pointer to be strict about it. They can be told to adopt (own) those objects or not. So they can be given objects to own and clean up when they destruct, or they can be used to provide light weight alternative views into other collections or arrays without any need to copy the elements or worries about double deletions</LItem>
+            <LItem Ref="By Value">By value collections, as you would imagine, take objects by value, so they must be able to copy and assign the elements in order to get them into the collection</LItem>
         </List>
 
-        <P>Since there are both by value and by reference collections, there isn't any of the syntax weirdness of trying to deal with both in a single set of collections, though it is a lot of work to do them twice. And it means they both have interfaces appropriate for the way they store objects, and the by value ones don't need to have any ownership semantics.</P>
+        <P>Since there are both by value and by reference collections, there isn't any of the syntax weirdness of trying to deal with both in a single set of collections, though it is a lot of work to do them twice. It means they both have interfaces appropriate for the way they store objects, and the by value ones don't need to ignore ownership semantics that don't apply to them.</P>
 
         <SecTitle>Collection Types</SecTitle>
 
-        <P>There are a fairly well established set of collection types in most systems out there since they reflect the various strategies (or compromises depending on how you look at it) for storage style, how elements are accessed, ordering of the elements, etc... CIDLib follows those common types pretty closely as well.</P>
+        <P>There are a fairly well established set of collection types in most systems out there since they reflect the various strategies (or compromises depending on how you look at it) for how elements are stored, how they are accessed, ordering of the elements, etc... CIDLib follows those common types pretty closely as well.</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem Ref="Storage">Are the elements in contiguous memory, in a list, in tree structure, in a hash table, etc...</LItem>
-            <LItem Ref="Ordered">Some collection are ordered, meaning that it remembers the order in which you added the elements and you can retrieve them in that order, else they are unordered and there is no relationship there.</LItem>
-            <LItem Ref="Keyed">Some collections require a unique key for every element, which is used to access it, and others are anonymous only allowing access by index or no access at all. Sometimes the key is in the element itself, sometimes it is a separate thing.</LItem>
+            <LItem Ref="Ordered">Some collection are ordered, meaning that it remembers the order in which you added the elements and you can retrieve them in that order, else they are unordered and there is no relationship there. Or perhaps they enforce an order, such as sorting by some criteria, but not the original order.</LItem>
+            <LItem Ref="Keyed">Some collections require a unique key for every element, which is used to access it, and others are anonymous, only allowing access by index or no direct access at all. Sometimes the key is in the element itself, sometimes it is a separate thing.</LItem>
             <LItem Ref="Access">Some collections let you directly access elements by an index or by a key. Others only allow iteration through the elements in some way. Some allow both. Some use LIFO (last in/first out) or FIFO (first in/first out) access.</LItem>
         </List>
 
@@ -55,7 +55,7 @@
             <TableRow>
                 <TableCol>Bag</TableCol>
                 <TableCol>Linked list</TableCol>
-                <TableCol>No</TableCol>
+                <TableCol>Yes</TableCol>
                 <TableCol>No</TableCol>
                 <TableCol>Iteration only</TableCol>
             </TableRow>
@@ -105,13 +105,13 @@
                 <TableCol>Linked List</TableCol>
                 <TableCol>If priority based</TableCol>
                 <TableCol>No</TableCol>
-                <TableCol>LIFO/Iteration</TableCol>
+                <TableCol>FIFO/Iteration</TableCol>
             </TableRow>
 
             <TableRow>
                 <TableCol>Sorted Bag</TableCol>
                 <TableCol>Linked List</TableCol>
-                <TableCol>Yes</TableCol>
+                <TableCol>Yes (Sorted)</TableCol>
                 <TableCol>No</TableCol>
                 <TableCol>Iteration</TableCol>
             </TableRow>
@@ -121,7 +121,7 @@
                 <TableCol>Linked List</TableCol>
                 <TableCol>Yes</TableCol>
                 <TableCol>No</TableCol>
-                <TableCol>FIFO/Iteration</TableCol>
+                <TableCol>LIFO/Iteration</TableCol>
             </TableRow>
 
             <TableRow>
@@ -141,29 +141,29 @@
             </TableRow>
         </Table>
 
-        <SecTitle>Fundamental Collections</SecTitle>
+        <SubSecTitle>Fundamental Collections</SubSecTitle>
 
-        <P>There aren't as many fundamental collection types, since the needs for storing fundamental types aren't quite as broad ad for objects. But there's a very useful set of them.</P>
+        <P>There aren't as many fundamental collection types, since the needs for storing fundamental types aren't quite as broad as for objects. But there's a very useful set of them.</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem>TFundArray</LItem>
             <LItem>TFundDeque</LItem>
             <LItem>TFundStack</LItem>
             <LItem>TFundVector</LItem>
         </List>
 
-        <SecTitle>By Reference Collections</SecTitle>
+        <SubSecTitle>By Reference Collections</SubSecTitle>
 
         <P>These are the by reference collection classes:</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem>TBasicDLinkedRefCol</LItem>
-            <LItem>TBasicTreeCol</LItem>
             <LItem>TRefBag</LItem>
-            <LItem>TRefDqueue</LItem>
+            <LItem>TRefDeqeue</LItem>
             <LItem>TRefKeyedHashSet</LItem>
             <LItem>TRefQueue</LItem>
             <LItem>TRefSortedBag</LItem>
+            <LItem>TRefStack</LItem>
             <LItem>TRefVector</LItem>
         </List>
 
@@ -171,19 +171,22 @@
 
         <Note>It's rare in CIDLib that we have a derived class that doesn't actually fully implement the interface of its base, but the TBasicTreeCol class is one. All collections implement an objAdd method (or Add if by reference) to generically add an element to it. But for a tree we don't know where to put it. So objAdd will throw if you call it on a tree. It is otherwise a valid collection derivative so there are enough benefits to justify this rare exception.</Note>
 
-        <SecTitle>By Value Collections</SecTitle>
+        <SubSecTitle>By Value Collections</SubSecTitle>
 
         <P>These are the by value collection classes:</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem>TBasicDLinkedCol</LItem>
             <LItem>TBag</LItem>
-            <LItem>TBasicTree</LItem>
+            <LItem>TBasicTreeCol</LItem>
+            <LItem>TDeque</LItem>
             <LItem>THashMap</LItem>
             <LItem>THashSet</LItem>
             <LItem>TKeyedHashSet</LItem>
             <LItem>TObjArray</LItem>
             <LItem>TQueue</LItem>
+            <LItem>TStack</LItem>
+            <LItem>TSortedBag</LItem>
             <LItem>TVector</LItem>
         </List>
 
@@ -193,11 +196,93 @@
 
         <Note>There is a non-templatized TSLinkedList class as well, but it's not one of our formal collection derivatives. It is sometimes used inside other things for simple linked list storage where it's easy to to internally handle casting node values to their real type, and it allows you to avoid extra code generation for something simple. There is no fully fleshed out singly linked list at this time.</Note>
 
+
+        <SecTitle>Copy/Assign/Move and Equality</SecTitle>
+
+        <P>One thing that is always tricky with fancy classes like collections is, what does copying or assigning them really mean? They may have various internal mechanisms that are very important, and how much of this stuff should be replicated in the target? Obviously in general you always want to follow the rule that after assiging or copying A to B, then A==B should be true.</P>
+
+        <P>For collections some hard choices had to be made, and the rule for collections is as below. Note that this is for non-fundamental collection types, i.e. those that hold objects:</P>
+
+        <Note>After A=B, then iterating A and B in cursor order will result in the elements being in the same order in both of them.</Note>
+
+        <P>That is all that is guaranteed. Nothing to do with the exact capacity of the collections, whether they adopt or don't adopt or anything of that nature is transferred by copy or assign. In some cases, internal details that are necessary to guarantee the same iteration order will be replicated. For instance, a hash set must have the same hash modulus in order for the elements to iterate in the same order after they are copied over and added to the target collection.</P>
+
+        <P>None of the non-fundamental collection classes have any built in equality testing anyway, so technically it doesn't matter since you can't compare collections via equality operator. We don't want to force all elements to support equality testing. But there is a tCIDLib::bCompareElems() method that will compare two collections using the above semantics. It can do so generically (non-templatized) since equality is defined in terms of cursor iteration order, and it can polymorphically create cursors for the provided collections.</P>
+
+        <P>The serial numbers of both source and destination are bumped in a move, and the target's is bumped in copy/assign.</P>
+
+        <P>If publish/subscribe is enabled (see below), bulk load/remove operations are reported for the target in copy/assign and for both in a move.</P>
+
+
+        <SecTitle>Iteration</SecTitle>
+
+        <P>More on iteration will be covered in the Collection Cursors section (see to the left), but there are some non-cursor oriented ways to iterate collections. As discussed there some collections have natural iteration capabilities, such as vectors/arrays which can just be iterated with an index using the [] operator. Though some post-modernists may turn up their noses at this scheme, it's often very convenient. Linked lists have the ability to get the root node and move to the next node until you hit the end.</P>
+
+        <Code>
+        TVector&amp;lt;TWhatever> colList;
+        // some objects are added here
+        const tCIDLib::TCard4 c4Count = colList.c4ElemCount();
+        for (tCIDLib::TCard4 c4Index = 0; c4Index &amp;lt; c4Count; c4Index++)
+        {
+            TWhatever&amp;amp; weCur = colList[c4Index];
+            weCur.DoSomething();
+        }
+        </Code>
+
+        <P>Others don't have any means to directly access elements in a way that you can step through them. For those you need some other mechanism. Cursors are one such, but another is the bForEach and bForEachNC methods. These are callback based schemes where you provide a callback and it will call that for each element in the collection. There is no particular guaranteed order though for ordered collections it will be in that natural order, and otherwise typically will be in cursor order.</P>
+
+        <Code>
+        tCIDLib::TVoid
+        TMagnum::CalcContArea(TCollection&amp;lt;TArea>&amp;amp; colList, TArea&amp;amp; areaCont)
+        {
+            areaCont.ZeroAll();
+            colList.bForEach
+            (
+                [this](const TArea&amp;amp; areaCur)
+                {
+                    areaCont |= areaCur;
+                    return kCIDLib::True;
+                }
+            );
+        }
+        </Code>
+
+        <P>In this example we have a method that can accept any sort of collection of TArea objects and will calculate the full containing area of all of them. Since bForEach() is supported at the TCollection level, it can accept any collection of areas.</P>
+
+        <P>Note that the callback returns a boolean. As long as you return True, then the iteration will continue. You can return False to break out of the loop if desired. The return from bForEach() indicates whether you went all the way to the end (True) or not (False.) So you can take action if something stopped the iteration, for instance maybe you were searching for something and found it.</P>
+
+        <Note>If you want to be able to modify the elements, then use bForEachNC (which means non-const) and then the callback element will not be const and you can modify them. Obviously be careful of this in ordered collections since you could invalidate the ordering, e.g. changing the key in a hashed collection would make that element no longer findable because it's key wouldn't generate the same hash modulus.</Note>
+
+        <P>This type of iteration will automatically take advantage of the thread safety of the collection, see below. You don't need to lock the collection from the outside to iterate it thread safely. The for each method will lock the collection (if it is thread safe) and then do the callback loop. So the loop will be atomic in that case.</P>
+
+
+        <SecTitle>Const'ness</SecTitle>
+
+        <P>With collections the concept of const becomes a little weird. Ideally the concept of the const'ness of the collection would be completely separate from the const'ness of the elements inside it, but that can get tricky. CIDLib's handling of this is not as clean as it in theory could possibly be, but works pretty well.</P>
+
+        <P>If the collection itself is const, it will only give you const access to the elements, just to be safe. If you want to modify the elements you should use a non-const collection. However, if the collection is declared with a const element type, the elements will always be const even if accessed via a non-const collection.</P>
+
+
+        <SecTitle>Thread Safety</SecTitle>
+
+        <P>Collections can be thread safe or not. You choose when you create one. This is one of those capabilities that is very useful, but also potentially dangerous so you have to be careful about them.</P>
+
+        <P>If thread safe, they will create an internal mutex and all calls to the collection will be guaranteed to be atomic. For those scenarios where all that two threads share is some collection, this can be particularly convenient, since no explicit synchronization is required. Also see Thread Synchronization to the left and the section on Queues, which are a particularly powerful case.</P>
+
+        <Note>Related to the Copy/Assign Semantics section above, thread safety is not something transferred during Copy/Assign (or Move.) It would be exceedingly dangerous if a thread safe collection was suddenly not thread safe after it was assigned to.</Note>
+
+        <P>If you do need to do more than one operation on a collection, you can lock it from the outside. You can use a mutex locker and give it the collection's mutex to lock. Note that, you can do this without regards as to whether the collection is really thread safe or not. If not, the mutex is null and the locker does nothing. So you can have a method that will do some operation on a collection and guaranteed that it's thread safe if the collection itself is thread safe, else not.</P>
+
+        <Code>    TMtxLocker mtxlSync(m_colMyList.pmtxLock());</Code>
+
+        <P>If a class has a collection that must be thread safe, and it has some other light sync requirements on other members, it can either create a separate mutex and use that. Or create the collection thread safe and use it to manage access to the other members as well. The latter means you only need explicit locking around the non-collection members. That may be seen as a good or bad thing by different folks.</P>
+
+
         <SecTitle>Polymorphism</SecTitle>
 
         <P>Unlike some other systems' collections/containers, CIDLib's collections are polymorphic. They derive from a common base class and some operations can be done on any type of collection. There are actually two different levels of polymorphism.</P>
 
-        <List Type="Unordered">
+        <List>
             <LItem Ref="TCollectionBase">This is the most fundamental class and is not templatized. So it provides common functionality that does not depend on the type of element or other template instantiation parameters. It is the common base class for fundamental, by value and by reference collection types.</LItem>
             <LItem Ref="TFundColBase">Derives from TCollectionBase and provides a common base class for the fundamental collections, below the point of templatization</LItem>
             <LItem Ref="TCollection/TRefCollection&lt;>">These derive from TCollectionBase but include knowledge of the element type, so they can provide common functionality that requires that information. And the value/reference split happens here for all of the by value/by reference concrete derivatives.</LItem>
@@ -215,7 +300,42 @@
         AddNew(colItems);
         </Code>
 
-        <P>So here we create a vector of strings, but we can pass it to AddNew which takes a TCollection of strings. objAdd is defined in TCollection, so AddNew can accept any collection with string elements (though see Collection Indices above.)</P>
+        <P>So here we create a vector of strings, but we can pass it to AddNew which takes a TCollection of strings. objAdd is defined in TCollection, so AddNew can accept any collection with string elements (though see Collection Indices in the Smart Enums section to the left.)</P>
+
+        <P>On the whole methods that take collections as parameters should try to accept a TCollection&amp;lt;> or TRefCollection&amp;lt;> parameter, since that allows for maximum flexibility. It does mean that the called method can only access elements via a cursor, since it doesn't know how to directly access elements (even if that's possible for the type actually passed.) But, if the called method requires some specific access scheme or collection type of course it would accept only that type.</P>
+
+        <P>For instance, the above example can only add elements through the generic objAdd() or Add() methods, which don't allow it to control where in the collection the new element will be placed, so that might not provide for sufficient control.</P>
+
+
+        <SecTitle>Publish/Subscribe</SecTitle>
+
+        <P>Collections can support the <Link Type="Page" Ref="/BigPicture/" Id="/PubSub">publish/subscribe framework</Link>, so that client code can subscribe to changes. That makes it much easier to track changes in the collection than trying to insure that they put checks at every point in their own code where the collection might be changed.</P>
+
+        <P>TCollectionBase has a pointer to a published topic object, which it will create if asked to by the derived class. It doesn't directly expose that setup method since not all collections support pub/sub yet. So the derived class calls EnablePublish() to enable it. It's assumed that, if pub/sub is enabled that someone is listening, so posting events isn't a waste of time, so no need to bother constantly checking if there are any subscribers. DisablePubSub() can be called to close the topic.</P>
+
+        <P>A collection can only support one topic. So EnablePublish takes a desired topic path, but if publishing is already enabled it returns the already set up path, so the caller can use that instead. If it wasn't already set up, the passed in path is used. If you care, you can compare them to see if your path was used. We have another version that just takes the path to use and throws if it is already enabled under another path. If it's already enabled under the same path it just returns since you can just use your desired path already.</P>
+
+        <P>The messages published by collections contain a <ClassRef Ref="TColPubSubInfo"/> object. It contains an event type and some index/count values that are relevant depending on the event.</P>
+
+        <SubSecTitle>Direct Element Changes</SubSecTitle>
+
+        <P>If you directly change an element, the collection cannot know about that. So you must report these changes yourself. It only matters on collections that you have enabled publishing of course. If you do this to collections passed in to you, it's best to do this just case. You can check if publishing is enabled first of course. The TCollectionBase class provides a PublishElemChanged() method that makes it easy for you to report such changes.</P>
+
+
+        <SubSecTitle>Bulk Operations with Pub/Sub</SubSecTitle>
+
+        <P>There is a <Italic>huge</Italic> gotcha here. Each item added or removed or changed generates a message. If you spit out 100K items into a collection at once, that will cause 100K msgs, which isn't practical (and will throw since the subcriber's queue isn't nearly that big.)  There is no clean way to automagically deal with this, because already published msgs cannot be gotten back and there's no way to know that client code is about to iterate the collection and remove or modify a bunch of elements. The client code MUST cooperate or it's going to get full subscription queue errors.</P>
+
+        <P>So they have to call the BlockModeStart() method on TCollectionBase, do the bulk operation, then call BlockModeEnd() with the start/count values of what it modified. Or, if they are not contiguous they must pass c4MaxCard for the start value, which just sends a Reordered event (effectively, hey, reload again.)</P>
+
+        <P>There's just no way around it. A flag is set between Start/End to prevent any messages from being published. Obviously you have to worry about exceptions that would leave the flag set, so a janitor class is provided (<ClassRef Ref="TColBlockModeJan"/>.) It will set the flag and remember the start index. It can be ticked each time one is added/removed to bump a counter. When it dtors, it will call BlockModeEnd and publish a block operation message.</P>
+
+        <P>If a copy/assign is done with the block mode flag set, it is just cleared. A full report will be issued anyway with the new content.</P>
+
+
+        <SecTitle>Prefab Algorithms</SecTitle>
+
+        <P>Though CIDLib doesn't go nearly as crazy as the STL libraries do, it does provide some very common operations that can be done generically on any type collection (well, some may only be valid for by value or by reference collections.) Some more will be added over time, but probably never as many as the STL. These are in the tCIDColAlgo namespace.</P>
 
     </HelpText>
 

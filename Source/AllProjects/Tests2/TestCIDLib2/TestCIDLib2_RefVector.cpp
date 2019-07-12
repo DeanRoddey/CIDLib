@@ -82,7 +82,7 @@ TTest_RefVectorLambda::eRunTest(TTextStringOutStream&   strmOut
 
     // Iterate the values and check them
     tCIDLib::TCard4 c4LoopVal = 0;
-    colTest.ForEach
+    colTest.bForEach
     (
         [&c4LoopVal, &strVal, &eRes, &strmOut](const TString& strCur)
         {

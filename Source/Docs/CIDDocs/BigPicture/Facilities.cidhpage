@@ -6,11 +6,11 @@
 
     <HelpText>
 
-        <P>CIDLib is structured into 'facilities' which is the CIDLib term for an executable or library module. These can have different names on different platforms so we use our own generic term.</P>
+        <P>CIDLib is structured into 'facilities' which is the CIDLib term for an executable or load library module (e.g. a DLL on Windows.) These can have different names on different platforms so we use our own generic term.</P>
 
         <P>A facility is also something more than that. Other than for trivial programs (executable facilities), each facility has a facility class, and a singleton instance of that class is created, which is the 'facility object'. The executable's facility object is often the only global data object created other than simple constants. It provides access to any facility-wide, always available functionality. It sometimes provides 'object factory' type functionality as well.</P>
 
-        <P>So this is a very common theme throughout CIDLib, references to the facility class or facility object. It will be typically in an xxx_ThisFacility.hpp and cpp file, where xxx is the name of the facility, and the actual object will be instantiated in xxx.cpp, i.e. the main cpp file of the facility.</P>
+        <P>So this is a very common theme throughout CIDLib, references to the facility class or facility object. It will be typically in an xxx_ThisFacility.hpp and cpp file, where xxx is the name of the facility, and the actual object will be instantiated in xxx.cpp, i.e. the main cpp file of the facility. See the Facility Files section to the left.</P>
 
         <P>Each facility creates a derivative of one of the underlying facility classes, either TFacility or TGUIFacility, depending on whether it is one that deals in UI functionality or not. The derived classes sometimes have very little of their own functionality, sometimes none and are just passing along setup information to the base class via constructor. Others can have quite a bit of functionality exposed.</P>
 
@@ -65,7 +65,7 @@
 
         <SecTitle>Lazy Faulting</SecTitle>
 
-        <P>To avoid various complications related to global objects in library type modules, particularly dynamically loadable ones, the facility objects in library facilities are lazily faulted in. The main cpp/hpp file will provide a method to access the facility object, which will fault it in upon being accessed.</P>
+        <P>To avoid various complications related to global objects in library type modules, the facility objects in library facilities are lazily faulted in. The main cpp/hpp file will provide a method to access the facility object, which will fault it in upon being accessed.</P>
 
         <P>For executable facilities, the facility object must be an actual global object because the main thread has to be pointed at it, hence there's no way to fault it in because there's no thread yet running CIDLib code to do so. And no need to either since no CIDLib threads that could access it are running prior to its construction.</P>
 
@@ -95,7 +95,7 @@
 
         <SecTitle>Versioning</SecTitle>
 
-        <P>Library facilities are versioned, in the name. How that works is platform specific. For Win32, there is _M_m type bit added to the name, for major and minor version. This insures that if two CIDLib programs based on separate versions were running at the same time, they would both find the library facilities appropriate for them.</P>
+        <P>Library facilities are versioned, in the name. How that works is platform specific. For Win32, there is an _M_m type bit added to the name, for major and minor version. This insures that if two CIDLib programs based on separate versions were running at the same time, they would both find the library facilities appropriate for them.</P>
 
         <Code>
         05/11/2019  11:13 PM     528,384 CIDOrb_5_3.dll
@@ -106,7 +106,7 @@
 
         <Note>The assumption is that revision level releases won't break binary compatibility and so we don't want to include that in the versioning.</Note>
 
-        <P>How the versioning is done on other platforms could be different, but the above scheme is pretty straightforward and likely to work well enough on other platforms CIDLib is likely to be able to support. If so, it should be used in order to maintain consistency.</P>
+        <P>How the versioning is done on other platforms could be different, but the above scheme is pretty straightforward and likely to work well enough on other platforms CIDLib is likely to be able to support. If so, it should be used in order to maintain consistency. But the building up of a facility file name from a base name and version information is something handled by per-platform code, so there is some leeway there if need be. As long as it creates a name that it understands if it gets it back later in some operation that requires finding or loading the file, then it will work.</P>
 
         <P>Other platform specific stuff can also be done by the build tools on those platforms, if it helps with integration there, such as embedded versions resources, embedded manifest files, or other means available to version stamp loadable modules. Those can operate in addition to the primary scheme used by CIDLib itself on that platform.</P>
 

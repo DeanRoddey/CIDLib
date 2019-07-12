@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TMutex" Prefix="mtx" Parent="TObject" Flags="Fmt">
+
+    <Desc>
+        <P>TMutex is, as you would likely expect, our wrapper around the system mutex functionality. In actual fact, this is a wrapper around a wrapper. The actual wrapper is a per-platform class in the CIDKernel facility, <ClassRef Ref="TKrnlMutex"/>. Mutexes are standard computer science stuff so we won't cover the concepts here.</P>
+
+        <P>For the most part, locking with a mutex is something that is done on a scoped basis, since you just want to lock for the minimum time possible while you update some data shared between threads. In those cases, the <ClassRef Ref="TMtxLocker"/> class should always be used since it makes scoped locking exception safe. But you can lock and unlock manually, just be sure you deal with exceptions or it will be a bad day at some point.</P>
+
+        <P>Mutexes can be anonymous (only accessible within the program via a TMutex object) or they can be named, which means that they can be shared between programs. The latter is fairly rare, but very useful in some cases.</P>
+
+        <P>Mutexes support <ClassRef Ref="MFormattable"/>, but mostly just as a debug mechanism so you can log the name and/or state of a mutex if something goes wrong.</P>
+
+    </Desc>
+
+    <PubIntf>
+        <Ctors DelMethods="CopyCtor MoveCtor">
+
+            <Method Name="TMutex">
+                <Desc>
+                    <P>The default constructor takes an initial lock state indicator, which defaults to initially unlocked. The next one allows you to create a named mutex, and indicates how to react if the named resource already does or does not exist. And a third one is the same as the second, except it returns a flag that indicates whether the mutex was created or not (i which case it already existed and was just opened.)</P>
+
+                    <P>For the named ones, the default action is to open it if it exists, or create it if doesn't exist, which is almost always the desired result. This is an atomic operation so there won't be any race conditions if two different programs are creating a shared mutex at the same time.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="eInitState" Type="tCIDLib::ELockStates" DefVal="tCIDLib::ELockStates::Unlocked"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="rsnMutex" Type="TResourceName"/>
+                    <MethParam Name="eInitState" Type="tCIDLib::ELockStates" DefVal="tCIDLib::ELockStates::Unlocked"/>
+                    <MethParam Name="eCreateAct" Type="tCIDLib::ECreateActs" DefVal="tCIDLib::ECreateActs::OpenOrCreate"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="rsnMutex" Type="TResourceName"/>
+                    <MethParam Name="bCreated" Type="tCIDLib::TBoolean" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="eInitState" Type="tCIDLib::ELockStates" DefVal="tCIDLib::ELockStates::Unlocked"/>
+                    <MethParam Name="eCreateAct" Type="tCIDLib::ECreateActs" DefVal="tCIDLib::ECreateActs::OpenOrCreate"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="~TMutex">
+                <Desc>Closes the system mutex handle, to release the resource.</Desc>
+                <MethVar/>
+            </Method>
+        </Ctors>
+
+        <Operators DelMethods="AssignOp MoveOp"/>
+
+        <!-- Non-virtual public methods -->
+        <NVirtMeths>
+
+            <GetSet Name="bIsNamed" RetType="tCIDLib::TBoolean">
+                Returns whether this is a named mutex or an anonymous one.
+            </GetSet>
+
+            <Method Name="bTryLock" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>Tries to lock the mutex, waiting for up to the indicated number of milliseconds before it gives up. The default is to wait indefinitely if not explicitly indicated. It returns a status that indicates if it locked the mutex or not.</P>
+
+                    <P>If any other error besides a timeout occurs, then an exception is thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Timeout" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxWait"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Lock">
+                <Desc>Like bTryLock() above, but throws a lock failure exception if it fails to get the lock instead of returning a status. The timeout defaults to kCIDLib::c4MaxWait for an indefinite timeout.</Desc>
+                <MethVar>
+                    <MethParam Name="c4Timeout" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxWait"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Unlock">
+                <Desc>
+                    <P>If the calling thread has this mutex locked, then it will be unlocked. If the same thread has it locked multiple times, this will reduce a lock counter, only actually unlocking when all of the stacked locks are finally undone. This makes it safe for multiple levels of code to lock and unlock the same mutex within their scopes.</P>
+
+                    <P>The mutex can only be unlocked by the thread that locked it, so an exception will occur if this is called by a thread other than the one who owns the lock. An exception will also be thrown if the mutex is not even locked at all.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <GetSet Name="rsnName" RetType="TResourceName" RetBy="CRef">
+                Returns the resource name of this mutex. If this mutex is not a named one, then this object will just contain empty data. Use bIsNamed() above to know if this is going to provide useful data.
+            </GetSet>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

@@ -620,16 +620,17 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
             }
         }
 
-        template <typename IterCB> tCIDLib::TVoid ForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
             TNode* pnodeHead = static_cast<TNode*>(m_llstCol.pnodeHead());
             while (pnodeHead)
             {
                 if (!iterCB(pnodeHead->objData()))
-                    break;
+                    return kCIDLib::False;
                 pnodeHead = static_cast<TNode*>(pnodeHead->pnodeNext());
             }
+            return kCIDLib::True;
         }
 
         TElem& objAddAtBottom(const TElem& objToAdd)

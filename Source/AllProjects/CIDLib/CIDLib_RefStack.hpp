@@ -114,17 +114,17 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
             return new TRefStack(this->eAdopt(), this->eMTState());
         }
 
-        const TElem* pobjPeek() const
+        [[nodiscard]] const TElem* pobjPeek() const
         {
             return this->pobjPeekAtBottom();
         }
 
-        TElem* pobjPeek()
+        [[nodiscard]] TElem* pobjPeek()
         {
             return this->pobjPeekAtBottom();
         }
 
-        TElem* pobjPop()
+        [[nodiscard]] TElem* pobjPop()
         {
             return this->pobjGetFromBottom();
         }

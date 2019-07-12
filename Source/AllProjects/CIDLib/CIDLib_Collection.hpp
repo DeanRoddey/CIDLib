@@ -54,104 +54,6 @@
 //  templatized stuff in order to make the generated code smaller, mostly error
 //  checking/throwing stuff.
 //
-//  Publish/Subscribe
-//
-//  Collections can support the publish/subscribe frameweork, so that client code
-//  can subscribe to changes. That makes it much easier to track changes in the
-//  collection than trying to insure that they put checks at every point in their
-//  own code where the collection might be changed.
-//
-//  So the base collection classes have a pointer to a published topic object, which
-//  they will create if asked to by the derived class. We don't directly expose that
-//  setup method since not all collections support pub/sub yet.
-//
-//  So the derived class calls EnablePublish() to enable it. It's assumed that, if pub/sub
-//  is enabled that someone is listening, so posting events isn't a waste of time, so
-//  no need to bother constantly checking if there are any subscribers. DisablePubSub()
-//  can be called to close the topic.
-//
-//  We can only support one topic. So EnablePublish takes a desired topic path, but if
-//  publishing is already enabled it returns the already set up path, so the caller can
-//  use that instead. If it wasn't already set up, you get back the path you passed in.
-//  If you care, you can compare them to see if your path was used. We have another
-//  version that just takes the path to use and throws if it is already enabled under
-//  another path. If it's already enabled under the same path it just returns since
-//  you can just use your desired path already.
-//
-//  We provide a small set of PublishXXX() variations that the derived class should
-//  call to report changes. There are only so many scenarios and we want to keep them
-//  small. Most just take an event type plus an index or key. Others take a little more
-//  info. We generate the correct topic object and publish it.
-//
-//  There is also a public PublishElemChange() method that we call if we can know that
-//  an element was changed. Often we cannot know (because it was directly modified) so
-//  this one is public, allowing the code that changed it to report the change.
-//
-//  * When we remove an element, we publish FIRST, then remove. This way, sync subscribers
-//    get a chance to get info about the element before we kill it. This can be very
-//    convenient, though they have to be careful to understand that is what is happening.
-//
-//  Bulk load with Pub/Sub
-//
-//  There is a HUGE gotcha here. Each item added generates a msg. If you spit out
-//  100K items into a collection at once, that will cause 100K msgs, which isn't
-//  practical (and will throw since the subcriber's queue isn't nearly that big.) Same
-//  with a big remove of elements. There is no clean way to automagically deal with this,
-//  because we cannot get back msgs already published and we don't know it's a bulk
-//  load/remove starting if they are done one at a time, or when it ended. The client
-//  code MUST cooperate or it's going to get full subscription queue errors.
-//
-//  So they have to call our BlockModeStart() method, do the load, then call our
-//  BlockModeEnd() method with the start/count values of what it loaded/removed. Or, if
-//  they are not contiguous they must pass c4MaxCard for the start value, which just
-//  sends a Reordered event (effectively, hey, reload from this collection.)
-//
-//  There's just no way around it. We use a flag that is set while doing this.
-//  Obviously they have to worry about exceptions that would leave the flag set, so
-//  we provide a janitor. It will set the flag and remember the start index. It can
-//  be ticked each time one is added/removed to bump a counter. When it dtors, it will
-//  call BlockModeEnd.
-//
-//  If a copy/assign is done with the block mode flag set, it is just cleared. A
-//  full report will be issued anyway with the new content.
-//
-//  Synchronization
-//
-//  Collections can be created thread safe. If so, a mutex is created. The derived
-//  classes can lock on that as required, and we do the same at our level.
-//
-//  You would have to explicitly change those things.
-//
-//  Move/Assign
-//
-//  You have to be very careful with move/assign. This ONLY deals with element
-//  content, it doesn't change thread safety, adoption status for by ref vectors,
-//  publish topic, etc... We only provide a move assignment operator. We want derived
-//  classes, in their move ctors, to do minimal setup, then do a move assign, which
-//  allows for locking on the source.
-//
-//  It does change anything required to represent the elements in the same order
-//  (they should be considered equal by the criteria below.) So, for instance, a
-//  hash collection would adopt the source hash modulus so that it will have the
-//  same element ordering after the operation.
-//
-//  The serial number of both source and target are bumped an move op, and the src's
-//  for a move ctor.
-//
-//  As with all changes, the derived class has to deal with pub/sub if enabled.
-//  For assign, remove current elements, post a clear. Take on the new elements,
-//  and post a block mode add.
-//
-//  Equality
-//
-//  Equality for collections means that they have the same number of elements
-//  and that those elements, in iteration order, are equal. This is only meaningful
-//  for by value collections. Anything beyond that client code has to check themselves
-//  because things mentioned above in the Move/Assign section that are not affected
-//  by these operations are considered internal details.
-//
-//  So there is a global equality operator below that works generically for all
-//  non-fundamental collections.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -177,45 +79,6 @@ class CIDLIBEXP TColPubSubInfo : public TObject
     public  :
         // -------------------------------------------------------------------
         //  Public types
-        //
-        //  These events use these members, else they don't use any:
-        //
-        //      BlockAdded
-        //          Index1  - Index of first item added
-        //          Index2  - Count of items added after that
-        //
-        //      BlockChanged
-        //          Index1  - Index of first item changed
-        //          Index2  - Count of items changed after that
-        //
-        //      BlockRemoved
-        //          Index1  - Index of first item removed
-        //          Index2  - Count of items removed after that
-        //
-        //      ElemAdded
-        //          Index1  - Index where it was added
-        //
-        //      ElemChanged
-        //          Index1 - Index of element changed
-        //
-        //      ElemMoved
-        //          Index1  - Where it was originally
-        //          Index2  - Where it ended up
-        //
-        //      ElemChanged
-        //      ElemRemoved
-        //          Index1  - Index of element modified or removed
-        //
-        //      Loaded
-        //          The previous contents has been replaced with new contents
-        //          Index1 - The count of elements newly added
-        //
-        //      Reordered
-        //          The elements are the same but the order has been affected
-        //
-        //      Swapped
-        //          Index1  - Index of element moved to index 2
-        //          Index2  - Index of element moved to index 1
         // -------------------------------------------------------------------
         enum class EEvents
         {
@@ -248,28 +111,19 @@ class CIDLIBEXP TColPubSubInfo : public TObject
         TColPubSubInfo
         (
             const   EEvents                 eEvent
-            , const TString&                stRKey
-        );
-
-        TColPubSubInfo
-        (
-            const   EEvents                 eEvent
             , const tCIDLib::TCard4         c4Index1
             , const tCIDLib::TCard4         c4Index2
         );
 
-        TColPubSubInfo(const TColPubSubInfo&) = delete;
+        TColPubSubInfo(const TColPubSubInfo&) = default;
 
-        ~TColPubSubInfo();
+        ~TColPubSubInfo() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TColPubSubInfo& operator=
-        (
-            const   TColPubSubInfo&         colpsiSrc
-        );
+        TColPubSubInfo& operator=(const TColPubSubInfo&) = default;
 
 
         // -------------------------------------------------------------------
@@ -290,12 +144,6 @@ class CIDLIBEXP TColPubSubInfo : public TObject
             return m_eEvent;
         }
 
-        const TString& strKey() const
-        {
-            return m_strKey;
-        }
-
-
     private :
         // -------------------------------------------------------------------
         //  Private data members
@@ -307,14 +155,10 @@ class CIDLIBEXP TColPubSubInfo : public TObject
         //
         //  m_eEvent
         //      The event being reported
-        //
-        //  m_strKey
-        //      Used for add/remove in key based collections.
         // -------------------------------------------------------------------
         tCIDLib::TCard4 m_c4Index1;
         tCIDLib::TCard4 m_c4Index2;
         EEvents         m_eEvent;
-        TString         m_strKey;
 
 
         // -------------------------------------------------------------------
@@ -336,15 +180,6 @@ class CIDLIBEXP TCollectionBase : public TObject
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
-        static tCIDLib::TBoolean bWaitForData
-        (
-                    TMtxLocker&             lockQueue
-            , const TCollectionBase&        colSrc
-            , const tCIDLib::TCard4         c4WaitMSs
-            ,       TThreadWaitList&        twlWaitList
-            , const tCIDLib::TBoolean       bThrowIfNot
-        );
-
         static tCIDLib::TVoid BadStoredCount
         (
             const   TClass&                 clsCol
@@ -440,6 +275,19 @@ class CIDLIBEXP TCollectionBase : public TObject
 
 
         // -------------------------------------------------------------------
+        //  Protected, static methods
+        // -------------------------------------------------------------------
+        static tCIDLib::TBoolean bWaitForData
+        (
+                    TMtxLocker&             mtxlQueue
+            , const TCollectionBase&        colSrc
+            , const tCIDLib::TCard4         c4WaitMSs
+            ,       TThreadWaitList&        twlWaitList
+            , const tCIDLib::TBoolean       bThrowIfNot
+        );
+
+
+        // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
         TCollectionBase
@@ -452,12 +300,15 @@ class CIDLIBEXP TCollectionBase : public TObject
             const   TCollectionBase&        colSrc
         );
 
+        TCollectionBase
+        (
+                    TCollectionBase&&       colSrc
+        );
+
         TCollectionBase& operator=
         (
             const   TCollectionBase&        colSrc
         );
-
-        TCollectionBase(TCollectionBase&&) = delete;
 
         TCollectionBase& operator=
         (
@@ -618,11 +469,6 @@ class CIDLIBEXP TCollectionBase : public TObject
             const   tCIDLib::TCard4         c4At
         );
 
-        tCIDLib::TVoid PublishAdd
-        (
-            const   TString&                strKey
-        );
-
         tCIDLib::TVoid PublishBlockAdded
         (
             const   tCIDLib::TCard4         c4At
@@ -646,11 +492,6 @@ class CIDLIBEXP TCollectionBase : public TObject
         tCIDLib::TVoid PublishRemove
         (
             const   tCIDLib::TCard4         c4At
-        );
-
-        tCIDLib::TVoid PublishRemove
-        (
-            const   TString&                strRemove
         );
 
         tCIDLib::TVoid PublishReorder();
@@ -807,7 +648,7 @@ class TCollection : public TCollectionBase, public MDuplicable
         //  pointer or lambda. We use a cursor so it will work for any of our
         //  collection derivatives.
         //
-        template <typename IterCB> tCIDLib::TVoid ForEach(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
             TColCursor<TElem>* pcursEach = pcursNew();
@@ -815,9 +656,10 @@ class TCollection : public TCollectionBase, public MDuplicable
             while (pcursEach->bIsValid())
             {
                 if (!iterCB(pcursEach->objRCur()))
-                    break;
+                    return kCIDLib::False;
                 pcursEach->bNext();
             }
+            return kCIDLib::True;
         }
 
 
@@ -1047,7 +889,7 @@ template <class TElem> class TRefCollection : public TCollectionBase
         //  pointer or lambda. We use a cursor so it will work for any of our
         //  collection derivatives.
         //
-        template <typename IterCB> tCIDLib::TVoid ForEach(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             TMtxLocker lockThis(this->pmtxLock());
             TColCursor<TElem>* pcursEach = pcursNew();
@@ -1055,9 +897,10 @@ template <class TElem> class TRefCollection : public TCollectionBase
             while (pcursEach->bIsValid())
             {
                 if (!iterCB(pcursEach->objRCur()))
-                    break;
+                    return kCIDLib::False;
                 pcursEach->bNext();
             }
+            return kCIDLib::True;
         }
 
 

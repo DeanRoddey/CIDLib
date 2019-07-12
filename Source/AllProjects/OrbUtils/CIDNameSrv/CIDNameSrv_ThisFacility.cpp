@@ -173,7 +173,7 @@ tCIDLib::EExitCodes TFacCIDNameSrv::eMainThread(TThread& thrThis, tCIDLib::TVoid
             , L"TCIDNameSrvClientProxy"
         );
         m_porbsCache = new TCIDNameServerImpl(ooidNS, m_bNoLease);
-        facCIDOrb().RegisterObject(m_porbsCache);
+        facCIDOrb().RegisterObject(m_porbsCache, tCIDLib::EAdoptOpts::Adopt);
 
         // Register an instance of our core admin implementation
         m_porbsCache->CreateScopePath
@@ -187,7 +187,7 @@ tCIDLib::EExitCodes TFacCIDNameSrv::eMainThread(TThread& thrThis, tCIDLib::TVoid
         //  landlord thread.
         //
         TCIDCoreAdminImpl* porbsAdmin = new TCIDCoreAdminImpl();
-        facCIDOrb().RegisterObject(porbsAdmin);
+        facCIDOrb().RegisterObject(porbsAdmin, tCIDLib::EAdoptOpts::Adopt);
         m_porbsCache->BindObj
         (
             TCIDNameSrvServerBase::strAdminBinding

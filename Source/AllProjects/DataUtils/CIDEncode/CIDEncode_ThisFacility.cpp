@@ -69,7 +69,7 @@ TFacCIDEncode::TFacCIDEncode() :
     m_pcolMap = new TMapList
     (
         29
-        , new TStringKeyOps(kCIDLib::False)
+        , TStringKeyOps(kCIDLib::False)
         , &TKeyValuePair::strExtractKey
         , tCIDLib::EMTStates::Safe
      );
@@ -310,7 +310,7 @@ TFacCIDEncode::GetAllEncodingNames(tCIDLib::TStrCollect& colToFill) const
     colToFill.RemoveAll();
 
     // This will be locked since our collection is thread safe
-    m_pcolMap->ForEach
+    m_pcolMap->bForEach
     (
         [&colToFill](const TKeyValuePair& kvalCur)
         {

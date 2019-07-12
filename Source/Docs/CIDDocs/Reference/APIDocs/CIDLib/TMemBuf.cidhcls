@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TMemBuf" Prefix="mbuf" Parent="TObject" Flags="BStrm">
+
+    <Desc>
+        <P>TMemBuf is abstract base class for all of the memory buffer oriented classes. We have derivatives for heap based buffers, system memory based buffers, and shared buffers. This class defines an interface via which you can manage memory buffers generically without having to worry about the specific type of buffer, how they get allocated, cleaned up, expanded, etc...</P>
+
+        <SecTitle>Buffer Size</SecTitle>
+
+        <P>Each derivative has different requirements, but generally memory buffers have a current allocation size and a maximum size. The buffer will expand automatically as required up to the maximum size. In some derivatives you can set an expansion increment to use when the buffer has to be expanded, to prevent too many expansions (which may require copying over existing content to a newly allocated buffer.) In others the expansion may be a fixed value. Any given derivative may constrain these values in various ways. We just use these values at this level, we don't control them.</P>
+
+        <SecTitle>Accessing Values in Buffers</SecTitle>
+
+        <P>This class provides methods to put the various fundamental types into and get them out of a buffer at a specific index. Of course be aware that this is not safe if the data is going to cross platform boundaries. CIDLib allows platforms to define the fundamental types, and though most of them are for fixed sizes some cannot be, such as booleans or wide characters. Floating point values don't necessarily have the same format across platforms. And of course endianness comes into play as well.</P>
+
+        <P>So only trust the binary streaming system to transport data across platform boundaries. Don't just transmit blobs of data unless they are in very well defined formats that deal with these issues, such as third party formats like PNG or bitmap for instance.</P>
+
+    </Desc>
+
+    <PubIntf>
+
+        <Ctors DefMethods="Dtor">
+        </Ctors>
+
+        <Operators>
+            <Method Name="operator[]" RetType="tCIDLib::TCard1">
+                <Desc>
+                    The const version returns the byte at the indicated index by value. The non-const version returns a reference so that you can set the value.
+                </Desc>
+                <MethVar RetBy="Ref"><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar Attrs="Const"><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+        </Operators>
+
+
+        <!-- Virtual public methods -->
+        <VirtMeths>
+            <Method Name="StreamCount" Attrs="Pure">
+                <Desc>
+                    <P>A helper that will do the same thing as the StreamTo() method of the MStreamable interface, but will only stream an indicated number of bytes of the buffer. The StreamTo() method doesn't know anything but to write all the bytes of the buffer's allocation. That's not always desirable.</P>
+
+                    <P>You could call this to write out some known used number of bytes and later do a StreamFrom(), via the >> operator of course, and it will work since they do the same thing in terms of the data format. The buffer will stream in the number of bytes this call streamed out.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strmToWriteTo" Type="TBinOutStream" PBy="Ref" Dir="In"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+        </VirtMeths>
+
+        <!-- Non-virtual public methods -->
+        <NVirtMeths>
+
+            <Method Name="bAt" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>Looks at the buffer bytes at the indicated index as a boolean value and returns the result. Note that this is <Italic>not</Italic> looking at the byte at the indicted offset, it's casting bytes at that offset to a boolean type, see the note below.</P>
+
+                    <Note>See "Accessing Value in Buffers" in the main class comments above</Note>
+                </Desc>
+                <MethVar>
+                </MethVar>
+            </Method>
+
+            <Method Name="bCompare" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>Compares c4Count bytes of this buffer to the source buffer and returns whether they are equal or not. The count on the version that takes a memory buffer object defaults to c4MaxCard, which means use the current allocated size of the source buffer. On the raw buffer one you must indicate a count.</P>
+
+                    <P>If this buffer isn't at least the comparison byte count in size, then an exception is thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="mbufSrc" Type="TMemBuf" PBy="CRef"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4" DefVal="kCIDLib::c4MaxCard"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pc1Src" Type="tCIDLib::TCard1" PBy="CPtrC"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c1At" RetType="tCIDLib::TCard1" Attrs="Const">
+                <Desc>
+                    <P>Returns the byte at the indicated index. If the index is at or beyond the current allocation size of this buffer, an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="c2At" RetType="tCIDLib::TCard2" Attrs="Const">
+                <Desc>
+                    <P>Looks at the bytes of this buffer at the passed index as a TCard2 value and returns that value. Of course endianness is an issue here. If the data in the buffer is not the same as the local system endianness, then you must flip the bytes to get the actual value.</P>
+
+                    <P>If two bytes at the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="c4At" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>
+                    <P>Looks at the bytes of this buffer at the passed index as a TCard4 value and returns that value. Of course endianness is an issue here. If the data in the buffer is not the same as the local system endianness, then you must flip the bytes to get the actual value.</P>
+
+                    <P>If four bytes at the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="c4CheckSum" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>
+                    <P>Does a simple check sum of all or a range of the bytes in this buffer. The sum is into a TCard4 value, but you can clip it down as needed for your own use. One does the whole buffer. One does the buffer from a given index to the current allocated size, and another does a count of bytes from a given index.</P>
+
+                    <P>If the index or the index plus count would exceed this buffer's current allocated size, then an index or range exception will be thrown.</P>
+                </Desc>
+                <MethVar/>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar>
+                    <MethParam Name="c4Index" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4ExpandIncrement" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>
+                    <P>Returns the currently set expansion increment.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="c4FindByte" RetType="tCIDLib::TCard4" Attrs="Const">
+                <Desc>
+                    <P>This method will find the next instance of the passed find character, starting at the passed start index. If found it returns the index where it was found. If not, it returns kCIDLib::c4MaxCard.</P>
+
+                    <P>If you want to continue looking, bump the index by 1 and call this method again to pick up the search at the next byte.</P>
+                </Desc>
+                <MethVar/>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar>
+                    <MethParam Name="c4Index" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <GetSet Name="c4MaxSize" RetType="tCIDLib::TCard4">
+                Returns the currently set maximum expansion size of this buffer.
+            </GetSet>
+
+            <GetSet Name="c4Size" RetType="tCIDLib::TCard4">
+                Returns the current allocation size of this buffer.
+            </GetSet>
+
+            <Method Name="c8At" RetType="tCIDLib::TCard8" Attrs="Const">
+                <Desc>
+                    <P>Looks at the bytes of this buffer at the passed index as a TCard8 value and returns that value. Of course endianness is an issue here. If the data in the buffer is not the same as the local system endianness, then you must flip the bytes to get the actual value.</P>
+
+                    <P>If eight bytes at the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="chAt" RetType="tCIDLib::TCh" Attrs="Const">
+                <Desc>
+                    <P>Looks at the bytes of this buffer at the passed index as a wide character value and returns that value. Of course endianness is an issue here and the wide character type varies by platform. If the data in the buffer is not the same as the local system endianness, then you must flip the bytes to get the actual value.</P>
+
+                    <P>If kCIDLib::c4CharBytes bytes at the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="CopyIn">
+                <Desc>
+                    <P>Copy c4Count bytes from the source buffer into this buffer at a given target index. So you indicate how many bytes to copy from the source, and where in this buffer to copy them to.</P>
+
+                    <P>If the source isn't at least c4Count in allocated size, or c4StartInd plus c4Count would exceed the maximum capacity of this buffer, an exception is thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="mbufSrc" Type="TMemBuf" PBy="CRef"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4StartInd" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pSrc" Type="tCIDLib::TVoid" PBy="CPtrC"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4StartInd" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="CopyOut" Attrs="Const">
+                <Desc>
+                    <P>Copy c4Count bytes from this buffer, starting from c4StartInd, to the target buffer. </P>
+
+                    <P>If either the target buffer's maximum capacility isn't at least c4Count, or c4StartInd plus c4Count would exceed the current allocation size of this buffer, an exception is thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="mbufTar" Type="TMemBuf" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4StartInd" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pSrc" Type="tCIDLib::TVoid" PBy="PtrC" Dir="Out"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4StartInd" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="eCompare" RetType="tCIDLib::ESortComps" Attrs="Const">
+                <Desc>
+                    <P>Compares c4Count bytes of this buffer to the source buffer, and returns either that they are the same, or the relative magnitude of the first byte that was different. If either buffer isn't at least c4Count in current allocation size, then an exception is thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="mbufSrc" Type="TMemBuf" PBy="CRef"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pSrc" Type="tCIDLib::TVoid" PBy="CPtrC"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="f4At" RetType="tCIDLib::TFloat4" Attrs="Const">
+                <Desc>
+                    <P>Looks at the bytes of this buffer at the passed index as a TFloat4 value and returns that value. Of course endianness and floating point format is an issue here. You shouldn't use to access data used across platforms. See "Accessing Values in Buffers" in the main class comments above.</P>
+
+                    <P>If four bytes at the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="f8At" RetType="tCIDLib::TFloat8" Attrs="Const">
+                <Desc>
+                    <P>Looks at the bytes of this buffer at the passed index as a TFloat8 value and returns that value. Of course endianness and floating point format is an issue here. You shouldn't use to access data used across platforms. See "Accessing Values in Buffers" in the main class comments above.</P>
+
+                    <P>If four bytes at the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="hshCalcHash" RetType="tCIDLib::THashVal" Attrs="Const">
+                <Desc>
+                    <P>This method will calculate a standard CIDLib hash on the bytes of this buffer or on a range of bytes within this buffer. The standard CIDLib hash is a simple but fast CRC based hash that is useful for hash based collections and such. It's implemented in the TRawMem namespace in the <FacRef Ref="CIDKernel"/> facility.</P>
+
+                    <P>If the start index is at or beyond the current allocation size of this buffer, or the start index plus count would exceed the allocation size, then an exception is thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Modulus" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4StartInd" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="c4Modulus" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4StartInd" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="HexEncode">
+                <Desc>
+                    <P>This method will format c4Count bytes from this buffer to the string, each one converted to the ASCII representations of its hex value, with leading zeros where needed. Each value will be spaced apart by the passed chSepChar. You can choose upper or lower case for the hex digits, and whether the target string should be appended to or overwritten.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="chSepChar" Type="tCIDLib::TCh"/>
+                    <MethParam Name="bAppend" Type="tCIDLib::TBoolean"/>
+                    <MethParam Name="bLowerCase" Type="tCIDLib::TBoolean"/>
+                    <MethParam Name="strTarget" Type="TString" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="i1At" RetType="tCIDLib::TInt1" Attrs="Const">
+                <Desc>
+                    <P>Returns the byte at the indicated index as a signed value. If the index is at or beyond the current allocation size of this buffer, an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="i2At" RetType="tCIDLib::TInt2" Attrs="Const">
+                <Desc>
+                    <P>Looks at the bytes of this buffer at the passed index as a TInt2 value and returns that value. Of course endianness is an issue here. If the data in the buffer is not the same as the local system endianness, then you must flip the bytes to get the actual value.</P>
+
+                    <P>If two bytes at the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="i4At" RetType="tCIDLib::TInt4" Attrs="Const">
+                <Desc>
+                    <P>Looks at the bytes of this buffer at the passed index as a TInt4 value and returns that value. Of course endianness is an issue here. If the data in the buffer is not the same as the local system endianness, then you must flip the bytes to get the actual value.</P>
+
+                    <P>If four bytes at the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="i8At" RetType="tCIDLib::TInt8" Attrs="Const">
+                <Desc>
+                    <P>Looks at the bytes of this buffer at the passed index as a TInt8 value and returns that value. Of course endianness is an issue here. If the data in the buffer is not the same as the local system endianness, then you must flip the bytes to get the actual value.</P>
+
+                    <P>If eight bytes at the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="MakeSpace">
+                <Desc>
+                    <P>This method will move c4Count bytes starting at c4Index forward by c4SpaceSz bytes. I.e. it will create a hole in the existing content to put something else in.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar><MethParam Name="c4SpaceSz" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar><MethParam Name="c4Count" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="MoveToStart">
+                <Desc>
+                    <P>This method will move the chunk of bytes at the indicated index and of the indicated number of bytes down to the start of the buffer. Of course the index plus the count must be within the current allocation size of this buffer or an exception will occur.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar><MethParam Name="c4Count" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="pc1Data" RetType="tCIDLib::TCard1">
+                <Desc>
+                    <P>This method provides direct access to the buffer. It provides both const and non-const access. Be careful of using the non-const pointer to modify the contents of this buffer. Depending on the type of buffer, the data may not even be contiguous. Be sure you understand the nature of the buffer before you do such things. And of course be sure you don't exceed the current allocation size of the buffer.</P>
+                </Desc>
+                <MethVar RetBy="CPtr" Attrs="Const"/>
+                <MethVar RetBy="Ptr"/>
+            </Method>
+
+            <Method Name="pc1DataAt" RetType="tCIDLib::TCard1">
+                <Desc>
+                    <P>This method is the same as pc1Data() above, but allows you to get the pointer to a particular offset within the buffer. It's safter to do this than to get the raw buffer above and index it since this method will validate the offset index.</P>
+                </Desc>
+                <MethVar RetBy="CPtr" Attrs="Const">
+                    <MethParam Name="c4Offset" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar RetBy="Ptr">
+                    <MethParam Name="c4Offset" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="pData" RetType="tCIDLib::TVoid">
+                <Desc>
+                    <P>This method provides direct access to the buffer. It provides both const and non-const access. Be careful of using the non-const pointer to modify the contents of this buffer. Depending on the type of buffer, the data may not even be contiguous. Be sure you understand the nature of the buffer before you do such things. And of course be sure you don't exceed the current allocation size of the buffer.</P>
+                </Desc>
+                <MethVar RetBy="CPtr" Attrs="Const"/>
+                <MethVar RetBy="Ptr"/>
+            </Method>
+
+            <Method Name="pDataAs" TmplParms="T" RetType="T" Attrs="Template">
+                <Desc>
+                    <P>This is a templatized version of the above direct buffer access methods, which will let you get the buffer as a pointer to a particular type in a convenient way. The same concerns exist for thie one as the non-templatized ones above in terms of being very careful about manipulating the buffer directly like this.</P>
+                </Desc>
+                <MethVar RetBy="CPtr" Attrs="Const"/>
+                <MethVar RetBy="Ptr"/>
+            </Method>
+
+            <Method Name="pstrmMakeReadable" RetType="TBinInStream" RetBy="Ptr" Attrs="NoDiscard">
+                <Desc>
+                    <P>This method will allocate and initialize a binary input stream of a type appropriate for this memory buffer and return it. You are responsible for cleaning it up when you are done with it, and this buffer must remain valid for as long as the returned stream exists.</P>
+
+                    <P>But you can use the returned stream to safely read data out of the buffer, in a much more portable and error checked way that using the typed value access methods above (c4At, f8At and so forth.) You can't read beyond the end or do any other dangerous stuff.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="pstrmMakeWritable" RetType="TBinOutStream" RetBy="Ptr" Attrs="NoDiscard">
+                <Desc>
+                    <P>This method will allocate and initialize a binary output stream of a type appropriate for this memory buffer and return it. You are responsible for cleaning it up when you are done with it, and this buffer must remain valid for as long as the returned stream exists.</P>
+
+                    <P>But you can use the returned stream to safely write to the buffer, in a much more portable and error checked way that using the typed value putting methods below (PutCard2, PutInt8 and so forth.) You can't write beyond the end or do any other dangerous stuff. The stream will grow the buffer as needed.</P>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="PutXXXAt">
+                <Desc>
+                    <P>Inserts one of the funamental types at an indicated offset within this buffer. The same concerns exist here as for the getter versions of these methods, of endianness and cross platform data format and such. XXX here stands for the various types that this method supports, to save replicating this same stuff over and over.</P>
+
+                    <P>If the size of the inserted value plus the indicated index would go beyond the allocated size of this buffer, a range exception is thrown. If the index itself is at or beyond the allocated size of this buffer, then an index exception is thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="xToPut" Type="X"/>
+                    <MethParam Name="c4Index" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Reallocate" Attrs="Const">
+                <Desc>
+                    <P>This method can be used to reallocate the buffer. It is automatically expanded for you, but if you know you are going to need a certain amount more storage, you can often be more efficient by pre-expanding it yourself. If the new size is smaller than the current allocation size nothing will happen. However, the actual new size may be larger since it will typically move up to the next expansion increment.</P>
+
+                    <P>You can choose to preserve existing content or not. If you don't need to, then of course don't because it's far more efficient.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4NewSize" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="bPreserve" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="RemoveSpace">
+                <Desc>
+                    <P>This method is the opposite of MakeSpace() above. This one will move c4Count bytes starting at c4Index. It will move them all down by c4SpaceSz bytes. So it's removing space to make room at the end of the buffer for something generally.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar><MethParam Name="c4SpaceSz" Type="tCIDLib::TCard4"/></MethVar>
+                <MethVar><MethParam Name="c4Count" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="schAt" RetType="tCIDLib::TSCh" Attrs="Const">
+                <Desc>
+                    <P>Returns the short character at the indicated index. If the index is at or beyond the current allocation size of this buffer, an index exception is thrown.</P>
+                </Desc>
+                <MethVar><MethParam Name="c4Index" Type="tCIDLib::TCard4"/></MethVar>
+            </Method>
+
+            <Method Name="Set">
+                <Desc>
+                    <P>This method will set ranges of bytes to a specific value. The first one fills the whole allocation size. The second from the start index to the end, and the last one a particular sub-range.</P>
+
+                    <P>Of course the start index and the start plus count must both be within the current allocation size of this buffer or an exceptio will be thrown.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c1Fill" Type="tCIDLib::TCard1"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="c1Fill" Type="tCIDLib::TCard1"/>
+                    <MethParam Name="c4StartInd" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="c1Fill" Type="tCIDLib::TCard1"/>
+                    <MethParam Name="c4StartInd" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Count" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+        </NVirtMeths>
+    </PubIntf>
+
+    <ProtIntf>
+        <!-- Non-virtual public methods -->
+        <VirtMeths>
+
+            <Method Name="pc1QueryBuf" RetType="tCIDLib::TCard1" Attrs="Pure">
+                <Desc>
+                    <P>The derived buffer class must override this and return a pointer to its buffer. This is used internally in this class to access the buffer and by the methods we provide to make the buffer accessible to the outside. There's one for const access and one for non-const.</P>
+                </Desc>
+                <MethVar RetBy="Ptr"/>
+                <MethVar RetBy="CPtr" Attrs="Const"/>
+            </Method>
+
+            <Method Name="pc1QueryBufInfo" RetType="tCIDLib::TCard1" Attrs="Pure">
+                <Desc>
+                    <P>Same as above but also includes the current size info for the buffer, which is commonyl needed if the buffer is being accessed..</P>
+                </Desc>
+                <MethVar RetBy="Ptr">
+                    <MethParam Name="c4CurSize" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4MaxSize" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+                <MethVar RetBy="CPtr" Attrs="Const">
+                    <MethParam Name="c4CurSize" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="c4MaxSize" Type="tCIDLib::TCard4" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Realloc" Attrs="Const Pure">
+                <Desc>
+                    <P>This is called by the public Reallocate() after it verifies the info and that something actually needs to be done. The derived class overrides this and reallocates the buffer, preserving previous content if asked to..</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4NewSize" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="bPreserve" Type="tCIDLib::TBoolean"/>
+                </MethVar>
+            </Method>
+        </VirtMeths>
+    </ProtIntf>
+
+</CppClass>
