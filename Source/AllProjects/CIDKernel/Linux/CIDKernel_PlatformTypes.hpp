@@ -55,21 +55,30 @@
 namespace tCIDLib
 {
     // -----------------------------------------------------------------------
+    //  A typedef for a returned function pointer (in the generic sense,
+    //  prior to casting to its real type.
+    // -----------------------------------------------------------------------
+    using FuncPtr = int (*)();
+
+
+    // -----------------------------------------------------------------------
     //  These are our versions of the fundamental data types. We provide very
     //  explicit sizes for all fundamental types using the number of bytes it
     //  takes.
     // -----------------------------------------------------------------------
-    using TBoolean  = bool;             // b
-    using TSCh      = char;             // ch
-    using TCard1    = unsigned char;    // c1
-    using TCard2    = unsigned short;   // c2
-    using TCard4    = unsigned long;    // c4
-    using TFloat4   = float;            // f4
-    using TFloat8   = double;           // f8
-    using TInt1     = signed char;      // i1
-    using TInt2     = short int;        // i2
-    using TInt4     = long int;         // i4
-    using TCh       = wchar_t;          // ch
+    using TBoolean  = bool;                 // b
+    using TSCh      = char;                 // ch
+    using TCard1    = unsigned char;        // c1
+    using TCard2    = unsigned short;       // c2
+    using TCard4    = unsigned long;        // c4
+    using TCard8    = unsigned long long;   // c8
+    using TFloat4   = float;                // f4
+    using TFloat8   = double;               // f8
+    using TInt1     = signed char;          // i1
+    using TInt2     = short int;            // i2
+    using TInt4     = long int;             // i4
+    using TInt8     = long long;            // i8
+    using TCh       = wchar_t;              // ch
 
 
     // -----------------------------------------------------------------------
@@ -96,6 +105,14 @@ namespace tCIDLib
     using TResId        = TCard4;       // rid
     using TMsgId        = TCard4;       // mid
     using TThreadId     = TCard4;       // tid
+
+
+    // -----------------------------------------------------------------------
+    //  A type we can internally use to bit manipulate enum values. This isn't what
+    //  they are stored as (they are stored as Int4 value) this is what we can cast
+    //  them to to do masking operations.
+    // -----------------------------------------------------------------------
+    using TEnumMaskType = TCard4;
 
 
     // -----------------------------------------------------------------------

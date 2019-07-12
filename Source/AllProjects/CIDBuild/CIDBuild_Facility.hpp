@@ -65,7 +65,7 @@ class TFacCIDBuild
             , const tCIDLib::TBoolean       bMustExist
         );
 
-         tCIDLib::TBoolean TFacCIDBuild::bForce() const
+         tCIDLib::TBoolean bForce() const
         {
             return m_bForce;
         }

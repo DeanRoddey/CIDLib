@@ -77,7 +77,7 @@ class TDepInfo
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid TDepInfo::AddHppDependent(TFindInfo* const pfndiHpp)
+        tCIDLib::TVoid AddHppDependent(TFindInfo* const pfndiHpp)
         {
             //
             //  Note that we set up this list not to adopt, so this is just
@@ -87,22 +87,22 @@ class TDepInfo
             m_listHpps.Add(pfndiHpp);
         }
 
-        const TFindInfo& TDepInfo::fndiThis() const
+        const TFindInfo& fndiThis() const
         {
             return m_fndiCpp;
         }
 
-        const TList<TFindInfo>& TDepInfo::listHpps() const
+        const TList<TFindInfo>& listHpps() const
         {
             return m_listHpps;
         }
 
-        const TBldStr& TDepInfo::strFileName() const
+        const TBldStr& strFileName() const
         {
             return m_fndiCpp.strFileName();
         }
 
-        const TBldStr& TDepInfo::strObjFileName() const
+        const TBldStr& strObjFileName() const
         {
             return m_strObjFile;
         }
@@ -224,17 +224,17 @@ class TToolsDriver
             const   TBldStr&                strCppName
         );
 
-        const TList<TDepInfo>& TToolsDriver::listCpps() const
+        const TList<TDepInfo>& listCpps() const
         {
             return m_listCpps;
         }
 
-        const TList<TFindInfo>& TToolsDriver::listHpps() const
+        const TList<TFindInfo>& listHpps() const
         {
             return m_listHpps;
         }
 
-        const TList<TFindInfo>& TToolsDriver::listLibs() const
+        const TList<TFindInfo>& listLibs() const
         {
             return m_listLibs;
         }
