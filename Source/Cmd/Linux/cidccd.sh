@@ -19,13 +19,16 @@ function setdir() {
         "cmd") chdir=${CID_SRCTREE}/Cmd/Linux
         ;;
 
-        "src") chdir=${CID_SRCTREE}
+        "src") chdir=${CID_SRCTREE}/Source
         ;;
 
         "res") chdir=${CID_RESDIR}
         ;;
 
-        "root") chdir=${CID_DEVTREE}
+        "root") chdir=${CID_SRCTREE}
+        ;;
+
+        "top") chdir=${CID_DEVTREE}
         ;;
 
     esac

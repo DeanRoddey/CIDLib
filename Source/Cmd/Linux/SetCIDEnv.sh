@@ -37,11 +37,11 @@ export CID_VERSIONUL=${CID_VERSION//./_}
 export CID_PLATFORM=Linux_32
 
 # Set some key directories relative to the incoming dev tree
-export CID_SRCTREE=${CID_DEVTREE}/Source
-export CID_RESDIR=${CID_DEVTREE}/Output/${CID_VERSIONUL}/${CID_BUILDMODE}Result
+export CID_SRCTREE=${CID_DEVTREE}/CID_Dev
+export CID_RESDIR=${CID_DEVTREE}/CID_Dev/Output/${CID_VERSIONUL}/${CID_BUILDMODE}Result
 
 # We need our result directory to be in the path, and our command directory
-PATH=$PATH:${CID_RESDIR}:${CID_SRCTREE}/Cmd/Linux
+PATH=$PATH:${CID_RESDIR}:${CID_SRCTREE}/Source/Cmd/Linux
 
 # Set our terminal title to reflect what we are set up for
 echo -ne "\033]0;CIDLib[${CID_BUILDMODE}, ${CID_VERSION}]\007"
