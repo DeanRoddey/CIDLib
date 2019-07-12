@@ -141,6 +141,10 @@ namespace kCIDBuild
     const tCIDBuild::TCh* const  pszPlatformDir     = L"Win32";
     const tCIDBuild::TCh* const  pszBasePlatform    = L"Win32";
     const tCIDBuild::TCh* const  pszFullPlatform    = L"Win32_Win7";
+    #elif defined(PLATFORM_LINUX)
+    const tCIDBuild::TCh* const  pszPlatformDir     = L"Linux";
+    const tCIDBuild::TCh* const  pszBasePlatform    = L"Linux";
+    const tCIDBuild::TCh* const  pszFullPlatform    = L"Linux";
     #else
     #error Unknown target platform
     #endif
