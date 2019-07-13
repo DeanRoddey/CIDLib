@@ -1454,6 +1454,12 @@ tCIDLib::TVoid TCppClassPage::OutputContent(TTextOutStream& strmTar) const
         strmTar << L"</td></tr>";
     }
 
+    if (!m_strPrefix.bIsEmpty())
+    {
+        strmTar << L"<tr><td>Prefix:</td><td>"
+                << m_strPrefix << L"</td></tr>";
+    }
+
     strmTar << L"</table></blockquote><Br/>";
 
     //

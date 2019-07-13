@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass   Class="TBase64" Prefix="b64" Parent="TObject">
+
+    <Desc>
+        <P>This class supports the standard 'base 64' encoding of data. It allows you to encode text or binary data to base 64 format, and to decode base 64 content back to text or binary data. </P>
+
+        <P>Generally you will encode to a text output stream, since base 64 is a text format. The actual text encoding (UTF-8, ASCII, etc...) is up to you, just set the appropriate text converter on the output stream. But you can encode to a binary stream if you choose to. In this case, it will just be writing out ASCII characters as byte data.</P>
+
+        <Note>Keep in mind that, when text streams are involved, there is the text encoding (i.e. is it ASCII, UTF-8, etc...) which is separate from the base 64 encoding. Base 64 is always text, but of course that text can be encoded in various ways.</Note>
+
+        <P>You can control line width, which is important for some applications. The default is 72 columns, but you can change that.</P>
+
+        <P>You can also choose to have forward slashes escaped. Otherwise, embedding base 64 in some other text formats migght cause problems. The default is not to.</P>
+
+    </Desc>
+
+    <PubIntf>
+
+        <Ctors DelMethods="CopyCtor" DefMethods="Dtor">
+
+            <Method Name="TBase64">
+                <Desc>
+                    There is only a default constructor, which sets the line width to 72 and the forward slash escapement to kCIDLib::False.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+        </Ctors>
+
+        <Operators DelMethods="AssignOp"/>
+
+        <NVirtMeths>
+
+            <GetSet Name="bEscapeForwardSlashes" RetType="tCIDLib::TBoolean">
+                Get or set the forward slash escapement setting, see class comments above.
+            </GetSet>
+
+            <Method Name="c4Decode" RetType="tCIDLib::TCard4">
+                <Desc>
+                    <P>This method will decode previously stored base 64 content from a source binary input stream, and write the decoded content to a target output binary stream. In this case, it's assumed that the source is just a block of raw ASCII bytes, since there is no text encoding information involved here.</P>
+
+                    <P>The return value is the number of bytes written to the output stream.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strmIn" Type="TBinInStream" PBy="Ref"/>
+                    <MethParam Name="strmOut" Type="TBinOutStream" PBy="Ref"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="c4Encode" RetType="tCIDLib::TCard4">
+                <Desc>
+                    <P>This method will encode cata t the base 64 format from a source binary input stream, and write the encoded content to a target output binary stream. In this case, it will just be writing raw ASCII bytes to the target, since there is no text encoding information involved here.</P>
+
+                    <P>The return value is the number of bytes written to the output stream.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strmIn" Type="TBinInStream" PBy="Ref"/>
+                    <MethParam Name="strmOut" Type="TBinOutStream" PBy="Ref"/>
+                </MethVar>
+            </Method>
+
+            <GetSet Name="c4LineWidth" RetType="tCIDLib::TCard4">
+                Get or set the line width setting, see class comments above.
+            </GetSet>
+
+            <Method Name="Decode">
+                <Desc>
+                    <P>This method will decode previously stored base 64 content from a source text input stream, and write the decoded content to a target output binary stream. So, if you already have the base 64 content in text form, you can pass it in this way.</P>
+
+                    <P>The output can be to a binary output stream, in which it will just be writing out raw ASCII bytes.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strmIn" Type="TTextInStream" PBy="Ref"/>
+                    <MethParam Name="strmOut" Type="TBinOutStream" PBy="Ref"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Encode">
+                <Desc>
+                    <P>This method will encode data to base 64 format. You have a number of options in terms of sources and targets. You can from a binary input stream to a text output stream, from a text input stream to an output text stream, or from a string to a binary output stream.</P>
+
+                    <P>In the binary input stream source, the data is assumed to be just raw ASCII bytes, and for binary stream output raw ASCII bytes will be the same. For text streams, the text converter on the stream will indicate the text encoding of the data.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strmIn" Type="TTextInStream" PBy="Ref"/>
+                    <MethParam Name="strmOut" Type="TBinOutStream" PBy="Ref"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strmIn" Type="TTextInStream" PBy="Ref"/>
+                    <MethParam Name="strmOut" Type="TTextOutStream" PBy="Ref"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="strIn" Type="TString" PBy="CRef"/>
+                    <MethParam Name="strmOut" Type="TBinOutStream" PBy="Ref"/>
+                </MethVar>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

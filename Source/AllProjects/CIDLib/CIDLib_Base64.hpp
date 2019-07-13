@@ -41,9 +41,9 @@ class CIDLIBEXP TBase64 : public TObject
         // -------------------------------------------------------------------
         TBase64();
 
-        TBase64(const TBase64&)  =delete;
+        TBase64(const TBase64&) = delete;
 
-        ~TBase64();
+        ~TBase64() = default;
 
 
         // -------------------------------------------------------------------
