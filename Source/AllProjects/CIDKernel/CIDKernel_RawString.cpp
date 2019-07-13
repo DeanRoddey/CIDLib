@@ -376,7 +376,10 @@ tCIDLib::TBoolean bCard4ToText( const   tCIDLib::TCard4     c4ToConvert
         return kCIDLib::False;
     }
 
-    // See if have enough room in the caller's buffer
+    //
+    //  See if have enough room in the caller's buffer. The caller has to
+    //  provide space for the null, so we can have up to the count.
+    //
     if (c4TmpIndex > c4MaxChars)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_BufferOverflow);
@@ -487,7 +490,10 @@ tCIDLib::TBoolean bCard8ToText( const   tCIDLib::TCard8&    c8ToConvert
         return kCIDLib::False;
     }
 
-    // See if have enough room in the caller's buffer
+    //
+    //  See if have enough room in the caller's buffer. The caller has to
+    //  provide space for the null, so we can have up to the count.
+    //
     if (c4TmpIndex > c4MaxChars)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_BufferOverflow);

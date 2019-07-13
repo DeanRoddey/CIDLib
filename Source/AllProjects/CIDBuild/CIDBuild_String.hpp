@@ -56,6 +56,11 @@ class TBldStr
             const   tCIDLib::TCh* const     pszSrc
         );
 
+        TBldStr
+        (
+            const   tCIDLib::TSCh* const    pszSrc
+        );        
+
         ~TBldStr();
 
 

@@ -105,31 +105,35 @@ CIDBuild_ResCompiler_Resources \
 CIDBuild_String \
 CIDBuild_TextFile \
 CIDBuild_ToolsDriver \
-CIDBuild_Utils \
-$(PLATDIR)/CIDBuild_BinFile_Linux \
-$(PLATDIR)/CIDBuild_Facility_Linux \
-$(PLATDIR)/CIDBuild_FindInfo_Linux \
-$(PLATDIR)/CIDBuild_ProjectInfo_Linux \
-$(PLATDIR)/CIDBuild_RawStr_Linux \
-$(PLATDIR)/CIDBuild_ToolsDriver_Linux \
-$(PLATDIR)/CIDBuild_Utils_Linux
+CIDBuild_Utils
+
+PLAT_STEMS=\
+CIDBuild_BinFile_Linux \
+CIDBuild_Facility_Linux \
+CIDBuild_FindInfo_Linux \
+CIDBuild_ProjectInfo_Linux \
+CIDBuild_RawStr_Linux \
+CIDBuild_ToolsDriver_Linux \
+CIDBuild_Utils_Linux
 
 #
 # Create the source files with the .o extension to define
 # the target files in the output directory.
 #
 OBJ_FILES := $(addprefix $(OUR_OUTDIR)/, $(addsuffix .o, $(SRC_STEMS)))
+OBJ_FILES += $(addprefix $(OUR_OUTDIR)/, $(addsuffix .o, $(PLAT_STEMS)))
 
 # And add the source extension to create the source files
-SRC_FILES := $(addsuffix $(SRC_EXT), $(SRC_STEMS))
+SRC_FILES := $(addsuffix $(SRC_EXT), $(SRC_STEMS)) 
+SRC_FILES += $(addprefix $(PLATDIR)/, $(addsuffix $(SRC_EXT), $(PLAT_STEMS)))
 
 .SUFFIXES : .cpp, .o
 
 # Declare the phony targets
-.PHONY: all dirs
+.PHONY: all dirs showlist
 
 #showlist :
-#	@echo $(SRC_FILES)
+#	@echo $(OBJ_FILES)
 
 all : dirs $(CID_RESDIR)/CIDBuild
 
@@ -137,10 +141,10 @@ $(CID_RESDIR)/CIDBuild : $(OBJ_FILES)
 	g++ $(LINK_FLAGS) -o $(CID_RESDIR)/CIDBuild $*"
 
 $(OUR_OUTDIR)/%.o: ./%.cpp
-	g++ $(BUILD_FLAGS) $<
+	g++ $(BUILD_FLAGS) $< -o $@
 
 $(OUR_OUTDIR)/%.o: ./Linux/%.cpp
-	g++ $(BUILD_FLAGS) $<
+	g++ $(BUILD_FLAGS) $< -o $@
 
 # Make sure our output directories are created
 dirs :

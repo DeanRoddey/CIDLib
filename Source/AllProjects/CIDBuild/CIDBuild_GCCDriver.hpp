@@ -40,45 +40,56 @@ class TGCCDriver : public TToolsDriver
         // -------------------------------------------------------------------
         TGCCDriver();
 
+        TGCCDriver(const TGCCDriver&) = delete;
+
         ~TGCCDriver();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TGCCDriver& operator=(const TGCCDriver&) = delete;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDBuild::TBoolean bBuild
+        tCIDLib::TBoolean bBuild
         (
             const   TProjectInfo&           projiTarget
         );
 
+        tCIDLib::TBoolean bInvokeDebugger
+        (
+            const   TProjectInfo&           projiTarget
+        )   override;
+
+        tCIDLib::TVoid ResetDebugInfo
+        (
+            const   TProjectInfo&           projiToReset
+        )   override;
+
 
     private :
         // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TGCCDriver(const TGCCDriver&);
-        tCIDBuild::TVoid operator=(const TGCCDriver&);
-
-
-        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDBuild::TBoolean bCompileCpps();
+        tCIDLib::TBoolean bCompileCpps();
 
-        tCIDBuild::TBoolean bLibsNewer
+        tCIDLib::TBoolean bLibsNewer
         (
             const   TFindInfo&              fndiTarget
         )   const;
 
-        tCIDBuild::TBoolean bMakeRes();
+        tCIDLib::TBoolean bMakeRes();
 
-        tCIDBuild::TBoolean bObjsNewer
+        tCIDLib::TBoolean bObjsNewer
         (
             const   TFindInfo&              fndiTarget
         )   const;
 
-        tCIDBuild::TVoid Link();
+        tCIDLib::TVoid Link();
 
 
         // -------------------------------------------------------------------
@@ -98,7 +109,7 @@ class TGCCDriver : public TToolsDriver
         //      around. Keep in mind that it has no path part since we link
         //      in the output directory.
         // -------------------------------------------------------------------
-        tCIDBuild::TBoolean m_bDebug;
+        tCIDLib::TBoolean m_bDebug;
         const TProjectInfo* m_pprojiTarget;
         TBldStr             m_strTargetFile;
 };

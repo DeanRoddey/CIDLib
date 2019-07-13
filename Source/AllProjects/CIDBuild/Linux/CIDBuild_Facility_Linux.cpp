@@ -34,15 +34,15 @@
 // ---------------------------------------------------------------------------
 //  TFacCIDBuild: Private platform methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TVoid
-TFacCIDBuild::__BuildVersionString(         TBldStr&            strToFill
-                                    , const tCIDBuild::TUInt    uiMajVer
-                                    , const tCIDBuild::TUInt    uiMinVer)
+tCIDLib::TVoid
+TFacCIDBuild::BuildVersionString(       TBldStr&        strToFill
+                                , const tCIDLib::TCard4 c4MajVer
+                                , const tCIDLib::TCard4 c4MinVer)
 {
     strToFill = L".";
-    strToFill.Append(uiMajVer);
+    strToFill.Append(c4MajVer);
     strToFill.Append(L".");
-    strToFill.Append(uiMinVer);
+    strToFill.Append(c4MinVer);
 }
 
 //
@@ -50,17 +50,17 @@ TFacCIDBuild::__BuildVersionString(         TBldStr&            strToFill
 //  files for some utilities that are shipped prebuilt. For now its just
 //  the CIDMsgs program.
 //
-tCIDBuild::TVoid
-TFacCIDBuild::__CopyUtilReleaseFiles(const TBldStr& strTargetDir)
+tCIDLib::TVoid
+TFacCIDBuild::CopyUtilReleaseFiles(const TBldStr& strTargetDir)
 {
-    TBldStr strSrc(__strOutDir);
+    TBldStr strSrc(m_strOutDir);
     strSrc.Append(L"CIDMsgs");
 
     TBldStr strDest(strTargetDir);
     strDest.Append(L"bin/CIDMsgs");
     if (!TUtils::bCopyFile(strSrc, strDest))
     {
-        stdOut  << NStr("Could not copy the CIDMsgs utility") << kCIDBuild::EndLn;
+        stdOut  << L"Could not copy the CIDMsgs utility" << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::CopyFailed;
     }
 }
@@ -74,10 +74,10 @@ TFacCIDBuild::__CopyUtilReleaseFiles(const TBldStr& strTargetDir)
 //  are associated with that project, and optionally whatever makes up the
 //  'lib' file on that platform.
 //
-tCIDBuild::TVoid
-TFacCIDBuild::__CopyLibReleaseFiles(const   TBldStr&            strTargetDir
+tCIDLib::TVoid
+TFacCIDBuild::CopyLibReleaseFiles(  const   TBldStr&            strTargetDir
                                     , const TProjectInfo&       projiCur
-                                    , const tCIDBuild::TBoolean bCopyLibFile)
+                                    , const tCIDLib::TBoolean   bCopyLibFile)
 {
     TBldStr strSrc;
     TBldStr strDest;
@@ -88,15 +88,15 @@ TFacCIDBuild::__CopyLibReleaseFiles(const   TBldStr&            strTargetDir
     strSrc = projiCur.strOutBin();
     strDest = strTargetDir;
     strDest.Append(L"bin/");
-    tCIDBuild::TUInt uiName;
-    tCIDBuild::TUInt uiExt;
-    TUtils::FindPathParts(projiCur.strOutBin(), uiName, uiExt);
-    strDest.Append(projiCur.strOutBin().pszBuffer() + uiName);
-    //strDest.Append(__strVersionSuffix);
+    tCIDLib::TCard4 c4Name;
+    tCIDLib::TCard4 c4Ext;
+    TUtils::FindPathParts(projiCur.strOutBin(), c4Name, c4Ext);
+    strDest.Append(projiCur.strOutBin().pszBuffer() + c4Name);
+    //strDest.Append(m_strVersionSuffix);
     //strDest.Append(L".Dll");
     if (!TUtils::bCopyFile(strSrc, strDest))
     {
-        stdOut << NStr("Could not copy file: ") << strSrc << kCIDBuild::EndLn;
+        stdOut << L"Could not copy file: " << strSrc << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::CopyFailed;
     }
 
@@ -108,11 +108,11 @@ TFacCIDBuild::__CopyLibReleaseFiles(const   TBldStr&            strTargetDir
     //  Copy over any .CIDMsg files that have this base file name. This will
     //  get us all of the language versions that are there.
     //
-    strSrc = __strOutDir;
+    strSrc = m_strOutDir;
     strSrc.Append(projiCur.strProjectName());
-    strSrc.Append(__strVersionSuffix);
+    strSrc.Append(m_strVersionSuffix);
     strSrc.Append(L"_*.CIDMsg");
-    if (TFindInfo::uiFindFiles(strSrc, listFiles))
+    if (TFindInfo::c4FindFiles(strSrc, listFiles))
     {
         //
         //  Cursor through the files we found and copy them over
@@ -125,7 +125,7 @@ TFacCIDBuild::__CopyLibReleaseFiles(const   TBldStr&            strTargetDir
             const TFindInfo& fndiCur = cursFiles.tCurElement();
 
             // Build up the source/dest file names
-            strSrc = __strOutDir;
+            strSrc = m_strOutDir;
             strSrc.Append(fndiCur.strFileName());
             strDest = strTargetDir;
             strDest.Append(L"bin/");
@@ -133,7 +133,7 @@ TFacCIDBuild::__CopyLibReleaseFiles(const   TBldStr&            strTargetDir
 
             if (!TUtils::bCopyFile(strSrc, strDest))
             {
-                stdOut  << NStr("Could not copy file: ") << strSrc
+                stdOut  << L"Could not copy file: " << strSrc
                         << kCIDBuild::EndLn;
                 throw tCIDBuild::EErrors::CopyFailed;
             }
@@ -141,8 +141,8 @@ TFacCIDBuild::__CopyLibReleaseFiles(const   TBldStr&            strTargetDir
     }
 }
 
-tCIDBuild::TVoid
-TFacCIDBuild::__MakePlatRelease(const   tCIDBuild::EActions eAction
+tCIDLib::TVoid
+TFacCIDBuild::MakePlatRelease(  const   tCIDBuild::EActions eAction
                                 , const TBldStr&            strTargetDir)
 {
     // Nothing to do for the binary release
@@ -159,7 +159,7 @@ TFacCIDBuild::__MakePlatRelease(const   tCIDBuild::EActions eAction
     //  the Cpp files of all of the DLL projects to the Source/xx output
     //  directory.
     //
-    if ((__eBldMode == tCIDBuild::EBldModes::Develop)
+    if ((m_eBldMode == tCIDBuild::EBldModes::Develop)
     &&  (eAction == tCIDBuild::EActions::MakeDevRelease))
     {
         //
@@ -167,15 +167,15 @@ TFacCIDBuild::__MakePlatRelease(const   tCIDBuild::EActions eAction
         //  directory, which was already created.
         //
         strDest = strTargetDir;
-        strDest.Append(kCIDBuild::pszPathSep);
+        strDest.Append(kCIDLib::chPathSep);
         strDest.Append(L"Source");
-        strDest.Append(kCIDBuild::pszPathSep);
+        strDest.Append(kCIDLib::chPathSep);
         strDest.Append(kCIDBuild::pszPlatformDir);
         if (!TUtils::bExists(strDest))
         {
             if (!TUtils::bMakeDir(strDest))
             {
-                stdOut  << NStr("Could not create output directory: ")
+                stdOut  << L"Could not create output directory: "
                         << strDest << kCIDBuild::EndLn;
                 throw tCIDBuild::EErrors::CreateError;
             }
@@ -184,7 +184,7 @@ TFacCIDBuild::__MakePlatRelease(const   tCIDBuild::EActions eAction
         // And now iterate the projects and copy the cpp files for each DLL project
         strDest = strTargetDir;
         strDest.Append(L"Source");
-        strDest.Append(kCIDBuild::pszPathSep);
+        strDest.Append(kCIDLib::chPathSep);
         cursProjs.bResetIter();
         do
         {
@@ -193,7 +193,7 @@ TFacCIDBuild::__MakePlatRelease(const   tCIDBuild::EActions eAction
             //  DLL. If so, lets process its Cpp files.
             //
             const TProjectInfo& projiCur = cursProjs.tCurElement();
-            if (projiCur.eType() == tCIDBuild::EProjTypes::Dll)
+            if (projiCur.eType() == tCIDBuild::EProjTypes::SharedLib)
             {
                 TList<TFindInfo>::TCursor cursCpps(&projiCur.listCpps());
                 if (cursCpps.bResetIter())
@@ -210,7 +210,7 @@ TFacCIDBuild::__MakePlatRelease(const   tCIDBuild::EActions eAction
                         {
                             TBldStr strTmpName = projiCur.strProjectDir();
                             strTmpName.Append(fndiCur.strFileName());
-                            stdOut  << NStr("Could not copy file: ")
+                            stdOut  << L"Could not copy file: "
                                     << strTmpName << kCIDBuild::EndLn;
                             throw tCIDBuild::EErrors::CopyFailed;
                         }
@@ -220,71 +220,5 @@ TFacCIDBuild::__MakePlatRelease(const   tCIDBuild::EActions eAction
             }
         }
         while (cursProjs.bNext());
-    }
-
-    //
-    //  Copy some selected Cmd files that will be of use in the development
-    //  build.
-    //
-    /*
-    strSrc = __strRootDir;
-    strSrc.Append(NStr("Source\\Cmd\\Win32\\SetDevEnv.Cmd"));
-    strDest = strTargetDir;
-    strDest.Append(NStr("SetDevEnv.Cmd"));
-    if (!TUtils::bCopyFile(strSrc, strDest))
-    {
-        stdOut  << NStr("Could not copy the file: ") << strSrc
-                << kCIDBuild::EndLn;
-        throw tCIDBuild::EErrors::CopyFailed;
-    }
-    */
-
-    //
-    //  Copy all the the miscellaneous files over to the MiscFiles/ directory
-    //  in the output.
-    //
-    /*
-    strSrc = __strRootDir;
-    strSrc.Append(NStr("Source\\MiscFiles\\Win32\\"));
-    strDest = strTargetDir;
-    strDest.Append(NStr("MiscFiles\\"));
-    if (!TUtils::bCopyAll(strSrc, strDest))
-    {
-        stdOut  << NStr("Could not replicate the misc files directory")
-                << kCIDBuild::EndLn;
-        throw tCIDBuild::EErrors::CopyFailed;
-    }
-    */
-
-    //
-    //  Make another copy of the readme file into the root directory so that
-    //  its easy to find.
-    //
-    /*
-    strSrc = __strRootDir;
-    strSrc.Append(NStr("Source\\MiscFiles\\Win32\\ReadMe.Txt"));
-    strDest = strTargetDir;
-    strDest.Append(NStr("ReadMe.Txt"));
-    if (!TUtils::bCopyFile(strSrc, strDest))
-    {
-        stdOut  << NStr("Could not copy the readme file")
-                << kCIDBuild::EndLn;
-        throw tCIDBuild::EErrors::CopyFailed;
-    }
-    */
-
-    //
-    //  And copy over all of the Word format public docs to the PublicDocs
-    //  directory.
-    //
-    strSrc = __strRootDir;
-    strSrc.Append(NStr("Source/PublicDocs/"));
-    strDest = strTargetDir;
-    strDest.Append(NStr("PublicDocs/"));
-    if (!TUtils::bCopyAll(strSrc, strDest))
-    {
-        stdOut  << NStr("Could not replicate the public docs directory")
-                << kCIDBuild::EndLn;
-        throw tCIDBuild::EErrors::CopyFailed;
     }
 }

@@ -73,7 +73,7 @@ tCIDLib::TVoid
 TResCompiler::ProcessDialog(TBinFile& bflBinOut, TTextFile& tflResHpp)
 {
     static tCIDLib::TBoolean bInitDone = kCIDLib::False;
-    static TBlkField ablkfDlgInfo[EDlgFlds::Count] =
+    static TBlkField ablkfDlgInfo[tCIDLib::TCard4(EDlgFlds::Count)] =
     {
         TBlkField(L"SYMBOL"         , kCIDLib::True     , 2, 2 )
         , TBlkField(L"AREA"         , kCIDLib::True     , 4, 4 )

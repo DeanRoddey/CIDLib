@@ -121,9 +121,7 @@ TToolsDriver& TToolsDriver::tdrvBuilder()
         //
         #if defined(_MSC_VER)
         ptdrvBuilder = new TVCppDriver;
-        #elif defined(m_KCC)
-        ptdrvBuilder = new TKCCDriver;
-        #elif defined(m_GNUCm_)
+        #elif defined(__GNUC__)
         ptdrvBuilder = new TGCCDriver;
         #else
         !Unknown Tool Driver Error!

@@ -35,51 +35,61 @@
 // ---------------------------------------------------------------------------
 //  TBinFile: Public implementation methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TUInt TBinFile::uiCurPos() const
+tCIDLib::TCard4 TBinFile::c4CurPos() const
 {
     return 0;
 }
 
 
-tCIDBuild::TUInt TBinFile::uiSize() const
+tCIDLib::TCard4 TBinFile::c4SeekToEnd()
 {
     return 0;
+}
+
+tCIDLib::TCard4 TBinFile::c4Size() const
+{
+    return 0;
+}
+
+
+tCIDLib::TVoid TBinFile::Close()
+{
+    
+}
+
+
+tCIDLib::TVoid TBinFile::Open(  const   TBldStr&                strName
+                                , const tCIDLib::EAccessModes   eAccess
+                                , const tCIDLib::ECreateActs    eAction)
+{
+}
+
+
+tCIDLib::TVoid TBinFile::Open(const tCIDLib::EStdFiles eStdFile)
+{
+
+}
+
+tCIDLib::TVoid TBinFile::SeekTo(const tCIDLib::TCard4 c4To)
+{
 }
 
 
 // ---------------------------------------------------------------------------
 //  TBinFile: Private implementation methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TVoid TBinFile::Close()
-{
-    
-}
 
-
-tCIDBuild::TVoid TBinFile::__Open(  const   tCIDBuild::EAccessModes eAccess
-                                    , const tCIDBuild::EOpenActions eAction)
-{
-
-}
-
-
-tCIDBuild::TVoid TBinFile::__Open(const tCIDBuild::EStdFiles eStdFile)
-{
-
-}
-
-
-tCIDBuild::TUInt
-TBinFile::__uiReadBytes(        tCIDBuild::TVoid* const pToFill
-                        , const tCIDBuild::TUInt        uiMax)
+tCIDLib::TCard4
+TBinFile::c4ReadBytes(          tCIDLib::TVoid* const   pToFill
+                        , const tCIDLib::TCard4         c4Max)
 {
     return 0;
 }
 
 
-tCIDBuild::TUInt
-TBinFile::__uiWriteBytes(   const   tCIDBuild::TVoid* const pToWrite
-                            , const tCIDBuild::TUInt        uiToWrite)
+tCIDLib::TCard4
+TBinFile::c4WriteBytes( const   tCIDLib::TVoid* const   pToWrite
+                        , const tCIDLib::TCard4         c4ToWrite)
 {
     return 0;
 }

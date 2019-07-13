@@ -104,38 +104,11 @@ TRawStr::bXlatInt4( const   tCIDLib::TCh* const pszValue
 }
 
 
-tCIDLib::TVoid
-TRawStr::FormatVal( const   tCIDLib::TCard4     c4ToFormat
-                    ,       tCIDLib::TCh* const pszToFill
-                    , const tCIDLib::TCard4     c4MaxChars
-                    , const tCIDLib::TCard4     c4Radix)
+tCIDLib::TCh TRawStr::chToUpper(const tCIDLib::TCh chSrc)
 {
-    _ultow_s(c4ToFormat, pszToFill, c4MaxChars, c4Radix);
+    return _towupper(chSrc);
 }
 
-
-tCIDLib::TVoid
-TRawStr::FormatVal( const   tCIDLib::TInt4      i4ToFormat
-                    ,       tCIDLib::TCh* const pszToFill
-                    , const tCIDLib::TCard4     c4MaxChars)
-{
-    _ltow_s(i4ToFormat, pszToFill, c4MaxChars, 10);
-}
-
-tCIDLib::TSInt
-TRawStr::iCompIStr( const   tCIDLib::TCh* const pszOne
-                    , const tCIDLib::TCh* const pszTwo)
-{
-    return _wcsicoll(pszOne, pszTwo);
-}
-
-tCIDLib::TSInt
-TRawStr::iCompIStrN(const   tCIDLib::TCh* const pszOne
-                    , const tCIDLib::TCh* const pszTwo
-                    , const tCIDLib::TCard4     c4Count)
-{
-    return _wcsnicoll(pszOne, pszTwo, c4Count);
-}
 
 tCIDLib::TCh*
 TRawStr::pszStrTok(         tCIDLib::TCh* const pszToTok

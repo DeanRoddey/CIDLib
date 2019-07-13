@@ -88,6 +88,15 @@ TBldStr::TBldStr(const tCIDLib::TCh* const pszName) :
     TRawStr::CopyStr(m_pszBuf, pszName);
 }
 
+TBldStr::TBldStr(const tCIDLib::TSCh* const pszName) :
+
+    m_c4BufSz(0)
+    , m_pszBuf(0)
+{
+    m_pszBuf = TRawStr::pszTranscode(pszName);
+    m_c4BufSz = TRawStr::c4StrLen(m_pszBuf) + 64;
+}
+
 TBldStr::~TBldStr()
 {
     delete [] m_pszBuf;

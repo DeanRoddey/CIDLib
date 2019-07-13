@@ -28,6 +28,7 @@ Tmp.Txt
 # In a couple small instances we may build in place, for some small tests
 # and such. Otherwise these are all in the ignored output directories above.
 #
+*.o
 *.obj
 *.pdb
 *.sln

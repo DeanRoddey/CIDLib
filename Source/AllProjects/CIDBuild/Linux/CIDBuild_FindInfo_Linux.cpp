@@ -29,6 +29,11 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "../CIDBuild.hpp"
+#include    <sys/stat.h>
+#include    <glob.h>
+#include    <stdio.h>
+#include    <string.h>
+
 
 namespace
 {
@@ -37,8 +42,8 @@ namespace
     // ---------------------------------------------------------------------------
     struct TFileInfo
     {
-        struct stat         StatBuf;
-        tCIDBuild::TSCh*    pszName;
+        struct stat     StatBuf;
+        tCIDLib::TSCh*  pszName;
     };
 }
 
@@ -46,31 +51,31 @@ namespace
 // ---------------------------------------------------------------------------
 //  TFindInfo: Public, static methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TBoolean
-TFindInfo::bFindAFile(  const   TBldStr&            strToFind
-                        ,       TFindInfo&          fndiToFill
-                        , const tCIDBuild::TBoolean bReturnFullPath)
+tCIDLib::TBoolean
+TFindInfo::bFindAFile(  const   TBldStr&                strToFind
+                        ,       TFindInfo&              fndiToFill
+                        , const tCIDBuild::EPathModes   eMode)
 {
     TFileInfo FileInfo;
     FileInfo.pszName = TRawStr::pszTranscode(strToFind.pszBuffer());
-    TArrayJanitor<tCIDBuild::TNatCh> janToFind(FileInfo.pszName);
+    TArrayJanitor<tCIDLib::TSCh> janToFind(FileInfo.pszName);
 
     if (::stat(FileInfo.pszName, &FileInfo.StatBuf))
         return false;
 
-    fndiToFill.__SetFromHostInfo(&FileInfo, strToFind, bReturnFullPath);
+    fndiToFill.SetFromHostInfo(&FileInfo, strToFind, eMode);
 
     return true;
 }
 
 
-tCIDBuild::TUInt
-TFindInfo::uiFindFiles( const   TBldStr&            strToFind
-                        ,       TList<TFindInfo>&   listToFill
-                        , const tCIDBuild::TBoolean bReturnFullPath)
+tCIDLib::TCard4
+TFindInfo::c4FindFiles( const   TBldStr&                strToFind
+                        ,       TList<TFindInfo>&       listToFill
+                        , const tCIDBuild::EPathModes   eMode)
 {
-    tCIDBuild::TNatCh* pszToFind = TRawStr::pszTranscode(strToFind.pszBuffer());
-    TArrayJanitor<tCIDBuild::TNatCh> janToFind(pszToFind);
+    tCIDLib::TSCh* pszToFind = TRawStr::pszTranscode(strToFind.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janToFind(pszToFind);
 
     glob_t GlobBuf;
     ::memset(&GlobBuf, 0, sizeof(GlobBuf));
@@ -79,27 +84,30 @@ TFindInfo::uiFindFiles( const   TBldStr&            strToFind
         return 0;
 
     TFileInfo FileInfo;
-    for (tCIDBuild::TInt i = 0; i < GlobBuf.gl_pathc; i++)
+    for (tCIDLib::TSInt i = 0; i < GlobBuf.gl_pathc; i++)
     {
         FileInfo.pszName = GlobBuf.gl_pathv[i];
         if (::stat(FileInfo.pszName, &FileInfo.StatBuf))
             continue;
 
-        listToFill.Add(new TFindInfo(&FileInfo, pszToFind, bReturnFullPath));
+        listToFill.Add
+        (
+            new TFindInfo(&FileInfo, TBldStr(FileInfo.pszName), eMode)
+        );
     }
 
     ::globfree(&GlobBuf);
 
-    return listToFill.uiElemCount();
+    return listToFill.c4ElemCount();
 }
 
 
 // ---------------------------------------------------------------------------
 //  TFindInfo: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TBoolean TFindInfo::bIsSpecialDirectory() const
+tCIDLib::TBoolean TFindInfo::bIsSpecialDirectory() const
 {
-    return ((__strFileName == NStr(".")) || (__strFileName == NStr("..")));
+    return ((m_strFileName == L".") || (m_strFileName == L".."));
 }
 
 
@@ -107,47 +115,64 @@ tCIDBuild::TBoolean TFindInfo::bIsSpecialDirectory() const
 // ---------------------------------------------------------------------------
 //  TFindInfo: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TVoid
-TFindInfo::__SetFromHostInfo(   const   tCIDBuild::TVoid* const pHostFindBuf
-                                , const TBldStr&                strSearchPath
-                                , const tCIDBuild::TBoolean     bFullPath)
+tCIDLib::TVoid
+TFindInfo::SetFromHostInfo( const   tCIDLib::TVoid* const   pHostFindBuf
+                            , const TBldStr&                strSearchPath
+                            , const tCIDBuild::EPathModes   eMode)
 {
     const TFileInfo* pFileInfo = static_cast<const TFileInfo*>(pHostFindBuf);
 
-    __uiSize = pFileInfo->StatBuf.st_size;
+    m_c4Size = pFileInfo->StatBuf.st_size;
 
     //
     //  Now deal with the path. We optionally have to support returning
     //  just the base name or the full path to the found file.
     //
-    tCIDBuild::TUInt uiName;
-    tCIDBuild::TUInt uiExt;
+    tCIDLib::TCard4 c4Name;
+    tCIDLib::TCard4 c4Ext;
     TBldStr strName(pFileInfo->pszName);
-    TUtils::FindPathParts(strName, uiName, uiExt);
-    strName.Cut(uiName);
+    TUtils::FindPathParts(strName, c4Name, c4Ext);
+    strName.Cut(c4Name);
 
-    if (bFullPath)
+    if (eMode == tCIDBuild::EPathModes::Relative)
     {
-        __strFileName = strSearchPath;
+        //
+        //  In this case we take any relative path component in the wildcard
+        //  spec, yank the name part off, and graft the actual found file name
+        //  back onto it.
+        //
+        tCIDLib::TCard4 c4NameOfs;
+        tCIDLib::TCard4 c4ExtOfs;
+        m_strFileName = strSearchPath;
+        TUtils::FindPathParts(m_strFileName, c4NameOfs, c4ExtOfs);
 
-        TUtils::FindPathParts(__strFileName, uiName, uiExt);
-
-        if (uiName != kCIDBuild::uiNotFound)
-            __strFileName.CapAt(uiName);
-
-        if (__strFileName.uiLength() &&  __strFileName.chLast() != kCIDBuild::chPathSep)
-            __strFileName.Append(kCIDBuild::pszPathSep);
-
-        __strFileName.Append(strName);
+        //
+        //  If the name offset is zero, then just copy over the name as is since
+        //  there was no relative part, else take the real name in place of the
+        //  wild card spec.
+        //
+        if (c4NameOfs)
+        {
+            m_strFileName.CapAt(c4NameOfs);
+            m_strFileName.Append(strName);
+        }
+         else
+        {
+            m_strFileName = pFileInfo->pszName;
+        }
     }
-    else
+     else if (eMode == tCIDBuild::EPathModes::Full)
     {
-        __strFileName = strName;
+        TUtils::CompletePath(strSearchPath, strName, m_strFileName);        
+    }
+     else
+    {
+        m_strFileName = strName;
     }
 
     //
     //  Convert the time into a floating point value. This is used so that
     //  any platform can represent its time easily in a common format.
     //
-    __tmLastWrite = double(pFileInfo->StatBuf.st_mtime);
+    m_tmLastWrite = double(pFileInfo->StatBuf.st_mtime);
 }

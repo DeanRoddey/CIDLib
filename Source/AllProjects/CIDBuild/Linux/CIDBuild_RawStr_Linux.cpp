@@ -28,135 +28,113 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "../CIDBuild.hpp"
-#include    <strstream>
+#include    <iostream>
+#include    <string.h>
 
 
-tCIDBuild::TBoolean TRawStr::bIsSpace(const tCIDBuild::TCh chToCheck)
+tCIDLib::TBoolean TRawStr::bIsAlpha(const tCIDLib::TCh chToCheck)
+{
+    return (iswalpha(chToCheck) != 0);
+}
+
+
+tCIDLib::TBoolean TRawStr::bIsAlphaNum(const tCIDLib::TCh chToCheck)
+{
+    return (iswalnum(chToCheck) != 0);
+}
+
+
+tCIDLib::TBoolean TRawStr::bIsSpace(const tCIDLib::TCh chToCheck)
 {
     return (iswspace(chToCheck) != 0);
 }
 
 
-tCIDBuild::TBoolean TRawStr::bIsDigit(const tCIDBuild::TCh chToCheck)
+tCIDLib::TBoolean TRawStr::bIsDigit(const tCIDLib::TCh chToCheck)
 {
     return (iswdigit(chToCheck) != 0);
 }
 
 
-tCIDBuild::TBoolean
-TRawStr::bXlatUInt(const   tCIDBuild::TCh* const        pszValue
-                   ,       tCIDBuild::TUInt&            uiToFill
-                   , const tCIDBuild::TUInt             uiRadix)
+tCIDLib::TBoolean
+TRawStr::bXlatCard4(const  tCIDLib::TCh* const  pszValue
+                   ,       tCIDLib::TCard4&     c4ToFill
+                   , const tCIDLib::TCard4      c4Radix)
 {
     // Attempt the conversion
-    tCIDBuild::TCh* pszEnd;
-    tCIDBuild::TUInt uiRet = ::wcstoul(pszValue, &pszEnd, uiRadix);
+    tCIDLib::TCh* pszEnd;
+    tCIDLib::TCard4 c4Ret = ::wcstoul(pszValue, &pszEnd, c4Radix);
 
     // See if it failed
     if (*pszEnd)
         return false;
 
     // It went ok, so fill in the param and return true
-    uiToFill = uiRet;
+    c4ToFill = c4Ret;
 
     return true;
 }
 
-tCIDBuild::TVoid
-TRawStr::FormatVal( const   tCIDBuild::TUInt            uiToFormat
-                    ,       tCIDBuild::TCh* const       pszToFill
-                    , const tCIDBuild::TUInt            uiRadix)
+
+tCIDLib::TBoolean
+TRawStr::bXlatInt4( const   tCIDLib::TCh* const pszValue
+                    ,       tCIDLib::TInt4&     i4ToFill)
 {
-    if (uiRadix != 8 && uiRadix != 10 && uiRadix != 16)
-    {
-        stdOut << NStr("Invalid radix") << kCIDBuild::EndLn;
-        throw tCIDBuild::EErrors::Internal;
-    }
+    // Attempt the conversion
+    tCIDLib::TCh* pszEnd;
+    tCIDLib::TInt4 i4Ret = wcstoul(pszValue, &pszEnd, 10);
 
-    std::ostrstream Strm;
+    // See if it failed
+    if (*pszEnd)
+        return kCIDLib::False;
 
-    if (uiRadix == 8)
-        Strm.setf(std::ios_base::oct);
-    else if (uiRadix == 10)
-        Strm.setf(std::ios_base::dec);
-    else if (uiRadix == 16)
-        Strm.setf(std::ios_base::hex);
-
-    Strm << uiToFormat << std::ends;
-
-    ::mbstowcs(pszToFill, Strm.str(), Strm.tellp());
+    // It went ok, so fill in the param and return kCIDLib::True
+    i4ToFill = i4Ret;
+    return kCIDLib::True;
 }
 
-tCIDBuild::TInt
-TRawStr::iCompIStr( const   tCIDBuild::TCh* const   pszOne
-                    , const tCIDBuild::TCh* const   pszTwo)
+
+tCIDLib::TCh TRawStr::chToUpper(const tCIDLib::TCh chSrc)
 {
-    tCIDBuild::TCh* pszOneCopy = TRawStr::pszDupString(pszOne);
-    TRawStr::UpperCase(pszOneCopy);
-    tCIDBuild::TCh* pszTwoCopy = TRawStr::pszDupString(pszTwo);
-    TRawStr::UpperCase(pszTwoCopy);
-
-    tCIDBuild::TInt iResult = TRawStr::iCompStr(pszOneCopy, pszTwoCopy);
-
-    delete [] pszOneCopy;
-    delete [] pszTwoCopy;
-
-    return iResult;
+    return towupper(chSrc);
 }
 
-tCIDBuild::TInt
-TRawStr::iCompIStrN(const   tCIDBuild::TCh* const       pszOne
-                    , const tCIDBuild::TCh* const       pszTwo
-                    , const tCIDBuild::TUInt            uiCount)
+
+tCIDLib::TCh*
+TRawStr::pszStrTok(         tCIDLib::TCh* const pszToTok
+                    , const tCIDLib::TCh* const pszSeps)
 {
-    tCIDBuild::TCh* pszOneCopy = TRawStr::pszDupString(pszOne);
-    TRawStr::UpperCase(pszOneCopy);
-    tCIDBuild::TCh* pszTwoCopy = TRawStr::pszDupString(pszTwo);
-    TRawStr::UpperCase(pszTwoCopy);
-
-    tCIDBuild::TInt iResult = TRawStr::iCompStrN(pszOneCopy, pszTwoCopy, uiCount);
-
-    delete [] pszOneCopy;
-    delete [] pszTwoCopy;
-
-    return iResult;
-}
-
-tCIDBuild::TCh*
-TRawStr::pszStrTok(         tCIDBuild::TCh* const pszToTok
-                    , const tCIDBuild::TCh* const pszSeps)
-{
-    static tCIDBuild::TCh* pszSave;
+    static tCIDLib::TCh* pszSave;
     return ::wcstok(pszToTok, pszSeps, &pszSave);
 }
 
-tCIDBuild::TCh*
-TRawStr::pszTranscode(  const   tCIDBuild::TSCh* const  pszToTranscode
-                        ,       tCIDBuild::TUInt&       uiTranscoded
-                        , const tCIDBuild::TUInt        uiInChars)
+tCIDLib::TCh*
+TRawStr::pszTranscode(  const   tCIDLib::TSCh* const    pszToTranscode
+                        ,       tCIDLib::TCard4&        c4Transcoded
+                        , const tCIDLib::TCard4         c4InChars)
 {
-    const tCIDBuild::TUInt uiLen = uiInChars ? uiInChars : ::strlen(pszToTranscode) + 1;
-    tCIDBuild::TCh* pszRet = new tCIDBuild::TCh[uiLen];
-    uiTranscoded = ::mbstowcs(pszRet, pszToTranscode, uiLen);
+    const tCIDLib::TUInt c4Len = c4InChars ? c4InChars : ::strlen(pszToTranscode) + 1;
+    tCIDLib::TCh* pszRet = new tCIDLib::TCh[c4Len];
+    c4Transcoded = ::mbstowcs(pszRet, pszToTranscode, c4Len);
     return pszRet;
 }
 
-char* TRawStr::pszTranscode(const   tCIDBuild::TCh* const       pszToTranscode
-                            ,       tCIDBuild::TUInt&           uiTranscoded
-                            , const tCIDBuild::TUInt            uiInChars)
+char* TRawStr::pszTranscode(const   tCIDLib::TCh* const pszToTranscode
+                            ,       tCIDLib::TCard4&    c4Transcoded
+                            , const tCIDLib::TCard4     c4InChars)
 {
-    const tCIDBuild::TUInt uiLen = uiInChars ? uiInChars : ::wcslen(pszToTranscode) + 1;
-    char* pszRet = new tCIDBuild::TSCh[(uiLen * 2)];
-    uiTranscoded = ::wcstombs(pszRet, pszToTranscode, (uiLen * 2));
+    const tCIDLib::TUInt c4Len = c4InChars ? c4InChars : ::wcslen(pszToTranscode) + 1;
+    char* pszRet = new tCIDLib::TSCh[c4Len * 2];
+    c4Transcoded = ::wcstombs(pszRet, pszToTranscode, (c4Len * 2));
     return pszRet;
 }
 
-tCIDBuild::TVoid TRawStr::UpperCase(tCIDBuild::TCh* const pszToUpper)
+tCIDLib::TVoid TRawStr::UpperCase(tCIDLib::TCh* const pszToUpper)
 {
-    tCIDBuild::TCh* pszSource = pszToUpper;
+    tCIDLib::TCh* pszSource = pszToUpper;
     while (*pszSource)
     {
-        *pszSource = ::towctrans(*pszSource, reinterpret_cast<wctrans_t>(__ctype_toupper));
+        *pszSource = towupper(*pszSource);
         ++pszSource;
     }
 }

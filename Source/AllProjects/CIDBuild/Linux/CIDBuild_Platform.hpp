@@ -28,11 +28,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  Define our endianness
-// ---------------------------------------------------------------------------
-
-
-// ---------------------------------------------------------------------------
 //  Define the packing mechanism
 // ---------------------------------------------------------------------------
 #define CIDBUILD_PACK(v)    pack(push,v)
@@ -92,7 +87,9 @@ namespace kCIDBuild
     //      program. The input extensions are predestined by what we named
     //      the files, so the are not a portability problem.
     // -----------------------------------------------------------------------
-    const tCIDBuild::TCh* const  pszAllHFiles       = L"*.h*";
+    const tCIDBuild::TCh* const  pszAllHFiles       = L"*.h";
+    const tCIDBuild::TCh* const  pszAllHppFiles     = L"*.hpp";
+    const tCIDBuild::TCh* const  pszAllCFiles       = L"*.c";
     const tCIDBuild::TCh* const  pszAllCppFiles     = L"*.cpp";
     const tCIDBuild::TCh* const  pszDllExt          = L".so";
     const tCIDBuild::TCh* const  pszExeExt          = L"";
@@ -111,13 +108,8 @@ namespace kCIDBuild
     //      is. If a project indicates that it has a per-platform sub-
     //      directory, then there will be a sub-directory with this name
     //      under the project directory.
-    //
-    //  pszTargetPlatform
-    //      This is a constant string that contains the text of the target
-    //      platform define. This saves from doing this work in all the
-    //      places we might need it. Its passed to all compiled code as well
-    //      as displayed in some places.
     // -----------------------------------------------------------------------
     const tCIDBuild::TCh* const  pszPlatformDir     = L"Linux";
-    const tCIDBuild::TCh* const  pszTargetPlatform  = L"PLATFORM_LINUX";
+    const tCIDBuild::TCh* const  pszBasePlatform    = L"Linux";
+    const tCIDBuild::TCh* const  pszFullPlatform    = L"Linux";
 }

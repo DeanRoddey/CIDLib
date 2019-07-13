@@ -36,6 +36,8 @@
 // ---------------------------------------------------------------------------
 #include    "CIDBuild.hpp"
 #include    "CIDBuild_GCCDriver.hpp"
+#include    <stdio.h>
+#include    <unistd.h>
 
 
 
@@ -66,7 +68,7 @@ TGCCDriver::~TGCCDriver()
 // ---------------------------------------------------------------------------
 //  TGCCDriver: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TBoolean TGCCDriver::bBuild(const TProjectInfo& projiTarget)
+tCIDLib::TBoolean TGCCDriver::bBuild(const TProjectInfo& projiTarget)
 {
     // Store away the target project for internal use while we are here
     m_pprojiTarget = &projiTarget;
@@ -75,19 +77,19 @@ tCIDBuild::TBoolean TGCCDriver::bBuild(const TProjectInfo& projiTarget)
     // Build up the target file name. We take the already computed one
     // (minus the path) to avoid duplicating the procedure.
     //
-    tCIDBuild::TUInt uiName;
-    tCIDBuild::TUInt uiExt;
-    TUtils::FindPathParts(m_pprojiTarget->strOutBin(), uiName, uiExt);
-    m_strTargetFile.CopyAt(m_pprojiTarget->strOutBin(), uiName);
+    tCIDLib::TCard4 c4Name;
+    tCIDLib::TCard4 c4Ext;
+    TUtils::FindPathParts(m_pprojiTarget->strOutBin(), c4Name, c4Ext);
+    m_strTargetFile.CopyAt(m_pprojiTarget->strOutBin(), c4Name);
 
     //
     // If it's a shared library then we've got to strip the version
     // part for compilation. We'll add it back later.
     //
-    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Dll)
+    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
     {
-        m_strTargetFile.CapAt(m_strTargetFile.uiLength()
-                              - facCIDBuild.strVersionSuffix().uiLength());
+        m_strTargetFile.CapAt(m_strTargetFile.c4Length()
+                              - facCIDBuild.strVersionSuffix().c4Length());
     }
 
     //
@@ -104,12 +106,12 @@ tCIDBuild::TBoolean TGCCDriver::bBuild(const TProjectInfo& projiTarget)
     //
     if (!TUtils::bChangeDir(facCIDBuild.strOutDir()))
     {
-        stdOut << NStr("Could not change to output directory for link step") << kCIDBuild::EndLn;
+        stdOut << L"Could not change to output directory for link step" << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::Internal;
     }
 
     if (bObjBuilt && facCIDBuild.bVerbose())
-        stdOut << NStr("    Linking because an Obj was rebuilt") << kCIDBuild::EndLn;
+        stdOut << L"    Linking because an Obj was rebuilt" << kCIDBuild::EndLn;
 
     //
     //  Now lets see if the target file is out of date with any of its Obj,
@@ -130,7 +132,7 @@ tCIDBuild::TBoolean TGCCDriver::bBuild(const TProjectInfo& projiTarget)
             bUpdate = true;
 
             if (facCIDBuild.bVerbose())
-                stdOut << NStr("    Target file not present: ") << m_strTargetFile << kCIDBuild::EndLn;
+                stdOut << L"    Target file not present: " << m_strTargetFile << kCIDBuild::EndLn;
         }
 
         //
@@ -152,11 +154,25 @@ tCIDBuild::TBoolean TGCCDriver::bBuild(const TProjectInfo& projiTarget)
 }
 
 
+//
+//  A convenience to invoke the debugger
+//
+tCIDLib::TBoolean TGCCDriver::bInvokeDebugger(const TProjectInfo& projiTarget)
+{
+
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TVoid TGCCDriver::ResetDebugInfo(const TProjectInfo& projiToReset)
+{
+}
+
 
 // ---------------------------------------------------------------------------
 //  TGCCDriver: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TBoolean TGCCDriver::bCompileCpps()
+tCIDLib::TBoolean TGCCDriver::bCompileCpps()
 {
     //
     //  First we want to build up the list of command line parameters that
@@ -165,20 +181,20 @@ tCIDBuild::TBoolean TGCCDriver::bCompileCpps()
     //  that will stay the same.
     //
     const tCIDBuild::TCh* apszArgs[128];
-    tCIDBuild::TUInt uiCurArg = 0;
-    apszArgs[uiCurArg++] = L"gcc";
-    apszArgs[uiCurArg++] = L"-c";
+    tCIDLib::TCard4 c4CurArg = 0;
+    apszArgs[c4CurArg++] = L"g++";
+    apszArgs[c4CurArg++] = L"-c";
 
     // Set up the debug/prod flags
     if (m_bDebug)
     {
-        apszArgs[uiCurArg++] = L"-g";
-        apszArgs[uiCurArg++] = L"-DCID_DEGUG_ON=1";
+        apszArgs[c4CurArg++] = L"-g";
+        apszArgs[c4CurArg++] = L"-DCID_DEGUG_ON=1";
     }
     else
     {
-        apszArgs[uiCurArg++] = L"-O3";
-        apszArgs[uiCurArg++] = L"-DCID_DEGUG_ON=0";
+        apszArgs[c4CurArg++] = L"-O3";
+        apszArgs[c4CurArg++] = L"-DCID_DEGUG_ON=0";
     }
 
     //
@@ -186,22 +202,13 @@ tCIDBuild::TBoolean TGCCDriver::bCompileCpps()
     //  to drive conditional compilation.
     //
     TBldStr strPlatform(L"-D");
-    strPlatform.Append(kCIDBuild::pszTargetPlatform);
-    apszArgs[uiCurArg++] = strPlatform.pszBuffer();
+    strPlatform.Append(kCIDBuild::pszPlatformDir);
+    apszArgs[c4CurArg++] = strPlatform.pszBuffer();
 
-    //
-    //  Set up our CIDLib build mode define that gets passed to all code
-    //  to drive debug/production compilation.
-    //
-    TBldStr strBuildMode(L"-D");
-    strBuildMode.Append(kCIDBuild::pszBuildMode);
-    apszArgs[uiCurArg++] = strBuildMode.pszBuffer();
 
     // Set the flags for the project type
-    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Dll)
-    {
-        apszArgs[uiCurArg++] = L"-fPIC";
-    }
+    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
+        apszArgs[c4CurArg++] = L"-fPIC";
 
     //
     //  Set up our standard include directories, for public and private
@@ -209,19 +216,19 @@ tCIDBuild::TBoolean TGCCDriver::bCompileCpps()
     //
     TBldStr strInclude(L"-I");
     strInclude.Append(facCIDBuild.strIncludeDir());
-    apszArgs[uiCurArg++] = strInclude.pszBuffer();
+    apszArgs[c4CurArg++] = strInclude.pszBuffer();
 
     TBldStr strPPInclude(L"-I");
     strPPInclude.Append(facCIDBuild.strPPIncludeDir());
-    apszArgs[uiCurArg++] = strPPInclude.pszBuffer();
+    apszArgs[c4CurArg++] = strPPInclude.pszBuffer();
 
     TBldStr strPrivInclude(L"-I");
     strPrivInclude.Append(facCIDBuild.strPrivIncludeDir());
-    apszArgs[uiCurArg++] = strPrivInclude.pszBuffer();
+    apszArgs[c4CurArg++] = strPrivInclude.pszBuffer();
 
     TBldStr strPPPrivInclude(L"-I");
     strPPPrivInclude.Append(facCIDBuild.strPPPrivIncludeDir());
-    apszArgs[uiCurArg++] = strPPPrivInclude.pszBuffer();
+    apszArgs[c4CurArg++] = strPPPrivInclude.pszBuffer();
 
     //
     //  If there are any per-project includes, then add them in as well.
@@ -231,17 +238,17 @@ tCIDBuild::TBoolean TGCCDriver::bCompileCpps()
     //  is ok since this program is always just a one shot anyway and this
     //  is not a repetitious operation.
     //
-    if (m_pprojiTarget->listIncludes().uiElemCount())
+    if (!m_pprojiTarget->listIncludePaths().bEmpty())
     {
         TBldStr strTmp;
 
-        TList<TBldStr>::TCursor cursIncludes(&m_pprojiTarget->listIncludes());
+        TList<TBldStr>::TCursor cursIncludes(&m_pprojiTarget->listIncludePaths());
         cursIncludes.bResetIter();
         do
         {
             strTmp = L"-I";
             strTmp.Append(cursIncludes.tCurElement());
-            apszArgs[uiCurArg++] = strTmp.pszOrphanBuffer();
+            apszArgs[c4CurArg++] = strTmp.pszOrphanBuffer();
         }   while (cursIncludes.bNext());
     }
 
@@ -250,23 +257,16 @@ tCIDBuild::TBoolean TGCCDriver::bCompileCpps()
     //  the RTL mode and current build mode, at least it is on VC++.
     //
     if (m_pprojiTarget->eRTLMode() == tCIDBuild::ERTLModes::MultiStatic
-        || m_pprojiTarget->eRTLMode() == tCIDBuild::ERTLModes::MultiDynamic)
+    ||  m_pprojiTarget->eRTLMode() == tCIDBuild::ERTLModes::MultiDynamic)
     {
-        apszArgs[uiCurArg++] = L"-D_REENTRANT";
+        apszArgs[c4CurArg++] = L"-D_REENTRANT";
     }
 
     // Set up the stuff driven by the 'PUREANSI' setting.
-    if (m_pprojiTarget->bPureANSI())
-    {
-        apszArgs[uiCurArg++] = L"-ansi";
-    }
-
-    //
-    //  Deal with the character mode. The mode to build target code in is
-    //  set by the user. If Unicode mode, we also have to set some VC++
-    //  flags.
-    //
-    apszArgs[uiCurArg++] = L"-DCHARMODE_ASCII";
+    const TKeyValuePair* pkvpPlatOpt;
+    pkvpPlatOpt = m_pprojiTarget->pkvpFindPlatOpt(L"WIN32_*", L"PUREANSI");
+    if (pkvpPlatOpt && pkvpPlatOpt->strValue().bIEquals(L"Yes"))
+        apszArgs[c4CurArg++] = L"-ansi";
 
     //
     //  Every project has a define which is in the form PROJ_XXX, where XXX
@@ -275,68 +275,71 @@ tCIDBuild::TBoolean TGCCDriver::bCompileCpps()
     TBldStr strProjDef(L"-DPROJ_");
     strProjDef.Append(m_pprojiTarget->strProjectName());
     strProjDef.UpperCase();
-    apszArgs[uiCurArg++] = strProjDef.pszBuffer();
+    apszArgs[c4CurArg++] = strProjDef.pszBuffer();
 
     //
     //  Remember the index at which the file independent parameters stopped
     //  so that we can just add onto the list what we need below.
     //
-    const tCIDBuild::TUInt uiFirstPerFileArg = uiCurArg;
+    const tCIDLib::TCard4 c4FirstPerFileArg = c4CurArg;
 
     //
     //  And now check each Cpp file and see if we have to build it. If so,
     //  the do it. Keep track of whether we build anything and return that
     //  status.
     //
-    TList<TDepInfo>::TCursor cursCpps(&_listCpps());
+    TList<TDepInfo>::TCursor cursCpps(&listCpps());
     if (!cursCpps.bResetIter())
         return false;
 
-    tCIDBuild::TBoolean bBuiltSomething = false;
+    tCIDLib::TBoolean bBuiltSomething = false;
     do
     {
         // Get a ref to the current element
         const TDepInfo& depiCur = cursCpps.tCurElement();
 
         // If this guy does not need to be compiled, check the next one
-        if (!_bMustCompile(*m_pprojiTarget, depiCur))
+        if (!bMustCompile(*m_pprojiTarget, depiCur))
             continue;
 
         // Keep up with the per-file args we add
-        tCIDBuild::TUInt uiExtraArgs = uiFirstPerFileArg;
+        tCIDLib::TCard4 c4ExtraArgs = c4FirstPerFileArg;
 
         // Setup output
-        apszArgs[uiExtraArgs++] = L"-o";
+        apszArgs[c4ExtraArgs++] = L"-o";
         TBldStr strJustName(depiCur.strObjFileName());
-        tCIDBuild::TUInt uiName, uiExtension;
-        TUtils::FindPathParts(strJustName, uiName, uiExtension);
-        strJustName.Cut(uiName);
+        tCIDLib::TCard4 c4Name, c4Extension;
+        TUtils::FindPathParts(strJustName, c4Name, c4Extension);
+        strJustName.Cut(c4Name);
         TBldStr strOutput(m_pprojiTarget->strOutDir(), strJustName);
-        apszArgs[uiExtraArgs++] = strOutput.pszBuffer();
+        apszArgs[c4ExtraArgs++] = strOutput.pszBuffer();
 
         // Add the current file as the source file
-        apszArgs[uiExtraArgs++] = depiCur.strFileName().pszBuffer();
+        apszArgs[c4ExtraArgs++] = depiCur.strFileName().pszBuffer();
 
         if (facCIDBuild.bVerbose())
         {
-            for (tCIDBuild::TUInt uiInd = 0; uiInd < uiExtraArgs; uiInd++)
-                stdOut << apszArgs[uiInd] << NStr(" ");
+            for (tCIDLib::TUInt uiInd = 0; uiInd < c4ExtraArgs; uiInd++)
+                stdOut << apszArgs[uiInd] << L" ";
             stdOut << kCIDBuild::EndLn;
         }
 
         // Ok, lets do the compilation
-        tCIDBuild::TUInt uiResult;
-        if (!TUtils::bExec(apszArgs, uiExtraArgs, uiResult))
+        tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
+        if (facCIDBuild.bLowPrio())
+            c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;        
+        tCIDLib::TCard4 c4Result;
+        if (!TUtils::bExec(apszArgs, c4ExtraArgs, c4Result, c4ExecFlags))
         {
-            stdOut << NStr("Could not execute the compiler") << kCIDBuild::EndLn;
+            stdOut << L"Could not execute the compiler" << kCIDBuild::EndLn;
             throw tCIDBuild::EErrors::BuildError;
         }
 
-        if (uiResult)
+        if (c4Result)
         {
-            stdOut  << NStr("Failed compilation of file: ")
-                    << depiCur.strFileName() << NStr(". Error Code: ")
-                    << uiResult << kCIDBuild::EndLn;
+            stdOut  << L"Failed compilation of file: "
+                    << depiCur.strFileName() << L". Error Code: "
+                    << c4Result << kCIDBuild::EndLn;
             throw tCIDBuild::EErrors::BuildError;
         }
 
@@ -352,10 +355,10 @@ tCIDBuild::TBoolean TGCCDriver::bCompileCpps()
 }
 
 
-tCIDBuild::TBoolean TGCCDriver::bLibsNewer(const TFindInfo& fndiTarget) const
+tCIDLib::TBoolean TGCCDriver::bLibsNewer(const TFindInfo& fndiTarget) const
 {
     // Get a cursor for the libs list
-    TList<TFindInfo>::TCursor cursLibs(&_listLibs());
+    TList<TFindInfo>::TCursor cursLibs(&listLibs());
 
     // If no libs listed, then couldn't be newer
     if (!cursLibs.bResetIter())
@@ -372,7 +375,7 @@ tCIDBuild::TBoolean TGCCDriver::bLibsNewer(const TFindInfo& fndiTarget) const
         {
             if (facCIDBuild.bVerbose())
             {
-                stdOut  << NStr("    Dependent library is newer: ")
+                stdOut  << L"    Dependent library is newer: "
                         << cursLibs.tCurElement().strFileName() << kCIDBuild::EndLn;
             }
             return true;
@@ -383,16 +386,16 @@ tCIDBuild::TBoolean TGCCDriver::bLibsNewer(const TFindInfo& fndiTarget) const
 }
 
 
-tCIDBuild::TBoolean TGCCDriver::bMakeRes()
+tCIDLib::TBoolean TGCCDriver::bMakeRes()
 {
     return true;
 }
 
 
-tCIDBuild::TBoolean TGCCDriver::bObjsNewer(const TFindInfo& fndiTarget) const
+tCIDLib::TBoolean TGCCDriver::bObjsNewer(const TFindInfo& fndiTarget) const
 {
     // Get a cursor for the Cpp list
-    TList<TDepInfo>::TCursor cursCpps(&_listCpps());
+    TList<TDepInfo>::TCursor cursCpps(&listCpps());
 
     // If no obect files listed, then couldn't be newer
     if (!cursCpps.bResetIter())
@@ -407,7 +410,7 @@ tCIDBuild::TBoolean TGCCDriver::bObjsNewer(const TFindInfo& fndiTarget) const
         // Try to find the current obj
         if (!TFindInfo::bFindAFile(depiCur.strObjFileName(), fndiTmp))
         {
-            stdOut  << NStr("Could not find object file: ")
+            stdOut  << L"Could not find object file: "
                     << depiCur.strObjFileName() << kCIDBuild::EndLn;
             throw tCIDBuild::EErrors::NotFound;
         }
@@ -421,7 +424,7 @@ tCIDBuild::TBoolean TGCCDriver::bObjsNewer(const TFindInfo& fndiTarget) const
         {
             if (facCIDBuild.bVerbose())
             {
-                stdOut  << NStr("    Object file is newer: ")
+                stdOut  << L"    Object file is newer: "
                         << depiCur.strObjFileName() << kCIDBuild::EndLn;
             }
             return true;
@@ -431,39 +434,39 @@ tCIDBuild::TBoolean TGCCDriver::bObjsNewer(const TFindInfo& fndiTarget) const
 }
 
 
-tCIDBuild::TVoid TGCCDriver::Link()
+tCIDLib::TVoid TGCCDriver::Link()
 {
     const tCIDBuild::TCh* apszArgs[128];
-    tCIDBuild::TUInt uiCurArg = 0;
+    tCIDLib::TUInt c4CurArg = 0;
 
     // Set up the standard stuff
-    apszArgs[uiCurArg++] = L"gcc";
+    apszArgs[c4CurArg++] = L"gcc";
 
     // Set up the output file. It is a versioned file and the name is prebuilt
-    apszArgs[uiCurArg++] = L"-o";
-    apszArgs[uiCurArg++] = m_strTargetFile.pszBuffer();
+    apszArgs[c4CurArg++] = L"-o";
+    apszArgs[c4CurArg++] = m_strTargetFile.pszBuffer();
 
     // And the debug vs. production flags
     if (m_bDebug)
-        apszArgs[uiCurArg++] = L"-g";
+        apszArgs[c4CurArg++] = L"-g";
     else
-        apszArgs[uiCurArg++] = L"-O3";
+        apszArgs[c4CurArg++] = L"-O3";
 
     //
     //  And now add in all of the Obj and Lib files. We built them up above
     //  when we needed to check all of the source for staleness of the target.
     //  So we just reference those existing names with our argument list.
     //
-    TList<TFindInfo>::TCursor cursLibs(&_listLibs());
+    TList<TFindInfo>::TCursor cursLibs(&listLibs());
     if (cursLibs.bResetIter())
     {
         do
         {
-            apszArgs[uiCurArg++] = cursLibs.tCurElement().strFileName().pszBuffer();
+            apszArgs[c4CurArg++] = cursLibs.tCurElement().strFileName().pszBuffer();
         }   while (cursLibs.bNext());
     }
 
-    TList<TDepInfo>::TCursor cursCpps(&_listCpps());
+    TList<TDepInfo>::TCursor cursCpps(&listCpps());
     if (cursCpps.bResetIter())
     {
         do
@@ -472,68 +475,71 @@ tCIDBuild::TVoid TGCCDriver::Link()
             const TDepInfo& depiCur = cursCpps.tCurElement();
 
             // And add its object file name to the list of args
-            apszArgs[uiCurArg++] = depiCur.strObjFileName().pszBuffer();
+            apszArgs[c4CurArg++] = depiCur.strObjFileName().pszBuffer();
         }   while (cursCpps.bNext());
     }
 
     if (m_pprojiTarget->eRTLMode() == tCIDBuild::ERTLModes::MultiStatic
         || m_pprojiTarget->eRTLMode() == tCIDBuild::ERTLModes::MultiDynamic)
     {
-        apszArgs[uiCurArg++] = L"-lpthread";
+        apszArgs[c4CurArg++] = L"-lpthread";
     }
 
-    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Exe)
+    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Executable)
     {
-        apszArgs[uiCurArg++] = L"-lncurses";
-        apszArgs[uiCurArg++] = L"-ldl";
-        apszArgs[uiCurArg++] = L"-lm";
+        apszArgs[c4CurArg++] = L"-lncurses";
+        apszArgs[c4CurArg++] = L"-ldl";
+        apszArgs[c4CurArg++] = L"-lm";
     }
-    else if (m_pprojiTarget->strProjectName() == TBldStr("CIDKernel"))
+    else if (m_pprojiTarget->strProjectName() == TBldStr(L"CIDKernel"))
     {
-        apszArgs[uiCurArg++] = L"-lreadline";
-        apszArgs[uiCurArg++] = L"-lhistory";
+        apszArgs[c4CurArg++] = L"-lreadline";
+        apszArgs[c4CurArg++] = L"-lhistory";
     }
 
     if (facCIDBuild.bVerbose())
     {
-        for (tCIDBuild::TUInt uiInd = 0; uiInd < uiCurArg; uiInd++)
-            stdOut << apszArgs[uiInd] << NStr(" ");
+        for (tCIDLib::TUInt uiInd = 0; uiInd < c4CurArg; uiInd++)
+            stdOut << apszArgs[uiInd] << L" ";
         stdOut << kCIDBuild::EndLn;
     }
 
     // And invoke the link
-    tCIDBuild::TUInt uiResult;
-    if (!TUtils::bExec(apszArgs, uiCurArg, uiResult))
+    tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
+    if (facCIDBuild.bLowPrio())
+        c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;    
+    tCIDLib::TCard4 c4Result;
+    if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, c4ExecFlags))
     {
-        stdOut << NStr("Could not execute the linker") << kCIDBuild::EndLn;
+        stdOut << L"Could not execute the linker" << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::BuildError;
     }
 
-    if (uiResult)
+    if (c4Result)
     {
-        stdOut << NStr("Link step failed. Error Code:") << uiResult << kCIDBuild::EndLn;
+        stdOut << L"Link step failed. Error Code:" << c4Result << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::BuildError;
     }
 
-    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Dll)
+    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
     {
         TBldStr strRealName(m_strTargetFile);
         strRealName.Append(facCIDBuild.strVersionSuffix());
 
-        tCIDBuild::TNatCh* pszRealName = TRawStr::pszTranscode(strRealName.pszBuffer());
-        TArrayJanitor<tCIDBuild::TNatCh> janReal(pszRealName);
-        tCIDBuild::TNatCh* pszTarget = TRawStr::pszTranscode(m_strTargetFile.pszBuffer());
-        TArrayJanitor<tCIDBuild::TNatCh> janTarget(pszTarget);
+        tCIDBuild::TSCh* pszRealName = TRawStr::pszTranscode(strRealName.pszBuffer());
+        TArrayJanitor<tCIDBuild::TSCh> janReal(pszRealName);
+        tCIDBuild::TSCh* pszTarget = TRawStr::pszTranscode(m_strTargetFile.pszBuffer());
+        TArrayJanitor<tCIDBuild::TSCh> janTarget(pszTarget);
 
         if (::rename(pszTarget, pszRealName))
         {
-            stdOut << NStr("Unable to rename target file") << kCIDBuild::EndLn;
+            stdOut << L"Unable to rename target file" << kCIDBuild::EndLn;
             throw tCIDBuild::EErrors::BuildError;
         }
 
         if (::symlink(pszRealName, pszTarget))
         {
-            stdOut << NStr("Unable to create symbolic link") << kCIDBuild::EndLn;
+            stdOut << L"Unable to create symbolic link" << kCIDBuild::EndLn;
             throw tCIDBuild::EErrors::BuildError;
         }
     }
