@@ -106,7 +106,7 @@ TRawStr::bXlatInt4( const   tCIDLib::TCh* const pszValue
 
 tCIDLib::TCh TRawStr::chToUpper(const tCIDLib::TCh chSrc)
 {
-    return _towupper(chSrc);
+    return towupper(chSrc);
 }
 
 
