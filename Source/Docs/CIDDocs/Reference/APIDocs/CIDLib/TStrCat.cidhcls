@@ -4,7 +4,7 @@
 <CppClass   Class="TStrCat" Prefix="scat" Parent="N/A">
 
     <Desc>
-        <P>This provides an efficient way to concat two or three strings and/or characters together and to pass the resulting string off to someone. Mostly it's used by the <ClassRef Ref="TString"/> class which has a constructor that takes one of these. This lets you easily create a string that is a concatenation of other strings. The string object just steals the resulting buffer from the the string cat object, so there's no need to copy the text again.</P>
+        <P>This class provides an efficient way to concat two or three strings and/or characters together and to pass the resulting string off to someone. Mostly it's used by the <ClassRef Ref="TString"/> class which has a constructor that takes one of these. This lets you easily create a string that is a concatenation of other strings. The string object just steals the resulting buffer from the the string cat object, so there's no need to copy the text again.</P>
 
         <P>Obviously you might use it in other places in a similar way. </P>
     </Desc>
