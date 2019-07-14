@@ -29,37 +29,43 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "../CIDBuild.hpp"
-
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+#include <string.h>
 #include <ctype.h>
+
 
 // ---------------------------------------------------------------------------
 //  TUtils: Implementations of platform specific methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TBoolean TUtils::bExists(const TBldStr& strFile)
+tCIDLib::TBoolean TUtils::bExists(const TBldStr& strFile)
 {
-    tCIDBuild::TNatCh* pszFile = TRawStr::pszTranscode(strFile.pszBuffer());
-    TArrayJanitor<tCIDBuild::TNatCh> janFile(pszFile);
+    tCIDLib::TSCh* pszFile = TRawStr::pszTranscode(strFile.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janFile(pszFile);
 
     return (::access(pszFile, F_OK) == 0);
 }
 
-tCIDBuild::TBoolean TUtils::bChangeDir(const TBldStr& strChangeTo)
+tCIDLib::TBoolean TUtils::bChangeDir(const TBldStr& strChangeTo)
 {
-    tCIDBuild::TNatCh* pszDir = TRawStr::pszTranscode(strChangeTo.pszBuffer());
-    TArrayJanitor<tCIDBuild::TNatCh> janDir(pszDir);
+    tCIDLib::TSCh* pszDir = TRawStr::pszTranscode(strChangeTo.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janDir(pszDir);
 
     return (::chdir(pszDir) == 0);
 }
 
-tCIDBuild::TBoolean
+tCIDLib::TBoolean
 TUtils::bCopyFile(  const   TBldStr&            strSourceName
                     , const TBldStr&            strTargetName
-                    , const tCIDBuild::TBoolean bFailIfExists)
+                    , const tCIDLib::TBoolean bFailIfExists)
 {
-    tCIDBuild::TNatCh* pszSrc = TRawStr::pszTranscode(strSourceName.pszBuffer());
-    tCIDBuild::TNatCh* pszTar = TRawStr::pszTranscode(strTargetName.pszBuffer());
-    TArrayJanitor<tCIDBuild::TNatCh> janSrc(pszSrc);
-    TArrayJanitor<tCIDBuild::TNatCh> janTar(pszTar);
+    tCIDLib::TSCh* pszSrc = TRawStr::pszTranscode(strSourceName.pszBuffer());
+    tCIDLib::TSCh* pszTar = TRawStr::pszTranscode(strTargetName.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janSrc(pszSrc);
+    TArrayJanitor<tCIDLib::TSCh> janTar(pszTar);
 
     if (!::access(pszTar, F_OK) && bFailIfExists)
         return false;
@@ -67,45 +73,45 @@ TUtils::bCopyFile(  const   TBldStr&            strSourceName
     struct stat StatBuf;
     if (::stat(pszSrc, &StatBuf))
     {
-        stdOut << NStr("While copying '") << pszSrc << NStr("' to '")
-               << pszTar << NStr("': ") << ::strerror(errno) << kCIDBuild::EndLn;
+        stdOut << L"While copying '" << pszSrc << L"' to '"
+               << pszTar << L"': " << ::strerror(errno) << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::CopyFailed;
     }
 
     if (!S_ISREG(StatBuf.st_mode))
     {
-        stdOut << NStr("'") << pszSrc << NStr("' is not a regular file") << kCIDBuild::EndLn;
+        stdOut << L"'" << pszSrc << L"' is not a regular file" << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::CopyFailed;
     }
 
-    tCIDBuild::TInt iSrcFd = ::open(pszSrc, O_RDONLY);
+    tCIDLib::TSInt iSrcFd = ::open(pszSrc, O_RDONLY);
     if (iSrcFd == -1)
     {
-        stdOut << NStr("While copying '") << pszSrc << NStr("' to '")
-               << pszTar << NStr("': ") << ::strerror(errno) << kCIDBuild::EndLn;
+        stdOut << L"While copying '" << pszSrc << L"' to '"
+               << pszTar << L"': " << ::strerror(errno) << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::CopyFailed;
     }
 
-    tCIDBuild::TInt iTgtFd = ::open(pszTar, O_WRONLY | O_CREAT | O_TRUNC);
+    tCIDLib::TSInt iTgtFd = ::open(pszTar, O_WRONLY | O_CREAT | O_TRUNC);
     if (iTgtFd == -1)
     {
         ::close(iSrcFd);
-        stdOut << NStr("While copying '") << pszSrc << NStr("' to '")
-               << pszTar << NStr("': ") << ::strerror(errno) << kCIDBuild::EndLn;
+        stdOut << L"While copying '" << pszSrc << L"' to '"
+               << pszTar << L"': " << ::strerror(errno) << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::CopyFailed;
     }
 
-    tCIDBuild::TBoolean bReturn = true;
+    tCIDLib::TBoolean bReturn = true;
     unsigned char* pBuf = new unsigned char[StatBuf.st_blksize];
     TArrayJanitor<unsigned char> janBuf(pBuf);
-    tCIDBuild::TInt iRead, iWritten;
+    tCIDLib::TSInt iRead, iWritten;
     while (true)
     {
         iRead = ::read(iSrcFd, pBuf, StatBuf.st_blksize);
         if (iRead == -1)
         {
-            stdOut << NStr("Error copying '") << pszSrc << NStr("' to '")
-                   << pszTar << NStr("'") << kCIDBuild::EndLn;
+            stdOut << L"Error copying '" << pszSrc << L"' to '"
+                   << pszTar << L'\'' << kCIDBuild::EndLn;
             bReturn = false;
             break;
         }
@@ -116,8 +122,8 @@ TUtils::bCopyFile(  const   TBldStr&            strSourceName
         iWritten = ::write(iTgtFd, pBuf, iRead);
         if (iWritten == -1)
         {
-            stdOut << NStr("Error copying '") << pszSrc << NStr("' to '")
-                   << pszTar << NStr("'") << kCIDBuild::EndLn;
+            stdOut << L"Error copying '" << pszSrc << L"' to '"
+                   << pszTar << L"'" << kCIDBuild::EndLn;
             bReturn = false;
             break;
         }
@@ -127,7 +133,8 @@ TUtils::bCopyFile(  const   TBldStr&            strSourceName
 
     if (::fchmod(iTgtFd, StatBuf.st_mode))
     {
-        stdOut << NStr("Error setting permissions on '") << pszTar << NStr("'") << kCIDBuild::EndLn;
+        stdOut  << L"Error setting permissions on '"
+                << pszTar << L"'" << kCIDBuild::EndLn;
         bReturn = false;
     }
     ::close(iTgtFd);
@@ -136,35 +143,28 @@ TUtils::bCopyFile(  const   TBldStr&            strSourceName
 }
 
 
-tCIDBuild::TBoolean TUtils::bDeleteFile(const TBldStr& strToDelete)
+tCIDLib::TBoolean TUtils::bDeleteFile(const TBldStr& strToDelete)
 {
-    tCIDBuild::TNatCh* pszDel = TRawStr::pszTranscode(strToDelete.pszBuffer());
-    TArrayJanitor<tCIDBuild::TNatCh> janDel(pszDel);
+    tCIDLib::TSCh* pszDel = TRawStr::pszTranscode(strToDelete.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janDel(pszDel);
 
     return (::unlink(pszDel) == 0);
 }
 
 
-tCIDBuild::TBoolean TUtils::bMakeDir(const TBldStr& strToMake)
+
+tCIDLib::TBoolean
+TUtils::bExec(  const   tCIDLib::TCh* const*    apszParams
+                , const tCIDLib::TCard4         c4Count
+                ,       tCIDLib::TCard4&        c4Result
+                , const tCIDLib::TCard4         c4Flags)
 {
-    tCIDBuild::TNatCh* pszDir = TRawStr::pszTranscode(strToMake.pszBuffer());
-    TArrayJanitor<tCIDBuild::TNatCh> janDir(pszDir);
-
-    return (::mkdir(pszDir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == 0);
-}
-
-
-tCIDBuild::TBoolean
-TUtils::bExec(  const   tCIDBuild::TCh* const *     apszParams
-                , const tCIDBuild::TUInt            uiCount
-                ,       tCIDBuild::TUInt&           uiResult)
-{
-    tCIDBuild::TUInt uiTmp;
-    tCIDBuild::TNatCh** apszArgs = new tCIDBuild::TNatCh*[uiCount + 2];
+    tCIDLib::TUInt uiTmp;
+    tCIDLib::TSCh** apszArgs = new tCIDLib::TSCh*[c4Count + 2];
     apszArgs[0] = TRawStr::pszTranscode(apszParams[0]);
-    for (uiTmp = 0; uiTmp < uiCount; uiTmp++)
+    for (uiTmp = 0; uiTmp < c4Count; uiTmp++)
         apszArgs[uiTmp + 1] = TRawStr::pszTranscode(apszParams[uiTmp]);
-    apszArgs[uiCount + 1] = 0;
+    apszArgs[c4Count + 1] = 0;
 
     pid_t pid = ::fork();
     if (pid == -1)
@@ -173,7 +173,7 @@ TUtils::bExec(  const   tCIDBuild::TCh* const *     apszParams
         while (apszArgs[uiTmp])
             delete [] apszArgs[uiTmp++];
         delete [] apszArgs;
-        stdOut << NStr("Unable to fork process") << kCIDBuild::EndLn;
+        stdOut << L"Unable to fork process" << kCIDBuild::EndLn;
         return false;
     }
 
@@ -186,13 +186,13 @@ TUtils::bExec(  const   tCIDBuild::TCh* const *     apszParams
     ::waitpid(pid, &status, WUNTRACED);
 
     if (WIFEXITED(status))
-        uiResult = WEXITSTATUS(status);
+        c4Result = WEXITSTATUS(status);
 
-    tCIDBuild::TBoolean bReturn = true;
+    tCIDLib::TBoolean bReturn = true;
 
     if (!WIFEXITED(status))
     {
-        stdOut << NStr("Failed to execute: ") << apszArgs[0] << kCIDBuild::EndLn;
+        stdOut << L"Failed to execute: " << apszArgs[0] << kCIDBuild::EndLn;
         bReturn = false;
     }
 
@@ -205,13 +205,81 @@ TUtils::bExec(  const   tCIDBuild::TCh* const *     apszParams
 }
 
 
-tCIDBuild::TVoid TUtils::Beep(  const   tCIDBuild::TUInt
-                                , const tCIDBuild::TUInt)
+tCIDLib::TBoolean TUtils::bGetEnvVar(const  TBldStr&    strVarName
+                                    ,       TBldStr&    strToFill)
 {
-    // A no op
+
+    return kCIDLib::True;
 }
 
-tCIDBuild::TVoid TUtils::LocalizePath(TBldStr& strPath)
+
+//
+//  Checks to see if the passed string represents a fully qualified Windows
+//  path.
+//
+tCIDLib::TBoolean TUtils::bIsFQPath(const TBldStr& strFileName)
 {
-    // Another no op
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean TUtils::bMakeDir(const TBldStr& strToMake)
+{
+    tCIDLib::TSCh* pszDir = TRawStr::pszTranscode(strToMake.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janDir(pszDir);
+
+    return (::mkdir(pszDir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == 0);
+}
+
+
+tCIDLib::TBoolean
+TUtils::bMakePath(const TBldStr& strParent, const TBldStr& strToMake)
+{
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TUtils::bRunCmdLine(const   TBldStr&            strToRun
+                    ,       tCIDLib::TCard4&    c4Result
+                    , const tCIDLib::TBoolean   bLowPrio)
+{
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TVoid TUtils::Beep(const   tCIDLib::TCard4 c4Freq
+                            , const tCIDLib::TCard4 c4Duration)
+{
+    // A no op for now
+}
+
+
+// Return the number of CPUs (effective) on this machine
+tCIDLib::TCard4 TUtils::c4CPUCount()
+{
+    return 1;
+}
+
+
+tCIDLib::TVoid
+TUtils::CompletePath(const TBldStr& strOrgName, TBldStr& strFullName)
+{
+
+}
+
+
+tCIDLib::TVoid TUtils::MakeTmpFileName(TBldStr& strToFill)
+{
+}
+
+
+tCIDLib::TVoid TUtils::QueryCurDir(TBldStr& strToFill)
+{
+}
+
+
+tCIDLib::TVoid
+TUtils::SetEnvVar(const TBldStr& strVar, const TBldStr& strValue)
+{
 }

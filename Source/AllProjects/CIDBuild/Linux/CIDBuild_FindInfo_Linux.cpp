@@ -124,10 +124,6 @@ TFindInfo::SetFromHostInfo( const   tCIDLib::TVoid* const   pHostFindBuf
 
     m_c4Size = pFileInfo->StatBuf.st_size;
 
-    //
-    //  Now deal with the path. We optionally have to support returning
-    //  just the base name or the full path to the found file.
-    //
     tCIDLib::TCard4 c4Name;
     tCIDLib::TCard4 c4Ext;
     TBldStr strName(pFileInfo->pszName);
@@ -163,10 +159,12 @@ TFindInfo::SetFromHostInfo( const   tCIDLib::TVoid* const   pHostFindBuf
     }
      else if (eMode == tCIDBuild::EPathModes::Full)
     {
-        TUtils::CompletePath(strSearchPath, strName, m_strFileName);        
+        // We have a utility helper for this
+        TUtils::CompletePath(strSearchPath, m_strFileName);        
     }
      else
     {
+        // They just want the name part
         m_strFileName = strName;
     }
 

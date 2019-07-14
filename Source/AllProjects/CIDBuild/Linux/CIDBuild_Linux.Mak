@@ -29,7 +29,7 @@ RM := rm -fv
 MKTREE := mkdir -p --verbose
 RMTREE := rm -fvr
 SRC_EXT := .cpp
-OUR_OUTDIR := $(CID_RESDIR)/CIDBuild
+OUR_OUTDIR := $(CID_RESDIR)/CIDBuild.out
 
 
 ifeq ($(findstring $(CID_BUILDMODE),Dev Prod),)
@@ -138,7 +138,7 @@ SRC_FILES += $(addprefix $(PLATDIR)/, $(addsuffix $(SRC_EXT), $(PLAT_STEMS)))
 all : dirs $(CID_RESDIR)/CIDBuild
 
 $(CID_RESDIR)/CIDBuild : $(OBJ_FILES)
-	g++ $(LINK_FLAGS) -o $(CID_RESDIR)/CIDBuild $*"
+	g++ $(LINK_FLAGS) -o $(CID_RESDIR)/CIDBuild $*
 
 $(OUR_OUTDIR)/%.o: ./%.cpp
 	g++ $(BUILD_FLAGS) $< -o $@
