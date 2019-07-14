@@ -4,7 +4,7 @@
 <!ENTITY % BoolVal 'False | True'>
 <!ENTITY % YNVal 'Yes | No'>
 <!ENTITY % ParmDir 'In | Out | InOut'>
-<!ENTITY % PageTypes 'HelpPage | CppClass'>
+<!ENTITY % PageTypes 'HelpPage | CppClass | Namespace'>
 
 
 <!--
@@ -205,3 +205,12 @@
                         VirtDtor (%YNVal;) 'No'
                         Flags NMTOKENS 'NoFlags'>
 
+
+<!--
+   - A C++ namespace. We just steal steal some stuff from the class definition
+   - above. We just don't have the visibility scopes to worry about, or
+   - constructors and operators. We just have one set of methods, plus constants
+   - and types.
+   -->
+<!ELEMENT   Namespace   (Desc, Aliases?, Enums?, Constants?, Method*)>
+<!ATTLIST   Namespace   Name NMTOKEN #REQUIRED>

@@ -262,10 +262,11 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
         apszArgs[c4CurArg++] = L"-D_REENTRANT";
     }
 
-    // Set up the stuff driven by the 'PUREANSI' setting.
-    const TKeyValuePair* pkvpPlatOpt;
-    pkvpPlatOpt = m_pprojiTarget->pkvpFindPlatOpt(L"WIN32_*", L"PUREANSI");
-    if (pkvpPlatOpt && pkvpPlatOpt->strValue().bIEquals(L"Yes"))
+    //
+    //  Set up the stuff driven by the 'PUREANSI' setting. This is temporary
+    //  until all platform specific stuff is split into per-platform dirs
+    //
+    if (m_pprojiTarget->bPureCpp())
         apszArgs[c4CurArg++] = L"-ansi";
 
     //
@@ -327,7 +328,7 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
         // Ok, lets do the compilation
         tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
         if (facCIDBuild.bLowPrio())
-            c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;        
+            c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
         tCIDLib::TCard4 c4Result;
         if (!TUtils::bExec(apszArgs, c4ExtraArgs, c4Result, c4ExecFlags))
         {
@@ -507,7 +508,7 @@ tCIDLib::TVoid TGCCDriver::Link()
     // And invoke the link
     tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
     if (facCIDBuild.bLowPrio())
-        c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;    
+        c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
     tCIDLib::TCard4 c4Result;
     if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, c4ExecFlags))
     {

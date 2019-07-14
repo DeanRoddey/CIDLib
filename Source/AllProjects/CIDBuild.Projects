@@ -10,6 +10,7 @@
 ;   DISPLAY     = Console
 ;   MSGFILE     = No
 ;   PLATFORMDIR = No
+;   PURECPP     = Yes
 ;   RESFILE     = No
 ;   RTL         = Multi/Dynamic
 ;   TYPE        = Executable
@@ -25,6 +26,12 @@
 ;   sample. It might be treated differently in a packaging process.
 ;
 ;   SAMPLE      = No
+;
+; NOTES:
+;   1- PURECPP is temporary for those things that have platform specific
+;       bits but haven't been split into per-platform implementations. When
+;       that is done it will be assumed that the per-platfrom files always
+;       need permissive flags and the platform independent stuff doesn't.
 ;
 ; MODIFICATION LOG:
 ;
@@ -82,6 +89,7 @@ PROJECT=CIDKernel
         DISPLAY     = N/A
         MSGFILE     = Yes
         PLATFORMDIR = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
@@ -89,7 +97,6 @@ PROJECT=CIDKernel
 
     PLATFORMOPTS
         PLATFORM=WIN32_*
-            PUREANSI    = No
             PERMISSIVE  = Yes
         END PLATFORM
     END PLATFORMOPTS
@@ -300,6 +307,7 @@ PROJECT=CIDJPEG
         DIRECTORY   = GraphicUtils\CIDJPEG
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -308,12 +316,6 @@ PROJECT=CIDJPEG
         CIDLib
         CIDImage
     END DEPENDENTS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     INCLUDEPATHS
         .\JLibInc
@@ -350,6 +352,7 @@ PROJECT=CIDSpReco
         DISPLAY     = N/A
         EXPORT      = CIDSPRECOEXP
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -361,7 +364,6 @@ PROJECT=CIDSpReco
 
     PLATFORMOPTS
         PLATFORM=WIN32_*
-            PUREANSI    = No
             PERMISSIVE  = Yes
         END PLATFORM
     END PLATFORMOPTS
@@ -412,6 +414,7 @@ PROJECT=CIDGraphDev
         DISPLAY     = N/A
         EXPORT      = CIDGRDEVEXP
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
@@ -421,12 +424,6 @@ PROJECT=CIDGraphDev
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -452,6 +449,7 @@ PROJECT=CIDCtrls
         DISPLAY     = N/A
         EXPORT      = CIDCTRLSEXP
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
@@ -461,12 +459,6 @@ PROJECT=CIDCtrls
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -493,6 +485,7 @@ PROJECT=CIDAdvGraph
         DISPLAY     = N/A
         EXPORT      = CIDADVGREXP
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
@@ -502,12 +495,6 @@ PROJECT=CIDAdvGraph
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
 ;        IDLFILE
@@ -531,6 +518,7 @@ PROJECT=CIDWUtils
         DIRECTORY   = WndUtils\CIDWUtils
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
@@ -539,12 +527,6 @@ PROJECT=CIDWUtils
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     DEPENDENTS
         CIDMData
@@ -560,18 +542,13 @@ PROJECT=CIDResEd
         DIRECTORY   = Utilities\CIDResEd
         DISPLAY     = GUI
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = Yes
     END SETTINGS
 
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-           PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -599,6 +576,7 @@ PROJECT=CIDDBase
         DIRECTORY   = DataUtils\CIDDBase
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PURECPP     = No
         PLATFORMDIR = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
@@ -609,12 +587,6 @@ PROJECT=CIDDBase
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     DEPENDENTS
         CIDKernel
@@ -692,6 +664,7 @@ PROJECT=CIDSChan
         DISPLAY     = N/A
         MSGFILE     = Yes
         PLATFORMDIR = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -703,12 +676,6 @@ PROJECT=CIDSChan
             NAMEEXT = Shared
         END IDLFILE
     END IDLFILES
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     ; This one has per-platform implementations but only Win32 so far
     INCLUDEPLATS
@@ -890,6 +857,7 @@ PROJECT=CIDAudStream
         EXPORT      = CIDAUDSTREAMEXP
         MSGFILE     = Yes
         PLATFORMDIR = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -901,12 +869,6 @@ PROJECT=CIDAudStream
             NAMEEXT = Shared
         END IDLFILE
     END IDLFILES
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     ; This one has per-platform implementations but only Win32 so far
     INCLUDEPLATS
@@ -933,6 +895,7 @@ PROJECT=CIDDAE
         DISPLAY     = N/A
         EXPORT      = CIDDAEEXP
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -941,12 +904,6 @@ PROJECT=CIDDAE
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -977,6 +934,7 @@ PROJECT=CIDMetaExtr
         DISPLAY     = N/A
         EXPORT      = CIDMETAEXTREXP
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -985,12 +943,6 @@ PROJECT=CIDMetaExtr
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -1040,6 +992,7 @@ PROJECT=CIDWebBrowser
         DIRECTORY   = WndUtils\CIDWebBrowser
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
@@ -1048,12 +1001,6 @@ PROJECT=CIDWebBrowser
     INCLUDEPLATS
         Win32
     END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     DEPENDENTS
         CIDKernel

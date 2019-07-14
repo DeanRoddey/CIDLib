@@ -20,6 +20,9 @@
 //  scopes we need nested enums, nested fundamental types, aliases, data members,
 //  and methods.
 //
+//  We also define a namespace derivative here as well, since it just uses some
+//  of the same  bits and pieces that the classes use.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -63,7 +66,8 @@ class TAliases
 
 
 // ---------------------------------------------------------------------------
-//  A constant definition. Mostly for a class but we might use it elsewhere.
+//  A constant definition. Mostly for a class but also used in namespaces,
+//  and maybe some other places eventually.
 // ---------------------------------------------------------------------------
 struct TConstDef
 {
@@ -443,4 +447,75 @@ class TCppClassPage : public TBasePage
         static TMethod              s_methFormatTo;
         static TMethod              s_methStreamFrom;
         static TMethod              s_methStreamTo;
+};
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TNamespacePage
+//  PREFIX: pg
+// ---------------------------------------------------------------------------
+class TNamespacePage : public TBasePage
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TNamespacePage() = delete;
+
+        TNamespacePage
+        (
+            const   TString&                strExtTopic
+            , const TString&                strParSrcDir
+            , const TString&                strParTopic
+            , const TString&                strFileName
+        );
+
+        ~TNamespacePage() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        const TString& strName() const
+        {
+            return m_strName;
+        }
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid Parse
+        (
+                    TTopic&                 topicParent
+            , const TXMLTreeElement&        xtnodeRoot
+        )   override;
+
+        tCIDLib::TVoid OutputContent
+        (
+                    TTextOutStream&         strmTar
+        )   const override;
+
+
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_colMethods
+        //      If we have any methods.
+        //
+        //  m_hnDesc
+        //      The overall namespace description
+        //
+        //  m_memgAliases
+        //  m_memgEnums
+        //      Any aliases and enums.
+        //
+        //  m_strName
+        //      The namespace's name.
+        // -------------------------------------------------------------------
+        TVector<TMethod>    m_colMethods;
+        THelpNode           m_hnDesc;
+        TAliases            m_memgAliases;
+        TEnums              m_memgEnums;
+        TString             m_strName;
 };

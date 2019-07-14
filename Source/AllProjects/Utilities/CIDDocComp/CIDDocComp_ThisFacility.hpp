@@ -308,6 +308,7 @@ class TCtxStackJan
         TCtxStackJan(const TTopic& topicToPush);
         TCtxStackJan(const THelpPage& pgToPush);
         TCtxStackJan(const TCppClassPage& pgToPush);
+        TCtxStackJan(const TNamespacePage& pgToPush);
 
         TCtxStackJan(const TCtxStackJan&) = delete;
 

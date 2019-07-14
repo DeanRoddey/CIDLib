@@ -103,6 +103,7 @@ TProjectInfo::TProjectInfo(const TBldStr& strName) :
     , m_bNeedsAdminPrivs(kCIDLib::False)
     , m_bPlatformDir(kCIDLib::False)
     , m_bPlatformInclude(kCIDLib::False)
+    , m_bPureCpp(kCIDLib::True)
     , m_bResFile(kCIDLib::False)
     , m_bUseSysLibs(kCIDLib::False)
     , m_bVarArgs(kCIDLib::False)
@@ -197,6 +198,11 @@ tCIDLib::TBoolean TProjectInfo::bNeedsAdminPrivs() const
 tCIDLib::TBoolean TProjectInfo::bPlatformDir() const
 {
     return m_bPlatformDir;
+}
+
+tCIDLib::TBoolean TProjectInfo::bPureCpp() const
+{
+    return m_bPureCpp;
 }
 
 
@@ -311,6 +317,7 @@ tCIDLib::TVoid TProjectInfo::DumpSettings() const
             << L"     Admin Privs: " << (m_bNeedsAdminPrivs ? L"Yes\n" : L"No\n")
             << L"   Resource File: " << (m_bResFile ? L"Yes\n" : L"No\n")
             << L"    Platform Dir: " << (m_bPlatformDir ? L"Yes\n" : L"No\n")
+            << L"        Pure Cpp: " << (m_bPureCpp ? L"Yes\n" : L"No\n")
             << L"    Use Sys Libs: " << (m_bUseSysLibs ? L"Yes\n" : L"No\n")
             << L"        Var Args: " << (m_bVarArgs ? L"Yes\n" : L"No\n")
             << L"        RTL Mode: " << m_eRTLMode << L"\n"
@@ -790,34 +797,16 @@ TProjectInfo::bSetSetting(const TBldStr& strName, const TBldStr& strValue)
      else if (strName == L"MSGFILE")
     {
         if (strValue == L"No")
-        {
             m_bMsgFile = kCIDLib::False;
-        }
-         else if (strValue == L"Yes")
-        {
+        else if (strValue == L"Yes")
             m_bMsgFile = kCIDLib::True;
-        }
-         else
-        {
-            // It's not valid
+        else
             return kCIDLib::False;
-        }
     }
      else if (strName == L"RESFILE")
     {
-        if (strValue == L"No")
-        {
-            m_bResFile = kCIDLib::False;
-        }
-         else if (strValue == L"Yes")
-        {
-            m_bResFile = kCIDLib::True;
-        }
-         else
-        {
-            // It's not valid
+        if (!TRawStr::bXlatBoolean(strValue.pszBuffer(), m_bResFile))
             return kCIDLib::False;
-        }
     }
      else if (strName == L"ADMINPRIVS")
     {
@@ -827,6 +816,11 @@ TProjectInfo::bSetSetting(const TBldStr& strName, const TBldStr& strValue)
      else if (strName == L"PLATFORMDIR")
     {
         if (!TRawStr::bXlatBoolean(strValue.pszBuffer(), m_bPlatformDir))
+            return kCIDLib::False;
+    }
+     else if (strName == L"PURECPP")
+    {
+        if (!TRawStr::bXlatBoolean(strValue.pszBuffer(), m_bPureCpp))
             return kCIDLib::False;
     }
      else if (strName == L"RTL")

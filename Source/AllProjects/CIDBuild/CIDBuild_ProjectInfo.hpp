@@ -143,6 +143,8 @@ class TProjectInfo
 
         tCIDLib::TBoolean bPlatformDir() const;
 
+        tCIDLib::TBoolean bPureCpp() const;
+
         tCIDLib::TBoolean bSupportsPlatform
         (
             const   TBldStr&                strToCheck
@@ -339,6 +341,11 @@ class TProjectInfo
         //      (only build on those) or ignore (build on all but those.) Defaults to
         //      ignore and and empty list.
         //
+        //  m_bPureCpp
+        //      This is defaulted to enabled, but can be disabled for lower level
+        //      stuff that has to import system headers that will require some sort
+        //      of permissive mode or suppression of errors.
+        //
         //  m_bResFile
         //      This project has a resource file that must be built. It is
         //      assumed to have the same name as the project and the standard
@@ -500,6 +507,7 @@ class TProjectInfo
         tCIDLib::TBoolean           m_bNeedsAdminPrivs;
         tCIDLib::TBoolean           m_bPlatformDir;
         tCIDLib::TBoolean           m_bPlatformInclude;
+        tCIDLib::TBoolean           m_bPureCpp;
         tCIDLib::TBoolean           m_bResFile;
         tCIDLib::TBoolean           m_bUseSysLibs;
         tCIDLib::TBoolean           m_bVarArgs;

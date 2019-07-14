@@ -83,7 +83,7 @@ TUtils::bCopyFile(  const   TBldStr&            strSourceName
                     , const TBldStr&            strSourceDir
                     , const TBldStr&            strTargetName
                     , const TBldStr&            strTargetDir
-                    , const tCIDLib::TBoolean bFailIfExists)
+                    , const tCIDLib::TBoolean   bFailIfExists)
 {
     TBldStr strSrc(strSourceDir);
     if (strSrc.chLast() != L'\\')
@@ -98,7 +98,7 @@ TUtils::bCopyFile(  const   TBldStr&            strSourceName
     return bCopyFile(strSrc, strTarget, bFailIfExists);
 }
 
-tCIDLib::TBoolean TUtils::bFindNVParts(const  TBldStr&    strSource
+tCIDLib::TBoolean TUtils::bFindNVParts( const   TBldStr&    strSource
                                         ,       TBldStr&    strName
                                         ,       TBldStr&    strValue)
 {
@@ -234,8 +234,7 @@ tCIDLib::TBoolean TUtils::bIsHppFile(const TBldStr& strFileName)
     // Find the last extension separator
     const tCIDLib::TCh* pszPeriod = TRawStr::pszFindLastChar
     (
-        strFileName.pszBuffer()
-        , kCIDBuild::chExtSep
+        strFileName.pszBuffer(), kCIDBuild::chExtSep
     );
 
     // If none, then just say its not a private header

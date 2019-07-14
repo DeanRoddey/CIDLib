@@ -41,6 +41,24 @@ namespace TAudio
         const   tCIDLib::EAudioCues     eCue
     );
 
+    CIDLIBEXP tCIDLib::TBoolean bPlayWAVFile
+    (
+        const   TString&                strFileToPlay
+        , const tCIDLib::EWaitModes     eWait = tCIDLib::EWaitModes::Wait
+    );
+
+    CIDLIBEXP tCIDLib::TBoolean bQuerySystemVolume
+    (
+                tCIDLib::TCard4&        c4ToFill
+        , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
+    );
+
+    CIDLIBEXP tCIDLib::TBoolean bSetSystemVolume
+    (
+        const   tCIDLib::TCard4         c4Percent
+        , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
+    );
+
     CIDLIBEXP tCIDLib::TVoid Beep
     (
         const   tCIDLib::TCard4         c4Frequency
@@ -63,11 +81,6 @@ namespace TAudio
         , const tCIDLib::EWaitModes     eWait = tCIDLib::EWaitModes::Wait
     );
 
-    CIDLIBEXP tCIDLib::TVoid QuerySystemVolume
-    (
-                tCIDLib::TCard4&        c4ToFill
-    );
-
     CIDLIBEXP tCIDLib::TVoid SetWAVForCue
     (
         const   tCIDLib::EAudioCues     eCue
@@ -75,9 +88,4 @@ namespace TAudio
     );
 
     CIDLIBEXP TString strDevInfo();
-
-    CIDLIBEXP tCIDLib::TVoid SetSystemVolume
-    (
-        const   tCIDLib::TCard4         c4Percent
-    );
 }

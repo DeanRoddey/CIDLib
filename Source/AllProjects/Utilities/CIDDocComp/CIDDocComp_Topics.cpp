@@ -189,6 +189,14 @@ tCIDLib::TVoid TTopic::Parse()
                 // Also add it to the main 'by name' list of the facility
                 facCIDDocComp.AddClass(ppgNew);
             }
+             else if (eType == tCIDDocComp::EPageTypes::Namespace)
+            {
+                TNamespacePage* ppgNew = new TNamespacePage
+                (
+                    strExtTitle, m_pathSource, m_strTopicPath, strFileName
+                );
+                m_colPages.objAdd(TPagePtr(ppgNew));
+            }
              else
             {
                 facCIDDocComp.AddErrorMsg

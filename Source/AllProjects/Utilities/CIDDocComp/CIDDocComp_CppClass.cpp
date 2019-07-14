@@ -163,7 +163,11 @@ TAliases::OutputContent(        TTextOutStream&         strmTar
     if (m_colList.bIsEmpty())
         return;
 
-    strmTar << L"<p><span class='SecHdr'>" << eVisType << L" Aliases</span></p>";
+    strmTar << L"<p><span class='SecHdr'>";
+    // The visibility may not be used if it's in a namespace
+    if (eVisType != tCIDDocComp::EVisTypes::Count)
+        strmTar << eVisType;
+    strmTar << L" Aliases</span></p>";
 
     m_colList.bForEach
     (
@@ -243,7 +247,11 @@ TEnums::OutputContent(          TTextOutStream&         strmTar
     if (m_colList.bIsEmpty())
         return;
 
-    strmTar << L"<p><span class='SecHdr'>" << eVisType << L" Enumerations</span></p>";
+    strmTar << L"<p><span class='SecHdr'>";
+    // The visibility may not be used if it's in a namespace
+    if (eVisType != tCIDDocComp::EVisTypes::Count)
+        strmTar << eVisType;
+    strmTar << L" Enumerations</span></p>";
 
     m_colList.bForEach
     (
@@ -1601,3 +1609,112 @@ tCIDLib::TVoid TCppClassPage::LoadMixinMethods()
     }
 }
 
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TNamespacePage
+//  PREFIX: pg
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TNamespacePage: Constructors and Destructor
+// ---------------------------------------------------------------------------
+TNamespacePage::TNamespacePage(  const   TString&   strExtTitle
+                                , const TString&    strParSrcDir
+                                , const TString&    strParTopic
+                                , const TString&    strFileName) :
+
+    TBasePage
+    (
+        strExtTitle
+        , strParSrcDir
+        , strParTopic
+        , strFileName
+        , tCIDDocComp::EPageTypes::Namespace
+    )
+{
+
+}
+
+
+// ---------------------------------------------------------------------------
+//  TNamespacePage: Private, inherited methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid
+TNamespacePage::Parse(TTopic& topicParent, const TXMLTreeElement& xtnodeNS)
+{
+    // Push us onto the context stack for this scope
+    TCtxStackJan janStack(*this);
+
+    // First we need to get out our namespace name
+    m_strName = xtnodeNS.strAttr(L"Name");
+
+    tCIDLib::TCard4 c4At;
+    const TXMLTreeElement& xtnodeDesc = xtnodeNS.xtnodeFindElement
+    (
+        kCIDDocComp::strXML_Desc, 0, c4At
+    );
+    m_hnDesc.Parse(xtnodeDesc);
+
+    xtnodeNS.bForEach
+    (
+        [&](const TXMLTreeElement& xtnodeCur)
+        {
+            const TString& strName = xtnodeCur.strQName();
+            if (strName == L"Aliases")
+            {
+                m_memgAliases.Parse(xtnodeCur);
+            }
+             else if (strName == L"Constants")
+            {
+            }
+             else if (strName == L"Enums")
+            {
+                m_memgEnums.Parse(xtnodeCur);
+            }
+             else if (strName == L"Method")
+            {
+                TMethod& methNew = m_colMethods.objAdd(TMethod());
+                methNew.Parse(xtnodeCur, tCIDDocComp::EMethAttrs::NoAttrs);
+            }
+            return kCIDLib::True;
+        }
+    );
+}
+
+
+tCIDLib::TVoid TNamespacePage::OutputContent(TTextOutStream& strmTar) const
+{
+    //  Push ourself into the source stack
+    TCtxStackJan janStack(*this);
+
+    // The namespace name is the title
+    strmTar << L"<p><span class='PageHdr'> Namespace: "
+            << m_strName << L"</span></p>";
+
+    m_hnDesc.OutputHelpText(strmTar, kCIDLib::False);
+
+    // Do a little divider
+    strmTar << L"<div class=\"HorzDivCont\"><div class=\"HorzDiv\"></div></div>";
+
+    // Do the aliases first if any
+    m_memgAliases.OutputContent(strmTar, tCIDDocComp::EVisTypes::Count);
+
+    // Then enums
+    m_memgEnums.OutputContent(strmTar, tCIDDocComp::EVisTypes::Count);
+
+    // And any methods we have
+    if (!m_colMethods.bIsEmpty())
+    {
+        strmTar << L"<p><span class='SecHdr'>Namespace Methods</span></p>";
+        TStreamIndentJan janIndent(&strmTar, 4);
+        m_colMethods.bForEach
+        (
+            [this, &strmTar] (const TMethod& methCur)
+            {
+                methCur.OutputContent(strmTar);
+                return kCIDLib::True;
+            }
+        );
+    }
+}

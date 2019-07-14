@@ -173,6 +173,7 @@
                 <CIDIDL:EnumVal CIDIDL:Name="None"      CIDIDL:Text=""/>
                 <CIDIDL:EnumVal CIDIDL:Name="CppClass"  CIDIDL:Text="cidhcls"/>
                 <CIDIDL:EnumVal CIDIDL:Name="HelpPage"  CIDIDL:Text="cidhpage"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Namespace" CIDIDL:Text="cidhns"/>
             </CIDIDL:Enum>
 
 
@@ -250,6 +251,7 @@
                 <CIDIDL:EnumVal CIDIDL:Name="CppClass"/>
                 <CIDIDL:EnumVal CIDIDL:Name="HelpPage"/>
                 <CIDIDL:EnumVal CIDIDL:Name="Topic"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Namespace"/>
             </CIDIDL:Enum>
 
 

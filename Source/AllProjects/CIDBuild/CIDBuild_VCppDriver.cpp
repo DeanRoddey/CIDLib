@@ -399,16 +399,18 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         apszArgs[c4CurArg++] = L"/DNDEBUG";
     }
 
-    // If a pure ANSI project, then disable extension
-    const TKeyValuePair* pkvpPlatOpt;
-    pkvpPlatOpt = m_pprojiTarget->pkvpFindPlatOpt(L"WIN32_*", L"PUREANSI");
-    if (pkvpPlatOpt && pkvpPlatOpt->strValue().bIEquals(L"Yes"))
+    //
+    //  If not a pure ANSI project, then disable extension. This is temporary
+    //  until all per-platform stuff is split out into per-platfrom dirs.
+    //
+    if (m_pprojiTarget->bPureCpp())
         apszArgs[c4CurArg++] = L"/Za";
 
     //
     //  Non-permissive mode is the default but they can ask us to enable permissive
     //  mode via.
     //
+    const TKeyValuePair*
     pkvpPlatOpt = m_pprojiTarget->pkvpFindPlatOpt(L"WIN32_*", L"PERMISSIVE");
     if (!pkvpPlatOpt || !pkvpPlatOpt->strValue().bIEquals(L"Yes"))
     {
