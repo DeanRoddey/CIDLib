@@ -103,7 +103,7 @@ CPPFLAGS=$(CPPFLAGS) /DPLATFORM_$(CID_PLATFORM)
 #   Build up the output directory
 # ----------------------------------------------------------------------------
 OUTDIR=$(CID_RESDIR)
-TMPOUTDIR=$(CID_RESDIR)\CIDBuild
+TMPOUTDIR=$(CID_RESDIR)\CIDBuild.out
 
 
 # ----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ $(TMPOUTDIR)\CIDBuild_Utils_Win32.obj
 # ----------------------------------------------------------------------------
 ALL :   $(CID_SRCTREE) \
         $(OUTDIR) \
-        $(OUTDIR)\CIDBuild \
+        $(TMPOUTDIR) \
         $(OUTDIR)\CIDBuild.exe
 
 
@@ -310,10 +310,10 @@ $(TMPOUTDIR)\CIDBuild_Utils_Win32.obj       : $(PLATDIR)\CIDBuild_Utils_Win32.cp
 $(CID_SRCTREE) :
     if not exist $(CID_SRCTREE)\$(NULL) mkdir $(CID_SRCTREE)
 
-$(OUTDIR) :
+$(OUTDIR) : $(CID_SRCTREE)
     if not exist $(OUTDIR)\$(NULL) mkdir $(OUTDIR)
 
-$(TMPOUTDIR) :
+$(TMPOUTDIR) : $(OUTDIR)
     if not exist $(TMPOUTDIR)\$(NULL) mkdir $(TMPOUTDIR)
 
 
@@ -322,10 +322,10 @@ $(TMPOUTDIR) :
 # ----------------------------------------------------------------------------
 .cpp{$(TMPOUTDIR)}.obj:
     cl $(CPPFLAGS) /Za /Zc:forScope,wchar_t /EHsc /W3 /nologo /c /D_WINDOWS /D_CONSOLE \
-        /Fd$(TMPOUTDIR) /DNTDDI_VERSION=NTDDI_WIN7 /Fo$(TMPOUTDIR)\ $<
+        /Fd$(TMPOUTDIR)\ /DNTDDI_VERSION=NTDDI_WIN7 /Fo$(TMPOUTDIR)\ $<
 
 {$(PLATDIR)}.cpp{$(TMPOUTDIR)}.obj:
     cl $(CPPFLAGS) /EHsc /Zc:forScope,wchar_t /W3 /nologo /c /D_WINDOWS /D_CONSOLE \
-        /Fd$(TMPOUTDIR) /DNTDDI_VERSION=NTDDI_WIN7 /Fo$(TMPOUTDIR)\ $<
+        /Fd$(TMPOUTDIR)\ /DNTDDI_VERSION=NTDDI_WIN7 /Fo$(TMPOUTDIR)\ $<
 
 !ENDIF
