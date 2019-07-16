@@ -1538,7 +1538,7 @@ TRawStr::c4AsBinary(const   tCIDLib::TCh* const pszToConvert
 }
 
 
-KRNLEXPORT tCIDLib::TCard4 TRawStr::c4ToHex(const tCIDLib::TCh ch1)
+tCIDLib::TCard4 TRawStr::c4ToHex(const tCIDLib::TCh ch1)
 {
     tCIDLib::TCard4 c4Ret = 0;
     if ((ch1 >= kCIDLib::chLatin_A) && (ch1 <= kCIDLib::chLatin_F))
@@ -1718,7 +1718,7 @@ TRawStr::CopyStr(           tCIDLib::TCh* const pszTarget
     // If a nul source, then obviously nothing to do
     if (!pszSrc)
     {
-        *pszTarget = 0;
+        *pszTarget = kCIDLib::chNull;
         return;
     }
 
@@ -1748,39 +1748,130 @@ TRawStr::CopyStr(           tCIDLib::TCh* const pszTarget
 }
 
 
+//
+//  Loop till we get a difference, or we hit the null of either. If one is
+//  null and the other is not, that will be a difference and of the correct
+//  relative magitude.
+//
 tCIDLib::ESortComps
 TRawStr::eCompareStr(   const   tCIDLib::TCh* const pszStr1
                         , const tCIDLib::TCh* const pszStr2) noexcept
 {
-    return eXlatSortRes(CIDStrOp_Compare(pszStr1, pszStr2));
+    const tCIDLib::TCh* pszCur1 = pszStr1;
+    const tCIDLib::TCh* pszCur2 = pszStr2;
+    tCIDLib::TSInt iRes = 0;
+
+    tCIDLib::TCh ch1;
+    tCIDLib::TCh ch2;
+    do
+    {
+        ch1 = *pszCur1++;
+        ch2 = *pszCur2++;
+        iRes = tCIDLib::TInt4(ch1) - tCIDLib::TInt4(ch2);
+    }   while (!iRes && ch1 && ch2);
+
+    return eXlatSortRes(iRes);
 }
 
+// Same as above, but only worry about c4Count chars worst case
 tCIDLib::ESortComps
 TRawStr::eCompareStrN(  const   tCIDLib::TCh* const pszStr1
                         , const tCIDLib::TCh* const pszStr2
                         , const tCIDLib::TCard4     c4Count) noexcept
 {
-    return eXlatSortRes(CIDStrOp_CompareN(pszStr1, pszStr2, c4Count));
+    //
+    //  Optimize if not comparing any characters, and gets rid of a possible
+    //  corner case below.
+    //
+    if (!c4Count)
+        return tCIDLib::ESortComps::Equal;
+
+    const tCIDLib::TCh* pszCur1 = pszStr1;
+    const tCIDLib::TCh* pszCur2 = pszStr2;
+    tCIDLib::TSInt iRes = 0;
+
+    tCIDLib::TCh ch1;
+    tCIDLib::TCh ch2;
+    tCIDLib::TCard4 c4SoFar = 0;
+    do
+    {
+        ch1 = *pszCur1++;
+        ch2 = *pszCur2++;
+        c4SoFar++;
+        iRes = tCIDLib::TInt4(ch1) - tCIDLib::TInt4(ch2);
+    }   while (!iRes && ch1 && ch2 && (c4SoFar < c4Count));
+
+    // If we made it to count, we ignore the result
+    if (c4SoFar == c4Count)
+        return tCIDLib::ESortComps::Equal;
+
+    return eXlatSortRes(iRes);
 }
 
 
+// Save as eCompareStr but we upper case each character
 tCIDLib::ESortComps
 TRawStr::eCompareStrI(  const   tCIDLib::TCh* const pszStr1
                         , const tCIDLib::TCh* const pszStr2) noexcept
 {
-    return eXlatSortRes(CIDStrOp_CompareI(pszStr1, pszStr2));
+    const tCIDLib::TCh* pszCur1 = pszStr1;
+    const tCIDLib::TCh* pszCur2 = pszStr2;
+    tCIDLib::TSInt iRes = 0;
+
+    tCIDLib::TCh ch1;
+    tCIDLib::TCh ch2;
+    do
+    {
+        ch1 = chUpper(*pszCur1++);
+        ch2 = chUpper(*pszCur2++);
+        iRes = tCIDLib::TInt4(ch1) - tCIDLib::TInt4(ch2);
+    }   while (!iRes && ch1 && ch2);
+
+    return eXlatSortRes(iRes);
 }
 
 
+// Same as ECompareStrN except we upper case each character
 tCIDLib::ESortComps
 TRawStr::eCompareStrNI( const   tCIDLib::TCh* const pszStr1
                         , const tCIDLib::TCh* const pszStr2
                         , const tCIDLib::TCard4     c4Count) noexcept
 {
-    return eXlatSortRes(CIDStrOp_CompareNI(pszStr1, pszStr2, c4Count));
+    //
+    //  Optimize if not comparing any characters, and gets rid of a possible
+    //  corner case below.
+    //
+    if (!c4Count)
+        return tCIDLib::ESortComps::Equal;
+
+    const tCIDLib::TCh* pszCur1 = pszStr1;
+    const tCIDLib::TCh* pszCur2 = pszStr2;
+    tCIDLib::TSInt iRes = 0;
+
+    tCIDLib::TCh ch1;
+    tCIDLib::TCh ch2;
+    tCIDLib::TCard4 c4SoFar = 0;
+    do
+    {
+        ch1 = chUpper(*pszCur1++);
+        ch2 = chUpper(*pszCur2++);
+        c4SoFar++;
+        iRes = tCIDLib::TInt4(ch1) - tCIDLib::TInt4(ch2);
+    }   while (!iRes && ch1 && ch2 && (c4SoFar < c4Count));
+
+    // If we made it to count, we ignore the result
+    if (c4SoFar == c4Count)
+        return tCIDLib::ESortComps::Equal;
+
+    return eXlatSortRes(iRes);
 }
 
 
+//
+//  These are local short strings (and possibly multi-byte) so we use platform
+//  defined methods for these, which typically just map to local code page aware
+//  system APIs.
+//
 tCIDLib::ESortComps
 TRawStr::eCompareStr(   const   tCIDLib::TSCh* const pszStr1
                         , const tCIDLib::TSCh* const pszStr2) noexcept
@@ -1814,6 +1905,10 @@ TRawStr::eCompareStrNI( const   tCIDLib::TSCh* const    pszStr1
 }
 
 
+//
+//  We don't want to try to understand the many float point variations. So we
+//  do this in terms of a per-platform helper.
+//
 tCIDLib::TFloat8
 TRawStr::f8AsBinary(const   tCIDLib::TCh* const pszToConvert
                     ,       tCIDLib::TBoolean&  bValid) noexcept
@@ -1836,7 +1931,7 @@ TRawStr::f8AsBinary(const   tCIDLib::TCh* const pszToConvert
     {
         while (*pszEnd)
         {
-            if (!TRawStr::bIsSpace(*pszEnd))
+            if (!bIsSpace(*pszEnd))
             {
                 bValid = kCIDLib::False;
                 return 0.0;
@@ -1855,20 +1950,10 @@ TRawStr::FillString(        tCIDLib::TCh* const pszBuf
                     , const tCIDLib::TCh        chFill
                     , const tCIDLib::TCard4     c4Count)
 {
-    //
-    //  Optimize if the high and low bytes are the same, since we can then
-    //  just do a memset.
-    //
-    if (((chFill & 0xFF00) >> 8) == (chFill & 0x00FF))
-    {
-        memset(pszBuf, tCIDLib::TCard1(chFill & 0x00FF), c4Count * 2);
-    }
-     else
-    {
-        tCIDLib::TCh* pchBuf = pszBuf;
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-            *pchBuf++ = chFill;
-    }
+
+    tCIDLib::TCh* pchBuf = pszBuf;
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+        *pchBuf++ = chFill;
     pszBuf[c4Count] = kCIDLib::chNull;
 }
 
@@ -2017,6 +2102,11 @@ TRawStr::i8AsBinary(const   tCIDLib::TCh* const pszToConvert
 }
 
 
+//
+//  Convert from a local short character string. We use a per-platform helper
+//  to do this. For the second one we allocate a buffer and return it, and the
+//  caller is responsible.
+//
 tCIDLib::TCh*
 TRawStr::pszConvert(const   tCIDLib::TSCh* const    pszToConvert
                     ,       tCIDLib::TCh* const     pszTarget
@@ -2037,7 +2127,7 @@ TRawStr::pszConvert(const   tCIDLib::TSCh* const    pszToConvert
 
 tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
 {
-    tCIDLib::TCh* pszNew = 0;
+    tCIDLib::TCh* pszNew = nullptr;
 
     if (pszToConvert)
     {
@@ -2060,6 +2150,12 @@ tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
     return pszNew;
 }
 
+
+//
+//  Converting from wide to local character type, so we use a per-platform
+//  helper to do this. A second one allocates a buffer and returns it, and
+//  the caller becomes responsible.
+//
 tCIDLib::TSCh*
 TRawStr::pszConvert(const   tCIDLib::TCh* const     pszToConvert
                     ,       tCIDLib::TSCh* const    pszTarget
@@ -2103,6 +2199,10 @@ tCIDLib::TSCh* TRawStr::pszConvert(const tCIDLib::TCh* const pszToConvert)
 }
 
 
+//
+//  Find a character in a string and return a pointer to the located character,
+//  null if not found.
+//
 tCIDLib::TCh*
 TRawStr::pszFindChar(       tCIDLib::TCh* const     pszToSearch
                     , const tCIDLib::TCh            chToFind
@@ -2111,7 +2211,7 @@ TRawStr::pszFindChar(       tCIDLib::TCh* const     pszToSearch
 {
     const tCIDLib::TCard4 c4At = ::c4FindChar(pszToSearch, chToFind, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
@@ -2123,11 +2223,15 @@ TRawStr::pszFindChar(const  tCIDLib::TCh* const     pszToSearch
 {
     const tCIDLib::TCard4 c4At = ::c4FindChar(pszToSearch, chToFind, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
 
+//
+//  Find a one of a set of chars in string and return a poitner to the first
+//  one located, null if none found.
+//
 tCIDLib::TCh*
 TRawStr::pszFindChars(          tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh* const     pszChars
@@ -2136,7 +2240,7 @@ TRawStr::pszFindChars(          tCIDLib::TCh* const     pszToSearch
 {
     const tCIDLib::TCard4 c4At = ::c4FindChars(pszToSearch, pszChars, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
@@ -2148,11 +2252,12 @@ TRawStr::pszFindChars(  const   tCIDLib::TCh* const     pszToSearch
 {
     const tCIDLib::TCard4 c4At = ::c4FindChars(pszToSearch, pszChars, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
 
+// Like pszFindChar but works from the end
 tCIDLib::TCh*
 TRawStr::pszFindLastChar(       tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh            chToFind
@@ -2166,7 +2271,7 @@ TRawStr::pszFindLastChar(       tCIDLib::TCh* const     pszToSearch
         pszToSearch, chToFind, c4Len - 1, bCase
     );
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
@@ -2183,11 +2288,12 @@ TRawStr::pszFindLastChar(   const   tCIDLib::TCh* const     pszToSearch
         pszToSearch, chToFind, c4Len - 1, bCase
     );
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
 
+// Like pszFindChars but works from the end
 tCIDLib::TCh*
 TRawStr::pszFindLastChars(          tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh* const     pszChars
@@ -2201,7 +2307,7 @@ TRawStr::pszFindLastChars(          tCIDLib::TCh* const     pszToSearch
         pszToSearch, pszChars, c4Len - 1, bCase
     );
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
@@ -2218,11 +2324,12 @@ TRawStr::pszFindLastChars(  const   tCIDLib::TCh* const     pszToSearch
         pszToSearch, pszChars, c4Len - 1, bCase
     );
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
 
+// Given a successful call (to last or prev char) find the next previous
 tCIDLib::TCh*
 TRawStr::pszFindPrevChar(       tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh            chToFind
@@ -2234,7 +2341,7 @@ TRawStr::pszFindPrevChar(       tCIDLib::TCh* const     pszToSearch
         pszToSearch, chToFind, c4StartAt, bCase
     );
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
@@ -2249,11 +2356,12 @@ TRawStr::pszFindPrevChar(const  tCIDLib::TCh* const     pszToSearch
         pszToSearch, chToFind, c4StartAt, bCase
     );
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
 
+// Given a previous call (to last or prev chars), find the next previous one
 tCIDLib::TCh*
 TRawStr::pszFindPrevChars(          tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh* const     pszChars
@@ -2265,7 +2373,7 @@ TRawStr::pszFindPrevChars(          tCIDLib::TCh* const     pszToSearch
         pszToSearch, pszChars, c4StartAt, bCase
     );
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
@@ -2280,11 +2388,12 @@ TRawStr::pszFindPrevChars(  const   tCIDLib::TCh* const     pszToSearch
         pszToSearch, pszChars, c4StartAt, bCase
     );
     if (c4At == kCIDLib::c4MaxCard)
-        return 0;
+        return nullptr;
     return &pszToSearch[c4At];
 }
 
 
+// Find the next previous substring in a string, from a starting index
 tCIDLib::TCh*
 TRawStr::pszFindPrevSubStr(         tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh* const     pszSubStr
@@ -2417,6 +2526,7 @@ TRawStr::pszFindPrevSubStr( const   tCIDLib::TCh* const     pszToSearch
 }
 
 
+// Find the first instance of a substring in a string, from the starting index
 tCIDLib::TCh*
 TRawStr::pszFindSubStr(         tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh* const     pszSubStr
@@ -2573,16 +2683,27 @@ TRawStr::pszStrTokenize(        tCIDLib::TCh* const pszSource
 }
 
 
+// We implement this in terms of the platform specific chLower()
 tCIDLib::TCh* TRawStr::pszLowerCase(tCIDLib::TCh* pszToLower) noexcept
 {
-    CIDStrOp_StrToLower(pszToLower);
+    tCIDLib::TCh* pszCur = pszToLower;
+    while (*pszCur)
+    {
+        *pszCur = chLower(*pszCur);
+        pszCur++;
+    }
     return pszToLower;
 }
 
-
+// We implement this in terms of the platform specific chUpper()
 tCIDLib::TCh* TRawStr::pszUpperCase(tCIDLib::TCh* pszToUpper) noexcept
 {
-    CIDStrOp_StrToUpper(pszToUpper);
+    tCIDLib::TCh* pszCur = pszToUpper;
+    while (*pszCur)
+    {
+        *pszCur = chUpper(*pszCur);
+        pszCur++;
+    }
     return pszToUpper;
 }
 
@@ -2616,7 +2737,7 @@ TRawStr::StripStr(          tCIDLib::TCh* const     pszStripBuf
     //  Handle special case of single char. We either kill the char and return
     //  an empty string or we return with no action.
     //
-    if (!(*(pszStripBuf+1)))
+    if (!(*(pszStripBuf + 1)))
     {
         if (pszFindChar(pszStripChars, *pszStripBuf))
             *pszStripBuf = kCIDLib::chNull;
@@ -2653,7 +2774,7 @@ TRawStr::StripStr(          tCIDLib::TCh* const     pszStripBuf
         // We stripped it away, so zero the passed string and return
         if (!(*pszStart))
         {
-            *pszStripBuf = 0;
+            *pszStripBuf = kCIDLib::chNull;
             return;
         }
     }
@@ -2676,12 +2797,12 @@ TRawStr::StripStr(          tCIDLib::TCh* const     pszStripBuf
         // If we hit the leading edge, then we are done
         if (pszEnd == pszStart)
         {
-            pszStripBuf[0] = 0;
+            pszStripBuf[0] = kCIDLib::chNull;
             return;
         }
 
         // Otherwise, put a nul in the end
-        *pszEnd = 0;
+        *pszEnd = kCIDLib::chNull;
     }
 
     //
@@ -2719,7 +2840,7 @@ TRawStr::StripStr(          tCIDLib::TCh* const     pszStripBuf
         // If we stripped the whole thing, then we are done
         if (pszStart == pszEnd)
         {
-            *pszStripBuf = 0;
+            *pszStripBuf = kCIDLib::chNull;
             return;
         }
 
@@ -2732,7 +2853,7 @@ TRawStr::StripStr(          tCIDLib::TCh* const     pszStripBuf
             if (pszStart != pszStripBuf)
             {
                 *pszStripBuf = *pszStart;
-                *(pszStripBuf+1) = 0;
+                *(pszStripBuf + 1) = kCIDLib::chNull;
             }
             return;
         }

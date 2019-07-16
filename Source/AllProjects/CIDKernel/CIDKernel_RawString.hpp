@@ -371,7 +371,7 @@ namespace TRawStr
         , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
     )   noexcept;
 
-    KRNLEXPORT tCIDLib::TCh* pszConvert
+    KRNLEXPORT [[nodiscard]] tCIDLib::TCh* pszConvert
     (
         const   tCIDLib::TSCh* const    pszToConvert
     );
@@ -383,7 +383,7 @@ namespace TRawStr
         , const tCIDLib::TCard4         c4MaxChars
     );
 
-    KRNLEXPORT tCIDLib::TSCh* pszConvert
+    KRNLEXPORT [[nodiscard]] tCIDLib::TSCh* pszConvert
     (
         const   tCIDLib::TCh* const  pszToConvert
     );

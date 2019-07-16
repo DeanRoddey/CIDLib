@@ -37,10 +37,6 @@
 
 #define CIDStrOp_ChToLower(c)           ::towlower(c)
 #define CIDStrOp_ChToUpper(c)           ::towupper(c)
-#define CIDStrOp_Compare(s1,s2)         ::wcscmp(s1,s2)
-#define CIDStrOp_CompareI(s1,s2)        ::_wcsicmp(s1,s2)
-#define CIDStrOp_CompareN(s1,s2,n)      ::wcsncmp(s1,s2,n)
-#define CIDStrOp_CompareNI(s1,s2,n)     ::_wcsnicmp(s1,s2,n)
 #define CIDStrOp_CnvtFloat(s,ep)        ::wcstod(s,ep)
 #define CIDStrOp_FmtFloat(b,l,v,p,d,s)  ::_fcvt_s(b,l,v,p,d,s)
 #define CIDStrOp_IsAlpha(c)             ::iswalpha(c)
@@ -53,8 +49,6 @@
 #define CIDStrOp_IsXDigit(c)            ::iswxdigit(c)
 #define CIDStrOp_MBToWC(t,mc,s,oc)      ::mbstowcs_s(&oc,t,mc,s,_TRUNCATE)
 #define CIDStrOp_StrTok(s,ws,c)         ::wcstok_s(s,ws,c)
-#define CIDStrOp_StrToLower(s)          ::_wcslwr(s)
-#define CIDStrOp_StrToUpper(s)          ::_wcsupr(s)
 #define CIDStrOp_WCToMB(t,s,ob)         ::wcstombs_s(0,t,ob,s,_TRUNCATE)
 #define CIDStrOp_CalcMBSize(s,nb)       ::wcstombs_s(&nb,0,0,s,_TRUNCATE)
 
