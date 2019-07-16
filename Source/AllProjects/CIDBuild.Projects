@@ -1875,7 +1875,6 @@ PROJECT=HTTPClient1
     DEPENDENTS
         CIDEncode
         CIDNet
-        CIDSChan
     END DEPENDENTS
 END PROJECT
 

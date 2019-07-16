@@ -32,12 +32,10 @@
 
 
 // ----------------------------------------------------------------------------
-//  Includes.
+//  Includes
 // ----------------------------------------------------------------------------
 #include    "CIDEncode.hpp"
 #include    "CIDNet.hpp"
-#include    "CIDSChan.hpp"
-
 
 
 // ----------------------------------------------------------------------------
@@ -52,7 +50,6 @@
 static TTextFileOutStream strmOut(tCIDLib::EStdFiles::StdOut);
 
 
-
 // ----------------------------------------------------------------------------
 //  Do the magic main module code
 // ----------------------------------------------------------------------------
@@ -60,18 +57,21 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"HTTPClient1MainThread", eMainThreadFunc))
 
 
-
 // ----------------------------------------------------------------------------
 //  Local functions
 // ----------------------------------------------------------------------------
 
-// Dumps out the info we get back from the HTTP operation
+//
+//  Once the HTTP operation is done below, this is called to dump out the info
+//  for examimation. We get the body content, the output headers and the content
+//  type info. We parse the content type to see if the body is a text format and
+//  to set up a text converter to convert it for display.
+//
 static tCIDLib::TVoid
 DumpInfo(const  tCIDLib::TKVPList&  colOutHdrs
-        , const TMemBuf&            mbufContent
+        , const TMemBuf&            mbufCont
         , const tCIDLib::TCard4     c4ContLen
-        , const TString&            strContType
-        , const TString             strReqType)
+        , const TString&            strContType)
 {
     //
     //  If we got header lines, dump those. They are in the form of a
@@ -80,39 +80,15 @@ DumpInfo(const  tCIDLib::TKVPList&  colOutHdrs
     if (!colOutHdrs.bIsEmpty())
     {
         strmOut << L"Header Lines:\n---------------------\n";
-        const tCIDLib::TCard4 c4Count = colOutHdrs.c4ElemCount();
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-        {
-            const TKeyValuePair& kvalCur = colOutHdrs[c4Index];
-
-            //
-            //  Handle the cache control header specially and break out
-            //  the values. Otherwise, just dump the key=value. The HTTP
-            //  client class has a helper to prase the cache control info
-            //  line, also giving us back a set of key/value strings.
-            //
-            if (kvalCur.strKey().bCompareI(THTTPClient::strHdr_CacheControl))
-            {
-                strmOut << L"    Cache-Control:\n";
-                tCIDLib::TKVPList colCacheVals;
-                THTTPClient::ParseCacheControl(kvalCur.strValue(), colCacheVals);
-
-                const tCIDLib::TCard4 c4Count = colCacheVals.c4ElemCount();
-                for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-                {
-                    const TKeyValuePair& kvalCur = colCacheVals[c4Index];
-                    strmOut << L"       " << kvalCur.strKey();
-                    if (!kvalCur.strValue().bIsEmpty())
-                        strmOut << L"=" << kvalCur.strValue();
-                    strmOut << kCIDLib::NewLn;
-                }
-            }
-             else
+        colOutHdrs.bForEach
+        (
+            [&](const TKeyValuePair& kvalCur)
             {
                 strmOut << L"    " << kvalCur.strKey() << L'=' << kvalCur.strValue()
                         << kCIDLib::NewLn;
+                return kCIDLib::True;
             }
-        }
+        );
         strmOut << kCIDLib::NewLn;
     }
 
@@ -125,19 +101,19 @@ DumpInfo(const  tCIDLib::TKVPList&  colOutHdrs
             << L"    Content Len=" << c4ContLen << kCIDLib::NewLn;
 
     // If we have content, try to dump it
-    if (c4ContLen && (strReqType != L"HEAD"))
+    if (c4ContLen)
     {
         //
-        //  Try to figure out the encoding. If there's not one indicated, then try the
-        //  default.
+        //  Try to figure out the encoding. If there's not one indicated, then try
+        //  the default.
         //
         TString strEncoding;
-        if (!TNetCoreParser::bFindTextEncoding(colOutHdrs, mbufContent, c4ContLen, strEncoding))
+        if (!TNetCoreParser::bFindTextEncoding(colOutHdrs, mbufCont, c4ContLen, strEncoding))
             strEncoding = kCIDNet::pszDefHTTPEncoding;
 
         //
-        //  It is text, so see if we have a transcoder for this
-        //  encoding in our CIDEncode facility.
+        //  It is text, so see if we have a transcoder for this encoding in our
+        //  CIDEncode facility. If so, we will display the text.
         //
         if (facCIDEncode().bSupportsEncoding(strEncoding))
         {
@@ -145,24 +121,15 @@ DumpInfo(const  tCIDLib::TKVPList&  colOutHdrs
             strmOut << L"\n\nBody Text\n-------------------------" << kCIDLib::NewEndLn;
 
             //
-            //  We do so create a text encoder and set that on a text input stream
-            //  we create over the body content, so that we can stream it in. We
-            //  got the size of the body content in the GET, and provide that as the
-            //  end of stream point.
-            //
-            //  We tell it not to adopt the memory buffer of course,  though it always
-            //  adopts the text converter, so we don't need to clean that up.
-            //
-            //  To help finding text encoding errors, we tell the text encoder to stop
-            //  parsing if it hits an error, and return what it got. That way, we'll
-            //  dump out text up to the error point, instead of stopping way before that
-            //  (since the stream pre-streams in chunks at a time.)
+            //  Create a text converter for the encoding, then create a memory based
+            //  input stream over the body content and give it the text converter to
+            //  use.
             //
             TTextConverter* ptcvtBody = facCIDEncode().ptcvtMakeNew(strEncoding);
             ptcvtBody->eErrorAction(tCIDLib::ETCvtActions::StopThenThrow);
             TTextMBufInStream strmSrc
             (
-                &mbufContent, c4ContLen, tCIDLib::EAdoptOpts::NoAdopt, ptcvtBody
+                &mbufCont, c4ContLen, tCIDLib::EAdoptOpts::NoAdopt, ptcvtBody
             );
 
             // OK, just read and dump lines until we hit the end of the body content.
@@ -189,6 +156,16 @@ DumpInfo(const  tCIDLib::TKVPList&  colOutHdrs
 }
 
 
+static tCIDLib::TVoid ShowUsage(TTextOutStream& strmOut)
+{
+    strmOut << L"Usage:\n"
+                L"   HTTPClient1 /URL=url [/FMT=[MIMETYPE] /Close]\n\n"
+                L"   /Close means send a close header line\n"
+                L"   /FMT= indicates an 'accept' MIME type, else it accepts text\n\n"
+                L"   The URL must be fully qualified!\n"
+            << kCIDLib::FlushIt;
+}
+
 
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
@@ -206,30 +183,70 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         strmOut << L"\nHTTPClient1.Exe\n"
                 << L"CIDLib Net Demo #1\n" << kCIDLib::EndLn;
 
-        // Get the URL parameter
-        if ((TSysInfo::c4CmdLineParmCount() < 1)
-        ||  (TSysInfo::c4CmdLineParmCount() > 3))
-        {
-            strmOut << L"Usage:\n"
-                       L"   HTTPClient1 url [/HEAD /FMT=[MIMETYPE] /Close /POST]\n\n"
-                       L" The URL must be fully qualified!\n"
-                       L" Use /HEAD option to only return headers\n"
-                    << kCIDLib::FlushIt;
-            return tCIDLib::EExitCodes::BadParameters;
-        }
-
         //
-        //  Get the paramter and set up the URL. It should be a fully
-        //  qualified URL.
+        //  Some of these we have to set via parms, and some we may override
+        //  via parms.
         //
-        TSysInfo::TCmdLineCursor cursParms = TSysInfo::cursCmdLineParms();
         tCIDLib::TBoolean bClose = kCIDLib::False;
         TString strRetFmt = L"text/html, text/plain, *.*";
         TString strURLText;
         TString strReqType = L"GET";
 
-        // The URL must be the first parm always. So get it and parse it
-        strURLText = *cursParms++;
+        //
+        //  Get the paramters and set up the URL. It should be a fully
+        //  qualified URL. These all fit the standard form for CIDLib parameters,
+        //  so we can call a little helper that will pre-parse them for us. It
+        //  uses the key/value/flag type, where the flag is true if was an
+        //  'option' parameter i.e. just /XXX, and false if a value parameter, i.e.
+        //  /XXX=YYY
+        //
+        tCIDLib::TKVPFList colParms;
+        const tCIDLib::TCard4 c4ParmCnt = TSysInfo::c4StdCmdLineParse(colParms);
+        if ((c4ParmCnt < 1) || (c4ParmCnt > 3))
+        {
+            ShowUsage(strmOut);
+            return tCIDLib::EExitCodes::BadParameters;
+        }
+
+        // We have the right number, so iterate them and store the info oawa
+        const tCIDLib::TBoolean bBadParm = !colParms.bForEach
+        (
+            [&](const TKeyValFPair& kvalfCur)
+            {
+                tCIDLib::TBoolean bGood = kCIDLib::True;
+                if (kvalfCur.strKey().bCompareI(L"Close"))
+                {
+                    bClose = kCIDLib::True;
+                }
+                 else if (kvalfCur.strKey().bCompareI(L"FMT"))
+                {
+                    if (kvalfCur.bFlag())
+                        strRetFmt = kvalfCur.strValue();
+                    else
+                        bGood = kCIDLib::False;
+                }
+                 else if (kvalfCur.strKey().bCompareI(L"URL"))
+                {
+                    if (kvalfCur.bFlag())
+                        strURLText = kvalfCur.strValue();
+                    else
+                        bGood = kCIDLib::False;
+                }
+                 else
+                {
+                    bGood = kCIDLib::False;
+                }
+                return bGood;
+            }
+        );
+
+        if (bBadParm || strURLText.bIsEmpty())
+        {
+            ShowUsage(strmOut);
+            return tCIDLib::EExitCodes::BadParameters;
+        }
+
+        // Parse the URL, which must be fully qualified
         TURL urlGet(strURLText, tCIDSock::EQualified::Full);
 
         // We only support HTTP and HTTPS
@@ -241,154 +258,56 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             return tCIDLib::EExitCodes::BadParameters;
         }
 
-        // If any optional parms get those
-        for (; cursParms; ++cursParms)
-        {
-            TString strOption = *cursParms;
-
-            if (strOption.bCompareI(L"/Close"))
-            {
-                bClose = kCIDLib::True;
-            }
-             else if (strOption.bStartsWithI(L"/FMT="))
-            {
-                strOption.Cut(0, 5);
-                strRetFmt = strOption;
-            }
-             else if (strOption.bCompareI(L"/HEAD"))
-            {
-                strReqType = L"HEAD";
-            }
-             else if (strOption.bCompareI(L"/POST"))
-            {
-                strReqType = L"POST";
-            }
-             else
-            {
-                strmOut << L"Usage:\n"
-                           L"   HTTPClient1 url [/HEAD /Close /Fmt]\n\n"
-                           L" The URL must be fully qualified!\n"
-                           L" Use /HEAD option to only return headers\n"
-                        << kCIDLib::FlushIt;
-                return tCIDLib::EExitCodes::BadParameters;
-            }
-        }
-
-        // Some stuff that will be given back to us
-        tCIDLib::TCard4     c4ContLen;
+        // Some stuff that will be given back to us from the query
+        tCIDLib::TCard4     c4ContLen = 0;
         tCIDLib::TKVPList   colInHdrs;
         tCIDLib::TKVPList   colOutHdrs;
         tCIDNet::EHTTPCodes eCodeType;
         TString             strContType;
         TString             strRepLine;
-        THeapBuf            mbufContent(8, 0x800000, 32 * 1024);
+        THeapBuf            mbufContent(kCIDLib::c4Sz_32K);
         TString             strUltimateURL;
         THTTPClient         httpcGet;
 
-        //
-        //  Do the get. Use the version that supoprts redirection. We'll get back
-        //  the HTTP status code as the return. We set an end time and keep passing
-        //  that back in. If we run out of time at any of the rounds, we give up.
-        //
-        tCIDLib::TCard4 c4Res;
+        // If asked to send a close, add a header line for that
+        if (bClose)
+            colInHdrs.objAdd(TKeyValuePair(L"Connection", L"close"));
+
+        // We'll wait up to 8 seconds for the operation to complete
         const tCIDLib::TEncodedTime enctEnd = TTime::enctNowPlusSecs(8);
-        if (strReqType == L"HEAD")
-        {
-            // Let the client object do a one-shot connection
-            c4Res = httpcGet.c4SendHead
-            (
-                nullptr
-                , urlGet
-                , enctEnd
-                , L"CIDLib Net1 Sample/1.0"
-                , strRetFmt
-                , eCodeType
-                , strRepLine
-                , colOutHdrs
-                , strContType
-                , c4ContLen
-                , colInHdrs
-            );
-        }
-         else if (strReqType == L"GET")
-        {
-            //
-            //  In our case we could have just passed in a null data source and the
-            //  HTTP client would have created one in a one-shot sort of way for us.
-            //  But we want to demonstrate how you create one if you want to do multiple
-            //  calls on a single connection.
-            //
-            //  Based on the protocol, we create a regular socket based data source or
-            //  a secure channel based one.
-            //
-            TCIDDataSrc* pcdsSrv = nullptr;
-            if (urlGet.eProto() == tCIDSock::EProtos::HTTP)
-            {
-                pcdsSrv = new TCIDSockStreamDataSrc(urlGet.ipepHost());
-            }
-             else
-            {
-                //
-                //  Create a socket and and then a secure channel data source that adopts it.
-                //  Give it the host to use as the security principal.
-                //
-                TClientStreamSocket* psockSrc = new TClientStreamSocket
-                (
-                    tCIDSock::ESockProtos::TCP, urlGet.ipepHost()
-                );
 
-                tCIDLib::TStrList colALPN;
-                pcdsSrv = new TCIDSChanClDataSrc
-                (
-                    L"HTTP1 Demo"
-                    , psockSrc
-                    , tCIDLib::EAdoptOpts::Adopt
-                    , TString::strEmpty()
-                    , colALPN
-                    , tCIDSChan::EConnOpts::None
-                    , urlGet.strHost()
-                );
-            }
-
-            //
-            //  Put the data source into a janitor, and let it adopt the source. Tell it
-            //  to do the shutdown sequence when it cleans up.
-            //
-            TCIDDataSrcJan janSrc(pcdsSrv, tCIDLib::EAdoptOpts::Adopt, kCIDLib::True);
-
-            // If asked to send a close, add that
-            if (bClose)
-                colInHdrs.objAdd(TKeyValuePair(L"Connection", L"close"));
-
-            c4Res = httpcGet.c4SendGetRedir
-            (
-                janSrc
-                , urlGet
-                , enctEnd
-                , L"CIDLib Net1 Sample/1.0"
-                , strRetFmt
-                , eCodeType
-                , strRepLine
-                , colOutHdrs
-                , strContType
-                , mbufContent
-                , c4ContLen
-                , strUltimateURL
-                , colInHdrs
-            );
-        }
+        //
+        //  Do the GET operation. We pass a null data source, which means this
+        //  will create a one shot data source for us (for secure or non-secure
+        //  comms depending on the protocol.)
+        //
+        tCIDLib::TCard4 c4Res = httpcGet.c4SendGet
+        (
+            nullptr
+            , urlGet
+            , enctEnd
+            , L"CIDLib Net1 Sample/1.0"
+            , strRetFmt
+            , eCodeType
+            , strRepLine
+            , colOutHdrs
+            , strContType
+            , mbufContent
+            , c4ContLen
+            , kCIDLib::False
+            , colInHdrs
+        );
 
         //
         //  Dump the results out, starting with the ultimate URL, in case
         //  we were redirected, the overall status code and the status
         //  reply line.
         ///
-        strmOut << L"Ultimate URL=" << strUltimateURL << kCIDLib::NewLn
-                << L"  Reply Code=" << c4Res << kCIDLib::NewLn
+        strmOut << L"  Reply Code=" << c4Res << kCIDLib::NewLn
                 << L"  Reply Text=" << strRepLine << kCIDLib::DNewLn;
 
         if (c4ContLen)
-            DumpInfo(colOutHdrs, mbufContent, c4ContLen, strContType, strReqType);
+            DumpInfo(colOutHdrs, mbufContent, c4ContLen, strContType);
     }
 
     // Catch any CIDLib runtime errors
@@ -398,27 +317,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;
     }
-
-    //
-    //  Kernel errors should never propogate out of CIDLib, but I test
-    //  for them in my test programs so I can catch them if they do
-    //  and fix them.
-    //
-    catch(const TKrnlError& kerrToCatch)
-    {
-        strmOut << L"A kernel error occured during processing.\nError="
-                << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::FatalError;
-    }
-
-    // Catch a general exception
-    catch(...)
-    {
-        strmOut << L"A general exception occured during processing"
-                << kCIDLib::DNewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::SystemException;
-    }
-
     return tCIDLib::EExitCodes::Normal;
 }
 

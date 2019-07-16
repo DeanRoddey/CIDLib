@@ -149,7 +149,7 @@ class CIDLIBEXP TArea :
 
         TArea(const TArea&) = default;
 
-        ~TArea();
+        ~TArea() = default;
 
 
         // -------------------------------------------------------------------
@@ -181,7 +181,7 @@ class CIDLIBEXP TArea :
 
         tCIDLib::TVoid operator-=
         (
-            const   TArea&                  areaToOR
+            const   TArea&                  areaToSub
         );
 
         friend TArea CIDLIBEXP operator&
@@ -207,12 +207,12 @@ class CIDLIBEXP TArea :
 
         tCIDLib::TVoid operator+=
         (
-            const   TPoint&                 pntToAddToOrg
+            const   TPoint&                 pntOffset
         );
 
         tCIDLib::TVoid operator-=
         (
-            const   TPoint&                 pntToSubFromOrg
+            const   TPoint&                 pntOffset
         );
 
 

@@ -20,13 +20,10 @@
 //  to set it back upon exit of the scope. There is also one for enums which
 //  is a template.
 //
-//  These are public classes that are exposed directly to the outside world,
-//  since they cannot have any errors and don't use any kernel specific types.
-//  They cannot be standard CIDLib classes, since they exist here in the
-//  kernel, but they don't need to be since they are very small and simple
-//  and don't need the RTTI overhead anyway.
-//
-//  This stuff is all platform independent.
+//  And we have another templated one that is a sort of magic one that takes
+//  a lambda expression, which it will call when it destructs. The lambda can
+//  do whatever you want, including having captures of data it can operate
+//  on.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -72,7 +69,7 @@ class KRNLEXPORT TBoolJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TBoolJanitor& operator=(const TBoolJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt)  = delete;
+        tCIDLib::TVoid* operator new(const size_t)  = delete;
 
 
         // -------------------------------------------------------------------
@@ -134,7 +131,7 @@ class KRNLEXPORT TCardJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TCardJanitor& operator=(const TCardJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -196,7 +193,7 @@ class KRNLEXPORT TIntJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TIntJanitor& operator=(const TIntJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------
@@ -206,8 +203,6 @@ class KRNLEXPORT TIntJanitor
         {
             m_pi4ToSanitize = nullptr;
         }
-
-
 
     private :
         // -------------------------------------------------------------------
@@ -226,6 +221,59 @@ class KRNLEXPORT TIntJanitor
 
 
 
+// ---------------------------------------------------------------------------
+//  CLASS: TLambdaJan
+// PREFIX: jan
+// ---------------------------------------------------------------------------
+template <typename CB> class TLambdaJan
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TLambdaJan() = delete;
+
+        TLambdaJan(CB pfnCallback) :
+
+            m_bOrphaned(kCIDLib::False)
+            , m_pfnCallback(pfnCallback)
+        { }
+
+        TLambdaJan(const TLambdaJan&) = delete;
+        ~TLambdaJan()
+        {
+            // If we still have the callback, invoke it
+            if (!m_bOrphaned)
+                m_pfnCallback();
+        }
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TLambdaJan& operator=(const TLambdaJan&) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bIsOrphaned() const
+        {
+            return m_bOrphaned;
+        }
+
+        tCIDLib::TVoid Orphan()
+        {
+            m_bOrphaned = kCIDLib::True;
+        }
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean   m_bOrphaned;
+        CB                  m_pfnCallback;
+};
 
 
 // ---------------------------------------------------------------------------
@@ -264,7 +312,7 @@ template <class T> class TPtrJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TPtrJanitor& operator=(const TPtrJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------
@@ -336,7 +384,7 @@ template <class T> class TGFJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TGFJanitor& operator=(const TGFJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------

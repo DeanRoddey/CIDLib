@@ -148,10 +148,6 @@ TArea::TArea(   const   TPoint&         pntOrg
 {
 }
 
-TArea::~TArea()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TArea: Public operators

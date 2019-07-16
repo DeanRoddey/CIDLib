@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass   Class="TArea" Prefix="area" Parent="TObject" Flags="Fmt Dup BStrm">
+
+    <Desc>
+        <P>TArea implements is a 2D rectangular area with a signed upper left origin and an unsigned size in the positive direction of each axis (left to right, top to bottom.) I.e. its a 4th quadrant coordinate system.</P>
+
+        <P>An area of 10x10 at 10,10 will cover the pixels from 10,10 to 19,19, since 10,10 is the first pixel. These kinds of "one off" things that are endlessly annoying no matter what type of representation you use for areas (or rectangles.) You have to very careful to understand what you are doing at each level, or you will end up with a hierarchy of offsetting errors that you can never undo.</P>
+
+        <SecTitle>Passing to System APIs</SecTitle>
+
+        <P>When converting to/from system rectangles, or UL/LR points, we have to be
+        careful to follow specific rules. Rectangles can be inclusive or non-inclusive.
+        Areas are neither, they are (origin - size) based, but the things you are passing them to are may assume one or the other. So you need to understand how they are translated.</P>
+
+        <List>
+            <LItem Ref="Inclusive Rectl to Area">The resulting area includes the outer edge. So 0,0,1,1 becomes 0,0 - 2,2 so it's 2 pixels wide.</LItem>
+            <LItem Ref="Non-Inclusive Rectl to Area">The resulting area excludes the outer edge. So 0,0,1,1 becomes 0,0 - 1,1 so it's 1 pixel wide.</LItem>
+            <LItem Ref="Area to Inculsive Rectl">An area of 0,0 - 1,1 is 1 pixel in size, and the inclusive rectangle includes the edges, so it becomes 0,0,0,0.</LItem>
+            <LItem Ref="Area to Non-Inculsive Rectl">An area of 0,0 - 1,1 is 1 pixel in size, and the inclusive rectangle does not include the edges, so it has to become 0,0,1,1.</LItem>
+        </List>
+    </Desc>
+
+    <PubIntf>
+
+        <Ctors DefMethods="CopyCtor DefCtor Dtor">
+
+            <Method Name="TArea">
+                <Desc>
+                    <P>There are various ways to construct area objects. You can construct from a host rectangle, indicating whether it is inclusive or not (see class comments above.) You can construct from an origin and size in a number of variations, and from origin and lower/right point.</P>
+
+                    <P>There are host points and host areas, which are defined for the local host and are primarily used internally to construct from areas and points gotten from system APIs.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="rectlToCopy" Type="tCIDLib::THostRectl" PBy="CRef"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="areaToCopy" Type="tCIDLib::TRawArea" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="ptULeft" Type="tCIDLib::THostPoint" PBy="CRef"/>
+                    <MethParam Name="ptLRight" Type="tCIDLib::THostPoint" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntULeft" Type="TPoint" PBy="CRef"/>
+                    <MethParam Name="pntLRight" Type="TPoint" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="i4X" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4Y" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="c4CX" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4CY" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntULeft" Type="TPoint" PBy="CRef"/>
+                    <MethParam Name="c4CX" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4CY" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntULeft" Type="" PBy="CRef"/>
+                    <MethParam Name="szExtent" Type="TSize" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+        </Ctors>
+
+        <Operators DefMethods="AssignOp">
+
+            <Method Name="operator==" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area is equal to the passed area.</Desc>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator!=" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area is not equal to the passed area.</Desc>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator=" RetType="TArea" RetBy="CRef">
+                <Desc>Assigns a raw area to this area. Returns a reference to this area after the change.</Desc>
+                <MethVar><MethParam Name="areaToAssign" Type="tCIDLib::TRawArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator|=">
+                <Desc>Updates this area to contain both its current area and the passed area.</Desc>
+                <MethVar><MethParam Name="areaToOR" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator-=">
+                <Desc>Updates this area to remove any overlap with the passed area. If both area equal, this area will end up empty.</Desc>
+                <MethVar><MethParam Name="areaToSub" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator&amp;=">
+                <Desc>Updates this area to reflect any area that it and the passed area have in common. If they don't overlap at all in one or both axes, this area will end up empty, with its origin at the larger values of the origins of the two.</Desc>
+                <MethVar><MethParam Name="areaToAND" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator+=">
+                <Desc>Adds the values in the passed point to this area's origin.</Desc>
+                <MethVar><MethParam Name="pntOffset" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator-=">
+                <Desc>Subtracts the values in teh passed point from this area's origin.</Desc>
+                <MethVar><MethParam Name="pntOffset" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+        </Operators>
+
+        <NVirtMeths>
+
+            <Method Name="AdjustAndShrink">
+                <Desc>This method is a convenience that will increase the origin by the passed adjustment values, and decrease the size by the same amount. This is different from Deflate() in that this only takes unsigned values, so it can never make the area bigger.</Desc>
+                <MethVar>
+                    <MethParam Name="c4XAdj" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4YAdj" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="AdjustOrg">
+                <Desc>Adjusts the origin by the passed values. One variation takes unsigned values, so it can never move the area upwards or leftwards. The other takes a point (signed values), so it can adjust in either direction.</Desc>
+                <MethVar>
+                    <MethParam Name="c4XAdj" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4YAdj" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar><MethParam Name="pntOffset" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="AdjustSides">
+                <Desc>Adjusts the left/right and bottom/top sides by the indicted offsets, either as separate values or as a point.</Desc>
+                <MethVar>
+                    <MethParam Name="i4XAdj" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4YAdj" Type="tCIDLib::TInt4"/>
+                </MethVar>
+                <MethVar><MethParam Name="pntAdjust" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+
+            <Method Name="AdjustSize">
+                <Desc>Adjusts the area's sizes by the passed value, either as separate values or as a point. These are signed values so it can adjust them in either direction.</Desc>
+                <MethVar>
+                    <MethParam Name="i4XAdj" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4YAdj" Type="tCIDLib::TInt4"/>
+                </MethVar>
+                <MethVar><MethParam Name="pntAdjust" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bContainsArea" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area contains the passed area. It's an inclusive check, so its sides can equal our sides and still be considered contained.</Desc>
+                <MethVar><MethParam Name="areaCheck" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bContainsPoint" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area contains the passed point. It's an inclusive check, so the point can be on our edges and still be considered contained.</Desc>
+                <MethVar>
+                    <MethParam Name="i4X" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4Y" Type="tCIDLib::TInt4"/>
+                </MethVar>
+                <MethVar><MethParam Name="pntCheck" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bHorzOverlap" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area intersects the passed area. Having a common edge counts as overlap.</Desc>
+                <MethVar><MethParam Name="areaCheck" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bIsEmpty" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area is zero sized in either axis.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bIsInside" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>This is like calling bContainsArea() and swapping the two areas, so in this case this object is being checked to see if it is contained inside the passed area.</Desc>
+                <MethVar><MethParam Name="areaCheck" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bMoveWithin" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Adjusts the passed point the least amount necessary to get it within this area. This is inclusive so it will be moved onto an edge if it outside of the area in a given direction. Returns kCIDLib::True if the point had to be adjusted.</Desc>
+                <MethVar><MethParam Name="pntToMove" Type="TPoint" PBy="Ref"/></MethVar>
+            </Method>
+
+            <Method Name="bParseFromText" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>This method will parse an area from text and set this object to reflect the results. It returns kCIDLib::True if successful, else it was not and this object was not changed.</P>
+
+                    <P>The format is assumed to be x,y,cx,cy, but you can indicate a different separator character. White space doesn't matter, so there can be space between the numbers and commas. You can also indicate the radix to interpret the numbers as, which defaults to auto detection.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strText" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eRadix" Type="tCIDLib::ERadices" DefVal="tCIDLib::ERadices::Auto"/>
+                    <MethParam Name="chSepChar" Type="tCIDLib::TCh" DefVal="','"/>
+                </MethVar>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

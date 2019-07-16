@@ -11,6 +11,7 @@
         <PageLink FileName="MFormattable" PageType="CppClass"/>
         <PageLink FileName="MStreamable" PageType="CppClass"/>
         <PageLink FileName="MLogger" PageType="CppClass"/>
+        <PageLink FileName="TArea" PageType="CppClass"/>
         <PageLink FileName="TAudio" PageType="Namespace"/>
         <PageLink FileName="TBase64" PageType="CppClass"/>
         <PageLink FileName="TCIDModuleInfo" PageType="CppClass"/>

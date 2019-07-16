@@ -80,6 +80,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_CntPtr1);
     AddTest(new TTest_UniquePtr);
     AddTest(new TTest_FlagJanitor);
+    AddTest(new TTest_LambdaJan);
     AddTest(new TTest_Enum1);
     AddTest(new TTest_EnumForEach);
 

@@ -1191,6 +1191,39 @@ class TTest_FlagJanitor : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_LambdaJan
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_LambdaJan : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_LambdaJan();
+
+        ~TTest_LambdaJan();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_LambdaJan,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TTest_LogLimiter
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
