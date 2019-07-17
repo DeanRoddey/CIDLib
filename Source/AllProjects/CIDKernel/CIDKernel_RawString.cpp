@@ -1793,13 +1793,15 @@ TRawStr::eCompareStrN(  const   tCIDLib::TCh* const pszStr1
     tCIDLib::TCh ch1;
     tCIDLib::TCh ch2;
     tCIDLib::TCard4 c4SoFar = 0;
-    do
+    while (c4SoFar < c4Count)
     {
         ch1 = *pszCur1++;
         ch2 = *pszCur2++;
-        c4SoFar++;
         iRes = tCIDLib::TInt4(ch1) - tCIDLib::TInt4(ch2);
-    }   while (!iRes && ch1 && ch2 && (c4SoFar < c4Count));
+        if (iRes || !ch1 || !ch2)
+            break;
+        c4SoFar++;
+    }
 
     // If we made it to count, we ignore the result
     if (c4SoFar == c4Count)
@@ -1851,13 +1853,15 @@ TRawStr::eCompareStrNI( const   tCIDLib::TCh* const pszStr1
     tCIDLib::TCh ch1;
     tCIDLib::TCh ch2;
     tCIDLib::TCard4 c4SoFar = 0;
-    do
+    while (c4SoFar < c4Count)
     {
         ch1 = chUpper(*pszCur1++);
         ch2 = chUpper(*pszCur2++);
-        c4SoFar++;
         iRes = tCIDLib::TInt4(ch1) - tCIDLib::TInt4(ch2);
-    }   while (!iRes && ch1 && ch2 && (c4SoFar < c4Count));
+        if (iRes || !ch1 || !ch2)
+            break;
+        c4SoFar++;
+    }
 
     // If we made it to count, we ignore the result
     if (c4SoFar == c4Count)
