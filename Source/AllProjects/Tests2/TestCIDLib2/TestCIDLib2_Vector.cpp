@@ -34,6 +34,7 @@
 // ---------------------------------------------------------------------------
 //  Magic macros
 // ---------------------------------------------------------------------------
+RTTIDecls(TTest_VectorPlace, TTestFWTest)
 RTTIDecls(TTest_VectorLambda, TTestFWTest)
 RTTIDecls(TTest_VectorMoveSem, TTestFWTest)
 
@@ -225,3 +226,60 @@ TTest_VectorMoveSem::eRunTest(  TTextStringOutStream&   strmOut
     return eRes;
 }
 
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_VectorPlace
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_VectorPlace: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_VectorPlace::TTest_VectorPlace() :
+
+    TTestFWTest
+    (
+        L"Vector Placement", L"Vector element placement tests", 3
+    )
+{
+}
+
+TTest_VectorPlace::~TTest_VectorPlace()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_VectorPlace: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_VectorPlace::eRunTest(TTextStringOutStream&  strmOut
+                            , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    // Place some areas directly and test that we get back what we expect
+    TVector<TArea> colTest(16);
+    const TArea& areaRet1 = colTest.objPlace<TArea>(1, 2, 3, 4);
+    const TArea& areaRet2 = colTest.objPlace<TArea>(TPoint::pntOrigin, TSize(4, 4));
+    const TArea& areaRet3 = colTest.objPlace<TArea>(TArea(4, 5, 6, 7));
+
+    if ((colTest[0] != TArea(1, 2, 3, 4))
+    ||  (colTest[1] != TArea(0, 0, 4, 4))
+    ||  (colTest[2] != TArea(4, 5, 6, 7)))
+    {
+        strmOut << TFWCurLn << L"In place vector elements are wrong\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if ((areaRet1 != TArea(1, 2, 3, 4))
+    ||  (areaRet2 != TArea(0, 0, 4, 4))
+    ||  (areaRet3 != TArea(4, 5, 6, 7)))
+    {
+        strmOut << TFWCurLn << L"In place vector element returns are wrong\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    return eRes;
+}

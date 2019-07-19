@@ -1872,17 +1872,35 @@ TRawStr::eCompareStrNI( const   tCIDLib::TCh* const pszStr1
 
 
 //
-//  These are local short strings (and possibly multi-byte) so we use platform
-//  defined methods for these, which typically just map to local code page aware
-//  system APIs.
+//  These are local short strings, but it's a case sensitive compare, so we just
+//  do a byte by byte comparison, so we don't need to have any per-platform stuff.
+//  They have to have the same bytes if they are equal, and the first zero byte we
+//  hit is assumed to be the end.
 //
 tCIDLib::ESortComps
 TRawStr::eCompareStr(   const   tCIDLib::TSCh* const pszStr1
                         , const tCIDLib::TSCh* const pszStr2) noexcept
 {
-    return eXlatSortRes(CIDSStrOp_Compare(pszStr1, pszStr2));
+    const tCIDLib::TCard1* pc1Cur1 = reinterpret_cast<const tCIDLib::TCard1*>(pszStr1);
+    const tCIDLib::TCard1* pc1Cur2 = reinterpret_cast<const tCIDLib::TCard1*>(pszStr2);
+    tCIDLib::TSInt iRes = 0;
+
+    tCIDLib::TCard1 c11;
+    tCIDLib::TCard1 c12;
+    do
+    {
+        c11 = *pc1Cur1++;
+        c12 = *pc1Cur2++;
+        iRes = tCIDLib::TInt4(c11) - tCIDLib::TInt4(c12);
+    }   while (!iRes && c11 && c12);
+    return eXlatSortRes(iRes);
 }
 
+
+//
+//  These we have to use local functionality to do because it will require
+//  being able to navigate through multi-byte characters one at a time.
+//
 tCIDLib::ESortComps
 TRawStr::eCompareStrN(  const   tCIDLib::TSCh* const    pszStr1
                         , const tCIDLib::TSCh* const    pszStr2
@@ -2678,15 +2696,6 @@ TRawStr::pszFindSubStr( const   tCIDLib::TCh* const     pszToSearch
 }
 
 
-tCIDLib::TCh*
-TRawStr::pszStrTokenize(        tCIDLib::TCh* const pszSource
-                        , const tCIDLib::TCh* const pszWhitespace
-                        ,       tCIDLib::TCh**      pszContext)
-{
-    return CIDStrOp_StrTok(pszSource, pszWhitespace, pszContext);
-}
-
-
 // We implement this in terms of the platform specific chLower()
 tCIDLib::TCh* TRawStr::pszLowerCase(tCIDLib::TCh* pszToLower) noexcept
 {
@@ -2697,6 +2706,16 @@ tCIDLib::TCh* TRawStr::pszLowerCase(tCIDLib::TCh* pszToLower) noexcept
         pszCur++;
     }
     return pszToLower;
+}
+
+
+// We use a local helper for this, though we should just do it ourself
+tCIDLib::TCh*
+TRawStr::pszStrTokenize(        tCIDLib::TCh* const pszSource
+                        , const tCIDLib::TCh* const pszWhitespace
+                        ,       tCIDLib::TCh**      pszContext)
+{
+    return CIDStrOp_StrTok(pszSource, pszWhitespace, pszContext);
 }
 
 // We implement this in terms of the platform specific chUpper()

@@ -964,6 +964,29 @@ class TVector : public TCollection<TElem>
             return *m_apElems[c4Index];
         }
 
+
+        // Construct an element in place
+        template <typename TElem, typename... TArgs>
+        TElem& objPlace(TArgs&&... Args)
+        {
+            TMtxLocker lockCol(this->pmtxLock());
+
+            if (m_c4CurCount == m_c4CurAlloc)
+                ExpandTo(m_c4CurCount + 1);
+
+            //
+            //  Allocate the space for this element and then construct in place
+            //  then we can add it.
+            //
+            tCIDLib::TVoid* pSlot = new tCIDLib::TCard1[sizeof(TElem)];
+            m_apElems[m_c4CurCount++] = new (pSlot) TElem(tCIDLib::Forward<TArgs>(Args)...);
+
+            // Invalidate any cursors and return a ref to the new element
+            this->c4IncSerialNum();
+            return *m_apElems[m_c4CurCount - 1];
+        }
+
+
         template <typename TCompFunc>
         TElem* pobjBinarySearch(const   TElem&          objToFind
                                 ,       TCompFunc       pfnComp
@@ -1203,6 +1226,7 @@ class TVector : public TCollection<TElem>
             }
             return nullptr;
         }
+
 
         tCIDLib::TVoid
         Reallocate(const tCIDLib::TCard4 c4NewSize, const tCIDLib::TBoolean bKeepOld)

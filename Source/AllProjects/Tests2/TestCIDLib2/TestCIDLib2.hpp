@@ -1190,6 +1190,40 @@ class TTest_FlagJanitor : public TTestFWTest
 };
 
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_HashSetPlace
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_HashSetPlace : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_HashSetPlace();
+
+        ~TTest_HashSetPlace();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_HashSetPlace,TTestFWTest)
+};
+
+
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_LambdaJan
 // PREFIX: tfwt
@@ -2297,6 +2331,39 @@ class TTest_VectorMoveSem : public TTestFWTest
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TTest_VectorMoveSem,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_VectorPlace
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_VectorPlace : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_VectorPlace();
+
+        ~TTest_VectorPlace();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_VectorPlace,TTestFWTest)
 };
 
 

@@ -222,6 +222,7 @@ eCompTest(const tCIDLib::TCard4& c41, const tCIDLib::TCard4& c42)
     tCIDLib::ESortComps::Equal;
 }
 
+
 static tCIDLib::TVoid DummyFunc()
 {
     tCIDLib::TBasicPair<TArea, TString> pairTmp;
@@ -240,7 +241,10 @@ static tCIDLib::TVoid DummyFunc()
     {
     }
     colOne.AddXCopies(TString::strEmpty(), 4);
-    colOne.bForEach([] (const TString& strCur) -> tCIDLib::TBoolean { return kCIDLib::True; });
+    colOne.bForEach
+    (
+        [] (const TString& strCur) -> tCIDLib::TBoolean { return kCIDLib::True; }
+    );
 
     TStringPool splStrings(L"Test", 8);
     THeapBufPool splHeapBufs(L"Test", 8);

@@ -90,6 +90,24 @@ namespace tCIDLib
         return static_cast<typename RemoveRef<T>::Type&&>(src);
     }
 
+
+    // -----------------------------------------------------------------------
+    //  Implements forwarding so that we can support in place construction for
+    //  collections and other things.
+    // -----------------------------------------------------------------------
+    template <typename T>
+    constexpr T&& Forward(typename RemoveRef<T>::Type& t) noexcept
+    {
+        return static_cast<T&&>(t);
+    }
+
+    template <typename T>
+    constexpr T&& Forward(typename RemoveRef<T>::type&& t) noexcept
+    {
+        return static_cast<T&&>(t);
+    }
+
+
     // -----------------------------------------------------------------------
     //  These are just simple templates to return the smaller or larger of two
     //  quantities (with 'quantity' meaning anything with a < and > operator.)

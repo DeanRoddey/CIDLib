@@ -52,8 +52,6 @@
 #define CIDStrOp_WCToMB(t,s,ob)         ::wcstombs_s(0,t,ob,s,_TRUNCATE)
 #define CIDStrOp_CalcMBSize(s,nb)       ::wcstombs_s(&nb,0,0,s,_TRUNCATE)
 
-
-#define CIDSStrOp_Compare(s1,s2)        ::strcmp(s1,s2)
 #define CIDSStrOp_CompareI(s1,s2)       ::_stricmp(s1,s2)
 #define CIDSStrOp_CompareN(s1,s2,n)     ::strncmp(s1,s2,n)
 #define CIDSStrOp_CompareNI(s1,s2,n)    ::_strnicmp(s1,s2,n)
