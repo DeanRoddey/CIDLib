@@ -65,10 +65,22 @@ template <class TElem> class TQueueNode : public TDLstNode
         TQueueNode() = delete;
 
         TQueueNode( const   TElem&              objData
-                    ,       tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0) :
+                    , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0) :
 
             m_ePriority(ePriority)
             , m_objData(objData)
+        {
+        }
+
+        //
+        //  A special one for in place elements. We can't figure out the next
+        //  node until after this object is built and the element constructed.
+        //
+        template <typename... TArgs>
+        TQueueNode(const tCIDLib::EQPrios ePriority, TArgs&&... Args) :
+
+            m_ePriority(ePriority)
+            , m_objData(tCIDLib::Forward<TArgs>(Args)...)
         {
         }
 
@@ -865,6 +877,29 @@ template <class TElem> class TQueue : public TCollection<TElem>
             return kCIDLib::True;
         }
 
+        // Construct an element in place
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            // Get control of the queue before we modify it
+            TMtxLocker lockQueue(this->pmtxLock());
+
+            // Add the new node to the list
+            TNode* pnodeNew = new TNode
+            (
+                tCIDLib::EQPrios::P0, tCIDLib::Forward<TArgs>(Args)...
+            );
+            m_llstQueue.AppendNode(pnodeNew);
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            //
+            //  And wake up one waiting thread to handle this new element.
+            //  Don't care if any are actually waiting.
+            //
+            m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitData);
+            return pnodeNew->objData();
+        }
 
         TElem&
         objPut( const   TElem&              objToPut

@@ -69,6 +69,21 @@ template <class TElem,class TKey> class TKeyedHashSetNode
         {
         }
 
+        //
+        //  A special one for in place elements. We can't figure out the next
+        //  node until after this object is built and the element constructed.
+        //  We have a special enum to allow this constructor to never clash
+        //  with the one above.
+        //
+        enum class EForceCall { Val1 };
+        template <typename... TArgs>
+        TKeyedHashSetNode(const EForceCall, TArgs&&... Args) :
+
+            m_objData(tCIDLib::Forward<TArgs>(Args)...)
+            , m_pnodeNext(nullptr)
+        {
+        }
+
         ~TKeyedHashSetNode() {}
 
 
@@ -1255,6 +1270,49 @@ class TKeyedHashSet : public TCollection<TElem>
                 m_c4CurElements++;
             }
             return pnodeRet->objData();
+        }
+
+        // Construct an element in place
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            TMtxLocker lockSync(this->pmtxLock());
+
+            //
+            //  Because we are forwarding, we have to go ahead and create the node
+            //  first so that we have the object to test and see if it's in the list
+            //  already. This would only be wasted in an error scenario where we
+            //  are going to throw, so not a biggie.
+            //
+            TJanitor<TNode> janNode
+            (
+                new TNode(TNode::EForceCall::Val1, tCIDLib::Forward<TArgs>(Args)...)
+            );
+
+            // See if this element is already in the collection
+            const TKey& objKey = m_pfnKeyExtract(janNode.pobjThis()->objData());
+            tCIDLib::THashVal hshElem;
+            TNode* pnodeCheck = pnodeFind(objKey, hshElem);
+
+            // If so, we cannot allow it
+            if (pnodeCheck)
+                this->DuplicateKey(objKey, CID_FILE, CID_LINE);
+
+            //
+            //  Add it to the appropriate bucket. We just put it at the head
+            //  since the order does not matter. We just construct the
+            //  node and pass it the current head, which it will make its
+            //  next node.
+            //
+            janNode.pobjThis()->pnodeNext(m_apBuckets[hshElem]);
+            m_apBuckets[hshElem] = janNode.pobjOrphan();
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            // Bump up the element count
+            m_c4CurElements++;
+
+            return m_apBuckets[hshElem]->objData();
         }
 
         const TElem* pobjFindByKey(const TKey& objKeyToFind) const

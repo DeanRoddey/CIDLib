@@ -71,9 +71,9 @@ TTest_HashSetPlace::eRunTest(TTextStringOutStream&  strmOut
     // Place some strings directly and test that we get back what we expect
     tCIDLib::TStrHashSet colTest(17, TStringKeyOps());
 
-    const TString& strRet1 = colTest.objPlace<TString>(L"Value 1");
-    const TString& strRet2 = colTest.objPlace<TString>(L"Value 2");
-    const TString& strRet3 = colTest.objPlace<TString>(L"Value 3");
+    const TString& strRet1 = colTest.objPlace(L"Value 1");
+    const TString& strRet2 = colTest.objPlace(L"Value 2");
+    const TString& strRet3 = colTest.objPlace(L"Value 3");
 
     if (!colTest.bHasElement(L"Value 1")
     ||  !colTest.bHasElement(L"Value 2")

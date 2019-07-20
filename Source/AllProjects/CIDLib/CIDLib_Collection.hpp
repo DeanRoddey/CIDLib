@@ -799,6 +799,13 @@ template <class TElem> class TBasicColNode : public TDLstNode
         {
         }
 
+        // A special one for in place elements.
+        template <typename... TArgs> TBasicColNode(TArgs&&... Args) :
+
+            m_objData(tCIDLib::Forward<TArgs>(Args)...)
+        {
+        }
+
         TBasicColNode(const TBasicColNode<TElem>&) = delete;
 
         ~TBasicColNode() {}

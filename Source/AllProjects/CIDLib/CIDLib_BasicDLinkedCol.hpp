@@ -775,6 +775,53 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
             return pnodeNew->objData();
         }
 
+        template <typename... TArgs> TElem& objPlaceAtBottom(TArgs&&... Args)
+        {
+            TMtxLocker lockSync(TParent::pmtxLock());
+            TNode* pnodeNew = new TNode(tCIDLib::Forward<TArgs>(Args)...);
+            m_llstCol.PrependNode(pnodeNew);
+            this->c4IncSerialNum();
+            return pnodeNew->objData();
+        }
+
+        template <typename... TArgs> TElem& objPlaceAtTop(TArgs&&... Args)
+        {
+            TMtxLocker lockSync(TParent::pmtxLock());
+            TNode* pnodeNew = new TNode(tCIDLib::Forward<TArgs>(Args)...);
+            m_llstCol.AppendNode(pnodeNew);
+            this->c4IncSerialNum();
+            return pnodeNew->objData();
+        }
+
+
+        template <typename... TArgs>
+        TElem& objPlaceAfter(TCursor& cursPos, TArgs&&... Args)
+        {
+            TMtxLocker lockSync(TParent::pmtxLock());
+
+            // Create a new node to add
+            TNode* pnodeNew = new TNode(tCIDLib::Forward<TArgs>(Args)...);
+
+            if (!cursPos.bIsValid())
+            {
+                m_llstCol.AppendNode(pnodeNew);
+            }
+             else
+            {
+                //
+                //  Move back now so that we can insert after this node. If
+                //  going back invalidates, then we prepend at the head.
+                //  Else, we insert after the node.
+                //
+                if (!cursPos.bPrevious())
+                    m_llstCol.PrependNode(pnodeNew);
+                 else
+                    m_llstCol.InsertNode(cursPos.pnodeCur(), pnodeNew);
+            }
+            return pnodeNew->objData();
+        }
+
+
         tCIDLib::TVoid RemoveAt(TCursor& cursAt)
         {
             TMtxLocker lockSync(TParent::pmtxLock());
@@ -944,5 +991,3 @@ TBinInStream& operator>>(TBinInStream&              strmIn
     strmIn.CheckForMarker(tCIDLib::EStreamMarkers::EndObject, CID_FILE, CID_LINE);
     return strmIn;
 }
-
-

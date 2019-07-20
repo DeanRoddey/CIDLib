@@ -37,6 +37,13 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
+        //  Nested class type aliases
+        // -------------------------------------------------------------------
+        using TMyElemType = TElem;
+        using TMyType = TBag<TElem>;
+
+
+        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TBag(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
@@ -45,20 +52,14 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
         {
         }
 
-        TBag(const TBag& colSrc) : TParent(colSrc)
-        {
-        }
+        TBag(const TMyType&) = default;
 
-        TBag(TBag&& colSrc) :
-
-            TBag(colSrc.eMTState())
+        TBag(TMyType&& colSrc) : TParent(colSrc.eMTState())
         {
             *this = operator=(tCIDLib::ForceMove(colSrc));
         }
 
-        ~TBag()
-        {
-        }
+        ~TBag() = default;
 
 
         // -------------------------------------------------------------------
@@ -85,6 +86,15 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
         {
             // Delegate to our parent
             return TParent::objAddAtTop(objNew);
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            return this->objPlaceAtTop(tCIDLib::Forward<TArgs>(Args)...);
         }
 
 

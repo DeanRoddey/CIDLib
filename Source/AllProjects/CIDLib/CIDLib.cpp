@@ -246,6 +246,8 @@ static tCIDLib::TVoid DummyFunc()
         [] (const TString& strCur) -> tCIDLib::TBoolean { return kCIDLib::True; }
     );
 
+    colOne.objPlace(L"Test in place");
+
     TStringPool splStrings(L"Test", 8);
     THeapBufPool splHeapBufs(L"Test", 8);
 
@@ -279,7 +281,8 @@ static tCIDLib::TVoid DummyFunc()
     (
         [](const TString& str1, const TString& str2) { return str1.eCompareI(str2); }
     );
-
+    colBagOStrings.objAdd(L"Added");
+    colBagOStrings.objPlace(L"Placed");
 
     TRefSortedBag<TString> colRefBagOStrings
     (
@@ -288,11 +291,17 @@ static tCIDLib::TVoid DummyFunc()
     );
 
 
+    TBag<TKeyValuePair> colBag;
+    colBag.objPlace(L"Key", L"Value");
+
+
     tCIDLib::TKVHashSet col1(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
     tCIDLib::TKVHashSet col2(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
     if (tCIDLib::bCompareElems(col1, col2, TKeyValuePair::bComp))
     {
     }
+
+    col1.objPlace(L"Key", L"Value");
 
     TEArray<tCIDLib::TCard4, tCIDLib::EDirs, tCIDLib::EDirs::Count> eaTest(0UL);
     eaTest[tCIDLib::EDirs::Left] = 1;
@@ -336,6 +345,8 @@ static tCIDLib::TVoid DummyFunc()
     TQueue<TString> colStrQ;
     colStrQ.bForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
 
+    colStrQ.objPlace(L"Test placement");
+
     TRefQueue<TString> colStrRQ(tCIDLib::EAdoptOpts::Adopt);
     colStrRQ.bForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
 
@@ -355,6 +366,8 @@ static tCIDLib::TVoid DummyFunc()
         23, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
     );
     colKHS.bForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
+
+    colKHS.objPlace(L"Key", L"Value");
 
 
     // Unique pointer template expansion to make sure it's good

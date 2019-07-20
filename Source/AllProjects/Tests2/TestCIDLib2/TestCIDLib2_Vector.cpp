@@ -261,9 +261,9 @@ TTest_VectorPlace::eRunTest(TTextStringOutStream&  strmOut
 
     // Place some areas directly and test that we get back what we expect
     TVector<TArea> colTest(16);
-    const TArea& areaRet1 = colTest.objPlace<TArea>(1, 2, 3, 4);
-    const TArea& areaRet2 = colTest.objPlace<TArea>(TPoint::pntOrigin, TSize(4, 4));
-    const TArea& areaRet3 = colTest.objPlace<TArea>(TArea(4, 5, 6, 7));
+    const TArea& areaRet1 = colTest.objPlace(1, 2, 3, 4);
+    const TArea& areaRet2 = colTest.objPlace(TPoint::pntOrigin, TSize(4, 4));
+    const TArea& areaRet3 = colTest.objPlace(TArea(4, 5, 6, 7));
 
     if ((colTest[0] != TArea(1, 2, 3, 4))
     ||  (colTest[1] != TArea(0, 0, 4, 4))

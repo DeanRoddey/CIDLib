@@ -104,6 +104,11 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
             return this->objPeekAtBottom();
         }
 
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            return this->objPlaceAtBottom(tCIDLib::Forward<TArgs>(Args)...);
+        }
+
         TElem objPop()
         {
             return this->objGetFromBottom();

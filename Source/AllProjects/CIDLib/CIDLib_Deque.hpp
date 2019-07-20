@@ -118,6 +118,16 @@ template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
             return this->objPeekAtTop();
         }
 
+        template <typename... TArgs> TElem& objPlaceBottom(TArgs&&... Args)
+        {
+            return this->objPlaceAtBottom(tCIDLib::Forward<TArgs>(Args)...);
+        }
+
+        template <typename... TArgs> TElem& objPlaceTop(TArgs&&... Args)
+        {
+            return this->objPlaceAtTop(tCIDLib::Forward<TArgs>(Args)...);
+        }
+
         TElem objPopBottom()
         {
             // Delegate to our parent

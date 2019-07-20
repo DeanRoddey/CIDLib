@@ -871,18 +871,19 @@ template <class TElem, class TKeyOps> class THashSet
         }
 
         // Construct an element in place
-        template <typename TElem, typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
         {
             TMtxLocker lockSync(this->pmtxLock());
 
             //
             //  Because we are forwarding, we have to go ahead and create the node
             //  first so that we have the object to test and see if it's in the list
-            //  already.
+            //  already. This would only be wasted in an error scenario where we
+            //  are going to throw, so not a biggie.
             //
             TJanitor<TNode> janNode
             (
-                new TNode(TNode::EForceCall::Val1, Args...)
+                new TNode(TNode::EForceCall::Val1, tCIDLib::Forward<TArgs>(Args)...)
             );
 
             // See if this element is already in the collection

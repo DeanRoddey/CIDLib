@@ -966,20 +966,14 @@ class TVector : public TCollection<TElem>
 
 
         // Construct an element in place
-        template <typename TElem, typename... TArgs>
-        TElem& objPlace(TArgs&&... Args)
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
         {
             TMtxLocker lockCol(this->pmtxLock());
 
             if (m_c4CurCount == m_c4CurAlloc)
                 ExpandTo(m_c4CurCount + 1);
 
-            //
-            //  Allocate the space for this element and then construct in place
-            //  then we can add it.
-            //
-            tCIDLib::TVoid* pSlot = new tCIDLib::TCard1[sizeof(TElem)];
-            m_apElems[m_c4CurCount++] = new (pSlot) TElem(tCIDLib::Forward<TArgs>(Args)...);
+            m_apElems[m_c4CurCount++] = new TElem(tCIDLib::Forward<TArgs>(Args)...);
 
             // Invalidate any cursors and return a ref to the new element
             this->c4IncSerialNum();

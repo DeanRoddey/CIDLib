@@ -126,6 +126,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_VectorMoveSem);
     AddTest(new TTest_VectorPlace);
     AddTest(new TTest_DequeMoveSem);
+    AddTest(new TTest_DequePlace);
     AddTest(new TTest_HashSetPlace);
     AddTest(new TTest_ColAlgo1);
 

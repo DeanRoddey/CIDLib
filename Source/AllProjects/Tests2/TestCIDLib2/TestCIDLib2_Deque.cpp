@@ -38,6 +38,7 @@
 //  Magic macros
 // ---------------------------------------------------------------------------
 RTTIDecls(TTest_DequeMoveSem, TTestFWTest)
+RTTIDecls(TTest_DequePlace, TTestFWTest)
 
 
 
@@ -166,3 +167,78 @@ TTest_DequeMoveSem::eRunTest(  TTextStringOutStream&   strmOut
     return eRes;
 }
 
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_DequePlace
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_DequePlace: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_DequePlace::TTest_DequePlace() :
+
+    TTestFWTest
+    (
+        L"Deque Placement", L"Deque element placement", 3
+    )
+{
+}
+
+TTest_DequePlace::~TTest_DequePlace()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_DequePlace: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_DequePlace::eRunTest(  TTextStringOutStream&   strmOut
+                                , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    TDeque<TKeyValuePair> colTest;
+    TString strKey(32UL);
+    TString strVal(32UL);
+    for (tCIDLib::TCard4 c4Index = 5; c4Index < 9; c4Index++)
+    {
+        strKey = L"Key ";
+        strKey.AppendFormatted(c4Index);
+        strVal = L"Value ";
+        strVal.AppendFormatted(c4Index);
+        colTest.objPlaceTop(strKey, strVal);
+    }
+
+    for (tCIDLib::TCard4 c4Index = 4; c4Index > 0; c4Index--)
+    {
+        strKey = L"Key ";
+        strKey.AppendFormatted(c4Index);
+        strVal = L"Value ";
+        strVal.AppendFormatted(c4Index);
+        colTest.objPlaceBottom(strKey, strVal);
+    }
+
+    // Now they shoudl iterate in sequence 1 to 8
+    tCIDLib::TCard4 c4Num = 1;
+    TDeque<TKeyValuePair>::TCursor cursTest(&colTest);
+    for (; cursTest; ++cursTest)
+    {
+        strKey = L"Key ";
+        strKey.AppendFormatted(c4Num);
+        strVal = L"Value ";
+        strVal.AppendFormatted(c4Num);
+
+        if (*cursTest != TKeyValuePair(strKey, strVal))
+        {
+            strmOut << TFWCurLn<< L"Deque elements were not placed in correct order\n\n";
+            eRes = tTestFWLib::ETestRes::Failed;
+        }
+
+        c4Num++;
+    }
+
+    return eRes;
+}

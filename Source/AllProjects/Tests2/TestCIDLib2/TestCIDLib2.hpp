@@ -885,6 +885,39 @@ class TTest_DequeMoveSem : public TTestFWTest
 };
 
 
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_DequePlace
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_DequePlace : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_DequePlace();
+
+        ~TTest_DequePlace();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_DequePlace,TTestFWTest)
+};
+
+
 
 
 // ---------------------------------------------------------------------------
