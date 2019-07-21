@@ -464,7 +464,7 @@ TDirChangeMon::bProcessDirChanges(  const   tCIDLib::TDirChanges&   colNewChange
     if ((m_colChanges.c4ElemCount() + c4Count) > CIDLib_DirChange::c4MaxChangeBlock)
     {
         m_colChanges.RemoveAll();
-        m_colChanges.objAdd(TDirChangeInfo(tCIDLib::EDirChanges::OutOfSync));
+        m_colChanges.objPlace(tCIDLib::EDirChanges::OutOfSync);
         m_bOverflow = kCIDLib::True;
 
         return kCIDLib::True;
@@ -489,7 +489,7 @@ tCIDLib::TVoid TDirChangeMon::DirChangeOutOfSync()
     if (!m_bOverflow)
     {
         m_colChanges.RemoveAll();
-        m_colChanges.objAdd(TDirChangeInfo(tCIDLib::EDirChanges::OutOfSync));
+        m_colChanges.objPlace(tCIDLib::EDirChanges::OutOfSync);
         m_bOverflow = kCIDLib::True;
     }
 }

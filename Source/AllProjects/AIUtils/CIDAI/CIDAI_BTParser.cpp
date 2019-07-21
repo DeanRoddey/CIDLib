@@ -265,13 +265,10 @@ TCIDAIBTParser::StartTag(       TXMLParserCore&     xprsSrc
          else if (xdeclElem.strFullName() == s_strElem_NodeParam)
         {
             // Store this new parameter
-            m_colParams.objAdd
+            m_colParams.objPlace
             (
-                TKeyValuePair
-                (
-                    strFindAttr(colAttrList, s_strAttr_Key, kCIDLib::True)
-                    , strFindAttr(colAttrList, s_strAttr_Value, kCIDLib::True)
-                )
+                strFindAttr(colAttrList, s_strAttr_Key, kCIDLib::True)
+                , strFindAttr(colAttrList, s_strAttr_Value, kCIDLib::True)
             );
         }
          else if (xdeclElem.strFullName() == s_strElem_BTNode)

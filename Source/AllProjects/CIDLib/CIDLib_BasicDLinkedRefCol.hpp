@@ -565,6 +565,22 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
             this->c4IncSerialNum();
         }
 
+        // Get the bottom or top. If there is one, then drop it or delete it
+        tCIDLib::TVoid DiscardBottom()
+        {
+            TElem* pobjBottom = pobjGetFromBottom(kCIDLib::False);
+            if (pobjBottom && (m_eAdopt == tCIDLib::EAdoptOpts::Adopt))
+                delete pobjBottom;
+        }
+
+        tCIDLib::TVoid DiscardTop()
+        {
+            TElem* pobjTop = pobjGetFromTop(kCIDLib::False);
+            if (pobjTop && (m_eAdopt == tCIDLib::EAdoptOpts::Adopt))
+                delete pobjTop;
+        }
+
+
         tCIDLib::TVoid ExchangeBottom()
         {
             TMtxLocker lockSync(this->pmtxLock());
@@ -633,7 +649,7 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
 
             //
             //  See if there are any nodes. If not, throw an exception or
-            //  return zero, according to the parm.
+            //  return null, according to the parm.
             //
             if (m_llstCol.bIsEmpty())
             {

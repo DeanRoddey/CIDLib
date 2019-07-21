@@ -91,48 +91,6 @@ TRawMem::bAllocSysMem(  const   tCIDLib::TCard4         c4Size
 
 
 
-//
-//  We do a safe inc/dec of the passed reference. Just to be safe we don't allow ref counts
-//  beyond i4MaxCard, since the interlocked stuff really works on signed values. It would be
-//  psychotic to expect such a thing anyway. And we check for an underflow in the release
-//  since that means something went really wrong.
-//
-tCIDLib::TBoolean TRawMem::bSafeRefAcquire(volatile tCIDLib::TCard4& c4Ref)
-{
-    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
-        return kCIDLib::False;
-    }
-    ::InterlockedIncrementAcquire(&c4Ref);
-    return kCIDLib::True;
-}
-
-tCIDLib::TBoolean TRawMem::bSafeRefRelease(volatile tCIDLib::TCard4& c4Ref)
-{
-    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
-        return kCIDLib::False;
-    }
-
-    if (!c4Ref)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_ZeroRefCntRel);
-        return kCIDLib::False;
-    }
-
-    if (::InterlockedDecrementRelease(&c4Ref) < 0)
-    {
-        // The ref count management must be wrong
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_RefCntUnderflow);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
-}
-
-
-
 tCIDLib::TCard4
 TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
                                 , const tCIDLib::TCard4     c4New
@@ -142,9 +100,7 @@ TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
     (
         ::InterlockedCompareExchange
         (
-            reinterpret_cast<long*>(&c4ToFill)
-            , c4New
-            , c4Compare
+            reinterpret_cast<long*>(&c4ToFill), c4New, c4Compare
         )
     );
 }
@@ -156,15 +112,64 @@ TRawMem::c4Exchange(        tCIDLib::TCard4&    c4ToFill
 {
     return static_cast<tCIDLib::TCard4>
     (
-        ::InterlockedExchange
-        (
-            reinterpret_cast<long*>(&c4ToFill)
-            , c4New
-        )
+        ::InterlockedExchange(reinterpret_cast<long*>(&c4ToFill), c4New)
     );
 }
 
 
+//
+//  We do a safe inc/dec of the passed reference. Just to be safe we don't allow ref
+//  counts beyond i4MaxCard, since the interlocked stuff really works on signed
+//  values. It would be psychotic to expect such a thing anyway. And we check for an
+//  underflow in the release since that means something went really wrong.
+//
+tCIDLib::TCard4
+TRawMem::c4SafeRefAcquire(volatile tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
+{
+    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+    bRes = kCIDLib::True;
+    return tCIDLib::TCard4(::InterlockedIncrement(&c4Ref));
+}
+
+tCIDLib::TCard4
+TRawMem::c4SafeRefRelease(volatile tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
+{
+    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+
+    if (!c4Ref)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_ZeroRefCntRel);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+
+    LONG iRes = ::InterlockedDecrement(&c4Ref);
+    if (iRes < 0)
+    {
+        // The ref count management must be wrong
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_RefCntUnderflow);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+    bRes = kCIDLib::True;
+    return tCIDLib::TCard4(iRes);
+}
+
+
+//
+//  Returns the original value in ppToFill. If that's the same as pCompare,
+//  then the exchange occurred.
+//
 tCIDLib::TVoid*
 TRawMem::pCompareAndExchangeRawPtr(         tCIDLib::TVoid**    ppToFill
                                     , const tCIDLib::TVoid*     pNew
@@ -179,10 +184,14 @@ TRawMem::pCompareAndExchangeRawPtr(         tCIDLib::TVoid**    ppToFill
     );
 }
 
+
+//
+//  Atomically updates the to fill pointer with the new pointer. Returns the
+//  original value that was replaced.
+//
 tCIDLib::TVoid*
 TRawMem::pExchangeRawPtr(tCIDLib::TVoid** ppToFill, const tCIDLib::TVoid* pNew)
 {
-    // We have to cast because this API doesn't understand const'ness
     return ::InterlockedExchangePointer
     (
         const_cast<tCIDLib::TVoid**>(ppToFill), const_cast<tCIDLib::TVoid*>(pNew)

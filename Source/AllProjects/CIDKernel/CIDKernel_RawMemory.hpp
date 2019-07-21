@@ -79,16 +79,6 @@ namespace TRawMem
         const   tCIDLib::TVoid* const   pBuf
     );
 
-    KRNLEXPORT tCIDLib::TBoolean bSafeRefAcquire
-    (
-        volatile tCIDLib::TCard4&      c4Ref
-    );
-
-    KRNLEXPORT tCIDLib::TBoolean bSafeRefRelease
-    (
-        volatile tCIDLib::TCard4&       c4Ref
-    );
-
     KRNLEXPORT tCIDLib::TCard4 c4CompareAndExchange
     (
                 tCIDLib::TCard4&        c4ToFill
@@ -110,6 +100,18 @@ namespace TRawMem
     KRNLEXPORT tCIDLib::TCard4 c4PagesCovered
     (
         const   tCIDLib::TCard4         c4Size
+    );
+
+    KRNLEXPORT tCIDLib::TCard4 c4SafeRefAcquire
+    (
+        volatile tCIDLib::TCard4&       c4Ref
+        ,       tCIDLib::TBoolean&      bRes
+    );
+
+    KRNLEXPORT tCIDLib::TCard4 c4SafeRefRelease
+    (
+        volatile tCIDLib::TCard4&       c4Ref
+        ,       tCIDLib::TBoolean&      bRes
     );
 
     KRNLEXPORT tCIDLib::ESortComps eCompareMemBuf
@@ -307,7 +309,8 @@ namespace TRawMem
 
     //
     //  These are some templates that make the business of doing compare
-    //  and exchanges on pointers typesafe and convenient.
+    //  and exchanges on pointers typesafe and convenient. They just work
+    //  in terms of the per-platform, untyped ones.
     //
     template <class T> T* pExchangePtr(T** ppToFill, const T* const pNew)
     {

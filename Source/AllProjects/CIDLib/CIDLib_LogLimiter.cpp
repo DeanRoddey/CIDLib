@@ -161,7 +161,7 @@ tCIDLib::TBoolean TLogLimiter::bShouldLog(const TLogEvent& errToLog)
             m_colList.RemoveAll();
 
         // It's a new one, so add it and indicate it needs to be logged
-        m_colList.objAdd(TErrInfo(errToLog, TTime::enctNowPlusSecs(m_c4Seconds)));
+        m_colList.objPlace(errToLog, TTime::enctNowPlusSecs(m_c4Seconds));
         bLogIt = kCIDLib::True;
     }
     return bLogIt;

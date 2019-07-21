@@ -49,6 +49,9 @@ ERRORS=
     errcArea_UnderOverflow      131     The operation caused a(n) %(1) field to over/underflow
     errcArea_BadFormat          132     Could not parse area object from passed text
 
+    ; Atomic ops errors
+    errcAtomic_AcquireRel       140     An atomic acquire/release error occurred
+
     ; TAudio errors
     errcAudio_DoCue             150     Could not generate the audio cue
     errcAudio_PlayWav           151     Could not play the wav file: %(1)

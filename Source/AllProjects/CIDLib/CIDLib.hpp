@@ -196,6 +196,7 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_ExpCharBuf.hpp"
 #include    "CIDLib_NativeWCConverter.hpp"
 
+#include    "CIDLib_Atomic.hpp"
 #include    "CIDLib_Base64.hpp"
 #include    "CIDLib_BitSet.hpp"
 #include    "CIDLib_Color.hpp"

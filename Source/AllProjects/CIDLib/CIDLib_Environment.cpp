@@ -384,13 +384,9 @@ TEnvironment::TEnvironment(const tCIDLib::TBoolean bInherit) :
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
             {
-                m_pcolEnv->objAdd
+                m_pcolEnv->objPlace
                 (
-                    TKeyValuePair
-                    (
-                        pelemList[c4Index].pszKey
-                        , pelemList[c4Index].pszValue
-                    )
+                    pelemList[c4Index].pszKey, pelemList[c4Index].pszValue
                 );
             }
 
@@ -454,7 +450,7 @@ TEnvironment& TEnvironment::operator=(TEnvironment&& envSrc)
 tCIDLib::TVoid
 TEnvironment::Add(const TString& strKey, const TString& strNewValue)
 {
-    m_pcolEnv->objAdd(TKeyValuePair(strKey, strNewValue));
+    m_pcolEnv->objPlace(strKey, strNewValue);
 }
 
 
@@ -465,7 +461,7 @@ TEnvironment::bAddIfNew(const TString& strKey, const TString& strValue)
     if (!pkvalTmp)
     {
         // It's not there currently, so add it
-        m_pcolEnv->objAdd(TKeyValuePair(strKey, strValue));
+        m_pcolEnv->objPlace(strKey, strValue);
         return kCIDLib::True;
     }
     return kCIDLib::False;
@@ -482,7 +478,7 @@ TEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue)
         return kCIDLib::False;
     }
 
-    m_pcolEnv->objAdd(TKeyValuePair(strKey, strNewValue));
+    m_pcolEnv->objPlace(strKey, strNewValue);
     return kCIDLib::True;
 }
 

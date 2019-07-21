@@ -48,14 +48,10 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
-
 namespace TSmartPtrHelpers
 {
     CIDLIBEXP tCIDLib::TVoid CheckRefNotZero(const tCIDLib::TCard4 c4ToCheck);
-    CIDLIBEXP tCIDLib::TVoid LogReleaseError();
-    CIDLIBEXP tCIDLib::TVoid ThrowAcquireError();
     CIDLIBEXP tCIDLib::TVoid ThrowNullRef(const tCIDLib::TCard4 c4Line);
-    CIDLIBEXP tCIDLib::TVoid ThrowReleaseError();
 }
 
 
@@ -88,8 +84,7 @@ template <class T> class TCntPtr
             // If the caller has a ref, increment the count and store the pointer
             if (cptrSrc.m_pcdRef)
             {
-                if (!TRawMem::bSafeRefAcquire(cptrSrc.m_pcdRef->m_c4RefCnt))
-                    TSmartPtrHelpers::ThrowAcquireError();
+                TAtomic::c4SafeAcquire(cptrSrc.m_pcdRef->m_c4RefCnt);
                 m_pcdRef = cptrSrc.m_pcdRef;
             }
         }
@@ -164,10 +159,7 @@ template <class T> class TCntPtr
 
                 // If the caller has a ref, bump its count
                 if (cptrSrc.m_pcdRef)
-                {
-                    if (!TRawMem::bSafeRefAcquire(cptrSrc.m_pcdRef->m_c4RefCnt))
-                        TSmartPtrHelpers::ThrowAcquireError();
-                }
+                    TAtomic::c4SafeAcquire(cptrSrc.m_pcdRef->m_c4RefCnt);
 
                 //
                 //  Now we can take his pointer and release ours, via the copy we
@@ -199,14 +191,14 @@ template <class T> class TCntPtr
             ReleaseRef(kCIDLib::False, pcdTmp);
         }
 
-        [[nodiscard]] T* pobjData()
+        T* pobjData()
         {
             if (!m_pcdRef)
                 return nullptr;
             return m_pcdRef->m_pobjData;
         }
 
-        [[nodiscard]] const T* pobjData() const
+        const T* pobjData() const
         {
             if (!m_pcdRef)
                 return nullptr;
@@ -267,27 +259,18 @@ template <class T> class TCntPtr
             if (!pcdToRelease)
                 return;
 
-            // If debugging, make sure we don't have a zero ref count here
+            //
+            //  Make sure we don't have a zero ref count here. The safe release below
+            //  will catch this also, but not give a good error context.
+            //
             #if CID_DEBUG_ON
             TSmartPtrHelpers::CheckRefNotZero(pcdToRelease->m_c4RefCnt);
             #endif
 
-            if (TRawMem::bSafeRefRelease(pcdToRelease->m_c4RefCnt))
+            if (!TAtomic::c4SafeRelease(pcdToRelease->m_c4RefCnt))
             {
-                // If the count goes zero, then destroy the object and our counted data
-                if (!pcdToRelease->m_c4RefCnt)
-                {
-                    TJanitor<T> janObj(pcdToRelease->m_pobjData);
-                    delete pcdToRelease;
-                }
-            }
-             else
-            {
-                // The count had to be bad
-                if (bDtor)
-                    TSmartPtrHelpers::LogReleaseError();
-                else
-                    TSmartPtrHelpers::ThrowReleaseError();
+                TJanitor<T> janObj(pcdToRelease->m_pobjData);
+                delete pcdToRelease;
             }
         }
 
@@ -385,24 +368,24 @@ template <class T> class TMngPtr
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        [[nodiscard]] T& objData()
+        T& objData()
         {
             CheckNullRef(CID_LINE);
             return *m_pData;
         }
 
-        [[nodiscard]] const T& objData() const
+        const T& objData() const
         {
             CheckNullRef(CID_LINE);
             return *m_pData;
         }
 
-        [[nodiscard]] T* pobjData()
+        T* pobjData()
         {
             return m_pData;
         }
 
-        [[nodiscard]] const T* pobjData() const
+        const T* pobjData() const
         {
             return m_pData;
         }

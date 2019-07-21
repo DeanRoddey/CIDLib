@@ -142,8 +142,8 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 
         tCIDLib::TVoid TrashTop()
         {
-            // Get the top but don't return it, just delete it
-            delete this->pobjGetFromBottom();
+            // Just pass on to our parent
+            this->DiscardBottom();
         }
 
 

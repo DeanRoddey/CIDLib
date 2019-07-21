@@ -157,7 +157,7 @@ TAIBTCtxVar::SetVal(const TString& strValKey, const tCIDLib::TBoolean bToSet)
 {
     TKeyValuePair* pkvalVal = pkvalFindVal(strValKey, kCIDLib::False);
     if (!pkvalVal)
-        pkvalVal = &m_colMembers.objAdd(TKeyValuePair(strValKey, TString::strEmpty()));
+        pkvalVal = &m_colMembers.objPlace(strValKey, TString::strEmpty());
 
     pkvalVal->strValue(bToSet ? kCIDAI::strVal_True : kCIDAI::strVal_False);
 }
@@ -167,7 +167,7 @@ TAIBTCtxVar::SetVal(const TString& strValKey, const tCIDLib::TCard4 c4ToSet)
 {
     TKeyValuePair* pkvalVal = pkvalFindVal(strValKey, kCIDLib::False);
     if (!pkvalVal)
-        pkvalVal = &m_colMembers.objAdd(TKeyValuePair(strValKey, TString::strEmpty()));
+        pkvalVal = &m_colMembers.objPlace(strValKey, TString::strEmpty());
 
     pkvalVal->strValue().SetFormatted(c4ToSet);
 }
@@ -177,7 +177,7 @@ TAIBTCtxVar::SetVal(const TString& strValKey, const tCIDLib::TInt4 i4ToSet)
 {
     TKeyValuePair* pkvalVal = pkvalFindVal(strValKey, kCIDLib::False);
     if (!pkvalVal)
-        pkvalVal = &m_colMembers.objAdd(TKeyValuePair(strValKey, TString::strEmpty()));
+        pkvalVal = &m_colMembers.objPlace(strValKey, TString::strEmpty());
 
     pkvalVal->strValue().SetFormatted(i4ToSet);
 }
@@ -189,7 +189,7 @@ TAIBTCtxVar::SetVal(const TString& strValKey, const TString& strToSet)
     if (pkvalVal)
         pkvalVal->strValue(strToSet);
     else
-        m_colMembers.objAdd(TKeyValuePair(strValKey, strToSet));
+        m_colMembers.objPlace(strValKey, strToSet);
 }
 
 
@@ -518,7 +518,7 @@ TAIBTCtx::SetCardVar(const  TString&        strVarKey
 {
     TAIBTCtxVar* pctxvSet = m_colVars.pobjFindByKey(strVarKey);
     if (!pctxvSet)
-        pctxvSet = &m_colVars.objAdd(TAIBTCtxVar(strVarKey));
+        pctxvSet = &m_colVars.objPlace(strVarKey);
 
     pctxvSet->SetVal(strValKey, c4ToSet);
 }
@@ -530,7 +530,7 @@ TAIBTCtx::SetIntVar(const   TString&        strVarKey
 {
     TAIBTCtxVar* pctxvSet = m_colVars.pobjFindByKey(strVarKey);
     if (!pctxvSet)
-        pctxvSet = &m_colVars.objAdd(TAIBTCtxVar(strVarKey));
+        pctxvSet = &m_colVars.objPlace(strVarKey);
 
     pctxvSet->SetVal(strValKey, i4ToSet);
 }
@@ -542,7 +542,7 @@ TAIBTCtx::SetStringVar( const   TString&    strVarKey
 {
     TAIBTCtxVar* pctxvSet = m_colVars.pobjFindByKey(strVarKey);
     if (!pctxvSet)
-        pctxvSet = &m_colVars.objAdd(TAIBTCtxVar(strVarKey));
+        pctxvSet = &m_colVars.objPlace(strVarKey);
 
     pctxvSet->SetVal(strValKey, strToSet);
 }

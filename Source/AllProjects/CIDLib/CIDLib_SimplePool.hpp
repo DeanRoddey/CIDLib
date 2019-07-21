@@ -59,9 +59,6 @@
 //  element for itself. So you just need to declare an instance of the smart pointer
 //  to get an element.
 //
-//  These guys effectively are thread safe if the pool itself is thread safe, since
-//  they are just getting and returning elements via the pool interface.
-//
 //  String/Heap Buffer Pool
 //
 //  It will be fairly common to use pools of strings or heap buffers, so we provide
@@ -74,11 +71,24 @@
 //  beyond this threshold, it will be reallocated back down to something small during
 //  element prep.
 //
-//
 //  Fixed Size Elements
 //
 //  If the elements are all the same size, use the TFixedSizedPool class instead which
 //  is much more efficient for such things.
+//
+//  Thread Safety
+//
+//  Pools can be marked as thread safe or not. If you are going to have multiple
+//  threads getting objects out, then it must be marked as asafe.
+//
+//  The smart pointers are NOT thread safe, and you shouldn't have multiple thread
+//  sharing a single object from the pool anyway. The whole point of the pool is to
+//  let them all get their own objects. Multiple threads can create their own to get
+//  their own objects from a single pool, as long as that pool itself is marked
+//  thread safe. You can pass these pointers from one thread to another if you are
+//  using some sort of thread safe transfer mechanism to do so.
+//
+//  The janitors are not, inherently so since they are for scoped access.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -98,13 +108,13 @@ template<typename TElem> class TSimplePool;
 //  CLASS: TSimplePoolPtr
 // PREFIX: spptr
 //
-//  This is a smart pointer for objects in a pool. It gets an object out of a
-//  pool and makes sure it gets given back. It will reference copy the object,
+//  This is a smart pointer for objects in a simple pool. It gets an object out
+//  of a pool and makes sure it gets given back. It will reference copy the object,
 //  so it knows when the last ref is gone.
 //
-//  This guy will use the mutex of the pool to sync the ref counting. If the pool
-//  is not thread safe, then these guys are not. Typically they either both are
-//  or both are not. If that's not the case, don't use this, create your own.
+//  Though in theory these are thread safe, you should never actually be sharing
+//  them between threads. The ref counting is just to let you pass them around
+//  and use them as by value objects conveniently. See the class comments above.
 // ---------------------------------------------------------------------------
 template <typename TElem> class TSimplePoolPtr
 {
@@ -120,6 +130,13 @@ template <typename TElem> class TSimplePoolPtr
                 TakeSource(spptrSrc);
         }
 
+        TSimplePoolPtr(TSimplePoolPtr&& spptrSrc) :
+
+            TSimplePoolPtr()
+        {
+            *this = tCIDLib::ForceMove(spptrSrc);
+        }
+
         virtual ~TSimplePoolPtr()
         {
             DecRefCnt();
@@ -133,6 +150,13 @@ template <typename TElem> class TSimplePoolPtr
         {
             if (&spptrSrc != this)
                 TakeSource(spptrSrc);
+            return *this;
+        }
+
+        TSimplePoolPtr& operator=(TSimplePoolPtr&& spptrSrc)
+        {
+            if (&spptrSrc != this)
+                tCIDLib::Swap(m_percThis, spptrSrc.m_percThis);
             return *this;
         }
 
@@ -253,19 +277,16 @@ template <typename TElem> class TSimplePoolPtr
 
             try
             {
-                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
-
                 // We shouldn't have a pointer if the ref count is zero, but check
                 CIDAssert(m_percThis->m_c4RefCnt, L"Simple pool ptr ref cnt underflow");
 
-                m_percThis->m_c4RefCnt--;
-                if (!m_percThis->m_c4RefCnt)
+                if (m_percThis->m_c4RefCnt && (--m_percThis->m_c4RefCnt == 0))
                 {
                     m_percThis->m_psplSrc->ReleaseElem(m_percThis->m_pobjElem);
                     delete m_percThis;
                 }
 
-                // And we are letting this guy go either way
+                // We drop our pointer either way
                 m_percThis = nullptr;
             }
 
@@ -281,8 +302,7 @@ template <typename TElem> class TSimplePoolPtr
         //  Do the stuff for us to take on another pointer's object, decrementing
         //  and releasing ours as required, and incrementing his. We know the source
         //  cannot change other than the ref count (which cannot go to zero while we
-        //  are here since the copy we have is keeping it alive.) So we just have to
-        //  sync the ref counting.
+        //  are here since the copy we are taking from is keeping it alive.)
         //
         tCIDLib::TVoid TakeSource(const TSimplePoolPtr& spptrSrc)
         {
@@ -302,10 +322,8 @@ template <typename TElem> class TSimplePoolPtr
             if (spptrSrc.m_percThis)
             {
                 m_percThis = spptrSrc.m_percThis;
-                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
                 m_percThis->m_c4RefCnt++;
             }
-
         }
 
 
@@ -393,7 +411,6 @@ template<typename TElem> class TSimplePool : public TObject
         // -------------------------------------------------------------------
         TSimplePool& operator=(const TSimplePool&) = delete;
         TSimplePool& operator=(TSimplePool&&) = delete;
-
 
 
         // -------------------------------------------------------------------
