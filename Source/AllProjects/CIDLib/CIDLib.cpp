@@ -222,7 +222,6 @@ eCompTest(const tCIDLib::TCard4& c41, const tCIDLib::TCard4& c42)
     tCIDLib::ESortComps::Equal;
 }
 
-
 static tCIDLib::TVoid DummyFunc()
 {
     tCIDLib::TBasicPair<TArea, TString> pairTmp;
@@ -447,6 +446,7 @@ static tCIDLib::TVoid DummyFunc()
 
     TVector<const TString> colConstStr;
     const TString& strNC = colConstStr[0];
+
 }
 #endif
 

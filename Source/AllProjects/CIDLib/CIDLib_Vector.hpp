@@ -656,6 +656,86 @@ class TVector : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+
+        //
+        //  If not in the list add it. We assume an unsorted list. If it's sorted
+        //  you'd do a lot better yourself doing a binary search and adding if not
+        //  found.
+        //
+        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        tCIDLib::TBoolean bAddIfNew(const TElem& objToAdd, TComp pfnComp = TComp())
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+
+            // See if this element is in teh list
+            tCIDLib::TCard4 c4Index = 0;
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+            {
+                if (pfnComp(*m_apElems[c4Index], objToAdd))
+                    return kCIDLib::False;
+            }
+
+            objAdd(objToAdd);
+            return kCIDLib::True;
+        }
+
+
+        //
+        //  We can remove an element by looking for one with that value, possibly
+        //  removing all such or just the first one. We assume the list is not
+        //  sorted. If it is, you can do better by doing a binary search and
+        //  removing it yourself.
+        //
+        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        tCIDLib::TBoolean
+        bRemoveIfMember(const TElem& objToRemove, TComp pfnComp = TComp())
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+
+            // See if this element is in teh list
+            tCIDLib::TCard4 c4Index = 0;
+            while (c4Index < m_c4CurCount)
+            {
+                if (pfnComp(*m_apElems[c4Index], objToRemove))
+                    break;
+                c4Index++;
+            }
+
+            // If not found, return false now
+            if (c4Index == m_c4CurCount)
+                return kCIDLib::False;
+
+            //
+            //  Put a janitor on the element that we are going to delete so
+            //  that it will delete on the way out. If it throws at that point
+            //  due to an error in the dtor, we don't care because we've got
+            //  our stuff straight, and it's now the caller's issue.
+            //
+            TJanitor<TElem> janRemove(m_apElems[c4Index]);
+            m_apElems[c4Index] = 0;
+
+            //
+            //  Now bump down the count of elements and compact the list if
+            //  needed.
+            //
+            m_c4CurCount--;
+            if (c4Index < m_c4CurCount)
+            {
+                for (tCIDLib::TCard4 c4CompInd = c4Index;
+                                        c4CompInd < m_c4CurCount; c4CompInd++)
+                {
+                    m_apElems[c4CompInd] = m_apElems[c4CompInd + 1];
+                }
+
+                // Zero the last one, since it's not used anymore
+                m_apElems[m_c4CurCount] = 0;
+            }
+
+            // And invalidate cursors
+            this->c4IncSerialNum();
+            return kCIDLib::True;
+        }
+
         tCIDLib::TBoolean bRemoveIfMember(TElem* const pobjToRemove)
         {
             TMtxLocker lockThis(this->pmtxLock());

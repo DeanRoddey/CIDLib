@@ -35,8 +35,122 @@
 // ---------------------------------------------------------------------------
 //  Magic macros
 // ---------------------------------------------------------------------------
+RTTIDecls(TTest_RefVectorBasic, TTestFWTest)
 RTTIDecls(TTest_RefVectorLambda, TTestFWTest)
 RTTIDecls(TTest_RefVectorMoveItem, TTestFWTest)
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_RefVectorBasic
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_RefVectorBasic: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_RefVectorBasic::TTest_RefVectorBasic() :
+
+    TTestFWTest
+    (
+        L"Ref Vector Basic", L"Ref vector basic tests", 3
+    )
+{
+}
+
+TTest_RefVectorBasic::~TTest_RefVectorBasic()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_RefVectorBasic: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_RefVectorBasic::eRunTest(TTextStringOutStream&  strmOut
+                            , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    TRefVector<TString> colTest(tCIDLib::EAdoptOpts::Adopt, 8UL);
+    if (colTest.c4ElemCount())
+    {
+        strmOut << TFWCurLn << L"Non-zero element count after ctor\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    colTest.Add(new TString(L"Value 1"));
+    colTest.Add(new TString(L"Value 2"));
+    colTest.Add(new TString(L"Value 3"));
+
+    if (colTest.c4ElemCount() != 3)
+    {
+        strmOut << TFWCurLn << L"Wrong element count after additions\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (!colTest.bRemoveIfMember(TString(L"Value 1")))
+    {
+        strmOut << TFWCurLn << L"Failed to remove member element\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (colTest.c4ElemCount() != 2)
+    {
+        strmOut << TFWCurLn << L"Wrong element count after removal\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Add that one back by value, which should work
+    if (!colTest.bAddIfNew(TString(L"Value 1")))
+    {
+        strmOut << TFWCurLn << L"Could not add if new on removed element\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (colTest.c4ElemCount() != 3)
+    {
+        strmOut << TFWCurLn << L"Wrong element count after add if new\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // And try it again by value, which should be rejected
+    if (colTest.bAddIfNew(TString(L"Value 1")))
+    {
+        strmOut << TFWCurLn << L"AddIfNew added an element already in the list\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (colTest.c4ElemCount() != 3)
+    {
+        strmOut << TFWCurLn << L"Wrong element count after rejected add if new\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    //
+    //  Add an object and try to add it again if new by the same pointer, which
+    //  should be rejected.
+    //
+    TString* pstrAdd = new TString(L"Value 4");
+    colTest.Add(pstrAdd);
+
+    if (colTest.bAddIfNew(pstrAdd))
+    {
+        strmOut << TFWCurLn << L"AddIfNew added an element already in the list\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Remove all elements and we should have zero elements
+    colTest.RemoveAll();
+    if (colTest.c4ElemCount())
+    {
+        strmOut << TFWCurLn << L"Non-zero element count after RemoveAll\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    return eRes;
+}
+
 
 
 // ---------------------------------------------------------------------------

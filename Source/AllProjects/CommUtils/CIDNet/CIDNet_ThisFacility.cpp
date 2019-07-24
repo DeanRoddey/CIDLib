@@ -370,7 +370,7 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
                         colTransEncodings.objAdd(strPartTransEncoding);
 
                         // To only store the actual bytes for this round
-                        THeapBuf& mbufTar = colParts.objAdd(THeapBuf(c4PartBytes, c4PartBytes + 1));
+                        THeapBuf& mbufTar = colParts.objPlace(c4PartBytes, c4PartBytes + 1);
                         mbufTar.CopyIn(mbufPartBuf, c4PartBytes);
 
                         // And go back out to the outer loop

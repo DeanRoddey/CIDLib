@@ -820,18 +820,12 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             if (pnodeCheck)
                 this->DuplicateKey(kobjToAdd.objKey(), CID_FILE, CID_LINE);
 
-            //  Add it to the appropriate bucket. We just put it at the head
-            //  since the order does not matter. We just construct the
-            //  node and pass it the current head, which it will make its
-            //  next node.
-            //
+            // Add this guy at the head of his bucket
             m_apBuckets[hshKey] = new TNode(kobjToAdd, m_apBuckets[hshKey]);
+            m_c4CurElements++;
 
             // Bump the serial number to invalidate cursors
             this->c4IncSerialNum();
-
-            // Bump up the element count
-            m_c4CurElements++;
 
             return m_apBuckets[hshKey]->objPair();
         }
@@ -930,9 +924,31 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         }
 
 
+        //
+        //  Add object/key separately, which is more efficient than creating
+        //  the pair and then copying it in. A number of other methods call
+        //  this so it's worth some duplication relative to objAdd.
+        //
         TPair& kobjAdd(const TKey& objKey, const TElem& objToAdd)
         {
-            return objAdd(TPair(objKey, objToAdd));
+            TMtxLocker lockSync(this->pmtxLock());
+
+            // See if this element is already in the collection
+            tCIDLib::THashVal hshKey;
+            TNode* pnodeCheck = pnodeFind(objKey, hshKey);
+
+            // If so, we cannot allow it
+            if (pnodeCheck)
+                this->DuplicateKey(objKey, CID_FILE, CID_LINE);
+
+            // Add this guy at the head of his bucket
+            m_apBuckets[hshKey] = new TNode(objKey, objToAdd, m_apBuckets[hshKey]);
+            m_c4CurElements++;
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            return m_apBuckets[hshKey]->objPair();
         }
 
         TPair& kobjAddIfNew(const   TKey&               objKey
@@ -951,8 +967,15 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 return pnodeRet->objPair();
             }
 
+            // Add this guy at the head of his bucket
+            m_apBuckets[hshKey] = new TNode(objKey, objToAdd, m_apBuckets[hshKey]);
+            m_c4CurElements++;
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
             bAdded = kCIDLib::True;
-            return kobjAdd(objKey, objToAdd);
+            return m_apBuckets[hshKey]->objPair();
         }
 
         TPair& kobjAddOrUpdate( const   TKey&               objKey
@@ -972,8 +995,15 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 return pnodeCheck->objPair();
             }
 
+            // Add this guy at the head of his bucket
+            m_apBuckets[hshKey] = new TNode(objKey, objToAdd, m_apBuckets[hshKey]);
+            m_c4CurElements++;
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
             bAdded = kCIDLib::True;
-            return kobjAdd(objKey, objToAdd);
+            return m_apBuckets[hshKey]->objPair();
         }
 
         TPair& kobjFindByKey(const TKey& objKeyToFind)
@@ -1029,12 +1059,10 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 //
                 pnodeRet = new TNode(objKey, objToFindOrAdd, m_apBuckets[hshKey]);
                 m_apBuckets[hshKey] = pnodeRet;
+                m_c4CurElements++;
 
                 // Bump the serial number to invalidate cursors
                 this->c4IncSerialNum();
-
-                // Bump up the element count
-                m_c4CurElements++;
             }
             return pnodeRet->objPair();
         }

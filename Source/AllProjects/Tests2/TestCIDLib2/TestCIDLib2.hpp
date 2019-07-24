@@ -1720,6 +1720,40 @@ class TTest_RawBits : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_RefVectorBasic
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_RefVectorBasic : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_RefVectorBasic();
+
+        ~TTest_RefVectorBasic();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_RefVectorBasic,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TTest_RefVectorLambda
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
@@ -2299,6 +2333,39 @@ class TTest_SimplePool : public TTestFWTest
         RTTIDefs(TTest_SimplePool,TTestFWTest)
 };
 
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_VectorBasic
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_VectorBasic : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_VectorBasic();
+
+        ~TTest_VectorBasic();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_VectorBasic,TTestFWTest)
+};
 
 
 // ---------------------------------------------------------------------------

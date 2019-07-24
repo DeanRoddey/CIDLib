@@ -43,6 +43,68 @@
 namespace tCIDColAlgo
 {
     //
+    //  If the passed object is not in the collection already, add it. Some
+    //  collections have such things built in, like has sets. But, for other
+    //  types, we have to just search it. This assumes it's not sorted already
+    //  so we have to search the whole thing. Returns true if it was added.
+    //
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    tCIDLib::TBoolean bAddIfNew(        TCol&   colTar
+                                , const TElem&  objToAdd
+                                ,       TComp   pfnComp = TComp())
+    {
+        TCol::TCursor cursTar(&colTar);
+        for (; cursTar; ++cursTar)
+        {
+            // If we find a match, return false, didn't add it
+            if (pfnComp(*cursTar, objToAdd))
+                return kCIDLib::False;
+        }
+
+        // Never found it, so add it
+        colTar.objAdd(objToAdd);
+        return kCIDLib::True;
+    }
+
+
+    //
+    //  If the passed object is in the collection, remove it. It can remove just
+    //  the first match, or all. Some collections have built in mechanisms for
+    //  this kind of stuff, but this can be used for those that dont. Returns
+    //  true if it removed any.
+    //
+    //  This only works for a collection that has a RemoveAt(cursor) method, but
+    //  most do.
+    //
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    tCIDLib::TBoolean bRemoveElem(          TCol&               colTar
+                                    , const TElem&              objToRem
+                                    , const tCIDLib::TBoolean   bRemoveAll
+                                    ,       TComp               pfnComp = TComp())
+    {
+        tCIDLib::TBoolean bRet = kCIDLib::False;
+        TCol::TCursor cursTar(&colTar);
+        for (; cursTar; ++cursTar)
+        {
+            // If we find a match, remove it
+            if (pfnComp(*cursTar, objToRem))
+            {
+                colTar.RemoveAt(cursTar);
+                bRet = kCIDLib::True;
+
+                if (!bRemoveAll)
+                    break;
+            }
+        }
+        return bRet;
+    }
+
+
+    //
     //  Given a collection and an initial value, call += for each value in the
     //  collection, adding them to the incoming value, which we return as the
     //  new value.

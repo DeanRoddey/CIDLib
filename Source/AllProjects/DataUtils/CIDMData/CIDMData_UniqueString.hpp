@@ -112,6 +112,10 @@ class CIDMDATAEXP TUniqueString
         // -------------------------------------------------------------------
         struct TAString
         {
+            TAString(const TString& strVal, const tCIDLib::TCard4 c4Id) :
+                m_c4Id(c4Id)
+                , m_strVal(strVal)
+            {}
             TString         m_strVal;
             tCIDLib::TCard4 m_c4Id;
         };

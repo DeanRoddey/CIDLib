@@ -871,17 +871,9 @@ TXMLTreeParser::HandleXMLError( const   tCIDLib::TErrCode   errcToPost
         m_bGotErrors = kCIDLib::True;
 
     // Add this error to our list of errors
-    m_pcolErrors->objAdd
+    m_pcolErrors->objPlace
     (
-        TErrInfo
-        (
-            errcToPost
-            , eType
-            , strText
-            , c4CurColumn
-            , c4CurLine
-            , strSystemId
-        )
+        errcToPost, eType, strText, c4CurColumn, c4CurLine, strSystemId
     );
 }
 

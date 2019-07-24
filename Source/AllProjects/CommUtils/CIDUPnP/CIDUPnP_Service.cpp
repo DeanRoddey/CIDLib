@@ -120,14 +120,10 @@ TUPnPService::UPnPVarChanged(const  tCIDLib::TCh* const pszVarName
     //
     TKeyValuePair* pkvalVar = m_colVarList.pobjFindByKey(pszVarName);
     if (pkvalVar)
-    {
         pkvalVar->strValue(pszVarVal);
-    }
-     else
-    {
-        TKeyValuePair kvalNew(pszVarName, pszVarVal);
-        m_colVarList.objAdd(kvalNew);
-    }
+    else
+        m_colVarList.objPlace(pszVarName, pszVarVal);
+
 
     m_c4SerialNum++;
     if (!m_c4SerialNum)
@@ -679,14 +675,9 @@ TUPnPService::SetStateVar(  const   TString& strVarName
     //
     TKeyValuePair* pkvalVar = m_colVarList.pobjFindByKey(strVarName);
     if (pkvalVar)
-    {
         pkvalVar->strValue(strVarVal);
-    }
-     else
-    {
-        TKeyValuePair kvalNew(strVarName, strVarVal);
-        m_colVarList.objAdd(kvalNew);
-    }
+    else
+        m_colVarList.objPlace(strVarName, strVarVal);
 }
 
 

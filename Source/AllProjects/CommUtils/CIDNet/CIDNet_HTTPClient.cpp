@@ -2437,20 +2437,20 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         tCIDLib::TKVPList colExHdrs;
 
         if (!TNetCoreParser::bHdrLineExists(colInHdrLines, L"Host") && !strHost.bIsEmpty())
-            colExHdrs.objAdd(TKeyValuePair(L"Host", strHost));
+            colExHdrs.objPlace(L"Host", strHost);
 
         if (!TNetCoreParser::bHdrLineExists(colInHdrLines, L"User-Agent") && !strAgent.bIsEmpty())
-            colExHdrs.objAdd(TKeyValuePair(L"User-Agent", strAgent));
+            colExHdrs.objPlace(L"User-Agent", strAgent);
 
         if (!TNetCoreParser::bHdrLineExists(colInHdrLines, L"Accept") && !strAccept.bIsEmpty())
-            colExHdrs.objAdd(TKeyValuePair(L"Accept", strAccept));
+            colExHdrs.objPlace(L"Accept", strAccept);
 
         //
         //  If 1.1, and there's no explict TE line, then we indicate we'll take
         //  chunked transfers plus trailers.
         //
         if (pcdsSrc && !TNetCoreParser::bHdrLineExists(colInHdrLines, strHdr_TE))
-            colExHdrs.objAdd(TKeyValuePair(strHdr_TE, L"trailers, chunked"));
+            colExHdrs.objPlace(strHdr_TE, L"trailers, chunked");
 
         //
         //  If outward body content have to add the content type. Either way we set
@@ -2462,7 +2462,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
             if (!TNetCoreParser::bHdrLineExists(colInHdrLines, THTTPClient::strHdr_ContType)
             &&  !strContType.bIsEmpty())
             {
-                colExHdrs.objAdd(TKeyValuePair(THTTPClient::strHdr_ContType, strContType));
+                colExHdrs.objPlace(THTTPClient::strHdr_ContType, strContType);
             }
         }
          else
@@ -2471,7 +2471,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         }
 
         if (!TNetCoreParser::bHdrLineExists(colInHdrLines, THTTPClient::strHdr_ContLen))
-            colExHdrs.objAdd(TKeyValuePair(strHdr_ContLen, c4ContLen));
+            colExHdrs.objPlace(strHdr_ContLen, c4ContLen);
 
         // They can pass us one extra one
         if (pkvalExLine)
@@ -2484,13 +2484,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         //
         SendMsg
         (
-            *pcdsToUse
-            , enctEnd
-            , strFirstLn
-            , colInHdrLines
-            , colExHdrs
-            , mbufCont
-            , c4ContLen
+            *pcdsToUse, enctEnd, strFirstLn, colInHdrLines, colExHdrs, mbufCont, c4ContLen
         );
 
         //
@@ -2845,16 +2839,11 @@ tCIDLib::TVoid
 TAsyncHTTPQ::CopyInHdrLines(const   tCIDLib::TKVPCollect&   colSrc
                             ,       tCIDLib::TKVPList&      colTar)
 {
-    TColCursor<TKeyValuePair>* pcursHdrLns = colSrc.pcursNew();
-    TJanitor<TColCursor<TKeyValuePair> > janCursor(pcursHdrLns);
+    TColCursor<TKeyValuePair>& cursHdrLns = *colSrc.pcursNew();
+    TJanitor<TColCursor<TKeyValuePair>> janCursor(&cursHdrLns);
     m_colInHdrLines.RemoveAll();
-    if (pcursHdrLns->bReset())
-    {
-        do
-        {
-            colTar.objAdd(pcursHdrLns->objRCur());
-        }   while (pcursHdrLns->bNext());
-    }
+    for (; cursHdrLns; ++cursHdrLns)
+        colTar.objAdd(*cursHdrLns);
 }
 
 tCIDLib::TVoid

@@ -34,9 +34,178 @@
 // ---------------------------------------------------------------------------
 //  Magic macros
 // ---------------------------------------------------------------------------
+RTTIDecls(TTest_VectorBasic, TTestFWTest)
 RTTIDecls(TTest_VectorPlace, TTestFWTest)
 RTTIDecls(TTest_VectorLambda, TTestFWTest)
 RTTIDecls(TTest_VectorMoveSem, TTestFWTest)
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_VectorBasic
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_VectorBasic: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_VectorBasic::TTest_VectorBasic() :
+
+    TTestFWTest
+    (
+        L"Vector Basic", L"Vector basic tests", 3
+    )
+{
+}
+
+TTest_VectorBasic::~TTest_VectorBasic()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_VectorBasic: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_VectorBasic::eRunTest(TTextStringOutStream&  strmOut
+                            , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    tCIDLib::TKVPList colTest(8UL);
+    if (colTest.c4ElemCount())
+    {
+        strmOut << TFWCurLn << L"Non-zero element count after ctor\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    colTest.objAdd(TKeyValuePair(L"Key 1", L"Value 1"));
+    colTest.objPlace(L"Key 2", L"Value 2");
+    colTest.objPlace(L"Key 3", L"Value 3");
+
+    if (colTest.c4ElemCount() != 3)
+    {
+        strmOut << TFWCurLn << L"Wrong element count after additions\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (!colTest.bRemoveIfMember(TKeyValuePair(L"Key 1", L"Value 1")))
+    {
+        strmOut << TFWCurLn << L"Failed to remove member element\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (colTest.c4ElemCount() != 2)
+    {
+        strmOut << TFWCurLn << L"Wrong element count after removal\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Add that one back if not new, which should add it
+    if (!colTest.bAddIfNew(TKeyValuePair(L"Key 1", L"Value 1")))
+    {
+        strmOut << TFWCurLn << L"Could not add if new on removed element\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (colTest.c4ElemCount() != 3)
+    {
+        strmOut << TFWCurLn << L"Wrong element count after addif new\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+   // And it should be rejected this time
+    if (colTest.bAddIfNew(TKeyValuePair(L"Key 1", L"Value 1")))
+    {
+        strmOut << TFWCurLn << L"Add if new added an element already in the list\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Remove all elements and we should have zero elements
+    colTest.RemoveAll();
+    if (colTest.c4ElemCount())
+    {
+        strmOut << TFWCurLn << L"Non-zero element count after RemoveAll\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Make sure we catch a bad index access
+    try
+    {
+        colTest[0].strValue(L"Bad");
+        strmOut << TFWCurLn << L"Failed to catch bad index 0 access\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+    catch(...) {}
+
+    // Add an element and test past the end again
+    colTest.objPlace(L"Key A", L"Value A");
+    try
+    {
+        colTest[1].strValue(L"Bad");
+        strmOut << TFWCurLn << L"Failed to catch bad index 1 access\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+    catch(...) {}
+
+    // Load up some and test removal at various places
+    TString strKey(L"Key ");
+    TString strValue(L"Value ");
+    colTest.RemoveAll();
+    for (tCIDLib::TCard4 c4Index = 1; c4Index < 9; c4Index++)
+    {
+        strKey.CapAt(4);
+        strValue.CapAt(6);
+        strKey.AppendFormatted(c4Index);
+        strValue.AppendFormatted(c4Index);
+        colTest.objPlace(strKey, strValue);
+    }
+
+    // Removing past the end should fail
+    try
+    {
+        colTest.RemoveAt(8);
+        strmOut << TFWCurLn << L"Failed to catch remove past last element\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+    catch(...) {}
+
+    // Remove the last and first elements
+    colTest.RemoveAt(7);
+    colTest.RemoveAt(0);
+
+    if ((colTest[0].strKey() != L"Key 2")
+    ||  (colTest[5].strKey() != L"Key 7"))
+    {
+        strmOut << TFWCurLn << L"First/last element removal failed\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // And delete the rest individually, which should leave us empty
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < 6; c4Index++)
+        colTest.RemoveAt(0);
+
+    if (colTest.c4ElemCount())
+    {
+        strmOut << TFWCurLn << L"Non-zero element count after removing all elements\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Test inserting
+    colTest.objPlace(L"Key 3", L"Value 3");
+    colTest.InsertAt(TKeyValuePair(L"Key 2", L"Value 2"), 0);
+    colTest.InsertAt(TKeyValuePair(L"Key 1", L"Value 1"), 0);
+
+    if ((colTest[0].strKey() != L"Key 1")
+    ||  (colTest[1].strKey() != L"Key 2")
+    ||  (colTest[2].strKey() != L"Key 3"))
+    {
+        strmOut << TFWCurLn << L"Element insertion failed\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    return eRes;
+}
 
 
 

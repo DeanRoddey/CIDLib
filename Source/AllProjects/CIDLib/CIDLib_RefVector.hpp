@@ -564,7 +564,14 @@ class TRefVector : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bAddIfNotAlready(TElem* const pnodeToAdd)
+
+        //
+        //  We can add if not already in the list literally by pointer or if the
+        //  new object's value is not in the list. For the latter, it must support
+        //  copy construction since we have to make a copy to add. If we don't add
+        //  it, the caller is still responsible for it.
+        //
+        tCIDLib::TBoolean bAddIfNew(TElem* const pnodeToAdd)
         {
             TMtxLocker lockThis(this->pmtxLock());
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
@@ -574,10 +581,26 @@ class TRefVector : public TRefCollection<TElem>
                     return kCIDLib::False;
             }
 
-            // It's not already in the list, so added and return true
             c4Append(pnodeToAdd);
             return kCIDLib::True;
         }
+
+        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        tCIDLib::TBoolean bAddIfNew(const TElem& objToAdd, TComp pfnComp = TComp())
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+
+            // See if this element is in teh list
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+            {
+                if (pfnComp(*m_apElems[c4Index], objToAdd))
+                    return kCIDLib::False;
+            }
+
+            c4Append(new TElem(objToAdd));
+            return kCIDLib::True;
+        }
+
 
         tCIDLib::TBoolean bIsMember(const TElem* const pnodeToCheck)
         {
@@ -588,6 +611,40 @@ class TRefVector : public TRefCollection<TElem>
                     return kCIDLib::True;
             }
             return kCIDLib::False;
+        }
+
+
+        //
+        //  We can remove an element by pointer comparison or by looking for the
+        //  first one that matches a value. We assume the list is not sorted. If
+        //  it is, you can do much better by doing a binary search and removing it
+        //  yourself by located index.
+        //
+        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        tCIDLib::TBoolean
+        bRemoveIfMember(const TElem& objToRemove, TComp pfnComp = TComp())
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+
+            // See if this element is in teh list
+            tCIDLib::TCard4 c4Index = 0;
+            while (c4Index < m_c4CurCount)
+            {
+                if (pfnComp(*m_apElems[c4Index], objToRemove))
+                    break;
+                c4Index++;
+            }
+
+            // If not found, return false now
+            if (c4Index == m_c4CurCount)
+                return kCIDLib::False;
+
+            // If we are adopting, then delete it
+            TElem* pobjAt = pobjPullOutElemAt(c4Index);
+            if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+                delete pobjAt;
+
+            return kCIDLib::True;
         }
 
         tCIDLib::TBoolean bRemoveIfMember(TElem* const pnodeToRemove)

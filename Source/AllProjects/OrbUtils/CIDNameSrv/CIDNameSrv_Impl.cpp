@@ -711,18 +711,15 @@ TCIDNameServerImpl::c4EnumObjects(  const   TString&                strScopeToEn
         if (cursEnum.eCurType() == tCIDLib::ETreeNodes::Terminal)
         {
             const TNSNode& nodeCur = cursEnum.objRCur();
-            colResults.objAdd
+            colResults.objPlace
             (
-                TNameServerInfo
-                (
-                    nodeCur.ooidThis()
-                    , cursEnum.strCurName()
-                    , cursEnum.strCurDescription()
-                    , nodeCur.strExtra1()
-                    , nodeCur.strExtra2()
-                    , nodeCur.strExtra3()
-                    , nodeCur.strExtra4()
-                )
+                nodeCur.ooidThis()
+                , cursEnum.strCurName()
+                , cursEnum.strCurDescription()
+                , nodeCur.strExtra1()
+                , nodeCur.strExtra2()
+                , nodeCur.strExtra3()
+                , nodeCur.strExtra4()
             );
             c4Count++;
         }
@@ -814,10 +811,7 @@ TCIDNameServerImpl::c4EnumSubScopes(const   TString&            strScopeToEnum
         //
         if (cursEnum.eCurType() == tCIDLib::ETreeNodes::NonTerminal)
         {
-            colResults.objAdd
-            (
-                TKeyValuePair(cursEnum.strCurName(), cursEnum.strCurDescription())
-            );
+            colResults.objPlace(cursEnum.strCurName(), cursEnum.strCurDescription());
             c4Count++;
         }
     }   while (cursEnum.bNext());

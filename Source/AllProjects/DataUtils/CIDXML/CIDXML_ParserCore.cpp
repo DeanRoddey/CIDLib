@@ -1179,17 +1179,14 @@ TXMLParserCore::bParseStartTag(const tCIDLib::TCard4 c4SpoolerId)
         if (c4AttrCount >= c4InitListSize)
         {
             // We have to add another attribute element to the vector
-            m_pcolAttrList->objAdd
+            m_pcolAttrList->objPlace
             (
-                TXMLAttr
-                (
-                    m_strName
-                    , TString::strEmpty()
-                    , TString::strEmpty()
-                    , m_strValue
-                    , pxadCur->eType()
-                    , !bAdded
-                )
+                m_strName
+                , TString::strEmpty()
+                , TString::strEmpty()
+                , m_strValue
+                , pxadCur->eType()
+                , !bAdded
             );
         }
          else
@@ -1262,17 +1259,14 @@ TXMLParserCore::bParseStartTag(const tCIDLib::TCard4 c4SpoolerId)
                     if (c4AttrCount >= c4InitListSize)
                     {
                         // We have to add another attribute element to the vector
-                        m_pcolAttrList->objAdd
+                        m_pcolAttrList->objPlace
                         (
-                            TXMLAttr
-                            (
-                                xadCur.strFullName()
-                                , TString::strEmpty()
-                                , TString::strEmpty()
-                                , xadCur.strValue()
-                                , xadCur.eType()
-                                , kCIDLib::False
-                            )
+                            xadCur.strFullName()
+                            , TString::strEmpty()
+                            , TString::strEmpty()
+                            , xadCur.strValue()
+                            , xadCur.eType()
+                            , kCIDLib::False
                         );
                     }
                      else

@@ -765,7 +765,7 @@ tCIDLib::TVoid TSysInfo::DoInit()
          else
         {
             // Wasn't a magic parameter so store it
-            s_pcolCmdLineParms->objAdd(TString(pszVal));
+            s_pcolCmdLineParms->objPlace(pszVal);
         }
     }
 

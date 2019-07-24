@@ -800,7 +800,7 @@ tCIDLib::TVoid TChunkedFileMeta::QueryValues(tCIDLib::TKVPList& colToFill) const
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TKeyValFPair& kvalfCur = m_colValues[c4Index];
-        colToFill.objAdd(TKeyValuePair(kvalfCur.strKey(), kvalfCur.strValue()));
+        colToFill.objPlace(kvalfCur.strKey(), kvalfCur.strValue());
     }
 }
 

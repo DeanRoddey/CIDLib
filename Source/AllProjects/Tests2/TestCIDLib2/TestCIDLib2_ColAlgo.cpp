@@ -243,7 +243,7 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         }
     }
 
-    // Test the removal of consequtive dups
+    // Test the removal of consequetive dups
     {
         tCIDLib::TStrList colDups(8UL);
         colDups.objAdd(L"First");
@@ -305,6 +305,71 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         {
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"Seq dups remove on empty list returned non-zero\n\n";
+        }
+    }
+
+    //
+    //  Test element add/remove. Not something always needed, since most will have their
+    //  own removal method. But it's there for any that don't, or for generic removal.
+    //
+    {
+        tCIDLib::TStrList colRemove(8UL);
+        colRemove.objAdd(L"Third");
+        colRemove.objAdd(L"First");
+        colRemove.objAdd(L"Second");
+        colRemove.objAdd(L"Third");
+        colRemove.objAdd(L"Fourth");
+        colRemove.objAdd(L"Fifth");
+        colRemove.objAdd(L"Third");
+
+        //
+        //  Do a single element removal first. It should remove the 0th element,
+        //  and leave First as the 0th.
+        //
+        if (!tCIDColAlgo::bRemoveElem(colRemove, L"Third", kCIDLib::False)
+        ||  (colRemove[0] != L"First"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Single element removal failed\n\n";
+        }
+
+        // Then remove all remaining
+        if (!tCIDColAlgo::bRemoveElem(colRemove, L"Third", kCIDLib::True)
+        ||  (colRemove.c4ElemCount() != 4))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Multiple element removal failed\n\n";
+        }
+
+        // Do add of somethng that's already there, which should be rejected
+        if (tCIDColAlgo::bAddIfNew(colRemove, L"Second"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Duplicate element was not rejected\n\n";
+        }
+
+        // Now one that should be taken
+        if (!tCIDColAlgo::bAddIfNew(colRemove, L"Sixth"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"New unique element was rejected\n\n";
+        }
+
+        //
+        //  Use a case insensitive comparison, which should reject even though
+        //  it's a different case.
+        //
+        if (tCIDColAlgo::bAddIfNew(colRemove, L"second", TString::bCompI))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Case insentive compare was not rejected\n\n";
+        }
+
+        // Add with a different case and case snsitive compare, which should be taken
+        if (!tCIDColAlgo::bAddIfNew(colRemove, L"second"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Different case element was rejected\n\n";
         }
     }
 

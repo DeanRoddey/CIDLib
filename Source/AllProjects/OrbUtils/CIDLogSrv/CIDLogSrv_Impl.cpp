@@ -181,17 +181,14 @@ TCIDLogServerImpl::bGetLiveEvents(  tCIDLib::TCard4&        c4NextEventId
     {
         if (c4NextEventId)
         {
-            colToFill.objAdd
+            colToFill.objPlace
             (
-                TError
-                (
-                    facCIDLogSrv.strName()
-                    , CID_FILE
-                    , CID_LINE
-                    , facCIDLogSrv.strMsg(kLogSErrs::errcLive_EventsMissed)
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::OutOfSync
-                )
+                facCIDLogSrv.strName()
+                , CID_FILE
+                , CID_LINE
+                , facCIDLogSrv.strMsg(kLogSErrs::errcLive_EventsMissed)
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::OutOfSync
             );
         }
 
@@ -201,17 +198,14 @@ TCIDLogServerImpl::bGetLiveEvents(  tCIDLib::TCard4&        c4NextEventId
      else if (c4NextEventId > pnodeTail->m_c4Index)
     {
         // Fake an event into the list to tell him what happened
-        colToFill.objAdd
+        colToFill.objPlace
         (
-            TError
-            (
-                facCIDLogSrv.strName()
-                , CID_FILE
-                , CID_LINE
-                , facCIDLogSrv.strMsg(kLogSErrs::errcLive_OutOfSync)
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::OutOfSync
-            )
+            facCIDLogSrv.strName()
+            , CID_FILE
+            , CID_LINE
+            , facCIDLogSrv.strMsg(kLogSErrs::errcLive_OutOfSync)
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::OutOfSync
         );
         // Don't give him anything else back, but we'll resync him now
     }
@@ -231,21 +225,17 @@ TCIDLogServerImpl::bGetLiveEvents(  tCIDLib::TCard4&        c4NextEventId
         //
         if (!pnodeCur)
         {
-            colToFill.objAdd
+            colToFill.objPlace
             (
-                TError
+                facCIDLogSrv.strName()
+                , CID_FILE
+                , CID_LINE
+                , facCIDLogSrv.strMsg
                 (
-                    facCIDLogSrv.strName()
-                    , CID_FILE
-                    , CID_LINE
-                    , facCIDLogSrv.strMsg
-                      (
-                        kLogSErrs::errcLive_BadId
-                        , TCardinal(c4NextEventId)
-                      )
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::NotFound
+                    kLogSErrs::errcLive_BadId, TCardinal(c4NextEventId)
                 )
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::NotFound
             );
         }
     }

@@ -210,9 +210,9 @@ tCIDLib::TBoolean TUPnPDevPropsService::bLEDState(const tCIDLib::TBoolean bToSet
 
     m_colInParms.RemoveAll();
     if (bToSet)
-        m_colInParms.objAdd(TString(L"On"));
+        m_colInParms.objPlace(L"On");
     else
-        m_colInParms.objAdd(TString(L"Off"));
+        m_colInParms.objPlace(L"Off");
 
     InvokeAction(strCmd, m_colInParms, m_colOutParms);
     CheckRetParmCnt(strCmd, m_colOutParms.c4ElemCount(), 0);

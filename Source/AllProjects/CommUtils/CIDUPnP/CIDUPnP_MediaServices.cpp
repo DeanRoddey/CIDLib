@@ -309,7 +309,7 @@ TUPnPAVTransService::AddURIToQueue( const   TString&            strURI
     m_colInParms.objAdd(CIDUPnP_MediaServices::strVal_InstID);
     m_colInParms.objAdd(strURI);
     m_colInParms.objAdd(strMetaData);
-    m_colInParms.objAdd(TString(TCardinal(c4FirstTrInd)));
+    m_colInParms.objPlace(TCardinal(c4FirstTrInd));
     if (bAsNext)
         m_colInParms.objAdd(kCIDUPnP_::strVal_One);
     else
@@ -855,7 +855,7 @@ TUPnPAVTransService::StartAutoplay( const   TString&            strURI
     m_colInParms.objAdd(CIDUPnP_MediaServices::strVal_InstID);
     m_colInParms.objAdd(strURI);
     m_colInParms.objAdd(TString::strEmpty());
-    m_colInParms.objAdd(TString(TCardinal(c4Volume)));
+    m_colInParms.objPlace(TCardinal(c4Volume));
     m_colInParms.objAdd(bIncLinked ? kCIDUPnP_::strVal_One : kCIDUPnP_::strVal_Zero);
     m_colInParms.objAdd(bResetVol ? kCIDUPnP_::strVal_One : kCIDUPnP_::strVal_Zero);
     InvokeAction
@@ -1347,8 +1347,8 @@ TUPnPContDirService::DoBrowse(  const   TString&            strContID
     else
         m_colInParms.objAdd(L"BrowseMetadata");
     m_colInParms.objAdd(L"*");
-    m_colInParms.objAdd(TString(TCardinal(c4StartAt)));
-    m_colInParms.objAdd(TString(TCardinal(c4ToGet)));
+    m_colInParms.objPlace(TCardinal(c4StartAt));
+    m_colInParms.objPlace(TCardinal(c4ToGet));
     m_colInParms.objAdd(L"*");
     InvokeAction(strCmd, m_colInParms, m_colOutParms);
 

@@ -89,7 +89,7 @@ const tCIDLib::TCard4 TUniqueString::c4AddString(const TString& strToAdd)
     if (!pastrTest)
     {
         // Don't got it, so add with next id and add to the id view
-        pastrTest = &m_colUniqueList.objAdd(TAString{ strToAdd, m_c4NextId++ });
+        pastrTest = &m_colUniqueList.objPlace(strToAdd, m_c4NextId++);
         m_colURLIdView.Add(pastrTest);
     }
     return pastrTest->m_c4Id;

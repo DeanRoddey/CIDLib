@@ -806,7 +806,7 @@ TUPnPDevice::ParseServiceList(const TXMLTreeElement& xtnodeDev, TString& strTmp)
         {
             strTmp = pxtnodeId->xtnodeChildAtAsText(0).strText();
             strType = pxtnodeType->xtnodeChildAtAsText(0).strText();
-            m_colServices.objAdd(TKeyValuePair(strType, strTmp));
+            m_colServices.objPlace(strType, strTmp);
         }
     }
 }
