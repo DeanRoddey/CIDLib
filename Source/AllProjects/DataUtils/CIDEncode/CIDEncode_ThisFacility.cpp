@@ -327,8 +327,8 @@ TFacCIDEncode::GetAllEncodingNames(tCIDLib::TStrCollect& colToFill) const
 //  the former and puts the pointer in a managed pointer object.
 //
 TTextConverter*
-TFacCIDEncode::ptcvtMakeNew(const   TString&            strName
-                            , const tCIDLib::TBoolean   bThrowIfNot) const
+TFacCIDEncode::ptcvtMake(const  TString&            strName
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     //
     //  We lock the mapping list until we've gotten our value out of it.
@@ -364,11 +364,48 @@ TFacCIDEncode::ptcvtMakeNew(const   TString&            strName
     return ::pobjMakeNewOfClass<TTextConverter>(strClassName);
 }
 
-tCIDEncode::TTCvtPtr
-TFacCIDEncode::cptrMakeNew( const   TString&            strName
-                            , const tCIDLib::TBoolean   bThrowIfNot) const
+TTextConverter*
+TFacCIDEncode::ptcvtMake(const  TString&            strName
+                        , const tCIDLib::ETCvtActs  eErrAction
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
 {
-    return tCIDEncode::TTCvtPtr(ptcvtMakeNew(strName, bThrowIfNot));
+    TTextConverter* ptcvtRet = ptcvtMake(strName, bThrowIfNot);
+    if (ptcvtRet)
+        ptcvtRet->eErrorAction(eErrAction);
+    return ptcvtRet;
+}
+
+TTextConverter*
+TFacCIDEncode::ptcvtMake(const  TString&        strName
+                        , const tCIDLib::TCh    chRepCar) const
+{
+    TTextConverter* ptcvtRet = ptcvtMake(strName, tCIDLib::ETCvtActs::Replace);
+    if (ptcvtRet)
+        ptcvtRet->chRepChar(chRepCar);
+    return ptcvtRet;
+}
+
+
+tCIDEncode::TTCvtPtr
+TFacCIDEncode::cptrMake(const   TString&            strName
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
+{
+    return tCIDEncode::TTCvtPtr(ptcvtMake(strName, bThrowIfNot));
+}
+
+tCIDEncode::TTCvtPtr
+TFacCIDEncode::cptrMake(const   TString&            strName
+                        , const tCIDLib::ETCvtActs  eErrAction
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
+{
+    return tCIDEncode::TTCvtPtr(ptcvtMake(strName, eErrAction, bThrowIfNot));
+}
+
+tCIDEncode::TTCvtPtr
+TFacCIDEncode::cptrMake(const   TString&        strName
+                        , const tCIDLib::TCh    chRepChar) const
+{
+    return tCIDEncode::TTCvtPtr(ptcvtMake(strName, chRepChar));
 }
 
 

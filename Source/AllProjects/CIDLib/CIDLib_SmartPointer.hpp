@@ -56,6 +56,131 @@ namespace TSmartPtrHelpers
 
 
 // ---------------------------------------------------------------------------
+//   CLASS: TUniquePtr
+//  PREFIX: uptr
+// ---------------------------------------------------------------------------
+template <class T> class TUniquePtr
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TUniquePtr() :
+
+            m_pData(nullptr)
+        {
+        }
+
+        explicit TUniquePtr(T* const pAdopt) :
+
+            m_pData(pAdopt)
+        {
+        }
+
+        TUniquePtr(const TUniquePtr<T>&) = delete;
+
+        TUniquePtr(TUniquePtr<T>&& uptrSrc) :
+
+            m_pData(nullptr)
+        {
+            *this = tCIDLib::ForceMove(uptrSrc);
+        }
+
+        ~TUniquePtr()
+        {
+            if (m_pData)
+            {
+                try
+                {
+                    delete m_pData;
+                    m_pData = nullptr;
+                }
+
+                catch(...)
+                {
+                }
+            }
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TUniquePtr<T>& operator=(const TUniquePtr<T>&) = delete;
+
+        TUniquePtr<T>& operator=(TUniquePtr<T>&& uptrSrc)
+        {
+            if (&uptrSrc != this)
+                tCIDLib::Swap(m_pData, uptrSrc.m_pData);
+            return *this;
+        }
+
+        operator tCIDLib::TBoolean() const
+        {
+            return (m_pData != nullptr);
+        }
+
+        tCIDLib::TBoolean operator!() const
+        {
+            return (m_pData == nullptr);
+        }
+
+        T* operator->()
+        {
+            return m_pData;
+        }
+
+        const T* operator->() const
+        {
+            return m_pData;
+        }
+
+        const T& operator*() const
+        {
+            return *m_pData;
+        }
+
+        T& operator*()
+        {
+            return *m_pData;
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid DropRef()
+        {
+            // If we still have a valid pointer, then we own it
+            if (m_pData)
+            {
+                T* pOld = m_pData;
+                m_pData = nullptr;
+                delete pOld;
+            }
+        }
+
+        [[nodiscard]] T* pOrphan()
+        {
+            T* pRet = m_pData;
+            m_pData = nullptr;
+            return pRet;
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_pData
+        //      The data object we were given to handle. It can be null of course.
+        // -------------------------------------------------------------------
+        T*  m_pData;
+};
+
+
+
+// ---------------------------------------------------------------------------
 //   CLASS: TCntPtr
 //  PREFIX: cptr
 // ---------------------------------------------------------------------------
@@ -87,6 +212,13 @@ template <class T> class TCntPtr
                 TAtomic::c4SafeAcquire(cptrSrc.m_pcdRef->m_c4RefCnt);
                 m_pcdRef = cptrSrc.m_pcdRef;
             }
+        }
+
+        // Become responsible for the object in a unique pointer
+        TCntPtr(TUniquePtr<T>& uptrSrc) :
+
+            m_pcdRef(new TCntData(uptrSrc.pOrphan()))
+        {
         }
 
         ~TCntPtr()
@@ -412,120 +544,6 @@ template <class T> class TMngPtr
         //
         //  m_pData
         //      This the pointer to the data
-        // -------------------------------------------------------------------
-        T*  m_pData;
-};
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TUniquePtr
-//  PREFIX: uptr
-// ---------------------------------------------------------------------------
-template <class T> class TUniquePtr
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and destructor
-        // -------------------------------------------------------------------
-        TUniquePtr() :
-
-            m_pData(nullptr)
-        {
-        }
-
-        explicit TUniquePtr(T* const pAdopt) :
-
-            m_pData(pAdopt)
-        {
-        }
-
-        TUniquePtr(const TUniquePtr<T>&) = delete;
-
-        TUniquePtr(TUniquePtr<T>&& uptrSrc) :
-
-            m_pData(nullptr)
-        {
-            *this = tCIDLib::ForceMove(uptrSrc);
-        }
-
-        ~TUniquePtr()
-        {
-            if (m_pData)
-            {
-                try
-                {
-                    delete m_pData;
-                    m_pData = nullptr;
-                }
-
-                catch(...)
-                {
-                }
-            }
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TUniquePtr<T>& operator=(const TUniquePtr<T>&) = delete;
-
-        TUniquePtr<T>& operator=(TUniquePtr<T>&& uptrSrc)
-        {
-            if (&uptrSrc != this)
-                tCIDLib::Swap(m_pData, uptrSrc.m_pData);
-            return *this;
-        }
-
-        operator tCIDLib::TBoolean() const
-        {
-            return (m_pData != nullptr);
-        }
-
-        tCIDLib::TBoolean operator!() const
-        {
-            return (m_pData == nullptr);
-        }
-
-        T* operator->()
-        {
-            return m_pData;
-        }
-
-        const T* operator->() const
-        {
-            return m_pData;
-        }
-
-        const T& operator*() const
-        {
-            return *m_pData;
-        }
-
-        T& operator*()
-        {
-            return *m_pData;
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        [[nodiscard]] T* pOrphan()
-        {
-            T* pRet = m_pData;
-            m_pData = nullptr;
-            return pRet;
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_pData
-        //      The data object we were given to handle. It can be null of course.
         // -------------------------------------------------------------------
         T*  m_pData;
 };

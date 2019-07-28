@@ -18,7 +18,7 @@
 //  This header defines a very simple derivative of TRefBag, TRefSortedBag,
 //  which just adds the capability to insert new objects in sorted order. All
 //  it requires, beyond the usual RTTI and constructor/destructor stuff, is
-//  to override the Add() method and find the correct sorted add position.
+//  to final the Add() method and find the correct sorted add position.
 //
 //  The comp function cannot be a capturing lambda because we have no way to
 //  specialize a template on a lambda. So we have to define it as a regular
@@ -83,7 +83,7 @@ template <typename TElem> class TRefSortedBag : public TRefBag<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Add(TElem* const pobjToAdd) override
+        tCIDLib::TVoid Add(TElem* const pobjToAdd) final
         {
             //
             //  The base class would catch this, but we will deref it below to

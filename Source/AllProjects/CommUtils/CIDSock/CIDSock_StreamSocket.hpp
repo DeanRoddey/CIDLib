@@ -181,7 +181,7 @@ class CIDSOCKEXP TStreamSocket : public TSocket
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid SocketClosed() override;
+        tCIDLib::TVoid SocketClosed() final;
 
 
     private :

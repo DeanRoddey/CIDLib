@@ -84,7 +84,7 @@ template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        TElem& objAdd(const TElem& objNew) override
+        TElem& objAdd(const TElem& objNew) final
         {
             // Delegate to our parent
             return this->objAddAtBottom(objNew);

@@ -170,7 +170,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             //
             TTextMBufInStream strmTmp
             (
-                &mbufRead, c4Count, tCIDLib::EAdoptOpts::NoAdopt, new TUSASCIIConverter
+                tCIDLib::ForceMove(mbufRead), c4Count, new TUSASCIIConverter
             );
 
             // Lets read a line of text from it and print it out

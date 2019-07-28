@@ -747,7 +747,7 @@ TTest_ChunkedTextOutStream::eRunTest(TTextStringOutStream&  strmOut
             return tTestFWLib::ETestRes::Failed;
         }
 
-        TTextMBufInStream strmSrc(&mbufText, c4DataSz);
+        TTextMBufInStream strmSrc(tCIDLib::ForceMove(mbufText), c4DataSz);
         TString strRead;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < 1000; c4Index++)
         {

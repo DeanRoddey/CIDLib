@@ -238,6 +238,17 @@ TNetCoreParser::bFindTextEncoding(  const   tCIDLib::TKVPCollect&   colHdrLines
         }
     }
 
+
+    //
+    //  Compare against some well text types. If so, return the default
+    //  HTTP text encoding.
+    //
+    if (facCIDNet().bIsKnownTextType(strCType))
+    {
+        strEncoding = strEncoding = kCIDNet::pszDefHTTPEncoding;
+        return kCIDLib::True;
+    }
+
     return kCIDLib::False;
 }
 

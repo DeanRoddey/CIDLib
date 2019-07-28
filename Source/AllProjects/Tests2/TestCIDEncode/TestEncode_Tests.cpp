@@ -101,9 +101,9 @@ TTest_ByName::eRunTest( TTextStringOutStream&   strmOut
         //  case it and try that. Tell it to throw if not found
         //
         strCurName = L"ISO-8859-1";
-        delete facCIDEncode().ptcvtMakeNew(strCurName, kCIDLib::True);
+        delete facCIDEncode().ptcvtMake(strCurName, kCIDLib::True);
         strCurName = L"iso-8859-1";
-        delete facCIDEncode().ptcvtMakeNew(strCurName, kCIDLib::True);
+        delete facCIDEncode().ptcvtMake(strCurName, kCIDLib::True);
     }
 
     catch(...)
@@ -117,14 +117,14 @@ TTest_ByName::eRunTest( TTextStringOutStream&   strmOut
     TTextConverter* pcvtRet;
     try
     {
-        pcvtRet = facCIDEncode().ptcvtMakeNew(L"BogusEncoding", kCIDLib::True);
+        pcvtRet = facCIDEncode().ptcvtMake(L"BogusEncoding", kCIDLib::True);
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Request to create bad encoding name did not throw"
                 << kCIDLib::DNewLn;
     }
     catch(...) { }
 
-    pcvtRet = facCIDEncode().ptcvtMakeNew(L"BogusEncoding2");
+    pcvtRet = facCIDEncode().ptcvtMake(L"BogusEncoding2");
     if (pcvtRet != nullptr)
     {
         eRes = tTestFWLib::ETestRes::Failed;
@@ -531,7 +531,7 @@ TTest_ErrModes::bTestBadSrc(        TTextOutStream&         strmOut
     //  First, set the mode to Throw mode, which sould fail without
     //  transcoding anything.
     //
-    tcvtTest.eErrorAction(tCIDLib::ETCvtActions::Throw);
+    tcvtTest.eErrorAction(tCIDLib::ETCvtActs::Throw);
     bCaughtIt = kCIDLib::False;
     try
     {
@@ -556,7 +556,7 @@ TTest_ErrModes::bTestBadSrc(        TTextOutStream&         strmOut
     //  Now test the StopThenThrow mode. We should decode c4ErrIndex
     //  characters the first time, then throw the second time.
     //
-    tcvtTest.eErrorAction(tCIDLib::ETCvtActions::StopThenThrow);
+    tcvtTest.eErrorAction(tCIDLib::ETCvtActs::StopThenThrow);
     try
     {
         c4BytesEaten = tcvtTest.c4ConvertFrom
@@ -611,7 +611,7 @@ TTest_ErrModes::bTestBadSrc(        TTextOutStream&         strmOut
     }
 
     // Now test the replacement character mode
-    tcvtTest.eErrorAction(tCIDLib::ETCvtActions::Replace);
+    tcvtTest.eErrorAction(tCIDLib::ETCvtActs::Replace);
     tcvtTest.chRepChar(chRepChar);
     try
     {
@@ -662,7 +662,7 @@ TTest_ErrModes::bTestBadTar(        TTextOutStream&         strmOut
     //  First, set the mode to Throw mode, which sould fail without
     //  transcoding anything.
     //
-    tcvtTest.eErrorAction(tCIDLib::ETCvtActions::Throw);
+    tcvtTest.eErrorAction(tCIDLib::ETCvtActs::Throw);
     bCaughtIt = kCIDLib::False;
     try
     {
@@ -689,7 +689,7 @@ TTest_ErrModes::bTestBadTar(        TTextOutStream&         strmOut
     //  characters and c4Bytes eaten the first time, then throw the
     //  second time.
     //
-    tcvtTest.eErrorAction(tCIDLib::ETCvtActions::StopThenThrow);
+    tcvtTest.eErrorAction(tCIDLib::ETCvtActs::StopThenThrow);
     try
     {
         const tCIDLib::TCard4 c4Len = strData.c4Length();

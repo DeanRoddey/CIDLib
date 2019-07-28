@@ -318,13 +318,12 @@ tCIDLib::TCh TTextConverter::chRepChar(const tCIDLib::TCh chToSet)
 //  Get or set the error action to take when bad data is seen during
 //  internalization.
 //
-tCIDLib::ETCvtActions TTextConverter::eErrorAction() const
+tCIDLib::ETCvtActs TTextConverter::eErrorAction() const
 {
     return m_eErrAction;
 }
 
-tCIDLib::ETCvtActions
-TTextConverter::eErrorAction(const tCIDLib::ETCvtActions eAction)
+tCIDLib::ETCvtActs TTextConverter::eErrorAction(const tCIDLib::ETCvtActs eAction)
 {
     m_eErrAction = eAction;
     return m_eErrAction;
@@ -344,7 +343,7 @@ const TString& TTextConverter::strEncodingName() const
 TTextConverter::TTextConverter(const TString& strEncodingName) :
 
     m_chRepChar(kCIDLib::chSpace)
-    , m_eErrAction(tCIDLib::ETCvtActions::Throw)
+    , m_eErrAction(tCIDLib::ETCvtActs::Throw)
     , m_strEncodingName(strEncodingName)
 {
 }
@@ -352,7 +351,7 @@ TTextConverter::TTextConverter(const TString& strEncodingName) :
 TTextConverter::TTextConverter(const TTextConverter& tcvtToCopy) :
 
     m_chRepChar(tcvtToCopy.m_chRepChar)
-    , m_eErrAction(tCIDLib::ETCvtActions::Throw)
+    , m_eErrAction(tCIDLib::ETCvtActs::Throw)
     , m_strEncodingName(tcvtToCopy.m_strEncodingName)
 {
 }

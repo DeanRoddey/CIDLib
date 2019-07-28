@@ -324,7 +324,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     return TParent::bIsDescendantOf(clsTarget);
                 }
 
-                tCIDLib::TBoolean bIsValid() const override
+                tCIDLib::TBoolean bIsValid() const final
                 {
                     if (!TParent::bIsValid())
                         return kCIDLib::False;
@@ -337,7 +337,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     );
                 }
 
-                tCIDLib::TBoolean bNext() override
+                tCIDLib::TBoolean bNext() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -353,7 +353,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bPrevious() override
+                tCIDLib::TBoolean bPrevious() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -369,7 +369,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bReset() override
+                tCIDLib::TBoolean bReset() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -383,7 +383,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bSeekToEnd() override
+                tCIDLib::TBoolean bSeekToEnd() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -407,7 +407,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     return TParent::clsThis();
                 }
 
-                const TElem& objRCur() const override
+                const TElem& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -607,19 +607,19 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
+                tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
                 {
                     if (clsTarget == clsThis())
                         return kCIDLib::True;
                     return TParent::bIsDescendantOf(clsTarget);
                 }
 
-                const TClass& clsIsA() const override
+                const TClass& clsIsA() const final
                 {
                     return clsThis();
                 }
 
-                const TClass& clsParent() const override
+                const TClass& clsParent() const final
                 {
                     return TParent::clsThis();
                 }
@@ -751,7 +751,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Add(TElem* const pobjToAdd) override
+        tCIDLib::TVoid Add(TElem* const pobjToAdd) final
         {
             if (!pobjToAdd)
                 this->NullNodeAdded(CID_FILE, CID_LINE);
@@ -791,41 +791,41 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             m_c4CurElements++;
         }
 
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
         {
             if (clsTarget == clsThis())
                 return kCIDLib::True;
             return TRefCollection<TElem>::bIsDescendantOf(clsTarget);
         }
 
-        tCIDLib::TBoolean bIsEmpty() const override
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             return (m_c4CurElements == 0);
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
              return m_c4CurElements;
         }
 
-        const TClass& clsIsA() const override
+        const TClass& clsIsA() const final
         {
             return clsThis();
         }
 
-        const TClass& clsParent() const override
+        const TClass& clsParent() const final
         {
             return TRefCollection<TElem>::clsThis();
         }
 
-        tCIDLib::EAdoptOpts eAdopt() const override
+        tCIDLib::EAdoptOpts eAdopt() const final
         {
             return m_eAdopt;
         }
 
-        tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) override
+        tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) final
         {
             // Look and add all of our items to the target
             TMtxLocker lockThis(this->pmtxLock());
@@ -847,7 +847,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             RemoveAll();
         }
 
-        tCIDLib::TVoid OrphanElem(TElem* const pobjToOrphan) override
+        tCIDLib::TVoid OrphanElem(TElem* const pobjToOrphan) final
         {
             TMtxLocker lockSync(this->pmtxLock());
 
@@ -895,13 +895,13 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             m_c4CurElements--;
         }
 
-        [[nodiscard]] TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
             TMtxLocker lockSync(this->pmtxLock());
             if (!m_c4CurElements)
@@ -914,7 +914,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             this->c4IncSerialNum();
         }
 
-        tCIDLib::TVoid RemoveElem(TElem* const pobjToRemove) override
+        tCIDLib::TVoid RemoveElem(TElem* const pobjToRemove) final
         {
             TMtxLocker lockSync(this->pmtxLock());
 

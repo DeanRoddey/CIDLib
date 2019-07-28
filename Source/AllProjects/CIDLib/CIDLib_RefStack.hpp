@@ -74,7 +74,7 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Add(TElem* const pobjNew) override
+        tCIDLib::TVoid Add(TElem* const pobjNew) final
         {
             this->AddAtBottom(pobjNew);
         }

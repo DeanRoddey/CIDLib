@@ -244,14 +244,14 @@ template <class TElem> class TQueue : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsValid() const override
+                tCIDLib::TBoolean bIsValid() const final
                 {
                     if (!TParent::bIsValid())
                         return kCIDLib::False;
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bNext() override
+                tCIDLib::TBoolean bNext() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -263,7 +263,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bPrevious() override
+                tCIDLib::TBoolean bPrevious() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -278,7 +278,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bSeekToEnd() override
+                tCIDLib::TBoolean bSeekToEnd() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -291,7 +291,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bReset() override
+                tCIDLib::TBoolean bReset() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -304,7 +304,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                const TElem& objRCur() const override
+                const TElem& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -567,19 +567,19 @@ template <class TElem> class TQueue : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsEmpty() const override
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return m_llstQueue.bIsEmpty();
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return m_llstQueue.c4ElemCount();
         }
 
-        TElem& objAdd(const TElem& objNew) override
+        TElem& objAdd(const TElem& objNew) final
         {
             TMtxLocker lockQueue(this->pmtxLock());
             TElem& objRet = objPut(objNew);
@@ -587,13 +587,13 @@ template <class TElem> class TQueue : public TCollection<TElem>
             return objRet;
         }
 
-        [[nodiscard]] TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const final
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return new TCursor(this);
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
             TMtxLocker lockQueue(this->pmtxLock());
             if (m_llstQueue.bIsEmpty())

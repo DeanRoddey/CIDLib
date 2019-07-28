@@ -169,7 +169,7 @@ TMEngTextInStreamVal::SetStream(TTextInStream* const pstrmToAdopt)
     //  not expose it, so we it would fail if they tried to read the mode
     //  at any point.
     //
-    m_pstrmSrc->tcvtThis().eErrorAction(tCIDLib::ETCvtActions::Throw);
+    m_pstrmSrc->tcvtThis().eErrorAction(tCIDLib::ETCvtActs::Throw);
 }
 
 
@@ -279,8 +279,8 @@ tCIDLib::TVoid TMEngTextInStreamInfo::Init(TCIDMacroEngine& meOwner)
             , L"MEng.Enum"
             , 2
         );
-        m_pmeciInErrActs->c4AddEnumItem(L"Throw", L"Throw on Error", tCIDLib::ETCvtActions::Throw);
-        m_pmeciInErrActs->c4AddEnumItem(L"RepChar", L"Use replacement character", tCIDLib::ETCvtActions::Replace);
+        m_pmeciInErrActs->c4AddEnumItem(L"Throw", L"Throw on Error", tCIDLib::ETCvtActs::Throw);
+        m_pmeciInErrActs->c4AddEnumItem(L"RepChar", L"Use replacement character", tCIDLib::ETCvtActs::Replace);
         m_pmeciInErrActs->BaseClassInit(meOwner);
         m_c2TypeId_InErrActs = meOwner.c2AddClass(m_pmeciInErrActs);
         bAddNestedType(m_pmeciInErrActs->strClassPath());
@@ -458,7 +458,7 @@ TMEngTextInStreamInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
             TMEngEnumVal& mecvAct = meOwner.mecvStackAtAs<TMEngEnumVal>(c4FirstInd);
             mecvActual.strmSrc(meOwner).tcvtThis().eErrorAction
             (
-                tCIDLib::ETCvtActions(m_pmeciInErrActs->c4MapValue(mecvAct))
+                tCIDLib::ETCvtActs(m_pmeciInErrActs->c4MapValue(mecvAct))
             );
         }
 
@@ -832,7 +832,7 @@ TMEngFileInStreamInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
                     , tCIDLib::EFilePerms::Default
                     , tCIDLib::EFileFlags::None
                     , tCIDLib::EAccessModes::Read
-                    , facCIDEncode().ptcvtMakeNew(mecvActual.strEncoding())
+                    , facCIDEncode().ptcvtMake(mecvActual.strEncoding())
                 )
             );
 

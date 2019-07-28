@@ -90,27 +90,21 @@ class CIDLIBEXP TUTFConverter : public TTextConverter
             const   EEncodings              eEncoding = EEncodings::UTF8
         );
 
-        TUTFConverter
-        (
-            const   TUTFConverter&          tcvtSrc
-        );
+        TUTFConverter(const TUTFConverter&) = default;
 
-        ~TUTFConverter();
+        ~TUTFConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TUTFConverter& operator=
-        (
-            const   TUTFConverter&          tcvtSrc
-        );
+        TUTFConverter& operator=(const TUTFConverter&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::EBaseTextFmts eBaseFmt() const override;
+        tCIDLib::EBaseTextFmts eBaseFmt() const final;
 
 
         // -------------------------------------------------------------------
@@ -131,7 +125,7 @@ class CIDLIBEXP TUTFConverter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxChars
             ,       tCIDLib::TCard4&        c4OutChars
             ,       tCIDLib::TBoolean&      bStop
-        ) override;
+        )   final;
 
         tCIDLib::TCard4 c4BlockTo
         (
@@ -141,7 +135,7 @@ class CIDLIBEXP TUTFConverter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxBytes
             ,       tCIDLib::TCard4&        c4OutBytes
             ,       tCIDLib::TBoolean&      bStop
-        ) override;
+        )   final;
 
 
     private :
@@ -173,23 +167,19 @@ class CIDLIBEXP TUSASCIIConverter: public TUTFConverter
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TUSASCIIConverter();
+        TUSASCIIConverter() : TUTFConverter(TUTFConverter::EEncodings::USASCII)
+        {
+        }
 
-        TUSASCIIConverter
-        (
-            const   TUSASCIIConverter&      tcvtSrc
-        );
+        TUSASCIIConverter(const TUSASCIIConverter&) = default;
 
-        ~TUSASCIIConverter();
+        ~TUSASCIIConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TUSASCIIConverter& operator=
-        (
-            const   TUSASCIIConverter&      tcvtSrc
-        );
+        TUSASCIIConverter& operator=(const TUSASCIIConverter&) = default;
 
 
     private :
@@ -211,23 +201,19 @@ class CIDLIBEXP TUTF16BEConverter: public TUTFConverter
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TUTF16BEConverter();
+        TUTF16BEConverter() : TUTFConverter(TUTFConverter::EEncodings::UTF16_BE)
+        {
+        }
 
-        TUTF16BEConverter
-        (
-            const   TUTF16BEConverter&      tcvtSrc
-        );
+        TUTF16BEConverter(const TUTF16BEConverter&) = default;
 
-        ~TUTF16BEConverter();
+        ~TUTF16BEConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TUTF16BEConverter& operator=
-        (
-            const   TUTF16BEConverter&      tcvtSrc
-        );
+        TUTF16BEConverter& operator=(const TUTF16BEConverter&) = default;
 
 
     private :
@@ -249,23 +235,19 @@ class CIDLIBEXP TUTF16LEConverter: public TUTFConverter
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TUTF16LEConverter();
+        TUTF16LEConverter() : TUTFConverter(TUTFConverter::EEncodings::UTF16_LE)
+        {
+        }
 
-        TUTF16LEConverter
-        (
-            const   TUTF16LEConverter&      tcvtSrc
-        );
+        TUTF16LEConverter(const TUTF16LEConverter&) = default;
 
-        ~TUTF16LEConverter();
+        ~TUTF16LEConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TUTF16LEConverter& operator=
-        (
-            const   TUTF16LEConverter&      tcvtSrc
-        );
+        TUTF16LEConverter& operator=(const TUTF16LEConverter&) = default;
 
 
     private :
@@ -287,23 +269,19 @@ class CIDLIBEXP TUTF8Converter: public TUTFConverter
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TUTF8Converter();
+        TUTF8Converter() :TUTFConverter(TUTFConverter::EEncodings::UTF8)
+        {
+        }
 
-        TUTF8Converter
-        (
-            const   TUTF8Converter&         tcvtSrc
-        );
+        TUTF8Converter(const TUTF8Converter&) = default;
 
-        ~TUTF8Converter();
+        ~TUTF8Converter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TUTF8Converter& operator=
-        (
-            const   TUTF8Converter&         tcvtSrc
-        );
+        TUTF8Converter& operator=(const TUTF8Converter&) = default;
 
 
     private :

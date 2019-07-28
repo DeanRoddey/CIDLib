@@ -1263,8 +1263,7 @@ TSMTPClient::ColumnateMsg(          TCIDDataSrc&            cdsSrc
     //  If we have no column width, just dump it as is and we are done. Else
     //  we have to break it into lines.
     //
-    TTextConverter* ptcvtMsg = facCIDEncode().ptcvtMakeNew(strTextEncoding);
-    TJanitor<TTextConverter> janEncoder(ptcvtMsg);
+    TJanitor<TTextConverter> janEncoder(facCIDEncode().ptcvtMake(strTextEncoding));
 
     tCIDLib::TCard4 c4DBytes = 0;
     if (m_c4ColWidth)
@@ -1321,7 +1320,7 @@ TSMTPClient::ColumnateMsg(          TCIDDataSrc&            cdsSrc
             // Terminate this line, transcode it, and write it to the output
             pszTmpBuf[c4OutIndex] = 0;
 
-            ptcvtMsg->c4ConvertTo(pszTmpBuf, c4OutIndex, mbufData, c4DBytes);
+            janEncoder->c4ConvertTo(pszTmpBuf, c4OutIndex, mbufData, c4DBytes);
             cdsSrc.WriteBytes(mbufData, c4DBytes);
 
             // Reset the line index
@@ -1337,7 +1336,7 @@ TSMTPClient::ColumnateMsg(          TCIDDataSrc&            cdsSrc
      else
     {
         THeapBuf mbufData(strMsgText.c4Length() * 2);
-        ptcvtMsg->c4ConvertTo(strMsgText, mbufData, c4DBytes);
+        janEncoder->c4ConvertTo(strMsgText, mbufData, c4DBytes);
 
         // And we need a blank line after it
         mbufData.PutCard1(0xD, c4DBytes++);

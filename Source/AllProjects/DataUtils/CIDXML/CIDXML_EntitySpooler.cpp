@@ -366,8 +366,8 @@ TXMLEntSpooler::TXMLEntSpooler( const   TString&                strSystemId
         // Tell the decoder our desired action on bad source
         m_ptcvtDecode->eErrorAction
         (
-            m_bIgnoreBadChars ? tCIDLib::ETCvtActions::Replace
-                              : tCIDLib::ETCvtActions::StopThenThrow
+            m_bIgnoreBadChars ? tCIDLib::ETCvtActs::Replace
+                              : tCIDLib::ETCvtActs::StopThenThrow
         );
 
         //
@@ -1200,7 +1200,12 @@ TXMLEntSpooler::SetDeclEncoding(const TString& strDeclEncoding)
     //  creating one for the basic auto-sensed format or the one that was
     //  set in the passed encoding string.
     //
-    m_ptcvtDecode = facCIDEncode().ptcvtMakeNew(m_strEncoding);
+    m_ptcvtDecode = facCIDEncode().ptcvtMake
+    (
+        m_strEncoding
+        , m_bIgnoreBadChars ? tCIDLib::ETCvtActs::Replace
+                            : tCIDLib::ETCvtActs::StopThenThrow
+    );
     if (!m_ptcvtDecode)
     {
         facCIDXML().ThrowErr
@@ -1213,17 +1218,6 @@ TXMLEntSpooler::SetDeclEncoding(const TString& strDeclEncoding)
             , m_strEncoding
         );
     }
-
-    //
-    //  Tell it our desired action on bad source. If it's to replace, the
-    //  default replacement character is a space, so we don't need to set
-    //  it.
-    //
-    m_ptcvtDecode->eErrorAction
-    (
-        m_bIgnoreBadChars ? tCIDLib::ETCvtActions::Replace
-                          : tCIDLib::ETCvtActions::StopThenThrow
-    );
 }
 
 
@@ -1651,7 +1645,12 @@ tCIDLib::TBoolean TXMLEntSpooler::bReloadCharBuf()
         //  the encoding. If there was one, then we will put off the
         //  creation of the transcoder until the decl is processed.
         //
-        m_ptcvtDecode = facCIDEncode().ptcvtMakeNew(m_strEncoding);
+        m_ptcvtDecode = facCIDEncode().ptcvtMake
+        (
+            m_strEncoding
+            , m_bIgnoreBadChars ? tCIDLib::ETCvtActs::Replace
+                                : tCIDLib::ETCvtActs::StopThenThrow
+        );
         if (!m_ptcvtDecode)
         {
             facCIDXML().ThrowErr
@@ -1664,13 +1663,6 @@ tCIDLib::TBoolean TXMLEntSpooler::bReloadCharBuf()
                 , m_strEncoding
             );
         }
-
-        // Tell it our desired action on bad source
-        m_ptcvtDecode->eErrorAction
-        (
-            m_bIgnoreBadChars ? tCIDLib::ETCvtActions::Replace
-                              : tCIDLib::ETCvtActions::StopThenThrow
-        );
     }
 
     // Calculate the chars we can now load up max

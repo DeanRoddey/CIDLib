@@ -242,14 +242,14 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsValid() const override
+                tCIDLib::TBoolean bIsValid() const final
                 {
                     if (!TParent::bIsValid())
                         return kCIDLib::False;
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bNext() override
+                tCIDLib::TBoolean bNext() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -261,7 +261,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bPrevious() override
+                tCIDLib::TBoolean bPrevious() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -273,7 +273,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bSeekToEnd() override
+                tCIDLib::TBoolean bSeekToEnd() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -286,7 +286,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bReset() override
+                tCIDLib::TBoolean bReset() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -299,7 +299,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                const TElem& objRCur() const override
+                const TElem& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -511,30 +511,30 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Add(TElem* const pobjNew) override
+        tCIDLib::TVoid Add(TElem* const pobjNew) final
         {
             // This is just passed on to the Put method
             Put(pobjNew);
         }
 
-        tCIDLib::TBoolean bIsEmpty() const override
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return m_llstQueue.bIsEmpty();
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return m_llstQueue.c4ElemCount();
         }
 
-        tCIDLib::EAdoptOpts eAdopt() const override
+        tCIDLib::EAdoptOpts eAdopt() const final
         {
             return m_eAdopt;
         }
 
-        tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) override
+        tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) final
         {
             // Look and add all of our items to the target
             TMtxLocker lockThis(this->pmtxLock());
@@ -557,7 +557,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             m_twlWaiters.bReleaseAll(kCIDLib::c4TWLReason_WaitSpace);
         }
 
-        tCIDLib::TVoid OrphanElem(TElem* const pobjToRemove) override
+        tCIDLib::TVoid OrphanElem(TElem* const pobjToRemove) final
         {
             TMtxLocker lockQueue(this->pmtxLock());
 
@@ -582,13 +582,13 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitSpace);
         }
 
-        [[nodiscard]] TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const final
         {
             TMtxLocker lockQueue(this->pmtxLock());
             return new TCursor(this);
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
             TMtxLocker lockQueue(this->pmtxLock());
             if (m_llstQueue.bIsEmpty())
@@ -600,7 +600,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             m_twlWaiters.bReleaseAll(kCIDLib::c4TWLReason_WaitSpace);
         }
 
-        tCIDLib::TVoid RemoveElem(TElem* const pobjToRemove) override
+        tCIDLib::TVoid RemoveElem(TElem* const pobjToRemove) final
         {
             TMtxLocker lockQueue(this->pmtxLock());
 

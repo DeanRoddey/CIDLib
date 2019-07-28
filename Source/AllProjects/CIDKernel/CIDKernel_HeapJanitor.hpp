@@ -75,6 +75,16 @@ template <class T> class TJanitor
         TJanitor& operator=(const TJanitor&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
+        T* operator->()
+        {
+            return m_pobjToSanitize;
+        }
+
+        const T* operator->() const
+        {
+            return m_pobjToSanitize;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods

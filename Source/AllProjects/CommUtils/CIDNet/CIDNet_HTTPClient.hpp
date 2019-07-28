@@ -220,7 +220,7 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             ,       TString&                strParm1
             ,       TString&                strParm2
             ,       TString&                strParm3
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------

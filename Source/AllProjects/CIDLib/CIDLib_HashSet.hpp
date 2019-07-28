@@ -294,7 +294,7 @@ template <class TElem, class TKeyOps> class THashSet
                     return TParent::bIsDescendantOf(clsTarget);
                 }
 
-                tCIDLib::TBoolean bIsValid() const override
+                tCIDLib::TBoolean bIsValid() const final
                 {
                     if (!TParent::bIsValid())
                         return kCIDLib::False;
@@ -307,7 +307,7 @@ template <class TElem, class TKeyOps> class THashSet
                     );
                 }
 
-                tCIDLib::TBoolean bNext() override
+                tCIDLib::TBoolean bNext() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -322,7 +322,7 @@ template <class TElem, class TKeyOps> class THashSet
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bPrevious() override
+                tCIDLib::TBoolean bPrevious() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -337,7 +337,7 @@ template <class TElem, class TKeyOps> class THashSet
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bReset() override
+                tCIDLib::TBoolean bReset() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -351,7 +351,7 @@ template <class TElem, class TKeyOps> class THashSet
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bSeekToEnd() override
+                tCIDLib::TBoolean bSeekToEnd() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -375,7 +375,7 @@ template <class TElem, class TKeyOps> class THashSet
                     return TParent::clsThis();
                 }
 
-                const TElem& objRCur() const override
+                const TElem& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -564,19 +564,19 @@ template <class TElem, class TKeyOps> class THashSet
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
+                tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
                 {
                     if (clsTarget == clsThis())
                         return kCIDLib::True;
                     return TParent::bIsDescendantOf(clsTarget);
                 }
 
-                const TClass& clsIsA() const override
+                const TClass& clsIsA() const final
                 {
                     return clsThis();
                 }
 
-                const TClass& clsParent() const override
+                const TClass& clsParent() const final
                 {
                     return TParent::clsThis();
                 }
@@ -787,36 +787,36 @@ template <class TElem, class TKeyOps> class THashSet
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
         {
             if (clsTarget == clsThis())
                 return kCIDLib::True;
             return TCollection<TElem>::bIsDescendantOf(clsTarget);
         }
 
-        tCIDLib::TBoolean bIsEmpty() const override
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             return (m_c4CurElements == 0);
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
              return m_c4CurElements;
         }
 
-        const TClass& clsIsA() const override
+        const TClass& clsIsA() const final
         {
             return clsThis();
         }
 
-        const TClass& clsParent() const override
+        const TClass& clsParent() const final
         {
             return TCollection<TElem>::clsThis();
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
             TMtxLocker lockSync(this->pmtxLock());
             if (!m_c4CurElements)
@@ -843,7 +843,7 @@ template <class TElem, class TKeyOps> class THashSet
             this->c4IncSerialNum();
         }
 
-        TElem& objAdd(const TElem& objToAdd) override
+        TElem& objAdd(const TElem& objToAdd) final
         {
             TMtxLocker lockSync(this->pmtxLock());
 
@@ -912,13 +912,13 @@ template <class TElem, class TKeyOps> class THashSet
             return m_apBuckets[hshElem]->objData();
         }
 
-        [[nodiscard]] TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);
         }
 
-        [[nodiscard]] TObject* pobjDuplicate() const override
+        [[nodiscard]] TObject* pobjDuplicate() const final
         {
             return new THashSet<TElem,TKeyOps>(*this);
         }

@@ -178,7 +178,7 @@ TMode1EncodingBase::c4BlockFrom(const   tCIDLib::TCard1* const  pc1Src
                                 ,       tCIDLib::TBoolean&      bStop)
 {
     const tCIDLib::TCh          chRep = chRepChar();
-    const tCIDLib::ETCvtActions eAct = eErrorAction();
+    const tCIDLib::ETCvtActs    eAct = eErrorAction();
     bStop = kCIDLib::False;
 
     //
@@ -200,13 +200,13 @@ TMode1EncodingBase::c4BlockFrom(const   tCIDLib::TCard1* const  pc1Src
 
         if (chCur == 0xFFFF)
         {
-            if ((eAct == tCIDLib::ETCvtActions::StopThenThrow) && c4Index)
+            if ((eAct == tCIDLib::ETCvtActs::StopThenThrow) && c4Index)
             {
                 bStop = kCIDLib::True;
                 break;
             }
 
-            if (eAct == tCIDLib::ETCvtActions::Replace)
+            if (eAct == tCIDLib::ETCvtActs::Replace)
             {
                 pszToFill[c4Index] = chRep;
             }
@@ -274,7 +274,7 @@ TMode1EncodingBase::c4BlockTo(  const   tCIDLib::TCh* const     pszSrc
             continue;
         }
 
-        if ((eErrorAction() == tCIDLib::ETCvtActions::StopThenThrow) && c4Index)
+        if ((eErrorAction() == tCIDLib::ETCvtActs::StopThenThrow) && c4Index)
         {
             bStop = kCIDLib::True;
             break;

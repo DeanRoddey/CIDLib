@@ -29,6 +29,11 @@
 
 namespace tCIDLib
 {
+    // Used in various metaprogramming templates below
+    struct FalseType { static constexpr tCIDLib::TBoolean bState = false; };
+    struct TrueType { static constexpr tCIDLib::TBoolean bState = true; };
+
+
     //
     //  Some helper sfor dealing with safe enums and the problems with converting them
     //  to numeric values.
@@ -55,15 +60,36 @@ namespace tCIDLib
         return tCIDLib::TInt4(tVal) + i4Plus;
     }
 
-    // For condition stuff based on const'ness
-    struct FalseType { static constexpr bool State = false; };
-    struct TrueType { static constexpr bool State = true; };
+
+    // Some testing for types
+    template <typename T> struct IsTCardX : FalseType {};
+    template <> struct IsTCardX<tCIDLib::TCard1> : TrueType {};
+    template <> struct IsTCardX<tCIDLib::TCard2> : TrueType {};
+    template <> struct IsTCardX<tCIDLib::TCard4> : TrueType {};
+
+    template <typename T> struct IsTFloatX : FalseType {};
+    template <> struct IsTFloatX<tCIDLib::TFloat4> : TrueType {};
+    template <> struct IsTFloatX<tCIDLib::TFloat8> : TrueType {};
+
+    template <typename T> struct IsTIntX : FalseType {};
+    template <> struct IsTIntX<tCIDLib::TInt1> : TrueType {};
+    template <> struct IsTIntX<tCIDLib::TInt2> : TrueType {};
+    template <> struct IsTIntX<tCIDLib::TInt4> : TrueType {};
+
+    template <typename T> struct IsNumeric
+    {
+        static constexpr tCIDLib::TBoolean bState =
+        (
+            IsTCardX<T>::bState || IsTFloatX<T>::bState || IsTIntX<T>::bState
+        );
+    };
+
+    // For conditional stuff based on const'ness
     template <typename T> struct IsConst : FalseType {};
     template <typename T> struct IsConst<const T> : TrueType {};
 
-
     // For conditional inclusion
-    template<bool C, typename T = tCIDLib::TVoid> struct EnableIf {};
+    template<bool C, typename T = tCIDLib::TVoid> struct EnableIf { };
     template<typename T> struct EnableIf<kCIDLib::True, T> { typedef T Type; };
 
 

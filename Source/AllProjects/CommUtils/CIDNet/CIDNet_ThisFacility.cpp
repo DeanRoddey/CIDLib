@@ -104,6 +104,21 @@ TFacCIDNet::~TFacCIDNet()
 //  TFacCIDNet: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 
+// Compares the passed MIME type string against some common text formats
+tCIDLib::TBoolean TFacCIDNet::bIsKnownTextType(const TString& strType) const
+{
+    if (strType.bStartsWithI(L"text/"))
+        return kCIDLib::True;
+
+    return
+    (
+        strType.bCompareI(L"application/json")
+        || strType.bCompareI(L"application/javascript")
+        || strType.bCompareI(L"application/xml")
+    );
+}
+
+
 tCIDLib::TVoid
 TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
                                 , const tCIDLib::TCard4     c4SrcBytes
@@ -370,8 +385,7 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
                         colTransEncodings.objAdd(strPartTransEncoding);
 
                         // To only store the actual bytes for this round
-                        THeapBuf& mbufTar = colParts.objPlace(c4PartBytes, c4PartBytes + 1);
-                        mbufTar.CopyIn(mbufPartBuf, c4PartBytes);
+                        colParts.objPlace(mbufPartBuf, c4PartBytes);
 
                         // And go back out to the outer loop
                         break;
@@ -400,3 +414,56 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
     }
 }
 
+
+//
+//  Given a URL for an HTTP or HTTPS protocol, create a data source for it.
+//  Other protocols will be considered an error. The caller is responsible for
+//  the data source cleanup and typically puts it into a data source janitor.
+//
+//  If they want to set a specific host or ALPN list, they have to do it
+//  manually.
+//
+TCIDDataSrc*
+TFacCIDNet::pcdsMakeSocketSrc(const TString& strName, const TURL& urlSrc)
+{
+    TCIDDataSrc* pcdsRet = nullptr;
+    if (urlSrc.eProto() == tCIDSock::EProtos::HTTP)
+    {
+        pcdsRet = new TCIDSockStreamDataSrc(urlSrc.ipepHost());
+    }
+     else if (urlSrc.eProto() == tCIDSock::EProtos::HTTPS)
+    {
+        TJanitor<TClientStreamSocket> janSocket
+        (
+            new TClientStreamSocket(tCIDSock::ESockProtos::TCP, urlSrc.ipepHost())
+        );
+
+        // Let the data source adopt the socket
+        tCIDLib::TStrList colALPN;
+        pcdsRet = new TCIDSChanClDataSrc
+        (
+            strName
+            , janSocket.pobjThis()
+            , tCIDLib::EAdoptOpts::Adopt
+            , TString::strEmpty()
+            , colALPN
+            , tCIDSChan::EConnOpts::None
+            , urlSrc.strHost()
+        );
+
+        // Let the socket go now that it's stored away safely
+        janSocket.Orphan();
+    }
+     else
+    {
+        facCIDNet().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kNetErrs::errcHTTP_UnsupportedProto
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::NotSupported
+        );
+    }
+    return pcdsRet;
+}

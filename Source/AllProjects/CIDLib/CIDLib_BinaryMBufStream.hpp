@@ -70,6 +70,12 @@ class CIDLIBEXP TBinMBufInStream : public TBinInStream
 
         TBinMBufInStream
         (
+                    THeapBuf&&              mbufToTake
+            , const tCIDLib::TCard4         c4InitLogicalEnd = 0
+        );
+
+        TBinMBufInStream
+        (
             const   tCIDLib::TCard1* const  pc1InitData
             , const tCIDLib::TCard4         c4Count
         );

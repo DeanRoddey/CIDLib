@@ -134,11 +134,11 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
             const   tCIDLib::TCh            chToSet
         );
 
-        tCIDLib::ETCvtActions eErrorAction() const;
+        tCIDLib::ETCvtActs eErrorAction() const;
 
-        tCIDLib::ETCvtActions eErrorAction
+        tCIDLib::ETCvtActs eErrorAction
         (
-            const   tCIDLib::ETCvtActions   eAction
+            const   tCIDLib::ETCvtActs      eAction
         );
 
         const TString& strEncodingName() const;
@@ -215,9 +215,9 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
         //      The name of the encoding that the derived class handles. Its
         //      constructor will pass on this value to our constructor.
         // -------------------------------------------------------------------
-        tCIDLib::TCh            m_chRepChar;
-        tCIDLib::ETCvtActions   m_eErrAction;
-        TString                 m_strEncodingName;
+        tCIDLib::TCh        m_chRepChar;
+        tCIDLib::ETCvtActs  m_eErrAction;
+        TString             m_strEncodingName;
 
 
         // -------------------------------------------------------------------

@@ -484,7 +484,7 @@ tCIDLib::TVoid TFacCIDDocComp::LoadDTD(const TString& strSrcPath)
         , tCIDLib::EFilePerms::Default
         , tCIDLib::EFileFlags::SequentialScan
         , tCIDLib::EAccessModes::Excl_Read
-        , facCIDEncode().ptcvtMakeNew(L"Latin1")
+        , facCIDEncode().ptcvtMake(L"Latin1")
     );
 
     //

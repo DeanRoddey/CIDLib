@@ -23,6 +23,7 @@
 //  An area of 10x10 at 10,10 will cover the pixels from 10,10 to 19,19, since 10,10
 //  is the first pixel.
 //
+//  See the docs for  discussion of inclusive vs exclusive rectanges and such.
 //  When converting to/from system rectangles, or UL/LR points, we have to be
 //  careful to follow specific rules. Rectangles can be inclusive or non-inclusive.
 //  Areas are neither, they are (origin - size) based.
@@ -457,6 +458,24 @@ class CIDLIBEXP TArea :
             , const tCIDLib::TBoolean       bLockRight = kCIDLib::False
         );
 
+        tCIDLib:: TInt4 i4Right() const;
+
+        tCIDLib:: TInt4 i4Right
+        (
+            const   tCIDLib::TInt4          i4XRight
+        );
+
+        constexpr tCIDLib::TInt4 i4Top() const
+        {
+            return m_i4Y;
+        }
+
+        tCIDLib::TInt4 i4Top
+        (
+            const   tCIDLib::TInt4          i4YTop
+            , const tCIDLib::TBoolean       bLockBottom = kCIDLib::False
+        );
+
         constexpr tCIDLib::TInt4 i4X() const
         {
             return m_i4X;
@@ -476,24 +495,6 @@ class CIDLIBEXP TArea :
         tCIDLib::TInt4 i4Y
         (
             const   tCIDLib::TInt4          i4NewY
-            , const tCIDLib::TBoolean       bLockBottom = kCIDLib::False
-        );
-
-        tCIDLib:: TInt4 i4Right() const;
-
-        tCIDLib:: TInt4 i4Right
-        (
-            const   tCIDLib::TInt4          i4XRight
-        );
-
-        constexpr tCIDLib::TInt4 i4Top() const
-        {
-            return m_i4Y;
-        }
-
-        tCIDLib::TInt4 i4Top
-        (
-            const   tCIDLib::TInt4          i4YTop
             , const tCIDLib::TBoolean       bLockBottom = kCIDLib::False
         );
 

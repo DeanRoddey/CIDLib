@@ -128,37 +128,37 @@ class CIDLIBEXP TSharedMemBuf : public TMemBuf
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard1* pc1QueryBuf() override;
+        tCIDLib::TCard1* pc1QueryBuf() final;
 
-        const tCIDLib::TCard1* pc1QueryBuf() const override;
+        const tCIDLib::TCard1* pc1QueryBuf() const final;
 
         tCIDLib::TCard1* pc1QueryBufInfo
         (
                     tCIDLib::TCard4&        c4CurSize
             ,       tCIDLib::TCard4&        c4MaxSize
-        ) override;
+        ) final;
 
         const tCIDLib::TCard1* pc1QueryBufInfo
         (
                     tCIDLib::TCard4&        c4CurSize
             ,       tCIDLib::TCard4&        c4MaxSize
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid Realloc
         (
             const   tCIDLib::TCard4         c4NewSize
             , const tCIDLib::TBoolean       bPreserve
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        ) final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :

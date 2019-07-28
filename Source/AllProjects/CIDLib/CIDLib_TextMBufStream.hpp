@@ -63,6 +63,13 @@ class CIDLIBEXP TTextMBufInStream : public TTextInStream
 
         TTextMBufInStream
         (
+                    THeapBuf&&              mbufToUse
+            , const tCIDLib::TCard4         c4InitLogicalEnd = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
+        );
+
+        TTextMBufInStream
+        (
             const   TTextMBufOutStream&     strmToSyncWith
         );
 

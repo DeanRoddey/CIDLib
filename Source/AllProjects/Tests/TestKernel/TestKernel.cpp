@@ -123,6 +123,38 @@ static tCIDLib::TCard4          c4SignalCount = 0;
 //  Local functions
 // ----------------------------------------------------------------------------
 
+template <typename T>
+typename tCIDLib::EnableIf<tCIDLib::IsNumeric<T>::bState, tCIDLib::TVoid>::Type TestEnabled()
+{
+    strmOut << L"I love numerics" << EndLn;
+}
+
+template <typename T>
+typename tCIDLib::EnableIf<!tCIDLib::IsNumeric<T>::bState, tCIDLib::TVoid>::Type TestEnabled()
+{
+    strmOut << L"I hate non-numerics" << EndLn;
+}
+
+template <typename T> tCIDLib::TVoid TestType(const T)
+{
+    if (tCIDLib::IsNumeric<T>::bState)
+        strmOut << L"T is a Numeric type" << EndLn;
+
+    if (tCIDLib::IsTCardX<T>::bState)
+        strmOut << L"T is a Cardinal type" << EndLn;
+
+    if (tCIDLib::IsTIntX<T>::bState)
+        strmOut << L"T is a Integer type" << EndLn;
+
+    TestEnabled<T>();
+}
+
+static tCIDLib::TVoid Test()
+{
+    tCIDLib::TCh tTest = 0;
+    TestType(tTest);
+}
+
 //
 //  This method is called to do the standard program announcement. Its just
 //  here to keep it separated out.
@@ -685,6 +717,9 @@ tCIDLib::TSInt main(const tCIDLib::TInt4 i4ArgC, tCIDLib::TSCh* apszArgs[])
 
     try
     {
+        Test();
+        return 0;
+
         //
         //  Do the most fundamental test which is to insure the per platform
         //  define types are the right sizes.

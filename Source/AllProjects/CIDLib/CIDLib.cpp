@@ -447,6 +447,8 @@ static tCIDLib::TVoid DummyFunc()
     TVector<const TString> colConstStr;
     const TString& strNC = colConstStr[0];
 
+    TUniquePtr<TString> uptrTest(new TString(L"Testing"));
+    TCntPtr<TString> cptrTest(uptrTest);
 }
 #endif
 

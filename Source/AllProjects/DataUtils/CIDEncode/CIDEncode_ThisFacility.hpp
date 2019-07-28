@@ -80,16 +80,42 @@ class CIDENCODEEXP TFacCIDEncode : public TFacility
                     tCIDLib::TStrCollect&   colToFill
         )   const;
 
-        [[nodiscard]] TTextConverter* ptcvtMakeNew
+        [[nodiscard]] TTextConverter* ptcvtMake
         (
             const   TString&                strName
             , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
         )   const;
 
-        tCIDEncode::TTCvtPtr cptrMakeNew
+        [[nodiscard]] TTextConverter* ptcvtMake
+        (
+            const   TString&                strName
+            , const tCIDLib::ETCvtActs      eErrAction
+            , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
+        )   const;
+
+        [[nodiscard]] TTextConverter* ptcvtMake
+        (
+            const   TString&                strName
+            , const tCIDLib::TCh            chRepChar
+        )   const;
+
+        tCIDEncode::TTCvtPtr cptrMake
         (
             const   TString&                strName
             , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
+        )   const;
+
+        tCIDEncode::TTCvtPtr cptrMake
+        (
+            const   TString&                strName
+            , const tCIDLib::ETCvtActs      eErrAction
+            , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
+        )   const;
+
+        tCIDEncode::TTCvtPtr cptrMake
+        (
+            const   TString&                strName
+            , const tCIDLib::TCh            chRepChar
         )   const;
 
         TString strBaseNameFor

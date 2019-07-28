@@ -491,7 +491,7 @@ TMacroEngParser::bParse(const   TString&                    strClassPath
     //  If the encoding is empty, use an ASCII converter, else try to create
     //  a converter for that encoding.
     //
-    TTextConverter* ptcvtSrc = facCIDEncode().ptcvtMakeNew(strEncoding);
+    TTextConverter* ptcvtSrc = facCIDEncode().ptcvtMake(strEncoding);
     if (!ptcvtSrc)
     {
         facCIDMacroEng().ThrowErr

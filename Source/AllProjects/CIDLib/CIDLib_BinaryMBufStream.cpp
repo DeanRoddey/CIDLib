@@ -121,6 +121,40 @@ TBinMBufInStream::TBinMBufInStream( const   TMemBuf* const      pmbufToUse
     m_pstrmiMem = pstrmiIn;
 }
 
+
+TBinMBufInStream::TBinMBufInStream(         THeapBuf&&          mbufToTake
+                                    , const tCIDLib::TCard4     c4InitLogicalEnd) :
+    m_pstrmiMem(nullptr)
+{
+    TMemInStreamImpl* pstrmiIn = nullptr;
+    try
+    {
+        //
+        //  Create an impl object for the passed buffer, giving it the contents
+        //  of the passed buffer.
+        //
+        pstrmiIn = new TMemInStreamImpl
+        (
+            new THeapBuf(tCIDLib::ForceMove(mbufToTake))
+            , c4InitLogicalEnd
+            , tCIDLib::EAdoptOpts::Adopt
+        );
+    }
+
+    catch(TError& errToCatch)
+    {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        throw;
+    }
+
+    // Pass the impl object to our parent for adoption
+    AdoptImplObject(pstrmiIn);
+
+    // And store our version
+    m_pstrmiMem = pstrmiIn;
+}
+
+
 TBinMBufInStream::TBinMBufInStream( const   tCIDLib::TCard1* const  pc1InitData
                                     , const tCIDLib::TCard4         c4Count) :
     m_pstrmiMem(nullptr)
@@ -158,7 +192,7 @@ TBinMBufInStream::TBinMBufInStream( const   tCIDLib::TCard1* const  pc1InitData
 
 TBinMBufInStream::TBinMBufInStream(const TBinMBufOutStream& strmSyncTo) :
 
-    m_pstrmiMem(0)
+    m_pstrmiMem(nullptr)
 {
     // Create a linked impl object
     m_pstrmiMem = new TMemInStreamImpl(strmSyncTo.strmiThis());

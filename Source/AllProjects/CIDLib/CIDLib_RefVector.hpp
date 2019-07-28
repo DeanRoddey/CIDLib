@@ -134,7 +134,7 @@ class TRefVector : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsValid() const override
+                tCIDLib::TBoolean bIsValid() const final
                 {
                     if (!TParent::bIsValid())
                         return kCIDLib::False;
@@ -147,7 +147,7 @@ class TRefVector : public TRefCollection<TElem>
                     );
                 }
 
-                tCIDLib::TBoolean bNext() override
+                tCIDLib::TBoolean bNext() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -160,7 +160,7 @@ class TRefVector : public TRefCollection<TElem>
                     return bIsValid();
                 }
 
-                tCIDLib::TBoolean bPrevious() override
+                tCIDLib::TBoolean bPrevious() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -172,7 +172,7 @@ class TRefVector : public TRefCollection<TElem>
                     return bIsValid();
                 }
 
-                tCIDLib::TBoolean bSeekToEnd() override
+                tCIDLib::TBoolean bSeekToEnd() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -186,7 +186,7 @@ class TRefVector : public TRefCollection<TElem>
                     return kCIDLib::True;
                 }
 
-                tCIDLib::TBoolean bReset() override
+                tCIDLib::TBoolean bReset() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -479,30 +479,30 @@ class TRefVector : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Add(TElem* const pobjNew) override
+        tCIDLib::TVoid Add(TElem* const pobjNew) final
         {
             // Just delegate to a non-virtual which does what we want already
             c4Append(pobjNew);
         }
 
-        tCIDLib::TBoolean bIsEmpty() const override
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             TMtxLocker lockThis(this->pmtxLock());
             return (m_c4CurCount == 0);
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             TMtxLocker lockThis(this->pmtxLock());
             return m_c4CurCount;
         }
 
-        tCIDLib::EAdoptOpts eAdopt() const override
+        tCIDLib::EAdoptOpts eAdopt() const final
         {
             return m_eAdopt;
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
             TMtxLocker lockThis(this->pmtxLock());
             if (!m_c4CurCount)
@@ -511,7 +511,7 @@ class TRefVector : public TRefCollection<TElem>
             RemoveAllElems(m_eAdopt);
         }
 
-        tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) override
+        tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) final
         {
             // Lock and add all of our items to the target
             TMtxLocker lockThis(this->pmtxLock());
@@ -535,20 +535,20 @@ class TRefVector : public TRefCollection<TElem>
             RemoveAllElems(tCIDLib::EAdoptOpts::NoAdopt);
         }
 
-        tCIDLib::TVoid OrphanElem(TElem* const pnodeToOrphan) override
+        tCIDLib::TVoid OrphanElem(TElem* const pnodeToOrphan) final
         {
             // Just lock and call the helper than pulls an element out
             TMtxLocker lockThis(this->pmtxLock());
             bPullOutElem(pnodeToOrphan, kCIDLib::True);
         }
 
-        [[nodiscard]] TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const final
         {
             TMtxLocker lockThis(this->pmtxLock());
             return new TCursor(this);
         }
 
-        tCIDLib::TVoid RemoveElem(TElem* const pnodeToRemove) override
+        tCIDLib::TVoid RemoveElem(TElem* const pnodeToRemove) final
         {
             TMtxLocker lockThis(this->pmtxLock());
 

@@ -62,14 +62,8 @@ TNativeWCConverter::TNativeWCConverter() :
 // ---------------------------------------------------------------------------
 tCIDLib::EBaseTextFmts TNativeWCConverter::eBaseFmt() const
 {
-    // <TBD> We need to handle UTF-32 here on some platforms
-    #if defined(CIDLIB_LITTLEENDIAN)
-    return tCIDLib::EBaseTextFmts::TwoByte_LE;
-    #endif
-
-    #if defined(CIDLIB_BIGENDIAN)
-    return tCIDLib::EBaseTextFmts::TwoByte_BE;
-    #endif
+    // This comes from the per-platfrom stuff
+    return kCIDLib::eWCCharFmt;
 }
 
 

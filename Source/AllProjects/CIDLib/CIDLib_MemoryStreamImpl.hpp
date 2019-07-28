@@ -133,6 +133,12 @@ class CIDLIBEXP TMemInStreamImpl : public TInStreamImpl
 
         TMemInStreamImpl
         (
+                    THeapBuf&&              mbufToStream
+            , const tCIDLib::TCard4         c4InitLogicalEnd = 0
+        );
+
+        TMemInStreamImpl
+        (
             const   TMemOutStreamImpl&      strmiToSyncTo
         );
 

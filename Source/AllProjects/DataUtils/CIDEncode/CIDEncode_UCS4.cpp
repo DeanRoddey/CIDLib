@@ -118,7 +118,7 @@ TUCS4Converter::c4BlockFrom(const   tCIDLib::TCard1* const  pc1Src
                             ,       tCIDLib::TBoolean&      bStop)
 {
     const tCIDLib::TCh          chRep = chRepChar();
-    const tCIDLib::ETCvtActions eAct = eErrorAction();
+    const tCIDLib::ETCvtActs    eAct = eErrorAction();
     bStop = kCIDLib::False;
 
     //
@@ -163,14 +163,14 @@ TUCS4Converter::c4BlockFrom(const   tCIDLib::TCard1* const  pc1Src
         }
          else
         {
-            if ((eAct == tCIDLib::ETCvtActions::StopThenThrow)
+            if ((eAct == tCIDLib::ETCvtActs::StopThenThrow)
             &&  (pchOut != pszToFill))
             {
                 bStop = kCIDLib::True;
                 break;
             }
 
-            if (eAct == tCIDLib::ETCvtActions::Replace)
+            if (eAct == tCIDLib::ETCvtActs::Replace)
             {
                 *pchOut++ = chRep;
             }
@@ -206,7 +206,7 @@ TUCS4Converter::c4BlockTo(  const   tCIDLib::TCh* const     pszSrc
                             ,       tCIDLib::TCard4&        c4OutBytes
                             ,       tCIDLib::TBoolean&      bStop)
 {
-    const tCIDLib::ETCvtActions eAct = eErrorAction();
+    const tCIDLib::ETCvtActs eAct = eErrorAction();
     bStop = kCIDLib::False;
 
     //
@@ -241,7 +241,7 @@ TUCS4Converter::c4BlockTo(  const   tCIDLib::TCh* const     pszSrc
             // See if its a valid trailing surrogate
             if ((chCur < 0xDC00) && (chCur > 0xDFFF))
             {
-                if ((eAct == tCIDLib::ETCvtActions::StopThenThrow)
+                if ((eAct == tCIDLib::ETCvtActs::StopThenThrow)
                 &&  (pchSrc != pszSrc))
                 {
                     bStop = kCIDLib::True;

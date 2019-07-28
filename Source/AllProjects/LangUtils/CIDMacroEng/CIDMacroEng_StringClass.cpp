@@ -4614,7 +4614,7 @@ TMEngTextXCoderVal::~TMEngTextXCoderVal()
 tCIDLib::TBoolean TMEngTextXCoderVal::bSetEncoding(const TString& strToSet)
 {
     // See if we can create an encoder for this new guy
-    TTextConverter* ptcvtNew = facCIDEncode().ptcvtMakeNew(strToSet);
+    TTextConverter* ptcvtNew = facCIDEncode().ptcvtMake(strToSet);
     if (!ptcvtNew)
         return kCIDLib::False;
     TJanitor<TTextConverter> janConverter(ptcvtNew);
@@ -4721,9 +4721,9 @@ tCIDLib::TVoid TMEngTextXCoderInfo::Init(TCIDMacroEngine& meOwner)
             , L"MEng.Enum"
             , 3
         );
-        m_pmeciCvtErrActs->c4AddEnumItem(L"Throw", L"Throw on error", tCIDLib::ETCvtActions::Throw);
-        m_pmeciCvtErrActs->c4AddEnumItem(L"StopThrow", L"Stop first, then throw", tCIDLib::ETCvtActions::StopThenThrow);
-        m_pmeciCvtErrActs->c4AddEnumItem(L"RepChar", L"Use replacement character", tCIDLib::ETCvtActions::Replace);
+        m_pmeciCvtErrActs->c4AddEnumItem(L"Throw", L"Throw on error", tCIDLib::ETCvtActs::Throw);
+        m_pmeciCvtErrActs->c4AddEnumItem(L"StopThrow", L"Stop first, then throw", tCIDLib::ETCvtActs::StopThenThrow);
+        m_pmeciCvtErrActs->c4AddEnumItem(L"RepChar", L"Use replacement character", tCIDLib::ETCvtActs::Replace);
         m_pmeciCvtErrActs->BaseClassInit(meOwner);
         m_c2TypeId_CvtErrActs = meOwner.c2AddClass(m_pmeciCvtErrActs);
         bAddNestedType(m_pmeciCvtErrActs->strClassPath());
@@ -5097,7 +5097,7 @@ TMEngTextXCoderInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
         TMEngEnumVal& mecvAct = meOwner.mecvStackAtAs<TMEngEnumVal>(c4FirstInd);
         mecvActual.tcvtValue().eErrorAction
         (
-            tCIDLib::ETCvtActions(m_pmeciCvtErrActs->c4MapValue(mecvAct))
+            tCIDLib::ETCvtActs(m_pmeciCvtErrActs->c4MapValue(mecvAct))
         );
     }
      else if (methiTarget.c2Id() == m_c2MethId_SetRepChar)

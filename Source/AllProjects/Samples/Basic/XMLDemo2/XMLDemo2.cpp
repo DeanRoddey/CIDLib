@@ -186,10 +186,7 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     }
 
     // See if we can create the requested encoding
-    TTextConverter* ptcvtOut = facCIDEncode().ptcvtMakeNew
-    (
-        strEncoding, kCIDLib::False
-    );
+    TTextConverter* ptcvtOut = facCIDEncode().ptcvtMake(strEncoding);
     if (!ptcvtOut)
     {
         conOut  << L"Could not create a converter for encoding: " << strEncoding

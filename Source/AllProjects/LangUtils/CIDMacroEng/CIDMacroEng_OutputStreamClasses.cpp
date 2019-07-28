@@ -1253,7 +1253,7 @@ TMEngFileOutStreamInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
                     , tCIDLib::EFilePerms::Default
                     , tCIDLib::EFileFlags::SequentialScan
                     , tCIDLib::EAccessModes::Write
-                    , facCIDEncode().ptcvtMakeNew(mecvActual.strEncoding())
+                    , facCIDEncode().ptcvtMake(mecvActual.strEncoding())
                 )
                 , tCIDLib::EAdoptOpts::Adopt
             );
@@ -1467,7 +1467,7 @@ TMEngStringOutStreamInfo::bInvokeMethod(        TCIDMacroEngine&    meOwner
             TMEngMemBufVal& mecvToFill = meOwner.mecvStackAtAs<TMEngMemBufVal>(c4FirstInd);
 
             // Get the encoding and create a text converter
-            TTextConverter* ptcvtToUse = facCIDEncode().ptcvtMakeNew
+            TTextConverter* ptcvtToUse = facCIDEncode().ptcvtMake
             (
                 meOwner.strStackValAt(c4FirstInd + 1)
             );

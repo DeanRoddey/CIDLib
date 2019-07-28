@@ -1855,7 +1855,7 @@ TMEngJSONParserInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 &meOwner.mecvStackAtAs<TMEngMemBufVal>(c4FirstInd).mbufValue()
                 , meOwner.c4StackValAt(c4FirstInd + 1)
                 , tCIDLib::EAdoptOpts::NoAdopt
-                , facCIDEncode().ptcvtMakeNew(meOwner.strStackValAt(c4FirstInd + 2))
+                , facCIDEncode().ptcvtMake(meOwner.strStackValAt(c4FirstInd + 2))
             );
             mecvActual.Parse(strmSrc);
         }

@@ -1913,7 +1913,7 @@ namespace tCIDLib
     //  Note that Replace is ignored when converting outwards and is treated
     //  like Throw. It's only used when internalizing text.
     // -----------------------------------------------------------------------
-    enum class ETCvtActions
+    enum class ETCvtActs
     {
         Throw
         , StopThenThrow
