@@ -68,6 +68,21 @@ TTextStringInStream::TTextStringInStream(const  TString* const      pstrToUse
     AdoptStream(new TBinInStream(m_pstrmiIn));
 }
 
+TTextStringInStream::TTextStringInStream(TString&& strToTake) :
+
+    TTextInStream(new TNativeWCConverter)
+    , m_pstrmiIn(nullptr)
+{
+    // Create an impl object for the passed string and store it
+    m_pstrmiIn = new TStringInStreamImpl(tCIDLib::ForceMove(strToTake));
+
+    //
+    //  Create a binary stream and give it the input string stream impl to
+    //  own. Give the new stream to our parent to own.
+    //
+    AdoptStream(new TBinInStream(m_pstrmiIn));
+}
+
 TTextStringInStream::TTextStringInStream(const TTextStringOutStream& strmToSyncWith) :
 
     TTextInStream(new TNativeWCConverter)

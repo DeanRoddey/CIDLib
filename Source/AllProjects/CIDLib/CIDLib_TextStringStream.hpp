@@ -67,6 +67,11 @@ class CIDLIBEXP TTextStringInStream : public TTextInStream
             , const tCIDLib::EAdoptOpts     eAdopt = tCIDLib::EAdoptOpts::NoAdopt
         );
 
+        TTextStringInStream
+        (
+                    TString&&               strToTake
+        );
+
         explicit TTextStringInStream
         (
             const   TTextStringOutStream&   strmToSyncWith

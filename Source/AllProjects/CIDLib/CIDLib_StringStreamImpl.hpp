@@ -22,10 +22,10 @@
 //
 //  1)  This is a wierd one in some ways. Strings are ONLY Unicode format,
 //      but we are allowing a binary stream to stream into it. The stream
-//      classes make sure that its only ever used in UTF-16 encoding mode,
-//      but it could be set up otherwise. If so, then junk data could be
-//      streamed into it. It wouldn't fail, it would just place meaningless
-//      Unicode characters into the string.
+//      classes make sure that its only ever used in the correct native
+//      character encoding mode, but it could be set up otherwise. If so,
+//      then junk data could be streamed into it. It wouldn't fail, it would
+//      just place meaningless characters into the string.
 //
 //      Since we provide convenience classes to create most combinations of
 //      streams, the TTextStringInStream and TTextStringOutStream classes
@@ -36,9 +36,6 @@
 //
 //      We cannot even check here that the right thing is being done upstream,
 //      since the text stream buffers and writes out bunches of bytes at once.
-//      The fact even that it wrote an odd number of bytes means nothing,
-//      since the next bunch might contain the second byte of that final
-//      character.
 //
 //  2)  The current position maintained by these classes are in terms of
 //      Unicode chars into the string. However, the semantics of the binary
@@ -123,6 +120,11 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
         (
             const   TString* const          pstrData
             , const tCIDLib::EAdoptOpts     eAdopt = tCIDLib::EAdoptOpts::Adopt
+        );
+
+        TStringInStreamImpl
+        (
+                    TString&&               strToTake
         );
 
         TStringInStreamImpl

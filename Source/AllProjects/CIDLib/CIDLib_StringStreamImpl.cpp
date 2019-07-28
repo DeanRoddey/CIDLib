@@ -86,6 +86,15 @@ TStringInStreamImpl::TStringInStreamImpl(const  TString* const      pstrToUse
     m_cptrInfo.SetPointer(new TStringStreamImplInfo(pstrToUse, eAdopt));
 }
 
+TStringInStreamImpl::TStringInStreamImpl(TString&& strToTake) :
+
+    m_c4CurPos(0)
+    , m_pstrIn(new TString(tCIDLib::ForceMove(strToTake)))
+{
+    // Looks ok, so create the info object and store it
+    m_cptrInfo.SetPointer(new TStringStreamImplInfo(m_pstrIn, tCIDLib::EAdoptOpts::Adopt));
+}
+
 TStringInStreamImpl::TStringInStreamImpl(const tCIDLib::TCard4 c4InitSize) :
 
     m_c4CurPos(0)

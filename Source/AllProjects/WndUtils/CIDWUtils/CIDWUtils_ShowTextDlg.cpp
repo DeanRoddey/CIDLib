@@ -87,7 +87,6 @@ tCIDLib::TBoolean TShowTextDlg::bCreated()
     strWndText(m_strTitle);
 
     // And load up the incoming display text (Default is not to adopt)
-    TTextStringInStream strmSrc(m_pstrText);
     pwndChildById(kCIDWUtils::ridDlg_ShowText_Text)->strWndText(*m_pstrText);
 
     // Register a handler for the OK button

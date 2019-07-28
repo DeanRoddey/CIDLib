@@ -1728,7 +1728,7 @@ TMacroDbgMainWnd::MenuCommand(  const   tCIDLib::TResId     ridItem
 
 
 TTextInStream*
-TMacroDbgMainWnd::pstrmDoLoad(  const   TString&             strClassPath
+TMacroDbgMainWnd::pstrmDoLoad(  const   TString&                strClassPath
                                 , const tCIDMacroEng::EResModes eMode)
 {
     TString strTmp;

@@ -139,7 +139,7 @@ TAudio::c4EnumAudioDevices(tCIDLib::TKVPCollect& colToFill)
 
     // It worked, set up a stream on the string and let's parse it
     TString strInfo(achToFill);
-    TTextStringInStream strmSrc(&strInfo);
+    TTextStringInStream strmSrc(tCIDLib::ForceMove(strInfo));
     colToFill.RemoveAll();
 
     TString strName;

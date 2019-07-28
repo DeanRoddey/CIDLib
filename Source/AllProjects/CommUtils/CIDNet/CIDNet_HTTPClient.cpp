@@ -867,7 +867,7 @@ THTTPClient::MakeBasicAuthStr(  const   TString&    strUserName
     strHashSrc.Append(strPassword);
 
     // Create text streams over the source and the output string
-    TTextStringInStream strmSrc(&strHashSrc);
+    TTextStringInStream strmSrc(tCIDLib::ForceMove(strHashSrc));
     TTextStringOutStream strmTar(&strOut);
     strmTar.Reset();
 

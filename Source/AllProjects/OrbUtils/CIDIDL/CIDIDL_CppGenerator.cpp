@@ -2052,7 +2052,7 @@ TCppGenerator::WriteTemplate(       TTextFileOutStream& strmOut
 {
     // Create a stream of the input
     TString strData(pszData);
-    TTextStringInStream strmTempl(&strData, tCIDLib::EAdoptOpts::NoAdopt);
+    TTextStringInStream strmTempl(tCIDLib::ForceMove(strData));
 
     //
     //  Loop through the input of the template, one line at a time, and replace
