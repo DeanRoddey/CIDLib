@@ -97,7 +97,7 @@ namespace kCIDBuild
     const tCIDBuild::TCh* const  pszLibExt          = L".a";
     const tCIDBuild::TCh* const  pszObjExt          = L".o";
     const tCIDBuild::TCh         chExtSep           = L'.';
-
+    const tCIDBuild::TCh         chPathCompSep      = L':';
 
 
     // -----------------------------------------------------------------------
