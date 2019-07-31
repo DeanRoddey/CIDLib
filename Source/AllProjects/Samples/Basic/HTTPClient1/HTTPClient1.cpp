@@ -80,24 +80,23 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
     // Output a little program blurb
     strmOut << L"\nHTTPClient1.Exe\n"
-            << L"CIDLib Net Demo #1\n" << kCIDLib::EndLn;
+            << L"CIDLib HTTP Client Demo #1\n" << kCIDLib::EndLn;
 
-    // Default values which may get overridden by parms
+    // Input values, which will be set/overridden by parms
     TString strRetFmt = L"text/*";
     TString strURLText;
-    TString strReqType = L"GET";
 
     //
-    //  Get the paramters and set up the URL. It should be a fully
+    //  Get the parameters and set up the URL. It should be a fully
     //  qualified URL. These all fit the standard form for CIDLib params,
     //  so we can call a little helper that will pre-parse them for us. It
-    //  uses the key/value/flag type, where the flag is true if was an
-    //  'option' parameter i.e. just /XXX, and false if a value param, i.e.
+    //  uses the key/value/flag type, where the flag is false if was an
+    //  'option' parameter i.e. just /XXX, and true if a value param, i.e.
     //  /XXX=YYY
     //
     tCIDLib::TKVPFList colParms;
     const tCIDLib::TCard4 c4ParmCnt = TSysInfo::c4StdCmdLineParse(colParms);
-    if ((c4ParmCnt < 1) || (c4ParmCnt > 3))
+    if ((c4ParmCnt < 1) || (c4ParmCnt > 2))
     {
         ShowUsage(strmOut);
         return tCIDLib::EExitCodes::BadParameters;
@@ -108,24 +107,22 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     (
         [&](const TKeyValFPair& kvalfCur)
         {
-            tCIDLib::TBoolean bGood = kCIDLib::True;
+            tCIDLib::TBoolean bGood = kCIDLib::False;
             if (kvalfCur.strKey().bCompareI(L"Fmt"))
             {
                 if (kvalfCur.bFlag())
+                {
                     strRetFmt = kvalfCur.strValue();
-                else
-                    bGood = kCIDLib::False;
+                    bGood = kCIDLib::True;
+                }
             }
              else if (kvalfCur.strKey().bCompareI(L"URL"))
             {
                 if (kvalfCur.bFlag())
+                {
                     strURLText = kvalfCur.strValue();
-                else
-                    bGood = kCIDLib::False;
-            }
-             else
-            {
-                bGood = kCIDLib::False;
+                    bGood = kCIDLib::True;
+                }
             }
             return bGood;
         }
@@ -189,7 +186,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         janSrc
         , urlGet
         , TTime::enctNowPlusSecs(5)
-        , L"CIDLib Net1 Sample/1.0"
+        , L"CIDLib HTTP Client 1/1.0"
         , strRetFmt
         , eCodeType
         , strRepLine

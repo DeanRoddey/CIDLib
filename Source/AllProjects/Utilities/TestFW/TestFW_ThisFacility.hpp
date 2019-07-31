@@ -137,6 +137,10 @@ class TFacTestFW : public TFacility
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_bNoLong
+        //      Used to disable long running tests when desired. It's set via a
+        //      /NoLong parameter.
+        //
         //  m_c4LineNum
         //      Used during file parsing. The bParseLine() method wil keep
         //      it up to date.
@@ -209,6 +213,7 @@ class TFacTestFW : public TFacility
         //      the test program path. We replace that token with this value.
         //      If not set, it will default to the CIDBuild output directory.
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean       m_bNoLong;
         tCIDLib::TCard4         m_c4LineNum;
         tCIDLib::TCard4         m_c4MaxLevel;
         tCIDLib::TCard4         m_c4NextGroupId;

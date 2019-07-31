@@ -156,6 +156,7 @@ TTest_CntPtr2::TTest_CntPtr2() :
     , m_colThreads(tCIDLib::EAdoptOpts::Adopt)
     , m_cptrTest(new TCardinal)
 {
+    MarkAsLong();
 }
 
 TTest_CntPtr2::~TTest_CntPtr2()

@@ -277,6 +277,8 @@ class TESTFWLIBEXP TTestFWConn : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bNoLong() const;
+
         tTestFWLib::EVerbosity eQueryTestData
         (
                     tCIDLib::TCard4&        c4MaxLevel
@@ -312,6 +314,7 @@ class TESTFWLIBEXP TTestFWConn : public TObject
         (
             const   tTestFWLib::EVerbosity  eVerbosity
             , const tCIDLib::TCard4         c4MaxLevel
+            , const tCIDLib::TBoolean       bNoLong
         );
 
         tCIDLib::TVoid SetTestRes
@@ -328,6 +331,7 @@ class TESTFWLIBEXP TTestFWConn : public TObject
         struct TConnInfo
         {
             // Incoming info from the test framework to the app
+            tCIDLib::TBoolean       bNoLong;
             tCIDLib::TCard4         c4MaxLevel;
             tTestFWLib::EVerbosity  eVerbosity;
             tCIDLib::TCard4         c4InBytes;

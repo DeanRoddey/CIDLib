@@ -1449,7 +1449,7 @@ TGraphDrawDev::DrawBitmapMasked(const   TBitmap&            bmpToDraw
 
 //
 //  Draw a box between the two points (upper left/lower right) with the indicated
-//  drawing radius. It's non-inclusive so we have to add one to the LR.
+//  drawing radius. We assume the passed points are non-inclusive.
 //
 tCIDLib::TVoid
 TGraphDrawDev::DrawBox( const   TPoint&         pntFrom
@@ -1464,8 +1464,8 @@ TGraphDrawDev::DrawBox( const   TPoint&         pntFrom
             hdevThis()
             , pntFrom.i4X()
             , pntFrom.i4Y()
-            , pntTo.i4X() + 1
-            , pntTo.i4Y() + 1
+            , pntTo.i4X()
+            , pntTo.i4Y()
             , c4Rounding
             , c4Rounding))
         {
@@ -1479,8 +1479,8 @@ TGraphDrawDev::DrawBox( const   TPoint&         pntFrom
             hdevThis()
             , pntFrom.i4X()
             , pntFrom.i4Y()
-            , pntTo.i4X() + 1
-            , pntTo.i4Y() + 1))
+            , pntTo.i4X()
+            , pntTo.i4Y()))
         {
             bRes = kCIDLib::False;
         }
@@ -1507,7 +1507,7 @@ tCIDLib::TVoid
 TGraphDrawDev::DrawBox(const TArea& areaBox, const tCIDLib::TCard4 c4Rounding)
 {
     TPoint pntUL, pntLR;
-    areaBox.ToPoints(pntUL, pntLR);
+    areaBox.ToPoints(pntUL, pntLR, tCIDLib::ERectlTypes::NonInclusive);
     DrawBox(pntUL, pntLR, c4Rounding);
 }
 
@@ -3763,12 +3763,13 @@ TGraphDrawDev::Fill(const TGUIRegion& grgnToFill, const TRGBClr& rgbClr)
     }
 }
 
+// WE asume the points are non-inclusive
 tCIDLib::TVoid
 TGraphDrawDev::Fill(const   TPoint&     pntFrom
                     , const TPoint&     pntTo
                     , const TRGBClr&    rgbToUse)
 {
-    Fill(TArea(pntFrom, pntTo), rgbToUse);
+    Fill(TArea(pntFrom, pntTo, tCIDLib::ERectlTypes::NonInclusive), rgbToUse);
 }
 
 
@@ -3899,8 +3900,8 @@ TGraphDrawDev::FillWithBmpPattern(  const   TPoint&                 pntFrom
                                     , const tCIDGraphDev::EBmpModes eMode
                                     , const TPoint&                 pntPatOrg)
 {
-    // Just call the other version
-    TArea areaTmp(pntFrom, pntTo);
+    // Just call the other version. We assume the points are non-inclusive
+    TArea areaTmp(pntFrom, pntTo, tCIDLib::ERectlTypes::NonInclusive);
     FillWithBmpPattern(areaTmp, bmpToUse, eMode, pntPatOrg);
 }
 
@@ -3912,7 +3913,7 @@ TGraphDrawDev::FillWithBmpPattern(  const   TPoint&                 pntFrom
                                     , const tCIDGraphDev::EBmpModes eMode)
 {
     // Just call the other version
-    TArea areaTmp(pntFrom, pntTo);
+    TArea areaTmp(pntFrom, pntTo, tCIDLib::ERectlTypes::NonInclusive);
     FillWithBmpPattern(areaTmp, bmpToUse, eMode, TPoint::pntOrigin);
 }
 
