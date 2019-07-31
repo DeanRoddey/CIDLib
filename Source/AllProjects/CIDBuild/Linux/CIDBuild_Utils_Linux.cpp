@@ -58,6 +58,15 @@ tCIDLib::TBoolean TUtils::bChangeDir(const TBldStr& strChangeTo)
 }
 
 tCIDLib::TBoolean
+TUtils::bCmpBufs(const  tCIDLib::TCard1* const  pc1Buf1
+                , const tCIDLib::TCard1* const  pc1Buf2
+                , const tCIDLib::TCard4         c4Count)
+{
+    return (memcmp(pc1Buf1, pc1Buf2, c4Count) != 0);
+}
+
+
+tCIDLib::TBoolean
 TUtils::bCopyFile(  const   TBldStr&            strSourceName
                     , const TBldStr&            strTargetName
                     , const tCIDLib::TBoolean bFailIfExists)

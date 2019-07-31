@@ -119,9 +119,9 @@ TRawStr::pszTranscode(  const   tCIDLib::TSCh* const    pszToTranscode
     return pszRet;
 }
 
-char* TRawStr::pszTranscode(const   tCIDLib::TCh* const pszToTranscode
-                            ,       tCIDLib::TCard4&    c4Transcoded
-                            , const tCIDLib::TCard4     c4InChars)
+tCIDLib::TSCh* TRawStr::pszTranscode(const  tCIDLib::TCh* const pszToTranscode
+                                    ,       tCIDLib::TCard4&    c4Transcoded
+                                    , const tCIDLib::TCard4     c4InChars)
 {
     const tCIDLib::TUInt c4Len = c4InChars ? c4InChars : ::wcslen(pszToTranscode) + 1;
     char* pszRet = new tCIDLib::TSCh[c4Len * 2];

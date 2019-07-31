@@ -53,7 +53,9 @@ else
 	LINK_FLAGS := -O3
 endif
 
-BUILD_FLAGS += -DPLATFORM_LINUX -std=c++17 -m32 
+BUILD_FLAGS += -DPLATFORM_LINUX -std=c++17 -m32
+LINK_FLAGS += -lstdc++ -m32
+# LINK_FLAGS += -lstdc++
 
 # The list of headers. We just use them all for each file
 HPP_FILES=\
@@ -91,10 +93,12 @@ CIDBuild_Facility \
 CIDBuild_FacilityActions \
 CIDBuild_FileDepend \
 CIDBuild_FindInfo \
+CIDBuild_IDLInfo \
 CIDBuild_GCCDriver \
 CIDBuild_LineSpooler \
 CIDBuild_MsgIdInfo \
 CIDBuild_ProjectInfo \
+CIDBuild_ProjectList \
 CIDBuild_RawStr \
 CIDBuild_Release \
 CIDBuild_ResCompiler \
@@ -138,7 +142,7 @@ SRC_FILES += $(addprefix $(PLATDIR)/, $(addsuffix $(SRC_EXT), $(PLAT_STEMS)))
 all : dirs $(CID_RESDIR)/CIDBuild
 
 $(CID_RESDIR)/CIDBuild : $(OBJ_FILES)
-	g++ $(LINK_FLAGS) -o $(CID_RESDIR)/CIDBuild $*
+	g++ $(LINK_FLAGS) -o $(CID_RESDIR)/CIDBuild $^
 
 $(OUR_OUTDIR)/%.o: ./%.cpp
 	g++ $(BUILD_FLAGS) $< -o $@
