@@ -119,12 +119,14 @@ class CIDLIBEXP TArea :
         (
             const   tCIDLib::THostPoint&    ptULeft
             , const tCIDLib::THostPoint&    ptLRight
+            , const tCIDLib::ERectlTypes    eInclusive
         );
 
         TArea
         (
             const   TPoint&                 pntULeft
             , const TPoint&                 pntLRight
+            , const tCIDLib::ERectlTypes    eInclusive
         );
 
         TArea
@@ -407,18 +409,21 @@ class CIDLIBEXP TArea :
         (
             const   TPoint&                 pntULeft
             , const TPoint&                 pntLRight
+            , const tCIDLib::ERectlTypes    eInclusive
         );
 
         tCIDLib::TVoid FromPoints
         (
             const   tCIDLib::THostPoint&    ptULeft
             , const tCIDLib::THostPoint&    ptLRight
+            , const tCIDLib::ERectlTypes    eInclusive
         );
 
         tCIDLib::TVoid FromPoints
         (
             const   tCIDLib::TRawPoint&     ptULeft
             , const tCIDLib::TRawPoint&     ptLRight
+            , const tCIDLib::ERectlTypes    eInclusive
         );
 
         tCIDLib::TVoid FromRectl
@@ -563,7 +568,7 @@ class CIDLIBEXP TArea :
         (
             const   TString&                strText
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
-            , const tCIDLib::TCh            chSepChar = L','
+            , const tCIDLib::TCh            chSepChar = kCIDLib::chComma
         );
 
         tCIDLib::TVoid RightAlign
@@ -657,6 +662,7 @@ class CIDLIBEXP TArea :
         tCIDLib::TVoid ToPointArray
         (
                     tCIDLib::THostPoint* const aptTarget
+            , const tCIDLib::ERectlTypes    eInclusive
         )   const;
 
         tCIDLib::TVoid ToCornerPoints
@@ -665,6 +671,7 @@ class CIDLIBEXP TArea :
             ,       tCIDLib::THostPoint&    ptURight
             ,       tCIDLib::THostPoint&    ptLRight
             ,       tCIDLib::THostPoint&    ptLLeft
+            , const tCIDLib::ERectlTypes    eInclusive
         )   const;
 
         tCIDLib::TVoid ToCornerPoints
@@ -673,18 +680,21 @@ class CIDLIBEXP TArea :
             ,       TPoint&                 pntURight
             ,       TPoint&                 pntLRight
             ,       TPoint&                 pntLLeft
+            , const tCIDLib::ERectlTypes    eInclusive
         )   const;
 
         tCIDLib::TVoid ToPoints
         (
                     TPoint&                 pntULeft
             ,       TPoint&                 pntLRight
+            , const tCIDLib::ERectlTypes    eInclusive
         )   const;
 
         tCIDLib::TVoid ToPoints
         (
                     tCIDLib::THostPoint&    ptULeft
             ,       tCIDLib::THostPoint&    ptLRight
+            , const tCIDLib::ERectlTypes    eInclusive
         )   const;
 
         tCIDLib::TVoid ToRawArea

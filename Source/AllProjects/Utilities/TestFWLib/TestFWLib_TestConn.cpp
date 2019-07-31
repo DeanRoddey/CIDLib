@@ -414,6 +414,12 @@ TTestFWConn::~TTestFWConn()
 //  TTestFWConn: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 
+tCIDLib::TBoolean TTestFWConn::bNoLong() const
+{
+    return m_pConnInfo->bNoLong;
+}
+
+
 // Called by the test framework to query the results back out
 tTestFWLib::EPhases
 TTestFWConn::eQueryTestRes( TTFWTestRes&    tfwtrToFill
@@ -526,9 +532,11 @@ tCIDLib::TVoid TTestFWConn::SetPhase(const tTestFWLib::EPhases ePhase)
 //
 tCIDLib::TVoid
 TTestFWConn::SetTestData(const  tTestFWLib::EVerbosity  eToSet
-                        , const tCIDLib::TCard4         c4MaxLevel)
+                        , const tCIDLib::TCard4         c4MaxLevel
+                        , const tCIDLib::TBoolean       bNoLong)
 {
     // Store the incoming info
+    m_pConnInfo->bNoLong = bNoLong;
     m_pConnInfo->c4MaxLevel = c4MaxLevel;
     m_pConnInfo->eVerbosity = eToSet;
 

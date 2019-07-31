@@ -57,33 +57,12 @@ TTestFWTest::~TTestFWTest()
 // ---------------------------------------------------------------------------
 //  TTestFWTest: Hidden Constructors
 // ---------------------------------------------------------------------------
+TTestFWTest::TTestFWTest(const  TString&            strSubName
+                        , const TString&            strDescr
+                        , const tCIDLib::TCard4     c4Level) :
 
-// Get the complexity level of this test
-tCIDLib::TCard4 TTestFWTest::c4Level() const
-{
-    return m_c4Level;
-}
-
-
-const TString& TTestFWTest::strDescription() const
-{
-    return m_strDescr;
-}
-
-
-const TString& TTestFWTest::strSubName() const
-{
-    return m_strSubName;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TTestFWTest: Hidden Constructors
-// ---------------------------------------------------------------------------
-TTestFWTest::TTestFWTest(const  TString&        strSubName
-                        , const TString&        strDescr
-                        , const tCIDLib::TCard4 c4Level) :
-    m_c4Level(c4Level)
+    m_bLong(kCIDLib::False)
+    , m_c4Level(c4Level)
     , m_strDescr(strDescr)
     , m_strSubName(strSubName)
 {
@@ -119,6 +98,13 @@ tCIDLib::EExitCodes TTestFWApp::eTestThread(TThread& thrThis, tCIDLib::TVoid*)
     //
     TOutConsole strmOut;
 
+	//
+	//  In order to be able to debug the test programs, we support a /TFWDebug flag
+	//	that will make us set up the connection info ourself and set some dummy
+	//	info.
+	//
+	tCIDLib::TBoolean bDebugMode = TSysInfo::bFindCmdLineParm(L"/TFWDebug");
+
     //
     //  The first thing we'll do is create the connection object that
     //  connects us to the test framework, and get any test info out.
@@ -128,21 +114,12 @@ tCIDLib::EExitCodes TTestFWApp::eTestThread(TThread& thrThis, tCIDLib::TVoid*)
     //  framework. So we just have to create an error out stream and
     //  report it and give up.
     //
-    //  In order to be able to debug the test programs, we check for a
-    //  command line parameter (/TFWDebug) and if that is set, then we
-    //  set up the connection object ourself.
-    //
-    tCIDLib::TBoolean bDebugMode = kCIDLib::False;
-    if (TSysInfo::c4CmdLineParmCount() == 1)
-    {
-        if (TSysInfo::strCmdLineParmAt(0).bCompareI(L"/TFWDebug"))
-            bDebugMode = kCIDLib::True;
-    }
-
     TTestFWConn* ptfwcnInfo = nullptr;
     try
     {
+        // Pass the debug flag to let it set up itself up if in debug mode
         ptfwcnInfo = new TTestFWConn(bDebugMode);
+        m_bNoLong = ptfwcnInfo->bNoLong();
         m_eVerbosity = ptfwcnInfo->eQueryTestData(m_c4MaxLevel);
     }
 
@@ -172,6 +149,13 @@ tCIDLib::EExitCodes TTestFWApp::eTestThread(TThread& thrThis, tCIDLib::TVoid*)
                             << L"due to a system exception" << kCIDLib::EndLn;
         return tCIDLib::EExitCodes::RuntimeError;
     }
+
+    //
+	//  When invoked in debug mode we want to look for some parameter that otherwise
+    //  would have come via the connection info above.
+    //
+    if (bDebugMode)
+        m_bNoLong = TSysInfo::bFindCmdLineParm(L"/NoLong");
 
     //
     //  Ok, we know we can now get the information back to the caller.
@@ -238,6 +222,11 @@ tCIDLib::EExitCodes TTestFWApp::eTestThread(TThread& thrThis, tCIDLib::TVoid*)
                     //
                     strmOutput  << L"Filtered by MaxLevel setting";
                     strmOut << L" Skipped by MaxLevel" << kCIDLib::EndLn;
+                }
+                 else if (m_bNoLong && tfwtCur.bLong())
+                {
+                    strmOutput  << L"Filtered by NoLong setting";
+                    strmOut << L" Skipped by NoLong" << kCIDLib::EndLn;
                 }
                  else
                 {
@@ -328,7 +317,8 @@ tCIDLib::EExitCodes TTestFWApp::eTestThread(TThread& thrThis, tCIDLib::TVoid*)
 // ---------------------------------------------------------------------------
 TTestFWApp::TTestFWApp() :
 
-    m_c4MaxLevel(kTestFWLib::c4MaxTestLevel)
+    m_bNoLong(kCIDLib::False)
+    , m_c4MaxLevel(kTestFWLib::c4MaxTestLevel)
     , m_eVerbosity(tTestFWLib::EVerbosity::Low)
     , m_colTests(tCIDLib::EAdoptOpts::Adopt, 32)
 {

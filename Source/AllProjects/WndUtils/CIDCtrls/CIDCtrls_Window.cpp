@@ -2835,12 +2835,13 @@ TWindow::InvalidateArea(const   tCIDCtrls::TWndId   widChild
     pwndChild->InvalidateArea(areaToInvalidate, bEraseBgn);
 }
 
+// We assume non-inclusive points
 tCIDLib::TVoid
 TWindow::InvalidateArea(const   TPoint&             pntUL
                         , const TPoint&             pntLR
                         , const tCIDLib::TBoolean   bEraseBgn)
 {
-    InvalidateArea(TArea(pntUL, pntLR), bEraseBgn);
+    InvalidateArea(TArea(pntUL, pntLR, tCIDLib::ERectlTypes::NonInclusive), bEraseBgn);
 }
 
 tCIDLib::TVoid
@@ -2849,7 +2850,10 @@ TWindow::InvalidateArea(const   tCIDCtrls::TWndId   widChild
                         , const TPoint&             pntLR
                         , const tCIDLib::TBoolean   bEraseBgn)
 {
-    InvalidateArea(widChild, TArea(pntUL, pntLR), bEraseBgn);
+    InvalidateArea
+    (
+        widChild, TArea(pntUL, pntLR, tCIDLib::ERectlTypes::NonInclusive), bEraseBgn
+    );
 }
 
 

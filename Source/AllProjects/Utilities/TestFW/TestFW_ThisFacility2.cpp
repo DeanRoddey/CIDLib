@@ -154,25 +154,7 @@ tCIDLib::TBoolean TFacTestFW::bParseParms()
     {
         strCurParm = *cursParms;
 
-        if (strCurParm.bStartsWithI(L"/Verbosity="))
-        {
-            strCurParm.Cut(0, 11);
-
-            // Set the verbosity, validing the value
-            if (strCurParm.bCompareI(L"low"))
-                m_eVerbosity = tTestFWLib::EVerbosity::Low;
-            else if (strCurParm.bCompareI(L"med"))
-                m_eVerbosity = tTestFWLib::EVerbosity::Medium;
-            else if (strCurParm.bCompareI(L"high"))
-                m_eVerbosity = tTestFWLib::EVerbosity::High;
-            else
-            {
-                *m_pstrmOut << L"The verbosity level was invalid. Use Low, Med, or High\n"
-                            << kCIDLib::EndLn;
-                return kCIDLib::False;
-            }
-        }
-         else if (strCurParm.bStartsWithI(L"/CfgFile="))
+        if (strCurParm.bStartsWithI(L"/CfgFile="))
         {
             strCurParm.Cut(0, 9);
             m_strCfgFile = strCurParm;
@@ -196,6 +178,10 @@ tCIDLib::TBoolean TFacTestFW::bParseParms()
             strCurParm.Cut(0, 8);
             strGroups = strCurParm;
         }
+         else if (strCurParm.bCompareI(L"/NoLong"))
+        {
+            m_bNoLong = kCIDLib::True;
+        }
          else if (strCurParm.bStartsWithI(L"/OutFmt="))
         {
             strCurParm.Cut(0, 8);
@@ -205,6 +191,24 @@ tCIDLib::TBoolean TFacTestFW::bParseParms()
         {
             strCurParm.Cut(0, 10);
             m_strTestRoot = strCurParm;
+        }
+         else if (strCurParm.bStartsWithI(L"/Verbosity="))
+        {
+            strCurParm.Cut(0, 11);
+
+            // Set the verbosity, validing the value
+            if (strCurParm.bCompareI(L"low"))
+                m_eVerbosity = tTestFWLib::EVerbosity::Low;
+            else if (strCurParm.bCompareI(L"med"))
+                m_eVerbosity = tTestFWLib::EVerbosity::Medium;
+            else if (strCurParm.bCompareI(L"high"))
+                m_eVerbosity = tTestFWLib::EVerbosity::High;
+            else
+            {
+                *m_pstrmOut << L"The verbosity level was invalid. Use Low, Med, or High\n"
+                            << kCIDLib::EndLn;
+                return kCIDLib::False;
+            }
         }
          else
         {
