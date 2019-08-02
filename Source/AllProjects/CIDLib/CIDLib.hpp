@@ -88,6 +88,19 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_ExpByteBuf.hpp"
 #include    "CIDLib_TextConverter.hpp"
 #include    "CIDLib_UTFConverter.hpp"
+
+#include    "CIDLib_DLinkedList.hpp"
+#include    "CIDLib_SLinkedList.hpp"
+#include    "CIDLib_CollectCursor.hpp"
+#include    "CIDLib_Collection.hpp"
+
+#include    "CIDLib_CircularBuf.hpp"
+#include    "CIDLib_FundArray.hpp"
+#include    "CIDLib_FundDeque.hpp"
+#include    "CIDLib_FundQueue.hpp"
+#include    "CIDLib_FundStack.hpp"
+#include    "CIDLib_FundVector.hpp"
+
 #include    "CIDLib_BinInStream.hpp"
 #include    "CIDLib_BinOutStream.hpp"
 
@@ -170,10 +183,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 
 #endif
 
-#include    "CIDLib_DLinkedList.hpp"
-#include    "CIDLib_SLinkedList.hpp"
-#include    "CIDLib_CollectCursor.hpp"
-#include    "CIDLib_Collection.hpp"
 #include    "CIDLib_BasicDLinkedCol.hpp"
 
 #include    "CIDLib_StreamFmt.hpp"
@@ -182,13 +191,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 
 #include    "CIDLib_StringTokenizer.hpp"
 #include    "CIDLib_BasicTreeCol.hpp"
-
-#include    "CIDLib_CircularBuf.hpp"
-#include    "CIDLib_FundArray.hpp"
-#include    "CIDLib_FundDeque.hpp"
-#include    "CIDLib_FundQueue.hpp"
-#include    "CIDLib_FundStack.hpp"
-#include    "CIDLib_FundVector.hpp"
 
 #include    "CIDLib_Enum.hpp"
 #include    "CIDLib_StatsCache.hpp"
@@ -344,6 +346,7 @@ namespace tCIDLib
     using TFloat8List   = TFundVector<tCIDLib::TFloat8>;
     using TChangeList   = TFundVector<tCIDLib::EChangeRes>;
     using TBoolStack    = TFundStack<tCIDLib::TBoolean>;
+    using TByteStack    = TFundStack<tCIDLib::TCard1>;
     using TCardStack    = TFundStack<tCIDLib::TCard4>;
     using TKVHashSet    = TKeyedHashSet<TKeyValuePair,TString,TStringKeyOps>;
     using TStrHashSet   = THashSet<TString,TStringKeyOps>;
@@ -391,6 +394,7 @@ extern template class TFundVector<tCIDLib::TFloat4>;
 extern template class TFundVector<tCIDLib::TFloat8>;
 
 extern template class TFundStack<tCIDLib::TBoolean>;
+extern template class TFundStack<tCIDLib::TCard1>;
 extern template class TFundStack<tCIDLib::TCard4>;
 
 extern template class TObjArray<TString>;

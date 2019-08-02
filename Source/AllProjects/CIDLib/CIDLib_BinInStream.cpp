@@ -122,6 +122,7 @@ TBinInStream::TBinInStream(TInStreamImpl* const pstrmiToAdopt) :
     m_c4CurAvail(0)
     , m_c4CurIndex(0)
     , m_eEndianMode(tCIDLib::EEndianModes::Little)
+    , m_fcolPushback(kCIDLib::c4Sz_8K)
     , m_pstrmiIn(pstrmiToAdopt)
 {
 }
@@ -349,17 +350,17 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TCh& chToFill)
 tCIDLib::TBoolean TBinInStream::bEndOfStream() const
 {
     //
-    //  If we have data in the cache, then we can't be at the end, so check
-    //  that first.
+    //  If we have data in the cache and/or pushback, then we can't be at the end,
+    //  so check that first.
     //
-    if (c4CacheAvail())
+    if (c4CacheAvail(kCIDLib::True))
         return kCIDLib::False;
 
-    // We don't have any in the cache, so try to refresh it
+    // We don't have any in either, so try to refresh the cache
     RefreshCache();
 
-    // And check again, this time its definitive
-    return !c4CacheAvail();
+    // And check again, this time its definitive, and no need to include the pushback
+    return !c4CacheAvail(kCIDLib::False);
 }
 
 
@@ -379,10 +380,14 @@ tCIDLib::EEndianModes TBinInStream::eEndianMode(const tCIDLib::EEndianModes eToS
 }
 
 
-// Returns the bytes currently in the cache
-tCIDLib::TCard4 TBinInStream::c4CacheAvail() const
+// Returns the bytes currently in the cache optionally including pushback
+tCIDLib::TCard4
+TBinInStream::c4CacheAvail(const tCIDLib::TBoolean bIncludePushback) const
 {
-    return (m_c4CurAvail - m_c4CurIndex);
+    tCIDLib::TCard4 c4Ret(m_c4CurAvail - m_c4CurIndex);
+    if (bIncludePushback)
+        c4Ret += m_fcolPushback.c4ElemCount();
+    return c4Ret;
 }
 
 
@@ -439,11 +444,38 @@ TBinInStream::c4ReadBuffer(         TMemBuf&            mbufTarget
 }
 
 
+//
+//  All reading goes through here, so that we can deal with the cache and
+//  pushback. Other than skipping forward, this is the only place we have to
+//  worry about these things.
+//
 tCIDLib::TCard4
 TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
-                                , const tCIDLib::TCard4         c4Count
+                                , const tCIDLib::TCard4         c4ToRead
                                 , const tCIDLib::EAllData       eAllData)
 {
+    // Make the code below a lot safer
+    if (!c4ToRead)
+        return 0;
+
+    // We need to see it as a byte array for our purposes below
+    tCIDLib::TCard1* pc1Tar = reinterpret_cast<tCIDLib::TCard1*>(pBufToFill);
+
+    // If the pushback stack is not empty, we get as much as we can out of that
+    tCIDLib::TCard4 c4BytesRead = 0;
+    while (!m_fcolPushback.bIsEmpty() && (c4BytesRead < c4ToRead))
+        *pc1Tar++ = m_fcolPushback.tPop();
+
+    // If we got them all, then are done
+    if (c4BytesRead == c4ToRead)
+        return c4ToRead;
+
+    //
+    //  Move up the target by the bytes we got from the pushback. The reset
+    //  of the work below will be relative to this.
+    //
+    pc1Tar += c4BytesRead;
+
     //
     //  We do three scenarios here. If the data is fully available via the
     //  cache now, just get it and go on.
@@ -453,45 +485,37 @@ TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
     //  contents out of it. Otherwise, we just do the normal steps of refilling
     //  the cache if needed and then reading from it.
     //
-    tCIDLib::TCard4 c4Ret = 0;
-    if (c4Count <= c4CacheAvail())
+    //  No need to include the pushback in the availability checks from here
+    //  forward since we have drained it now.
+    //
+    tCIDLib::TCard4 c4Remainder(c4ToRead - c4BytesRead);
+    if (c4Remainder <= c4CacheAvail(kCIDLib::False))
     {
-        TRawMem::CopyMemBuf
-        (
-            reinterpret_cast<tCIDLib::TCard1*>(pBufToFill)
-            , &m_ac1Cache[m_c4CurIndex]
-            , c4Count
-        );
+        // We can read the from the cache
 
-        // Bump up the cache index and set the bytes read to the full count
-        m_c4CurIndex += c4Count;
-        c4Ret = c4Count;
+        TRawMem::CopyMemBuf(pc1Tar, &m_ac1Cache[m_c4CurIndex], c4Remainder);
+        m_c4CurIndex += c4Remainder;
+        c4BytesRead += c4Remainder;
     }
-     else if (c4Count > c4CacheSz)
+     else if (c4Remainder > c4CacheSz)
     {
         //
         //  The amount asked for is bigger than the whole cache, so we optimize
         //  this one by getting the data from the cache and then reading the
-        //  reset straight into the caller's buffer.
+        //  rest straight into the caller's buffer.
         //
-        if (c4CacheAvail())
+        if (c4CacheAvail(kCIDLib::False))
         {
-            c4Ret = c4CacheAvail();
-            TRawMem::CopyMemBuf
-            (
-                pBufToFill
-                , &m_ac1Cache[m_c4CurIndex]
-                , c4Ret
-            );
-            m_c4CurIndex = m_c4CurAvail;
+            const tCIDLib::TCard4 c4Avail = c4CacheAvail(kCIDLib::False);
+            TRawMem::CopyMemBuf(pc1Tar, &m_ac1Cache[m_c4CurIndex], c4Avail);
+            m_c4CurIndex += c4Avail;
+            c4BytesRead += c4Avail;
+            pc1Tar += c4Avail;
+            c4Remainder -= c4Avail;
         }
 
-        // Ask the implementation to provide the rest
-        c4Ret += m_pstrmiIn->c4ReadBytes
-        (
-            reinterpret_cast<tCIDLib::TCard1*>(pBufToFill) + c4Ret
-            , c4Count - c4Ret
-        );
+        // Ask the implementation to provide the rest, or as much as it can
+        c4BytesRead += m_pstrmiIn->c4ReadBytes(pc1Tar, c4Remainder);
     }
      else
     {
@@ -500,16 +524,14 @@ TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
         //  enough left in the cache to handle it. So first get what's in the
         //  cache.
         //
-        if (c4CacheAvail())
+        if (c4CacheAvail(kCIDLib::False))
         {
-            c4Ret = c4CacheAvail();
-            TRawMem::CopyMemBuf
-            (
-                pBufToFill
-                , &m_ac1Cache[m_c4CurIndex]
-                , c4Ret
-            );
-            m_c4CurIndex = m_c4CurAvail;
+            const tCIDLib::TCard4 c4Avail = c4CacheAvail(kCIDLib::False);
+            TRawMem::CopyMemBuf(pc1Tar, &m_ac1Cache[m_c4CurIndex], c4Avail);
+            m_c4CurIndex += c4Avail;
+            pc1Tar += c4Avail;
+            c4BytesRead += c4Avail;
+            c4Remainder -= c4Avail;
         }
 
         // And refresh the cache
@@ -519,21 +541,10 @@ TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
         //  Now, we get the rest if we can, or at least as much as we can get
         //  up to the amount left in the requested count
         //
-        const tCIDLib::TCard4 c4Extra = tCIDLib::MinVal
-        (
-            c4Count - c4Ret
-            , m_c4CurAvail
-        );
-
-        TRawMem::CopyMemBuf
-        (
-            reinterpret_cast<tCIDLib::TCard1*>(pBufToFill) + c4Ret
-            , &m_ac1Cache[m_c4CurIndex]
-            , c4Extra
-        );
-
-        c4Ret += c4Extra;
+        const tCIDLib::TCard4 c4Extra = tCIDLib::MinVal(c4Remainder, m_c4CurAvail);
+        TRawMem::CopyMemBuf(pc1Tar, &m_ac1Cache[m_c4CurIndex], c4Extra);
         m_c4CurIndex += c4Extra;
+        c4BytesRead += c4Extra;
     }
 
     //
@@ -541,9 +552,9 @@ TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
     //  parameter indicates all bytes must be read, then throw. If we get zero
     //  bytes, then throw the end of stream error.
     //
-    if ((c4Ret != c4Count) && (eAllData == tCIDLib::EAllData::FailIfNotAll))
+    if ((c4BytesRead < c4ToRead) && (eAllData == tCIDLib::EAllData::FailIfNotAll))
     {
-        if (c4Ret)
+        if (c4BytesRead)
         {
             facCIDLib().ThrowErr
             (
@@ -552,8 +563,8 @@ TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
                 , kCIDErrs::errcStrm_NotAllData
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::OutResource
-                , TCardinal(c4Ret)
-                , TCardinal(c4Count)
+                , TCardinal(c4BytesRead)
+                , TCardinal(c4ToRead)
             );
         }
          else
@@ -568,8 +579,7 @@ TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
             );
         }
     }
-
-    return c4Ret;
+    return c4BytesRead;
 }
 
 
@@ -720,9 +730,15 @@ tCIDLib::TCard4 TBinInStream::c4CurPos() const
 {
     //
     //  We get the current raw position and then subtract back from that
-    //  the cache bytes we've not read yet.
+    //  the cache and pushback bytes we've not read yet.
     //
-    const tCIDLib::TCard8 c8Tmp = m_pstrmiIn->c8CurPos() - c4CacheAvail();
+    const tCIDLib::TCard8 c8Tmp
+    (
+        m_pstrmiIn->c8CurPos() - c4CacheAvail(kCIDLib::True)
+    );
+
+    // If debugging, make sure we didn't somehow go psycho and wrap
+    CIDAssert(c8Tmp <= m_pstrmiIn->c8CurPos(), L"Current position underflowed")
 
     // If it won't fit, we can't do it
     if (c8Tmp > kCIDLib::c4MaxCard)
@@ -740,13 +756,33 @@ tCIDLib::TCard4 TBinInStream::c4CurPos() const
 }
 
 
+// Pushes a byte onto the pushback stack and returns the space left on the stack
+tCIDLib::TCard4 TBinInStream::c4Pushback(const tCIDLib::TCard1 c1ToPush)
+{
+    if (m_fcolPushback.bIsFull())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStrm_PBStackIsFull
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Overflow
+        );
+    }
+
+    m_fcolPushback.Push(c1ToPush);
+    return m_fcolPushback.c4MaxElemCount() - m_fcolPushback.c4ElemCount();
+}
+
+
 tCIDLib::TCard8 TBinInStream::c8CurPos() const
 {
     //
     //  We get the current raw position and then subtract back from that
-    //  the cache bytes we've not read yet.
+    //  the cache and pushback bytes we've not read yet.
     //
-    return m_pstrmiIn->c8CurPos() - c4CacheAvail();
+    return m_pstrmiIn->c8CurPos() - c4CacheAvail(kCIDLib::True);
 }
 
 
@@ -1066,40 +1102,60 @@ TBinInStream::ReadArray(        tCIDLib::TFloat8* const af8List
 
 tCIDLib::TVoid TBinInStream::Reset()
 {
-    // Clear out the cache and reset the impl object
+    // Clear out the cache and pushback, and reset the impl object
     m_c4CurIndex = 0;
     m_c4CurAvail = 0;
+    m_fcolPushback.RemoveAll();
     m_pstrmiIn->Reset();
 }
 
 
 tCIDLib::TVoid TBinInStream::SkipForwardBy(const tCIDLib::TCard4 c4SkipBy)
 {
-    //
-    //  Run up through the cache first. If there are enough bytes in the cache,
-    //  just bump up the index. Otherwise, we do a more complex operation.
-    //
-    const tCIDLib::TCard4 c4Avail = c4CacheAvail();
-    if (c4Avail >= c4SkipBy)
+    // Make code below safer
+    if (!c4SkipBy)
+        return;
+
+    // First eat as much as possible from the pushback
+    tCIDLib::TCard4 c4LeftToSkip = c4SkipBy;
+    while (!m_fcolPushback.bIsEmpty() && c4LeftToSkip)
     {
-        m_c4CurIndex += c4SkipBy;
+        m_fcolPushback.tPop();
+        c4LeftToSkip--;
     }
-     else
+
+    //
+    //  If any more left to skip. No need to include pushback anymore since we
+    //  drained it if we aren't done yet.
+    //
+    if (c4LeftToSkip)
     {
         //
-        //  First we have to account for the cache data. So we zero out the
-        //  current index and cache index, and subtract the amount still
-        //  available in the cache from the amount to skip forward by.
+        //  Run up through the cache first. If there are enough bytes in the cache,
+        //  just bump up the index. Otherwise, we do a more complex operation.
         //
-        const tCIDLib::TCard4 c4ActualSkip = c4SkipBy - c4Avail;
-        m_c4CurIndex = 0;
-        m_c4CurAvail = 0;
+        const tCIDLib::TCard4 c4Avail = c4CacheAvail(kCIDLib::False);
+        if (c4Avail >= c4LeftToSkip)
+        {
+            m_c4CurIndex += c4LeftToSkip;
+        }
+        else
+        {
+            //
+            //  First we have to account for the cache data. So we zero out the
+            //  current index and cache index, and subtract the amount still
+            //  available in the cache from the amount to skip forward by.
+            //
+            const tCIDLib::TCard4 c4ActualSkip = c4LeftToSkip - c4Avail;
+            m_c4CurIndex = 0;
+            m_c4CurAvail = 0;
 
-        // And now ask the impl object to move up the rest of the way
-        m_pstrmiIn->SkipForwardBy(c4ActualSkip);
+            // And now ask the impl object to move up the rest of the way
+            m_pstrmiIn->SkipForwardBy(c4ActualSkip);
 
-        // And try to reload the cache
-        RefreshCache();
+            // And try to reload the cache
+            RefreshCache();
+        }
     }
 }
 
@@ -1112,6 +1168,7 @@ TBinInStream::TBinInStream() :
     m_c4CurAvail(0)
     , m_c4CurIndex(0)
     , m_eEndianMode(tCIDLib::EEndianModes::Little)
+    , m_fcolPushback(kCIDLib::c4Sz_8K)
     , m_pstrmiIn(nullptr)
 {
 }
@@ -1158,6 +1215,8 @@ tCIDLib::TVoid TBinInStream::DeleteImplObject()
 
 tCIDLib::TVoid TBinInStream::TrashCache()
 {
+    // This also means trashing the pushback, since it is in front of the cache
+    m_fcolPushback.RemoveAll();
     m_c4CurAvail = 0;
     m_c4CurIndex = 0;
 }
@@ -1176,7 +1235,7 @@ tCIDLib::TVoid TBinInStream::RefreshCache() const
 {
     //
     //  The cache index should always be empty when we get here, so do a debug
-    //  mode check that it is.
+    //  mode check that it is. And the pushback should be as well.
     //
     #if CID_DEBUG_ON
     if (m_c4CurIndex != m_c4CurAvail)
@@ -1186,6 +1245,17 @@ tCIDLib::TVoid TBinInStream::RefreshCache() const
             CID_FILE
             , CID_LINE
             , kCIDErrs::errcStrm_CacheIndexErr
+            , tCIDLib::ESeverities::ProcFatal
+            , tCIDLib::EErrClasses::Internal
+        );
+    }
+    if (!m_fcolPushback.bIsEmpty())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStrm_PBNotEmpty
             , tCIDLib::ESeverities::ProcFatal
             , tCIDLib::EErrClasses::Internal
         );

@@ -90,7 +90,7 @@ namespace kCIDLib
     #if defined(CIDLIB_LITTLEENDIAN)
     const tCIDLib::EBaseTextFmts    eWCCharFmt = tCIDLib::EBaseTextFmts::TwoByte_LE;
     #else
-    const tCIDLib::EBaseTextFmts    eWCCharFmt = tCIDLib::EBaseTextFmts::TwoByte_BLE;
+    const tCIDLib::EBaseTextFmts    eWCCharFmt = tCIDLib::EBaseTextFmts::TwoByte_BE;
     #endif
 }
 

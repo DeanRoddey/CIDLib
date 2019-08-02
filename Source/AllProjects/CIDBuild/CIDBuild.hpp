@@ -40,12 +40,10 @@
 #if defined(PLATFORM_WIN32_WIN7)
     #include    "../CIDKernel/Win32/CIDKernel_PlatformDefines.hpp"
     #include    "../CIDKernel/Win32/CIDKernel_PlatformTypes.hpp"
-    #include    "../CIDKernel/Win32/CIDKernel_PlatformConstants.hpp"
     #define     CIDBUILD_WIDEMAIN 1
 #elif defined(PLATFORM_LINUX)
     #include    "../CIDKernel/Linux/CIDKernel_PlatformDefines.hpp"
     #include    "../CIDKernel/Linux/CIDKernel_PlatformTypes.hpp"
-    #include    "../CIDKernel/Linux/CIDKernel_PlatformConstants.hpp"
     #define     CIDBUILD_WIDEMAIN 1
 #else
     #error Unknown platform define
@@ -56,6 +54,15 @@
 #include    "../CIDKernel/CIDKernel_Type.hpp"
 #include    "../CIDKernel/CIDKernel_Constant.hpp"
 #include    "../CIDKernel/CIDKernel_Unicode.hpp"
+
+// This one has to see the public types above
+#if defined(PLATFORM_WIN32_WIN7)
+    #include    "../CIDKernel/Win32/CIDKernel_PlatformConstants.hpp"
+#elif defined(PLATFORM_LINUX)
+    #include    "../CIDKernel/Linux/CIDKernel_PlatformConstants.hpp"
+#else
+    #error Unknown platform define
+#endif
 
 #define     CIDCTRLS_NOCLASSES
 #include    "../CIDKernel/CIDKernel_Type_Ctrls.hpp"

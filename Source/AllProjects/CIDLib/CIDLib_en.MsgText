@@ -547,6 +547,8 @@ ERRORS=
     errcStrm_NotAllBytesEaten   3381    Not all received UTF-8 bytes (%(1)) were eaten during unflattening
     errcStrm_ImplDataSzErr      3382    The current stream impl data size is less than current position
     errcStrm_FileTextInit       3383    This text file stream has not been opened yet
+    errcStrm_PBNotEmpty         3384    The pushback stack must be empty at this point
+    errcStrm_PBStackIsFull      3385    The pushback stack is full
 
     ; System info errors
     errcSysI_QueryUserName      3450    Could not get the current user name

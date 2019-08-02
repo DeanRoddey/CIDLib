@@ -48,13 +48,20 @@
 //  WE ASSUME that all data passed to be written is in the system endianness format.
 //  We swap if the stream's format is not the same as the system's.
 //
+//
+//  Pushback
+//
+//  We support pushback of data. We have a fundstack of bytes which can be used
+//  used to push back bytes one at a time. We allow up to 8K of pushback.
+//
+//
 // CAVEATS/GOTCHAS:
 //
 //  1)  If an input stream is linked to an output stream, and the input stream
 //      is used to reset the end of stream, that does not change the output
 //      stream position. If it writes, it can write beyond the end of the current
 //      end of data. So the output stream must deal with that by expanding the
-//      data up to the write point, fi the output stream is not also reset back
+//      data up to the write point, if the output stream is not also reset back
 //      to the start.
 //
 //      And vice versa, if the output stream truncates or resets, the input stream
@@ -287,7 +294,19 @@ class CIDLIBEXP TBinInStream : public TObject
             return m_eEndianMode == tCIDLib::EEndianModes::Little;
         }
 
-        tCIDLib::TCard4 c4CacheAvail() const;
+        tCIDLib::TCard4 c4CacheAvail
+        (
+            const   tCIDLib::TBoolean       bIncludePushback
+        )   const;
+
+        tCIDLib::TCard4 c4CurPos() const;
+
+        tCIDLib::TCard4 c4Pushback
+        (
+            const   tCIDLib::TCard1         c1ToPush
+        );
+
+        tCIDLib::TCard8 c8CurPos() const;
 
         tCIDLib::TCard4 c4ReadBuffer
         (
@@ -303,38 +322,34 @@ class CIDLIBEXP TBinInStream : public TObject
             , const tCIDLib::EAllData       eAllData = tCIDLib::EAllData::FailIfNotAll
         );
 
-        TClass clsReadClassInfo();
+        tCIDLib::TCard4 c4ReadEnum();
 
-        tCIDLib::TVoid CheckForFrameMarker
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        );
+        TClass clsReadClassInfo();
 
         tCIDLib::TVoid CheckForMarker
         (
-            const   tCIDLib::EStreamMarkers eMarker
+            const  tCIDLib::EStreamMarkers  eMarker
             , const tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         );
 
-        tCIDLib::TVoid CheckForEndMarker
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        );
+        tCIDLib::TVoid CheckForFrameMarker( const   tCIDLib::TCh* const pszFile
+                                            , const tCIDLib::TCard4     c4Line)
+        {
+            CheckForMarker(tCIDLib::EStreamMarkers::Frame, pszFile, c4Line);
+        }
 
-        tCIDLib::TVoid CheckForStartMarker
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        );
+        tCIDLib::TVoid CheckForEndMarker(const  tCIDLib::TCh* const pszFile
+                                        , const tCIDLib::TCard4     c4Line)
+        {
+            CheckForMarker(tCIDLib::EStreamMarkers::EndObject, pszFile, c4Line);
+        }
 
-        tCIDLib::TCard4 c4ReadEnum();
-
-        tCIDLib::TCard4 c4CurPos() const;
-
-        tCIDLib::TCard8 c8CurPos() const;
+        tCIDLib::TVoid CheckForStartMarker( const   tCIDLib::TCh* const pszFile
+                                            , const tCIDLib::TCard4     c4Line)
+        {
+            CheckForMarker(tCIDLib::EStreamMarkers::StartObject, pszFile, c4Line);
+        }
 
         tCIDLib::EEndianModes eEndianMode() const
         {
@@ -490,6 +505,11 @@ class CIDLIBEXP TBinInStream : public TObject
         //      will go (and hence also the current number of bytes in the
         //      cache.)
         //
+        //  m_fcolPushback
+        //      We support a pushback stack. We only allow pushback a byte at a
+        //      time, which we push onto the stack. The TByteStack alias isn't
+        //      available for us here.
+        //
         //  m_pstrmiIn
         //      This is the impl object that we do all of our work through.
         //
@@ -499,12 +519,13 @@ class CIDLIBEXP TBinInStream : public TObject
         //      The overhead of creating this converter is low enough that we
         //      don't bother with any kind of lazy faulting in.
         // -------------------------------------------------------------------
-        mutable tCIDLib::TCard1 m_ac1Cache[c4CacheSz];
-        mutable tCIDLib::TCard4 m_c4CurAvail;
-        mutable tCIDLib::TCard4 m_c4CurIndex;
-        tCIDLib::EEndianModes   m_eEndianMode;
-        TInStreamImpl*          m_pstrmiIn;
-        TUTF8Converter          m_tcvtText;
+        mutable tCIDLib::TCard1     m_ac1Cache[c4CacheSz];
+        mutable tCIDLib::TCard4     m_c4CurAvail;
+        mutable tCIDLib::TCard4     m_c4CurIndex;
+        tCIDLib::EEndianModes       m_eEndianMode;
+        TFundStack<tCIDLib::TCard1> m_fcolPushback;
+        TInStreamImpl*              m_pstrmiIn;
+        TUTF8Converter              m_tcvtText;
 
 
         // -------------------------------------------------------------------
@@ -518,35 +539,10 @@ class CIDLIBEXP TBinInStream : public TObject
 
 
 // ---------------------------------------------------------------------------
-//  Some convenience methods that just provide a parm and call CheckForMarker()
-// ---------------------------------------------------------------------------
-inline tCIDLib::TVoid
-TBinInStream::CheckForFrameMarker(  const   tCIDLib::TCh* const pszFile
-                                    , const tCIDLib::TCard4     c4Line)
-{
-    CheckForMarker(tCIDLib::EStreamMarkers::Frame, pszFile, c4Line);
-}
-
-inline tCIDLib::TVoid
-TBinInStream::CheckForEndMarker(const   tCIDLib::TCh* const pszFile
-                                , const tCIDLib::TCard4     c4Line)
-{
-    CheckForMarker(tCIDLib::EStreamMarkers::EndObject, pszFile, c4Line);
-}
-
-inline tCIDLib::TVoid
-TBinInStream::CheckForStartMarker(  const   tCIDLib::TCh* const pszFile
-                                    , const tCIDLib::TCard4     c4Line)
-{
-    CheckForMarker(tCIDLib::EStreamMarkers::StartObject, pszFile, c4Line);
-}
-
-
-// ---------------------------------------------------------------------------
 //  To help the fundamental collections, we define a set of globals for array
 //  reading, which just map to the members of the input stream above. This
 //  allows us to generate other globals for things like enumerations so that
-//  the fundamental collections can enum types as well.
+//  the fundamental collections can stream enum types as well.
 // ---------------------------------------------------------------------------
 inline tCIDLib::TVoid
 TBinInStream_ReadArray(         TBinInStream&           strmSrc

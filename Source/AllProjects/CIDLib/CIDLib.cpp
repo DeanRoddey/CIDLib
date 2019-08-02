@@ -72,6 +72,7 @@ template class CIDLIBEXP TFundVector<tCIDLib::TFloat4>;
 template class CIDLIBEXP TFundVector<tCIDLib::TFloat8>;
 
 template class CIDLIBEXP TFundStack<tCIDLib::TBoolean>;
+template class CIDLIBEXP TFundStack<tCIDLib::TCard1>;
 template class CIDLIBEXP TFundStack<tCIDLib::TCard4>;
 
 template class CIDLIBEXP TObjArray<TString>;
