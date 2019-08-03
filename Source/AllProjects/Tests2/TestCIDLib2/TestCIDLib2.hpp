@@ -45,6 +45,8 @@
 // ---------------------------------------------------------------------------
 //  Include our own internally used headers
 // ---------------------------------------------------------------------------
+#include    "TestCIDLib2_BinStreams.hpp"
+#include    "TestCIDLib2_TextStreams.hpp"
 #include    "TestCIDLib2_IDLGen.hpp"
 
 
@@ -511,140 +513,6 @@ class TTest_ColAlgo1 : public TTestFWTest
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TTest_ColAlgo1,TTestFWTest)
-};
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedBinInStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_ChunkedBinInStream : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_ChunkedBinInStream();
-
-        ~TTest_ChunkedBinInStream();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        )   override;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_ChunkedBinInStream,TTestFWTest)
-};
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedBinOutStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_ChunkedBinOutStream : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_ChunkedBinOutStream();
-
-        ~TTest_ChunkedBinOutStream();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        )   override;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_ChunkedBinOutStream,TTestFWTest)
-};
-
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedTextInStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_ChunkedTextInStream : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_ChunkedTextInStream();
-
-        ~TTest_ChunkedTextInStream();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        )   override;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_ChunkedTextInStream,TTestFWTest)
-};
-
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedTextOutStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_ChunkedTextOutStream : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_ChunkedTextOutStream();
-
-        ~TTest_ChunkedTextOutStream();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        )   override;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_ChunkedTextOutStream,TTestFWTest)
 };
 
 

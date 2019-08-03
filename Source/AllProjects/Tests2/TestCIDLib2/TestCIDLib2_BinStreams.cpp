@@ -1,5 +1,5 @@
 //
-// FILE NAME: TestCIDLib2_ChunkedStream.cpp
+// FILE NAME: TestCIDLib2_BinStreams.cpp
 //
 // AUTHOR: Dean Roddey
 //
@@ -15,7 +15,11 @@
 //
 // DESCRIPTION:
 //
-//  This file contains tests related to the binary and text chunked stream classes.
+//  This file contains tests related to the binary streams classes. There are
+//  various variations, most of which can share common functionality since that's
+//  the whole purpose of the streaming system. So we define a base binary stream
+//  test class and derive the rest from that. Each variation just calls the base
+//  class for core testing, then does any derivation specific bits.
 //
 //  The output tests are added to the list first (in the main Cpp file) so that
 //  they are tested first. The inputs only support inked mode, i.e. they can onyl
@@ -38,51 +42,49 @@
 // ---------------------------------------------------------------------------
 //  Magic macros
 // ---------------------------------------------------------------------------
-RTTIDecls(TTest_ChunkedBinInStream,TTestFWTest)
-RTTIDecls(TTest_ChunkedBinOutStream,TTestFWTest)
-RTTIDecls(TTest_ChunkedTextInStream,TTestFWTest)
-RTTIDecls(TTest_ChunkedTextOutStream,TTestFWTest)
-
-
+RTTIDecls(TTest_BaseBinStream,TTestFWTest)
+RTTIDecls(TTest_ChunkedBinStream,TTest_BaseBinStream)
+RTTIDecls(TTest_MBufBinStream,TTest_BaseBinStream)
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedBinInStream
+//  CLASS: TTest_BaseBinStream
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 //  TTest_ChunkedBinIntStream1: Constructor and Destructor
 // ---------------------------------------------------------------------------
-TTest_ChunkedBinInStream::TTest_ChunkedBinInStream() :
-
-    TTestFWTest
-    (
-        L"Bin In chunked stream", L"Basic tests of the TChunkedBinIntStream class", 3
-    )
-{
-}
-
-TTest_ChunkedBinInStream::~TTest_ChunkedBinInStream()
+TTest_BaseBinStream::~TTest_BaseBinStream()
 {
 }
 
 
 // ---------------------------------------------------------------------------
-//  TTest_ChunkedBinIntStream: Public, inherited methods
+//  TTest_ChunkedBinIntStream: Hidden constructors
+// ---------------------------------------------------------------------------
+TTest_BaseBinStream::
+TTest_BaseBinStream(const TString& strName, const TString& strDesc) :
+
+    TTestFWTest(strName, strDesc, 3)
+{
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  TTest_BaseBinStream: Protected, non-virtual methods
 // ---------------------------------------------------------------------------
 tTestFWLib::ETestRes
-TTest_ChunkedBinInStream::eRunTest( TTextStringOutStream&   strmOut
+TTest_BaseBinStream::eRunBaseTests( TBinInStream&           strmTestIn
+                                    , TBinOutStream&        strmTestOut
+                                    , TTextStringOutStream& strmOut
                                     , tCIDLib::TBoolean&    bWarning)
 {
     try
     {
-        // Create a chunked output stream and a linked input stream
-        TChunkedBinOutStream strmTestOut(8192);
-        TChunkedBinInStream  strmTestIn(strmTestOut);
-
-        // The input stream should show zero current size
-        if (strmTestIn.c4CurSize() != 0)
+        // The input stream should be at 0 position
+        if (strmTestIn.c4CurPos() != 0)
         {
             strmOut << TFWCurLn << L"Init size on in stream != 0\n\n";
             return tTestFWLib::ETestRes::Failed;
@@ -104,13 +106,6 @@ TTest_ChunkedBinInStream::eRunTest( TTextStringOutStream&   strmOut
                     << f8Test
                     << strTest
                     << kCIDLib::FlushIt;
-
-        // The input and output streams should have the same size now
-        if (strmTestIn.c4CurSize() != strmTestOut.c4CurSize())
-        {
-            strmOut << TFWCurLn << L"In/out disagree on current end of data\n\n";
-            return tTestFWLib::ETestRes::Failed;
-        }
 
         // We should not be at end of stream now
         if (strmTestIn.bEndOfStream())
@@ -177,8 +172,8 @@ TTest_ChunkedBinInStream::eRunTest( TTextStringOutStream&   strmOut
         // Reset the output back to zero
         strmTestOut.Reset();
 
-        // The output stream should now be at zero pos and zero size
-        if (strmTestOut.c4CurPos() || strmTestOut.c4CurSize())
+        // The output stream should now be at zero pos
+        if (strmTestOut.c4CurPos())
         {
             strmOut << TFWCurLn << L"Out stream reset didn't reset size/pos\n\n";
             return tTestFWLib::ETestRes::Failed;
@@ -233,6 +228,197 @@ TTest_ChunkedBinInStream::eRunTest( TTextStringOutStream&   strmOut
             strmOut << TFWCurLn << L"Skip did not get to expected value\n\n";
             return tTestFWLib::ETestRes::Failed;
         }
+
+
+        // Run some pushback tests
+        tTestFWLib::ETestRes eRes = eRunPushbackTests
+        (
+            strmTestIn, strmTestOut, strmOut, bWarning
+        );
+        if (eRes != tTestFWLib::ETestRes::Success)
+            return eRes;
+    }
+
+    catch(TError& errToCatch)
+    {
+        strmOut << errToCatch << kCIDLib::DNewLn;
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    return tTestFWLib::ETestRes::Success;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_BaseBinStream: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_BaseBinStream::eRunPushbackTests( TBinInStream&           strmTestIn
+                                        , TBinOutStream&        strmTestOut
+                                        , TTextStringOutStream& strmOut
+                                        , tCIDLib::TBoolean&    bWarning)
+{
+    // Reset both streams for some pushback tests
+    strmTestIn.Reset();
+    strmTestOut.Reset();
+
+    // Don't allow pushback before the start
+    try
+    {
+        strmTestIn.c4Pushback(1);
+        strmOut << TFWCurLn << L"Failed to catch pushback underflow\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+    catch(...) {}
+
+    for (tCIDLib::TCard1 c1Index = 0; c1Index < 8; c1Index++)
+        strmTestOut << c1Index;
+    strmTestOut.Flush();
+
+    // Read a byte and the count should drop to 7
+    tCIDLib::TCard1 c1Tmp;
+    strmTestIn >> c1Tmp;
+
+    if (strmTestIn.c4CurPos() != 1)
+    {
+        strmOut << TFWCurLn << L"Current position should have been 1\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    // Push the byte back and it should go back to 0
+    strmTestIn.c4Pushback(c1Tmp);
+    if (strmTestIn.c4CurPos() != 0)
+    {
+        strmOut << TFWCurLn
+                << L"Current position should have been 0 after pushback\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    // Read the byte again and it should be the same
+    tCIDLib::TCard1 c1Tmp2;
+    strmTestIn >> c1Tmp2;
+    if (c1Tmp != c1Tmp2)
+    {
+        strmOut << TFWCurLn << L"Pushed back byte should have been read next\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    // And the current position should be 1 again
+    if (strmTestIn.c4CurPos() != 1)
+    {
+        strmOut << TFWCurLn
+                << L"Current position should have been 1 after reading pushback\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    // Read out the remaining 7 bytes, then do a pushback of all of the values
+    for (tCIDLib::TCard1 c1Index = 0; c1Index < 7; c1Index++)
+        strmTestIn >> c1Tmp;
+
+    if (!strmTestIn.bEndOfStream())
+    {
+        strmOut << TFWCurLn << L"Stream should be at end after reading all bytes\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    if (strmTestIn.c4CurPos() != 8)
+    {
+        strmOut << TFWCurLn
+                << L"Position should have been 8 after reading all bytes\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    for (tCIDLib::TCard1 c1Index = 8; c1Index > 0; c1Index--)
+        strmTestIn.c4Pushback(c1Index - 1);
+
+    if (strmTestIn.c4CurPos() != 0)
+    {
+        strmOut << TFWCurLn
+                << L"Position should have been 0 after pushing back all bytes\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    // And again, we shouldn't be able to push back now
+    try
+    {
+        strmTestIn.c4Pushback(1);
+        strmOut << TFWCurLn << L"Failed to catch pushback underflow\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+    catch(...) {}
+
+    // Make sure they come back out in the right order
+    for (tCIDLib::TCard1 c1Index = 0; c1Index < 8; c1Index++)
+    {
+        strmTestIn >> c1Tmp;
+        if (c1Tmp != c1Index)
+        {
+            strmOut << TFWCurLn
+                    << L"Pushed back bytes came out in the wrong order\n\n";
+            return tTestFWLib::ETestRes::Failed;
+        }
+    }
+
+    if (!strmTestIn.bEndOfStream())
+    {
+        strmOut << TFWCurLn
+                << L"Stream should be at end after reading all pushed back bytes\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+    return tTestFWLib::ETestRes::Success;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_ChunkedBinStream
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_ChunkedBinIntStream1: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_ChunkedBinStream::TTest_ChunkedBinStream() :
+
+    TTest_BaseBinStream
+    (
+        L"Bin chunked stream", L"Basic tests of the chunked binary streams"
+    )
+{
+}
+
+TTest_ChunkedBinStream::~TTest_ChunkedBinStream()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_ChunkedBinStream: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_ChunkedBinStream::eRunTest( TTextStringOutStream&   strmOut
+                                    , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRet = tTestFWLib::ETestRes::Success;
+    try
+    {
+        // Create a chunked output stream and a linked input stream
+        TChunkedBinOutStream strmTestOut(8192);
+        TChunkedBinInStream  strmTestIn(strmTestOut);
+
+        // The input stream should show zero current size
+        if (strmTestIn.c4CurSize() != 0)
+        {
+            strmOut << TFWCurLn << L"Init size on in stream != 0\n\n";
+            return tTestFWLib::ETestRes::Failed;
+        }
+
+        // Run the common tests
+        eRet = eRunBaseTests(strmTestIn, strmTestOut, strmOut, bWarning);
+
+        // If that worked, run some chunked stream specific tests
+        if (eRet == tTestFWLib::ETestRes::Success)
+            eRet = eRunOutTests(strmOut, bWarning);
     }
 
     catch(TError& errToCatch)
@@ -241,40 +427,21 @@ TTest_ChunkedBinInStream::eRunTest( TTextStringOutStream&   strmOut
         return tTestFWLib::ETestRes::Failed;
     }
 
-    return tTestFWLib::ETestRes::Success;
-}
-
-
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedBinOutStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TTest_ChunkedBinOutStream1: Constructor and Destructor
-// ---------------------------------------------------------------------------
-TTest_ChunkedBinOutStream::TTest_ChunkedBinOutStream() :
-
-    TTestFWTest
-    (
-        L"Bin out chunked stream", L"Basic tests of the TChunkedBinOutStream class", 3
-    )
-{
-}
-
-TTest_ChunkedBinOutStream::~TTest_ChunkedBinOutStream()
-{
+    return eRet;
 }
 
 
 // ---------------------------------------------------------------------------
-//  TTest_ChunkedBinOutStream: Public, inherited methods
+//  TTest_ChunkedBinStream: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+
+//
+//  These are derivative specific tests of chunked output streams. We want to test
+//  these specifically, to make sure the chunking is working right.
+//
 tTestFWLib::ETestRes
-TTest_ChunkedBinOutStream::eRunTest(TTextStringOutStream&   strmOut
-                                    , tCIDLib::TBoolean&    bWarning)
+TTest_ChunkedBinStream::eRunOutTests(   TTextStringOutStream&   strmOut
+                                        , tCIDLib::TBoolean&    bWarning)
 {
     try
     {
@@ -622,49 +789,48 @@ TTest_ChunkedBinOutStream::eRunTest(TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << errToCatch << kCIDLib::DNewLn;
         return tTestFWLib::ETestRes::Failed;
     }
-
-
     return tTestFWLib::ETestRes::Success;
 }
 
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedTextInStream
+//  CLASS: TTest_MBufBinStream
 // PREFIX: tfwt
-//
-//  Note that we aren't really worried too much about writing large amounts
-//  of data here, since we've tested that in the output stream test. It's more
-//  just making sure we see the data written.
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TTest_ChunkedTextInStream1: Constructor and Destructor
+//  TTest_MBufBinIntStream1: Constructor and Destructor
 // ---------------------------------------------------------------------------
-TTest_ChunkedTextInStream::TTest_ChunkedTextInStream() :
+TTest_MBufBinStream::TTest_MBufBinStream() :
 
-    TTestFWTest
+    TTest_BaseBinStream
     (
-        L"Text In chunked stream", L"Basic tests of the TChunkedTextInStream class", 3
+        L"Bin membuf stream", L"Basic tests of memory buffer binary streams"
     )
 {
 }
 
-TTest_ChunkedTextInStream::~TTest_ChunkedTextInStream()
+TTest_MBufBinStream::~TTest_MBufBinStream()
 {
 }
 
 
 // ---------------------------------------------------------------------------
-//  TTest_ChunkedTextInStream: Public, inherited methods
+//  TTest_MBufBinStream: Public, inherited methods
 // ---------------------------------------------------------------------------
 tTestFWLib::ETestRes
-TTest_ChunkedTextInStream::eRunTest(TTextStringOutStream&   strmOut
+TTest_MBufBinStream::eRunTest( TTextStringOutStream&   strmOut
                                     , tCIDLib::TBoolean&    bWarning)
 {
+    tTestFWLib::ETestRes eRet = tTestFWLib::ETestRes::Success;
     try
     {
+        TBinMBufOutStream strmTestOut(128UL);
+        TBinMBufInStream strmTestIn(strmTestOut);
 
+        // Do common tests
+        eRet = eRunBaseTests(strmTestIn, strmTestOut, strmOut, bWarning);
     }
 
     catch(TError& errToCatch)
@@ -672,101 +838,5 @@ TTest_ChunkedTextInStream::eRunTest(TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << errToCatch << kCIDLib::DNewLn;
         return tTestFWLib::ETestRes::Failed;
     }
-
     return tTestFWLib::ETestRes::Success;
 }
-
-
-
-
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedTextOutStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TTest_ChunkedTextOutStream1: Constructor and Destructor
-// ---------------------------------------------------------------------------
-TTest_ChunkedTextOutStream::TTest_ChunkedTextOutStream() :
-
-    TTestFWTest
-    (
-        L"Text out chunked stream", L"Basic tests of the TChunkedTextOutStream class", 3
-    )
-{
-}
-
-TTest_ChunkedTextOutStream::~TTest_ChunkedTextOutStream()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TTest_ChunkedTextOutStream: Public, inherited methods
-// ---------------------------------------------------------------------------
-tTestFWLib::ETestRes
-TTest_ChunkedTextOutStream::eRunTest(TTextStringOutStream&  strmOut
-                                    , tCIDLib::TBoolean&    bWarning)
-{
-    try
-    {
-        const tCIDLib::TCard4 c4MaxBufSz = 3 * (1024 * 1024);
-        TChunkedTextOutStream strmTest(c4MaxBufSz);
-
-        //
-        //  Create a string and just write it out enough times to cause at least
-        //  one buffer allocation.
-        //
-        const TString strTest
-        (
-            L"Version 4.4 includes some fairly significant changes. We are setting the stage for "
-            L"for the next steps in the product, and some of the changes may require some small "
-            L"adjustments for existing users. You should also be aware of new features that you "
-            L"might make use of. This document lays out all the significant changes."
-        );
-
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < 1000; c4Index++)
-            strmTest << strTest << kCIDLib::NewLn;
-
-        strmTest.Flush();
-
-        //
-        //  Copy out the data, then set up a regular text input stream on it, and let's
-        //  read back out the strings and make sure we get back what we put in.
-        //
-        const tCIDLib::TCard4 c4DataSz = strmTest.c4CurSize();
-        THeapBuf mbufText(c4DataSz, c4DataSz);
-        const tCIDLib::TCard4 c4CopiedSz = strmTest.c4CopyOutTo(mbufText, 0);
-
-        if (c4CopiedSz != c4DataSz)
-        {
-            strmOut << TFWCurLn << L"Copied out " << c4CopiedSz << L" but "
-                    << c4DataSz << L" bytes were available\n\n";
-            return tTestFWLib::ETestRes::Failed;
-        }
-
-        TTextMBufInStream strmSrc(tCIDLib::ForceMove(mbufText), c4DataSz);
-        TString strRead;
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < 1000; c4Index++)
-        {
-            strmSrc >> strRead;
-            if (strRead != strTest)
-            {
-                strmOut << TFWCurLn << L"Read in different text thatn written\n\n";
-                return tTestFWLib::ETestRes::Failed;
-            }
-        }
-    }
-
-    catch(TError& errToCatch)
-    {
-        strmOut << TFWCurLn << errToCatch << kCIDLib::DNewLn;
-        return tTestFWLib::ETestRes::Failed;
-    }
-
-    return tTestFWLib::ETestRes::Success;
-}
-
-

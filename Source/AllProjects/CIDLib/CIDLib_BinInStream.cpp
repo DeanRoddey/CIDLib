@@ -464,7 +464,10 @@ TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
     // If the pushback stack is not empty, we get as much as we can out of that
     tCIDLib::TCard4 c4BytesRead = 0;
     while (!m_fcolPushback.bIsEmpty() && (c4BytesRead < c4ToRead))
+    {
         *pc1Tar++ = m_fcolPushback.tPop();
+        c4BytesRead++;
+    }
 
     // If we got them all, then are done
     if (c4BytesRead == c4ToRead)
@@ -737,7 +740,11 @@ tCIDLib::TCard4 TBinInStream::c4CurPos() const
         m_pstrmiIn->c8CurPos() - c4CacheAvail(kCIDLib::True)
     );
 
-    // If debugging, make sure we didn't somehow go psycho and wrap
+    //
+    //  If debugging, make sure we didn't somehow go psycho and wrap. We don't allow
+    //  pushback before the start, which should be th eonly way this could happen,
+    //  but check just in case.
+    //
     CIDAssert(c8Tmp <= m_pstrmiIn->c8CurPos(), L"Current position underflowed")
 
     // If it won't fit, we can't do it
@@ -768,6 +775,24 @@ tCIDLib::TCard4 TBinInStream::c4Pushback(const tCIDLib::TCard1 c1ToPush)
             , kCIDErrs::errcStrm_PBStackIsFull
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Overflow
+        );
+    }
+
+    //
+    //  Don't allow pushback to before the origin. It really should only be
+    //  possible to be >= here, but we check for less as well, just in case.
+    //
+    //  Note that c4CurPos() includes pushback!
+	//
+    if (!c4CurPos())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStrm_PBUnderflow
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Underflow
         );
     }
 

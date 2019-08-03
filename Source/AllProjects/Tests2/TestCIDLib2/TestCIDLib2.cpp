@@ -147,11 +147,10 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_GenCache2);
     AddTest(new TTest_GenCache3);
 
-    // Test out streams first then input, which are linked to outputs
-    AddTest(new TTest_ChunkedBinOutStream);
-    AddTest(new TTest_ChunkedTextOutStream);
-    AddTest(new TTest_ChunkedBinInStream);
-    AddTest(new TTest_ChunkedTextInStream);
+    // Stream related tests
+    AddTest(new TTest_MBufBinStream);
+    AddTest(new TTest_ChunkedBinStream);
+    AddTest(new TTest_ChunkedTextStream);
 
     // Cicular buffer
     AddTest(new TTest_CircularBuf);
