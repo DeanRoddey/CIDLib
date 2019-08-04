@@ -441,6 +441,29 @@ tCIDLib::TCard4 TTextInStream::c4Read(const tCIDLib::ERadices eRadix)
     return strInput.c4Val(eRadix);
 }
 
+
+//
+//  Read up to the indicated number of characters. Note that here, we are just getting
+//  data, not lines. So we don't do any new line conversion and such. We return how
+//  many we read.
+//
+tCIDLib::TCard4
+TTextInStream::c4ReadChars(tCIDLib::TCh* const pszToFill, const tCIDLib::TCard4 c4MaxChars)
+{
+    // Loop until we max out or hit the end of the input
+    tCIDLib::TCard4 c4Index = 0;
+    while (c4Index < c4MaxChars)
+    {
+        // Get the next character from the cache, breaking out if we hit the end
+        const tCIDLib::TCh chCur = chNextChar(kCIDLib::False);
+        if (!chCur)
+            break;
+        pszToFill[c4Index++] = chCur;
+    }
+    return c4Index;
+}
+
+
 tCIDLib::TCard8 TTextInStream::c8Read(const tCIDLib::ERadices eRadix)
 {
     TString strInput(128UL);

@@ -183,6 +183,12 @@ class CIDLIBEXP TTextInStream : public TObject
             const   tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         );
 
+        tCIDLib::TCard4 c4ReadChars
+        (
+                    tCIDLib::TCh* const     pszToFill
+            , const tCIDLib::TCard4         c4MaxChars
+        );
+
         tCIDLib::TCard8 c8Read
         (
             const   tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto

@@ -779,10 +779,8 @@ tCIDLib::TCard4 TBinInStream::c4Pushback(const tCIDLib::TCard1 c1ToPush)
     }
 
     //
-    //  Don't allow pushback to before the origin. It really should only be
-    //  possible to be >= here, but we check for less as well, just in case.
-    //
-    //  Note that c4CurPos() includes pushback!
+    //  Don't allow pushback to before the origin. Note that c4CurPos()
+    //  includes current pushback!
 	//
     if (!c4CurPos())
     {
@@ -798,6 +796,54 @@ tCIDLib::TCard4 TBinInStream::c4Pushback(const tCIDLib::TCard1 c1ToPush)
 
     m_fcolPushback.Push(c1ToPush);
     return m_fcolPushback.c4MaxElemCount() - m_fcolPushback.c4ElemCount();
+}
+
+tCIDLib::TCard4
+TBinInStream::c4Pushback(const  tCIDLib::TCard1* const  pc1ToPush
+                        , const tCIDLib::TCard4         c4Count)
+{
+    //
+    //  We can't push back to the point we pass the start. c4CurPos includes any
+    //  already existing pushed back data.
+    //
+    if (c4Count > c4CurPos())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStrm_PBUnderflow
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Underflow
+        );
+    }
+
+    // And we can't push back more than the undo stack can hold
+    if (m_fcolPushback.c4ElemCount() + c4Count > m_fcolPushback.c4MaxElemCount())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStrm_PBOverflow
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Overflow
+            , TCardinal(c4Count)
+        );
+    }
+
+    // We have to do them backwards
+    for (tCIDLib::TCard4 c4Index = c4Count; c4Index > 0; c4Index--)
+        m_fcolPushback.Push(pc1ToPush[c4Index - 1]);
+    return m_fcolPushback.c4MaxElemCount() - m_fcolPushback.c4ElemCount();
+}
+
+tCIDLib::TCard4
+TBinInStream::c4Pushback(const  TMemBuf&        mbufToPush
+                        , const tCIDLib::TCard4 c4Count)
+{
+    // Just call the raw buffer one
+    return c4Pushback(mbufToPush.pc1Data(), c4Count);
 }
 
 

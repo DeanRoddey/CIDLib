@@ -31,6 +31,8 @@
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 class TMemBuf;
+class TBinInStream;
+class TTextInStream;
 
 
 // ---------------------------------------------------------------------------
@@ -57,6 +59,13 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TCard4 c4ConvertFrom
+        (
+                    TBinInStream&           strmSrc
+            ,       TTextOutStream&         strmTar
+            ,       tCIDLib::TCard4&        c4OutChars
+        );
+
         tCIDLib::TCard4 c4ConvertFrom
         (
             const   tCIDLib::TCard1* const  pc1Src
@@ -87,6 +96,13 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
             const   tCIDLib::TCh            chSrc
             ,       tCIDLib::TCard1* const  pc1ToFill
             , const tCIDLib::TCard4         c4MaxBytes
+        );
+
+        tCIDLib::TCard4 c4ConvertTo
+        (
+                    TTextInStream&          strmSrc
+            ,       TBinOutStream&          strmTar
+            ,       tCIDLib::TCard4&        c4OutBytes
         );
 
         tCIDLib::TCard4 c4ConvertTo

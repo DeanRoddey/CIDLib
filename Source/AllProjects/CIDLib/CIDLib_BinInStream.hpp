@@ -306,6 +306,18 @@ class CIDLIBEXP TBinInStream : public TObject
             const   tCIDLib::TCard1         c1ToPush
         );
 
+        tCIDLib::TCard4 c4Pushback
+        (
+            const   tCIDLib::TCard1* const  pc1ToPush
+            , const tCIDLib::TCard4         c4Count
+        );
+
+        tCIDLib::TCard4 c4Pushback
+        (
+            const   TMemBuf&                mbufToPush
+            , const tCIDLib::TCard4         c4Count
+        );
+
         tCIDLib::TCard8 c8CurPos() const;
 
         tCIDLib::TCard4 c4ReadBuffer

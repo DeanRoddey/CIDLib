@@ -320,7 +320,7 @@ TTest_Convert::bTestSrc(        TTextOutStream&         strmOut
 
 //
 //  Tests a single externalization scenario. We expect to transcode all
-//  srce chars and to end up with the indicated number of bytes, and the
+//  src chars and to end up with the indicated number of bytes, and the
 //  indicated actual bytes content.
 //
 tCIDLib::TBoolean

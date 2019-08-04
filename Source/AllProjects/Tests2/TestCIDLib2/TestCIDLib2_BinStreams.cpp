@@ -365,6 +365,34 @@ TTest_BaseBinStream::eRunPushbackTests( TBinInStream&           strmTestIn
                 << L"Stream should be at end after reading all pushed back bytes\n\n";
         return tTestFWLib::ETestRes::Failed;
     }
+
+    // Push a buffer of bytes back. We push back six which should takes us to offset 2
+    {
+        CIDAssert(strmTestIn.c4CurPos() > 6, L"The current position must be > 6");
+        const tCIDLib::TCard4 c4BackTo = (strmTestIn.c4CurPos() - 6);
+
+        const tCIDLib::TCard1 ac1Test[] = { 1, 2, 3, 4, 5, 6 };
+        strmTestIn.c4Pushback(ac1Test, 6);
+
+        if (strmTestIn.c4CurPos() != c4BackTo)
+        {
+            strmOut << TFWCurLn
+                    << L"Position should have been 2 after pushing back 6 bytes\n\n";
+            return tTestFWLib::ETestRes::Failed;
+        }
+
+        // Make sure they come back in the right order
+        for (tCIDLib::TCard1 c1Index = 0; c1Index < 6; c1Index++)
+        {
+            strmTestIn >> c1Tmp;
+            if (c1Tmp != (c1Index + 1))
+            {
+                strmOut << TFWCurLn
+                        << L"Pushed back bytes came out in the wrong order\n\n";
+                return tTestFWLib::ETestRes::Failed;
+            }
+        }
+    }
     return tTestFWLib::ETestRes::Success;
 }
 

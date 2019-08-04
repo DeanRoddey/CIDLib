@@ -397,6 +397,11 @@ class CIDLIBEXP TTextOutStream : public TObject
 
         const TTextConverter& tcvtThis() const;
 
+        tCIDLib::TVoid WriteChars
+        (
+            const   tCIDLib::TCh* const     pszToWrite
+            , const tCIDLib::TCard4         c4Len = 0
+        );
 
 
     protected :
@@ -439,16 +444,6 @@ class CIDLIBEXP TTextOutStream : public TObject
         //  Private class constants
         // -------------------------------------------------------------------
         static const tCIDLib::TCard4 c4CacheBufSize = 2048;
-
-
-        // -------------------------------------------------------------------
-        //  Private, non-virtual methods
-        // -------------------------------------------------------------------
-        tCIDLib::TVoid WriteChars
-        (
-            const   tCIDLib::TCh* const     pszToWrite
-            , const tCIDLib::TCard4         c4Len = 0
-        );
 
 
         // -------------------------------------------------------------------

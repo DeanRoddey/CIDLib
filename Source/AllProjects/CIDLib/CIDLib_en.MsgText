@@ -550,6 +550,7 @@ ERRORS=
     errcStrm_PBNotEmpty         3384    The pushback stack must be empty at this point
     errcStrm_PBStackIsFull      3385    The pushback stack is full
     errcStrm_PBUnderflow        3386    You cannot push back beyond the start of the stream
+    errcStrm_PBOverflow         3387    The push back stack doesn't have enough room left for %(1) bytes
 
     ; System info errors
     errcSysI_QueryUserName      3450    Could not get the current user name

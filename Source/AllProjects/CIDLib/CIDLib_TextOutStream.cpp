@@ -947,73 +947,6 @@ const TTextConverter& TTextOutStream::tcvtThis() const
 }
 
 
-// ---------------------------------------------------------------------------
-//  TTextOutStream: Hidden constructors
-// ---------------------------------------------------------------------------
-TTextOutStream::TTextOutStream(TTextConverter* const ptcvtToAdopt) :
-
-    m_bIndentNext(kCIDLib::False)
-    , m_bSawOD(kCIDLib::False)
-    , m_bSuppressIndent(kCIDLib::False)
-    , m_chFill(kCIDLib::chSpace)
-    , m_c4Indent(0)
-    , m_c4Index(0)
-    , m_c4Precision(2)
-    , m_c4TrailingSp(0)
-    , m_c4Width(0)
-    , m_eJustification(tCIDLib::EHJustify::Left)
-    , m_eNewLineType(tCIDLib::ENewLineTypes::CRLF)
-    , m_eRadix(tCIDLib::ERadices::Dec)
-    , m_pstrmOut(0)
-    , m_ptcvtThis(ptcvtToAdopt)
-{
-    // If no converter is provided, then create a default one
-    if (!m_ptcvtThis)
-        m_ptcvtThis = new TUTFConverter;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TTextOutStream: Protected, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::TVoid
-TTextOutStream::AdoptStream(TBinOutStream* const pstrmToAdopt)
-{
-    if (m_pstrmOut)
-    {
-        // Clean up passed stream since we are responsible for it
-        delete pstrmToAdopt;
-
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcTStrm_StrmAlreadySet
-            , tCIDLib::ESeverities::Failed
-             , tCIDLib::EErrClasses::AppError
-            , clsIsA()
-        );
-    }
-    m_pstrmOut = pstrmToAdopt;
-}
-
-
-TBinOutStream& TTextOutStream::strmOut()
-{
-    return *m_pstrmOut;
-}
-
-
-const TBinOutStream& TTextOutStream::strmOut() const
-{
-    return *m_pstrmOut;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TTextOutStream: Private, non-virtual methods
-// ---------------------------------------------------------------------------
-
 //
 //  This method is the one point of actual output of text, so all other
 //  output methods call here eventually. This guy spools out the passed text
@@ -1150,5 +1083,69 @@ TTextOutStream::WriteChars( const   tCIDLib::TCh* const pszToWrite
         if (m_c4Index == c4CacheBufSize)
             Flush();
     }
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  TTextOutStream: Hidden constructors
+// ---------------------------------------------------------------------------
+TTextOutStream::TTextOutStream(TTextConverter* const ptcvtToAdopt) :
+
+    m_bIndentNext(kCIDLib::False)
+    , m_bSawOD(kCIDLib::False)
+    , m_bSuppressIndent(kCIDLib::False)
+    , m_chFill(kCIDLib::chSpace)
+    , m_c4Indent(0)
+    , m_c4Index(0)
+    , m_c4Precision(2)
+    , m_c4TrailingSp(0)
+    , m_c4Width(0)
+    , m_eJustification(tCIDLib::EHJustify::Left)
+    , m_eNewLineType(tCIDLib::ENewLineTypes::CRLF)
+    , m_eRadix(tCIDLib::ERadices::Dec)
+    , m_pstrmOut(0)
+    , m_ptcvtThis(ptcvtToAdopt)
+{
+    // If no converter is provided, then create a default one
+    if (!m_ptcvtThis)
+        m_ptcvtThis = new TUTFConverter;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTextOutStream: Protected, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid
+TTextOutStream::AdoptStream(TBinOutStream* const pstrmToAdopt)
+{
+    if (m_pstrmOut)
+    {
+        // Clean up passed stream since we are responsible for it
+        delete pstrmToAdopt;
+
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcTStrm_StrmAlreadySet
+            , tCIDLib::ESeverities::Failed
+             , tCIDLib::EErrClasses::AppError
+            , clsIsA()
+        );
+    }
+    m_pstrmOut = pstrmToAdopt;
+}
+
+
+TBinOutStream& TTextOutStream::strmOut()
+{
+    return *m_pstrmOut;
+}
+
+
+const TBinOutStream& TTextOutStream::strmOut() const
+{
+    return *m_pstrmOut;
 }
 
