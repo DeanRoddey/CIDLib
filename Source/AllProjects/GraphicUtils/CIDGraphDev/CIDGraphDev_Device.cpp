@@ -2052,7 +2052,7 @@ TGraphDrawDev::DrawPBar(const   TBitmap&                bmpMask
             rgbEndFill = rgbEnd;
             areaBar.ScaleSize(f4Percent, 1.0);
             areaFill.ScaleSize(1.0 - f4Percent, 1.0);
-            areaFill.i4X(areaBar.i4Right() + 1);
+            areaFill.i4X(areaBar.i4Right());
             break;
 
         case tCIDLib::EDirs::Right :
@@ -2061,7 +2061,7 @@ TGraphDrawDev::DrawPBar(const   TBitmap&                bmpMask
             bIsVert = kCIDLib::True;
             areaFill.ScaleSize(1.0 - f4Percent, 1.0);
             areaBar.ScaleSize(f4Percent, 1.0);
-            areaBar.i4X(areaFill.i4Right() + 1);
+            areaBar.i4X(areaFill.i4Right());
             break;
 
         case tCIDLib::EDirs::Down :
@@ -2069,7 +2069,7 @@ TGraphDrawDev::DrawPBar(const   TBitmap&                bmpMask
             rgbEndFill = rgbEnd;
             areaBar.ScaleSize(1.0, f4Percent);
             areaFill.ScaleSize(1.0, 1.0 - f4Percent);
-            areaFill.i4Y(areaBar.i4Bottom() + 1);
+            areaFill.i4Y(areaBar.i4Bottom());
             bIsVert = kCIDLib::True;
             break;
 
@@ -2079,7 +2079,7 @@ TGraphDrawDev::DrawPBar(const   TBitmap&                bmpMask
             bIsVert = kCIDLib::True;
             areaFill.ScaleSize(1.0, 1.0 - f4Percent);
             areaBar.ScaleSize(1.0, f4Percent);
-            areaBar.i4Y(areaFill.i4Bottom() + 1);
+            areaBar.i4Y(areaFill.i4Bottom());
             bIsVert = kCIDLib::True;
             break;
 
@@ -5268,8 +5268,8 @@ TGraphDrawDev::Stroke(  const   TArea&          areaToStroke
             hdevThis()
             , areaToStroke.i4X()
             , areaToStroke.i4Y()
-            , areaToStroke.i4Right() + 1
-            , areaToStroke.i4Bottom() + 1
+            , areaToStroke.i4Right()
+            , areaToStroke.i4Bottom()
             , c4Rounding
             , c4Rounding
         );
@@ -5281,8 +5281,8 @@ TGraphDrawDev::Stroke(  const   TArea&          areaToStroke
             hdevThis()
             , areaToStroke.i4X()
             , areaToStroke.i4Y()
-            , areaToStroke.i4Right() + 1
-            , areaToStroke.i4Bottom() + 1
+            , areaToStroke.i4Right()
+            , areaToStroke.i4Bottom()
         );
     }
 

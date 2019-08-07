@@ -349,14 +349,14 @@ tCIDLib::TVoid TGUIRegion::Set(const TArea& areaToSet)
 {
     //
     //  Create the region. The area is assumed to be exclusive, so the bottom/right
-    //  edges aren't included. So we have to bump ours by 1.
+    //  edges aren't included, and our right/bottom are the same
     //
     tCIDGraphDev::TRegionHandle hrgnTmp = ::CreateRectRgn
     (
         areaToSet.i4X()
         , areaToSet.i4Y()
-        , areaToSet.i4Right() + 1
-        , areaToSet.i4Bottom() + 1
+        , areaToSet.i4Right()
+        , areaToSet.i4Bottom()
     );
 
     if (!hrgnTmp)

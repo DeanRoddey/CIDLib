@@ -504,7 +504,7 @@ TMColListBox::CalcChildAreas(const  TArea& areaAvail
     //  And the display window gets what is left. We made sure above that we have enough
     //  that it won't underflow, we'll just clip our content if it gets too small.
     //
-    areaDisplay.Set(0, areaHdr.i4Bottom() + 1, areaHdr.c4Width(), 0);
+    areaDisplay.Set(0, areaHdr.i4Bottom(), areaHdr.c4Width(), 0);
     areaDisplay.i4Bottom(areaHScroll.i4Top() - 1);
 
     //

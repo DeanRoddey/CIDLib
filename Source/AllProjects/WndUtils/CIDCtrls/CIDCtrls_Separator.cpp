@@ -164,7 +164,7 @@ TSeparatorWnd::bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate)
     // Draw a line centered vertically in our area
     TPoint pntLeft = areaUs.pntCenter();
     pntLeft.i4X(areaUs.i4Left());
-    TPoint pntRight(areaUs.i4Right(), pntLeft.i4Y());
+    TPoint pntRight(areaUs.i4Right() - 1, pntLeft.i4Y());
     gdevToUse.DrawLine(pntLeft, pntRight, facCIDGraphDev().rgbPaleGrey);
 
     //
@@ -341,9 +341,9 @@ TVSeparatorWnd::bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate)
         TFontMetrics fmtrDraw(gdevToUse);
         areaDraw.AdjustAndShrink(fmtrDraw.c4Height() + 2, 0);
 
-        // Draw a vertical line on the left
+        // Draw a vertical line on the left, adjust bottom for exclusive area points
         TPoint pnt1 = areaDraw.pntUL();
-        TPoint pnt2 = areaDraw.pntLL();
+        TPoint pnt2 = areaDraw.pntLL(0, -1);
         gdevToUse.DrawLine(pnt1, pnt2, facCIDGraphDev().rgbDarkGrey);
 
         // And the little top/bottom lines
@@ -351,7 +351,7 @@ TVSeparatorWnd::bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate)
         pnt2.Adjust(4, 0);
         gdevToUse.DrawLine(pnt1, pnt2, facCIDGraphDev().rgbDarkGrey);
 
-        pnt1 = areaDraw.pntLL();
+        pnt1 = areaDraw.pntLL(0, -1);
         pnt2 = pnt1;
         pnt2.Adjust(4, 0);
         gdevToUse.DrawLine(pnt1, pnt2, facCIDGraphDev().rgbDarkGrey);
@@ -359,8 +359,8 @@ TVSeparatorWnd::bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate)
      else
     {
         // Draw a line down the right edge
-        TPoint pnt1 = areaDraw.pntUR();
-        TPoint pnt2 = areaDraw.pntLR();
+        TPoint pnt1 = areaDraw.pntUR(-1, 0);
+        TPoint pnt2 = areaDraw.pntLR(-1, -1);
         gdevToUse.DrawLine(pnt1, pnt2, facCIDGraphDev().rgbDarkGrey);
 
         // And draw the small lines at the top and bottom
@@ -368,7 +368,7 @@ TVSeparatorWnd::bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate)
         pnt2.Adjust(-4, 0);
         gdevToUse.DrawLine(pnt1, pnt2, facCIDGraphDev().rgbDarkGrey);
 
-        pnt1 = areaDraw.pntLR();
+        pnt1 = areaDraw.pntLR(-1, -1);
         pnt2 = pnt1;
         pnt2.Adjust(-4, 0);
         gdevToUse.DrawLine(pnt1, pnt2, facCIDGraphDev().rgbDarkGrey);

@@ -1982,11 +1982,11 @@ TSize TMultiColListBox::szGridExtent() const
     TSize szRet;
     TArea areaCell;
     QueryColArea(0, c4ColCnt - 1, areaCell);
-    szRet.c4Width(tCIDLib::TCard4(areaCell.i4Right() + 1));
+    szRet.c4Width(tCIDLib::TCard4(areaCell.i4Right()));
 
     // Get the 0th cell of the last row
     QueryColArea(c4RowCnt - 1, 0, areaCell);
-    szRet.c4Height(tCIDLib::TCard4(areaCell.i4Bottom() + 1));
+    szRet.c4Height(tCIDLib::TCard4(areaCell.i4Bottom()));
 
     return szRet;
 }
