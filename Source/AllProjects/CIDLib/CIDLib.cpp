@@ -450,6 +450,16 @@ static tCIDLib::TVoid DummyFunc()
 
     TUniquePtr<TString> uptrTest(new TString(L"Testing"));
     TCntPtr<TString> cptrTest(uptrTest);
+
+    TObjLocker<TArea> olockrTest(10, 12, 14, 16);
+    TObjLock<TArea> olockTest = olockrTest.olockGet(5000);
+    if (*olockTest != TArea(10, 12, 14, 16))
+    {
+    }
+    TObjLock<TArea> olockTest2 = olockrTest.olockTryGet(1000);
+    if (olockTest2)
+    {
+    }
 }
 #endif
 

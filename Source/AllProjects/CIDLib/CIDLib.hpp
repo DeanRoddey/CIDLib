@@ -79,6 +79,7 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_CriticalSection.hpp"
 #include    "CIDLib_Event.hpp"
 #include    "CIDLib_Mutex.hpp"
+#include    "CIDLib_ObjLocker.hpp"
 #include    "CIDLib_ModuleInfo.hpp"
 #include    "CIDLib_Module.hpp"
 #include    "CIDLib_KeyValuePair.hpp"

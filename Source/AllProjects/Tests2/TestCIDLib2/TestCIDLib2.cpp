@@ -83,6 +83,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_LambdaJan);
     AddTest(new TTest_Enum1);
     AddTest(new TTest_EnumForEach);
+    AddTest(new TTest_ObjLocker1);
 
     AddTest(new TTest_String1);
     AddTest(new TTest_String2);

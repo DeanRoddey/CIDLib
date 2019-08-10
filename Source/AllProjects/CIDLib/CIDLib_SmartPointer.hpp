@@ -35,7 +35,8 @@
 //  But of course be careful you don't assign away the one that you mean to keep.
 //
 //  To keep some of the functionality out of line, to reduce rebuilds and code footprint
-//  we have a little helper namespace with some functions they can call.
+//  we have a little helper namespace with some functions they can call. These are also
+//  used by some other smart pointer'ish classes.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -50,8 +51,22 @@
 
 namespace TSmartPtrHelpers
 {
-    CIDLIBEXP tCIDLib::TVoid CheckRefNotZero(const tCIDLib::TCard4 c4ToCheck);
-    CIDLIBEXP tCIDLib::TVoid ThrowNullRef(const tCIDLib::TCard4 c4Line);
+    CIDLIBEXP tCIDLib::TVoid CheckRefNotZero
+    (
+        const   tCIDLib::TCard4         c4Line
+        , const tCIDLib::TCard4         c4ToCheck
+        , const tCIDLib::TCh* const     pszType
+    );
+    CIDLIBEXP tCIDLib::TVoid ThrowAlreadyLocked
+    (
+        const   tCIDLib::TCard4         c4Line
+        , const tCIDLib::TCh* const     pszType
+    );
+    CIDLIBEXP tCIDLib::TVoid ThrowNullRef
+    (
+        const   tCIDLib::TCard4         c4Line
+        , const tCIDLib::TCh* const     pszType
+    );
 }
 
 
@@ -137,11 +152,15 @@ template <class T> class TUniquePtr
 
         const T& operator*() const
         {
+            if (!m_pData)
+                TSmartPtrHelpers::ThrowNullRef(CID_LINE, L"TUniquePtr");
             return *m_pData;
         }
 
         T& operator*()
         {
+            if (!m_pData)
+                TSmartPtrHelpers::ThrowNullRef(CID_LINE, L"TUniquePtr");
             return *m_pData;
         }
 
@@ -375,7 +394,7 @@ template <class T> class TCntPtr
         tCIDLib::TVoid CheckNullRef(const tCIDLib::TCard4 c4Line) const
         {
             if ((m_pcdRef == nullptr) || (m_pcdRef->m_pobjData == nullptr))
-                TSmartPtrHelpers::ThrowNullRef(c4Line);
+                TSmartPtrHelpers::ThrowNullRef(c4Line, L"TCntPtr");
         }
 
 
@@ -396,7 +415,7 @@ template <class T> class TCntPtr
             //  will catch this also, but not give a good error context.
             //
             #if CID_DEBUG_ON
-            TSmartPtrHelpers::CheckRefNotZero(pcdToRelease->m_c4RefCnt);
+            TSmartPtrHelpers::CheckRefNotZero(CID_LINE, pcdToRelease->m_c4RefCnt, L"TCntPtr");
             #endif
 
             if (!TAtomic::c4SafeRelease(pcdToRelease->m_c4RefCnt))
@@ -534,8 +553,8 @@ template <class T> class TMngPtr
         // -------------------------------------------------------------------
         tCIDLib::TVoid CheckNullRef(const tCIDLib::TCard4 c4Line) const
         {
-            if (m_pData == nullptr)
-                TSmartPtrHelpers::ThrowNullRef(c4Line);
+            if (!m_pData)
+                TSmartPtrHelpers::ThrowNullRef(c4Line, L"TMngPtr");
         }
 
 

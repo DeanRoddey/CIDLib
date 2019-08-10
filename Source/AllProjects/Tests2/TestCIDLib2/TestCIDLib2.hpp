@@ -1393,6 +1393,40 @@ class TTest_ObjArrayMoveSem : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_ObjLocker1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_ObjLocker1 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_ObjLocker1();
+
+        ~TTest_ObjLocker1();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_ObjLocker1,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TTest_UniquePtr
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------

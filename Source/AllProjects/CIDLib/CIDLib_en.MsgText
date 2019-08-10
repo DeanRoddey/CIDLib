@@ -457,10 +457,11 @@ ERRORS=
     errcSize_BadFormat          3127    Could not parse size object from passed text
 
     ; Smart pointer related errors
-    errcSPtr_NoReference        3150    The counted pointer doesn't have a reference
-    errcSPtr_RefReleaseErr      3151    A ref count release error occurred
-    errcSPtr_RefUnderflow       3152    Ref count was at zero before release call
-    errcSPtr_RefAcquireErr      3153    A ref count acquire error occurred
+    errcSPtr_NoReference        3150    The %(1) pointer doesn't have a reference
+    errcSPtr_RefReleaseErr      3151    A %(1) pointer ref count release error occurred
+    errcSPtr_RefUnderflow       3152    Ref count was at zero before release call on %(1)
+    errcSPtr_RefAcquireErr      3153    A %(1) pointer ref count acquire error occurred
+    errcSPtr_AlreadyLocked      3154    The %(1) pointer is already locked
 
     ; Speech related errors
     errcSpeech_SpeakFailed      3160    Text to speech operation failed

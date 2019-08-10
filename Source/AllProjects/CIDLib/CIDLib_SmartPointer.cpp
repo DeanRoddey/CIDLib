@@ -33,7 +33,43 @@
 #include    "CIDLib_.hpp"
 
 
-tCIDLib::TVoid TSmartPtrHelpers::ThrowNullRef(const tCIDLib::TCard4 c4Line)
+tCIDLib::TVoid
+TSmartPtrHelpers::CheckRefNotZero(  const   tCIDLib::TCard4         c4Line
+                                    , const tCIDLib::TCard4         c4ToCheck
+                                    , const tCIDLib::TCh* const     pszType)
+{
+    if (!c4ToCheck)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , c4Line
+            , kCIDErrs::errcSPtr_RefUnderflow
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Internal
+            , TString(pszType)
+        );
+    }
+}
+
+tCIDLib::TVoid
+TSmartPtrHelpers::ThrowAlreadyLocked(const  tCIDLib::TCard4         c4Line
+                                    , const tCIDLib::TCh* const     pszType)
+{
+    facCIDLib().ThrowKrnlErr
+    (
+        CID_FILE
+        , c4Line
+        , kCIDErrs::errcSPtr_AlreadyLocked
+        , TKrnlError::kerrLast()
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Internal
+        , TString(pszType)
+    );
+}
+
+tCIDLib::TVoid
+TSmartPtrHelpers::ThrowNullRef(const tCIDLib::TCard4 c4Line, const tCIDLib::TCh* const pszType)
 {
     facCIDLib().ThrowKrnlErr
     (
@@ -43,20 +79,7 @@ tCIDLib::TVoid TSmartPtrHelpers::ThrowNullRef(const tCIDLib::TCard4 c4Line)
         , TKrnlError::kerrLast()
         , tCIDLib::ESeverities::Failed
         , tCIDLib::EErrClasses::Internal
+        , TString(pszType)
     );
 }
 
-tCIDLib::TVoid TSmartPtrHelpers::CheckRefNotZero(const tCIDLib::TCard4 c4ToCheck)
-{
-    if (!c4ToCheck)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcSPtr_RefUnderflow
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Internal
-        );
-    }
-}

@@ -16,11 +16,9 @@
 // DESCRIPTION:
 //
 //  This name space provides some more convenient wrappers around some of the
-//  CIDKernel level atomic operations in TRawMem. Those cannot throw exceptions
-//  because they don't know about such things.
-//
-//  Really low level code should use the CIDKernel versions. But other stuff can
-//  use these.
+//  low level atomic operations in TRawMem. Those cannot throw exceptions
+//  because they don't know about such things. Really low level code should use
+//  the CIDKernel versions. But other stuff can use these.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -32,6 +30,20 @@
 
 namespace TAtomic
 {
+    inline tCIDLib::TCard4
+    c4CompareAndExchange(tCIDLib::TCard4&       c4ToFill
+                        , const tCIDLib::TCard4 c4New
+                        , const tCIDLib::TCard4 c4Compare)
+    {
+        return TRawMem::c4CompareAndExchange(c4ToFill, c4New, c4Compare);
+    }
+
+    inline tCIDLib::TCard4
+    c4Exchange(tCIDLib::TCard4& c4ToFill, const tCIDLib::TCard4 c4New)
+    {
+        return TRawMem::c4Exchange(c4ToFill, c4New);
+    }
+
     CIDLIBEXP tCIDLib::TCard4 c4SafeAcquire
     (
         volatile    tCIDLib::TCard4&    c4Target
@@ -41,4 +53,26 @@ namespace TAtomic
     (
         volatile    tCIDLib::TCard4&    c4Target
     );
+
+
+    template <class T> T* pExchangePtr(T** ppToFill, const T* const pNew)
+    {
+        return reinterpret_cast<T*>
+        (
+            TRawMem::pExchangeRawPtr(static_cast<tCIDLib::TVoid**>(ppToFill), pNew)
+        );
+    }
+
+    template <class T> T* pCompareAndExchangePtr(       T**         ppToFill
+                                                , const T* const    pNew
+                                                , const T* const    pCompare)
+    {
+        return reinterpret_cast<T*>
+        (
+            TRawMem::pCompareAndExchangeRawPtr
+            (
+                static_cast<tCIDLib::TVoid**>(ppToFill), pNew, pCompare
+            )
+        );
+    }
 }
