@@ -1656,19 +1656,19 @@ TString TModule::strMsg(const   tCIDLib::TMsgId midToLoad
         if (!MFormattable::bIsNullObject(fmtblToken4))
             strRet.eReplaceToken(fmtblToken4, L'4');
     }
-    return strRet;
+    return tCIDLib::ForceMove(strRet);
 }
 
 
 // REturn the name of this module
-const TString& TModule::strName() const
+TString TModule::strName() const
 {
     return m_strName;
 }
 
 
 // Return the path to this module
-const TString& TModule::strPath() const
+TString TModule::strPath() const
 {
     return m_strPath;
 }

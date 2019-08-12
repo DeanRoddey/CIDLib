@@ -22,13 +22,11 @@
 //  basis, which is very useful, and put it back to the original when it destructs.
 //  And we implement one that saves the current general output format and restores it.
 //
-//  We also implement a very useful helper that takes a pointer to a text out stream
-//  and to a mutex. It will keep the mutex locked until it goes out of scope, and it
-//  provides a deref operator to access the stream. This lets it act like a thread safe
-//  stream on a scoped basis.
-//
 //  And we also add some stuff to the kCIDLib namespace, related to special values
 //  that can be sent to a text output stream, like end line, new line, etc...
+//
+//  Streams are NOT thread safe so synchronize all operations if a single stream is
+//  being used by multiple threads.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -372,6 +370,18 @@ class CIDLIBEXP TTextOutStream : public TObject
 
         tCIDLib::TVoid Flush();
 
+        // Just call the recursive helper with the start of the format buffer
+        template <typename... TArgs>
+        tCIDLib::TVoid Format(const TString& strFmt, const TArgs... Args)
+        {
+            // Save any stream format stuff then call our recursive helper
+            TStreamJanitor janFormat(this);
+
+            // If we get back the buffer, then no parms, just write out fmt text
+            if (pszFmtHelper(strFmt.pszBuffer(), Args...) == strFmt.pszBuffer())
+                PutLine(strFmt);
+        }
+
         tCIDLib::TVoid PutLine
         (
             const   TString&                strToWrite
@@ -444,6 +454,63 @@ class CIDLIBEXP TTextOutStream : public TObject
         //  Private class constants
         // -------------------------------------------------------------------
         static const tCIDLib::TCard4 c4CacheBufSize = 2048;
+
+
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+
+        //
+        //  Helpers for Format() which needs to process a list of variadic
+        //  parameters.
+        //
+        template <typename TOne, typename... TOthers>
+        const tCIDLib::TCh* pszFmtHelper(const  tCIDLib::TCh* const pszFmt
+                                        , const TOne                tOne
+                                        , const TOthers...          tOthers)
+        {
+            //
+            //  We have to loop until we get a token, since we could have text bits
+            //  which we just copy straight out as text.
+            //
+            const tCIDLib::TCh* pszStart = pszFmt;
+            const tCIDLib::TCh* pszEnd;
+            while (kCIDLib::True)
+            {
+                tCIDLib::TCh chToken;
+                const TString::ETokenFind eFindRes = TString::eFindToken
+                (
+                    pszStart, chToken, m_eJustification, m_c4Width, m_chFill, m_c4Precision, pszEnd
+                );
+
+                // If it fails, then give up and stop recursing
+                if ((eFindRes == TString::ETokenFind::BadFormat)
+                ||  (eFindRes == TString::ETokenFind::End))
+                {
+                    return nullptr;
+                }
+                 else if (eFindRes == TString::ETokenFind::Token)
+                {
+                    // OK, we got one, so format it out and we need to recurse
+                    *this << tOne;
+                    pszEnd = pszFmtHelper(pszEnd, tOthers...);
+                }
+                 else if (eFindRes == TString::ETokenFind::TextRun)
+                {
+                    // It's a text run, so just write those character out
+                    WriteChars(pszStart, (pszEnd - pszStart));
+                }
+
+                // Move forward
+                pszStart = pszEnd;
+            }
+            return pszEnd;
+        }
+
+        const tCIDLib::TCh* pszFmtHelper(const tCIDLib::TCh* pszFmt)
+        {
+            return pszFmt;
+        }
 
 
         // -------------------------------------------------------------------
@@ -661,66 +728,6 @@ class CIDLIBEXP TStreamIndentJan
         tCIDLib::TCard4 m_c4OldIndent;
         TTextOutStream* m_pstrmToSanitize;
 };
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeTStrmJan
-//  PREFIX: jan
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TSafeTStrmJan
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeTStrmJan() = delete;
-
-        TSafeTStrmJan(  TTextOutStream* const   pstrmToLock
-                        , TMutex* const         pmtxLock
-                        , const tCIDLib::TCard4 c4Wait = kCIDLib::c4MaxCard) :
-
-            m_pmtxLock(pmtxLock)
-            , m_pstrmToLock(pstrmToLock)
-        {
-            // Lock the mutex
-            m_pmtxLock->Lock(c4Wait);
-        }
-
-        TSafeTStrmJan(const TSafeTStrmJan&) = delete;
-
-        ~TSafeTStrmJan()
-        {
-            // We just unlock the mutex now
-            m_pmtxLock->Unlock();
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TSafeTStrmJan& operator=(const TSafeTStrmJan&) = delete;
-        tCIDLib::TVoid* operator new(const size_t) = delete;
-
-        TTextOutStream& operator*()
-        {
-            return *m_pstrmToLock;
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_pmtxLock
-        //      This is the mutex that we lock until we destruct
-        //
-        //  m_pstrmToLock
-        //      This is the pointer to the text out stream that we are protected.
-        // -------------------------------------------------------------------
-        TMutex*         m_pmtxLock;
-        TTextOutStream* m_pstrmToLock;
-};
-
 
 #pragma CIDLIB_POPPACK
 

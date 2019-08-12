@@ -410,9 +410,7 @@ static tCIDLib::TVoid DummyFunc()
         = tCIDColAlgo::tFindMaxFundSeqDup<TFundVector<tCIDLib::TCard8>>(fcolCard8s);
 
     TTextStringOutStream strmTest(1024UL);
-    TMutex mtxSync;
-    TSafeTStrmJan janStrm(&strmTest, &mtxSync);
-    *janStrm << L"This is a test" << kCIDLib::EndLn;
+    strmTest.Format(L"Value %(1) is really %(2)", TString(L"Test"), TCardinal(2));
 
 
     TVector<TArea> colTestCurs(2);
@@ -458,6 +456,17 @@ static tCIDLib::TVoid DummyFunc()
     }
     TObjLock<TArea> olockTest2 = olockrTest.olockTryGet(1000);
     if (olockTest2)
+    {
+    }
+
+//    TString strFmtTest;
+//    strFmtTest.Format(L"%(1) %(2)", TPoint(1, 2), TSize(3, 4));
+//    if (strFmtTest == L"1,2 3,4")
+//    {
+//    }
+
+    tCIDLib::TFloat4 f4Test;
+    if (tCIDLib::IsTFloatX<decltype(f4Test)>::bState)
     {
     }
 }

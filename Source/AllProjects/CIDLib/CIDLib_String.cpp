@@ -64,235 +64,6 @@ namespace CIDLib_String
 
 
 // ---------------------------------------------------------------------------
-//  Local functions
-// ---------------------------------------------------------------------------
-
-//
-//  This method will find a token in the passed string, parse it out, and
-//  give back the token information.
-//
-//  Returns a pointer to the % sign of the token found, or 0 if not found.
-//
-//  We also return whether the count of tokens we saw up until we found the
-//  target one. This can allow for significant optimization by calling code
-//  that is going through an replacing multiple tokens, if it knows no more
-//  will be found. If the indicated token was not found, then we went all
-//  the way to the end, and if there were no tokens seen, then there are
-//  no more tokens in the source text.
-//
-static const tCIDLib::TCh*
-pszFindToken(   const   tCIDLib::TCh* const pszSource
-                , const tCIDLib::TCh        chToken
-                ,       tCIDLib::EHJustify& eJustify
-                ,       tCIDLib::TCard4&    c4FldWidth
-                ,       tCIDLib::TCh&       chFill
-                ,       tCIDLib::TCard4&    c4TokenChars
-                ,       tCIDLib::TCard4&    c4TokenCnt)
-{
-    const tCIDLib::TCh* const pszSeparators = L" (,)%";
-
-    tCIDLib::TCh        chTokenType;
-    tCIDLib::TInt4      i4WidthVal;
-    const tCIDLib::TCh* pszCur;
-    const tCIDLib::TCh* pszClose;
-    tCIDLib::TCh*       pszTok;
-    tCIDLib::TCh        szTmp[64];
-
-    // Set up the returns with correct default values
-    eJustify        = tCIDLib::EHJustify::Right;
-    c4FldWidth      = 0;
-    c4TokenChars    = 0;
-    chFill          = kCIDLib::chSpace;
-
-    // Initialize the token count
-    c4TokenCnt = 0;
-
-    //
-    //  Do an initial search for a percent sign. After we find one, check the
-    //  next character to see what we are looking for.
-    //
-    pszCur = TRawStr::pszFindChar(pszSource, L'%');
-    while (pszCur != 0)
-    {
-        // See if the next char is the end of the string. If so, then no match
-        if (*(pszCur + 1) == 0)
-            return 0;
-
-        // If the next char is a (, then it is a token so check it out
-        if (*(pszCur + 1) == L'(')
-        {
-            // Search for the closing paren
-            pszClose = TRawStr::pszFindChar(pszCur + 1, L')');
-
-            //
-            //  There was no closing parm so we need to just search for the
-            //  next %, because this was a false alarm.
-            //
-            if (!pszClose)
-            {
-                pszCur++;
-                pszCur = TRawStr::pszFindChar(pszCur, L'%');
-                continue;
-            }
-
-            //
-            //  If the enclosed text is larger than the tmp buffer, then
-            //  something is wrong.
-            //
-            if (pszClose - pszCur > c4MaxBufChars(szTmp))
-            {
-                facCIDLib().ThrowErr
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , kCIDErrs::errcStr_InvalidToken
-                    , tCIDLib::ESeverities::Warn
-                    , tCIDLib::EErrClasses::BadParms
-                );
-                return 0;
-            }
-
-            // If it is empty, then can't be right
-            if (pszClose-pszCur == 1)
-            {
-                facCIDLib().ThrowErr
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , kCIDErrs::errcStr_InvalidToken
-                    , tCIDLib::ESeverities::Warn
-                    , tCIDLib::EErrClasses::BadParms
-                );
-                return 0;
-            }
-
-            //
-            //  We need to parse the token contents. So copy the substring of
-            //  the token to a temp buffer. Note that we multiply by the char
-            //  size in order to convert chars to bytes.
-            //
-            TRawMem::CopyMemBuf
-            (
-                szTmp
-                , pszCur
-                , (pszClose - pszCur) * kCIDLib::c4CharBytes
-            );
-            szTmp[pszClose - pszCur] = kCIDLib::chNull;
-
-            tCIDLib::TCh* pszCtx = 0;
-            pszTok = TRawStr::pszStrTokenize(szTmp, pszSeparators, &pszCtx);
-
-            //
-            //  If no token or the more than a character, then invalid.
-            //  Otherwise, pull out the token as the token character.
-            //
-            if (!pszTok || (TRawStr::c4StrLen(pszTok) > 1))
-            {
-                facCIDLib().ThrowErr
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , kCIDErrs::errcStr_InvalidToken
-                    , tCIDLib::ESeverities::Warn
-                    , tCIDLib::EErrClasses::BadParms
-                );
-                return 0;
-            }
-            chTokenType = pszTok[0];
-
-            // Bump the count of tokens seen so far
-            c4TokenCnt++;
-
-            //
-            //  See if the char is the token character. If not, then start
-            //  looking for the next character. It has to start after the
-            //  close parent we already found, so we can skip up to there.
-            //
-            if (chToken != chTokenType)
-            {
-                pszCur = pszClose;
-                pszCur = TRawStr::pszFindChar(pszCur, L'%');
-                continue;
-            }
-
-            // We know the token width now
-            c4TokenChars = (pszClose - pszCur) + 1;
-
-            //
-            //  Look for another token. If so, then it will be the field
-            //  width. It must be a valid integral value. If it is negative,
-            //  that means left justification.
-            //
-            pszTok = TRawStr::pszStrTokenize(0, pszSeparators, &pszCtx);
-            if (pszTok)
-            {
-                tCIDLib::TBoolean  bValid;
-                i4WidthVal = TRawStr::i4AsBinary
-                (
-                    pszTok
-                    , bValid
-                    , tCIDLib::ERadices::Dec
-                );
-
-                if (!bValid)
-                {
-                    facCIDLib().ThrowErr
-                    (
-                        CID_FILE
-                        , CID_LINE
-                        , kCIDErrs::errcStr_InvalidToken
-                        , tCIDLib::ESeverities::Warn
-                        , tCIDLib::EErrClasses::BadParms
-                    );
-                    return 0;
-                }
-
-                if (i4WidthVal < 0)
-                {
-                    eJustify = tCIDLib::EHJustify::Left;
-                    if (i4WidthVal < 0)
-                        c4FldWidth = i4WidthVal * -1;
-                    else
-                        c4FldWidth = i4WidthVal;
-                }
-                 else
-                {
-                    c4FldWidth = i4WidthVal;
-                }
-
-                pszTok = TRawStr::pszStrTokenize(0, pszSeparators, &pszCtx);
-                if (pszTok)
-                {
-                    if (TRawStr::c4StrLen(pszTok) > 1)
-                    {
-                        facCIDLib().ThrowErr
-                        (
-                            CID_FILE
-                            , CID_LINE
-                            , kCIDErrs::errcStr_InvalidToken
-                            , tCIDLib::ESeverities::Warn
-                            , tCIDLib::EErrClasses::BadParms
-                        );
-                        return 0;
-                    }
-                    chFill = pszTok[0];
-                }
-            }
-
-            // Break out to return
-            break;
-        }
-
-        // Look for another percent sign
-        pszCur++;
-        pszCur = TRawStr::pszFindChar(pszCur, L'%');
-    }
-    return pszCur;
-}
-
-
-
-// ---------------------------------------------------------------------------
 //  CLASS: TStrCat
 // PREFIX: scat
 // ---------------------------------------------------------------------------
@@ -2429,6 +2200,364 @@ TString::TStrBuf::ToZStr(       tCIDLib::TCh* const pszTarget
 //  TString: Public, static data
 // ---------------------------------------------------------------------------
 
+//
+//  We have various scenarios where we need to find a given token, find all the tokens
+//  or find the tokens and text that goes between them. This function provides the core
+//  capabilities for that that. You pass in the start of the string and it returns the next
+//  thing it finds, which is either a run of text or a token (or end of string or bad
+//  format error.)
+//
+//  If it returns a token, then it returns the token info. In either case it returns the
+//  start and end pointers of what it found. The end is the character after the last char,
+//  which can be the null if at the end. To keep going, move up the pointer to the end
+//  index (if End is not returned.)
+//
+//  The incoming pointer can be moved upwards by one character as well, so it is not
+//  a const pointer. If we hit an escaped percent, we won't to only return the actual
+//  percentage as text, so we have to move the start pointer forward.
+//
+//  This stuff is used in some low level scenarios, so we try to make use of as little
+//  standard functionality as possible. So it's more complex than it otherwise would
+//  be. We also want to be very efficient since this will be indirectly used all over
+//  the place. So it's mostly for internal use and the general public would use things
+//  like eReplaceToken() or the msg loading methods of this class and TModule and such,
+//  which are very convenient to use.
+//
+enum class ETokenStates
+{
+    Start
+    , StartToken
+    , TokenChar
+    , PostChar
+    , WaitWidth
+    , Width
+    , Precision
+    , PostWidth
+    , FillChar
+    , WaitEnd
+    , WaitEndToken
+    , TextRun
+
+    // These are termination states, end text has to be the first!
+    , EndText
+    , EndToken
+    , Error
+};
+
+TString::ETokenFind
+TString::eFindToken(const tCIDLib::TCh*&    pszStart
+                    , tCIDLib::TCh&         chToken
+                    , tCIDLib::EHJustify&   eJustify
+                    , tCIDLib::TCard4&      c4FldWidth
+                    , tCIDLib::TCh&         chFill
+                    , tCIDLib::TCard4&      c4Precision
+                    , const tCIDLib::TCh*&  pszEnd)
+{
+    // Watch for psycho scenarios
+    if (!pszStart)
+        return ETokenFind::BadFormat;
+
+    if (*pszStart == kCIDLib::chNull)
+    {
+        pszEnd = pszStart;
+        return ETokenFind::End;
+    }
+
+    // Set up the token formatting values with correct default values
+    c4FldWidth      = 0;
+    c4Precision     = 0;
+    chFill          = kCIDLib::chSpace;
+    eJustify        = tCIDLib::EHJustify::Right;
+
+    // We need a pointer to run up to the end of whatever we find
+    pszEnd = pszStart;
+
+    // Some states need to remember a starting point
+    const tCIDLib::TCh* pszStateFirst = nullptr;
+
+    // And let's do our state machine
+    ETokenStates eState = ETokenStates::Start;
+    while (*pszEnd && (eState < ETokenStates::EndText))
+    {
+        const tCIDLib::TCh chCur = *pszEnd;
+        switch(eState)
+        {
+            case ETokenStates::Start :
+                //
+                //  If it's a percent, then assume for the moment it's a token, else
+                //  has to be a text run.
+                //
+                if (chCur == kCIDLib::chPercentSign)
+                {
+                    eState = ETokenStates::StartToken;
+                    pszEnd++;
+                }
+                 else
+                {
+                    eState = ETokenStates::TextRun;
+                }
+                break;
+
+            case ETokenStates::TextRun :
+                //
+                //  It's a text run, so we are just going to eat chars till we hit
+                //  another percent or the end. Else just move forward to the next
+                //  char.
+                //
+                if (!chCur || (chCur == kCIDLib::chPercentSign))
+                    eState = ETokenStates::EndText;
+                else
+                    pszEnd++;
+                break;
+
+            case ETokenStates::StartToken :
+                if (chCur == kCIDLib::chOpenParen)
+                {
+                    // Gotta be a token or bad format, so move forward with token
+                    eState = ETokenStates::TokenChar;
+                    pszEnd++;
+                }
+                 else
+                {
+                    //
+                    //  A false start, so go to text run state.
+                    //
+                    //  If it's another percent, that means an escaped percent, we only
+                    //  want to return the first one, so we move both start and end
+                    //  forward. Else we don't move end forward.
+                    //
+                    eState = ETokenStates::TextRun;
+                    if (chCur == kCIDLib::chPercentSign)
+                    {
+                        pszEnd++;
+                        pszStart++;
+                    }
+                }
+                break;
+
+            case ETokenStates::TokenChar :
+                if (TRawStr::bIsSpace(chCur))
+                {
+                    // Can't be a white space character
+                    eState = ETokenStates::Error;
+                }
+                 else
+                {
+                    // Keep this character as the token and do post char stuff
+                    chToken = chCur;
+                    eState = ETokenStates::PostChar;
+                    pszEnd++;
+                }
+
+                break;
+
+            case ETokenStates::PostChar :
+                // We have to see a comma or close paren
+                if (chCur == kCIDLib::chComma)
+                {
+                    eState = ETokenStates::WaitWidth;
+                    pszEnd++;
+                }
+                 else if (chCur == kCIDLib::chCloseParen)
+                {
+                    eState = ETokenStates::EndToken;
+                    pszEnd++;
+                }
+                 else
+                {
+                    eState = ETokenStates::Error;
+                }
+                break;
+
+            case ETokenStates::WaitWidth :
+                //
+                //  It has to be either a negative or positive sign  or the first
+                //  digit of the width, then we move to the width, else it is bad.
+                //
+                if (chCur == kCIDLib::chPlusSign)
+                {
+                    eJustify = tCIDLib::EHJustify::Right;
+                    pszEnd++;
+                    eState = ETokenStates::Width;
+                }
+                 else if (chCur == kCIDLib::chHyphenMinus)
+                {
+                    eJustify = tCIDLib::EHJustify::Left;
+                    pszEnd++;
+                    eState = ETokenStates::Width;
+                }
+                 else if (TRawStr::bIsDigit(chCur))
+                {
+                    // Don't move forward just move to width state
+                    eState = ETokenStates::Width;
+                }
+                 else
+                {
+                    eState = ETokenStates::Error;
+                }
+
+                // If the state is now width, save this position
+                if (eState == ETokenStates::Width)
+                    pszStateFirst = pszEnd;
+                break;
+
+            case ETokenStates::Width :
+            case ETokenStates::Precision :
+                //
+                //  These are almost exactly the same, so we do them together. The
+                //  only difference is what we store and the next state.
+                //
+                //  If a digit, just keep going, else process
+                //
+                if (TRawStr::bIsDigit(chCur))
+                {
+                    pszEnd++;
+
+                    //
+                    //  We will accept a zero width, but no leading zero in
+                    //  an otherwise non-zero number.
+                    //
+                    if (((pszEnd - pszStateFirst) > 1)
+                    &&  (*pszStateFirst == kCIDLib::chDigit0))
+                    {
+                        eState = ETokenStates::Error;
+                    }
+                }
+                 else
+                {
+                    if (pszEnd == pszStateFirst)
+                    {
+                        // We got nothing
+                        eState = ETokenStates::Error;
+                    }
+                     else
+                    {
+                        //
+                        //  We need to convert what we have to a number, which has to be
+                        //  decimal radix. We do this manually here for reasons discussed
+                        //  above. We'll use a Card8 initially so we can catch an
+                        //  overflow.
+                        //
+                        tCIDLib::TCard8 c8Width = 0;
+                        const tCIDLib::TCh* pszCur = pszStateFirst;
+                        while (pszCur < pszEnd)
+                        {
+                            // Skip leading zeros
+                            if (*pszCur != kCIDLib::chDigit0)
+                            {
+                                // If not the first digit, move up to make room for new one
+                                if (pszCur > pszStateFirst)
+                                    c8Width *= 10;
+                                c8Width += tCIDLib::TCard4(*pszCur - kCIDLib::chDigit0);
+                            }
+                            pszCur++;
+                        }
+
+                        if (c8Width > kCIDLib::c4MaxCard)
+                        {
+                            //
+                            //  Move the end back to the start of this width, since we
+                            //  want to report it as the problem.
+                            //
+                            pszEnd = pszStateFirst;
+                            eState = ETokenStates::Error;
+                        }
+                         else
+                        {
+                            if (eState == ETokenStates::Width)
+                            {
+                                c4FldWidth = tCIDLib::TCard4(c8Width);
+                                if (chCur == kCIDLib::chPeriod)
+                                {
+                                    //
+                                    //  We need to move forward past the period and reset
+                                    //  set the first of state pointer.
+                                    //
+                                    eState = ETokenStates::Precision;
+                                    pszEnd++;
+                                    pszStateFirst = pszEnd;
+                                }
+                                 else
+                                {
+                                    eState = ETokenStates::PostWidth;
+                                }
+                            }
+                             else
+                            {
+                                c4Precision = tCIDLib::TCard4(c8Width);
+                                eState = ETokenStates::PostWidth;
+                            }
+                        }
+                    }
+                }
+                break;
+
+
+            case ETokenStates::PostWidth :
+                // We either see the end of token or a comma
+                if (chCur == kCIDLib::chComma)
+                {
+                    eState = ETokenStates::FillChar;
+                    pszEnd++;
+                }
+                 else if (chCur == kCIDLib::chCloseParen)
+                {
+                    eState = ETokenStates::EndToken;
+                    pszEnd++;
+                }
+                 else
+                {
+                    eState = ETokenStates::Error;
+                }
+                break;
+
+            case ETokenStates::FillChar :
+                // Take the current char as the fill and move forward
+                chFill = chCur;
+                eState = ETokenStates::WaitEndToken;
+                pszEnd++;
+                break;
+
+            case ETokenStates::WaitEndToken :
+                // It has to be the close paren
+                if (chCur == kCIDLib::chCloseParen)
+                {
+                    eState = ETokenStates::EndToken;
+                    pszEnd++;
+                }
+                 else
+                {
+                    eState = ETokenStates::Error;
+                }
+                break;
+
+            case ETokenStates::EndText :
+            case ETokenStates::EndToken :
+                // Just place holders so we have positive end states to use below
+                break;
+
+            default :
+                CIDAssert2(L"Unknown token find state");
+                break;
+        };
+    }
+
+    // It's legal to be in a text run at the end, it just went to the end
+    if ((eState == ETokenStates::EndText)
+    ||  (eState == ETokenStates::TextRun))
+    {
+        return ETokenFind::TextRun;
+    }
+     else if (eState == ETokenStates::EndToken)
+    {
+        return ETokenFind::Token;
+    }
+
+    // It has to be a bad format error
+    return ETokenFind::BadFormat;
+}
+
+
 // THESE PUT OUT UPPER CASE and some folks depend on that. So don't change the case
 tCIDLib::TVoid TString::FromHex(const   tCIDLib::TCard1 c1ToXlat
                                 ,       tCIDLib::TSCh&  chOne
@@ -2482,6 +2611,59 @@ tCIDLib::TVoid TString::FromHex(const   tCIDLib::TCard1 c1ToXlat
     {
         chOne = kCIDLib::chDigit0;
     }
+}
+
+
+//
+//  A wrapper around the more fundamental eFindToken() method above, which lets
+//  the caller find the first instance of a given token in the passed string.
+//
+const tCIDLib::TCh*
+TString::pszFindToken(  const   tCIDLib::TCh* const     pszSrc
+                        , const tCIDLib::TCh            chToFind
+                        ,       tCIDLib::EHJustify&     eJustify
+                        ,       tCIDLib::TCard4&        c4FldWidth
+                        ,       tCIDLib::TCh&           chFill
+                        ,       tCIDLib::TCard4&        c4Precision
+                        ,       tCIDLib::TCard4&        c4TokenChars
+                        ,       tCIDLib::TCard4&        c4TokenCnt)
+{
+    // Initialize the token count
+    c4TokenCnt = 0;
+
+    const tCIDLib::TCh* pszStart = pszSrc;
+    const tCIDLib::TCh* pszEnd;
+    while (*pszStart)
+    {
+        tCIDLib::TCh chTokenChar;
+        const ETokenFind eFindRes = eFindToken
+        (
+            pszStart
+            , chTokenChar
+            , eJustify
+            , c4FldWidth
+            , chFill
+            , c4Precision
+            , pszEnd
+        );
+
+        if (eFindRes == ETokenFind::End)
+            break;
+
+        if (chTokenChar == chToFind)
+        {
+            c4TokenChars = (pszEnd - pszStart);
+            return pszStart;
+        }
+
+        // Not ours, so bump the count of tokens seen so far
+        c4TokenCnt++;
+
+        // And move our pointer forward
+        pszStart = pszEnd;
+    }
+
+    return nullptr;
 }
 
 
@@ -3177,7 +3359,11 @@ TString::AppendFormatted(const  tCIDLib::TInt8      i8ToFmt
 }
 
 
-tCIDLib::TVoid TString::AppendFormatted(const MFormattable& fmtblSrc)
+//
+//  The trailing parameter is a dummy one that helps us deal with an otherwise
+//  much more messy issue with the variac recursion processing of Format().
+//
+tCIDLib::TVoid TString::AppendFormatted(const MFormattable& fmtblSrc, const tCIDLib::TCard4)
 {
     // Create a temporary stream over ourself to stream to. Tell it to append
     TTextStringOutStream strmTar
@@ -3449,7 +3635,7 @@ tCIDLib::TBoolean TString::bFindTokenList(TString& strToFill) const
             );
             szTmp[pszClose - pszCur] = kCIDLib::chNull;
 
-            tCIDLib::TCh* pszCtx = 0;
+            tCIDLib::TCh* pszCtx = nullptr;
             pszTok = TRawStr::pszStrTokenize(szTmp, pszSeparators, &pszCtx);
 
             //
@@ -4170,26 +4356,22 @@ TString::bToInt8(tCIDLib::TInt8& i8ToFill, const tCIDLib::ERadices eRadix) const
 // Checks to see if the indicated token is in this string
 tCIDLib::TBoolean TString::bTokenExists(const tCIDLib::TCh chToken) const
 {
-    //
-    //  We don't care about these, but the searching function returns
-    //  them, so...
-    //
-    tCIDLib::EHJustify  eJustify;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::TCard4     c4Width;
-    tCIDLib::TCh        chFill;
+    //  Some dummy params to get output values we are goign to discard
+    tCIDLib::TCh        chDummy;
+    tCIDLib::EHJustify  eDummy;
+    tCIDLib::TCard4     c4Dummy;
 
     // And look for the token.
     if (pszFindToken
     (
         m_strbData.pszBuffer()
         , chToken
-        , eJustify
-        , c4Width
-        , chFill
-        , c4Chars
-        , c4TokenCnt))
+        , eDummy
+        , c4Dummy
+        , chDummy
+        , c4Dummy
+        , c4Dummy
+        , c4Dummy))
     {
         return kCIDLib::True;
     }
@@ -4385,6 +4567,7 @@ TString::eReplaceToken(  const  tCIDLib::TCh* const pszVal
     tCIDLib::TCard4     c4Chars;
     tCIDLib::TCard4     c4FldWidth;
     tCIDLib::TCard4     c4Index;
+    tCIDLib::TCard4     c4Precision;
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::EHJustify  eJustify;
 
@@ -4396,6 +4579,7 @@ TString::eReplaceToken(  const  tCIDLib::TCh* const pszVal
         , eJustify
         , c4FldWidth
         , chFill
+        , c4Precision
         , c4Chars
         , c4TokenCnt
     );
@@ -4466,6 +4650,7 @@ TString::eReplaceToken( const   MFormattable&   fmtblVal
     tCIDLib::TCard4     c4Chars;
     tCIDLib::TCard4     c4FldWidth;
     tCIDLib::TCard4     c4Index;
+    tCIDLib::TCard4     c4Precision;
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::EHJustify  eJustify;
 
@@ -4476,6 +4661,7 @@ TString::eReplaceToken( const   MFormattable&   fmtblVal
         , eJustify
         , c4FldWidth
         , chFill
+        , c4Precision
         , c4Chars
         , c4TokenCnt
     );
@@ -4531,6 +4717,7 @@ TString::eReplaceToken( const   tCIDLib::TBoolean   bVal
     tCIDLib::TCard4     c4Chars;
     tCIDLib::TCard4     c4FldWidth;
     tCIDLib::TCard4     c4Index;
+    tCIDLib::TCard4     c4Precision;
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::EHJustify  eJustify;
 
@@ -4542,6 +4729,7 @@ TString::eReplaceToken( const   tCIDLib::TBoolean   bVal
         , eJustify
         , c4FldWidth
         , chFill
+        , c4Precision
         , c4Chars
         , c4TokenCnt
     );
@@ -4636,6 +4824,7 @@ TString::eReplaceToken( const   tCIDLib::TCard4     c4Val
     tCIDLib::TCard4     c4Chars;
     tCIDLib::TCard4     c4FldWidth;
     tCIDLib::TCard4     c4Index;
+    tCIDLib::TCard4     c4Precision;
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::EHJustify  eJustify;
 
@@ -4647,6 +4836,7 @@ TString::eReplaceToken( const   tCIDLib::TCard4     c4Val
         , eJustify
         , c4FldWidth
         , chFill
+        , c4Precision
         , c4Chars
         , c4TokenCnt
     );
@@ -4726,6 +4916,7 @@ TString::eReplaceToken( const   tCIDLib::TCard8     c8Val
     tCIDLib::TCard4     c4Chars;
     tCIDLib::TCard4     c4FldWidth;
     tCIDLib::TCard4     c4Index;
+    tCIDLib::TCard4     c4Precision;
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::EHJustify  eJustify;
 
@@ -4737,6 +4928,7 @@ TString::eReplaceToken( const   tCIDLib::TCard8     c8Val
         , eJustify
         , c4FldWidth
         , chFill
+        , c4Precision
         , c4Chars
         , c4TokenCnt
     );
@@ -4817,6 +5009,7 @@ TString::eReplaceToken( const   tCIDLib::TFloat8&   f8Val
     tCIDLib::TCard4     c4Chars;
     tCIDLib::TCard4     c4FldWidth;
     tCIDLib::TCard4     c4Index;
+    tCIDLib::TCard4     c4Precision;
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::EHJustify  eJustify;
 
@@ -4828,6 +5021,7 @@ TString::eReplaceToken( const   tCIDLib::TFloat8&   f8Val
         , eJustify
         , c4FldWidth
         , chFill
+        , c4Precision
         , c4Chars
         , c4TokenCnt
     );
@@ -4925,6 +5119,7 @@ TString::eReplaceToken( const   tCIDLib::TInt4      i4Val
     tCIDLib::TCard4     c4Chars;
     tCIDLib::TCard4     c4FldWidth;
     tCIDLib::TCard4     c4Index;
+    tCIDLib::TCard4     c4Precision;
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::EHJustify  eJustify;
 
@@ -4936,6 +5131,7 @@ TString::eReplaceToken( const   tCIDLib::TInt4      i4Val
         , eJustify
         , c4FldWidth
         , chFill
+        , c4Precision
         , c4Chars
         , c4TokenCnt
     );
@@ -5016,6 +5212,7 @@ TString::eReplaceToken( const   tCIDLib::TInt8      i8Val
     tCIDLib::TCard4     c4Chars;
     tCIDLib::TCard4     c4FldWidth;
     tCIDLib::TCard4     c4Index;
+    tCIDLib::TCard4     c4Precision;
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::EHJustify  eJustify;
 
@@ -5027,6 +5224,7 @@ TString::eReplaceToken( const   tCIDLib::TInt8      i8Val
         , eJustify
         , c4FldWidth
         , chFill
+        , c4Precision
         , c4Chars
         , c4TokenCnt
     );
@@ -5114,6 +5312,7 @@ tCIDLib::EFindRes TString::eTokenExists(const tCIDLib::TCh chToken) const
     tCIDLib::EHJustify  eJustify;
     tCIDLib::TCard4     c4Width;
     tCIDLib::TCard4     c4Chars;
+    tCIDLib::TCard4     c4Precision;
     tCIDLib::TCard4     c4TokenCnt;
     tCIDLib::TCh        chFill;
 
@@ -5124,6 +5323,7 @@ tCIDLib::EFindRes TString::eTokenExists(const tCIDLib::TCh chToken) const
         , eJustify
         , c4Width
         , chFill
+        , c4Precision
         , c4Chars
         , c4TokenCnt))
     {
@@ -5298,7 +5498,10 @@ tCIDLib::TVoid TString::Prepend(const tCIDLib::TCh chPrepend)
 //  Sets our contents to a formatted version of the passed value, using the
 //  indicated formatting information.
 //
-tCIDLib::TVoid TString::SetFormatted(const MFormattable& fmtblSrc)
+//  The trailing parameter is a dummy one that helps us deal with an otherwise
+//  much more messy issue with the variac recursion processing of Format().
+//
+tCIDLib::TVoid TString::SetFormatted(const MFormattable& fmtblSrc, const tCIDLib::TCard4)
 {
     // Create a temporary stream over ourself to stream to, telling it not to append
     TTextStringOutStream strmTar

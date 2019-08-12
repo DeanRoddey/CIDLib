@@ -1459,6 +1459,40 @@ class TTest_UniquePtr : public TTestFWTest
 };
 
 
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_MetaProg1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_MetaProg1 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_MetaProg1();
+
+        ~TTest_MetaProg1();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_MetaProg1,TTestFWTest)
+};
+
+
+
 
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_PubSub
@@ -1949,6 +1983,40 @@ class TTest_String3 : public TTestFWTest
 };
 
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_StringCat
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_StringCat : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_StringCat();
+
+        ~TTest_StringCat();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_StringCat,TTestFWTest)
+};
+
+
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_StringMove
 // PREFIX: tfwt
@@ -1983,18 +2051,18 @@ class TTest_StringMove : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TTest_StringCat
+//  CLASS: TTest_StringTokens
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_StringCat : public TTestFWTest
+class TTest_StringTokens : public TTestFWTest
 {
     public  :
         // -------------------------------------------------------------------
         //  Constructor and Destructor
         // -------------------------------------------------------------------
-        TTest_StringCat();
+        TTest_StringTokens();
 
-        ~TTest_StringCat();
+        ~TTest_StringTokens();
 
 
         // -------------------------------------------------------------------
@@ -2009,9 +2077,90 @@ class TTest_StringCat : public TTestFWTest
 
     private :
         // -------------------------------------------------------------------
+        //  Private data types
+        // -------------------------------------------------------------------
+        struct TTestRes
+        {
+            TString::ETokenFind     eFindRes;
+            const tCIDLib::TCh*     pszText;
+            tCIDLib::TCh            chToken = kCIDLib::chNull;
+            tCIDLib::TCard4         c4Width = 0;
+            tCIDLib::EHJustify      eJustify = tCIDLib::EHJustify::Right;
+            tCIDLib::TCh            chFill = kCIDLib::chSpace;
+            tCIDLib::TCard4         c4Precision = 0;
+        };
+
+        // -------------------------------------------------------------------
+        //
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bRunOneTest
+        (
+                    TTextStringOutStream&   strmOutput
+            , const tCIDLib::TCh* const     pszFormat
+            , const TTestRes* const         apRes
+            , const tCIDLib::TCard4         c4ResCount
+            , const tCIDLib::TCh* const     pszTestName
+        );
+
+
+        // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
-        RTTIDefs(TTest_StringCat,TTestFWTest)
+        RTTIDefs(TTest_StringTokens,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_StringTokenRep
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_StringTokenRep : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_StringTokenRep();
+
+        ~TTest_StringTokenRep();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        template <typename T> tCIDLib::TBoolean
+        bTestOne(       TTextOutStream&         strmOut
+                , const TTFWCurLn&              tfwCurLine
+                , const tCIDLib::TCh* const     pszFmt
+                , const T                       tVal
+                , const tCIDLib::TCh* const     pszRes
+                ,       TString&                strTmp)
+        {
+            strTmp.Format(pszFmt, tVal);
+            if (strTmp != pszRes)
+            {
+                strmOut << tfwCurLine << L"Result should have been '"
+                        << pszRes << L"'\n";
+                return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_StringTokenRep,TTestFWTest)
 };
 
 

@@ -384,27 +384,13 @@ TSysInfo::QueryOSInfo(  tCIDLib::TCard4&    c4OSMajVersion
 // REturn the OS info formatted into a string
 tCIDLib::TVoid TSysInfo::QueryOSInfoStr(TString& strToFill)
 {
-    tCIDLib::TCard4 c4OSMajVersion;
-    tCIDLib::TCard4 c4OSMinVersion;
+    tCIDLib::TCard4 c4OSMajVer;
+    tCIDLib::TCard4 c4OSMinVer;
     tCIDLib::TCard4 c4OSRev;
     tCIDLib::TCard4 c4OSBuildNum;
 
-    TKrnlSysInfo::QueryOSInfo
-    (
-        c4OSMajVersion
-        , c4OSMinVersion
-        , c4OSRev
-        , c4OSBuildNum
-    );
-
-    strToFill.SetFormatted(c4OSMajVersion);
-    strToFill.Append(kCIDLib::chPeriod);
-    strToFill.AppendFormatted(c4OSMinVersion);
-    strToFill.Append(kCIDLib::chPeriod);
-    strToFill.AppendFormatted(c4OSRev);
-    strToFill.Append(L" [");
-    strToFill.AppendFormatted(c4OSBuildNum);
-    strToFill.Append(kCIDLib::chCloseBracket);
+    TKrnlSysInfo::QueryOSInfo(c4OSMajVer, c4OSMinVer, c4OSRev, c4OSBuildNum);
+    strToFill.Format(L"%(1).%(2).%(3) [%(4)]", c4OSMajVer, c4OSMinVer, c4OSRev, c4OSBuildNum);
 }
 
 

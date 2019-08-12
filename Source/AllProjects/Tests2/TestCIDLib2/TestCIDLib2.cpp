@@ -72,6 +72,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     //  we'd want to test them, so that within a given test level they will
     //  be seen in this order.
     //
+AddTest(new TTest_StringTokens);
 
     // The most fundamental stuff
     AddTest(new TTest_Types);
@@ -83,11 +84,14 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_LambdaJan);
     AddTest(new TTest_Enum1);
     AddTest(new TTest_EnumForEach);
+    AddTest(new TTest_MetaProg1);
     AddTest(new TTest_ObjLocker1);
 
     AddTest(new TTest_String1);
     AddTest(new TTest_String2);
     AddTest(new TTest_String3);
+    AddTest(new TTest_StringTokens);
+    AddTest(new TTest_StringTokenRep);
     AddTest(new TTest_StringMove);
     AddTest(new TTest_StringCat);
 

@@ -197,6 +197,21 @@ class CIDLIBEXP TString :
 {
     public  :
         // -------------------------------------------------------------------
+        //  Public types
+        // -------------------------------------------------------------------
+
+        // Used in the low level token processing method, pszFindToken()
+        enum class ETokenFind
+        {
+            End
+            , Token
+            , TextRun
+            , NewLine
+            , BadFormat
+        };
+
+
+        // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
         static tCIDLib::TBoolean bComp(const TString& str1, const TString& str2)
@@ -243,6 +258,17 @@ class CIDLIBEXP TString :
             return str1.eCompareI(str2);
         }
 
+        static ETokenFind eFindToken
+        (
+            const tCIDLib::TCh*&            pszStart
+            , tCIDLib::TCh&                 chToken
+            , tCIDLib::EHJustify&           eJustify
+            , tCIDLib::TCard4&              c4FldWidth
+            , tCIDLib::TCh&                 chFill
+            , tCIDLib::TCard4&              c4Precision
+            , const tCIDLib::TCh*&          pszEnd
+        );
+
         static tCIDLib::TVoid FromHex
         (
             const   tCIDLib::TCard1         c1ToXlat
@@ -255,6 +281,18 @@ class CIDLIBEXP TString :
             const   tCIDLib::TCard1         c1ToXlat
             ,       tCIDLib::TCh&           chOne
             ,       tCIDLib::TCh&           chTwo
+        );
+
+        static const tCIDLib::TCh* pszFindToken
+        (
+            const   tCIDLib::TCh* const     pszSrc
+            , const tCIDLib::TCh            chToFind
+            ,       tCIDLib::EHJustify&     eJustify
+            ,       tCIDLib::TCard4&        c4FldWidth
+            ,       tCIDLib::TCh&           chFill
+            ,       tCIDLib::TCard4&        c4Precision
+            ,       tCIDLib::TCard4&        c4TokenChars
+            ,       tCIDLib::TCard4&        c4TokenCnt
         );
 
         static const TString& strEmpty();
@@ -591,9 +629,15 @@ class CIDLIBEXP TString :
             , const tCIDLib::TCh            chGroupSep = kCIDLib::chNull
         );
 
+        //
+        //  The precision parameter is a dummy parameter that is not used. This
+        //  exists purely to deal with an otherwise really ugly issue with
+        //  the variadice Format() method.
+        //
         tCIDLib::TVoid AppendFormatted
         (
             const   MFormattable&           fmtblSrc
+            , const tCIDLib::TCard4         c4Prec = 0
         );
 
         tCIDLib::TVoid AppendSubStr(const   TString&        strSrc
@@ -1131,6 +1175,30 @@ class CIDLIBEXP TString :
             m_strbData.SetFromShort(pszNewValue);
         }
 
+        //
+        //  This will append the formatted content to us. We have another that will
+        //  clear us first and then call appending version. To avoid having to
+        //  replicate a lot of code, we pass a temp string which will be used to
+        //  format the token values out.
+        //
+        template <typename... TArgs>
+        tCIDLib::TVoid Format(const TString& strFmt, const TArgs... Args)
+        {
+            Clear();
+            FormatAppend(strFmt, Args...);
+        }
+
+        template <typename... TArgs>
+        tCIDLib::TVoid FormatAppend(const TString& strFmt, const TArgs... Args)
+        {
+            TString strTmp;
+            TString strTmp2;
+
+            // If we get back the buffer, then no parms, just write out fmt text
+            if (pszFmtHelper(strFmt.pszBuffer(), strTmp, strTmp2, Args...) == strFmt.pszBuffer())
+                Append(strFmt);
+        }
+
         tCIDLib::TFloat8 f8Val() const;
 
         tCIDLib::THashVal hshCalcHash
@@ -1234,9 +1302,15 @@ class CIDLIBEXP TString :
             m_strbData.Reallocate(c4NewSize, bPreserveContent);
         }
 
+        //
+        //  The precision parameter is a dummy parameter that is not used. This
+        //  exists purely to deal with an otherwise really ugly issue with
+        //  the variadice Format() method.
+        //
         tCIDLib::TVoid SetFormatted
         (
             const   MFormattable&           fmtblSrc
+            , const tCIDLib::TCard4         c4Prec = 0
         );
 
         tCIDLib::TVoid SetFormatted
@@ -1799,6 +1873,96 @@ class CIDLIBEXP TString :
         (
             const   tCIDLib::TCh            chToXlat
         );
+
+        //
+        //  Helpers for Format() which needs to process a list of variadic
+        //  parameters.
+        //
+        template <typename TOne, typename... TOthers>
+        const tCIDLib::TCh* pszFmtHelper(const  tCIDLib::TCh* const pszFmt
+                                        ,       TString&            strTmp
+                                        ,       TString&            strTmp2
+                                        , const TOne                tOne
+                                        , const TOthers...          tOthers)
+        {
+            tCIDLib::TCh chFill;
+            tCIDLib::TCh chToken;
+            tCIDLib::TCard4 c4Width;
+            tCIDLib::TCard4 c4Precision;
+            tCIDLib::EHJustify eJustify;
+
+            //
+            //  We have to loop until we get a token, since we could have text bits
+            //  which we just copy straight out as text.
+            //
+            const tCIDLib::TCh* pszStart = pszFmt;
+            const tCIDLib::TCh* pszEnd;
+            while (kCIDLib::True)
+            {
+                const TString::ETokenFind eFindRes = TString::eFindToken
+                (
+                    pszStart, chToken, eJustify, c4Width, chFill, c4Precision, pszEnd
+                );
+
+                // If it fails, then give up and stop recursing
+                if ((eFindRes == TString::ETokenFind::BadFormat)
+                ||  (eFindRes == TString::ETokenFind::End))
+                {
+                    return nullptr;
+                }
+                 else if (eFindRes == TString::ETokenFind::Token)
+                {
+                    //
+                    //  If no width, then just append it formatted, else we need
+                    //  to use a temp string and formatted into a field, then append
+                    //  that.
+                    //
+                    if (tCIDLib::IsTFloatX<TOne>::bState)
+                    {
+                        if (c4Width)
+                        {
+                            strTmp.SetFormatted(tOne, c4Precision);
+                            strTmp2.FormatToFld(strTmp, c4Width, eJustify, chFill);
+                            Append(strTmp2);
+                        }
+                         else
+                        {
+                            AppendFormatted(tOne, c4Precision);
+                        }
+                    }
+                     else
+                    {
+                        if (c4Width)
+                        {
+                            strTmp.SetFormatted(tOne);
+                            strTmp2.FormatToFld(strTmp, c4Width, eJustify, chFill);
+                            Append(strTmp2);
+                        }
+                         else
+                        {
+                            AppendFormatted(tOne);
+                        }
+                    }
+
+                    // Now we need to recurse to move to the next parameter
+                    pszEnd = pszFmtHelper(pszEnd, strTmp, strTmp2, tOthers...);
+                }
+                 else if (eFindRes == TString::ETokenFind::TextRun)
+                {
+                    // It's a text run, so just copy those as is
+                    AppendSubStr(pszStart, 0, pszEnd - pszStart);
+                }
+
+                // Move forward
+                pszStart = pszEnd;
+            }
+            return pszEnd;
+        }
+
+        const tCIDLib::TCh* pszFmtHelper(const tCIDLib::TCh* pszFmt, TString&, TString&)
+        {
+            return pszFmt;
+        }
 
 
         // -------------------------------------------------------------------

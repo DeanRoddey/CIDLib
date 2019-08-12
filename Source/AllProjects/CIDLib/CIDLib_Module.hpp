@@ -422,9 +422,9 @@ class CIDLIBEXP TModule : public TObject
             , const MFormattable&           fmtblToken4 = MFormattable::Nul_MFormattable()
         )   const;
 
-        const TString& strPath() const;
+        TString strPath() const;
 
-        const TString& strName() const;
+        TString strName() const;
 
         tCIDLib::TVoid ThrowErr
         (

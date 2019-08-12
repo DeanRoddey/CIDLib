@@ -55,15 +55,6 @@ namespace CIDCrypto_UniqueId
 
 
 
-TString TUniqueId::strMakeId()
-{
-    // Call the other version and fill in our string, then return it
-    TString strRet;
-    MakeId(strRet);
-    return strRet;
-}
-
-
 TMD5Hash TUniqueId::mhashMakeId()
 {
     // Get an id into a local MD5 hash and return it
@@ -204,3 +195,10 @@ tCIDLib::TVoid TUniqueId::MakeSystemId(TMD5Hash& mhashToFill)
 }
 
 
+TString TUniqueId::strMakeId()
+{
+    // Call the other version and fill in our string, then return it
+    TString strRet;
+    MakeId(strRet);
+    return tCIDLib::ForceMove(strRet);
+}

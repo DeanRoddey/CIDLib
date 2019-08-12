@@ -87,7 +87,7 @@ TString TFacCIDLib::strNextThreadName(const tCIDLib::TCh* const pszBaseName)
     strRet.Append(L"Thread");
     strRet.AppendFormatted(m_scntThread++);
 
-    return strRet;
+    return tCIDLib::ForceMove(strRet);
 }
 
 TString TFacCIDLib::strNextThreadName(const TString& strBaseName)
@@ -96,6 +96,6 @@ TString TFacCIDLib::strNextThreadName(const TString& strBaseName)
     strRet.Append(L"Thread");
     strRet.AppendFormatted(m_scntThread++);
 
-    return strRet;
+    return tCIDLib::ForceMove(strRet);
 }
 

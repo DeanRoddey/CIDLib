@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd - 2019
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -98,7 +98,7 @@ int main(int argc, char** argv) \
     CIDLib_MakePrimary(pthrToStart); \
     CIDLib_Init(); \
     pthrToStart->Start(); \
-    return pthrToStart->eWaitForDeath(); \
+    return int(pthrToStart->eWaitForDeath()); \
 }
 
 
