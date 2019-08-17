@@ -155,7 +155,7 @@ tCIDLib::TVoid TSHA256Hash::ParseFormatted(const TString& strFormatted)
     );
 
     // Get the raw buffer to work with
-    tCIDLib::TCard1* pc1This = pc1Writeable();
+    tCIDLib::TCard1* pc1This = pc1HashW();
 
     tCIDLib::TCard1 c1Cur;
     tCIDLib::TCard4 c4SrcInd = 0;

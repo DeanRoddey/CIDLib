@@ -93,7 +93,7 @@ class CIDCRYPTEXP TMD5Hash : public TMsgHash
         (
                     TString&                strToFill
             , const tCIDLib::TBoolean       bAppend = kCIDLib::False
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -112,7 +112,7 @@ class CIDCRYPTEXP TMD5Hash : public TMsgHash
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const   override;
+        )   const   final;
 
 
     private :

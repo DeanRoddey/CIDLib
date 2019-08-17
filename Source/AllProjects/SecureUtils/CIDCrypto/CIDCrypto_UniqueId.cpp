@@ -57,15 +57,8 @@ namespace CIDCrypto_UniqueId
 
 TMD5Hash TUniqueId::mhashMakeId()
 {
-    // Get an id into a local MD5 hash and return it
-    TMD5Hash mhashTmp;
-    MakeId(mhashTmp);
-    return mhashTmp;
-}
+    TMD5Hash mhashRet;
 
-
-tCIDLib::TVoid TUniqueId::MakeId(TMD5Hash& mhashToFill)
-{
     // If we haven't set the storage for this thread, then do it now
     if (!CIDCrypto_UniqueId::ptdLastId.bIsSet())
     {
@@ -74,7 +67,7 @@ tCIDLib::TVoid TUniqueId::MakeId(TMD5Hash& mhashToFill)
         // Generate a seed for this guy
         tCIDLib::TCard4 c4Seed
         (
-            tCIDLib::TCard4(&mhashToFill)
+            tCIDLib::TCard4(&mhashRet)
             ^ (tCIDLib::TCard4(prandThread) >> 19)
             ^ TTime::c4Millis()
             ^ tCIDLib::TCard4(TProcess::pidThis())
@@ -110,23 +103,16 @@ tCIDLib::TVoid TUniqueId::MakeId(TMD5Hash& mhashToFill)
         reinterpret_cast<tCIDLib::TCard1*>(ac4Buf)
         , CIDCrypto_UniqueId::c4SrcBufLen * sizeof(ac4Buf[0])
     );
-    mdigTmp.Complete(mhashToFill);
+    mdigTmp.Complete(mhashRet);
+
+    return tCIDLib::ForceMove(mhashRet);
 }
 
 
-tCIDLib::TVoid TUniqueId::MakeId(TString& strToFill)
+TMD5Hash TUniqueId::mhashMakeSystemId()
 {
-    // Get an id into a local MD5 hash, and format it into the caller's string
-    TMD5Hash mhashTmp;
-    MakeId(mhashTmp);
+    TMD5Hash mhashRet;
 
-    // Format this guy to the passed string
-    mhashTmp.FormatToStr(strToFill);
-}
-
-
-tCIDLib::TVoid TUniqueId::MakeSystemId(TMD5Hash& mhashToFill)
-{
     // Get the unique machine name into a local buffer
     const tCIDLib::TCard4 c4IDBufSz = 2048;
     tCIDLib::TCh achBuf[c4IDBufSz + 1];
@@ -191,14 +177,21 @@ tCIDLib::TVoid TUniqueId::MakeSystemId(TMD5Hash& mhashToFill)
     TMessageDigest5 mdigTmp;
     mdigTmp.StartNew();
     mdigTmp.DigestBuf(mbufEnc, c4EncBytes);
-    mdigTmp.Complete(mhashToFill);
+    mdigTmp.Complete(mhashRet);
+
+    return tCIDLib::ForceMove(mhashRet);
 }
 
 
 TString TUniqueId::strMakeId()
 {
-    // Call the other version and fill in our string, then return it
-    TString strRet;
-    MakeId(strRet);
+    //
+    //  Get an id into a local MD5 hash, and format it into a string to return. Presize
+    //  the string to hash bytes times 2 plus a bit which will cover most scenarios
+    //  without having to re-size.
+    //
+    TMD5Hash mhashTmp = mhashMakeId();
+    TString strRet((mhashTmp.c4Bytes() * 2) + 16);
+    mhashTmp.FormatToStr(strRet);
     return tCIDLib::ForceMove(strRet);
 }

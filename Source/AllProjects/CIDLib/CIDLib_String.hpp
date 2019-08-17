@@ -1456,6 +1456,16 @@ class CIDLIBEXP TString :
             , const tCIDLib::TBoolean       bCaseSensitive
         )   const;
 
+        tCIDLib::TCard4 c4CalcBufDiff
+        (
+            const   tCIDLib::TCh* const     pszUpper
+            , const tCIDLib::TCh* const     pszLower
+        )   const;
+
+        tCIDLib::TCard4 c4CalcBufDiff(const tCIDLib::TCh* const pszUpper) const
+        {
+            return c4CalcBufDiff(pszUpper, m_pszBuffer);
+        }
 
         //
         //  Helpers for Format() which needs to process a list of variadic

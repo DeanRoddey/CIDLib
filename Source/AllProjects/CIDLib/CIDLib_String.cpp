@@ -1762,7 +1762,7 @@ tCIDLib::TBoolean TString::bCapAtChar(const tCIDLib::TCh chAt)
 
     // Cap it at the match point and update our end index
     *pszMatch = kCIDLib::chNull;
-    m_c4CurEnd = pszMatch - m_pszBuffer;
+    m_c4CurEnd = c4CalcBufDiff(pszMatch);
 
     return kCIDLib::True;
 }
@@ -1942,7 +1942,7 @@ TString::bExtractNthToken(  const   tCIDLib::TCard4     c4TokInd
     }
 
     // We have one, so copy out to the target string
-    strToFill.FromZStr(pchStart, pchTokEnd - pchStart);
+    strToFill.FromZStr(pchStart, c4CalcBufDiff(pchTokEnd, pchStart));
 
     // And strip trailing now, if asked
     if (bStripWS)
@@ -2019,7 +2019,7 @@ TString::bFirstOccurrence(  const   tCIDLib::TCh            chTarget
     }
 
     // Calc the position
-    c4Pos = tCIDLib::TCard4(pszMatch - pszBuffer());
+    c4Pos = c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -2059,7 +2059,7 @@ TString::bFirstOccurrence(  const   TString&                strSubStr
     }
 
     // Calc the position and return true
-    c4Pos = tCIDLib::TCard4(pszMatch - pszBuffer());
+    c4Pos = c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -2106,7 +2106,7 @@ TString::bLastOccurrence(   const   tCIDLib::TCh            chTarget
     }
 
     // Calc the position and return true
-    c4Pos = tCIDLib::TCard4(pszMatch - pszBuffer());
+    c4Pos = c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -2141,7 +2141,7 @@ TString::bLastOccurrence(   const   TString&                strSubStr
     }
 
     // Calc the position of the match and return true
-    c4Pos = tCIDLib::TCard4(pszMatch - pszBuffer());
+    c4Pos = c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -2181,7 +2181,7 @@ TString::bNextOccurrence(   const   tCIDLib::TCh            chTarget
     }
 
     // Calc the position
-    c4Pos = tCIDLib::TCard4(pszMatch - pszBuffer());
+    c4Pos = c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -2234,7 +2234,7 @@ TString::bNextOccurrence(   const   TString&                strSubStr
     }
 
     // Calc the position of the match and return true
-    c4Pos = tCIDLib::TCard4(pszLast - pszBuffer());
+    c4Pos = c4CalcBufDiff(pszLast);
     return kCIDLib::True;
 }
 
@@ -2280,7 +2280,7 @@ TString::bPrevOccurrence(   const   tCIDLib::TCh            chTarget
     }
 
     // Calc the position of the match and return true
-    c4Pos = tCIDLib::TCard4(pszMatch - pszBuffer());
+    c4Pos = c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -2328,26 +2328,20 @@ TString::bPrevOccurrence(   const   TString&                strSubStr
         //
         pszFind = TRawStr::pszFindPrevChars
         (
-            pszBuffer()
-            , strSubStr.pszBuffer()
-            , c4Pos - 1
-            , bCaseSensitive
+            pszBuffer(), strSubStr.pszBuffer(), c4Pos - 1, bCaseSensitive
         );
     }
      else
     {
         pszFind = TRawStr::pszFindPrevSubStr
         (
-            pszBuffer()
-            , strSubStr.pszBuffer()
-            , c4Pos - 1
-            , bCaseSensitive
+            pszBuffer(), strSubStr.pszBuffer(), c4Pos - 1, bCaseSensitive
         );
     }
 
     if (pszFind)
     {
-        c4Pos = tCIDLib::TCard4(pszFind - pszBuffer());
+        c4Pos = c4CalcBufDiff(pszFind);
         return kCIDLib::True;
     }
 
@@ -2459,7 +2453,7 @@ TString::bReplaceSubStr(const   TString&            strToReplace
         bRet = kCIDLib::True;
 
         // Calc the position of the match
-        c4StartAt = tCIDLib::TCard4(pszMatch - pszBuffer());
+        c4StartAt = c4CalcBufDiff(pszMatch);
 
         // Replace the substring we found, just cutting if no rep text
         if (c4RepLen)
@@ -2518,7 +2512,7 @@ TString::bSplit(        TString&                strSecondHalf
         return kCIDLib::False;
 
     // Calc the offset
-    const tCIDLib::TCard4 c4Ofs = pszMatch - pszBuffer();
+    const tCIDLib::TCard4 c4Ofs = c4CalcBufDiff(pszMatch);
 
     //
     //  We want to skip over the divider, and we want to make sure we don't
@@ -2794,6 +2788,7 @@ tCIDLib::TCh TString::chAt(const tCIDLib::TCard4 c4Ind) const
     }
 
     // If we have no buffer, then our end is zero and we couldn't get here
+    CIDAssert(m_pszBuffer != nullptr, L"The buffer should not be null here");
     return m_pszBuffer[c4Ind];
 }
 
@@ -2945,8 +2940,7 @@ tCIDLib::TVoid TString::CutUpTo(const tCIDLib::TCh chFind)
         //  We end the cut on the found character, so we subtract the two
         //  pointers and add one. Then just call the cut method.
         //
-        const tCIDLib::TCard4 c4Len((pszMatch - m_pszBuffer) + 1);
-        Cut(0, c4Len);
+        Cut(0, c4CalcBufDiff(pszMatch) + 1);
     }
 }
 
@@ -3119,7 +3113,7 @@ TString::eReplaceToken(  const  tCIDLib::TCh* const pszVal
     }
 
     // Calc the index where we found it
-    c4Index = pszTmp - pszBuffer();
+    c4Index = c4CalcBufDiff(pszTmp);
 
     //
     //  If the field width is zero, then it's just going to be the source
@@ -3193,7 +3187,7 @@ TString::eReplaceToken( const   MFormattable&   fmtblVal
     }
 
     // Calc the index where we found it
-    c4Index = pszTmp - pszBuffer();
+    c4Index = c4CalcBufDiff(pszTmp);
 
     //
     //  Format the replacement value to a string, being sure to flush it
@@ -3247,7 +3241,7 @@ TString::eReplaceToken( const   tCIDLib::TBoolean   bVal
     }
 
     // Calc the index where we found it
-    c4Index = pszTmp - pszBuffer();
+    c4Index = c4CalcBufDiff(pszTmp);
 
     // And ask the buffer object to replace the token with the text
     const tCIDLib::TCh* pszVal = bVal
@@ -3345,7 +3339,7 @@ TString::eReplaceToken( const   tCIDLib::TCard4     c4Val
     }
 
     // Calc the index where we found it
-    c4Index = pszTmp - pszBuffer();
+    c4Index = c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr64 szTmp;
     if (!TRawStr::bFormatVal(c4Val, szTmp, 64, eRadix))
@@ -3429,7 +3423,7 @@ TString::eReplaceToken( const   tCIDLib::TCard8     c8Val
     }
 
     // Calc the index where we found it
-    c4Index = pszTmp - pszBuffer();
+    c4Index = c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr128 szTmp;
     if (!TRawStr::bFormatVal(c8Val, szTmp, 128, eRadix))
@@ -3515,7 +3509,7 @@ TString::eReplaceToken( const   tCIDLib::TFloat8&   f8Val
     }
 
     // Calc the index where we found it
-    c4Index = pszTmp - pszBuffer();
+    c4Index = c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr128 szTmp;
     if (!TRawStr::bFormatVal(f8Val, szTmp, c1Precision, 128, tCIDLib::ETrailFmts::Zeroes))
@@ -3617,7 +3611,7 @@ TString::eReplaceToken( const   tCIDLib::TInt4      i4Val
     }
 
     // Calc the index where we found it
-    c4Index = pszTmp - pszBuffer();
+    c4Index = c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr64 szTmp;
     if (!TRawStr::bFormatVal(i4Val, szTmp, 64, eRadix))
@@ -3702,7 +3696,7 @@ TString::eReplaceToken( const   tCIDLib::TInt8      i8Val
     }
 
     // Calc the index where we found it
-    c4Index = pszTmp - pszBuffer();
+    c4Index = c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr128  szTmp;
     if (!TRawStr::bFormatVal(i8Val, szTmp, 128, eRadix))
@@ -4072,7 +4066,7 @@ tCIDLib::TVoid TString::Insert( const   tCIDLib::TCh* const pszInsert
     TRawMem::CopyMemBuf(pszStop, pszActual, c4InsertLen * kCIDLib::c4CharBytes);
     m_c4CurEnd += c4InsertLen;
 
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -5080,43 +5074,6 @@ tCIDLib::TVoid TString::BadHexChar(const tCIDLib::TCh chToXlat)
 //  TString: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 
-tCIDLib::TBoolean
-TString::bCheckSuffix(  const   TString&            strToCheck
-                        , const tCIDLib::TBoolean   bCaseSensitive) const
-{
-    const tCIDLib::TCard4 c4SrcLen = strToCheck.m_c4CurEnd;
-
-    //
-    //  Do the fast check, where this string is shorter, or the suffix is
-    //  empty.
-    //
-    if (!c4SrcLen || (m_c4CurEnd < c4SrcLen))
-        return kCIDLib::False;
-
-    // Oh well, check the strings
-    const tCIDLib::TCh* pszUs = pszBufferAt(m_c4CurEnd - c4SrcLen);
-    const tCIDLib::TCh* pszThem = strToCheck.pszBuffer();
-
-    if (bCaseSensitive)
-    {
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4SrcLen; c4Index++)
-        {
-            if (*pszUs++ != *pszThem++)
-                return kCIDLib::False;
-        }
-    }
-     else
-    {
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4SrcLen; c4Index++)
-        {
-            if (TRawStr::chUpper(*pszUs++) != TRawStr::chUpper(*pszThem++))
-                return kCIDLib::False;
-        }
-    }
-    return kCIDLib::True;
-}
-
-
 //
 //  Check whether this string starts with the passed string, with optional
 //  case sensitivity or insensitivity. We have two versions so that when
@@ -5236,6 +5193,75 @@ TString::bCheckSuffix(  const  tCIDLib::TCh* const  pszToCheck
         }
     }
     return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TString::bCheckSuffix(  const   TString&            strToCheck
+                        , const tCIDLib::TBoolean   bCaseSensitive) const
+{
+    const tCIDLib::TCard4 c4SrcLen = strToCheck.m_c4CurEnd;
+
+    //
+    //  Do the fast check, where this string is shorter, or the suffix is
+    //  empty.
+    //
+    if (!c4SrcLen || (m_c4CurEnd < c4SrcLen))
+        return kCIDLib::False;
+
+    // Oh well, check the strings
+    const tCIDLib::TCh* pszUs = pszBufferAt(m_c4CurEnd - c4SrcLen);
+    const tCIDLib::TCh* pszThem = strToCheck.pszBuffer();
+
+    if (bCaseSensitive)
+    {
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4SrcLen; c4Index++)
+        {
+            if (*pszUs++ != *pszThem++)
+                return kCIDLib::False;
+        }
+    }
+     else
+    {
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4SrcLen; c4Index++)
+        {
+            if (TRawStr::chUpper(*pszUs++) != TRawStr::chUpper(*pszThem++))
+                return kCIDLib::False;
+        }
+    }
+    return kCIDLib::True;
+}
+
+
+//
+//  Just to be safe, we call this to calculate the difference in characters between
+//  two places in our buffer. This insures that they are indeed both within our
+//  buffer if in debug mode, just in case. With buffers being resized or faulted
+//  in there's a danger we could sub from an old pointer or something. We also make
+//  sure neither is null.
+//
+//  We have an inlined second that only takes an upper calls us with our own buffer
+//  as the lower.
+//
+tCIDLib::TCard4
+TString::c4CalcBufDiff( const   tCIDLib::TCh* const pszUpper
+                        , const tCIDLib::TCh* const pszLower) const
+{
+    #if CID_DEBUG_ON
+    const tCIDLib::TCh* const pszEnd = m_pszBuffer + m_c4CurEnd;
+    CIDAssert
+    (
+        (pszUpper != nullptr)
+        && (pszLower != nullptr)
+        && (pszUpper >= pszLower)
+        && (pszUpper >= m_pszBuffer)
+        && (pszUpper <= pszEnd)
+        && (pszLower >= m_pszBuffer)
+        && (pszLower <= pszEnd)
+        , L"There is an issue with one or both string buffer pointers"
+    );
+    #endif
+
+    return pszUpper - pszLower;
 }
 
 

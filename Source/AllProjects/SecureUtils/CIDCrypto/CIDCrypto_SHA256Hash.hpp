@@ -97,7 +97,7 @@ class CIDCRYPTEXP TSHA256Hash : public TMsgHash
         (
                     TString&                strToFill
             , const tCIDLib::TBoolean       bAppend = kCIDLib::False
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------

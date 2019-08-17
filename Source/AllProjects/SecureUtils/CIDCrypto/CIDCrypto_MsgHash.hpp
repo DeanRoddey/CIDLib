@@ -52,11 +52,6 @@ class CIDCRYPTEXP TMsgHash :
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        tCIDLib::TCard1& operator[]
-        (
-            const   tCIDLib::TCard4         c4ByteIndex
-        );
-
         tCIDLib::TCard1 operator[]
         (
             const   tCIDLib::TCard4         c4ByteIndex
@@ -111,6 +106,12 @@ class CIDCRYPTEXP TMsgHash :
 
         const tCIDLib::TCard1* pc1Buffer() const;
 
+        tCIDLib::TVoid PutAt
+        (
+            const   tCIDLib::TCard4         c4At
+            , const tCIDLib::TCard1         c1ToPut
+        );
+
         tCIDLib::TVoid RawFormat
         (
                     TString&                strToFill
@@ -136,6 +137,8 @@ class CIDCRYPTEXP TMsgHash :
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
+        TMsgHash() = delete;
+
         TMsgHash
         (
             const   tCIDLib::TCard4         c4Bytes
@@ -182,12 +185,6 @@ class CIDCRYPTEXP TMsgHash :
 
 
         // -------------------------------------------------------------------
-        //  Protected, non-virtual methods
-        // -------------------------------------------------------------------
-        tCIDLib::TCard1* pc1Writeable();
-
-
-        // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
         tCIDLib::TVoid StreamFrom
@@ -201,11 +198,32 @@ class CIDCRYPTEXP TMsgHash :
         )   const override;
 
 
+        // -------------------------------------------------------------------
+        //  Protected, non-virtual methods
+        // -------------------------------------------------------------------
+        const tCIDLib::TCard1* pc1Hash() const;
+
+        const tCIDLib::TCard1* pc1HashAt
+        (
+            const   tCIDLib::TCard4     c4At
+        )   const;
+
+        tCIDLib::TCard1* pc1HashW();
+
+        tCIDLib::TCard1* pc1HashWAt
+        (
+            const   tCIDLib::TCard4     c4At
+        );
+
+
     private :
         // -------------------------------------------------------------------
         //  Hidden constructor, just for use in move ctor
         // -------------------------------------------------------------------
-        TMsgHash();
+        TMsgHash
+        (
+            const   tCIDLib::TCard4         c4Bytes
+        );
 
 
         // -------------------------------------------------------------------
@@ -216,10 +234,13 @@ class CIDCRYPTEXP TMsgHash :
         //
         //  m_pc1Hash
         //      This is an array of bytes that make up the hash value. It is
-        //      m_c4Bytes in size.
+        //      m_c4Bytes in size. It can be null (for move semantics reasons
+        //      mostly) and will be faulted in to a default if accessed while it
+        //      is null. Note that m_c4Bytes is kept at it's actual value since
+        //      any defaulted in value will be that size.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4     m_c4Bytes;
-        tCIDLib::TCard1*    m_pc1Hash;
+        tCIDLib::TCard4             m_c4Bytes;
+        mutable tCIDLib::TCard1*    m_pc1Hash;
 
 
         // -------------------------------------------------------------------

@@ -72,8 +72,7 @@ TTest_UniqueId1::eRunTest(TTextStringOutStream&  strmOut
     //  Create an id, get it into a binary message hash object, then
     //  format that object and see if get the same string back.
     //
-    TString strTmpId;
-    TUniqueId::MakeId(strTmpId);
+    TString strTmpId = TUniqueId::strMakeId();
 
     TMD5Hash mhashTmp;
     mhashTmp.ParseFormatted(strTmpId);

@@ -148,7 +148,7 @@ TMD5Hash::FormatToStr(TString& strToFill, const tCIDLib::TBoolean bAppend) const
 tCIDLib::TVoid TMD5Hash::ParseFormatted(const TString& strFormatted)
 {
     // Get a raw buffer to work with
-    tCIDLib::TCard1* pc1This = pc1Writeable();
+    tCIDLib::TCard1* pc1This = pc1HashW();
 
     // Check the length and that it has a hypen at the correct place
     if ((strFormatted.c4Length() != kCIDCrypto::c4UniqueIdStrLen)

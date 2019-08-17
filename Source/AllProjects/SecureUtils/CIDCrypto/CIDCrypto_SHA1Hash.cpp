@@ -124,7 +124,7 @@ TSHA1Hash::FormatToStr(TString& strToFill, const tCIDLib::TBoolean bAppend) cons
 
     const tCIDLib::TCard4* pc4Cur
     (
-        reinterpret_cast<const tCIDLib::TCard4*>(pc1Buffer())
+        reinterpret_cast<const tCIDLib::TCard4*>(pc1Hash())
     );
 
     TString strVal;
