@@ -669,7 +669,7 @@ TString tCIDLib::strLoadEExitCodes(const tCIDLib::EExitCodes eToXlat)
             break;
     }
 
-    return strRet;
+    return tCIDLib::ForceMove(strRet);
 }
 
 

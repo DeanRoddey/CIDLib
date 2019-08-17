@@ -73,8 +73,23 @@ class CIDXMLEXP TMemBufEntitySrc : public TXMLEntitySrc
         TMemBufEntitySrc
         (
             const   TString&                strSystemId
+            ,       THeapBuf&&              mbufToTake
+            , const tCIDLib::TCard4         c4SrcBytes
+        );
+
+        TMemBufEntitySrc
+        (
+            const   TString&                strSystemId
             , const TString&                strPublicId
             , const TMemBuf&                mbufToCopy
+            , const tCIDLib::TCard4         c4SrcBytes
+        );
+
+        TMemBufEntitySrc
+        (
+            const   TString&                strSystemId
+            , const TString&                strPublicId
+            ,       THeapBuf&&              mbufToTake
             , const tCIDLib::TCard4         c4SrcBytes
         );
 

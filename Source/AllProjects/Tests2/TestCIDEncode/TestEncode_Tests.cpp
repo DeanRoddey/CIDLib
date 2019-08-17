@@ -476,7 +476,7 @@ TTest_ErrModes::eRunTest(  TTextStringOutStream&   strmOut
     //
     {
         TString strSrc(L"AB CD");
-        strSrc[2] = tCIDLib::TCh(0x91);
+        strSrc.PutAt(2, tCIDLib::TCh(0x91));
         TUSASCIIConverter tcvtTest;
         if (!bTestBadTar(strmOut, tcvtTest, strSrc, 2, 2))
             eRes = tTestFWLib::ETestRes::Failed;
@@ -484,7 +484,7 @@ TTest_ErrModes::eRunTest(  TTextStringOutStream&   strmOut
 
     {
         TString strSrc(L"AB CD");
-        strSrc[2] = tCIDLib::TCh(0xC3);
+        strSrc.PutAt(2, tCIDLib::TCh(0xC3));
         TLatin3Converter tcvtTest;
         if (!bTestBadTar(strmOut, tcvtTest, strSrc, 2, 2))
             eRes = tTestFWLib::ETestRes::Failed;
@@ -492,7 +492,7 @@ TTest_ErrModes::eRunTest(  TTextStringOutStream&   strmOut
 
     {
         TString strSrc(L"AB CD");
-        strSrc[2] = tCIDLib::TCh(0x91);
+        strSrc.PutAt(2, tCIDLib::TCh(0x91));
         TLatin1Converter tcvtTest;
         if (!bTestBadTar(strmOut, tcvtTest, strSrc, 2, 2))
             eRes = tTestFWLib::ETestRes::Failed;

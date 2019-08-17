@@ -711,13 +711,13 @@ tCIDLib::TVoid TParserSrc::EscapeStr(TString& strToEscape)
             //
             if (bOweEscape)
             {
-                strToEscape[c4TarIndex++] = chCur;
+                strToEscape.PutAt(c4TarIndex++, chCur);
                 bOweEscape = kCIDLib::False;
             }
              else
             {
-                strToEscape[c4TarIndex++] = kCIDLib::chBackSlash;
-                strToEscape[c4TarIndex++] = chCur;
+                strToEscape.PutAt(c4TarIndex++, kCIDLib::chBackSlash);
+                strToEscape.PutAt(c4TarIndex++, chCur);
             }
         }
          else
@@ -730,7 +730,7 @@ tCIDLib::TVoid TParserSrc::EscapeStr(TString& strToEscape)
              else
             {
                 if (c4SrcIndex != c4TarIndex)
-                    strToEscape[c4TarIndex] = strToEscape[c4SrcIndex];
+                    strToEscape.PutAt(c4TarIndex, strToEscape[c4SrcIndex]);
                 c4TarIndex++;
             }
         }
@@ -744,7 +744,7 @@ tCIDLib::TVoid TParserSrc::EscapeStr(TString& strToEscape)
     //  slash, so put it on.
     //
     if (bOweEscape)
-        strToEscape[c4TarIndex++] = kCIDLib::chBackSlash;
+        strToEscape.PutAt(c4TarIndex++, kCIDLib::chBackSlash);
 
     // And cap us on the target index
     strToEscape.CapAt(c4TarIndex);

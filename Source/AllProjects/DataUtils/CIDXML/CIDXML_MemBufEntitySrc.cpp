@@ -65,12 +65,31 @@ TMemBufEntitySrc::TMemBufEntitySrc( const   TString&        strSysId
 }
 
 TMemBufEntitySrc::TMemBufEntitySrc( const   TString&        strSysId
+                                    ,       THeapBuf&&      mbufToTake
+                                    , const tCIDLib::TCard4 c4SrcBytes) :
+    TXMLEntitySrc(strSysId)
+    , m_c4SrcBytes(c4SrcBytes)
+    , m_cptrBuffer(new THeapBuf(tCIDLib::ForceMove(mbufToTake)))
+{
+}
+
+TMemBufEntitySrc::TMemBufEntitySrc( const   TString&        strSysId
                                     , const TString&        strPubId
                                     , const TMemBuf&        mbufToCopy
                                     , const tCIDLib::TCard4 c4SrcBytes) :
     TXMLEntitySrc(strSysId, strPubId)
     , m_c4SrcBytes(c4SrcBytes)
     , m_cptrBuffer(new THeapBuf(mbufToCopy.pc1Data(), c4SrcBytes, c4SrcBytes))
+{
+}
+
+TMemBufEntitySrc::TMemBufEntitySrc( const   TString&        strSysId
+                                    , const TString&        strPubId
+                                    ,       THeapBuf&&      mbufToTake
+                                    , const tCIDLib::TCard4 c4SrcBytes) :
+    TXMLEntitySrc(strSysId, strPubId)
+    , m_c4SrcBytes(c4SrcBytes)
+    , m_cptrBuffer(new THeapBuf(tCIDLib::ForceMove(mbufToTake)))
 {
 }
 
