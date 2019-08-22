@@ -59,10 +59,7 @@ namespace CIDLib_HeapMemBuf
 //  THeapBuf: Constructors and Destructor
 // ---------------------------------------------------------------------------
 
-//
-//  Creates a default buffer with an initial size of 1K, and a default max
-//  size.
-//
+// We leave the buffer empty and will fault it in if needed
 THeapBuf::THeapBuf() :
 
     m_c4ExpandIncrement(4096)
@@ -70,8 +67,6 @@ THeapBuf::THeapBuf() :
     , m_c4MaxSize(kCIDLib::c4DefMaxBufferSz)
     , m_pc1Data(nullptr)
 {
-    // Allocate the buffer
-    m_pc1Data = new tCIDLib::TCard1[m_c4Size];
 }
 
 
@@ -233,10 +228,12 @@ THeapBuf::THeapBuf( const   tCIDLib::TCh* const pszInitData
 
 
 //
-//  Create a buffer with no initial content. The size must be non-zero on
-//  this one. If max size is zero, then it's set to the actual size allocated,
-//  so the buffer becomes fully allocated. Else it must be bigger than the size
-//  required.
+//  The size must be non-zero on this one. If max size is zero, then it's set
+//  to the actual size, so the buffer becomes fully allocated. Else it must be
+//  bigger than the size required.
+//
+//  We don't actually create the buffer here, we let it fault in later if actually
+//  ever used.
 //
 THeapBuf::THeapBuf( const   tCIDLib::TCard4 c4Size
                     , const tCIDLib::TCard4 c4MaxSize
@@ -280,9 +277,6 @@ THeapBuf::THeapBuf( const   tCIDLib::TCard4 c4Size
             }
         }
     }
-
-    // Allocate the buffer
-    m_pc1Data = new tCIDLib::TCard1[m_c4Size];
 }
 
 
@@ -492,11 +486,8 @@ THeapBuf::THeapBuf(const THeapBuf& mbufSrc) :
     , m_c4ExpandIncrement(mbufSrc.m_c4ExpandIncrement)
     , m_c4Size(mbufSrc.m_c4Size)
     , m_c4MaxSize(mbufSrc.m_c4MaxSize)
-    , m_pc1Data(nullptr)
+    , m_pc1Data(new tCIDLib::TCard1[m_c4Size])
 {
-    // Allocate a new buffer
-    m_pc1Data = new tCIDLib::TCard1[m_c4Size];
-
     // Copy the data in from the source
     try
     {
@@ -510,13 +501,16 @@ THeapBuf::THeapBuf(const THeapBuf& mbufSrc) :
     }
 }
 
-// Set up the absolute minimum and then force a move assign
+//
+//  Set up a null buffer and give it to the source. He'll fault one back
+//  in if needed.
+//
 THeapBuf::THeapBuf(THeapBuf&& mbufSrc) :
 
-    m_c4ExpandIncrement(0)
-    , m_c4Size(1)
-    , m_c4MaxSize(1)
-    , m_pc1Data(new tCIDLib::TCard1[1])
+    m_c4ExpandIncrement(4096)
+    , m_c4Size(8)
+    , m_c4MaxSize(kCIDLib::c4DefMaxBufferSz)
+    , m_pc1Data(nullptr)
 {
     *this = tCIDLib::ForceMove(mbufSrc);
 }
@@ -584,6 +578,10 @@ tCIDLib::TBoolean THeapBuf::operator==(const THeapBuf& mbufToTest) const
     if (this == &mbufToTest)
         return kCIDLib::True;
 
+    //
+    //  If the sizes are different we won't compare the actual bytes which
+    //  avoids faulting in a buffer that we don't need to.
+    //
     if ((m_c4Size == mbufToTest.m_c4Size)
     &&  (m_c4MaxSize == mbufToTest.m_c4MaxSize)
     &&  (m_c4ExpandIncrement == mbufToTest.m_c4ExpandIncrement)
@@ -638,8 +636,9 @@ tCIDLib::TVoid THeapBuf::StreamCount(       TBinOutStream&  strmToWriteTo
                     << m_c4MaxSize
                     << m_c4ExpandIncrement;
 
+    // This will fault in the buffer if not already created
     if (c4Count)
-        strmToWriteTo.c4WriteRawBuffer(m_pc1Data, c4Count);
+        strmToWriteTo.c4WriteRawBuffer(pc1QueryBuf(), c4Count);
 
     // End up with an end object marker
     strmToWriteTo   << tCIDLib::EStreamMarkers::EndObject;
@@ -649,6 +648,12 @@ tCIDLib::TVoid THeapBuf::StreamCount(       TBinOutStream&  strmToWriteTo
 // ---------------------------------------------------------------------------
 //  THeapBuf: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+//
+//  If the info has changed and we have to get rid of any current buffer that we might
+//  have, we don't actually create the new one. We'll let it fault in if actually
+//  needed.
+//
 tCIDLib::TVoid THeapBuf::Reset( const   tCIDLib::TCard4 c4Size
                                 , const tCIDLib::TCard4 c4MaxSize
                                 , const tCIDLib::TCard4 c4ExpandIncrement)
@@ -661,7 +666,9 @@ tCIDLib::TVoid THeapBuf::Reset( const   tCIDLib::TCard4 c4Size
 
     //
     //  If the passed settings are the same as our settings, then we can
-    //  just skip the creation of a new buffer and keep the current one.
+    //  just skip the creation of a new buffer and keep the current one. If
+    //  we don't have a buffer yet, then no need to create one. It'll get
+    //  faulted in later if needed.
     //
     if ((m_c4MaxSize == c4RealMax)
     &&  (m_c4Size == c4Size)
@@ -694,29 +701,40 @@ tCIDLib::TVoid THeapBuf::Reset( const   tCIDLib::TCard4 c4Size
     // Store our new stuff
     m_c4Size = c4Size;
     m_c4MaxSize = c4RealMax;
-
-    // And allocate a new buffer
-    m_pc1Data = new tCIDLib::TCard1[c4Size];
 }
 
 
 // ---------------------------------------------------------------------------
 //  THeapBuf: Protected inherited methods
 // ---------------------------------------------------------------------------
+
+//
+//  The base class has to call these to get access to the buffer, so we will fault
+//  in the buffer if needed.
+//
 tCIDLib::TCard1* THeapBuf::pc1QueryBuf()
 {
+    // Fault it in if not already
+    if (!m_pc1Data)
+        m_pc1Data = new tCIDLib::TCard1[m_c4Size];
     return m_pc1Data;
 }
 
 const tCIDLib::TCard1* THeapBuf::pc1QueryBuf() const
 {
+    // Fault it in if not already
+    if (!m_pc1Data)
+        m_pc1Data = new tCIDLib::TCard1[m_c4Size];
     return m_pc1Data;
 }
-
 
 tCIDLib::TCard1*
 THeapBuf::pc1QueryBufInfo(tCIDLib::TCard4& c4CurSize, tCIDLib::TCard4& c4MaxSize)
 {
+    // Fault it in if not already
+    if (!m_pc1Data)
+        m_pc1Data = new tCIDLib::TCard1[m_c4Size];
+
     c4CurSize = m_c4Size;
     c4MaxSize = m_c4MaxSize;
     return m_pc1Data;
@@ -726,9 +744,21 @@ const tCIDLib::TCard1*
 THeapBuf::pc1QueryBufInfo(  tCIDLib::TCard4&    c4CurSize
                             , tCIDLib::TCard4&  c4MaxSize) const
 {
+    // Fault it in if not already
+    if (!m_pc1Data)
+        m_pc1Data = new tCIDLib::TCard1[m_c4Size];
+
     c4CurSize = m_c4Size;
     c4MaxSize = m_c4MaxSize;
     return m_pc1Data;
+}
+
+tCIDLib::TVoid
+THeapBuf::QueryBufInfo( tCIDLib::TCard4&    c4CurSize
+                        , tCIDLib::TCard4&  c4MaxSize) const
+{
+    c4CurSize = m_c4Size;
+    c4MaxSize = m_c4MaxSize;
 }
 
 
@@ -761,13 +791,19 @@ THeapBuf::Realloc(  const   tCIDLib::TCard4     c4NewSize
     TArrayJanitor<tCIDLib::TCard1> janNewData(pc1NewData);
 
     //
-    //  Copy over the new info if we were told to. Else we want to just
-    //  fill the old area.
+    //  Copy over the new info if we were told to. Else we want to just fill the
+    //  fill the old one. We may not have a buffer. If not, then no need to
+    //  fault it in, we'll just do a zero fill since that means there was no real
     //
     if (bPreserve)
-        TRawMem::CopyMemBuf(pc1NewData, m_pc1Data, m_c4Size);
+    {
+        if (m_pc1Data)
+            TRawMem::CopyMemBuf(pc1NewData, m_pc1Data, m_c4Size);
+        else
+            TRawMem::SetMemBuf(pc1NewData, tCIDLib::TCard1(0), m_c4Size);
+    }
 
-    // Free the existing buffer now
+    // Free the existing buffer now if we had one
     delete [] m_pc1Data;
     m_pc1Data = nullptr;
 

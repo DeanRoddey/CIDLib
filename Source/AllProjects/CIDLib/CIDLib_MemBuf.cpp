@@ -50,7 +50,7 @@ RTTIDecls(TMemBuf,TObject)
 // ---------------------------------------------------------------------------
 TMemBuf& TMemBuf::Nul_TMemBuf()
 {
-    static TMemBuf* pmbufNull = 0;
+    static TMemBuf* pmbufNull = nullptr;
     if (!pmbufNull)
     {
         TBaseLock lockInit;
@@ -69,12 +69,6 @@ TMemBuf& TMemBuf::Nul_TMemBuf()
 // ---------------------------------------------------------------------------
 //  TMemBuf: Public operators
 // ---------------------------------------------------------------------------
-tCIDLib::TCard1& TMemBuf::operator[](const tCIDLib::TCard4 c4Ind)
-{
-    tCIDLib::TCard1* pc1Buf = pc1CheckIndex(CID_LINE, c4Ind);
-    return pc1Buf[c4Ind];
-}
-
 tCIDLib::TCard1 TMemBuf::operator[](const tCIDLib::TCard4 c4Ind) const
 {
     const tCIDLib::TCard1* pc1Buf = pc1CheckIndex(CID_LINE, c4Ind);
@@ -258,7 +252,7 @@ tCIDLib::TCard4 TMemBuf::c4MaxSize() const
 {
     tCIDLib::TCard4 c4CurSize;
     tCIDLib::TCard4 c4MaxSize;
-    pc1QueryBufInfo(c4CurSize, c4MaxSize);
+    QueryBufInfo(c4CurSize, c4MaxSize);
     return c4MaxSize;
 }
 
@@ -268,7 +262,7 @@ tCIDLib::TCard4 TMemBuf::c4Size() const
 {
     tCIDLib::TCard4 c4CurSize;
     tCIDLib::TCard4 c4MaxSize;
-    pc1QueryBufInfo(c4CurSize, c4MaxSize);
+    QueryBufInfo(c4CurSize, c4MaxSize);
     return c4CurSize;
 }
 
@@ -536,7 +530,10 @@ TMemBuf::MakeSpace( const   tCIDLib::TCard4     c4At
     //
     //  Make sure there's enough space in the whole buffer, expanding if needed
     //  to hold all the content the caller says is of interest plus the extra
-    //  space
+    //  space.
+	//
+	//	WE HAVE TO call the pc1 version, since it will reallocate if required, even
+	//	though we aren't using the return value here!
     //
     pc1CheckRange(CID_LINE, 0, c4OrgCnt + c4SpaceSz);
 
@@ -591,7 +588,7 @@ TMemBuf::MoveToStart(const  tCIDLib::TCard4 c4StartInd
 }
 
 
-// Returns readable or writeable straems over this buffer
+// Returns readable or writeable streams over this buffer
 TBinInStream* TMemBuf::pstrmMakeReadable()
 {
     return new TBinInStream(new TMemInStreamImpl(this));
@@ -902,7 +899,7 @@ TMemBuf::TMemBuf()
 
 //
 //  These are here just so that they can be called by derived classes. So, if we
-//  ever do add any members here, these will be in placed and called.
+//  ever do add any members here, these will be in place and called.
 //
 TMemBuf::TMemBuf(const TMemBuf&)
 {
@@ -927,6 +924,8 @@ TMemBuf& TMemBuf::operator=(TMemBuf&&)
 // ---------------------------------------------------------------------------
 //  TMemBuf: Protected, inherited methods
 // ---------------------------------------------------------------------------
+
+// Derived class should call us after his info
 tCIDLib::TVoid TMemBuf::StreamFrom(TBinInStream& strmToReadFrom)
 {
     strmToReadFrom.CheckForStartMarker(CID_FILE, CID_LINE);
@@ -1045,6 +1044,12 @@ TMemBuf::ValidateSizes( const   tCIDLib::TCard4 c4Size
 // ---------------------------------------------------------------------------
 //  TMemBuf: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+
+//
+//  These are called to get the buffer pointer and check indices and counts
+//  to make sure they are valid. If so, the buffer is returned. It may be faulted
+//  in or reallocated if needed, up to the max size.
+//
 const tCIDLib::TCard1*
 TMemBuf::pc1CheckIndex( const   tCIDLib::TCard4 c4Line
                         , const tCIDLib::TCard4 c4Index) const

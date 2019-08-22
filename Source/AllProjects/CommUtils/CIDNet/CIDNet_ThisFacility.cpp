@@ -368,8 +368,8 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
                     if (eState == EState_InPart)
                     {
                         // We want to keep the new lines in this case
-                        mbufCurLn[c4CurBytes++] = 0xD;
-                        mbufCurLn[c4CurBytes++] = 0xA;
+                        mbufCurLn.PutCard1(0xD, c4CurBytes++);
+                        mbufCurLn.PutCard1(0xA, c4CurBytes++);
 
                         mbufPartBuf.CopyIn(mbufCurLn, c4CurBytes, c4PartBytes);
                         c4PartBytes += c4CurBytes;
@@ -394,7 +394,7 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
                  else
                 {
                     // Nothing special so just accumulate
-                    mbufCurLn[c4CurBytes++] = c1Cur;
+                    mbufCurLn.PutCard1(c1Cur, c4CurBytes++);
                 }
             }
         }

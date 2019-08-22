@@ -73,7 +73,8 @@ static tCIDLib::TVoid TestBasicCountedPointer(TTextOutStream& strmOut)
 
     // Create a counted pointer for a TTester object
     {
-        TCntPtr<TTester> cptrTest(new TTester(bGotDeleted));
+        // Throw in the use of the make new helper
+        TCntPtr<TTester> cptrTest = tCIDLib::cptrMakeNew<TTester>(bGotDeleted);
 
         // Make sure that we can access the point members via the operators
         cptrTest->m_i4Field1 = 1;

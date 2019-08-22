@@ -265,6 +265,18 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     {
         strmOut << L"Body content is a binary or unknown text encoding"
                 << kCIDLib::NewEndLn;
+
+        TBinFileOutStream strmTar
+        (
+            L"Test.jpg"
+            , tCIDLib::ECreateActs::CreateAlways
+            , tCIDLib::EFilePerms::Default
+            , tCIDLib::EFileFlags::SequentialScan
+        );
+
+        strmTar.c4WriteBuffer(mbufCont, c4ContLen);
+        strmTar.Flush();
+
     }
 
     return tCIDLib::EExitCodes::Normal;

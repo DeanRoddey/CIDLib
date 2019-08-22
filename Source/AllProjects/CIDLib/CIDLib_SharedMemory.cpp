@@ -400,6 +400,15 @@ TSharedMemBuf::pc1QueryBufInfo(  tCIDLib::TCard4&    c4CurSize
 
 
 tCIDLib::TVoid
+TSharedMemBuf::QueryBufInfo(tCIDLib::TCard4&    c4CurSize
+                            , tCIDLib::TCard4&  c4MaxSize) const
+{
+    c4CurSize = m_c4Size;
+    c4MaxSize = m_ksmbThis.c4MaxSize();
+}
+
+
+tCIDLib::TVoid
 TSharedMemBuf::Realloc( const   tCIDLib::TCard4     c4NewSize
                         , const tCIDLib::TBoolean   bPreserve) const
 {

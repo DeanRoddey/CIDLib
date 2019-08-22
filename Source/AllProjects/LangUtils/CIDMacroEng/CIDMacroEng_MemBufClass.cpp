@@ -1237,12 +1237,11 @@ TMEngMemBufInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             const tCIDLib::TCh chCur = strSrc[c4Index];
             if (chCur > 255)
                 ThrowAnErr(meOwner, m_c4Err_ByteRange);
-            mbufInst[c4At++] = tCIDLib::TCard1(chCur);
+            mbufInst.PutCard1(tCIDLib::TCard1(chCur), c4At++);
         }
 
         // Give back the count we actually did
-        TMEngCard4Val& mecvRet
-                    = meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd - 1);
+        TMEngCard4Val& mecvRet = meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd - 1);
         mecvRet.c4Value(c4Count);
     }
      else if (c2MethId == m_c2MethId_InsertASCIIHexPair)
@@ -1255,13 +1254,13 @@ TMEngMemBufInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
         TRawStr::bFormatVal(c1Val, szTmp, 2, tCIDLib::ERadices::Hex);
         if (c1Val < 0x10)
         {
-            mbufInst[c4At] = 0x20;
-            mbufInst[c4At + 1] = tCIDLib::TCard1(szTmp[0]);
+            mbufInst.PutCard1(0x20, c4At);
+            mbufInst.PutCard1(tCIDLib::TCard1(szTmp[0]), c4At + 1);
         }
          else
         {
-            mbufInst[c4At] = tCIDLib::TCard1(szTmp[0]);
-            mbufInst[c4At + 1] = tCIDLib::TCard1(szTmp[1]);
+            mbufInst.PutCard1(tCIDLib::TCard1(szTmp[0]), c4At);
+            mbufInst.PutCard1(tCIDLib::TCard1(szTmp[1]), c4At + 1);
         }
     }
      else if (c2MethId == m_c2MethId_MakeSpace)

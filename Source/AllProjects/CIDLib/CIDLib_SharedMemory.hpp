@@ -144,6 +144,12 @@ class CIDLIBEXP TSharedMemBuf : public TMemBuf
             ,       tCIDLib::TCard4&        c4MaxSize
         )   const final;
 
+        tCIDLib::TVoid QueryBufInfo
+        (
+                    tCIDLib::TCard4&        c4CurSize
+            ,       tCIDLib::TCard4&        c4MaxSize
+        )   const final;
+
         tCIDLib::TVoid Realloc
         (
             const   tCIDLib::TCard4         c4NewSize

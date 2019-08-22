@@ -38,6 +38,8 @@
 //  we have a little helper namespace with some functions they can call. These are also
 //  used by some other smart pointer'ish classes.
 //
+//  At the bottom we add some smart pointer related helpers to the tCIDLib namespace.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -566,6 +568,23 @@ template <class T> class TMngPtr
         // -------------------------------------------------------------------
         T*  m_pData;
 };
+
+
+namespace tCIDLib
+{
+    // -----------------------------------------------------------------------
+    //  Helpers to create counted and unique pointers in place
+    // -----------------------------------------------------------------------
+    template <typename T, typename... TArgs> TCntPtr<T> cptrMakeNew(TArgs&& ...Args)
+    {
+        return TCntPtr<T>(new T(tCIDLib::Forward<TArgs>(Args)...));
+    }
+
+    template <typename T, typename... TArgs> TUniquePtr<T> uptrMakeNew(TArgs&& ...Args)
+    {
+        return TUniquePtr<T>(new T(tCIDLib::Forward<TArgs>(Args)...));
+    }
+}
 
 #pragma CIDLIB_POPPACK
 

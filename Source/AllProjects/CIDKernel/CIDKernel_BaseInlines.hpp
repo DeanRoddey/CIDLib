@@ -112,7 +112,9 @@ namespace tCIDLib
 
     // -----------------------------------------------------------------------
     //  Implements forwarding so that we can support in place construction for
-    //  collections and other things.
+    //  collections and other things. It removes any pointer/reference from the
+    //  type and casts it to a universal reference type. We need one for references
+    //  and one for moves.
     // -----------------------------------------------------------------------
     template <typename T>
     constexpr T&& Forward(typename RemoveRef<T>::Type& t) noexcept

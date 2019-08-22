@@ -697,7 +697,7 @@ TSrcEditor::LoadText(const TString& strPath, const TString& strToSet)
     //  It expects a null terminated string, so do that. The transcoding doesn't
     //  transcode anything but the actual text.
     //
-    mbufText[c4Bytes++] = 0;
+    mbufText.PutCard1(0, c4Bytes++);
     ::SendMessage
     (
         hwndSafe(), SCI_SETTEXT, 0, tCIDCtrls::TLParam(mbufText.pc1Data())
@@ -745,7 +745,7 @@ TSrcEditor::LoadText(const TString& strPath, TTextInStream& strmSrc)
     THeapBuf mbufData(c4Bytes, c4Bytes + 1);
     mbufData.CopyIn(strmOut.mbufData(), c4Bytes);
 
-    mbufData[c4Bytes++] = 0;
+    mbufData.PutCard1(0, c4Bytes++);
     ::SendMessage
     (
         hwndSafe(), SCI_SETTEXT, 0, tCIDCtrls::TLParam(mbufData.pc1Data())

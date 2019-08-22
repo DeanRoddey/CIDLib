@@ -682,15 +682,15 @@ tCIDLib::TVoid TURL::ExpandTo(  const   tCIDLib::TCh* const     pszSrc
                     , tCIDLib::EErrClasses::Format
                 );
             }
-            mbufToUse[c4BufInd++] = c1Ref;
+            mbufToUse.PutCard1(c1Ref, c4BufInd++);
         }
          else if ((*pszCur == kCIDLib::chPlusSign) && (eType == EExpTypes::Query))
         {
-            mbufToUse[c4BufInd++] = 0x20;
+            mbufToUse.PutCard1(0x20, c4BufInd++);
         }
          else
         {
-            mbufToUse[c4BufInd++] = tCIDLib::TCard1(*pszCur);
+            mbufToUse.PutCard1(tCIDLib::TCard1(*pszCur), c4BufInd++);
         }
         pszCur++;
     }

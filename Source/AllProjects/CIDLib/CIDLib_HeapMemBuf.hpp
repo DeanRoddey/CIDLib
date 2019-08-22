@@ -19,6 +19,11 @@
 //  the THeapBuf class, which is a derivative of the base TMemBuf class. This
 //  one provides a buffer of heap allocated memory.
 //
+//  For efficiency particularly with moves, we allow the buffer to be null and
+//  will fault it in upon use. The derived class provides almost all the
+//  functionality and it has to call us to get the buffer, so it's fairly easy
+//  for us to fault it in.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -155,9 +160,15 @@ class CIDLIBEXP THeapBuf : public TMemBuf
         (
                     tCIDLib::TCard4&        c4CurSize
             ,       tCIDLib::TCard4&        c4MaxSize
-        ) final;
+        )   final;
 
         const tCIDLib::TCard1* pc1QueryBufInfo
+        (
+                    tCIDLib::TCard4&        c4CurSize
+            ,       tCIDLib::TCard4&        c4MaxSize
+        )   const final;
+
+        tCIDLib::TVoid QueryBufInfo
         (
                     tCIDLib::TCard4&        c4CurSize
             ,       tCIDLib::TCard4&        c4MaxSize
@@ -198,7 +209,8 @@ class CIDLIBEXP THeapBuf : public TMemBuf
         //
         //  m_pc1Data
         //      Our current buffer pointer. Due to reallocation, this must
-        //      be mutable.
+        //      be mutable because it may be null and have to be faulted in
+        //      or realloatedreallocated to change the size.
         // -------------------------------------------------------------------
         tCIDLib::TCard4             m_c4ExpandIncrement;
         mutable tCIDLib::TCard4     m_c4Size;

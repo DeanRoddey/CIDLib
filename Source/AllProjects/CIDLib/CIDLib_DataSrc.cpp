@@ -637,6 +637,7 @@ TCIDDataSrc::TCIDDataSrc() :
     , m_c4InBufIndex(0)
     , m_c4OutBufCount(0)
     , m_c4ReadSz(4096)
+    , m_mbufOutData(kCIDLib::c4Sz_32K)
 {
 }
 

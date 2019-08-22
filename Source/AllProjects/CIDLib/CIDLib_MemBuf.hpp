@@ -53,11 +53,6 @@ class CIDLIBEXP TMemBuf :
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        tCIDLib::TCard1& operator[]
-        (
-            const   tCIDLib::TCard4         c4Ind
-        );
-
         tCIDLib::TCard1 operator[]
         (
             const   tCIDLib::TCard4         c4Ind
@@ -471,6 +466,12 @@ class CIDLIBEXP TMemBuf :
         )   = 0;
 
         virtual const tCIDLib::TCard1* pc1QueryBufInfo
+        (
+                    tCIDLib::TCard4&        c4CurSize
+            ,       tCIDLib::TCard4&        c4MaxSize
+        )   const = 0;
+
+        virtual tCIDLib::TVoid QueryBufInfo
         (
                     tCIDLib::TCard4&        c4CurSize
             ,       tCIDLib::TCard4&        c4MaxSize

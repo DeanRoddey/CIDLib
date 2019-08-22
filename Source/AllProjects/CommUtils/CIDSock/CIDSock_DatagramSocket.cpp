@@ -410,12 +410,12 @@ tCIDLib::TVoid TClientDatagramSocket::SendWOLBroadcast(const TString& strMACAddr
     THeapBuf mbufData(c4Len, c4Len);
 
     for (c4Index = 0; c4Index < c4BinMACLen; c4Index++)
-        mbufData[c4Index] = 0xFF;
+        mbufData.PutCard1(0xFF, c4Index);
 
     for (tCIDLib::TCard4 c4RepInd = 0; c4RepInd < c4MACRep; c4RepInd++)
     {
         for (tCIDLib::TCard4 c4MACInd = 0; c4MACInd < c4BinMACLen; c4MACInd++)
-            mbufData[c4Index++] = ac1MAC[c4MACInd];
+            mbufData.PutCard1(ac1MAC[c4MACInd], c4Index++);
     }
 
     //

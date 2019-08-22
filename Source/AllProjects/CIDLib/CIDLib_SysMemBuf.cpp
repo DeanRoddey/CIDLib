@@ -440,6 +440,14 @@ TSysBuf::pc1QueryBufInfo(  tCIDLib::TCard4&    c4CurSize
 
 
 tCIDLib::TVoid
+TSysBuf::QueryBufInfo(  tCIDLib::TCard4&    c4CurSize
+                        , tCIDLib::TCard4&  c4MaxSize) const
+{
+    c4CurSize = m_c4Size;
+    c4MaxSize = m_c4MaxSize;
+}
+
+tCIDLib::TVoid
 TSysBuf::Realloc(   const   tCIDLib::TCard4     c4NewSize
                     , const tCIDLib::TBoolean   ) const
 {
