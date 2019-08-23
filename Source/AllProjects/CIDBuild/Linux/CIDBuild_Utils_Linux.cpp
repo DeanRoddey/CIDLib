@@ -35,6 +35,9 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <limits.h>
 #include <ctype.h>
 
 
@@ -217,7 +220,14 @@ TUtils::bExec(  const   tCIDLib::TCh* const*    apszParams
 tCIDLib::TBoolean TUtils::bGetEnvVar(const  TBldStr&    strVarName
                                     ,       TBldStr&    strToFill)
 {
+    tCIDLib::TSCh* pszVar = TRawStr::pszTranscode(strVarName.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janDir(pszVar);
 
+    const char* pszVal = ::getenv(pszVar);
+    if (!pszVal)
+        return kCIDLib::False;
+
+    strToFill = pszVal;
     return kCIDLib::True;
 }
 
@@ -228,7 +238,7 @@ tCIDLib::TBoolean TUtils::bGetEnvVar(const  TBldStr&    strVarName
 //
 tCIDLib::TBoolean TUtils::bIsFQPath(const TBldStr& strFileName)
 {
-    return kCIDLib::False;
+    return (!strFileName.bEmpty() && strFileName[0] == '/');
 }
 
 
@@ -280,15 +290,25 @@ TUtils::CompletePath(const TBldStr& strOrgName, TBldStr& strFullName)
 
 tCIDLib::TVoid TUtils::MakeTmpFileName(TBldStr& strToFill)
 {
+
 }
 
 
 tCIDLib::TVoid TUtils::QueryCurDir(TBldStr& strToFill)
 {
+    char pszCurDir[PATH_MAX];
+    if (::getcwd(pszCurDir, sizeof(pszCurDir)))
+        strToFill = pszCurDir;
 }
 
 
 tCIDLib::TVoid
 TUtils::SetEnvVar(const TBldStr& strVar, const TBldStr& strValue)
 {
+    tCIDLib::TSCh* pszVar = TRawStr::pszTranscode(strVar.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janVar(pszVar);
+    tCIDLib::TSCh* pszVal = TRawStr::pszTranscode(strValue.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janVal(pszVal);    
+
+    ::setenv(pszVar, pszVal, 1);
 }

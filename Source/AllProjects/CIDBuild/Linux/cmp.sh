@@ -1,1 +1,1 @@
-make --makefile=./Linux/CIDBuild_Linux.Mak
+make -s --makefile=./Linux/CIDBuild_Linux.Mak
