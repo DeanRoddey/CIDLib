@@ -9,18 +9,14 @@
 ;
 ;   DISPLAY     = Console
 ;   MSGFILE     = No
+;   OPTIONS     =
 ;   PLATFORMDIR = No
 ;   PURECPP     = Yes
 ;   RESFILE     = No
-;   RTL         = Multi/Dynamic
 ;   TYPE        = Executable
 ;   USESYSLIBS  = No
 ;   VARARGS     = No
 ;   VERSIONED   = No
-;
-;   PLATFORMOPTS=
-;   EXCLUDEPLATS=
-;   INCLUDEPLATS=
 ;
 ;   This one is just a hint to the release creation code that this one is a
 ;   sample. It might be treated differently in a packaging process.
@@ -95,13 +91,11 @@ PROJECT=CIDKernel
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PERMISSIVE  = Yes
-        END PLATFORM
-    END PLATFORMOPTS
+    OPTIONS [Win32_*]
+        PERMISSIVE  = Yes
+    END OPTIONS
 
-    INCLUDEPATHS
+    INCLUDEPATHS [Win32_*]
         .\Win32\ASPI
     END INCLUDEPATHS
 
@@ -362,11 +356,9 @@ PROJECT=CIDSpReco
         CIDXML
     END DEPENDENTS
 
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PERMISSIVE  = Yes
-        END PLATFORM
-    END PLATFORMOPTS
+    OPTIONS [WIN32_*]
+        PERMISSIVE  = Yes
+    END OPTIONS
 
     IDLFILES
         IDLFILE
@@ -408,7 +400,8 @@ END PROJECT
 ;   that works in terms of them.
 ; ----------------------------------------------------------------------------
 
-PROJECT=CIDGraphDev
+PROJECT=CIDGraphDev [Win32_*]
+
     SETTINGS
         DIRECTORY   = GraphicUtils\CIDGraphDev
         DISPLAY     = N/A
@@ -420,10 +413,6 @@ PROJECT=CIDGraphDev
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     IDLFILES
         IDLFILE
@@ -443,7 +432,7 @@ PROJECT=CIDGraphDev
 END PROJECT
 
 
-PROJECT=CIDCtrls
+PROJECT=CIDCtrls [Win32_*]
     SETTINGS
         DIRECTORY   = WndUtils\CIDCtrls
         DISPLAY     = N/A
@@ -455,10 +444,6 @@ PROJECT=CIDCtrls
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     IDLFILES
         IDLFILE
@@ -478,9 +463,8 @@ PROJECT=CIDCtrls
 END PROJECT
 
 
-PROJECT=CIDAdvGraph
+PROJECT=CIDAdvGraph [Win32_*]
     SETTINGS
-
         DIRECTORY   = GraphicUtils\CIDAdvGraph
         DISPLAY     = N/A
         EXPORT      = CIDADVGREXP
@@ -491,10 +475,6 @@ PROJECT=CIDAdvGraph
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     IDLFILES
 ;        IDLFILE
@@ -513,7 +493,8 @@ PROJECT=CIDAdvGraph
 END PROJECT
 
 
-PROJECT=CIDWUtils
+PROJECT=CIDWUtils [Win32_*]
+
     SETTINGS
         DIRECTORY   = WndUtils\CIDWUtils
         DISPLAY     = N/A
@@ -524,10 +505,6 @@ PROJECT=CIDWUtils
         VERSIONED   = Yes
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDMData
         CIDCtrls
@@ -537,7 +514,8 @@ PROJECT=CIDWUtils
 END PROJECT
 
 
-PROJECT=CIDResEd
+PROJECT=CIDResEd [Win32_*]
+
     SETTINGS
         DIRECTORY   = Utilities\CIDResEd
         DISPLAY     = GUI
@@ -545,10 +523,6 @@ PROJECT=CIDResEd
         PURECPP     = No
         RESFILE     = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     IDLFILES
         IDLFILE
@@ -571,7 +545,9 @@ END PROJECT
 ;   Data processing/storage related facilities
 ; ----------------------------------------------------------------------------
 
-PROJECT=CIDDBase
+;; Win32 only for now
+PROJECT=CIDDBase [Win32_*]
+
     SETTINGS
         DIRECTORY   = DataUtils\CIDDBase
         DISPLAY     = N/A
@@ -582,11 +558,6 @@ PROJECT=CIDDBase
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    ; This one has per-platform implementations but only Win32 so far
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDKernel
@@ -658,7 +629,9 @@ END PROJECT
 ;   Security related facilities
 ; ----------------------------------------------------------------------------
 
-PROJECT=CIDSChan
+; Win32 only for now
+PROJECT=CIDSChan [Win32_*]
+
     SETTINGS
         DIRECTORY   = SecureUtils\CIDSChan
         DISPLAY     = N/A
@@ -676,11 +649,6 @@ PROJECT=CIDSChan
             NAMEEXT = Shared
         END IDLFILE
     END IDLFILES
-
-    ; This one has per-platform implementations but only Win32 so far
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -849,8 +817,12 @@ END PROJECT
 ;   Media related facilities
 ; ----------------------------------------------------------------------------
 
+;
 ;  A framework for streaming audio in from sources and out to targets.
-PROJECT=CIDAudStream
+;  Win32 only for now.
+;
+PROJECT=CIDAudStream [Win32_*]
+
     SETTINGS
         DIRECTORY   = MediaUtils\CIDAudStream
         DISPLAY     = N/A
@@ -870,11 +842,6 @@ PROJECT=CIDAudStream
         END IDLFILE
     END IDLFILES
 
-    ; This one has per-platform implementations but only Win32 so far
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDLib
     END DEPENDENTS
@@ -889,7 +856,10 @@ END PROJECT
 ;  external headers specially here since we provide some wrappers around
 ;  system media stuff.
 ;
-PROJECT=CIDDAE
+; For now only Win32. Needs to have some stuff split out into per-platform
+;
+PROJECT=CIDDAE [Win32_*]
+
     SETTINGS
         DIRECTORY   = MediaUtils\CIDDAE
         DISPLAY     = N/A
@@ -899,11 +869,6 @@ PROJECT=CIDDAE
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
-
-    ; For now only Win32. Needs to have some stuff split out into per-platform
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     IDLFILES
         IDLFILE
@@ -917,7 +882,7 @@ PROJECT=CIDDAE
         CIDLib
     END DEPENDENTS
 
-    INCLUDEPATHS
+    INCLUDEPATHS [Win32_*]
         $(CID_WMFSDKDIR)\Include
     END INCLUDEPATHS
 
@@ -926,9 +891,10 @@ END PROJECT
 
 ;
 ;  Metadata extraction. It provides classes to extra metadata tag info from
-;  various media formats.
+;  various media formats. Win32 only for now
 ;
-PROJECT=CIDMetaExtr
+PROJECT=CIDMetaExtr [Win32_*]
+
     SETTINGS
         DIRECTORY   = MediaUtils\CIDMetaExtr
         DISPLAY     = N/A
@@ -938,11 +904,6 @@ PROJECT=CIDMetaExtr
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
-
-    ; For now only Win32. Needs to have some stuff split out into per-platform
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     IDLFILES
         IDLFILE
@@ -987,7 +948,10 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;  Higher level GUI related facilities
 ; ----------------------------------------------------------------------------
-PROJECT=CIDWebBrowser
+
+; Win32 only for now
+PROJECT=CIDWebBrowser [Win32_*]
+
     SETTINGS
         DIRECTORY   = WndUtils\CIDWebBrowser
         DISPLAY     = N/A
@@ -997,10 +961,6 @@ PROJECT=CIDWebBrowser
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDKernel
@@ -1014,7 +974,10 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;   Program execution related facilities
 ; ----------------------------------------------------------------------------
-PROJECT=CIDAppSh
+
+; Win32 only for now
+PROJECT=CIDAppSh  [Win32_*]
+
     SETTINGS
         DIRECTORY   = ExecUtils\CIDAppSh
         DISPLAY     = N/A
@@ -1022,11 +985,6 @@ PROJECT=CIDAppSh
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
-
-    ; For now only Win32. Needs to have some stuff split out into per-platform
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDXML
@@ -1072,7 +1030,9 @@ PROJECT=CIDMacroEng
 END PROJECT
 
 
-PROJECT=CIDMacroDbg
+; Win32 only
+PROJECT=CIDMacroDbg [Win32_*]
+
     SETTINGS
         DIRECTORY   = LangUtils\CIDMacroDbg
         DISPLAY     = N/A
@@ -1081,10 +1041,6 @@ PROJECT=CIDMacroDbg
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDEncode
@@ -1096,17 +1052,14 @@ PROJECT=CIDMacroDbg
 END PROJECT
 
 
-PROJECT=TestMacroDbg
+PROJECT=TestMacroDbg [Win32_*]
+
     SETTINGS
         DIRECTORY   = Tests\TestMacroDbg
         DISPLAY     = GUI
         MSGFILE     = Yes
         RESFILE     = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
@@ -1279,17 +1232,14 @@ PROJECT=CIDLogAdmin
 END PROJECT
 
 
-PROJECT=CIDLogMon
+PROJECT=CIDLogMon [Win32_*]
+
     SETTINGS
         DIRECTORY   = OrbUtils\CIDLogMon
         DISPLAY     = GUI
         MSGFILE     = Yes
         RESFILE     = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDOrbUC
@@ -1620,7 +1570,7 @@ PROJECT=TestCIDLib
     END DEPENDENTS
 END PROJECT
 
-PROJECT=TestCIDCtrls
+PROJECT=TestCIDCtrls [Win32_*]
 
     SETTINGS
         DIRECTORY   = WndUtils\CIDCtrls\TestCIDCtrls
@@ -1629,17 +1579,13 @@ PROJECT=TestCIDCtrls
         RESFILE     = Yes
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDCtrls
         ; CIDWUtils
     END DEPENDENTS
 END PROJECT
 
-PROJECT=TestCIDCtrls2
+PROJECT=TestCIDCtrls2 [Win32_*]
 
     SETTINGS
         DIRECTORY   = WndUtils\CIDCtrls\TestCIDCtrls2
@@ -1648,16 +1594,12 @@ PROJECT=TestCIDCtrls2
         RESFILE     = No
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDCtrls
     END DEPENDENTS
 END PROJECT
 
-PROJECT=TestScroll
+PROJECT=TestScroll [Win32_*]
 
     SETTINGS
         DIRECTORY   = WndUtils\CIDCtrls\TestScroll
@@ -1665,10 +1607,6 @@ PROJECT=TestScroll
         MSGFILE     = Yes
         RESFILE     = No
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
@@ -1780,35 +1718,27 @@ PROJECT=CvtImgToTrans
 END PROJECT
 
 
-PROJECT=DAE1
+; Win32 for now
+PROJECT=DAE1 [Win32_*]
+
     SETTINGS
         DIRECTORY   = Samples\Basic\DAE1
         SAMPLE      = Yes
     END SETTINGS
 
-    ; For now only Win32 until CIDDAE gets sorted out for portability
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDLib
         CIDDAE
     END DEPENDENTS
 END PROJECT
 
+PROJECT=DAE2 [Win32_*]
 
-PROJECT=DAE2
     SETTINGS
         DIRECTORY   = Samples\Basic\DAE2
         SAMPLE      = Yes
     END SETTINGS
 
-    ; For now only Win32 until CIDDAE gets sorted out for portability
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDLib
         CIDDAE
@@ -1816,7 +1746,8 @@ PROJECT=DAE2
 END PROJECT
 
 
-PROJECT=EnumMons
+PROJECT=EnumMons [Win32_*]
+
     SETTINGS
         DIRECTORY   = Samples\Basic\EnumMons
         SAMPLE      = Yes
@@ -1958,16 +1889,13 @@ PROJECT=SpReco1
     END DEPENDENTS
 END PROJECT
 
-PROJECT=MetaExtract
+; Win32 only for now
+PROJECT=MetaExtract [Win32_*]
+
     SETTINGS
         DIRECTORY   = Samples\Basic\MetaExtract
         SAMPLE      = Yes
     END SETTINGS
-
-    ; For now only Win32 until CIDMetaExtr gets sorted out for portability
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -2404,7 +2332,7 @@ PROJECT=ORB1Samp
 END PROJECT
 
 
-PROJECT=Window1
+PROJECT=Window1 [Win32_*]
 
     SETTINGS
         DIRECTORY   = Samples\Intermediate\Window1
@@ -2413,16 +2341,12 @@ PROJECT=Window1
         RESFILE     = No
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDCtrls
     END DEPENDENTS
 END PROJECT
 
-PROJECT=Window2
+PROJECT=Window2 [Win32_*]
 
     SETTINGS
         DIRECTORY   = Samples\Intermediate\Window2
@@ -2431,16 +2355,12 @@ PROJECT=Window2
         RESFILE     = No
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDCtrls
     END DEPENDENTS
 END PROJECT
 
-PROJECT=Window3
+PROJECT=Window3 [Win32_*]
 
     SETTINGS
         DIRECTORY   = Samples\Intermediate\Window3
@@ -2448,10 +2368,6 @@ PROJECT=Window3
         MSGFILE     = Yes
         RESFILE     = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls

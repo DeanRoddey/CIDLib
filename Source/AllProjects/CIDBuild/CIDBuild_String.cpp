@@ -53,16 +53,16 @@ TTextFile& operator<<(TTextFile& strmOut, const TBldStr& strOut)
 TBldStr::TBldStr() :
 
     m_c4BufSz(64)
-    , m_pszBuf(0)
+    , m_pszBuf(nullptr)
 {
     m_pszBuf = new tCIDLib::TCh[m_c4BufSz + 1];
-    m_pszBuf[0] = 0;
+    m_pszBuf[0] = kCIDLib::chNull;
 }
 
 TBldStr::TBldStr(const TBldStr& strSrc) :
 
     m_c4BufSz(strSrc.m_c4BufSz)
-    , m_pszBuf(0)
+    , m_pszBuf(nullptr)
 {
     m_pszBuf = new tCIDLib::TCh[m_c4BufSz + 1];
     TRawStr::MoveChars(m_pszBuf, strSrc.m_pszBuf, m_c4BufSz + 1);
@@ -71,7 +71,7 @@ TBldStr::TBldStr(const TBldStr& strSrc) :
 TBldStr::TBldStr(const TBldStr& strFirst, const TBldStr& strSec) :
 
     m_c4BufSz(strFirst.m_c4BufSz + strSec.m_c4BufSz + 16)
-    , m_pszBuf(0)
+    , m_pszBuf(nullptr)
 {
     m_pszBuf = new tCIDLib::TCh[m_c4BufSz + 1];
     TRawStr::CopyStr(m_pszBuf, strFirst.m_pszBuf);
@@ -91,10 +91,20 @@ TBldStr::TBldStr(const tCIDLib::TCh* const pszText) :
 TBldStr::TBldStr(const tCIDLib::TSCh* const pszName) :
 
     m_c4BufSz(0)
-    , m_pszBuf(0)
+    , m_pszBuf(nullptr)
 {
     m_pszBuf = TRawStr::pszTranscode(pszName);
     m_c4BufSz = TRawStr::c4StrLen(m_pszBuf) + 64;
+}
+
+TBldStr::TBldStr(const tCIDLib::TCh chText) :
+
+    m_c4BufSz(1)
+    , m_pszBuf(nullptr)
+{
+    m_pszBuf = new tCIDLib::TCh[m_c4BufSz + 1];
+    m_pszBuf[0] = chText;
+    m_pszBuf[1] = kCIDLib::chNull;
 }
 
 TBldStr::~TBldStr()
@@ -233,7 +243,7 @@ tCIDLib::TVoid TBldStr::Append(const tCIDLib::TCh chToAppend)
 {
     tCIDLib::TCh szTmp[2];
     szTmp[0] = chToAppend;
-    szTmp[1] = 0;
+    szTmp[1] = kCIDLib::chNull;
     Append(szTmp);
 }
 
@@ -262,6 +272,15 @@ TBldStr::bStartsWith(const tCIDLib::TCh* const pszToCheck) const
 }
 
 
+tCIDLib::TBoolean
+TBldStr::bIStartsWithN(const tCIDLib::TCh* const pszToCheck, const tCIDLib::TCard4 c4Count) const
+{
+    if (!TRawStr::iCompIStrN(m_pszBuf, pszToCheck, c4Count))
+        return kCIDLib::True;
+    return kCIDLib::False;
+}
+
+
 tCIDLib::TCard4 TBldStr::c4AsCard(const tCIDLib::TCard4 c4Radix) const
 {
     tCIDLib::TCard4 c4Ret;
@@ -283,7 +302,7 @@ tCIDLib::TVoid TBldStr::CapAt(const tCIDLib::TCard4 c4Index)
         stdOut << L"CapAt index is beyond the length of the string" << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::IndexError;
     }
-    m_pszBuf[c4Index] = 0;
+    m_pszBuf[c4Index] = kCIDLib::chNull;
 }
 
 
@@ -318,7 +337,7 @@ tCIDLib::TVoid TBldStr::Cut(const tCIDLib::TCard4 c4At)
     // If its at the end, then just empty the string
     if (c4At == c4Len)
     {
-        m_pszBuf[0] = 0;
+        m_pszBuf[0] = kCIDLib::chNull;
         return;
     }
 
@@ -349,7 +368,7 @@ tCIDLib::TVoid TBldStr::DeleteLast()
         pszTarget++;
 
     pszTarget--;
-    *pszTarget = 0;
+    *pszTarget = kCIDLib::chNull;
 }
 
 
@@ -435,7 +454,7 @@ tCIDLib::TVoid TBldStr::ReplaceExt(const tCIDLib::TCh* const pszNewExt)
     }
 
     // Cap it off where it is and get the new length, and of the new extension
-    *pszExt = 0;
+    *pszExt = kCIDLib::chNull;
     const tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(m_pszBuf);
     const tCIDLib::TCard4 c4ExtLen = TRawStr::c4StrLen(pszNewExt);
 
@@ -477,7 +496,7 @@ tCIDLib::TVoid TBldStr::StripWhitespace()
     // If we hit the null, then just empty our buffer
     if (!*pszNonWS)
     {
-        m_pszBuf[0] = 0;
+        m_pszBuf[0] = kCIDLib::chNull;
         return;
     }
 
@@ -506,7 +525,7 @@ tCIDLib::TVoid TBldStr::StripWhitespace()
         pszTarget--;
 
     // Put a null in the next position past the non-WS that broke us out
-    *(pszTarget+1) = 0;
+    *(pszTarget+1) = kCIDLib::chNull;
 }
 
 

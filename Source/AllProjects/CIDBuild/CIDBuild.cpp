@@ -201,20 +201,3 @@ TTextFile& operator<<(TTextFile& strmOut, const tCIDBuild::EProjTypes eType)
         strmOut << L"[Unknown project type value]";
     return strmOut;
 }
-
-TTextFile& operator<<(TTextFile& strmOut, const tCIDBuild::ERTLModes eMode)
-{
-    if (eMode == tCIDBuild::ERTLModes::SingleStatic)
-        strmOut << L"Single/Static";
-    else if (eMode == tCIDBuild::ERTLModes::SingleDynamic)
-        strmOut << L"Single/Dynamic";
-    else if (eMode == tCIDBuild::ERTLModes::MultiStatic)
-        strmOut << L"Multi/Static";
-    else if (eMode == tCIDBuild::ERTLModes::MultiDynamic)
-        strmOut << L"Multi/Dynamic";
-    else
-        strmOut << L"[Unknown RTL mode value]";
-
-    return strmOut;
-}
-

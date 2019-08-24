@@ -175,11 +175,48 @@ namespace TUtils
         , const TBldStr&                    strToMake
     );
 
+    tCIDLib::TBoolean bParseInclExclLists
+    (
+        const   TBldStr&                    strSrc
+        ,       tCIDBuild::TStrList&        listProjIncl
+        ,       tCIDBuild::TStrList&        listProjExcl
+        ,       TBldStr&                    strError
+    );
+
+    tCIDLib::TBoolean bParseInclExclLists
+    (
+                tCIDBuild::TStrList::TCursor& cusrSrc
+        ,       tCIDBuild::TStrList&        listProjIncl
+        ,       tCIDBuild::TStrList&        listProjExcl
+        ,       TBldStr&                    strError
+    );
+
     tCIDLib::TBoolean bRunCmdLine
     (
         const   TBldStr&                    strToRun
         ,       tCIDLib::TCard4&            c4Result
         , const tCIDLib::TBoolean           bLowPrio = kCIDLib::False
+    );
+
+    tCIDLib::TBoolean bSupportsPlatform
+    (
+        const   TBldStr&                    strToCheck
+        , const tCIDBuild::TStrList&        listInclude
+        , const tCIDBuild::TStrList&        listExclude
+    );
+
+    tCIDLib::TBoolean bSupportsThisPlatform
+    (
+        const   tCIDBuild::TStrList&        listInclude
+        , const tCIDBuild::TStrList&        listExclude
+    );
+
+    tCIDLib::TBoolean bTokenize
+    (
+        const   TBldStr&                    strSrc
+        , const TBldStr&                    strSpecial
+        , const TBldStr&                    strSpace
+        ,       tCIDBuild::TStrList&        listTokens
     );
 
     tCIDLib::TVoid Beep

@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd - 2019
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -112,6 +112,6 @@ namespace kCIDBuild
     //      under the project directory.
     // -----------------------------------------------------------------------
     const tCIDBuild::TCh* const  pszPlatformDir     = L"Linux";
-    const tCIDBuild::TCh* const  pszBasePlatform    = L"Linux";
-    const tCIDBuild::TCh* const  pszFullPlatform    = L"Linux";
+    const tCIDBuild::TCh* const  pszBasePlatform    = L"Linux_*";
+    const tCIDBuild::TCh* const  pszFullPlatform    = L"Linux_Generic";
 }

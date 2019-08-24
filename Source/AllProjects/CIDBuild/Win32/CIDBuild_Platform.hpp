@@ -114,6 +114,9 @@ namespace kCIDBuild
     //      one is for path component separators, such as in PATH=x;y; and so
     //      forth.
     // -----------------------------------------------------------------------
+    const tCIDBuild::TCh         chExtSep           = L'.';
+    const tCIDBuild::TCh         chPathSep          = L'\\';
+    const tCIDBuild::TCh         chPathCompSep      = L';';
     const tCIDBuild::TCh* const  pszAllHFiles       = L"*.h";
     const tCIDBuild::TCh* const  pszAllHppFiles     = L"*.hpp";
     const tCIDBuild::TCh* const  pszAllCFiles       = L"*.c";
@@ -123,8 +126,7 @@ namespace kCIDBuild
     const tCIDBuild::TCh* const  pszHppExt          = L".hpp";
     const tCIDBuild::TCh* const  pszLibExt          = L".lib";
     const tCIDBuild::TCh* const  pszObjExt          = L".obj";
-    const tCIDBuild::TCh         chExtSep           = L'.';
-    const tCIDBuild::TCh         chPathCompSep      = L';';
+    const tCIDBuild::TCh* const  pszPathSep         = L"\\";
 
 
 
@@ -139,7 +141,7 @@ namespace kCIDBuild
     // -----------------------------------------------------------------------
     #if defined(PLATFORM_WIN32_WIN7)
     const tCIDBuild::TCh* const  pszPlatformDir     = L"Win32";
-    const tCIDBuild::TCh* const  pszBasePlatform    = L"Win32";
+    const tCIDBuild::TCh* const  pszBasePlatform    = L"Win32_*";
     const tCIDBuild::TCh* const  pszFullPlatform    = L"Win32_Win7";
     #else
     #error Unknown target platform

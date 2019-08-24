@@ -410,9 +410,8 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     //  Non-permissive mode is the default but they can ask us to enable permissive
     //  mode via.
     //
-    const TKeyValuePair*
-    pkvpPlatOpt = m_pprojiTarget->pkvpFindPlatOpt(L"WIN32_*", L"PERMISSIVE");
-    if (!pkvpPlatOpt || !pkvpPlatOpt->strValue().bIEquals(L"Yes"))
+    const TKeyValuePair* pkvpOpt = m_pprojiTarget->pkvpFindOption(L"PERMISSIVE");
+    if (!pkvpOpt || !pkvpOpt->strValue().bIEquals(L"Yes"))
     {
         apszArgs[c4CurArg++] = L"/permissive-";
         apszArgs[c4CurArg++] = L"/Zc:twoPhase-";
@@ -515,41 +514,13 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     }
 
     //
-    //  Set up the flags for the runtime library mode. This is driven by
-    //  the RTL mode and current build mode, at least it is on VC++.
+    //  Set up the flags for the runtime library mode. We always do multi-threaded
+    //  dynamic linking.
     //
-    switch(m_pprojiTarget->eRTLMode())
-    {
-        case tCIDBuild::ERTLModes::SingleStatic :
-            if (m_bDebug)
-                apszArgs[c4CurArg++] = L"/MLd";
-            else
-                apszArgs[c4CurArg++] = L"/ML";
-            break;
-
-        case tCIDBuild::ERTLModes::SingleDynamic :
-            // This is the default, so not options are required
-            break;
-
-        case tCIDBuild::ERTLModes::MultiStatic :
-            if (m_bDebug)
-                apszArgs[c4CurArg++] = L"/MTd";
-            else
-                apszArgs[c4CurArg++] = L"/MT";
-            break;
-
-        case tCIDBuild::ERTLModes::MultiDynamic :
-            if (m_bDebug)
-                apszArgs[c4CurArg++] = L"/MDd";
-            else
-                apszArgs[c4CurArg++] = L"/MD";
-            break;
-
-        default :
-            stdOut << L"Unknown RTL mode" << kCIDBuild::EndLn;
-            throw tCIDBuild::EErrors::Internal;
-            break;
-    }
+    if (m_bDebug)
+        apszArgs[c4CurArg++] = L"/MDd";
+    else
+        apszArgs[c4CurArg++] = L"/MD";
 
     //
     //  Set the parameters for the display type. Under Visual C++ we just

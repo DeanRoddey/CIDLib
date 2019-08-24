@@ -370,9 +370,17 @@ namespace kCIDBuild
 #include    "CIDBuild_Janitor.hpp"
 #include    "CIDBuild_RawStr.hpp"
 #include    "CIDBuild_String.hpp"
+#include    "CIDBuild_List.hpp"
+
+namespace tCIDBuild
+{
+    typedef TList<TBldStr>      TStrList;
+}
+
 #include    "CIDBuild_Utils.hpp"
 #include    "CIDBuild_BinFile.hpp"
 #include    "CIDBuild_TextFile.hpp"
+
 
 // ---------------------------------------------------------------------------
 //  Export global data
@@ -386,8 +394,13 @@ extern TTextFile    stdOut;
 #include    "CIDBuild_MsgIdInfo.hpp"
 #include    "CIDBuild_FindInfo.hpp"
 #include    "CIDBuild_KeyValuePair.hpp"
+
+namespace tCIDBuild
+{
+    typedef TList<TKeyValuePair>    TKVPList;
+}
+
 #include    "CIDBuild_LineSpooler.hpp"
-#include    "CIDBuild_List.hpp"
 #include    "CIDBuild_IDLInfo.hpp"
 #include    "CIDBuild_DependGraph.hpp"
 #include    "CIDBuild_ProjectInfo.hpp"
@@ -424,7 +437,6 @@ TTextFile& operator<<(TTextFile&, const tCIDBuild::EActions);
 TTextFile& operator<<(TTextFile&, const tCIDBuild::EBldModes);
 TTextFile& operator<<(TTextFile&, const tCIDBuild::EErrors);
 TTextFile& operator<<(TTextFile&, const tCIDBuild::EProjTypes);
-TTextFile& operator<<(TTextFile&, const tCIDBuild::ERTLModes);
 
 template <typename T> tCIDLib::TBoolean bTestBits(const T tLHS, const T tRHS)
 {

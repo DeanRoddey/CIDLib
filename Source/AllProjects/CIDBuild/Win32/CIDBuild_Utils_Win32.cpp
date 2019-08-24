@@ -156,7 +156,7 @@ TUtils::bExec(  const   tCIDLib::TCh* const*    apszParams
         if (bHasSpaces && (chLastChar != L'"'))
         {
             if (chLastChar == kCIDBuild::chPathSep)
-                TRawStr::CatStr(szCmdLine, kCIDBuild::chPathSep);
+                TRawStr::CatStr(szCmdLine, kCIDBuild::pszPathSep);
             TRawStr::CatStr(szCmdLine, L"\"");
         }
 
@@ -347,7 +347,7 @@ TUtils::bMakePath(const TBldStr& strParent, const TBldStr& strToMake)
     TArrayJanitor<tCIDLib::TCh> janSrc(pszSrc);
 
     // Start with the parent path and we'll build up layers as we go
-    tCIDLib::TCh* pszTok = TRawStr::pszStrTok(pszSrc, kCIDBuild::chPathSep);
+    tCIDLib::TCh* pszTok = TRawStr::pszStrTok(pszSrc, kCIDBuild::pszPathSep);
     while (pszTok)
     {
         strName.Append(kCIDBuild::chPathSep);
@@ -361,7 +361,7 @@ TUtils::bMakePath(const TBldStr& strParent, const TBldStr& strToMake)
                 throw tCIDBuild::EErrors::CreateError;
             }
         }
-        pszTok = TRawStr::pszStrTok(0, kCIDBuild::chPathSep);
+        pszTok = TRawStr::pszStrTok(0, kCIDBuild::pszPathSep);
     }
 
     // Indicate we create some path components
@@ -499,27 +499,6 @@ TUtils::CompletePath(const TBldStr& strOrgName, TBldStr& strFullName)
     // Copy it back to the caller's buffer
     szTmp[c4Len] = 0;
     strFullName = szTmp;
-}
-
-
-tCIDLib::TVoid TUtils::MakeTmpFileName(TBldStr& strToFill)
-{
-    // Get the temp path first
-    tCIDLib::TCh szPath[kCIDLib::c4MaxPathLen - 14];
-    if (!::GetTempPath(kCIDLib::c4MaxPathLen - 14, szPath))
-    {
-        stdOut << L"Could not get temp path" << kCIDBuild::EndLn;
-        throw tCIDBuild::EErrors::MakeTmpFile;
-    }
-
-    // And get a temp file in that temp path
-    tCIDLib::TCh szFile[kCIDLib::c4MaxPathLen];
-    if (!::GetTempFileName(szPath, L"CID", 0, szFile))
-    {
-        stdOut << L"Could not get temp file" << kCIDBuild::EndLn;
-        throw tCIDBuild::EErrors::MakeTmpFile;
-    }
-    strToFill = szFile;
 }
 
 

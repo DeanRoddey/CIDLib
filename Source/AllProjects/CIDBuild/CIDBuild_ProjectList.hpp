@@ -149,6 +149,16 @@ class TProjectList
             const   TBldStr&                strToFind
         );
 
+        tCIDLib::TVoid ParseInitProjLine
+        (
+            const   TBldStr&                strLine
+            , const tCIDLib::TCard4         c4Line
+            ,       TBldStr&                strName
+            ,       tCIDBuild::TStrList&    listProjIncl
+            ,       tCIDBuild::TStrList&    listProjExcl
+        );
+
+
 
         // -------------------------------------------------------------------
         //  Private data members

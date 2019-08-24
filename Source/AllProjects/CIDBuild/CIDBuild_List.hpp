@@ -58,10 +58,18 @@ template <class T> class TList
         {
         }
 
+        TList(const TList&) = delete;
+
         ~TList()
         {
             RemoveAll();
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TList& operator=(const TList&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -197,13 +205,6 @@ template <class T> class TList
             T*              ptElement;
             TNode*          pnodeNext;
         };
-
-
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TList(const TList&);
-        tCIDLib::TVoid operator=(const TList&);
 
 
         // -------------------------------------------------------------------

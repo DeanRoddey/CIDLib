@@ -270,6 +270,95 @@ tCIDLib::TBoolean TUtils::bIsPrivateHeader(const TBldStr& strToTest)
 }
 
 
+//
+//  Parses our standard platform include/exclude list which is in the form:
+//
+//      [incl1 incl2, excl1 excl2]
+//
+//  It's a list of platforms to include, followed by a list to exclude. Both are
+//  optional. We shouldn't be called unless the [ character is seen and makes it
+//  clear that a list should follow.
+//
+//  We have one where we get the raw string and another where we get an already
+//  tokenized string. In the latter case we leave it at the next token after the
+//  lists, if any, in case this is embedded in something larger that must be
+//  parsed onwards afterwards. In the former one we tokenize first and then call
+//  the other version.
+//
+tCIDLib::TBoolean
+TUtils::bParseInclExclLists(const   TBldStr&                strSrc
+                            ,       tCIDBuild::TStrList&    listProjIncl
+                            ,       tCIDBuild::TStrList&    listProjExcl
+                            ,       TBldStr&                strError)
+{
+    // Tokenize the string and pass it to the other version
+    tCIDBuild::TStrList listTokens;
+    if (!TUtils::bTokenize(strSrc, L"[,]", TBldStr(), listTokens))
+    {
+        strError = L"Could not tokenize project include/exclude list";
+        return kCIDLib::False;
+    }
+
+    tCIDBuild::TStrList::TCursor cursTokens(&listTokens);
+    if (!cursTokens.bResetIter())
+    {
+        strError = L"No tokens produced for project include/exclude list";
+        return kCIDLib::False;
+    }
+    return bParseInclExclLists(cursTokens, listProjIncl, listProjExcl, strError);
+}
+
+tCIDLib::TBoolean
+TUtils::bParseInclExclLists(tCIDBuild::TStrList::TCursor&   cursSrc
+                            , tCIDBuild::TStrList&          listProjIncl
+                            , tCIDBuild::TStrList&          listProjExcl
+                            , TBldStr&                      strError)
+{
+    static const TBldStr strClose(L"]");
+    static const TBldStr strOpen(L"[");
+    static const TBldStr strComma(L",");
+
+    // The first one must be the open bracket
+    if (cursSrc.tCurElement() != strOpen)
+    {
+        strError = L"Expected an open bracket to start a project include/exclude list";
+        return kCIDLib::False;
+    }
+
+    // And now let's continue until we get the closing bracket
+    tCIDLib::TBoolean bInExcludes = kCIDLib::False;
+    tCIDLib::TBoolean bGotClose = kCIDLib::False;
+    while (cursSrc.bNext())
+    {
+        const TBldStr& strCur = cursSrc.tCurElement();
+        if (strCur == strClose)
+        {
+            bGotClose = kCIDLib::True;
+            break;
+        }
+         else if (strCur == strComma)
+        {
+            bInExcludes = kCIDLib::True;
+        }
+         else
+        {
+            if (bInExcludes)
+                listProjExcl.Add(new TBldStr(strCur));
+            else
+                listProjIncl.Add(new TBldStr(strCur));
+        }
+    }
+
+    if (!bGotClose)
+    {
+        strError = L"Expected end of project include/exclude list";
+        return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
+
+
+// Replicates the directory tree under the source directory to the target
 tCIDLib::TBoolean
 TUtils::bReplicateTree( const   TBldStr&    strSrcDir
                         , const TBldStr&    strTargetDir)
@@ -343,6 +432,195 @@ TUtils::bReplicateTree( const   TBldStr&    strSrcDir
         }   while (cursFiles.bNext());
     }
     return kCIDLib::True;
+}
+
+
+//
+//  See is the passed platform to check is supported, given the inclusion and exclusion
+//  lists provided. We have another that passes our own (currently being built) platform.
+//
+tCIDLib::TBoolean
+TUtils::bSupportsThisPlatform(  const   tCIDBuild::TStrList&    listInclude
+                                , const tCIDBuild::TStrList&    listExclude)
+{
+    return bSupportsPlatform(kCIDBuild::pszFullPlatform, listInclude, listExclude);
+}
+
+tCIDLib::TBoolean
+TUtils::bSupportsPlatform(  const   TBldStr&                strToCheck
+                            , const tCIDBuild::TStrList&    listInclude
+                            , const tCIDBuild::TStrList&    listExclude)
+{
+    //
+    //  First we see if the platform is explicitly in the includes. We remember if it
+    //  is by wild card or not. We consider an empty include list to be a wild card
+    //  inclusion since an empty list means all platforms.
+    //
+    tCIDLib::TBoolean bByWildcard = kCIDLib::False;
+    tCIDLib::TBoolean bInList = kCIDLib::False;
+    if (listInclude.bEmpty())
+    {
+        bInList = kCIDLib::True;
+        bByWildcard = kCIDLib::True;
+    }
+     else
+    {
+        TList<TBldStr>::TCursor cursPlatforms(&listInclude);
+        if (cursPlatforms.bResetIter())
+        {
+            do
+            {
+                // If non-wild card, then we take it
+                const TBldStr& strCur = cursPlatforms.tCurElement();
+                if (strCur.bIEquals(strToCheck))
+                {
+                    bInList = kCIDLib::True;
+                    break;
+                }
+
+                //
+                //  If the current value ends with a *, then we can compare up to
+                //  but no including the asterisk for a wild card match.
+                //
+                if (strCur.chLast() == kCIDLib::chAsterisk)
+                {
+                    if (strToCheck.bIStartsWithN(strCur, strCur.c4Length() - 1))
+                    {
+                        bInList = kCIDLib::True;
+                        bByWildcard = kCIDLib::True;
+                        break;
+                    }
+                }
+
+            }   while (cursPlatforms.bNext());
+        }
+    }
+
+    //
+    //  OK, in the include list without wild card, or not in the include list at all,
+    //  then we are done.
+    //
+    if (!bInList)
+        return kCIDLib::False;
+    if (bInList && !bByWildcard)
+        return kCIDLib::True;
+
+    //
+    //  It's in the include list by via wild card. So see if it is explicitly
+    //  excluded (these are all non-wild card.)
+    //
+    bInList = kCIDLib::False;
+    TList<TBldStr>::TCursor cursPlatforms(&listExclude);
+    if (cursPlatforms.bResetIter())
+    {
+        do
+        {
+            const TBldStr& strCur = cursPlatforms.tCurElement();
+            if (strCur.bIEquals(strToCheck))
+            {
+                bInList = kCIDLib::True;
+                break;
+            }
+        }   while (cursPlatforms.bNext());
+    }
+
+    // Return true if not in the exclude list
+    return !bInList;
+}
+
+
+//
+//  Finds separated tokens in the source string. It tokenizes on the passed space
+//  characters and the passed special characters. The difference is that special
+//  characters are returned as tokens themselves (but they don't have to have space
+//  characters around them.
+//
+tCIDLib::TBoolean
+TUtils::bTokenize(  const   TBldStr&                strSrc
+                    , const TBldStr&                strSpecial
+                    , const TBldStr&                strSpace
+                    ,       tCIDBuild::TStrList&    listTokens)
+{
+    enum class EStates
+    {
+        InToken
+        , InSpace
+    };
+
+    listTokens.RemoveAll();
+    const tCIDLib::TCard4 c4Count = strSrc.c4Length();
+    if (!c4Count)
+        return kCIDLib::False;
+
+    EStates eCurState = EStates::InSpace;
+    tCIDLib::TCard4 c4Index = 0;
+    TBldStr strCurToken;
+    while (c4Index < c4Count)
+    {
+        const tCIDLib::TCh chCur = strSrc[c4Index++];
+        const tCIDLib::TBoolean bIsSpace
+        (
+            strSpace.bEmpty() ? TRawStr::bIsSpace(chCur) : strSpace.iFindFirst(chCur) != -1
+        );
+         const tCIDLib::TBoolean bIsSpecial(strSpecial.iFindFirst(chCur) != -1);
+
+        switch(eCurState)
+        {
+            case EStates::InSpace :
+            {
+                if (bIsSpecial)
+                {
+                    // It's a special token character. Store it and stay in the same state
+                    listTokens.Add(new TBldStr(chCur));
+                }
+                 else if (!bIsSpace)
+                {
+                    // We need to start a token
+                    strCurToken.Clear();
+                    strCurToken.Append(chCur);
+                    eCurState = EStates::InToken;
+                }
+                break;
+            }
+
+            case EStates::InToken :
+            {
+                if (bIsSpecial)
+                {
+                    //
+                    //  Store the current token, then store the special character
+                    //  token, and to back to inspace state.
+                    //
+                    listTokens.Add(new TBldStr(strCurToken));
+                    listTokens.Add(new TBldStr(chCur));
+                    eCurState = EStates::InSpace;
+                }
+                 else if (bIsSpace)
+                {
+                    // Just add the current token and go to space state
+                    listTokens.Add(new TBldStr(strCurToken));
+                    eCurState = EStates::InSpace;
+                }
+                 else
+                {
+                    // Accumulate to the token
+                    strCurToken.Append(chCur);
+                }
+                break;
+            }
+
+            default :
+                stdOut  << L"Unknown tokenize state" << kCIDBuild::EndLn;
+                throw tCIDBuild::EErrors::CopyFailed;
+        };
+    }
+
+    // If we ended in token state, store the last one
+    if ((eCurState == EStates::InToken) && !strCurToken.bEmpty())
+        listTokens.Add(new TBldStr(strCurToken));
+
+    // If we got any tokens, return true
+    return !listTokens.bEmpty();
 }
 
 

@@ -58,8 +58,13 @@ class TBldStr
 
         TBldStr
         (
+            const   tCIDLib::TCh            chSrc
+        );
+
+        TBldStr
+        (
             const   tCIDLib::TSCh* const    pszSrc
-        );        
+        );
 
         ~TBldStr();
 
@@ -162,6 +167,18 @@ class TBldStr
         tCIDLib::TBoolean bStartsWith
         (
             const   tCIDLib::TCh* const     pszToCheck
+        )   const;
+
+        tCIDLib::TBoolean bIStartsWithN
+        (
+            const   TBldStr&                strToCheck
+            , const tCIDLib::TCard4         c4Count
+        )   const;
+
+        tCIDLib::TBoolean bIStartsWithN
+        (
+            const   tCIDLib::TCh* const     pszToCheck
+            , const tCIDLib::TCard4         c4Count
         )   const;
 
         tCIDLib::TCh chFirst() const;
@@ -315,6 +332,12 @@ inline tCIDLib::TBoolean TBldStr::bIEquals(const TBldStr& strToCompare) const
 inline tCIDLib::TBoolean TBldStr::bStartsWith(const TBldStr& strToCheck) const
 {
     return bStartsWith(strToCheck.m_pszBuf);
+}
+
+inline tCIDLib::TBoolean
+TBldStr::bIStartsWithN(const TBldStr& strToCheck, const tCIDLib::TCard4 c4Count) const
+{
+    return bIStartsWithN(strToCheck.m_pszBuf, c4Count);
 }
 
 inline tCIDLib::TCh TBldStr::chFirst() const
