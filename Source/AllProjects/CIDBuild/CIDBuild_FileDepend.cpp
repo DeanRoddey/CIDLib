@@ -482,8 +482,8 @@ TFileDepAnalyzer::bSearchInclude(const  TBldStr& strToFind
         TBldStr strTmp = cursIncls.tCurElement();
 
         // Add the separator if not there
-        if (strTmp.chLast() != L'\\')
-            strTmp.Append(L"\\");
+        if (strTmp.chLast() != kCIDBuild::chPathSep)
+            strTmp.Append(kCIDBuild::chPathSep);
         strTmp.Append(strToFind);
 
         if (TUtils::bExists(strTmp))
@@ -691,7 +691,7 @@ TFileDepAnalyzer::eNextToken(TLineSpooler& lsplInput, TBldStr& strBuf)
             while (pszTmp = TRawStr::pszStrTok(0, L" \t\n\r()"))
             {
                 // If we hit the continuation, read the next line
-                if (!TRawStr::iCompStr(pszTmp, L"\\"))
+                if (!TRawStr::iCompStr(pszTmp, kCIDBuild::pszPathSep))
                 {
                     if (!lsplInput.bReadLine(strReadBuf))
                     {

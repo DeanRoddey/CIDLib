@@ -135,7 +135,7 @@ class TBldStr
             , const tCIDLib::TCard4         c4StartAt
         );
 
-        tCIDLib::TVoid AppendCh
+        tCIDLib::TVoid Append
         (
             const   tCIDLib::TCh            chToAppend
         );

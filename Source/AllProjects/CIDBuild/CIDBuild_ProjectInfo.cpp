@@ -446,19 +446,19 @@ tCIDLib::TVoid TProjectInfo::LoadFileLists()
     if (m_bPlatformDir)
     {
         strSearch = kCIDBuild::pszPlatformDir;
-        strSearch.Append(L"\\", kCIDBuild::pszAllHFiles);
+        strSearch.Append(kCIDBuild::pszPathSep, kCIDBuild::pszAllHFiles);
         TFindInfo::c4FindFiles(strSearch, m_listHpps, tCIDBuild::EPathModes::Relative);
 
         strSearch = kCIDBuild::pszPlatformDir;
-        strSearch.Append(L"\\", kCIDBuild::pszAllHppFiles);
+        strSearch.Append(kCIDBuild::pszPathSep, kCIDBuild::pszAllHppFiles);
         TFindInfo::c4FindFiles(strSearch, m_listHpps, tCIDBuild::EPathModes::Relative);
 
         strSearch = kCIDBuild::pszPlatformDir;
-        strSearch.Append(L"\\", kCIDBuild::pszAllCFiles);
+        strSearch.Append(kCIDBuild::pszPathSep, kCIDBuild::pszAllCFiles);
         TFindInfo::c4FindFiles(strSearch, m_listCpps, tCIDBuild::EPathModes::Relative);
 
         strSearch = kCIDBuild::pszPlatformDir;
-        strSearch.Append(L"\\", kCIDBuild::pszAllCppFiles);
+        strSearch.Append(kCIDBuild::pszPathSep, kCIDBuild::pszAllCppFiles);
         TFindInfo::c4FindFiles(strSearch, m_listCpps, tCIDBuild::EPathModes::Relative);
     }
 }
@@ -619,7 +619,7 @@ tCIDLib::TVoid TProjectInfo::ParseContent(TLineSpooler& lsplSource)
         m_strOutDir = facCIDBuild.strOutDir();
         m_strOutDir.Append(m_strProjectName);
         m_strOutDir.Append(L".Out");
-        m_strOutDir.Append(L"\\");
+        m_strOutDir.Append(kCIDBuild::pszPathSep);
 
         // Build the name to the error ids header, which goes to the include dir
         m_strOutErrHpp = m_strProjectDir; // facCIDBuild.strIncludeDir();
@@ -769,14 +769,14 @@ TProjectInfo::bSetSetting(const TBldStr& strName, const TBldStr& strValue)
 
         // Build up the path to the directory and store it.
         m_strProjectDir = facCIDBuild.strRootDir();
-        m_strProjectDir.Append(L"Source", L"\\");
-        m_strProjectDir.Append(L"AllProjects", L"\\");
+        m_strProjectDir.Append(L"Source", kCIDBuild::pszPathSep);
+        m_strProjectDir.Append(L"AllProjects", kCIDBuild::pszPathSep);
 
         // If it's not empty (i.e. top level), then add it, and end with a slash
         if (!m_strDirectory.bEmpty())
         {
             m_strProjectDir.Append(m_strDirectory);
-            m_strProjectDir.Append(L"\\");
+            m_strProjectDir.Append(kCIDBuild::pszPathSep);
         }
     }
      else if (strName == L"DISPLAY")

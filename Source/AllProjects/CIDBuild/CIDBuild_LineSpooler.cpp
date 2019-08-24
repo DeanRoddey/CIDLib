@@ -219,7 +219,7 @@ tCIDLib::TVoid TLineSpooler::ExpandKeywords(TBldStr& strToExpand)
                     if (chCur == kCIDLib::chDollarSign)
                         eState = EState_OpenParen;
                      else
-                        strToExpand.AppendCh(chCur);
+                        strToExpand.Append(chCur);
                     break;
 
                 case EState_OpenParen :
@@ -234,7 +234,7 @@ tCIDLib::TVoid TLineSpooler::ExpandKeywords(TBldStr& strToExpand)
                     if (chCur == kCIDLib::chDollarSign)
                     {
                         eState = EState_Input;
-                        strToExpand.AppendCh(chCur);
+                        strToExpand.Append(chCur);
                     }
                      else if (chCur == kCIDLib::chOpenParen)
                     {
@@ -290,7 +290,7 @@ tCIDLib::TVoid TLineSpooler::ExpandKeywords(TBldStr& strToExpand)
                     }
                      else
                     {
-                        strMacroName.AppendCh(chCur);
+                        strMacroName.Append(chCur);
                     }
                     break;
             }

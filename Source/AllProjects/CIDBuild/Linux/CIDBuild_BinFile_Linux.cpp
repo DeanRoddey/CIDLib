@@ -99,6 +99,8 @@ tCIDLib::TVoid TBinFile::Open(  const   TBldStr&                strName
                                 , const tCIDLib::EAccessModes   eAccess
                                 , const tCIDLib::ECreateActs    eAction)
 {
+    m_strFileName = strName;
+
     tCIDLib::TSInt iFlags = 0;
     if (eAction == tCIDLib::ECreateActs::TruncateExisting)
         iFlags = O_TRUNC;

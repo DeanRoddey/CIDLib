@@ -86,13 +86,13 @@ TUtils::bCopyFile(  const   TBldStr&            strSourceName
                     , const tCIDLib::TBoolean   bFailIfExists)
 {
     TBldStr strSrc(strSourceDir);
-    if (strSrc.chLast() != L'\\')
-        strSrc.Append(L'\\');
+    if (strSrc.chLast() != kCIDBuild::chPathSep)
+        strSrc.Append(kCIDBuild::chPathSep);
     strSrc.Append(strSourceName);
 
     TBldStr strTarget(strTargetDir);
-    if (strTarget.chLast() != L'\\')
-        strTarget.Append(L'\\');
+    if (strTarget.chLast() != kCIDBuild::chPathSep)
+        strTarget.Append(kCIDBuild::chPathSep);
     strTarget.Append(strTargetName);
 
     return bCopyFile(strSrc, strTarget, bFailIfExists);
@@ -319,10 +319,10 @@ TUtils::bReplicateTree( const   TBldStr&    strSrcDir
                 {
                     strTmp = strSrcDir;
                     strTmp.Append(fndiCur.strFileName());
-                    strTmp.Append(L'\\');
+                    strTmp.Append(kCIDBuild::chPathSep);
                     strDest = strTargetDir;
                     strDest.Append(fndiCur.strFileName());
-                    strDest.Append(L'\\');
+                    strDest.Append(kCIDBuild::chPathSep);
 
                     if (!bReplicateTree(strTmp, strDest))
                         return kCIDLib::False;
@@ -481,7 +481,7 @@ TUtils::FindPathParts(  const   TBldStr&            strSource
     //  we found above, then the period cannot be the extension so null it
     //  back out.
     //
-    const tCIDLib::TCh* pszName = TRawStr::pszFindLastChar(pszRaw, L'\\');
+    const tCIDLib::TCh* pszName = TRawStr::pszFindLastChar(pszRaw, kCIDBuild::chPathSep);
     if (pszName > pszExtension)
         pszExtension = 0;
 

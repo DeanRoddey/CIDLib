@@ -83,16 +83,6 @@ tCIDLib::TBoolean TGCCDriver::bBuild(const TProjectInfo& projiTarget)
     m_strTargetFile.CopyAt(m_pprojiTarget->strOutBin(), c4Name);
 
     //
-    // If it's a shared library then we've got to strip the version
-    // part for compilation. We'll add it back later.
-    //
-    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
-    {
-        m_strTargetFile.CapAt(m_strTargetFile.c4Length()
-                              - facCIDBuild.strVersionSuffix().c4Length());
-    }
-
-    //
     //  Lets do our Cpp compilations. We just run through each of the Cpp
     //  files, which our parent class has has already set up, and ask if
     //  each one needs to be compiled. If so, we build it.
@@ -184,18 +174,6 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
     tCIDLib::TCard4 c4CurArg = 0;
     apszArgs[c4CurArg++] = L"g++";
     apszArgs[c4CurArg++] = L"-c";
-
-    // Set up the debug/prod flags
-    if (m_bDebug)
-    {
-        apszArgs[c4CurArg++] = L"-g";
-        apszArgs[c4CurArg++] = L"-DCID_DEGUG_ON=1";
-    }
-    else
-    {
-        apszArgs[c4CurArg++] = L"-O3";
-        apszArgs[c4CurArg++] = L"-DCID_DEGUG_ON=0";
-    }
 
     //
     //  Set up our CIDLib platform define that gets passed to all code
@@ -330,6 +308,8 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
         if (facCIDBuild.bLowPrio())
             c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
         tCIDLib::TCard4 c4Result;
+
+        /*
         if (!TUtils::bExec(apszArgs, c4ExtraArgs, c4Result, c4ExecFlags))
         {
             stdOut << L"Could not execute the compiler" << kCIDBuild::EndLn;
@@ -343,6 +323,8 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
                     << c4Result << kCIDBuild::EndLn;
             throw tCIDBuild::EErrors::BuildError;
         }
+
+        */
 
         // Make sure we have a line after the output if in verbose mode
         if (facCIDBuild.bVerbose())

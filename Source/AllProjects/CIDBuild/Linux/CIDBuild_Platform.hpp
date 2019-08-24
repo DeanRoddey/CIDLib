@@ -87,6 +87,9 @@ namespace kCIDBuild
     //      program. The input extensions are predestined by what we named
     //      the files, so the are not a portability problem.
     // -----------------------------------------------------------------------
+    const tCIDBuild::TCh         chExtSep           = L'.';
+    const tCIDBuild::TCh         chPathCompSep      = L':';
+    const tCIDBuild::TCh         chPathSep          = L'/';
     const tCIDBuild::TCh* const  pszAllHFiles       = L"*.h";
     const tCIDBuild::TCh* const  pszAllHppFiles     = L"*.hpp";
     const tCIDBuild::TCh* const  pszAllCFiles       = L"*.c";
@@ -96,8 +99,7 @@ namespace kCIDBuild
     const tCIDBuild::TCh* const  pszHppExt          = L".hpp";
     const tCIDBuild::TCh* const  pszLibExt          = L".a";
     const tCIDBuild::TCh* const  pszObjExt          = L".o";
-    const tCIDBuild::TCh         chExtSep           = L'.';
-    const tCIDBuild::TCh         chPathCompSep      = L':';
+    const tCIDBuild::TCh* const  pszPathSep         = L"/";
 
 
     // -----------------------------------------------------------------------

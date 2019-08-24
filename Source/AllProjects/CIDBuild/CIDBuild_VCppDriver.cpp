@@ -579,7 +579,7 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     // Set up the Obj output directory param
     TBldStr strOutDir(L"/Fo");
     strOutDir.Append(m_pprojiTarget->strOutDir());
-    if (strOutDir.chLast() == L'\\')
+    if (strOutDir.chLast() == kCIDBuild::chPathSep)
     apszArgs[c4CurArg++] = strOutDir.pszBuffer();
 
     //

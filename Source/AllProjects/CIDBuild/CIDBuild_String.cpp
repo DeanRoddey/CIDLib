@@ -78,14 +78,14 @@ TBldStr::TBldStr(const TBldStr& strFirst, const TBldStr& strSec) :
     TRawStr::CopyStr(&m_pszBuf[strFirst.m_c4BufSz], strSec.m_pszBuf);
 }
 
-TBldStr::TBldStr(const tCIDLib::TCh* const pszName) :
+TBldStr::TBldStr(const tCIDLib::TCh* const pszText) :
 
     m_c4BufSz(0)
-    , m_pszBuf(0)
+    , m_pszBuf(nullptr)
 {
-    m_c4BufSz = TRawStr::c4StrLen(pszName) + 64;
+    m_c4BufSz = TRawStr::c4StrLen(pszText) + 64;
     m_pszBuf = new tCIDLib::TCh[m_c4BufSz + 1];
-    TRawStr::CopyStr(m_pszBuf, pszName);
+    TRawStr::CopyStr(m_pszBuf, pszText);
 }
 
 TBldStr::TBldStr(const tCIDLib::TSCh* const pszName) :
@@ -219,7 +219,7 @@ tCIDLib::TVoid TBldStr::AppendAt(const  TBldStr&        strToAppend
 {
     if (c4StartAt >= strToAppend.c4Length())
     {
-        stdOut << L"Start index for Append is beyond source string length"
+        stdOut << L"Start index for Append is beyond source string's length"
                << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::IndexError;
     }
@@ -229,7 +229,7 @@ tCIDLib::TVoid TBldStr::AppendAt(const  TBldStr&        strToAppend
 }
 
 
-tCIDLib::TVoid TBldStr::AppendCh(const tCIDLib::TCh chToAppend)
+tCIDLib::TVoid TBldStr::Append(const tCIDLib::TCh chToAppend)
 {
     tCIDLib::TCh szTmp[2];
     szTmp[0] = chToAppend;

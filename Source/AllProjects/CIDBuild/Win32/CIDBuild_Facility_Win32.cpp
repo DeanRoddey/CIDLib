@@ -199,9 +199,9 @@ TFacCIDBuild::MakePlatRelease(  const   tCIDBuild::EActions eAction
         //  directory, which was already created.
         //
         strDest = strTargetDir;
-        strDest.Append(L"\\");
+        strDest.Append(kCIDBuild::chPathSep);
         strDest.Append(L"Source");
-        strDest.Append(L"\\");
+        strDest.Append(kCIDBuild::chPathSep);
         strDest.Append(kCIDBuild::pszPlatformDir);
         if (!TUtils::bExists(strDest))
         {
@@ -216,7 +216,7 @@ TFacCIDBuild::MakePlatRelease(  const   tCIDBuild::EActions eAction
         // And now iterate the projects and copy the cpp files for each library project
         strDest = strTargetDir;
         strDest.Append(L"Source");
-        strDest.Append(L"\\");
+        strDest.Append(kCIDBuild::chPathSep);
         cursProjs.bResetIter();
         do
         {
@@ -298,7 +298,7 @@ TFacCIDBuild::MakePlatRelease(  const   tCIDBuild::EActions eAction
     strSrc = m_strRootDir;
     strSrc.Append(L"Source\\MiscFiles\\");
     strSrc.Append(kCIDBuild::pszPlatformDir);
-    strSrc.Append(L"\\");
+    strSrc.Append(kCIDBuild::chPathSep);
     strDest = strTargetDir;
     strDest.Append(L"MiscFiles\\");
     if (!TUtils::bCopyAll(strSrc, strDest))

@@ -142,8 +142,8 @@ tCIDLib::TVoid TProjectList::ParseProjectFile()
 {
     // Build up the path to the project file
     TBldStr strProjFile(facCIDBuild.strRootDir());
-    strProjFile.Append(L"Source", L"\\");
-    strProjFile.Append(L"AllProjects", L"\\");
+    strProjFile.Append(L"Source", kCIDBuild::pszPathSep);
+    strProjFile.Append(L"AllProjects", kCIDBuild::pszPathSep);
     strProjFile.Append(L"CIDBuild.Projects");
 
     // Make sure it exists

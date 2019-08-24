@@ -102,7 +102,7 @@ TResCompiler::bMassageMsgText(  const   TBldStr&        strOriginal
         //  single, binary control character. If not, just put out the
         //  slash itself.
         //
-        if (chNext == L'\\')
+        if (chNext == kCIDBuild::chPathSep)
         {
             tCIDLib::TCh chPeek = strOriginal[c4SrcIndex];
 
@@ -114,15 +114,15 @@ TResCompiler::bMassageMsgText(  const   TBldStr&        strOriginal
             else if (chPeek == L't')
                 chActual = L'\t';
             else
-                chActual = L'\\';
+                chActual = kCIDBuild::chPathSep;
 
-            strToFill.AppendCh(chActual);
+            strToFill.Append(chActual);
             c4SrcIndex++;
         }
          else
         {
             // Nothing special, just put it in the string
-            strToFill.AppendCh(chNext);
+            strToFill.Append(chNext);
         }
     }
     return kCIDLib::True;
@@ -735,7 +735,7 @@ TResCompiler::bFindMsgEntryParts(TBldStr&   strSrcLine
     //  so lets loop as long as we have continuations, and just append it
     //
     strText = pszCur;
-    while (strText.chLast() == L'\\')
+    while (strText.chLast() == kCIDBuild::chPathSep)
     {
         // Throw away the trailing slash
         strText.DeleteLast();

@@ -29,6 +29,7 @@ RM := rm -fv
 MKTREE := mkdir -p --verbose
 RMTREE := rm -fvr
 SRC_EXT := .cpp
+HDR_EXT := .hpp
 OUR_OUTDIR := $(CID_RESDIR)/CIDBuild.out
 
 
@@ -58,7 +59,7 @@ LINK_FLAGS += -lstdc++ -m32
 # LINK_FLAGS += -lstdc++
 
 # The list of headers. We just use them all for each file
-HPP_FILES=\
+SRC_HEADERS=\
 CIDBuild.hpp \
 CIDBuild_BinFile.hpp \
 CIDBuild_BlkParser.hpp \
@@ -66,7 +67,7 @@ CIDBuild_DependGraph.hpp \
 CIDBuild_Facility.hpp \
 CIDBuild_FileDepend.hpp \
 CIDBuild_FindInfo.hpp \
-CIDBuild_IDLinfo.hpp \
+CIDBuild_IDLInfo.hpp \
 CIDBuild_Janitor.hpp \
 CIDBuild_KeyValuePair.hpp \
 CIDBuild_LineSpooler.hpp \
@@ -81,7 +82,7 @@ CIDBuild_TextFile.hpp \
 CIDBuild_ToolsDriver.hpp \
 CIDBuild_Utils.hpp \
 CIDBuild_VCppDriver.hpp \
-$(PLATDIR)\CIDBuild_Platform.hpp
+$(PLATDIR)/CIDBuild_Platform.hpp
 
 # The cpp files we need to build
 SRC_STEMS=\
@@ -128,8 +129,8 @@ OBJ_FILES := $(addprefix $(OUR_OUTDIR)/, $(addsuffix .o, $(SRC_STEMS)))
 OBJ_FILES += $(addprefix $(OUR_OUTDIR)/, $(addsuffix .o, $(PLAT_STEMS)))
 
 # And add the source extension to create the source files
-SRC_FILES := $(addsuffix $(SRC_EXT), $(SRC_STEMS)) 
-SRC_FILES += $(addprefix $(PLATDIR)/, $(addsuffix $(SRC_EXT), $(PLAT_STEMS)))
+#SRC_FILES := $(addsuffix $(SRC_EXT), $(SRC_STEMS)) 
+#SRC_FILES += $(addprefix $(PLATDIR)/, $(addsuffix $(SRC_EXT), $(PLAT_STEMS)))
 
 .SUFFIXES : .cpp, .o
 
@@ -137,17 +138,18 @@ SRC_FILES += $(addprefix $(PLATDIR)/, $(addsuffix $(SRC_EXT), $(PLAT_STEMS)))
 .PHONY: all dirs showlist
 
 #showlist :
-#	@echo $(OBJ_FILES)
+#	@echo $(SRC_HEADERS)
 
 all : dirs $(CID_RESDIR)/CIDBuild
+
 
 $(CID_RESDIR)/CIDBuild : $(OBJ_FILES)
 	g++ $(LINK_FLAGS) -o $(CID_RESDIR)/CIDBuild $^
 
-$(OUR_OUTDIR)/%.o: ./%.cpp
+$(OUR_OUTDIR)/%.o: ./%.cpp $(SRC_HEADERS)
 	g++ $(BUILD_FLAGS) $< -o $@
 
-$(OUR_OUTDIR)/%.o: ./Linux/%.cpp
+$(OUR_OUTDIR)/%.o: ./Linux/%.cpp $(SRC_HEADERS)
 	g++ $(BUILD_FLAGS) $< -o $@
 
 # Make sure our output directories are created

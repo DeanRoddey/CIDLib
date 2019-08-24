@@ -196,11 +196,6 @@ namespace TUtils
         ,       TBldStr&                    strFullName
     );
 
-    tCIDLib::TVoid MakeTmpFileName
-    (
-                TBldStr&                    strToFill
-    );
-
     tCIDLib::TVoid QueryCurDir
     (
                 TBldStr&                    strToFill

@@ -94,7 +94,7 @@ static tCIDLib::TVoid MakeDirs( const   tCIDBuild::EActions     eAction
     {
         strTmpDir = strTargetDir;
         strTmpDir.Append(L"Include");
-        strTmpDir.Append(L"\\");
+        strTmpDir.Append(kCIDBuild::pszPathSep);
         strTmpDir.Append(kCIDBuild::pszPlatformDir);
         if (!TUtils::bExists(strTmpDir))
         {
@@ -211,7 +211,7 @@ TFacCIDBuild::MakeRelease(  const   tCIDBuild::EActions eAction
         //
         strDest = strTargetDir;
         strDest.Append(L"Include");
-        strDest.Append(L"\\");
+        strDest.Append(kCIDBuild::pszPathSep);
         cursProjs.bResetIter();
         do
         {
@@ -275,9 +275,9 @@ TFacCIDBuild::MakeRelease(  const   tCIDBuild::EActions eAction
                 // Build up the target directory for this project
                 strDest = strTargetDir;
                 strDest.Append(L"Samples");
-                strDest.Append(L"\\");
+                strDest.Append(kCIDBuild::pszPathSep);
                 strDest.Append(projiCur.strProjectName());
-                strDest.Append(L"\\");
+                strDest.Append(kCIDBuild::pszPathSep);
 
                 // Create the target directory
                 if (!TUtils::bExists(strDest))
@@ -313,12 +313,12 @@ TFacCIDBuild::MakeRelease(  const   tCIDBuild::EActions eAction
         // We need to copy over all the ray tracer scene files
         strSrc = facCIDBuild.strRootDir();
         strSrc.Append(L"Source");
-        strSrc.Append(L"\\");
+        strSrc.Append(kCIDBuild::chPathSep);
         strSrc.Append(L"SceneFiles");
-        strSrc.Append(L"\\");
+        strSrc.Append(kCIDBuild::chPathSep);
         strDest = strTargetDir;
         strDest.Append(L"SceneFiles");
-        strDest.Append(L"\\");
+        strDest.Append(kCIDBuild::chPathSep);
         if (!TUtils::bCopyAll(strSrc, strDest))
         {
             stdOut  << L"Could not copy ray tracer scene files"

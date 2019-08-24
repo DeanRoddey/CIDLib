@@ -853,22 +853,22 @@ tCIDLib::TVoid TFacCIDBuild::CheckEnv()
     if (TUtils::bGetEnvVar(L"CID_SRCTREE", m_strRootDir))
     {
         // Make sure it ends with a slash
-        if (m_strRootDir.chLast() != L'\\')
-            m_strRootDir.Append(L"\\");
+        if (m_strRootDir.chLast() != kCIDBuild::chPathSep)
+            m_strRootDir.Append(kCIDBuild::chPathSep);
     }
 
     if (TUtils::bGetEnvVar(L"CIDLIB_SRCDIR", m_strCIDLibSrcDir))
     {
         // Make sure it ends with a slash
-        if (m_strCIDLibSrcDir.chLast() != L'\\')
-            m_strCIDLibSrcDir.Append(L"\\");
+        if (m_strCIDLibSrcDir.chLast() != kCIDBuild::chPathSep)
+            m_strCIDLibSrcDir.Append(kCIDBuild::chPathSep);
     }
 
     if (TUtils::bGetEnvVar(L"CID_RESDIR", m_strOutDir))
     {
         // Make sure it ends with a slash
-        if (m_strOutDir.chLast() != L'\\')
-            m_strOutDir.Append(L"\\");
+        if (m_strOutDir.chLast() != kCIDBuild::chPathSep)
+            m_strOutDir.Append(kCIDBuild::chPathSep);
     }
 
     // Create full string versions of the xxx_Platform.hpp file values
@@ -963,8 +963,8 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
                 //  space for a trailing slash in case it does not have one.
                 //
                 m_strRootDir = &pszCurParm[8];
-                if (m_strRootDir.chLast() != L'\\')
-                    m_strRootDir.Append(L"\\");
+                if (m_strRootDir.chLast() != kCIDBuild::chPathSep)
+                    m_strRootDir.Append(kCIDBuild::chPathSep);
             }
              else if (!TRawStr::iCompIStr(pszCurParm, L"Single"))
             {
@@ -1122,13 +1122,13 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
 
     // Build up the standard include path
     m_strIncludeDir = m_strOutDir;
-    m_strIncludeDir.Append(L"Include", L"\\");
+    m_strIncludeDir.Append(L"Include", kCIDBuild::pszPathSep);
 
     m_strPPIncludeDir = m_strIncludeDir;
     m_strPPIncludeDir.Append(kCIDBuild::pszPlatformDir);
 
     m_strPrivIncludeDir = m_strOutDir;
-    m_strPrivIncludeDir.Append(L"PrivInclude", L"\\");
+    m_strPrivIncludeDir.Append(L"PrivInclude", kCIDBuild::pszPathSep);
 
     m_strPPPrivIncludeDir = m_strPrivIncludeDir;
     m_strPPPrivIncludeDir.Append(kCIDBuild::pszPlatformDir);
@@ -1159,8 +1159,8 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
         }
 
         // Make sure it ends in a path separator
-        if (m_strTarget.chLast() != L'\\')
-            m_strTarget.Append(L"\\");
+        if (m_strTarget.chLast() != kCIDBuild::chPathSep)
+            m_strTarget.Append(kCIDBuild::chPathSep);
 
         if (m_eBldMode == tCIDBuild::EBldModes::Develop)
             stdOut << L"WARNING: This action should use the Production build" << kCIDBuild::EndLn;

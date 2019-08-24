@@ -30,6 +30,7 @@
 // ---------------------------------------------------------------------------
 #include    "../CIDBuild.hpp"
 #include <sys/stat.h>
+#include <sys/sysinfo.h>
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -254,7 +255,58 @@ tCIDLib::TBoolean TUtils::bMakeDir(const TBldStr& strToMake)
 tCIDLib::TBoolean
 TUtils::bMakePath(const TBldStr& strParent, const TBldStr& strToMake)
 {
-    return kCIDLib::False;
+    TFindInfo   fndiToFill;
+
+    // First make sure the parent exists
+    TBldStr strName(strParent);
+    if (strName.chLast() == L'/')
+        strName.DeleteLast();
+    if (!TFindInfo::bFindAFile(strName, fndiToFill))
+    {
+        stdOut << L"Parent diretory does not exist: " << strParent << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::FileNotFound;
+    }
+
+    //
+    //  Ok, we need to start pulling out the components of the part of the
+    //  path we are to create and work our way down it. If the string to
+    //  make is empty, we are done, so return false to say we created nothing.
+    //
+    if (strToMake.bEmpty())
+        return kCIDLib::False;
+
+    // Get a copy of it so we can modify it a bit if needed
+    TBldStr strTarPath(strToMake);
+    strTarPath.StripWhitespace();
+
+    // If it has a trailing slash, remove it
+    if (strTarPath.chLast() == L'/')
+        strTarPath.DeleteLast();
+
+    // Get a raw buffer copy of the string, so we can tokenize it
+    tCIDLib::TCh* pszSrc = strTarPath.pszDupBuffer();
+    TArrayJanitor<tCIDLib::TCh> janSrc(pszSrc);
+
+    // Start with the parent path and we'll build up layers as we go
+    tCIDLib::TCh* pszTok = TRawStr::pszStrTok(pszSrc, L"/");
+    while (pszTok)
+    {
+        strName.Append(L"/");
+        strName.Append(pszTok);
+        strName.StripWhitespace();
+        if (!TFindInfo::bIsDirectory(strName))
+        {
+            if (!bMakeDir(strName))
+            {
+                stdOut << L"Could not create directory: " << strName << kCIDBuild::EndLn;
+                throw tCIDBuild::EErrors::CreateError;
+            }
+        }
+        pszTok = TRawStr::pszStrTok(0, L"/");
+    }
+
+    // Indicate we create some path components
+    return kCIDLib::True;
 }
 
 
@@ -263,7 +315,13 @@ TUtils::bRunCmdLine(const   TBldStr&            strToRun
                     ,       tCIDLib::TCard4&    c4Result
                     , const tCIDLib::TBoolean   bLowPrio)
 {
-    return kCIDLib::False;
+    tCIDLib::TSCh* pszCmd = TRawStr::pszTranscode(strToRun.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janOrg(pszCmd);
+
+    int iRes = ::system(pszCmd);
+    c4Result = tCIDLib::TCard4(iRes);
+
+    return kCIDLib::True;
 }
 
 
@@ -277,20 +335,27 @@ tCIDLib::TVoid TUtils::Beep(const   tCIDLib::TCard4 c4Freq
 // Return the number of CPUs (effective) on this machine
 tCIDLib::TCard4 TUtils::c4CPUCount()
 {
-    return 1;
+    return get_nprocs();
 }
 
 
 tCIDLib::TVoid
 TUtils::CompletePath(const TBldStr& strOrgName, TBldStr& strFullName)
 {
+    tCIDLib::TSCh* pszOrgName = TRawStr::pszTranscode(strOrgName.pszBuffer());
+    TArrayJanitor<tCIDLib::TSCh> janOrg(pszOrgName);
 
-}
+    tCIDLib::TSCh pszResolved[PATH_MAX];
+    if (!realpath(pszOrgName, pszResolved))
+    {
+        stdOut << "Could not complete path: " << strOrgName << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::FileNotFound;    
+    }
 
-
-tCIDLib::TVoid TUtils::MakeTmpFileName(TBldStr& strToFill)
-{
-
+    // Convert it and store it
+    tCIDLib::TCh* pszFullPath = TRawStr::pszTranscode(pszResolved);
+    strFullName = pszFullPath;
+    delete [] pszFullPath;
 }
 
 

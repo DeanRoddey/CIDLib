@@ -61,7 +61,7 @@ tCIDLib::TBoolean TUtils::bExists(const TBldStr& strFile)
     const tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(pszFile);
     if (c4Len)
     {
-        if (pszFile[c4Len-1] == L'\\')
+        if (pszFile[c4Len-1] == kCIDBuild::chPathSep)
             pszFile[c4Len-1] = 0;
     }
 
@@ -155,8 +155,8 @@ TUtils::bExec(  const   tCIDLib::TCh* const*    apszParams
         const tCIDLib::TCh chLastChar(pszCur[TRawStr::c4StrLen(pszCur) - 1]);
         if (bHasSpaces && (chLastChar != L'"'))
         {
-            if (chLastChar == L'\\')
-                TRawStr::CatStr(szCmdLine, L"\\");
+            if (chLastChar == kCIDBuild::chPathSep)
+                TRawStr::CatStr(szCmdLine, kCIDBuild::chPathSep);
             TRawStr::CatStr(szCmdLine, L"\"");
         }
 
@@ -318,7 +318,7 @@ TUtils::bMakePath(const TBldStr& strParent, const TBldStr& strToMake)
 
     // First make sure the parent exists
     TBldStr strName(strParent);
-    if (strName.chLast() == L'\\')
+    if (strName.chLast() == kCIDBuild::chPathSep)
         strName.DeleteLast();
     if (!TFindInfo::bFindAFile(strName, fndiToFill))
     {
@@ -339,7 +339,7 @@ TUtils::bMakePath(const TBldStr& strParent, const TBldStr& strToMake)
     strTarPath.StripWhitespace();
 
     // If it has a trailing slash, remove it
-    if (strTarPath.chLast() == L'\\')
+    if (strTarPath.chLast() == kCIDBuild::chPathSep)
         strTarPath.DeleteLast();
 
     // Get a raw buffer copy of the string, so we can tokenize it
@@ -347,10 +347,10 @@ TUtils::bMakePath(const TBldStr& strParent, const TBldStr& strToMake)
     TArrayJanitor<tCIDLib::TCh> janSrc(pszSrc);
 
     // Start with the parent path and we'll build up layers as we go
-    tCIDLib::TCh* pszTok = TRawStr::pszStrTok(pszSrc, L"\\");
+    tCIDLib::TCh* pszTok = TRawStr::pszStrTok(pszSrc, kCIDBuild::chPathSep);
     while (pszTok)
     {
-        strName.Append(L"\\");
+        strName.Append(kCIDBuild::chPathSep);
         strName.Append(pszTok);
         strName.StripWhitespace();
         if (!TFindInfo::bIsDirectory(strName))
@@ -361,7 +361,7 @@ TUtils::bMakePath(const TBldStr& strParent, const TBldStr& strToMake)
                 throw tCIDBuild::EErrors::CreateError;
             }
         }
-        pszTok = TRawStr::pszStrTok(0, L"\\");
+        pszTok = TRawStr::pszStrTok(0, kCIDBuild::chPathSep);
     }
 
     // Indicate we create some path components
