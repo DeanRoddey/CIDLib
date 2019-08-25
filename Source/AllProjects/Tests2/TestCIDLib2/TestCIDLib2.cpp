@@ -78,12 +78,14 @@ AddTest(new TTest_StringTokens);
     AddTest(new TTest_Types);
     AddTest(new TTest_RawBits);
     AddTest(new TTest_SafeCnt1);
-    AddTest(new TTest_CntPtr1);
-    AddTest(new TTest_UniquePtr);
     AddTest(new TTest_FlagJanitor);
     AddTest(new TTest_LambdaJan);
     AddTest(new TTest_Enum1);
     AddTest(new TTest_EnumForEach);
+    AddTest(new TTest_CntPtr1);
+    AddTest(new TTest_UniquePtr);
+    AddTest(new TTest_WeakPtr1);
+    AddTest(new TTest_WeakPtr2);
     AddTest(new TTest_MetaProg1);
     AddTest(new TTest_ObjLocker1);
 
@@ -160,8 +162,13 @@ AddTest(new TTest_StringTokens);
     // Cicular buffer
     AddTest(new TTest_CircularBuf);
 
-    // High level tests that can gen up some threads
+    //
+    //  High level tests that can gen up some threads and take a while
+    //
+
+    // Some threaded tests of variosu synchronized bits
     AddTest(new TTest_CntPtr2);
+    AddTest(new TTest_WeakPtr3);
     AddTest(new TTest_SafeCnt2);
 
     // Publish/subscribe

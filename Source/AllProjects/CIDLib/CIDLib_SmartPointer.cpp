@@ -33,6 +33,19 @@
 #include    "CIDLib_.hpp"
 
 
+tCIDLib::TVoid TSmartPtrHelpers::CantAcquireStrongRef(const tCIDLib::TCard4 c4Line)
+{
+    facCIDLib().ThrowErr
+    (
+        CID_FILE
+        , c4Line
+        , kCIDErrs::errcSPtr_CantGetStrongRef
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Internal
+    );
+}
+
+
 tCIDLib::TVoid
 TSmartPtrHelpers::CheckRefNotZero(  const   tCIDLib::TCard4         c4Line
                                     , const tCIDLib::TCard4         c4ToCheck

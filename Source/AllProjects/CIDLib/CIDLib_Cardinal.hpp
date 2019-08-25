@@ -109,7 +109,7 @@ class CIDLIBEXP TCardinal :
 
         TCardinal& operator=
         (
-                    tCIDLib::TCard4         c4Src
+            const   tCIDLib::TCard4         c4Src
         );
 
         tCIDLib::TBoolean operator==
@@ -181,6 +181,18 @@ class CIDLIBEXP TCardinal :
         (
             const   tCIDLib::TCard4         c4Src
         );
+
+        TCardinal& operator--(int)
+        {
+            m_c4Val--;
+            return *this;
+        }
+
+        TCardinal& operator++(int)
+        {
+            m_c4Val++;
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
@@ -367,6 +379,18 @@ class CIDLIBEXP TCardinal64 :
         (
             const   tCIDLib::TCard8         c8Src
         );
+
+        TCardinal64& operator--(int)
+        {
+            m_c8Val--;
+            return *this;
+        }
+
+        TCardinal64& operator++(int)
+        {
+            m_c8Val++;
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------

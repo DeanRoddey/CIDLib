@@ -92,15 +92,15 @@ TRawMem::bAllocSysMem(  const   tCIDLib::TCard4         c4Size
 
 
 tCIDLib::TCard4
-TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
-                                , const tCIDLib::TCard4     c4New
-                                , const tCIDLib::TCard4     c4Compare)
+TRawMem::c4CompareAndExchange(  volatile    tCIDLib::TCard4&    c4ToFill
+                                , const     tCIDLib::TCard4     c4New
+                                , const     tCIDLib::TCard4     c4Compare)
 {
     return static_cast<tCIDLib::TCard4>
     (
         ::InterlockedCompareExchange
         (
-            reinterpret_cast<long*>(&c4ToFill), c4New, c4Compare
+            reinterpret_cast<volatile long*>(&c4ToFill), c4New, c4Compare
         )
     );
 }

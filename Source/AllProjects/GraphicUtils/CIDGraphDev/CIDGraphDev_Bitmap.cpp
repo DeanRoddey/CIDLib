@@ -2369,7 +2369,7 @@ tCIDLib::TBoolean TBitmap::bHasAlpha() const
 // Return the ref count of this image's handle
 tCIDLib::TCard4 TBitmap::c4RefCount() const
 {
-    return m_cptrHandle.c4RefCount();
+    return m_cptrHandle.c4StrongCount();
 }
 
 

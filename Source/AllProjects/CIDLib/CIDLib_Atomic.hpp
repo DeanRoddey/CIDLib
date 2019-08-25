@@ -31,9 +31,9 @@
 namespace TAtomic
 {
     inline tCIDLib::TCard4
-    c4CompareAndExchange(tCIDLib::TCard4&       c4ToFill
-                        , const tCIDLib::TCard4 c4New
-                        , const tCIDLib::TCard4 c4Compare)
+    c4CompareAndExchange(volatile   tCIDLib::TCard4&    c4ToFill
+                        , const     tCIDLib::TCard4     c4New
+                        , const     tCIDLib::TCard4     c4Compare)
     {
         return TRawMem::c4CompareAndExchange(c4ToFill, c4New, c4Compare);
     }

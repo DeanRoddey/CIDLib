@@ -106,9 +106,9 @@ static tCIDLib::TVoid TestBasicCountedPointer(TTextOutStream& strmOut)
             strmOut << CUR_LN << L"Test pointer was already deleted" << kCIDLib::EndLn;
 
         // The count should be 64 now
-        if (cptrTest.c4RefCount() != 64)
+        if (cptrTest.c4StrongCount() != 64)
         {
-            strmOut << CUR_LN << L"Ref count was " << cptrTest.c4RefCount()
+            strmOut << CUR_LN << L"Ref count was " << cptrTest.c4StrongCount()
                     << L" instead of 64" << kCIDLib::EndLn;
         }
 
@@ -121,9 +121,9 @@ static tCIDLib::TVoid TestBasicCountedPointer(TTextOutStream& strmOut)
             strmOut << CUR_LN << L"Test pointer was already deleted" << kCIDLib::EndLn;
 
         // Count should now be 1 again
-        if (cptrTest.c4RefCount() != 1)
+        if (cptrTest.c4StrongCount() != 1)
         {
-            strmOut << CUR_LN << L"Ref count was " << cptrTest.c4RefCount()
+            strmOut << CUR_LN << L"Ref count was " << cptrTest.c4StrongCount()
                     << L" instead of 1" << kCIDLib::EndLn;
         }
     }

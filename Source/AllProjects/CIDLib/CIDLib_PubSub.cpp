@@ -1147,7 +1147,7 @@ tCIDLib::TBoolean TPubSubTopic::bIsPublished() const
 tCIDLib::TCard4 TPubSubTopic::c4RefCount() const
 {
     CheckReady();
-    return m_cptrImpl.c4RefCount();
+    return m_cptrImpl.c4StrongCount();
 }
 
 

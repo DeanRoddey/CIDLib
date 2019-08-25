@@ -2519,6 +2519,133 @@ class TTest_VectorPlace : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_WeakPtr1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_WeakPtr1 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_WeakPtr1();
+
+        ~TTest_WeakPtr1();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_WeakPtr1,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_WeakPtr2
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_WeakPtr2 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_WeakPtr2();
+
+        ~TTest_WeakPtr2();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_WeakPtr2,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_WeakPtr3
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_WeakPtr3 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_WeakPtr3();
+
+        ~TTest_WeakPtr3();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::EExitCodes eTestThread
+        (
+                    TThread&                thrThis
+            ,       tCIDLib::TVoid*         pData
+        );
+
+
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_colThreads
+        //      A list of threads we start up to do the testing. They are all started
+        //      on eTestThread.
+        //
+        //  m_cptrTest
+        //      A weak pointer that the threads will convert to strongs and update the
+        //      value and back again, and we'll copy/assign in various ways to insure
+        //      the ref count management is correct.
+        // -------------------------------------------------------------------
+        TRefVector<TThread>         m_colThreads;
+        TWeakPtr<TSafeCard4Counter> m_wptrTest;
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_WeakPtr3,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TCIDLibTest
 // PREFIX: tfwapp
 //

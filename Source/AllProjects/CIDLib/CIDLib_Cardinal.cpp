@@ -107,7 +107,7 @@ TCardinal::TCardinal(   const   tCIDLib::TCard4     c4Val
 // ---------------------------------------------------------------------------
 //  TCardinal: Public operators
 // ---------------------------------------------------------------------------
-TCardinal& TCardinal::operator=(tCIDLib::TCard4 c4Src)
+TCardinal& TCardinal::operator=(const tCIDLib::TCard4 c4Src)
 {
     m_c4Val = c4Src;
     return *this;

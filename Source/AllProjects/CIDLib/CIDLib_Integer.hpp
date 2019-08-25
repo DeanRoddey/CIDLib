@@ -179,6 +179,18 @@ class CIDLIBEXP TInteger :
             const   tCIDLib::TInt4         i4Src
         );
 
+        TInteger& operator--(int)
+        {
+            m_i4Val--;
+            return *this;
+        }
+
+        TInteger& operator++(int)
+        {
+            m_i4Val++;
+            return *this;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -358,6 +370,18 @@ class CIDLIBEXP TInteger64 :
         (
             const   tCIDLib::TInt8          i8Src
         );
+
+        TInteger64& operator--(int)
+        {
+            m_i8Val--;
+            return *this;
+        }
+
+        TInteger64& operator++(int)
+        {
+            m_i8Val++;
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------

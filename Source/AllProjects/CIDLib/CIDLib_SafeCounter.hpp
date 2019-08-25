@@ -96,6 +96,31 @@ class CIDLIBEXP TSafeCard4Counter : public TObject, public TKrnlSafeCard4Counter
             return c4Dec() + 1;
         }
 
+        tCIDLib::TCard4 operator*() const
+        {
+            return c4Value();
+        }
+
+        tCIDLib::TBoolean operator==(const tCIDLib::TCard4 c4Val) const
+        {
+            return(c4Value() == c4Val);
+        }
+
+        tCIDLib::TBoolean operator!=(const tCIDLib::TCard4 c4Val) const
+        {
+            return !operator==(c4Val);
+        }
+
+        tCIDLib::TBoolean operator==(const TSafeCard4Counter& scntSrc) const
+        {
+            return(c4Value() == scntSrc.c4Value());
+        }
+
+        tCIDLib::TBoolean operator!=(const TSafeCard4Counter& scntSrc) const
+        {
+            return !operator==(scntSrc);
+        }
+
 
     private :
         // -------------------------------------------------------------------
@@ -157,6 +182,31 @@ class CIDLIBEXP TSafeInt4Counter : public TObject, public TKrnlSafeInt4Counter
         {
             // Add one tp the return value for post-inc semantics
             return i4Dec() + 1;
+        }
+
+        tCIDLib::TInt4 operator*() const
+        {
+            return i4Value();
+        }
+
+        tCIDLib::TBoolean operator==(const tCIDLib::TInt4 i4Val) const
+        {
+            return(i4Value() == i4Val);
+        }
+
+        tCIDLib::TBoolean operator!=(const tCIDLib::TInt4 i4Val) const
+        {
+            return !operator==(i4Val);
+        }
+
+        tCIDLib::TBoolean operator==(const TSafeInt4Counter& scntSrc) const
+        {
+            return(i4Value() == scntSrc.i4Value());
+        }
+
+        tCIDLib::TBoolean operator!=(const TSafeInt4Counter& scntSrc) const
+        {
+            return !operator==(scntSrc);
         }
 
 
