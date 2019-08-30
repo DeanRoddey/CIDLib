@@ -230,6 +230,8 @@ static tCIDLib::TVoid DummyFunc()
 
     TArrayJanitor<tCIDLib::TCard4> janBuf(10);
 
+//    TMemberPtr<TArea> mbptrTest;
+
     TVector<TString> colOne;
     TVector<TString> colTwo;
     if (tCIDLib::bCompareElems(colOne, colTwo)
@@ -447,7 +449,6 @@ static tCIDLib::TVoid DummyFunc()
     const TString& strNC = colConstStr[0];
 
     TUniquePtr<TString> uptrTest(new TString(L"Testing"));
-    TCntPtr<TString> cptrTest(uptrTest);
 
     TObjLocker<TArea> olockrTest(10, 12, 14, 16);
     TObjLock<TArea> olockTest = olockrTest.olockGet(5000);

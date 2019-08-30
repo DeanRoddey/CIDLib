@@ -36,6 +36,7 @@
 // ---------------------------------------------------------------------------
 RTTIDecls(TTest_CntPtr1,TTestFWTest)
 RTTIDecls(TTest_CntPtr2,TTestFWTest)
+RTTIDecls(TTest_MemberPtr1,TTestFWTest)
 RTTIDecls(TTest_UniquePtr,TTestFWTest)
 RTTIDecls(TTest_WeakPtr1,TTestFWTest)
 RTTIDecls(TTest_WeakPtr2,TTestFWTest)
@@ -67,11 +68,25 @@ TTest_CntPtr1::~TTest_CntPtr1()
 // ---------------------------------------------------------------------------
 //  TTest_CntPtr1: Public, inherited methods
 // ---------------------------------------------------------------------------
+struct TTest
+{
+    static tCIDLib::TCard4 c4Count;
+    TTest()
+    {
+        c4Count++;
+    }
+
+    ~TTest()
+    {
+        c4Count--;
+    }
+};
+
+tCIDLib::TCard4 TTest::c4Count = 0;
+
 tTestFWLib::ETestRes
 TTest_CntPtr1::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWarning)
 {
-    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
-
     TCntPtr<TString> cptrTest1(new TString(L"This is a test"));
     if (!cptrTest1)
     {
@@ -89,8 +104,8 @@ TTest_CntPtr1::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWarni
 
     if (!cptrTest1->bCompare(L"This is a test"))
     {
-        eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Object != to original one passed to ctor\n\n";
+        return tTestFWLib::ETestRes::Failed;
     }
 
     if (cptrTest1.c4StrongCount() != 1)
@@ -125,7 +140,25 @@ TTest_CntPtr1::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWarni
         return tTestFWLib::ETestRes::Failed;
     }
 
-    return eRes;
+    // Test a custom deleter for an array scenario
+    {
+        TCntPtr<TTest> cptrList
+        (
+            new TTest[5]
+            , [](TTest* pT) -> tCIDLib::TVoid { delete [] pT; }
+        );
+
+		cptrList.DropRef();
+
+        // The test class' count should be back to zero
+        if (TTest::c4Count != 0)
+        {
+            strmOut << TFWCurLn << L"Custom array deleter did not work";
+            return tTestFWLib::ETestRes::Failed;
+        }
+    }
+
+    return tTestFWLib::ETestRes::Success;
 }
 
 
@@ -240,6 +273,97 @@ tCIDLib::EExitCodes TTest_CntPtr2::eTestThread(TThread& thrThis, tCIDLib::TVoid*
 }
 
 
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_MemberPtr1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_MemberPtr11: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_MemberPtr1::TTest_MemberPtr1() :
+
+    TTestFWTest
+    (
+        L"Member Pointer", L"Tests of the TMemberPtr class", 2
+    )
+{
+}
+
+TTest_MemberPtr1::~TTest_MemberPtr1()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_MemberPtr1: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_MemberPtr1::eRunTest(  TTextStringOutStream&   strmOut
+                            , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    //
+    //  Create one of our test wrappers and copy and assign it a few ways, getting
+    //  back to the single one at the end. Each one creates two objects, so the count
+    //  at the end should be two, and the zero once back outside the scope.
+    //
+    {
+        TTestData::s_c4Count = 0;
+        TTestWrapper wrapTest1;
+        {
+            TTestWrapper wrapTest2(wrapTest1);
+            TTestWrapper wrapTest3(wrapTest2);
+
+            TTestWrapper wrapTest4  = wrapTest1;
+            TTestWrapper wrapTest5  = wrapTest3;
+        }
+
+        if (TTestData::s_c4Count != 2)
+        {
+            strmOut << TFWCurLn << L"Member pointer test count was " << TTestData::s_c4Count
+                    << L" but expected 2\n\n";
+            return tTestFWLib::ETestRes::Failed;
+        }
+    }
+    if (TTestData::s_c4Count != 0)
+    {
+        strmOut << TFWCurLn << L"Member pointer test count was " << TTestData::s_c4Count
+                << L" but expected 0\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    // Do the same thing but with custom delete/copy handlers
+    {
+        TTestData::s_c4Count = 0;
+        TTestWrapperCD wrapTest1;
+        {
+            TTestWrapperCD wrapTest2(wrapTest1);
+            TTestWrapperCD wrapTest3(wrapTest2);
+
+            TTestWrapperCD wrapTest4  = wrapTest1;
+            TTestWrapperCD wrapTest5  = wrapTest3;
+        }
+
+        if (TTestData::s_c4Count != 2)
+        {
+            strmOut << TFWCurLn << L"Member pointer test count was " << TTestData::s_c4Count
+                    << L" but expected 2\n\n";
+            return tTestFWLib::ETestRes::Failed;
+        }
+    }
+    if (TTestData::s_c4Count != 0)
+    {
+        strmOut << TFWCurLn << L"Member pointer test count was " << TTestData::s_c4Count
+                << L" but expected 0\n\n";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    return tTestFWLib::ETestRes::Success;
+}
+
+tCIDLib::TCard4 TTest_MemberPtr1::TTestData::s_c4Count;
 
 
 // ---------------------------------------------------------------------------

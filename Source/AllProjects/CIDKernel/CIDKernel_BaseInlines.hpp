@@ -84,6 +84,10 @@ namespace tCIDLib
         );
     };
 
+    template <typename T> struct IsArray : FalseType {};
+    template <typename T> struct IsArray<T[]> : TrueType {};
+    template <typename T, tCIDLib::TCard4 N> struct IsArray<T[N]> : TrueType {};
+
     // For conditional stuff based on const'ness
     template <typename T> struct IsConst : FalseType {};
     template <typename T> struct IsConst<const T> : TrueType {};

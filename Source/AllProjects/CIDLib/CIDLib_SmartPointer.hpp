@@ -18,7 +18,11 @@
 //  This file defines some smart pointer classes for general usage.
 //
 //  There is TCntPtr which provides a thread safe counted pointer, using lockless
-//  reference counting.
+//  reference counting. It works in conjunction with TWeakPtr which works similarly
+//  to the standard C++ shared/weak pointers. You can get weak pointers from a
+//  counted pointers. And later, you can ask to get a counted pointer back from the
+//  weak pointers. If at least one counted pointer to that data is still around,
+//  you will get a counted pointer to that data, else a pointer to null.
 
 //  We also provide TMngPtr from the base class, which just provides a non-counted
 //  pointer. It purely exists to give 'by value' semantics to a pointer. It's assumed
@@ -33,6 +37,11 @@
 //  the original pointer, and that you can't accidentally assign it to another one.
 //
 //  But of course be careful you don't assign away the one that you mean to keep.
+//
+//  And we provide TMemberPtr, which is used when a class needs to allocate members
+//  but otherwise wants to treat them by value for copy/assignment purposes. This means
+//  the containing class can use default copy/assignment where otherwise it wouldn't
+//  be able to.
 //
 //  To keep some of the functionality out of line, to reduce rebuilds and code footprint
 //  we have a little helper namespace with some functions they can call. These are also
@@ -93,13 +102,13 @@ template <class T> class TUniquePtr
         // -------------------------------------------------------------------
         TUniquePtr() :
 
-            m_pData(nullptr)
+            m_pdpInfo(new TDataPtr<T>(nullptr))
         {
         }
 
-        explicit TUniquePtr(T* const pAdopt) :
+        explicit TUniquePtr(T* const pobjAdopt) :
 
-            m_pData(pAdopt)
+            m_pdpInfo(new TDataPtr<T>(pobjAdopt))
         {
         }
 
@@ -107,19 +116,21 @@ template <class T> class TUniquePtr
 
         TUniquePtr(TUniquePtr<T>&& uptrSrc) :
 
-            m_pData(nullptr)
+            m_pdpInfo(new TDataPtr<T>(nullptr))
         {
             *this = tCIDLib::ForceMove(uptrSrc);
         }
 
         ~TUniquePtr()
         {
-            if (m_pData)
+            if (m_pdpInfo)
             {
                 try
                 {
-                    delete m_pData;
-                    m_pData = nullptr;
+                    // Destroy the user data if we still have it, then our data
+                    m_pdpInfo->DestroyData();
+                    delete m_pdpInfo;
+                    m_pdpInfo = nullptr;
                 }
 
                 catch(...)
@@ -137,42 +148,43 @@ template <class T> class TUniquePtr
         TUniquePtr<T>& operator=(TUniquePtr<T>&& uptrSrc)
         {
             if (&uptrSrc != this)
-                tCIDLib::Swap(m_pData, uptrSrc.m_pData);
+                tCIDLib::Swap(m_pdpInfo, uptrSrc.m_pdpInfo);
             return *this;
         }
 
         operator tCIDLib::TBoolean() const
         {
-            return (m_pData != nullptr);
+            return (m_pdpInfo->m_pobjData != nullptr);
         }
 
         tCIDLib::TBoolean operator!() const
         {
-            return (m_pData == nullptr);
+            return (m_pdpInfo->m_pobjData == nullptr);
         }
 
         T* operator->()
         {
-            return m_pData;
+            return m_pdpInfo->m_pobjData;
         }
 
         const T* operator->() const
         {
-            return m_pData;
+            return m_pdpInfo->m_pobjData;
         }
+
 
         const T& operator*() const
         {
-            if (!m_pData)
+            if (!m_pdpInfo->m_pobjData)
                 TSmartPtrHelpers::ThrowNullRef(CID_LINE, L"TUniquePtr");
-            return *m_pData;
+            return *m_pdpInfo->m_pobjData;
         }
 
         T& operator*()
         {
-            if (!m_pData)
+            if (!m_pdpInfo->m_pobjData)
                 TSmartPtrHelpers::ThrowNullRef(CID_LINE, L"TUniquePtr");
-            return *m_pData;
+            return *m_pdpInfo->m_pobjData;
         }
 
 
@@ -182,31 +194,68 @@ template <class T> class TUniquePtr
         tCIDLib::TVoid DropRef()
         {
             // If we still have a valid pointer, then we own it
-            if (m_pData)
+            if (m_pdpInfo->m_pobjData)
             {
-                T* pOld = m_pData;
-                m_pData = nullptr;
-                delete pOld;
+                m_pdpInfo.DestroyData();
+                delete m_pdpInfo;
+                m_pdpInfo = new TDataPtr<T>(nullptr);
             }
         }
 
         [[nodiscard]] T* pOrphan()
         {
-            T* pRet = m_pData;
-            m_pData = nullptr;
+            T* pobjRet = m_pdpInfo->m_pobjData;
+            m_pdpInfo->m_pobjData = nullptr;
             return pRet;
         }
 
 
     private :
         // -------------------------------------------------------------------
+        //  Private types
+        //
+        //  We need a base class to hold our object and a derived class that can hold
+        //  a deleter. Our base class is the default and just called delete on it.
+        // -------------------------------------------------------------------
+        template <typename T> struct TDataPtr
+        {
+            TDataPtr(T* const pobjAdopt) : m_pobjData(pobjAdopt) {}
+            virtual tCIDLib::TVoid DestroyData()
+            {
+                delete m_pobjData;
+            }
+            T*  m_pobjData;
+        };
+
+        template <typename T, typename TDeleter> struct TDataPtrDel : public TDataPtr<T>
+        {
+            TDataPtrDel(T* const pobjAdopt, TDeleter fnDelete) :
+
+                TDataPtr<T>(pobjAdopt)
+                , m_fnDeleter(fnDelete)
+            {
+            }
+
+            tCIDLib::TVoid DestroyData() final
+            {
+                m_fnDeleter(m_pobjData);
+            }
+
+            TDeleter    m_fnDeleter;
+        };
+
+
+        // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_pData
-        //      The data object we were given to handle. It can be null of course.
+        //  m_pdpInfo
+        //      This will be either our base pointer or the derived deleter oriented
+        //      one, depending on how we were constructed. It is never null. If we
+        //      drop our ref, ew create a new one that holds a null pointer.
         // -------------------------------------------------------------------
-        T*  m_pData;
+        TDataPtr<T>*    m_pdpInfo;
 };
+
 
 
 // ---------------------------------------------------------------------------
@@ -246,13 +295,14 @@ template <typename T> class TCntPtrData
 
         TCntPtrData(const TCntPtrData<T>&) = delete;
 
-        ~TCntPtrData()
+        virtual ~TCntPtrData()
         {
             //
             //  It's an error if this goes away without a zero count. It means someone
             //  didn't do what they are supposed to.
             //
-            CIDAssert(m_c4RefCnt == 0, L"The pointer ref was not zero at data dtor");
+            CIDAssert(m_c4RefCnt == 0, L"The pointer ref count was not zero at data dtor");
+            CIDAssert(m_pobjData == nullptr, L"The pointer was not zero at data dtor");
         }
 
 
@@ -363,7 +413,7 @@ template <typename T> class TCntPtrData
             //
             if (!(c4New & 0xFFFF))
             {
-                delete m_pobjData;
+                DestroyUserData();
                 m_pobjData = nullptr;
             }
 
@@ -442,6 +492,18 @@ template <typename T> class TCntPtrData
         }
 
 
+    protected :
+        // -------------------------------------------------------------------
+        //  Protected, virtual methods
+        // -------------------------------------------------------------------
+
+        // Default is to just call delete
+        virtual tCIDLib::TVoid DestroyUserData()
+        {
+            delete m_pobjData;
+        }
+
+
     private :
         //
         //  To avoid redundancy in the two methods above that return the strong and weak
@@ -466,11 +528,54 @@ template <typename T> class TCntPtrData
             return c4Ret;
         }
 
-
         volatile mutable tCIDLib::TCard4    m_c4RefCnt;
         T*                                  m_pobjData;
 };
 
+template <typename T, typename TDeleter> class TCntPtrDataImpl : public TCntPtrData<T>
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TCntPtrDataImpl() = delete;
+
+        TCntPtrDataImpl(        T* const            pobjAdopt
+                        , const tCIDLib::TBoolean   bStrongType
+                        ,       TDeleter            fnDeleter) :
+
+            TCntPtrData<T>(pobjAdopt, bStrongType)
+            , m_fnDeleter(fnDeleter)
+        {
+        }
+
+        TCntPtrDataImpl(const TCntPtrDataImpl<T,TDeleter>&) = delete;
+
+        ~TCntPtrDataImpl() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TCntPtrDataImpl<T,TDeleter>& operator=(const TCntPtrDataImpl<T,TDeleter>&) = delete;
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  Protected, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid DestroyUserData() final
+        {
+            m_fnDeleter(this->pobjData());
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        // -------------------------------------------------------------------
+        TDeleter    m_fnDeleter;
+};
 
 
 // ---------------------------------------------------------------------------
@@ -495,6 +600,12 @@ template <typename T> class TCntPtr
         {
         }
 
+        template <typename TDeleter> TCntPtr(T* pobjToAdopt, TDeleter fnDeleter) :
+
+            m_pcdRef(new TCntPtrDataImpl<T,TDeleter>(pobjToAdopt, kCIDLib::True, fnDeleter))
+        {
+        }
+
         TCntPtr(const TCntPtr<T>& cptrSrc) :
 
             m_pcdRef(nullptr)
@@ -505,13 +616,6 @@ template <typename T> class TCntPtr
             if (!cptrSrc.m_pcdRef->bAcquireStrongRef())
                 TSmartPtrHelpers::CantAcquireStrongRef(CID_LINE);
             m_pcdRef = cptrSrc.m_pcdRef;
-        }
-
-        // Become responsible for the object in a unique pointer
-        TCntPtr(TUniquePtr<T>& uptrSrc) :
-
-            m_pcdRef(new TCntPtrData<T>(uptrSrc.pOrphan(), kCIDLib::True))
-        {
         }
 
         ~TCntPtr()
@@ -641,7 +745,22 @@ template <typename T> class TCntPtr
             //  old ref via the copy we made.
             //
             TCntPtrData<T>* pcdTmp = m_pcdRef;
-            m_pcdRef = new TCntPtrData(pobjNew, kCIDLib::True);
+            m_pcdRef = new TCntPtrData<T>(pobjNew, kCIDLib::True);
+
+            // If no more refs of either type left, then clean up the pointer data
+            if (!pcdTmp->bReleaseStrongRef())
+                delete pcdTmp;
+        }
+
+        template <typename TDeleter>
+        tCIDLib::TVoid SetPointer(T* const pobjNew, TDeleter fnDeleter)
+        {
+            //
+            //  Make sure we've got the new guy stored away then release our
+            //  old ref via the copy we made.
+            //
+            TCntPtrData<T>* pcdTmp = m_pcdRef;
+            m_pcdRef = new TCntPtrDataImpl<T,TDeleter>(pobjNew, kCIDLib::True, fnDeleter);
 
             // If no more refs of either type left, then clean up the pointer data
             if (!pcdTmp->bReleaseStrongRef())
@@ -654,6 +773,7 @@ template <typename T> class TCntPtr
         //  Friend declaration
         // -------------------------------------------------------------------
         template <typename T> friend class TWeakPtr;
+
 
         // -------------------------------------------------------------------
         //  Hidden constructors
@@ -691,9 +811,12 @@ template <typename T> class TCntPtr
         //  Private data members
         //
         //  m_pcdRef
-        //      An instance of our little counted data structure. If it is not null, then
-        //      it means we have a valid reference. once the ref count goes zero, we delete
-        //      this guy and set this pointer to null.
+        //      An instance of our little counted data structure. It is never null.
+        //      If the old one is dropped we allocate a new, default one with a
+        //      null data pointer in it.
+        //
+        //      We store it via the base class because we cannot be tied to the
+        //      deleter type.
         // -------------------------------------------------------------------
         TCntPtrData<T>* m_pcdRef;
 };
@@ -709,6 +832,8 @@ template <typename T> class TWeakPtr
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+
+        // Just set up an already dead null pointer with a single weak ref
         TWeakPtr() :
 
             m_pcdRef(new TCntPtrData<T>(nullptr, kCIDLib::False))
@@ -731,6 +856,13 @@ template <typename T> class TWeakPtr
             // Bump the weak ref count and take on his data pointer
             wptrSrc.m_pcdRef->AcquireWeakRef();
             m_pcdRef = wptrSrc.m_pcdRef;
+        }
+
+        TWeakPtr(TWeakPtr<T>&& wptrSrc) :
+
+            m_pcdRef(new TCntPtrData<T>(nullptr, kCIDLib::False))
+        {
+            *this = tCIDLib::ForceMove(wptrSrc);
         }
 
         ~TWeakPtr()
@@ -775,6 +907,13 @@ template <typename T> class TWeakPtr
             return *this;
         }
 
+        TWeakPtr<T>& operator=(TWeakPtr<T>&& wptrSrc)
+        {
+            if (&wptrSrc != this)
+                tCIDLib::Swap(m_pcdRef, wptrSrc.m_pcdRef);
+            return *this;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -812,7 +951,7 @@ template <typename T> class TWeakPtr
         tCIDLib::TVoid DropRef()
         {
             TCntPtrData<T>* pcdOld = m_pcdRef;
-            m_pcdRef = nullptr;
+            m_pcdRef = new TDefDataImpl(nullptr, kCIDLib::False, TDefDelT());
 
             // Drop the old weak ref and delete if we were the last
             if (!pcdOld->bReleaseWeakRef())
@@ -961,6 +1100,264 @@ template <class T> class TMngPtr
         //      This the pointer to the data
         // -------------------------------------------------------------------
         T*  m_pData;
+};
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TMemberPtr
+//  PREFIX: mbptr
+// ---------------------------------------------------------------------------
+template <class T> class TMemberPtr
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TMemberPtr() :
+
+            m_pdpInfo(new TDataPtrDefDC<T>(nullptr))
+        {
+        }
+
+        explicit TMemberPtr(T* const pobjAdopt) :
+
+            m_pdpInfo(new TDataPtrDefDC<T>(pobjAdopt))
+        {
+        }
+
+        // Let them set custom copy/delete handlers
+        template <typename TCopy, typename TDel>
+        TMemberPtr(T* const pobjAdopt, TCopy fnCopy, TDel fnDelete) :
+
+            m_pdpInfo(new TDataPtrCustDC<T,TCopy,TDel>(pobjAdopt, fnCopy, fnDelete))
+        {
+        }
+
+        //
+        //  Duplicate the caller's pointer data, which gets us the data and the
+        //  copy/delete handlers.
+        //
+        TMemberPtr(const TMemberPtr<T>& mbptrSrc) :
+
+            m_pdpInfo(mbptrSrc.m_pdpInfo->pdpDuplicate())
+        {
+        }
+
+        // We just gen up a default one with null data to give away
+        TMemberPtr(TMemberPtr<T>&& mbptrSrc) :
+
+            m_pdpInfo(new TDataPtrDefDC<T>(nullptr))
+        {
+            *this = tCIDLib::ForceMove(mbptrSrc);
+        }
+
+        ~TMemberPtr()
+        {
+            ReleaseData(kCIDLib::False);
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+
+        //
+        //  Drop our current data and duplicate the caller's pointer data, which
+        //  gets us the data and the copy/delete handlers.
+        //
+        TMemberPtr<T>& operator=(const TMemberPtr<T>& mbptrSrc)
+        {
+            if (&mbptrSrc != this)
+            {
+                ReleaseData(kCIDLib::False);
+                m_pdpInfo = mbptrSrc->pdpDuplicate();
+            }
+            return *this;
+        }
+
+        TMemberPtr<T>& operator=(TMemberPtr<T>&& mbptrSrc)
+        {
+            if (&mbptrSrc != this)
+                tCIDLib::Swap(m_pdpInfo, mbptrSrc.m_pdpInfo);
+            return *this;
+        }
+
+        operator tCIDLib::TBoolean() const
+        {
+            return (m_pdpInfo->m_pobjData != nullptr);
+        }
+
+        tCIDLib::TBoolean operator!() const
+        {
+            return (m_pdpInfo->m_pobjData == nullptr);
+        }
+
+        T* operator->()
+        {
+            return m_pdpInfo->m_pobjData;
+        }
+
+        const T* operator->() const
+        {
+            return m_pdpInfo->m_pobjData;
+        }
+
+
+        const T& operator*() const
+        {
+            if (!m_pdpInfo->m_pobjData)
+                TSmartPtrHelpers::ThrowNullRef(CID_LINE, L"TMemberPtr");
+            return *m_pdpInfo->m_pobjData;
+        }
+
+        T& operator*()
+        {
+            if (!m_pdpInfo->m_pobjData)
+                TSmartPtrHelpers::ThrowNullRef(CID_LINE, L"TMemberPtr");
+            return *m_pdpInfo->m_pobjData;
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid DropRef()
+        {
+            //
+            //  Release our current data if we have any, telling it to allocate a
+            //  dummy new one with null user data.
+            //
+            ReleaseData(kCIDLib::True);
+        }
+
+        [[nodiscard]] T* pOrphan()
+        {
+            T* pobjRet = m_pdpInfo->m_pobjData;
+            m_pdpInfo->m_pobjData = nullptr;
+            return pRet;
+        }
+
+        // Drop any current data and create a new default handler for the new data
+        tCIDLib::TVoid SetPointer(T* const pobjAdopt)
+        {
+            ReleaseData(kCIDLib::False);
+            m_pdpInfo = new TDataPtrDefDC<T>(pobjAdopt);
+        }
+
+        // For this one, let them set their own copy/delete handlers
+        template <typename TCopy, typename TDel>
+        tCIDLib::TVoid SetPointer(T* const pobjAdopt, TCopy fnCopy, TDel fnDelete)
+        {
+            ReleaseData(kCIDLib::False);
+            m_pdpInfo = new TDataPtrCustDC<T,TCopy,TDel>(pobjAdopt, fnCopy, fnDelete);
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private types
+        //
+        //  We need a base class to hold our object and a derived class that can hold
+        //  a deleter. Our base class is the default and just called delete on it.
+        // -------------------------------------------------------------------
+        template <typename T> struct TDataPtr
+        {
+            TDataPtr(T* const pobjAdopt) : m_pobjData(pobjAdopt) {}
+            virtual TDataPtr<T>* pdpDuplicate() = 0;
+            virtual tCIDLib::TVoid DestroyData() = 0;
+
+            T*  m_pobjData;
+        };
+
+        template <typename T>
+        struct TDataPtrDefDC : public TDataPtr<T>
+        {
+            TDataPtrDefDC(T* const pobjAdopt) : TDataPtr<T>(pobjAdopt)
+            {
+            }
+
+            // Duplicate ourself and our contained data
+            [[nodiscard]] TDataPtr<T>* pdpDuplicate() final
+            {
+                return new TDataPtrDefDC<T>
+                (
+                    this->m_pobjData ? new T(*this->m_pobjData) : nullptr
+                );
+            }
+
+            tCIDLib::TVoid DestroyData() final
+            {
+                delete this->m_pobjData;
+            }
+        };
+
+        template <typename T, typename TCopier, typename TDeleter>
+        struct TDataPtrCustDC : public TDataPtr<T>
+        {
+            TDataPtrCustDC(T* const pobjAdopt, TCopier fnCopy, TDeleter fnDelete) :
+
+                TDataPtr<T>(pobjAdopt)
+                , m_fnCopier(fnCopy)
+                , m_fnDeleter(fnDelete)
+            {
+            }
+
+            // Duplicate ourself and our contained data
+            [[nodiscard]] TDataPtr<T>* pdpDuplicate() final
+            {
+                return new TDataPtrCustDC<T, TCopier, TDeleter>
+                (
+                    this->m_pobjData ? m_fnCopier(this->m_pobjData) : nullptr
+                    , m_fnCopier
+                    , m_fnDeleter
+                );
+            }
+
+            tCIDLib::TVoid DestroyData() final
+            {
+                m_fnDeleter(this->m_pobjData);
+            }
+
+            TCopier     m_fnCopier;
+            TDeleter    m_fnDeleter;
+        };
+
+
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid ReleaseData(const tCIDLib::TBoolean bSetNull)
+        {
+            if (m_pdpInfo)
+            {
+                try
+                {
+                    // Destroy the user data if we still have it, then our data
+                    m_pdpInfo->DestroyData();
+                    delete m_pdpInfo;
+
+                    if (bSetNull)
+                        m_pdpInfo = new TDataPtrDefDC<T>(nullptr);
+                    else
+                        m_pdpInfo = nullptr;
+                }
+
+                catch(...)
+                {
+                }
+            }
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_pdpInfo
+        //      This will be either our base pointer or the derived deleter oriented
+        //      one, depending on how we were constructed. It is never null. If we
+        //      drop our ref, ew create a new one that holds a null pointer.
+        // -------------------------------------------------------------------
+        TDataPtr<T>*    m_pdpInfo;
 };
 
 

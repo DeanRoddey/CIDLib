@@ -82,6 +82,7 @@ AddTest(new TTest_StringTokens);
     AddTest(new TTest_LambdaJan);
     AddTest(new TTest_Enum1);
     AddTest(new TTest_EnumForEach);
+    AddTest(new TTest_MemberPtr1);
     AddTest(new TTest_CntPtr1);
     AddTest(new TTest_UniquePtr);
     AddTest(new TTest_WeakPtr1);
