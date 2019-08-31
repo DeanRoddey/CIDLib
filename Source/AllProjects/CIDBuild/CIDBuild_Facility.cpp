@@ -816,6 +816,7 @@ tCIDLib::TVoid TFacCIDBuild::CheckEnv()
     //  Run through the environment and look for the following environment
     //  variables (and what they set):
     //
+    //  CIDLIB_SRCDIR       m_strCIDLibSrcDir
     //  CID_BUILDMODE       m_eBldMode
     //  CID_RESDIR          m_strOutDir
     //  CID_SRCTREE         m_strRootDir
@@ -857,7 +858,7 @@ tCIDLib::TVoid TFacCIDBuild::CheckEnv()
             m_strRootDir.Append(kCIDBuild::chPathSep);
     }
 
-    if (TUtils::bGetEnvVar(L"CID_SRCTREE", m_strCIDLibSrcDir))
+    if (TUtils::bGetEnvVar(L"CIDLIB_SRCDIR", m_strCIDLibSrcDir))
     {
         // Make sure it ends with a slash
         if (m_strCIDLibSrcDir.chLast() != kCIDBuild::chPathSep)
