@@ -224,6 +224,7 @@ template <class T> class TKrnlTypedSharedBuf : public TKrnlSharedMemBuf
             (
                 pszName
                 , sizeof(T)
+                , tCIDLib::EAllocTypes::Commit
                 , eAccess
                 , bCreated
                 , eCreateFlags
@@ -241,6 +242,7 @@ template <class T> class TKrnlTypedSharedBuf : public TKrnlSharedMemBuf
             (
                 pszName
                 , sizeof(T)
+                , tCIDLib::EAllocTypes::Commit
                 , eAccess
                 , bDummy
                 , eCreateFlags

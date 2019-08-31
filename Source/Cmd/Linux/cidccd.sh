@@ -16,6 +16,12 @@ function setdir() {
         "cidbuild") chdir=${CID_SRCTREE}/Source/AllProjects/CIDBuild
         ;;
 
+        "cidlib") chdir=${CID_SRCTREE}/Source/AllProjects/CIDLib
+        ;;
+
+        "cidkernel") chdir=${CID_SRCTREE}/Source/AllProjects/CIDKernel
+        ;;                
+
         "cmd") chdir=${CID_SRCTREE}/Source/Cmd/Linux
         ;;
 
@@ -29,6 +35,12 @@ function setdir() {
         ;;
 
         "root") chdir=${CID_SRCTREE}
+        ;;
+
+        "tests") chdir=${CID_SRCTREE}/Source/AllProjects/Tests
+        ;;
+
+        "tests2") chdir=${CID_SRCTREE}/Source/AllProjects/Tests2
         ;;
 
         "top") chdir=${CID_DEVTREE}

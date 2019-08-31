@@ -809,19 +809,22 @@ TProjectInfo::bSetSetting(const TBldStr& strName, const TBldStr& strValue)
     }
      else if (strName == L"DIRECTORY")
     {
-        // Store the raw directory
+        // Store the raw directory, updating for local path sep type
         m_strDirectory = strValue;
+        if (kCIDBuild::chProjectPathSep != kCIDBuild::chPathSep)
+            m_strDirectory.ReplaceChar(kCIDBuild::chProjectPathSep, kCIDBuild::chPathSep);
 
         // Build up the path to the directory and store it.
         m_strProjectDir = facCIDBuild.strRootDir();
-        m_strProjectDir.Append(L"Source", kCIDBuild::pszPathSep);
-        m_strProjectDir.Append(L"AllProjects", kCIDBuild::pszPathSep);
+
+        // Indicate we want a trailing slash
+        m_strProjectDir.AppendPathComps(L"Source", L"AllProjects", kCIDLib::True);
 
         // If it's not empty (i.e. top level), then add it, and end with a slash
         if (!m_strDirectory.bEmpty())
         {
             m_strProjectDir.Append(m_strDirectory);
-            m_strProjectDir.Append(kCIDBuild::pszPathSep);
+            m_strProjectDir.Append(kCIDBuild::chPathSep);
         }
     }
      else if (strName == L"DISPLAY")

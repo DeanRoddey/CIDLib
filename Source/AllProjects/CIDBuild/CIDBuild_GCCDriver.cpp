@@ -164,6 +164,9 @@ tCIDLib::TVoid TGCCDriver::ResetDebugInfo(const TProjectInfo& projiToReset)
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TGCCDriver::bCompileCpps()
 {
+    TBldStr strTmp;
+
+
     //
     //  First we want to build up the list of command line parameters that
     //  will be used to compile a Cpp file. For our Visual C++ compiler, the
@@ -174,6 +177,14 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
     tCIDLib::TCard4 c4CurArg = 0;
     apszArgs[c4CurArg++] = L"g++";
     apszArgs[c4CurArg++] = L"-c";
+    apszArgs[c4CurArg++] = L"-m32";
+    apszArgs[c4CurArg++] = L"-DPLATFORM_LINUX";
+    apszArgs[c4CurArg++] = L"-std=c++17";
+    apszArgs[c4CurArg++] = L"-m32";
+
+    if (m_bDebug)
+        apszArgs[c4CurArg++] = L"-D_DEBUG";
+    
 
     //
     //  Set up our CIDLib platform define that gets passed to all code
@@ -182,6 +193,37 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
     TBldStr strPlatform(L"-D");
     strPlatform.Append(kCIDBuild::pszPlatformDir);
     apszArgs[c4CurArg++] = strPlatform.pszBuffer();
+
+    TBldStr strMajVer(L"-DCID_MAJVER=");
+    strTmp.Format(facCIDBuild.c4MajVer());
+    strMajVer.Append(strTmp);
+    apszArgs[c4CurArg++] = strMajVer.pszBuffer();
+
+    TBldStr strMinVer(L"-DCID_MINVER=");
+    strTmp.Format(facCIDBuild.c4MinVer());
+    strMinVer.Append(strTmp);
+    apszArgs[c4CurArg++] = strMinVer.pszBuffer();
+
+    TBldStr strRevision(L"-DCID_REVISION=");
+    strTmp.Format(facCIDBuild.c4Revision());
+    strRevision.Append(strTmp);
+    apszArgs[c4CurArg++] = strRevision.pszBuffer();
+
+    TBldStr strVerString(L"-DCID_VERSTRING=");
+    strTmp.Format(facCIDBuild.c4MajVer());
+    strVerString.Append(strTmp);
+    strVerString.Append(L".");
+    strTmp.Format(facCIDBuild.c4MinVer());
+    strVerString.Append(strTmp);
+    strVerString.Append(L".");
+    strTmp.Format(facCIDBuild.c4Revision());
+    strVerString.Append(strTmp);
+    apszArgs[c4CurArg++] = strVerString.pszBuffer();
+
+    TBldStr strVerSuff(L"-DCID_VERSUFF=");
+    strVerSuff.Append(facCIDBuild.strVersionSuffix());
+    apszArgs[c4CurArg++] = strVerSuff.pszBuffer();
+
 
 
     // Set the flags for the project type
@@ -280,12 +322,7 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
 
         // Setup output
         apszArgs[c4ExtraArgs++] = L"-o";
-        TBldStr strJustName(depiCur.strObjFileName());
-        tCIDLib::TCard4 c4Name, c4Extension;
-        TUtils::FindPathParts(strJustName, c4Name, c4Extension);
-        strJustName.Cut(c4Name);
-        TBldStr strOutput(m_pprojiTarget->strOutDir(), strJustName);
-        apszArgs[c4ExtraArgs++] = strOutput.pszBuffer();
+        apszArgs[c4ExtraArgs++] = depiCur.strObjFileName().pszBuffer();
 
         // Add the current file as the source file
         apszArgs[c4ExtraArgs++] = depiCur.strFileName().pszBuffer();
@@ -303,7 +340,6 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
             c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
         tCIDLib::TCard4 c4Result;
 
-        /*
         if (!TUtils::bExec(apszArgs, c4ExtraArgs, c4Result, c4ExecFlags))
         {
             stdOut << L"Could not execute the compiler" << kCIDBuild::EndLn;
@@ -317,8 +353,6 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
                     << c4Result << kCIDBuild::EndLn;
             throw tCIDBuild::EErrors::BuildError;
         }
-
-        */
 
         // Make sure we have a line after the output if in verbose mode
         if (facCIDBuild.bVerbose())
@@ -417,17 +451,25 @@ tCIDLib::TVoid TGCCDriver::Link()
     tCIDLib::TUInt c4CurArg = 0;
 
     // Set up the standard stuff
-    apszArgs[c4CurArg++] = L"gcc";
+    apszArgs[c4CurArg++] = L"g++";
 
-    // Set up the output file. It is a versioned file and the name is prebuilt
+    // Set up the output file
     apszArgs[c4CurArg++] = L"-o";
     apszArgs[c4CurArg++] = m_strTargetFile.pszBuffer();
 
     // And the debug vs. production flags
     if (m_bDebug)
+    {
         apszArgs[c4CurArg++] = L"-g";
-    else
+    }
+     else
+    {
         apszArgs[c4CurArg++] = L"-O3";
+    }
+
+    // 32 bit mode and standard C++ libraries
+    apszArgs[c4CurArg++] = L"-lstdc++";
+    apszArgs[c4CurArg++] = L"-m32";
 
     //
     //  And now add in all of the Obj and Lib files. We built them up above
@@ -465,11 +507,12 @@ tCIDLib::TVoid TGCCDriver::Link()
         apszArgs[c4CurArg++] = L"-ldl";
         apszArgs[c4CurArg++] = L"-lm";
     }
-    else if (m_pprojiTarget->strProjectName() == TBldStr(L"CIDKernel"))
+     else if (m_pprojiTarget->strProjectName() == TBldStr(L"CIDKernel"))
     {
         apszArgs[c4CurArg++] = L"-lreadline";
         apszArgs[c4CurArg++] = L"-lhistory";
     }
+
 
     if (facCIDBuild.bVerbose())
     {

@@ -857,7 +857,7 @@ tCIDLib::TVoid TFacCIDBuild::CheckEnv()
             m_strRootDir.Append(kCIDBuild::chPathSep);
     }
 
-    if (TUtils::bGetEnvVar(L"CIDLIB_SRCDIR", m_strCIDLibSrcDir))
+    if (TUtils::bGetEnvVar(L"CID_SRCTREE", m_strCIDLibSrcDir))
     {
         // Make sure it ends with a slash
         if (m_strCIDLibSrcDir.chLast() != kCIDBuild::chPathSep)

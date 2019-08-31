@@ -33,7 +33,8 @@ END CTRL
 ;  Error ids
 ; ----------------------------------------------------------------------------
 ERRORS=
-    errcNoError                        0    No error
+    errcNoError                        0    No error \
+                                            was found
     errcUnknown                     7998    An unknown error occured
     errcHostErr                     7999    An error occured in a host API
 

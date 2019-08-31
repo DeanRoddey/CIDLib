@@ -39,7 +39,15 @@
 #include <fnmatch.h>
 #include <langinfo.h>
 #include <linux/limits.h>
-#include <linux/uio.h>
+
+//
+//  An error in the headers, this is also included in socket.h below and 
+//  causes duplicate definitions. If that is later fixed, we'll have to
+//  include this again (or make this conditional somehow.)
+//
+// #include <linux/uio.h>
+//
+
 #include <math.h>
 #include <mntent.h>
 #include <netdb.h>

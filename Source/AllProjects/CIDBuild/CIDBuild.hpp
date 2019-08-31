@@ -343,6 +343,13 @@ namespace kCIDBuild
 
 
     // -----------------------------------------------------------------------
+    //  The path separators used in the project files. If not the same as the platform
+    //  path separator, we have to update the paths as we parse the file.
+    // -----------------------------------------------------------------------
+    const tCIDLib::TCh      chProjectPathSep = L'\\';
+
+
+    // -----------------------------------------------------------------------
     //  Flags for TUtils::bExec
     // -----------------------------------------------------------------------
     const tCIDLib::TCard4   c4ExecFlag_None     = 0;

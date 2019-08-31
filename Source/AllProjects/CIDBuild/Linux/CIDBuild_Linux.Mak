@@ -30,7 +30,7 @@ MKTREE := mkdir -p --verbose
 RMTREE := rm -fvr
 SRC_EXT := .cpp
 HDR_EXT := .hpp
-OUR_OUTDIR := $(CID_RESDIR)/CIDBuild.out
+OUR_OUTDIR := $(CID_RESDIR)/CIDBuild.Out
 
 
 ifeq ($(findstring $(CID_BUILDMODE),Dev Prod),)
@@ -81,7 +81,7 @@ CIDBuild_RawStr.hpp \
 CIDBuild_TextFile.hpp \
 CIDBuild_ToolsDriver.hpp \
 CIDBuild_Utils.hpp \
-CIDBuild_VCppDriver.hpp \
+CIDBuild_GCCDriver.hpp \
 $(PLATDIR)/CIDBuild_Platform.hpp
 
 # The cpp files we need to build

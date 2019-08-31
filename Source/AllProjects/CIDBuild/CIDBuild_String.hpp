@@ -145,6 +145,21 @@ class TBldStr
             const   tCIDLib::TCh            chToAppend
         );
 
+        tCIDLib::TVoid AppendPathComps
+        (
+            const   tCIDLib::TCh* const     pszComp1
+            , const tCIDLib::TCh* const     pszComp2
+            , const tCIDLib::TBoolean       bTrailingSep = kCIDLib::False
+        );        
+
+        tCIDLib::TVoid AppendPathComps
+        (
+            const   tCIDLib::TCh* const     pszComp1
+            , const tCIDLib::TCh* const     pszComp2
+            , const tCIDLib::TCh* const     pszComp3
+            , const tCIDLib::TBoolean       bTrailingSep = kCIDLib::False
+        ); 
+
         tCIDLib::TBoolean bAsBoolean() const;
 
         tCIDLib::TBoolean bContainsChar

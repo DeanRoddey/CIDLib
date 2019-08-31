@@ -567,7 +567,10 @@ tCIDLib::TVoid TIDLInfo::Parse(TLineSpooler& lsplSource)
         // Ok and now parse the rest according to the name field
         if (strName == L"SRCFILE")
         {
+            // Update path seps if needed
             m_strSrcFile = strValue;
+            if (kCIDBuild::chProjectPathSep != kCIDBuild::chPathSep)
+                m_strSrcFile.ReplaceChar(kCIDBuild::chProjectPathSep, kCIDBuild::chPathSep);            
             m_strSrcFile.Append(L".CIDIDL");
         }
          else if (strName == L"GEN")

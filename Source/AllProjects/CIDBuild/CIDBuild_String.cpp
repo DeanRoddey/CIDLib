@@ -248,6 +248,41 @@ tCIDLib::TVoid TBldStr::Append(const tCIDLib::TCh chToAppend)
 }
 
 
+tCIDLib::TVoid
+TBldStr::AppendPathComps(const  tCIDLib::TCh* const psz1
+                        , const tCIDLib::TCh* const psz2
+                        , const tCIDLib::TBoolean   bTrailingSep)
+{
+    if (chLast() != kCIDBuild::chPathSep)
+        Append(kCIDBuild::chPathSep);
+
+    Append(psz1);
+    Append(kCIDBuild::chPathSep);
+    Append(psz2);
+
+    if (bTrailingSep)
+        Append(kCIDBuild::chPathSep);    
+}
+
+tCIDLib::TVoid
+TBldStr::AppendPathComps(const  tCIDLib::TCh* const psz1
+                        , const tCIDLib::TCh* const psz2
+                        , const tCIDLib::TCh* const psz3
+                        , const tCIDLib::TBoolean   bTrailingSep)
+{
+    if (chLast() != kCIDBuild::chPathSep)
+        Append(kCIDBuild::chPathSep);
+
+    Append(psz1);
+    Append(kCIDBuild::chPathSep);
+    Append(psz2);
+    Append(kCIDBuild::chPathSep);
+    Append(psz3);    
+
+    if (bTrailingSep)
+        Append(kCIDBuild::chPathSep);    
+}
+
 tCIDLib::TBoolean TBldStr::bAsBoolean() const
 {
     return (TRawStr::iCompIStr(m_pszBuf, L"True") == 0);

@@ -447,7 +447,7 @@ class TFacCIDBuild
         //      created at construction time with a little conditional code.
         //
         //  m_strCIDLibSrcDir
-        //      This is set via the CIDLIB_SRCDIR environment variable and
+        //      This is set via the CID_SRCTREE environment variable and
         //      points to the top level of the CIDLib tree (or to the
         //      packaged CIDLib system if not working against the original
         //      source.) It's redundant in a way when building CIDLib itself,

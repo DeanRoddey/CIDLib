@@ -1458,7 +1458,7 @@ PROJECT=TestORB
 
     IDLFILES
         IDLFILE
-            SRCFILE = TestOrb_Loopback
+            SRCFILE = TestORB_Loopback
             GEN     = CLIENT,SERVER
             NAMEEXT = Loopback
         END IDLFILE
@@ -1645,7 +1645,7 @@ PROJECT=Beeper
 END PROJECT
 
 
-PROJECT=CDROM1
+PROJECT=CDROM1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\CDROM1
         SAMPLE      = Yes
@@ -1896,7 +1896,7 @@ PROJECT=JSON1 [WIN32_*]
     END DEPENDENTS
 END PROJECT
 
-PROJECT=SpReco1
+PROJECT=SpReco1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\SpReco1
         SAMPLE      = Yes
@@ -2007,7 +2007,7 @@ PROJECT=RTTI1
     END DEPENDENTS
 END PROJECT
 
-PROJECT=SpGrammarComp
+PROJECT=SpGrammarComp [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\SpGrammarComp
         SAMPLE      = Yes
@@ -2153,7 +2153,7 @@ PROJECT=Streams6
 END PROJECT
 
 
-PROJECT=UPnP1
+PROJECT=UPnP1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\UPnP1
         SAMPLE      = Yes
@@ -2220,7 +2220,7 @@ END PROJECT
 ;  Some intermediate samples
 ; ----------------------------------------------------------------------------
 
-PROJECT=CML1
+PROJECT=CML1 [WIN32_*]
 
     SETTINGS
         DIRECTORY   = Samples\Intermediate\CML1

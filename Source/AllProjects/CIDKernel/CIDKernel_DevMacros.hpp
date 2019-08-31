@@ -88,7 +88,7 @@ inline eEnumType operator--(eEnumType& eVal) \
 \
 inline tCIDLib::TBoolean bIsValidEnum(const eEnumType eVal) \
 { \
-    if ((eVal < eEnumType##::Min) || (eVal > eEnumType##::Max)) \
+    if ((eVal < eEnumType::Min) || (eVal > eEnumType::Max)) \
         return kCIDLib::False; \
     return kCIDLib::True; \
 }

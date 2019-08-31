@@ -109,7 +109,7 @@ class TGCCDriver : public TToolsDriver
         //      around. Keep in mind that it has no path part since we link
         //      in the output directory.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean m_bDebug;
+        tCIDLib::TBoolean   m_bDebug;
         const TProjectInfo* m_pprojiTarget;
         TBldStr             m_strTargetFile;
 };

@@ -46,6 +46,12 @@
 #define WNDPROCAPI
 
 
+// ---------------------------------------------------------------------------
+//  We need size_t but it's only available in the std:: namespace in g++, and we
+//  don't use any of the standard headers. So we fake our own
+// ---------------------------------------------------------------------------
+using size_t = unsigned int;
+
 
 // ---------------------------------------------------------------------------
 //  This is the part of the tCIDLib namespace that defines the types for the

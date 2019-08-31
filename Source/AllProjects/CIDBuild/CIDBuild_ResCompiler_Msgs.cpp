@@ -100,9 +100,10 @@ TResCompiler::bMassageMsgText(  const   TBldStr&        strOriginal
         //  If this is a backslash character, then we need to see if its
         //  one of the standard escape sequences and translate it into a
         //  single, binary control character. If not, just put out the
-        //  slash itself.
+        //  slash itself (which may be an end of line continuation that will
+        //  be dealt with upon return.)
         //
-        if (chNext == kCIDBuild::chPathSep)
+        if (chNext == L'\\')
         {
             tCIDLib::TCh chPeek = strOriginal[c4SrcIndex];
 
@@ -114,10 +115,13 @@ TResCompiler::bMassageMsgText(  const   TBldStr&        strOriginal
             else if (chPeek == L't')
                 chActual = L'\t';
             else
-                chActual = kCIDBuild::chPathSep;
+                chActual = L'\\';
 
             strToFill.Append(chActual);
-            c4SrcIndex++;
+
+            // If it was an escape sequence we ate another one
+            if (chActual != L'\\')
+                c4SrcIndex++;
         }
          else
         {
@@ -541,7 +545,7 @@ TIdInfo* TResCompiler::pidiProcessMsg(          TBldStr&        strFirstLine
 
     // Make sure the id is legal
     tCIDLib::TCard4 c4Id;
-    if (!TRawStr::bXlatCard4(strId.pszBuffer(), c4Id, 0))
+    if (!TRawStr::bXlatCard4(strId.pszBuffer(), c4Id))
     {
         stdOut  << L"(Line " << m_plsplInput->c4CurLine()
                 << L") Id field was not a valid number"
@@ -735,7 +739,7 @@ TResCompiler::bFindMsgEntryParts(TBldStr&   strSrcLine
     //  so lets loop as long as we have continuations, and just append it
     //
     strText = pszCur;
-    while (strText.chLast() == kCIDBuild::chPathSep)
+    while (strText.chLast() == L'\\')
     {
         // Throw away the trailing slash
         strText.DeleteLast();
