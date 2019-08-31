@@ -47,25 +47,6 @@ tCIDLib::TVoid TSmartPtrHelpers::CantAcquireStrongRef(const tCIDLib::TCard4 c4Li
 
 
 tCIDLib::TVoid
-TSmartPtrHelpers::CheckRefNotZero(  const   tCIDLib::TCard4         c4Line
-                                    , const tCIDLib::TCard4         c4ToCheck
-                                    , const tCIDLib::TCh* const     pszType)
-{
-    if (!c4ToCheck)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , c4Line
-            , kCIDErrs::errcSPtr_RefUnderflow
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Internal
-            , TString(pszType)
-        );
-    }
-}
-
-tCIDLib::TVoid
 TSmartPtrHelpers::ThrowAlreadyLocked(const  tCIDLib::TCard4         c4Line
                                     , const tCIDLib::TCh* const     pszType)
 {
@@ -78,6 +59,27 @@ TSmartPtrHelpers::ThrowAlreadyLocked(const  tCIDLib::TCard4         c4Line
         , tCIDLib::ESeverities::Failed
         , tCIDLib::EErrClasses::Internal
         , TString(pszType)
+    );
+}
+
+
+tCIDLib::TVoid
+TSmartPtrHelpers::RefCountRange(const   tCIDLib::TCard4     c4Line
+                                , const tCIDLib::TBoolean   bStrong
+                                , const tCIDLib::TBoolean   bOver
+                                , const tCIDLib::TCh* const pszPtrType)
+{
+    facCIDLib().ThrowKrnlErr
+    (
+        CID_FILE
+        , c4Line
+        , kCIDErrs::errcSPtr_RefOverUnderflow
+        , TKrnlError::kerrLast()
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Internal
+        , TString(bStrong ? L"Ref" : L"Weak ref")
+        , TString(bOver ? L"overflowed" : L"underflowed")
+        , TString(pszPtrType)
     );
 }
 

@@ -459,7 +459,7 @@ ERRORS=
     ; Smart pointer related errors
     errcSPtr_NoReference        3150    The %(1) pointer doesn't have a reference
     errcSPtr_RefReleaseErr      3151    A %(1) pointer ref count release error occurred
-    errcSPtr_RefUnderflow       3152    Ref count was at zero before release call on %(1)
+    errcSPtr_RefOverUnderflow   3152    %(1) count %(2) on %(3) pointer
     errcSPtr_RefAcquireErr      3153    A %(1) pointer ref count acquire error occurred
     errcSPtr_AlreadyLocked      3154    The %(1) pointer is already locked
     errcSPtr_CantGetStrongRef   3155    Cannot acquire strong ref to counted pointer

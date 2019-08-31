@@ -17,37 +17,37 @@
 //
 //  This file defines some smart pointer classes for general usage.
 //
-//  There is TCntPtr which provides a thread safe counted pointer, using lockless
-//  reference counting. It works in conjunction with TWeakPtr which works similarly
-//  to the standard C++ shared/weak pointers. You can get weak pointers from a
-//  counted pointers. And later, you can ask to get a counted pointer back from the
-//  weak pointers. If at least one counted pointer to that data is still around,
-//  you will get a counted pointer to that data, else a pointer to null.
-
-//  We also provide TMngPtr from the base class, which just provides a non-counted
-//  pointer. It purely exists to give 'by value' semantics to a pointer. It's assumed
-//  that someone owns it and will clean it up. So this class just copies the pointer
-//  as required.
+//  1. Counted/Weak - These are analgous to the shared/weak pointers of the standard
+//  libraries, and work similarly. You can provide a custom deleter to the counted
+//  pointer (the default is to just call delete.)
 //
-//  Ane we provide TUniquePtr, which uses move semantics and disables assignment and
-//  copy ctor, to insure that only one instance of it will ever have the pointer
-//  that it contains (unless you of course explictly set two of them to the same
-//  pointer, which you should definitely not do.) It is not thread safe, but it intended
-//  to allow you to pass around a pointer and insure that only the last copy of it has
-//  the original pointer, and that you can't accidentally assign it to another one.
+//  2. Managed - The are just simple, non-counting wrappers that don't delete. They
+//  just let you pass around a pointer in a value semantics sort of way, but ultimately
+//  someone else has to clean the data up.
 //
-//  But of course be careful you don't assign away the one that you mean to keep.
+//  3. Member - These are for classes that need to allocate members but otherwise
+//  want to treat them as by value objects. So this type of pointer imposes copy,
+//  assign, and move semantics on the pointer. The default is to use delete and the
+//  copy constructor, but you can provide a custom deleter and copier.
 //
-//  And we provide TMemberPtr, which is used when a class needs to allocate members
-//  but otherwise wants to treat them by value for copy/assignment purposes. This means
-//  the containing class can use default copy/assignment where otherwise it wouldn't
-//  be able to.
+//  4. Unique = Similar to the standard library unique pointers. They don't allow copy
+//  or assign, just move and give away the pointer to the next one in line. The last
+//  one that has when it destructs will clean up the object. The default is to just
+//  call delete but you can provide a custom deleter.
 //
-//  To keep some of the functionality out of line, to reduce rebuilds and code footprint
-//  we have a little helper namespace with some functions they can call. These are also
-//  used by some other smart pointer'ish classes.
 //
-//  At the bottom we add some smart pointer related helpers to the tCIDLib namespace.
+//  The latter ones self contained but the counted/weak ones need to share a couple
+//  helper classes. There is a base class that manages the object pointer and the
+//  weak/strong reference counts. It provides methods for inc/dec of either count,
+//  and tells the caller when it's time to delete the helper object (when there are
+//  no more weak or strong pointers.) It has a derivative that takes a custom deleter
+//  object, but weak/strong ptr classes always look at it via the base class so that
+//  they are not tied to the deleter type.
+//
+//  The refs are stored in a single 32 bit value so that we can do all our all ref
+//  count management atomically. The high 16 bits is the weak count and the low 16 is
+//  the strong count. That means a max of 64K refs of either type, but that's pretty
+//  reasonable for the benefits and simplicity this scheme provides.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -67,11 +67,12 @@ namespace TSmartPtrHelpers
         const   tCIDLib::TCard4         c4Line
     );
 
-    CIDLIBEXP tCIDLib::TVoid CheckRefNotZero
+    CIDLIBEXP tCIDLib::TVoid RefCountRange
     (
         const   tCIDLib::TCard4         c4Line
-        , const tCIDLib::TCard4         c4ToCheck
-        , const tCIDLib::TCh* const     pszType
+        , const tCIDLib::TBoolean       bStrong
+        , const tCIDLib::TBoolean       bOver
+        , const tCIDLib::TCh* const     pszPtrType
     );
 
     CIDLIBEXP tCIDLib::TVoid ThrowAlreadyLocked
@@ -85,6 +86,25 @@ namespace TSmartPtrHelpers
         const   tCIDLib::TCard4         c4Line
         , const tCIDLib::TCh* const     pszType
     );
+
+
+
+    // Default deleter and copier handlers
+    template <typename T> struct TDefDeleter
+    {
+        tCIDLib::TVoid operator()(T* pT)
+        {
+            delete pT;
+        }
+    };
+
+    template <typename T> struct TDefCopier
+    {
+        T* operator()(T* pT)
+        {
+            return new T(*pT);
+        }
+    };
 }
 
 template <typename T> class TWeakPtr;
@@ -112,8 +132,15 @@ template <class T> class TUniquePtr
         {
         }
 
+        template <typename TDeleter> TUniquePtr(T* const pobjAdopt, TDeleter fnDel) :
+
+            m_pdpInfo(new TDataPtrDel<T, TDeleter>(pobjAdopt, fnDel))
+        {
+        }
+
         TUniquePtr(const TUniquePtr<T>&) = delete;
 
+        // We gen up a default data pointer object with a null user object to give away
         TUniquePtr(TUniquePtr<T>&& uptrSrc) :
 
             m_pdpInfo(new TDataPtr<T>(nullptr))
@@ -125,17 +152,10 @@ template <class T> class TUniquePtr
         {
             if (m_pdpInfo)
             {
-                try
-                {
-                    // Destroy the user data if we still have it, then our data
-                    m_pdpInfo->DestroyData();
-                    delete m_pdpInfo;
-                    m_pdpInfo = nullptr;
-                }
-
-                catch(...)
-                {
-                }
+                // Destroy the user data if we still have it, then our data
+                TJanitor<TDataPtr<T>> janData(m_pdpInfo);
+                m_pdpInfo = nullptr;
+                janData.pobjThis()->DestroyData();
             }
         }
 
@@ -172,7 +192,6 @@ template <class T> class TUniquePtr
             return m_pdpInfo->m_pobjData;
         }
 
-
         const T& operator*() const
         {
             if (!m_pdpInfo->m_pobjData)
@@ -193,15 +212,24 @@ template <class T> class TUniquePtr
         // -------------------------------------------------------------------
         tCIDLib::TVoid DropRef()
         {
-            // If we still have a valid pointer, then we own it
+            //
+            //  If we still have a valid pointer, then we own it. We replace it with a
+            //  default data pointer object with a null user data pointer.
+            //
             if (m_pdpInfo->m_pobjData)
             {
-                m_pdpInfo.DestroyData();
-                delete m_pdpInfo;
+                TJanitor<TDataPtr<T>> janData(m_pdpInfo);
                 m_pdpInfo = new TDataPtr<T>(nullptr);
+
+                janData.pobjThis()->DestroyData();
             }
         }
 
+        //
+        //  We give away our object and set a null in its place. Note that the caller
+        //  must be aware of custom deleter issues here. If it was set with a customer
+        //  deleter and he gets it out and calls delete on it, it might not work.
+        //
         [[nodiscard]] T* pOrphan()
         {
             T* pobjRet = m_pdpInfo->m_pobjData;
@@ -215,7 +243,7 @@ template <class T> class TUniquePtr
         //  Private types
         //
         //  We need a base class to hold our object and a derived class that can hold
-        //  a deleter. Our base class is the default and just called delete on it.
+        //  a deleter. Our base class is the default and just calls delete on it.
         // -------------------------------------------------------------------
         template <typename T> struct TDataPtr
         {
@@ -251,32 +279,18 @@ template <class T> class TUniquePtr
         //  m_pdpInfo
         //      This will be either our base pointer or the derived deleter oriented
         //      one, depending on how we were constructed. It is never null. If we
-        //      drop our ref, ew create a new one that holds a null pointer.
+        //      drop our ref, we create a new base one that holds a null pointer.
         // -------------------------------------------------------------------
         TDataPtr<T>*    m_pdpInfo;
 };
 
 
 
+
+
 // ---------------------------------------------------------------------------
 //  This is really just for internal use, but it needs to be shared by both counted
 //  and weak pointers.
-//
-//  The count is a double count with the high 16 bits used for weak ref counts and
-//  the low 16 for strong ref counts. This means no more than 64K references of each
-//  type but that's not much of a limitation and it lets us do our thing atomically
-//  without locks. We can just use compare and swap.
-//
-//  We provide the methods for managing the ref counts cleanly, so the callers don't
-//  have to redundantly do that. We tell the caller when he should release this data
-//  object.
-//
-//  Note that we can get a null pointer to manage, so the strong count being non-zero
-//  doesn't require that the pointer be non-null. But a zero strong count requires
-//  that the pointer be cleaned up and nulled.
-//
-//  The caller tells our ctor whether this is an initial strong or weak ref and set
-//  the counts accordingly.
 // ---------------------------------------------------------------------------
 template <typename T> class TCntPtrData
 {
@@ -298,8 +312,8 @@ template <typename T> class TCntPtrData
         virtual ~TCntPtrData()
         {
             //
-            //  It's an error if this goes away without a zero count. It means someone
-            //  didn't do what they are supposed to.
+            //  It's an error if this goes away without a zero count or a nulled data
+            //  pointer. It means someone didn't do what they are supposed to.
             //
             CIDAssert(m_c4RefCnt == 0, L"The pointer ref count was not zero at data dtor");
             CIDAssert(m_pobjData == nullptr, L"The pointer was not zero at data dtor");
@@ -330,7 +344,8 @@ template <typename T> class TCntPtrData
             while (kCIDLib::True)
             {
                 c4Comp = m_c4RefCnt;
-                CIDAssert((c4Comp >> 16) < kCIDLib::c2MaxCard, L"Weak ref count overflow");
+                if ((c4Comp >> 16) == 0xFFFF)
+                    TSmartPtrHelpers::RefCountRange(CID_LINE, kCIDLib::False, kCIDLib::True, L"weak");
 
                 // Create a new value with a bumped weak count and try it
                 c4New = (c4Comp & 0xFFFF) | (((c4Comp >> 16) + 1) << 16);
@@ -344,13 +359,13 @@ template <typename T> class TCntPtrData
 
         //
         //  We increment the strong ref count if the data is not already gone. We return
-        //  the true if we got the ref, which means the data still exists and will now
+        //  true if we got the ref, which means the data still exists and will now
         //  not go away until the caller releases. If the data is already gone, we return
         //  false.
         //
         //  If we return false here, then a counted pointer being copied or assigned to
         //  from another strong pointer, or a weak pointer being turned into a strong pointer,
-        //  will set themselves up with a different pointer data with a null user object, so
+        //  will set themselves up with a default pointer data with a null user object, so
         //  this guy cannot get strong owned again once it's released the object.
         //
         tCIDLib::TBoolean bAcquireStrongRef()
@@ -362,14 +377,18 @@ template <typename T> class TCntPtrData
 
                 //
                 //  If the strong count has gone zero, we are done. Once it goes zero it
-                //  stays zero, so no more sync is required to do this. Not that we cannot
-                //  assert the pointer is null here since it might not have happened yet,
-                //  the thread that zeroed the count could still be working on that.
+                //  stays zero, so no more sync is required to do this.
                 //
-                if (!(c4Comp & 0xFFFF))
-                {
+                //  NOTE that we cannot assert the pointer is null here since it might not
+                //  have happened yet, the thread that zeroed the count could still be
+                //  working on that.
+                //
+                if ((c4Comp & 0xFFFF) == 0)
                     return kCIDLib::False;
-                }
+
+                // Make sure we aren't overflowing the counter
+                if ((c4Comp & 0xFFFF) == 0xFFFF)
+                    TSmartPtrHelpers::RefCountRange(CID_LINE, kCIDLib::True, kCIDLib::True, L"counted");
 
                 // Create a new value with a bumped strong count and try it
                 c4New = (c4Comp & 0xFFFF0000) | ((c4Comp & 0xFFFF) + 1);
@@ -384,19 +403,21 @@ template <typename T> class TCntPtrData
 
 
         //
-        //  If the strong count goes zero, we free the object. We return false if there are
-        //  no more refs of either type, which means the caller should free this pointer
-        //  data member. If no refs at all, then there can be no way anyone else could do
-        //  any more operations on this data unless something is very wrong.
+        //  If the strong count goes zero, we free the user object. We return false if there
+        //  are no more refs of either type, which means the caller should free us as well.
+        //  If no refs at all, then there can be no way anyone else could do any more
+        //  operations on this data unless something is very wrong. The caller is the last
+        //  man standing.
         //
         tCIDLib::TBoolean bReleaseStrongRef()
         {
             tCIDLib::TCard4 c4Comp, c4Result, c4New;
             while (kCIDLib::True)
             {
-                // Get the current value
+                // Get the current value and make sure we aren't going to underflow
                 c4Comp = m_c4RefCnt;
-                CIDAssert(c4Comp & 0xFFFF, L"Strong ref count underflow");
+                if ((c4Comp & 0xFFFF) == 0)
+                    TSmartPtrHelpers::RefCountRange(CID_LINE, kCIDLib::True, kCIDLib::False, L"counted");
 
                 // Create a new value with a strong count one smaller
                 c4New = (c4Comp & 0xFFFF0000) | ((c4Comp & 0xFFFF) - 1);
@@ -408,25 +429,39 @@ template <typename T> class TCntPtrData
             }
 
             //
-            //  If the new value has a zero strong count, this guy is done. Once it
-            //  goes zero it stays zero, so no need to sync anymore here.
+            //  If the new value has a zero strong count, the user object is done.
+            //  Once it goes zero it stays zero, so no need to sync anymore here.
+            //  It couldn't have already been zero, since we would have gotten an
+            //  underflow error above.
             //
             if (!(c4New & 0xFFFF))
             {
-                DestroyUserData();
-                m_pobjData = nullptr;
+                try
+                {
+                    DestroyUserData(m_pobjData);
+                    m_pobjData = nullptr;
+                }
+
+                catch(...)
+                {
+                    m_pobjData = nullptr;
+                    #if CID_DEBUG_ON
+                    TAudio::Beep(880, 100);
+                    #endif
+                }
             }
 
-            // Return true if any counts left
+            //
+            //  If no refs left at all, return false, in which case the caller should
+            //  free this pointer data.
+            //
             return (c4New > 0);
         }
 
         //
         //  Drops the weak count. If both the weak and strong pointers are zero, then
         //  the caller should delete us. We return false if there are no refs at all.
-        //
-        //  Otherwise, there are still strong refs which will keep both the object and
-        //  this pointer data alive.
+        //  Otherwise, there's still someone hanging on.
         //
         //  If both counts are zero there should be no one left to do anything to this
         //  pointer data except the caller.
@@ -439,9 +474,10 @@ template <typename T> class TCntPtrData
                 // Get the current value
                 c4Comp = m_c4RefCnt;
 
-                // Create a new value with a weak count one smaller
-                CIDAssert(c4Comp >> 16, L"Weak ref count underflow");
+                if ((c4Comp >> 16) == 0)
+                    TSmartPtrHelpers::RefCountRange(CID_LINE, kCIDLib::False, kCIDLib::False, L"weak");
 
+                // Create a new value with a weak count one smaller
                 c4New = (c4Comp & 0xFFFF) | (((c4Comp >> 16) - 1) << 16);
                 c4Result = TAtomic::c4CompareAndExchange(m_c4RefCnt, c4New, c4Comp);
 
@@ -465,7 +501,7 @@ template <typename T> class TCntPtrData
         tCIDLib::TCard4 c4StrongCount() const
         {
             tCIDLib::TCard4 c4Ret = c4RefCount();
-            c4Ret &= kCIDLib::c2MaxCard;
+            c4Ret &= 0xFFFF;
             return c4Ret;
         }
 
@@ -496,18 +532,14 @@ template <typename T> class TCntPtrData
         // -------------------------------------------------------------------
         //  Protected, virtual methods
         // -------------------------------------------------------------------
-
-        // Default is to just call delete
-        virtual tCIDLib::TVoid DestroyUserData()
-        {
-            delete m_pobjData;
-        }
+        virtual tCIDLib::TVoid DestroyUserData(T* const pobjDestroy) = 0;
 
 
     private :
         //
-        //  To avoid redundancy in the two methods above that return the strong and weak
-        //  counts. They first need to get a clean copy of the current combined value.
+        //  To avoid redundancy in the methods above that need to get the current count
+        //  values out and aren't themslves doing a c/x, we provide this helper, which
+        //  insures they get a clean copy of the ref count member.
         //
         tCIDLib::TCard4 c4RefCount() const
         {
@@ -532,15 +564,15 @@ template <typename T> class TCntPtrData
         T*                                  m_pobjData;
 };
 
-template <typename T, typename TDeleter> class TCntPtrDataImpl : public TCntPtrData<T>
+template <typename T, typename TDeleter> class TCntPtrDataDel : public TCntPtrData<T>
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
-        TCntPtrDataImpl() = delete;
+        TCntPtrDataDel() = delete;
 
-        TCntPtrDataImpl(        T* const            pobjAdopt
+        TCntPtrDataDel(         T* const            pobjAdopt
                         , const tCIDLib::TBoolean   bStrongType
                         ,       TDeleter            fnDeleter) :
 
@@ -549,32 +581,81 @@ template <typename T, typename TDeleter> class TCntPtrDataImpl : public TCntPtrD
         {
         }
 
-        TCntPtrDataImpl(const TCntPtrDataImpl<T,TDeleter>&) = delete;
+        TCntPtrDataDel(const TCntPtrDataDel<T,TDeleter>&) = delete;
 
-        ~TCntPtrDataImpl() = default;
+        ~TCntPtrDataDel() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TCntPtrDataImpl<T,TDeleter>& operator=(const TCntPtrDataImpl<T,TDeleter>&) = delete;
+        TCntPtrDataDel<T,TDeleter>& operator=(const TCntPtrDataDel<T,TDeleter>&) = delete;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid DestroyUserData() final
+        tCIDLib::TVoid DestroyUserData(T* const pobjDestroy) final
         {
-            m_fnDeleter(this->pobjData());
+            m_fnDeleter(pobjDestroy);
         }
 
 
     private :
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_fnDeleter
+        //      A custom deleter provided by the client code.
         // -------------------------------------------------------------------
         TDeleter    m_fnDeleter;
+};
+
+template <typename T> class TCntPtrDataDefDel : public TCntPtrData<T>
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TCntPtrDataDefDel() = delete;
+
+        TCntPtrDataDefDel(T* const pobjAdopt, const tCIDLib::TBoolean bStrongType) :
+
+            TCntPtrData<T>(pobjAdopt, bStrongType)
+        {
+        }
+
+        TCntPtrDataDefDel(const TCntPtrDataDefDel<T>&) = delete;
+
+        ~TCntPtrDataDefDel() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TCntPtrDataDefDel<T>& operator=(const TCntPtrDataDefDel<T>&) = delete;
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  Protected, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid DestroyUserData(T* const pobjDestroy) final
+        {
+            m_fnDeleter(pobjDestroy);
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_fnDeleter
+        //      We just have a fixed default deleter, which just calls delete on the
+        //      user object.
+        // -------------------------------------------------------------------
+        TSmartPtrHelpers::TDefDeleter<T>    m_fnDeleter;
 };
 
 
@@ -590,19 +671,19 @@ template <typename T> class TCntPtr
         // -------------------------------------------------------------------
         TCntPtr() :
 
-            m_pcdRef(new TCntPtrData<T>(nullptr, kCIDLib::True))
+            m_pcdRef(new TCntPtrDataDefDel<T>(nullptr, kCIDLib::True))
         {
         }
 
         explicit TCntPtr(T* pobjToAdopt) :
 
-            m_pcdRef(new TCntPtrData<T>(pobjToAdopt, kCIDLib::True))
+            m_pcdRef(new TCntPtrDataDefDel<T>(pobjToAdopt, kCIDLib::True))
         {
         }
 
         template <typename TDeleter> TCntPtr(T* pobjToAdopt, TDeleter fnDeleter) :
 
-            m_pcdRef(new TCntPtrDataImpl<T,TDeleter>(pobjToAdopt, kCIDLib::True, fnDeleter))
+            m_pcdRef(new TCntPtrDataDel<T,TDeleter>(pobjToAdopt, kCIDLib::True, fnDeleter))
         {
         }
 
@@ -721,7 +802,7 @@ template <typename T> class TCntPtr
         tCIDLib::TVoid DropRef()
         {
             TCntPtrData<T>* pcdTmp = m_pcdRef;
-            m_pcdRef = new TCntPtrData<T>(nullptr, kCIDLib::True);
+            m_pcdRef = new TCntPtrDataDefDel<T>(nullptr, kCIDLib::True);
 
             // If no more refs of either type left, then clean up the pointer data
             if (!pcdTmp->bReleaseStrongRef())
@@ -745,7 +826,7 @@ template <typename T> class TCntPtr
             //  old ref via the copy we made.
             //
             TCntPtrData<T>* pcdTmp = m_pcdRef;
-            m_pcdRef = new TCntPtrData<T>(pobjNew, kCIDLib::True);
+            m_pcdRef = new TCntPtrDataDefDel<T>(pobjNew, kCIDLib::True);
 
             // If no more refs of either type left, then clean up the pointer data
             if (!pcdTmp->bReleaseStrongRef())
@@ -760,7 +841,7 @@ template <typename T> class TCntPtr
             //  old ref via the copy we made.
             //
             TCntPtrData<T>* pcdTmp = m_pcdRef;
-            m_pcdRef = new TCntPtrDataImpl<T,TDeleter>(pobjNew, kCIDLib::True, fnDeleter);
+            m_pcdRef = new TCntPtrDataDel<T,TDeleter>(pobjNew, kCIDLib::True, fnDeleter);
 
             // If no more refs of either type left, then clean up the pointer data
             if (!pcdTmp->bReleaseStrongRef())
@@ -836,7 +917,7 @@ template <typename T> class TWeakPtr
         // Just set up an already dead null pointer with a single weak ref
         TWeakPtr() :
 
-            m_pcdRef(new TCntPtrData<T>(nullptr, kCIDLib::False))
+            m_pcdRef(new TCntPtrDataDefDel<T>(nullptr, kCIDLib::False))
         {
         }
 
@@ -860,7 +941,7 @@ template <typename T> class TWeakPtr
 
         TWeakPtr(TWeakPtr<T>&& wptrSrc) :
 
-            m_pcdRef(new TCntPtrData<T>(nullptr, kCIDLib::False))
+            m_pcdRef(new TCntPtrDataDefDel<T>(nullptr, kCIDLib::False))
         {
             *this = tCIDLib::ForceMove(wptrSrc);
         }
@@ -951,7 +1032,7 @@ template <typename T> class TWeakPtr
         tCIDLib::TVoid DropRef()
         {
             TCntPtrData<T>* pcdOld = m_pcdRef;
-            m_pcdRef = new TDefDataImpl(nullptr, kCIDLib::False, TDefDelT());
+            m_pcdRef = new TCntPtrDataDefDel<T>(nullptr, kCIDLib::False);
 
             // Drop the old weak ref and delete if we were the last
             if (!pcdOld->bReleaseWeakRef())
