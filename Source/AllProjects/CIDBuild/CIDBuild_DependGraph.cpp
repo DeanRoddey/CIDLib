@@ -76,7 +76,8 @@ TDependGraph::AddDependency(const   TBldStr&    strTarget
     if (c4Depend == kCIDBuild::c4NotFound)
     {
         stdOut  << L"Dependent project '"
-                << strDependent << L"' was not found in dependency graph"
+                << strDependent << L"' was not found in dependency graph (for "
+                << strTarget << L")"
                 << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::NotFound;
     }
@@ -104,7 +105,9 @@ TDependGraph::AddDependency(const   tCIDLib::TCard4 c4Target
     if (c4Depend == kCIDBuild::c4NotFound)
     {
         stdOut  << L"Dependent project '" << strDependent
-                << L"' was not found" << kCIDBuild::EndLn;
+                << L"' was not found (for "
+                << m_astrNames[c4Target] << L')'
+                << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::NotFound;
     }
 

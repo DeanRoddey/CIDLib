@@ -268,7 +268,8 @@ class TProjectInfo
 
         tCIDLib::TVoid ParseDependents
         (
-                    TLineSpooler&           lsplSource
+            const   TBldStr&                strOptions
+            ,       TLineSpooler&           lsplSource
         );
 
         tCIDLib::TVoid ParseExtLibs
@@ -289,7 +290,7 @@ class TProjectInfo
 
         tCIDLib::TVoid ParseIncludePaths
         (
-            const   TBldStr&                strPlatforms
+            const   TBldStr&                strOptions
             ,       TLineSpooler&           lsplSource
         );
 
@@ -430,6 +431,10 @@ class TProjectInfo
         //      TUtils::bSupportsPlatform() method for a description of how these
         //      work together.
         //
+        //  m_listTmpX
+        //      For local use during parsing to avoid creating and destroying them all
+        //      the time.
+        //
         //  m_strDirectory
         //      The directory under the AllProjects directory for this project. Usually
         //      the same as the project name, but not always.
@@ -518,6 +523,8 @@ class TProjectInfo
         tCIDBuild::TKVPList         m_listOptions;
         tCIDBuild::TStrList         m_listPlatformsExcl;
         tCIDBuild::TStrList         m_listPlatformsIncl;
+        tCIDBuild::TStrList         m_listTmp1;
+        tCIDBuild::TStrList         m_listTmp2;
         TBldStr                     m_strCopyOutDir;
         TBldStr                     m_strDirectory;
         TBldStr                     m_strExportKeyword;

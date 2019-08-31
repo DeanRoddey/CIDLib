@@ -545,9 +545,11 @@ tCIDLib::TVoid TProjectInfo::ParseContent(TLineSpooler& lsplSource)
         {
             ParseSettings(lsplSource);
         }
-         else if (strReadBuf == L"DEPENDENTS")
+         else if (strReadBuf.bStartsWith(L"DEPENDENTS"))
         {
-            ParseDependents(lsplSource);
+            strReadBuf.Cut(10);
+            strReadBuf.StripWhitespace();
+            ParseDependents(strReadBuf, lsplSource);
         }
          else if (strReadBuf == L"DEFINES")
         {
@@ -753,8 +755,10 @@ TProjectInfo::bBlockForThisPlatform(        TLineSpooler&       lsplSource
     if (!strPlatforms.bEmpty())
     {
         TBldStr strReadBuf;
-        tCIDBuild::TStrList listPlatIncl, listPlatExcl;
-        if (!TUtils::bParseInclExclLists(strPlatforms, listPlatIncl, listPlatExcl, strReadBuf))
+
+        m_listTmp1.RemoveAll();
+        m_listTmp2.RemoveAll();
+        if (!TUtils::bParseInclExclLists(strPlatforms, m_listTmp1, m_listTmp2, strReadBuf))
         {
             stdOut  << L"(Line " << lsplSource.c4CurLine()
                     << L") " << strReadBuf << kCIDBuild::EndLn;
@@ -762,7 +766,7 @@ TProjectInfo::bBlockForThisPlatform(        TLineSpooler&       lsplSource
         }
 
         // If this block is not for the current platform, then skip it
-        if (!TUtils::bSupportsThisPlatform(listPlatIncl, listPlatExcl))
+        if (!TUtils::bSupportsThisPlatform(m_listTmp1, m_listTmp2))
         {
             // Tell the spooler to disable macro expansion for this
             tCIDLib::TBoolean bGotEnd = kCIDLib::False;
@@ -978,8 +982,15 @@ tCIDLib::TVoid TProjectInfo::ParseDefines(TLineSpooler& lsplSource)
 }
 
 
-tCIDLib::TVoid TProjectInfo::ParseDependents(TLineSpooler& lsplSource)
+tCIDLib::TVoid
+TProjectInfo::ParseDependents(const TBldStr& strOptions, TLineSpooler& lsplSource)
 {
+    static const TBldStr strEndBlock(L"END DEPENDENTS");
+
+    // If not for this platform, then we skip this block
+    if (!bBlockForThisPlatform(lsplSource, strOptions, strEndBlock, L"dependents"))
+        return;
+
     TBldStr strReadBuf;
     while (kCIDLib::True)
     {
@@ -995,7 +1006,6 @@ tCIDLib::TVoid TProjectInfo::ParseDependents(TLineSpooler& lsplSource)
         if (strReadBuf == L"END DEPENDENTS")
             break;
 
-        // Have to assume its the name of a dependent
         m_listDeps.Add(new TBldStr(strReadBuf));
     }
 }
@@ -1154,7 +1164,7 @@ tCIDLib::TVoid TProjectInfo::ParseIDLFiles(TLineSpooler& lsplSource)
 
 
 tCIDLib::TVoid
-TProjectInfo::ParseIncludePaths(const TBldStr& strBlockOpts, TLineSpooler& lsplSource)
+TProjectInfo::ParseIncludePaths(const TBldStr& strOptions, TLineSpooler& lsplSource)
 {
     static const TBldStr strEndBlock(L"END INCLUDEPATHS");
 
@@ -1169,7 +1179,7 @@ TProjectInfo::ParseIncludePaths(const TBldStr& strBlockOpts, TLineSpooler& lsplS
 
 
     // If not for this platform, the we skip this block
-    if (!bBlockForThisPlatform(lsplSource, strBlockOpts, strEndBlock, L"include path"))
+    if (!bBlockForThisPlatform(lsplSource, strOptions, strEndBlock, L"include path"))
         return;
 
     TBldStr strReadBuf;

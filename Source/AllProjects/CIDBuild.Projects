@@ -728,7 +728,7 @@ END PROJECT
 
 
 ; Win32 until we can get CIDSChan supported on Linux
-PROJECT=CIDNet [WIN_*]
+PROJECT=CIDNet [WIN32_*]
     SETTINGS
         DIRECTORY   = CommUtils\CIDNet
         DISPLAY     = N/A
@@ -1538,13 +1538,16 @@ PROJECT=Tests2
         TestMathLib
         TestCIDEncode
         TestRegX
-        TestCrypto [WIN32_*]
         TestXML
         TestCIDMData
-        TestNet [WIN32_*]
         TestObjStore
         TestORB
         StressTests
+    END DEPENDENTS
+
+    DEPENDENTS [WIN32_*]
+        TestCrypto
+        TestNet
     END DEPENDENTS
 
 END PROJECT

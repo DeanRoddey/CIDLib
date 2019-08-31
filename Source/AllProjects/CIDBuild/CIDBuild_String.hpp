@@ -147,6 +147,16 @@ class TBldStr
 
         tCIDLib::TBoolean bAsBoolean() const;
 
+        tCIDLib::TBoolean bContainsChar
+        (
+            const   tCIDLib::TCh            chToCheck
+        )   const;
+
+        tCIDLib::TBoolean bIContainsChar
+        (
+            const   tCIDLib::TCh            chToCheck
+        )   const;
+
         tCIDLib::TBoolean bEmpty() const;
 
         tCIDLib::TBoolean bIEquals

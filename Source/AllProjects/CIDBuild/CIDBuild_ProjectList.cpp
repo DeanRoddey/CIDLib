@@ -290,11 +290,7 @@ tCIDLib::TVoid TProjectList::ParseProjectFile()
                     //  use the cached index into the dependency graph instead
                     //  of doing an insert by project name.
                     //
-                    m_depgList.AddDependency
-                    (
-                        projiCur.c4DepIndex()
-                        , cursDeps.tCurElement()
-                    );
+                    m_depgList.AddDependency(projiCur.c4DepIndex(), cursDeps.tCurElement());
                 }   while (cursDeps.bNext());
             }
         }   while (cursProjs.bNext());
