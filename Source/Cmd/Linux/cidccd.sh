@@ -22,6 +22,9 @@ function setdir() {
         "src") chdir=${CID_SRCTREE}/Source
         ;;
 
+        "output") chdir=${CID_SRCTREE}/Output
+        ;;
+
         "res") chdir=${CID_RESDIR}
         ;;
 

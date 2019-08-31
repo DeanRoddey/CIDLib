@@ -83,6 +83,13 @@ extern "C" tCIDLib::TSInt wmain(tCIDLib::TSInt iArgs, tCIDLib::TCh**apszArgs)
 #endif
 
 
+// Some out of line helpers that the very first templatized headers need
+tCIDLib::TVoid tCIDBuild::LogMsg(const tCIDLib::TCh* const pszMsg)
+{
+    stdOut << pszMsg << kCIDBuild::EndLn;
+}
+
+
 
 // ---------------------------------------------------------------------------
 //  Global insertion operators

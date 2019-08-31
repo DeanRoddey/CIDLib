@@ -365,6 +365,19 @@ namespace kCIDBuild
 
 
 // ---------------------------------------------------------------------------
+//  We need an out of line helper for some of the first headers below to be able
+//  to log stuff if they are inlined.
+// ---------------------------------------------------------------------------
+namespace tCIDBuild
+{
+    tCIDLib::TVoid LogMsg
+    (
+        const   tCIDLib::TCh* const         pszMsg
+    );
+}
+
+
+// ---------------------------------------------------------------------------
 //  The rest of the program includes
 // ---------------------------------------------------------------------------
 #include    "CIDBuild_Janitor.hpp"

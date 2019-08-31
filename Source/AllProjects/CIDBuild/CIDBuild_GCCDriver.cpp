@@ -231,14 +231,8 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
     }
 
     //
-    //  Set up the flags for the runtime library mode. This is driven by
-    //  the RTL mode and current build mode, at least it is on VC++.
-    //
-    if (m_pprojiTarget->eRTLMode() == tCIDBuild::ERTLModes::MultiStatic
-    ||  m_pprojiTarget->eRTLMode() == tCIDBuild::ERTLModes::MultiDynamic)
-    {
-        apszArgs[c4CurArg++] = L"-D_REENTRANT";
-    }
+    //  Set up the flags for the runtime library mode.
+    apszArgs[c4CurArg++] = L"-D_REENTRANT";
 
     //
     //  Set up the stuff driven by the 'PUREANSI' setting. This is temporary
@@ -462,11 +456,8 @@ tCIDLib::TVoid TGCCDriver::Link()
         }   while (cursCpps.bNext());
     }
 
-    if (m_pprojiTarget->eRTLMode() == tCIDBuild::ERTLModes::MultiStatic
-        || m_pprojiTarget->eRTLMode() == tCIDBuild::ERTLModes::MultiDynamic)
-    {
-        apszArgs[c4CurArg++] = L"-lpthread";
-    }
+    // Multi-threaded support
+    apszArgs[c4CurArg++] = L"-lpthread";
 
     if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Executable)
     {

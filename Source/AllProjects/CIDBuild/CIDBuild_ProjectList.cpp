@@ -206,9 +206,9 @@ tCIDLib::TVoid TProjectList::ParseProjectFile()
                 const TBldStr strProjName = pprojiCur->strProjectName();
                 delete pprojiCur;
 
-                // Eat the rest of this project's content
+                // Eat the rest of this project's content (tell it not to try to expand macros)
                 tCIDLib::TBoolean bGotEnd = kCIDLib::False;
-                while (lsplSource.bReadLine(strReadBuf))
+                while (lsplSource.bReadLine(strReadBuf, kCIDLib::True))
                 {
                     if (strReadBuf.bIEquals(L"END PROJECT"))
                     {

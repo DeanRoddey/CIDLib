@@ -22,6 +22,9 @@
 //
 // CAVEATS/GOTCHAS:
 //
+//  1)  We have to use some special out of line helpers here since we are one
+//      of the first headers and some stuff isn't available to us inline.
+//
 // LOG:
 //
 //  $_CIDLib_Log_$
@@ -156,8 +159,7 @@ template <class T> class TList
 
             if (!pnodeCur)
             {
-                stdOut  << L"Element to remove was not in the list"
-                        << kCIDBuild::EndLn;
+                tCIDBuild::LogMsg(L"Element to remove was not in the list");
                 throw tCIDBuild::EErrors::NotFound;
             }
 
@@ -290,7 +292,7 @@ template <class T> class TListCursor
         {
             if (!m_pnodeCur)
             {
-                stdOut << L"List cursor is invalid" << kCIDBuild::EndLn;
+                tCIDBuild::LogMsg(L"List cursor is invalid");
                 throw tCIDBuild::EErrors::Internal;
             }
             return *m_pnodeCur->ptElement;
@@ -300,7 +302,7 @@ template <class T> class TListCursor
         {
             if (!m_pnodeCur)
             {
-                stdOut << L"List cursor is invalid" << kCIDBuild::EndLn;
+                tCIDBuild::LogMsg(L"List cursor is invalid");
                 throw tCIDBuild::EErrors::Internal;
             }
             return *m_pnodeCur->ptElement;

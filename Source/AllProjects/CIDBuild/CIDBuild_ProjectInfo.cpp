@@ -764,8 +764,9 @@ TProjectInfo::bBlockForThisPlatform(        TLineSpooler&       lsplSource
         // If this block is not for the current platform, then skip it
         if (!TUtils::bSupportsThisPlatform(listPlatIncl, listPlatExcl))
         {
+            // Tell the spooler to disable macro expansion for this
             tCIDLib::TBoolean bGotEnd = kCIDLib::False;
-            while (lsplSource.bReadLine(strReadBuf))
+            while (lsplSource.bReadLine(strReadBuf, kCIDLib::True))
             {
                 if (strReadBuf == strEndBlock)
                 {

@@ -70,7 +70,8 @@ tCIDLib::TBoolean TLineSpooler::bEndOfFile() const
 }
 
 
-tCIDLib::TBoolean TLineSpooler::bReadLine(TBldStr& strTarget)
+tCIDLib::TBoolean
+TLineSpooler::bReadLine(TBldStr& strTarget, const tCIDLib::TBoolean bDisableMacros)
 {
     while (1)
     {
@@ -93,8 +94,8 @@ tCIDLib::TBoolean TLineSpooler::bReadLine(TBldStr& strTarget)
         }
     }
 
-    // Expand any keywords, unless its disabled
-    if (!m_bDisableMacros)
+    // Expand any keywords, unless its disabled (globally or for this read)
+    if (!m_bDisableMacros && !bDisableMacros)
         ExpandKeywords(strTarget);
 
     return kCIDLib::True;

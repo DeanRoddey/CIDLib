@@ -340,7 +340,8 @@ END PROJECT
 ;  Our 'AI' oriented facility and some stuff that supports it.
 ; ----------------------------------------------------------------------------
 
-PROJECT=CIDSpReco
+; Windows only for now
+PROJECT=CIDSpReco [WIN32_*]
     SETTINGS
         DIRECTORY   = AIUtils\CIDSpReco
         DISPLAY     = N/A
@@ -382,7 +383,6 @@ PROJECT=CIDAI
     DEPENDENTS
         CIDMath
         CIDXML
-        ; CIDSpReco
     END DEPENDENTS
 
     IDLFILES
@@ -706,7 +706,8 @@ PROJECT=CIDSock
 END PROJECT
 
 
-PROJECT=CIDSIP
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=CIDSIP [WIN32_*]
     SETTINGS
         DIRECTORY   = CommUtils\CIDSIP
         DISPLAY     = N/A
@@ -726,7 +727,8 @@ PROJECT=CIDSIP
 END PROJECT
 
 
-PROJECT=CIDNet
+; Win32 until we can get CIDSChan supported on Linux
+PROJECT=CIDNet [WIN_*]
     SETTINGS
         DIRECTORY   = CommUtils\CIDNet
         DISPLAY     = N/A
@@ -755,7 +757,8 @@ PROJECT=CIDNet
 END PROJECT
 
 
-PROJECT=CIDUPnP
+; Win32 only until we can get CIDNet (actually CIDSChan which it needs)
+PROJECT=CIDUPnP [WIN32_*]
     SETTINGS
         DIRECTORY   = CommUtils\CIDUPnP
         DISPLAY     = N/A
@@ -783,7 +786,8 @@ PROJECT=CIDUPnP
 END PROJECT
 
 
-PROJECT=CIDWebSock
+; Win32 only until we get CIDSChan going on Linux
+PROJECT=CIDWebSock [WIN32_*]
     SETTINGS
         DIRECTORY   = CommUtils\CIDWebSock
         DISPLAY     = N/A
@@ -922,8 +926,11 @@ PROJECT=CIDMetaExtr [Win32_*]
 END PROJECT
 
 
-; Implements the RTP/RTCP standards (just early work so far)
-PROJECT=CIDRTP
+;
+;   Implements the RTP/RTCP standards (just early work so far). It's Win32
+;   only until we get CIDNet (actually CIDSchan which it needs) going on Linux.
+;
+PROJECT=CIDRTP [WIN32_*]
     SETTINGS
         DIRECTORY   = MediaUtils\CIDRTP
         DISPLAY     = N/A
@@ -998,7 +1005,9 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;   Language related facilities
 ; ----------------------------------------------------------------------------
-PROJECT=CIDMacroEng
+
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=CIDMacroEng [WIN32_*]
     SETTINGS
         DIRECTORY   = LangUtils\CIDMacroEng
         DISPLAY     = N/A
@@ -1325,7 +1334,8 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 
 ; Cryptography libraries
-PROJECT=TestCrypto
+; Win32 only until we get CIDSChan going on Linux
+PROJECT=TestCrypto [WIN32_*]
     SETTINGS
         DIRECTORY   = Tests2\TestCrypto
     END SETTINGS
@@ -1400,7 +1410,8 @@ PROJECT=TestCIDMData
 END PROJECT
 
 ; Macro engine
-PROJECT=TestMacroEng
+; Win32 only until we get some stuff underlying CIDMacroEng ready for Linux
+PROJECT=TestMacroEng [WIN32_*]
     SETTINGS
         DIRECTORY   = Tests2\TestMacroEng
     END SETTINGS
@@ -1413,7 +1424,8 @@ PROJECT=TestMacroEng
 END PROJECT
 
 ; URLs, IP end points and address, sockets, etc...
-PROJECT=TestNet
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=TestNet [WIN32_*]
     SETTINGS
         DIRECTORY   = Tests2\TestNet
     END SETTINGS
@@ -1526,10 +1538,10 @@ PROJECT=Tests2
         TestMathLib
         TestCIDEncode
         TestRegX
-        TestCrypto
+        TestCrypto [WIN32_*]
         TestXML
         TestCIDMData
-        TestNet
+        TestNet [WIN32_*]
         TestObjStore
         TestORB
         StressTests
@@ -1797,7 +1809,8 @@ PROJECT=FileSys3
 END PROJECT
 
 
-PROJECT=HTTPClient1
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=HTTPClient1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\HTTPClient1
         SAMPLE      = Yes
@@ -1852,7 +1865,8 @@ PROJECT=MakePreviews
 END PROJECT
 
 
-PROJECT=HTTPSrv1
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=HTTPSrv1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\HTTPSrv1
         SAMPLE      = Yes
@@ -1866,7 +1880,8 @@ PROJECT=HTTPSrv1
     END DEPENDENTS
 END PROJECT
 
-PROJECT=JSON1
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=JSON1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\JSON1
         SAMPLE      = Yes
@@ -2012,7 +2027,8 @@ PROJECT=Speech
 END PROJECT
 
 
-PROJECT=SMTP1
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=SMTP1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\SMTP1
         SAMPLE      = Yes
