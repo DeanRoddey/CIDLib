@@ -37,7 +37,8 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_PlatformStrOps.hpp"
-#include    <math.h>
+// #include    <math.h>
+
 
 
 //
@@ -2141,9 +2142,9 @@ TRawStr::pszConvert(const   tCIDLib::TSCh* const    pszToConvert
     }
 
     pszTarget[0] = 0;
-    size_t OutChars = size_t(-1);
-    if (!CIDStrOp_MBToWC(pszTarget, c4MaxChars + 1, pszToConvert, OutChars))
-        pszTarget[c4MaxChars] = 0;
+    tCIDLib::TCard4 c4OutChars;
+    if (!CIDStrOp_MBToWC(pszTarget, c4MaxChars + 1, pszToConvert, c4OutChars))
+        pszTarget[c4OutChars] = kCIDLib::chNull;
     return pszTarget;
 }
 
@@ -2158,11 +2159,11 @@ tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
         pszNew = new tCIDLib::TCh[c4Len + 1];
 
         // Convert into the new string and cap it off
-        size_t OutChars = size_t(-1);
-        if (CIDStrOp_MBToWC(pszNew, c4Len + 1, pszToConvert, OutChars))
+        tCIDLib::TCard4 c4OutChars;
+        if (CIDStrOp_MBToWC(pszNew, c4Len + 1, pszToConvert, c4OutChars))
             pszNew[0] = 0;
         else
-            pszNew[c4Len] = 0;
+            pszNew[c4OutChars] = 0;
     }
      else
     {
@@ -2189,8 +2190,12 @@ TRawStr::pszConvert(const   tCIDLib::TCh* const     pszToConvert
         return pszTarget;
     }
 
-    CIDStrOp_WCToMB(pszTarget, pszToConvert, c4MaxChars + 1);
-    pszTarget[c4MaxChars] = 0;
+    tCIDLib::TCard4 c4OutBytes;
+    if (CIDStrOp_WCToMB(pszTarget, c4MaxChars + 1, pszToConvert, c4OutBytes))
+        pszTarget[c4MaxChars] = 0;
+    else
+        pszTarget[0] = 0;
+
     return pszTarget;
 }
 
@@ -2201,18 +2206,25 @@ tCIDLib::TSCh* TRawStr::pszConvert(const tCIDLib::TCh* const pszToConvert)
     if (pszToConvert)
     {
         // Calc the size required for this string
-        size_t NeededBytes;
-        CIDStrOp_CalcMBSize(pszToConvert, NeededBytes);
+        tCIDLib::TCard4 c4NeededBytes;
+        if (CIDStrOp_CalcMBSize(pszToConvert, c4NeededBytes))
+        {
+            // Allocate a buffer big enough
+            pszNew = new tCIDLib::TSCh[c4NeededBytes + 1];
 
-        // Allocate a buffer big enough
-        pszNew = new tCIDLib::TSCh[NeededBytes + 1];
-
-        // Convert into the new string and cap it off
-        if (NeededBytes)
-            CIDStrOp_WCToMB(pszNew, pszToConvert, NeededBytes);
-        pszNew[NeededBytes] = 0;
+            // Convert into the new string and cap it off
+            
+            if (c4NeededBytes)
+            {
+                tCIDLib::TCard4 c4OutBytes;                
+                CIDStrOp_WCToMB(pszNew, c4NeededBytes, pszToConvert, c4OutBytes);
+            }
+            pszNew[c4NeededBytes] = 0;
+        }
     }
-     else
+
+    // If we didn't get it, create an empty one
+    if (!pszNew)
     {
         pszNew = new tCIDLib::TSCh[1];
         pszNew[0] = 0;

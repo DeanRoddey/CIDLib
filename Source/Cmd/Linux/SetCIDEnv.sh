@@ -40,6 +40,12 @@ export CID_PLATFORM=Linux_32
 export CID_SRCTREE=${CID_DEVTREE}/CID_Dev
 export CID_RESDIR=${CID_DEVTREE}/CID_Dev/Output/${CID_VERSIONUL}/${CID_BUILDMODE}Result
 
+#
+# This one is always pointed at the CIDLib stuff, so we can't use CID_SRCTREE, even
+# though it's the same on CIDLib itself.
+#
+export CIDLIB_SRCDIR=${CID_SRCTREE}
+
 # We need our result directory to be in the path, and our command directory
 PATH=$PATH:${CID_RESDIR}:${CID_SRCTREE}/Source/Cmd/Linux
 

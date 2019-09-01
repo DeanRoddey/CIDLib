@@ -29,6 +29,7 @@
 //  Facility specific includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
+#include    <unistd.h>
 
 namespace
 {
@@ -40,11 +41,11 @@ namespace
 //  TFacCIDKernel: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermAudio(const tCIDLib::EInitTerm eState)
+TCIDKrnlModule::bInitTermAudio(const tCIDLib::EInitTerm eState)
 {
     if (eState == tCIDLib::EInitTerm::Initialize)
     {
-        TKrnlAudio::__bAudioSupport = kCIDLib::False;
+        TKrnlAudio::s_bAudioSupport = kCIDLib::False;
         iFdTTY = ::open("/dev/tty0", O_WRONLY);
     }
     else
@@ -60,6 +61,56 @@ TCIDKrnlModule::__bInitTermAudio(const tCIDLib::EInitTerm eState)
 // ---------------------------------------------------------------------------
 //  TKrnlAudio: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+tCIDLib::TBoolean
+TKrnlAudio::bEnumAudioDevices(          tCIDLib::TCh* const pszToFill
+                                , const tCIDLib::TCard4     c4BufLen)
+{
+    // <TBD-Linux>
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+//
+//  Mutes or unmutes the output on the default system audio output.
+//
+tCIDLib::TBoolean TKrnlAudio::bMuteSystemAudio(const tCIDLib::TBoolean bMute)
+{
+    // <TBD-Linux>
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+
+tCIDLib::TBoolean
+TKrnlAudio::bPlayWAVFile(const  tCIDLib::TCh* const
+                        , const tCIDLib::EWaitModes)
+{
+    // <TBD-Linux>
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean TKrnlAudio::bQuerySystemVolume(tCIDLib::TCard4& c4ToFill)
+{
+    // <TBD-Linux>
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlAudio::bSetSystemVolume(const tCIDLib::TCard4 c4VolPercent)
+{
+    // <TBD-Linux>
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;    
+}
+
+
 tCIDLib::TVoid TKrnlAudio::Beep(const   tCIDLib::TCard4 c4Frequency
                                 , const tCIDLib::TCard4 c4Duration)
 {
@@ -85,9 +136,9 @@ tCIDLib::TVoid TKrnlAudio::Beep(const   tCIDLib::TCard4 c4Frequency
     while (::nanosleep(&TimeRequested, &TimeRemaining) == EINTR)
     {
         ::gettimeofday(&TimeVal, 0);
-        if (TimeVal.tv_sec > TargetTimeVal.tv_sec
-            || (TimeVal.tv_sec == TargetTimeVal.tv_sec
-            && TimeVal.tv_usec > TargetTimeVal.tv_usec))
+        if ((TimeVal.tv_sec > TargetTimeVal.tv_sec)
+        ||  ((TimeVal.tv_sec == TargetTimeVal.tv_sec
+        &&  TimeVal.tv_usec > TargetTimeVal.tv_usec)))
         {
             break;
         }
@@ -97,11 +148,3 @@ tCIDLib::TVoid TKrnlAudio::Beep(const   tCIDLib::TCard4 c4Frequency
     ::ioctl(iFdTTY, KIOCSOUND, 0);
 }
 
-
-tCIDLib::TBoolean
-TKrnlAudio::bPlayWavFile(const  tCIDLib::TCh* const
-                        , const tCIDLib::EWaitModes)
-{
-    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
-    return kCIDLib::False;
-}

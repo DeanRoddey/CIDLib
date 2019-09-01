@@ -35,6 +35,12 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
+#include    <unistd.h>
+#include    <limits.h>
+#include    <curses.h>
+#include    <term.h>
+
+
 // We don't need this because everything is in TConsoleHandleImpl.
 struct TKrnlConIn::TConPlatInfo
 {
@@ -66,12 +72,12 @@ namespace
     // ---------------------------------------------------------------------------
     //  Local functions
     // ---------------------------------------------------------------------------
-    tCIDLib::TBoolean
-    __bLookupKey(const TKrnlLinux::TTermValueNode*        pnodeTree
-               , const tCIDLib::EConKeys    eKey
-               , tCIDLib::TBoolean&         bFound
-               , tCIDLib::TSCh*             pszTermValue
-               , tCIDLib::TCard4            c4MaxChars)
+    static tCIDLib::TBoolean
+    bLookupKey(const    TKrnlLinux::TTermValueNode* pnodeTree
+               , const tCIDLib::EConKeys            eKey
+               ,        tCIDLib::TBoolean&          bFound
+               ,        tCIDLib::TSCh*              pszTermValue
+               ,        tCIDLib::TCard4             c4MaxChars)
     {
         const TKrnlLinux::TTermValueNode* pnodeCur = pnodeTree;
 
@@ -85,19 +91,13 @@ namespace
 
             tCIDLib::TSCh* pszActual = pszTermValue ? pszTermValue + 1 : 0;
 
-            if (!__bLookupKey(pnodeCur->pnodeChild
-                            , eKey
-                            , bFound
-                            , pszActual
-                            , c4MaxChars - 1))
-            {
+            if (!bLookupKey(pnodeCur->pnodeChild, eKey, bFound, pszActual, c4MaxChars - 1))
                 return kCIDLib::False;
-            }
 
             if (bFound)
                 break;
 
-            if (pnodeCur->c2Code == eKey)
+            if (pnodeCur->c2Code == tCIDLib::TCard2(eKey))
             {
                 bFound = kCIDLib::True;
                 *(pszTermValue + 1) = '\000';
@@ -115,10 +115,10 @@ namespace
         return kCIDLib::True;
     }
 
-    tCIDLib::TVoid
-    __AddTermValueNode(TKrnlLinux::TTermValueNode*& pnodeTree
-                     , const tCIDLib::TSCh* const pszValue
-                     , const tCIDLib::EConKeys eKey)
+    static tCIDLib::TVoid
+    AddTermValueNode(       TKrnlLinux::TTermValueNode*&    pnodeTree
+                    , const tCIDLib::TSCh* const            pszValue
+                    , const tCIDLib::EConKeys               eKey)
     {
         tCIDLib::TSCh* pszLocValue = const_cast<tCIDLib::TSCh*>(pszValue);
         tCIDLib::TSCh chCur;
@@ -153,7 +153,7 @@ namespace
                 {
                     if (*(++pszLocValue) == '\000')
                     {
-                        pnodeCur->c2Code = eKey;
+                        pnodeCur->c2Code = tCIDLib::TCard2(eKey);
                         return;
                     }
 
@@ -189,11 +189,11 @@ namespace
             */
         }
 
-        pnodeCur->c2Code = eKey;
+        pnodeCur->c2Code = tCIDLib::TCard2(eKey);
     }
 
-    tCIDLib::TVoid
-    __BuildTermValueTree(TKrnlLinux::TTermValueNode*& pnodeTree)
+    static tCIDLib::TVoid
+    BuildTermValueTree(TKrnlLinux::TTermValueNode*& pnodeTree)
     {
         // This maps the terminfo capability identifiers
         // to the CIDLib console keys values, so we can
@@ -224,15 +224,18 @@ namespace
         };
 
         // Start with the no-brainer.
-        __AddTermValueNode(pnodeTree, "\t", tCIDLib::EConKeys::Tab);
+        AddTermValueNode(pnodeTree, "\t", tCIDLib::EConKeys::Tab);
 
         // Now do the initial round of lookups
         tCIDLib::TCard4 c4Idx;
         for (c4Idx = 0; c4Idx < tCIDLib::c4ArrayElems(__atikXlat); c4Idx++)
         {
-            __AddTermValueNode(pnodeTree
-                               , ::tigetstr(__atikXlat[c4Idx].pszTermInfo)
-                               , __atikXlat[c4Idx].eKey);
+            AddTermValueNode
+            (
+                pnodeTree
+                , ::tigetstr(__atikXlat[c4Idx].pszTermInfo)
+                , __atikXlat[c4Idx].eKey
+            );
         }
 
         tCIDLib::TBoolean bGotIt;
@@ -240,7 +243,7 @@ namespace
         // Now check for failures and do the backup round.
         for (c4Idx = 0; c4Idx < tCIDLib::c4ArrayElems(__atikXlat2); c4Idx++)
         {
-            if (__bLookupKey(pnodeTree
+            if (bLookupKey( pnodeTree
                              , __atikXlat2[c4Idx].eKey
                              , bGotIt
                              , 0
@@ -248,9 +251,12 @@ namespace
             {
                 if (!bGotIt)
                 {
-                    __AddTermValueNode(pnodeTree
-                                       , ::tigetstr(__atikXlat2[c4Idx].pszTermInfo)
-                                       , __atikXlat2[c4Idx].eKey);
+                    AddTermValueNode
+                    (
+                        pnodeTree
+                        , ::tigetstr(__atikXlat2[c4Idx].pszTermInfo)
+                        , __atikXlat2[c4Idx].eKey
+                    );
                 }
             }
         }
@@ -261,7 +267,7 @@ namespace
         tCIDLib::TSCh szValue[32];
         szValue[0] = '\033';
         tCIDLib::TSCh* pszFillHere = &szValue[1];
-        if (__bLookupKey(pnodeTree
+        if (bLookupKey( pnodeTree
                          , tCIDLib::EConKeys::Previous
                          , bGotIt
                          , 0
@@ -269,74 +275,54 @@ namespace
         {
             if (!bGotIt)
             {
-                if (__bLookupKey(pnodeTree
-                                 , tCIDLib::EConKeys::Left
-                                 , bGotIt
-                                 , pszFillHere
-                                 , 31))
+                if (bLookupKey( pnodeTree
+                                , tCIDLib::EConKeys::Left
+                                , bGotIt
+                                , pszFillHere
+                                , 31))
                 {
                     if (bGotIt)
-                    {
-                        __AddTermValueNode(pnodeTree
-                                           , szValue
-                                           , tCIDLib::EConKeys::Previous);
-                    }
+                        AddTermValueNode(pnodeTree, szValue, tCIDLib::EConKeys::Previous);
                 }
             }
         }
-        if (__bLookupKey(pnodeTree
-                         , tCIDLib::EConKeys::Next
-                         , bGotIt
-                         , 0
-                         , 0))
+        if (bLookupKey( pnodeTree
+                        , tCIDLib::EConKeys::Next
+                        , bGotIt
+                        , 0
+                        , 0))
         {
             if (!bGotIt)
             {
-                if (__bLookupKey(pnodeTree
-                                 , tCIDLib::EConKeys::Right
-                                 , bGotIt
-                                 , pszFillHere
-                                 , 31))
+                if (bLookupKey( pnodeTree
+                                , tCIDLib::EConKeys::Right
+                                , bGotIt
+                                , pszFillHere
+                                , 31))
                 {
                     if (bGotIt)
-                    {
-                        __AddTermValueNode(pnodeTree
-                                           , szValue
-                                           , tCIDLib::EConKeys::Next);
-                    }
+                        AddTermValueNode(pnodeTree, szValue, tCIDLib::EConKeys::Next);
                 }
             }
         }
 
         // If Enter wasn't in the database, just make it "\n".
-        if (__bLookupKey(pnodeTree
-                         , tCIDLib::EConKeys::Enter
-                         , bGotIt
-                         , 0
-                         , 0))
+        if (bLookupKey(pnodeTree, tCIDLib::EConKeys::Enter, bGotIt, 0, 0))
         {
             if (!bGotIt)
-            {
-                __AddTermValueNode(pnodeTree, "\n", tCIDLib::EConKeys::Enter);
-            }
+                AddTermValueNode(pnodeTree, "\n", tCIDLib::EConKeys::Enter);
         }
 
         // If Backspace wasn't in the database, just make it "\b".
-        if (__bLookupKey(pnodeTree
-                         , tCIDLib::EConKeys::Backspace
-                         , bGotIt
-                         , 0
-                         , 0))
+        if (bLookupKey(pnodeTree, tCIDLib::EConKeys::Backspace, bGotIt, 0, 0))
         {
             if (!bGotIt)
-            {
-                __AddTermValueNode(pnodeTree, "\b", tCIDLib::EConKeys::Backspace);
-            }
+                AddTermValueNode(pnodeTree, "\b", tCIDLib::EConKeys::Backspace);
         }
     }
 
-    tCIDLib::TBoolean
-    __bWaitForInput(tCIDLib::TCard4& c4Milliseconds)
+    static tCIDLib::TBoolean
+    bWaitForInput(tCIDLib::TCard4& c4Milliseconds)
     {
         tCIDLib::TInt4 i4Sec = c4Milliseconds / 1000;
         tCIDLib::TInt4 i4Microsec = (c4Milliseconds % 1000) * 1000;
@@ -377,8 +363,8 @@ namespace
         return (iReturn != 0 && iReturn != -1);
     }
 
-    tCIDLib::TCard4 __c4WriteString(const tCIDLib::TCh* const pszToWrite
-                                  , tCIDLib::TCard4&        c4BytesWritten)
+    static tCIDLib::TCard4
+    c4WriteString(const tCIDLib::TCh* const pszToWrite, tCIDLib::TCard4& c4BytesWritten)
     {
         const tCIDLib::TCard4 c4BufSize = 1023;
         tCIDLib::TSCh szTmp[c4BufSize + 1];
@@ -422,7 +408,7 @@ namespace
         return c4SrcIndex;
     }
 
-    tCIDLib::TBoolean __bInitTerminalInfo()
+    static tCIDLib::TBoolean bInitTerminalInfo()
     {
         static tCIDLib::TBoolean bInitialized = kCIDLib::False;
         if (!bInitialized)
@@ -443,7 +429,8 @@ namespace
         return kCIDLib::True;
     }
 
-    tCIDLib::TBoolean __bSetSingleCharMode(TConsoleHandleImpl* phconiToSet, tCIDLib::TBoolean bNewState)
+    static tCIDLib::TBoolean
+    bSetSingleCharMode(TConsoleHandleImpl* phconiToSet, tCIDLib::TBoolean bNewState)
     {
         if (bNewState)
         {
@@ -458,13 +445,13 @@ namespace
 
                 // Now read the terminfo database, so we can know
                 // how to interpret key presses.
-                if (!__bInitTerminalInfo())
+                if (!bInitTerminalInfo())
                     return kCIDLib::False;
 
                 // Build up a tree. This will maximize efficiency when
                 // reading characters from the terminal.
                 phconiToSet->pnodeTree = 0;
-                __BuildTermValueTree(phconiToSet->pnodeTree);
+                BuildTermValueTree(phconiToSet->pnodeTree);
 
                 // Now create the FIFO that we'll use to buffer input.
                 phconiToSet->pfifoThis = new TKrnlLinux::TTermFifo(c4TermFifoSize);
@@ -505,7 +492,7 @@ namespace
 //  Initialization methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermConsole(const tCIDLib::EInitTerm eState)
+TCIDKrnlModule::bInitTermConsole(const tCIDLib::EInitTerm eState)
 {
     return kCIDLib::True;
 }
@@ -521,30 +508,30 @@ TCIDKrnlModule::__bInitTermConsole(const tCIDLib::EInitTerm eState)
 // ---------------------------------------------------------------------------
 TConsoleHandle::TConsoleHandle() :
 
-    __phconiThis(0)
+    m_phconiThis(0)
 {
-    __phconiThis = new TConsoleHandleImpl;
-    __phconiThis->pfifoThis = 0;
-    __phconiThis->pnodeTree = 0;
-    __phconiThis->bValid = kCIDLib::False;
-    __phconiThis->bSingleCharMode = kCIDLib::False;
+    m_phconiThis = new TConsoleHandleImpl;
+    m_phconiThis->pfifoThis = 0;
+    m_phconiThis->pnodeTree = 0;
+    m_phconiThis->bValid = kCIDLib::False;
+    m_phconiThis->bSingleCharMode = kCIDLib::False;
 }
 
 TConsoleHandle::TConsoleHandle(const TConsoleHandle& hconToCopy) :
 
-    __phconiThis(0)
+    m_phconiThis(0)
 {
-    __phconiThis = new TConsoleHandleImpl;
+    m_phconiThis = new TConsoleHandleImpl;
     // Shallow copy on purpose. The object that owns this can't be copied anyway.
-    TRawMem::CopyMemBuf(__phconiThis, hconToCopy.__phconiThis, sizeof(*__phconiThis));
+    TRawMem::CopyMemBuf(m_phconiThis, hconToCopy.m_phconiThis, sizeof(*m_phconiThis));
 }
 
 TConsoleHandle::~TConsoleHandle()
 {
-    delete __phconiThis->pfifoThis;
-    delete __phconiThis->pnodeTree;
-    delete __phconiThis;
-    __phconiThis = 0;
+    delete m_phconiThis->pfifoThis;
+    delete m_phconiThis->pnodeTree;
+    delete m_phconiThis;
+    m_phconiThis = 0;
 }
 
 
@@ -555,7 +542,7 @@ TConsoleHandle& TConsoleHandle::operator=(const TConsoleHandle& hconToAssign)
 {
     if (this != &hconToAssign)
     {
-        TRawMem::CopyMemBuf(__phconiThis, hconToAssign.__phconiThis, sizeof(*__phconiThis));
+        TRawMem::CopyMemBuf(m_phconiThis, hconToAssign.m_phconiThis, sizeof(*m_phconiThis));
     }
     return *this;
 }
@@ -564,7 +551,7 @@ TConsoleHandle& TConsoleHandle::operator=(const TConsoleHandle& hconToAssign)
 tCIDLib::TBoolean
 TConsoleHandle::operator==(const TConsoleHandle& hconToCompare) const
 {
-    return TRawMem::eCompareMemBuf(__phconiThis, hconToCompare.__phconiThis, sizeof(*__phconiThis))
+    return TRawMem::eCompareMemBuf(m_phconiThis, hconToCompare.m_phconiThis, sizeof(*m_phconiThis))
         == tCIDLib::ESortComps::Equal;
 }
 
@@ -573,15 +560,15 @@ TConsoleHandle::operator==(const TConsoleHandle& hconToCompare) const
 // ---------------------------------------------------------------------------
 //  Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TConsoleHandle::bValid() const
+tCIDLib::TBoolean TConsoleHandle::bIsValid() const
 {
-    return __phconiThis->bValid;
+    return m_phconiThis->bValid;
 }
 
 
 tCIDLib::TVoid TConsoleHandle::Clear()
 {
-    __phconiThis->bValid = kCIDLib::False;
+    m_phconiThis->bValid = kCIDLib::False;
 }
 
 
@@ -590,7 +577,7 @@ TConsoleHandle::FormatToStr(        tCIDLib::TCh* const pszToFill
                             , const tCIDLib::TCard4     c4MaxChars) const
 {
     tCIDLib::TCh* pszValue = L"False";
-    if (__phconiThis->bValid)
+    if (m_phconiThis->bValid)
         pszValue = L"True";
     TRawStr::CopyStr(pszToFill, pszValue, c4MaxChars);
 }
@@ -607,20 +594,20 @@ TConsoleHandle::FormatToStr(        tCIDLib::TCh* const pszToFill
 //  TKrnlConIn: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TKrnlConIn::bReadNext(tCIDLib::EConKeys& keyType, tCIDLib::TCh& chGotten, const tCIDLib::TBoolean bWait)
+TKrnlConIn::bReadChar(tCIDLib::EConKeys& keyType, tCIDLib::TCh& chGotten, const tCIDLib::TBoolean bWait)
 {
     const tCIDLib::TCard4 c4WaitForSequence = 1000;
 
-    if (!__hconThis.__phconiThis->bSingleCharMode)
+    if (!m_hconThis.m_phconiThis->bSingleCharMode)
     {
-        if (!__bSetSingleCharMode(__hconThis.__phconiThis, kCIDLib::True))
+        if (!bSetSingleCharMode(m_hconThis.m_phconiThis, kCIDLib::True))
             return kCIDLib::False;
     }
 
     tCIDLib::TSCh chTmp;
     tCIDLib::TCard4 c4WaitLeft = c4WaitForSequence;
-    TKrnlLinux::TTermValueNode* pnodeCur = __hconThis.__phconiThis->pnodeTree;
-    TKrnlLinux::TTermFifo* pFifo = __hconThis.__phconiThis->pfifoThis;
+    TKrnlLinux::TTermValueNode* pnodeCur = m_hconThis.m_phconiThis->pnodeTree;
+    TKrnlLinux::TTermFifo* pFifo = m_hconThis.m_phconiThis->pfifoThis;
 
     while (kCIDLib::True)
     {
@@ -653,7 +640,7 @@ TKrnlConIn::bReadNext(tCIDLib::EConKeys& keyType, tCIDLib::TCh& chGotten, const 
 
         if (pFifo->bIsEmpty())
         {
-            if (!__bWaitForInput(c4WaitLeft))
+            if (!bWaitForInput(c4WaitLeft))
                 return kCIDLib::False;
         }
     }
@@ -681,9 +668,9 @@ TKrnlConIn::bReadLine(tCIDLib::TCh* const pszToFill
                       , const tCIDLib::TCard4     c4CharsToRead
                       ,       tCIDLib::TCard4&    c4CharsRead)
 {
-    if (__hconThis.__phconiThis->bSingleCharMode)
+    if (m_hconThis.m_phconiThis->bSingleCharMode)
     {
-        if (!__bSetSingleCharMode(__hconThis.__phconiThis, kCIDLib::False))
+        if (!bSetSingleCharMode(m_hconThis.m_phconiThis, kCIDLib::False))
             return kCIDLib::False;
     }
 
@@ -703,22 +690,22 @@ TKrnlConIn::bReadLine(tCIDLib::TCh* const pszToFill
     return kCIDLib::True;
 }
 
-tCIDLib::TBoolean TKrnlConIn::__bOpen()
+tCIDLib::TBoolean TKrnlConIn::bOpen()
 {
-    __hconThis.__phconiThis->bValid = kCIDLib::True;
-    __hconThis.__phconiThis->bSingleCharMode = kCIDLib::False;
+    m_hconThis.m_phconiThis->bValid = kCIDLib::True;
+    m_hconThis.m_phconiThis->bSingleCharMode = kCIDLib::False;
     return kCIDLib::True;
 }
 
-tCIDLib::TBoolean TKrnlConIn::__bSetInsertMode(const tCIDLib::TBoolean)
+tCIDLib::TBoolean TKrnlConIn::bSetInsertMode(const tCIDLib::TBoolean)
 {
     return kCIDLib::True;
 }
 
-tCIDLib::TVoid TKrnlConIn::__Close()
+tCIDLib::TVoid TKrnlConIn:Close()
 {
-    if (__hconThis.__phconiThis->bSingleCharMode)
-        ::tcsetattr(0, TCSADRAIN, &__hconThis.__phconiThis->TermInfo);
+    if (m_hconThis.m_phconiThis->bSingleCharMode)
+        ::tcsetattr(0, TCSADRAIN, &m_hconThis.m_phconiThis->TermInfo);
 }
 
 TKrnlConIn::TConPlatInfo*
