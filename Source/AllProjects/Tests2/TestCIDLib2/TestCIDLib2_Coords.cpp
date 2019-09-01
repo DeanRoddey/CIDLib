@@ -255,17 +255,8 @@ TTest_CoordCtor::eRunTest(  TTextStringOutStream&   strmOut
         tCIDLib::THostPoint HostPnt1 = { 100, 100 };
         tCIDLib::THostPoint HostPnt2 = { 500, 200 };
 
-        TArea areaTest1(HostPnt1, HostPnt2, tCIDLib::ERectlTypes::NonInclusive);
+        TArea areaTest1(HostPnt1, HostPnt2);
         if (!bCheckArea(areaTest1, 100, 100, 400, 100))
-        {
-            eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Area ctor failed\n\n";
-        }
-    }
-
-    {
-        TArea areaTest(TPoint(10, 20), TPoint(30, 40), tCIDLib::ERectlTypes::Inclusive);
-        if (!bCheckArea(areaTest, 10, 20, 21, 21))
         {
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"Area ctor failed\n\n";
@@ -861,7 +852,7 @@ TTest_CoordAcc::eRunTest(TTextStringOutStream&  strmOut
         TArea areaTest(10, 10, 20, 30);
         tCIDLib::THostRectl HostRectl;
 
-        areaTest.ToRectl(HostRectl, tCIDLib::ERectlTypes::Inclusive);
+        areaTest.ToRectl(HostRectl);
         if ((HostRectl.i4Left != 10)
         ||  (HostRectl.i4Top != 10)
         ||  (HostRectl.i4Right != 29)
@@ -883,7 +874,7 @@ TTest_CoordAcc::eRunTest(TTextStringOutStream&  strmOut
         }
 
         // Construct another area from it and compare to original
-        TArea areaTest2(HostRectl, tCIDLib::ERectlTypes::Inclusive);
+        TArea areaTest2(HostRectl);
         if (areaTest2 != areaTest)
         {
             eRes = tTestFWLib::ETestRes::Failed;
@@ -891,7 +882,7 @@ TTest_CoordAcc::eRunTest(TTextStringOutStream&  strmOut
         }
 
         // Do the non-inclusive version now
-        areaTest.ToRectl(HostRectl, tCIDLib::ERectlTypes::NonInclusive);
+        areaTest.ToRectl(HostRectl);
         if ((HostRectl.i4Left != 10)
         ||  (HostRectl.i4Top != 10)
         ||  (HostRectl.i4Right != 30)
@@ -913,7 +904,7 @@ TTest_CoordAcc::eRunTest(TTextStringOutStream&  strmOut
         }
 
         // Convert back from the rectangle
-        areaTest2.FromRectl(HostRectl, tCIDLib::ERectlTypes::NonInclusive);
+        areaTest2.FromRectl(HostRectl);
         if (areaTest2 != areaTest)
         {
             eRes = tTestFWLib::ETestRes::Failed;
@@ -1188,17 +1179,10 @@ TTest_Area1::eRunTest(  TTextStringOutStream&   strmOut
           , TTestData(TArea(-1, -1, 1, 1), -1, -1, 1, 1)
           , TTestData(TArea(TPoint(50, 60), TSize(70, 80)), 50, 60, 70, 80)
           , TTestData(TArea(TPoint(51, 61), 71, 81), 51, 61, 71, 81)
-          , TTestData
-            (
-                TArea(TPoint(1, 1), TPoint(100, 100), tCIDLib::ERectlTypes::NonInclusive)
-                , 1, 1, 99, 99
-            )
+          , TTestData(TArea(TPoint(1, 1), TPoint(100, 100)), 1, 1, 99, 99)
 
-          // Inclusive vs. exclusive tests
-          , TTestData(TArea(rectlSrc1, tCIDLib::ERectlTypes::Inclusive), 1, 1, 2, 2)
-          , TTestData(TArea(rectlSrc1, tCIDLib::ERectlTypes::NonInclusive), 1, 1, 1, 1)
-          , TTestData(TArea(rectlSrc2, tCIDLib::ERectlTypes::Inclusive), 1, 1, 1, 1)
-          , TTestData(TArea(rectlSrc2, tCIDLib::ERectlTypes::NonInclusive), 1, 1, 0, 0)
+          , TTestData(TArea(rectlSrc1), 1, 1, 1, 1)
+          , TTestData(TArea(rectlSrc2), 1, 1, 0, 0)
         };
         const tCIDLib::TCard4 c4Count = tCIDLib::c4ArrayElems(aTestData);
 
@@ -1317,18 +1301,11 @@ TTest_Area1::eRunTest(  TTextStringOutStream&   strmOut
 
 
     // Test setting from points
-    areaTest1.FromPoints(TPoint(0, 0), TPoint(1, 1), tCIDLib::ERectlTypes::NonInclusive);
+    areaTest1.FromPoints(TPoint(0, 0), TPoint(1, 1));
     if (areaTest1 != TArea(0, 0, 1, 1))
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"SetFromPoints non-inclusive method failed \n\n";
-    }
-
-    areaTest1.FromPoints(TPoint(0, 0), TPoint(1, 1), tCIDLib::ERectlTypes::Inclusive);
-    if (areaTest1 != TArea(0, 0, 2, 2))
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"SetFromPoints inclusive method failed \n\n";
     }
 
     return eRes;

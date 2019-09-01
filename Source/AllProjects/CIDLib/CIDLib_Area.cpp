@@ -46,7 +46,7 @@ AdvRTTIDecls(TArea,TObject)
 // ---------------------------------------------------------------------------
 //  TArea: Public, static data
 // ---------------------------------------------------------------------------
-const TArea  TArea::areaEmpty(0, 0, 0, 0);
+const TArea  TArea::areaEmpty(0, 0, 0UL, 0UL);
 
 
 // ---------------------------------------------------------------------------
@@ -68,15 +68,13 @@ TArea& TArea::Nul_TArea()
 // ---------------------------------------------------------------------------
 //  TArea: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TArea::TArea(   const   tCIDLib::THostRectl&    rectlSrc
-                , const tCIDLib::ERectlTypes    eInclusive)
+TArea::TArea(const tCIDLib::THostRectl& rectlSrc)
 {
-    FromRectl(rectlSrc, eInclusive);
+    FromRectl(rectlSrc);
 }
 
 TArea::TArea(   const   tCIDLib::THostPoint&    ptULeft
-                , const tCIDLib::THostPoint&    ptLRt
-                , const tCIDLib::ERectlTypes    eInclusive) :
+                , const tCIDLib::THostPoint&    ptLRt) :
 
     // Note that this depends upon correct member order!!
     m_i4X(tCIDLib::MinVal(ptULeft.i4X, ptLRt.i4X))
@@ -84,17 +82,10 @@ TArea::TArea(   const   tCIDLib::THostPoint&    ptULeft
     , m_c4CX(tCIDLib::MaxVal(ptULeft.i4X, ptLRt.i4X) - m_i4X)
     , m_c4CY(tCIDLib::MaxVal(ptULeft.i4Y, ptLRt.i4Y) - m_i4Y)
 {
-    // If they were inclusive, then bump the sizes
-    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
-    {
-        m_c4CX++;
-        m_c4CY++;
-    }
 }
 
 TArea::TArea(const  TPoint&                 pntULeft
-            , const TPoint&                 pntLRt
-            , const tCIDLib::ERectlTypes    eInclusive)
+            , const TPoint&                 pntLRt)
 {
     // Get the values out of the points for greater efficiency
     tCIDLib::TInt4 i4X1 = pntULeft.m_i4X;
@@ -106,13 +97,6 @@ TArea::TArea(const  TPoint&                 pntULeft
     m_c4CX  = i4X1 > i4X2 ? i4X1 - i4X2 : i4X2 - i4X1;
     m_i4Y   = tCIDLib::MinVal(i4Y1, i4Y2);
     m_c4CY  = i4Y1 > i4Y2 ? i4Y1 - i4Y2 : i4Y2 - i4Y1;
-
-    // If they were inclusive, then bump the sizes
-    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
-    {
-        m_c4CX++;
-        m_c4CY++;
-    }
 }
 
 
@@ -721,13 +705,31 @@ TArea::FromAreaScaled(  const   TArea&              areaSource
 }
 
 
-//
-//  Sets our origin and size from the passed UL/LR corner points.
-//
+// From the various edges. R/B must be non-inclusive
 tCIDLib::TVoid
-TArea::FromPoints(  const   TPoint&                 pntULeft
-                    , const TPoint&                 pntLRight
-                    , const tCIDLib::ERectlTypes    eInclusive)
+TArea::FromEdges(const  tCIDLib::TInt4  i4Left
+                , const tCIDLib::TInt4  i4Top
+                , const tCIDLib::TInt4  i4Right
+                , const tCIDLib::TInt4  i4Bottom)
+{
+    m_i4X = i4Left;
+    m_i4Y = i4Top;
+
+    if (i4Right < i4Left)
+        m_c4CX = tCIDLib::TCard4(i4Left - i4Right);
+    else
+        m_c4CX = tCIDLib::TCard4(i4Right - i4Left);
+
+    if (i4Bottom < i4Top)
+        m_c4CY = tCIDLib::TCard4(i4Top) - i4Bottom;
+    else
+        m_c4CY = tCIDLib::TCard4(i4Bottom - i4Top);
+}
+
+
+// Sets our origin and size from the passed UL/LR corner points. LR must be non-inclusive
+tCIDLib::TVoid
+TArea::FromPoints(const TPoint& pntULeft, const TPoint& pntLRight)
 {
     if (pntULeft.m_i4X > pntLRight.m_i4X)
     {
@@ -750,20 +752,12 @@ TArea::FromPoints(  const   TPoint&                 pntULeft
         m_i4Y  = pntULeft.m_i4Y;
         m_c4CY = (pntLRight.m_i4Y - pntULeft.m_i4Y);
     }
-
-    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
-    {
-        if (m_c4CX)
-            m_c4CX++;
-        if (m_c4CY)
-            m_c4CY++;
-    }
 }
 
+// LR must be non-inclusive
 tCIDLib::TVoid
 TArea::FromPoints(  const   tCIDLib::THostPoint&    ptlULeft
-                    , const tCIDLib::THostPoint&    ptlLRight
-                    , const tCIDLib::ERectlTypes    eInclusive)
+                    , const tCIDLib::THostPoint&    ptlLRight)
 {
     if (ptlULeft.i4X > ptlLRight.i4X)
     {
@@ -786,25 +780,11 @@ TArea::FromPoints(  const   tCIDLib::THostPoint&    ptlULeft
         m_i4Y  = ptlULeft.i4Y;
         m_c4CY = tCIDLib::TCard4(ptlLRight.i4Y - ptlULeft.i4Y);
     }
-
-    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
-    {
-        if (m_c4CX)
-            m_c4CX++;
-        if (m_c4CY)
-            m_c4CY++;
-    }
 }
 
 
-//
-//  Sets our origin/size based on a host rectangle, which can be inclusive or non-
-//  inclusive. We just subtract left/top from right/bottom which is correct for a
-//  non-inclusive rectangle (effectively throwing away the extra pixel.) If it's
-//  inclusive then we increment the width/height.
-//
-tCIDLib::TVoid TArea::FromRectl(const   tCIDLib::THostRectl&    rectlSrc
-                                , const tCIDLib::ERectlTypes    eInclusive)
+// Sets our origin/size based on a host rectangle, which must be non-inclusive.
+tCIDLib::TVoid TArea::FromRectl(const   tCIDLib::THostRectl&    rectlSrc)
 {
     // We initially assume non-inclusive
     if (rectlSrc.i4Left > rectlSrc.i4Right)
@@ -827,13 +807,6 @@ tCIDLib::TVoid TArea::FromRectl(const   tCIDLib::THostRectl&    rectlSrc
     {
         m_i4Y  = rectlSrc.i4Bottom;
         m_c4CY = tCIDLib::TCard4(rectlSrc.i4Top - rectlSrc.i4Bottom);
-    }
-
-    // If the original was inclusive, then bump the values
-    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
-    {
-        m_c4CX++;
-        m_c4CY++;
     }
 }
 
@@ -1629,8 +1602,8 @@ TArea::ToRectl(         tCIDLib::THostRectl&    rectlDest
 
 tCIDLib::TVoid
 TArea::ToRectl(         tCIDLib::THostRectl&    rectlDest
-                , const tCIDLib::ERectlTypes    eInclusive
-                , const TPoint&                 pntOffset) const
+                , const TPoint&                 pntOffset
+                , const tCIDLib::ERectlTypes    eInclusive) const
 {
     // Create a inclusive rectangle
     rectlDest.i4Left  = m_i4X + pntOffset.i4X();

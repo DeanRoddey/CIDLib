@@ -303,7 +303,7 @@ static tCIDLib::TVoid TestBinStreamIO(TTextOutStream& strmOut)
     ::PolymorphicWrite(&strTest, strmTestOut);
 
     // And do another object, this time an area object
-    TArea   areaTest(10, 10, 100, 100);
+    TArea   areaTest(10, 10, 100UL, 100UL);
     ::PolymorphicWrite(&areaTest, strmTestOut);
 
     // And now a date object

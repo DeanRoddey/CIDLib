@@ -809,10 +809,7 @@ TArea TWindow::areaClient() const
         );
     }
     TArea areaRet;
-    areaRet.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaRet.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
     return areaRet;
 }
 
@@ -855,10 +852,7 @@ TArea TWindow::areaWnd() const
     }
 
     TArea areaRet;
-    areaRet.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaRet.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
     return areaRet;
 }
 
@@ -884,10 +878,7 @@ TArea TWindow::areaWndSize() const
         );
     }
     TArea areaRet;
-    areaRet.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaRet.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
     areaRet.ZeroOrg();
     return areaRet;
 }
@@ -2677,7 +2668,6 @@ tCIDCtrls::EPosStates TWindow::ePosState(TArea& areaNormal) const
     areaNormal.FromRectl
     (
         *reinterpret_cast<tCIDLib::THostRectl*>(&WndPlace.rcNormalPosition)
-        , tCIDLib::ERectlTypes::NonInclusive
     );
 
     return eRet;
@@ -2808,7 +2798,7 @@ TWindow::InvalidateArea(const   TArea&              areaToInvalidate
                         , const tCIDLib::TBoolean   bEraseBgn)
 {
     tCIDLib::THostRectl rectlInvalidate;
-    areaToInvalidate.ToRectl(rectlInvalidate, tCIDLib::ERectlTypes::NonInclusive);
+    areaToInvalidate.ToRectl(rectlInvalidate);
     if (!::InvalidateRect(m_hwndThis, (RECT*)&rectlInvalidate, bEraseBgn))
     {
         TKrnlError::SetLastHostError(::GetLastError());
@@ -2841,7 +2831,7 @@ TWindow::InvalidateArea(const   TPoint&             pntUL
                         , const TPoint&             pntLR
                         , const tCIDLib::TBoolean   bEraseBgn)
 {
-    InvalidateArea(TArea(pntUL, pntLR, tCIDLib::ERectlTypes::NonInclusive), bEraseBgn);
+    InvalidateArea(TArea(pntUL, pntLR), bEraseBgn);
 }
 
 tCIDLib::TVoid
@@ -2850,10 +2840,7 @@ TWindow::InvalidateArea(const   tCIDCtrls::TWndId   widChild
                         , const TPoint&             pntLR
                         , const tCIDLib::TBoolean   bEraseBgn)
 {
-    InvalidateArea
-    (
-        widChild, TArea(pntUL, pntLR, tCIDLib::ERectlTypes::NonInclusive), bEraseBgn
-    );
+    InvalidateArea(widChild, TArea(pntUL, pntLR), bEraseBgn);
 }
 
 
@@ -3465,10 +3452,7 @@ TWindow::QueryClientArea(       TArea&              areaToFill
     RECT rectCur;
     ::GetClientRect(hwndUs, &rectCur);
 
-    areaToFill.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaToFill.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
 
     //
     //  If asked for only the available area, then iterate all of the child windows
@@ -3492,11 +3476,7 @@ TWindow::QueryClientArea(       TArea&              areaToFill
                 //
                 ::GetWindowRect(hwndCur, &rectCur);
                 ::MapWindowPoints(0, hwndUs, (POINT*)&rectCur, 2);
-                areaCur.FromRectl
-                (
-                    *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-                );
-
+                areaCur.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
                 areaToFill -= areaCur;
             }
 
@@ -3527,10 +3507,7 @@ TWindow::QueryClientArea(       TArea&                  areaToFill
     RECT rectCur;
     ::GetClientRect(hwndUs, &rectCur);
 
-    areaToFill.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaToFill.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
 
     //
     //  If asked for only the available area, then iterate all of the child windows
@@ -3569,11 +3546,7 @@ TWindow::QueryClientArea(       TArea&                  areaToFill
                     //
                     ::GetWindowRect(hwndCur, &rectCur);
                     ::MapWindowPoints(0, hwndUs, (POINT*)&rectCur, 2);
-                    areaCur.FromRectl
-                    (
-                        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-                    );
-
+                    areaCur.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
                     areaToFill -= areaCur;
                 }
             }
@@ -3671,7 +3644,7 @@ tCIDLib::TVoid TWindow::Redraw( const   TArea&                  areaToRedraw
                                 , const tCIDCtrls::ERedrawFlags eFlags)
 {
     tCIDLib::THostRectl rectlRedraw;
-    areaToRedraw.ToRectl(rectlRedraw, tCIDLib::ERectlTypes::NonInclusive);
+    areaToRedraw.ToRectl(rectlRedraw);
 
     tCIDLib::TCard4 c4Flags = RDW_INVALIDATE;
     if (tCIDLib::bAllBitsOn(eFlags, tCIDCtrls::ERedrawFlags::Erase))
@@ -3931,10 +3904,10 @@ TWindow::Scroll(const   TArea&              areaToScroll
                 , const tCIDLib::TBoolean   bInvalidate)
 {
     tCIDLib::THostRectl  rectScroll;
-    areaToScroll.ToRectl(rectScroll, tCIDLib::ERectlTypes::NonInclusive);
+    areaToScroll.ToRectl(rectScroll);
 
     tCIDLib::THostRectl  rectClip;
-    areaClip.ToRectl(rectClip, tCIDLib::ERectlTypes::NonInclusive);
+    areaClip.ToRectl(rectClip);
 
     tCIDLib::THostRectl  rectInvalid;
 
@@ -3963,7 +3936,7 @@ TWindow::Scroll(const   TArea&              areaToScroll
         );
     }
 
-    areaInvalid.FromRectl(rectInvalid, tCIDLib::ERectlTypes::NonInclusive);
+    areaInvalid.FromRectl(rectInvalid);
 }
 
 
@@ -3976,12 +3949,7 @@ TWindow::Scroll(const   TArea&              areaToScroll
 {
     Scroll
     (
-        areaToScroll
-        , areaToScroll
-        , areaInvalid
-        , i4HorzAmount
-        , i4VertAmount
-        , bInvalidate
+        areaToScroll, areaToScroll, areaInvalid, i4HorzAmount, i4VertAmount, bInvalidate
     );
 }
 
@@ -4767,7 +4735,7 @@ tCIDLib::TVoid
 TWindow::XlatCoordinates(TArea& areaToXlat, const TWindow& wndSrc) const
 {
     tCIDLib::THostRectl rectlXlat;
-    areaToXlat.ToRectl(rectlXlat, tCIDLib::ERectlTypes::Inclusive);
+    areaToXlat.ToRectl(rectlXlat);
     ::SetLastError(0);
     if (!::MapWindowPoints(wndSrc.m_hwndThis, m_hwndThis, (POINT*)&rectlXlat, 2))
     {
@@ -4787,7 +4755,7 @@ TWindow::XlatCoordinates(TArea& areaToXlat, const TWindow& wndSrc) const
             );
         }
     }
-    areaToXlat.FromRectl(rectlXlat, tCIDLib::ERectlTypes::Inclusive);
+    areaToXlat.FromRectl(rectlXlat);
 }
 
 tCIDLib::TVoid
@@ -5839,11 +5807,7 @@ TWindow::mresDispatch(  const   TWindow&            wndThis
             if (pDraw->itemState & ODS_FOCUS)
                 eFlags |= tCIDCtrls::ECustDrFlags::Focus;
 
-            TArea areaTar
-            (
-                *(tCIDLib::THostRectl*)&pDraw->rcItem, tCIDLib::ERectlTypes::NonInclusive
-            );
-
+            TArea areaTar(*(tCIDLib::THostRectl*)&pDraw->rcItem);
             CustomDraw(gdevTar, pDraw->itemID, eFlags, areaTar);
             return 1;
         };
@@ -6416,11 +6380,7 @@ TWindow::mresDispatch(  const   TWindow&            wndThis
             }
 
             // Convert the update rect to an area structure
-            areaUpdate.FromRectl
-            (
-                *(tCIDLib::THostRectl*)&PaintStruct.rcPaint
-                , tCIDLib::ERectlTypes::NonInclusive
-            );
+            areaUpdate.FromRectl(*(tCIDLib::THostRectl*)&PaintStruct.rcPaint);
 
             // Create a device object for the device
             TGraphPaintDev gdevPaint(hdevPaint, PaintStruct);

@@ -1691,20 +1691,12 @@ TMultiColListBox::QueryColArea( const   tCIDLib::TCard4     c4Row
     if (bScreenRel)
     {
         TArea areaTmp;
-        areaTmp.FromRectl
-        (
-            reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-            , tCIDLib::ERectlTypes::NonInclusive
-        );
+        areaTmp.FromRectl(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
         ToScreenCoordinates(areaTmp, areaToFill);
     }
      else
     {
-       areaToFill.FromRectl
-        (
-            reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-            , tCIDLib::ERectlTypes::NonInclusive
-        );
+       areaToFill.FromRectl(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
     }
 }
 
@@ -1779,11 +1771,7 @@ TMultiColListBox::QueryRowArea( const tCIDLib::TCard4 c4Row, TArea& areaToFill) 
         );
     }
 
-    areaToFill.FromRectl
-    (
-        reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-        , tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaToFill.FromRectl(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
 }
 
 
@@ -3039,12 +3027,7 @@ TMultiColListBox::bNotReflect(          TWindow&                wndTar
                                 m_hwndListView, pDraw->nmcd.dwItemSpec, &rectRow, LVIR_BOUNDS
                             );
 
-                            TArea areaRow
-                            (
-                                reinterpret_cast<tCIDLib::THostRectl&>(rectRow)
-                                , tCIDLib::ERectlTypes::NonInclusive
-                            );
-
+                            TArea areaRow(reinterpret_cast<tCIDLib::THostRectl&>(rectRow));
                             if (areaClient().bIntersects(areaRow))
                             {
                                 TGraphWndDev gdevTmp(pDraw->nmcd.hdc, tCIDLib::EAdoptOpts::NoAdopt);
@@ -3082,12 +3065,7 @@ TMultiColListBox::bNotReflect(          TWindow&                wndTar
                                 , &rectCol
                             );
 
-                            TArea areaCol
-                            (
-                                reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-                                , tCIDLib::ERectlTypes::NonInclusive
-                            );
-
+                            TArea areaCol(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
                             if (areaClient().bIntersects(areaCol))
                             {
                                 TGraphWndDev gdevTmp(pDraw->nmcd.hdc, tCIDLib::EAdoptOpts::NoAdopt);
@@ -3121,12 +3099,7 @@ TMultiColListBox::bNotReflect(          TWindow&                wndTar
                                 m_hwndListView, pDraw->nmcd.dwItemSpec, &rectRow, LVIR_BOUNDS
                             );
 
-                            TArea areaRow
-                            (
-                                reinterpret_cast<tCIDLib::THostRectl&>(rectRow)
-                                , tCIDLib::ERectlTypes::NonInclusive
-                            );
-
+                            TArea areaRow(reinterpret_cast<tCIDLib::THostRectl&>(rectRow));
                             if (areaClient().bIntersects(areaRow))
                             {
                                 TGraphWndDev gdevTmp(pDraw->nmcd.hdc, tCIDLib::EAdoptOpts::NoAdopt);
@@ -3157,12 +3130,7 @@ TMultiColListBox::bNotReflect(          TWindow&                wndTar
                                 , &rectCol
                             );
 
-                            TArea areaCol
-                            (
-                                reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-                                , tCIDLib::ERectlTypes::NonInclusive
-                            );
-
+                            TArea areaCol(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
                             if (areaClient().bIntersects(areaCol))
                             {
                                 TGraphWndDev gdevTmp(pDraw->nmcd.hdc, tCIDLib::EAdoptOpts::NoAdopt);

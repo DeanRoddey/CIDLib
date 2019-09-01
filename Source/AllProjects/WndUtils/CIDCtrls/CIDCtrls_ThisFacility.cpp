@@ -146,21 +146,9 @@ QueryMonitorArea(HMONITOR hMon, TArea& areaToFill, const tCIDLib::TBoolean bAvai
     if (::GetMonitorInfo(hMon, &MonInfo))
     {
         if (bAvailOnly)
-        {
-            areaToFill.FromRectl
-            (
-                *reinterpret_cast<tCIDLib::THostRectl*>(&MonInfo.rcWork)
-                , tCIDLib::ERectlTypes::NonInclusive
-            );
-        }
-         else
-        {
-            areaToFill.FromRectl
-            (
-                *reinterpret_cast<tCIDLib::THostRectl*>(&MonInfo.rcMonitor)
-                , tCIDLib::ERectlTypes::NonInclusive
-            );
-        }
+            areaToFill.FromRectl(*reinterpret_cast<tCIDLib::THostRectl*>(&MonInfo.rcWork));
+        else
+            areaToFill.FromRectl(*reinterpret_cast<tCIDLib::THostRectl*>(&MonInfo.rcMonitor));
     }
      else
     {
@@ -1491,7 +1479,7 @@ tCIDLib::TVoid TFacCIDCtrls::ConfinePointer(const TArea& areaOnScreen)
 {
     // Set the cursor confinement to the confine area
     tCIDLib::THostRectl rectlConfine;
-    areaOnScreen.ToRectl(rectlConfine, tCIDLib::ERectlTypes::NonInclusive);
+    areaOnScreen.ToRectl(rectlConfine);
     ::ClipCursor((RECT*)&rectlConfine);
 }
 

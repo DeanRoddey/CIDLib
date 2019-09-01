@@ -1629,6 +1629,18 @@ PROJECT=TestScroll [Win32_*]
 END PROJECT
 
 
+PROJECT=TestGraphArea [Win32_*]
+
+    SETTINGS
+        DIRECTORY   = Tests\TestGraphArea
+        DISPLAY     = GUI
+    END SETTINGS
+
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
 
 ; ----------------------------------------------------------------------------
 ;  Basic Sample programs to demonstrate various aspects of CIDLib

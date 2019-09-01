@@ -20,58 +20,17 @@
 //  unsigned size in the positive direction of each axis (left to right, top to
 //  bottom.) I.e. its a 4th quadrant coordinate system.
 //
-//  An area of 10x10 at 10,10 will cover the pixels from 10,10 to 19,19, since 10,10
-//  is the first pixel.
+//  Areas are always non-inclusive when being set from individual points or coordinates
+//  or rectanges. I.e. it's assumed that right-left is the width and bottom-top is the
+//  height, which only works if the bottom and right are one larger. That's how Windows
+//  rectangles work and how most UIs probably will work. Inclusive points cannot represent
+//  an empty area either.
 //
-//  See the docs for  discussion of inclusive vs exclusive rectanges and such.
-//  When converting to/from system rectangles, or UL/LR points, we have to be
-//  careful to follow specific rules. Rectangles can be inclusive or non-inclusive.
-//  Areas are neither, they are (origin - size) based.
+//  So you must be careful of this and provide the right type of right/bottom coordinates
+//  or things will be a mess.
 //
-//  Inclusive Rectl to Area
-//
-//      The resulting area includes the outer edge. So 0,0,1,1 becomes 0,0 - 2,2
-//      so it's 2 pixels wide.
-//
-//  Non-Inclusive Rectl to Area
-//
-//      The resulting area excludes the outer edge. So 0,0,1,1 becomes 0,0 - 1,1
-//      so it's 1 pixel wide.
-//
-//  Area to Inculsive Rectl
-//
-//      An area of 0,0 - 1,1 is 1 pixel in size, and the inclusive rectangle includes
-//      the edges, so it becomes 0,0,0,0.
-//
-//  Area to Non-Inculsive Rectl
-//
-//      An area of 0,0 - 1,1 is 1 pixel in size, and the inclusive rectangle does not
-//      include the edges, so it has to become 0,0,1,1.
-//
-//
-//  From UL/LR points to Area
-//  From Area to UL/LR points.
-//      The points are assumed to represent points on an non-inclusive rectangle, so
-//      the same as the non-inclusive rect to area scenario above, and vice versa.
-//
-//      So points 10,10 and 20,20 create an area of 10x10, because the area does not
-//      include the 20 coordinates.It goes 10 to 19.
-//
-//      This may seem non-intuitive, but ultimately it's a lot more sane. Otherwise
-//      you can't create an empty area, or tell the difference between an empty or
-//      1x1 rectangle when you convert it to an area.
-//
-//  i4Right()/i4Bottom
-//
-//      These return the right/bottom points of the area. They return inclusive
-//      coordinates. If they were non-inclusive, they would actually return the first
-//      point past the right/bottom. For an empty area the left/top is the same as
-//      the right/bottom. For x=1,cx=1, you will get 1, because pixel 1 is the only
-//      pixel in the area horizontally.
-//
-//      When setting them, it's also assumed to be inclusive. So if x-1 and you set
-//      right=1, then the width will be 1. You can't set an empty area this way.
-//
+//  When converting to points, you can tell it what you want them to be, inclusive or
+//  non-inclusive. The default will be non-inclusive since that's the norm.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -107,7 +66,6 @@ class CIDLIBEXP TArea :
         TArea
         (
             const   tCIDLib::THostRectl&    rectlToCopy
-            , const tCIDLib::ERectlTypes    eInclusive
         );
 
         explicit TArea
@@ -119,14 +77,12 @@ class CIDLIBEXP TArea :
         (
             const   tCIDLib::THostPoint&    ptULeft
             , const tCIDLib::THostPoint&    ptLRight
-            , const tCIDLib::ERectlTypes    eInclusive
         );
 
         TArea
         (
             const   TPoint&                 pntULeft
             , const TPoint&                 pntLRight
-            , const tCIDLib::ERectlTypes    eInclusive
         );
 
         TArea
@@ -393,45 +349,6 @@ class CIDLIBEXP TArea :
             DoAdjustments(-tCIDLib::TInt4(c4Ofs), -tCIDLib::TInt4(c4Ofs));
         }
 
-        tCIDLib::TVoid FromAreaAtOrg
-        (
-            const   TArea&                  areaSource
-        );
-
-        tCIDLib::TVoid FromAreaScaled
-        (
-            const   TArea&                  areaSource
-            , const tCIDLib::TFloat8        f8CXScale
-            , const tCIDLib::TFloat8        f8CYScale
-        );
-
-        tCIDLib::TVoid FromPoints
-        (
-            const   TPoint&                 pntULeft
-            , const TPoint&                 pntLRight
-            , const tCIDLib::ERectlTypes    eInclusive
-        );
-
-        tCIDLib::TVoid FromPoints
-        (
-            const   tCIDLib::THostPoint&    ptULeft
-            , const tCIDLib::THostPoint&    ptLRight
-            , const tCIDLib::ERectlTypes    eInclusive
-        );
-
-        tCIDLib::TVoid FromPoints
-        (
-            const   tCIDLib::TRawPoint&     ptULeft
-            , const tCIDLib::TRawPoint&     ptLRight
-            , const tCIDLib::ERectlTypes    eInclusive
-        );
-
-        tCIDLib::TVoid FromRectl
-        (
-            const   tCIDLib::THostRectl&    rectlSrc
-            , const tCIDLib::ERectlTypes    eInclusive
-        );
-
         tCIDLib::TVoid ForceWithin
         (
             const   TArea&                  areaToFit
@@ -444,6 +361,49 @@ class CIDLIBEXP TArea :
             , const tCIDLib::TCh            chSepChar = kCIDLib::chComma
             , const tCIDLib::TBoolean       bAppend = kCIDLib::False
         )   const;
+
+        tCIDLib::TVoid FromAreaAtOrg
+        (
+            const   TArea&                  areaSource
+        );
+
+        tCIDLib::TVoid FromAreaScaled
+        (
+            const   TArea&                  areaSource
+            , const tCIDLib::TFloat8        f8CXScale
+            , const tCIDLib::TFloat8        f8CYScale
+        );
+
+        tCIDLib::TVoid FromEdges
+        (
+            const   tCIDLib::TInt4          i4Left
+            , const tCIDLib::TInt4          i4Top
+            , const tCIDLib::TInt4          i4Right
+            , const tCIDLib::TInt4          i4Bottom
+        );
+
+        tCIDLib::TVoid FromPoints
+        (
+            const   TPoint&                 pntULeft
+            , const TPoint&                 pntLRight
+        );
+
+        tCIDLib::TVoid FromPoints
+        (
+            const   tCIDLib::THostPoint&    ptULeft
+            , const tCIDLib::THostPoint&    ptLRight
+        );
+
+        tCIDLib::TVoid FromPoints
+        (
+            const   tCIDLib::TRawPoint&     ptULeft
+            , const tCIDLib::TRawPoint&     ptLRight
+        );
+
+        tCIDLib::TVoid FromRectl
+        (
+            const   tCIDLib::THostRectl&    rectlSrc
+        );
 
         tCIDLib::TInt4 i4Bottom() const;
 
@@ -662,7 +622,7 @@ class CIDLIBEXP TArea :
         tCIDLib::TVoid ToPointArray
         (
                     tCIDLib::THostPoint* const aptTarget
-            , const tCIDLib::ERectlTypes    eInclusive
+            , const tCIDLib::ERectlTypes    eInclusive = tCIDLib::ERectlTypes::NonInclusive
         )   const;
 
         tCIDLib::TVoid ToCornerPoints
@@ -671,7 +631,7 @@ class CIDLIBEXP TArea :
             ,       tCIDLib::THostPoint&    ptURight
             ,       tCIDLib::THostPoint&    ptLRight
             ,       tCIDLib::THostPoint&    ptLLeft
-            , const tCIDLib::ERectlTypes    eInclusive
+            , const tCIDLib::ERectlTypes    eInclusive = tCIDLib::ERectlTypes::NonInclusive
         )   const;
 
         tCIDLib::TVoid ToCornerPoints
@@ -680,21 +640,21 @@ class CIDLIBEXP TArea :
             ,       TPoint&                 pntURight
             ,       TPoint&                 pntLRight
             ,       TPoint&                 pntLLeft
-            , const tCIDLib::ERectlTypes    eInclusive
+            , const tCIDLib::ERectlTypes    eInclusive = tCIDLib::ERectlTypes::NonInclusive
         )   const;
 
         tCIDLib::TVoid ToPoints
         (
                     TPoint&                 pntULeft
             ,       TPoint&                 pntLRight
-            , const tCIDLib::ERectlTypes    eInclusive
+            , const tCIDLib::ERectlTypes    eInclusive = tCIDLib::ERectlTypes::NonInclusive
         )   const;
 
         tCIDLib::TVoid ToPoints
         (
                     tCIDLib::THostPoint&    ptULeft
             ,       tCIDLib::THostPoint&    ptLRight
-            , const tCIDLib::ERectlTypes    eInclusive
+            , const tCIDLib::ERectlTypes    eInclusive = tCIDLib::ERectlTypes::NonInclusive
         )   const;
 
         tCIDLib::TVoid ToRawArea
@@ -711,14 +671,14 @@ class CIDLIBEXP TArea :
         tCIDLib::TVoid ToRectl
         (
                     tCIDLib::THostRectl&    rectlTarget
-            , const tCIDLib::ERectlTypes    eInclusive
+            , const tCIDLib::ERectlTypes    eInclusive = tCIDLib::ERectlTypes::NonInclusive
         )   const;
 
         tCIDLib::TVoid ToRectl
         (
                     tCIDLib::THostRectl&    rectlTarget
-            , const tCIDLib::ERectlTypes    eInclusive
             , const TPoint&                 pntOfs
+            , const tCIDLib::ERectlTypes    eInclusive = tCIDLib::ERectlTypes::NonInclusive
         )   const;
 
         tCIDLib::TVoid UpdateSizesIfZero

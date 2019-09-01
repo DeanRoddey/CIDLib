@@ -266,7 +266,6 @@ static tCIDLib::TVoid TestConversions()
     if (strncmp(szANSIString, pszANSIString, 4))
         strmOut << CUR_LN << L"Target ANSI string != to start of original\n";
 
-
     // Now go the other way, from ANSI to UNI
     TRawStr::pszConvert(pszANSIString, szUNIString, 4);
 

@@ -100,7 +100,7 @@ bCommonTests(       TTextOutStream&     strmOut
                 << tCIDLib::TFloat8(8.8);
 
     // Write some objects, and a class info object to the stream
-    strmTestOut << TArea(6, 7, 8, 9) << TString(L"This is a test");
+    strmTestOut << TArea(6, 7, 8UL, 9UL) << TString(L"This is a test");
     strmTestOut.WriteClassInfo(TArea::clsThis());
     strmTestOut << kCIDLib::FlushIt;
 
@@ -136,7 +136,7 @@ bCommonTests(       TTextOutStream&     strmOut
                 << kCIDLib::EndLn;
     }
 
-    if (areaTest != TArea(6, 7, 8, 9))
+    if (areaTest != TArea(6, 7, 8UL, 9UL))
         strmOut << L"    " << CUR_LN << L"Area read back in was wrong" << kCIDLib::EndLn;
 
     if (strTest != TString(L"This is a test"))

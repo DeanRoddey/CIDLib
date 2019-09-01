@@ -66,14 +66,14 @@ TFrameWnd::AreaForClient(const  TArea&                  areaClient
                         , const tCIDLib::TBoolean       bHasMenu)
 {
     RECT rectClient;
-    areaClient.ToRectl(*(tCIDLib::THostRectl*)&rectClient, tCIDLib::ERectlTypes::NonInclusive);
+    areaClient.ToRectl(*(tCIDLib::THostRectl*)&rectClient);
     ::AdjustWindowRectEx
     (
         &rectClient, tCIDLib::c4EnumOrd(eStyles), bHasMenu, tCIDLib::c4EnumOrd(eExStyles)
     );
 
     // And convert back to the output area
-    areaNew.FromRectl(*(tCIDLib::THostRectl*)&rectClient, tCIDLib::ERectlTypes::NonInclusive);
+    areaNew.FromRectl(*(tCIDLib::THostRectl*)&rectClient);
 }
 
 
@@ -652,11 +652,7 @@ TFrameWnd::RestorePosState( const   tCIDCtrls::EPosStates   eState
            WndPlace.showCmd = SW_RESTORE;
     }
 
-    areaNormal.ToRectl
-    (
-        *(tCIDLib::THostRectl*)&WndPlace.rcNormalPosition
-        , tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaNormal.ToRectl(*(tCIDLib::THostRectl*)&WndPlace.rcNormalPosition);
     ::SetWindowPlacement(hwndThis(), &WndPlace);
 }
 
@@ -674,11 +670,7 @@ TFrameWnd::RestorePosState( const   TArea&              areaTo
     ::GetWindowPlacement(hwndThis(), &WndPlace);
 
     // Put the passed area in as the restore area
-    areaTo.ToRectl
-    (
-        *(tCIDLib::THostRectl*)&WndPlace.rcNormalPosition
-        , tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaTo.ToRectl(*(tCIDLib::THostRectl*)&WndPlace.rcNormalPosition);
 
     // Ok, now do the actual restore
     if (bShow)
@@ -779,11 +771,7 @@ tCIDLib::TVoid TFrameWnd::SizeToClient(const TArea& areaFitTo)
 
     // And convert back to the output area
     TArea areaNew;
-    areaNew.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectClient
-        , tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaNew.FromRectl(*(tCIDLib::THostRectl*)&rectClient);
     SetSize(areaNew.szArea(), kCIDLib::False);
 }
 

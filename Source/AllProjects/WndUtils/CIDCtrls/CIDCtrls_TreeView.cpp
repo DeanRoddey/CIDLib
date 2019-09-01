@@ -804,10 +804,7 @@ TTreeView::bQueryItemArea(  const TString&              strPath
     if (!::SendMessage(hwndSafe(), TVM_GETITEMRECT, TRUE, tCIDCtrls::TLParam(&rcDummy)))
         return kCIDLib::False;
 
-    areaToFill.FromRectl
-    (
-        *reinterpret_cast<tCIDLib::THostRectl*>(&rcDummy), tCIDLib::ERectlTypes::Inclusive
-    );
+    areaToFill.FromRectl(*reinterpret_cast<tCIDLib::THostRectl*>(&rcDummy));
     return kCIDLib::True;
 }
 

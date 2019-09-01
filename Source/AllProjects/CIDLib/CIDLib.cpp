@@ -416,8 +416,8 @@ static tCIDLib::TVoid DummyFunc()
 
 
     TVector<TArea> colTestCurs(2);
-    colTestCurs.objAdd(TArea(1, 1, 1, 1));
-    colTestCurs.objAdd(TArea(2, 2, 2, 2));
+    colTestCurs.objAdd(TArea(1, 1, 1UL, 1UL));
+    colTestCurs.objAdd(TArea(2, 2, 2UL, 2UL));
     TVector<TArea>::TCursor cursTest(&colTestCurs);
     cursTest++;
     --cursTest;
@@ -430,11 +430,11 @@ static tCIDLib::TVoid DummyFunc()
     cursNCTest++;
     --cursNCTest;
 
-    if ((cursTest->i4Y() == 0) && (*cursTest == TArea(0, 0, 0, 0)))
+    if ((cursTest->i4Y() == 0) && (*cursTest == TArea(0, 0, 0UL, 0UL)))
     {
     }
 
-    TVector<TArea>::TCursor cursFind = tCIDColAlgo::cursFind(colTestCurs, TArea(1,1,1,1));
+    TVector<TArea>::TCursor cursFind = tCIDColAlgo::cursFind(colTestCurs, TArea(1,1,1UL,1UL));
     if (cursFind.bIsValid())
     {
     }
@@ -450,9 +450,9 @@ static tCIDLib::TVoid DummyFunc()
 
     TUniquePtr<TString> uptrTest(new TString(L"Testing"));
 
-    TObjLocker<TArea> olockrTest(10, 12, 14, 16);
+    TObjLocker<TArea> olockrTest(10, 12, 14UL, 16UL);
     TObjLock<TArea> olockTest = olockrTest.olockGet(5000);
-    if (*olockTest != TArea(10, 12, 14, 16))
+    if (*olockTest != TArea(10, 12, 14UL, 16UL))
     {
     }
     TObjLock<TArea> olockTest2 = olockrTest.olockTryGet(1000);

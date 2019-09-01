@@ -68,12 +68,12 @@ static tCIDLib::TVoid TestSetBasics(TTextOutStream& strmOut)
     THashMapOfTArea colTest(c4HashModulus, TStringKeyOps());
 
     // Add in one element, then try to add it again. It should be rejected
-    colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3, 4)));
+    colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3UL, 4UL)));
 
     bCaughtIt = kCIDLib::False;
     try
     {
-        colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3, 4)));
+        colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3UL, 4UL)));
     }
 
     catch(const TError& errToCatch)
@@ -135,9 +135,9 @@ static tCIDLib::TVoid TestSetStreaming(TTextOutStream& strmOut)
     THashMapOfTArea colTest(17, TStringKeyOps());
 
     // Put some values into it
-    colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3, 4)));
-    colTest.objAdd(TTestPair(L"Test2", TArea(2, 3, 4, 5)));
-    colTest.objAdd(TTestPair(L"Test3", TArea(3, 4, 5, 6)));
+    colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3UL, 4UL)));
+    colTest.objAdd(TTestPair(L"Test2", TArea(2, 3, 4UL, 5UL)));
+    colTest.objAdd(TTestPair(L"Test3", TArea(3, 4, 5UL, 6UL)));
 
     //
     //  Create a memory based output stream, and an input stream linked

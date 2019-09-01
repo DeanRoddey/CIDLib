@@ -439,7 +439,7 @@ TArea TGraphDrawDev::areaBounds(const tCIDLib::TBoolean bReset) const
     }
 
     if ((c4Res & DCB_SET) == DCB_SET)
-        return TArea(rectlTmp, tCIDLib::ERectlTypes::Inclusive);
+        return TArea(rectlTmp);
 
     return TArea();
 }
@@ -482,7 +482,7 @@ TArea TGraphDrawDev::areaMLText(const   TString&        strText
     );
 
     // Get the temp rectangle into an area for return
-    return TArea(rectlTmp, tCIDLib::ERectlTypes::Inclusive);
+    return TArea(rectlTmp);
 }
 
 
@@ -1522,7 +1522,7 @@ tCIDLib::TVoid TGraphDrawDev::DrawFocusArea(const TArea& areaToDraw)
     TPenJanitor janLine(this, &gpenLine);
 
     tCIDLib::THostRectl rectlDraw;
-    areaToDraw.ToRectl(rectlDraw, tCIDLib::ERectlTypes::NonInclusive);
+    areaToDraw.ToRectl(rectlDraw);
     if (!::DrawFocusRect(hdevThis(), (RECT*)&rectlDraw))
     {
         if (!bDevErrToIgnore())
@@ -2303,11 +2303,11 @@ TGraphDrawDev::DrawMText(const  TString&            strText
     {
         TArea areaText = areaMLText(strText, areaFormat.c4Width());
         areaText.JustifyIn(areaFormat, eHJustify, eVJustify);
-        areaText.ToRectl(rectDraw, tCIDLib::ERectlTypes::NonInclusive);
+        areaText.ToRectl(rectDraw);
     }
      else
     {
-        areaFormat.ToRectl(rectDraw, tCIDLib::ERectlTypes::NonInclusive);
+        areaFormat.ToRectl(rectDraw);
     }
 
     switch(eHJustify)
@@ -2430,7 +2430,7 @@ TGraphDrawDev::DrawShadowText(const TString&            strText
     #endif
 
     tCIDLib::THostRectl rectlText;
-    areaFormat.ToRectl(rectlText, tCIDLib::ERectlTypes::NonInclusive);
+    areaFormat.ToRectl(rectlText);
     ::DrawShadowText
     (
         hdevThis()
@@ -3667,7 +3667,7 @@ TGraphDrawDev::hrgnSetClipRegion(const  tCIDGraphDev::EClipModes    eMode
 tCIDLib::TVoid TGraphDrawDev::InvertArea(const TArea& areaToInvert)
 {
     tCIDLib::THostRectl  rectlInvert;
-    areaToInvert.ToRectl(rectlInvert, tCIDLib::ERectlTypes::NonInclusive);
+    areaToInvert.ToRectl(rectlInvert);
 
     if (!::InvertRect(hdevThis(), reinterpret_cast<const RECT*>(&rectlInvert)))
     {
@@ -3693,7 +3693,7 @@ TGraphDrawDev::Fill(const TArea& areaToFill, const TGUIBrush& gbrToUse)
 {
     // Convert the area to a host rectangle
     tCIDLib::THostRectl  rectlFill;
-    areaToFill.ToRectl(rectlFill, tCIDLib::ERectlTypes::NonInclusive);
+    areaToFill.ToRectl(rectlFill);
 
     tCIDGraphDev::TDeviceHandle hdevTarget = hdevThis();
     if (!::FillRect(hdevTarget, reinterpret_cast<RECT*>(&rectlFill), gbrToUse.hbrThis()))
@@ -3720,7 +3720,7 @@ TGraphDrawDev::Fill(const TArea& areaToFill, const TRGBClr& rgbToUse)
 {
     // Convert the area to a host rectangle
     tCIDLib::THostRectl  rectlFill;
-    areaToFill.ToRectl(rectlFill, tCIDLib::ERectlTypes::NonInclusive);
+    areaToFill.ToRectl(rectlFill);
 
     TSolidBrush gbrToUse(rgbToUse);
     tCIDGraphDev::TDeviceHandle hdevTarget = hdevThis();
@@ -3769,7 +3769,7 @@ TGraphDrawDev::Fill(const   TPoint&     pntFrom
                     , const TPoint&     pntTo
                     , const TRGBClr&    rgbToUse)
 {
-    Fill(TArea(pntFrom, pntTo, tCIDLib::ERectlTypes::NonInclusive), rgbToUse);
+    Fill(TArea(pntFrom, pntTo), rgbToUse);
 }
 
 
@@ -3900,8 +3900,8 @@ TGraphDrawDev::FillWithBmpPattern(  const   TPoint&                 pntFrom
                                     , const tCIDGraphDev::EBmpModes eMode
                                     , const TPoint&                 pntPatOrg)
 {
-    // Just call the other version. We assume the points are non-inclusive
-    TArea areaTmp(pntFrom, pntTo, tCIDLib::ERectlTypes::NonInclusive);
+    // Just call the other version
+    TArea areaTmp(pntFrom, pntTo);
     FillWithBmpPattern(areaTmp, bmpToUse, eMode, pntPatOrg);
 }
 
@@ -3913,7 +3913,7 @@ TGraphDrawDev::FillWithBmpPattern(  const   TPoint&                 pntFrom
                                     , const tCIDGraphDev::EBmpModes eMode)
 {
     // Just call the other version
-    TArea areaTmp(pntFrom, pntTo, tCIDLib::ERectlTypes::NonInclusive);
+    TArea areaTmp(pntFrom, pntTo);
     FillWithBmpPattern(areaTmp, bmpToUse, eMode, TPoint::pntOrigin);
 }
 
@@ -5068,10 +5068,10 @@ TGraphDrawDev::ScrollBits(  const   TArea&              areaToScroll
 {
     // Convert the areas to RECTs
     tCIDLib::THostRectl rectlScroll;
-    areaToScroll.ToRectl(rectlScroll, tCIDLib::ERectlTypes::NonInclusive);
+    areaToScroll.ToRectl(rectlScroll);
 
     tCIDLib::THostRectl rectlClip;
-    areaClip.ToRectl(rectlClip, tCIDLib::ERectlTypes::NonInclusive);
+    areaClip.ToRectl(rectlClip);
 
     if (bWaitRetrace)
         WaitRetrace();
@@ -5105,7 +5105,7 @@ TGraphDrawDev::ScrollBits(  const   TArea&              areaToScroll
     }
 
     // Convert the update rectangle back
-    areaUpdate.FromRectl(rectlUpdate, tCIDLib::ERectlTypes::NonInclusive);
+    areaUpdate.FromRectl(rectlUpdate);
 }
 
 

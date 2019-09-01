@@ -379,7 +379,7 @@ namespace TRawStr
     KRNLEXPORT tCIDLib::TCh* pszConvert
     (
         const   tCIDLib::TSCh* const    pszToConvert
-        ,       tCIDLib::TCh* const     pszTarget
+        ,       tCIDLib::TCh*           pszTarget
         , const tCIDLib::TCard4         c4MaxChars
     );
 
@@ -391,7 +391,7 @@ namespace TRawStr
     KRNLEXPORT tCIDLib::TSCh* pszConvert
     (
         const   tCIDLib::TCh* const     pszToConvert
-        ,       tCIDLib::TSCh* const    pszTarget
+        ,       tCIDLib::TSCh*          pszTarget
         , const tCIDLib::TCard4         c4MaxChars
     );
 

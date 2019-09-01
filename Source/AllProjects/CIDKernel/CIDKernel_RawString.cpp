@@ -37,7 +37,7 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_PlatformStrOps.hpp"
-// #include    <math.h>
+#include    <math.h>
 
 
 
@@ -2130,21 +2130,27 @@ TRawStr::i8AsBinary(const   tCIDLib::TCh* const pszToConvert
 //  to do this. For the second one we allocate a buffer and return it, and the
 //  caller is responsible.
 //
+//  For the one that takes a target buffer, it must be at least one larger
+//  than the max chars (to account for the termination.)
+//
 tCIDLib::TCh*
 TRawStr::pszConvert(const   tCIDLib::TSCh* const    pszToConvert
-                    ,       tCIDLib::TCh* const     pszTarget
+                    ,       tCIDLib::TCh*           pszTarget
                     , const tCIDLib::TCard4         c4MaxChars)
 {
-    if (!pszToConvert)
-    {
-        pszTarget[0] = kCIDLib::chNull;
-        return pszTarget;
-    }
+    if (!pszTarget)
+        return nullptr;
 
-    pszTarget[0] = 0;
-    tCIDLib::TCard4 c4OutChars;
-    if (!CIDStrOp_MBToWC(pszTarget, c4MaxChars + 1, pszToConvert, c4OutChars))
-        pszTarget[c4OutChars] = kCIDLib::chNull;
+    pszTarget[0] = kCIDLib::chNull;
+    if (pszToConvert)
+    {
+        size_t c4OutChars = size_t(-1);
+        errno_t err = CIDStrOp_MBToWC(pszTarget, c4MaxChars + 1, pszToConvert, &c4OutChars);
+
+        // If an error, make sure we just return an empty string
+        if (err && (err != STRUNCATE))
+            pszTarget[0] = kCIDLib::chNull;
+    }
     return pszTarget;
 }
 
@@ -2154,18 +2160,25 @@ tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
 
     if (pszToConvert)
     {
-        // Allocate a buffer big enough
-        tCIDLib::TCard4 c4Len = strlen(pszToConvert);
-        pszNew = new tCIDLib::TCh[c4Len + 1];
-
-        // Convert into the new string and cap it off
-        tCIDLib::TCard4 c4OutChars;
-        if (CIDStrOp_MBToWC(pszNew, c4Len + 1, pszToConvert, c4OutChars))
-            pszNew[0] = 0;
-        else
-            pszNew[c4OutChars] = 0;
+        // Calc the size required for this string
+        size_t c4NeededChars = size_t(-1);
+        if (!CIDStrOp_CalcWCSize(pszToConvert, &c4NeededChars) && c4NeededChars)
+        {
+            // Allocate a buffer big enough, plus 1 to be safe
+            pszNew = new tCIDLib::TCh[c4NeededChars + 1];
+            if (CIDStrOp_MBToWC(pszNew, c4NeededChars, pszToConvert, &c4NeededChars))
+            {
+                //
+                //  Shouldn't happen since we just did the calc above, but just in
+                //  case
+                //
+                delete [] pszNew;
+                pszNew = nullptr;
+            }
+        }
     }
-     else
+
+    if (!pszNew)
     {
         pszNew = new tCIDLib::TCh[1];
         pszNew[0] = kCIDLib::chNull;
@@ -2179,47 +2192,54 @@ tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
 //  helper to do this. A second one allocates a buffer and returns it, and
 //  the caller becomes responsible.
 //
+//  For the one that takes a target buffer, it must be at least one larger
+//  than the max chars (to account for the termination.)
+//
 tCIDLib::TSCh*
 TRawStr::pszConvert(const   tCIDLib::TCh* const     pszToConvert
-                    ,       tCIDLib::TSCh* const    pszTarget
+                    ,       tCIDLib::TSCh*          pszTarget
                     , const tCIDLib::TCard4         c4MaxChars)
 {
-    if (!pszToConvert)
+    if (!pszTarget)
+        return nullptr;
+
+    pszTarget[0] = kCIDLib::chNull;
+    if (pszToConvert)
     {
-        pszTarget[0] = 0;
-        return pszTarget;
+        size_t c4OutBytes = size_t(-1);
+        errno_t err = CIDStrOp_WCToMB(pszTarget, c4MaxChars + 1, pszToConvert, &c4OutBytes);
+
+        // If an error, make sure we just return an empty string
+        if (err && (err != STRUNCATE))
+            pszTarget[0] = 0;
     }
-
-    tCIDLib::TCard4 c4OutBytes;
-    if (CIDStrOp_WCToMB(pszTarget, c4MaxChars + 1, pszToConvert, c4OutBytes))
-        pszTarget[c4MaxChars] = 0;
-    else
-        pszTarget[0] = 0;
-
     return pszTarget;
 }
 
 tCIDLib::TSCh* TRawStr::pszConvert(const tCIDLib::TCh* const pszToConvert)
 {
-    tCIDLib::TSCh* pszNew = 0;
+    tCIDLib::TSCh* pszNew = nullptr;
 
     if (pszToConvert)
     {
         // Calc the size required for this string
-        tCIDLib::TCard4 c4NeededBytes;
-        if (CIDStrOp_CalcMBSize(pszToConvert, c4NeededBytes))
+        size_t c4NeededBytes = size_t(-1);
+        if (!CIDStrOp_CalcMBSize(pszToConvert, &c4NeededBytes) && c4NeededBytes)
         {
-            // Allocate a buffer big enough
+            //
+            //  Allocate a buffer big enough, plus one to be safe and in case
+            //  we should get back zero.
+            //
             pszNew = new tCIDLib::TSCh[c4NeededBytes + 1];
-
-            // Convert into the new string and cap it off
-            
-            if (c4NeededBytes)
+            if (CIDStrOp_WCToMB(pszNew, c4NeededBytes, pszToConvert, &c4NeededBytes))
             {
-                tCIDLib::TCard4 c4OutBytes;                
-                CIDStrOp_WCToMB(pszNew, c4NeededBytes, pszToConvert, c4OutBytes);
+                //
+                //  Shouldn't happen since we just did the calc above, but just in
+                //  case
+                //
+                delete [] pszNew;
+                pszNew = nullptr;
             }
-            pszNew[c4NeededBytes] = 0;
         }
     }
 
@@ -2227,7 +2247,7 @@ tCIDLib::TSCh* TRawStr::pszConvert(const tCIDLib::TCh* const pszToConvert)
     if (!pszNew)
     {
         pszNew = new tCIDLib::TSCh[1];
-        pszNew[0] = 0;
+        pszNew[0] = kCIDLib::chNull;
     }
     return pszNew;
 }
