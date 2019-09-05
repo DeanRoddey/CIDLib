@@ -70,9 +70,9 @@ AdvRTTIDecls(TItemListWnd, TMultiColListBox)
 // ----------------------------------------------------------------------------
 //  TLogItem: Constructors and Destructor
 // ----------------------------------------------------------------------------
-TLogItem::TLogItem(const TLogEvent& errSrc, const tCIDLib::TCard4 c4UniqueId) :
+TLogItem::TLogItem(const TLogEvent& logevSrc, const tCIDLib::TCard4 c4UniqueId) :
 
-    TLogEvent(errSrc)
+    TLogEvent(logevSrc)
     , m_c4UniqueId(c4UniqueId)
 {
 }
@@ -95,9 +95,9 @@ class TMCListItemOps : public TMCListOps
         // -------------------------------------------------------------------
         //  Constructors and destructors
         // -------------------------------------------------------------------
-        TMCListItemOps(const TRefVector<const TLogItem>* const pcolList) :
+        TMCListItemOps(TEvList&& colList) :
 
-            m_pcolList(pcolList)
+            m_colList(tCIDLib::ForceMove(colList))
         {
             m_tmFmt.strDefaultFormat(TTime::strMMDD_24HHMMSS());
         }
@@ -123,13 +123,13 @@ class TMCListItemOps : public TMCListOps
 
         tCIDLib::TCard4 c4RowCount() const override
         {
-            return m_pcolList->c4ElemCount();
+            return m_colList.c4ElemCount();
         }
 
         tCIDLib::TCard4 c4RowId(const tCIDLib::TCard4 c4RowIndex) const override
         {
             // Give back the unique id assigned to this item
-            return m_pcolList->pobjAt(c4RowIndex)->m_c4UniqueId;
+            return m_colList.objAt(c4RowIndex)->m_c4UniqueId;
         }
 
         const TString& strColumnText
@@ -139,10 +139,10 @@ class TMCListItemOps : public TMCListOps
         )   const override;
 
 
-        const TRefVector<const TLogItem>* const m_pcolList;
-        mutable TPathStr                        m_pathTmp;
-        mutable TString                         m_strTmpFmt;
-        mutable TTime                           m_tmFmt;
+        TEvList             m_colList;
+        mutable TPathStr    m_pathTmp;
+        mutable TString     m_strTmpFmt;
+        mutable TTime       m_tmFmt;
 };
 
 
@@ -150,28 +150,28 @@ const TString&
 TMCListItemOps::strColumnText(  const   tCIDLib::TCard4     c4RowIndex
                                 , const tCIDLib::TCard4     c4ColIndex) const
 {
-    const TLogItem& errCur = *m_pcolList->pobjAt(c4RowIndex);
+    const TLogEvPtr& logevCur = m_colList[c4RowIndex];
 
     // Column zero is a custom drawn color fill
     switch(c4ColIndex)
     {
         case 1 :
-            return errCur.strHostName();
+            return logevCur->strHostName();
 
         case 2 :
-            return errCur.strProcess();
+            return logevCur->strProcess();
 
         case 3 :
-            m_strTmpFmt.SetFormatted(errCur.c4LineNum());
+            m_strTmpFmt.SetFormatted(logevCur->c4LineNum());
             return m_strTmpFmt;
 
         case 4 :
-            m_tmFmt.enctTime(errCur.enctLogged());
+            m_tmFmt.enctTime(logevCur->enctLogged());
             m_tmFmt.FormatToStr(m_strTmpFmt);
             return m_strTmpFmt;
 
         case 5 :
-            return errCur.strErrText();
+            return logevCur->strErrText();
 
         default :
             break;
@@ -259,10 +259,10 @@ TItemListWnd::eCustomDraw(          TGraphDrawDev&      gdevTar
         if ((c4Row != kCIDLib::c4MaxCard) && (c4Column == 0))
         {
             // Find the target log event and figure out the color
-            const TLogItem* perrCur = m_pwndParent->pliFindById(c4IndexToId(c4Row));
-            if (perrCur)
+            TLogEvPtr cptrCur = m_pwndParent->wptrFindById(c4IndexToId(c4Row)).cptrGet();
+            if (cptrCur)
             {
-                switch(perrCur->eSeverity())
+                switch(cptrCur->eSeverity())
                 {
                     case tCIDLib::ESeverities::Info :
                         rgbBgn = facCIDGraphDev().rgbGreen;
@@ -310,7 +310,6 @@ TMainFrame::TMainFrame() :
     , m_c4NextMsgId(0)
     , m_c4NextUID(1)
     , m_colList()
-    , m_colLoad(tCIDLib::EAdoptOpts::NoAdopt, CIDLogMon::c4MaxItems / 2)
     , m_colNewEvents(CIDLogMon::c4MaxItems, tCIDLib::EMTStates::Safe)
     , m_colQuery()
     , m_porbcLogger(nullptr)
@@ -395,15 +394,22 @@ tCIDLib::TBoolean TMainFrame::bCreateMain()
 
 
 // Search the list for an item with this id
-const TLogItem* TMainFrame::pliFindById(const tCIDLib::TCard4 c4IdToFind) const
+TLogEvRef TMainFrame::wptrFindById(const tCIDLib::TCard4 c4IdToFind) const
 {
-    TDeque<TLogItem>::TCursor cursFind(&m_colList);
-    for (; cursFind; ++cursFind)
-    {
-        if (cursFind->m_c4UniqueId == c4IdToFind)
-            return &cursFind.objRCur();
-    }
-    return nullptr;
+    TLogEvRef wptrRet;
+    m_colList.bForEachNC
+    (
+        [&wptrRet, c4IdToFind](TLogEvPtr& cptrCur)
+        {
+            if (cptrCur->m_c4UniqueId == c4IdToFind)
+            {
+                wptrRet = cptrCur;
+                return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+    );
+    return wptrRet;
 }
 
 
@@ -600,7 +606,13 @@ TMainFrame::CodeReceived(const  tCIDLib::TInt4  i4Code
     // Prevent repainting until we are done
     TWndPaintJanitor janPaint(m_pwndList);
 
-    // We need to lock until we get the new events into our main list
+    //
+    //  We need to lock until we get the new events into our main deque. And
+    //  we want to end up with a list of new items we can load (but dealing with
+    //  the fact that they might not all survive), so we load a list of weak
+    //  pointers that point into the main list. If he drops any we'll know it.
+    //
+    TEvRefList colKeepers;
     {
         TMtxLocker lockEvents(m_colNewEvents.pmtxLock());
 
@@ -613,7 +625,7 @@ TMainFrame::CodeReceived(const  tCIDLib::TInt4  i4Code
             //
             if (m_colList.bIsFull(CIDLogMon::c4MaxItems))
             {
-                tCIDLib::TCard4 c4Id = m_colList.objPeekBottom().m_c4UniqueId;
+                tCIDLib::TCard4 c4Id = m_colList.objPeekBottom()->m_c4UniqueId;
                 m_colList.objPopBottom();
 
                 // See if it's in the list, don't throw if not
@@ -622,9 +634,12 @@ TMainFrame::CodeReceived(const  tCIDLib::TInt4  i4Code
                     m_pwndList->RemoveAt(c4RemoveInd);
             }
 
-            // Add this one one to the list
-            TLogItem liTmp(m_colNewEvents[c4Index], m_c4NextUID++);
-            m_colList.objPushTop(liTmp);
+            // Add this one one to the list and set the next available UID on it
+            TLogEvPtr& cptrNew = m_colList.objPushTop(tCIDLib::ForceMove(m_colNewEvents[c4Index]));
+
+            // And store a weak pointer to it in our load list if it's not filtered
+            if (!bFiltered(*cptrNew))
+                colKeepers.objAdd(cptrNew);
         }
 
         //
@@ -635,28 +650,24 @@ TMainFrame::CodeReceived(const  tCIDLib::TInt4  i4Code
     }
 
     //
-    //  Now add any non-filtered ones to our load list. We can't do it above since
-    //  items in the deque can get removed if it gets full. So that would invalidate
-    //  our list (which is just referencing items in that deque.) We'd have to handle
-    //  going back and removing them from this list. And this let's us release the lock
-    //  as soon as the new events are in the deque.
-    //
-    m_colLoad.RemoveAll();
-    TDeque<TLogItem>::TCursor cursDeque(&m_colList);
-    for (; cursDeque; ++cursDeque)
-    {
-        // If not filtered out, then get a ref
-        if (!bFiltered(*cursDeque))
-            m_colLoad.Add(&cursDeque.objRCur());
-    }
-
-    //
-    //  Now bulk load these new events into the output window. Indicate we want to
-    //  append to it. Remember if it was empty, and do an initial selection after
-    //  loading if so.
+    //  Now load up any that survived into a list that we can pass to the
+    //  list box.
     //
     const tCIDLib::TBoolean bWasEmpty(m_pwndList->c4ItemCount() == 0);
-    TMCListItemOps mclopsLoad(&m_colLoad);
+
+    TEvList colLoad(colKeepers.c4ElemCount());
+    colKeepers.bForEachNC
+    (
+        [&colLoad](TLogEvRef& wptrCur)
+        {
+            TLogEvPtr cptrCur = wptrCur.cptrGet();
+            if (cptrCur)
+                colLoad.objAdd(tCIDLib::ForceMove(cptrCur));
+            return kCIDLib::True;
+        }
+    );
+
+    TMCListItemOps mclopsLoad(tCIDLib::ForceMove(colLoad));
     m_pwndList->LoadList(mclopsLoad, kCIDLib::True);
 
     // Keep us bottom scrolled
@@ -837,23 +848,23 @@ TMainFrame::eListHandler(TListChangeInfo& wnotEvent)
     if (wnotEvent.eEvent() == tCIDCtrls::EListEvents::SelChanged)
     {
         // Find the item with the incoming id
-        const TLogItem* pliSel = pliFindById(wnotEvent.c4Id());
-        if (pliSel)
+        TLogEvPtr cptrSel = wptrFindById(wnotEvent.c4Id()).cptrGet();
+        if (cptrSel)
         {
             // We found it so update our display values
-            m_pwndFacName->strWndText(pliSel->strFacName());
-            m_pwndFileName->strWndText(pliSel->strFileName());
-            m_pwndThreadName->strWndText(pliSel->strThread());
+            m_pwndFacName->strWndText(cptrSel->strFacName());
+            m_pwndFileName->strWndText(cptrSel->strFileName());
+            m_pwndThreadName->strWndText(cptrSel->strThread());
 
-            m_strTmpFmt.SetFormatted(pliSel->errcId());
+            m_strTmpFmt.SetFormatted(cptrSel->errcId());
             m_strTmpFmt.Append(kCIDLib::chForwardSlash);
-            m_strTmpFmt.AppendFormatted(pliSel->errcKrnlId());
+            m_strTmpFmt.AppendFormatted(cptrSel->errcKrnlId());
             m_strTmpFmt.Append(kCIDLib::chForwardSlash);
-            m_strTmpFmt.AppendFormatted(pliSel->errcHostId());
+            m_strTmpFmt.AppendFormatted(cptrSel->errcHostId());
             m_pwndErrors->strWndText(m_strTmpFmt);
 
-            if (pliSel->bHasAuxText())
-                m_pwndAuxText->strWndText(pliSel->strAuxText());
+            if (cptrSel->bHasAuxText())
+                m_pwndAuxText->strWndText(cptrSel->strAuxText());
             else
                 m_pwndAuxText->ClearText();
         }
@@ -976,10 +987,13 @@ tCIDLib::TVoid TMainFrame::GetNewMsgs()
                         , tCIDLib::ESeverities::Failed
                         , tCIDLib::EErrClasses::Internal
                     );
-                    m_colNewEvents.objAdd(errFull);
+                    m_colNewEvents.objAdd
+                    (
+                        TLogEvPtr(new TLogItem(errFull, m_c4NextUID++))
+                    );
                     break;
                 }
-                m_colNewEvents.objAdd(m_colQuery[c4Index]);
+                m_colNewEvents.objAdd(TLogEvPtr(new TLogItem(m_colQuery[c4Index], m_c4NextUID++)));
             }
         }
 
@@ -989,7 +1003,7 @@ tCIDLib::TVoid TMainFrame::GetNewMsgs()
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
             if (m_colNewEvents.bIsFull(CIDLogMon::c4MaxItems * 2))
                 m_colNewEvents.RemoveAt(0);
-            m_colNewEvents.objAdd(errToCatch);
+            m_colNewEvents.objPlace(TLogEvPtr(new TLogItem(errToCatch, m_c4NextUID++)));
         }
 
         // Let the GUI thread there are items to display
@@ -1058,11 +1072,11 @@ tCIDLib::TVoid TMainFrame::SnapToFile()
         TTime tmLogged;
         tmLogged.strDefaultFormat(L"%(M,2,0)/%(D,2,0) %(H,2,0):%(u,2,0):%(s,2,0)");
 
-        TDeque<TLogItem>::TCursor cursSave(&m_colList);
+        TLogEvDeque::TCursor cursSave(&m_colList);
         for (; cursSave; ++cursSave)
         {
-            if (!bFiltered(*cursSave))
-                cursSave->AdvFormat(strmOut, tmLogged);
+            if (!bFiltered(*(*cursSave)))
+                (*cursSave)->AdvFormat(strmOut, tmLogged);
         }
         strmOut.Flush();
         strmOut.Close();
@@ -1105,15 +1119,15 @@ tCIDLib::TVoid TMainFrame::UpdateFilters()
 
     // Clear the list box, and reload with any that are not filtered out.
     m_pwndList->RemoveAll();
-    m_colLoad.RemoveAll();
-    TDeque<TLogItem>::TCursor cursFind(&m_colList);
+    TEvList colLoad(m_colList.c4ElemCount());
+    TLogEvDeque::TCursor cursFind(&m_colList);
     for (; cursFind; ++cursFind)
     {
-        if (!bFiltered(*cursFind))
-            m_colLoad.Add(&cursFind.objRCur());
+        if (!bFiltered(*(*cursFind)))
+            colLoad.objAdd(cursFind.objRCur());
     }
 
-    TMCListItemOps mclopsLoad(&m_colLoad);
+    TMCListItemOps mclopsLoad(tCIDLib::ForceMove(colLoad));
     m_pwndList->LoadList(mclopsLoad, kCIDLib::False);
 
     // If not empty, then select the last one

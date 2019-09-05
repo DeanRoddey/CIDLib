@@ -4576,7 +4576,7 @@ tCIDLib::TVoid TWindow::ToBottom()
 //
 //  NOTE: We are converting from client coordinates, so you should call this on the
 //  containing window with the coordinates of things inside that window. Don't call
-//  it on a window using it's own coordinates, i.e. don't try to translate the origin
+//  it on a window using its own coordinates, i.e. don't try to translate the origin
 //  of child control X by calling this on X. Call it on X's parent.
 //
 tCIDLib::TVoid

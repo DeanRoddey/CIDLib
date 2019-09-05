@@ -855,41 +855,11 @@ TTest_CoordAcc::eRunTest(TTextStringOutStream&  strmOut
         areaTest.ToRectl(HostRectl);
         if ((HostRectl.i4Left != 10)
         ||  (HostRectl.i4Top != 10)
-        ||  (HostRectl.i4Right != 29)
-        ||  (HostRectl.i4Bottom != 39))
-        {
-            eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Convert to inclusive host rectl failed\n\n";
-        }
-
-        //
-        //  These return inclusive points, which should be one less than the
-        //  non-inclusive values returned by the area.
-        //
-        if ((HostRectl.i4Right + 1 != areaTest.i4Right())
-        ||  (HostRectl.i4Bottom + 1 != areaTest.i4Bottom()))
-        {
-            eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Inclusive tectl right/bottom is wrong\n\n";
-        }
-
-        // Construct another area from it and compare to original
-        TArea areaTest2(HostRectl);
-        if (areaTest2 != areaTest)
-        {
-            eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Conversion back from inclusive rectl failed\n\n";
-        }
-
-        // Do the non-inclusive version now
-        areaTest.ToRectl(HostRectl);
-        if ((HostRectl.i4Left != 10)
-        ||  (HostRectl.i4Top != 10)
         ||  (HostRectl.i4Right != 30)
         ||  (HostRectl.i4Bottom != 40))
         {
             eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Convert to non-inclusive host rectl failed\n\n";
+            strmOut << TFWCurLn << L"Convert to host rectl failed\n\n";
         }
 
         //
@@ -900,15 +870,16 @@ TTest_CoordAcc::eRunTest(TTextStringOutStream&  strmOut
         ||  (HostRectl.i4Bottom != areaTest.i4Bottom()))
         {
             eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Non-inclusive tectl right/bottom is wrong\n\n";
+            strmOut << TFWCurLn << L"Host Rectl right/bottom is wrong\n\n";
         }
 
         // Convert back from the rectangle
+        TArea areaTest2;
         areaTest2.FromRectl(HostRectl);
         if (areaTest2 != areaTest)
         {
             eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Conversion back from non-inclusve rectl failed\n\n";
+            strmOut << TFWCurLn << L"Conversion back from rectl failed\n\n";
         }
     }
     return eRes;

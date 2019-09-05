@@ -72,7 +72,7 @@ class TLogItem : public TLogEvent
         // --------------------------------------------------------------------
         TLogItem
         (
-            const   TLogEvent&              errSrc
+            const   TLogEvent&              logevSrc
             , const tCIDLib::TCard4         c4UniqueId
         );
 
@@ -92,6 +92,16 @@ class TLogItem : public TLogEvent
         // --------------------------------------------------------------------
         tCIDLib::TCard4     m_c4UniqueId;
 };
+
+
+// ----------------------------------------------------------------------------
+//  Some types we use internally
+// ----------------------------------------------------------------------------
+using TLogEvPtr = TCntPtr<TLogItem>;
+using TLogEvRef = TWeakPtr<TLogItem>;
+using TLogEvDeque = TDeque<TLogEvPtr>;
+using TEvList = TVector<TLogEvPtr>;
+using TEvRefList = TVector<TLogEvRef>;
 
 
 // ---------------------------------------------------------------------------
@@ -175,7 +185,15 @@ class TMainFrame : public TFrameWnd
         // -------------------------------------------------------------------
         TMainFrame();
 
+        TMainFrame(const TMainFrame&) = delete;
+
         ~TMainFrame();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TMainFrame& operator=(const TMainFrame&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -183,7 +201,7 @@ class TMainFrame : public TFrameWnd
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bCreateMain();
 
-        const TLogItem* pliFindById
+        TLogEvRef wptrFindById
         (
             const   tCIDLib::TCard4         c4IdToFind
         )   const;
@@ -237,13 +255,6 @@ class TMainFrame : public TFrameWnd
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TMainFrame(const TMainFrame&);
-        tCIDLib::TVoid operator=(const TMainFrame&);
-
-
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
@@ -304,12 +315,9 @@ class TMainFrame : public TFrameWnd
         //      keeps them in the right order for when we need to reload due to
         //      filtering.
         //
-        //  m_colLoad
-        //      For loading items into the list box and to deal with filtering
-        //      we need to get a filtered list. So we use a non-adopting ref vector
-        //      to point at items in the main m_colList long enough to get them
-        //      loaded into the list. After that, the unique ids in each item are
-        //      used to refer back to the main list.
+        //      It holds counted pointers to log events, so that we can give out
+        //      weak pointers for things like loading the list or loading new items,
+        //      since we have to dump items if this guy starts getting full.
         //
         //  m_colNewEvents
         //      The bgn thread does a query using the m_colQuery below. Once
@@ -319,13 +327,14 @@ class TMainFrame : public TFrameWnd
         //      threads. The GUI thread locks it and pulls the items out and adds
         //      them to the main deque used to hold the current items.
         //
+        //      This guys holds counted pointers to log event objects. See m_colList
+        //      above for why. We just copy them over to the m_colList and do some
+        //      processing, then free it up again for the bgn thread to use.
+        //
         //  m_colQuery
         //      The collection which we pass to the log server to be filled in
-        //      with new events. We don't use m_colNewEvents because worst
-        //      case the GUI thread might not have got the last set that we
-        //      put there. Also, this means we don't have to block the other
-        //      collection while we query, only for the short period when we
-        //      are loading new events into it.
+        //      with new events. It has to be events by value since it's being used
+        //      to return them via remote call.
         //
         //  m_porbcLogger
         //      We need a log server client proxy. It's created as possible and
@@ -358,9 +367,8 @@ class TMainFrame : public TFrameWnd
         tCIDLib::TBoolean           m_bShowWarnings;
         tCIDLib::TCard4             m_c4NextMsgId;
         tCIDLib::TCard4             m_c4NextUID;
-        TDeque<TLogItem>            m_colList;
-        TRefVector<const TLogItem>  m_colLoad;
-        TVector<TLogEvent>          m_colNewEvents;
+        TLogEvDeque                 m_colList;
+        TEvList                     m_colNewEvents;
         TVector<TLogEvent>          m_colQuery;
         TPathStr                    m_pathLastSavePath;
         TCIDLogSrvClientProxy*      m_porbcLogger;

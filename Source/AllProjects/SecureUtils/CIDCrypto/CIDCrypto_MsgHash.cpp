@@ -602,7 +602,7 @@ const tCIDLib::TCard1* TMsgHash::pc1HashAt(const tCIDLib::TCard4 c4At) const
         m_pc1Hash = new tCIDLib::TCard1[m_c4Bytes];
         TRawMem::SetMemBuf(m_pc1Hash, tCIDLib::TCard1(0), m_c4Bytes);
     }
-    return m_pc1Hash;
+    return &m_pc1Hash[c4At];
 }
 
 
@@ -638,7 +638,7 @@ tCIDLib::TCard1* TMsgHash::pc1HashWAt(const tCIDLib::TCard4 c4At)
         m_pc1Hash = new tCIDLib::TCard1[m_c4Bytes];
         TRawMem::SetMemBuf(m_pc1Hash, tCIDLib::TCard1(0), m_c4Bytes);
     }
-    return m_pc1Hash;
+    return &m_pc1Hash[c4At];
 }
 
 

@@ -314,6 +314,7 @@ class CIDCTRLSEXP TTreeView : public TStdCtrlWnd
         (
             const   TString&                strPath
             ,       TArea&                  areaToFill
+            , const tCIDLib::TBoolean       bJustText
             , const tCIDLib::TBoolean       bThrowIfNot
         )   const;
 
