@@ -34,12 +34,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  Since this is ad hoc included, we need a multiple inclusion avoidance mechanism.
-// ---------------------------------------------------------------------------
-#define CIDKERNEL_TYPE_CTRLS 1
-
-
-// ---------------------------------------------------------------------------
 //  In order to be able to share resource file format between the non-GUI resource
 //  compiler and the CIDCtrls facility that uses them, we put them here but make
 //  them look like they are CIDWnd stuff.

@@ -2244,6 +2244,50 @@ TMultiColListBox::SetMCLBStyle( const   tCIDCtrls::EMCLBStyles  eToChange
 }
 
 
+// Set a new sort column and resort
+tCIDLib::TVoid TMultiColListBox::SetSortColumn(const tCIDLib::TCard4 c4ColIndex)
+{
+    // If not sorted, this is a meaningless call
+    if (!tCIDLib::bAllBitsOn(m_eMCLBStyles, tCIDCtrls::EMCLBStyles::Sorted))
+    {
+        facCIDCtrls().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCtrlsErrs::errcList_NotSorted
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::AppError
+        );
+    }
+
+    // Don't do anything if the same as the current one, since this can be heavy
+    if (c4ColIndex != m_c4SortCol)
+    {
+        // Store the incoming column, which may be the same thing
+        m_c4SortCol = c4ColIndex;
+
+        // If we have any rows, then let's update
+        if (!m_colList.bIsEmpty())
+        {
+            // And save the current item index
+            const tCIDLib::TCard4 c4OrgInd = c4CurItem();
+
+
+            // Sort by the currently selected direction and redraw any visible ones
+            SortList();
+            RedrawVisible();
+
+            //
+            //  Reselect the original item if there was one. Force an event so that any
+            //  data dependent on the current selection updates.
+            //
+            if (c4OrgInd != kCIDLib::c4MaxCard)
+                SelectByIndex(c4OrgInd, kCIDLib::True);
+        }
+    }
+}
+
+
 // Set the per-row user data value for the indicated index
 tCIDLib::TVoid
 TMultiColListBox::SetUserDataAt(const   tCIDLib::TCard4 c4Index
@@ -2510,24 +2554,8 @@ tCIDLib::TVoid TMultiColListBox::TitleClicked(const tCIDLib::TCard4 c4ColIndex)
             else
                 m_bSortAsc = kCIDLib::True;
 
-            // Store the incoming column, which may be the same thing
-            m_c4SortCol = c4ColIndex;
-
-            // And save the current item index
-            const tCIDLib::TCard4 c4OrgInd = c4CurItem();
-
-            // Sort by the currently selected direction
-            SortList();
-
-            // Redraw now to make it pick up the changes
-            RedrawVisible();
-
-            //
-            //  Reselect the original item if there was one. Force an event so that any
-            //  data dependent on the current selection updates.
-            //
-            if (c4OrgInd != kCIDLib::c4MaxCard)
-                SelectByIndex(c4OrgInd, kCIDLib::True);
+            // After this it's the same as calling the public API
+            SetSortColumn(c4ColIndex);
         }
     }
      else

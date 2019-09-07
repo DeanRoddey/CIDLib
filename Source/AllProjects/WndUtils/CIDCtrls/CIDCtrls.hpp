@@ -55,10 +55,7 @@
 //  the constants namespace below. One of these is actually defined down in
 //  CIDKernel, so that the build tool can use those types.
 // ---------------------------------------------------------------------------
-#if         !defined(CIDKERNEL_TYPE_CTRLS)
 #include    "CIDKernel_Type_Ctrls.hpp"
-#endif
-
 #include    "CIDCtrls_Type.hpp"
 
 

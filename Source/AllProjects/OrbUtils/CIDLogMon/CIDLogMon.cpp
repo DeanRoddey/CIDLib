@@ -259,7 +259,7 @@ TItemListWnd::eCustomDraw(          TGraphDrawDev&      gdevTar
         if ((c4Row != kCIDLib::c4MaxCard) && (c4Column == 0))
         {
             // Find the target log event and figure out the color
-            TLogEvPtr cptrCur = m_pwndParent->wptrFindById(c4IndexToId(c4Row)).cptrGet();
+            TLogEvPtr cptrCur = m_pwndParent->cptrFindById(c4IndexToId(c4Row));
             if (cptrCur)
             {
                 switch(cptrCur->eSeverity())
@@ -394,22 +394,22 @@ tCIDLib::TBoolean TMainFrame::bCreateMain()
 
 
 // Search the list for an item with this id
-TLogEvRef TMainFrame::wptrFindById(const tCIDLib::TCard4 c4IdToFind) const
+TLogEvPtr TMainFrame::cptrFindById(const tCIDLib::TCard4 c4IdToFind) const
 {
-    TLogEvRef wptrRet;
+    TLogEvPtr cptrRet;
     m_colList.bForEachNC
     (
-        [&wptrRet, c4IdToFind](TLogEvPtr& cptrCur)
+        [&cptrRet, c4IdToFind](TLogEvPtr& cptrCur)
         {
             if (cptrCur->m_c4UniqueId == c4IdToFind)
             {
-                wptrRet = cptrCur;
+                cptrRet = cptrCur;
                 return kCIDLib::False;
             }
             return kCIDLib::True;
         }
     );
-    return wptrRet;
+    return cptrRet;
 }
 
 
@@ -608,9 +608,10 @@ TMainFrame::CodeReceived(const  tCIDLib::TInt4  i4Code
 
     //
     //  We need to lock until we get the new events into our main deque. And
-    //  we want to end up with a list of new items we can load (but dealing with
+    //  we want to end up with a list of new items we can display (but dealing with
     //  the fact that they might not all survive), so we load a list of weak
-    //  pointers that point into the main list. If he drops any we'll know it.
+    //  pointers that point into the main list. If he drops any we'll know it
+    //  when we later go to load the keepers into the list window.
     //
     TEvRefList colKeepers;
     {
@@ -634,10 +635,13 @@ TMainFrame::CodeReceived(const  tCIDLib::TInt4  i4Code
                     m_pwndList->RemoveAt(c4RemoveInd);
             }
 
-            // Add this one one to the list and set the next available UID on it
+            // Add this one one to the list
             TLogEvPtr& cptrNew = m_colList.objPushTop(tCIDLib::ForceMove(m_colNewEvents[c4Index]));
 
-            // And store a weak pointer to it in our load list if it's not filtered
+            //
+            //  And store a weak pointer to it in our load list if it's not filtered for
+            //  display purposes.
+            //
             if (!bFiltered(*cptrNew))
                 colKeepers.objAdd(cptrNew);
         }
@@ -848,7 +852,7 @@ TMainFrame::eListHandler(TListChangeInfo& wnotEvent)
     if (wnotEvent.eEvent() == tCIDCtrls::EListEvents::SelChanged)
     {
         // Find the item with the incoming id
-        TLogEvPtr cptrSel = wptrFindById(wnotEvent.c4Id()).cptrGet();
+        TLogEvPtr cptrSel = cptrFindById(wnotEvent.c4Id());
         if (cptrSel)
         {
             // We found it so update our display values
@@ -962,7 +966,12 @@ tCIDLib::TVoid TMainFrame::GetNewMsgs()
         //
         //  Note that we ADD here, we don't clean it out. Worst case, the
         //  GUI thread may have not gotten the last ones we stored, so we
-        //  just new ones. He cleans it out when he grabs them for display.
+        //  just add new ones. He cleans it out when he grabs them for display.
+        //
+        //  Unfortunately this means we can't be very efficient. Otherwise
+        //  we could just make the new events list hold TLogEvent objects
+        //  and move the query list contents to the new events list en masse.
+        //  But we have to copy them.
         //
         TMtxLocker lockEvents(m_colNewEvents.pmtxLock());
 

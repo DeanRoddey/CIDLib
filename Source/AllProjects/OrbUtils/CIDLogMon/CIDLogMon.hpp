@@ -201,7 +201,7 @@ class TMainFrame : public TFrameWnd
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bCreateMain();
 
-        TLogEvRef wptrFindById
+        TLogEvPtr cptrFindById
         (
             const   tCIDLib::TCard4         c4IdToFind
         )   const;
