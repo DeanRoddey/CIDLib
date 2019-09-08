@@ -78,6 +78,19 @@ TEmailAttachment::TEmailAttachment( const   tCIDLib::TCard4 c4BufSz
     pathTmp.bQueryNameExt(m_strFileName);
 }
 
+TEmailAttachment::TEmailAttachment( const   tCIDLib::TCard4 c4BufSz
+                                    ,       THeapBuf&&      mbufData
+                                    , const TString&        strMIMEType
+                                    , const TString&        strFileName) :
+    m_c4BufSz(c4BufSz)
+    , m_mbufData(tCIDLib::ForceMove(mbufData))
+    , m_strMIMEType(strMIMEType)
+{
+    // We only keep the file name part of the name, no path
+    TPathStr pathTmp(strFileName);
+    pathTmp.bQueryNameExt(m_strFileName);
+}
+
 TEmailAttachment::TEmailAttachment(const TEmailAttachment& eattSrc) :
 
     m_c4BufSz(eattSrc.m_c4BufSz)
@@ -169,24 +182,61 @@ TEmailMsg::TEmailMsg() :
 {
 }
 
-TEmailMsg::TEmailMsg(const TEmailMsg& emsgToCopy) :
+// A simple one for the most common scenario
+TEmailMsg::TEmailMsg(const  TString&    strFrom
+                    , const TString&    strTo
+                    , const TString&    strTopic
+                    , const TString&    strMsg) :
+
+    m_pcolAttachments(nullptr)
+    , m_pcolCCList(nullptr)
+    , m_pcolToList(new tCIDLib::TStrBag())
+    , m_strFrom(strFrom)
+    , m_strMsg(strMsg)
+    , m_strTopic(strTopic)
+{
+    m_pcolToList->objAdd(strTo);
+}
+
+TEmailMsg::TEmailMsg(const TEmailMsg& emsgSrc) :
 
     m_pcolAttachments(nullptr)
     , m_pcolCCList(nullptr)
     , m_pcolToList(nullptr)
-    , m_strFrom(emsgToCopy.m_strFrom)
-    , m_strMsg(emsgToCopy.m_strMsg)
-    , m_strTopic(emsgToCopy.m_strTopic)
+    , m_strFrom(emsgSrc.m_strFrom)
+    , m_strMsg(emsgSrc.m_strMsg)
+    , m_strTopic(emsgSrc.m_strTopic)
 {
-    if (emsgToCopy.m_pcolAttachments)
-        m_pcolAttachments = new TAttachList(*emsgToCopy.m_pcolAttachments);
+    if (emsgSrc.m_pcolAttachments)
+        m_pcolAttachments = new TAttachList(*emsgSrc.m_pcolAttachments);
 
-    if (emsgToCopy.m_pcolCCList)
-        m_pcolCCList = new tCIDLib::TStrBag(*emsgToCopy.m_pcolCCList);
+    if (emsgSrc.m_pcolCCList)
+        m_pcolCCList = new tCIDLib::TStrBag(*emsgSrc.m_pcolCCList);
 
-    if (emsgToCopy.m_pcolToList)
-        m_pcolToList = new tCIDLib::TStrBag(*emsgToCopy.m_pcolToList);
+    if (emsgSrc.m_pcolToList)
+        m_pcolToList = new tCIDLib::TStrBag(*emsgSrc.m_pcolToList);
 }
+
+//
+//  The lists can all be null if they never get used, so we can just swap out
+//  a set of null lists to the source. To avoid extra overhead we don't just
+//  call the move operator, we do the work here separately so we can directly
+//  move the string members as well.
+//
+TEmailMsg::TEmailMsg(TEmailMsg&& emsgSrc) :
+
+    m_pcolAttachments(nullptr)
+    , m_pcolCCList(nullptr)
+    , m_pcolToList(nullptr)
+    , m_strFrom(tCIDLib::ForceMove(emsgSrc.m_strFrom))
+    , m_strMsg(tCIDLib::ForceMove(emsgSrc.m_strMsg))
+    , m_strTopic(tCIDLib::ForceMove(emsgSrc.m_strTopic))
+{
+    tCIDLib::Swap(m_pcolAttachments, emsgSrc.m_pcolAttachments);
+    tCIDLib::Swap(m_pcolCCList, emsgSrc.m_pcolCCList);
+    tCIDLib::Swap(m_pcolToList, emsgSrc.m_pcolToList);
+}
+
 
 TEmailMsg::~TEmailMsg()
 {
@@ -208,14 +258,14 @@ TEmailMsg::~TEmailMsg()
 // ---------------------------------------------------------------------------
 //  TEmailMsg: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-TEmailMsg& TEmailMsg::operator=(const TEmailMsg& emsgToAssign)
+TEmailMsg& TEmailMsg::operator=(const TEmailMsg& emsgSrc)
 {
-    if (this != &emsgToAssign)
+    if (this != &emsgSrc)
     {
         // Copy over the easy fields first
-        m_strFrom       = emsgToAssign.m_strFrom;
-        m_strMsg        = emsgToAssign.m_strMsg;
-        m_strTopic      = emsgToAssign.m_strTopic;
+        m_strFrom   = emsgSrc.m_strFrom;
+        m_strMsg    = emsgSrc.m_strMsg;
+        m_strTopic  = emsgSrc.m_strTopic;
 
         //
         //  Handle the lists. First, if we have one, flush ours. Then copy the
@@ -223,30 +273,45 @@ TEmailMsg& TEmailMsg::operator=(const TEmailMsg& emsgToAssign)
         //
         if (m_pcolAttachments)
             m_pcolAttachments->RemoveAll();
-        if (emsgToAssign.m_pcolAttachments)
+        if (emsgSrc.m_pcolAttachments)
         {
             if (!m_pcolAttachments)
                 m_pcolAttachments = new TAttachList(4);
-            *m_pcolAttachments = *emsgToAssign.m_pcolAttachments;
+            *m_pcolAttachments = *emsgSrc.m_pcolAttachments;
         }
 
         if (m_pcolCCList)
             m_pcolCCList->RemoveAll();
-        if (emsgToAssign.m_pcolCCList)
+        if (emsgSrc.m_pcolCCList)
         {
             if (!m_pcolCCList)
                 m_pcolCCList = new tCIDLib::TStrBag;
-            *m_pcolCCList = *emsgToAssign.m_pcolCCList;
+            *m_pcolCCList = *emsgSrc.m_pcolCCList;
         }
 
         if (m_pcolToList)
             m_pcolToList->RemoveAll();
-        if (emsgToAssign.m_pcolToList)
+        if (emsgSrc.m_pcolToList)
         {
             if (!m_pcolToList)
                 m_pcolToList = new tCIDLib::TStrBag;
-            *m_pcolToList = *emsgToAssign.m_pcolToList;
+            *m_pcolToList = *emsgSrc.m_pcolToList;
         }
+    }
+    return *this;
+}
+
+TEmailMsg& TEmailMsg::operator=(TEmailMsg&& emsgSrc)
+{
+    if (this != &emsgSrc)
+    {
+        m_strFrom   = tCIDLib::ForceMove(emsgSrc.m_strFrom);
+        m_strMsg    = tCIDLib::ForceMove(emsgSrc.m_strMsg);
+        m_strTopic  = tCIDLib::ForceMove(emsgSrc.m_strTopic);
+
+        tCIDLib::Swap(m_pcolAttachments, emsgSrc.m_pcolAttachments);
+        tCIDLib::Swap(m_pcolCCList, emsgSrc.m_pcolCCList);
+        tCIDLib::Swap(m_pcolToList, emsgSrc.m_pcolToList);
     }
     return *this;
 }
@@ -267,9 +332,22 @@ TEmailMsg::AddAttachment(const  tCIDLib::TCard4 c4BufSz
     if (!m_pcolAttachments)
         m_pcolAttachments = new TAttachList(4);
 
-    m_pcolAttachments->objAdd
+    m_pcolAttachments->objPlace(c4BufSz, mbufData, strMIMEType, strFileName);
+}
+
+tCIDLib::TVoid
+TEmailMsg::AddAttachment(const  tCIDLib::TCard4 c4BufSz
+                        ,       THeapBuf&&      mbufData
+                        , const TString&        strMIMEType
+                        , const TString&        strFileName)
+{
+    // Fault in the list if needed
+    if (!m_pcolAttachments)
+        m_pcolAttachments = new TAttachList(4);
+
+    m_pcolAttachments->objPlace
     (
-        TEmailAttachment(c4BufSz, mbufData, strMIMEType, strFileName)
+        c4BufSz, tCIDLib::ForceMove(mbufData), strMIMEType, strFileName
     );
 }
 
@@ -470,16 +548,39 @@ TSMTPClient::~TSMTPClient()
 // ---------------------------------------------------------------------------
 
 // Add a message to the send queue
-tCIDLib::TVoid TSMTPClient::AddMsgToQueue(TEmailMsg* const pemsgToAdopt)
+tCIDLib::TVoid TSMTPClient::AddMsgToQueue(const TEmailMsg& emsgToAdd)
 {
     // If the queue isn't created yet, then create it
     if (!m_pcolQueue)
-        m_pcolQueue = new TRefQueue<TEmailMsg>(tCIDLib::EAdoptOpts::Adopt);
+        m_pcolQueue = new TQueue<TEmailMsg>();
 
     // And add the new message
-    m_pcolQueue->Add(pemsgToAdopt);
+    m_pcolQueue->objAdd(emsgToAdd);
 }
 
+tCIDLib::TVoid TSMTPClient::AddMsgToQueue(TEmailMsg&& emsgToAdd)
+{
+    // If the queue isn't created yet, then create it
+    if (!m_pcolQueue)
+        m_pcolQueue = new TQueue<TEmailMsg>();
+
+    // And add the new message
+    m_pcolQueue->objAdd(tCIDLib::ForceMove(emsgToAdd));
+}
+
+// For the most common scenario, we can just do an emplace of the parameters
+tCIDLib::TVoid
+TSMTPClient::AddMsgToQueue(const    TString&    strFrom
+                            , const TString&    strTo
+                            , const TString&    strTopic
+                            , const TString&    strMsg)
+{
+    // If the queue isn't created yet, then create it
+    if (!m_pcolQueue)
+        m_pcolQueue = new TQueue<TEmailMsg>();
+
+    m_pcolQueue->objPlace(strFrom, strTo, strTo, strMsg);
+}
 
 // Get/set the column width that we are to use to format outgoing body text
 tCIDLib::TCard4 TSMTPClient::c4ColumnWidth() const
@@ -729,17 +830,14 @@ TSMTPClient::SendMsgs(  const   tCIDLib::TCard4     c4MaxMSPer
         //
         if (m_pcolQueue)
         {
-            TRefQueue<TEmailMsg>::TNCCursor cursMsgs(m_pcolQueue);
+            TQueue<TEmailMsg>::TNCCursor cursMsgs(m_pcolQueue);
             while (!m_pcolQueue->bIsEmpty())
             {
-                // Get this next message to send and send it out
-                const TEmailMsg& emsgCur = cursMsgs.objRCur();
-                SendAMsg(*pcdsSrv, emsgCur, enctEnd);
-
                 //
-                //  It worked so remove it from the list, which will put the
-                //  cursor on the next message.
+                //  Send the current one, an dthe remove it, which will move the cursor
+                //  forward to the next one.
                 //
+                SendAMsg(*pcdsSrv, *cursMsgs, enctEnd);
                 m_pcolQueue->RemoveAt(cursMsgs);
             }
         }

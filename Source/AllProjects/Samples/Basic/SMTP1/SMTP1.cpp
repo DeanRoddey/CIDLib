@@ -133,7 +133,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         }
     }
 
-    // We made sure server was provided, but these are related
+    // If we have a unser name, we need a password
     if (!strUserName.bIsEmpty() && strPassword.bIsEmpty())
     {
         ShowUsage();
@@ -141,70 +141,44 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     //
-    //  Create an email message object that we can fill in and send. To
-    //  send messages, you add TEmailMsg objects to the output queue of
-    //  a TSMTPClient object, then send them.
-    //
-    TEmailMsg emsgToSend;
-
-    //
     //  Get the from field. This is what you'd think, it shows up as the
-    //  person that the message is from. We loop until they enter a non
-    //  empty value.
+    //  person that the message is from.
     //
-    TString strInput;
-    while (kCIDLib::True)
-    {
-        conOut << L"Enter 'From' Address: " << kCIDLib::FlushIt;
-        if (conIn.c4GetLine(strInput))
-        {
-            strInput.StripWhitespace();
-            if (!strInput.bIsEmpty())
-                break;
-        }
-    }
-    emsgToSend.strFrom(strInput);
+    conOut << L"Enter 'From' Address: " << kCIDLib::FlushIt;
+    TString strFromAddr;
+    if (!conIn.c4GetLine(strFromAddr))
+        return tCIDLib::EExitCodes::NotFound;
+    strFromAddr.StripWhitespace();
 
     //
-    //  Ok, now get the to list. This can be more than one address, so
-    //  we tell them to enter an empty string when done.
+    //  Ok, now get the to address. This can be more than one, but we are
+    //  just doing a simple example here and just get one.
     //
-    conOut << L"Enter 'To' Addresses (empty line to finish): "
-            << kCIDLib::FlushIt;
-    while (kCIDLib::True)
-    {
-        if (conIn.c4GetLine(strInput))
-        {
-            strInput.StripWhitespace();
-            if (strInput.bIsEmpty())
-                break;
-
-            emsgToSend.AddToAddr(strInput);
-        }
-            else
-        {
-            break;
-        }
-        conOut << L"  To: " << kCIDLib::FlushIt;
-    }
+    conOut << L"Enter 'To' Address: " << kCIDLib::FlushIt;
+    TString strToAddr;
+    if (!conIn.c4GetLine(strToAddr))
+        return tCIDLib::EExitCodes::NotFound;
+    strToAddr.StripWhitespace();
 
     conOut << L" Topic: " << kCIDLib::FlushIt;
-    conIn.c4GetLine(strInput);
-    emsgToSend.strTopic(strInput);
+    TString strTopic;
+    if (!conIn.c4GetLine(strTopic))
+        return tCIDLib::EExitCodes::NotFound;
 
+    // Get the messages which is multi-line
     conOut  << L"  Enter Msg (End with a '.' on a line by itself):\n"
             << kCIDLib::FlushIt;
     TString strMsg;
     while (kCIDLib::True)
     {
-        conIn.c4GetLine(strInput);
-        if (strInput == L".")
+        TString strCurLn;
+        conIn.c4GetLine(strCurLn);
+        if (strCurLn == L".")
             break;
 
-        strMsg.Append(strInput);
+        strMsg.Append(strCurLn);
         strMsg.Append(L"\n");
     }
-    emsgToSend.strMsg(strMsg);
 
     //
     //  Create an SMTP client object and set up the connection info. We
@@ -228,18 +202,15 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     if (!strUserName.bIsEmpty())
         smtpClient.eAuthType(tCIDNet::EMailAuthTypes::SMTP);
 
-    // We could add attachements
-    //emsgToSend.AddFileAttachment
-    //(
-    //    L"image/png", L"C:\\SomeImage.png"
-    //);
-
     //
-    //  Add a copy of the msg to the client's send queue and then send queued
-    //  msgs. Set a 10 second per message timeout. Of course in our case we
+    //  We pass in the values we collected. For this common scenario it will
+    //  just do an emplace of the values into the queue as an e-mail message
+    //  object.
+    //
+    //  Set a 10 second per message timeout. Of course in our case we
     //  just have one msg.
     //
-    smtpClient.AddMsgToQueue(new TEmailMsg(emsgToSend));
+    smtpClient.AddMsgToQueue(strFromAddr, strToAddr, strTopic, strMsg);
     smtpClient.SendMsgs(10000);
 
     // The queue should be empty now
