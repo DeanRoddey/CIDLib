@@ -34,7 +34,6 @@
 //
 #pragma once
 
-
 #define CIDStrOp_ChToLower(c)           ::towlower(c)
 #define CIDStrOp_ChToUpper(c)           ::towupper(c)
 #define CIDStrOp_CnvtFloat(s,ep)        ::wcstod(s,ep)
@@ -47,12 +46,36 @@
 #define CIDStrOp_IsSpace(c)             ::iswspace(c)
 #define CIDStrOp_IsUpper(c)             ::iswupper(c)
 #define CIDStrOp_IsXDigit(c)            ::iswxdigit(c)
-#define CIDStrOp_MBToWC(t,mc,s,oc)      ::mbstowcs_s(oc,t,mc,s,_TRUNCATE)
-#define CIDStrOp_CalcWCSize(s,nb)       ::mbstowcs_s(nb,0,0,s,_TRUNCATE)
 #define CIDStrOp_StrTok(s,ws,c)         ::wcstok_s(s,ws,c)
-#define CIDStrOp_WCToMB(t,mb,s,ob)      ::wcstombs_s(ob,t,mb,s,_TRUNCATE)
-#define CIDStrOp_CalcMBSize(s,nb)       ::wcstombs_s(nb,0,0,s,_TRUNCATE)
 
 #define CIDSStrOp_CompareI(s1,s2)       ::_stricmp(s1,s2)
 #define CIDSStrOp_CompareN(s1,s2,n)     ::strncmp(s1,s2,n)
 #define CIDSStrOp_CompareNI(s1,s2,n)    ::_strnicmp(s1,s2,n)
+
+tCIDLib::TBoolean CIDStrOp_MBToWC
+(
+            tCIDLib::TCh* const     pszTarget
+    , const tCIDLib::TCard4         c4MaxOutChars
+    , const tCIDLib::TSCh* const    pschSrc
+    ,       tCIDLib::TCard4&        c4OutChars
+);
+
+tCIDLib::TBoolean CIDStrOp_WCToMB
+(
+            tCIDLib::TSCh* const    pschTarget
+    , const tCIDLib::TCard4         c4MaxOutBytes
+    , const tCIDLib::TCh* const     pszSrc
+    ,       tCIDLib::TCard4&        c4OutBytes
+);
+
+tCIDLib::TBoolean CIDStrOp_CalcMBSize
+(
+    const   tCIDLib::TCh* const     pszSrc
+    ,       tCIDLib::TCard4&        c4OutBytes
+);
+
+tCIDLib::TBoolean CIDStrOp_CalcWCSize
+(
+    const   tCIDLib::TSCh* const    pszSrc
+    ,       tCIDLib::TCard4&        c4OutBytes
+);

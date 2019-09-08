@@ -38,7 +38,6 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_PlatformStrOps.hpp"
 
-#include    <sys/errno.h>
 #include    <math.h>
 
 
@@ -2146,7 +2145,7 @@ TRawStr::pszConvert(const   tCIDLib::TSCh* const    pszToConvert
     pszTarget[0] = kCIDLib::chNull;
     if (pszToConvert)
     {
-        // If an error, make sure we just return an empty string        
+        // If an error, make sure we just return an empty string
         tCIDLib::TCard4 c4OutChars = tCIDLib::TCard4(-1);
         if (!CIDStrOp_MBToWC(pszTarget, c4MaxChars + 1, pszToConvert, c4OutChars))
             pszTarget[0] = kCIDLib::chNull;
@@ -2162,11 +2161,11 @@ tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
     {
         // Calc the size required for this string
         tCIDLib::TCard4 c4NeededChars = tCIDLib::TCard4(-1);
-        if (!CIDStrOp_CalcWCSize(pszToConvert, c4NeededChars) && c4NeededChars)
+        if (CIDStrOp_CalcWCSize(pszToConvert, c4NeededChars) && c4NeededChars)
         {
             // Allocate a buffer big enough, plus 1 to be safe
             pszNew = new tCIDLib::TCh[c4NeededChars + 1];
-            if (CIDStrOp_MBToWC(pszNew, c4NeededChars, pszToConvert, c4NeededChars))
+            if (!CIDStrOp_MBToWC(pszNew, c4NeededChars, pszToConvert, c4NeededChars))
             {
                 //
                 //  Shouldn't happen since we just did the calc above, but just in
@@ -2207,13 +2206,7 @@ TRawStr::pszConvert(const   tCIDLib::TCh* const     pszToConvert
     if (pszToConvert)
     {
         tCIDLib::TCard4 c4OutBytes = tCIDLib::TCard4(-1);
-        int err = CIDStrOp_WCToMB(pszTarget, c4MaxChars + 1, pszToConvert, c4OutBytes);
-
-        //
-        //  If an error, make sure we just return an empty string. For the Windows side
-        //  make sure its not the STRUNCATE value, which we ignore.
-        //
-        if (err && (err != 0x80))
+        if (!CIDStrOp_WCToMB(pszTarget, c4MaxChars + 1, pszToConvert, c4OutBytes))
             pszTarget[0] = 0;
     }
     return pszTarget;
@@ -2227,14 +2220,14 @@ tCIDLib::TSCh* TRawStr::pszConvert(const tCIDLib::TCh* const pszToConvert)
     {
         // Calc the size required for this string
         tCIDLib::TCard4 c4NeededBytes = tCIDLib::TCard4(-1);
-        if (!CIDStrOp_CalcMBSize(pszToConvert, c4NeededBytes) && c4NeededBytes)
+        if (CIDStrOp_CalcMBSize(pszToConvert, c4NeededBytes) && c4NeededBytes)
         {
             //
             //  Allocate a buffer big enough, plus one to be safe and in case
             //  we should get back zero.
             //
             pszNew = new tCIDLib::TSCh[c4NeededBytes + 1];
-            if (CIDStrOp_WCToMB(pszNew, c4NeededBytes, pszToConvert, c4NeededBytes))
+            if (!CIDStrOp_WCToMB(pszNew, c4NeededBytes, pszToConvert, c4NeededBytes))
             {
                 //
                 //  Shouldn't happen since we just did the calc above, but just in
