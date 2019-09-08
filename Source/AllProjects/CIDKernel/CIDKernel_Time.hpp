@@ -137,7 +137,7 @@ class KRNLEXPORT TKrnlTimeStamp
 
         TKrnlTimeStamp
         (
-            const   TKrnlTimeStamp&         ktmsToCopy
+            const   TKrnlTimeStamp&         ktmsSrc
         );
 
         ~TKrnlTimeStamp();

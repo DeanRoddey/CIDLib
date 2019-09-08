@@ -20,7 +20,7 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  The __enctTime field in the Win32 implementation is always a local
+//  1)  The m_enctTime field in the Win32 implementation is always a local
 //      time, i.e. we adjust any UTC times we get from the system to be local
 //      times.
 //
@@ -42,17 +42,11 @@
 //  TCIDKrnlModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermTime(const tCIDLib::EInitTerm eInitTerm)
+TCIDKrnlModule::bInitTermTime(const tCIDLib::EInitTerm eInitTerm)
 {
     if (eInitTerm == tCIDLib::EInitTerm::Initialize)
     {
         ::tzset();
-
-        TKrnlTimeStamp::__bDST = daylight ? kCIDLib::True : kCIDLib::False;
-        TKrnlTimeStamp::__i4Offset = timezone / 60 / -60;
-
-        tCIDLib::TCard4 c4Index = TKrnlTimeStamp::__bDST ? 1 : 0;
-        TRawStr::pszConvert(tzname[c4Index], TKrnlTimeStamp::__szTZName, 32);
     }
 
     return kCIDLib::True;
@@ -70,7 +64,7 @@ TKrnlTimeStamp::bAsDateInfo(tCIDLib::TCard4&        c4Year
                             , tCIDLib::EWeekDays&   eWeekDay) const
 {
     time_t LinuxTime;
-    TKrnlLinux::CIDFileTimeToLinuxFileTime(__enctTime, LinuxTime);
+    TKrnlLinux::CIDFileTimeToLinuxFileTime(m_enctTime, LinuxTime);
 
     struct tm TimeStruct;
     if (!::gmtime_r(&LinuxTime, &TimeStruct))
@@ -95,7 +89,7 @@ TKrnlTimeStamp::bAsTimeInfo(tCIDLib::TCard4&    c4Hour
                             , tCIDLib::TCard4&  c4Millis) const
 {
     time_t LinuxTime;
-    TKrnlLinux::CIDFileTimeToLinuxFileTime(__enctTime, LinuxTime);
+    TKrnlLinux::CIDFileTimeToLinuxFileTime(m_enctTime, LinuxTime);
 
     struct tm TimeStruct;
     if (!::gmtime_r(&LinuxTime, &TimeStruct))
@@ -117,7 +111,7 @@ tCIDLib::TBoolean
 TKrnlTimeStamp::bDayOfWeek(tCIDLib::EWeekDays& eToFill) const
 {
     time_t LinuxTime;
-    TKrnlLinux::CIDFileTimeToLinuxFileTime(__enctTime, LinuxTime);
+    TKrnlLinux::CIDFileTimeToLinuxFileTime(m_enctTime, LinuxTime);
 
     struct tm TimeStruct;
     if (!::gmtime_r(&LinuxTime, &TimeStruct))
@@ -149,7 +143,7 @@ TKrnlTimeStamp::bFromDetails(const  tCIDLib::TCard4     c4Year
     TimeStruct.tm_min = c4Minute;
     TimeStruct.tm_hour = c4Hour;
     TimeStruct.tm_mday = c4Day;
-    TimeStruct.tm_mon = eMonth;
+    TimeStruct.tm_mon = int(eMonth);
     TimeStruct.tm_year = c4Year - 1900;
 
     time_t LinuxTime = ::mktime(&TimeStruct);
@@ -160,34 +154,15 @@ TKrnlTimeStamp::bFromDetails(const  tCIDLib::TCard4     c4Year
         return kCIDLib::False;
     }
 
-    TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime - timezone, __enctTime);
+    TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime - timezone, m_enctTime);
 
     return kCIDLib::True;
 }
-
-
-tCIDLib::TBoolean TKrnlTimeStamp::bJulianDate(tCIDLib::TCard4& c4ToFill) const
-{
-    time_t LinuxTime;
-    TKrnlLinux::CIDFileTimeToLinuxFileTime(__enctTime, LinuxTime);
-
-    struct tm TimeStruct;
-    if (!::gmtime_r(&LinuxTime, &TimeStruct))
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidValue);
-        return kCIDLib::False;
-    }
-
-    c4ToFill = TimeStruct.tm_yday;
-
-    return kCIDLib::True;
-}
-
 
 
 tCIDLib::TBoolean TKrnlTimeStamp::bSetTo(const tCIDLib::TEncodedTime& enctNew)
 {
-    __enctTime = enctNew;
+    m_enctTime = enctNew;
     return kCIDLib::True;
 }
 
@@ -198,7 +173,7 @@ tCIDLib::TBoolean TKrnlTimeStamp::bSetTo(const tCIDLib::ESpecialTimes eSpecial)
     if (eSpecial == tCIDLib::ESpecialTimes::Base)
     {
         LinuxTime = 0;
-        TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime, __enctTime);
+        TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime, m_enctTime);
         return kCIDLib::True;
     }
 
@@ -244,7 +219,7 @@ tCIDLib::TBoolean TKrnlTimeStamp::bSetTo(const tCIDLib::ESpecialTimes eSpecial)
         }
     }
 
-    TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime, __enctTime);
+    TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime, m_enctTime);
 
     return kCIDLib::True;
 }
@@ -252,5 +227,5 @@ tCIDLib::TBoolean TKrnlTimeStamp::bSetTo(const tCIDLib::ESpecialTimes eSpecial)
 
 tCIDLib::TBoolean TKrnlTimeStamp::bValidate() const
 {
-    return __enctTime >= 0;
+    return m_enctTime >= 0;
 }

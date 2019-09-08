@@ -80,3 +80,9 @@ tCIDLib::TBoolean CIDStrOp_CalcMBSize
     const   tCIDLib::TCh* const     pszSrc
     ,       tCIDLib::TCard4&        c4OutBytes
 );
+
+tCIDLib::TBoolean CIDStrOp_CalcWCSize
+(
+    const   tCIDLib::TSCh* const    pszSrc
+    ,       tCIDLib::TCard4&        c4OutBytes
+);

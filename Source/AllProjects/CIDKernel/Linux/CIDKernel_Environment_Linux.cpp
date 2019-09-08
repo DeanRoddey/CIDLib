@@ -30,16 +30,17 @@
 //  Facility specific includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
+#include    <unistd.h>
 
 
 // ---------------------------------------------------------------------------
 //  Local const data
 //
-//  __c4Modulus
+//  m_c4Modulus
 //      The modulus used in the hashing of the key strings. This is passed
 //      along to the hash map object.
 // ---------------------------------------------------------------------------
-static const tCIDLib::TCard4    __c4Modulus = 23;
+static const tCIDLib::TCard4    m_c4Modulus = 23;
 
 
 
@@ -47,13 +48,13 @@ static const tCIDLib::TCard4    __c4Modulus = 23;
 //  TCIDKrnlModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermEnvironment(const tCIDLib::EInitTerm eInitTerm)
+TCIDKrnlModule::bInitTermEnvironment(const tCIDLib::EInitTerm eInitTerm)
 {
     if (eInitTerm == tCIDLib::EInitTerm::Initialize)
     {
         // Allocate our critical section and our hash map objects.
-        TKrnlEnvironment::__pkcrsAccess = new TKrnlCritSec;
-        TKrnlEnvironment::__pkhshmEnv = new TKrnlHashMap(__c4Modulus);
+        TKrnlEnvironment::s_pkcrsAccess = new TKrnlCritSec;
+        TKrnlEnvironment::s_pkhshmEnv = new TKrnlHashMap(m_c4Modulus);
 
         //
         //  Now load up the environment with all of the environment
@@ -61,10 +62,10 @@ TCIDKrnlModule::__bInitTermEnvironment(const tCIDLib::EInitTerm eInitTerm)
         //
         tCIDLib::TZStr512   szTmp;
 
-        for (tCIDLib::TCard4 c4Count = 0; __environ[c4Count]; c4Count++)
+        for (tCIDLib::TCard4 c4Count = 0; environ[c4Count]; c4Count++)
         {
             // Make a copy of the current element
-            TRawStr::pszConvert(__environ[c4Count], szTmp, c4MaxBufChars(szTmp));
+            TRawStr::pszConvert(environ[c4Count], szTmp, c4MaxBufChars(szTmp));
 
             //
             //  We need to find the two parts of the string and pull
@@ -90,15 +91,15 @@ TCIDKrnlModule::__bInitTermEnvironment(const tCIDLib::EInitTerm eInitTerm)
             TRawStr::pszUpperCase(szTmp);
 
             // And add them now to the hash map
-            if (!TKrnlEnvironment::__pkhshmEnv->bAdd(szTmp, pszSplit+1))
+            if (!TKrnlEnvironment::s_pkhshmEnv->bAdd(szTmp, pszSplit+1))
                 return kCIDLib::False;
         }
     }
-    else
+     else
     {
         // Delete our critical section and our hash map objects.
-        delete TKrnlEnvironment::__pkcrsAccess;
-        delete TKrnlEnvironment::__pkhshmEnv;
+        delete TKrnlEnvironment::s_pkcrsAccess;
+        delete TKrnlEnvironment::s_pkhshmEnv;
     }
     return kCIDLib::True;
 }

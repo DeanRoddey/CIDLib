@@ -232,9 +232,12 @@ namespace
             return kCIDLib::False;
         }
 
-        tCIDLib::TSInt iRet = ::fscanf(StatFile,
-                                       "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %*d %*d %*d %*d %*d %*d %*u %*u %d",
-                                       &c4RawStartTime);
+        tCIDLib::TSInt iRet = ::fscanf
+        (
+            StatFile,
+            "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %*d %*d %*d %*d %*d %*d %*u %*u %d",
+            &c4RawStartTime
+        );
 
         ::fclose(StatFile);
 
@@ -309,7 +312,7 @@ TKrnlExtProcess::TKrnlExtProcess()
 
 TKrnlExtProcess::~TKrnlExtProcess()
 {
-    __ChildProcs.RemoveChildProc(&__hprocThis);
+    __ChildProcs.RemoveChildProc(&m_hprocThis);
 }
 
 
@@ -329,7 +332,7 @@ TKrnlExtProcess::bGetPriorityClass(tCIDLib::EPrioClasses& eToFill) const
         return kCIDLib::False;
     }
 
-    tCIDLib::TSInt iPolicy = ::sched_getscheduler(__hprocThis.__phprociThis->pidThis);
+    tCIDLib::TSInt iPolicy = ::sched_getscheduler(m_hprocThis.m_phprociThis->pidThis);
     if (iPolicy == -1)
     {
         TKrnlError::SetLastHostError(errno);
@@ -350,8 +353,8 @@ TKrnlExtProcess::bGetPriorityClass(tCIDLib::EPrioClasses& eToFill) const
 tCIDLib::TBoolean
 TKrnlExtProcess::bIsRunning(tCIDLib::TBoolean& bToFill) const
 {
-    if (!__hprocThis.__phprociThis->pidThis
-        || __hprocThis.__phprociThis->bAlreadyClean)
+    if (!m_hprocThis.m_phprociThis->pidThis
+        || m_hprocThis.m_phprociThis->bAlreadyClean)
     {
         bToFill = kCIDLib::False;
     }
@@ -377,7 +380,7 @@ tCIDLib::TBoolean TKrnlExtProcess::bKill()
     }
 
     // Do a SIGTERM instead of SIGKILL so that the process can clean up.
-    if (::kill(__hprocThis.__phprociThis->pidThis, SIGTERM))
+    if (::kill(m_hprocThis.m_phprociThis->pidThis, SIGTERM))
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
@@ -422,7 +425,7 @@ TKrnlExtProcess::bSetPriorityClass(const tCIDLib::EPrioClasses eNewClass)
         SchedParam.sched_priority = ::sched_get_priority_min(SCHED_RR);
     }
 
-    if (::sched_setscheduler(__hprocThis.__phprociThis->pidThis
+    if (::sched_setscheduler(m_hprocThis.m_phprociThis->pidThis
                              , iPolicy
                              , &SchedParam))
     {
@@ -450,7 +453,7 @@ TKrnlExtProcess::bQueryProcessTimes(tCIDLib::TEncodedTime&     enctStart
 
     // First set the start time
     TKrnlLinux::LinuxFileTimeToCIDFileTime(c4BootTime, enctStart);
-    enctStart += tCIDLib::TEncodedTime(__hprocThis.__phprociThis->c4JiffyStartTime) * 100000;
+    enctStart += tCIDLib::TEncodedTime(m_hprocThis.m_phprociThis->c4JiffyStartTime) * 100000;
 
     // We need to use a different method of getting the time if the process is still
     // running.
@@ -459,7 +462,7 @@ TKrnlExtProcess::bQueryProcessTimes(tCIDLib::TEncodedTime&     enctStart
         tCIDLib::TCard4 c4JiffyUserTime;
         tCIDLib::TCard4 c4JiffyKernelTime;
 
-        if (!__bQueryRawTimes(__hprocThis.__phprociThis->pidThis
+        if (!__bQueryRawTimes(m_hprocThis.m_phprociThis->pidThis
                               , c4JiffyUserTime
                               , c4JiffyKernelTime))
         {
@@ -478,18 +481,18 @@ TKrnlExtProcess::bQueryProcessTimes(tCIDLib::TEncodedTime&     enctStart
     else
     {
         // Now user time
-        tCIDLib::TEncodedTime enctSec = __hprocThis.__phprociThis->UserTime.tv_sec;
-        tCIDLib::TEncodedTime enctUSec = __hprocThis.__phprociThis->UserTime.tv_usec;
+        tCIDLib::TEncodedTime enctSec = m_hprocThis.m_phprociThis->UserTime.tv_sec;
+        tCIDLib::TEncodedTime enctUSec = m_hprocThis.m_phprociThis->UserTime.tv_usec;
         enctInUserMode = (enctSec * 1000000 + enctUSec) * 10;
 
         // And kernel time
-        enctSec = __hprocThis.__phprociThis->KernelTime.tv_sec;
-        enctUSec = __hprocThis.__phprociThis->KernelTime.tv_usec;
+        enctSec = m_hprocThis.m_phprociThis->KernelTime.tv_sec;
+        enctUSec = m_hprocThis.m_phprociThis->KernelTime.tv_usec;
         enctInKernel = (enctSec * 1000000 + enctUSec) * 10;
 
         // Now end time
-        TKrnlLinux::LinuxFileTimeToCIDFileTime(__hprocThis.__phprociThis->EndTime.tv_sec, enctEnd);
-        enctEnd += tCIDLib::TEncodedTime(__hprocThis.__phprociThis->EndTime.tv_usec) * 10;
+        TKrnlLinux::LinuxFileTimeToCIDFileTime(m_hprocThis.m_phprociThis->EndTime.tv_sec, enctEnd);
+        enctEnd += tCIDLib::TEncodedTime(m_hprocThis.m_phprociThis->EndTime.tv_usec) * 10;
     }
 
     return kCIDLib::True;
@@ -610,15 +613,15 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
     // We're in the parent process
     // Get its start time. Since SIGCHLD is blocked, we can be sure
     // that this data is available.
-    if (!__bQueryRawStartTime(pidTmp, __hprocThis.__phprociThis->c4JiffyStartTime))
-        __hprocThis.__phprociThis->c4JiffyStartTime = 0;
+    if (!__bQueryRawStartTime(pidTmp, m_hprocThis.m_phprociThis->c4JiffyStartTime))
+        m_hprocThis.m_phprociThis->c4JiffyStartTime = 0;
 
     // Set up the handle
-    __hprocThis.__phprociThis->pidThis = pidTmp;
+    m_hprocThis.m_phprociThis->pidThis = pidTmp;
 
     // Add it to the list of processes for which we're waiting. This handle will be
     // removed from the list when this object is destroyed.
-    __ChildProcs.AddChildProc(&__hprocThis);
+    __ChildProcs.AddChildProc(&m_hprocThis);
 
     // Now it's safe to restore the old signal mask, which should unblock
     // the SIGCHLD signal.
@@ -737,16 +740,16 @@ tCIDLib::TBoolean
 TKrnlExtProcess::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
                                 , const tCIDLib::TCard4      c4MilliSecs) const
 {
-    if (!__hprocThis.__phprociThis->pidThis)
+    if (!m_hprocThis.m_phprociThis->pidThis)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NeverStarted);
         return kCIDLib::False;
     }
 
     // If it's already clean, then we're off the hook.
-    if (__hprocThis.__phprociThis->bAlreadyClean)
+    if (m_hprocThis.m_phprociThis->bAlreadyClean)
     {
-        eToFill = __hprocThis.__phprociThis->eExit;
+        eToFill = m_hprocThis.m_phprociThis->eExit;
         return kCIDLib::True;
     }
 
@@ -766,9 +769,9 @@ TKrnlExtProcess::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
             return kCIDLib::False;
         }
 
-        if (__hprocThis.__phprociThis->bAlreadyClean)
+        if (m_hprocThis.m_phprociThis->bAlreadyClean)
         {
-            eToFill = __hprocThis.__phprociThis->eExit;
+            eToFill = m_hprocThis.m_phprociThis->eExit;
             return kCIDLib::True;
         }
 
@@ -776,9 +779,9 @@ TKrnlExtProcess::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
         TimeRequested.tv_nsec = TimeRemaining.tv_nsec;
     }
 
-    if (__hprocThis.__phprociThis->bAlreadyClean)
+    if (m_hprocThis.m_phprociThis->bAlreadyClean)
     {
-        eToFill = __hprocThis.__phprociThis->eExit;
+        eToFill = m_hprocThis.m_phprociThis->eExit;
         return kCIDLib::True;
     }
 

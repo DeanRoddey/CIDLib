@@ -39,6 +39,9 @@
 #include    <limits.h>
 #include    <curses.h>
 #include    <term.h>
+#include    <stdio.h>
+#include    <editline/readline.h>
+#include    <editline/history.h>
 
 
 // We don't need this because everything is in TConsoleHandleImpl.
@@ -64,8 +67,8 @@ namespace
     // ---------------------------------------------------------------------------
     struct TTermInfoKey
     {
-        tCIDLib::TSCh*      pszTermInfo;
-        tCIDLib::EConKeys   eKey;
+        const tCIDLib::TSCh*    pszTermInfo;
+        tCIDLib::EConKeys       eKey;
     };
 
 
@@ -199,6 +202,7 @@ namespace
         // to the CIDLib console keys values, so we can
         // look them up in the terminfo database.
         static TTermInfoKey __atikXlat[] =
+
         {
                 { "kbs"     , tCIDLib::EConKeys::Backspace  }
             ,   { "kcbt"    , tCIDLib::EConKeys::BackTab    }
@@ -321,11 +325,19 @@ namespace
         }
     }
 
-    static tCIDLib::TBoolean
-    bWaitForInput(tCIDLib::TCard4& c4Milliseconds)
+    static tCIDLib::TBoolean bWaitForInput(const tCIDLib::TEncodedTime enctEnd)
     {
-        tCIDLib::TInt4 i4Sec = c4Milliseconds / 1000;
-        tCIDLib::TInt4 i4Microsec = (c4Milliseconds % 1000) * 1000;
+        const tCIDLib::TEncodedTime enctCur = TKrnlTimeStamp::enctNow();
+        if (enctCur >= enctEnd)
+            return kCIDLib::False;
+
+        // Set up a time value with the remaining time
+        const tCIDLib::TEncodedTime enctDiff(enctEnd - enctCur);
+        tCIDLib::TInt4 i4Sec = tCIDLib::TInt4(enctDiff / kCIDLib::enctOneSecond);
+        tCIDLib::TInt4 i4Microsec = tCIDLib::TInt4
+        (
+            (enctDiff - (i4Sec * kCIDLib::enctOneSecond)) / kCIDLib::enctOneMilliSec
+        );
 
         struct timeval WaitTimeVal;
         WaitTimeVal.tv_sec = i4Sec;
@@ -335,31 +347,8 @@ namespace
         FD_ZERO(&ReadSet);
         FD_SET(0, &ReadSet);
 
-        struct timeval StartTimeVal;
-        ::gettimeofday(&StartTimeVal, 0);
 
-        tCIDLib::TSInt iReturn = ::select(1, &ReadSet, 0, 0, &WaitTimeVal);
-
-        struct timeval EndTimeVal;
-        ::gettimeofday(&EndTimeVal, 0);
-
-        tCIDLib::TInt4 i4Delta = i4Sec - EndTimeVal.tv_sec + StartTimeVal.tv_sec;
-        WaitTimeVal.tv_sec = i4Delta >= 0 ? i4Delta : 0;
-
-        i4Delta = i4Microsec - EndTimeVal.tv_usec + StartTimeVal.tv_usec;
-        while (i4Delta < 0 && WaitTimeVal.tv_sec != 0)
-        {
-            --WaitTimeVal.tv_sec;
-            i4Delta += 1000000;
-        }
-        WaitTimeVal.tv_usec = i4Delta;
-
-        if (i4Delta < 0)
-            WaitTimeVal.tv_sec = WaitTimeVal.tv_usec = 0;
-
-        c4Milliseconds = (WaitTimeVal.tv_sec * 1000)
-                         + (WaitTimeVal.tv_usec / 1000);
-
+        const tCIDLib::TSInt iReturn = ::select(1, &ReadSet, 0, 0, &WaitTimeVal);
         return (iReturn != 0 && iReturn != -1);
     }
 
@@ -576,7 +565,7 @@ tCIDLib::TVoid
 TConsoleHandle::FormatToStr(        tCIDLib::TCh* const pszToFill
                             , const tCIDLib::TCard4     c4MaxChars) const
 {
-    tCIDLib::TCh* pszValue = L"False";
+    const tCIDLib::TCh* pszValue = L"False";
     if (m_phconiThis->bValid)
         pszValue = L"True";
     TRawStr::CopyStr(pszToFill, pszValue, c4MaxChars);
@@ -593,11 +582,14 @@ TConsoleHandle::FormatToStr(        tCIDLib::TCh* const pszToFill
 // ---------------------------------------------------------------------------
 //  TKrnlConIn: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean
-TKrnlConIn::bReadChar(tCIDLib::EConKeys& keyType, tCIDLib::TCh& chGotten, const tCIDLib::TBoolean bWait)
-{
-    const tCIDLib::TCard4 c4WaitForSequence = 1000;
 
+tCIDLib::TBoolean
+TKrnlConIn::bReadChar(          tCIDLib::EConKeys&      keyType
+                        ,       tCIDLib::TCh&           chGotten
+                        , const tCIDLib::TEncodedTime   enctEnd
+                        ,       TIdleCB                 pfnCallback
+                        ,       TObject* const          pobjCBData)
+{
     if (!m_hconThis.m_phconiThis->bSingleCharMode)
     {
         if (!bSetSingleCharMode(m_hconThis.m_phconiThis, kCIDLib::True))
@@ -605,7 +597,6 @@ TKrnlConIn::bReadChar(tCIDLib::EConKeys& keyType, tCIDLib::TCh& chGotten, const 
     }
 
     tCIDLib::TSCh chTmp;
-    tCIDLib::TCard4 c4WaitLeft = c4WaitForSequence;
     TKrnlLinux::TTermValueNode* pnodeCur = m_hconThis.m_phconiThis->pnodeTree;
     TKrnlLinux::TTermFifo* pFifo = m_hconThis.m_phconiThis->pfifoThis;
 
@@ -613,7 +604,7 @@ TKrnlConIn::bReadChar(tCIDLib::EConKeys& keyType, tCIDLib::TCh& chGotten, const 
     {
         if (pFifo->bIsEmpty())
         {
-            if (!bWait || !pFifo->bPush())
+            if (!enctEnd || !pFifo->bPush())
                 return kCIDLib::False;
         }
 
@@ -640,7 +631,7 @@ TKrnlConIn::bReadChar(tCIDLib::EConKeys& keyType, tCIDLib::TCh& chGotten, const 
 
         if (pFifo->bIsEmpty())
         {
-            if (!bWaitForInput(c4WaitLeft))
+            if (!bWaitForInput(enctEnd))
                 return kCIDLib::False;
         }
     }
@@ -664,9 +655,11 @@ TKrnlConIn::bReadChar(tCIDLib::EConKeys& keyType, tCIDLib::TCh& chGotten, const 
 //  TKrnlConIn: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TKrnlConIn::bReadLine(tCIDLib::TCh* const pszToFill
-                      , const tCIDLib::TCard4     c4CharsToRead
-                      ,       tCIDLib::TCard4&    c4CharsRead)
+TKrnlConIn::bReadLine(          tCIDLib::TCh* const pszToFill
+                        , const tCIDLib::TCard4     c4CharsToRead
+                        ,       tCIDLib::TCard4&    c4CharsRead
+                        ,       TIdleCB             pfnCallback
+                        ,       TObject* const      pobjCBData)
 {
     if (m_hconThis.m_phconiThis->bSingleCharMode)
     {
@@ -674,7 +667,7 @@ TKrnlConIn::bReadLine(tCIDLib::TCh* const pszToFill
             return kCIDLib::False;
     }
 
-    tCIDLib::TSCh* pszLineRead = ::readline("");
+    const tCIDLib::TSCh* pszLineRead = ::readline("");
     if (!pszLineRead)
         pszLineRead = "";
     c4CharsRead = ::strlen(pszLineRead);
@@ -702,14 +695,14 @@ tCIDLib::TBoolean TKrnlConIn::bSetInsertMode(const tCIDLib::TBoolean)
     return kCIDLib::True;
 }
 
-tCIDLib::TVoid TKrnlConIn:Close()
+tCIDLib::TVoid TKrnlConIn::Close()
 {
     if (m_hconThis.m_phconiThis->bSingleCharMode)
         ::tcsetattr(0, TCSADRAIN, &m_hconThis.m_phconiThis->TermInfo);
 }
 
 TKrnlConIn::TConPlatInfo*
-TKrnlConIn::__pInitPlatform(const tCIDLib::TCard4 c4MaxRecall)
+TKrnlConIn::pInitPlatform(const tCIDLib::TCard4 c4MaxRecall)
 {
     // Set up the history buffer according to instructions
     if (c4MaxRecall > 0)
@@ -719,14 +712,16 @@ TKrnlConIn::__pInitPlatform(const tCIDLib::TCard4 c4MaxRecall)
     return 0;
 }
 
-tCIDLib::TVoid TKrnlConIn::__ResetRecallBuf()
+tCIDLib::TVoid TKrnlConIn::ResetRecallBuf()
 {
     ::clear_history();
 }
 
-tCIDLib::TVoid TKrnlConIn::__TermPlatform()
+tCIDLib::TVoid TKrnlConIn::TermPlatform()
 {
 }
+
+
 
 // ---------------------------------------------------------------------------
 //   CLASS: TKrnlConOut
@@ -807,7 +802,7 @@ TKrnlConOut::bWriteBytes(const  tCIDLib::TVoid* const   pToWrite
         pszToWrite[c4CharsToWrite] = '\000';
 
     tCIDLib::TCard4 c4BytesWritten;
-    c4Written = __c4WriteString(pszToWrite, c4BytesWritten);
+    c4Written = c4WriteString(pszToWrite, c4BytesWritten);
 
     c4Written *= kCIDLib::c4CharBytes;
 
@@ -818,7 +813,7 @@ tCIDLib::TBoolean
 TKrnlConOut::bWriteLine(const tCIDLib::TCh* const pszToWrite)
 {
     tCIDLib::TCard4 c4BytesWritten;
-    __c4WriteString(pszToWrite, c4BytesWritten);
+    c4WriteString(pszToWrite, c4BytesWritten);
     return kCIDLib::True;
 }
 
@@ -827,23 +822,23 @@ TKrnlConOut::bWriteLine(const tCIDLib::TCh* const pszToWrite)
 // ---------------------------------------------------------------------------
 //  TKrnlConOut: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TKrnlConOut::__bOpen()
+tCIDLib::TBoolean TKrnlConOut::bOpen()
 {
-    return __bInitTerminalInfo();
+    return bInitTerminalInfo();
 }
 
-tCIDLib::TVoid TKrnlConOut::__Close()
+tCIDLib::TVoid TKrnlConOut::Close()
 {
 }
 
-TKrnlConOut::TConPlatInfo* TKrnlConOut::__pInitPlatform()
+TKrnlConOut::TConPlatInfo* TKrnlConOut::pInitPlatform()
 {
     // We don't use this so we just return a null pointer
     return 0;
 }
 
 
-tCIDLib::TVoid TKrnlConOut::__TermPlatform()
+tCIDLib::TVoid TKrnlConOut::TermPlatform()
 {
     // No-op for us
 }

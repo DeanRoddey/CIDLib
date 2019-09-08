@@ -100,9 +100,9 @@ namespace TKrnlLinux
 union semun
 {
     int                 val;
-    struct semid_ds*    buf;
+    struct semid_ds*    idbuf;
     unsigned short int* array;
-    struct seminfo*     __buf;
+    struct seminfo*     infobuf;
 };
 #endif
 

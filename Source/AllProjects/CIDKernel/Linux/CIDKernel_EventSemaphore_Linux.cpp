@@ -32,6 +32,8 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
+
+
 // ---------------------------------------------------------------------------
 //   CLASS: TEventHandle
 //  PREFIX: hev
@@ -41,18 +43,20 @@
 //  TEventHandle: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TEventHandle::TEventHandle() :
-    __pheviThis(0)
+
+    m_pheviThis(nullptr)
 {
 }
 
 TEventHandle::TEventHandle(const TEventHandle& hevToCopy) :
-    __pheviThis(hevToCopy.__pheviThis)
+
+    m_pheviThis(hevToCopy.m_pheviThis)
 {
 }
 
 TEventHandle::~TEventHandle()
 {
-    __pheviThis = 0;
+    m_pheviThis = nullptr;
 }
 
 
@@ -64,7 +68,7 @@ TEventHandle& TEventHandle::operator=(const TEventHandle& hevToAssign)
     if (this == &hevToAssign)
         return *this;
 
-    __pheviThis = hevToAssign.__pheviThis;
+    m_pheviThis = hevToAssign.m_pheviThis;
 
     return *this;
 }
@@ -73,7 +77,7 @@ TEventHandle& TEventHandle::operator=(const TEventHandle& hevToAssign)
 tCIDLib::TBoolean
 TEventHandle::operator==(const TEventHandle& hevToCompare) const
 {
-    return (__pheviThis == hevToCompare.__pheviThis);
+    return (m_pheviThis == hevToCompare.m_pheviThis);
 }
 
 
@@ -81,15 +85,15 @@ TEventHandle::operator==(const TEventHandle& hevToCompare) const
 // -------------------------------------------------------------------
 //  Public, non-virtual methods
 // -------------------------------------------------------------------
-tCIDLib::TBoolean TEventHandle::bValid() const
+tCIDLib::TBoolean TEventHandle::bIsValid() const
 {
-    return (__pheviThis && __pheviThis->c4RefCount);
+    return (m_pheviThis && m_pheviThis->c4RefCount);
 }
 
 
 tCIDLib::TVoid TEventHandle::Clear()
 {
-    __pheviThis = 0;
+    m_pheviThis = 0;
 }
 
 
@@ -99,7 +103,7 @@ TEventHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
 {
     TRawStr::bFormatVal
     (
-        tCIDLib::TCard4(__pheviThis)
+        tCIDLib::TCard4(m_pheviThis)
         , pszToFill
         , c4MaxChars
         , tCIDLib::ERadices::Hex
@@ -118,23 +122,25 @@ TEventHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
 //  TKrnlEvent: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlEvent::TKrnlEvent() :
-    __pszName(0)
+
+    m_pszName(nullptr)
 {
 }
 
 TKrnlEvent::TKrnlEvent(const tCIDLib::TCh* const pszName) :
-    __pszName(0)
+
+    m_pszName(nullptr)
 {
     if (pszName)
-        __pszName = TRawStr::pszReplicate(pszName);
+        m_pszName = TRawStr::pszReplicate(pszName);
 }
 
 TKrnlEvent::~TKrnlEvent()
 {
-    if (__pszName)
+    if (m_pszName)
     {
-        delete [] __pszName;
-        __pszName = 0;
+        delete [] m_pszName;
+        m_pszName = nullptr;
     }
 
     if (!bClose())
@@ -161,27 +167,27 @@ TKrnlEvent::~TKrnlEvent()
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TKrnlEvent::bClose()
 {
-    if (__hevThis.bValid())
+    if (m_hevThis.bIsValid())
     {
-        ::pthread_mutex_lock(&__hevThis.__pheviThis->mtxThis);
+        ::pthread_mutex_lock(&m_hevThis.m_pheviThis->mtxThis);
 
         tCIDLib::TOSErrCode HostErr;
-        if (!--__hevThis.__pheviThis->c4RefCount)
+        if (!--m_hevThis.m_pheviThis->c4RefCount)
         {
-            if(__hevThis.__pheviThis->iSysVSemId != -1)
+            if(m_hevThis.m_pheviThis->iSysVSemId != -1)
             {
-                if (__hevThis.__pheviThis->bSysVOwner)
+                if (m_hevThis.m_pheviThis->bSysVOwner)
                 {
                     union semun SemUnion;
                     SemUnion.val = 0;
 
-                    if (::semctl(__hevThis.__pheviThis->iSysVSemId
+                    if (::semctl(m_hevThis.m_pheviThis->iSysVSemId
                                  , 0
                                  , IPC_RMID
                                  , SemUnion))
                     {
-                        __hevThis.__pheviThis->c4RefCount++;
-                        ::pthread_mutex_unlock(&__hevThis.__pheviThis->mtxThis);
+                        m_hevThis.m_pheviThis->c4RefCount++;
+                        ::pthread_mutex_unlock(&m_hevThis.m_pheviThis->mtxThis);
                         TKrnlError::SetLastHostError(errno);
                         return kCIDLib::False;
                     }
@@ -189,7 +195,7 @@ tCIDLib::TBoolean TKrnlEvent::bClose()
             }
             else
             {
-                HostErr = ::pthread_cond_destroy(&__hevThis.__pheviThis->condThis);
+                HostErr = ::pthread_cond_destroy(&m_hevThis.m_pheviThis->condThis);
                 if (HostErr)
                 {
                     TKrnlError::SetLastHostError(HostErr);
@@ -197,52 +203,56 @@ tCIDLib::TBoolean TKrnlEvent::bClose()
                 }
             }
 
-            ::pthread_mutex_unlock(&__hevThis.__pheviThis->mtxThis);
-            HostErr = ::pthread_mutex_destroy(&__hevThis.__pheviThis->mtxThis);
+            ::pthread_mutex_unlock(&m_hevThis.m_pheviThis->mtxThis);
+            HostErr = ::pthread_mutex_destroy(&m_hevThis.m_pheviThis->mtxThis);
             if (HostErr)
             {
                 TKrnlError::SetLastHostError(HostErr);
                 return kCIDLib::False;
             }
 
-            delete __hevThis.__pheviThis;
+            delete m_hevThis.m_pheviThis;
         }
         else
         {
-            ::pthread_mutex_unlock(&__hevThis.__pheviThis->mtxThis);
+            ::pthread_mutex_unlock(&m_hevThis.m_pheviThis->mtxThis);
         }
 
-        __hevThis.__pheviThis = 0;
+        m_hevThis.m_pheviThis = nullptr;
     }
 
     return kCIDLib::True;
 }
 
 
-tCIDLib::TBoolean TKrnlEvent::bCreate(const tCIDLib::EEventStates eInitState)
+tCIDLib::TBoolean
+TKrnlEvent::bCreate(const tCIDLib::EEventStates eInitState, const tCIDLib::TBoolean bManual)
 {
-    if (__hevThis.bValid())
+    if (m_hevThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
     }
 
-    if (__pszName)
-        return __bCreateNamed(eInitState, kCIDLib::True);
+    if (m_pszName)
+    {
+        tCIDLib::TBoolean bCreated;
+        return bCreateNamed(eInitState, kCIDLib::True, bManual, bCreated);
+    }
 
-    __hevThis.__pheviThis = new TEventHandleImpl;
-    __hevThis.__pheviThis->c4RefCount = 1;
-    __hevThis.__pheviThis->iSysVSemId = -1;
-    __hevThis.__pheviThis->bSet = (eInitState == tCIDLib::EEventStates::Reset);
+    m_hevThis.m_pheviThis = new TEventHandleImpl;
+    m_hevThis.m_pheviThis->c4RefCount = 1;
+    m_hevThis.m_pheviThis->iSysVSemId = -1;
+    m_hevThis.m_pheviThis->bSet = (eInitState == tCIDLib::EEventStates::Reset);
 
-    ::pthread_mutex_init(&__hevThis.__pheviThis->mtxThis, 0);
+    ::pthread_mutex_init(&m_hevThis.m_pheviThis->mtxThis, 0);
 
-    tCIDLib::TSInt iErr = ::pthread_cond_init(&__hevThis.__pheviThis->condThis, 0);
+    tCIDLib::TSInt iErr = ::pthread_cond_init(&m_hevThis.m_pheviThis->condThis, 0);
     if (iErr)
     {
-        ::pthread_mutex_destroy(&__hevThis.__pheviThis->mtxThis);
-        delete __hevThis.__pheviThis;
-        __hevThis.__pheviThis = 0;
+        ::pthread_mutex_destroy(&m_hevThis.m_pheviThis->mtxThis);
+        delete m_hevThis.m_pheviThis;
+        m_hevThis.m_pheviThis = nullptr;
         TKrnlError::SetLastHostError(iErr);
         return kCIDLib::False;
     }
@@ -252,21 +262,23 @@ tCIDLib::TBoolean TKrnlEvent::bCreate(const tCIDLib::EEventStates eInitState)
 
 
 tCIDLib::TBoolean
-TKrnlEvent::bCreateOrOpen(const tCIDLib::EEventStates eInitState)
+TKrnlEvent::bOpenOrCreate(  const   tCIDLib::EEventStates   eInitState
+                            , const tCIDLib::TBoolean       bManual
+                            ,       tCIDLib::TBoolean&      bCreated)
 {
-    if (__hevThis.bValid())
+    if (m_hevThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
     }
 
-    if (!__pszName)
+    if (!m_pszName)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NullName);
         return kCIDLib::False;
     }
 
-    return __bCreateNamed(eInitState, kCIDLib::False);
+    return bCreateNamed(eInitState, kCIDLib::False, bManual, bCreated);
 }
 
 
@@ -276,20 +288,20 @@ tCIDLib::TBoolean TKrnlEvent::bDuplicate(const TKrnlEvent& kevToDup)
         return kCIDLib::False;
 
     // Clean up the name
-    delete [] __pszName;
-    __pszName = 0;
+    delete [] m_pszName;
+    m_pszName = nullptr;
 
     // Recreate the name
-    if (kevToDup.__pszName)
-        __pszName = TRawStr::pszReplicate(kevToDup.__pszName);
+    if (kevToDup.m_pszName)
+        m_pszName = TRawStr::pszReplicate(kevToDup.m_pszName);
 
     // Duplicate the handle
-    __hevThis = kevToDup.__hevThis;
-    if (__hevThis.bValid())
+    m_hevThis = kevToDup.m_hevThis;
+    if (m_hevThis.bIsValid())
     {
-        ::pthread_mutex_lock(&__hevThis.__pheviThis->mtxThis);
-        __hevThis.__pheviThis->c4RefCount++;
-        ::pthread_mutex_unlock(&__hevThis.__pheviThis->mtxThis);
+        ::pthread_mutex_lock(&m_hevThis.m_pheviThis->mtxThis);
+        m_hevThis.m_pheviThis->c4RefCount++;
+        ::pthread_mutex_unlock(&m_hevThis.m_pheviThis->mtxThis);
     }
 
     return kCIDLib::True;
@@ -298,37 +310,37 @@ tCIDLib::TBoolean TKrnlEvent::bDuplicate(const TKrnlEvent& kevToDup)
 
 tCIDLib::TBoolean TKrnlEvent::bOpen()
 {
-    if (__hevThis.bValid())
+    if (m_hevThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
     }
 
-    if (!__pszName)
+    if (!m_pszName)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NullName);
         return kCIDLib::False;
     }
 
-    __hevThis.__pheviThis = new TEventHandleImpl;
-    __hevThis.__pheviThis->c4RefCount = 1;
+    m_hevThis.m_pheviThis = new TEventHandleImpl;
+    m_hevThis.m_pheviThis->c4RefCount = 1;
 
     tCIDLib::TSInt iFlags = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-    key_t key = TRawStr::hshHashStr(__pszName, kCIDLib::i4MaxInt);
+    key_t key = TRawStr::hshHashStr(m_pszName, kCIDLib::i4MaxInt);
 
     tCIDLib::TSInt iTmp = ::semget(key, 0, iFlags);
     if (iTmp == -1)
     {
-        delete __hevThis.__pheviThis;
-        __hevThis.__pheviThis = 0;
+        delete m_hevThis.m_pheviThis;
+        m_hevThis.m_pheviThis = 0;
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
 
-    ::pthread_mutex_init(&__hevThis.__pheviThis->mtxThis, 0);
+    ::pthread_mutex_init(&m_hevThis.m_pheviThis->mtxThis, 0);
 
-    __hevThis.__pheviThis->iSysVSemId = iTmp;
-    __hevThis.__pheviThis->bSysVOwner = kCIDLib::False;
+    m_hevThis.m_pheviThis->iSysVSemId = iTmp;
+    m_hevThis.m_pheviThis->bSysVOwner = kCIDLib::False;
 
     return kCIDLib::True;
 }
@@ -336,18 +348,18 @@ tCIDLib::TBoolean TKrnlEvent::bOpen()
 
 tCIDLib::TBoolean TKrnlEvent::bReset()
 {
-    if (!__hevThis.bValid())
+    if (!m_hevThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
     }
 
-    if (__hevThis.__pheviThis->iSysVSemId != -1)
+    if (m_hevThis.m_pheviThis->iSysVSemId != -1)
     {
         union semun SemUnion;
         SemUnion.val = 1;
 
-        if (::semctl(__hevThis.__pheviThis->iSysVSemId
+        if (::semctl(m_hevThis.m_pheviThis->iSysVSemId
                      , 0
                      , SETVAL
                      , SemUnion))
@@ -358,11 +370,11 @@ tCIDLib::TBoolean TKrnlEvent::bReset()
     }
     else
     {
-        ::pthread_mutex_lock(&__hevThis.__pheviThis->mtxThis);
+        ::pthread_mutex_lock(&m_hevThis.m_pheviThis->mtxThis);
 
-        __hevThis.__pheviThis->bSet = kCIDLib::True;
+        m_hevThis.m_pheviThis->bSet = kCIDLib::True;
 
-        ::pthread_mutex_unlock(&__hevThis.__pheviThis->mtxThis);
+        ::pthread_mutex_unlock(&m_hevThis.m_pheviThis->mtxThis);
     }
 
     return kCIDLib::True;
@@ -371,7 +383,7 @@ tCIDLib::TBoolean TKrnlEvent::bReset()
 
 tCIDLib::TBoolean TKrnlEvent::bSetName(const tCIDLib::TCh* const pszName)
 {
-    if (__hevThis.bValid())
+    if (m_hevThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
@@ -383,8 +395,8 @@ tCIDLib::TBoolean TKrnlEvent::bSetName(const tCIDLib::TCh* const pszName)
         return kCIDLib::False;
     }
 
-    delete [] __pszName;
-    __pszName = TRawStr::pszReplicate(pszName);
+    delete [] m_pszName;
+    m_pszName = TRawStr::pszReplicate(pszName);
 
     return kCIDLib::True;
 }
@@ -392,18 +404,18 @@ tCIDLib::TBoolean TKrnlEvent::bSetName(const tCIDLib::TCh* const pszName)
 
 tCIDLib::TBoolean TKrnlEvent::bTrigger()
 {
-    if (!__hevThis.bValid())
+    if (!m_hevThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
     }
 
-    if (__hevThis.__pheviThis->iSysVSemId != -1)
+    if (m_hevThis.m_pheviThis->iSysVSemId != -1)
     {
         union semun SemUnion;
         SemUnion.val = 0;
 
-        if (::semctl(__hevThis.__pheviThis->iSysVSemId
+        if (::semctl(m_hevThis.m_pheviThis->iSysVSemId
                      , 0
                      , SETVAL
                      , SemUnion))
@@ -414,12 +426,12 @@ tCIDLib::TBoolean TKrnlEvent::bTrigger()
     }
     else
     {
-        ::pthread_mutex_lock(&__hevThis.__pheviThis->mtxThis);
+        ::pthread_mutex_lock(&m_hevThis.m_pheviThis->mtxThis);
 
-        __hevThis.__pheviThis->bSet = kCIDLib::False;
-        ::pthread_cond_broadcast(&__hevThis.__pheviThis->condThis);
+        m_hevThis.m_pheviThis->bSet = kCIDLib::False;
+        ::pthread_cond_broadcast(&m_hevThis.m_pheviThis->condThis);
 
-        ::pthread_mutex_unlock(&__hevThis.__pheviThis->mtxThis);
+        ::pthread_mutex_unlock(&m_hevThis.m_pheviThis->mtxThis);
     }
 
     return kCIDLib::True;
@@ -428,7 +440,7 @@ tCIDLib::TBoolean TKrnlEvent::bTrigger()
 
 tCIDLib::TBoolean TKrnlEvent::bWaitFor(const tCIDLib::TCard4 c4Wait)
 {
-    if (!__hevThis.bValid())
+    if (!m_hevThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
@@ -436,14 +448,14 @@ tCIDLib::TBoolean TKrnlEvent::bWaitFor(const tCIDLib::TCard4 c4Wait)
 
     if (c4Wait == kCIDLib::c4MaxWait)
     {
-        if (__hevThis.__pheviThis->iSysVSemId != -1)
+        if (m_hevThis.m_pheviThis->iSysVSemId != -1)
         {
             struct sembuf SemBuf;
             SemBuf.sem_num = 0;
             SemBuf.sem_op = 0;
             SemBuf.sem_flg = 0;
 
-            if (::semop(__hevThis.__pheviThis->iSysVSemId
+            if (::semop(m_hevThis.m_pheviThis->iSysVSemId
                         , &SemBuf
                         , 1))
             {
@@ -453,16 +465,16 @@ tCIDLib::TBoolean TKrnlEvent::bWaitFor(const tCIDLib::TCard4 c4Wait)
         }
         else
         {
-            ::pthread_mutex_lock(&__hevThis.__pheviThis->mtxThis);
+            ::pthread_mutex_lock(&m_hevThis.m_pheviThis->mtxThis);
 
             tCIDLib::TOSErrCode HostErr = 0;
-            while (__hevThis.__pheviThis->bSet && !HostErr)
+            while (m_hevThis.m_pheviThis->bSet && !HostErr)
             {
-                HostErr = ::pthread_cond_wait(&__hevThis.__pheviThis->condThis
-                                              , &__hevThis.__pheviThis->mtxThis);
+                HostErr = ::pthread_cond_wait(&m_hevThis.m_pheviThis->condThis
+                                              , &m_hevThis.m_pheviThis->mtxThis);
             }
 
-            ::pthread_mutex_unlock(&__hevThis.__pheviThis->mtxThis);
+            ::pthread_mutex_unlock(&m_hevThis.m_pheviThis->mtxThis);
 
             if (HostErr)
             {
@@ -474,7 +486,7 @@ tCIDLib::TBoolean TKrnlEvent::bWaitFor(const tCIDLib::TCard4 c4Wait)
     }
     else
     {
-        if (__hevThis.__pheviThis->iSysVSemId != -1)
+        if (m_hevThis.m_pheviThis->iSysVSemId != -1)
         {
             TKrnlLinux::TThreadTimer thtWaitFor(c4Wait);
 
@@ -486,7 +498,7 @@ tCIDLib::TBoolean TKrnlEvent::bWaitFor(const tCIDLib::TCard4 c4Wait)
             if (!thtWaitFor.bBegin())
                 return kCIDLib::False;
 
-            if (::semop(__hevThis.__pheviThis->iSysVSemId
+            if (::semop(m_hevThis.m_pheviThis->iSysVSemId
                         , &SemBuf
                         , 1))
             {
@@ -503,17 +515,17 @@ tCIDLib::TBoolean TKrnlEvent::bWaitFor(const tCIDLib::TCard4 c4Wait)
             TimeSpec.tv_sec = ::time(0) + (c4Wait / 1000);
             TimeSpec.tv_nsec = (c4Wait % 1000) * 1000000;
 
-            ::pthread_mutex_lock(&__hevThis.__pheviThis->mtxThis);
+            ::pthread_mutex_lock(&m_hevThis.m_pheviThis->mtxThis);
 
             tCIDLib::TOSErrCode HostErr = 0;
-            while (__hevThis.__pheviThis->bSet && !HostErr)
+            while (m_hevThis.m_pheviThis->bSet && !HostErr)
             {
-                HostErr = ::pthread_cond_timedwait(&__hevThis.__pheviThis->condThis
-                                                   , &__hevThis.__pheviThis->mtxThis
+                HostErr = ::pthread_cond_timedwait(&m_hevThis.m_pheviThis->condThis
+                                                   , &m_hevThis.m_pheviThis->mtxThis
                                                    , &TimeSpec);
             }
 
-            ::pthread_mutex_unlock(&__hevThis.__pheviThis->mtxThis);
+            ::pthread_mutex_unlock(&m_hevThis.m_pheviThis->mtxThis);
 
             if (HostErr)
             {
@@ -548,11 +560,13 @@ tCIDLib::TBoolean TKrnlEvent::bWaitFor(const tCIDLib::TCard4 c4Wait)
 //  RETURN: kCIDLib::True if successful, else kCIDLib::False.
 //
 tCIDLib::TBoolean
-TKrnlEvent::__bCreateNamed( const   tCIDLib::EEventStates eInitState
-                            , const tCIDLib::TBoolean     bFailIfExists)
+TKrnlEvent::bCreateNamed(const  tCIDLib::EEventStates eInitState
+                        , const tCIDLib::TBoolean     bFailIfExists
+                        , const tCIDLib::TBoolean     bManual
+                        ,       tCIDLib::TBoolean&    bCreated)
 {
     tCIDLib::TSInt iFlags = IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-    key_t key = TRawStr::hshHashStr(__pszName, kCIDLib::i4MaxInt);
+    key_t key = TRawStr::hshHashStr(m_pszName, kCIDLib::i4MaxInt);
     tCIDLib::TBoolean bOwner = kCIDLib::False;
 
     tCIDLib::TSInt iTmp = ::semget(key, 1, iFlags);
@@ -580,6 +594,9 @@ TKrnlEvent::__bCreateNamed( const   tCIDLib::EEventStates eInitState
             TKrnlError::SetLastHostError(errno);
             return kCIDLib::False;
         }
+
+        // Not created, we opened an existing one
+        bCreated = kCIDLib::False;
     }
     else
     {
@@ -594,15 +611,18 @@ TKrnlEvent::__bCreateNamed( const   tCIDLib::EEventStates eInitState
             ::semctl(iTmp, 0, IPC_RMID, SemUnion);
             return kCIDLib::False;
         }
+
+        // We created a new one
+        bCreated = kCIDLib::True;        
     }
 
-    __hevThis.__pheviThis = new TEventHandleImpl;
-    __hevThis.__pheviThis->c4RefCount = 1;
-    __hevThis.__pheviThis->iSysVSemId = iTmp;
-    __hevThis.__pheviThis->bSysVOwner = bOwner;
-    __hevThis.__pheviThis->bSet = (eInitState == tCIDLib::EEventStates::Reset);
+    m_hevThis.m_pheviThis = new TEventHandleImpl;
+    m_hevThis.m_pheviThis->c4RefCount = 1;
+    m_hevThis.m_pheviThis->iSysVSemId = iTmp;
+    m_hevThis.m_pheviThis->bSysVOwner = bOwner;
+    m_hevThis.m_pheviThis->bSet = (eInitState == tCIDLib::EEventStates::Reset);
 
-    ::pthread_mutex_init(&__hevThis.__pheviThis->mtxThis, 0);
+    ::pthread_mutex_init(&m_hevThis.m_pheviThis->mtxThis, 0);
 
     return kCIDLib::True;
 }

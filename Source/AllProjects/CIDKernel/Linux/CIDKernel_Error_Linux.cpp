@@ -243,7 +243,7 @@ namespace
 //  TCIDKrnlModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid
-TCIDKrnlModule::__InitTermError(const tCIDLib::EInitTerm eInitTerm)
+TCIDKrnlModule::InitTermError(const tCIDLib::EInitTerm eInitTerm)
 {
     if (eInitTerm == tCIDLib::EInitTerm::Initialize)
     {

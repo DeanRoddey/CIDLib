@@ -87,3 +87,18 @@ CIDStrOp_CalcMBSize(const tCIDLib::TCh* const pszSrc, tCIDLib::TCard4& c4OutByte
     return kCIDLib::False;
 }
 
+
+tCIDLib::TBoolean
+CIDStrOp_CalcWCSize(const tCIDLib::TSCh* const pszSrc, tCIDLib::TCard4& c4OutBytes)
+{
+    mbstate_t state;
+    ::memset(&state, 0, sizeof state);
+    const int iRes = ::mbsrtowcs(0, (tCIDLib::TSCh**)&pszSrc, 0, &state);
+    if (iRes >= 0)
+    {
+        c4OutBytes = tCIDLib::TCard4(iRes);
+        return kCIDLib::True;
+    }
+    return kCIDLib::False;
+}
+

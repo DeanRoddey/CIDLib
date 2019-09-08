@@ -40,18 +40,18 @@
 //  TKrnlCritSec: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlCritSec::TKrnlCritSec() :
-    __pData(0)
+    m_pData(0)
 {
     TKrnlLinux::TRecursiveMutex* prmtxThis =
         new TKrnlLinux::TRecursiveMutex();
     prmtxThis->iInitialize();
-    __pData = prmtxThis;
+    m_pData = prmtxThis;
 }
 
 TKrnlCritSec::~TKrnlCritSec()
 {
     TKrnlLinux::TRecursiveMutex* prmtxThis =
-        static_cast<TKrnlLinux::TRecursiveMutex*>(__pData);
+        static_cast<TKrnlLinux::TRecursiveMutex*>(m_pData);
     prmtxThis->iDestroy();
     delete prmtxThis;
 }
@@ -63,7 +63,7 @@ TKrnlCritSec::~TKrnlCritSec()
 tCIDLib::TVoid TKrnlCritSec::Enter() const
 {
     TKrnlLinux::TRecursiveMutex* prmtxThis =
-        static_cast<TKrnlLinux::TRecursiveMutex*>(__pData);
+        static_cast<TKrnlLinux::TRecursiveMutex*>(m_pData);
     prmtxThis->iLock();
 }
 
@@ -71,6 +71,6 @@ tCIDLib::TVoid TKrnlCritSec::Enter() const
 tCIDLib::TVoid TKrnlCritSec::Exit() const
 {
     TKrnlLinux::TRecursiveMutex* prmtxThis =
-        static_cast<TKrnlLinux::TRecursiveMutex*>(__pData);
+        static_cast<TKrnlLinux::TRecursiveMutex*>(m_pData);
     prmtxThis->iUnlock();
 }
