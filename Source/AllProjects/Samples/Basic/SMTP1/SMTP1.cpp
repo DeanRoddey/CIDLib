@@ -93,7 +93,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
     // Output a little program blurb
     conOut  << L"\nSMTP.Exe\n"
-            << L"CIDLib SMTP Demo #1\n" << kCIDLib::EndLn;
+            << L"CIDLib SMTP Sample #1\n" << kCIDLib::EndLn;
 
     // Parse and validate the parameters
     tCIDLib::TBoolean   bSecure;
@@ -147,7 +147,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     conOut << L"Enter 'From' Address: " << kCIDLib::FlushIt;
     TString strFromAddr;
     if (!conIn.c4GetLine(strFromAddr))
-        return tCIDLib::EExitCodes::NotFound;
+        return tCIDLib::EExitCodes::Normal;
     strFromAddr.StripWhitespace();
 
     //
@@ -157,13 +157,13 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     conOut << L"Enter 'To' Address: " << kCIDLib::FlushIt;
     TString strToAddr;
     if (!conIn.c4GetLine(strToAddr))
-        return tCIDLib::EExitCodes::NotFound;
+        return tCIDLib::EExitCodes::Normal;
     strToAddr.StripWhitespace();
 
     conOut << L" Topic: " << kCIDLib::FlushIt;
     TString strTopic;
     if (!conIn.c4GetLine(strTopic))
-        return tCIDLib::EExitCodes::NotFound;
+        return tCIDLib::EExitCodes::Normal;
 
     // Get the messages which is multi-line
     conOut  << L"  Enter Msg (End with a '.' on a line by itself):\n"
