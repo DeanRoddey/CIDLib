@@ -47,6 +47,270 @@ namespace CIDLib_SystemInfo
 }
 
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TCmdLine
+// PREFIX: cmdl
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TCmdLine: Constructors and destructor
+// ---------------------------------------------------------------------------
+TCmdLine::TCmdLine(const tCIDLib::TCh chOptionChar) :
+
+    m_bRemoveConsumed(kCIDLib::False)
+{
+    TString strCurParm;
+    TString strVal;
+    TSysInfo::TCmdLineCursor cursParms = TSysInfo::cursCmdLineParms();
+    for (; cursParms; ++cursParms)
+    {
+        strCurParm = *cursParms;
+
+        if (strCurParm[0] == chOptionChar)
+        {
+            // Cut the slash off
+            strCurParm.Cut(0, 1);
+
+            //
+            //  Split it on an equal sign if it has one. If so, it's an option with a
+            //  value, else an option without one.
+            //
+            if (strCurParm.bSplit(strVal, kCIDLib::chEquals))
+            {
+                // An option with a value
+                m_colList.objPlace(strCurParm, strVal);
+            }
+             else
+            {
+                // An option but no value
+                m_colList.objPlace(strCurParm, kCIDLib::True);
+            }
+        }
+         else
+        {
+            // Not an option type
+            m_colList.objPlace(strCurParm, kCIDLib::False);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+//  TCmdLine: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+
+// Some helpers to find specific types of parameters by name
+tCIDLib::TBoolean TCmdLine::bFindOption(const TString& strName)
+{
+    const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TCmdLineParm& cmdlpCur = m_colList[c4Index];
+        if ((cmdlpCur.eType() == tCIDLib::ECmdLnPTypes::Option)
+        &&  cmdlpCur.strName().bCompareI(strName))
+        {
+            if (m_bRemoveConsumed)
+                m_colList.RemoveAt(c4Index);
+            return kCIDLib::True;
+        }
+    }
+    return kCIDLib::False;
+}
+
+
+//
+//  For these, return is found or not found, and bad value or out of range
+//  cause an exception.
+//
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const  TString&            strName
+                        ,       tCIDLib::TCard4&    c4Val
+                        , const tCIDLib::TCard4     c4MinVal
+                        , const tCIDLib::TCard4     c4MaxVal
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Call the other version to see if have the option value
+    TString strVal;
+    if (!bFindOptionVal(strName, strVal))
+        return kCIDLib::False;
+
+    if (!strVal.bToCard4(c4Val, eRadix))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcSysI_ConvertArg
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , strName
+            , TString(L"unsigned integer")
+        );
+    }
+
+    if ((c4Val < c4MinVal) || (c4Val > c4MaxVal))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcSysI_ConvertArg
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , strName
+            , TCardinal(c4MinVal)
+            , TCardinal(c4MaxVal)
+        );
+    }
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const  TString&            strName
+                        ,       tCIDLib::TInt4&     i4Val
+                        , const tCIDLib::TInt4      i4MinVal
+                        , const tCIDLib::TInt4      i4MaxVal
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Call the other version to see if have the option value
+    TString strVal;
+    if (!bFindOptionVal(strName, strVal))
+        return kCIDLib::False;
+
+    if (!strVal.bToInt4(i4Val, eRadix))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcSysI_ConvertArg
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , strName
+            , TString(L"signed integer")
+        );
+    }
+
+    if ((i4Val < i4MinVal) || (i4Val > i4MaxVal))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcSysI_ConvertArg
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , strName
+            , TInteger(i4MinVal)
+            , TInteger(i4MaxVal)
+        );
+    }
+    return kCIDLib::True;
+}
+
+
+// False here means a bad value, else we get found value/default value and return true
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const  TString&            strName
+                        ,       tCIDLib::TCard4&    c4Val
+                        , const tCIDLib::TCard4     c4DefVal
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Call the other version to see if have the option value
+    TString strVal;
+    if (!bFindOptionVal(strName, strVal))
+    {
+        c4Val = c4DefVal;
+        return kCIDLib::True;
+    }
+    return strVal.bToCard4(c4Val, eRadix);
+}
+
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const  TString&            strName
+                        ,       tCIDLib::TInt4&     i4Val
+                        , const tCIDLib::TInt4      i4DefVal
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Call the other version to see if have the option value
+    TString strVal;
+    if (!bFindOptionVal(strName, strVal))
+    {
+        i4Val = i4DefVal;
+        return kCIDLib::True;
+    }
+
+    return strVal.bToInt4(i4Val, eRadix);
+}
+
+
+//
+//  Find an option with a string value. Here we return found or not found status.
+//  A lot of the others above call this one, so we handle the 'remove if consumed'
+//  option for them, else they would try to do it again.
+//
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const TString& strName, TString& strValue)
+{
+    const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TCmdLineParm& cmdlpCur = m_colList[c4Index];
+        if ((cmdlpCur.eType() == tCIDLib::ECmdLnPTypes::OptionVal)
+        &&  cmdlpCur.strName().bCompareI(strName))
+        {
+            strValue = cmdlpCur.strValue();
+
+            // DO THIS AFTER we get the value out above of course
+            if (m_bRemoveConsumed)
+                m_colList.RemoveAt(c4Index);
+            return kCIDLib::True;
+        }
+    }
+    return kCIDLib::False;
+}
+
+
+//
+//  This one DOES NOT remove the parameter if the 'remove if consumed' flag is set
+//  since it doesn't consume the parameter. So we can't call bFindOptionVal() above,
+//  we have to do our own search.
+//
+tCIDLib::TBoolean TCmdLine::bOptionExists(const TString& strName) const
+{
+        const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TCmdLineParm& cmdlpCur = m_colList[c4Index];
+        if ((cmdlpCur.eType() == tCIDLib::ECmdLnPTypes::OptionVal)
+        &&  cmdlpCur.strName().bCompareI(strName))
+        {
+            return kCIDLib::True;
+        }
+    }
+    return kCIDLib::False;
+}
+
+
+// The one at the indicated index must be a value type
+tCIDLib::TBoolean TCmdLine::bValueAt(const tCIDLib::TCard4 c4At, TString& strValue)
+{
+    const TCmdLineParm& cmdlpAt = m_colList[c4At];
+    if (cmdlpAt.eType() != tCIDLib::ECmdLnPTypes::Value)
+        return kCIDLib::False;
+
+    strValue = cmdlpAt.strValue();
+
+    // DO THIS AFTER we get the value out above of course
+    if (m_bRemoveConsumed)
+        m_colList.RemoveAt(c4At);
+
+    return kCIDLib::True;
+}
+
+
+
+
 // ---------------------------------------------------------------------------
 //   CLASS: TSysInfo
 //  PREFIX: sysi
@@ -561,55 +825,6 @@ tCIDLib::TVoid TSysInfo::SetNSAddr( const   TString&            strDNSAddr
     s_pstrNSAddr = new TString(strDNSAddr);
     s_pstrNSAddr->Append(kCIDLib::chColon);
     s_pstrNSAddr->AppendFormatted(ippnToUse);
-}
-
-
-//
-//  This does a standard CIDLib style command line parameter parse. It will
-//  check each parameter. If it starts with an / it considers that an option.
-//  If it's in the form /x=y, then it's an option with a value. Otherwise it's
-//  just a value. It strips them down to key/value pairs, removing the slash
-//  and equal signs. It fills in a collection of key/value/flag objects. If
-//  one is an option, it set the flag, else it clears it.
-//
-tCIDLib::TCard4 TSysInfo::c4StdCmdLineParse(tCIDLib::TKVPFCollect& colToFill)
-{
-    colToFill.RemoveAll();
-
-    TString strCurParm;
-    TString strVal;
-    TSysInfo::TCmdLineCursor cursParms = cursCmdLineParms();
-    for (; cursParms; ++cursParms)
-    {
-        strCurParm = *cursParms;
-
-        if (strCurParm[0] == kCIDLib::chForwardSlash)
-        {
-            // Cut the slash off
-            strCurParm.Cut(0, 1);
-
-            //
-            //  Split it on an equal sign if it has one. If so, it's an option with a
-            //  value, else an option without one.
-            //
-            if (strCurParm.bSplit(strVal, kCIDLib::chEquals))
-            {
-                // An option with a value
-                colToFill.objAdd(TKeyValFPair(strCurParm, strVal, kCIDLib::True));
-            }
-             else
-            {
-                // An option but no value
-                colToFill.objAdd(TKeyValFPair(strCurParm, TString::strEmpty(), kCIDLib::True));
-            }
-        }
-         else
-        {
-            // Not an option type
-            colToFill.objAdd(TKeyValFPair(strCurParm, TString::strEmpty()));
-        }
-    }
-    return colToFill.c4ElemCount();
 }
 
 

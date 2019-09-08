@@ -94,6 +94,28 @@ class TString;
 namespace tCIDLib
 {
     // -----------------------------------------------------------------------
+    //  Used by the standard command line parameter parsing stuff in TSysInfo
+    // -----------------------------------------------------------------------
+    enum class ECmdLnPTypes
+    {
+        Value
+        , Option
+        , OptionVal
+
+        , Count
+    };
+
+    enum class ECmdLnPRes
+    {
+        NotFound
+        , BadValue
+        , Found
+
+        , Count
+    };
+
+
+    // -----------------------------------------------------------------------
     //  Our CIDLib logging flags. These are used to turn off and on logging in the
     //  stats cache item that our facility object creates. It provides a helper
     //  method to get/set those flags. These enum values are bit indices into the

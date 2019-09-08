@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd - 2019
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -34,13 +34,14 @@ namespace kCIDLib
     //  File system constants
     // -----------------------------------------------------------------------
     const tCIDLib::TCard4           c4MaxPathLen    = 255;
+    const tCIDLib::TCh              chMultiPathSep  = L':';
+    const tCIDLib::TCh              chDefParmSep    = L'-';
     const tCIDLib::TCh* const       pszAllFilesSpec = L"*";
     const tCIDLib::TCh* const       pszAllDirsSpec  = L"*";
     const tCIDLib::TCh* const       szWhitespace    = L"\r\n\t\a\f\v ";
     const tCIDLib::TCh* const       szExtSeparator  = L".";
     const tCIDLib::TCh* const       szExeExtension  = L"";
-    const tCIDLib::TCh* const       szLibExtension  = L".so";    
-    const tCIDLib::TCh              chMultiPathSep  = L':';
+    const tCIDLib::TCh* const       szLibExtension  = L".so";
     const tCIDLib::TCh* const       szMultiPathSep  = L":";
     const tCIDLib::TCh              chPathSep       = L'/';
     const tCIDLib::TCh* const       szSysExePath    = L"PATH";

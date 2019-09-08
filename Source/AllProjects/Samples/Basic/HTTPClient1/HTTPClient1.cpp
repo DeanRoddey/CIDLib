@@ -63,7 +63,7 @@ CIDLib_MainModule(TThread(L"HTTPClient1MainThread", eMainThreadFunc))
 static tCIDLib::TVoid ShowUsage(TTextOutStream& strmOut)
 {
     strmOut << L"Usage:\n"
-                L"   HTTPClient1 /URL=url [/Fmt=[MIMETYPE] /Close]\n\n"
+                L"   HTTPClient1 url [/Fmt=[MIMETYPE] /Close]\n\n"
                 L"   /Fmt= indicates an 'accept' MIME type, else it accepts text\n"
                 L"   /URL= indicates a fully qualified URL to GET\n"
             << kCIDLib::FlushIt;
@@ -83,55 +83,39 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             << L"CIDLib HTTP Client Demo #1\n" << kCIDLib::EndLn;
 
     // Input values, which will be set/overridden by parms
-    TString strRetFmt = L"text/*";
+    TString strRetFmt;
     TString strURLText;
 
     //
-    //  Get the parameters and set up the URL. It should be a fully
-    //  qualified URL. These all fit the standard form for CIDLib params,
-    //  so we can call a little helper that will pre-parse them for us. It
-    //  uses the key/value/flag type, where the flag is false if was an
-    //  'option' parameter i.e. just /XXX, and true if a value param, i.e.
-    //  /XXX=YYY
+    //  Get the parameters and set up the URL. Tell it remove consumed params
+    //  so that we can check for unknown ones.
     //
-    tCIDLib::TKVPFList colParms;
-    const tCIDLib::TCard4 c4ParmCnt = TSysInfo::c4StdCmdLineParse(colParms);
-    if ((c4ParmCnt < 1) || (c4ParmCnt > 2))
     {
-        ShowUsage(strmOut);
-        return tCIDLib::EExitCodes::BadParameters;
-    }
-
-    // We have the right number, so iterate them and store the info away.
-    const tCIDLib::TBoolean bBadParm = !colParms.bForEach
-    (
-        [&](const TKeyValFPair& kvalfCur)
+        TCmdLine cmdlLoad;
+        cmdlLoad.bRemoveConsumed(kCIDLib::True);
+        if ((cmdlLoad.c4ParmCount() < 1) || (cmdlLoad.c4ParmCount() > 2))
         {
-            tCIDLib::TBoolean bGood = kCIDLib::False;
-            if (kvalfCur.strKey().bCompareI(L"Fmt"))
-            {
-                if (kvalfCur.bFlag())
-                {
-                    strRetFmt = kvalfCur.strValue();
-                    bGood = kCIDLib::True;
-                }
-            }
-             else if (kvalfCur.strKey().bCompareI(L"URL"))
-            {
-                if (kvalfCur.bFlag())
-                {
-                    strURLText = kvalfCur.strValue();
-                    bGood = kCIDLib::True;
-                }
-            }
-            return bGood;
+            ShowUsage(strmOut);
+            return tCIDLib::EExitCodes::BadParameters;
         }
-    );
 
-    if (bBadParm || strURLText.bIsEmpty())
-    {
-        ShowUsage(strmOut);
-        return tCIDLib::EExitCodes::BadParameters;
+        // The 0th one is a value parameter that contains the URL
+        if (!cmdlLoad.bValueAt(0, strURLText))
+        {
+            ShowUsage(strmOut);
+            return tCIDLib::EExitCodes::BadParameters;
+        }
+
+        // If no format set, default it
+        if (!cmdlLoad.bFindOptionVal(L"Fmt", strRetFmt))
+             strRetFmt = L"text/*";
+
+        // If any left, they are unknown ones
+        if (!cmdlLoad.bIsEmpty())
+        {
+            ShowUsage(strmOut);
+            return tCIDLib::EExitCodes::BadParameters;
+        }
     }
 
     //
@@ -169,8 +153,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //
     //  We have to create a data source in order to use the redirect aware
     //  get, because it requires creating multiple connections potentially.
-    //  we create a regular socket based one or a secure one, depending on
-    //  the URL protocol. For simple source creation there's a helper
+    //  We create a regular socket based one or a secure one, depending on
+    //  the URL protocol. For simple source creation there's a helper that
+    //  will do this for us
     //
     TCIDDataSrcJan janSrc
     (

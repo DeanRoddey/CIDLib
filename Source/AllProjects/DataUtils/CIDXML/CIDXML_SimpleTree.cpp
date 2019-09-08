@@ -470,8 +470,12 @@ tCIDLib::TVoid TXMLTreeDecl::PrintTo(       TTextOutStream&     strmTarget
     strmTarget  << TTextOutStream::RepChars(kCIDLib::chSpace, c4Indent * 4)
                 << L"<?xml version='" << m_strVersion << L"'";
 
-    if (!m_strEncoding.bIsEmpty())
-        strmTarget << L" encoding='" << m_strEncoding << L"'";
+    //
+    //  Note that we don't use the encoding in the original decl. We use the
+    //  encoding set on the passed stream because that insures what we put
+    //  out matches reality.
+    //
+    strmTarget << L" encoding='" << strmTarget.strEncodingName() << L"'";
 
     if (!m_strStandalone.bIsEmpty())
         strmTarget << L" standalone='" << m_strStandalone << L"'";

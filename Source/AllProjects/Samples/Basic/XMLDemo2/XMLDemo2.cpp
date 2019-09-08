@@ -74,6 +74,7 @@ static tCIDLib::TVoid ShowUsage()
                L"          /InFile=xxx\n"
                L"          /OutFile=xxx\n"
                L"          /IgnoreBadChars\n"
+               L"          /Encoding=xxx\n"
                L"          /MemTest\n"
                L"          /Validate\n"
                L"          /IgnoreDTD\n\n"
@@ -139,46 +140,34 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     tCIDXML::EParseOpts eOptsToUse = tCIDXML::EParseOpts::None;
     TString             strInFileParm;
     TString             strOutFileParm;
-    TString             strEncoding(L"UTF-8");
+    TString             strEncoding;
     {
-        //
-        //  Do a standard CIDLib style command line parse. These should all be option
-        //  type parameters (start with /, which means the flag should be set on all
-        //  of them.)
-        //
-        tCIDLib::TKVPFList colParms;
-        TSysInfo::c4StdCmdLineParse(colParms);
-        tCIDLib::TKVPFList::TCursor cursParms = tCIDLib::TKVPFList::TCursor(&colParms);
-        for (; cursParms && bParmsOK; ++cursParms)
-        {
-            const TKeyValFPair& kvalfCur = *cursParms;
-            if (!kvalfCur.bFlag())
-            {
-                // Wasn't option style, so can't be good
-                bParmsOK = kCIDLib::False;
-                break;
-            }
+        // Tell it to remove consumed parms so we can check for unknown ones
+        TCmdLine cmdlLoad;
+        cmdlLoad.bRemoveConsumed(kCIDLib::True);
 
-            if (kvalfCur.strKey().bCompareI(L"InFile"))
-                strInFileParm = kvalfCur.strValue();
-            else if (kvalfCur.strKey().bCompareI(L"OutFile"))
-                strOutFileParm = kvalfCur.strValue();
-            else if (kvalfCur.strKey().bCompareI(L"IgnoreBadChars"))
-                eOptsToUse |= tCIDXML::EParseOpts::IgnoreBadChars;
-            else if (kvalfCur.strKey().bCompareI(L"IgnoreDTD"))
-                eOptsToUse |= tCIDXML::EParseOpts::IgnoreDTD;
-            else if (kvalfCur.strKey().bCompareI(L"Validate"))
-                eOptsToUse |= tCIDXML::EParseOpts::Validate;
-            else
-            {
-                conOut << L"\nUnknown parameter '" << kvalfCur.strKey()
-                         << L"'" << kCIDLib::NewEndLn;
-                bParmsOK = kCIDLib::False;
-            }
+        // The input file is required
+        if (!cmdlLoad.bFindOptionVal(L"InFile", strInFileParm))
+        {
+            ShowUsage();
+            return tCIDLib::EExitCodes::BadParameters;
         }
 
-        // If no file name or bad parms in general, then missing something
-        if (strInFileParm.bIsEmpty() || !bParmsOK)
+        // Values that are option or defaulted if not set
+        cmdlLoad.bFindOptionVal(L"OutFile", strOutFileParm);
+        if (!cmdlLoad.bFindOptionVal(L"Encoding", strEncoding))
+            strEncoding = L"UTF-8";
+
+        // These are just option flags
+        if (cmdlLoad.bFindOption(L"IgnoreBadChars"))
+            eOptsToUse |= tCIDXML::EParseOpts::IgnoreBadChars;
+        if (cmdlLoad.bFindOption(L"IgnoreDTD"))
+            eOptsToUse |= tCIDXML::EParseOpts::IgnoreDTD;
+        if (cmdlLoad.bFindOption(L"Validate"))
+            eOptsToUse |= tCIDXML::EParseOpts::Validate;
+
+        // If any left, they are unknown ones
+        if (!cmdlLoad.bIsEmpty())
         {
             ShowUsage();
             return tCIDLib::EExitCodes::BadParameters;

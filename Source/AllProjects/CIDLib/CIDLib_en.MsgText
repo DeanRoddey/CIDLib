@@ -562,7 +562,9 @@ ERRORS=
     errcSysI_GetCmdLineParm     3454    Could not get command line parameter %(1)
     errcSysI_RemoveCmdLineParm  3455    Could not remove command line parameter %(1)
     errcSysI_QuerySpecialPath   3456    Could not get special path
-    errcSysInfo_BadArgIndex     3457    %(1) is not a valid command line argument index. Count=%(2)
+    errcSysI_BadArgIndex        3457    %(1) is not a valid command line argument index. Count=%(2)
+    errcSysI_ConvertArg         3458    Could not convert parameter %(1) to %(2)
+    errcSysI_ArgRange           3459    Parameter %(1) must be in the range %(2) to %(3)
 
     ; Text converter errors
     errcTCvt_Unrepresentable    3600    '%(1)' is not representable in the encoding '%(2)'

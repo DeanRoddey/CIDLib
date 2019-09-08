@@ -30,6 +30,223 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+class TCmdLine;
+
+// ---------------------------------------------------------------------------
+//  CLASS: TCmdLineParm
+// PREFIX: cmdlp
+// ---------------------------------------------------------------------------
+class TCmdLineParm
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TCmdLineParm();
+
+        TCmdLineParm(const  TString&            strText
+                    , const tCIDLib::TBoolean   bOption)
+
+        {
+            if (bOption)
+            {
+                // Valueless options have no value just a name
+                m_eType = tCIDLib::ECmdLnPTypes::Option;
+                m_strName = strText;
+            }
+            else
+            {
+                // Values have no name, just a value
+                m_eType = tCIDLib::ECmdLnPTypes::Value;
+                m_strValue = strText;
+            }
+        }
+
+        TCmdLineParm(const TString& strName, const TString& strValue) :
+
+            m_eType(tCIDLib::ECmdLnPTypes::OptionVal)
+            , m_strName(strName)
+            , m_strValue(strValue)
+        {
+        }
+
+        TCmdLineParm(const TCmdLineParm&) = default;
+        TCmdLineParm(TCmdLineParm&&) = default;
+
+        ~TCmdLineParm() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        tCIDLib::ECmdLnPTypes eType() const
+        {
+            return m_eType;
+        }
+
+        const TString& strName() const
+        {
+            return m_strName;
+        }
+
+        const TString& strValue() const
+        {
+            return m_strValue;
+        }
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  The containing class below is a friend
+        // -------------------------------------------------------------------
+        friend class TCmdLine;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        // -------------------------------------------------------------------
+        tCIDLib::ECmdLnPTypes   m_eType;
+        TString                 m_strName;
+        TString                 m_strValue;
+};
+
+// ---------------------------------------------------------------------------
+//  CLASS: TCmdLine
+// PREFIX: cmdl
+// ---------------------------------------------------------------------------
+class CIDLIBEXP TCmdLine
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Public class types
+        // -------------------------------------------------------------------
+        using TParmList = TVector<TCmdLineParm>;
+
+
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TCmdLine
+        (
+            const   tCIDLib::TCh            chOptionChar = kCIDLib::chDefParmSep
+        );
+
+        TCmdLine(const TCmdLine&) = delete;
+        TCmdLine(TCmdLine&&) = delete;
+
+        ~TCmdLine() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bFindOption
+        (
+            const   TString&                strName
+        );
+
+        tCIDLib::TBoolean bFindOptionVal
+        (
+            const   TString&                strName
+            ,       tCIDLib::TCard4&        c4Val
+            , const tCIDLib::TCard4         c4MinVal
+            , const tCIDLib::TCard4         c4MaxVal
+            , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
+        );
+
+        tCIDLib::TBoolean bFindOptionVal
+        (
+            const   TString&                strName
+            ,       tCIDLib::TCard4&        c4Val
+            , const tCIDLib::TCard4         c4DefVal
+            , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
+        );
+
+        tCIDLib::TBoolean bFindOptionVal
+        (
+            const   TString&                strName
+            ,       tCIDLib::TInt4&         i4Val
+            , const tCIDLib::TInt4          i4MinVal
+            , const tCIDLib::TInt4          i4MaxVal
+            , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
+        );
+
+        tCIDLib::TBoolean bFindOptionVal
+        (
+            const   TString&                strName
+            ,       tCIDLib::TInt4&         i4Val
+            , const tCIDLib::TInt4          i4DefVal
+            , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
+        );
+
+        tCIDLib::TBoolean bFindOptionVal
+        (
+            const   TString&                strName
+            ,       TString&                strValue
+        );
+
+        tCIDLib::TBoolean bIsEmpty() const
+        {
+            return m_colList.bIsEmpty();
+        }
+
+        tCIDLib::TBoolean bOptionExists
+        (
+            const   TString&                strName
+        )   const;
+
+        tCIDLib::TBoolean bRemoveConsumed() const
+        {
+            return m_bRemoveConsumed;
+        }
+
+        tCIDLib::TBoolean bRemoveConsumed(const tCIDLib::TBoolean bToSet)
+        {
+            m_bRemoveConsumed = bToSet;
+            return m_bRemoveConsumed;
+        }
+
+        tCIDLib::TBoolean bValueAt
+        (
+            const   tCIDLib::TCard4         c4At
+            ,       TString&                strValue
+        );
+
+        tCIDLib::TCard4 c4ParmCount() const
+        {
+            return m_colList.c4ElemCount();
+        }
+
+        const TCmdLineParm& cmdlpAt(const tCIDLib::TCard4 c4At) const
+        {
+            return m_colList[c4At];
+        }
+
+        tCIDLib::TVoid RemoveAt(const tCIDLib::TCard4 c4At)
+        {
+            m_colList.RemoveAt(c4At);
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_bRemoveConsumed
+        //      If set, then parms successfully found via bFindXXX() methods are
+        //      automatically removed. This lets you check for unknown/unprocessed
+        //      parameters at the end. You can also manually remove parms. Note that
+        //      bOptionExists() doesn't use this flag!
+        //
+        //  m_colList
+        //      Our list of parameters.
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean   m_bRemoveConsumed;
+        TParmList           m_colList;
+};
+
+
 // ---------------------------------------------------------------------------
 //  CLASS: TSysInfo
 // PREFIX: sysi
@@ -42,6 +259,7 @@ class CIDLIBEXP TSysInfo : public TObject
         // -------------------------------------------------------------------
         using TCmdLineList   = TVector<TString>;
         using TCmdLineCursor = TVector<TString>::TConstCursor<TString>;
+
 
 
         // -------------------------------------------------------------------
@@ -169,12 +387,6 @@ class CIDLIBEXP TSysInfo : public TObject
         (
             const   TString&                strDNSAddr
             , const tCIDLib::TIPPortNum     ippnToUse
-        );
-
-        // The tCIDLib::TKeyValFPair alias isn't created yet, so can't use it
-        static tCIDLib::TCard4 c4StdCmdLineParse
-        (
-                    TCollection<TKeyValFPair>&  colToFill
         );
 
 
