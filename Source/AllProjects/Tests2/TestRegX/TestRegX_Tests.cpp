@@ -266,6 +266,9 @@ static const TTestEntry aTests[] =
   , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])*", L"1" }
   , { 1 , 1, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])*", L"1.2" }
   , { 0 , 0, EFull  , 0 , 0 , 0, L"([0-9]|[0-9][0-9]|[0-9][0-9][0-9])(\\.[0-9])*", L"1.23" }
+
+
+  , { 1 , 1, EFull  , 0 , 0 , 0, L"ARMED \\*+[A-Z]+\\*+ .*", L"ARMED ***AWAY***** ALL SECURE **" }
 };
 static const tCIDLib::TCard4 c4TestCount = tCIDLib::c4ArrayElems(aTests);
 
