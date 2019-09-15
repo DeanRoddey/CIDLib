@@ -52,6 +52,5 @@ PATH=$PATH:${CID_RESDIR}:${CID_SRCTREE}/Source/Cmd/Linux
 # Set our terminal title to reflect what we are set up for
 echo -ne "\033]0;CIDLib[${CID_BUILDMODE}, ${CID_VERSION}]\007"
 
-
 alias="cidccd.sh setdir"
 

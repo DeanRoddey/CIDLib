@@ -31,12 +31,15 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
+#include    <limits.h>
+#include    <unistd.h>
+
 
 // ---------------------------------------------------------------------------
 //  Local functions
 // ---------------------------------------------------------------------------
 
-namespace
+namespace CIDKernel_FileSys_Linux
 {
     const tCIDLib::TCard2 c2Ext2SuperMagic = 0xEF53;
     const tCIDLib::TCard4 c4Ext2VolNameLen = 16;
@@ -61,9 +64,9 @@ namespace
     };
 
     tCIDLib::TVoid
-    __GetExt2Label(const tCIDLib::TSCh* const pszDevice
-                   , tCIDLib::TSCh* const pszToFill
-                   , tCIDLib::TCard4 c4MaxChars)
+    GetExt2Label(const  tCIDLib::TSCh* const    pszDevice
+                ,       tCIDLib::TSCh* const    pszToFill
+                ,       tCIDLib::TCard4         c4MaxChars)
     {
         pszToFill[0] = L'\000';
 
@@ -92,8 +95,7 @@ namespace
     }
 
     tCIDLib::TBoolean
-    __GetMountEntry(const tCIDLib::TSCh* const pszFile
-                    , TMountEntry& MountEntryToFill)
+    GetMountEntry(const tCIDLib::TSCh* const pszFile, TMountEntry& MountEntryToFill)
     {
         FILE* pFile = ::setmntent(MOUNTED, "r");
         if (!pFile)
@@ -150,10 +152,12 @@ namespace
     }
 
     tCIDLib::TBoolean
-    __bQueryVolumeInfo(const tCIDLib::TSCh* const pszSrcPath
-                       , const TMountEntry& MountEntry
-                       , TKrnlVolumeInfo& kvoliToFill)
+    bQueryVolumeInfo(const  tCIDLib::TSCh* const    pszSrcPath
+                    , const TMountEntry&            MountEntry
+                    ,       TKrnlVolumeInfo&        kvoliToFill
+                    ,       tCIDLib::EVolHWTypes&   eHWType)
     {
+        /*
         // Perform the statfs call
         struct statfs StatBuf;
         if (::statfs(pszSrcPath, &StatBuf))
@@ -197,7 +201,7 @@ namespace
         }
 
         // In some cases we can make an educated guess about the hardware
-        tCIDLib::EVolHWTypes eHWType = tCIDLib::EVolHWTypes::Unknown;
+        eHWType = tCIDLib::EVolHWTypes::Unknown;
 
         // The first guess is based on the device name, so we need to
         // extract the name part of the path.
@@ -231,7 +235,7 @@ namespace
         // device. In other words, it only works if you're root.
         tCIDLib::TSCh szLabel[c4Ext2VolNameLen + 1];
         if (StatBuf.f_type == 0xEF53)
-            __GetExt2Label(szDeviceName, szLabel, c4Ext2VolNameLen);
+            GetExt2Label(szDeviceName, szLabel, c4Ext2VolNameLen);
         else
             szLabel[0] = '\000';
 
@@ -254,6 +258,8 @@ namespace
         delete [] pszConvertedType;
 
         return kCIDLib::True;
+        */
+       return kCIDLib::False;
     }
 
     //
@@ -277,7 +283,7 @@ namespace
     //
     //  RETURN: None
     //
-    tCIDLib::TVoid __TreeDelete(const tCIDLib::TSCh* const pszStartDir)
+    tCIDLib::TVoid TreeDelete(const tCIDLib::TSCh* const pszStartDir)
     {
         DIR* dir = 0;
         tCIDLib::TSCh* pszFullName = 0;
@@ -308,7 +314,7 @@ namespace
                     TKrnlError::ThrowHostError(errno);
 
                 if (S_ISDIR(mode))
-                    __TreeDelete(pszFullName);
+                    TreeDelete(pszFullName);
 
                 if (::unlink(pszFullName))
                 {
@@ -347,9 +353,9 @@ namespace
     }
 
     tCIDLib::TVoid
-    __FillFindBuf(const tCIDLib::TSCh* const   pszFullName
-                  , const struct stat&          StatBuf
-                  , TKrnlFileSys::TRawFileFind& fndbToFill)
+    FillFindBuf(const           tCIDLib::TSCh* const        pszFullName
+                , const struct  stat&                       StatBuf
+                ,               TKrnlFileSys::TRawFileFind& fndbToFill)
     {
         TRawStr::pszConvert(pszFullName
                             , fndbToFill.szName
@@ -358,7 +364,7 @@ namespace
         TKrnlLinux::LinuxFileTimeToCIDFileTime(StatBuf.st_atime, fndbToFill.enctLastAccessTime);
         TKrnlLinux::LinuxFileTimeToCIDFileTime(StatBuf.st_mtime, fndbToFill.enctLastWriteTime);
 
-        fndbToFill.fposFileSize = StatBuf.st_size;
+        fndbToFill.c8FileSize = StatBuf.st_size;
 
         TKrnlLinux::StatBufToInfoFlags(StatBuf, fndbToFill.eInfoFlags);
     }
@@ -368,11 +374,11 @@ namespace
     //  found meets the search criteria in the passed search flags.
     //
     tCIDLib::TBoolean
-    __bCheckSearchCriteria(const   tCIDLib::EDirSearchFlags  eFlags
-                           , const TDirSearchHandleImpl&     hdiriToCheck
-                           , const struct dirent&            DirEntry
-                           ,       tCIDLib::TSCh*            pszNameToFill
-                           ,       struct stat&              StatToFill)
+    bCheckSearchCriteria(const  tCIDLib::EDirSearchFlags  eFlags
+                        , const TDirSearchHandleImpl&     hdiriToCheck
+                        , const struct dirent&            DirEntry
+                        ,       tCIDLib::TSCh*            pszNameToFill
+                        ,       struct stat&              StatToFill)
     {
         // If the stinking d_type field of the dirent structure were
         // actually used, we wouldn't need all this stuff!
@@ -381,8 +387,8 @@ namespace
         if (!::strcmp(DirEntry.d_name, ".")
         ||  !::strcmp(DirEntry.d_name, ".."))
         {
-            if (!(eFlags & tCIDLib::EDirSearchFlags::FindDirs)
-            ||  (eFlags & tCIDLib::EDirSearchFlags::NormalDirsOnly))
+            if (!tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::FindDirs)
+            ||  tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::NormalDirsOnly))
             {
                 return kCIDLib::False;
             }
@@ -404,13 +410,13 @@ namespace
         tCIDLib::TBoolean bMatches = kCIDLib::False;
 
         if (S_ISDIR(StatToFill.st_mode)
-        &&  (eFlags & tCIDLib::EDirSearchFlags::FindDirs))
+        &&  tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::FindDirs))
         {
             bMatches = kCIDLib::True;
         }
-        else if (eFlags & tCIDLib::EDirSearchFlags::FindFiles)
+        else if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::FindFiles))
         {
-            if (eFlags & tCIDLib::EDirSearchFlags::NormalFilesOnly)
+            if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::NormalFilesOnly))
             {
                 if (S_ISREG(StatToFill.st_mode))
                     bMatches = kCIDLib::True;
@@ -437,35 +443,36 @@ namespace
 //  TDirSearchHandle: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TDirSearchHandle::TDirSearchHandle() :
-    __phdiriThis(0)
+
+    m_phdiriThis(nullptr)
 {
-    __phdiriThis = new TDirSearchHandleImpl;
-    __phdiriThis->pDir = 0;
-    __phdiriThis->pNextDirEntry = 0;
-    __phdiriThis->pszDirName = 0;
-    __phdiriThis->pszFileSpec = 0;
+    m_phdiriThis = new TDirSearchHandleImpl;
+    m_phdiriThis->pDir = 0;
+    m_phdiriThis->pNextDirEntry = 0;
+    m_phdiriThis->pszDirName = 0;
+    m_phdiriThis->pszFileSpec = 0;
 }
 
 TDirSearchHandle::TDirSearchHandle(const TDirSearchHandle& hdirToCopy) :
-    __phdiriThis(0)
+    m_phdiriThis(0)
 {
-    __phdiriThis = new TDirSearchHandleImpl;
-    __phdiriThis->pDir = hdirToCopy.__phdiriThis->pDir;
-    __phdiriThis->pNextDirEntry = hdirToCopy.__phdiriThis->pNextDirEntry;
-    __phdiriThis->pszDirName =
-        new tCIDLib::TSCh[::strlen(hdirToCopy.__phdiriThis->pszDirName) + 1];
-    ::strcpy(__phdiriThis->pszDirName, hdirToCopy.__phdiriThis->pszDirName);
-    __phdiriThis->pszFileSpec =
-        new tCIDLib::TSCh[::strlen(hdirToCopy.__phdiriThis->pszFileSpec) + 1];
-    ::strcpy(__phdiriThis->pszFileSpec, hdirToCopy.__phdiriThis->pszFileSpec);
+    m_phdiriThis = new TDirSearchHandleImpl;
+    m_phdiriThis->pDir = hdirToCopy.m_phdiriThis->pDir;
+    m_phdiriThis->pNextDirEntry = hdirToCopy.m_phdiriThis->pNextDirEntry;
+    m_phdiriThis->pszDirName =
+        new tCIDLib::TSCh[::strlen(hdirToCopy.m_phdiriThis->pszDirName) + 1];
+    ::strcpy(m_phdiriThis->pszDirName, hdirToCopy.m_phdiriThis->pszDirName);
+    m_phdiriThis->pszFileSpec =
+        new tCIDLib::TSCh[::strlen(hdirToCopy.m_phdiriThis->pszFileSpec) + 1];
+    ::strcpy(m_phdiriThis->pszFileSpec, hdirToCopy.m_phdiriThis->pszFileSpec);
 }
 
 TDirSearchHandle::~TDirSearchHandle()
 {
-    delete [] __phdiriThis->pszFileSpec;
-    delete [] __phdiriThis->pszDirName;
-    delete __phdiriThis;
-    __phdiriThis = 0;
+    delete [] m_phdiriThis->pszFileSpec;
+    delete [] m_phdiriThis->pszDirName;
+    delete m_phdiriThis;
+    m_phdiriThis = 0;
 }
 
 
@@ -478,16 +485,16 @@ TDirSearchHandle::operator=(const TDirSearchHandle& hdirToAssign)
     if (this == &hdirToAssign)
         return *this;
 
-    __phdiriThis->pDir = hdirToAssign.__phdiriThis->pDir;
-    __phdiriThis->pNextDirEntry = hdirToAssign.__phdiriThis->pNextDirEntry;
-    delete [] __phdiriThis->pszDirName;
-    __phdiriThis->pszDirName
-        = new tCIDLib::TSCh[::strlen(hdirToAssign.__phdiriThis->pszDirName) + 1];
-    ::strcpy(__phdiriThis->pszDirName, hdirToAssign.__phdiriThis->pszDirName);
-    delete [] __phdiriThis->pszFileSpec;
-    __phdiriThis->pszFileSpec
-        = new tCIDLib::TSCh[::strlen(hdirToAssign.__phdiriThis->pszFileSpec) + 1];
-    ::strcpy(__phdiriThis->pszFileSpec, hdirToAssign.__phdiriThis->pszFileSpec);
+    m_phdiriThis->pDir = hdirToAssign.m_phdiriThis->pDir;
+    m_phdiriThis->pNextDirEntry = hdirToAssign.m_phdiriThis->pNextDirEntry;
+    delete [] m_phdiriThis->pszDirName;
+    m_phdiriThis->pszDirName
+        = new tCIDLib::TSCh[::strlen(hdirToAssign.m_phdiriThis->pszDirName) + 1];
+    ::strcpy(m_phdiriThis->pszDirName, hdirToAssign.m_phdiriThis->pszDirName);
+    delete [] m_phdiriThis->pszFileSpec;
+    m_phdiriThis->pszFileSpec
+        = new tCIDLib::TSCh[::strlen(hdirToAssign.m_phdiriThis->pszFileSpec) + 1];
+    ::strcpy(m_phdiriThis->pszFileSpec, hdirToAssign.m_phdiriThis->pszFileSpec);
 
     return *this;
 }
@@ -496,12 +503,12 @@ TDirSearchHandle::operator=(const TDirSearchHandle& hdirToAssign)
 tCIDLib::TBoolean
 TDirSearchHandle::operator==(const TDirSearchHandle& hdirToCompare) const
 {
-    return (__phdiriThis->pDir == hdirToCompare.__phdiriThis->pDir
-            && __phdiriThis->pNextDirEntry == hdirToCompare.__phdiriThis->pNextDirEntry
-            && !::strcmp(__phdiriThis->pszDirName
-                         , hdirToCompare.__phdiriThis->pszDirName)
-            && !::strcmp(__phdiriThis->pszFileSpec
-                         , hdirToCompare.__phdiriThis->pszFileSpec));
+    return (m_phdiriThis->pDir == hdirToCompare.m_phdiriThis->pDir
+            && m_phdiriThis->pNextDirEntry == hdirToCompare.m_phdiriThis->pNextDirEntry
+            && !::strcmp(m_phdiriThis->pszDirName
+                         , hdirToCompare.m_phdiriThis->pszDirName)
+            && !::strcmp(m_phdiriThis->pszFileSpec
+                         , hdirToCompare.m_phdiriThis->pszFileSpec));
 }
 
 
@@ -509,26 +516,26 @@ TDirSearchHandle::operator==(const TDirSearchHandle& hdirToCompare) const
 // -------------------------------------------------------------------
 //  Public, non-virtual methods
 // -------------------------------------------------------------------
-tCIDLib::TBoolean TDirSearchHandle::bValid() const
+tCIDLib::TBoolean TDirSearchHandle::bIsValid() const
 {
-    return (__phdiriThis->pDir && __phdiriThis->pszDirName && __phdiriThis->pszFileSpec);
+    return (m_phdiriThis->pDir && m_phdiriThis->pszDirName && m_phdiriThis->pszFileSpec);
 }
 
 tCIDLib::TVoid TDirSearchHandle::Clear()
 {
-    __phdiriThis->pDir = 0;
-    __phdiriThis->pNextDirEntry = 0;
-    delete [] __phdiriThis->pszDirName;
-    __phdiriThis->pszDirName = 0;
-    delete [] __phdiriThis->pszFileSpec;
-    __phdiriThis->pszFileSpec = 0;
+    m_phdiriThis->pDir = 0;
+    m_phdiriThis->pNextDirEntry = 0;
+    delete [] m_phdiriThis->pszDirName;
+    m_phdiriThis->pszDirName = 0;
+    delete [] m_phdiriThis->pszFileSpec;
+    m_phdiriThis->pszFileSpec = 0;
 }
 
 tCIDLib::TVoid
 TDirSearchHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
                                 , const tCIDLib::TCard4     c4MaxChars) const
 {
-    TRawStr::bFormatVal(tCIDLib::TCard4(__phdiriThis->pDir)
+    TRawStr::bFormatVal(tCIDLib::TCard4(m_phdiriThis->pDir)
                         , pszToFill
                         , c4MaxChars
                         , tCIDLib::ERadices::Hex);
@@ -541,9 +548,9 @@ TDirSearchHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
     }
 
     tCIDLib::TCh szTmp[kCIDLib::c4MaxPathLen + 1];
-    TRawStr::pszConvert(__phdiriThis->pszDirName, szTmp, c4MaxBufChars(szTmp));
+    TRawStr::pszConvert(m_phdiriThis->pszDirName, szTmp, c4MaxBufChars(szTmp));
     tCIDLib::TCard4 c4DirLen = TRawStr::c4StrLen(szTmp);
-    TRawStr::pszConvert(__phdiriThis->pszFileSpec, &szTmp[c4DirLen], c4MaxBufChars(szTmp) - c4DirLen);
+    TRawStr::pszConvert(m_phdiriThis->pszFileSpec, &szTmp[c4DirLen], c4MaxBufChars(szTmp) - c4DirLen);
     c4Len += TRawStr::c4StrLen(szTmp);
 
     if (c4Len < c4MaxChars)
@@ -563,7 +570,8 @@ TDirSearchHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
 //  TKrnlDirSearch: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlDirSearch::TKrnlDirSearch() :
-    __eSearchFlags(tCIDLib::EDirSearchFlags::AllNormal)
+
+    m_eSearchFlags(tCIDLib::EDirSearchFlags::AllNormal)
 {
 }
 
@@ -594,15 +602,15 @@ TKrnlDirSearch::~TKrnlDirSearch()
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TKrnlDirSearch::bClose()
 {
-    if (__hdirSearch.__phdiriThis->pDir)
+    if (m_hdirSearch.m_phdiriThis->pDir)
     {
-        if (::closedir(__hdirSearch.__phdiriThis->pDir))
+        if (::closedir(m_hdirSearch.m_phdiriThis->pDir))
         {
             TKrnlError::SetLastHostError(errno);
             return kCIDLib::False;
         }
     }
-    __hdirSearch.Clear();
+    m_hdirSearch.Clear();
     return kCIDLib::True;
 }
 
@@ -613,8 +621,10 @@ TKrnlDirSearch::bFindFirst( const   tCIDLib::TCh* const         pszToSearch
                             ,       tCIDLib::TBoolean&          bFound
                             , const tCIDLib::EDirSearchFlags    eFlags)
 {
+    // <TBD>
+    /*
     // If there is an existing search, then close it
-    if (!__hdirSearch.__phdiriThis->pDir)
+    if (!m_hdirSearch.m_phdiriThis->pDir)
     {
         if (!bClose())
             return kCIDLib::False;
@@ -627,7 +637,7 @@ TKrnlDirSearch::bFindFirst( const   tCIDLib::TCh* const         pszToSearch
 
     // Get its length
     tCIDLib::TCard4 c4ToSearchLen = TRawStr::c4StrLen(pszCopy);
-    if (pszCopy[0] == kCIDLib::chPathSeparator && c4ToSearchLen == 1)
+    if (pszCopy[0] == kCIDLib::chPathSep && c4ToSearchLen == 1)
     {
         // We have to have at least one other character if there's a
         // path separator
@@ -636,19 +646,19 @@ TKrnlDirSearch::bFindFirst( const   tCIDLib::TCh* const         pszToSearch
     }
 
     // If it ends with a path separator, then cap it
-    if (pszCopy[c4ToSearchLen - 1] == kCIDLib::chPathSeparator)
+    if (pszCopy[c4ToSearchLen - 1] == kCIDLib::chPathSep)
         pszCopy[c4ToSearchLen - 1] = L'\000';
 
     // Find where we're going to chop the string in half
     tCIDLib::TCh* pszLastPathSep = TRawStr::pszFindLastChar(pszCopy
-                                                            , kCIDLib::chPathSeparator);
+                                                            , kCIDLib::chPathSep);
     if (!pszLastPathSep)
     {
         // If there's no path separator, then we're looking for files in the
         // current directory
-        __hdirSearch.__phdiriThis->pszDirName = new tCIDLib::TSCh[::strlen("./") + 1];
-        ::strcpy(__hdirSearch.__phdiriThis->pszDirName, "./");
-        __hdirSearch.__phdiriThis->pszFileSpec = TRawStr::pszConvert(pszCopy);
+        m_hdirSearch.m_phdiriThis->pszDirName = new tCIDLib::TSCh[::strlen("./") + 1];
+        ::strcpy(m_hdirSearch.m_phdiriThis->pszDirName, "./");
+        m_hdirSearch.m_phdiriThis->pszFileSpec = TRawStr::pszConvert(pszCopy);
     }
     else
     {
@@ -658,55 +668,65 @@ TKrnlDirSearch::bFindFirst( const   tCIDLib::TCh* const         pszToSearch
         // the two strings.
         tCIDLib::TCard4 c4PathSepIdx = pszLastPathSep - pszCopy;
         pszCopy[c4PathSepIdx] = '\000';
-        __hdirSearch.__phdiriThis->pszDirName = TRawStr::pszConvert(pszCopy);
-        ::strcat(__hdirSearch.__phdiriThis->pszDirName, "/");
-        __hdirSearch.__phdiriThis->pszFileSpec = TRawStr::pszConvert(&pszCopy[c4PathSepIdx + 1]);
+        m_hdirSearch.m_phdiriThis->pszDirName = TRawStr::pszConvert(pszCopy);
+        ::strcat(m_hdirSearch.m_phdiriThis->pszDirName, "/");
+        m_hdirSearch.m_phdiriThis->pszFileSpec = TRawStr::pszConvert(&pszCopy[c4PathSepIdx + 1]);
     }
 
-    DIR* pDirTmp = ::opendir(__hdirSearch.__phdiriThis->pszDirName);
+    DIR* pDirTmp = ::opendir(m_hdirSearch.m_phdiriThis->pszDirName);
     if (!pDirTmp)
     {
-        __hdirSearch.Clear();
+        m_hdirSearch.Clear();
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
 
-    __hdirSearch.__phdiriThis->pDir = pDirTmp;
-    __eSearchFlags = eFlags;
+    m_hdirSearch.m_phdiriThis->pDir = pDirTmp;
+    m_eSearchFlags = eFlags;
 
     bFound = kCIDLib::False;
     struct dirent DirEntry;
     struct stat StatBuf;
     tCIDLib::TSCh szFullName[kCIDLib::c4MaxPathLen + 1];
 
-    ::readdir_r(__hdirSearch.__phdiriThis->pDir
-                , &DirEntry
-                , &__hdirSearch.__phdiriThis->pNextDirEntry);
-    while (!bFound && __hdirSearch.__phdiriThis->pNextDirEntry)
+    ::readdir_r
+    (
+        m_hdirSearch.m_phdiriThis->pDir
+        , &DirEntry
+        , &m_hdirSearch.m_phdiriThis->pNextDirEntry
+    );
+    while (!bFound && m_hdirSearch.m_phdiriThis->pNextDirEntry)
     {
-        bFound = __bCheckSearchCriteria(__eSearchFlags
-                                        , *__hdirSearch.__phdiriThis
-                                        , DirEntry
-                                        , szFullName
-                                        , StatBuf);
+        bFound = CIDKernel_FileSys_Linux::bCheckSearchCriteria
+        (
+            m_eSearchFlags
+            , *m_hdirSearch.m_phdiriThis
+            , DirEntry
+            , szFullName
+            , StatBuf
+        );
 
         if (!bFound)
-            ::readdir_r(__hdirSearch.__phdiriThis->pDir
+            ::readdir_r(m_hdirSearch.m_phdiriThis->pDir
                         , &DirEntry
-                        , &__hdirSearch.__phdiriThis->pNextDirEntry);
+                        , &m_hdirSearch.m_phdiriThis->pNextDirEntry);
     }
 
     if (bFound)
     {
-        __FillFindBuf(szFullName, StatBuf, fndbToFill);
+        CIDKernel_FileSys_Linux::FillFindBuf(szFullName, StatBuf, fndbToFill);
     }
     else
     {
-        ::closedir(__hdirSearch.__phdiriThis->pDir);
-        __hdirSearch.Clear();
+        ::closedir(m_hdirSearch.m_phdiriThis->pDir);
+        m_hdirSearch.Clear();
     }
 
     return kCIDLib::True;
+    */
+
+   // <TBD> 
+   return kCIDLib::False;
 }
 
 
@@ -714,8 +734,9 @@ tCIDLib::TBoolean
 TKrnlDirSearch::bFindNext(  TKrnlFileSys::TRawFileFind& fndbToFill
                             , tCIDLib::TBoolean&        bFound)
 {
+    /*
     // If the find first was not done yet, then its not ready
-    if (!__hdirSearch.__phdiriThis->pDir)
+    if (!m_hdirSearch.m_phdiriThis->pDir)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
@@ -726,41 +747,46 @@ TKrnlDirSearch::bFindNext(  TKrnlFileSys::TRawFileFind& fndbToFill
     struct stat StatBuf;
     tCIDLib::TSCh szFullName[kCIDLib::c4MaxPathLen + 1];
 
-    while (!bFound && __hdirSearch.__phdiriThis->pNextDirEntry)
+    while (!bFound && m_hdirSearch.m_phdiriThis->pNextDirEntry)
     {
         //
         //  Look for another file. If its just no more files, then break
         //  out; else, its an error so return false.
         //
-        ::readdir_r(__hdirSearch.__phdiriThis->pDir
+        ::readdir_r(m_hdirSearch.m_phdiriThis->pDir
                     , &DirEntry
-                    , &__hdirSearch.__phdiriThis->pNextDirEntry);
+                    , &m_hdirSearch.m_phdiriThis->pNextDirEntry);
 
         //
         //  Check this one against the search criteria. If it matches, then
         //  we will break out and return this file. Otherwise, we'll keep
         //  looking.
         //
-        bFound = __bCheckSearchCriteria(__eSearchFlags
-                                        , *__hdirSearch.__phdiriThis
-                                        , DirEntry
-                                        , szFullName
-                                        , StatBuf);
+        bFound = CIDKernel_FileSys_Linux::bCheckSearchCriteria
+        (
+            m_eSearchFlags
+            , *m_hdirSearch.m_phdiriThis
+            , DirEntry
+            , szFullName
+            , StatBuf
+        );
     }
 
     // Convert the system structure to our structure, if we found one.
     if (bFound)
-    {
-        __FillFindBuf(szFullName, StatBuf, fndbToFill);
-    }
+        CIDKernel_FileSys_Linux::FillFindBuf(szFullName, StatBuf, fndbToFill);
 
     return kCIDLib::True;
+    */
+
+   // <TBD>
+   return kCIDLib::False;
 }
 
 
 tCIDLib::TBoolean TKrnlDirSearch::bSearchIsOpen() const
 {
-    return (__hdirSearch.__phdiriThis->pDir != 0);
+    return (m_hdirSearch.m_phdiriThis->pDir != 0);
 }
 
 
@@ -859,8 +885,11 @@ TKrnlFileSys::bCopy(const  tCIDLib::TCh* const  pszSourceFile
 
 tCIDLib::TBoolean
 TKrnlFileSys::bCreateTmpFileName(       tCIDLib::TCh* const pszToFillIn
-                                , const tCIDLib::TCard4     c4BufChars)
+                                , const tCIDLib::TCard4     c4BufChars
+                                , const tCIDLib::TCard4     c4UniqueNum)
 {
+    // <TBD> Use the unique num?
+
     tCIDLib::TSCh* pszTmp = ::tempnam(0, 0);
     if (!pszTmp)
     {
@@ -880,6 +909,17 @@ TKrnlFileSys::bCreateTmpFileName(       tCIDLib::TCh* const pszToFillIn
     ::free(pszTmp);
 
     return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TKrnlFileSys::bCreateTmpFileNameIn( const   tCIDLib::TCh* const pszTarDir
+                                    ,       tCIDLib::TCh* const pszToFillIn
+                                    , const tCIDLib::TCard4     c4BufChars
+                                    , const tCIDLib::TCard4     c4UniqueNum)
+{
+    // <TBD>
+    return kCIDLib::False;
 }
 
 
@@ -1020,6 +1060,14 @@ TKrnlFileSys::bHasWildCards(const tCIDLib::TCh* const pszToSearch)
 
 
 tCIDLib::TBoolean
+TKrnlFileSys::bIsDirectory(const tCIDLib::TCh* const pszDirToCheck)
+{
+   // <TBD>
+   return kCIDLib::False;        
+}
+
+
+tCIDLib::TBoolean
 TKrnlFileSys::bIsNormalDir(const tCIDLib::TCh* const pszDirToCheck)
 {
     if (TRawStr::bCompareStr(pszDirToCheck, L".")
@@ -1031,10 +1079,19 @@ TKrnlFileSys::bIsNormalDir(const tCIDLib::TCh* const pszDirToCheck)
 }
 
 
+tCIDLib::TBoolean TKrnlFileSys::bIsRedirected(const tCIDLib::EStdFiles eStdFile)
+{
+   // <TBD>
+   return kCIDLib::False;    
+}
+
+
 tCIDLib::TBoolean
 TKrnlFileSys::bMakeDirectory(const  tCIDLib::TCh* const pszToCreate
-                            , const tCIDLib::TCh* const pszTemplate)
+                            , const tCIDLib::TBoolean   bErrIfExists
+                            , const tCIDLib::TBoolean   bAllAccess)
 {
+    /*
     mode_t mode = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
 
     if (pszTemplate)
@@ -1061,7 +1118,39 @@ TKrnlFileSys::bMakeDirectory(const  tCIDLib::TCh* const pszToCreate
     }
 
     return kCIDLib::True;
+    */
+
+   // <TBD>
+   return kCIDLib::False;
 }
+
+
+tCIDLib::TBoolean
+TKrnlFileSys::bMakePath(const tCIDLib::TCh* const pszToCreate)
+{
+    // <TBD>
+    return kCIDLib::False;        
+}
+
+
+tCIDLib::TBoolean
+TKrnlFileSys::bNormalizePath(const  tCIDLib::TCh* const pszToNormalize
+                            ,       tCIDLib::TCh* const pszResult
+                            , const tCIDLib::TCard4     c4MaxChars)
+{
+    const char* pszNorm = TRawStr::pszConvert(pszToNormalize);
+    TArrayJanitor<const char> janNorm(pszNorm);
+
+    char szTmp[PATH_MAX + 1];
+    if (!::realpath(pszNorm, szTmp))
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;    
+    }
+    TRawStr::pszConvert(szTmp, pszResult, c4MaxChars);
+    return kCIDLib::True;
+}                            
+
 
 
 tCIDLib::TBoolean
@@ -1087,7 +1176,7 @@ TKrnlFileSys::bQueryFullPath(const  tCIDLib::TCh* const pszPartialPath
                             ,       tCIDLib::TCh* const pszToFillIn
                             , const tCIDLib::TCard4     c4BufChars)
 {
-    if (pszPartialPath[0] == kCIDLib::chPathSeparator)
+    if (pszPartialPath[0] == kCIDLib::chPathSep)
     {
         if (c4BufChars < TRawStr::c4StrLen(pszPartialPath))
         {
@@ -1124,10 +1213,22 @@ TKrnlFileSys::bQueryFullPath(const  tCIDLib::TCh* const pszPartialPath
 
 
 tCIDLib::TBoolean
+TKrnlFileSys::bQueryMountInfo(  const   tCIDLib::TCh* const pszVolume
+                                ,       tCIDLib::TCh* const pszHostToFill
+                                , const tCIDLib::TCard4     c4MaxHostChars
+                                ,       tCIDLib::TCh* const pszMountInfo
+                                , const tCIDLib::TCard4     c4MaxInfoChars)
+{
+    // <TBD>
+    return kCIDLib::False;    
+}
+
+
+tCIDLib::TBoolean
 TKrnlFileSys::bQueryTmpPath(        tCIDLib::TCh* const pszToFillIn
                             , const tCIDLib::TCard4     c4BufChars)
 {
-    tCIDLib::TSCh* pszTmpDir = ::getenv("TMPDIR");
+    const tCIDLib::TSCh* pszTmpDir = ::getenv("TMPDIR");
 
     // First try the environment variable
     if (!pszTmpDir || ::access(pszTmpDir, W_OK))
@@ -1155,23 +1256,42 @@ TKrnlFileSys::bQueryTmpPath(        tCIDLib::TCh* const pszToFillIn
 
 tCIDLib::TBoolean
 TKrnlFileSys::bQueryVolumeInfo( const   tCIDLib::TCh* const pszSrcPath
+                                ,       tCIDLib::TCard8&    c8VolTotalBytes
+                                ,       tCIDLib::TCard8&    c8VolFreeBytes
+                                ,       tCIDLib::TCard8&    c8UserAvailBytes)
+{
+    // <TBD>
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlFileSys::bQueryVolumeInfo( const   tCIDLib::TCh* const pszSrcPath
                                 ,       TKrnlVolumeInfo&    kvoliToFill)
 {
     tCIDLib::TSCh* pszLocPath = TRawStr::pszConvert(pszSrcPath);
     TArrayJanitor<tCIDLib::TSCh> janPath(pszLocPath);
 
-    TMountEntry MountEntry;
-    if (!__GetMountEntry(pszLocPath, MountEntry))
+    CIDKernel_FileSys_Linux::TMountEntry MountEntry;
+    if (!CIDKernel_FileSys_Linux::GetMountEntry(pszLocPath, MountEntry))
         return false;
-    return __bQueryVolumeInfo(pszLocPath, MountEntry, kvoliToFill);
+
+
+    tCIDLib::EVolHWTypes eHWType;
+    return CIDKernel_FileSys_Linux::bQueryVolumeInfo
+    (
+        pszLocPath, MountEntry, kvoliToFill, eHWType
+    );
 }
 
 
-tCIDLib::TBoolean
-TKrnlFileSys::bQueryVolumeList( TKrnlVolumeInfo*&       pakvoliToFill
-                                , tCIDLib::TCard4&      c4VolCount
-                                , TKrnlVolFailureInfo*& pakvolfiToFill
-                                , tCIDLib::TCard4&      c4ErrCount)
+tCIDLib::TBoolean TKrnlFileSys
+::bQueryVolumeList(         TKrnlLList<TKrnlVolumeInfo>&        kllistGood
+                    ,       tCIDLib::TCard4&                    c4VolCount
+                    ,       TKrnlLList<TKrnlVolFailureInfo>&    kllistBad
+                    ,       tCIDLib::TCard4&                    c4ErrCount
+                    , const tCIDLib::TBoolean                   bIncludeShares
+                    , const tCIDLib::TBoolean                   bForceUpdate)
 {
     // First get the number of mounted volumes
     FILE* pFile = ::setmntent(MOUNTED, "r");
@@ -1183,12 +1303,15 @@ TKrnlFileSys::bQueryVolumeList( TKrnlVolumeInfo*&       pakvoliToFill
 
     tCIDLib::TCard4 c4MountCount = 0;
     struct mntent Context;
-    tCIDLib::TSCh szMountBuffer[c4MountBufferSize];
-    struct mntent* pEntry = ::getmntent_r(pFile, &Context, szMountBuffer, c4MountBufferSize);
+    tCIDLib::TSCh szMountBuffer[CIDKernel_FileSys_Linux::c4MountBufferSize];
+    struct mntent* pEntry = ::getmntent_r
+    (
+        pFile, &Context, szMountBuffer, CIDKernel_FileSys_Linux::c4MountBufferSize
+    );
     while (pEntry)
     {
         c4MountCount++;
-        pEntry = ::getmntent_r(pFile, &Context, szMountBuffer, c4MountBufferSize);
+        pEntry = ::getmntent_r(pFile, &Context, szMountBuffer, CIDKernel_FileSys_Linux::c4MountBufferSize);
     }
 
     ::endmntent(pFile);
@@ -1199,19 +1322,18 @@ TKrnlFileSys::bQueryVolumeList( TKrnlVolumeInfo*&       pakvoliToFill
         return kCIDLib::False;
     }
 
-    pakvoliToFill = new TKrnlVolumeInfo[c4MountCount];
-    pakvolfiToFill = new TKrnlVolFailureInfo[c4MountCount];
-
-    c4VolCount = 0;
-    c4ErrCount = 0;
-    TMountEntry MountEntry;
+    CIDKernel_FileSys_Linux::TMountEntry MountEntry;
     pFile = ::setmntent(MOUNTED, "r");
     if (!pFile)
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
-    pEntry = ::getmntent_r(pFile, &Context, szMountBuffer, c4MountBufferSize);
+
+    TKrnlVolumeInfo voliCur;
+    TKrnlVolFailureInfo volfiCur;
+    tCIDLib::EVolHWTypes eHWType;
+    pEntry = ::getmntent_r(pFile, &Context, szMountBuffer, CIDKernel_FileSys_Linux::c4MountBufferSize);
     while (pEntry)
     {
         TRawStr::CopyStr(MountEntry.szDevice
@@ -1223,23 +1345,42 @@ TKrnlFileSys::bQueryVolumeList( TKrnlVolumeInfo*&       pakvoliToFill
         TRawStr::CopyStr(MountEntry.szType
                          , pEntry->mnt_type
                          , sizeof(MountEntry.szType));
-        if (__bQueryVolumeInfo(MountEntry.szMountPoint
-                               , MountEntry
-                               , pakvoliToFill[c4VolCount]))
+        
+        if (CIDKernel_FileSys_Linux::bQueryVolumeInfo(MountEntry.szMountPoint
+                                                    , MountEntry
+                                                    , voliCur
+                                                    , eHWType))
         {
-            c4VolCount++;
+            kllistGood.pobjAddNew(new TKrnlVolumeInfo(voliCur));
         }
-        else
+         else
         {
-            pakvolfiToFill[c4ErrCount++].Set(TRawStr::pszConvert(MountEntry.szMountPoint)
-                                             , TKrnlError::kerrLast());
+            kllistBad.pobjAddNew
+            (
+                new TKrnlVolFailureInfo
+                (
+                    TRawStr::pszConvert(MountEntry.szMountPoint), eHWType, TKrnlError::kerrLast()
+                )
+            );
         }
-        pEntry = ::getmntent_r(pFile, &Context, szMountBuffer, c4MountBufferSize);
+        pEntry = ::getmntent_r
+        (
+            pFile, &Context, szMountBuffer, CIDKernel_FileSys_Linux::c4MountBufferSize
+        );
     }
 
     ::endmntent(pFile);
 
     return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TKrnlFileSys::bQueryVolHWType( const   tCIDLib::TCh* const     pszVolPath
+                               ,       tCIDLib::EVolHWTypes&   eType)
+{
+    // <TBD>
+    return kCIDLib::False;
 }
 
 
@@ -1274,14 +1415,18 @@ TKrnlFileSys::bRemoveFile(const tCIDLib::TCh* const pszToDelete)
 
 
 tCIDLib::TBoolean
-TKrnlFileSys::bRemovePath(const tCIDLib::TCh* const pszStartDir)
+TKrnlFileSys::bRemovePath(  const   tCIDLib::TCh* const     pszStartDir
+                            , const tCIDLib::ETreeDelModes  eMode
+                            , const tCIDLib::TBoolean       bRemoveStartDir)
 {
+    // <TBD> New parameters to be used
+
     tCIDLib::TSCh* pszLocStartDir = TRawStr::pszConvert(pszStartDir);
     TArrayJanitor<tCIDLib::TSCh> janStart(pszLocStartDir);
 
     try
     {
-        __TreeDelete(pszLocStartDir);
+        CIDKernel_FileSys_Linux::TreeDelete(pszLocStartDir);
     }
 
     catch(const TKrnlError& kerrToCatch)
@@ -1308,4 +1453,59 @@ TKrnlFileSys::bRename(  const   tCIDLib::TCh* const pszOldName
         return kCIDLib::False;
     }
     return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TKrnlFileSys::bReplaceFile( const   tCIDLib::TCh* const pszToReplace
+                            , const tCIDLib::TCh* const pszNewFile
+                            , const tCIDLib::TCh* const pszBackupName)
+{
+    // <TBD>
+    return kCIDLib::False;    
+}                            
+
+
+tCIDLib::TBoolean
+TKrnlFileSys::bSetCurrentDir(const tCIDLib::TCh* const pszNewDir)
+{
+    // <TBD>
+    return kCIDLib::False;    
+}
+
+
+tCIDLib::TBoolean
+TKrnlFileSys::bSetPerms(const   tCIDLib::TCh* const pszTarget
+                        , const tCIDLib::EFilePerms ePerms)
+{
+    // <TBD>
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TCard4 TKrnlFileSys::c4FSRetryCount()
+{
+    // <TBD>
+    static tCIDLib::TCard4 c4Num = 1;
+
+    return c4Num++;
+}
+
+
+tCIDLib::TCard4 TKrnlFileSys::c4VolListSerialNum()
+{
+    // <TBD>
+    static tCIDLib::TCard4 c4Num = 1;
+
+    return c4Num++;
+}
+
+
+tCIDLib::EConnRes
+TKrnlFileSys::eAccessRemoteShare(const  tCIDLib::TCh* const pszTarShare
+                                , const tCIDLib::TCh* const pszUserName
+                                , const tCIDLib::TCh* const pszPassword
+                                , const tCIDLib::TBoolean   bTemp)
+{
+    return tCIDLib::EConnRes::Failed;
 }
