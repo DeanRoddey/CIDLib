@@ -195,7 +195,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             //  got one. If we provided a timeout, we'd have to check the
             //  return.
             //
-            colTest.bGetNext(strNextElem);
+            colTest.bGetNextMv(strNextElem);
             conOut  << L"    Got element from thread: " << strNextElem
                     << kCIDLib::EndLn;
             c4Count++;

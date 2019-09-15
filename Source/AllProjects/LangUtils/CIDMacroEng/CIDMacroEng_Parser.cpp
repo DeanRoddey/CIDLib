@@ -649,7 +649,7 @@ TMacroEngParser::pmeciCheckClassLoad(       TParserSrc& psrcClass
 
 TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
 {
-    TMEngStdClassInfo* pmeciRet = 0;
+    TMEngStdClassInfo* pmeciRet = nullptr;
     const tCIDLib::TCard4 c4InitNestDepth = m_colClassStack.c4ElemCount();
     try
     {
@@ -889,13 +889,13 @@ TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
             TModule::LogEventObj(errToCatch);
         }
         IssueExcept(psrcClass, errToCatch);
-        pmeciRet = 0;
+        pmeciRet = nullptr;
     }
 
     catch(...)
     {
         IssueExcept(psrcClass);
-        pmeciRet = 0;
+        pmeciRet = nullptr;
     }
 
     // Make sure we get rid of any classes we put on the stack
@@ -1220,7 +1220,7 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 //  the class and get a literal from it.
                 //
                 tCIDLib::TCard4 c4LastSep;
-                const TMEngLiteralVal* pmelvFound = 0;
+                const TMEngLiteralVal* pmelvFound = nullptr;
                 if (strTmp.bLastOccurrence(kCIDLib::chPeriod, c4LastSep))
                 {
                     strTmp.CopyOutSubStr(strPath, c4LastSep + 1);
@@ -1389,7 +1389,7 @@ TMacroEngParser::ParseLiterals(TParserSrc& psrcClass, TMEngClassInfo& meciToFill
         //
         eTok = psrcClass.eGetNextToken(strText);
 
-        TMEngClassVal* pmecvLit = 0;
+        TMEngClassVal* pmecvLit = nullptr;
         switch(tCIDMacroEng::EIntrinsics(meciTarget.c2Id()))
         {
             case tCIDMacroEng::EIntrinsics::Boolean :
@@ -1856,7 +1856,7 @@ TMacroEngParser::ParseMembers(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 //  the class and get a literal from it.
                 //
                 tCIDLib::TCard4 c4LastSep;
-                const TMEngLiteralVal* pmelvFound = 0;
+                const TMEngLiteralVal* pmelvFound = nullptr;
                 if (strText.bLastOccurrence(kCIDLib::chPeriod, c4LastSep))
                 {
                     strText.CopyOutSubStr(strName, c4LastSep + 1);
@@ -2189,7 +2189,7 @@ TMacroEngParser::ParseTypes(TParserSrc& psrcClass, TMEngClassInfo& meciOwner)
             }
              else
             {
-                TMEngColBaseInfo* pmeciNew = 0;
+                TMEngColBaseInfo* pmeciNew = nullptr;
                 if (eTok == tCIDMacroEng::ETokens::VectorOf)
                 {
                     pmeciNew = new TMEngVectorInfo

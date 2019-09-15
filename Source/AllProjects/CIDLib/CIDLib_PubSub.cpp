@@ -1052,8 +1052,8 @@ TPubSubTopic::pstopCreateTopic(const TString& strTopicPath, const TClass& clsMsg
     //
     //  Create a new one and add it to our list and return it. Of course adding it to
     //  our list creates a new copy that goes into the list, but the ref counted bit
-    //  inside is the same, so we can just return our local copy. We assing it the
-    //  next available unique id.
+    //  inside is the same, so we can just return our local copy. It will be assigned
+    //  the next available unique topic id.
     //
     TPubSubTopic pstopRet(strTopicPath, clsMsgType);
     CIDLib_PubSub::pcolTopicList->objAdd(pstopRet);

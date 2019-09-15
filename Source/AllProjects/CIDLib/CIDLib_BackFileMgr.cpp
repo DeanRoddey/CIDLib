@@ -121,7 +121,7 @@ tCIDLib::TBoolean TBackFileMgr::bPromote(const TString& strSaveCurAs)
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::FileSystem))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
 
         facCIDLib().ThrowErr
@@ -170,7 +170,7 @@ tCIDLib::TBoolean TBackFileMgr::bSaveCur(const TString& strSaveAs)
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::FileSystem))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
 
         facCIDLib().ThrowErr
@@ -196,7 +196,7 @@ tCIDLib::TBoolean TBackFileMgr::bSaveCur(const TString& strSaveAs)
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::FileSystem))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
 
         facCIDLib().ThrowErr
@@ -298,7 +298,7 @@ tCIDLib::TVoid TBackFileMgr::Demote()
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::FileSystem))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
 
         facCIDLib().ThrowErr
@@ -337,7 +337,7 @@ tCIDLib::TVoid TBackFileMgr::Demote()
             if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::FileSystem))
             {
                 errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
+                TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
             }
 
             facCIDLib().ThrowErr
@@ -370,7 +370,7 @@ tCIDLib::TVoid TBackFileMgr::Demote()
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::FileSystem))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
 
         facCIDLib().ThrowErr

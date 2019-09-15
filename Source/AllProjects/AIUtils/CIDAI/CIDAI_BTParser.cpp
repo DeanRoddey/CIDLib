@@ -111,7 +111,7 @@ TCIDAIBTParser::pbtnodeParse(const TMemBuf& mbufSrc, const tCIDLib::TCard4 c4Byt
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
 
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);

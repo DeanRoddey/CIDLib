@@ -91,7 +91,7 @@ class CIDLIBEXP TPubSubAsyncSub : public TObject, private MPubSubscription
         tCIDLib::TVoid ProcessPubMsg
         (
             const   TPubSubMsg&             psmsgIn
-        )   override;
+        )   final;
 
 
     private :

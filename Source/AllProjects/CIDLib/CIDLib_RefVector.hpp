@@ -1660,10 +1660,10 @@ class TRefVector : public TRefCollection<TElem>
                         delete m_apElems[c4Index];
                     }
 
-                    catch(const TError& errToCatch)
+                    catch(TError& errToCatch)
                     {
-                        if (!errToCatch.bLogged())
-                            TModule::LogEventObj(errToCatch);
+                        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                        TModule::LogEventObj(errToCatch);
                     }
 
                     catch(...)

@@ -303,7 +303,7 @@ TLogSrvLogger::eLoggerThread(TThread& thrThis, tCIDLib::TVoid*)
             //  Wait a while for content to arrive. We wake up periodically
             //  to check for shutdown requests
             //
-            if (m_colLogQ.bGetNext(logevCur, 250, kCIDLib::False))
+            if (m_colLogQ.bGetNextMv(logevCur, 250, kCIDLib::False))
             {
                 //
                 //  If if the logger pointer is null and it's been more than 5

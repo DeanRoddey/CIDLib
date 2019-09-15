@@ -72,6 +72,14 @@ template <class TElem> class TQueueNode : public TDLstNode
         {
         }
 
+        TQueueNode(         TElem&&             objData
+                    , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0) :
+
+            m_ePriority(ePriority)
+            , m_objData(tCIDLib::ForceMove(objData))
+        {
+        }
+
         //
         //  A special one for in place elements. We can't figure out the next
         //  node until after this object is built and the element constructed.
@@ -674,8 +682,8 @@ template <class TElem> class TQueue : public TCollection<TElem>
 
 
         //
-        //  Get the next available object, waiting up to the indicated
-        //  amount of time for it to show up.
+        //  Get the next available object, waiting up to the indicated amount of time
+        //  for it to show up. We have one that copies and one that moves out.
         //
         tCIDLib::TBoolean bGetNext(         TElem&              objToFill
                                     , const tCIDLib::TCard4     c4Millis = kCIDLib::c4MaxWait
@@ -707,6 +715,38 @@ template <class TElem> class TQueue : public TCollection<TElem>
             }
             return bGotOne;
         }
+
+        tCIDLib::TBoolean bGetNextMv(       TElem&              objToFill
+                                    , const tCIDLib::TCard4     c4Millis = kCIDLib::c4MaxWait
+                                    , const tCIDLib::TBoolean   bThrowIfTimeout = kCIDLib::False)
+        {
+            // Lock the queue
+            TMtxLocker lockQueue(this->pmtxLock());
+
+            // Call a helper to wait for something to show up
+            tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
+            (
+                lockQueue, *this, c4Millis, m_twlWaiters, bThrowIfTimeout
+            );
+
+            if (bGotOne)
+            {
+                // Get the head node
+                TNode* pnodeHead = static_cast<TNode*>(m_llstQueue.pnodeHead());
+
+                // Get the object out of it and then flush the node
+                objToFill = tCIDLib::ForceMove(pnodeHead->objData());
+                m_llstQueue.RemoveNode(pnodeHead);
+
+                // Bump the serial number to invalidate cursors
+                this->c4IncSerialNum();
+
+                // Wake up one thread waiting for space
+                m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitSpace);
+            }
+            return bGotOne;
+        }
+
 
         //
         //  This method just looks at the next available element, and sees if
@@ -922,6 +962,29 @@ template <class TElem> class TQueue : public TCollection<TElem>
             m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitData);
             return pnodeNew->objData();
         }
+
+        TElem&
+        objPut(         TElem&&             objToPut
+                , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0)
+        {
+            // Get control of the queue before we modify it
+            TMtxLocker lockQueue(this->pmtxLock());
+
+            // Add the new node to the list
+            TNode* pnodeNew = new TNode(tCIDLib::ForceMove(objToPut), ePriority);
+            m_llstQueue.AppendNode(pnodeNew);
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            //
+            //  And wake up one waiting thread to handle this new element.
+            //  Don't care if any are actually waiting.
+            //
+            m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitData);
+            return pnodeNew->objData();
+        }
+
 
         tCIDLib::TVoid RemoveAt(TCursor& cursAt)
         {

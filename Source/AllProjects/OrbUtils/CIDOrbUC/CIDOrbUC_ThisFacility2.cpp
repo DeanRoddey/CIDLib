@@ -208,7 +208,7 @@ tCIDLib::TVoid TFacCIDOrbUC::StopRebinder() noexcept
         if (facCIDOrbUC().bShouldLog(errToCatch))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 
@@ -319,7 +319,7 @@ TFacCIDOrbUC::UpdateExtraNSVal( const   TString&        strNodePath
         if (facCIDOrbUC().bShouldLog(errToCatch))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }
@@ -757,7 +757,7 @@ TFacCIDOrbUC::eBinderThread(TThread& thrThis, tCIDLib::TVoid*)
             if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
             {
                 errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
+                TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
             }
 
             m_enctLastNSCheck = TTime::enctNow();

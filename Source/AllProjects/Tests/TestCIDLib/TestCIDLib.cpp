@@ -122,7 +122,6 @@ static tCIDLib::TVoid RunTests()
     }
 }
 
-
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
     // We have to let our calling thread go first

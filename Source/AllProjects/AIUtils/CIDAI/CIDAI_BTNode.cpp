@@ -478,7 +478,7 @@ TAIBTNode::eRunNode(TAIBehaviorTree& btreeOwner, TAIBTNode& btnodeTar)
         btreeOwner.PopNode();
 
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-        TModule::LogEventObj(errToCatch);
+        TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
 
         facCIDAI().LogMsg
         (

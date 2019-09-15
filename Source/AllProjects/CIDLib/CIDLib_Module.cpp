@@ -597,6 +597,120 @@ tCIDLib::TVoid TModule::LogEventObj(const TLogEvent& logevToLog)
 }
 
 
+tCIDLib::TVoid TModule::LogEventObj(TLogEvent&& logevToLog)
+{
+    // Get the severity out since its used a lot below
+    tCIDLib::ESeverities eSev = logevToLog.eSeverity();
+
+    // Get control of the sync semaphore before we do anything
+    TMtxLocker lockLog(pmtxLogSync());
+
+    //
+    //  See if there is a recursive error going on. If so, we need to
+    //  do an emergency popup and give up.
+    //
+    if (CIDLib_Module::c4EntryCount > 16)
+    {
+        // Let the lock go so we don't hang up everyone
+        lockLog.Release();
+
+        TKrnlPopup::Show
+        (
+            CID_FILE
+            , CID_LINE
+            , CIDLib_Module::pszTitle1
+            , CIDLib_Module::pszTitle2
+            , 0
+            , 0
+            , 0
+            , CIDLib_Module::pszRecursiveError
+            , kCIDLib::pszEmptyZStr
+        );
+        TProcess::ExitProcess(tCIDLib::EExitCodes::RuntimeError);
+    }
+
+    //
+    //  Bump the entry counter. We use a janitor so its sure to get put
+    //  back on any entry, and before the mutex locker above lets the
+    //  mutex go.
+    //
+    TCardJanitor janEntry
+    (
+        &CIDLib_Module::c4EntryCount, CIDLib_Module::c4EntryCount + 1
+    );
+
+    //
+    //  If there is an installed logger, then we need to log it. Mark
+    //  it as logged, so that if its throw also, the catcher will know
+    //  if its been logged or not.
+    //
+    if (plgrTarget())
+    {
+        logevToLog.SetLogged();
+        try
+        {
+            plgrTarget()->LogEvent(tCIDLib::ForceMove(logevToLog));
+        }
+
+        catch(const TError& errToCatch)
+        {
+            // Let the lock go so we don't hang up everyone
+            lockLog.Release();
+
+            #if CID_DEBUG_ON
+            TKrnlPopup::Show
+            (
+                errToCatch.strFileName().pszBuffer()
+                , errToCatch.c4LineNum()
+                , CIDLib_Module::pszTitle1
+                , CIDLib_Module::pszExceptDuringLog
+                , errToCatch.errcId()
+                , 0
+                , 0
+                , errToCatch.strErrText().pszBuffer()
+                , errToCatch.strAuxText().pszBuffer()
+            );
+            #endif
+        }
+
+        catch(...)
+        {
+            // Let the lock go so we don't hang up everyone
+            lockLog.Release();
+
+            #if CID_DEBUG_ON
+            TKrnlPopup::Show
+            (
+                CID_FILE
+                , CID_LINE
+                , CIDLib_Module::pszTitle1
+                , CIDLib_Module::pszTitle2
+                , 0
+                , 0
+                , 0
+                , CIDLib_Module::pszExceptDuringLog
+                , kCIDLib::pszEmptyZStr
+            );
+            #endif
+        }
+    }
+
+    //
+    //  If its at or above the process fatal level, then we need to exit the
+    //  program now. We use the standard runtime error code.
+    //
+    //  If we are in testing mode, then we don't exit since the host process
+    //  is just probing to insure that errors are caught and wants to continue
+    //  processing.
+    //
+    if ((eSev >= tCIDLib::ESeverities::ProcFatal)
+    &&  (eSev != tCIDLib::ESeverities::Status)
+    &&  !TSysInfo::bTestMode())
+    {
+        TProcess::ExitProcess(tCIDLib::EExitCodes::RuntimeError);
+    }
+}
+
 //
 //  This method is designed to log bulk events, generally when they recieved
 //  by a logging server from clients. So we don't do much of the stuff that

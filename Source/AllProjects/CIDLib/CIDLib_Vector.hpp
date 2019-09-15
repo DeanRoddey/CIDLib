@@ -618,7 +618,7 @@ class TVector : public TCollection<TElem>
             return m_c4CurCount;
         }
 
-        TElem& objAdd(const TElem& objNew)
+        TElem& objAdd(const TElem& objNew) final
         {
             TMtxLocker lockCol(this->pmtxLock());
 
@@ -1676,11 +1676,11 @@ class TVector : public TCollection<TElem>
                     delete m_apElems[c4Index];
                 }
 
-                catch(const TError& errToCatch)
+                catch(TError& errToCatch)
                 {
                     // Not much we can do other than log
-                    if (!errToCatch.bLogged())
-                        TModule::LogEventObj(errToCatch);
+                    errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                    TModule::LogEventObj(errToCatch);
                 }
 
                 catch(...)

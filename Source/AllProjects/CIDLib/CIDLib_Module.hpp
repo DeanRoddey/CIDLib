@@ -136,6 +136,11 @@ class CIDLIBEXP TModule : public TObject
             const   TLogEvent&              logevToLog
         );
 
+        static tCIDLib::TVoid LogEventObj
+        (
+                    TLogEvent&&             logevToLog
+        );
+
         static tCIDLib::TVoid LogEventObjs
         (
             const   TCollection<TLogEvent>& colToLog

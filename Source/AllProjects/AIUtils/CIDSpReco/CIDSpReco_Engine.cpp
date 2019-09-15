@@ -130,7 +130,7 @@ TCIDSpReco::~TCIDSpReco()
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }
@@ -1157,7 +1157,7 @@ tCIDLib::TVoid TCIDSpReco::Terminate()
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 
@@ -1197,7 +1197,7 @@ tCIDLib::TVoid TCIDSpReco::Terminate()
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 
@@ -1465,7 +1465,7 @@ TCIDSpReco::eEvMonThread(TThread& thrThis, tCIDLib::TVoid* const pData)
                     catch(TError& errToCatch)
                     {
                         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                        TModule::LogEventObj(errToCatch);
+                        TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
                     }
                 }
             }
@@ -1553,7 +1553,7 @@ TRecoGramRuleJan::~TRecoGramRuleJan()
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }

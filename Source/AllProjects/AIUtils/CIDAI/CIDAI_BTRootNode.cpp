@@ -85,7 +85,7 @@ tCIDAI::ENodeStates TAIBTRootNode::eRun(TAIBehaviorTree& btreeOwner)
     catch(TError& errToCatch)
     {
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-        TModule::LogEventObj(errToCatch);
+        TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
     }
     return eRet;
 }

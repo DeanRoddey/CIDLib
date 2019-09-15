@@ -59,13 +59,12 @@
 //  sources you could also throw the incoming msgs into one. As long as the queue is thread
 //  safe, then there are no issues.
 //
-//  Our internal msg class (which wraps your published objects) implements MRefCounted and
-//  we manage the reference counting internally. Each subscriber is giving a copy of this
-//  ref counted object, so they all see the same one. When the last subscriber has read
-//  it, it is dropped.
+//  Our public msg class (TPubSubMsg) wraps your published messages. It actually puts
+//  them into an internal msg implementation object, and the public class uses a pointed
+//  counter on that impl object. It hands out these msgs out, all of which are looking
+//  at the same message data. When the one is dropped the internal object and your
+//  published message is dropped.
 //
-//  To avoid potential deadlocks, we use a separate internal critical section to handle
-//  the reference counting.
 //
 //  KEEP IN MIND that anything you do in the dtor of the published objects will happen at
 //  some fairly random time, when the last subscriber of that topic has read it and let it
@@ -77,16 +76,18 @@
 //
 //  A common scenario with async subscribers is for the client code to either use a GUI
 //  timer or a separate thread to monitor the subscription object for msgs to process.
-//  In the former case it will just do a 0 timeout read to get anything already avaialble.
-//  In the latter it can do a longer blocking read to just wait for stuff to be available.
+//  In the former case it will just do a 0 timeout read to get anything already available.
+//  In the latter it can do a longer blocking read to just wait for stuff to be available,
+//  though of course still being responsive to shutdown requests.
 //
 //  But, in some cases, if some client code needed to subscribe to multiple topics, or to
 //  wait for either topic msgs or socket input or some such, then it would want to use an
 //  event driven scheme.
 //
 //  So you can request the subscription to create an event, which can either be blocked on
-//  itself (not really needed sinc you can just do a blocking read) or added to to a multi-
-//  event wait list. It will be posted when msgs are available and reset when not.
+//  itself (not really needed sinc you can just do a blocking read in that case) or more
+//  likely added to to a multi-event wait list. It will be posted when msgs are available
+//  and reset when not.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -153,6 +154,7 @@ class CIDLIBEXP TPubSubMsg : public TObject
         }
 
         const TString& strSrcTopicPath() const;
+
 
     private :
         // -------------------------------------------------------------------

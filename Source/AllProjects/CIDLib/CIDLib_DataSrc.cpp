@@ -786,7 +786,7 @@ TCIDDataSrcJan::~TCIDDataSrcJan()
             if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::DataSrc))
             {
                 errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
+                TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
             }
         }
 
@@ -803,7 +803,7 @@ TCIDDataSrcJan::~TCIDDataSrcJan()
                 if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::DataSrc))
                 {
                     errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                    TModule::LogEventObj(errToCatch);
+                    TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
                 }
             }
         }
@@ -899,7 +899,7 @@ TCIDDataSrcJan::SetNew(         TCIDDataSrc* const      pcdsToSanitize
             if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::DataSrc))
             {
                 errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
+                TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
             }
         }
 

@@ -212,7 +212,7 @@ TChunkedMemStreamImplInfo::~TChunkedMemStreamImplInfo()
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::BinStreams))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }
@@ -894,7 +894,7 @@ TChunkedInStreamImpl::~TChunkedInStreamImpl()
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::BinStreams))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }
@@ -1035,7 +1035,7 @@ TChunkedOutStreamImpl::~TChunkedOutStreamImpl()
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::BinStreams))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }

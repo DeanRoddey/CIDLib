@@ -96,7 +96,7 @@ TFacCIDOrbUC::~TFacCIDOrbUC()
         if (facCIDOrbUC().bShouldLog(errToCatch))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 
@@ -611,7 +611,7 @@ TFacCIDOrbUC::porbcMakeNSProxy(const tCIDLib::TCard4 c4WaitUpTo)
             if (facCIDOrbUC().bLogInfo() && !errToCatch.bLogged())
             {
                 errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
+                TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
             }
 
             // It failed, so flush this guy from the cache
