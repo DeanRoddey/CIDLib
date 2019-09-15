@@ -673,9 +673,7 @@ tCIDLib::TVoid
 TFileSys::CleanPath(const   TString&                strStartDir
                     , const tCIDLib::ETreeDelModes  eMode)
 {
-    if (!TKrnlFileSys::bRemovePath( strStartDir.pszBuffer()
-                                    , eMode
-                                    , kCIDLib::False))
+    if (!TKrnlFileSys::bRemovePath( strStartDir.pszBuffer(), eMode, kCIDLib::False))
     {
         facCIDLib().ThrowKrnlErr
         (

@@ -185,7 +185,7 @@ pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
 // ---------------------------------------------------------------------------
 TKrnlExtProcess::TKrnlExtProcess() :
 
-    m_pExtra(0)
+    m_pExtra(nullptr)
 {
     // Allocate the new process handle and get it set up
     m_hprocThis.m_phprociThis = new TProcessHandleImpl;
@@ -360,10 +360,7 @@ tCIDLib::TBoolean TKrnlExtProcess::bKill()
 }
 
 
-//
-//  Using the handle of the running process, get the full path to it. Flip
-//  the slashes to internal CIDLib format for return.
-//
+// Using the handle of the running process, get the full path to it
 tCIDLib::TBoolean
 TKrnlExtProcess::bQueryFullPath(        tCIDLib::TCh* const pszToFill
                                 , const tCIDLib::TCard4     c4MaxChars)

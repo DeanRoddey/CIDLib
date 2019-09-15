@@ -1871,7 +1871,6 @@ TKrnlFileSys::bHasWildCards(const tCIDLib::TCh* const pszToSearch)
 }
 
 
-
 tCIDLib::TBoolean
 TKrnlFileSys::bIsDirectory(const tCIDLib::TCh* const pszDirToCheck)
 {
@@ -1918,7 +1917,6 @@ TKrnlFileSys::bIsDirectory(const tCIDLib::TCh* const pszDirToCheck)
     // Make sure it doesn't have any wild cards
     return (bRes && !bHasWildCards(pszCheck));
 }
-
 
 
 tCIDLib::TBoolean
@@ -2183,6 +2181,40 @@ TKrnlFileSys::bMakePath(const tCIDLib::TCh* const pszToCreate)
     }
     return kCIDLib::True;
 }
+
+
+//
+//  Normalize a path and return the adjusted path. This gets rid of . and ..
+//  type entries and such.
+//
+tCIDLib::TBoolean
+TKrnlFileSys::bNormalizePath(const  tCIDLib::TCh* const pszToNormalize
+                            ,       tCIDLib::TCh* const pszResult
+                            , const tCIDLib::TCard4     c4MaxChars)
+{
+    // And canonicalize it to the local output
+    tCIDLib::TCh szOut[MAX_PATH + 1];
+    if (!::PathCanonicalize(szOut, pszToNormalize))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcFl_Normalize);
+        return kCIDLib::False;
+    }
+
+    //
+    //  The system call is kind of dumb on a couple of special cases, so
+    //  watch for them ourself.
+    //
+    if (TRawStr::bCompareStr(&szOut[1], L":..")
+    ||  TRawStr::bCompareStr(&szOut[1], L":."))
+    {
+        szOut[2] = kCIDLib::chNull;
+    }
+
+    // Ok, copy back to the caller's buffer
+    TRawStr::CopyStr(pszResult, szOut, c4MaxChars);
+    return kCIDLib::True;
+}
+
 
 
 tCIDLib::TBoolean
@@ -2709,38 +2741,6 @@ tCIDLib::TBoolean TKrnlFileSys
     return kCIDLib::True;
 }
 
-
-//
-//  Normalize a path and return the adjusted path. This gets rid of . and ..
-//  type entries and such.
-//
-tCIDLib::TBoolean
-TKrnlFileSys::bNormalizePath(const  tCIDLib::TCh* const pszToNormalize
-                            ,       tCIDLib::TCh* const pszResult
-                            , const tCIDLib::TCard4     c4MaxChars)
-{
-    // And canonicalize it to the local output
-    tCIDLib::TCh szOut[MAX_PATH + 1];
-    if (!::PathCanonicalize(szOut, pszToNormalize))
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcFl_Normalize);
-        return kCIDLib::False;
-    }
-
-    //
-    //  The system call is kind of dumb on a couple of special cases, so
-    //  watch for them ourself.
-    //
-    if (TRawStr::bCompareStr(&szOut[1], L":..")
-    ||  TRawStr::bCompareStr(&szOut[1], L":."))
-    {
-        szOut[2] = kCIDLib::chNull;
-    }
-
-    // Ok, copy back to the caller's buffer
-    TRawStr::CopyStr(pszResult, szOut, c4MaxChars);
-    return kCIDLib::True;
-}
 
 
 tCIDLib::TBoolean
