@@ -119,6 +119,11 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
             return this->objAddAtBottom(objToPush);
         }
 
+        TElem& objPush(TElem&& objToPush)
+        {
+            return this->objAddAtBottom(tCIDLib::ForceMove(objToPush));
+        }
+
         tCIDLib::TVoid SwapTop()
         {
             // Our parent class can do this safely and efficiently
@@ -158,6 +163,13 @@ template <class TElem> class TStackJan
             m_pcolTarget(pcolTarget)
         {
             m_pcolTarget->objPush(objToPush);
+        }
+
+        TStackJan(TStack<TElem>* const pcolTarget, TElem&& objToPush) :
+
+            m_pcolTarget(pcolTarget)
+        {
+            m_pcolTarget->objPush(tCIDLib::ForceMove(objToPush));
         }
 
         TStackJan(const TStackJan&) = delete;

@@ -406,6 +406,8 @@ namespace TFileSys
     CIDLIBEXP tCIDLib::TVoid RemovePath
     (
         const   TString&                strStartDir
+        , const tCIDLib::ETreeDelModes  eMode = tCIDLib::ETreeDelModes::Remove
+        , const tCIDLib::TBoolean       bRemoveStart = kCIDLib::True
     );
 
     CIDLIBEXP tCIDLib::TVoid Rename

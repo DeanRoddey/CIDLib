@@ -642,10 +642,28 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
             return pnodeNew->objData();
         }
 
+        TElem& objAddAtBottom(TElem&& objToAdd)
+        {
+            TMtxLocker lockSync(TParent::pmtxLock());
+            TNode* pnodeNew = new TNode(tCIDLib::ForceMove(objToAdd));
+            m_llstCol.PrependNode(pnodeNew);
+            this->c4IncSerialNum();
+            return pnodeNew->objData();
+        }
+
         TElem& objAddAtTop(const TElem& objToAdd)
         {
             TMtxLocker lockSync(TParent::pmtxLock());
             TNode* pnodeNew = new TNode(objToAdd);
+            m_llstCol.AppendNode(pnodeNew);
+            this->c4IncSerialNum();
+            return pnodeNew->objData();
+        }
+
+        TElem& objAddAtTop(TElem&& objToAdd)
+        {
+            TMtxLocker lockSync(TParent::pmtxLock());
+            TNode* pnodeNew = new TNode(tCIDLib::ForceMove(objToAdd));
             m_llstCol.AppendNode(pnodeNew);
             this->c4IncSerialNum();
             return pnodeNew->objData();

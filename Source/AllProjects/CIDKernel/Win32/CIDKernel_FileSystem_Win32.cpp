@@ -154,7 +154,13 @@ bCheckSearchCriteria(   const   WIN32_FIND_DATA&            toCheck
 
     if (toCheck.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
     {
-        if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::FindDirs))
+        //
+        //  We don't return the current/parent directory entries, so filter those out
+        //  always.
+        //
+        if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::FindDirs)
+        &&  !TRawStr::bCompareStrI(toCheck.cFileName, L".")
+        &&  !TRawStr::bCompareStrI(toCheck.cFileName, L".."))
         {
             //
             //  It was a directory and they want see directories. So now check
@@ -163,9 +169,7 @@ bCheckSearchCriteria(   const   WIN32_FIND_DATA&            toCheck
             //
             if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::NormalDirsOnly))
             {
-                if (!TRawStr::bCompareStrI(toCheck.cFileName, L".")
-                &&  !TRawStr::bCompareStrI(toCheck.cFileName, L"..")
-                &&  !(toCheck.dwFileAttributes & TKrnlWin32::c4NonNormalAttrs))
+                if (!(toCheck.dwFileAttributes & TKrnlWin32::c4NonNormalAttrs))
                 {
                     bMatches = kCIDLib::True;
                 }
@@ -435,219 +439,6 @@ bConvertFindBuf(const   WIN32_FIND_DATA&            FileData
         , c4MaxBufChars(fndbToFill.szName)
     );
     return kCIDLib::True;
-}
-
-
-//
-//  This is a (potentially) recursive function to delete an entire directory tree. See
-//  the ETreeDelModes enum comments for what the modes mean.
-//
-//  In order to avoid a lot of wierdness, this guy throws its errors and catches them at
-//  the bottom to clean up before rethrowing. The public calling method will catch it
-//  and set it as the last error.
-//
-static tCIDLib::TVoid TreeDelete(const  tCIDLib::TCh* const     pszStartDir
-                                , const tCIDLib::ETreeDelModes  eMode
-                                , const tCIDLib::TBoolean       bRemoveStartDir)
-{
-    //
-    //  Note that we allocate both the file find data and the search
-    //  spec string in order to minimize stack usage in case of heavily
-    //  nested paths.
-    //
-    WIN32_FIND_DATA*    pFileData = 0;
-    HANDLE              hFind = 0;
-    tCIDLib::TCh*       pszSubSearch = 0;
-    try
-    {
-        //
-        //  Create a string that consists of the passed path and with an
-        //  appended extension to find everything in this directory.
-        //
-        const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszStartDir);
-        pszSubSearch = new tCIDLib::TCh[kCIDLib::c4MaxPathLen + 1];
-
-        TRawStr::CopyCatStr
-        (
-            pszSubSearch
-            , kCIDLib::c4MaxPathLen
-            , pszStartDir
-            , L"\\"
-            , kCIDLib::pszAllFilesSpec
-        );
-
-        //
-        //  Allocate the buffer so we don't eat up stack space on a
-        //  large disk with deep directory structure. We have a catch
-        //  block in place.
-        //
-        pFileData = new WIN32_FIND_DATA;
-        hFind = ::FindFirstFile(pszSubSearch, pFileData);
-        if (hFind == INVALID_HANDLE_VALUE)
-            TKrnlError::ThrowHostError(::GetLastError());
-
-        {
-            // Insure the handle gets cleaned up
-            TFindJanitor janFind(hFind);
-
-            tCIDLib::TBoolean bDone = kCIDLib::False;
-            while (!bDone)
-            {
-                //
-                //  If its a directory, and we are not in shallow mode, lets recurse
-                //  into the underlying dir. Otherwise, we remove the file, overriding
-                //  attrs if needed.
-                //
-                if (pFileData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                {
-                    if (eMode != tCIDLib::ETreeDelModes::Shallow)
-                    {
-                        // Recurse on this path if not one of the special ones
-                        if (!TRawStr::bCompareStr(pFileData->cFileName, L".")
-                        &&  !TRawStr::bCompareStr(pFileData->cFileName, L".."))
-                        {
-                            //
-                            //  For nested invocations we always indicate that it
-                            //  should remove the start dir. We have to build up
-                            //  the full path name, and can reuse the buffer we
-                            //  built the initial search spec in above.
-                            //
-                            TRawStr::CopyStr
-                            (
-                                &pszSubSearch[c4SrcLen + 1]
-                                , pFileData->cFileName
-                                , kCIDLib::c4MaxPathLen
-                            );
-                            TreeDelete(pszSubSearch, eMode, kCIDLib::True);
-                        }
-                    }
-                }
-                 else
-                {
-                    const tCIDLib::TCard4 c4Override =  FILE_ATTRIBUTE_HIDDEN
-                                                        | FILE_ATTRIBUTE_READONLY
-                                                        | FILE_ATTRIBUTE_SYSTEM;
-
-                    // Build up the full name
-                    TRawStr::CopyStr
-                    (
-                        &pszSubSearch[c4SrcLen + 1]
-                        , pFileData->cFileName
-                        , kCIDLib::c4MaxPathLen
-                    );
-
-                    //
-                    //  If any attributes are on that we have to override in
-                    //  order to delete the file, then lets set it back to
-                    //  normal.
-                    //
-                    if ((pFileData->dwFileAttributes & c4Override)
-                    &&  !::SetFileAttributes(pszSubSearch, FILE_ATTRIBUTE_NORMAL))
-                    {
-                        TKrnlError::ThrowHostError(::GetLastError());
-                    }
-
-                    //
-                    //  And now try to delete the file. We can reuse the buffer
-                    //  we created above to make the initial search string. We
-                    //  saved the original source len, so we can just copy at
-                    //  that point (plus 1 for the separator) in order to append.
-                    //
-                    if (!::DeleteFile(pszSubSearch))
-                        TKrnlError::ThrowHostError(::GetLastError());
-                }
-
-                // Now find the next file/directory
-                if (!::FindNextFile(hFind, pFileData))
-                {
-                    //
-                    //  If the reason is no more files, that's cool and its
-                    //  not an error, i.e. we just return. Otherwise its an
-                    //  error and we throw it to unwind.
-                    //
-                    tCIDLib::TOSErrCode errcRes = ::GetLastError();
-                    if (errcRes == ERROR_NO_MORE_FILES)
-                        break;
-
-                    TKrnlError::ThrowHostError(errcRes);
-                }
-            }
-        }
-
-        //
-        //  Ok, we've cleaned out everything under the starting directory that
-        //  we are going to, so lets remove it now if we were told to. If we get
-        //  a sharing violation, it may be because we are in it, so lets move to
-        //  the root and try again. If the mode is clean or shallow we leave the
-        //  directories in place. And we also look at the remove start dir flag
-        //  to see if we should remove it. This flag is used to support keeping
-        //  the top level directory (i.e. just getting rid of its contents) or
-        //  removing the top level dir, too.
-        //
-        if (bRemoveStartDir && (eMode == tCIDLib::ETreeDelModes::Remove))
-        {
-            //
-            //  We do this because sometimes there are programs
-            //  that will immediately change to a directory that is
-            //  changing, so they will have their current directory
-            //  there until they see it's empty. So we can fail
-            //  until they go away.
-            //
-            const tCIDLib::TCard4 c4MaxTries = 8;
-            tCIDLib::TCard4 c4Err = 0;
-            tCIDLib::TCard4 c4Tries = 0;
-            while (c4Tries < c4MaxTries)
-            {
-                // Try the remove. If it works, break out
-                if (::RemoveDirectory(pszStartDir))
-                    break;
-
-                // It didn't, so get the last error
-                c4Err = ::GetLastError();
-
-                //
-                //  If a sharing violation or dir not empty, we'll
-                //  pause a bit and try again. Else give up now.
-                //
-                if ((c4Err == ERROR_SHARING_VIOLATION)
-                ||  (c4Err == ERROR_DIR_NOT_EMPTY))
-                {
-                    //
-                    //  If the first time, make sure it's not us in
-                    //  this directory, by moving to the root of the
-                    //  current drive or volume.
-                    //
-                    if (!c4Tries)
-                    {
-                        if (!::SetCurrentDirectory(L"\\"))
-                            TKrnlError::ThrowHostError(c4Err);
-                    }
-                    ::Sleep(500);
-                }
-                 else
-                {
-                    TKrnlError::ThrowHostError(c4Err);
-                }
-                c4Tries++;
-            }
-
-            // If max tries, we failed
-            if (c4Tries == c4MaxTries)
-                TKrnlError::ThrowHostError(c4Err);
-        }
-    }
-
-    catch(...)
-    {
-        // Clean up the buffers we allocated
-        delete pFileData;
-        delete [] pszSubSearch;
-        throw;
-    }
-
-    // Clean up the buffers we allocated
-    delete pFileData;
-    delete [] pszSubSearch;
 }
 
 
@@ -2786,53 +2577,51 @@ TKrnlFileSys::bRemoveFile(const tCIDLib::TCh* const pszToDelete)
 {
     const tCIDLib::TCard4 c4MaxTries = 15;
     tCIDLib::TCard4 c4Tries = 0;
+    tCIDLib::TBoolean bRet = kCIDLib::False;
     while (kCIDLib::True)
     {
         // Try it. If it works, break out and return true
         if (::DeleteFile(pszToDelete))
-            break;
-
-        // Indicate we've made another try
-        c4Tries++;
-
-        // It didn't, so get the last error
-        tCIDLib::TCard4 c4Err = ::GetLastError();
-
-        //
-        //  If a sharing violation or dir not empty, we'll
-        //  pause a bit and try again.
-        //
-        if ((c4Err == ERROR_SHARING_VIOLATION) && (c4Tries < c4MaxTries))
         {
-            CIDKernel_FileSystem::c4FSRetryCount++;
-            ::Sleep(200);
-            continue;
+            bRet = kCIDLib::True;
+            break;
         }
 
-        // Not one of our special cases or we've timed out
-        TKrnlError::SetLastHostError(c4Err);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
-}
+        c4Tries++;
+        tCIDLib::TCard4 c4Err = ::GetLastError();
+        if (c4Err == ERROR_ACCESS_DENIED)
+        {
+            //
+            //  It's read only, so try to remove that. If we can't, then we have
+            //  failed. If we can, go back around and try again.
+            //
+            //  If tries is > 1, then something is wrong since we already had to
+            //  have removed the read-only attribute.
+            //
+            if (!::SetFileAttributes(pszToDelete, FILE_ATTRIBUTE_NORMAL)
+            || (c4Tries > 1))
+            {
+                TKrnlError::SetLastHostError(c4Err);
+                break;
+            }
+        }
+         else if (c4Err == ERROR_SHARING_VIOLATION)
+        {
+            //
+            //  Someone has it open, If we are maxed out on retries, we have to
+            //  give up. Else sleep a little and go back to the top.
+            //
+            if (c4Tries >= c4MaxTries)
+            {
+                TKrnlError::SetLastHostError(c4Err);
+                break;
+            }
 
-
-tCIDLib::TBoolean
-TKrnlFileSys::bRemovePath(  const   tCIDLib::TCh* const     pszStartDir
-                            , const tCIDLib::ETreeDelModes  eMode
-                            , const tCIDLib::TBoolean       bRemoveStartDir)
-{
-    try
-    {
-        TreeDelete(pszStartDir, eMode, bRemoveStartDir);
+            CIDKernel_FileSystem::c4FSRetryCount++;
+            ::Sleep(200);
+        }
     }
-
-    catch(const TKrnlError& kerrToCatch)
-    {
-        TKrnlError::SetLastError(kerrToCatch);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
+    return bRet;
 }
 
 

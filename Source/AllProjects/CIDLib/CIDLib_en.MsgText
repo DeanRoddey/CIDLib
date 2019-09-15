@@ -235,7 +235,7 @@ ERRORS=
     ; File and file system errors
     errcFile_NoOpenSearch       1408    There must be an open search, call bStartSearch() first
     errcFile_PathFormat         1409    Invalid path format!
-    errcFile_MustBeDir          1410    %(1) must be a directory
+    errcFile_MustBeADir         1410    The target (or source) must be a directory
     errcFile_Close              1411    Could not close the file, name=%(1)
     errcFile_Seek               1412    Could not move the file pointer, name=%(1)
     errcFile_QuerySize          1413    Could not query the size of the file, name=%(1)

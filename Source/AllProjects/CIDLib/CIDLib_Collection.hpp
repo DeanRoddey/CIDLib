@@ -799,6 +799,12 @@ template <class TElem> class TBasicColNode : public TDLstNode
         {
         }
 
+        TBasicColNode(TElem&& objData) :
+
+            m_objData(tCIDLib::ForceMove(objData))
+        {
+        }
+
         // A special one for in place elements.
         template <typename... TArgs> TBasicColNode(TArgs&&... Args) :
 

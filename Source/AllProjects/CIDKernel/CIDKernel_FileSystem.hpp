@@ -591,13 +591,6 @@ namespace TKrnlFileSys
         const   tCIDLib::TCh* const     pszToRemove
     );
 
-    KRNLEXPORT tCIDLib::TBoolean bRemovePath
-    (
-        const   tCIDLib::TCh* const     pszStartDir
-        , const tCIDLib::ETreeDelModes  eMode
-        , const tCIDLib::TBoolean       bRemoveStartDir
-    );
-
     KRNLEXPORT tCIDLib::TBoolean bRename
     (
         const   tCIDLib::TCh* const     pszOldName

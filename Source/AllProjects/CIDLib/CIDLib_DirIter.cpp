@@ -360,10 +360,10 @@ tCIDLib::TVoid TDirIterCB::Reset(const  TString&            strPath
         (
             CID_FILE
             , CID_LINE
-            , kCIDErrs::errcFile_MustBeDir
+            , kCIDErrs::errcFile_MustBeADir
+            , strPath
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::NotFound
-            , strPath
         );
     }
 
