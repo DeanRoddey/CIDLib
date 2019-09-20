@@ -923,11 +923,18 @@ const TString& TLogEvent::strThread(const TString& strToSet)
 }
 
 
-// Set the 'has been logged' flag and time stamp
+//
+//  Set the 'has been logged' flag and time stamp. If the time stamp is already
+//  set we don't change it. They have to set it explicitly if they want to change
+//  it otherwise. This is mostly for the logging framework to call on events that
+//  are about to be logged and we don't want to modify ones that are being logged
+//  after they've already been created and set up.
+//
 tCIDLib::TVoid TLogEvent::SetLogged() const
 {
     m_bLogged = kCIDLib::True;
-    m_enctLogged = TTime::enctNow();
+    if (!m_enctLogged)
+        m_enctLogged = TTime::enctNow();
 }
 
 

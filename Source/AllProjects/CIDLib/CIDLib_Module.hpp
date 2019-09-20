@@ -141,9 +141,10 @@ class CIDLIBEXP TModule : public TObject
                     TLogEvent&&             logevToLog
         );
 
+        // The events will be moved!
         static tCIDLib::TVoid LogEventObjs
         (
-            const   TCollection<TLogEvent>& colToLog
+                    TCollection<TLogEvent>& colToLog
         );
 
         static tCIDLib::TVoid OrphanLogger();
@@ -162,8 +163,6 @@ class CIDLIBEXP TModule : public TObject
             ,       tCIDLib::TCard4&        c4MinVer
             ,       tCIDLib::TCard4&        c4Revision
         );
-
-        static TMutex* pmtxLogSync();
 
 
         // -------------------------------------------------------------------
@@ -514,7 +513,21 @@ class CIDLIBEXP TModule : public TObject
         // -------------------------------------------------------------------
         //  Private, static methods
         // -------------------------------------------------------------------
-        static MLogger* plgrTarget();
+        static tCIDLib::TVoid CheckFatal
+        (
+            const   tCIDLib::ESeverities    eSev
+        );
+
+        static tCIDLib::TVoid ShowLogFailure
+        (
+            const   TLogEvent&              logevShow
+        );
+
+        static tCIDLib::TVoid ShowLogFailure
+        (
+            const   tCIDLib::TCh* const     pszFile
+            , const tCIDLib::TCard4         c4Line
+        );
 
 
         // -------------------------------------------------------------------

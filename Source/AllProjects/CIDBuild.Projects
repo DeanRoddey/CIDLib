@@ -1585,6 +1585,20 @@ PROJECT=TestCIDLib
     END DEPENDENTS
 END PROJECT
 
+
+PROJECT=LogStressTest
+    SETTINGS
+        DIRECTORY   = Tests\LogStressTest
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDOrb
+        CIDOrbUC
+    END DEPENDENTS
+END PROJECT
+
+
 PROJECT=TestCIDCtrls [Win32_*]
 
     SETTINGS

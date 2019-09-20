@@ -617,6 +617,15 @@ class CIDLIBEXP TString :
             , const tCIDLib::TCh            chGroupSep = kCIDLib::chNull
         );
 
+        tCIDLib::TVoid AppendFormatted
+        (
+            const   tCIDLib::TSInt          iToFmt
+            , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
+            , const tCIDLib::TCh            chNegSign = kCIDLib::chHyphenMinus
+            , const tCIDLib::TCard4         c4GroupSize = 0
+            , const tCIDLib::TCh            chGroupSep = kCIDLib::chNull
+        );
+
         //
         //  The precision parameter is a dummy parameter that is not used. This
         //  exists purely to deal with an otherwise really ugly issue with
@@ -1342,6 +1351,15 @@ class CIDLIBEXP TString :
         tCIDLib::TVoid SetFormatted
         (
             const   tCIDLib::TInt8          i8ToFmt
+            , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
+            , const tCIDLib::TCh            chNegSign = kCIDLib::chHyphenMinus
+            , const tCIDLib::TCard4         c4GroupSize = 0
+            , const tCIDLib::TCh            chGroupSep = kCIDLib::chNull
+        );
+
+        tCIDLib::TVoid SetFormatted
+        (
+            const   tCIDLib::TSInt          iToFmt
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
             , const tCIDLib::TCh            chNegSign = kCIDLib::chHyphenMinus
             , const tCIDLib::TCard4         c4GroupSize = 0

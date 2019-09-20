@@ -1590,6 +1590,23 @@ TString::AppendFormatted(const  tCIDLib::TInt8      i8ToFmt
     Append(szTmp);
 }
 
+// Just force this one to the Int4 one
+tCIDLib::TVoid
+TString::AppendFormatted(const  tCIDLib::TSInt      iToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    AppendFormatted
+    (
+        tCIDLib::TInt4(iToFmt)
+        , eRadix
+        , chNegSign
+        , c4GroupSize
+        , chGroupSep
+    );
+}
 
 //
 //  The trailing parameter is a dummy one that helps us deal with an otherwise
@@ -4728,7 +4745,26 @@ TString::SetFormatted(  const   tCIDLib::TInt8      i8ToFmt
     AppendFormatted(i8ToFmt, eRadix, chNegSign, c4GroupSize, chGroupSep);
 }
 
+// Just force this one to the TInt4 version
+tCIDLib::TVoid
+TString::SetFormatted(  const   tCIDLib::TSInt      iToFmt
+                        , const tCIDLib::ERadices   eRadix
+                        , const tCIDLib::TCh        chNegSign
+                        , const tCIDLib::TCard4     c4GroupSize
+                        , const tCIDLib::TCh        chGroupSep)
+{
+    Clear();
+    AppendFormatted
+    (
+        tCIDLib::TInt4(iToFmt), eRadix, chNegSign, c4GroupSize, chGroupSep
+    );
+}
 
+
+//
+//  Set the last character in this string to the passed value. If empty, this
+//  does nothing.
+//
 tCIDLib::TVoid TString::SetLast(const tCIDLib::TCh chNew)
 {
     if (!m_c4CurEnd)

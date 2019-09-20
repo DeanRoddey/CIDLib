@@ -88,20 +88,22 @@ namespace kCIDLib
     //
     //  And we define the paths for some values that we maintain at this level.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const   pszStat_Scope_Ctrl      = L"/Ctrl/";
-    const tCIDLib::TCh* const   pszStat_Scope_Info      = L"/Info/";
-    const tCIDLib::TCh* const   pszStat_Scope_Settings  = L"/Settings/";
-    const tCIDLib::TCh* const   pszStat_Scope_Stats     = L"/Stats/";
+    const tCIDLib::TCh* const   pszStat_Scope_Ctrl          = L"/Ctrl/";
+    const tCIDLib::TCh* const   pszStat_Scope_Info          = L"/Info/";
+    const tCIDLib::TCh* const   pszStat_Scope_Settings      = L"/Settings/";
+    const tCIDLib::TCh* const   pszStat_Scope_Stats         = L"/Stats/";
 
-    const tCIDLib::TCh* const   pszStat_Scope_LogThresh = L"/Settings/LogThresh/";
-    const tCIDLib::TCh* const   pszStat_Scope_LogFlags  = L"/Settings/LogFlags/";
-    const tCIDLib::TCh* const   pszStat_Scope_LogTrace  = L"/Settings/LogTrace/";
+    const tCIDLib::TCh* const   pszStat_Scope_LogThresh     = L"/Settings/LogThresh/";
+    const tCIDLib::TCh* const   pszStat_Scope_LogFlags      = L"/Settings/LogFlags/";
+    const tCIDLib::TCh* const   pszStat_Scope_LogTrace      = L"/Settings/LogTrace/";
 
-    const tCIDLib::TCh* const   pszStat_Scope_AppInfo   = L"/Info/App/";
-    const tCIDLib::TCh* const   pszStat_AppInfo_UpSince = L"/Info/App/UpSince";
+    const tCIDLib::TCh* const   pszStat_Scope_AppInfo       = L"/Info/App/";
+    const tCIDLib::TCh* const   pszStat_AppInfo_DroppedLogEvs = L"/Info/App/DroppedLogEvs";
+    const tCIDLib::TCh* const   pszStat_AppInfo_LogErrors   = L"/Info/App/LogErrors";
+    const tCIDLib::TCh* const   pszStat_AppInfo_UpSince     = L"/Info/App/UpSince";
 
-    const tCIDLib::TCh* const   pszStat_Scope_Core      = L"/Stats/Core/";
-    const tCIDLib::TCh* const   pszStat_Core_ThreadCount= L"/Stats/Core/ThreadCnt";
+    const tCIDLib::TCh* const   pszStat_Scope_Core          = L"/Stats/Core/";
+    const tCIDLib::TCh* const   pszStat_Core_ThreadCount    = L"/Stats/Core/ThreadCnt";
 }
 
 namespace tCIDLib

@@ -114,7 +114,7 @@ class CIDWEBSOCKEXP TCIDWebSockThread : public TThread
         // --------------------------------------------------------------------
         //  Protected, inherited methods
         // --------------------------------------------------------------------
-        tCIDLib::EExitCodes eProcess() override;
+        tCIDLib::EExitCodes eProcess() final;
 
 
         // --------------------------------------------------------------------

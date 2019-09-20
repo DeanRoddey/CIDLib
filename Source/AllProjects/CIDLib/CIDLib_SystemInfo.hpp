@@ -341,6 +341,8 @@ class CIDLIBEXP TSysInfo : public TObject
             #endif
         }
 
+        static const tCIDLib::TCh* pszLogInfo();
+
         static tCIDLib::TVoid QueryOSInfo
         (
                     tCIDLib::TCard4&        c4OSMajVersion
@@ -392,12 +394,6 @@ class CIDLIBEXP TSysInfo : public TObject
 
     protected :
         // -------------------------------------------------------------------
-        //  Declare our friends
-        // -------------------------------------------------------------------
-        friend class TModule;
-
-
-        // -------------------------------------------------------------------
         //  Hidden stuff
         // -------------------------------------------------------------------
         TSysInfo();
@@ -407,12 +403,6 @@ class CIDLIBEXP TSysInfo : public TObject
         ~TSysInfo();
 
         TSysInfo& operator=(const TSysInfo&) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Protected, non-virtual methods
-        // -------------------------------------------------------------------
-        static const tCIDLib::TCh* pszLogInfo();
 
 
     private :

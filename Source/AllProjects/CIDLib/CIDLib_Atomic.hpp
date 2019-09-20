@@ -55,23 +55,26 @@ namespace TAtomic
     );
 
 
-    template <class T> T* pExchangePtr(T** ppToFill, const T* const pNew)
+    template <class T> T* pExchangePtr(T** ppToFill, T* const pNew)
     {
         return reinterpret_cast<T*>
         (
-            TRawMem::pExchangeRawPtr(static_cast<tCIDLib::TVoid**>(ppToFill), pNew)
+            TRawMem::pExchangeRawPtr
+            (
+                reinterpret_cast<tCIDLib::TVoid**>(ppToFill), pNew
+            )
         );
     }
 
-    template <class T> T* pCompareAndExchangePtr(       T**         ppToFill
-                                                , const T* const    pNew
-                                                , const T* const    pCompare)
+    template <class T> T* pCompareAndExchangePtr(T**        ppToFill
+                                                , T* const  pNew
+                                                , T* const  pCompare)
     {
         return reinterpret_cast<T*>
         (
             TRawMem::pCompareAndExchangeRawPtr
             (
-                static_cast<tCIDLib::TVoid**>(ppToFill), pNew, pCompare
+                reinterpret_cast<tCIDLib::TVoid**>(ppToFill), pNew, pCompare
             )
         );
     }

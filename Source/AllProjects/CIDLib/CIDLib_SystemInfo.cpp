@@ -628,6 +628,15 @@ tCIDLib::TStrList::TCursor TSysInfo::cursCmdLineParms()
 }
 
 
+// Mostly for internal use by TModule
+const tCIDLib::TCh* TSysInfo::pszLogInfo()
+{
+    if (!CIDLib_SystemInfo::bInitDone)
+        DoInit();
+    return s_pszLogInfo;
+}
+
+
 // Return the OS version and build info
 tCIDLib::TVoid
 TSysInfo::QueryOSInfo(  tCIDLib::TCard4&    c4OSMajVersion
@@ -838,17 +847,6 @@ TSysInfo::TSysInfo()
 
 TSysInfo::~TSysInfo()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  TSysInfo: Protected, static methods
-// ---------------------------------------------------------------------------
-const tCIDLib::TCh* TSysInfo::pszLogInfo()
-{
-    if (!CIDLib_SystemInfo::bInitDone)
-        DoInit();
-    return s_pszLogInfo;
 }
 
 
