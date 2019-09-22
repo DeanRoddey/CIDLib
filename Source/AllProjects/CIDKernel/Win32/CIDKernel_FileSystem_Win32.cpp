@@ -1710,6 +1710,10 @@ TKrnlFileSys::bIsDirectory(const tCIDLib::TCh* const pszDirToCheck)
 }
 
 
+//
+//  We don't return these, but if they should get directory info from another
+//  source we want to be able to let them test those paths.
+//
 tCIDLib::TBoolean
 TKrnlFileSys::bIsNormalDir(const tCIDLib::TCh* const pszDirToCheck)
 {

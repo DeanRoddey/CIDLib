@@ -115,14 +115,6 @@ static tCIDLib::TVoid TestBasicFileSystem(TTextOutStream& strmOut)
         strmOut << CUR_LN
                 << L"Directory " << pathRoot << L" not found." << kCIDLib::EndLn;
     }
-
-    // Try to find one of the special directory entries
-    if (!TFileSys::bExists(L"..", tCIDLib::EDirSearchFlags::AllDirs))
-    {
-        strmOut << CUR_LN
-                << L"Failed to find a non-normal directory that should exist"
-                << kCIDLib::EndLn;
-    }
 }
 
 

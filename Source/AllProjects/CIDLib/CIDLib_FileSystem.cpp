@@ -105,12 +105,9 @@ FindFiles(  const   TString&                    strWildCard
     TFindBuf::TNCCursor cursChildren = fndbTarget.cursChildrenNC();
     for (; cursChildren; ++cursChildren)
     {
-        //
-        //  If this one is a directory and not a special directory, then
-        //  search it.
-        //
+        //  If this one is a directory, then search it.
         TFindBuf& fndbCur = *cursChildren;
-        if (fndbCur.bIsNormalDir())
+        if (fndbCur.bIsDirectory())
             FindFiles(strWildCard, fndbCur, c4Matches, eFlags);
     }
 }
@@ -508,6 +505,17 @@ tCIDLib::TBoolean TFileSys::bIsFQPath(const TString& strPath)
 }
 
 
+//
+//  We don't return the . and .. type directories in searches (and there may be
+//  others on some platforms), but we provide this in case they get directory
+//  info from elsewhere.
+//
+tCIDLib::TBoolean TFileSys::bIsNormalDir(const TString& strPath)
+{
+    return TKrnlFileSys::bIsNormalDir(strPath.pszBuffer());
+}
+
+
 tCIDLib::TBoolean TFileSys::bIsRedirected(const tCIDLib::EStdFiles eStdFile)
 {
     return TKrnlFileSys::bIsRedirected(eStdFile);
@@ -536,11 +544,8 @@ tCIDLib::TBoolean TFileSys::bRemoveTrailingSeparator(TString& strSrc)
 tCIDLib::TCard4
 TFileSys::c4BuildDirTree(const TString& strWildCard, TFindBuf& fndbMatches)
 {
-    //
-    //  Make sure the find buffer is valid. It has to be a directory and
-    //  not a special directory.
-    //
-    if (!fndbMatches.bIsNormalDir())
+    //  Make sure the find buffer is valid. It has to be a directory
+    if (!fndbMatches.bIsDirectory())
     {
         facCIDLib().ThrowErr
         (
@@ -577,8 +582,8 @@ TFileSys::c4BuildFileTree(  const   TString&                    strWildCard
                             ,       TFindBuf&                   fndbMatches
                             , const tCIDLib::EDirSearchFlags    eFlags)
 {
-    // The passed match must be a non-special directory
-    if (!fndbMatches.bIsNormalDir())
+    // The passed match must be a directory
+    if (!fndbMatches.bIsDirectory())
     {
         facCIDLib().ThrowErr
         (

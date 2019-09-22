@@ -433,12 +433,6 @@ tCIDLib::TBoolean TFindBuf::bIsNormal() const
 }
 
 
-tCIDLib::TBoolean TFindBuf::bIsNormalDir() const
-{
-    return bIsNormal() && bIsDirectory();
-}
-
-
 tCIDLib::TBoolean TFindBuf::bIsNormalFile() const
 {
     return bIsNormal() && bIsFile();

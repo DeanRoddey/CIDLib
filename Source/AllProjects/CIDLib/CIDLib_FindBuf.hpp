@@ -157,8 +157,6 @@ class CIDLIBEXP TFindBuf :
 
         tCIDLib::TBoolean bIsNormal() const;
 
-        tCIDLib::TBoolean bIsNormalDir() const;
-
         tCIDLib::TBoolean bIsNormalFile() const;
 
         tCIDLib::TCard8 c8Size() const;

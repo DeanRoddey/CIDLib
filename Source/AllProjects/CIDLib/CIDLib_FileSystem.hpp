@@ -249,6 +249,11 @@ namespace TFileSys
         const   TString&                strPath
     );
 
+    CIDLIBEXP tCIDLib::TBoolean bIsNormalDir
+    (
+        const   TString&                strPath
+    );
+
     CIDLIBEXP tCIDLib::TBoolean bIsRedirected
     (
         const   tCIDLib::EStdFiles      eStdFile
