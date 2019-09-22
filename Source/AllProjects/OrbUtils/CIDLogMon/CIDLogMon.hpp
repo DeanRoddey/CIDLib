@@ -61,6 +61,24 @@ extern TGUIFacility facCIDLogMon;
 
 
 // ----------------------------------------------------------------------------
+//  Constants namespace
+// ----------------------------------------------------------------------------
+namespace kCIDLogMon
+{
+    // -------------------------------------------------------------------
+    //  Private types and constants
+    // -------------------------------------------------------------------
+    const tCIDLib::TCard4    c4Col_Dummy     = 0;
+    const tCIDLib::TCard4    c4Col_Host      = 1;
+    const tCIDLib::TCard4    c4Col_Process   = 2;
+    const tCIDLib::TCard4    c4Col_Line      = 3;
+    const tCIDLib::TCard4    c4Col_Time      = 4;
+    const tCIDLib::TCard4    c4Col_Message   = 5;
+    const tCIDLib::TCard4    c4Col_Count     = 6;
+}
+
+
+// ----------------------------------------------------------------------------
 //   CLASS: TLogItem
 //  PREFIX: li
 // ----------------------------------------------------------------------------
@@ -140,7 +158,7 @@ class TItemListWnd : public TMultiColListBox
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bCreated() override;
+        tCIDLib::TBoolean bCreated() final;
 
         tCIDCtrls::EMCLBCustRets eCustomDraw
         (
@@ -151,7 +169,7 @@ class TItemListWnd : public TMultiColListBox
             , const TArea&                  areaAt
             ,       TRGBClr&                rgbBgn
             ,       TRGBClr&                rgbText
-        )   override;
+        )   final;
 
 
     private :
@@ -219,39 +237,39 @@ class TMainFrame : public TFrameWnd
             , const tCIDLib::TBoolean       bOrgChanged
             , const tCIDLib::TBoolean       bSizeChanged
             , const tCIDLib::TBoolean       bStateChanged
-        )   override;
+        )   final;
 
-        tCIDLib::TBoolean bAllowShutdown() override;
+        tCIDLib::TBoolean bAllowShutdown() final;
 
-        tCIDLib::TBoolean bCreated() override;
+        tCIDLib::TBoolean bCreated() final;
 
          tCIDLib::TBoolean bEraseBgn
         (
                     TGraphDrawDev&          gdevToUse
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bPaint
         (
                     TGraphDrawDev&          gdevToUse
             , const TArea&                  areaUpdate
-        )   override;
+        )   final;
 
         tCIDLib::TVoid CodeReceived
         (
             const   tCIDLib::TInt4          i4Code
             , const tCIDLib::TCard4         c4Data
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid Destroyed() override;
+        tCIDLib::TVoid Destroyed() final;
 
-        tCIDLib::TVoid DragEnd() override;
+        tCIDLib::TVoid DragEnd() final;
 
         tCIDLib::TVoid MenuCommand
         (
             const   tCIDLib::TResId         ridItem
             , const tCIDLib::TBoolean       bChecked
             , const tCIDLib::TBoolean       bEnabled
-        )   override;
+        )   final;
 
 
     private :

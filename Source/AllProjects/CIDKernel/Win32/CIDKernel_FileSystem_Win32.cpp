@@ -2620,6 +2620,12 @@ TKrnlFileSys::bRemoveFile(const tCIDLib::TCh* const pszToDelete)
             CIDKernel_FileSystem::c4FSRetryCount++;
             ::Sleep(200);
         }
+         else
+        {
+            // Anything else, just consider it an error
+            TKrnlError::SetLastHostError(c4Err);
+            break;
+        }
     }
     return bRet;
 }

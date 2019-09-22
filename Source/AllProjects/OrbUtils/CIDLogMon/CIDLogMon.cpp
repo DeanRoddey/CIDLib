@@ -116,17 +116,17 @@ class TMCListItemOps : public TMCListOps
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4ColCount() const override
+        tCIDLib::TCard4 c4ColCount() const final
         {
-            return 6;
+            return kCIDLogMon::c4Col_Count;
         }
 
-        tCIDLib::TCard4 c4RowCount() const override
+        tCIDLib::TCard4 c4RowCount() const final
         {
             return m_colList.c4ElemCount();
         }
 
-        tCIDLib::TCard4 c4RowId(const tCIDLib::TCard4 c4RowIndex) const override
+        tCIDLib::TCard4 c4RowId(const tCIDLib::TCard4 c4RowIndex) const final
         {
             // Give back the unique id assigned to this item
             return m_colList.objAt(c4RowIndex)->m_c4UniqueId;
@@ -136,7 +136,7 @@ class TMCListItemOps : public TMCListOps
         (
             const   tCIDLib::TCard4     c4RowIndex
             , const tCIDLib::TCard4     c4ColIndex
-        )   const override;
+        )   const final;
 
 
         TEvList             m_colList;
@@ -155,22 +155,22 @@ TMCListItemOps::strColumnText(  const   tCIDLib::TCard4     c4RowIndex
     // Column zero is a custom drawn color fill
     switch(c4ColIndex)
     {
-        case 1 :
+        case kCIDLogMon::c4Col_Host :
             return logevCur->strHostName();
 
-        case 2 :
+        case kCIDLogMon::c4Col_Process :
             return logevCur->strProcess();
 
-        case 3 :
+        case kCIDLogMon::c4Col_Line :
             m_strTmpFmt.SetFormatted(logevCur->c4LineNum());
             return m_strTmpFmt;
 
-        case 4 :
+        case kCIDLogMon::c4Col_Time :
             m_tmFmt.enctTime(logevCur->enctLogged());
             m_tmFmt.FormatToStr(m_strTmpFmt);
             return m_strTmpFmt;
 
-        case 5 :
+        case kCIDLogMon::c4Col_Message :
             return logevCur->strErrText();
 
         default :
@@ -229,13 +229,7 @@ tCIDLib::TVoid TItemListWnd::SetParFrame(const TMainFrame* const pwndParent)
 tCIDLib::TBoolean TItemListWnd::bCreated()
 {
     TParent::bCreated();
-    SetCustomDrawOpts
-    (
-        tCIDCtrls::EMCLBCustOpts
-        (
-            tCIDCtrls::EMCLBCustOpts::PreCol
-        )
-    );
+    SetCustomDrawOpts(tCIDCtrls::EMCLBCustOpts(tCIDCtrls::EMCLBCustOpts::PreCol));
     return kCIDLib::True;
 }
 
@@ -537,7 +531,7 @@ tCIDLib::TBoolean TMainFrame::bCreated()
     m_pwndSnap->pnothRegisterHandler(this, &TMainFrame::eClickHandler);
 
     // Set up our columns. We have a good number of them
-    tCIDLib::TStrList colColTitles(6);
+    tCIDLib::TStrList colColTitles(kCIDLogMon::c4Col_Count);
     colColTitles.objAdd(L"");
     colColTitles.objAdd(L"Host");
     colColTitles.objAdd(L"Process");
@@ -546,13 +540,16 @@ tCIDLib::TBoolean TMainFrame::bCreated()
     colColTitles.objAdd(L"Message Text");
     m_pwndList->SetColumns(colColTitles);
 
+    // Set time as the default initial sort column
+    m_pwndList->SetSortColumn(kCIDLogMon::c4Col_Time);
+
     // Set some obvious initial column sizes
-    m_pwndList->SetColOpts(0, TGUIFacility::c4AdjustHDlgUnit(10));
-    m_pwndList->SetColOpts(1, TGUIFacility::c4AdjustHDlgUnit(48));
-    m_pwndList->SetColOpts(2, TGUIFacility::c4AdjustHDlgUnit(52));
-    m_pwndList->SetColOpts(3, TGUIFacility::c4AdjustHDlgUnit(28));
-    m_pwndList->SetColOpts(4, TGUIFacility::c4AdjustHDlgUnit(54));
-    m_pwndList->SetColOpts(5, TGUIFacility::c4AdjustHDlgUnit(220));
+    m_pwndList->SetColOpts(kCIDLogMon::c4Col_Dummy, TGUIFacility::c4AdjustHDlgUnit(10));
+    m_pwndList->SetColOpts(kCIDLogMon::c4Col_Host, TGUIFacility::c4AdjustHDlgUnit(48));
+    m_pwndList->SetColOpts(kCIDLogMon::c4Col_Process, TGUIFacility::c4AdjustHDlgUnit(52));
+    m_pwndList->SetColOpts(kCIDLogMon::c4Col_Line, TGUIFacility::c4AdjustHDlgUnit(28));
+    m_pwndList->SetColOpts(kCIDLogMon::c4Col_Time, TGUIFacility::c4AdjustHDlgUnit(54));
+    m_pwndList->SetColOpts(kCIDLogMon::c4Col_Message, TGUIFacility::c4AdjustHDlgUnit(220));
 
     // And now set the correct initial show state state
     facCIDCtrls().ShowGUI(*this);
@@ -932,14 +929,14 @@ TMainFrame::ePollThread(TThread& thrThis, tCIDLib::TVoid* pData)
         catch(const TError&)
         {
             delete m_porbcLogger;
-            m_porbcLogger = 0;
+            m_porbcLogger = nullptr;
             m_c4NextMsgId = 0;
         }
 
         catch(...)
         {
             delete m_porbcLogger;
-            m_porbcLogger = 0;
+            m_porbcLogger = nullptr;
             m_c4NextMsgId = 0;
         }
     }
