@@ -50,7 +50,7 @@
                              CIDIDL:Value="/CIDLib/CfgSrv/%(h)/CoreAdmin"/>
 
             <CIDIDL:Constant CIDIDL:Name="strBinding"
-                             CIDIDL:Type="TString"
+                            CIDIDL:Type="TString"
                              CIDIDL:Value="/CIDLib/CfgSrv/%(h)/RepoObj"/>
         </CIDIDL:Constants>
 
@@ -63,7 +63,7 @@
 
             <!-- =============================================================
               - Adds an object to the object store. If the key already exists,
-              - then an exception will be thrown. So it is for unconditionally
+            - then an exception will be thrown. So it is for unconditionally
               - adding objects. It's version number will be 1 upon successful
               - return.
               -  =============================================================
@@ -75,7 +75,7 @@
                 <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
                     <CIDIDL:TString/>
                 </CIDIDL:Param>
-                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In">
+                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In" CIDIDL:Moveable="Yes">
                     <CIDIDL:THeapBuf/>
                 </CIDIDL:Param>
                 <CIDIDL:Param CIDIDL:Name="c4Reserve" CIDIDL:Dir="In">
@@ -101,7 +101,7 @@
                 <CIDIDL:Param CIDIDL:Name="c4Version" CIDIDL:Dir="Out">
                     <CIDIDL:TCard4/>
                 </CIDIDL:Param>
-                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In">
+                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In" CIDIDL:Moveable="Yes">
                     <CIDIDL:THeapBuf/>
                 </CIDIDL:Param>
                 <CIDIDL:Param CIDIDL:Name="c4Reserve" CIDIDL:Dir="In">
@@ -268,7 +268,7 @@
                 <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
                     <CIDIDL:TString/>
                 </CIDIDL:Param>
-                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In">
+                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In" CIDIDL:Moveable="Yes">
                     <CIDIDL:THeapBuf/>
                 </CIDIDL:Param>
             </CIDIDL:Method>

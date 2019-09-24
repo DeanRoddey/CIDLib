@@ -1354,8 +1354,8 @@ TCppGenerator::GenMethod(const  TString&            strName
                          else
                         {
                             m_strmHeader << L"const tCIDLib::TCard4 c4BufSz_"
-                                         << mparmCur.strName() << kCIDLib::NewLn
-                                         << TTextOutStream::Spaces(12) << L", ";
+                                        << mparmCur.strName() << kCIDLib::NewLn
+                                        << TTextOutStream::Spaces(12) << L", ";
                         }
                     }
 
@@ -1404,7 +1404,8 @@ TCppGenerator::GenMethod(const  TString&            strName
             //
             //  Create a local var for the parameter. Do a special case check for the
             //  memory buffer types, since they have to have a magic preceding In TCard4
-            //  parm, that indicates the bytes that were streamed.
+            //  parm, that indicates the bytes that were streamed (except for input only
+            //  moveable ones.)
             //
             //  For output only buffers we set them to zero so that, if the called method
             //  doesn't set it, we won't stream back some random amount of data based on
@@ -1417,7 +1418,6 @@ TCppGenerator::GenMethod(const  TString&            strName
             if ((mparmCur.tinfoThis().strType() == L"CIDIDL:THeapBuf")
             ||  (mparmCur.tinfoThis().strType() == L"CIDIDL:TMemBuf"))
             {
-                // Declare the magic buffer size parameter
                 m_strmImpl  <<  L"        tCIDLib::TCard4 c4BufSz_"
                             <<  mparmCur.strName();
 
@@ -1537,7 +1537,13 @@ TCppGenerator::GenMethod(const  TString&            strName
                             << mparmCur.strName() << kCIDLib::NewLn
                             << L"          , ";
             }
-            m_strmImpl << mparmCur.strName() << kCIDLib::NewLn;
+
+            if (mparmCur.bMoveable())
+                m_strmImpl << L"tCIDLib::ForceMove(";
+            m_strmImpl << mparmCur.strName();
+            if (mparmCur.bMoveable())
+                m_strmImpl << L")";
+            m_strmImpl << kCIDLib::NewLn;
         }
 
         // Close off the call
@@ -1676,11 +1682,17 @@ TCppGenerator::FormatParam( const   TCGenMethodParm&    mparmFmt
                             ,       TString&            strToFill
                             , const tCIDLib::TBoolean   bHeader)
 {
-    // If an input parm, make it const
+    //
+    //  If an input parm it's const, as long as it's not not a moveable parm
+    //  on the server.
+    //
+    strToFill.Clear();
     if (mparmFmt.eDir() == tCIDLib::EParmDirs::In)
-        strToFill = L"const ";
-    else
-        strToFill.Clear();
+    {
+        // Hard to do this logic so do the negative and negate
+        if (!((m_eMode == tCIDIDL::EOutputs::Server) && mparmFmt.bMoveable()))
+            strToFill = L"const ";
+    }
 
     // And format the type part to a temp, then append that to the output string
     TString strTmp;
@@ -1705,7 +1717,10 @@ TCppGenerator::FormatParam( const   TCGenMethodParm&    mparmFmt
     ||  (strRawType == L"CIDIDL:TFundVector")
     ||  (strRawType == L"CIDIDL:TString"))
     {
-        strToFill.Append(L"& ");
+        if ((m_eMode == tCIDIDL::EOutputs::Server) && mparmFmt.bMoveable())
+            strToFill.Append(L"&& ");
+        else
+            strToFill.Append(L"& ");
     }
      else
     {

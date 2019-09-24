@@ -45,6 +45,7 @@ ERRORS=
     errcGen_PollMethRet         2006    A poll method must have a boolean return type. Method=%(1)
     errcGen_InvalidParmDir      2007    The parameter direction for method %(1) is invalid
     errcGen_NoGlobalsFac        2008    Globals were found but no globals facility name was set
+    errcGen_ParmMove            2009    Move semantics only makes sense for In or InOut parameters of moveable classes. Method=%(1)
 
     ; Input file related errors
     errcInp_ExpectedElem        4000    Expected element '%(1)', but found '%(2)'

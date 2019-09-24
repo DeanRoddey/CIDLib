@@ -49,6 +49,11 @@ class TCGenTypeInfo : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bIsMoveableType() const
+        {
+            return m_bMoveableType;
+        }
+
         const TString& strAuxType() const;
 
         const TString& strKeyExtract() const;
@@ -71,6 +76,12 @@ class TCGenTypeInfo : public TObject
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_bMoveable
+        //      Set to true during parsing if this is one of the types that could
+        //      support moves (though we don't always know for sure. If it's an Object
+        //      or heap buffer, or one of the moveable collections we allow it, though
+        //      it might fail during compile later.
+        //
         //  m_strAuxType
         //      If it's any kind of templatized type, this is the type it is
         //      templatized over. If it's an object this is the class type.
@@ -92,12 +103,30 @@ class TCGenTypeInfo : public TObject
         //  m_strType
         //      The main type name.
         // -------------------------------------------------------------------
-        TString m_strAuxType;
-        TString m_strKeyExtract;
-        TString m_strKeyOps;
-        TString m_strKeyType;
-        TString m_strModulus;
-        TString m_strType;
+        tCIDLib::TBoolean       m_bMoveableType;
+        TString                 m_strAuxType;
+        TString                 m_strKeyExtract;
+        TString                 m_strKeyOps;
+        TString                 m_strKeyType;
+        TString                 m_strModulus;
+        TString                 m_strType;
+
+        static const TString    s_strElem_Bag;
+        static const TString    s_strElem_ElemType;
+        static const TString    s_strElem_Enumerated;
+        static const TString    s_strElem_FundArray;
+        static const TString    s_strElem_FundVector;
+        static const TString    s_strElem_HashSet;
+        static const TString    s_strElem_HeapBuf;
+        static const TString    s_strElem_KeyExtract;
+        static const TString    s_strElem_KeyedHashSet;
+        static const TString    s_strElem_KeyOps;
+        static const TString    s_strElem_KeyType;
+        static const TString    s_strElem_Modulus;
+        static const TString    s_strElem_Object;
+        static const TString    s_strElem_String;
+        static const TString    s_strElem_Type;
+        static const TString    s_strElem_Vector;
 
 
         // -------------------------------------------------------------------
@@ -131,7 +160,15 @@ class TCGenMethodParm : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::EParmDirs eDir() const;
+        tCIDLib::TBoolean bMoveable() const
+        {
+            return m_bMoveable;
+        }
+
+        tCIDLib::EParmDirs eDir() const
+        {
+            return m_eDir;
+        }
 
         const TString& strDefVal() const;
 
@@ -143,6 +180,11 @@ class TCGenMethodParm : public TObject
     private :
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_bMovable
+        //      Some can be marked moveable, which will use a move operation on
+        //      the server side to pass the temp that is streamed into into the
+        //      server side call.
         //
         //  m_eDir
         //      The direction of the parameter
@@ -156,10 +198,16 @@ class TCGenMethodParm : public TObject
         //  m_strName
         //      The name of the parameter
         // -------------------------------------------------------------------
-        tCIDLib::EParmDirs  m_eDir;
-        TString             m_strDefVal;
-        TString             m_strName;
-        TCGenTypeInfo       m_tinfoThis;
+        tCIDLib::TBoolean       m_bMoveable;
+        tCIDLib::EParmDirs      m_eDir;
+        TString                 m_strDefVal;
+        TString                 m_strName;
+        TCGenTypeInfo           m_tinfoThis;
+
+        static const TString    s_strAttr_DefVal;
+        static const TString    s_strAttr_Dir;
+        static const TString    s_strAttr_Moveable;
+        static const TString    s_strAttr_Name;
 
 
         // -------------------------------------------------------------------

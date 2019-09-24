@@ -43,6 +43,16 @@ class TFacCIDIDL : public TFacility
 {
     public :
         // -------------------------------------------------------------------
+        //  Public, static members
+        // -------------------------------------------------------------------
+        static const TString    strVal_In;
+        static const TString    strVal_InOut;
+        static const TString    strVal_No;
+        static const TString    strVal_Out;
+        static const TString    strVal_Yes;
+
+
+        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TFacCIDIDL();

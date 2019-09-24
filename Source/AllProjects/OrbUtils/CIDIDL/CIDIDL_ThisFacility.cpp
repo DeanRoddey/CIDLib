@@ -39,6 +39,16 @@
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TFacCIDIDL: Public static members
+// ---------------------------------------------------------------------------
+const TString    TFacCIDIDL::strVal_In(L"In");
+const TString    TFacCIDIDL::strVal_InOut(L"InOut");
+const TString    TFacCIDIDL::strVal_No(L"No");
+const TString    TFacCIDIDL::strVal_Out(L"Out");
+const TString    TFacCIDIDL::strVal_Yes(L"Yes");
+
+
+// ---------------------------------------------------------------------------
 //  TFacCIDIDL: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TFacCIDIDL::TFacCIDIDL() :
