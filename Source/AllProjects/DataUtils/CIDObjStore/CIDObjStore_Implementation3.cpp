@@ -748,9 +748,7 @@ TCIDObjStoreImpl::ValidateStore(TTextOutStream* const pstrmOut)
             //
             const tCIDLib::THashVal hshTest = mbufData.hshCalcHash
             (
-                kCIDObjStore_::c4Modulus
-                , 0
-                , hdrItem.m_c4CurUsed
+                kCIDObjStore_::c4Modulus, 0, hdrItem.m_c4CurUsed
             );
 
             if (hshTest != hdrItem.m_hshData)
@@ -1545,19 +1543,15 @@ tCIDLib::TVoid TCIDObjStoreImpl::BuildIndex()
                 }
             }
 
-            TOSStoreItem& osiNew = m_colStoreList.objAdd
+            TOSStoreItem& osiNew = m_colStoreList.objPlace
             (
-                TOSStoreItem
-                (
-                    c4CurOfs
-                    , hdrItem.m_c4CurUsed
-                    , hdrItem.m_c4Allocated
-                    , hdrItem.m_c4VersionNum
-                    , strKey
-                    , hdrItem.m_c4KeyBytes
-                )
+                c4CurOfs
+                , hdrItem.m_c4CurUsed
+                , hdrItem.m_c4Allocated
+                , hdrItem.m_c4VersionNum
+                , strKey
+                , hdrItem.m_c4KeyBytes
             );
-
 
             //
             //  If the allocation is larger than the used, then we have to

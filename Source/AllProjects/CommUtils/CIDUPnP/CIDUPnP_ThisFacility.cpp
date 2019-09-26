@@ -366,8 +366,7 @@ TFacCIDUPnP::bSetDeviceFromUID(const TString& strUID, TUPnPDevice& upnpdToSet)
 //  we get them from the kernel level object as well.
 //
 tCIDLib::TBoolean
-TFacCIDUPnP::bFindDevsByType(const  TString&                    strType
-                            ,       tCIDLib::TKValsCollect&     colFound)
+TFacCIDUPnP::bFindDevsByType(const  TString& strType, tCIDLib::TKValsCollect& colFound)
 {
     // Create a finder and try the search
     TKrnlLList<TKrnlKVPair> kllistDevs;

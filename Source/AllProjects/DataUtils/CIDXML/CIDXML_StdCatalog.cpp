@@ -279,10 +279,7 @@ tCIDLib::TVoid TXMLStdCatalog::Initialize(tCIDXML::TEntitySrcRef& esrToParse)
         //  And add an element to our collection for this guy. Make the value
         //  the system id and the key the public id.
         //
-        m_colIdMap.objAdd
-        (
-            tCIDXML::TEntitySrcRef(new TFileEntitySrc(strValue, strKey))
-        );
+        m_colIdMap.objPlace(new TFileEntitySrc(strValue, strKey));
     }
 }
 

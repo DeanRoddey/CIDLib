@@ -178,7 +178,7 @@ TAppShEngine::c4QueryAppsInfo(tCIDLib::TKVPList& colToFill)
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         TAppShRecord* const pasrCur = m_colRecs[c4Index];
-        colToFill.objAdd(TKeyValuePair(pasrCur->strApp(), pasrCur->strParms()));
+        colToFill.objPlace(pasrCur->strApp(), pasrCur->strParms());
     }
     return c4Count;
 }

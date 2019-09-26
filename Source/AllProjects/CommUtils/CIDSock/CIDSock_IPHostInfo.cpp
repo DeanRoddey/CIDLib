@@ -162,7 +162,7 @@ tCIDLib::TVoid TIPHostInfo::CommonSetup(const tCIDLib::TBoolean bIncludeLoopback
     {
         TKrnlIPAddr* pkipaCur;
         while (llstAddrs.bNext(pkipaCur))
-            m_colAddrs.objAdd(TIPAddress(*pkipaCur));
+            m_colAddrs.objPlace(*pkipaCur);
     }
 }
 

@@ -248,6 +248,15 @@ class TBuildResTab : public TTabWindow, public MMEngPrsErrHandler
 
                 TErrInfo
                 (
+                    const   tCIDLib::TCard4 c4ColNum
+                    , const tCIDLib::TCard4 c4LineNum
+                    , const tCIDMacroEng::EPrsEvs eEvent
+                    , const TString&        strClassPath
+                    , const TString&        strText
+                );
+
+                TErrInfo
+                (
                     const   TErrInfo&       erriSrc
                 );
 

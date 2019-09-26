@@ -72,16 +72,12 @@ TBinMBufInStream::TBinMBufInStream( const   tCIDLib::TCard4         c4InitSize
 
     catch(TError& errToCatch)
     {
-        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-        //
-        //  Delete anything we got created. If stream implementation got
-        //  created, then it owns the memory buffer so only delete it manually
-        //  if the stream implementation failed.
-        //
-        if (!pstrmiIn)
+        if (pstrmiIn)
+            delete pstrmiIn;
+        else
             delete pmbufData;
-        delete pstrmiIn;
+
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
         throw;
     }
 
@@ -100,17 +96,19 @@ TBinMBufInStream::TBinMBufInStream( const   TMemBuf* const      pmbufToUse
     TMemInStreamImpl* pstrmiIn = nullptr;
     try
     {
-        // Create an impl object for the passed buffer
+        CIDAssert(pmbufToUse->c4Size() >= c4InitLogicalEnd, L"Buffer is smaller than logical end");
         pstrmiIn = new TMemInStreamImpl(pmbufToUse, c4InitLogicalEnd, eAdopt);
     }
 
     catch(TError& errToCatch)
     {
-        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-        // If we owned the buffer object, then clean it up
-        if (eAdopt == tCIDLib::EAdoptOpts::Adopt)
+        // If we created the impl, delete that, else the buffer if we are adopting
+        if (pstrmiIn)
+            delete pstrmiIn;
+        else if (eAdopt == tCIDLib::EAdoptOpts::Adopt)
             delete pmbufToUse;
+
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
         throw;
     }
 
@@ -126,23 +124,31 @@ TBinMBufInStream::TBinMBufInStream(         THeapBuf&&          mbufToTake
                                     , const tCIDLib::TCard4     c4InitLogicalEnd) :
     m_pstrmiMem(nullptr)
 {
+    CIDAssert(mbufToTake.c4Size() >= c4InitLogicalEnd, L"Buffer is smaller than logical end");
+
     TMemInStreamImpl* pstrmiIn = nullptr;
+    THeapBuf* pmbufData = nullptr;
     try
     {
         //
         //  Create an impl object for the passed buffer, giving it the contents
         //  of the passed buffer.
         //
+        pmbufData = new THeapBuf(tCIDLib::ForceMove(mbufToTake));
         pstrmiIn = new TMemInStreamImpl
         (
-            new THeapBuf(tCIDLib::ForceMove(mbufToTake))
-            , c4InitLogicalEnd
-            , tCIDLib::EAdoptOpts::Adopt
+            pmbufData, c4InitLogicalEnd, tCIDLib::EAdoptOpts::Adopt
         );
     }
 
     catch(TError& errToCatch)
     {
+        // If we created the impl delet that, else delete the buffer
+        if (pstrmiIn)
+            delete pstrmiIn;
+        else
+            delete pmbufData;
+
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
         throw;
     }
@@ -178,8 +184,13 @@ TBinMBufInStream::TBinMBufInStream( const   tCIDLib::TCard1* const  pc1InitData
 
     catch(TError& errToCatch)
     {
+        // If we created the impl delet that, else delete the buffer
+        if (pstrmiIn)
+            delete pstrmiIn;
+        else
+            delete pmbufNew;
+
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-        delete pmbufNew;
         throw;
     }
 
@@ -248,8 +259,8 @@ tCIDLib::TVoid TBinMBufInStream::SetEndIndex(const tCIDLib::TCard4 c4NewIndex)
 // ---------------------------------------------------------------------------
 //  TBinMBufOutStream: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TBinMBufOutStream::TBinMBufOutStream(const  tCIDLib::TCard4         c4InitSize
-                                    , const tCIDLib::TCard4         c4MaxSize) :
+TBinMBufOutStream::TBinMBufOutStream(const  tCIDLib::TCard4 c4InitSize
+                                    , const tCIDLib::TCard4 c4MaxSize) :
     m_pstrmiMem(nullptr)
 {
     // Create the system buffer that becomes the basis for the stream
@@ -271,16 +282,12 @@ TBinMBufOutStream::TBinMBufOutStream(const  tCIDLib::TCard4         c4InitSize
 
     catch(TError& errToCatch)
     {
-        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-        //
-        //  Delete anything we got created. If stream implementation got
-        //  created, then it owns the memory buffer so only delete it manually
-        //  if the stream implementation failed.
-        //
-        if (!pstrmiOut)
+        if (pstrmiOut)
+            delete pstrmiOut;
+        else
             delete pmbufData;
-        delete pstrmiOut;
+
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
         throw;
     }
 
@@ -304,11 +311,12 @@ TBinMBufOutStream::TBinMBufOutStream(       TMemBuf* const      pmbufToUse
 
     catch(TError& errToCatch)
     {
-        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-        // If we owned the buffer object, then clean it up
-        if (eAdopt == tCIDLib::EAdoptOpts::Adopt)
+        if (pstrmiOut)
+            delete pstrmiOut;
+        else if (eAdopt == tCIDLib::EAdoptOpts::Adopt)
             delete pmbufToUse;
+
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
         throw;
     }
 

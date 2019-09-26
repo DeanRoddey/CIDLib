@@ -1440,7 +1440,7 @@ TURL::QueryExpQParams(tCIDLib::TKVPList& colToFill, const tCIDLib::TBoolean bApp
         (
             kvalSrc.strValue(), strValue, TURL::EExpTypes::Query, tCIDLib::EAppendOver::Overwrite
         );
-        colToFill.objAdd(TKeyValuePair(strKey, strValue));
+        colToFill.objPlace(strKey, strValue);
     }
 }
 
@@ -1747,26 +1747,25 @@ TURL::Set(  const   tCIDSock::EProtos       eProto
         m_strPath = strPath;
         m_strFragment = strFrag;
 
-        TColCursor<TKeyValuePair>* pcursQPs = colQParms.pcursNew();
-        TJanitor<TColCursor<TKeyValuePair> > janCurs(pcursQPs);
-        for (; pcursQPs->bIsValid(); pcursQPs->bNext())
-            m_colQParms.objAdd(pcursQPs->objRCur());
+        TColCursor<TKeyValuePair>& cursQPs = *colQParms.pcursNew();
+        TJanitor<TColCursor<TKeyValuePair>> janCurs(&cursQPs);
+        for (; cursQPs; ++cursQPs)
+            m_colQParms.objAdd(*cursQPs);
     }
      else
     {
         EncodeTo(strPath, m_strPath, EExpTypes::Path, tCIDLib::EAppendOver::Overwrite);
         EncodeTo(strFrag, m_strFragment, EExpTypes::Fragment, tCIDLib::EAppendOver::Overwrite);
 
-
-        TColCursor<TKeyValuePair>* pcursQPs = colQParms.pcursNew();
-        TJanitor<TColCursor<TKeyValuePair> > janCurs(pcursQPs);
-        if (pcursQPs->bIsValid())
+        TColCursor<TKeyValuePair>& cursQPs = *colQParms.pcursNew();
+        TJanitor<TColCursor<TKeyValuePair>> janCurs(&cursQPs);
+        if (cursQPs)
         {
             TString strName;
             TString strVal;
-            for (; pcursQPs->bIsValid(); pcursQPs->bNext())
+            for (; cursQPs; ++cursQPs)
             {
-                const TKeyValuePair& kvalCur = pcursQPs->objRCur();
+                const TKeyValuePair& kvalCur = *cursQPs;
 
                 EncodeTo
                 (
@@ -1783,8 +1782,7 @@ TURL::Set(  const   tCIDSock::EProtos       eProto
                     , EExpTypes::Query
                     , tCIDLib::EAppendOver::Overwrite
                 );
-
-                m_colQParms.objAdd(TKeyValuePair(strName, strVal));
+                m_colQParms.objPlace(strName, strVal);
             }
         }
     }

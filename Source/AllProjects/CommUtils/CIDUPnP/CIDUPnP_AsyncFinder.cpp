@@ -378,10 +378,7 @@ TUPnPAsyncFinder::StartSearch(  const   TString&    strFindType
     //  value we leave empty. That's the search complete flag.
     //
     TMtxLocker mtxlSync(m_colDevList.pmtxLock());
-    m_colSearches.objAdd
-    (
-        TKeyValues(strSearchName, kstrSearchID.pszValue(), TString::strEmpty())
-    );
+    m_colSearches.objPlace(strSearchName, kstrSearchID.pszValue(), TString::strEmpty());
 }
 
 
