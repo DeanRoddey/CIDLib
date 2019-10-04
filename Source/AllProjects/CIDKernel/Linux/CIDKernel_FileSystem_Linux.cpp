@@ -262,95 +262,6 @@ namespace CIDKernel_FileSys_Linux
        return kCIDLib::False;
     }
 
-    //
-    // FUNCTION/METHOD NAME: __TreeDelete
-    //
-    // DESCRIPTION:
-    //
-    //  This is a recursive function to delete an entire directory tree. Its
-    //  a depth first function so it goes into each subdirectory as it finds
-    //  them, deletes any files in the starting directory, then removes the
-    //  starting directory and returns.
-    //
-    //  In order to avoid a lot of wierdness, this guy throws its errors and
-    //  catches them at the bottom to clean up before rethrowing. The public
-    //  calling method will catch it and set it as the last error.
-    // ---------------------------------------
-    //   INPUT: pszStartDir is the starting directory for this level of
-    //              recursion.
-    //
-    //  OUTPUT: None
-    //
-    //  RETURN: None
-    //
-    tCIDLib::TVoid TreeDelete(const tCIDLib::TSCh* const pszStartDir)
-    {
-        DIR* dir = 0;
-        tCIDLib::TSCh* pszFullName = 0;
-        mode_t mode;
-
-        try
-        {
-            DIR* dir = ::opendir(pszStartDir);
-            if (!dir)
-                TKrnlError::ThrowHostError(errno);
-
-            pszFullName = new tCIDLib::TSCh[kCIDLib::c4MaxPathLen + 1];
-
-            struct dirent* pEntry = ::readdir(dir);
-            while (pEntry)
-            {
-                ::strcpy(pszFullName, pszStartDir);
-                if (pszFullName[::strlen(pszFullName) - 1] != '\\')
-                    ::strcat(pszFullName, "\\");
-                ::strcat(pszFullName, pEntry->d_name);
-
-                struct stat* pStatBuf = new struct stat;
-                tCIDLib::TSInt iRc = ::stat(pszFullName, pStatBuf);
-                mode = pStatBuf->st_mode;
-                delete pStatBuf;
-
-                if (iRc)
-                    TKrnlError::ThrowHostError(errno);
-
-                if (S_ISDIR(mode))
-                    TreeDelete(pszFullName);
-
-                if (::unlink(pszFullName))
-                {
-                    mode = S_IWUSR | S_IWGRP | S_IWOTH;
-                    if (::chmod(pszFullName, mode))
-                        TKrnlError::ThrowHostError(errno);
-
-                    if (::unlink(pszFullName))
-                        TKrnlError::ThrowHostError(errno);
-                }
-                pEntry = ::readdir(dir);
-            }
-
-            if (::closedir(dir))
-                TKrnlError::ThrowHostError(errno);
-
-            dir = 0;
-            if (::rmdir(pszStartDir))
-            {
-                mode = S_IWUSR | S_IWGRP | S_IWOTH;
-                if (::chmod(pszFullName, mode))
-                    TKrnlError::ThrowHostError(errno);
-
-                if (::rmdir(pszStartDir))
-                    TKrnlError::ThrowHostError(errno);
-            }
-
-            delete [] pszFullName;
-        }
-        catch (...)
-        {
-            if (dir)
-                ::closedir(dir);
-            delete [] pszFullName;
-        }
-    }
 
     tCIDLib::TVoid
     FillFindBuf(const           tCIDLib::TSCh* const        pszFullName
@@ -1408,30 +1319,6 @@ TKrnlFileSys::bRemoveFile(const tCIDLib::TCh* const pszToDelete)
     if (::unlink(pszLocToDelete))
     {
         TKrnlError::SetLastHostError(errno);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
-}
-
-
-tCIDLib::TBoolean
-TKrnlFileSys::bRemovePath(  const   tCIDLib::TCh* const     pszStartDir
-                            , const tCIDLib::ETreeDelModes  eMode
-                            , const tCIDLib::TBoolean       bRemoveStartDir)
-{
-    // <TBD> New parameters to be used
-
-    tCIDLib::TSCh* pszLocStartDir = TRawStr::pszConvert(pszStartDir);
-    TArrayJanitor<tCIDLib::TSCh> janStart(pszLocStartDir);
-
-    try
-    {
-        CIDKernel_FileSys_Linux::TreeDelete(pszLocStartDir);
-    }
-
-    catch(const TKrnlError& kerrToCatch)
-    {
-        TKrnlError::SetLastError(kerrToCatch);
         return kCIDLib::False;
     }
     return kCIDLib::True;

@@ -202,7 +202,7 @@ namespace CIDKernel_ExtProc_Linux
 
                 if (!::strncmp(szLine, "btime", 5))
                 {
-                    if (::sscanf(szLine, "%*s %u", &c4BootTime) != 1)
+                    if (::sscanf(szLine, "%*s %lu", &c4BootTime) != 1)
                         continue;
                     break;
                 }
@@ -237,7 +237,7 @@ namespace CIDKernel_ExtProc_Linux
         tCIDLib::TSInt iRet = ::fscanf
         (
             StatFile
-            , "%*u %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %*d %*d %*d %*d %*d %*d %*u %*u %d"
+            , "%*u %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %*d %*d %*d %*d %*d %*d %*u %*u %lu"
             , &c4RawStartTime
         );
 
@@ -269,7 +269,7 @@ namespace CIDKernel_ExtProc_Linux
         }
 
         tCIDLib::TSInt iRet = ::fscanf(StatFile,
-                                       "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %d %d",
+                                       "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu",
                                        &c4RawUserTime,
                                        &c4RawKernelTime);
 
@@ -816,7 +816,7 @@ TKrnlExtProcess::bSystemEscape(const    tCIDLib::TCh* const     pszCommandLine
     const tCIDLib::TCard4       c4BufSize = 4095;
     tCIDLib::TCh                szCmdLine[c4BufSize + 1];
 
-    tCIDLib::TCh* pszShellSwitches;
+    const tCIDLib::TCh* pszShellSwitches;
     if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::ESysEscFlags::StayOpen))
         pszShellSwitches = L"-i -c ";
     else

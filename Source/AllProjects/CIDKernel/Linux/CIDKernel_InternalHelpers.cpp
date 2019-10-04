@@ -32,6 +32,11 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
+#include    <sys/types.h>
+#include    <sys/stat.h>
+#include    <unistd.h>
+#include    <signal.h>
+
 
 // ---------------------------------------------------------------------------
 //  Local variables
@@ -41,7 +46,7 @@ namespace
     // Magic number
     //const tCIDLib::TEncodedTime enctTimeAdjustment = 116444736000000000;
     const tCIDLib::TEncodedTime enctIntervalsPerSec = 1000000000 / 100;
-    const tCIDLib::TSInt        iThreadTimerSignal = SIGUNUSED;
+    const tCIDLib::TSInt        iThreadTimerSignal = SIGSYS;
 
     struct TThreadStartupInfo
     {
@@ -91,35 +96,38 @@ TKrnlLinux::CIDFileTimeToLinuxFileTime(const tCIDLib::TEncodedTime enctCIDTime
 tCIDLib::TVoid TKrnlLinux::StatBufToInfoFlags(const struct stat& StatBuf
                                               , tCIDLib::EFileInfoFlags& eFlags)
 {
-    tCIDLib::TCard4 c4Tmp = S_ISDIR(StatBuf.st_mode)
-        ? tCIDLib::EFileInfoFlags::IsDirectory : tCIDLib::EFileInfoFlags::None;
+    tCIDLib::TCard4 c4Tmp;
+    if (S_ISDIR(StatBuf.st_mode))
+        c4Tmp = tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::IsDirectory);
+    else
+        c4Tmp = tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::None);
 
     if (StatBuf.st_uid == ::getuid())
     {
         if (StatBuf.st_mode & S_IRUSR)
-            c4Tmp |= tCIDLib::EFileInfoFlags::CanRead;
+            c4Tmp |= tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::CanRead);
         if (StatBuf.st_mode & S_IWUSR)
-            c4Tmp |= tCIDLib::EFileInfoFlags::CanWrite;
+            c4Tmp |= tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::CanWrite);
         if (StatBuf.st_mode & S_IXUSR)
-            c4Tmp |= tCIDLib::EFileInfoFlags::CanExecute;
+            c4Tmp |= tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::CanExecute);
     }
     else if (StatBuf.st_gid == ::getgid())
     {
         if (StatBuf.st_mode & S_IRGRP)
-            c4Tmp |= tCIDLib::EFileInfoFlags::CanRead;
+            c4Tmp |= tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::CanRead);
         if (StatBuf.st_mode & S_IWGRP)
-            c4Tmp |= tCIDLib::EFileInfoFlags::CanWrite;
+            c4Tmp |= tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::CanWrite);
         if (StatBuf.st_mode & S_IXGRP)
-            c4Tmp |= tCIDLib::EFileInfoFlags::CanExecute;
+            c4Tmp |= tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::CanExecute);
     }
     else
     {
         if (StatBuf.st_mode & S_IROTH)
-            c4Tmp |= tCIDLib::EFileInfoFlags::CanRead;
+            c4Tmp |= tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::CanRead);
         if (StatBuf.st_mode & S_IWOTH)
-            c4Tmp |= tCIDLib::EFileInfoFlags::CanWrite;
+            c4Tmp |= tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::CanWrite);
         if (StatBuf.st_mode & S_IXOTH)
-            c4Tmp |= tCIDLib::EFileInfoFlags::CanExecute;
+            c4Tmp |= tCIDLib::c4EnumOrd(tCIDLib::EFileInfoFlags::CanExecute);
     }
 
     eFlags = tCIDLib::EFileInfoFlags(c4Tmp);
@@ -130,7 +138,7 @@ TKrnlLinux::pszFindInPath(const tCIDLib::TCh* const pszToFind)
 {
     tCIDLib::TSCh* pszCopy = TRawStr::pszConvert(pszToFind);
 
-    if (!TRawStr::pszFindChar(pszToFind, kCIDLib::chPathSeparator))
+    if (!TRawStr::pszFindChar(pszToFind, kCIDLib::chPathSep))
     {
         tCIDLib::TSCh* pszPath = ::getenv("PATH");
         if (!pszPath)

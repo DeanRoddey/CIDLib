@@ -31,6 +31,7 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+#include    <unistd.h>
 
 
 // ---------------------------------------------------------------------------
@@ -42,23 +43,25 @@
 //  TFileHandle: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TFileHandle::TFileHandle() :
-    __phfliThis(0)
+
+    m_phfliThis(nullptr)
 {
-    __phfliThis = new TFileHandleImpl;
-    __phfliThis->iFd = -1;
+    m_phfliThis = new TFileHandleImpl;
+    m_phfliThis->iFd = -1;
 }
 
 TFileHandle::TFileHandle(const TFileHandle& hflToCopy) :
-    __phfliThis(0)
+
+    m_phfliThis(nullptr)
 {
-    __phfliThis = new TFileHandleImpl;
-    __phfliThis->iFd = hflToCopy.__phfliThis->iFd;
+    m_phfliThis = new TFileHandleImpl;
+    m_phfliThis->iFd = hflToCopy.m_phfliThis->iFd;
 }
 
 TFileHandle::~TFileHandle()
 {
-    delete __phfliThis;
-    __phfliThis = 0;
+    delete m_phfliThis;
+    m_phfliThis = nullptr;
 }
 
 
@@ -67,11 +70,8 @@ TFileHandle::~TFileHandle()
 // -------------------------------------------------------------------
 TFileHandle& TFileHandle::operator=(const TFileHandle& hflToAssign)
 {
-    if (this == &hflToAssign)
-        return *this;
-
-    __phfliThis->iFd = hflToAssign.__phfliThis->iFd;
-
+    if (this != &hflToAssign)
+        m_phfliThis->iFd = hflToAssign.m_phfliThis->iFd;
     return *this;
 }
 
@@ -79,7 +79,7 @@ TFileHandle& TFileHandle::operator=(const TFileHandle& hflToAssign)
 tCIDLib::TBoolean
 TFileHandle::operator==(const TFileHandle& hflToCompare) const
 {
-    return (__phfliThis->iFd == hflToCompare.__phfliThis->iFd);
+    return (m_phfliThis->iFd == hflToCompare.m_phfliThis->iFd);
 }
 
 
@@ -87,14 +87,14 @@ TFileHandle::operator==(const TFileHandle& hflToCompare) const
 // -------------------------------------------------------------------
 //  Public, non-virtual methods
 // -------------------------------------------------------------------
-tCIDLib::TBoolean TFileHandle::bValid() const
+tCIDLib::TBoolean TFileHandle::bIsValid() const
 {
-    return (__phfliThis->iFd != -1);
+    return (m_phfliThis->iFd != -1);
 }
 
 tCIDLib::TVoid TFileHandle::Clear()
 {
-    __phfliThis->iFd = -1;
+    m_phfliThis->iFd = -1;
 }
 
 tCIDLib::TVoid
@@ -103,7 +103,7 @@ TFileHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
 {
     TRawStr::bFormatVal
     (
-        tCIDLib::TInt4(__phfliThis->iFd)
+        tCIDLib::TInt4(m_phfliThis->iFd)
         , pszToFill
         , c4MaxChars
         , tCIDLib::ERadices::Hex
@@ -128,13 +128,13 @@ TKrnlFile::bOpenStdFile(const   tCIDLib::EStdFiles  eStdFile
     switch (eStdFile)
     {
     case tCIDLib::EStdFiles::StdOut:
-        hflToFill.__phfliThis->iFd = 1;
+        hflToFill.m_phfliThis->iFd = 1;
         break;
     case tCIDLib::EStdFiles::StdIn:
-        hflToFill.__phfliThis->iFd = 0;
+        hflToFill.m_phfliThis->iFd = 0;
         break;
     case tCIDLib::EStdFiles::StdErr:
-        hflToFill.__phfliThis->iFd = 2;
+        hflToFill.m_phfliThis->iFd = 2;
         break;
     }
 
@@ -146,15 +146,17 @@ TKrnlFile::bOpenStdFile(const   tCIDLib::EStdFiles  eStdFile
 //  TKrnlFile: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlFile::TKrnlFile() :
-    __pszName(0)
+
+    m_pszName(nullptr)
 {
 }
 
 TKrnlFile::TKrnlFile(const tCIDLib::TCh* const pszName) :
-    __pszName(0)
+
+    m_pszName(nullptr)
 {
     if (pszName)
-        __pszName = TRawStr::pszReplicate(pszName);
+        m_pszName = TRawStr::pszReplicate(pszName);
 }
 
 TKrnlFile::~TKrnlFile()
@@ -177,7 +179,7 @@ TKrnlFile::~TKrnlFile()
     }
 
     // And now delete our name member
-    delete [] __pszName;
+    delete [] m_pszName;
 }
 
 
@@ -187,41 +189,41 @@ TKrnlFile::~TKrnlFile()
 tCIDLib::TBoolean TKrnlFile::bClose()
 {
     // If the handle shows its supposed to be open, try to close it
-    if (__hflThis.__phfliThis->iFd > 2)
+    if (m_hflThis.m_phfliThis->iFd > 2)
     {
-        if (::close(__hflThis.__phfliThis->iFd))
+        if (::close(m_hflThis.m_phfliThis->iFd))
         {
             TKrnlError::SetLastHostError(errno);
             return kCIDLib::False;
         }
-        __hflThis.__phfliThis->iFd = -1;
+        m_hflThis.m_phfliThis->iFd = -1;
     }
     return kCIDLib::True;
 }
 
 
-tCIDLib::TBoolean TKrnlFile::bQueryCurSize(tCIDLib::TFilePos& fposToFill) const
+tCIDLib::TBoolean TKrnlFile::bQueryCurSize(tCIDLib::TCard8& c8ToFill) const
 {
     struct stat StatBuf;
-    if (::fstat(__hflThis.__phfliThis->iFd, &StatBuf))
+    if (::fstat(m_hflThis.m_phfliThis->iFd, &StatBuf))
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
-    fposToFill = StatBuf.st_size;
+    c8ToFill = StatBuf.st_size;
     return kCIDLib::True;
 }
 
 
-tCIDLib::TBoolean TKrnlFile::bQueryFilePtr(tCIDLib::TFilePos& fposToFill) const
+tCIDLib::TBoolean TKrnlFile::bQueryFilePtr(tCIDLib::TCard8& c8ToFill) const
 {
-    off_t offset = ::lseek(__hflThis.__phfliThis->iFd, 0, SEEK_CUR);
+    off_t offset = ::lseek(m_hflThis.m_phfliThis->iFd, 0, SEEK_CUR);
     if (offset == -1)
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
-    fposToFill = offset;
+    c8ToFill = offset;
     return kCIDLib::True;
 }
 
@@ -229,7 +231,7 @@ tCIDLib::TBoolean TKrnlFile::bQueryFilePtr(tCIDLib::TFilePos& fposToFill) const
 tCIDLib::TBoolean TKrnlFile::bQueryLastAccessTime(tCIDLib::TEncodedTime& enctToFill) const
 {
     struct stat StatBuf;
-    if (::fstat(__hflThis.__phfliThis->iFd, &StatBuf))
+    if (::fstat(m_hflThis.m_phfliThis->iFd, &StatBuf))
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
@@ -242,7 +244,7 @@ tCIDLib::TBoolean TKrnlFile::bQueryLastAccessTime(tCIDLib::TEncodedTime& enctToF
 tCIDLib::TBoolean TKrnlFile::bQueryLastWriteTime(tCIDLib::TEncodedTime& enctToFill) const
 {
     struct stat StatBuf;
-    if (::fstat(__hflThis.__phfliThis->iFd, &StatBuf))
+    if (::fstat(m_hflThis.m_phfliThis->iFd, &StatBuf))
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
@@ -253,10 +255,10 @@ tCIDLib::TBoolean TKrnlFile::bQueryLastWriteTime(tCIDLib::TEncodedTime& enctToFi
 
 
 tCIDLib::TBoolean
-TKrnlFile::bOffsetFilePointer(  const   tCIDLib::TFileOfs   fofsOffsetBy
-                                ,       tCIDLib::TFilePos&  fposToFill)
+TKrnlFile::bOffsetFilePointer(  const   tCIDLib::TInt8&     i8OffsetBy
+                                ,       tCIDLib::TCard8&    c8ToFill)
 {
-    off_t offThis = ::lseek(__hflThis.__phfliThis->iFd, fofsOffsetBy, SEEK_CUR);
+    off_t offThis = ::lseek(m_hflThis.m_phfliThis->iFd, i8OffsetBy, SEEK_CUR);
 
     if (offThis == -1)
     {
@@ -264,7 +266,7 @@ TKrnlFile::bOffsetFilePointer(  const   tCIDLib::TFileOfs   fofsOffsetBy
         return kCIDLib::False;
     }
 
-    fposToFill = offThis;
+    c8ToFill = offThis;
 
     return kCIDLib::True;;
 }
@@ -277,13 +279,13 @@ TKrnlFile::bOpen(const  tCIDLib::EAccessModes    eAccess
                  , const tCIDLib::EFileFlags)
 {
     // Sanity check, just in case we are already open
-    if (__hflThis.__phfliThis->iFd != -1)
+    if (m_hflThis.m_phfliThis->iFd != -1)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
     }
 
-    if (!__pszName)
+    if (!m_pszName)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NullName);
         return kCIDLib::False;
@@ -291,16 +293,16 @@ TKrnlFile::bOpen(const  tCIDLib::EAccessModes    eAccess
 
     tCIDLib::TSInt iFlags = 0;
 
-    if (((eAccess & tCIDLib::EAccessModes::ReadWrite) == tCIDLib::EAccessModes::ReadWrite)
-    ||   (eAccess & tCIDLib::EAccessModes::DenyRead))
+    if (tCIDLib::bAllBitsOn(eAccess, tCIDLib::EAccessModes::ReadWrite)
+    ||  tCIDLib::bAllBitsOn(eAccess, tCIDLib::EAccessModes::DenyRead))
     {
         iFlags = O_RDWR;
     }
-    else if (eAccess & tCIDLib::EAccessModes::Read)
+    else if (tCIDLib::bAllBitsOn(eAccess, tCIDLib::EAccessModes::Read))
     {
         iFlags = O_RDONLY;
     }
-    else if (eAccess & tCIDLib::EAccessModes::Write)
+    else if (tCIDLib::bAllBitsOn(eAccess, tCIDLib::EAccessModes::Write))
     {
         iFlags = O_WRONLY;
     }
@@ -312,50 +314,50 @@ TKrnlFile::bOpen(const  tCIDLib::EAccessModes    eAccess
 
     switch (eAction)
     {
-    case tCIDLib::ECreateActs::CreateIfNew:
-        iFlags |= O_CREAT | O_EXCL;
-        break;
+        case tCIDLib::ECreateActs::CreateIfNew:
+            iFlags |= O_CREAT | O_EXCL;
+            break;
 
-    case tCIDLib::ECreateActs::CreateAlways:
-        iFlags |= O_CREAT | O_TRUNC;
-        break;
+        case tCIDLib::ECreateActs::CreateAlways:
+            iFlags |= O_CREAT | O_TRUNC;
+            break;
 
-    case tCIDLib::ECreateActs::TruncateExisting:
-        iFlags |= O_TRUNC;
-        break;
+        case tCIDLib::ECreateActs::TruncateExisting:
+            iFlags |= O_TRUNC;
+            break;
 
-    case tCIDLib::ECreateActs::OpenOrCreate:
-        iFlags |= O_CREAT;
-        break;
+        case tCIDLib::ECreateActs::OpenOrCreate:
+            iFlags |= O_CREAT;
+            break;
 
-    default:
-        ;
+        default :
+            break;
     }
 
     mode_t mode = 0;
     if (iFlags & O_CREAT)
     {
-        if (ePerms & tCIDLib::EFilePerms::OwnerRead)
+        if (tCIDLib::bAllBitsOn(ePerms, tCIDLib::EFilePerms::OwnerRead))
             mode |= S_IRUSR;
-        if (ePerms & tCIDLib::EFilePerms::OwnerWrite)
+        if (tCIDLib::bAllBitsOn(ePerms, tCIDLib::EFilePerms::OwnerWrite))
             mode |= S_IWUSR;
-        if (ePerms & tCIDLib::EFilePerms::OwnerExecute)
+        if (tCIDLib::bAllBitsOn(ePerms, tCIDLib::EFilePerms::OwnerExecute))
             mode |= S_IXUSR;
-        if (ePerms & tCIDLib::EFilePerms::GroupRead)
+        if (tCIDLib::bAllBitsOn(ePerms, tCIDLib::EFilePerms::GroupRead))
             mode |= S_IRGRP;
-        if (ePerms & tCIDLib::EFilePerms::GroupWrite)
+        if (tCIDLib::bAllBitsOn(ePerms, tCIDLib::EFilePerms::GroupWrite))
             mode |= S_IWGRP;
-        if (ePerms & tCIDLib::EFilePerms::GroupExecute)
+        if (tCIDLib::bAllBitsOn(ePerms, tCIDLib::EFilePerms::GroupExecute))
             mode |= S_IXGRP;
-        if (ePerms & tCIDLib::EFilePerms::WorldRead)
+        if (tCIDLib::bAllBitsOn(ePerms, tCIDLib::EFilePerms::WorldRead))
             mode |= S_IROTH;
-        if (ePerms & tCIDLib::EFilePerms::WorldWrite)
+        if (tCIDLib::bAllBitsOn(ePerms, tCIDLib::EFilePerms::WorldWrite))
             mode |= S_IWOTH;
-        if (ePerms & tCIDLib::EFilePerms::WorldExecute)
+        if (tCIDLib::bAllBitsOn(ePerms, tCIDLib::EFilePerms::WorldExecute))
             mode |= S_IXOTH;
     }
 
-    tCIDLib::TSCh* pszLocName = TRawStr::pszConvert(__pszName);
+    tCIDLib::TSCh* pszLocName = TRawStr::pszConvert(m_pszName);
     TArrayJanitor<tCIDLib::TSCh> janName(pszLocName);
 
     tCIDLib::TSInt iFdTmp = ::open(pszLocName, iFlags, mode);
@@ -366,9 +368,11 @@ TKrnlFile::bOpen(const  tCIDLib::EAccessModes    eAccess
         return kCIDLib::False;
     }
 
-    // Now query the lock status. Locks are advisory, which means
-    // we have to do all the work. To make it act like Windows we
-    // only have to check lock status at open() time.
+    //
+    //  Now query the lock status. Locks are advisory, which means
+    //  we have to do all the work. To make it act like Windows we
+    //  only have to check lock status at open() time.
+    //
     struct flock FlockBuf;
     ::memset(&FlockBuf, 0, sizeof(FlockBuf));
     if (::fcntl(iFdTmp, F_GETLK, &FlockBuf) == -1)
@@ -378,7 +382,7 @@ TKrnlFile::bOpen(const  tCIDLib::EAccessModes    eAccess
     }
 
     if ((FlockBuf.l_type == F_WRLCK)
-    ||  (FlockBuf.l_type == F_RDLCK && (eAccess & tCIDLib::EAccessModes::Write)))
+    ||  (FlockBuf.l_type == F_RDLCK && tCIDLib::bAllBitsOn(eAccess, tCIDLib::EAccessModes::Write)))
     {
         ::close(iFdTmp);
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcAcc_LockViolation);
@@ -387,10 +391,10 @@ TKrnlFile::bOpen(const  tCIDLib::EAccessModes    eAccess
 
     // Now see if we need to set a lock. For our purposes DenyRead implies
     // DenyWrite.
-    if (eAccess & (tCIDLib::EAccessModes::DenyRead | tCIDLib::EAccessModes::DenyWrite))
+    if (tCIDLib::bAllBitsOn(eAccess, (tCIDLib::EAccessModes::DenyRead | tCIDLib::EAccessModes::DenyWrite)))
     {
         ::memset(&FlockBuf, 0, sizeof(FlockBuf));
-        if (eAccess & tCIDLib::EAccessModes::DenyRead)
+        if (tCIDLib::bAllBitsOn(eAccess, tCIDLib::EAccessModes::DenyRead))
             FlockBuf.l_type = F_WRLCK;
         else
             FlockBuf.l_type = F_RDLCK;
@@ -403,8 +407,7 @@ TKrnlFile::bOpen(const  tCIDLib::EAccessModes    eAccess
         }
     }
 
-    __hflThis.__phfliThis->iFd = iFdTmp;
-
+    m_hflThis.m_phfliThis->iFd = iFdTmp;
     return kCIDLib::True;
 }
 
@@ -412,7 +415,7 @@ TKrnlFile::bOpen(const  tCIDLib::EAccessModes    eAccess
 tCIDLib::TBoolean TKrnlFile::bOpen(const tCIDLib::EStdFiles eStdFile)
 {
     // Sanity check, just in case we are already open
-    if (__hflThis.__phfliThis->iFd != -1)
+    if (m_hflThis.m_phfliThis->iFd != -1)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
@@ -420,15 +423,17 @@ tCIDLib::TBoolean TKrnlFile::bOpen(const tCIDLib::EStdFiles eStdFile)
 
     switch (eStdFile)
     {
-    case tCIDLib::EStdFiles::StdOut:
-        __hflThis.__phfliThis->iFd = 1;
-        break;
-    case tCIDLib::EStdFiles::StdIn:
-        __hflThis.__phfliThis->iFd = 0;
-        break;
-    case tCIDLib::EStdFiles::StdErr:
-        __hflThis.__phfliThis->iFd = 2;
-        break;
+        case tCIDLib::EStdFiles::StdOut:
+            m_hflThis.m_phfliThis->iFd = 1;
+            break;
+
+        case tCIDLib::EStdFiles::StdIn:
+            m_hflThis.m_phfliThis->iFd = 0;
+            break;
+
+        case tCIDLib::EStdFiles::StdErr:
+            m_hflThis.m_phfliThis->iFd = 2;
+            break;
     }
 
     return kCIDLib::True;
@@ -439,7 +444,7 @@ tCIDLib::TBoolean
 TKrnlFile::bQueryFileInfo(TKrnlFileSys::TRawFileFind& fndbToFill)
 {
     struct stat StatBuf;
-    if (::fstat(__hflThis.__phfliThis->iFd, &StatBuf))
+    if (::fstat(m_hflThis.m_phfliThis->iFd, &StatBuf))
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
@@ -448,11 +453,11 @@ TKrnlFile::bQueryFileInfo(TKrnlFileSys::TRawFileFind& fndbToFill)
     TKrnlLinux::LinuxFileTimeToCIDFileTime(StatBuf.st_atime, fndbToFill.enctLastAccessTime);
     TKrnlLinux::LinuxFileTimeToCIDFileTime(StatBuf.st_mtime, fndbToFill.enctLastWriteTime);
 
-    fndbToFill.fposFileSize = StatBuf.st_size;
+    fndbToFill.c8FileSize = StatBuf.st_size;
 
     TKrnlLinux::StatBufToInfoFlags(StatBuf, fndbToFill.eInfoFlags);
 
-    TRawStr::CopyStr(fndbToFill.szName, __pszName, kCIDLib::c4MaxPathLen);
+    TRawStr::CopyStr(fndbToFill.szName, m_pszName, kCIDLib::c4MaxPathLen);
 
     return kCIDLib::True;
 }
@@ -463,7 +468,7 @@ TKrnlFile::bQueryFileTimes( tCIDLib::TEncodedTime&    enctLastAccess
                             , tCIDLib::TEncodedTime&    enctLastWrite)
 {
     struct stat StatBuf;
-    if (::fstat(__hflThis.__phfliThis->iFd, &StatBuf))
+    if (::fstat(m_hflThis.m_phfliThis->iFd, &StatBuf))
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
@@ -481,7 +486,7 @@ TKrnlFile::bReadBuffer(         tCIDLib::TVoid* const   pBuffer
                         , const tCIDLib::TCard4         c4ToRead
                         ,       tCIDLib::TCard4&        c4BytesRead)
 {
-    ssize_t count = ::read(__hflThis.__phfliThis->iFd, pBuffer, c4ToRead);
+    ssize_t count = ::read(m_hflThis.m_phfliThis->iFd, pBuffer, c4ToRead);
 
     if (count == -1)
     {
@@ -495,24 +500,23 @@ TKrnlFile::bReadBuffer(         tCIDLib::TVoid* const   pBuffer
 }
 
 
-tCIDLib::TBoolean TKrnlFile::bSetFilePointer(const tCIDLib::TFilePos fposToSet)
+tCIDLib::TBoolean TKrnlFile::bSetFilePointer(const tCIDLib::TCard8& c8ToSet)
 {
     //
     //  If the position to set is the maximum, that means do a seek to the end
     //  of the file, so flip around the seek position and seek type to cause
     //  that.
     //
-    off_t offActualPos = fposToSet;
+    off_t offActualPos = c8ToSet;
     tCIDLib::TSInt iSeekType = SEEK_SET;
 
-    if (fposToSet == kCIDLib::c4MaxCard)
+    if (c8ToSet == kCIDLib::c4MaxCard)
     {
         offActualPos = 0;
         iSeekType = SEEK_END;
     }
 
-    off_t offReturn = ::lseek(__hflThis.__phfliThis->iFd, offActualPos, iSeekType);
-
+    off_t offReturn = ::lseek(m_hflThis.m_phfliThis->iFd, offActualPos, iSeekType);
     if (offReturn == -1)
     {
         TKrnlError::SetLastHostError(errno);
@@ -527,7 +531,7 @@ tCIDLib::TBoolean
 TKrnlFile::bSetFileTimes(const tCIDLib::TEncodedTime& enctLastAccess
                          , const tCIDLib::TEncodedTime& enctLastWrite)
 {
-    if (!__pszName)
+    if (!m_pszName)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NullName);
         return kCIDLib::False;
@@ -538,7 +542,7 @@ TKrnlFile::bSetFileTimes(const tCIDLib::TEncodedTime& enctLastAccess
     TKrnlLinux::CIDFileTimeToLinuxFileTime(enctLastAccess, UTimeBuf.actime);
     TKrnlLinux::CIDFileTimeToLinuxFileTime(enctLastWrite, UTimeBuf.modtime);
 
-    tCIDLib::TSCh* pszLocName = TRawStr::pszConvert(__pszName);
+    tCIDLib::TSCh* pszLocName = TRawStr::pszConvert(m_pszName);
     TArrayJanitor<tCIDLib::TSCh> janName(pszLocName);
 
     if (::utime(pszLocName, &UTimeBuf))
@@ -554,39 +558,37 @@ TKrnlFile::bSetFileTimes(const tCIDLib::TEncodedTime& enctLastAccess
 tCIDLib::TBoolean
 TKrnlFile::bSetName(const tCIDLib::TCh* const pszNewName)
 {
-    if (__hflThis.__phfliThis->iFd != -1)
+    if (m_hflThis.m_phfliThis->iFd != -1)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
     }
 
     // Delete the current name and replicate the new one
-    delete [] __pszName;
-    __pszName = 0;
-    __pszName = TRawStr::pszReplicate(pszNewName);
+    delete [] m_pszName;
+    m_pszName = 0;
+    m_pszName = TRawStr::pszReplicate(pszNewName);
 
     return kCIDLib::True;
 }
 
 
-tCIDLib::TBoolean TKrnlFile::bTruncateAt(const tCIDLib::TFilePos fposPosition)
+tCIDLib::TBoolean TKrnlFile::bTruncateAt(const tCIDLib::TCard8& c8Position)
 {
-    tCIDLib::TFilePos fposCur = ::lseek(__hflThis.__phfliThis->iFd, 0, SEEK_CUR);
-    if (fposCur == tCIDLib::TFilePos(-1))
+    tCIDLib::TCard8 c8Cur = ::lseek(m_hflThis.m_phfliThis->iFd, 0, SEEK_CUR);
+    if (c8Cur == tCIDLib::TCard8(-1))
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
 
-    if (::ftruncate(__hflThis.__phfliThis->iFd, fposPosition))
+    if (::ftruncate(m_hflThis.m_phfliThis->iFd, c8Position))
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
 
-    if (::lseek(__hflThis.__phfliThis->iFd
-                , tCIDLib::MinVal(fposCur, fposPosition)
-                , SEEK_SET) == -1)
+    if (::lseek(m_hflThis.m_phfliThis->iFd, tCIDLib::MinVal(c8Cur, c8Position), SEEK_SET) == -1)
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
@@ -597,17 +599,17 @@ tCIDLib::TBoolean TKrnlFile::bTruncateAt(const tCIDLib::TFilePos fposPosition)
 
 tCIDLib::TBoolean TKrnlFile::bTruncateAt()
 {
-    tCIDLib::TFilePos fposThis;
-    if (bQueryFilePtr(fposThis) && bTruncateAt(fposThis))
+    tCIDLib::TCard8 c8This;
+    if (bQueryFilePtr(c8This) && bTruncateAt(c8This))
         return kCIDLib::True;
 
     return kCIDLib::False;
 }
 
 
-tCIDLib::TBoolean TKrnlFile::bValid() const
+tCIDLib::TBoolean TKrnlFile::bIsValid() const
 {
-    return  (__hflThis.__phfliThis->iFd != -1);
+    return  (m_hflThis.m_phfliThis->iFd != -1);
 }
 
 
@@ -616,7 +618,7 @@ TKrnlFile::bWriteBuffer(const   tCIDLib::TVoid* const   pBuffer
                         , const tCIDLib::TCard4         c4ToWrite
                         ,       tCIDLib::TCard4&        c4BytesWritten)
 {
-    ssize_t count = ::write(__hflThis.__phfliThis->iFd, pBuffer, c4ToWrite);
+    ssize_t count = ::write(m_hflThis.m_phfliThis->iFd, pBuffer, c4ToWrite);
 
     if (count == -1)
     {

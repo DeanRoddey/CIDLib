@@ -21,7 +21,7 @@
 // CAVEATS/GOTCHAS:
 //
 //  1)  This class only caches some highly used information. So the private
-//      method __LoadLocaleInfo() only loads up the cached stuff. The others
+//      method LoadLocaleInfo() only loads up the cached stuff. The others
 //      are queried from the system when requested.
 //
 // LOG:
@@ -36,6 +36,7 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
+#include    <locale.h>
 
 
 namespace
@@ -50,22 +51,22 @@ namespace
     struct TLangXlat
     {
         tCIDLib::ELanguages eIndependent;
-        tCIDLib::TCh        szISO639Code[3];
-        tCIDLib::TCh*       pszISO639Name;
+        const tCIDLib::TCh  szISO639Code[3];
+        const tCIDLib::TCh* pszISO639Name;
     };
 
     // ---------------------------------------------------------------------------
     //  Local, static data
     //
-    //  __alxTable
-    //  __c4LangXlatCount
+    //  alxlTable
+    //  c4LangXlatCount
     //      A table to translate the CIDLib languag ids into local platform
     //      language ids, and vice versa, and its size.
     //
-    //  __szThisLocale
+    //  szThisLocale
     //      The string identifier for the set locale returned by setlocale()
     // ---------------------------------------------------------------------------
-    TLangXlat __alxlTable[] =
+    TLangXlat alxlTable[] =
     {
             { tCIDLib::ELanguages::Afrikaans  , L"af", L"Afrikaans" }
         ,   { tCIDLib::ELanguages::Albanian   , L"sg", L"Albanian" }
@@ -108,18 +109,18 @@ namespace
         ,   { tCIDLib::ELanguages::Ukrainian  , L"uk", L"Ukrainian" }
         ,   { tCIDLib::ELanguages::Vietnamese , L"vi", L"Vietnamese" }
     };
-    tCIDLib::TCard4  __c4LangXlatCount = tCIDLib::c4ArrayElems(__alxlTable);
-    tCIDLib::TZStr32 __szThisLocale;
+    tCIDLib::TCard4  c4LangXlatCount = tCIDLib::c4ArrayElems(alxlTable);
+    tCIDLib::TZStr32 szThisLocale;
 
 
     // ---------------------------------------------------------------------------
     //  Local functions
     // ---------------------------------------------------------------------------
-    tCIDLib::TVoid __BuildMonetaryFmt(tCIDLib::TBoolean       bPositive
-                                      , tCIDLib::TCh* const   pszToFill
-                                      , const tCIDLib::TCard4 c4MaxChars)
+    tCIDLib::TVoid BuildMonetaryFmt(        tCIDLib::TBoolean   bPositive
+                                    ,       tCIDLib::TCh* const pszToFill
+                                    , const tCIDLib::TCard4     c4MaxChars)
     {
-        static const tCIDLib::TCh* __apszMonFmt[] =
+        static const tCIDLib::TCh* apszMonFmt[] =
         {
             L"%(v)%(y)"
             , L"%(y)%(v)"
@@ -127,7 +128,7 @@ namespace
             , L"%(y) %(v)"
         };
 
-        static const tCIDLib::TCh* __apszPrecedeCurrFmt[] =
+        static const tCIDLib::TCh* apszPrecedeCurrFmt[] =
         {
             L"%(v)%(s)%(y)"
             , L"%(s)%(y)%(v)"
@@ -135,7 +136,7 @@ namespace
             , L"%(s)%(y) %(v)"
         };
 
-        static const tCIDLib::TCh* __apszFollowCurrFmt[] =
+        static const tCIDLib::TCh* apszFollowCurrFmt[] =
         {
             L"%(v)%(y)%(s)"
             , L"%(y)%(s)%(v)"
@@ -168,51 +169,40 @@ namespace
 
         switch (c4PosVal)
         {
-        case 0:
-            TRawStr::CopyCatStr(pszToFill, c4MaxChars,
-                                L"(",
-                                __apszMonFmt[c4Idx],
-                                L")");
-            break;
+            case 0:
+                TRawStr::CopyCatStr(pszToFill, c4MaxChars, L"(", apszMonFmt[c4Idx], L")");
+                break;
 
-        case 1:
-            TRawStr::CopyCatStr(pszToFill, c4MaxChars,
-                                L"%(s)",
-                                __apszMonFmt[c4Idx]);
-            break;
+            case 1:
+                TRawStr::CopyCatStr(pszToFill, c4MaxChars, L"%(s)", apszMonFmt[c4Idx]);
+                break;
 
-        case 2:
-            TRawStr::CopyCatStr(pszToFill, c4MaxChars,
-                                __apszMonFmt[c4Idx],
-                                L"%(s)");
-            break;
+            case 2:
+                TRawStr::CopyCatStr(pszToFill, c4MaxChars, apszMonFmt[c4Idx], L"%(s)");
+                break;
 
-        case 3:
-            TRawStr::CopyStr(pszToFill, __apszPrecedeCurrFmt[c4Idx], c4MaxChars);
-            break;
+            case 3:
+                TRawStr::CopyStr(pszToFill, apszPrecedeCurrFmt[c4Idx], c4MaxChars);
+                break;
 
-        case 4:
-            TRawStr::CopyStr(pszToFill, __apszFollowCurrFmt[c4Idx], c4MaxChars);
-            break;
+            case 4:
+                TRawStr::CopyStr(pszToFill, apszFollowCurrFmt[c4Idx], c4MaxChars);
+                break;
 
-        case 5:
-            TRawStr::CopyStr(pszToFill, __apszMonFmt[c4Idx], c4MaxChars);
+            case 5:
+                TRawStr::CopyStr(pszToFill, apszMonFmt[c4Idx], c4MaxChars);
         }
     }
 
-    tCIDLib::TVoid __BuildCIDToken(const tCIDLib::TCh chToken
-                                   , const tCIDLib::TCh* const pszWidth
-                                   , const tCIDLib::TCh chPad
-                                   , tCIDLib::TCh* const pszToFill
-                                   , const tCIDLib::TCard4 c4MaxChars)
+    tCIDLib::TVoid BuildCIDToken(const  tCIDLib::TCh chToken
+                                , const tCIDLib::TCh* const pszWidth
+                                , const tCIDLib::TCh chPad
+                                ,       tCIDLib::TCh* const pszToFill
+                                , const tCIDLib::TCard4 c4MaxChars)
     {
         if (*pszWidth != kCIDLib::chNull)
         {
-            TRawStr::CopyCatStr(pszToFill
-                                , c4MaxChars
-                                , L"%( ,"
-                                , pszWidth
-                                , L", )");
+            TRawStr::CopyCatStr(pszToFill, c4MaxChars, L"%( ,", pszWidth, L", )");
             pszToFill[2] = chToken;
             tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(pszToFill);
             pszToFill[c4Len - 2] = chPad ? chPad : kCIDLib::chUnderscore;
@@ -224,11 +214,11 @@ namespace
         }
     }
 
-    tCIDLib::TVoid __ConvertDateTimeString(tCIDLib::TCh* const pszTarget
+    tCIDLib::TVoid ConvertDateTimeString(tCIDLib::TCh* const pszTarget
                                            , const tCIDLib::TCh* const pszSource
                                            , const tCIDLib::TCard4 c4MaxChars);
 
-    tCIDLib::TCard4 __ConvertAToken(const tCIDLib::TSCh* const pszToken
+    tCIDLib::TCard4 ConvertAToken(const tCIDLib::TSCh* const pszToken
                                     , tCIDLib::TCh* const     pszOutput
                                     , const tCIDLib::TCard4   c4MaxChars)
     {
@@ -278,145 +268,145 @@ namespace
 
             switch (chCur)
             {
-            case '%':
-                TRawStr::CopyStr(pszOutput, L"%%", c4MaxChars);
-                break;
+                case '%':
+                    TRawStr::CopyStr(pszOutput, L"%%", c4MaxChars);
+                    break;
 
-            case 'a':
-                TRawStr::CopyStr(pszOutput, L"%(a)", c4MaxChars);
-                break;
+                case 'a':
+                    TRawStr::CopyStr(pszOutput, L"%(a)", c4MaxChars);
+                    break;
 
-            case 'A':
-                TRawStr::CopyStr(pszOutput, L"%(d)", c4MaxChars);
-                break;
+                case 'A':
+                    TRawStr::CopyStr(pszOutput, L"%(d)", c4MaxChars);
+                    break;
 
-            case 'b':
-            case 'h':
-                TRawStr::CopyStr(pszOutput, L"%(m)", c4MaxChars);
-                break;
+                case 'b':
+                case 'h':
+                    TRawStr::CopyStr(pszOutput, L"%(m)", c4MaxChars);
+                    break;
 
-            case 'B':
-                TRawStr::CopyStr(pszOutput, L"%(n)", c4MaxChars);
-                break;
+                case 'B':
+                    TRawStr::CopyStr(pszOutput, L"%(n)", c4MaxChars);
+                    break;
 
-            case 'c':
-                if (chModifier == 'E' && *(::nl_langinfo(ERA_D_T_FMT)) != 0)
-                    TRawStr::pszConvert(::nl_langinfo(ERA_D_T_FMT), szBuf, c4MaxBufChars(szBuf));
-                else
-                    TRawStr::pszConvert(::nl_langinfo(D_T_FMT), szBuf, c4MaxBufChars(szBuf));
-                __ConvertDateTimeString(pszOutput, szBuf, c4MaxChars);
-                break;
+                case 'c':
+                    if (chModifier == 'E' && *(::nl_langinfo(ERA_D_T_FMT)) != 0)
+                        TRawStr::pszConvert(::nl_langinfo(ERA_D_T_FMT), szBuf, c4MaxBufChars(szBuf));
+                    else
+                        TRawStr::pszConvert(::nl_langinfo(D_T_FMT), szBuf, c4MaxBufChars(szBuf));
+                    ConvertDateTimeString(pszOutput, szBuf, c4MaxChars);
+                    break;
 
-            case 'd':
-                TRawStr::CopyStr(pszOutput, L"%(D,2,0)", c4MaxChars);
-                break;
+                case 'd':
+                    TRawStr::CopyStr(pszOutput, L"%(D,2,0)", c4MaxChars);
+                    break;
 
-            case 'D':
-                TRawStr::CopyStr(pszOutput, L"%(M,2,0)/%(D,2,0)/%(Y)", c4MaxChars);
-                break;
+                case 'D':
+                    TRawStr::CopyStr(pszOutput, L"%(M,2,0)/%(D,2,0)/%(Y)", c4MaxChars);
+                    break;
 
-            case 'e':
-                __BuildCIDToken(kCIDLib::chLatin_D, szWidth, chPad, pszOutput, c4MaxChars);
-                break;
+                case 'e':
+                    BuildCIDToken(kCIDLib::chLatin_D, szWidth, chPad, pszOutput, c4MaxChars);
+                    break;
 
-            case 'H':
-                TRawStr::CopyStr(pszOutput, L"%(H,2,0)", c4MaxChars);
-                break;
+                case 'H':
+                    TRawStr::CopyStr(pszOutput, L"%(H,2,0)", c4MaxChars);
+                    break;
 
-            case 'I':
-                TRawStr::CopyStr(pszOutput, L"%(h,2,0)", c4MaxChars);
-                break;
+                case 'I':
+                    TRawStr::CopyStr(pszOutput, L"%(h,2,0)", c4MaxChars);
+                    break;
 
-            case 'k':
-                __BuildCIDToken(kCIDLib::chLatin_H, szWidth, chPad, pszOutput, c4MaxChars);
-                break;
+                case 'k':
+                    BuildCIDToken(kCIDLib::chLatin_H, szWidth, chPad, pszOutput, c4MaxChars);
+                    break;
 
-            case 'l':
-                __BuildCIDToken(kCIDLib::chLatin_h, szWidth, chPad, pszOutput, c4MaxChars);
-                break;
+                case 'l':
+                    BuildCIDToken(kCIDLib::chLatin_h, szWidth, chPad, pszOutput, c4MaxChars);
+                    break;
 
-            case 'm':
-                TRawStr::CopyStr(pszOutput, L"%(M,2,0)", c4MaxChars);
-                break;
+                case 'm':
+                    TRawStr::CopyStr(pszOutput, L"%(M,2,0)", c4MaxChars);
+                    break;
 
-            case 'M':
-                TRawStr::CopyStr(pszOutput, L"%(u,2,0)", c4MaxChars);
-                break;
+                case 'M':
+                    TRawStr::CopyStr(pszOutput, L"%(u,2,0)", c4MaxChars);
+                    break;
 
-            case 'p':
-            case 'P':
-                TRawStr::CopyStr(pszOutput, L"%(P)", c4MaxChars);
-                break;
+                case 'p':
+                case 'P':
+                    TRawStr::CopyStr(pszOutput, L"%(P)", c4MaxChars);
+                    break;
 
-            case 'r':
-                TRawStr::CopyStr(pszOutput, L"%(h,2,0):%(u,2,0):%(s,2,0) %(P)", c4MaxChars);
-                break;
+                case 'r':
+                    TRawStr::CopyStr(pszOutput, L"%(h,2,0):%(u,2,0):%(s,2,0) %(P)", c4MaxChars);
+                    break;
 
-            case 'R':
-                TRawStr::CopyStr(pszOutput, L"%(H,2,0):%(u,2,0)", c4MaxChars);
-                break;
+                case 'R':
+                    TRawStr::CopyStr(pszOutput, L"%(H,2,0):%(u,2,0)", c4MaxChars);
+                    break;
 
-            case 'S':
-                TRawStr::CopyStr(pszOutput, L"%(s,2,0)", c4MaxChars);
-                break;
+                case 'S':
+                    TRawStr::CopyStr(pszOutput, L"%(s,2,0)", c4MaxChars);
+                    break;
 
-            case 'T':
-                TRawStr::CopyStr(pszOutput, L"%(H,2,0):%(u,2,0):%(s,2,0)", c4MaxChars);
-                break;
+                case 'T':
+                    TRawStr::CopyStr(pszOutput, L"%(H,2,0):%(u,2,0):%(s,2,0)", c4MaxChars);
+                    break;
 
-            case 'x':
-                if (chModifier == 'E' && *(::nl_langinfo(ERA_D_FMT)) != 0)
-                    TRawStr::pszConvert(::nl_langinfo(ERA_D_FMT), szBuf, c4MaxBufChars(szBuf));
-                else
-                    TRawStr::pszConvert(::nl_langinfo(D_FMT), szBuf, c4MaxBufChars(szBuf));
-                __ConvertDateTimeString(pszOutput, szBuf, c4MaxChars);
-                break;
+                case 'x':
+                    if (chModifier == 'E' && *(::nl_langinfo(ERA_D_FMT)) != 0)
+                        TRawStr::pszConvert(::nl_langinfo(ERA_D_FMT), szBuf, c4MaxBufChars(szBuf));
+                    else
+                        TRawStr::pszConvert(::nl_langinfo(D_FMT), szBuf, c4MaxBufChars(szBuf));
+                    ConvertDateTimeString(pszOutput, szBuf, c4MaxChars);
+                    break;
 
-            case'X':
-                if (chModifier == 'E' && *(::nl_langinfo(ERA_T_FMT)) != 0)
-                    TRawStr::pszConvert(::nl_langinfo(ERA_T_FMT), szBuf, c4MaxBufChars(szBuf));
-                else
-                    TRawStr::pszConvert(::nl_langinfo(T_FMT), szBuf, c4MaxBufChars(szBuf));
-                __ConvertDateTimeString(pszOutput, szBuf, c4MaxChars);
-                break;
+                case'X':
+                    if (chModifier == 'E' && *(::nl_langinfo(ERA_T_FMT)) != 0)
+                        TRawStr::pszConvert(::nl_langinfo(ERA_T_FMT), szBuf, c4MaxBufChars(szBuf));
+                    else
+                        TRawStr::pszConvert(::nl_langinfo(T_FMT), szBuf, c4MaxBufChars(szBuf));
+                    ConvertDateTimeString(pszOutput, szBuf, c4MaxChars);
+                    break;
 
-            case 'y':
-                TRawStr::CopyStr(pszOutput, L"%(y)", c4MaxChars);
-                break;
+                case 'y':
+                    TRawStr::CopyStr(pszOutput, L"%(y)", c4MaxChars);
+                    break;
 
-            case 'Y':
-                TRawStr::CopyStr(pszOutput, L"%(Y)", c4MaxChars);
-                break;
+                case 'Y':
+                    TRawStr::CopyStr(pszOutput, L"%(Y)", c4MaxChars);
+                    break;
 
-            case 'Z':
-                TRawStr::CopyStr(pszOutput, L"%(T)", c4MaxChars);
-                break;
+                case 'Z':
+                    TRawStr::CopyStr(pszOutput, L"%(T)", c4MaxChars);
+                    break;
 
-            default:
-                bFoundTerminator = kCIDLib::False;
-                break;
-            }
+                default:
+                    bFoundTerminator = kCIDLib::False;
+                    break;
+                }
 
-            if (bFoundTerminator)
-                break;
+                if (bFoundTerminator)
+                    break;
         }
 
         return c4Idx + 1;
     }
 
-    tCIDLib::TCard4 __ConvertAToken(const tCIDLib::TCh* const pszToken
-                                    , tCIDLib::TCh* const     pszOutput
-                                    , const tCIDLib::TCard4   c4MaxChars)
+    tCIDLib::TCard4 ConvertAToken(  const   tCIDLib::TCh* const pszToken
+                                    ,       tCIDLib::TCh* const pszOutput
+                                    , const tCIDLib::TCard4     c4MaxChars)
     {
         tCIDLib::TSCh* pszLocToken = TRawStr::pszConvert(pszToken);
         TArrayJanitor<tCIDLib::TSCh> janToken(pszLocToken);
-        return __ConvertAToken(pszLocToken, pszOutput, c4MaxChars);
+        return ConvertAToken(pszLocToken, pszOutput, c4MaxChars);
     }
 
 
-    tCIDLib::TVoid __ConvertDateTimeString(tCIDLib::TCh* const pszTarget
-                                           , const tCIDLib::TCh* const pszSource
-                                           , const tCIDLib::TCard4 c4MaxChars)
+    tCIDLib::TVoid ConvertDateTimeString(       tCIDLib::TCh* const pszTarget
+                                        , const tCIDLib::TCh* const pszSource
+                                        , const tCIDLib::TCard4     c4MaxChars)
     {
         tCIDLib::TZStr128 szBuf;
         tCIDLib::TCard4 c4Len;
@@ -426,7 +416,7 @@ namespace
 
         for (tCIDLib::TCh* pszCur = const_cast<tCIDLib::TCh*>(pszSource); *pszCur; pszCur++)
         {
-            c4Len = __ConvertAToken(pszCur, szBuf, 128);
+            c4Len = ConvertAToken(pszCur, szBuf, 128);
 
             if (c4Len)
             {
@@ -443,14 +433,14 @@ namespace
         }
     }
 
-    tCIDLib::TCh __chFindSeparator(nl_item nlItem)
+    tCIDLib::TCh chFindSeparator(nl_item nlItem)
     {
         tCIDLib::TZStr128 szBuf;
         tCIDLib::TCard4 c4Len;
 
         for (tCIDLib::TSCh* pszCur = ::nl_langinfo(nlItem); *pszCur; pszCur++)
         {
-            c4Len = __ConvertAToken(pszCur, szBuf, 128);
+            c4Len = ConvertAToken(pszCur, szBuf, 128);
 
             if (c4Len)
             {
@@ -485,15 +475,15 @@ namespace
 //  TCIDKrnlModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid
-TCIDKrnlModule::__InitTermLocale(const tCIDLib::EInitTerm eInitTerm)
+TCIDKrnlModule::InitTermLocale(const tCIDLib::EInitTerm eInitTerm)
 {
     if (eInitTerm == tCIDLib::EInitTerm::Initialize)
     {
         TRawStr::pszConvert(::setlocale(LC_ALL, "")
-                            , __szThisLocale
-                            , c4MaxBufChars(__szThisLocale));
+                            , szThisLocale
+                            , c4MaxBufChars(szThisLocale));
 
-        if (!TKrnlLocale::__bLoadLocaleInfo())
+        if (!TKrnlLocale::bLoadLocaleInfo())
             throw TKrnlError::kerrLast();
     }
 }
@@ -515,63 +505,63 @@ TKrnlLocale::bQueryStrField(const   EStrFlds            eField
 {
     switch(eField)
     {
-    case EStrFld_Country:
-    case EStrFld_Language:
-    case EStrFld_ISOCountry:
-    case EStrFld_EnglishCountry:
-        pszToFill[0] = L'\000';
-        break;
+        case EStrFlds::Country:
+        case EStrFlds::Language:
+        case EStrFlds::ISOCountry:
+        case EStrFlds::EnglishCountry:
+            pszToFill[0] = L'\000';
+            break;
 
-    case EStrFld_EnglishLanguage:
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < __c4LangXlatCount; c4Index++)
-        {
-            if (__alxlTable[c4Index].eIndependent == __eLanguage)
+        case EStrFlds::EnglishLanguage:
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < c4LangXlatCount; c4Index++)
             {
-                TRawStr::CopyStr(pszToFill, __alxlTable[c4Index].pszISO639Name, c4MaxChars);
-                break;
+                if (alxlTable[c4Index].eIndependent == s_eLanguage)
+                {
+                    TRawStr::CopyStr(pszToFill, alxlTable[c4Index].pszISO639Name, c4MaxChars);
+                    break;
+                }
             }
-        }
-        break;
+            break;
 
-    case EStrFld_ISOLanguage:
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < __c4LangXlatCount; c4Index++)
-        {
-            if (__alxlTable[c4Index].eIndependent == __eLanguage)
+        case EStrFlds::ISOLanguage:
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < c4LangXlatCount; c4Index++)
             {
-                TRawStr::CopyStr(pszToFill, __alxlTable[c4Index].szISO639Code, c4MaxChars);
-                break;
+                if (alxlTable[c4Index].eIndependent == s_eLanguage)
+                {
+                    TRawStr::CopyStr(pszToFill, alxlTable[c4Index].szISO639Code, c4MaxChars);
+                    break;
+                }
             }
-        }
-        break;
+            break;
 
-    // These are already loaded and translated
-    case EStrFld_AMString :
-        TRawStr::CopyStr(pszToFill, __szAMString, c4MaxChars);
-        break;
+        // These are already loaded and translated
+        case EStrFlds::AMString :
+            TRawStr::CopyStr(pszToFill, s_szAMString, c4MaxChars);
+            break;
 
-    case EStrFld_PMString :
-        TRawStr::CopyStr(pszToFill, __szPMString, c4MaxChars);
-        break;
+        case EStrFlds::PMString :
+            TRawStr::CopyStr(pszToFill, s_szPMString, c4MaxChars);
+            break;
 
-    case EStrFld_TimeFormat :
-        TRawStr::CopyStr(pszToFill, __szTimeFmt, c4MaxChars);
-        break;
+        case EStrFlds::TimeFormat :
+            TRawStr::CopyStr(pszToFill, s_szTimeFmt, c4MaxChars);
+            break;
 
-    case EStrFld_DateFormat :
-        TRawStr::CopyStr(pszToFill, __szDateFmt, c4MaxChars);
-        break;
+        case EStrFlds::DateFormat :
+            TRawStr::CopyStr(pszToFill, s_szDateFmt, c4MaxChars);
+            break;
 
-    case EStrFld_NegMonFormat :
-        TRawStr::CopyStr(pszToFill, __szNegMonFmt, c4MaxChars);
-        break;
+        case EStrFlds::NegMonFormat :
+            TRawStr::CopyStr(pszToFill, s_szNegMonFmt, c4MaxChars);
+            break;
 
-    case EStrFld_PosMonFormat :
-        TRawStr::CopyStr(pszToFill, __szPosMonFmt, c4MaxChars);
-        break;
+        case EStrFlds::PosMonFormat :
+            TRawStr::CopyStr(pszToFill, s_szPosMonFmt, c4MaxChars);
+            break;
 
-    default :
-        TKrnlError::ThrowKrnlError(kKrnlErrs::errcLoc_UnknownStrField);
-        return kCIDLib::False;
+        default :
+            TKrnlError::ThrowKrnlError(kKrnlErrs::errcLoc_UnknownStrField);
+            return kCIDLib::False;
     };
 
     return kCIDLib::True;
@@ -583,7 +573,10 @@ TKrnlLocale::bQueryShortDay(const   tCIDLib::EWeekDays  eDay
                             ,       tCIDLib::TCh* const pszToFill
                             , const tCIDLib::TCard4     c4MaxChars)
 {
-    TRawStr::pszConvert(::nl_langinfo(nl_item(ABDAY_1 + eDay)), pszToFill, c4MaxChars);
+    TRawStr::pszConvert
+    (
+        ::nl_langinfo(nl_item(ABDAY_1 + tCIDLib::c4EnumOrd(eDay))), pszToFill, c4MaxChars
+    );
     return kCIDLib::True;
 }
 
@@ -593,7 +586,10 @@ TKrnlLocale::bQueryLongDay( const   tCIDLib::EWeekDays  eDay
                             ,       tCIDLib::TCh* const pszToFill
                             , const tCIDLib::TCard4     c4MaxChars)
 {
-    TRawStr::pszConvert(::nl_langinfo(nl_item(DAY_1 + eDay)), pszToFill, c4MaxChars);
+    TRawStr::pszConvert
+    (
+        ::nl_langinfo(nl_item(DAY_1 + tCIDLib::c4EnumOrd(eDay))), pszToFill, c4MaxChars
+    );
     return kCIDLib::True;
 }
 
@@ -603,7 +599,10 @@ TKrnlLocale::bQueryShortMonth(  const   tCIDLib::EMonths    eMonth
                                 ,       tCIDLib::TCh* const pszToFill
                                 , const tCIDLib::TCard4     c4MaxChars)
 {
-    TRawStr::pszConvert(::nl_langinfo(nl_item(ABMON_1 + eMonth)), pszToFill, c4MaxChars);
+    TRawStr::pszConvert
+    (
+        ::nl_langinfo(nl_item(ABMON_1 + tCIDLib::c4EnumOrd(eMonth))), pszToFill, c4MaxChars
+    );
     return kCIDLib::True;
 }
 
@@ -613,7 +612,10 @@ TKrnlLocale::bQueryLongMonth(const  tCIDLib::EMonths    eMonth
                             ,       tCIDLib::TCh* const pszToFill
                             , const tCIDLib::TCard4     c4MaxChars)
 {
-    TRawStr::pszConvert(::nl_langinfo(nl_item(MON_1 + eMonth)), pszToFill, c4MaxChars);
+    TRawStr::pszConvert
+    (
+        ::nl_langinfo(nl_item(MON_1 + tCIDLib::c4EnumOrd(eMonth))), pszToFill, c4MaxChars
+    );
     return kCIDLib::True;
 }
 
@@ -622,62 +624,62 @@ TKrnlLocale::bQueryLongMonth(const  tCIDLib::EMonths    eMonth
 // ---------------------------------------------------------------------------
 //  TKrnlLocale: Private, static methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TKrnlLocale::__bLoadLocaleInfo()
+tCIDLib::TBoolean TKrnlLocale::bLoadLocaleInfo()
 {
     // We have to guess at the measure type, because Dean said so. :)
-    if (!TRawStr::bCompareStr(__szThisLocale, L"C") == tCIDLib::ESortComps::Equal
-        || TRawStr::pszFindChars(__szThisLocale, L"US") != 0)
+    if ((TRawStr::eCompareStr(szThisLocale, L"C") == tCIDLib::ESortComps::Equal)
+    ||  TRawStr::pszFindChars(szThisLocale, L"US") != 0)
     {
-        __eMeasure = tCIDLib::EMeasures::US;
+        s_eMeasure = tCIDLib::EMeasures::US;
     }
     else
     {
-        __eMeasure = tCIDLib::EMeasures::Metric;
+        s_eMeasure = tCIDLib::EMeasures::Metric;
     }
 
     // Find the language from the locale identifier string
-    __eLanguage = tCIDLib::ELanguages::English;
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < __c4LangXlatCount; c4Index++)
+    s_eLanguage = tCIDLib::ELanguages::English;
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4LangXlatCount; c4Index++)
     {
-        if (!TRawStr::bCompareStrN(__alxlTable[c4Index].szISO639Code, __szThisLocale, 2) == tCIDLib::ESortComps::Equal)
-            __eLanguage = __alxlTable[c4Index].eIndependent;
+        if (TRawStr::eCompareStrN(alxlTable[c4Index].szISO639Code, szThisLocale, 2) == tCIDLib::ESortComps::Equal)
+            s_eLanguage = alxlTable[c4Index].eIndependent;
     }
-    __eDefLanguage = __eLanguage;
+    s_eDefLanguage = s_eLanguage;
 
     // Now extract the date and time separator characters
-    __chDateSep = __chFindSeparator(D_FMT);
-    __chTimeSep = __chFindSeparator(T_FMT);
+    s_chDateSep = chFindSeparator(D_FMT);
+    s_chTimeSep = chFindSeparator(T_FMT);
 
     // AM and PM are easy
-    TRawStr::pszConvert(::nl_langinfo(AM_STR), __szAMString, c4MaxBufChars(__szAMString));
-    TRawStr::pszConvert(::nl_langinfo(PM_STR), __szPMString, c4MaxBufChars(__szPMString));
+    TRawStr::pszConvert(::nl_langinfo(AM_STR), s_szAMString, c4MaxBufChars(s_szAMString));
+    TRawStr::pszConvert(::nl_langinfo(PM_STR), s_szPMString, c4MaxBufChars(s_szPMString));
 
     // Numeric
     tCIDLib::TCard4 c4Tmp = *::nl_langinfo(FRAC_DIGITS);
-    __c4DecDigits = c4Tmp == 127 ? 0 : c4Tmp;
+    s_c4DecDigits = c4Tmp == 127 ? 0 : c4Tmp;
     c4Tmp = *::nl_langinfo(GROUPING);
-    __c4GroupSize = c4Tmp == 127 ? 0 : c4Tmp;
-    ::mbtowc(&__chGroupSep, ::nl_langinfo(THOUSANDS_SEP), 1);
-    ::mbtowc(&__chPosSign, ::nl_langinfo(POSITIVE_SIGN), 1);
-    ::mbtowc(&__chNegSign, ::nl_langinfo(NEGATIVE_SIGN), 1);
-    ::mbtowc(&__chDecSymbol, ::nl_langinfo(DECIMAL_POINT), 1);
+    s_c4GroupSize = c4Tmp == 127 ? 0 : c4Tmp;
+    ::mbtowc(&s_chGroupSep, ::nl_langinfo(THOUSANDS_SEP), 1);
+    ::mbtowc(&s_chPosSign, ::nl_langinfo(POSITIVE_SIGN), 1);
+    ::mbtowc(&s_chNegSign, ::nl_langinfo(NEGATIVE_SIGN), 1);
+    ::mbtowc(&s_chDecSymbol, ::nl_langinfo(DECIMAL_POINT), 1);
 
     // Monetary
-    __c4MonetaryDecDigits = __c4DecDigits;
+    s_c4MonetaryDecDigits = s_c4DecDigits;
     c4Tmp = *::nl_langinfo(MON_GROUPING);
-    __c4MonetaryGrpSize = c4Tmp == 127 ? 0 : c4Tmp;
-    ::mbtowc(&__chMonetaryDecSymbol, ::nl_langinfo(MON_DECIMAL_POINT), 1);
-    ::mbtowc(&__chMonetaryGrpSep, ::nl_langinfo(MON_THOUSANDS_SEP), 1);
-    ::mbtowc(&__chCurrencySymbol, ::nl_langinfo(CURRENCY_SYMBOL), 1);
+    s_c4MonetaryGrpSize = c4Tmp == 127 ? 0 : c4Tmp;
+    ::mbtowc(&s_chMonetaryDecSymbol, ::nl_langinfo(MON_DECIMAL_POINT), 1);
+    ::mbtowc(&s_chMonetaryGrpSep, ::nl_langinfo(MON_THOUSANDS_SEP), 1);
+    ::mbtowc(&s_chCurrencySymbol, ::nl_langinfo(CURRENCY_SYMBOL), 1);
 
-    __BuildMonetaryFmt(kCIDLib::True, __szPosMonFmt, c4MaxBufChars(__szPosMonFmt));
-    __BuildMonetaryFmt(kCIDLib::False, __szNegMonFmt, c4MaxBufChars(__szNegMonFmt));
+    BuildMonetaryFmt(kCIDLib::True, s_szPosMonFmt, c4MaxBufChars(s_szPosMonFmt));
+    BuildMonetaryFmt(kCIDLib::False, s_szNegMonFmt, c4MaxBufChars(s_szNegMonFmt));
 
     tCIDLib::TZStr128 szBuf;
     TRawStr::pszConvert(::nl_langinfo(D_FMT), szBuf, c4MaxBufChars(szBuf));
-    __ConvertDateTimeString(__szDateFmt, szBuf, c4MaxBufChars(__szDateFmt));
+    ConvertDateTimeString(s_szDateFmt, szBuf, c4MaxBufChars(s_szDateFmt));
     TRawStr::pszConvert(::nl_langinfo(T_FMT), szBuf, c4MaxBufChars(szBuf));
-    __ConvertDateTimeString(__szTimeFmt, szBuf, c4MaxBufChars(__szTimeFmt));
+    ConvertDateTimeString(s_szTimeFmt, szBuf, c4MaxBufChars(s_szTimeFmt));
 
     return kCIDLib::True;
 }
