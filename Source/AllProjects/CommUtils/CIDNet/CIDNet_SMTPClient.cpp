@@ -579,7 +579,7 @@ TSMTPClient::AddMsgToQueue(const    TString&    strFrom
     if (!m_pcolQueue)
         m_pcolQueue = new TQueue<TEmailMsg>();
 
-    m_pcolQueue->objPlace(strFrom, strTo, strTo, strMsg);
+    m_pcolQueue->objPlace(strFrom, strTo, strTopic, strMsg);
 }
 
 // Get/set the column width that we are to use to format outgoing body text
