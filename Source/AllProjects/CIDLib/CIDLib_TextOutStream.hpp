@@ -370,7 +370,10 @@ class CIDLIBEXP TTextOutStream : public TObject
 
         tCIDLib::TVoid Flush();
 
-        // Just call the recursive helper with the start of the format buffer
+        //
+        //  Just call the recursive helper with the start of the format buffer. WE
+        //  have another that flushes at the end.
+        //
         template <typename... TArgs>
         tCIDLib::TVoid Format(const TString& strFmt, const TArgs... Args)
         {
@@ -380,6 +383,18 @@ class CIDLIBEXP TTextOutStream : public TObject
             // If we get back the buffer, then no parms, just write out fmt text
             if (pszFmtHelper(strFmt.pszBuffer(), Args...) == strFmt.pszBuffer())
                 PutLine(strFmt);
+        }
+
+        template <typename... TArgs>
+        tCIDLib::TVoid FormatF(const TString& strFmt, const TArgs... Args)
+        {
+            // Save any stream format stuff then call our recursive helper
+            TStreamJanitor janFormat(this);
+
+            // If we get back the buffer, then no parms, just write out fmt text
+            if (pszFmtHelper(strFmt.pszBuffer(), Args...) == strFmt.pszBuffer())
+                PutLine(strFmt);
+            Flush();
         }
 
         tCIDLib::TVoid PutLine

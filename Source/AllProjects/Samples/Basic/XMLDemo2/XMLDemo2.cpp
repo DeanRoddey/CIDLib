@@ -46,7 +46,7 @@
 
 
 // ----------------------------------------------------------------------------
-//  Include magic main module code to start the main thread
+//  For this simple example, just start the main thread on a global function.
 // ----------------------------------------------------------------------------
 tCIDLib::EExitCodes eXMLDemo2Thread(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"XMLDemo2Thread", eXMLDemo2Thread))
@@ -75,10 +75,10 @@ static tCIDLib::TVoid ShowUsage()
                L"          /OutFile=xxx\n"
                L"          /IgnoreBadChars\n"
                L"          /Encoding=xxx\n"
-               L"          /MemTest\n"
                L"          /Validate\n"
                L"          /IgnoreDTD\n\n"
-               L" If no output file, output is to the console"
+               L"   If no output file, output is to the console\n"
+               L"   Encoding is only used if outputing to a file"
             << kCIDLib::NewEndLn;
 }
 
@@ -86,7 +86,7 @@ static tCIDLib::TVoid ShowUsage()
 //
 //  This is called to do the actual parse. If it works, then the passed
 //  tree parser is filled in. We get the input file name for error msg
-//  dipslay purposes. We get an output stream to dump the resulting
+//  display purposes. We get an output stream to dump the resulting
 //  XML content back out to.
 //
 static tCIDLib::TVoid DoParse(          TXMLTreeParser&     xtprsToUse
@@ -106,24 +106,34 @@ static tCIDLib::TVoid DoParse(          TXMLTreeParser&     xtprsToUse
                                         , eOpts
                                         , tCIDXML::EParseFlags::All))
         {
-            strmOut << xtprsToUse.xtdocThis() << kCIDLib::DNewLn;
+            //
+            //  It worked, so format it back out to the output passed output stream, We
+            //  just dump the top level document and it all recursively formats out.
+            //
+            strmOut << xtprsToUse.xtdocThis() << kCIDLib::NewEndLn;
         }
          else
         {
             // XML errors occurred, display the first one
-            const TXMLTreeParser::TErrInfo& errCur = xtprsToUse.erriFirst();
-            conOut  << L"The parse failed\n"
-                    << errCur.strText()
-                    << kCIDLib::NewLn << L"(" << errCur.c4Line()
-                    << kCIDLib::chPeriod << errCur.c4Column()
-                    << L") " << errCur.strSystemId() << kCIDLib::NewEndLn;
+            const TXMLTreeParser::TErrInfo& errFirst = xtprsToUse.erriFirst();
+            conOut.FormatF
+            (
+                L"\nThe parse failed\n    %(1)\n    (%(2).%(3)) %(4)\n"
+                , errFirst.strText()
+                , errFirst.c4Line()
+                , errFirst.c4Column()
+                , errFirst.strSystemId()
+            );
         }
     }
 
     catch(TError& errToCatch)
     {
-        conOut  << L"A CIDLib runtime error occured during parsing.\n"
-                << L"Error: " << errToCatch.strErrText() << kCIDLib::NewEndLn;
+        conOut.FormatF
+        (
+            L"A CIDLib runtime error occured during parsing.\n    Error: %(1)\n\n"
+            , errToCatch.strErrText()
+        );
     }
 }
 
@@ -136,14 +146,16 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     // We have to let our calling thread go first
     thrThis.Sync();
 
+    // Parse our parameters, some are defaulted
     tCIDLib::TBoolean   bParmsOK = kCIDLib::True;
     tCIDXML::EParseOpts eOptsToUse = tCIDXML::EParseOpts::None;
     TString             strInFileParm;
     TString             strOutFileParm;
     TString             strEncoding;
     {
-        // Tell it to remove consumed parms so we can check for unknown ones
         TCmdLine cmdlLoad;
+
+        // Remove consumed parms so we can check for unknown ones at the end
         cmdlLoad.bRemoveConsumed(kCIDLib::True);
 
         // The input file is required
@@ -153,12 +165,15 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
             return tCIDLib::EExitCodes::BadParameters;
         }
 
-        // Values that are option or defaulted if not set
+        // Values that are optional or defaulted if not set
         cmdlLoad.bFindOptionVal(L"OutFile", strOutFileParm);
         if (!cmdlLoad.bFindOptionVal(L"Encoding", strEncoding))
             strEncoding = L"UTF-8";
 
-        // These are just option flags
+        //
+        //  These are just option flags. Note we are OR'ing class type enums
+        //  since our enums are IDL generated and support that.
+        //
         if (cmdlLoad.bFindOption(L"IgnoreBadChars"))
             eOptsToUse |= tCIDXML::EParseOpts::IgnoreBadChars;
         if (cmdlLoad.bFindOption(L"IgnoreDTD"))
@@ -178,15 +193,17 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     TTextConverter* ptcvtOut = facCIDEncode().ptcvtMake(strEncoding);
     if (!ptcvtOut)
     {
-        conOut  << L"Could not create a converter for encoding: " << strEncoding
-                << kCIDLib::NewEndLn;
+        conOut.FormatF
+        (
+            L"Could not create a converter for encoding: %(1)\n\n", strEncoding
+        );
         return tCIDLib::EExitCodes::BadParameters;
     }
 
     //
     //  Decide where to send the output. If they provided an output file, then
-    //  let's create a stream for that. Else we use the console. The file output
-    //  stream adopts our converter even if we don't end up using it.
+    //  let's create a file stream for that. Else we use the console. The file
+    //  output stream adopts our text converter even if we don't end up using it.
     //
     TTextOutStream*     pstrmOut = &conOut;
     TTextFileOutStream  strmOutFile(ptcvtOut);
@@ -203,7 +220,7 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
         pstrmOut = &strmOutFile;
     }
 
-    // Run the test, dumping to the selected target
+    // And do the parse and output, passing along options and target stream
     TXMLTreeParser xtprsToUse;
     DoParse(xtprsToUse, strInFileParm, eOptsToUse, *pstrmOut);
 
