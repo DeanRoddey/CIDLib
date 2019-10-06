@@ -1391,15 +1391,8 @@ TCppGenerator::GenMethod(const  TString&            strName
             const TCGenMethodParm& mparmCur = colParams[c4Index];
             const tCIDLib::EParmDirs eDir = mparmCur.eDir();
 
-            //
-            //  Format the type. But special case TMemBuf. That's abstract and how we
-            //  use this below is to instantiate a local that can be used on the server
-            //  side. In that case, create a heap buffer to use.
-            //
-            if (mparmCur.tinfoThis().strType() == L"CIDIDL:TMemBuf")
-                strTmp = L"THeapBuf";
-            else
-                FormatType(mparmCur.tinfoThis(), strTmp);
+            // Format the type
+            FormatType(mparmCur.tinfoThis(), strTmp);
 
             //
             //  Create a local var for the parameter. Do a special case check for the
@@ -1784,7 +1777,15 @@ TCppGenerator::FormatType(  const   TCGenTypeInfo&  tinfoFmt
     }
      else if (strRawType == L"CIDIDL:TMemBuf")
     {
-        strToFill = L"TMemBuf";
+        //
+        //  On the server side we have to use a concrete class to read in the data
+        //  and pass it in, so we generate a heap buffer parm on the server side.
+        //  This also helps with move semantics.
+        //
+        if (m_eMode == tCIDIDL::EOutputs::Client)
+            strToFill = L"TMemBuf";
+        else
+            strToFill = L"THeapBuf";
     }
      else if (strRawType == L"CIDIDL:Object")
     {

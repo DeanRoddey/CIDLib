@@ -122,6 +122,7 @@ class TCGenTypeInfo : public TObject
         static const TString    s_strElem_KeyedHashSet;
         static const TString    s_strElem_KeyOps;
         static const TString    s_strElem_KeyType;
+        static const TString    s_strElem_MemBuf;
         static const TString    s_strElem_Modulus;
         static const TString    s_strElem_Object;
         static const TString    s_strElem_String;

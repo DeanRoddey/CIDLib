@@ -138,8 +138,13 @@ tCIDLib::TVoid TCGenTypeInfo::Set(const TXMLTreeElement& xtnodeType)
         m_strModulus = xtnodeType.xtattrNamed(s_strElem_Modulus).strValue();
     }
      else if ((m_strType == s_strElem_HeapBuf)
+          ||  (m_strType == s_strElem_MemBuf)
           ||  (m_strType == s_strElem_String))
     {
+        //
+        //  TMemBuf itself is not movenable, but on the server side base class, we
+        //  create a THeapBuf object for processing on the server side, which is.
+        //
         m_bMoveableType = kCIDLib::True;
     }
      else if (m_strType == s_strElem_KeyedHashSet)
@@ -181,6 +186,7 @@ const TString    TCGenTypeInfo::s_strElem_KeyExtract(L"CIDIDL:KeyExtract");
 const TString    TCGenTypeInfo::s_strElem_KeyedHashSet(L"CIDIDL:TKeyedHashSet");
 const TString    TCGenTypeInfo::s_strElem_KeyOps(L"CIDIDL:KeyOps");
 const TString    TCGenTypeInfo::s_strElem_KeyType(L"CIDIDL:KeyType");
+const TString    TCGenTypeInfo::s_strElem_MemBuf(L"CIDIDL:TMemBuf");
 const TString    TCGenTypeInfo::s_strElem_Modulus(L"CIDIDL:Modulus");
 const TString    TCGenTypeInfo::s_strElem_Object(L"CIDIDL:Object");
 const TString    TCGenTypeInfo::s_strElem_String(L"CIDIDL:TString");
