@@ -43,18 +43,20 @@
 //  TMemoryHandle: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TMemoryHandle::TMemoryHandle() :
-    __phmemiThis(0)
+
+    m_phmemiThis(nullptr)
 {
 }
 
 TMemoryHandle::TMemoryHandle(const TMemoryHandle& hmemToCopy) :
-    __phmemiThis(hmemToCopy.__phmemiThis)
+
+    m_phmemiThis(hmemToCopy.m_phmemiThis)
 {
 }
 
 TMemoryHandle::~TMemoryHandle()
 {
-    __phmemiThis = 0;
+    m_phmemiThis = nullptr;
 }
 
 
@@ -66,8 +68,7 @@ TMemoryHandle& TMemoryHandle::operator=(const TMemoryHandle& hmemToAssign)
     if (this == &hmemToAssign)
         return *this;
 
-    __phmemiThis = hmemToAssign.__phmemiThis;
-
+    m_phmemiThis = hmemToAssign.m_phmemiThis;
     return *this;
 }
 
@@ -75,22 +76,24 @@ TMemoryHandle& TMemoryHandle::operator=(const TMemoryHandle& hmemToAssign)
 tCIDLib::TBoolean
 TMemoryHandle::operator==(const TMemoryHandle& hmemToCompare) const
 {
-    return (__phmemiThis == hmemToCompare.__phmemiThis);
+    return (m_phmemiThis == hmemToCompare.m_phmemiThis);
 }
 
 
 // -------------------------------------------------------------------
 //  Public, non-virtual methods
 // -------------------------------------------------------------------
-tCIDLib::TBoolean TMemoryHandle::bValid() const
+tCIDLib::TBoolean TMemoryHandle::bIsValid() const
 {
-    return (__phmemiThis && __phmemiThis->c4RefCount);
+    return (m_phmemiThis && m_phmemiThis->c4RefCount);
 }
+
 
 tCIDLib::TVoid TMemoryHandle::Clear()
 {
-    __phmemiThis = 0;
+    m_phmemiThis = nullptr;
 }
+
 
 tCIDLib::TVoid
 TMemoryHandle::FormatToStr(         tCIDLib::TCh* const pszToFill
@@ -98,7 +101,7 @@ TMemoryHandle::FormatToStr(         tCIDLib::TCh* const pszToFill
 {
     TRawStr::bFormatVal
     (
-        tCIDLib::TInt4(__phmemiThis)
+        tCIDLib::TInt4(m_phmemiThis)
         , pszToFill
         , c4MaxChars
         , tCIDLib::ERadices::Hex
@@ -112,7 +115,8 @@ TMemoryHandle::FormatToStr(         tCIDLib::TCh* const pszToFill
 //  TKrnlSharedMemBuf: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlSharedMemBuf::TKrnlSharedMemBuf() :
-    __c4Size(0)
+
+    m_c4Size(0)
     , __eAccess(tCIDLib::EMemAccFlags::ReadOnly)
     , __pBuffer(0)
     , __pszName(0)
@@ -207,7 +211,7 @@ TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
     __pszName = TRawStr::pszReplicate(pszName);
 
     // Store the size and access flags
-    __c4Size = c4Size;
+    m_c4Size = c4Size;
     __eAccess = eAccess;
 
     tCIDLib::TSInt iFlags;
@@ -276,13 +280,13 @@ TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
 
     __pBuffer = pTmp;
 
-    __hmemThis.__phmemiThis = new TMemoryHandleImpl;
-    __hmemThis.__phmemiThis->c4RefCount = 1;
-    __hmemThis.__phmemiThis->iShmId = iTmpId;
-    __hmemThis.__phmemiThis->bOwner = bCreated = bOwner;
+    __hmemThis.m_phmemiThis = new TMemoryHandleImpl;
+    __hmemThis.m_phmemiThis->c4RefCount = 1;
+    __hmemThis.m_phmemiThis->iShmId = iTmpId;
+    __hmemThis.m_phmemiThis->bOwner = bCreated = bOwner;
 
-    __hmemThis.__phmemiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
-    __hmemThis.__phmemiThis->prmtxThis->iInitialize();
+    __hmemThis.m_phmemiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
+    __hmemThis.m_phmemiThis->prmtxThis->iInitialize();
 
     return kCIDLib::True;
 }
@@ -300,7 +304,7 @@ TKrnlSharedMemBuf::bDuplicate(const TKrnlSharedMemBuf& ksmbToCopy)
 
     __pBuffer = ksmbToCopy.__pBuffer;
     __eAccess = ksmbToCopy.__eAccess;
-    __c4Size = ksmbToCopy.__c4Size;
+    m_c4Size = ksmbToCopy.m_c4Size;
     if (ksmbToCopy.__pszName)
     {
         delete [] __pszName;
@@ -310,9 +314,9 @@ TKrnlSharedMemBuf::bDuplicate(const TKrnlSharedMemBuf& ksmbToCopy)
     __hmemThis = ksmbToCopy.__hmemThis;
     if (__hmemThis.bValid())
     {
-        __hmemThis.__phmemiThis->prmtxThis->iLock();
-        __hmemThis.__phmemiThis->c4RefCount++;
-        __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+        __hmemThis.m_phmemiThis->prmtxThis->iLock();
+        __hmemThis.m_phmemiThis->c4RefCount++;
+        __hmemThis.m_phmemiThis->prmtxThis->iUnlock();
     }
 
     return kCIDLib::True;
@@ -327,45 +331,45 @@ tCIDLib::TBoolean TKrnlSharedMemBuf::bFree()
 
     if (__hmemThis.bValid())
     {
-        __hmemThis.__phmemiThis->prmtxThis->iLock();
+        __hmemThis.m_phmemiThis->prmtxThis->iLock();
 
-        if (!--__hmemThis.__phmemiThis->c4RefCount)
+        if (!--__hmemThis.m_phmemiThis->c4RefCount)
         {
 
             if (::shmdt(reinterpret_cast<tCIDLib::TSCh*>(__pBuffer)))
             {
-                __hmemThis.__phmemiThis->c4RefCount++;
-                __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+                __hmemThis.m_phmemiThis->c4RefCount++;
+                __hmemThis.m_phmemiThis->prmtxThis->iUnlock();
                 TKrnlError::SetLastHostError(errno);
                 return kCIDLib::False;
             }
 
-            if (__hmemThis.__phmemiThis->bOwner)
+            if (__hmemThis.m_phmemiThis->bOwner)
             {
-                if (::shmctl(__hmemThis.__phmemiThis->iShmId, IPC_RMID, 0))
+                if (::shmctl(__hmemThis.m_phmemiThis->iShmId, IPC_RMID, 0))
                 {
-                    __hmemThis.__phmemiThis->c4RefCount++;
-                    __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+                    __hmemThis.m_phmemiThis->c4RefCount++;
+                    __hmemThis.m_phmemiThis->prmtxThis->iUnlock();
                     TKrnlError::SetLastHostError(errno);
                     return kCIDLib::False;
                 }
             }
 
-            __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+            __hmemThis.m_phmemiThis->prmtxThis->iUnlock();
             tCIDLib::TOSErrCode HostErr;
-            HostErr = __hmemThis.__phmemiThis->prmtxThis->iDestroy();
+            HostErr = __hmemThis.m_phmemiThis->prmtxThis->iDestroy();
             if (HostErr)
             {
                 TKrnlError::SetLastHostError(HostErr);
                 return kCIDLib::False;
             }
 
-            delete __hmemThis.__phmemiThis->prmtxThis;
-            delete __hmemThis.__phmemiThis;
+            delete __hmemThis.m_phmemiThis->prmtxThis;
+            delete __hmemThis.m_phmemiThis;
         }
         else
         {
-            __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+            __hmemThis.m_phmemiThis->prmtxThis->iUnlock();
         }
     }
 
@@ -380,7 +384,7 @@ tCIDLib::TBoolean TKrnlSharedMemBuf::bZero()
         return kCIDLib::False;
     }
 
-    TRawMem::SetMemBuf(__pBuffer, tCIDLib::TCard1(0), __c4Size);
+    TRawMem::SetMemBuf(__pBuffer, tCIDLib::TCard1(0), m_c4Size);
 
     return kCIDLib::True;
 }

@@ -46,7 +46,10 @@ CIDStrOp_MBToWC(        tCIDLib::TCh* const     pszTarget
 {
     mbstate_t state;
     ::memset(&state, 0, sizeof state);
-    const int iRes = ::mbsrtowcs(pszTarget, (char**)&pschSrc, c4MaxOutChars, &state);
+    const int iRes = ::mbsrtowcs
+    (
+        pszTarget, const_cast<const tCIDLib::TSCh**>(&pschSrc), c4MaxOutChars, &state
+    );
     if (iRes >= 0)
     {
         c4OutChars = tCIDLib::TCard4(iRes);
@@ -64,7 +67,13 @@ CIDStrOp_WCToMB(        tCIDLib::TSCh* const    pschTarget
 {
     mbstate_t state;
     ::memset(&state, 0, sizeof state);
-    const int iRes = ::wcsrtombs(pschTarget, (tCIDLib::TCh**)&pszSrc, c4MaxOutBytes, &state);
+    const int iRes = ::wcsrtombs
+    (
+        pschTarget
+        , const_cast<const tCIDLib::TCh**>(&pszSrc)
+        , c4MaxOutBytes
+        , &state
+    );
     if (iRes >= 0)
     {
         c4OutBytes = tCIDLib::TCard4(iRes);
@@ -78,7 +87,7 @@ CIDStrOp_CalcMBSize(const tCIDLib::TCh* const pszSrc, tCIDLib::TCard4& c4OutByte
 {
     mbstate_t state;
     ::memset(&state, 0, sizeof state);
-    const int iRes = ::wcsrtombs(0, (tCIDLib::TCh**)&pszSrc, 0, &state);
+    const int iRes = ::wcsrtombs(0, const_cast<const tCIDLib::TCh**>(&pszSrc), 0, &state);
     if (iRes >= 0)
     {
         c4OutBytes = tCIDLib::TCard4(iRes);
@@ -93,7 +102,7 @@ CIDStrOp_CalcWCSize(const tCIDLib::TSCh* const pszSrc, tCIDLib::TCard4& c4OutByt
 {
     mbstate_t state;
     ::memset(&state, 0, sizeof state);
-    const int iRes = ::mbsrtowcs(0, (tCIDLib::TSCh**)&pszSrc, 0, &state);
+    const int iRes = ::mbsrtowcs(0, const_cast<const tCIDLib::TSCh**>(&pszSrc), 0, &state);
     if (iRes >= 0)
     {
         c4OutBytes = tCIDLib::TCard4(iRes);

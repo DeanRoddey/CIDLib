@@ -32,6 +32,8 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
+#include    <unistd.h>
+
 
 // ---------------------------------------------------------------------------
 //   CLASS: TMutexHandle
@@ -42,18 +44,20 @@
 //  TMutexHandle: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TMutexHandle::TMutexHandle() :
-    __phmtxiThis(0)
+
+    m_phmtxiThis(nullptr)
 {
 }
 
 TMutexHandle::TMutexHandle(const TMutexHandle& hmtxToCopy) :
-    __phmtxiThis(hmtxToCopy.__phmtxiThis)
+
+    m_phmtxiThis(hmtxToCopy.m_phmtxiThis)
 {
 }
 
 TMutexHandle::~TMutexHandle()
 {
-    __phmtxiThis = 0;
+    m_phmtxiThis = nullptr;
 }
 
 
@@ -65,8 +69,7 @@ TMutexHandle& TMutexHandle::operator=(const TMutexHandle& hmtxToAssign)
     if (this == &hmtxToAssign)
         return *this;
 
-    __phmtxiThis = hmtxToAssign.__phmtxiThis;
-
+    m_phmtxiThis = hmtxToAssign.m_phmtxiThis;
     return *this;
 }
 
@@ -74,7 +77,7 @@ TMutexHandle& TMutexHandle::operator=(const TMutexHandle& hmtxToAssign)
 tCIDLib::TBoolean
 TMutexHandle::operator==(const TMutexHandle& hmtxToCompare) const
 {
-    return (__phmtxiThis == hmtxToCompare.__phmtxiThis);
+    return (m_phmtxiThis == hmtxToCompare.m_phmtxiThis);
 }
 
 
@@ -82,14 +85,14 @@ TMutexHandle::operator==(const TMutexHandle& hmtxToCompare) const
 // -------------------------------------------------------------------
 //  Public, non-virtual methods
 // -------------------------------------------------------------------
-tCIDLib::TBoolean TMutexHandle::bValid() const
+tCIDLib::TBoolean TMutexHandle::bIsValid() const
 {
-    return (__phmtxiThis && __phmtxiThis->c4RefCount);
+    return (m_phmtxiThis && m_phmtxiThis->c4RefCount);
 }
 
 tCIDLib::TVoid TMutexHandle::Clear()
 {
-    __phmtxiThis = 0;
+    m_phmtxiThis = 0;
 }
 
 tCIDLib::TVoid
@@ -98,7 +101,7 @@ TMutexHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
 {
     TRawStr::bFormatVal
     (
-        tCIDLib::TCard4(__phmtxiThis)
+        tCIDLib::TCard4(m_phmtxiThis)
         , pszToFill
         , c4MaxChars
         , tCIDLib::ERadices::Hex
@@ -117,23 +120,25 @@ TMutexHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
 //  TKrnlMutex: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlMutex::TKrnlMutex() :
-    __pszName(0)
+
+    m_pszName(nullptr)
 {
 }
 
 TKrnlMutex::TKrnlMutex(const tCIDLib::TCh* const pszName):
-    __pszName(0)
+
+    m_pszName(nullptr)
 {
     if (pszName)
-        __pszName = TRawStr::pszReplicate(pszName);
+        m_pszName = TRawStr::pszReplicate(pszName);
 }
 
 TKrnlMutex::~TKrnlMutex()
 {
-    if (__pszName)
+    if (m_pszName)
     {
-        delete [] __pszName;
-        __pszName = 0;
+        delete [] m_pszName;
+        m_pszName = nullptr;
     }
 
     if (!bClose())
@@ -158,57 +163,51 @@ TKrnlMutex::~TKrnlMutex()
 // ---------------------------------------------------------------------------
 //  TKrnlMutex: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TKrnlMutex::bValid() const
-{
-    return __hmtxThis.bValid();
-}
-
-
 tCIDLib::TBoolean TKrnlMutex::bClose()
 {
-    if (__hmtxThis.bValid())
+    if (m_hmtxThis.bIsValid())
     {
-        __hmtxThis.__phmtxiThis->prmtxThis->iLock();
+        m_hmtxThis.m_phmtxiThis->prmtxThis->iLock();
 
-        if (!--__hmtxThis.__phmtxiThis->c4RefCount)
+        if (!--m_hmtxThis.m_phmtxiThis->c4RefCount)
         {
-            if((__hmtxThis.__phmtxiThis->iSysVSemId != -1)
-               && __hmtxThis.__phmtxiThis->bSysVOwner)
+            if((m_hmtxThis.m_phmtxiThis->iSysVSemId != -1)
+               && m_hmtxThis.m_phmtxiThis->bSysVOwner)
             {
                 union semun SemUnion;
                 SemUnion.val = 0;
 
-                if (::semctl(__hmtxThis.__phmtxiThis->iSysVSemId
+                if (::semctl(m_hmtxThis.m_phmtxiThis->iSysVSemId
                              , 0
                              , IPC_RMID
                              , SemUnion))
                 {
-                    __hmtxThis.__phmtxiThis->c4RefCount++;
-                    __hmtxThis.__phmtxiThis->prmtxThis->iUnlock();
+                    m_hmtxThis.m_phmtxiThis->c4RefCount++;
+                    m_hmtxThis.m_phmtxiThis->prmtxThis->iUnlock();
                     TKrnlError::SetLastHostError(errno);
                     return kCIDLib::False;
                 }
             }
 
-            __hmtxThis.__phmtxiThis->prmtxThis->iUnlock();
+            m_hmtxThis.m_phmtxiThis->prmtxThis->iUnlock();
 
             tCIDLib::TOSErrCode HostErr =
-                __hmtxThis.__phmtxiThis->prmtxThis->iDestroy();
+                m_hmtxThis.m_phmtxiThis->prmtxThis->iDestroy();
             if (HostErr)
             {
                 TKrnlError::SetLastHostError(HostErr);
                 return kCIDLib::False;
             }
 
-            delete __hmtxThis.__phmtxiThis->prmtxThis;
-            delete __hmtxThis.__phmtxiThis;
+            delete m_hmtxThis.m_phmtxiThis->prmtxThis;
+            delete m_hmtxThis.m_phmtxiThis;
         }
         else
         {
-            __hmtxThis.__phmtxiThis->prmtxThis->iUnlock();
+            m_hmtxThis.m_phmtxiThis->prmtxThis->iUnlock();
         }
 
-        __hmtxThis.__phmtxiThis = 0;
+        m_hmtxThis.m_phmtxiThis = 0;
     }
 
     return kCIDLib::True;
@@ -218,45 +217,49 @@ tCIDLib::TBoolean TKrnlMutex::bClose()
 tCIDLib::TBoolean
 TKrnlMutex::bCreate(const tCIDLib::ELockStates eInitState)
 {
-    if (__hmtxThis.bValid())
+    if (m_hmtxThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
     }
 
-    if (__pszName)
-        return __bCreateNamed(eInitState, kCIDLib::True);
+    if (m_pszName)
+    {
+        tCIDLib::TBoolean bDummy;
+        return bCreateNamed(eInitState, kCIDLib::True, bDummy);
+    }
 
-    __hmtxThis.__phmtxiThis = new TMutexHandleImpl;
-    __hmtxThis.__phmtxiThis->c4RefCount = 1;
-    __hmtxThis.__phmtxiThis->iSysVSemId = -1;
+    m_hmtxThis.m_phmtxiThis = new TMutexHandleImpl;
+    m_hmtxThis.m_phmtxiThis->c4RefCount = 1;
+    m_hmtxThis.m_phmtxiThis->iSysVSemId = -1;
 
-    __hmtxThis.__phmtxiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
-    __hmtxThis.__phmtxiThis->prmtxThis->iInitialize();
+    m_hmtxThis.m_phmtxiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
+    m_hmtxThis.m_phmtxiThis->prmtxThis->iInitialize();
 
     if (eInitState == tCIDLib::ELockStates::Locked)
-        __hmtxThis.__phmtxiThis->prmtxThis->iLock();
+        m_hmtxThis.m_phmtxiThis->prmtxThis->iLock();
 
     return kCIDLib::True;
 }
 
 
 tCIDLib::TBoolean
-TKrnlMutex::bCreateOrOpen(const tCIDLib::ELockStates eInitState)
+TKrnlMutex::bOpenOrCreate(  const   tCIDLib::ELockStates    eInitState
+                            ,       tCIDLib::TBoolean&      bCreated)
 {
-    if (__hmtxThis.bValid())
+    if (m_hmtxThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
     }
 
-    if (!__pszName)
+    if (!m_pszName)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NullName);
         return kCIDLib::False;
     }
 
-    return __bCreateNamed(eInitState, kCIDLib::False);
+    return bCreateNamed(eInitState, kCIDLib::False, bCreated);
 }
 
 
@@ -265,36 +268,36 @@ tCIDLib::TBoolean TKrnlMutex::bLock(const tCIDLib::TCard4 c4MilliSecs) const
     union semun SemUnion;
     SemUnion.val = 0;
 
-    if (!__hmtxThis.bValid())
+    if (!m_hmtxThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
     }
 
-    if (__hmtxThis.__phmtxiThis->iSysVSemId != -1
-        && !::semctl(__hmtxThis.__phmtxiThis->iSysVSemId
+    if (m_hmtxThis.m_phmtxiThis->iSysVSemId != -1
+        && !::semctl(m_hmtxThis.m_phmtxiThis->iSysVSemId
                      , 0
                      , GETVAL
                      , SemUnion)
-        && (::semctl(__hmtxThis.__phmtxiThis->iSysVSemId
+        && (::semctl(m_hmtxThis.m_phmtxiThis->iSysVSemId
                      , 0
                      , GETPID
                      , SemUnion) == ::getpid()))
     {
-        __hmtxThis.__phmtxiThis->c4LockCount++;
+        m_hmtxThis.m_phmtxiThis->c4LockCount++;
         return kCIDLib::True;
     }
 
     if (c4MilliSecs == kCIDLib::c4MaxWait)
     {
-        if (__hmtxThis.__phmtxiThis->iSysVSemId != -1)
+        if (m_hmtxThis.m_phmtxiThis->iSysVSemId != -1)
         {
             struct sembuf SemBuf;
             SemBuf.sem_num = 0;
             SemBuf.sem_op = -1;
             SemBuf.sem_flg = 0;
 
-            if (::semop(__hmtxThis.__phmtxiThis->iSysVSemId
+            if (::semop(m_hmtxThis.m_phmtxiThis->iSysVSemId
                         , &SemBuf
                         , 1))
             {
@@ -302,18 +305,18 @@ tCIDLib::TBoolean TKrnlMutex::bLock(const tCIDLib::TCard4 c4MilliSecs) const
                 return kCIDLib::False;
             }
 
-            __hmtxThis.__phmtxiThis->c4LockCount = 1;
+            m_hmtxThis.m_phmtxiThis->c4LockCount = 1;
         }
         else
         {
-            __hmtxThis.__phmtxiThis->prmtxThis->iLock();
+            m_hmtxThis.m_phmtxiThis->prmtxThis->iLock();
         }
     }
     else
     {
         TKrnlLinux::TThreadTimer thtWaitFor(c4MilliSecs);
 
-        if (__hmtxThis.__phmtxiThis->iSysVSemId != -1)
+        if (m_hmtxThis.m_phmtxiThis->iSysVSemId != -1)
         {
             struct sembuf SemBuf;
             SemBuf.sem_num = 0;
@@ -323,7 +326,7 @@ tCIDLib::TBoolean TKrnlMutex::bLock(const tCIDLib::TCard4 c4MilliSecs) const
             if (!thtWaitFor.bBegin())
                 return kCIDLib::False;
 
-            if (::semop(__hmtxThis.__phmtxiThis->iSysVSemId
+            if (::semop(m_hmtxThis.m_phmtxiThis->iSysVSemId
                         , &SemBuf
                         , 1))
             {
@@ -334,7 +337,7 @@ tCIDLib::TBoolean TKrnlMutex::bLock(const tCIDLib::TCard4 c4MilliSecs) const
                 return kCIDLib::False;
             }
 
-            __hmtxThis.__phmtxiThis->c4LockCount = 1;
+            m_hmtxThis.m_phmtxiThis->c4LockCount = 1;
         }
         else
         {
@@ -343,13 +346,13 @@ tCIDLib::TBoolean TKrnlMutex::bLock(const tCIDLib::TCard4 c4MilliSecs) const
                 if (!thtWaitFor.bBegin())
                     return kCIDLib::False;
 
-                __hmtxThis.__phmtxiThis->prmtxThis->iLock();
+                m_hmtxThis.m_phmtxiThis->prmtxThis->iLock();
 
                 thtWaitFor.Cancel();
             }
             else
             {
-                __hmtxThis.__phmtxiThis->prmtxThis->iUnlock();
+                m_hmtxThis.m_phmtxiThis->prmtxThis->iUnlock();
                 TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_Timeout);
                 return kCIDLib::False;
             }
@@ -367,20 +370,20 @@ tCIDLib::TBoolean TKrnlMutex::bDuplicate(const TKrnlMutex& kmtxToDup)
         return kCIDLib::False;
 
     // Clean up the name
-    delete [] __pszName;
-    __pszName = 0;
+    delete [] m_pszName;
+    m_pszName = 0;
 
     // Recreate the name
-    if (kmtxToDup.__pszName)
-        __pszName = TRawStr::pszReplicate(kmtxToDup.__pszName);
+    if (kmtxToDup.m_pszName)
+        m_pszName = TRawStr::pszReplicate(kmtxToDup.m_pszName);
 
     // Duplicate the handle
-    __hmtxThis = kmtxToDup.__hmtxThis;
-    if (__hmtxThis.bValid())
+    m_hmtxThis = kmtxToDup.m_hmtxThis;
+    if (m_hmtxThis.bIsValid())
     {
-        __hmtxThis.__phmtxiThis->prmtxThis->iLock();
-        __hmtxThis.__phmtxiThis->c4RefCount++;
-        __hmtxThis.__phmtxiThis->prmtxThis->iUnlock();
+        m_hmtxThis.m_phmtxiThis->prmtxThis->iLock();
+        m_hmtxThis.m_phmtxiThis->c4RefCount++;
+        m_hmtxThis.m_phmtxiThis->prmtxThis->iUnlock();
     }
 
     return kCIDLib::True;
@@ -389,39 +392,39 @@ tCIDLib::TBoolean TKrnlMutex::bDuplicate(const TKrnlMutex& kmtxToDup)
 
 tCIDLib::TBoolean TKrnlMutex::bOpen()
 {
-    if (__hmtxThis.bValid())
+    if (m_hmtxThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
     }
 
-    if (!__pszName)
+    if (!m_pszName)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NullName);
         return kCIDLib::False;
     }
 
-    __hmtxThis.__phmtxiThis = new TMutexHandleImpl;
-    __hmtxThis.__phmtxiThis->c4RefCount = 1;
+    m_hmtxThis.m_phmtxiThis = new TMutexHandleImpl;
+    m_hmtxThis.m_phmtxiThis->c4RefCount = 1;
 
     tCIDLib::TSInt iFlags = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-    key_t key = TRawStr::hshHashStr(__pszName, kCIDLib::i4MaxInt);
+    key_t key = TRawStr::hshHashStr(m_pszName, kCIDLib::i4MaxInt);
 
     tCIDLib::TSInt iTmp = ::semget(key, 0, iFlags);
     if (iTmp == -1)
     {
-        delete __hmtxThis.__phmtxiThis;
-        __hmtxThis.__phmtxiThis = 0;
+        delete m_hmtxThis.m_phmtxiThis;
+        m_hmtxThis.m_phmtxiThis = 0;
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
 
-    __hmtxThis.__phmtxiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
-    __hmtxThis.__phmtxiThis->prmtxThis->iInitialize();
+    m_hmtxThis.m_phmtxiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
+    m_hmtxThis.m_phmtxiThis->prmtxThis->iInitialize();
 
-    __hmtxThis.__phmtxiThis->iSysVSemId = iTmp;
-    __hmtxThis.__phmtxiThis->bSysVOwner = kCIDLib::False;
-    __hmtxThis.__phmtxiThis->c4LockCount = 0;
+    m_hmtxThis.m_phmtxiThis->iSysVSemId = iTmp;
+    m_hmtxThis.m_phmtxiThis->bSysVOwner = kCIDLib::False;
+    m_hmtxThis.m_phmtxiThis->c4LockCount = 0;
 
     return kCIDLib::True;
 }
@@ -429,7 +432,7 @@ tCIDLib::TBoolean TKrnlMutex::bOpen()
 
 tCIDLib::TBoolean TKrnlMutex::bSetName(const tCIDLib::TCh* const pszName)
 {
-    if (__hmtxThis.bValid())
+    if (m_hmtxThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyOpen);
         return kCIDLib::False;
@@ -441,8 +444,8 @@ tCIDLib::TBoolean TKrnlMutex::bSetName(const tCIDLib::TCh* const pszName)
         return kCIDLib::False;
     }
 
-    delete [] __pszName;
-    __pszName = TRawStr::pszReplicate(pszName);
+    delete [] m_pszName;
+    m_pszName = TRawStr::pszReplicate(pszName);
 
     return kCIDLib::True;
 }
@@ -450,35 +453,35 @@ tCIDLib::TBoolean TKrnlMutex::bSetName(const tCIDLib::TCh* const pszName)
 
 tCIDLib::TBoolean TKrnlMutex::bUnlock() const
 {
-    if (!__hmtxThis.bValid())
+    if (!m_hmtxThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
     }
 
-    if (__hmtxThis.__phmtxiThis->iSysVSemId != -1)
+    if (m_hmtxThis.m_phmtxiThis->iSysVSemId != -1)
     {
         union semun SemUnion;
         SemUnion.val = 0;
 
-        if (!::semctl(__hmtxThis.__phmtxiThis->iSysVSemId
+        if (!::semctl(m_hmtxThis.m_phmtxiThis->iSysVSemId
                       , 0
                       , GETVAL
                       , SemUnion))
         {
-            if (::semctl(__hmtxThis.__phmtxiThis->iSysVSemId
+            if (::semctl(m_hmtxThis.m_phmtxiThis->iSysVSemId
                          , 0
                          , GETPID
                          , SemUnion) == ::getpid())
             {
-                if (!--__hmtxThis.__phmtxiThis->c4LockCount)
+                if (!--m_hmtxThis.m_phmtxiThis->c4LockCount)
                 {
                     struct sembuf SemBuf;
                     SemBuf.sem_num = 0;
                     SemBuf.sem_op = 1;
                     SemBuf.sem_flg = 0;
 
-                    if (::semop(__hmtxThis.__phmtxiThis->iSysVSemId, &SemBuf, 1))
+                    if (::semop(m_hmtxThis.m_phmtxiThis->iSysVSemId, &SemBuf, 1))
                     {
                         TKrnlError::SetLastHostError(errno);
                         return kCIDLib::False;
@@ -493,7 +496,7 @@ tCIDLib::TBoolean TKrnlMutex::bUnlock() const
     }
     else
     {
-        __hmtxThis.__phmtxiThis->prmtxThis->iUnlock();
+        m_hmtxThis.m_phmtxiThis->prmtxThis->iUnlock();
     }
 
     return kCIDLib::True;
@@ -504,12 +507,16 @@ tCIDLib::TBoolean TKrnlMutex::bUnlock() const
 //  TKrnlMutex: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TKrnlMutex::__bCreateNamed( const   tCIDLib::ELockStates    eState
-                            , const tCIDLib::TBoolean       bFailIfExists)
+TKrnlMutex::bCreateNamed(const  tCIDLib::ELockStates    eState
+                        , const tCIDLib::TBoolean       bFailIfExists
+                        ,       tCIDLib::TBoolean&      bCreated)
 {
     tCIDLib::TSInt iFlags = IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-    key_t key = TRawStr::hshHashStr(__pszName, kCIDLib::i4MaxInt);
+    key_t key = TRawStr::hshHashStr(m_pszName, kCIDLib::i4MaxInt);
     tCIDLib::TBoolean bOwner = kCIDLib::False;
+
+    // We only need to set if we create it
+    bCreated = kCIDLib::False;            
 
     tCIDLib::TSInt iTmp = ::semget(key, 1, iFlags);
     if (iTmp == -1)
@@ -550,15 +557,18 @@ TKrnlMutex::__bCreateNamed( const   tCIDLib::ELockStates    eState
             ::semctl(iTmp, 0, IPC_RMID, SemUnion);
             return kCIDLib::False;
         }
+
+        // We created it
+        bCreated = kCIDLib::True;
     }
 
-    __hmtxThis.__phmtxiThis = new TMutexHandleImpl;
-    __hmtxThis.__phmtxiThis->c4RefCount = 1;
-    __hmtxThis.__phmtxiThis->iSysVSemId = iTmp;
-    __hmtxThis.__phmtxiThis->bSysVOwner = bOwner;
+    m_hmtxThis.m_phmtxiThis = new TMutexHandleImpl;
+    m_hmtxThis.m_phmtxiThis->c4RefCount = 1;
+    m_hmtxThis.m_phmtxiThis->iSysVSemId = iTmp;
+    m_hmtxThis.m_phmtxiThis->bSysVOwner = bOwner;
 
-    __hmtxThis.__phmtxiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
-    __hmtxThis.__phmtxiThis->prmtxThis->iInitialize();
+    m_hmtxThis.m_phmtxiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
+    m_hmtxThis.m_phmtxiThis->prmtxThis->iInitialize();
 
     if (eState == tCIDLib::ELockStates::Locked)
         return bLock(kCIDLib::c4MaxWait);

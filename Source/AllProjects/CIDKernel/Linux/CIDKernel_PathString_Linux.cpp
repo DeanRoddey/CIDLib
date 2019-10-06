@@ -45,10 +45,6 @@ tCIDLib::TBoolean TKrnlPathStr::bFindPart(  const   tCIDLib::TCh* const pszSrc
     if (pszSrc[0] == L'\000')
         return kCIDLib::False;
 
-    // There's no concept of node parts around here
-    if (ePart == tCIDLib::EPathParts::Node)
-        return kCIDLib::False;
-
     // First exclude special cases.
     if (ePart == tCIDLib::EPathParts::FullPath)
     {
@@ -57,7 +53,7 @@ tCIDLib::TBoolean TKrnlPathStr::bFindPart(  const   tCIDLib::TCh* const pszSrc
         return kCIDLib::True;
     }
 
-    const tCIDLib::TCh* pszLastPathSep = TRawStr::pszFindLastChar(pszSrc, kCIDLib::chPathSeparator);
+    const tCIDLib::TCh* pszLastPathSep = TRawStr::pszFindLastChar(pszSrc, kCIDLib::chPathSep);
     const tCIDLib::TCh* pszLastExtSep = TRawStr::pszFindLastChar(pszSrc, L'.');
 
     // Another special case. If the path separator is last,
@@ -115,7 +111,7 @@ tCIDLib::TBoolean TKrnlPathStr::bFindPart(  const   tCIDLib::TCh* const pszSrc
     {
         c4End = kCIDLib::c4MaxCard;
     }
-    else if (ePart & tCIDLib::EPathParts::Name)
+    else if (tCIDLib::bAllBitsOn(ePart, tCIDLib::EPathParts::Name))
     {
         const tCIDLib::TCh* const pszTmpName = pszSrc + c4Start;
         if (pszLastExtSep
@@ -150,12 +146,6 @@ tCIDLib::TBoolean TKrnlPathStr::bHasName(const tCIDLib::TCh* const pszToCheck)
     return bFindPart(pszToCheck, c4Start, c4End, tCIDLib::EPathParts::Name);
 }
 
-tCIDLib::TBoolean TKrnlPathStr::bHasNode(const tCIDLib::TCh* const pszToCheck)
-{
-    tCIDLib::TCard4 c4Start, c4End;
-    return bFindPart(pszToCheck, c4Start, c4End, tCIDLib::EPathParts::Node);
-}
-
 tCIDLib::TBoolean TKrnlPathStr::bHasPath(const tCIDLib::TCh* const pszToCheck)
 {
     tCIDLib::TCard4 c4Start, c4End;
@@ -165,7 +155,7 @@ tCIDLib::TBoolean TKrnlPathStr::bHasPath(const tCIDLib::TCh* const pszToCheck)
 tCIDLib::TBoolean
 TKrnlPathStr::bIsFullyQualified(const tCIDLib::TCh* const pszToCheck)
 {
-    return pszToCheck[0] == kCIDLib::chPathSeparator;
+    return pszToCheck[0] == kCIDLib::chPathSep;
 }
 
 tCIDLib::TBoolean
@@ -192,13 +182,6 @@ TKrnlPathStr::bQueryNameExt(const   tCIDLib::TCh* const pszSrc
     return bQueryPart(pszSrc, pszToFill, c4MaxChars, tCIDLib::EPathParts::NameExt);
 }
 
-tCIDLib::TBoolean
-TKrnlPathStr::bQueryNode(   const   tCIDLib::TCh* const pszSrc
-                            ,       tCIDLib::TCh* const pszToFill
-                            , const tCIDLib::TCard4     c4MaxChars)
-{
-    return bQueryPart(pszSrc, pszToFill, c4MaxChars, tCIDLib::EPathParts::Node);
-}
 
 tCIDLib::TBoolean
 TKrnlPathStr::bQueryPart(const  tCIDLib::TCh* const pszSrc
@@ -216,9 +199,11 @@ TKrnlPathStr::bQueryPart(const  tCIDLib::TCh* const pszSrc
     }
 
     // Calculate the size
-    const tCIDLib::TCard4 c4Size = (c4End == kCIDLib::c4MaxCard) ?
-                                   TRawStr::c4StrLen(&pszSrc[c4Start])
-                                   : (c4End - c4Start) + 1;
+    const tCIDLib::TCard4 c4Size
+    (
+        (c4End == kCIDLib::c4MaxCard) ? TRawStr::c4StrLen(&pszSrc[c4Start])
+                                      : (c4End - c4Start) + 1
+    );
 
     // Make sure the buffer is large enough
     if (c4MaxChars < c4Size)
@@ -250,7 +235,7 @@ tCIDLib::TBoolean TKrnlPathStr::bRemoveLevel(tCIDLib::TCh* const pszSrc)
         return kCIDLib::False;
 
     // Find the last path separator in the string
-    tCIDLib::TCh* pszTmp = TRawStr::pszFindLastChar(pszSrc, kCIDLib::chPathSeparator);
+    tCIDLib::TCh* pszTmp = TRawStr::pszFindLastChar(pszSrc, kCIDLib::chPathSep);
 
     // If there isn't any, then we empty out the whole string
     if (!pszTmp)
@@ -277,12 +262,7 @@ tCIDLib::TBoolean TKrnlPathStr::bRemoveLevel(tCIDLib::TCh* const pszSrc)
     //  We have to find another one before this. If we don't find one,
     //  then there's nothing to do.
     //
-    pszTmp = TRawStr::pszFindPrevChar
-    (
-        pszSrc
-        , kCIDLib::chPathSeparator
-        , (pszTmp - pszSrc) - 1
-    );
+    pszTmp = TRawStr::pszFindPrevChar(pszSrc, kCIDLib::chPathSep, (pszTmp - pszSrc) - 1);
     if (!pszTmp)
         return kCIDLib::False;
 

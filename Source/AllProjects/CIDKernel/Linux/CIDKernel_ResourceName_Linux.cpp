@@ -42,7 +42,7 @@ TKrnlRscName::bBuildFullName(       tCIDLib::TCh* const     pszToFill
                             , const tCIDLib::ENamedRscTypes eType)  const
 {
     // If its not valid, then return an empty string
-    if (!bValid())
+    if (!bIsValid())
     {
         pszToFill[0] = kCIDLib::chNull;
         return kCIDLib::True;
@@ -79,10 +79,10 @@ TKrnlRscName::bBuildFullName(       tCIDLib::TCh* const     pszToFill
     //  If there is a process id to format in, then we need to format it
     //  to a hex value and cat it on.
     //
-    if (__pidOfName != kCIDLib::pidInvalid)
+    if (m_pidOfName != kCIDLib::pidInvalid)
     {
         tCIDLib::TZStr64 szTmp;
-        TRawStr::bFormatVal(tCIDLib::TCard4(__pidOfName), szTmp, 64, tCIDLib::ERadices::Hex);
+        TRawStr::bFormatVal(tCIDLib::TCard4(m_pidOfName), szTmp, 64, tCIDLib::ERadices::Hex);
         TRawStr::CatStr(pszToFill, szTmp, c4MaxChars);
         TRawStr::CatStr(pszToFill, L".", c4MaxChars);
         if (TRawStr::c4StrLen(pszToFill) == c4MaxChars)
@@ -93,7 +93,7 @@ TKrnlRscName::bBuildFullName(       tCIDLib::TCh* const     pszToFill
     }
 
     // Now put on the three name parts
-    TRawStr::CatStr(pszToFill, __pszCompany, c4MaxChars);
+    TRawStr::CatStr(pszToFill, m_pszCompany, c4MaxChars);
     TRawStr::CatStr(pszToFill, L".", c4MaxChars);
     if (TRawStr::c4StrLen(pszToFill) == c4MaxChars)
     {
@@ -101,7 +101,7 @@ TKrnlRscName::bBuildFullName(       tCIDLib::TCh* const     pszToFill
         return kCIDLib::False;
     }
 
-    TRawStr::CatStr(pszToFill, __pszSubsystem, c4MaxChars);
+    TRawStr::CatStr(pszToFill, m_pszSubsystem, c4MaxChars);
     TRawStr::CatStr(pszToFill, L".", c4MaxChars);
     if (TRawStr::c4StrLen(pszToFill) == c4MaxChars)
     {
@@ -109,7 +109,7 @@ TKrnlRscName::bBuildFullName(       tCIDLib::TCh* const     pszToFill
         return kCIDLib::False;
     }
 
-    TRawStr::CatStr(pszToFill, __pszResource, c4MaxChars);
+    TRawStr::CatStr(pszToFill, m_pszResource, c4MaxChars);
     if (TRawStr::c4StrLen(pszToFill) == c4MaxChars)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InsufficientBuffer);

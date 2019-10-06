@@ -34,7 +34,6 @@
 //
 #pragma once
 
-#define __STDC_LIB_EXT1__ 1
 #include    <stdlib.h>
 #include    <wchar.h>
 
