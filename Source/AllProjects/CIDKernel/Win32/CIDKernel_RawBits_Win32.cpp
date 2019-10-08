@@ -50,7 +50,7 @@ tCIDLib::TFloat4
 TRawBits::f4SwapBytes(  const   tCIDLib::TFloat4    f4ToSwap
                         , const tCIDLib::TBoolean   bIsLittle)
 {
-    if (bIsLittle)
+    if (!bIsLittle)
     {
         // <TBD>
     }
@@ -61,7 +61,7 @@ tCIDLib::TFloat8
 TRawBits::f8SwapBytes(  const   tCIDLib::TFloat8    f8ToSwap
                         , const tCIDLib::TBoolean   bIsLittle)
 {
-    if (bIsLittle)
+    if (!bIsLittle)
     {
         // <TBD>
     }

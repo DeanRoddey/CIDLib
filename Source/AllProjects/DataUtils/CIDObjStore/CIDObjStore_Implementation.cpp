@@ -102,7 +102,7 @@ tCIDLib::TVoid
 TCIDObjStoreImpl::AddObject(const   TString&        strKey
                             , const TMemBuf&        mbufKey
                             , const tCIDLib::TCard4 c4KeyBytes
-                            , const TMemBuf&        mbufData
+                            , const TMemBuf&       mbufData
                             , const tCIDLib::TCard4 c4DataSize
                             , const tCIDLib::TCard4 c4Reserve)
 {

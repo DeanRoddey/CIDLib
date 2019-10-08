@@ -143,36 +143,6 @@ TCIDObjStore::AddObjectDirect(  const   TString&        strKey
     );
 }
 
-tCIDLib::TVoid
-TCIDObjStore::AddObjectDirect(  const   TString&        strKey
-                                ,       THeapBuf&&      mbufToWrite
-                                , const tCIDLib::TCard4 c4Bytes
-                                , const tCIDLib::TCard4 c4Reserve)
-{
-    if (!m_bReady)
-        ThrowNotReady(CID_LINE);
-    ValidatePath(strKey, kCIDLib::True, CID_LINE);
-
-    // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
-
-    // And flatten the key
-    m_strmKey.Reset();
-    m_strmKey << strKey;
-    m_strmKey.Flush();
-
-    // Delegate to the cache object
-    m_postCache->AddObject
-    (
-        strKey
-        , m_strmKey.mbufData()
-        , m_strmKey.c4CurSize()
-        , tCIDLib::ForceMove(mbufToWrite)
-        , c4Bytes
-        , c4Reserve
-    );
-}
-
 
 tCIDLib::TBoolean
 TCIDObjStore::bAddOrUpdate( const   TString&            strKey
@@ -242,38 +212,6 @@ TCIDObjStore::bAddOrUpdateDirect(const  TString&            strKey
     );
 }
 
-
-tCIDLib::TBoolean
-TCIDObjStore::bAddOrUpdateDirect(const  TString&            strKey
-                                ,       tCIDLib::TCard4&    c4Version
-                                ,       THeapBuf&&          mbufToWrite
-                                , const tCIDLib::TCard4     c4Bytes
-                                , const tCIDLib::TCard4     c4Reserve)
-{
-    if (!m_bReady)
-        ThrowNotReady(CID_LINE);
-    ValidatePath(strKey, kCIDLib::True, CID_LINE);
-
-    // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
-
-    // And flatten the key
-    m_strmKey.Reset();
-    m_strmKey << strKey;
-    m_strmKey.Flush();
-
-    // Delegate to the cache object
-    return m_postCache->bAddOrUpdate
-    (
-        strKey
-        , c4Version
-        , m_strmKey.mbufData()
-        , m_strmKey.c4CurSize()
-        , tCIDLib::ForceMove(mbufToWrite)
-        , c4Bytes
-        , c4Reserve
-    );
-}
 
 tCIDLib::TBoolean
 TCIDObjStore::bAllObjectsUnder( const   TString&            strStartScope
@@ -506,22 +444,6 @@ TCIDObjStore::c4UpdateObjectDirect( const   TString&        strKey
 
     // Delegate to the cache object
     return m_postCache->c4UpdateObject(strKey, mbufToWrite, c4Bytes);
-}
-
-tCIDLib::TCard4
-TCIDObjStore::c4UpdateObjectDirect( const   TString&        strKey
-                                    ,       THeapBuf&&      mbufToWrite
-                                    , const tCIDLib::TCard4 c4Bytes)
-{
-    if (!m_bReady)
-        ThrowNotReady(CID_LINE);
-    ValidatePath(strKey, kCIDLib::True, CID_LINE);
-
-    // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
-
-    // Delegate to the cache object
-    return m_postCache->c4UpdateObject(strKey, tCIDLib::ForceMove(mbufToWrite), c4Bytes);
 }
 
 

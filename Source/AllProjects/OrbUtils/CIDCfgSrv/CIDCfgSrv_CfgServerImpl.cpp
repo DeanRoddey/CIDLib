@@ -64,10 +64,10 @@ TCIDCfgServerImpl::~TCIDCfgServerImpl()
 tCIDLib::TVoid
 TCIDCfgServerImpl::AddObject(const  TString&        strKey
                             , const tCIDLib::TCard4 c4DataBytes
-                            ,       THeapBuf&&      mbufObjData
+                            , const THeapBuf&       mbufObjData
                             , const tCIDLib::TCard4 c4Reserve)
 {
-    m_oseRepo.AddObjectDirect(strKey, tCIDLib::ForceMove(mbufObjData), c4DataBytes, c4Reserve);
+    m_oseRepo.AddObjectDirect(strKey, mbufObjData, c4DataBytes, c4Reserve);
 }
 
 
@@ -83,12 +83,12 @@ tCIDLib::TBoolean
 TCIDCfgServerImpl::bAddOrUpdate(const   TString&            strKey
                                 ,       tCIDLib::TCard4&    c4Version
                                 , const tCIDLib::TCard4     c4DataBytes
-                                ,       THeapBuf&&          mbufObjData
+                                , const THeapBuf&           mbufObjData
                                 , const tCIDLib::TCard4     c4Reserve)
 {
     return m_oseRepo.bAddOrUpdateDirect
     (
-        strKey, c4Version, tCIDLib::ForceMove(mbufObjData), c4DataBytes, c4Reserve
+        strKey, c4Version, mbufObjData, c4DataBytes, c4Reserve
     );
 }
 
@@ -163,9 +163,9 @@ TCIDCfgServerImpl::c4QuerySubScopes(const   TString&            strParScope
 tCIDLib::TCard4
 TCIDCfgServerImpl::c4UpdateObject(  const   TString&        strKey
                                     , const tCIDLib::TCard4 c4DataBytes
-                                    ,       THeapBuf&&      mbufObjData)
+                                    , const THeapBuf&       mbufObjData)
 {
-    return m_oseRepo.c4UpdateObjectDirect(strKey, tCIDLib::ForceMove(mbufObjData), c4DataBytes);
+    return m_oseRepo.c4UpdateObjectDirect(strKey, mbufObjData, c4DataBytes);
 }
 
 
@@ -224,11 +224,8 @@ tCIDLib::TVoid TCIDCfgServerImpl::Initialize()
 
     catch(TError& errToCatch)
     {
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
 
         facCIDCfgSrv.ThrowErr
         (

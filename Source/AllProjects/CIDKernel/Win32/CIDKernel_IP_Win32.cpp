@@ -742,7 +742,7 @@ TKrnlIP::bQueryAdaptorInfo( const   tCIDLib::TCh* const pszName
         return kCIDLib::True;
 
     // Loop through them and try to find the indicated name
-    TAdaptorInfo* pCur;
+    TAdaptorInfo* pCur = nullptr;
     while (llstAdaptors.bNext(pCur))
     {
         if (TRawStr::bCompareStr(pCur->szName, pszName))
@@ -764,7 +764,7 @@ TKrnlIP::bQueryAdaptorList(TKrnlLList<TAdaptorInfo>& llstToFill)
     //  Allocate a buffer. They recommend 15K or larger to make it unlikely
     //  that a reallocation is needed. We go over twice that.
     //
-    ULONG uBufSz = 1024 * 32;
+    ULONG uBufSz = kCIDLib::c4Sz_32K;
     tCIDLib::TCard1* pc1Buf = new tCIDLib::TCard1[uBufSz];
     TArrayJanitor<tCIDLib::TCard1> janBuf(pc1Buf);
     IP_ADAPTER_ADDRESSES* pAdapters = (IP_ADAPTER_ADDRESSES*)pc1Buf;
@@ -954,7 +954,7 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
 //
 tCIDLib::TBoolean TKrnlIP::bQueryLocalName(TKrnlString& kstrToFill)
 {
-    const tCIDLib::TCard4 c4NameBufMax = 1024;
+    const tCIDLib::TCard4 c4NameBufMax = kCIDLib::c4Sz_1K;
     tCIDLib::TCh szName[c4NameBufMax + 2];
     tCIDLib::TCard4 c4ActualSz = c4NameBufMax;
     if (!::GetComputerNameEx(ComputerNameDnsHostname, szName, &c4ActualSz))
@@ -1053,7 +1053,7 @@ TKrnlIP::bTextFromIPAddr(const  TKrnlIPAddr&    kipaToConvert
         return kCIDLib::False;
 
     // Try the conversion
-    const tCIDLib::TCard4 c4Len = 1024;
+    const tCIDLib::TCard4 c4Len = kCIDLib::c4Sz_1K;
     tCIDLib::TCh achBuf[c4Len + 1];
 
     tCIDLib::TCard4 c4InLen = c4Len;

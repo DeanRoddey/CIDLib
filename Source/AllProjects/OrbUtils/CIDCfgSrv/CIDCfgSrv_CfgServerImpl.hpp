@@ -60,7 +60,7 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
         (
             const   TString&                strKey
             , const tCIDLib::TCard4         c4DataBytes
-            ,       THeapBuf&&              mbufObjData
+            , const THeapBuf&               mbufObjData
             , const tCIDLib::TCard4         c4Reserve
         )   final;
 
@@ -69,7 +69,7 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
             const   TString&               strKey
             ,       tCIDLib::TCard4&        c4Version
             , const tCIDLib::TCard4         c4DataBytes
-            ,       THeapBuf&&              mbufObjData
+            , const THeapBuf&               mbufObjData
             , const tCIDLib::TCard4         c4Reserve
         )   final;
 
@@ -126,7 +126,7 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
         (
             const   TString&                strKey
             , const tCIDLib::TCard4         c4DataBytes
-            ,       THeapBuf&&              mbufObjData
+            , const THeapBuf&               mbufObjData
         )   final;
 
         tCIDLib::TVoid DeleteObject

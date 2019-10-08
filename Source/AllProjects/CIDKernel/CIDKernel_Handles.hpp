@@ -86,7 +86,7 @@ class KRNLEXPORT TCommHandle
 
         TCommHandle
         (
-            const   TCommHandle&            hcommToCopy
+            const   TCommHandle&            hcommSrc
         );
 
         ~TCommHandle();
@@ -97,17 +97,17 @@ class KRNLEXPORT TCommHandle
         // -------------------------------------------------------------------
         TCommHandle& operator=
         (
-            const   TCommHandle&            hcommToAssign
+            const   TCommHandle&            hcommSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TCommHandle&            hcommToCompare
+            const   TCommHandle&            hcommSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TCommHandle&            hcommToCompare
+            const   TCommHandle&            hcommSrc
         )   const;
 
 
@@ -161,7 +161,7 @@ class KRNLEXPORT TConsoleHandle
 
         TConsoleHandle
         (
-            const   TConsoleHandle&         hconToCopy
+            const   TConsoleHandle&         hconSrc
         );
 
         ~TConsoleHandle();
@@ -172,17 +172,17 @@ class KRNLEXPORT TConsoleHandle
         // -------------------------------------------------------------------
         TConsoleHandle& operator=
         (
-            const   TConsoleHandle&         hconToAssign
+            const   TConsoleHandle&         hconSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TConsoleHandle&         hconToCompare
+            const   TConsoleHandle&         hconSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TConsoleHandle&         hconToCompare
+            const   TConsoleHandle&         hconSrc
         )   const;
 
 
@@ -237,7 +237,7 @@ class KRNLEXPORT TDirSearchHandle
 
         TDirSearchHandle
         (
-            const   TDirSearchHandle&       hdirToCopy
+            const   TDirSearchHandle&       hdirSrc
         );
 
         ~TDirSearchHandle();
@@ -248,17 +248,17 @@ class KRNLEXPORT TDirSearchHandle
         // -------------------------------------------------------------------
         TDirSearchHandle& operator=
         (
-            const   TDirSearchHandle&       hdirToAssign
+            const   TDirSearchHandle&       hdirSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TDirSearchHandle&       hdirToCompare
+            const   TDirSearchHandle&       hdirSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TDirSearchHandle&       hdirToCompare
+            const   TDirSearchHandle&       hdirSrc
         )   const;
 
 
@@ -312,7 +312,7 @@ class KRNLEXPORT TEventHandle
 
         TEventHandle
         (
-            const   TEventHandle&           hevToCopy
+            const   TEventHandle&           hevSrc
         );
 
         ~TEventHandle();
@@ -323,17 +323,17 @@ class KRNLEXPORT TEventHandle
         // -------------------------------------------------------------------
         TEventHandle& operator=
         (
-            const   TEventHandle&           hevToAssign
+            const   TEventHandle&           hevSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TEventHandle&           hevToCompare
+            const   TEventHandle&           hevSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TEventHandle&           hevToCompare
+            const   TEventHandle&           hevSrc
         )   const;
 
 
@@ -388,7 +388,7 @@ class KRNLEXPORT TFileHandle
 
         TFileHandle
         (
-            const   TFileHandle&            hflToCopy
+            const   TFileHandle&            hflSrc
         );
 
         ~TFileHandle();
@@ -399,17 +399,17 @@ class KRNLEXPORT TFileHandle
         // -------------------------------------------------------------------
         TFileHandle& operator=
         (
-            const   TFileHandle&            hflToAssign
+            const   TFileHandle&            hflSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TFileHandle&            hflToCompare
+            const   TFileHandle&            hflSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TFileHandle&            hflToCompare
+            const   TFileHandle&            hflSrc
         )   const;
 
 
@@ -463,7 +463,7 @@ class KRNLEXPORT TMediaChgHandle
 
         TMediaChgHandle
         (
-            const   TMediaChgHandle&        hmchgToCopy
+            const   TMediaChgHandle&        hmchgSrc
         );
 
         ~TMediaChgHandle();
@@ -474,17 +474,17 @@ class KRNLEXPORT TMediaChgHandle
         // -------------------------------------------------------------------
         TMediaChgHandle& operator=
         (
-            const   TMediaChgHandle&        hmchgToAssign
+            const   TMediaChgHandle&        hmchgSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TMediaChgHandle&        hmchgToCompare
+            const   TMediaChgHandle&        hmchgSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TMediaChgHandle&        hmchgToCompare
+            const   TMediaChgHandle&        hmchgSrc
         )   const;
 
 
@@ -538,7 +538,7 @@ class KRNLEXPORT TMemoryHandle
 
         TMemoryHandle
         (
-            const   TMemoryHandle&          hmemToCopy
+            const   TMemoryHandle&          hmemSrc
         );
 
         ~TMemoryHandle();
@@ -549,17 +549,17 @@ class KRNLEXPORT TMemoryHandle
         // -------------------------------------------------------------------
         TMemoryHandle& operator=
         (
-            const   TMemoryHandle&          hmemToAssign
+            const   TMemoryHandle&          hmemSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TMemoryHandle&          hmemToCompare
+            const   TMemoryHandle&          hmemSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TMemoryHandle&          hmemToCompare
+            const   TMemoryHandle&          hmemSrc
         )   const;
 
 
@@ -613,7 +613,7 @@ class KRNLEXPORT TModuleHandle
 
         TModuleHandle
         (
-            const   TModuleHandle&          hmodToCopy
+            const   TModuleHandle&          hmodSrc
         );
 
         ~TModuleHandle();
@@ -624,17 +624,17 @@ class KRNLEXPORT TModuleHandle
         // -------------------------------------------------------------------
         TModuleHandle& operator=
         (
-            const   TModuleHandle&          hmodToAssign
+            const   TModuleHandle&          hmodSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TModuleHandle&          hmodToCompare
+            const   TModuleHandle&          hmodSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TModuleHandle&          hmodToCompare
+            const   TModuleHandle&          hmodSrc
         )   const;
 
 
@@ -688,7 +688,7 @@ class KRNLEXPORT TMutexHandle
 
         TMutexHandle
         (
-            const   TMutexHandle&           hmtxToCopy
+            const   TMutexHandle&           hmtxSrc
         );
 
         ~TMutexHandle();
@@ -699,17 +699,17 @@ class KRNLEXPORT TMutexHandle
         // -------------------------------------------------------------------
         TMutexHandle& operator=
         (
-            const   TMutexHandle&           hmtxToAssign
+            const   TMutexHandle&           hmtxSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TMutexHandle&           hmtxToCompare
+            const   TMutexHandle&           hmtxSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TMutexHandle&           hmtxToCompare
+            const   TMutexHandle&           hmtxSrc
         )   const;
 
 
@@ -763,7 +763,7 @@ class KRNLEXPORT TProcessHandle
 
         TProcessHandle
         (
-            const   TProcessHandle&         hprocToCopy
+            const   TProcessHandle&         hprocSrc
         );
 
         TProcessHandle
@@ -779,17 +779,17 @@ class KRNLEXPORT TProcessHandle
         // -------------------------------------------------------------------
         TProcessHandle& operator=
         (
-            const   TProcessHandle&         hprocToAssign
+            const   TProcessHandle&         hprocSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TProcessHandle&         hprocToCompare
+            const   TProcessHandle&         hprocSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TProcessHandle&         hprocToCompare
+            const   TProcessHandle&         hprocSrc
         )   const;
 
 
@@ -845,7 +845,7 @@ class KRNLEXPORT TSemaphoreHandle
 
         TSemaphoreHandle
         (
-            const   TSemaphoreHandle&       hsemToCopy
+            const   TSemaphoreHandle&       hsemSrc
         );
 
         ~TSemaphoreHandle();
@@ -856,17 +856,17 @@ class KRNLEXPORT TSemaphoreHandle
         // -------------------------------------------------------------------
         TSemaphoreHandle& operator=
         (
-            const   TSemaphoreHandle&       hsemToAssign
+            const   TSemaphoreHandle&       hsemSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TSemaphoreHandle&       hsemToCompare
+            const   TSemaphoreHandle&       hsemSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TSemaphoreHandle&       hsemToCompare
+            const   TSemaphoreHandle&       hsemSrc
         )   const;
 
 
@@ -920,7 +920,7 @@ class KRNLEXPORT TSocketHandle
 
         TSocketHandle
         (
-            const   TSocketHandle&          hsockToCopy
+            const   TSocketHandle&          hsockSrc
         );
 
         ~TSocketHandle();
@@ -931,17 +931,17 @@ class KRNLEXPORT TSocketHandle
         // -------------------------------------------------------------------
         TSocketHandle& operator=
         (
-            const   TSocketHandle&          hsockToAssign
+            const   TSocketHandle&          hsockSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TSocketHandle&          hsockToCompare
+            const   TSocketHandle&          hsockSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TSocketHandle&          hsockToCompare
+            const   TSocketHandle&          hsockSrc
         )   const;
 
 
@@ -995,7 +995,7 @@ class KRNLEXPORT TThreadHandle
 
         TThreadHandle
         (
-            const   TThreadHandle&          hthrToCopy
+            const   TThreadHandle&          hthrSrc
         );
 
         ~TThreadHandle();
@@ -1006,17 +1006,17 @@ class KRNLEXPORT TThreadHandle
         // -------------------------------------------------------------------
         TThreadHandle& operator=
         (
-            const   TThreadHandle&          hthrToAssign
+            const   TThreadHandle&          hthrSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TThreadHandle&          hthrToCompare
+            const   TThreadHandle&          hthrSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TThreadHandle&          hthrToCompare
+            const   TThreadHandle&          hthrSrc
         )   const;
 
 

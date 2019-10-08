@@ -75,7 +75,7 @@
                 <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
                     <CIDIDL:TString/>
                 </CIDIDL:Param>
-                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In" CIDIDL:Moveable="Yes">
+                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In">
                     <CIDIDL:THeapBuf/>
                 </CIDIDL:Param>
                 <CIDIDL:Param CIDIDL:Name="c4Reserve" CIDIDL:Dir="In">
@@ -101,7 +101,7 @@
                 <CIDIDL:Param CIDIDL:Name="c4Version" CIDIDL:Dir="Out">
                     <CIDIDL:TCard4/>
                 </CIDIDL:Param>
-                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In" CIDIDL:Moveable="Yes">
+                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In">
                     <CIDIDL:THeapBuf/>
                 </CIDIDL:Param>
                 <CIDIDL:Param CIDIDL:Name="c4Reserve" CIDIDL:Dir="In">
@@ -268,7 +268,7 @@
                 <CIDIDL:Param CIDIDL:Name="strKey" CIDIDL:Dir="In">
                     <CIDIDL:TString/>
                 </CIDIDL:Param>
-                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In" CIDIDL:Moveable="Yes">
+                <CIDIDL:Param CIDIDL:Name="mbufObjData" CIDIDL:Dir="In">
                     <CIDIDL:THeapBuf/>
                 </CIDIDL:Param>
             </CIDIDL:Method>

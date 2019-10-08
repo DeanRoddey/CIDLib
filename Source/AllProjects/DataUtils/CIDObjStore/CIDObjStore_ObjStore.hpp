@@ -83,14 +83,6 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
             , const tCIDLib::TCard4         c4Reserve = 0
         );
 
-        tCIDLib::TVoid AddObjectDirect
-        (
-            const   TString&                strKey
-            ,       THeapBuf&&              mbufToWrite
-            , const tCIDLib::TCard4         c4Bytes
-            , const tCIDLib::TCard4         c4Reserve = 0
-        );
-
         tCIDLib::TBoolean bAddOrUpdate
         (
             const   TString&                strKey
@@ -104,15 +96,6 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
             const   TString&                strKey
             ,       tCIDLib::TCard4&        c4Version
             , const THeapBuf&               mbufToWrite
-            , const tCIDLib::TCard4         c4Bytes
-            , const tCIDLib::TCard4         c4Reserve = 0
-        );
-
-        tCIDLib::TBoolean bAddOrUpdateDirect
-        (
-            const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
-            ,       THeapBuf&&              mbufToWrite
             , const tCIDLib::TCard4         c4Bytes
             , const tCIDLib::TCard4         c4Reserve = 0
         );
@@ -185,13 +168,6 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         (
             const   TString&                strKey
             , const THeapBuf&               mbufToWrite
-            , const tCIDLib::TCard4         c4Bytes
-        );
-
-        tCIDLib::TCard4 c4UpdateObjectDirect
-        (
-            const   TString&                strKey
-            ,       THeapBuf&&              mbufToWrite
             , const tCIDLib::TCard4         c4Bytes
         );
 
