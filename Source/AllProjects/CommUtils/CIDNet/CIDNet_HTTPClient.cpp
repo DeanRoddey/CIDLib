@@ -2424,11 +2424,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         TString strFirstLn(strOpType);
         strFirstLn.Append(kCIDLib::chSpace);
         strFirstLn.Append(strPath);
-
-        if (pcdsSrc)
-            strFirstLn.Append(L" HTTP/1.1");
-        else
-            strFirstLn.Append(L" HTTP/1.0");
+		strFirstLn.Append(L" HTTP/1.1");
 
         //
         //  Set up the special header lines we take directly, if they are not
@@ -2877,13 +2873,19 @@ TAsyncHTTPQ::eQueryThread(TThread& thrThis, tCIDLib::TVoid*)
         if (m_OpType == EOpTypes::GETRedir)
         {
             //
-            //  Issue the operation. Let it create a one-shot socket for us by
-            //  by passing in an empty data source janitor.
+            //  Issue the operation. We have to create a persistent data source to
+            //  deal with redirection. There's a helper to do this.
             //
-            TCIDDataSrcJan janEmpty;
+            TCIDDataSrcJan janSrc
+            (
+                facCIDNet().pcdsMakeSocketSrc(m_strAgent, m_urlToGet)
+                , tCIDLib::EAdoptOpts::Adopt
+                , kCIDLib::True
+            );
+
             m_c4ResCode = m_httpcThis.c4SendGetRedir
             (
-                janEmpty
+                janSrc
                 , m_urlToGet
                 , TTime::enctNowPlusMSs(m_c4WaitFor)
                 , m_strAgent
@@ -2902,7 +2904,7 @@ TAsyncHTTPQ::eQueryThread(TThread& thrThis, tCIDLib::TVoid*)
         {
             m_c4ResCode = m_httpcThis.c4SendPost
             (
-                0
+                nullptr
                 , m_urlToGet
                 , TTime::enctNowPlusMSs(m_c4WaitFor)
                 , m_strAgent

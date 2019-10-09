@@ -262,7 +262,7 @@ TTest_HTTPGET::eRunTest(TTextStringOutStream&   strmOut
     if (bDoGET(strmOut, ahttpqTest, L"http://www.google.com", L"Test 1"))
     {
         // That worked, so try another one
-        if (!bDoGET(strmOut, ahttpqTest, L"http://www.microsoft.com", L"Test 2"))
+        if (!bDoGET(strmOut, ahttpqTest, L"https://www.microsoft.com", L"Test 2"))
             eRes = tTestFWLib::ETestRes::Failed;
     }
      else
@@ -296,13 +296,12 @@ TTest_HTTPGET::bDoGET(          TTextStringOutStream&   strmOut
     {
         TURL urlTest(strURL, tCIDSock::EQualified::Full);
         tCIDLib::TKVPList colInHdrLines;
-        colInHdrLines.objAdd(TKeyValuePair(L"Connection", L"Close"));
         ahttpqTest.StartGETRedir
         (
             strTestName
             , urlTest
             , 5000
-            , L"Async HTTP Test Client"
+            , L"Async HTTP Client"
             , L"text/html"
             , colInHdrLines
         );
