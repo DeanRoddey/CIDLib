@@ -1,12 +1,12 @@
 #
 # This file does the environmental setup for CIDLib on Linux
-# 
+#
 # All we expect here is:
 #
 #   CID_DEVTREE     - Set to the top of the dev tree, which is the
 #                     CID_Dev directory.
 #   CID_BUILDMODE   - Set to Prod or Dev
-# 
+#
 
 # Make sure our expected incoming values are present and valid
 if [ -z "$CID_DEVTREE" ]; then
@@ -26,11 +26,11 @@ else
     return
 fi
 
-# 
+#
 # Set the CIDLib version to apply when building, and create a version
 # with underlines instead of dots.
 #
-export CID_VERSION=5.4.903
+export CID_VERSION=5.4.906
 export CID_VERSIONUL=${CID_VERSION//./_}
 
 # Set the platform, which for now is fixed at Linux_32
