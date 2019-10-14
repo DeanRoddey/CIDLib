@@ -157,11 +157,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     //
     while (!pstmrTest.bEndOfStream())
     {
-        // A base widget pointer to read objects back into
-        TBaseWidget* pwidRead;
-
-        pwidRead = pstmrTest.pobjStreamIn();
-        colWidgets.Add(pwidRead);
+        colWidgets.Add(pstmrTest.pobjStreamIn());
     }
 
     // Now we can 'draw' them again and should get the same output
