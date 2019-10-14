@@ -2529,6 +2529,7 @@ namespace tCIDSock
     {
         IP
         , ICMP
+        , ICMP6
         , IGMP
         , TCP
         , PUP
@@ -2579,10 +2580,11 @@ namespace tCIDSock
     {
         Stream
         , Datagram
+        , Raw
 
         , Count
         , Min           = Stream
-        , Max           = Datagram
+        , Max           = Raw
     };
 
 

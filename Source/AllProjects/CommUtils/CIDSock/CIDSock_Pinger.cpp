@@ -70,10 +70,10 @@ TSockPinger::~TSockPinger()
 //  underlying kernel object figures out for us.
 //
 tCIDLib::TBoolean
-TSockPinger::bWaitReply(const   tCIDLib::TCard4     c4WaitMillis
-                        ,       tCIDLib::TCard4&    c4RepMSs
-                        ,       tCIDLib::TCard4&    c4RepBytes
-                        ,       TIPAddress&         ipaFrom)
+TSockPinger::bWaitReply(const   tCIDLib::TCard4         c4WaitMillis
+                        ,       tCIDLib::TCard4&        c4RepMSs
+                        ,       tCIDLib::TCard4&        c4RepBytes
+                        ,       TIPAddress&             ipaFrom)
 {
     // Make sure we are waiting for a reply
     if (m_kspingThis.eState() != tCIDSock::EPingStates::WaitReply)
@@ -208,7 +208,8 @@ const TString& TSockPinger::strRemAddr() const
 tCIDLib::TVoid
 TSockPinger::StartPing( const   TString&                strRemAddr
                         , const tCIDSock::EAddrTypes    eType
-                        ,       TIPAddress&             ipaTar)
+                        ,       TIPAddress&             ipaTar
+                        , const tCIDLib::TCard4         c4TTL)
 {
     // Clean up any existing session
     EndPing();

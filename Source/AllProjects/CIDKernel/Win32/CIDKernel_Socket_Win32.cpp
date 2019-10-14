@@ -51,6 +51,7 @@ namespace CIDKernel_Socket_Win32
     {
         0       // IP
         , 1     // ICMP
+        , 58    // ICMP6
         , 2     // IGMP
         , 6     // TCP
         , 12    // PUP
@@ -1088,8 +1089,18 @@ TKrnlSocket::bCreate(   const   tCIDSock::ESocketTypes  eType
     }
 
     // Convert the passed socket type to the internal value
-    const tCIDLib::TCard4 c4Type = (eType == tCIDSock::ESocketTypes::Stream) ?
-                                    SOCK_STREAM : SOCK_DGRAM;
+    tCIDLib::TCard4 c4Type;
+    if (eType == tCIDSock::ESocketTypes::Stream)
+        c4Type = SOCK_STREAM;
+    else if (eType == tCIDSock::ESocketTypes::Datagram)
+        c4Type = SOCK_DGRAM;
+    else if (eType == tCIDSock::ESocketTypes::Raw)
+        c4Type = SOCK_RAW;
+    else
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_WrongSOType);
+        return kCIDLib::False;
+    }
 
     // Translate the protocol
     const tCIDLib::TCard4 c4Proto = c4XlatProto(eProtocol);
@@ -1099,6 +1110,11 @@ TKrnlSocket::bCreate(   const   tCIDSock::ESocketTypes  eType
         iFamily = AF_INET;
     else if (eAddrType == tCIDSock::EAddrTypes::IPV6)
         iFamily = AF_INET6;
+    else
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_BadAddrType);
+        return kCIDLib::False;
+    }
 
     // And try to create the socket
     const tCIDLib::TInt4 i4Tmp = ::socket(iFamily, c4Type, c4Proto);
@@ -1747,6 +1763,7 @@ TKrnlSocket::bSetSockOpt(       TKrnlSocket::EBSockOpts eOpt
     return kCIDLib::True;
 }
 
+
 tCIDLib::TBoolean
 TKrnlSocket::bSetSockOpt(       TKrnlSocket::EISockOpts eOpt
                         , const tCIDLib::TInt4          i4NewValue)
@@ -1766,6 +1783,16 @@ TKrnlSocket::bSetSockOpt(       TKrnlSocket::EISockOpts eOpt
         case EISockOpts::SendBuf :
             c4Level = SOL_SOCKET;
             c4Opt = SO_SNDBUF;
+            break;
+
+        case EISockOpts::TTL :
+            c4Level = IPPROTO_IP;
+            c4Opt = IP_TTL;
+            break;
+
+        case EISockOpts::TTLV6 :
+            c4Level = IPPROTO_IPV6;
+            c4Opt = IPV6_UNICAST_HOPS;
             break;
 
         default :

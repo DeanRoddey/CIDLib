@@ -686,7 +686,7 @@ TIPEndPoint::TIPEndPoint(const  TIPAddress&         ipaThis
 {
 }
 
-TIPEndPoint::TIPEndPoint(const  tCIDSock::ESpecAddrs eAddr
+TIPEndPoint::TIPEndPoint(const  tCIDSock::ESpecAddrs    eAddr
                         , const tCIDSock::EAddrTypes    eType
                         , const tCIDLib::TIPPortNum     ippnThis) :
 

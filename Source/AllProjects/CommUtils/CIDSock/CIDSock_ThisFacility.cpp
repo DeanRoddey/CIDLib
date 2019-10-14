@@ -908,6 +908,7 @@ TString TFacCIDSock::strXlatProto(const tCIDSock::ESockProtos eToXlat) const
     {
         L"IP"
         , L"ICMP"
+        , L"ICMP6"
         , L"IGMP"
         , L"TCP"
         , L"PUP"

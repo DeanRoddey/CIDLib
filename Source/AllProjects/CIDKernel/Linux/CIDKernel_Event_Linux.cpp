@@ -1,5 +1,5 @@
 //
-// FILE NAME: CIDKernel_EventSemaphore_Linux.Cpp
+// FILE NAME: CIDKernel_Event_Linux.Cpp
 //
 // AUTHOR: Will Mason
 //
@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd - 2019
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -544,7 +544,7 @@ tCIDLib::TBoolean TKrnlEvent::bWaitFor(const tCIDLib::TCard4 c4Wait)
 // ---------------------------------------------------------------------------
 
 //
-// FUNCTION/METHOD NAME: __bCreateNamed
+// FUNCTION/METHOD NAME: bCreateNamed
 //
 // DESCRIPTION:
 //
@@ -613,7 +613,7 @@ TKrnlEvent::bCreateNamed(const  tCIDLib::EEventStates eInitState
         }
 
         // We created a new one
-        bCreated = kCIDLib::True;        
+        bCreated = kCIDLib::True;
     }
 
     m_hevThis.m_pheviThis = new TEventHandleImpl;

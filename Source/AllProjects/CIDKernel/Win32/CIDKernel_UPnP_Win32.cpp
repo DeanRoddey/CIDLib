@@ -1384,13 +1384,13 @@ MUPnPAsyncFinderCB::MUPnPAsyncFinderCB()
 // ---------------------------------------------------------------------------
 TKrnlUPnPAsyncFinder::TKrnlUPnPAsyncFinder() :
 
-    m_pFinderInfo(0)
-    , m_pmkupnpfcbTar(0)
+    m_pFinderInfo(nullptr)
+    , m_pmkupnpfcbTar(nullptr)
 {
     // Create our per-platform info structure
     TAFinderInfo* pInfo = new TAFinderInfo;
-    pInfo->pcbTar = 0;
-    pInfo->pFinder = 0;
+    pInfo->pcbTar = nullptr;
+    pInfo->pFinder = nullptr;
     m_pFinderInfo = pInfo;
 }
 
@@ -1398,7 +1398,7 @@ TKrnlUPnPAsyncFinder::TKrnlUPnPAsyncFinder() :
 TKrnlUPnPAsyncFinder::
 TKrnlUPnPAsyncFinder(MUPnPAsyncFinderCB* const pmkupnpfcbTar) :
 
-    m_pFinderInfo(0)
+    m_pFinderInfo(nullptr)
     , m_pmkupnpfcbTar(pmkupnpfcbTar)
 {
     //
@@ -1406,8 +1406,8 @@ TKrnlUPnPAsyncFinder(MUPnPAsyncFinderCB* const pmkupnpfcbTar) :
     //  the callback object.
     //
     TAFinderInfo* pInfo = new TAFinderInfo;
-    pInfo->pcbTar = 0;
-    pInfo->pFinder = 0;
+    pInfo->pcbTar = nullptr;
+    pInfo->pFinder = nullptr;
     m_pFinderInfo = pInfo;
 
     CUPnPFinderCallback* pcbNew = new CUPnPFinderCallback(pmkupnpfcbTar);
@@ -1421,7 +1421,7 @@ TKrnlUPnPAsyncFinder::~TKrnlUPnPAsyncFinder()
     // Call our own cleanup method
     bCleanup();
 
-    m_pFinderInfo = 0;
+    m_pFinderInfo = nullptr;
     delete pInfo;
 }
 
@@ -1432,8 +1432,8 @@ TKrnlUPnPAsyncFinder::~TKrnlUPnPAsyncFinder()
 
 //
 //  Allows the CIDUpnP level async finder to get us to clean up before we
-//  destruct, which migth be desirable in order to make sure it's done in
-//  the same thread that careated the finder object. After this, the callback
+//  destruct, which might be desirable in order to make sure it's done in
+//  the same thread that created the finder object. After this, the callback
 //  has to be set again and a new search started.
 //
 tCIDLib::TBoolean TKrnlUPnPAsyncFinder::bCleanup()
@@ -1444,14 +1444,14 @@ tCIDLib::TBoolean TKrnlUPnPAsyncFinder::bCleanup()
     if (pInfo->pFinder)
     {
         pInfo->pFinder->Release();
-        pInfo->pFinder = 0;
+        pInfo->pFinder = nullptr;
     }
 
     // And the callback
     if (pInfo->pcbTar)
     {
         pInfo->pcbTar->Release();
-        pInfo->pcbTar = 0;
+        pInfo->pcbTar = nullptr;
     }
 
     return kCIDLib::True;

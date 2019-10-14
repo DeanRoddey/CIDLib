@@ -107,7 +107,7 @@ static ISpVoice* pcomMakeVoiceObj(tCIDLib::TVoid*& pData)
 tCIDLib::TBoolean
 TKrnlSpeech::bQueryOutputList(TKrnlLList<TKrnlKVPair>& kllstOutputs)
 {
-    // Flush both lists in preparation for filling them in
+    // Flush the list in preparation for filling it in
     kllstOutputs.RemoveAll();
 
     // Get the number of devices available

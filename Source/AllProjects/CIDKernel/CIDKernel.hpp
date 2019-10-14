@@ -42,14 +42,34 @@
 // ---------------------------------------------------------------------------
 //  Subinclude the really fundamental headers that must be before everything.
 // ---------------------------------------------------------------------------
-#include    "CIDKernel_PlatformDefines.hpp"
-#include    "CIDKernel_PlatformIncludes.hpp"
+
+//
+//  This is a hack to get around Visual Studio Code's apparent innability to ignore
+//  directories in the intellisense stuff, so it sees the Linux files on Windows.
+//
+#if CID_PLATFORM == WIN32_WIN7
+#include    ".\Win32\CIDKernel_PlatformDefines.hpp"
+#include    ".\Win32\CIDKernel_PlatformIncludes.hpp"
+#include    ".\Win32\CIDKernel_PlatformTypes.hpp"
+#elif CID_PLATFORM == LINUX_32
+#include    ".\Linux\CIDKernel_PlatformDefines.hpp"
+#include    ".\Linux\CIDKernel_PlatformIncludes.hpp"
+#include    ".\Linux\CIDKernel_PlatformTypes.hpp"
+#endif
+
 #include    "CIDKernel_DevMacros.hpp"
-#include    "CIDKernel_PlatformTypes.hpp"
 #include    "CIDKernel_Type.hpp"
+
+// See above, a temporary hack due to Visual Studio Code silliness
+#if CID_PLATFORM == WIN32_WIN7
+#include    ".\Win32\CIDKernel_PlatformConstants.hpp"
+#elif CID_PLATFORM == LINUX_32
+#include    ".\Linux\CIDKernel_PlatformConstants.hpp"
+#endif
+
+
 #include    "CIDKernel_Constant.hpp"
 #include    "CIDKernel_Version.hpp"
-#include    "CIDKernel_PlatformConstants.hpp"
 #include    "CIDKernel_BaseInlines.hpp"
 #include    "CIDKernel_MemCheck.hpp"
 #include    "CIDKernel_Unicode.hpp"

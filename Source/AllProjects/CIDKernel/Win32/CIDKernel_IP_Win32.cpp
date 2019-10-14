@@ -535,6 +535,24 @@ TKrnlIPAddr::bToSockAddr(       tCIDLib::TVoid* const  pAddr
 }
 
 
+//
+//  This one is more for higher level code that doesn't have access to the socket
+//  headers but needs to get raw IP address data. We allocate a buffer for them
+//  and tell them how big it is.
+//
+tCIDLib::TCard1*
+TKrnlIPAddr::pc1ToSockAddr(tCIDLib::TCard4& c4SzOut, const tCIDLib::TIPPortNum ippnPort) const
+{
+    // We call the other version with a buffer big enough for whatever it is
+    SOCKADDR_STORAGE Addr;
+    if (!bToSockAddr(&Addr, c4SzOut, ippnPort))
+        return nullptr;
+
+    tCIDLib::TCard1* pc1Ret = new tCIDLib::TCard1[c4SzOut];
+    TRawMem::CopyMemBuf(pc1Ret, &Addr, c4SzOut);
+    return pc1Ret;
+}
+
 
 
 

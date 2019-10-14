@@ -347,6 +347,7 @@ ERRORS=
     errcNet_BadSockOpt              1047    An uknown socket option was passed
     errcNet_SelListTooBig           1048    The passed socket select list is to large
     errcNet_GetLocalAddr            1049    Could not get local binding for target address
+    errcNet_BadAddrType             1050    Unknown socket address type
 
     ; Printing errors
     errcPrn_OutOfPaper              1200    Out of paper
@@ -423,11 +424,7 @@ ERRORS=
     ; Socket pinger related errors
     errcSPing_AlreadyInit           5425    The socket pinger is already initialized
     errcSPing_NotReqReady           5426    The socket pinger is not ready to make a request
-    errcSPing_InitSocket            5427    Could not initialize the ICMP socket
-    errcSPing_NoCtxInfo             5428    The socket pinger context has not been set
     errcSPing_NotWaiting            5429    The socket pinger is not currently waiting for a reply
-    errcSPing_Bind                  5430    Could not locally bind the ping socket
-    errcSPing_GetTarAddr            5431    Could not get target IP address bytes
     errcSPing_SendReq               5432    An error occurred while sending the ping request
     errcSPing_ReadRep               5433    An error occurred while reading the ping reply
     errcSPing_BadCntRecv            5434    The received ping byte count is not the same as that sent

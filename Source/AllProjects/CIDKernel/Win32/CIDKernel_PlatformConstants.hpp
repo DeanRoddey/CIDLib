@@ -104,6 +104,7 @@ namespace kCIDSock
     const tCIDLib::TCard4       c4MaxSelect     = 64;
 }
 
+
 namespace kCIDGraphDev
 {
 

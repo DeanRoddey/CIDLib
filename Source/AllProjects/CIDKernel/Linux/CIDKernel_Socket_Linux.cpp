@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd - 2019
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -94,6 +94,9 @@ namespace
             break;
         case tCIDSock::ESockProtos::ICMP:
             pszProtoName = "icmp";
+            break;
+        case tCIDSock::ESockProtos::ICMP6:
+            pszProtoName = "icmp6";
             break;
         case tCIDSock::ESockProtos::IGMP:
             pszProtoName = "igmp";
@@ -932,4 +935,21 @@ TKrnlSocket::bWaitForData(          tCIDLib::TBoolean&  bGotData
     bGotData = FD_ISSET(__hsockThis.__phsockiThis->iDescr, &FDRead) != 0;
 
     return kCIDLib::True;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TKrnlSocket: Protected, non-virtual methods
+// ---------------------------------------------------------------------------
+
+// Just for the TKrnlSockPinter class to call
+tCIDLib::TBoolean
+TKrnlSocket::bCreatePingSocket( const   tCIDSock::EAddrTypes    eAddrType
+                                , const TKrnlIPAddr&            kipaTar
+                                ,       TKrnlIPAddr&            kipaLocal
+                                ,       tCIDLib::TIPPortNum&    ippnLocal
+                                , const tCIDLib::TCard4         c4TTL)
+{
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
 }

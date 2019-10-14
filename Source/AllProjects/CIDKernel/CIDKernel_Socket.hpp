@@ -30,6 +30,7 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+class TKrnlSockPinger;
 
 // ---------------------------------------------------------------------------
 //   CLASS: TKrnlSocket
@@ -68,6 +69,8 @@ class KRNLEXPORT TKrnlSocket
             , MaxMsgSize
             , ReceiveBuf
             , SendBuf
+            , TTL
+            , TTLV6
         };
 
 

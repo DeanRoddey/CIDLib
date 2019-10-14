@@ -141,6 +141,12 @@ class KRNLEXPORT TKrnlIPAddr
             , const tCIDLib::TIPPortNum     ippnToSet = 0
         )   const;
 
+        tCIDLib::TCard1* pc1ToSockAddr
+        (
+                    tCIDLib::TCard4&        c4SzOut
+            , const tCIDLib::TIPPortNum     ippnToSet = 0
+        )   const;
+
         tCIDLib::TVoid SetToSpecial
         (
             const   tCIDSock::ESpecAddrs    eAddr

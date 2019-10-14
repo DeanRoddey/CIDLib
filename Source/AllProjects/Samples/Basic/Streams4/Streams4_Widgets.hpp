@@ -35,7 +35,7 @@
 //  to implement the default duplication code, which is just a call to their
 //  own copy constructor.
 //
-//  TFilledBoxWidget is a second level derivative, so note how it calls its
+//  TFilledCircleWidget is a second level derivative, so note how it calls its
 //  parent's version of everything. The standard RTTI macro create a typedef
 //  called TParent, which stands for the parent class. So it always calls
 //  through this magic TParent class instead of hard coding its parent class.
@@ -45,10 +45,7 @@
 // CAVEATS/GOTCHAS:
 //
 //  1)  Because these are trivial examples, they do not follow the formal
-//      guidelines for style. They just implement all of their functionality
-//      inline, within the class definition. And they are more 'scrunched'
-//      up that I would normally do so that they can all fit easily within
-//      this one file.
+//      guidelines for style.
 //
 // LOG:
 //
@@ -64,38 +61,22 @@ class TBaseWidget : public TObject, public MStreamable, public MDuplicable
 {
     public  :
         // --------------------------------------------------------------------
-        //  Public constructors and destructors
-        // --------------------------------------------------------------------
-        ~TBaseWidget() {}
-
-        // --------------------------------------------------------------------
         //  Public, virtual methods
         // --------------------------------------------------------------------
-        virtual TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const = 0;
+        virtual TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const = 0
+        {
+            strmToWriteTo << L"Type: " << clsIsA() << L" - ";
+            return strmToWriteTo;
+        }
 
 
     protected   :
-        // --------------------------------------------------------------------
-        //  Hidden constructors and operators
-        // --------------------------------------------------------------------
-        TBaseWidget() {}
-
-        TBaseWidget(const TBaseWidget& toCopy) {}
-        TBaseWidget& operator=(const TBaseWidget& toCopy) {return *this;}
-
-
         // --------------------------------------------------------------------
         //  Magic macros
         // --------------------------------------------------------------------
         RTTIDefs(TBaseWidget,TObject)
 };
 
-
-inline TTextOutStream& TBaseWidget::Draw(TTextOutStream& strmToWriteTo) const
-{
-    strmToWriteTo << L"Type: " << clsIsA() << L" - ";
-    return strmToWriteTo;
-}
 
 
 // ----------------------------------------------------------------------------
@@ -108,63 +89,34 @@ class TLineWidget : public TBaseWidget
         // --------------------------------------------------------------------
         //  Public constructors and destructors
         // --------------------------------------------------------------------
+        TLineWidget() = default;
         TLineWidget(const TPoint& pntFrom, const TPoint& pntTo) :
 
             m_pntFrom(pntFrom)
             , m_pntTo(pntTo)
         {}
 
-        TLineWidget(const TLineWidget& widToCopy) :
-
-            m_pntFrom(widToCopy.m_pntFrom)
-            , m_pntTo(widToCopy.m_pntTo)
-        {}
-
-        ~TLineWidget() {}
-
-
-        // --------------------------------------------------------------------
-        //  Public operators
-        // --------------------------------------------------------------------
-        TLineWidget& operator=(const TLineWidget& widToAssign)
-        {
-            m_pntFrom = widToAssign.m_pntFrom;
-            m_pntTo = widToAssign.m_pntTo;
-            return *this;
-        }
 
         // --------------------------------------------------------------------
         //  Public, inherited methods
         // --------------------------------------------------------------------
-        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
+        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const final
         {
-            strmToWriteTo   << TParent::Draw(strmToWriteTo)
-                            << L"{" << m_pntFrom
-                            << L"," << m_pntTo << L"}";
+            TParent::Draw(strmToWriteTo) << L"{" << m_pntFrom << L"," << m_pntTo << L"}";
             return strmToWriteTo;
         }
 
 
     protected   :
         // --------------------------------------------------------------------
-        //  Hidden constructors
-        // --------------------------------------------------------------------
-        TLineWidget() :
-
-            m_pntFrom(0, 0)
-            , m_pntTo(1, 1)
-        {}
-
-
-        // --------------------------------------------------------------------
         //  Protected, implemented methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
+        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom) final
         {
             strmToReadFrom >> m_pntFrom >> m_pntTo;
         }
 
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
+        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const final
         {
             strmToWriteTo << m_pntFrom << m_pntTo;
         }
@@ -173,20 +125,16 @@ class TLineWidget : public TBaseWidget
     private :
         // --------------------------------------------------------------------
         //  Private data members
-        //
-        //  m_pntFrom
-        //  m_pntTo
-        //      The points that the line draws from and to.
         // --------------------------------------------------------------------
         TPoint  m_pntFrom;
         TPoint  m_pntTo;
+
 
         // --------------------------------------------------------------------
         //  Magic macros
         // --------------------------------------------------------------------
         RTTIDefs(TLineWidget,TBaseWidget)
         DefPolyDup(TLineWidget)
-        BefriendFactory(TLineWidget)
 };
 
 
@@ -201,63 +149,35 @@ class TCircleWidget : public TBaseWidget
         // --------------------------------------------------------------------
         //  Public constructors and destructors
         // --------------------------------------------------------------------
+        TCircleWidget() = default;
         TCircleWidget(const TPoint& pntCenter, const tCIDLib::TCard4 c4Radius) :
 
             m_c4Radius(c4Radius)
             , m_pntCenter(pntCenter)
         {}
 
-        TCircleWidget(const TCircleWidget& widToCopy) :
-
-            m_c4Radius(widToCopy.m_c4Radius)
-            , m_pntCenter(widToCopy.m_pntCenter)
-        {}
-
-        ~TCircleWidget() {}
-
-
-        // --------------------------------------------------------------------
-        //  Public operators
-        // --------------------------------------------------------------------
-        TCircleWidget& operator=(const TCircleWidget& widToAssign)
-        {
-            m_c4Radius = widToAssign.m_c4Radius;
-            m_pntCenter = widToAssign.m_pntCenter;
-            return *this;
-        }
 
         // --------------------------------------------------------------------
         //  Public, inherited methods
         // --------------------------------------------------------------------
-        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
+        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const override
         {
-            strmToWriteTo   << TParent::Draw(strmToWriteTo)
-                            << L"Center/Radius: {" << m_pntCenter
-                            << L"," << m_c4Radius << L"}";
+            TParent::Draw(strmToWriteTo) << L"Center/Radius: {" << m_pntCenter
+                                         << L"," << m_c4Radius << L"}";
             return strmToWriteTo;
         }
 
 
     protected   :
         // --------------------------------------------------------------------
-        //  Hidden constructors
-        // --------------------------------------------------------------------
-        TCircleWidget() :
-
-            m_c4Radius(1)
-            , m_pntCenter(0, 0)
-        {}
-
-
-        // --------------------------------------------------------------------
         //  Protected, implemented methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
+        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom) override
         {
             strmToReadFrom >> m_pntCenter >> m_c4Radius;
         }
 
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
+        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const override
         {
             strmToWriteTo << m_pntCenter << m_c4Radius;
         }
@@ -266,12 +186,8 @@ class TCircleWidget : public TBaseWidget
     private :
         // --------------------------------------------------------------------
         //  Private data members
-        //
-        //  m_c4Radius
-        //  m_pntCenter
-        //      The center point and radius of the circle
         // --------------------------------------------------------------------
-        tCIDLib::TCard4 m_c4Radius;
+        tCIDLib::TCard4 m_c4Radius = 1;
         TPoint          m_pntCenter;
 
         // --------------------------------------------------------------------
@@ -279,173 +195,51 @@ class TCircleWidget : public TBaseWidget
         // --------------------------------------------------------------------
         RTTIDefs(TCircleWidget,TBaseWidget)
         DefPolyDup(TCircleWidget)
-        BefriendFactory(TCircleWidget)
 };
 
 
 
 // ----------------------------------------------------------------------------
-//   CLASS: TBoxWidget
+//   CLASS: TFilledCircleWidget
 //  PREFIX: wid
 // ----------------------------------------------------------------------------
-class TBoxWidget : public TBaseWidget
+class TFilledCircleWidget : public TCircleWidget
 {
     public  :
         // --------------------------------------------------------------------
         //  Public constructors and destructors
         // --------------------------------------------------------------------
-        TBoxWidget(const TPoint& pntUL, const TPoint& pntLR) :
+        TFilledCircleWidget() = default;
+        TFilledCircleWidget(const   TPoint&         pntCenter
+                            , const tCIDLib::TCard4 c4Radius
+                            , const TRGBClr&        rgbFill) :
 
-            m_pntUL(pntUL)
-            , m_pntLR(pntLR)
-        {}
-
-        TBoxWidget(const TBoxWidget& widToCopy) :
-
-            m_pntUL(widToCopy.m_pntUL)
-            , m_pntLR(widToCopy.m_pntLR)
-        {}
-
-        ~TBoxWidget() {}
-
-
-        // --------------------------------------------------------------------
-        //  Public operators
-        // --------------------------------------------------------------------
-        TBoxWidget& operator=(const TBoxWidget& widToAssign)
-        {
-            m_pntUL = widToAssign.m_pntUL;
-            m_pntLR = widToAssign.m_pntLR;
-            return *this;
-        }
-
-        // --------------------------------------------------------------------
-        //  Public, inherited methods
-        // --------------------------------------------------------------------
-        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
-        {
-            strmToWriteTo   << TParent::Draw(strmToWriteTo)
-                            << L"Corners: {" << m_pntUL
-                            << L"," << m_pntLR << L"}";
-            return strmToWriteTo;
-        }
-
-
-    protected   :
-        // --------------------------------------------------------------------
-        //  Hidden constructors
-        // --------------------------------------------------------------------
-        TBoxWidget() :
-
-            m_pntUL(0, 0)
-            , m_pntLR(1, 1)
-        {}
-
-
-        // --------------------------------------------------------------------
-        //  Protected, implemented methods
-        // --------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
-        {
-            strmToReadFrom >> m_pntUL >> m_pntLR;
-        }
-
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
-        {
-            strmToWriteTo << m_pntUL << m_pntLR;
-        }
-
-
-    private :
-        // --------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_pntUL
-        //  m_pntLR
-        //      The points that the line draws from and to.
-        // --------------------------------------------------------------------
-        TPoint  m_pntUL;
-        TPoint  m_pntLR;
-
-        // --------------------------------------------------------------------
-        //  Magic macros
-        // --------------------------------------------------------------------
-        RTTIDefs(TBoxWidget,TBaseWidget)
-        DefPolyDup(TBoxWidget)
-        BefriendFactory(TBoxWidget)
-};
-
-
-
-
-// ----------------------------------------------------------------------------
-//   CLASS: TFilledBoxWidget
-//  PREFIX: wid
-// ----------------------------------------------------------------------------
-class TFilledBoxWidget : public TBoxWidget
-{
-    public  :
-        // --------------------------------------------------------------------
-        //  Public constructors and destructors
-        // --------------------------------------------------------------------
-        TFilledBoxWidget(   const   TPoint&     pntUL
-                            , const TPoint&     pntLL
-                            , const TRGBClr&    rgbFill) :
-
-            TBoxWidget(pntUL, pntLL)
+            TParent(pntCenter, c4Radius)
             , m_rgbFill(rgbFill)
         {}
 
-        TFilledBoxWidget(const TFilledBoxWidget& widToCopy) :
-
-            TBoxWidget(widToCopy)
-            , m_rgbFill(widToCopy.m_rgbFill)
-        {}
-
-        ~TFilledBoxWidget() {}
-
-
-        // --------------------------------------------------------------------
-        //  Public operators
-        // --------------------------------------------------------------------
-        TFilledBoxWidget& operator=(const TFilledBoxWidget& widToAssign)
-        {
-            TParent::operator=(widToAssign);
-            m_rgbFill = widToAssign.m_rgbFill;
-            return *this;
-        }
 
         // --------------------------------------------------------------------
         //  Public, inherited methods
         // --------------------------------------------------------------------
-        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
+        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const final
         {
-            TParent::Draw(strmToWriteTo);
-            strmToWriteTo << L", Fill Color: " << m_rgbFill;
+            TParent::Draw(strmToWriteTo) << L", Fill Color: " << m_rgbFill;
             return strmToWriteTo;
         }
 
 
     protected   :
         // --------------------------------------------------------------------
-        //  Hidden constructors
-        // --------------------------------------------------------------------
-        TFilledBoxWidget() :
-
-            m_rgbFill(0xFF, 0xFF, 0xFF)
-        {}
-
-
-        // --------------------------------------------------------------------
         //  Protected, implemented methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
+        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom) final
         {
             TParent::StreamFrom(strmToReadFrom);
             strmToReadFrom >> m_rgbFill;
         }
 
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
+        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const final
         {
             TParent::StreamTo(strmToWriteTo);
             strmToWriteTo << m_rgbFill;
@@ -465,104 +259,8 @@ class TFilledBoxWidget : public TBoxWidget
         // --------------------------------------------------------------------
         //  Magic macros
         // --------------------------------------------------------------------
-        RTTIDefs(TFilledBoxWidget,TBoxWidget)
-        DefPolyDup(TFilledBoxWidget)
-        BefriendFactory(TFilledBoxWidget)
+        RTTIDefs(TFilledCircleWidget,TCircleWidget)
+        DefPolyDup(TFilledCircleWidget)
 };
 
-
-
-// ----------------------------------------------------------------------------
-//   CLASS: TTextWidget
-//  PREFIX: wid
-// ----------------------------------------------------------------------------
-class TTextWidget : public TBaseWidget
-{
-    public  :
-        // --------------------------------------------------------------------
-        //  Public constructors and destructors
-        // --------------------------------------------------------------------
-        TTextWidget(const TPoint& pntLL, const TString& strText) :
-
-            m_pntLL(pntLL)
-            , m_strText(strText)
-        {}
-
-        TTextWidget(const TTextWidget& widToCopy) :
-
-            m_pntLL(widToCopy.m_pntLL)
-            , m_strText(widToCopy.m_strText)
-        {}
-
-        ~TTextWidget() {}
-
-
-        // --------------------------------------------------------------------
-        //  Public operators
-        // --------------------------------------------------------------------
-        TTextWidget& operator=(const TTextWidget& widToAssign)
-        {
-            TParent::operator=(widToAssign);
-            m_pntLL = widToAssign.m_pntLL;
-            m_strText = widToAssign.m_strText;
-            return *this;
-        }
-
-        // --------------------------------------------------------------------
-        //  Public, inherited methods
-        // --------------------------------------------------------------------
-        TTextOutStream& Draw(TTextOutStream& strmToWriteTo) const
-        {
-            TParent::Draw(strmToWriteTo);
-            strmToWriteTo << L"Text: " << m_strText
-                          << L", LLeft: " << m_pntLL;
-            return strmToWriteTo;
-        }
-
-
-    protected   :
-        // --------------------------------------------------------------------
-        //  Hidden constructors
-        // --------------------------------------------------------------------
-        TTextWidget()
-        {}
-
-
-        // --------------------------------------------------------------------
-        //  Protected, implemented methods
-        // --------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
-        {
-            strmToReadFrom >> m_strText
-                           >> m_pntLL;
-        }
-
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
-        {
-            strmToWriteTo << m_strText
-                          << m_pntLL;
-        }
-
-
-    private :
-        // --------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_pntLL
-        //      The lower left corner to draw the text at.
-        //
-        //  m_strText
-        //      The text to display.
-        // --------------------------------------------------------------------
-        TPoint  m_pntLL;
-        TString m_strText;
-
-
-        // --------------------------------------------------------------------
-        //  Magic macros
-        // --------------------------------------------------------------------
-        RTTIDefs(TTextWidget,TBaseWidget)
-        DefPolyDup(TTextWidget)
-        BefriendFactory(TTextWidget)
-};
 

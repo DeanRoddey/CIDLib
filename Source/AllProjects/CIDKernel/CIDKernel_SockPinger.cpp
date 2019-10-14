@@ -1,9 +1,9 @@
 //
-// FILE NAME: CIDKernel_SockPinger_Win32.Cpp
+// FILE NAME: CIDKernel_SockPinger.Cpp
 //
 // AUTHOR: Dean Roddey
 //
-// CREATED: 04/10/2012
+// CREATED: 10/13/2019
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
@@ -15,8 +15,10 @@
 //
 // DESCRIPTION:
 //
-//  This file provides the Win32 specific implementation of the TKrnlSockPinger
-//  class.
+//  This file implements the TKrnlSockPinger class. This was moved up to the
+//  platform independent layer to reduce the amount of per-platform code. With
+//  just a specialize init method on the socket class provided per-platform,
+//  we can handle the rest here.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -25,12 +27,11 @@
 //  $_CIDLib_Log_$
 //
 
+
 // ---------------------------------------------------------------------------
-//  Includes
+//  Facility specific includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
-#include    "CIDKernel_InternalHelpers_.hpp"
-#include    <ws2tcpip.h>
 
 
 // ---------------------------------------------------------------------------
@@ -86,6 +87,17 @@ struct icmp_echohdr
 };
 
 
+// A simple structure to hold a V6 address and access in two ways
+struct in6_addr
+{
+    union
+    {
+        UCHAR       Byte[16];
+        USHORT      Word[8];
+    } u;
+};
+
+
 // IPv6 protocol header
 struct ipv6_hdr
 {
@@ -132,10 +144,6 @@ struct icmpv6_echohdr
 #define IP_RECORD_ROUTE             0x7
 
 
-// ICMP6 protocol value (used in the socket call and IPv6 header)
-#define IPPROTO_ICMP6               58
-
-
 // ICMP types and codes
 #define ICMPV4_ECHO_REQUEST_TYPE    8
 #define ICMPV4_ECHO_REQUEST_CODE    0
@@ -154,20 +162,6 @@ struct icmpv6_echohdr
 // Error msg types
 #define ICMPV4_ERROR_REPLY_TYPE     3
 #define ICMPV6_ERROR_REPLY_TYPE     1
-
-
-
-// For our own purposes, our internal version of the class' context data
-struct TPingCtxData
-{
-    SOCKET              sTarget;
-
-    SOCKADDR_STORAGE    LocalAddr;
-    DWORD               c4LocalSz;
-
-    SOCKADDR_STORAGE    RemAddr;
-    DWORD               c4RemSz;
-};
 
 #pragma CIDLIB_POPPACK
 
@@ -207,12 +201,15 @@ TKrnlSockPinger::TKrnlSockPinger() :
 
     m_c2Id(0)
     , m_c2SeqNum(1)
+    , m_c4LocalAddrSz(0)
     , m_c4PacketLen(0)
-    , m_c4TTL(128)
+    , m_c4RemAddrSz(0)
     , m_enctLastTime(0)
     , m_eState(tCIDSock::EPingStates::WaitInit)
     , m_pc1Buf(nullptr)
-    , m_pContext(nullptr)
+    , m_ippnLocal(0)
+    , m_pc1LocalAddr(nullptr)
+    , m_pc1RemAddr(nullptr)
 {
     //
     //  Get a unique id for this pinger object. Wrap it if it gets close to
@@ -228,30 +225,12 @@ TKrnlSockPinger::TKrnlSockPinger() :
     if (c4Id >= 0xFFA0)
         s_scntIds.c4SetValue(1);
     m_c2Id = tCIDLib::TCard2(c4Id);
-
-    // Set up our context info
-    TPingCtxData* pCtx = new TPingCtxData;
-    pCtx->sTarget = 0;
-    pCtx->c4LocalSz = 0;
-    m_pContext = pCtx;
 }
 
 TKrnlSockPinger::~TKrnlSockPinger()
 {
-    // Clean up our context data
-    if (m_pContext)
-    {
-        TPingCtxData* pCtx = static_cast<TPingCtxData*>(m_pContext);
-
-        // Call our own termination method to make sure all is cleaned up
-        bTerminate();
-
-        delete pCtx;
-        m_pContext = nullptr;
-    }
-
-    // Clean up our buffer
-    delete [] m_pc1Buf;
+    // Call our own termination method to make sure all is cleaned up
+    bTerminate();
 }
 
 
@@ -269,13 +248,6 @@ TKrnlSockPinger::~TKrnlSockPinger()
 tCIDLib::TBoolean
 TKrnlSockPinger::bCancelReply(const tCIDLib::TBoolean bResetStamp)
 {
-    // Make sure our context has been set
-    if (!m_pContext)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSPing_NoCtxInfo);
-        return kCIDLib::False;
-    }
-
     // Make sure we are initialized
     if (m_eState == tCIDSock::EPingStates::WaitInit)
     {
@@ -299,14 +271,12 @@ TKrnlSockPinger::bCancelReply(const tCIDLib::TBoolean bResetStamp)
 //  Set us up to ping a specific target address. They can optinally provide a
 //  source address to bind to. if not, we do a default bind.
 //
-tCIDLib::TBoolean TKrnlSockPinger::bInitialize(const TKrnlIPAddr& kipaTarget)
+tCIDLib::TBoolean
+TKrnlSockPinger::bInitialize(const  TKrnlIPAddr&        kipaRemote
+                            , const tCIDLib::TCard4     c4TTL)
 {
-    // Make sure our context has been set
-    if (!m_pContext)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSPing_NoCtxInfo);
-        return kCIDLib::False;
-    }
+    // If we don't get out of here successfully, then call terminate
+    TLambdaJan janCleanup([this]() { this->bTerminate(); });
 
     // Make sure we are not already initialized
     if (m_eState != tCIDSock::EPingStates::WaitInit)
@@ -316,99 +286,57 @@ tCIDLib::TBoolean TKrnlSockPinger::bInitialize(const TKrnlIPAddr& kipaTarget)
         return kCIDLib::False;
     }
 
-    // Store the incoming remote address
-    m_kipaTar = kipaTarget;
+    // Store the incoming remote address info
+    m_kipaRemote = kipaRemote;
 
-    // Get the context data now and set us up
-    TPingCtxData* pCtx = static_cast<TPingCtxData*>(m_pContext);
-
-    // Initialize info in the context for a new round
-    pCtx->c4LocalSz = 0;
-    pCtx->c4RemSz = 0;
-    TRawMem::SetMemBuf(&pCtx->LocalAddr, tCIDLib::TCard1(0), sizeof(pCtx->LocalAddr));
-    TRawMem::SetMemBuf(&pCtx->RemAddr, tCIDLib::TCard1(0), sizeof(pCtx->RemAddr));
+    // Remember if it's a V6 type
+    m_bV6Target = m_kipaRemote.eType() == tCIDSock::EAddrTypes::IPV6;
 
     //
-    //  We'll need the destination address bytes for sending requests, and we'll need
-    //  it in V6 for the checksum.
+    //  Set up our socket as a raw type. The protocol is 4/6 mode specific,
+    //  so that's driven by the target address.
     //
-    pCtx->c4RemSz = sizeof(pCtx->RemAddr);
-    tCIDLib::TIPPortNum ippnRem = 0;
-    if (!m_kipaTar.bToSockAddr(&pCtx->RemAddr, pCtx->c4RemSz, ippnRem))
+    const tCIDLib::TBoolean bRes = m_ksockPing.bCreate
+    (
+        tCIDSock::ESocketTypes::Raw
+        , m_bV6Target ? tCIDSock::ESockProtos::ICMP6 : tCIDSock::ESockProtos::ICMP
+        , m_kipaRemote.eType()
+    );
+
+    //
+    //  Get a local binding appropriate for the target address. Set remote port to
+    //  zero.
+    //
+    if (!m_ksockPing.bBindForRemote(m_kipaRemote, 0))
         return kCIDLib::False;
 
+    // Get the local address we bound to
+    TKrnlIPAddr kipaLocal;
+    if (!m_ksockPing.bLocalEndPoint(m_ippnLocal, m_kipaLocal))
+        return kCIDLib::False;
+
+    // Set the TTL we got
+    if (!m_ksockPing.bSetSockOpt(TKrnlSocket::EISockOpts::TTL, c4TTL))
+        return kCIDLib::False;
+
+    // Calculate our packet length and allocate our data buffer
     m_c4PacketLen = 0;
-    int iProto;
-    int iFamily;
-    if (m_kipaTar.eType() == tCIDSock::EAddrTypes::IPV4)
-    {
-        iFamily = AF_INET;
-        iProto = IPPROTO_ICMP;
+    if (m_kipaRemote.eType() == tCIDSock::EAddrTypes::IPV4)
         m_c4PacketLen = sizeof(icmp_echohdr);
-    }
-     else
-    {
-        iFamily = AF_INET6;
-        iProto = IPPROTO_ICMP6;
+    else
         m_c4PacketLen = sizeof(icmpv6_echohdr);
-    }
-
-    // Add the payload data size to the packet len
     m_c4PacketLen += CIDKernel_SockPinger_Win32::c4PLBytes;
-
-    // Allocate our buffer and zero it out
     m_pc1Buf = new tCIDLib::TCard1[m_c4PacketLen];
-    TRawMem::SetMemBuf(m_pc1Buf, tCIDLib::TCard1(0), m_c4PacketLen);
-
-    // Let's open up the socket
-    pCtx->sTarget = ::socket(iFamily, SOCK_RAW, iProto);
-    if (!pCtx->sTarget)
-    {
-        tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSPing_InitSocket, c4LastErr);
-        return kCIDLib::False;
-    }
-
-    // Set the time to live if it is supported. If not we keep going
-    SetTTL();
-
-    //
-    //  Figure out what local IP address we should use for the target address. Store
-    //  that in the context. For V6 we'll also need it for the checksum.
-    //
-    if (::WSAIoctl( pCtx->sTarget
-                    , SIO_ROUTING_INTERFACE_QUERY
-                    , &pCtx->RemAddr
-                    , pCtx->c4RemSz
-                    , (SOCKADDR*)&pCtx->LocalAddr
-                    , sizeof(pCtx->LocalAddr)
-                    , &pCtx->c4LocalSz
-                    , 0
-                    , 0) == SOCKET_ERROR)
-    {
-        ::closesocket(pCtx->sTarget);
-        pCtx->sTarget = 0;
-
-        tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_GetLocalAddr, c4LastErr);
-        return kCIDLib::False;
-    }
-
-    // And now let's do our local bind to a default local port
-    if (::bind(pCtx->sTarget, (SOCKADDR*)&pCtx->LocalAddr, pCtx->c4LocalSz) == SOCKET_ERROR)
-    {
-        tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSPing_Bind, c4LastErr);
-
-        // Clean up the socket now since we failed
-        ::closesocket(pCtx->sTarget);
-        pCtx->sTarget = 0;
-
-        return kCIDLib::False;
-    }
 
     // Set up the headers for the settings we have now
     InitHeader();
+
+    //
+    //  Set up some data based on src/target addresses and such, so that we don't
+    //  have to repeatedly set them up. Ports don't matter here.
+    //
+    m_pc1LocalAddr = m_kipaLocal.pc1ToSockAddr(m_c4LocalAddrSz, 0);
+    m_pc1RemAddr = m_kipaRemote.pc1ToSockAddr(m_c4RemAddrSz, 0);
 
     //
     //  And now put our state to idle, and set the last request time to zero,
@@ -416,6 +344,9 @@ tCIDLib::TBoolean TKrnlSockPinger::bInitialize(const TKrnlIPAddr& kipaTarget)
     //
     m_eState = tCIDSock::EPingStates::Idle;
     m_enctLastTime = 0;
+
+    // We survived, so release the cleanup janitor
+    janCleanup.Orphan();
 
     return kCIDLib::True;
 }
@@ -430,13 +361,6 @@ tCIDLib::TBoolean TKrnlSockPinger::bInitialize(const TKrnlIPAddr& kipaTarget)
 //
 tCIDLib::TBoolean TKrnlSockPinger::bSendRequest()
 {
-    // Make sure our context has been set
-    if (!m_pContext)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSPing_NoCtxInfo);
-        return kCIDLib::False;
-    }
-
     if ((m_eState != tCIDSock::EPingStates::Idle)
     &&  (m_eState != tCIDSock::EPingStates::WaitReply))
     {
@@ -444,30 +368,14 @@ tCIDLib::TBoolean TKrnlSockPinger::bSendRequest()
         return kCIDLib::False;
     }
 
-    // Get the context data ready for use below
-    TPingCtxData* pCtx = static_cast<TPingCtxData*>(m_pContext);
-
     // Set the next sequence number and compute the check sum
     SetSequence();
     ComputeChecksum();
 
-    // And now send the buffer
-    const tCIDLib::TSInt iRet = ::sendto
-    (
-        pCtx->sTarget
-        , (char*)m_pc1Buf
-        , m_c4PacketLen
-        , 0
-        , reinterpret_cast<sockaddr*>(&pCtx->RemAddr)
-        , pCtx->c4RemSz
-    );
-
-    if (iRet == SOCKET_ERROR)
-    {
-        tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSPing_SendReq, c4LastErr);
+    // And now send the buffer, using a zero port
+    tCIDLib::TCard4 c4Sent;
+    if (!m_ksockPing.bSendTo(m_pc1Buf, m_c4PacketLen, c4Sent, m_kipaRemote, 0))
         return kCIDLib::False;
-    }
 
     //
     //  Put our state to waiting for a reply and set the last request time
@@ -487,24 +395,20 @@ tCIDLib::TBoolean TKrnlSockPinger::bSendRequest()
 //
 tCIDLib::TBoolean TKrnlSockPinger::bTerminate()
 {
-    // Make sure our context has been set
-    if (!m_pContext)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSPing_NoCtxInfo);
-        return kCIDLib::False;
-    }
+    // IF we got the socket open, then close it first
+    tCIDLib::TBoolean bOpen;
+    if (m_ksockPing.bIsOpen(bOpen) && bOpen)
+        m_ksockPing.bClose();
 
-    // Get the context data to its real type and clean up
-    TPingCtxData* pCtx = static_cast<TPingCtxData*>(m_pContext);
-    if (pCtx->sTarget)
-    {
-        ::closesocket(pCtx->sTarget);
-        pCtx->sTarget = 0;
-    }
-
-    // Clean up the memory buffer
+    // Clean up the ping data buffer
     delete [] m_pc1Buf;
-    m_pc1Buf = 0;
+    m_pc1Buf = nullptr;
+
+    // Delete our address buffers
+    delete [] m_pc1LocalAddr;
+    m_pc1LocalAddr = nullptr;
+    delete [] m_pc1RemAddr;
+    m_pc1RemAddr = nullptr;
 
     // Make sure our state and other per-run stuff gets reset
     m_eState = tCIDSock::EPingStates::WaitInit;
@@ -512,22 +416,6 @@ tCIDLib::TBoolean TKrnlSockPinger::bTerminate()
     m_c4PacketLen = 0;
 
     return kCIDLib::True;
-}
-
-
-// Get/set the time to live value
-tCIDLib::TCard4 TKrnlSockPinger::c4TTL() const
-{
-    return m_c4TTL;
-}
-
-tCIDLib::TCard4 TKrnlSockPinger::c4TTL(const tCIDLib::TCard4 c4ToSet)
-{
-    if (c4ToSet > 512)
-        m_c4TTL = 512;
-    else
-        m_c4TTL = c4ToSet;
-    return m_c4TTL;
 }
 
 
@@ -555,13 +443,6 @@ TKrnlSockPinger::eWaitRep(  const   tCIDLib::TCard4     c4WaitFor
                             ,       tCIDLib::TCard4&    c4RepBytes
                             ,       TKrnlIPAddr&        kipaFrom)
 {
-    // Make sure our context has been set
-    if (!m_pContext)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSPing_NoCtxInfo);
-        return tCIDSock::EPingRes::Error;
-    }
-
     // Make sure we are waiting for a reply
     if (m_eState != tCIDSock::EPingStates::WaitReply)
     {
@@ -569,62 +450,35 @@ TKrnlSockPinger::eWaitRep(  const   tCIDLib::TCard4     c4WaitFor
         return tCIDSock::EPingRes::Error;
     }
 
-    TPingCtxData* pCtx = static_cast<TPingCtxData*>(m_pContext);
-
-    // Wait for up to the indicted time for the socket to be data ready
-    fd_set FDRead;
-    FDRead.fd_count = 1;
-    FDRead.fd_array[0] = pCtx->sTarget;
-
-    timeval WTime;
-    timeval* pWTime = 0;
-
-    WTime.tv_sec = tCIDLib::TCard4(c4WaitFor / 1000);
-    WTime.tv_usec = tCIDLib::TCard4
-    (
-        (c4WaitFor - (WTime.tv_sec * 1000)) * 1000
-    );
-    pWTime = &WTime;
-
-    // And now do the select statement
-    const tCIDLib::TSInt iCount = ::select(0, &FDRead, 0, 0, pWTime);
-    if (iCount == SOCKET_ERROR)
-    {
-        tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
-        TKrnlError::SetLastKrnlError(TKrnlIP::c4XlatError(c4LastErr), c4LastErr);
+    //
+    //  We need to wait for data to become available, up to the indicated amount
+    //  of time. The higher level code will actually call us for short periods of
+    //  time in a loop so that he can watch for shutdown requests.
+    //
+    tCIDLib::TBoolean bGotData;
+    if (!m_ksockPing.bWaitForDataReady(bGotData, c4RepMSs * kCIDLib::enctOneMilliSec))
         return tCIDSock::EPingRes::Error;
-    }
 
-    if (iCount == 1)
+    // If no data, we timed out, so return that status
+    if (!bGotData)
+        return tCIDSock::EPingRes::Timeout;
+
+    // Let's read the reply
+    tCIDSock::EPingRes eRes = eReadReply(c4RepBytes, kipaFrom);
+    if (eRes == tCIDSock::EPingRes::Success)
     {
-        // Read the message in
-        const tCIDSock::EPingRes eRes = eReadReply(c4RepBytes, kipaFrom);
-        if (eRes == tCIDSock::EPingRes::Success)
-        {
-            // We got something, so reset our state
-            m_eState = tCIDSock::EPingStates::Idle;
+        // We got something, so reset our state
+        m_eState = tCIDSock::EPingStates::Idle;
 
-            // Return the millis between request and reception
-            c4RepMSs = tCIDLib::TCard4
-            (
-                (TKrnlTimeStamp::enctNow() - m_enctLastTime) / kCIDLib::enctOneMilliSec
-            );
-        }
-
-        // And reset our last time stamp to now
-        m_enctLastTime = TKrnlTimeStamp::enctNow();
-        return eRes;
+        // Return the millis between request and reception
+        c4RepMSs = tCIDLib::TCard4
+        (
+            (TKrnlTimeStamp::enctNow() - m_enctLastTime) / kCIDLib::enctOneMilliSec
+        );
     }
 
-    // We timed out waiting, so nothing yet
-    return tCIDSock::EPingRes::Timeout;
-}
-
-
-// Provide access to the target IP address
-const TKrnlIPAddr& TKrnlSockPinger::ipaTar() const
-{
-    return m_kipaTar;
+    m_enctLastTime = TKrnlTimeStamp::enctNow();
+    return eRes;
 }
 
 
@@ -666,12 +520,10 @@ TKrnlSockPinger::c2CheckSum(const   tCIDLib::TCard1* const  pc1Src
 }
 
 
-//
-//  Sets up the checksum for our next outgoing packet
-//
+// Sets up the checksum for our next outgoing packet
 tCIDLib::TVoid TKrnlSockPinger::ComputeChecksum()
 {
-    if (m_kipaTar.eType() == tCIDSock::EAddrTypes::IPV4)
+    if (m_kipaRemote.eType() == tCIDSock::EAddrTypes::IPV4)
     {
         icmp_hdr* pHdr = (icmp_hdr*)m_pc1Buf;
 
@@ -688,20 +540,21 @@ tCIDLib::TVoid TKrnlSockPinger::ComputeChecksum()
         tCIDLib::TCard1*    pc1BufPtr = ac1Buf;
         tCIDLib::TCard4     c4Total = 0;
 
-        TPingCtxData* pCtx = static_cast<TPingCtxData*>(m_pContext);
-
         // Copy source address
-        TRawMem::CopyMemBuf(pc1BufPtr, &pCtx->LocalAddr, pCtx->c4LocalSz);
-        pc1BufPtr += pCtx->c4LocalSz;
-        c4Total += pCtx->c4LocalSz;
+        TRawMem::CopyMemBuf(pc1BufPtr, &m_pc1LocalAddr, m_c4LocalAddrSz);
+        pc1BufPtr += m_c4LocalAddrSz;
+        c4Total += m_c4LocalAddrSz;
 
         // Copy destination address
-        TRawMem::CopyMemBuf(pc1BufPtr, &pCtx->RemAddr, pCtx->c4RemSz);
-        pc1BufPtr += pCtx->c4RemSz;
-        c4Total += pCtx->c4RemSz;
+        TRawMem::CopyMemBuf(pc1BufPtr, &m_pc1RemAddr, m_c4RemAddrSz);
+        pc1BufPtr += m_c4RemAddrSz;
+        c4Total += m_c4RemAddrSz;
 
         // Copy ICMP packet length
-        tCIDLib::TCard4 c4NetLen = htonl(m_c4PacketLen);
+        tCIDLib::TCard4 c4NetLen = m_c4PacketLen;
+        #if CID_LITTLE_ENDIAN
+        c4NetLen = TRawBits::c4SwapBytes(c4NetLen);
+        #endif
         TRawMem::CopyMemBuf(pc1BufPtr, &c4NetLen, sizeof(c4NetLen));
         pc1BufPtr += sizeof(c4NetLen);
         c4Total += sizeof(c4NetLen);
@@ -711,8 +564,8 @@ tCIDLib::TVoid TKrnlSockPinger::ComputeChecksum()
         pc1BufPtr += 3;
         c4Total += 3;
 
-        // Copy next hop header
-        *pc1BufPtr = tCIDLib::TCard1(IPPROTO_ICMP6);
+        // Copy next hop header (IPPROTO_ICMP)
+        *pc1BufPtr = tCIDLib::TCard1(58);
         pc1BufPtr++;
         c4Total++;
 
@@ -721,6 +574,7 @@ tCIDLib::TVoid TKrnlSockPinger::ComputeChecksum()
         pc1BufPtr += m_c4PacketLen;
         c4Total += m_c4PacketLen;
 
+        // And zero pad to nearest 64 bit boundary
         for(tCIDLib::TCard4 c4Index = 0; c4Index < m_c4PacketLen % 2 ; c4Index++)
         {
             *pc1BufPtr++ = 0;
@@ -740,52 +594,34 @@ tCIDLib::TVoid TKrnlSockPinger::ComputeChecksum()
 
 
 //
-//  Reads in a reply once we see that data is ready, and does basic validation
-//  of the reply.
+//  We assume the caller has determined that data is available. And it should be
+//  a ping packet unless something is really wrong. We read the available data
+//  into m_pc1Buf and return the bytes and the source address
 //
 tCIDSock::EPingRes
 TKrnlSockPinger::eReadReply(tCIDLib::TCard4& c4RepBytes, TKrnlIPAddr& kipaFrom)
 {
-    c4RepBytes = 0;
-    tCIDLib::TCard1 ac1InBuf[4096];
+    // A buffer way bigger enough
+    const tCIDLib::TCard4 c4MaxBufSize(4096);
+    tCIDLib::TCard1 ac1InBuf[c4MaxBufSize];
 
-    SOCKADDR_STORAGE AddrStore = {0};
-    sockaddr* pAddr = reinterpret_cast<sockaddr*>(&AddrStore);
-    if (m_kipaTar.eType() == tCIDSock::EAddrTypes::IPV4)
-        pAddr->sa_family = AF_INET;
-    else
-        pAddr->sa_family = AF_INET6;
-    int iLen = sizeof(AddrStore);
-
-    TPingCtxData* pCtx = static_cast<TPingCtxData*>(m_pContext);
-    const tCIDLib::TCard4 c4Flags = 0;
-    const tCIDLib::TSInt iRet = ::recvfrom
+    tCIDLib::TIPPortNum ippnFrom;
+    const tCIDLib::TBoolean bRes = m_ksockPing.bReceiveFrom
     (
-        pCtx->sTarget
-        , reinterpret_cast<char*>(ac1InBuf)
-        , 4096
-        , c4Flags
-        , reinterpret_cast<sockaddr*>(&AddrStore)
-        , &iLen
+        ac1InBuf, c4MaxBufSize, c4RepBytes, kipaFrom, ippnFrom
     );
 
-    if (iRet == SOCKET_ERROR)
-    {
-        tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSPing_ReadRep, c4LastErr);
+    if (!bRes)
         return tCIDSock::EPingRes::Error;
-    }
 
-    // Process the buffer and make sure its correct
-    const tCIDLib::TCard4 c4PackSz = static_cast<tCIDLib::TCard4>(iRet);
 
     // Figure out the msg type
     tCIDLib::TCard1     c1MsgType;
     tCIDLib::TCard2     c2MsgId;
     tCIDLib::TCard2     c2MsgSeq;
-    tCIDLib::TCard1*    pc1Data = 0;
+    tCIDLib::TCard1*    pc1Data = nullptr;
 
-    if (m_kipaTar.eType() == tCIDSock::EAddrTypes::IPV4)
+    if (m_kipaRemote.eType() == tCIDSock::EAddrTypes::IPV4)
     {
         icmp_echohdr* pHdr = reinterpret_cast<icmp_echohdr*>(ac1InBuf + sizeof(ip_hdr));
         c1MsgType = pHdr->icmp_type;
@@ -838,15 +674,15 @@ TKrnlSockPinger::eReadReply(tCIDLib::TCard4& c4RepBytes, TKrnlIPAddr& kipaFrom)
     //  It seems to be an echo response, so check the number of reply bytes we
     //  got back and return that count as well, if we end up returning success.
     //
-    if (m_kipaTar.eType() == tCIDSock::EAddrTypes::IPV4)
+    if (m_kipaRemote.eType() == tCIDSock::EAddrTypes::IPV4)
     {
-        if (c4PackSz > CIDKernel_SockPinger_Win32::c4V4NonData)
-            c4RepBytes = c4PackSz - CIDKernel_SockPinger_Win32::c4V4NonData;
+        if (c4RepBytes > CIDKernel_SockPinger_Win32::c4V4NonData)
+            c4RepBytes = c4RepBytes - CIDKernel_SockPinger_Win32::c4V4NonData;
     }
      else
     {
-        if (c4PackSz > CIDKernel_SockPinger_Win32::c4V6NonData)
-            c4RepBytes = c4PackSz - CIDKernel_SockPinger_Win32::c4V6NonData;
+        if (c4RepBytes > CIDKernel_SockPinger_Win32::c4V6NonData)
+            c4RepBytes = c4RepBytes - CIDKernel_SockPinger_Win32::c4V6NonData;
     }
 
     if (c4RepBytes != CIDKernel_SockPinger_Win32::c4PLBytes)
@@ -856,8 +692,7 @@ TKrnlSockPinger::eReadReply(tCIDLib::TCard4& c4RepBytes, TKrnlIPAddr& kipaFrom)
     }
 
     // Check that the returned bytes have the values we sent out
-    for (tCIDLib::TCard4 c4Index = 0;
-                    c4Index < CIDKernel_SockPinger_Win32::c4PLBytes; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4RepBytes; c4Index++)
     {
         if (*pc1Data != CIDKernel_SockPinger_Win32::c1PLData)
         {
@@ -870,13 +705,8 @@ TKrnlSockPinger::eReadReply(tCIDLib::TCard4& c4RepBytes, TKrnlIPAddr& kipaFrom)
         pc1Data++;
     }
 
-    // It looks like our guy, so give back the from address
-    tCIDLib::TIPPortNum ippnFrom;
-    kipaFrom.bFromSockAddr(pAddr, sizeof(AddrStore), ippnFrom);
-
     return tCIDSock::EPingRes::Success;
 }
-
 
 
 //
@@ -887,7 +717,7 @@ TKrnlSockPinger::eReadReply(tCIDLib::TCard4& c4RepBytes, TKrnlIPAddr& kipaFrom)
 //
 tCIDLib::TVoid TKrnlSockPinger::InitHeader()
 {
-    if (m_kipaTar.eType() == tCIDSock::EAddrTypes::IPV4)
+    if (m_kipaRemote.eType() == tCIDSock::EAddrTypes::IPV4)
     {
         icmp_echohdr* pHdr = (icmp_echohdr*)m_pc1Buf;
 
@@ -897,7 +727,6 @@ tCIDLib::TVoid TKrnlSockPinger::InitHeader()
         pHdr->icmp_checksum  = 0;
         pHdr->icmp_sequence  = 0;
 
-        // Place some junk in the buffer.
         tCIDLib::TCard1* pc1Data = m_pc1Buf + sizeof(icmp_echohdr);
         TRawMem::SetMemBuf
         (
@@ -941,7 +770,7 @@ tCIDLib::TVoid TKrnlSockPinger::SetSequence()
     if (m_c2SeqNum == 0xFFFF)
         m_c2SeqNum++;
 
-    if (m_kipaTar.eType() == tCIDSock::EAddrTypes::IPV4)
+    if (m_kipaRemote.eType() == tCIDSock::EAddrTypes::IPV4)
     {
         icmp_echohdr* pHdr = (icmp_echohdr*)m_pc1Buf;
         pHdr->icmp_sequence = ++m_c2SeqNum;
@@ -952,39 +781,4 @@ tCIDLib::TVoid TKrnlSockPinger::SetSequence()
         phdr->icmp6_sequence = ++m_c2SeqNum;
     }
 }
-
-
-
-//
-//  Set the time to live that the client indicated (or default.) Since it
-//  might not be supported, we don't report an error if it fails. The default
-//  should generally be fine anyway.
-//
-tCIDLib::TVoid TKrnlSockPinger::SetTTL()
-{
-    int iLevel;
-    int iOpt;
-
-    if (m_kipaTar.eType() == tCIDSock::EAddrTypes::IPV4)
-    {
-        iLevel = IPPROTO_IP;
-        iOpt = IP_TTL;
-    }
-      else if (m_kipaTar.eType() == tCIDSock::EAddrTypes::IPV6)
-    {
-        iLevel = IPPROTO_IPV6;
-        iOpt = IPV6_UNICAST_HOPS;
-    }
-
-    TPingCtxData* pCtx = static_cast<TPingCtxData*>(m_pContext);
-    ::setsockopt
-    (
-        pCtx->sTarget
-        , iLevel
-        , iOpt
-        , (char *)&m_c4TTL
-        , sizeof(m_c4TTL)
-    );
-}
-
 

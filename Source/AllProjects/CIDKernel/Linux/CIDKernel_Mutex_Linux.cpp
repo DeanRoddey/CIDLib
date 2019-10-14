@@ -1,5 +1,5 @@
 //
-// FILE NAME: CIDKernel_MutexSemaphore_Linux.Cpp
+// FILE NAME: CIDKernel_Mutex_Linux.Cpp
 //
 // AUTHOR: Will Mason
 //
@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd - 2019
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -516,7 +516,7 @@ TKrnlMutex::bCreateNamed(const  tCIDLib::ELockStates    eState
     tCIDLib::TBoolean bOwner = kCIDLib::False;
 
     // We only need to set if we create it
-    bCreated = kCIDLib::False;            
+    bCreated = kCIDLib::False;
 
     tCIDLib::TSInt iTmp = ::semget(key, 1, iFlags);
     if (iTmp == -1)
