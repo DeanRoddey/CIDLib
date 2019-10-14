@@ -15,7 +15,7 @@
 //
 // DESCRIPTION:
 //
-//  This is the header file for the Streams3_Widgets.cpp module. This module
+//  This header file defines some 'widget' classes for this sample to use. It
 //  implements a set of simple classes that derive from a common class. These
 //  classes implement the streamable interface, the polymorphic duplicability
 //  interface, and the required RTTI functionality to be polymorphically
@@ -23,10 +23,10 @@
 //
 //  These classes emulate a set of 'graphic widgets' such as circles, boxes,
 //  lines, etc... They all must implement a Draw() method, which is a
-//  pure virtual in the TBaseWidget class. But, since this is just a TTY
+//  pure virtual in the TBaseWidget class. But, since this is just a console
 //  output program, the 'drawing' is just a matter of outputting the type
-//  of the class plus its data information. The type is output using the
-//  clsIsA() RTTI method.
+//  of the class plus its member data. The type is output using the clsIsA()
+//  RTTI method.
 //
 //  Since TBaseWidget also mixes in MStreamable and MDuplicable, but does not
 //  implement the interface, each derivative must implement them. MStreamable
@@ -34,6 +34,12 @@
 //  supports polymorphic duplication. They all use the DefPolyDup() macro
 //  to implement the default duplication code, which is just a call to their
 //  own copy constructor.
+//
+//  They must have a default ctor, because the polymorphic streaming code
+//  needs to be able to dynamically gen one up when streaming back in. For our
+//  purposes we just let the compiler generate a protected one for us. We could
+//  make them protected and use the BefriendFactory macro to make those available
+//  to the RTTI support for the class.
 //
 //  TFilledCircleWidget is a second level derivative, so note how it calls its
 //  parent's version of everything. The standard RTTI macro create a typedef
@@ -44,8 +50,8 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  Because these are trivial examples, they do not follow the formal
-//      guidelines for style.
+//  1)  Because these are trivial examples, they are fairly lax in terms of
+//      style relative to other CIDLib stuff.
 //
 // LOG:
 //

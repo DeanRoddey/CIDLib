@@ -19,11 +19,11 @@
 //  programs. This one is basically just like the previous version, except
 //  that this one uses smart polymorphic streaming.
 //
-//  When using polymorphic streaming, each object streamed out must also be
+//  When using polymorphic streaming, each object streamed out must be
 //  streamed along with its class information. This allows the code that
 //  streams that objects back in to know what class each stored object is.
 //  It uses this information to create a new object of that type and stream
-//  the stored information inot the new object.
+//  the stored information into the new object.
 //
 //  This extra class information can be a large burden if there are a lot of
 //  objects being streamed (particularly if the object's themselves are
@@ -31,7 +31,7 @@
 //  streaming that can drastically reduce the overhead of streaming out
 //  class information.
 //
-//  The smart polymorphic streamer will maintain a dictionary of types that
+//  The polymorphic streamer will maintain a dictionary of types that
 //  have been streamed. So it knows whether you've streamed an object out
 //  of a particular type. So, instead of writing out full type info, it just
 //  writes out an id value. When reading back in, it reads in the dictionary
@@ -41,8 +41,7 @@
 // CAVEATS/GOTCHAS:
 //
 //  1)  This program is very simple so it does not attempt to be language
-//      independent and it does not provide its own facility object since
-//      it does not need one.
+//      independent and it does not provide its own facility class or object.
 //
 // LOG:
 //
@@ -75,7 +74,7 @@ AdvRTTIDecls(TFilledCircleWidget,TCircleWidget)
 //  TBagOWidgets
 //      This is a convenience typedef for our collection template.
 // ----------------------------------------------------------------------------
-typedef TRefBag<TBaseWidget>   TBagOWidgets;
+
 
 
 // ----------------------------------------------------------------------------
@@ -83,25 +82,6 @@ typedef TRefBag<TBaseWidget>   TBagOWidgets;
 // ----------------------------------------------------------------------------
 tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Streams4MainThread", eMainThreadFunc))
-
-
-// ----------------------------------------------------------------------------
-//  Local functions
-// ----------------------------------------------------------------------------
-
-//
-//  Since this program has no user interaction, we need to have some widgets
-//  to use, as though they were entered by a user in a real drawing program.
-//  So this guy just puts some widgets into the passed collection.
-//
-static tCIDLib::TVoid FillBag(TBagOWidgets& colWidgets)
-{
-    colWidgets.Add(new TLineWidget(TPoint(10, 10), TPoint(100, 100)));
-    colWidgets.Add(new TLineWidget(TPoint(200, 150), TPoint(210, 155)));
-    colWidgets.Add(new TCircleWidget(TPoint(50,150), 25));
-    colWidgets.Add(new TFilledCircleWidget(TPoint(75,100), 80, TRGBClr(0,0,0)));
-    colWidgets.Add(new TLineWidget(TPoint(320, 480), TPoint(20, 15)));
-}
 
 
 // ----------------------------------------------------------------------------
@@ -117,14 +97,21 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     // We need a console to 'draw' our widgets to
      TOutConsole  conOut;
 
-    // Create our bag that we will use to hold the widgets
+    //
+    //  Create our bag that we will use to hold the widgets and load up some test
+    //  widgets into it. Tell it to adopt the widgets we put into it.
+    //
+    using TBagOWidgets = TRefBag<TBaseWidget>;
     TBagOWidgets colWidgets(tCIDLib::EAdoptOpts::Adopt);
+    colWidgets.Add(new TLineWidget(TPoint(10, 10), TPoint(100, 100)));
+    colWidgets.Add(new TLineWidget(TPoint(200, 150), TPoint(210, 155)));
+    colWidgets.Add(new TCircleWidget(TPoint(50,150), 25));
+    colWidgets.Add(new TFilledCircleWidget(TPoint(75,100), 80, TRGBClr(0,0,0)));
+    colWidgets.Add(new TLineWidget(TPoint(320, 480), TPoint(20, 15)));
 
     //
     //  Create a new binary output file stream, overwriting any previous
     //  contents. Then create a linked binary input file stream over that.
-    //  So we can read and write this file. The poly streamer want's to have
-    //  both.
     //
     const TString strTestFile(L"TestStreamFile.Dat");
     TBinFileOutStream strmTestOut
@@ -146,24 +133,14 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     // Create a poly streamer to stream out with
     TPolyStreamer<TBaseWidget> pstmrTest(&strmTestIn, &strmTestOut);
 
-    //
-    //  Since we have no user interface, just call a function that will
-    //  fill in our bag of widgets with some test objects.
-    //
-    FillBag(colWidgets);
-
-    //
-    //  Create a cursor for our widget list and stream them out. We pass each
-    //  one to the poly streamer object.
-    conOut  << kCIDLib::DNewLn << L"Writing and 'drawing' objects"
-            << kCIDLib::EndLn;
+    // Loop through them streaming and 'drawing' each one
+    conOut  << kCIDLib::DNewLn
+            << L"Writing and 'drawing' objects" << kCIDLib::EndLn;
 
     TBagOWidgets::TCursor cursWidgets(&colWidgets);
     for (; cursWidgets; ++cursWidgets)
     {
         pstmrTest.StreamOut(*cursWidgets);
-
-        // Tell the one we just wrote to 'draw' itself
         cursWidgets->Draw(conOut);
         conOut << kCIDLib::NewLn;
     }
@@ -173,25 +150,16 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     colWidgets.RemoveAll();
 
     //
-    //  Now we can stream in the elements that we written to the file.
-    //  Note that we don't need to know what order they were streamed
-    //  out because our polymorphic streaming system figures this out
-    //  for us.
+    //  Now we can stream in the elements that we wrote to the file.
+    //  The poly streamer figures out what the objects are and creates
+    //  an object of that type for us to stream into. We then just add
+    //  them into the bag.
     //
     while (!pstmrTest.bEndOfStream())
     {
         // A base widget pointer to read objects back into
         TBaseWidget* pwidRead;
 
-        //
-        //  Now we use the polymorphic reading template function that
-        //  understands now to find out what the next object is, create
-        //  an object of that type using dynamic type creation, then
-        //  to stream into that object.
-        //
-        //  We get back a dynamically allocated object that can be put
-        //  into the collection.
-        //
         pwidRead = pstmrTest.pobjStreamIn();
         colWidgets.Add(pwidRead);
     }
