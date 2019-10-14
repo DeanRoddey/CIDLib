@@ -36,10 +36,6 @@
 //
 #pragma once
 
-
-#if !defined(CIDKERNEL_REMMEDIA_HPP)
-#define CIDKERNEL_REMMEDIA_HPP 1
-
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 //
@@ -128,6 +124,12 @@ class KRNLEXPORT TKrnlRemMediaDrv
 {
     public :
         // -------------------------------------------------------------------
+        //  Forward ref our per-platform data structure, which is opaque publically
+        // -------------------------------------------------------------------
+        struct TPlatData;
+
+
+        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TKrnlRemMediaDrv();
@@ -197,7 +199,6 @@ class KRNLEXPORT TKrnlRemMediaDrv
         const tCIDLib::TCh* pszDrivePath() const;
 
 
-
     private :
         // -------------------------------------------------------------------
         //  Private data members
@@ -215,7 +216,7 @@ class KRNLEXPORT TKrnlRemMediaDrv
         //      to the user to identify the drive.
         // -------------------------------------------------------------------
         tCIDLib::TCard4 m_c4DriveNum;
-        tCIDLib::TVoid* m_pPlatData;
+        TPlatData*      m_pPlatData;
         tCIDLib::TCh    m_szDriveId[TKrnlRemMedia::c4MaxDriveIdLen + 1];
 };
 
@@ -278,7 +279,5 @@ namespace TKrnlRemMedia
 }
 
 #pragma CIDLIB_POPPACK
-
-#endif
 
 

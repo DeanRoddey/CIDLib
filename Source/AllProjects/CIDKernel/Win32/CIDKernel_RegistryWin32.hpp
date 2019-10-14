@@ -19,6 +19,10 @@
 //  which provides some support code for managing items in the Win32
 //  registry.
 //
+//  This is not cross platform currently, so it's not included in the main
+//  header. That code that needs it will include it. It needs to be made
+//  cross platform.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
