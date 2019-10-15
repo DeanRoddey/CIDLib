@@ -87,9 +87,15 @@ class KRNLEXPORT TKrnlSemaphore
 
         tCIDLib::TBoolean bExit();
 
-        tCIDLib::TBoolean bIsValid() const;
+        tCIDLib::TBoolean bIsValid() const
+        {
+            return (m_hsemThis.bIsValid());
+        }
 
-        tCIDLib::TBoolean bNamed() const;
+        tCIDLib::TBoolean bNamed() const
+        {
+            return (m_pszName != nullptr);
+        }
 
         tCIDLib::TBoolean bOpen();
 
@@ -104,10 +110,15 @@ class KRNLEXPORT TKrnlSemaphore
             const   tCIDLib::TCh* const     pszNewName
         );
 
-        tCIDLib::TCard4 c4MaxCount() const;
+        tCIDLib::TCard4 c4MaxCount() const
+        {
+            return m_c4MaxCount;
+        }
 
-        const tCIDLib::TCh* pszName() const;
-
+        const tCIDLib::TCh* pszName() const
+        {
+            return m_pszName;
+        }
 
 
     private :
@@ -142,28 +153,4 @@ class KRNLEXPORT TKrnlSemaphore
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TKrnlSemaphore: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean TKrnlSemaphore::bIsValid() const
-{
-    return (m_hsemThis.bIsValid());
-}
-
-inline tCIDLib::TBoolean TKrnlSemaphore::bNamed() const
-{
-    return (m_pszName != 0);
-}
-
-inline tCIDLib::TCard4 TKrnlSemaphore::c4MaxCount() const
-{
-    return m_c4MaxCount;
-}
-
-inline const tCIDLib::TCh* TKrnlSemaphore::pszName() const
-{
-    return m_pszName;
-}
 

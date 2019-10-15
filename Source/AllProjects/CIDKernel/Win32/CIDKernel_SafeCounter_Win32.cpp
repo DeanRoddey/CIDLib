@@ -64,6 +64,7 @@ TKrnlSafeCard4Counter::~TKrnlSafeCard4Counter()
 {
     // On this platform we don't use the lock data
     ::_aligned_free((void*)m_pc4Counter);
+    m_pc4Counter = nullptr;
 }
 
 
@@ -155,6 +156,7 @@ TKrnlSafeInt4Counter::~TKrnlSafeInt4Counter()
 {
     // On this platform we don't use the lock data
     ::_aligned_free((void*)m_pi4Counter);
+    m_pi4Counter = nullptr;
 }
 
 

@@ -258,7 +258,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 
 #include    "CIDLib_ThreadWaitList.hpp"
 #include    "CIDLib_EventTimer.hpp"
-#include    "CIDLib_MediaChanger.hpp"
 #include    "CIDLib_PerThreadData.hpp"
 #include    "CIDLib_TypedMBuf.hpp"
 #include    "CIDLib_USB.hpp"

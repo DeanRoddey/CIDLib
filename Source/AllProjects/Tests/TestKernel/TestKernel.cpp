@@ -575,32 +575,6 @@ static tCIDLib::TVoid ShowSysInfo()
     }
 
 
-    // Iterate any media changers
-    const tCIDLib::TCard4 c4MaxChangers = 256;
-    tCIDLib::TCard4 c4ChangerCnt;
-    TKrnlMediaChanger::TMediaChgInfo aciList[c4MaxChangers];
-    if (TKrnlMediaChanger::bEnumChangers(aciList, c4MaxChangers, c4ChangerCnt))
-    {
-        strmOut << L"Available Media Changers\n"
-                << L"------------------------------------\n";
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChangerCnt; c4Index++)
-        {
-            strmOut << (c4Index + 1) << L". ";
-            const TKrnlMediaChanger::TMediaChgInfo& ciCur = aciList[c4Index];
-            strmOut << L"Volume: " << ciCur.achDevPath
-                    << L"\n   Id: " << ciCur.achProductId
-                    << L"\n   Number: " << ciCur.c4ChangerNum << L"\n";
-        }
-
-        if (!c4ChangerCnt)
-            strmOut << L"  [NONE FOUND]\n";
-    }
-     else
-    {
-        strmOut << L"Could not enumerate media changers\n";
-    }
-    strmOut << L"\n\n";
-
     // Show some of the special directories
     strmOut << L"Special Directories\n"
             << L"------------------------------------\n";

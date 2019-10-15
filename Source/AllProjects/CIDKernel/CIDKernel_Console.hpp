@@ -35,11 +35,10 @@
 //  1)  Construction just sets up the object, which must then be bOpen()'d
 //      before it can be used.
 //
-//  2)  Each platform can store state info in the m_pExtra field of the
+//  2)  Each platform can store state info in the m_pPlatData field of the
 //      console classes, which they will generally need to do. The platform
 //      independent stuff will call the bOpen and Close methods to provide a
-//      chance to create and clean up this extra information. It must be seen
-//      as a void pointer at this level.
+//      chance to create and clean up this extra information.
 //
 //  3)  TKrnlConIn implements the MSignalHandler mixin so that it can set
 //      up itself as a signal handler for break events (to be able to break

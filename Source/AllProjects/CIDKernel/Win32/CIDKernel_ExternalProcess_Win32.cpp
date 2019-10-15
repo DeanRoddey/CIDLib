@@ -35,9 +35,9 @@
 
 
 // ---------------------------------------------------------------------------
-//  Local types
+//  Define our publically opaque per-platfrom data
 // ---------------------------------------------------------------------------
-struct TConSaveInfo
+struct TKrnlExtProcess::TPlatData
 {
     BOOL        bInCon;
     HANDLE      hIn;
@@ -73,7 +73,7 @@ namespace CIDKernel_ExternalProcess_Win32
 //  This method is called to save console information around the execution
 //  of an external process.
 //
-static tCIDLib::TVoid QueryConInfo(TConSaveInfo& SaveInfo)
+static tCIDLib::TVoid QueryConInfo(TKrnlExtProcess::TPlatData& SaveInfo)
 {
     //
     //  To prevent the child process from freaking out our console handle
@@ -91,7 +91,7 @@ static tCIDLib::TVoid QueryConInfo(TConSaveInfo& SaveInfo)
 //  This method is called to restore the console mode settings after an
 //  external process is run.
 //
-static tCIDLib::TVoid RestoreConInfo(const TConSaveInfo& SaveInfo)
+static tCIDLib::TVoid RestoreConInfo(const TKrnlExtProcess::TPlatData& SaveInfo)
 {
     if (SaveInfo.bInCon)
         ::SetConsoleMode(SaveInfo.hIn, SaveInfo.dwInFlags);
@@ -185,28 +185,26 @@ pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
 // ---------------------------------------------------------------------------
 TKrnlExtProcess::TKrnlExtProcess() :
 
-    m_pExtra(nullptr)
+    m_pPlatData(nullptr)
 {
     // Allocate the new process handle and get it set up
     m_hprocThis.m_phprociThis = new TProcessHandleImpl;
     m_hprocThis.m_phprociThis->pidThis = 0;
     m_hprocThis.m_phprociThis->hProcess = 0;
 
-    // And allocate the extra data structure and init it
-    TConSaveInfo* pSaveInfo = new TConSaveInfo;
-    pSaveInfo->bInCon = 0;
-    pSaveInfo->bOutCon = 0;
-    pSaveInfo->hIn = 0;
-    pSaveInfo->hOut = 0;
-
-    // Store it in the per-platform storage field
-    m_pExtra = new TConSaveInfo;
+    // And allocate our per-platform data structure and init it
+    m_pPlatData = new TPlatData;
+    m_pPlatData->bInCon = 0;
+    m_pPlatData->bOutCon = 0;
+    m_pPlatData->hIn = 0;
+    m_pPlatData->hOut = 0;
 }
 
 TKrnlExtProcess::~TKrnlExtProcess()
 {
-    // Clean up the extra data
-    delete static_cast<TConSaveInfo*>(m_pExtra);
+    // Clean up the platform data
+    delete m_pPlatData;
+    m_pPlatData = nullptr;
 
     // Close the process handle if open
     if (m_hprocThis.m_phprociThis->hProcess)
@@ -754,8 +752,7 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
     //  To prevent the child process from freaking out our console handle
     //  mode settings, save them and restore them.
     //
-    TConSaveInfo* pSaveInfo = static_cast<TConSaveInfo*>(m_pExtra);
-    QueryConInfo(*pSaveInfo);
+    QueryConInfo(*m_pPlatData);
 
 
     //
@@ -781,7 +778,7 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
         TKrnlError::SetLastHostError(::GetLastError());
 
         // Restore the console mode
-        RestoreConInfo(*pSaveInfo);
+        RestoreConInfo(*m_pPlatData);
 
         return kCIDLib::False;
     }
@@ -806,7 +803,7 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
                 return kCIDLib::False;
 
             // Restore the saved console info
-            RestoreConInfo(*pSaveInfo);
+            RestoreConInfo(*m_pPlatData);
         }
     }
     return kCIDLib::True;
@@ -987,8 +984,7 @@ TKrnlExtProcess::bSystemEscape( const   tCIDLib::TCh* const     pszCommandLine
     //  To prevent the child process from freaking out our console handle
     //  mode settings, save them and restore them.
     //
-    TConSaveInfo* pSaveInfo = static_cast<TConSaveInfo*>(m_pExtra);
-    QueryConInfo(*pSaveInfo);
+    QueryConInfo(*m_pPlatData);
 
     //
     //  And now invoke the process. We pass the command processor as the
@@ -1004,7 +1000,7 @@ TKrnlExtProcess::bSystemEscape( const   tCIDLib::TCh* const     pszCommandLine
         TKrnlError::SetLastHostError(::GetLastError());
 
         // Restore the console mode
-        RestoreConInfo(*pSaveInfo);
+        RestoreConInfo(*m_pPlatData);
         return kCIDLib::False;
     }
 
@@ -1023,7 +1019,7 @@ TKrnlExtProcess::bSystemEscape( const   tCIDLib::TCh* const     pszCommandLine
             return kCIDLib::False;
 
         // Restore the console mode
-        RestoreConInfo(*pSaveInfo);
+        RestoreConInfo(*m_pPlatData);
     }
     return kCIDLib::True;
 }
@@ -1184,8 +1180,7 @@ TKrnlExtProcess::bWaitForDeath(         tCIDLib::TBoolean&   bState
     //  Assume its dead at this point, and put back the console mode that
     //  was saved away when it started.
     //
-    TConSaveInfo* pSaveInfo = static_cast<TConSaveInfo*>(m_pExtra);
-    RestoreConInfo(*pSaveInfo);
+    RestoreConInfo(*m_pPlatData);
 
     // If it failed, then the handle may be bad or something
     if (eRes == tCIDLib::EWaitRes::Error)

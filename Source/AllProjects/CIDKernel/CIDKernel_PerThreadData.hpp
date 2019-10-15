@@ -73,7 +73,7 @@ class KRNLEXPORT TKrnlPerThreadData
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlPerThreadData& operator=(const TKrnlPerThreadData&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------

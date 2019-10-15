@@ -88,14 +88,21 @@ class KRNLEXPORT TKrnlMutex
             const   TKrnlMutex&             kmtxToDup
         );
 
-        tCIDLib::TBoolean bIsValid() const;
+        tCIDLib::TBoolean bIsValid() const
+        {
+            return  (m_hmtxThis.bIsValid());
+        }
 
         tCIDLib::TBoolean bLock
         (
             const   tCIDLib::TCard4         c4MilliSecs = kCIDLib::c4MaxWait
         )   const;
 
-        tCIDLib::TBoolean bNamed() const;
+
+        tCIDLib::TBoolean bNamed() const
+        {
+            return (m_pszName != nullptr);
+        }
 
         tCIDLib::TBoolean bOpen();
 
@@ -112,7 +119,10 @@ class KRNLEXPORT TKrnlMutex
 
         tCIDLib::TBoolean bUnlock() const;
 
-        const tCIDLib::TCh* pszName() const;
+        const tCIDLib::TCh* pszName() const
+        {
+            return m_pszName;
+        }
 
 
     private :
@@ -141,22 +151,3 @@ class KRNLEXPORT TKrnlMutex
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean TKrnlMutex::bIsValid() const
-{
-    return  (m_hmtxThis.bIsValid());
-}
-
-inline tCIDLib::TBoolean TKrnlMutex::bNamed() const
-{
-    return (m_pszName != 0);
-}
-
-inline const tCIDLib::TCh* TKrnlMutex::pszName() const
-{
-    return m_pszName;
-}

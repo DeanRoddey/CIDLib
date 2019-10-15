@@ -37,24 +37,42 @@
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlCritSec: Public data types
+// ---------------------------------------------------------------------------
+struct TKrnlCritSec::TPlatData
+{
+    CRITICAL_SECTION* pCritSec;
+};
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlCritSec: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlCritSec::TKrnlCritSec() :
 
-    m_pData(0)
+    m_pPlatData(new TPlatData)
 {
-    m_pData = static_cast<CRITICAL_SECTION*>(::malloc(sizeof(CRITICAL_SECTION)));
-    ::InitializeCriticalSection((CRITICAL_SECTION*)m_pData);
+    // Make sure this guy is 32 bit aligned
+    m_pPlatData->pCritSec = static_cast<CRITICAL_SECTION*>
+    (
+        ::_aligned_malloc(sizeof(CRITICAL_SECTION), 32)
+    );
+    ::InitializeCriticalSection(m_pPlatData->pCritSec);
 }
 
 TKrnlCritSec::~TKrnlCritSec()
 {
-    if (m_pData)
+    if (m_pPlatData)
     {
-        ::DeleteCriticalSection((CRITICAL_SECTION*)m_pData);
-        ::free(m_pData);
+        if (m_pPlatData->pCritSec)
+        {
+            ::DeleteCriticalSection(m_pPlatData->pCritSec);
+            ::_aligned_free(m_pPlatData->pCritSec);
+            m_pPlatData->pCritSec = nullptr;
+        }
 
-        m_pData = 0;
+        delete m_pPlatData;
+        m_pPlatData = nullptr;
     }
 }
 
@@ -64,28 +82,12 @@ TKrnlCritSec::~TKrnlCritSec()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TKrnlCritSec::Enter() const
 {
-    ::EnterCriticalSection(static_cast<CRITICAL_SECTION*>(m_pData));
+    ::EnterCriticalSection(m_pPlatData->pCritSec);
 }
 
 
 tCIDLib::TVoid TKrnlCritSec::Exit() const
 {
-    ::LeaveCriticalSection(static_cast<CRITICAL_SECTION*>(m_pData));
+    ::LeaveCriticalSection(m_pPlatData->pCritSec);
 }
-
-
-
-// ---------------------------------------------------------------------------
-//  Custom allocators to ensure alignment
-// ---------------------------------------------------------------------------
-void* TKrnlCritSec::operator new(size_t t)
-{
-    return ::_aligned_malloc(t, 32);
-}
-
-void TKrnlCritSec::operator delete(void* ptr)
-{
-    ::_aligned_free(ptr);
-}
-
 

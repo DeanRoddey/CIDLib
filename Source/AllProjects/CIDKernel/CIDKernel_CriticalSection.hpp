@@ -52,6 +52,11 @@ class KRNLEXPORT TKrnlCritSec
 {
     public  :
         // -------------------------------------------------------------------
+        //  Forward declare our internal platform structure
+        // -------------------------------------------------------------------
+        struct TPlatData;
+
+        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TKrnlCritSec();
@@ -75,21 +80,14 @@ class KRNLEXPORT TKrnlCritSec
         tCIDLib::TVoid Exit() const;
 
 
-        // We have to guarantee alignment
-        void* operator new(size_t);
-        void operator delete(void*);
-
-
     private :
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_pData
-        //      This is the critical section data. Publically it is just seen
-        //      as a void pointer. Internally it is interpreted as required
-        //      for the platform.
+        //  m_pPlatData
+        //      This is the per-platform data, which they define as desired.
         // -------------------------------------------------------------------
-        tCIDLib::TVoid* m_pData;
+        TPlatData*  m_pPlatData;
 };
 
 
@@ -105,27 +103,42 @@ class KRNLEXPORT TKrnlCritSecLocker
         // -------------------------------------------------------------------
         TKrnlCritSecLocker() = delete;
 
-        TKrnlCritSecLocker
-        (
-            const   TKrnlCritSec* const     pkcrsToLock
-        );
+        TKrnlCritSecLocker(const TKrnlCritSec* const pkcrsToLock) :
+
+            m_pkcrsLocked(pkcrsToLock)
+        {
+            if (m_pkcrsLocked)
+                m_pkcrsLocked->Enter();
+        }
 
         TKrnlCritSecLocker(const TKrnlCritSecLocker&) = delete;
 
-        ~TKrnlCritSecLocker();
+        ~TKrnlCritSecLocker()
+        {
+            Release();
+        }
+
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlCritSecLocker& operator=(const TKrnlCritSecLocker&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Release();
+        tCIDLib::TVoid Release()
+        {
+            // If its been released or never was set, don't bother
+            if (!m_pkcrsLocked)
+                return;
+
+            m_pkcrsLocked->Exit();
+            m_pkcrsLocked = nullptr;
+        }
 
 
     private :
@@ -140,36 +153,4 @@ class KRNLEXPORT TKrnlCritSecLocker
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TKrnlCritSecLocker: Constructors and operators
-// ---------------------------------------------------------------------------
-inline
-TKrnlCritSecLocker::TKrnlCritSecLocker(const TKrnlCritSec* const pkcrsToLock) :
-
-    m_pkcrsLocked(pkcrsToLock)
-{
-    if (m_pkcrsLocked)
-        m_pkcrsLocked->Enter();
-}
-
-inline TKrnlCritSecLocker::~TKrnlCritSecLocker()
-{
-    Release();
-}
-
-
-// ---------------------------------------------------------------------------
-//  TKrnlCritSecLocker: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TVoid TKrnlCritSecLocker::Release()
-{
-    // If its been released or never was set, don't bother
-    if (!m_pkcrsLocked)
-        return;
-
-    m_pkcrsLocked->Exit();
-    m_pkcrsLocked = 0;
-}
 

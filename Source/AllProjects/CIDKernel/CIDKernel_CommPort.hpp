@@ -234,8 +234,10 @@ class KRNLEXPORT TKrnlCommPort
             , const tCIDLib::TEncodedTime   enctWait
         );
 
-        tCIDLib::TCard4 c4PortNum() const;
-
+        tCIDLib::TCard4 c4PortNum() const
+        {
+            return m_c4PortNum;
+        }
 
 
     private :
@@ -268,13 +270,3 @@ class KRNLEXPORT TKrnlCommPort
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TKrnlCommPort: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TCard4 TKrnlCommPort::c4PortNum() const
-{
-    return m_c4PortNum;
-}
-

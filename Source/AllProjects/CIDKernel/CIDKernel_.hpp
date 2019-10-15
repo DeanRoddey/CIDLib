@@ -51,16 +51,7 @@
 //  or definitions that are required internally for all per-platform
 //  implementation files.
 // ---------------------------------------------------------------------------
-
-//
-//  This is a temporary hack because Visual Studio Code cannot seem to ignore the
-//  other platform's headers, and it creates havoc.
-//
-#if CID_PLATFORM == WIN32_WIN7
 #include    ".\Win32\CIDKernel_PlatformInternal_.hpp"
-#elif  CID_PLATFORM == LINUX_32
-#include    ".\Linux\CIDKernel_PlatformInternal_.hpp"
-#endif
 
 
 // ---------------------------------------------------------------------------

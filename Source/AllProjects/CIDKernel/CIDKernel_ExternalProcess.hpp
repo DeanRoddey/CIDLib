@@ -42,6 +42,12 @@ class KRNLEXPORT TKrnlExtProcess
 {
     public  :
         // -------------------------------------------------------------------
+        //  Forward declare our per-platform internal structure
+        // -------------------------------------------------------------------
+        struct TPlatData;
+
+
+        // -------------------------------------------------------------------
         //  Public, static methods
         //
         //  This method understands how to parse a standard CIDLib command
@@ -227,12 +233,12 @@ class KRNLEXPORT TKrnlExtProcess
         //  m_hprocThis
         //      This is the handle to the process.
         //
-        //  m_pExtra
+        //  m_pPlatData
         //      This can be used by per-platform drivers to hold extra info
         //      if they need to.
         // -------------------------------------------------------------------
         TProcessHandle  m_hprocThis;
-        tCIDLib::TVoid* m_pExtra;
+        TPlatData*      m_pPlatData;
 };
 
 #pragma CIDLIB_POPPACK

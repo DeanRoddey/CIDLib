@@ -250,19 +250,6 @@ class CUPnPFinderCallback : public IUPnPDeviceFinderCallback
 
 
 
-// -----------------------------------------------------------------------
-//  This is the structure used to store our per-platform info in the
-//  async finder class.
-// -----------------------------------------------------------------------
-struct TAFinderInfo
-{
-    // The finder callback we created and pointed to the finder class instance
-    CUPnPFinderCallback*    pcbTar;
-
-    // The OS level async finder object
-    IUPnPDeviceFinder*      pFinder;
-};
-
 
 
 // ---------------------------------------------------------------------------
@@ -395,16 +382,28 @@ MUPnPSvcCallback& MUPnPSvcCallback::operator=(const MUPnPSvcCallback&)
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlUPnPService: Public data types
+// ---------------------------------------------------------------------------
+struct TKrnlUPnPService::TPlatData
+{
+    IUPnPService*   pService;
+};
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlUPnPService: Destructor
 // ---------------------------------------------------------------------------
 
 TKrnlUPnPService::~TKrnlUPnPService()
 {
     // Let our COM level object go if we have one
-    if (m_pData)
+    if (m_pPlatData)
     {
-        static_cast<IUPnPService*>(m_pData)->Release();
-        m_pData = nullptr;
+        if (m_pPlatData->pService)
+            m_pPlatData->pService->Release();
+
+        delete m_pPlatData;
+        m_pPlatData = nullptr;
     }
 }
 
@@ -432,7 +431,7 @@ tCIDLib::TVoid TKrnlUPnPService::AddCallback(MUPnPSvcCallback* pupnpscbTar)
         //  then we can drop our reference. It'll get destroyed when we are
         //  destroyed.
         //
-        HRESULT hRes = static_cast<IUPnPService*>(m_pData)->AddCallback
+        HRESULT hRes = m_pPlatData->pService->AddCallback
         (
             pUPnPServiceCallback
         );
@@ -444,10 +443,8 @@ tCIDLib::TVoid TKrnlUPnPService::AddCallback(MUPnPSvcCallback* pupnpscbTar)
 tCIDLib::TBoolean
 TKrnlUPnPService::bQueryServiceType(TKrnlString& kstrToFill) const
 {
-    IUPnPService* pSrv = static_cast<IUPnPService*>(m_pData);
-
     BSTR TypeStr;
-    HRESULT hRes = pSrv->get_ServiceTypeIdentifier(&TypeStr);
+    HRESULT hRes =  m_pPlatData->pService->get_ServiceTypeIdentifier(&TypeStr);
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnP_QueryServiceType, hRes);
@@ -468,11 +465,9 @@ TKrnlUPnPService::bQueryStateVar(const  tCIDLib::TCh* const pszVarName
     // Get the var name into a BSTR
     TBSTRJanitor janName(pszVarName);
 
-    IUPnPService* pSrv = static_cast<IUPnPService*>(m_pData);
-
     VARIANT VarVal;
     ::VariantInit(&VarVal);
-    HRESULT hRes = pSrv->QueryStateVariable(janName.bsData, &VarVal);
+    HRESULT hRes =  m_pPlatData->pService->QueryStateVariable(janName.bsData, &VarVal);
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnP_QueryStateVar, hRes);
@@ -555,8 +550,10 @@ TKrnlUPnPService::bInvokeAct(const  tCIDLib::TCh* const         pszCmdName
     VARIANT RetVal;
     ::VariantInit(&RetVal);
 
-    IUPnPService* pSrv = static_cast<IUPnPService*>(m_pData);
-    HRESULT hRes = pSrv->InvokeAction(janCmd.bsData, InArgs, &OutArgs, &RetVal);
+    HRESULT hRes =  m_pPlatData->pService->InvokeAction
+    (
+        janCmd.bsData, InArgs, &OutArgs, &RetVal
+    );
 
     tCIDLib::TBoolean bRet = kCIDLib::True;
     if (FAILED(hRes))
@@ -650,12 +647,9 @@ TKrnlUPnPService::bInvokeAct(const  tCIDLib::TCh* const         pszCmdName
 //
 TKrnlUPnPService* TKrnlUPnPService::pkupnpsClone()
 {
-    // Get a pointer to our actual data
-    IUPnPService* pSrv = static_cast<IUPnPService*>(m_pData);
-
     // Add a reference and give it to a new service objject
-    pSrv->AddRef();
-    return new TKrnlUPnPService(pSrv);
+     m_pPlatData->pService->AddRef();
+    return new TKrnlUPnPService( m_pPlatData->pService);
 }
 
 
@@ -671,8 +665,9 @@ TKrnlUPnPService* TKrnlUPnPService::pkupnpsClone()
 //
 TKrnlUPnPService::TKrnlUPnPService(tCIDLib::TVoid* const pData) :
 
-    m_pData(pData)
+    m_pPlatData(new TKrnlUPnPService::TPlatData)
 {
+    m_pPlatData->pService = static_cast<IUPnPService*>(pData);
 }
 
 
@@ -685,15 +680,26 @@ TKrnlUPnPService::TKrnlUPnPService(tCIDLib::TVoid* const pData) :
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlUPnPDevice: Public data types
+// ---------------------------------------------------------------------------
+struct TKrnlUPnPDevice::TPlatData
+{
+    IUPnPDevice*   pDevice;
+};
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlUPnPDevice: Destructor
 // ---------------------------------------------------------------------------
 TKrnlUPnPDevice::~TKrnlUPnPDevice()
 {
     // Let our COM level object go if we have one
-    if (m_pData)
+    if (m_pPlatData)
     {
-        static_cast<IUPnPDevice*>(m_pData)->Release();
-        m_pData = nullptr;
+        m_pPlatData->pDevice->Release();
+
+        delete m_pPlatData;
+        m_pPlatData = nullptr;
     }
 }
 
@@ -713,7 +719,7 @@ TKrnlUPnPDevice::bGetRootDevice(TKrnlUPnPDevice*& pkupnpdToFill)
 
     // First see if this device is the root device
     VARIANT_BOOL IsRoot;
-    HRESULT hRes = static_cast<IUPnPDevice*>(m_pData)->get_IsRootDevice(&IsRoot);
+    HRESULT hRes = m_pPlatData->pDevice->get_IsRootDevice(&IsRoot);
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnp_AttrQuery, hRes);
@@ -723,7 +729,7 @@ TKrnlUPnPDevice::bGetRootDevice(TKrnlUPnPDevice*& pkupnpdToFill)
     IUPnPDevice* pDev = nullptr;
     if (IsRoot == VARIANT_FALSE)
     {
-        HRESULT hRes = static_cast<IUPnPDevice*>(m_pData)->get_RootDevice(&pDev);
+        HRESULT hRes = m_pPlatData->pDevice->get_RootDevice(&pDev);
         if (FAILED(hRes) || !pDev)
         {
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnp_GetRoot, hRes);
@@ -743,7 +749,7 @@ TKrnlUPnPDevice::bHasChildren(tCIDLib::TBoolean& bToFill) const
 {
     // See if we have any children
     VARIANT_BOOL Res;
-    HRESULT hRes = static_cast<IUPnPDevice*>(m_pData)->get_HasChildren(&Res);
+    HRESULT hRes = m_pPlatData->pDevice->get_HasChildren(&Res);
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnp_AttrQuery, hRes);
@@ -759,7 +765,7 @@ TKrnlUPnPDevice::bHasChildren(tCIDLib::TBoolean& bToFill) const
 tCIDLib::TBoolean TKrnlUPnPDevice::bIsRoot(tCIDLib::TBoolean& bToFill) const
 {
     VARIANT_BOOL Res;
-    HRESULT hRes = static_cast<IUPnPDevice*>(m_pData)->get_IsRootDevice(&Res);
+    HRESULT hRes = m_pPlatData->pDevice->get_IsRootDevice(&Res);
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnp_AttrQuery, hRes);
@@ -791,7 +797,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
     // Empty the incoming list first
     kllistFound.RemoveAll();
 
-    hRes = static_cast<IUPnPDevice*>(m_pData)->get_Children(&pDevices);
+    hRes = m_pPlatData->pDevice->get_Children(&pDevices);
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnP_QueryChildDevs, hRes);
@@ -894,7 +900,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
 tCIDLib::TBoolean TKrnlUPnPDevice::bQueryDevDescrURL(TKrnlString& kstrToFill) const
 {
     // Get a pointer to our actual data
-    IUPnPDevice* pDev = static_cast<IUPnPDevice*>(m_pData);
+    IUPnPDevice* pDev = m_pPlatData->pDevice;
 
     IUPnPDeviceDocumentAccess* pDocAcc = nullptr;
     HRESULT hRes = pDev->QueryInterface(IID_IUPnPDeviceDocumentAccess, (void**)&pDocAcc);
@@ -928,7 +934,7 @@ TKrnlUPnPDevice::bQueryDevInfo( TKrnlString&    kstrUID
                                 , TKrnlString&  kstrType) const
 {
     // Get a pointer to our actual data
-    IUPnPDevice* pDev = static_cast<IUPnPDevice*>(m_pData);
+    IUPnPDevice* pDev = m_pPlatData->pDevice;
 
     //
     //  And try to get each string. If any of them fail we just return an
@@ -1004,7 +1010,7 @@ tCIDLib::TBoolean
 TKrnlUPnPDevice::bQueryManufacturer(TKrnlString& kstrToFill) const
 {
     // Get a pointer to our actual data
-    IUPnPDevice* pDev = static_cast<IUPnPDevice*>(m_pData);
+    IUPnPDevice* pDev = m_pPlatData->pDevice;
 
     BSTR TmpStr;
     HRESULT hRes = pDev->get_ModelName(&TmpStr);
@@ -1039,7 +1045,7 @@ TKrnlUPnPDevice::bQueryServiceByID( const   tCIDLib::TCh* const pszServiceId
     pkupnpsToFill = 0;
 
     // Get a pointer to our actual data
-    IUPnPDevice* pDev = static_cast<IUPnPDevice*>(m_pData);
+    IUPnPDevice* pDev = m_pPlatData->pDevice;
 
     // Get the known id for the service into a BSTR
     TBSTRJanitor janID(pszServiceId);
@@ -1081,7 +1087,7 @@ TKrnlUPnPDevice::bQueryServiceByID( const   tCIDLib::TCh* const pszServiceId
 TKrnlUPnPDevice* TKrnlUPnPDevice::pkupnpdClone()
 {
     // Get a pointer to our actual data
-    IUPnPDevice* pDev = static_cast<IUPnPDevice*>(m_pData);
+    IUPnPDevice* pDev = m_pPlatData->pDevice;
 
     // Add a ref count and give it to a new device object
     pDev->AddRef();
@@ -1099,8 +1105,9 @@ TKrnlUPnPDevice* TKrnlUPnPDevice::pkupnpdClone()
 //
 TKrnlUPnPDevice::TKrnlUPnPDevice(tCIDLib::TVoid* const pDevInfo) :
 
-    m_pData(pDevInfo)
+    m_pPlatData(new TPlatData)
 {
+    m_pPlatData->pDevice = static_cast<IUPnPDevice*>(pDevInfo);
 }
 
 
@@ -1111,11 +1118,22 @@ TKrnlUPnPDevice::TKrnlUPnPDevice(tCIDLib::TVoid* const pDevInfo) :
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlUPnPFinder: Public data types
+// ---------------------------------------------------------------------------
+struct TKrnlUPnPFinder::TPlatData
+{
+    IUPnPDeviceFinder*   pFinder;
+};
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlUPnPFinder: Constructors and Destructor
 // ---------------------------------------------------------------------------
+
+// This one we will fault in the platform info if ever used
 TKrnlUPnPFinder::TKrnlUPnPFinder() :
 
-    m_pData(0)
+    m_pPlatData(nullptr)
 {
 }
 
@@ -1123,16 +1141,15 @@ TKrnlUPnPFinder::TKrnlUPnPFinder() :
 TKrnlUPnPFinder::~TKrnlUPnPFinder()
 {
     // Clean up our data
-    if (m_pData)
+    if (m_pPlatData)
     {
-        // Get a pointer as our type and then we can clear the public pointer
-        IUPnPDeviceFinder* pFinder = static_cast<IUPnPDeviceFinder*>(m_pData);
-        m_pData = 0;
-
         // If we still have the COM object, release it
-        if (pFinder)
-            pFinder->Release();
-    }
+        if (m_pPlatData->pFinder)
+            m_pPlatData->pFinder->Release();
+
+        delete m_pPlatData;
+         m_pPlatData = nullptr;
+     }
 }
 
 
@@ -1156,14 +1173,11 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
     // Clear the output list so we can fill it in
     kllistFound.RemoveAll();
 
-    // Get our internal pointer
-    IUPnPDeviceFinder* pFinder = static_cast<IUPnPDeviceFinder*>(m_pData);
-
     // Get the type into correct COM form of the type URN
     TBSTRJanitor janType(pszType);
 
     IUPnPDevices* pDevices;
-    HRESULT hRes = pFinder->FindByType(janType.bsData, 0, &pDevices);
+    HRESULT hRes = m_pPlatData->pFinder->FindByType(janType.bsData, 0, &pDevices);
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnP_SearchFailed, hRes);
@@ -1260,9 +1274,6 @@ TKrnlUPnPFinder::bSearchByUID(  const   tCIDLib::TCh* const pszUID
     if (!bCheckData())
         return kCIDLib::False;
 
-    // Get our internal pointer
-    IUPnPDeviceFinder* pFinder = static_cast<IUPnPDeviceFinder*>(m_pData);
-
     // Create a new string we can put the stupid Windows uid prefix on
     const tCIDLib::TCard4 c4RealUIDLen
     (
@@ -1279,7 +1290,7 @@ TKrnlUPnPFinder::bSearchByUID(  const   tCIDLib::TCh* const pszUID
     TBSTRJanitor janType(pszRealUID);
 
     IUPnPDevice* pDev;
-    HRESULT hRes = pFinder->FindByUDN(janType.bsData, &pDev);
+    HRESULT hRes = m_pPlatData->pFinder->FindByUDN(janType.bsData, &pDev);
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnP_UIDLookupFailed, hRes);
@@ -1310,7 +1321,7 @@ TKrnlUPnPFinder::bSearchByUID(  const   tCIDLib::TCh* const pszUID
 tCIDLib::TBoolean TKrnlUPnPFinder::bCheckData()
 {
     // If not initialized already, try to do it and return that status
-    if (!m_pData)
+    if (!m_pPlatData)
         return bInit();
     return kCIDLib::True;
 }
@@ -1319,11 +1330,8 @@ tCIDLib::TBoolean TKrnlUPnPFinder::bCheckData()
 // This is called to fault in the underlying finder object
 tCIDLib::TBoolean TKrnlUPnPFinder::bInit()
 {
-    // Get a pointer to our internal struct
-    IUPnPDeviceFinder* pFinder = static_cast<IUPnPDeviceFinder*>(m_pData);
-
     // If there is already a finder, that's an error
-    if (pFinder)
+    if (m_pPlatData->pFinder)
     {
         TKrnlError::SetLastError(kKrnlErrs::errcUPnP_AlreadyInit);
         return kCIDLib::False;
@@ -1347,7 +1355,7 @@ tCIDLib::TBoolean TKrnlUPnPFinder::bInit()
     }
 
     // It worked so store it in our data
-    m_pData = pDevFinder;
+    m_pPlatData->pFinder = pDevFinder;
     return kCIDLib::True;
 }
 
@@ -1380,49 +1388,60 @@ MUPnPAsyncFinderCB::MUPnPAsyncFinderCB()
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlUPnPAsyncFinder: Public types
+// ---------------------------------------------------------------------------
+struct TKrnlUPnPAsyncFinder::TPlatData
+{
+    // The finder callback we created and pointed to the finder class instance
+    CUPnPFinderCallback*    pcbTar;
+
+    // The OS level async finder object
+    IUPnPDeviceFinder*      pFinder;
+};
+
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlUPnPAsyncFinder: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlUPnPAsyncFinder::TKrnlUPnPAsyncFinder() :
 
-    m_pFinderInfo(nullptr)
+    m_pPlatData(nullptr)
     , m_pmkupnpfcbTar(nullptr)
 {
     // Create our per-platform info structure
-    TAFinderInfo* pInfo = new TAFinderInfo;
-    pInfo->pcbTar = nullptr;
-    pInfo->pFinder = nullptr;
-    m_pFinderInfo = pInfo;
+    m_pPlatData = new TPlatData;
+    m_pPlatData->pcbTar = nullptr;
+    m_pPlatData->pFinder = nullptr;
+
 }
 
 // Set the callback up front
 TKrnlUPnPAsyncFinder::
 TKrnlUPnPAsyncFinder(MUPnPAsyncFinderCB* const pmkupnpfcbTar) :
 
-    m_pFinderInfo(nullptr)
+    m_pPlatData(nullptr)
     , m_pmkupnpfcbTar(pmkupnpfcbTar)
 {
     //
     //  Create our per-platform info structure, and we can go ahead and set
     //  the callback object.
     //
-    TAFinderInfo* pInfo = new TAFinderInfo;
-    pInfo->pcbTar = nullptr;
-    pInfo->pFinder = nullptr;
-    m_pFinderInfo = pInfo;
+    m_pPlatData = new TPlatData;
+    m_pPlatData->pcbTar = nullptr;
+    m_pPlatData->pFinder = nullptr;
 
     CUPnPFinderCallback* pcbNew = new CUPnPFinderCallback(pmkupnpfcbTar);
-    pInfo->pcbTar = pcbNew;
+    m_pPlatData->pcbTar = pcbNew;
 }
 
 TKrnlUPnPAsyncFinder::~TKrnlUPnPAsyncFinder()
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
-
     // Call our own cleanup method
     bCleanup();
 
-    m_pFinderInfo = nullptr;
-    delete pInfo;
+    m_pPlatData = nullptr;
+    delete m_pPlatData;
 }
 
 
@@ -1438,22 +1457,22 @@ TKrnlUPnPAsyncFinder::~TKrnlUPnPAsyncFinder()
 //
 tCIDLib::TBoolean TKrnlUPnPAsyncFinder::bCleanup()
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
-
-    // Destroy the finder if set
-    if (pInfo->pFinder)
+    if (m_pPlatData)
     {
-        pInfo->pFinder->Release();
-        pInfo->pFinder = nullptr;
-    }
+        // Destroy the finder if set
+        if (m_pPlatData->pFinder)
+        {
+            m_pPlatData->pFinder->Release();
+            m_pPlatData->pFinder = nullptr;
+        }
 
-    // And the callback
-    if (pInfo->pcbTar)
-    {
-        pInfo->pcbTar->Release();
-        pInfo->pcbTar = nullptr;
+        // And the callback
+        if (m_pPlatData->pcbTar)
+        {
+            m_pPlatData->pcbTar->Release();
+            m_pPlatData->pcbTar = nullptr;
+        }
     }
-
     return kCIDLib::True;
 }
 
@@ -1466,17 +1485,15 @@ tCIDLib::TBoolean
 TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
                                 ,       TKrnlString&        kstrSearchID)
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
-
     // Make sure that the callback has been set
-    if (!pInfo->pcbTar)
+    if (!m_pPlatData->pcbTar)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
     }
 
     // Create a finder object for our purposes if not already
-    if (!pInfo->pFinder)
+    if (!m_pPlatData->pFinder)
     {
         IUPnPDeviceFinder* pNewFinder;
         HRESULT hRes = ::CoCreateInstance
@@ -1498,7 +1515,7 @@ TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
         }
 
         // We created it so store it away
-        pInfo->pFinder = pNewFinder;
+        m_pPlatData->pFinder = pNewFinder;
     }
 
     // Try to create a new find for our finder
@@ -1506,9 +1523,9 @@ TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
     HRESULT hRes;
 
     TBSTRJanitor janType(pszFindType);
-    hRes = pInfo->pFinder->CreateAsyncFind
+    hRes = m_pPlatData->pFinder->CreateAsyncFind
     (
-        janType.bsData, 0, pInfo->pcbTar, &lFindData
+        janType.bsData, 0, m_pPlatData->pcbTar, &lFindData
     );
 
     if (hRes != S_OK)
@@ -1521,11 +1538,11 @@ TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
     }
 
     // Start the find
-    hRes = pInfo->pFinder->StartAsyncFind(lFindData);
+    hRes = m_pPlatData->pFinder->StartAsyncFind(lFindData);
     if (hRes != S_OK)
     {
         // Cancel the search since it didn't work
-        pInfo->pFinder->CancelAsyncFind(lFindData);
+        m_pPlatData->pFinder->CancelAsyncFind(lFindData);
         TKrnlError::SetLastKrnlError
         (
             kKrnlErrs::errcUPnP_StartAsyncFind, ::GetLastError()
@@ -1549,8 +1566,6 @@ TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
 tCIDLib::TBoolean
 TKrnlUPnPAsyncFinder::bSetCallback(MUPnPAsyncFinderCB* const pmkupnpfcbTar)
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
-
     // Make sure the finder hasn't already been set
     if (m_pmkupnpfcbTar)
     {
@@ -1565,7 +1580,7 @@ TKrnlUPnPAsyncFinder::bSetCallback(MUPnPAsyncFinderCB* const pmkupnpfcbTar)
     CUPnPFinderCallback* pcbNew = new CUPnPFinderCallback(pmkupnpfcbTar);
 
     // And store it in our platform data
-    pInfo->pcbTar = pcbNew;
+    m_pPlatData->pcbTar = pcbNew;
     return kCIDLib::True;
 }
 
@@ -1574,8 +1589,6 @@ TKrnlUPnPAsyncFinder::bSetCallback(MUPnPAsyncFinderCB* const pmkupnpfcbTar)
 tCIDLib::TBoolean
 TKrnlUPnPAsyncFinder::bStopListeningFor(const tCIDLib::TCh* const pszSearchID)
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
-
     // It has to be the long value we formatted into earlier
     tCIDLib::TBoolean bValid;
     LONG lID = TRawStr::i4AsBinary(pszSearchID, bValid, tCIDLib::ERadices::Dec);
@@ -1585,7 +1598,7 @@ TKrnlUPnPAsyncFinder::bStopListeningFor(const tCIDLib::TCh* const pszSearchID)
         return kCIDLib::False;
     }
 
-    pInfo->pFinder->CancelAsyncFind(lID);
+    m_pPlatData->pFinder->CancelAsyncFind(lID);
     return kCIDLib::True;
 }
 
