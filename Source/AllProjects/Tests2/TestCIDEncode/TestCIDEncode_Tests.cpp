@@ -1,5 +1,5 @@
 //
-// FILE NAME: TestEncode_Tests.cpp
+// FILE NAME: TestCIDEncode_Tests.cpp
 //
 // AUTHOR: Dean Roddey
 //
@@ -29,7 +29,7 @@
 // ---------------------------------------------------------------------------
 //  Include underlying headers
 // ---------------------------------------------------------------------------
-#include    "TestEncode.hpp"
+#include    "TestCIDEncode.hpp"
 
 
 // ---------------------------------------------------------------------------

@@ -62,11 +62,12 @@ using TParent = ParentClass; \
 public  : \
 static const TClass& clsThis() \
 { \
-    static const TClass* pclsThis = 0; \
+    static const TClass* pclsThis = nullptr; \
     if (!pclsThis) \
     { \
         TBaseLock lockInit; \
-        pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
+        if (!pclsThis) \
+            pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
     } \
     return *pclsThis; \
 } \
@@ -98,11 +99,12 @@ const TClass& clsParent() const \
 #define RTTIDecls(Class,ParentClass) \
 const TClass& Class::clsThis() \
 { \
-    static const TClass* pclsThis = 0; \
+    static const TClass* pclsThis = nullptr; \
     if (!pclsThis) \
     { \
         TBaseLock lockInit; \
-        pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
+        if (!pclsThis) \
+            pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
     } \
     return *pclsThis; \
 }
@@ -112,11 +114,12 @@ const TClass& Class::clsThis() \
 static const TTypeFactoryKicker Class##Kicker(CIDLib_MakeLStr2(Class), pMakeNew_##Class); \
 const TClass& Class::clsThis() \
 { \
-    static const TClass* pclsThis = 0; \
+    static const TClass* pclsThis = nullptr; \
     if (!pclsThis) \
     { \
         TBaseLock lockInit; \
-        pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
+        if (!pclsThis) \
+            pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
     } \
     return *pclsThis; \
 }

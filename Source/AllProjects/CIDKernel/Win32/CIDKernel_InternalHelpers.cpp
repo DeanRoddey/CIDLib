@@ -27,6 +27,13 @@
 
 
 // ---------------------------------------------------------------------------
+//  Includes
+// ---------------------------------------------------------------------------
+#include    "CIDKernel_.hpp"
+#include    "CIDKernel_InternalHelpers_.hpp"
+
+
+// ---------------------------------------------------------------------------
 //  CIDKernel needs a lot of stuff that are only needed here and no where
 //  else, so instead of burdening everyone with all these libraries in the
 //  tools driver generated command lines, we use pragmas to force them in.
@@ -43,14 +50,6 @@
 #pragma comment(lib, "shlwapi.lib")
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "Winhttp.lib")
-
-
-// ---------------------------------------------------------------------------
-//  Includes
-// ---------------------------------------------------------------------------
-#include    "CIDKernel_.hpp"
-#include    "CIDKernel_InternalHelpers_.hpp"
-
 
 
 // ---------------------------------------------------------------------------

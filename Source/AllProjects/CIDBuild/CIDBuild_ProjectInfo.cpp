@@ -508,12 +508,15 @@ tCIDLib::TVoid TProjectInfo::LoadFileLists()
 const TKeyValuePair* TProjectInfo::pkvpFindOption(const TBldStr& strOption) const
 {
     tCIDBuild::TKVPList::TCursor cursOpts(&m_listOptions);
-    if (cursOpts.bResetIter())
-    {
-        if (cursOpts->strKey().bIEquals(strOption))
-            return &cursOpts.tCurElement();
+	if (cursOpts.bResetIter())
+	{
+		do
+		{
+			if (cursOpts->strKey().bIEquals(strOption))
+				return &cursOpts.tCurElement();
 
-    }   while (cursOpts.bNext());
+		} while (cursOpts.bNext());
+	}
 
     return nullptr;
 }

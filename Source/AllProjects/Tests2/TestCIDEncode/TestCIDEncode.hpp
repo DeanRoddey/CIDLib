@@ -1,5 +1,5 @@
 //
-// FILE NAME: TestEncode.hpp
+// FILE NAME: TestCIDEncode.hpp
 //
 // AUTHOR: Dean Roddey
 //

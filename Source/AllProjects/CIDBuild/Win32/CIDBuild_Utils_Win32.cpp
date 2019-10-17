@@ -123,7 +123,7 @@ tCIDLib::TBoolean TUtils::bDeleteFile(const TBldStr& strToDelete)
 
 
 tCIDLib::TBoolean
-TUtils::bExec(  const   tCIDLib::TCh* const*    apszParams
+TUtils::bExec(  const   tCIDLib::TCh**          apszParams
                 , const tCIDLib::TCard4         c4Count
                 ,       tCIDLib::TCard4&        c4Result
                 , const tCIDLib::TCard4         c4Flags)

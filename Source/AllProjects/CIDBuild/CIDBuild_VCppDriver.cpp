@@ -286,6 +286,39 @@ tCIDLib::TVoid TVCppDriver::ResetDebugInfo(const TProjectInfo& projiToReset)
 // ---------------------------------------------------------------------------
 //  TVCppDriver: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+
+tCIDLib::TBoolean
+TVCppDriver::bCompileOne(const  tCIDLib::TCh**      apszArgs
+                        , const tCIDLib::TCard4     c4ArgCnt
+                        ,       tCIDLib::TCard4&    c4ErrCode)
+{
+    if (facCIDBuild.bVerbose())
+    {
+        for (tCIDLib::TCard4 c4Ind = 0; c4Ind < c4ArgCnt; c4Ind++)
+            stdOut << apszArgs[c4Ind] << L" ";
+        stdOut << kCIDBuild::EndLn;
+    }
+
+    // Ok, lets do the compilation
+    tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
+    if (facCIDBuild.bLowPrio())
+        c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
+    if (!TUtils::bExec(apszArgs, c4ArgCnt, c4ErrCode, c4ExecFlags))
+    {
+        stdOut << L"Could not execute the compiler" << kCIDBuild::EndLn;
+        return kCIDLib::False;
+    }
+
+    if (c4ErrCode)
+        return kCIDLib::False;
+
+    // Make sure we have a line after the output if in verbose mode
+    if (facCIDBuild.bVerbose())
+        stdOut << kCIDBuild::EndLn;
+
+    return kCIDLib::True;
+}
+
 tCIDLib::TBoolean TVCppDriver::bCompileCpps()
 {
     TBldStr strTmp;
@@ -310,22 +343,19 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     apszArgs[c4CurArg++] = L"/c";
     apszArgs[c4CurArg++] = L"/EHa";     // Needed for /GR+
     apszArgs[c4CurArg++] = L"/GR";      // Enable RTTI
-    apszArgs[c4CurArg++] = L"/FD";
+//    apszArgs[c4CurArg++] = L"/FD";
     apszArgs[c4CurArg++] = L"/DSTRICT";
     apszArgs[c4CurArg++] = L"/nologo";
     apszArgs[c4CurArg++] = L"/DWIN32";
     apszArgs[c4CurArg++] = L"/Zp8";     // Pack on 8 bytes unless forced otherwise
 
-    //
-    //  Multi-core support during compiles if not low priority or in single
-    //  mode. We set the count  to the count minus one.
-    //
+    // Enable multi-processor compiles. We'll use half the CPUs, or at least one.
     TBldStr strMP = L"/MP";
     if (!facCIDBuild.bLowPrio() && !facCIDBuild.bSingle())
     {
         tCIDLib::TCard4 c4Count = facCIDBuild.c4CPUCount();
         if (c4Count > 1)
-            c4Count--;
+            c4Count >>= 1;
         strMP.Append(c4Count);
         apszArgs[c4CurArg++] = strMP.pszBuffer();
     }
@@ -554,65 +584,92 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     apszArgs[c4CurArg++] = strOutDir.pszBuffer();
 
     //
-    //  And now check each Cpp file and see if we have to build it. If so,
-    //  the do it. Keep track of whether we build anything and return that
-    //  status.
+    //  And now check each Cpp file and see if we have to build it. If so
+    //  add it to a list of files to comiler.
     //
+    tCIDLib::TBoolean bBuildErr = kCIDLib::False;
+    TList<TBldStr> listToBuild;
     TList<TDepInfo>::TCursor cursCpps(&listCpps());
-    if (!cursCpps.bResetIter())
-        return kCIDLib::False;
-
-    tCIDLib::TBoolean bBuiltSomething = kCIDLib::False;
-    TBldStr strTargets;
-    do
+    if (cursCpps.bResetIter())
     {
-        // Get a ref to the current element
-        const TDepInfo& depiCur = cursCpps.tCurElement();
-
-        // If this guy does not need to be compiled, check the next one
-        if (!bMustCompile(*m_pprojiTarget, depiCur))
-            continue;
-
-        // Indicate that we built at least one Obj file
-        bBuiltSomething = kCIDLib::True;
-
-        apszArgs[c4CurArg++] = depiCur.strFileName().pszBuffer();
-    }   while (cursCpps.bNext());
-
-
-    // If any targets need updating, then let's do it
-    if (bBuiltSomething)
-    {
-
-        if (facCIDBuild.bVerbose())
+        do
         {
-            for (tCIDLib::TCard4 c4Ind = 0; c4Ind < c4CurArg; c4Ind++)
-                stdOut << apszArgs[c4Ind] << L" ";
-            stdOut << kCIDBuild::EndLn;
-        }
+            const TDepInfo& depiCur = cursCpps.tCurElement();
+            if (bMustCompile(*m_pprojiTarget, depiCur))
+                listToBuild.Add(new TBldStr(depiCur.strFileName()));
+        }   while (cursCpps.bNext());
 
-        // Ok, lets do the compilation
-        tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
-        if (facCIDBuild.bLowPrio())
-            c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
-        tCIDLib::TCard4 c4Result;
-        if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, c4ExecFlags))
+        if (!listToBuild.bEmpty())
         {
-            stdOut << L"Could not execute the compiler" << kCIDBuild::EndLn;
-            throw tCIDBuild::EErrors::BuildError;
-        }
+            // See if PCH's are disabled
+            tCIDLib::TBoolean bDoPCH(m_pprojiTarget->pkvpFindOption(L"NOPCH") == nullptr);
 
-        if (c4Result)
-        {
-            stdOut  << L"Failed compilation of targets: "
-                    << strTargets << L". Error Code: "
-                    << c4Result << kCIDBuild::EndLn;
-            throw tCIDBuild::EErrors::BuildError;
-        }
+            // Build up the name of the header that will drive them
+            TBldStr strPCHHeader = m_pprojiTarget->strProjectName().pszBuffer();
+            if (m_pprojiTarget->eType() != tCIDBuild::EProjTypes::Executable)
+                strPCHHeader.Append(L'_');
+            strPCHHeader.Append(L".hpp");
 
-        // Make sure we have a line after the output if in verbose mode
-        if (facCIDBuild.bVerbose())
-            stdOut << kCIDBuild::EndLn;
+            // If that doesn't exist, then no PCH
+            if (!TUtils::bExists(strPCHHeader))
+                bDoPCH = kCIDLib::False;
+
+            // This one we will pass to all files to use the PCH header
+            TBldStr strPCHUse = L"/Yu";
+            strPCHUse.Append(strPCHHeader);
+
+            // The actual PCH file we want to create and use. It's always included
+            TBldStr strPCHFile = L"/Fp";
+            strPCHFile.Append(m_pprojiTarget->strOutDir());
+            strPCHFile.AppendPathComp(m_pprojiTarget->strProjectName().pszBuffer());
+            strPCHFile.Append(L".pch");
+
+            if (bDoPCH)
+            {
+                apszArgs[c4CurArg++] = strPCHUse.pszBuffer();
+                apszArgs[c4CurArg++] = strPCHFile.pszBuffer();
+            }
+
+            // The main or internal header is used with the /Yc option
+            TBldStr strPCHCreate = L"/Yc";
+            strPCHCreate.Append(m_pprojiTarget->strProjectName().pszBuffer());
+            if ((m_pprojiTarget->eType() != tCIDBuild::EProjTypes::Executable)
+            &&  (m_pprojiTarget->eType() != tCIDBuild::EProjTypes::Service))
+            {
+                strPCHCreate.Append(L'_');
+            }
+            strPCHCreate.Append(L".hpp");
+
+
+            TList<TBldStr>::TCursor cursBuildList(&listToBuild);
+            cursBuildList.bResetIter();
+            tCIDLib::TBoolean bFirstFile = kCIDLib::True;
+            do
+            {
+                tCIDLib::TCard4 c4RealCnt = c4CurArg;
+
+                // If the first file, we need to create the PCH
+                if (bFirstFile)
+                {
+                    bFirstFile = kCIDLib::False;
+                    if (bDoPCH)
+                        apszArgs[c4RealCnt++] = strPCHCreate.pszBuffer();
+                }
+
+                // Add the current file as the target to compile
+                const TBldStr& strCurFl = cursBuildList.tCurElement();
+                apszArgs[c4RealCnt++] = strCurFl.pszBuffer();
+
+                tCIDLib::TCard4 c4ErrCode;
+                if (!bCompileOne(apszArgs, c4RealCnt, c4ErrCode))
+                {
+                    stdOut  << L"Failed compilation of target: "
+                            << strCurFl << L". Error Code: "
+                            << c4ErrCode << kCIDBuild::EndLn;
+                    bBuildErr = kCIDLib::True;
+                }
+            }   while (cursBuildList.bNext());
+        }
     }
 
     // Delete any dynamically allocated parameters
@@ -621,7 +678,12 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         if (abDynAlloc[c4Index])
             delete [] apszArgs[c4Index];
     }
-    return bBuiltSomething;
+
+    if (bBuildErr)
+        throw tCIDBuild::EErrors::BuildError;
+
+    // REturn true if we built something
+    return !listToBuild.bEmpty();
 }
 
 
@@ -709,7 +771,7 @@ tCIDLib::TVoid TVCppDriver::Link(const tCIDLib::TBoolean bHaveResFile)
     apszArgs[c4CurArg++] = L"Link.Exe";
     apszArgs[c4CurArg++] = L"/nologo";
     apszArgs[c4CurArg++] = L"/machine:X86";
-    apszArgs[c4CurArg++] = L"/NODEFAULTLIB:LIBCMT";
+    // apszArgs[c4CurArg++] = L"/NODEFAULTLIB:LIBCMT";
 
     //
     //  Set up the map file output. If this is a versioned project, then
@@ -784,23 +846,6 @@ tCIDLib::TVoid TVCppDriver::Link(const tCIDLib::TBoolean bHaveResFile)
         strResFile = m_pprojiTarget->strProjectName();
         strResFile.Append(L".res");
         apszArgs[c4CurArg++] = strResFile.pszBuffer();
-    }
-
-    //
-    //  If this is a based project, then set up the base address of the
-    //  project. We space them out in 2MB spots. Its formatted as a hex
-    //  value.
-    //
-    TBldStr strBase(L"/base:0x");
-    if (m_pprojiTarget->c4Base())
-    {
-//        // We start at 258MB and work up in 1MB chunks
-//        const tCIDLib::TCard4 c4Chunk = (1024*1024);
-//        const tCIDLib::TCard4 c4BaseBase = 0x12000000 + c4Chunk;
-//        const tCIDLib::TCard4 c4BaseOfs = c4BaseBase
-//                                        + ((m_pprojiTarget->c4Base() - 1) * c4Chunk);
-//        strBase.Append(c4BaseOfs, 16);
-//        apszArgs[c4CurArg++] = strBase.pszBuffer();
     }
 
     // Add in all of the library files that are from dependent projects.

@@ -147,7 +147,7 @@ namespace TUtils
 
     tCIDLib::TBoolean bExec
     (
-        const   tCIDLib::TCh* const *       apszParams
+        const   tCIDLib::TCh**              apszParams
         , const tCIDLib::TCard4             c4Count
         ,       tCIDLib::TCard4&            c4Result
         , const tCIDLib::TCard4             c4Flags

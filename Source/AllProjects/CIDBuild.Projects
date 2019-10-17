@@ -311,6 +311,11 @@ PROJECT=CIDJPEG
         CIDImage
     END DEPENDENTS
 
+    OPTIONS [WIN32_*]
+        ; We have some c files, which CIDBuild doesn't deal with yet
+        NOPCH = Yes
+    END OPTIONS
+
     INCLUDEPATHS
         .\JLibInc
     END INCLUDEPATHS
@@ -974,6 +979,12 @@ PROJECT=CIDWebBrowser [Win32_*]
         CIDLib
         CIDCtrls
     END DEPENDENTS
+
+    OPTIONS [WIN32_*]
+        ; We have a c file, which CIDBuild doesn't deal with yet
+        NOPCH = Yes
+    END OPTIONS
+
 END PROJECT
 
 
@@ -1156,7 +1167,6 @@ PROJECT=CIDNameSrv
     SETTINGS
         DIRECTORY   = OrbUtils\CIDNameSrv
         MSGFILE     = Yes
-        TYPE        = Service
     END SETTINGS
 
     IDLFILES
@@ -1177,7 +1187,6 @@ PROJECT=CIDLogSrv
     SETTINGS
         DIRECTORY   = OrbUtils\CIDLogSrv
         MSGFILE     = Yes
-        TYPE        = Service
     END SETTINGS
 
     DEPENDENTS
@@ -1191,7 +1200,6 @@ PROJECT=CIDCfgSrv
     SETTINGS
         DIRECTORY   = OrbUtils\CIDCfgSrv
         MSGFILE     = Yes
-        TYPE        = Service
     END SETTINGS
 
     IDLFILES
@@ -1225,6 +1233,7 @@ PROJECT=CIDNSAdmin
     DEPENDENTS
         CIDOrbUC
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1238,6 +1247,7 @@ PROJECT=CIDLogAdmin
         CIDRegX
         CIDOrbUC
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1596,6 +1606,7 @@ PROJECT=LogStressTest
         CIDOrb
         CIDOrbUC
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1668,6 +1679,7 @@ PROJECT=Beeper
     DEPENDENTS
         CIDLib
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1683,6 +1695,7 @@ PROJECT=CDROM1 [WIN32_*]
         CIDJPEG
         CIDDAE
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1695,6 +1708,7 @@ PROJECT=Collect1
     DEPENDENTS
         CIDLib
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1707,6 +1721,7 @@ PROJECT=Collect2
     DEPENDENTS
         CIDLib
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1719,6 +1734,7 @@ PROJECT=Collect3
     DEPENDENTS
         CIDMath
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1731,6 +1747,7 @@ PROJECT=Collect4
     DEPENDENTS
         CIDMath
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1743,6 +1760,7 @@ PROJECT=Crypto1
     DEPENDENTS
         CIDCrypto
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1756,6 +1774,7 @@ PROJECT=CvtImgToTrans
         CIDImage
         CIDPNG
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1771,6 +1790,7 @@ PROJECT=DAE1 [Win32_*]
         CIDLib
         CIDDAE
     END DEPENDENTS
+
 END PROJECT
 
 PROJECT=DAE2 [Win32_*]
@@ -1784,6 +1804,7 @@ PROJECT=DAE2 [Win32_*]
         CIDLib
         CIDDAE
     END DEPENDENTS
+
 END PROJECT
 
 
