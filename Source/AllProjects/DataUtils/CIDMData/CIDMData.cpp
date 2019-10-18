@@ -37,12 +37,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDMData& facCIDMData()
 {
-    static TFacCIDMData* pfacCIDMData = nullptr;
-    if (!pfacCIDMData)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDMData)
-            pfacCIDMData = new TFacCIDMData;
-    }
-    return *pfacCIDMData;
+    static TFacCIDMData facCIDMData;
+    return facCIDMData;
 }

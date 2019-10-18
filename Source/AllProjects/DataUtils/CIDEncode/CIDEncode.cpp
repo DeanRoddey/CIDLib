@@ -37,12 +37,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDEncode& facCIDEncode()
 {
-    static TFacCIDEncode* pfacCIDEncode = nullptr;
-    if (!pfacCIDEncode)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDEncode)
-            pfacCIDEncode = new TFacCIDEncode;
-    }
-    return *pfacCIDEncode;
+    static TFacCIDEncode facCIDEncode;
+    return facCIDEncode;
 }
+

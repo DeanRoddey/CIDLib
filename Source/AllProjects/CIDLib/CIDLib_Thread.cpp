@@ -335,15 +335,8 @@ static tCIDLib::TBoolean bRemoveName(const TString& strName)
 //
 static TMutex* pmtxListAccess()
 {
-    static TMutex* pmtxListAccess = 0;
-
-    if (!pmtxListAccess)
-    {
-        TBaseLock lockInit;
-        if (!pmtxListAccess)
-            TRawMem::pExchangePtr(&pmtxListAccess, new TMutex);
-    }
-    return pmtxListAccess;
+    static TMutex mtxListAccess;
+    return &mtxListAccess;
 }
 
 

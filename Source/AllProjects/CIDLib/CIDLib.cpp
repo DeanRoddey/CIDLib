@@ -485,14 +485,8 @@ static tCIDLib::TVoid DummyFunc()
 //
 TFacCIDLib& facCIDLib()
 {
-    static TFacCIDLib* pfacCIDLib = nullptr;
-    if (!pfacCIDLib)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDLib)
-            pfacCIDLib = new TFacCIDLib;
-    }
-    return *pfacCIDLib;
+    static TFacCIDLib facCIDLib;
+    return facCIDLib;
 }
 
 

@@ -142,13 +142,26 @@ struct  TMutexHandleImpl
 
 //
 //  A process under Win32 is represented by a process handle and a
-//  process id. By putting them together in a single blob, we abstract
-//  whether the platform has one or both of these.
+//  process id.
 //
 struct  TProcessHandleImpl
 {
     HANDLE          hProcess;
     tCIDLib::TCard4 pidThis;
+
+    TProcessHandleImpl() :
+
+        hProcess(0)
+        , pidThis(0)
+    {
+    }
+
+    TProcessHandleImpl(HANDLE hProc, const tCIDLib::TCard4 pidProc) :
+
+        hProcess(hProc)
+        , pidThis(pidProc)
+    {
+    }
 };
 
 

@@ -48,14 +48,8 @@ AdvRTTIDecls(TSize,TObject)
 // ---------------------------------------------------------------------------
 TSize& TSize::Nul_TSize()
 {
-    static TSize* pszNull = nullptr;
-    if (!pszNull)
-    {
-        TBaseLock lockInit;
-        if (!pszNull)
-            TRawMem::pExchangePtr(&pszNull, new TSize);
-    }
-    return *pszNull;
+    static TSize szNull;
+    return szNull;
 }
 
 

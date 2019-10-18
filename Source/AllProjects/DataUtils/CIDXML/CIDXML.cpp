@@ -72,13 +72,7 @@ RTTIDecls(TXMLElemDecl,TObject)
 // ---------------------------------------------------------------------------
 TFacCIDXML& facCIDXML()
 {
-    static TFacCIDXML* pfacCIDXML = nullptr;
-    if (!pfacCIDXML)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDXML)
-            pfacCIDXML = new TFacCIDXML;
-    }
-    return *pfacCIDXML;
+    static TFacCIDXML facCIDXML;
+    return facCIDXML;
 }
 

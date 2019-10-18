@@ -35,13 +35,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDComm& facCIDComm()
 {
-    static TFacCIDComm* pfacCIDComm = nullptr;
-    if (!pfacCIDComm)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDComm)
-            pfacCIDComm = new TFacCIDComm;
-    }
-    return *pfacCIDComm;
+    static TFacCIDComm facCIDComm;
+    return facCIDComm;
 }
 

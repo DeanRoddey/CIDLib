@@ -45,14 +45,8 @@ MDuplicable& MDuplicable::Nul_MDuplicable()
     //  We need some object to represent this and it's not a concrete class
     //  so we just use a point, which implements this interface.
     //
-    static TPoint* pmdupNull = nullptr;
-    if (!pmdupNull)
-    {
-        TBaseLock lockInit;
-        if (!pmdupNull)
-            TRawMem::pExchangePtr(&pmdupNull, new TPoint);
-    }
-    return *pmdupNull;
+    static TPoint mdupNull;
+    return mdupNull;
 }
 
 

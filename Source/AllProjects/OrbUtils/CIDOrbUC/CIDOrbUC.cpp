@@ -35,13 +35,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDOrbUC& facCIDOrbUC()
 {
-    static TFacCIDOrbUC* pfacCIDOrbUC = nullptr;
-    if (!pfacCIDOrbUC)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDOrbUC)
-            pfacCIDOrbUC = new TFacCIDOrbUC;
-    }
-    return *pfacCIDOrbUC;
+    static TFacCIDOrbUC facCIDOrbUC;
+    return facCIDOrbUC;
 }
 

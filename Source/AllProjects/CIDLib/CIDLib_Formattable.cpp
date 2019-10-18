@@ -50,13 +50,7 @@ MFormattable& MFormattable::Nul_MFormattable()
     //  We have to have some real class for this, which derives from formattable
     //  so we use TPoint.
     //
-    static TPoint* pfmtblNull = nullptr;
-    if (!pfmtblNull)
-    {
-        TBaseLock lockInit;
-        if (!pfmtblNull)
-            TRawMem::pExchangePtr(&pfmtblNull, new TPoint);
-    }
-    return *pfmtblNull;
+    static TPoint fmtblNull;
+    return fmtblNull;
 }
 

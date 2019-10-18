@@ -54,14 +54,8 @@ const TArea  TArea::areaEmpty(0, 0, 0UL, 0UL);
 // ---------------------------------------------------------------------------
 TArea& TArea::Nul_TArea()
 {
-    static TArea* pareaNull = nullptr;
-    if (!pareaNull)
-    {
-        TBaseLock lockInit;
-        if (!pareaNull)
-            TRawMem::pExchangePtr(&pareaNull, new TArea);
-    }
-    return *pareaNull;
+    static TArea areaNull;
+    return areaNull;
 }
 
 

@@ -608,14 +608,8 @@ TWindow::CheckHandlerRegParms(  const   TWindow* const  pwndSrc
 // Lazy eval for the null window object
 TWindow& TWindow::Nul_TWindow()
 {
-    static TWindow* pwndNull = nullptr;
-    if (!pwndNull)
-    {
-        TBaseLock lockInit;
-        if (!pwndNull)
-            TRawMem::pExchangePtr(&pwndNull, new TWindow(kCIDLib::False));
-    }
-    return *pwndNull;
+    static TWindow wndNull(kCIDLib::False);
+    return wndNull;
 }
 
 

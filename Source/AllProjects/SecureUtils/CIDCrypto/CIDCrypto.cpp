@@ -37,12 +37,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDCrypto& facCIDCrypto()
 {
-    static TFacCIDCrypto* pfacCIDCrypto = nullptr;
-    if (!pfacCIDCrypto)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDCrypto)
-            pfacCIDCrypto = new TFacCIDCrypto;
-    }
-    return *pfacCIDCrypto;
+    static TFacCIDCrypto facCIDCrypto;
+    return facCIDCrypto;
 }

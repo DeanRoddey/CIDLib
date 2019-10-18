@@ -50,19 +50,8 @@ RTTIDecls(TMemBuf,TObject)
 // ---------------------------------------------------------------------------
 TMemBuf& TMemBuf::Nul_TMemBuf()
 {
-    static TMemBuf* pmbufNull = nullptr;
-    if (!pmbufNull)
-    {
-        TBaseLock lockInit;
-        if (!pmbufNull)
-        {
-            TRawMem::pExchangePtr
-            (
-                &pmbufNull, static_cast<TMemBuf*>(new THeapBuf(1))
-            );
-        }
-    }
-    return *pmbufNull;
+    static THeapBuf mbufNull(1);
+    return mbufNull;
 }
 
 

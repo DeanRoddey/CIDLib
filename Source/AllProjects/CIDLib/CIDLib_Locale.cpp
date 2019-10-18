@@ -148,14 +148,8 @@ static tCIDLib::TVoid LoadStr(          tCIDLib::TCh* const     pszToFill
 //
 static TCriticalSection* pcrsSync()
 {
-    static TCriticalSection* pcrsLocSync = 0;
-    if (!pcrsLocSync)
-    {
-        TBaseLock lockInit;
-        if (!pcrsLocSync)
-            TRawMem::pExchangePtr(&pcrsLocSync, new TCriticalSection);
-    }
-    return pcrsLocSync;
+    static TCriticalSection crsLocSync;
+    return &crsLocSync;
 }
 
 

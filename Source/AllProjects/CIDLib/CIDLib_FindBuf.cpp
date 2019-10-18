@@ -99,19 +99,8 @@ TFindBuf::eCompByLastMod(const TFindBuf& fndb1, const TFindBuf& fndb2)
 
 const TString& TFindBuf::strFull()
 {
-    static const TString* pstrFull = nullptr;
-    if (!pstrFull)
-    {
-        TBaseLock lockInit;
-        if (!pstrFull)
-        {
-            TRawMem::pExchangePtr<const TString>
-            (
-                &pstrFull, new TString(CIDLib_FindBuf::pszDefFmt)
-            );
-        }
-    }
-    return *pstrFull;
+    static const TString strFull(CIDLib_FindBuf::pszDefFmt);
+    return strFull;
 }
 
 
@@ -123,19 +112,8 @@ const TString& TFindBuf::strGetKey(const TFindBuf& fndbSrc)
 
 const TString& TFindBuf::strNameAndSize()
 {
-    static const TString* pstrNameAndSize = nullptr;
-    if (!pstrNameAndSize)
-    {
-        TBaseLock lockInit;
-        if (!pstrNameAndSize)
-        {
-            TRawMem::pExchangePtr<const TString>
-            (
-                &pstrNameAndSize, new TString(L"%(S,10) %(P)")
-            );
-        }
-    }
-    return *pstrNameAndSize;
+    static const TString strNameAndSize(L"%(S,10) %(P)");
+    return strNameAndSize;
 }
 
 

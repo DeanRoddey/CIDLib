@@ -56,14 +56,8 @@ RTTIDecls(TNulRefCounted,TObject)
 // ---------------------------------------------------------------------------
 MRefCounted& MRefCounted::Nul_MRefCounted()
 {
-    static TNulRefCounted* pdupNull = nullptr;
-    if (!pdupNull)
-    {
-        TBaseLock lockInit;
-        if (!pdupNull)
-            TRawMem::pExchangePtr(&pdupNull, new TNulRefCounted);
-    }
-    return *pdupNull;
+    static TNulRefCounted mrefcNull;
+    return mrefcNull;
 }
 
 

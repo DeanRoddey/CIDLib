@@ -49,14 +49,8 @@ AdvRTTIDecls(TMoney,TObject)
 // ---------------------------------------------------------------------------
 TMoney& TMoney::Nul_TMoney()
 {
-    static TMoney* pmonNull = nullptr;
-    if (!pmonNull)
-    {
-        TBaseLock lockInit;
-        if (!pmonNull)
-            TRawMem::pExchangePtr(&pmonNull, new TMoney);
-    }
-    return *pmonNull;
+    static TMoney monNull;
+    return monNull;
 }
 
 

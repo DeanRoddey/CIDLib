@@ -46,13 +46,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDGraphDev& facCIDGraphDev()
 {
-    static TFacCIDGraphDev* pfacCIDGraphDev = nullptr;
-    if (!pfacCIDGraphDev)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDGraphDev)
-            pfacCIDGraphDev = new TFacCIDGraphDev;
-    }
-    return *pfacCIDGraphDev;
+    static TFacCIDGraphDev facCIDGraphDev;
+    return facCIDGraphDev;
 }
 

@@ -60,14 +60,8 @@ namespace CIDImage_ColorPalette
 // ---------------------------------------------------------------------------
 TClrPalette& TClrPalette::Nul_TClrPalette()
 {
-    static TClrPalette* ppalNull = nullptr;
-    if (!ppalNull)
-    {
-        TBaseLock lockInit;
-        if (!ppalNull)
-            TRawMem::pExchangePtr(&ppalNull, new TClrPalette);
-    }
-    return *ppalNull;
+    static TClrPalette palNull;
+    return palNull;
 }
 
 

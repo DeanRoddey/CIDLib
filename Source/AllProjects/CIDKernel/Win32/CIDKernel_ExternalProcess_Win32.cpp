@@ -187,10 +187,8 @@ TKrnlExtProcess::TKrnlExtProcess() :
 
     m_pPlatData(nullptr)
 {
-    // Allocate the new process handle and get it set up
+    // Allocate the new process handle
     m_hprocThis.m_phprociThis = new TProcessHandleImpl;
-    m_hprocThis.m_phprociThis->pidThis = 0;
-    m_hprocThis.m_phprociThis->hProcess = 0;
 
     // And allocate our per-platform data structure and init it
     m_pPlatData = new TPlatData;

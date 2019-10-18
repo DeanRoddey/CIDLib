@@ -563,35 +563,14 @@ tCIDLib::TVoid TKrnlProcess::ExitProcess(const tCIDLib::EExitCodes eExitCode)
 }
 
 
+// Fault in our process handle
 const TProcessHandle& TKrnlProcess::hprocThis()
 {
-    static TProcessHandle* phprocThis = 0;
-
-    //
-    //  If the process handle object has not been created yet, then create it
-    //  with appropriate synchronization.
-    //
-    if (!phprocThis)
-    {
-        TBaseLock lockInit;
-        if (!phprocThis)
-        {
-            TProcessHandleImpl hprociTmp;
-            hprociTmp.hProcess = ::GetCurrentProcess();
-            hprociTmp.pidThis = ::GetCurrentProcessId();
-
-            //
-            //  We can't make the static volatile, since then the return
-            //  has to be volatile and so on. So we insure a memory
-            //  barrier by doing an interlocked exchange.
-            //
-            InterlockedExchangePointer
-            (
-                (void**)&phprocThis, new TProcessHandle(hprociTmp)
-            );
-        }
-    }
-    return *phprocThis;
+    static TProcessHandle hprocThis
+    (
+        TProcessHandleImpl(::GetCurrentProcess(), ::GetCurrentProcessId())
+    );
+    return hprocThis;
 }
 
 

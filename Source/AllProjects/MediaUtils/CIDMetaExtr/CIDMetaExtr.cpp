@@ -36,13 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDMetaExtr& facCIDMetaExtr()
 {
-    static TFacCIDMetaExtr* pfacCIDMetaExtr = nullptr;
-    if (!pfacCIDMetaExtr)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDMetaExtr)
-            pfacCIDMetaExtr = new TFacCIDMetaExtr;
-    }
-    return *pfacCIDMetaExtr;
+    static TFacCIDMetaExtr facCIDMetaExtr;
+    return facCIDMetaExtr;
 }
 

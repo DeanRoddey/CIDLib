@@ -43,20 +43,6 @@
 RTTIDecls(TTextOutStream,TObject)
 
 
-// ---------------------------------------------------------------------------
-//  Local types and constants
-// ---------------------------------------------------------------------------
-namespace CIDLib_TextOutStream
-{
-    // -----------------------------------------------------------------------
-    //  Some stream format objects we fault in upon use
-    // -----------------------------------------------------------------------
-    static const TStreamFmt* pstrmfDef = 0;
-    static const TStreamFmt* pstrmfHex = 0;
-    static const TStreamFmt* pstrmfHex2 = 0;
-    static const TStreamFmt* pstrmfHex4 = 0;
-}
-
 
 // ---------------------------------------------------------------------------
 //  Local functions
@@ -100,70 +86,35 @@ static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
 // ---------------------------------------------------------------------------
 const TStreamFmt& TTextOutStream::strmfDefault()
 {
-    if (!CIDLib_TextOutStream::pstrmfDef)
-    {
-        TBaseLock lockInit;
-        if (!CIDLib_TextOutStream::pstrmfDef)
-        {
-            TRawMem::pExchangePtr<const TStreamFmt>
-            (
-                &CIDLib_TextOutStream::pstrmfDef
-                , new TStreamFmt(0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace)
-            );
-        }
-    }
-    return *CIDLib_TextOutStream::pstrmfDef;
+    static const TStreamFmt strmfDef(0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
+    return strmfDef;
 }
 
 const TStreamFmt& TTextOutStream::strmfHex()
 {
-    if (!CIDLib_TextOutStream::pstrmfHex)
-    {
-        TBaseLock lockInit;
-        if (!CIDLib_TextOutStream::pstrmfHex)
-        {
-            TRawMem::pExchangePtr<const TStreamFmt>
-            (
-                &CIDLib_TextOutStream::pstrmfHex
-                , new TStreamFmt(0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace, tCIDLib::ERadices::Hex)
-            );
-        }
-    }
-    return *CIDLib_TextOutStream::pstrmfHex;
+    static const TStreamFmt strmfHex
+    (
+        0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace, tCIDLib::ERadices::Hex
+    );
+    return strmfHex;
 }
 
 const TStreamFmt& TTextOutStream::strmfHex2()
 {
-    if (!CIDLib_TextOutStream::pstrmfHex2)
-    {
-        TBaseLock lockInit;
-        if (!CIDLib_TextOutStream::pstrmfHex2)
-        {
-            TRawMem::pExchangePtr<const TStreamFmt>
-            (
-                &CIDLib_TextOutStream::pstrmfHex2
-                , new TStreamFmt(2, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex)
-            );
-        }
-    }
-    return *CIDLib_TextOutStream::pstrmfHex2;
+    static const TStreamFmt strmfHex2
+    (
+        2, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex
+    );
+    return strmfHex2;
 }
 
 const TStreamFmt& TTextOutStream::strmfHex4()
 {
-    if (!CIDLib_TextOutStream::pstrmfHex4)
-    {
-        TBaseLock lockInit;
-        if (!CIDLib_TextOutStream::pstrmfHex4)
-        {
-            TRawMem::pExchangePtr<const TStreamFmt>
-            (
-                &CIDLib_TextOutStream::pstrmfHex4
-                , new TStreamFmt(4, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex)
-            );
-        }
-    }
-    return *CIDLib_TextOutStream::pstrmfHex4;
+    static const TStreamFmt strmfHex4
+    (
+        4, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex
+    );
+    return strmfHex4;
 }
 
 

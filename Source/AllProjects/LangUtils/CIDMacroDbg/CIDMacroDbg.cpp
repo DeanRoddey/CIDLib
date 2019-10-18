@@ -35,14 +35,6 @@
 //
 TFacCIDMacroDbg& facCIDMacroDbg()
 {
-    static TFacCIDMacroDbg* pfacCIDMacroDbg = nullptr;
-    if (!pfacCIDMacroDbg)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDMacroDbg)
-            pfacCIDMacroDbg = new TFacCIDMacroDbg;
-    }
-    return *pfacCIDMacroDbg;
+    static TFacCIDMacroDbg facCIDMacroDbg;
+    return facCIDMacroDbg;
 }
-
-

@@ -36,14 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDWebBrowser& facCIDWebBrowser()
 {
-    static TFacCIDWebBrowser* pfacCIDWebBrowser = nullptr;
-    if (!pfacCIDWebBrowser)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDWebBrowser)
-            pfacCIDWebBrowser = new TFacCIDWebBrowser;
-    }
-    return *pfacCIDWebBrowser;
+    static TFacCIDWebBrowser facCIDWebBrowser;
+    return facCIDWebBrowser;
 }
-
 

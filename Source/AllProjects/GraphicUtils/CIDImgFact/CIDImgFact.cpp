@@ -36,14 +36,7 @@
 //
 TFacCIDImgFact& facCIDImgFact()
 {
-    static TFacCIDImgFact* pfacCIDImgFact = nullptr;
-    if (!pfacCIDImgFact)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDImgFact)
-            pfacCIDImgFact = new TFacCIDImgFact;
-    }
-    return *pfacCIDImgFact;
+    static TFacCIDImgFact facCIDImgFact;
+    return facCIDImgFact;
 }
-
 

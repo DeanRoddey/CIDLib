@@ -212,14 +212,8 @@ static tCIDLib::TVoid InitCharTable()
 // ---------------------------------------------------------------------------
 TURL& TURL::Nul_TURL()
 {
-    static TURL* purlNull = nullptr;
-    if (!purlNull)
-    {
-        TBaseLock lockInit;
-        if (!purlNull)
-            purlNull = new TURL;
-    }
-    return *purlNull;
+    static TURL urlNull;
+    return urlNull;
 }
 
 

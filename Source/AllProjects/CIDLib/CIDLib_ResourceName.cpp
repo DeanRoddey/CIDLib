@@ -58,14 +58,8 @@ namespace CIDLib_ResourceName
 // ---------------------------------------------------------------------------
 TResourceName& TResourceName::Nul_TResourceName()
 {
-    static TResourceName* prsnNull = 0;
-    if (!prsnNull)
-    {
-        TBaseLock lockInit;
-        if (!prsnNull)
-            TRawMem::pExchangePtr(&prsnNull, new TResourceName);
-    }
-    return *prsnNull;
+    static TResourceName rsnNull;
+    return rsnNull;
 }
 
 

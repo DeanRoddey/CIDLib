@@ -96,16 +96,8 @@ namespace CIDLib_Module
     //
     TMutex* pmtxLogSync()
     {
-        static TMutex* pmtxSync = nullptr;
-        if (!pmtxSync)
-        {
-            TBaseLock lockSync;
-            pmtxSync = TAtomic::pExchangePtr<TMutex>
-            (
-                &pmtxSync, new TMutex(tCIDLib::ELockStates::Unlocked)
-            );
-        }
-        return pmtxSync;
+        static TMutex mtxSync(tCIDLib::ELockStates::Unlocked);
+        return &mtxSync;
     }
 
 

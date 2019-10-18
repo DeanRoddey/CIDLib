@@ -327,15 +327,8 @@ TProcEnvLocker::~TProcEnvLocker()
 // ---------------------------------------------------------------------------
 TEnvironment& TEnvironment::Nul_TEnvironment()
 {
-    static TEnvironment* penvNull = nullptr;
-
-    if (!penvNull)
-    {
-        TBaseLock lockInit;
-        if (!penvNull)
-           TRawMem::pExchangePtr(&penvNull, new TEnvironment);
-    }
-    return *penvNull;
+    static TEnvironment envNull;
+    return envNull;
 }
 
 

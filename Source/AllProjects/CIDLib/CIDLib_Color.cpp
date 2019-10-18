@@ -50,14 +50,8 @@ RTTIDecls(TRGBClr,TObject)
 // ---------------------------------------------------------------------------
 TRGBClr& TRGBClr::Nul_TRGBClr()
 {
-    static TRGBClr* prgbNull = nullptr;
-    if (!prgbNull)
-    {
-        TBaseLock lockInit;
-        if (!prgbNull)
-            TRawMem::pExchangePtr(&prgbNull, new TRGBClr);
-    }
-    return *prgbNull;
+    static TRGBClr rgbNull;
+    return rgbNull;
 }
 
 

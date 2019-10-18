@@ -43,13 +43,7 @@ RTTIDecls(TFacCIDOrb,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDOrb& facCIDOrb()
 {
-    static TFacCIDOrb* pfacCIDOrb = nullptr;
-    if (!pfacCIDOrb)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDOrb)
-            pfacCIDOrb = new TFacCIDOrb;
-    }
-    return *pfacCIDOrb;
+    static TFacCIDOrb facCIDOrb;
+    return facCIDOrb;
 }
 

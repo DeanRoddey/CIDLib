@@ -36,13 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacTestFWLib& facTestFWLib()
 {
-    static TFacTestFWLib* pfacTestFWLib = nullptr;
-    if (!pfacTestFWLib)
-    {
-        TBaseLock lockInit;
-        if (!pfacTestFWLib)
-            pfacTestFWLib = new TFacTestFWLib;
-    }
-    return *pfacTestFWLib;
+    static TFacTestFWLib facTestFWLib;
+    return facTestFWLib;
 }
 

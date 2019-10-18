@@ -184,14 +184,8 @@ TFontMetrics::c4EnumAllFonts(const  TGraphDrawDev&              gdevTarget
 
 TFontMetrics& TFontMetrics::Nul_TFontMetrics()
 {
-    static TFontMetrics* pfmtrNull = nullptr;
-    if (!pfmtrNull)
-    {
-        TBaseLock lockInit;
-        if (!pfmtrNull)
-            TRawMem::pExchangePtr(&pfmtrNull, new TFontMetrics);
-    }
-    return *pfmtrNull;
+    static TFontMetrics fmtrNull;
+    return fmtrNull;
 }
 
 

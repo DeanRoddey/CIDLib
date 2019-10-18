@@ -59,14 +59,8 @@ RTTIDecls(TFacCIDNet,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDNet& facCIDNet()
 {
-    static TFacCIDNet* pfacCIDNet = nullptr;
-    if (!pfacCIDNet)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDNet)
-            pfacCIDNet = new TFacCIDNet;
-    }
-    return *pfacCIDNet;
+    static TFacCIDNet facCIDNet;
+    return facCIDNet;
 }
 
 

@@ -52,14 +52,8 @@ AdvRTTIDecls(TLocCardinal64,TCardinal64)
 // ---------------------------------------------------------------------------
 TCardinal& TCardinal::Nul_TCardinal()
 {
-    static TCardinal* pcNull = nullptr;
-    if (!pcNull)
-    {
-        TBaseLock lockInit;
-        if (!pcNull)
-            TRawMem::pExchangePtr(&pcNull, new TCardinal);
-    }
-    return *pcNull;
+    static TCardinal cNull;
+    return cNull;
 }
 
 
@@ -256,14 +250,8 @@ tCIDLib::TVoid TCardinal::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 TCardinal64& TCardinal64::Nul_TCardinal64()
 {
-    static TCardinal64* pcNull = nullptr;
-    if (!pcNull)
-    {
-        TBaseLock lockInit;
-        if (!pcNull)
-            TRawMem::pExchangePtr(&pcNull, new TCardinal64);
-    }
-    return *pcNull;
+    static TCardinal64 cNull;
+    return cNull;
 }
 
 

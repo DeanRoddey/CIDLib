@@ -82,14 +82,8 @@ namespace CIDSock_IPAddr
 // ---------------------------------------------------------------------------
 TIPAddress& TIPAddress::Nul_TIPAddress()
 {
-    static TIPAddress* pipaNull = 0;
-    if (!pipaNull)
-    {
-        TBaseLock lockInit;
-        if (!pipaNull)
-            TRawMem::pExchangePtr(&pipaNull, new TIPAddress);
-    }
-    return *pipaNull;
+    static TIPAddress ipaNull;
+    return ipaNull;
 }
 
 
@@ -631,14 +625,8 @@ TIPAddress::SetAddr(const   TString&                strIPAddress
 // ---------------------------------------------------------------------------
 TIPEndPoint& TIPEndPoint::Nul_TIPEndPoint()
 {
-    static TIPEndPoint* pipepNull = nullptr;
-    if (!pipepNull)
-    {
-        TBaseLock lockInit;
-        if (!pipepNull)
-            TRawMem::pExchangePtr(&pipepNull, new TIPEndPoint);
-    }
-    return *pipepNull;
+    static TIPEndPoint ipepNull;
+    return ipepNull;
 }
 
 

@@ -233,14 +233,8 @@ static tCIDLib::TVoid LoadDDraw()
 // ---------------------------------------------------------------------------
 TGraphicDevice& TGraphicDevice::Nul_TGraphicDevice()
 {
-    static TGraphicDevice* pgdevNull = nullptr;
-    if (!pgdevNull)
-    {
-        TBaseLock lockInit;
-        if (!pgdevNull)
-            TRawMem::pExchangePtr(&pgdevNull, new TGraphicDevice);
-    }
-    return *pgdevNull;
+    static TGraphicDevice gdevNull;
+    return gdevNull;
 }
 
 

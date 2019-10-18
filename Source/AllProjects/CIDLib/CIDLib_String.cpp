@@ -779,14 +779,8 @@ tCIDLib::TVoid TString::FromHex(const   tCIDLib::TCard1 c1ToXlat
 
 const TString& TString::strEmpty()
 {
-    static TString* pstrEmpty = nullptr;
-    if (!pstrEmpty)
-    {
-        TBaseLock lockInit;
-        if (!pstrEmpty)
-            TRawMem::pExchangePtr(&pstrEmpty, new TString);
-    }
-    return *pstrEmpty;
+    static TString strEmpty;
+    return strEmpty;
 }
 
 
@@ -796,15 +790,8 @@ const TString& TString::strEmpty()
 // ---------------------------------------------------------------------------
 TString& TString::Nul_TString()
 {
-    static TString* pstrNull = nullptr;
-
-    if (!pstrNull)
-    {
-        TBaseLock lockInit;
-        if (!pstrNull)
-            TRawMem::pExchangePtr(&pstrNull, new TString);
-    }
-    return *pstrNull;
+    static TString strNull;
+    return strNull;
 }
 
 

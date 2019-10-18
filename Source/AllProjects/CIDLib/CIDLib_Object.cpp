@@ -43,19 +43,8 @@
 // ---------------------------------------------------------------------------
 const TClass& TObject::clsThis()
 {
-    static const TClass* pclsThis = 0;
-    if (!pclsThis)
-    {
-        TBaseLock lockInit;
-        if (!pclsThis)
-        {
-            TRawMem::pExchangePtr<const TClass>
-            (
-                &pclsThis, new TClass(L"TObject")
-            );
-        }
-    }
-    return *pclsThis;
+    static const TClass clsThis(L"TObject");
+    return clsThis;
 }
 
 

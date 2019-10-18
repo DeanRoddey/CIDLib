@@ -42,14 +42,10 @@
 // ---------------------------------------------------------------------------
 //  Global functions
 // ---------------------------------------------------------------------------
+
+// Fault in our facility object
 TFacCIDSpReco& facCIDSpReco()
 {
-    static TFacCIDSpReco* pfacCIDSpReco = nullptr;
-    if (!pfacCIDSpReco)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDSpReco)
-            pfacCIDSpReco = new TFacCIDSpReco;
-    }
-    return *pfacCIDSpReco;
+    static TFacCIDSpReco facCIDSpReco;
+    return facCIDSpReco;
 }

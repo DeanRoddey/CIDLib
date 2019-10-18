@@ -51,14 +51,8 @@ AdvRTTIDecls(TStreamFmt,TObject)
 // ---------------------------------------------------------------------------
 TStreamFmt& TStreamFmt::Nul_TStreamFmt()
 {
-    static TStreamFmt* pstrmfNull = 0;
-    if (!pstrmfNull)
-    {
-        TBaseLock lockInit;
-        if (!pstrmfNull)
-            TRawMem::pExchangePtr(&pstrmfNull, new TStreamFmt);
-    }
-    return *pstrmfNull;
+    static TStreamFmt strmfNull;
+    return strmfNull;
 }
 
 

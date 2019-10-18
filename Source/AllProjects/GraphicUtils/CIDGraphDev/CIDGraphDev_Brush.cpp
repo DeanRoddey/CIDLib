@@ -77,19 +77,8 @@ static tCIDGraphDev::TBrushHandle hbrCreateNewBrush(const LOGBRUSH& Brush)
 // ---------------------------------------------------------------------------
 TGUIBrush& TGUIBrush::Nul_TGUIBrush()
 {
-    static TGUIBrush* pgbrNull = nullptr;
-    if (!pgbrNull)
-    {
-        TBaseLock lockInit;
-        if (!pgbrNull)
-        {
-            TRawMem::pExchangePtr<TGUIBrush>
-            (
-                &pgbrNull, new TSolidBrush(facCIDGraphDev().rgbBlack)
-            );
-        }
-    }
-    return *pgbrNull;
+    static TSolidBrush gbrNull(TRGBClr(0, 0, 0));
+    return gbrNull;
 }
 
 

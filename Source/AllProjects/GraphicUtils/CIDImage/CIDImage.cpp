@@ -30,15 +30,12 @@
 #include    "CIDImage_.hpp"
 
 
+// ---------------------------------------------------------------------------
+//  Global methods
+// ---------------------------------------------------------------------------
 TFacCIDImage& facCIDImage()
 {
-    static TFacCIDImage* pfacCIDImage = nullptr;
-    if (!pfacCIDImage)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDImage)
-            pfacCIDImage = new TFacCIDImage;
-    }
-    return *pfacCIDImage;
+    static TFacCIDImage facCIDImage;
+    return facCIDImage;
 }
 

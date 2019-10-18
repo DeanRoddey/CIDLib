@@ -50,14 +50,8 @@ AdvRTTIDecls(TLocFloat,TFloat)
 // ---------------------------------------------------------------------------
 TFloat& TFloat::Nul_TFloat()
 {
-    static TFloat* pfNull = nullptr;
-    if (!pfNull)
-    {
-        TBaseLock lockInit;
-        if (!pfNull)
-            TRawMem::pExchangePtr(&pfNull, new TFloat);
-    }
-    return *pfNull;
+    static TFloat fNull;
+    return fNull;
 }
 
 

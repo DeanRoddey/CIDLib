@@ -36,14 +36,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDObjStore& facCIDObjStore()
 {
-    static TFacCIDObjStore* pfacCIDObjStore = nullptr;
-    if (!pfacCIDObjStore)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDObjStore)
-            pfacCIDObjStore = new TFacCIDObjStore;
-    }
-    return *pfacCIDObjStore;
+    static TFacCIDObjStore facCIDObjStore;
+    return facCIDObjStore;
 }
-
-

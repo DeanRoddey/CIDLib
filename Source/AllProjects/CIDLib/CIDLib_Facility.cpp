@@ -88,15 +88,8 @@ namespace CIDLib_Facility
 // ---------------------------------------------------------------------------
 static TCriticalSection* pcrsList()
 {
-    static TCriticalSection*   pcrsList = 0;
-
-    if (!pcrsList)
-    {
-        TBaseLock lockSync;
-        if (!pcrsList)
-            TRawMem::pExchangePtr(&pcrsList, new TCriticalSection);
-    }
-    return pcrsList;
+    static TCriticalSection crsList;
+    return &crsList;
 }
 
 static tCIDLib::TVoid AddToList(TFacility* const pfacNew)

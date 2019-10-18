@@ -153,14 +153,8 @@ TRegNode::TRegNode( const   tCIDLib::TCh* const     pszToReg
 //
 static TCriticalSection* pcrsLock()
 {
-    static  TCriticalSection* pcrsTRLock = nullptr;
-    if (!pcrsTRLock)
-    {
-        TBaseLock lockInit;
-        if (!pcrsTRLock)
-            TRawMem::pExchangePtr(&pcrsTRLock, new TCriticalSection);
-    }
-    return pcrsTRLock;
+    static  TCriticalSection crsTRLock;
+    return &crsTRLock;
 }
 
 

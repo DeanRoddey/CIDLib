@@ -55,14 +55,8 @@ const TPoint TPoint::pntOrigin(0, 0);
 // ---------------------------------------------------------------------------
 TPoint& TPoint::Nul_TPoint()
 {
-    static TPoint* ppntNull = nullptr;
-    if (!ppntNull)
-    {
-        TBaseLock lockInit;
-        if (!ppntNull)
-            TRawMem::pExchangePtr(&ppntNull, new TPoint);
-    }
-    return *ppntNull;
+    static TPoint pntNull;
+    return pntNull;
 }
 
 

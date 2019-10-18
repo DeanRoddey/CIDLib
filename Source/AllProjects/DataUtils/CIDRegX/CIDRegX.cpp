@@ -35,12 +35,6 @@
 //
 TFacCIDRegX& facCIDRegX()
 {
-    static TFacCIDRegX* pfacCIDRegX = nullptr;
-    if (!pfacCIDRegX)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDRegX)
-            pfacCIDRegX = new TFacCIDRegX;
-    }
-    return *pfacCIDRegX;
+    static TFacCIDRegX facCIDRegX;
+    return facCIDRegX;
 }

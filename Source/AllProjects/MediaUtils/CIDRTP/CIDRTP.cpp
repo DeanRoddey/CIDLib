@@ -36,13 +36,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDRTP& facCIDRTP()
 {
-    static TFacCIDRTP* pfacCIDRTP = nullptr;
-    if (!pfacCIDRTP)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDRTP)
-            pfacCIDRTP = new TFacCIDRTP;
-    }
-    return *pfacCIDRTP;
+    static TFacCIDRTP facCIDRTP;
+    return facCIDRTP;
 }
-

@@ -36,13 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDMath& facCIDMath()
 {
-    static TFacCIDMath* pfacCIDMath = nullptr;
-    if (!pfacCIDMath)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDMath)
-            pfacCIDMath = new TFacCIDMath;
-    }
-    return *pfacCIDMath;
+    static TFacCIDMath facCIDMath;
+    return facCIDMath;
 }
 

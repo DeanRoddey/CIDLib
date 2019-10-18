@@ -34,14 +34,10 @@
 // ---------------------------------------------------------------------------
 //  Global functions
 // ---------------------------------------------------------------------------
+
+// Fault in our facility object
 TFacCIDAI& facCIDAI()
 {
-    static TFacCIDAI* pfacCIDAI = nullptr;
-    if (!pfacCIDAI)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDAI)
-            pfacCIDAI = new TFacCIDAI;
-    }
-    return *pfacCIDAI;
+    static TFacCIDAI facCIDAI;
+    return facCIDAI;
 }

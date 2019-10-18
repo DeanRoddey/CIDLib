@@ -36,13 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDDAE& facCIDDAE()
 {
-    static TFacCIDDAE* pfacCIDDAE = nullptr;
-    if (!pfacCIDDAE)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDDAE)
-            pfacCIDDAE = new TFacCIDDAE;
-    }
-    return *pfacCIDDAE;
+    static TFacCIDDAE facCIDDAE;
+    return facCIDDAE;
 }
 
