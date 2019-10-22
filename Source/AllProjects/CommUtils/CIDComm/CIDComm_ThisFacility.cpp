@@ -47,6 +47,7 @@ namespace CIDComm_ThisFacility
     //  is faulted in.
     // -----------------------------------------------------------------------
     using TFactoryList = TRefVector<TComPortFactory>;
+    TAtomicFlag     atomInitDone;
     TFactoryList*   pcolFList;
 }
 
@@ -83,10 +84,10 @@ TFacCIDComm::TFacCIDComm() :
     //  Fault in the factory list, and add the factory for local ports that
     //  are always supported.
     //
-    if (!CIDComm_ThisFacility::pcolFList)
+    if (!CIDComm_ThisFacility::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDComm_ThisFacility::pcolFList)
+        if (!CIDComm_ThisFacility::atomInitDone)
         {
             TRefVector<TComPortFactory>* pcolList = new TRefVector<TComPortFactory>
             (
@@ -94,12 +95,9 @@ TFacCIDComm::TFacCIDComm() :
             );
             TJanitor<TRefVector<TComPortFactory> > janCol(pcolList);
             pcolList->Add(new TLocalComPortFactory);
+            CIDComm_ThisFacility::pcolFList = janCol.pobjOrphan();
 
-            // Store the list last, else we'll have a race condition!
-            TRawMem::pExchangePtr
-            (
-                &CIDComm_ThisFacility::pcolFList, janCol.pobjOrphan()
-            );
+            CIDComm_ThisFacility::atomInitDone.Set();
         }
     }
 }

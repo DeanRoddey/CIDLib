@@ -322,8 +322,7 @@ template
 
         TEArray(const ElemType InitVal) :
 
-            m_bLoaded(kCIDLib::False)
-            , m_c4Size(tCIDLib::TCard4(ListSize) + c4Extra)
+            m_c4Size(tCIDLib::TCard4(ListSize) + c4Extra)
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Size; c4Index++)
                 m_aetArray[c4Index] = InitVal;
@@ -331,7 +330,7 @@ template
 
         TEArray(const ElemType aValues[tCIDLib::TCard4(ListSize) + c4Extra]) :
 
-            m_bLoaded(kCIDLib::True)
+            m_atomLoaded(kCIDLib::True)
             , m_c4Size(tCIDLib::TCard4(ListSize) + c4Extra)
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Size; c4Index++)
@@ -340,7 +339,7 @@ template
 
         TEArray(const TMyType& eaSrc) :
 
-            m_bLoaded(eaSrc.m_bLoaded)
+            m_atomLoaded(eaSrc.m_atomLoaded.bValue())
             , m_c4Size(eaSrc.m_c4Size)
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Size; c4Index++)
@@ -378,12 +377,12 @@ template
         // -----------------------------------------------------------------------
         tCIDLib::TBoolean bIsLoaded() const
         {
-            return m_bLoaded;
+            return m_atomLoaded.bValue();
         }
 
         tCIDLib::TVoid SetLoaded()
         {
-            m_bLoaded = kCIDLib::True;
+            m_atomLoaded.Set();
         }
 
 
@@ -392,7 +391,7 @@ template
         //  Private data members
         // -----------------------------------------------------------------------
         ElemType            m_aetArray[tCIDLib::TCard4(ListSize) + c4Extra];
-        tCIDLib::TBoolean   m_bLoaded;
+        TAtomicFlag         m_atomLoaded;
         tCIDLib::TCard4     m_c4Size;
 };
 

@@ -53,29 +53,29 @@ const TString& tCIDComm::strXlatEDataBits(const tCIDComm::EDataBits eToXlat)
         );
     }
 
-    static const TString* apstrValues[tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Count)];
-    if (!apstrValues[0])
+    static TEArray<TString, tCIDComm::EDataBits, tCIDComm::EDataBits::Count>
+    astrValues(TString::strEmpty());
+
+    if (!astrValues.bIsLoaded())
     {
         TBaseLock lockInit;
-        if (!apstrValues[0])
+        if (!astrValues.bIsLoaded())
         {
-            tCIDLib::ForEachE<tCIDComm::EDataBits>
-            (
-                [](const tCIDComm::EDataBits eIndex)
-                {
-                    const tCIDLib::TCard4 c4Index
-                    (
-                        tCIDLib::c4EnumOrd(eIndex)
-                        - tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Min)
-                    );
-                    apstrValues[c4Index] = new TString(TInteger(tCIDLib::i4EnumOrd(eIndex)));
-                }
-            );
+            astrValues[tCIDComm::EDataBits::Four]   = L"Four";
+            astrValues[tCIDComm::EDataBits::Five]   = L"Five";
+            astrValues[tCIDComm::EDataBits::Six]    = L"Six";
+            astrValues[tCIDComm::EDataBits::Seven]  = L"Seven";
+            astrValues[tCIDComm::EDataBits::Eight]  = L"Eight";
+
+            astrValues.SetLoaded();
         }
     }
-    return *apstrValues
+    return astrValues
     [
-        tCIDLib::c4EnumOrd(eToXlat) - tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Min)
+        tCIDComm::EDataBits
+        (
+            tCIDLib::c4EnumOrd(eToXlat) - tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Min)
+        )
     ];
 }
 
@@ -96,13 +96,12 @@ const TString& tCIDComm::strXlatEParities(const tCIDComm::EParities eToXlat)
         );
     }
 
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
     static TEArray<TString, tCIDComm::EParities, tCIDComm::EParities::Count>
-                                                          astrValues(TString::strEmpty());
-    if (!bLoaded)
+    astrValues(TString::strEmpty());
+    if (!astrValues.bIsLoaded())
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!astrValues.bIsLoaded())
         {
             astrValues[tCIDComm::EParities::None] = L"None";
             astrValues[tCIDComm::EParities::Odd] = L"Odd";
@@ -110,7 +109,7 @@ const TString& tCIDComm::strXlatEParities(const tCIDComm::EParities eToXlat)
             astrValues[tCIDComm::EParities::Mark] = L"Mark";
             astrValues[tCIDComm::EParities::Space] = L"Space";
 
-            bLoaded = kCIDLib::True;
+            astrValues.SetLoaded();
         }
     }
     return astrValues[eToXlat];
@@ -133,19 +132,18 @@ const TString& tCIDComm::strXlatEPortDTR(const tCIDComm::EPortDTR eToXlat)
         );
     }
 
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
     static TEArray<TString, tCIDComm::EPortDTR, tCIDComm::EPortDTR::Count>
-                                                          astrValues(TString::strEmpty());
-    if (!bLoaded)
+    astrValues(TString::strEmpty());
+    if (!astrValues.bIsLoaded())
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!astrValues.bIsLoaded())
         {
             astrValues[tCIDComm::EPortDTR::Disable] = L"Disable";
             astrValues[tCIDComm::EPortDTR::Enable] = L"Enable";
             astrValues[tCIDComm::EPortDTR::Handshake] = L"Handshake";
 
-            bLoaded = kCIDLib::True;
+            astrValues.SetLoaded();
         }
     }
     return astrValues[eToXlat];
@@ -168,18 +166,19 @@ const TString& tCIDComm::strXlatEPortRTS(const tCIDComm::EPortRTS eToXlat)
         );
     }
 
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
     static TEArray<TString, tCIDComm::EPortRTS, tCIDComm::EPortRTS::Count>
-                                                          astrValues(TString::strEmpty());
-    if (!bLoaded)
+    astrValues(TString::strEmpty());
+    if (!astrValues.bIsLoaded())
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!astrValues.bIsLoaded())
         {
             astrValues[tCIDComm::EPortRTS::Disable] = L"Disable";
             astrValues[tCIDComm::EPortRTS::Enable] = L"Enable";
             astrValues[tCIDComm::EPortRTS::Handshake] = L"Handshake";
             astrValues[tCIDComm::EPortRTS::Toggle] = L"Toggle";
+
+            astrValues.SetLoaded();
         }
     }
     return astrValues[eToXlat];
@@ -202,17 +201,18 @@ const TString& tCIDComm::strXlatEStopBits(const tCIDComm::EStopBits eToXlat)
         );
     }
 
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
     static TEArray<TString, tCIDComm::EStopBits, tCIDComm::EStopBits::Count>
-                                                          astrValues(TString::strEmpty());
-    if (!bLoaded)
+    astrValues(TString::strEmpty());
+    if (!astrValues.bIsLoaded())
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!astrValues.bIsLoaded())
         {
             astrValues[tCIDComm::EStopBits::One] = L"1";
             astrValues[tCIDComm::EStopBits::OnePointFive] = L"1.5";
             astrValues[tCIDComm::EStopBits::Two] = L"2";
+
+            astrValues.SetLoaded();
         }
     }
     return astrValues[eToXlat];

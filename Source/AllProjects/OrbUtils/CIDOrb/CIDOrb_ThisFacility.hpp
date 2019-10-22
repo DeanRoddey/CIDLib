@@ -252,7 +252,8 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //  m_bServerInit
         //      These flags indicate whether the client or server support has
         //      been initialized. It tells us what to shut down when we clean
-        //      up.
+        //      up. We assume these are done during startup and shutdown and that
+        //      no threading issues are involved.
         //
         //  m_c4CmdOverhead
         //  m_c4ReplyOverhead
@@ -328,22 +329,22 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //      pool (which is in the WorkQItem file. We call a method on it
         //      periodically to update the stat.
         // -------------------------------------------------------------------
-        volatile tCIDLib::TBoolean  m_bClientInit;
-        volatile tCIDLib::TBoolean  m_bServerInit;
-        tCIDLib::TCard4             m_c4CmdOverhead;
-        tCIDLib::TCard4             m_c4ReplyOverhead;
-        tCIDLib::TCard4             m_c4TimeoutAdjust;
-        tCIDLib::TCard8             m_c8LastNSCookie;
-        TOrbSObjList                m_colObjList;
-        TObjIdCache                 m_colNSCache;
-        TCriticalSection            m_crsAddrInfo;
-        TCriticalSection            m_crsObjList;
-        tCIDLib::TEncodedTime       m_enctNextForcedNS;
-        tCIDLib::TEncodedTime       m_enctTimeoutAdjust;
-        TOrbClientConnMgr*          m_poccmSrv;
-        TBlockEncrypter*            m_pcrypSecure;
-        TStatsCacheItem             m_sciRegisteredObjs;
-        TStatsCacheItem             m_sciWorkQItems;
+        tCIDLib::TBoolean       m_bClientInit;
+        tCIDLib::TBoolean       m_bServerInit;
+        tCIDLib::TCard4         m_c4CmdOverhead;
+        tCIDLib::TCard4         m_c4ReplyOverhead;
+        tCIDLib::TCard4         m_c4TimeoutAdjust;
+        tCIDLib::TCard8         m_c8LastNSCookie;
+        TOrbSObjList            m_colObjList;
+        TObjIdCache             m_colNSCache;
+        TCriticalSection        m_crsAddrInfo;
+        TCriticalSection        m_crsObjList;
+        tCIDLib::TEncodedTime   m_enctNextForcedNS;
+        tCIDLib::TEncodedTime   m_enctTimeoutAdjust;
+        TOrbClientConnMgr*      m_poccmSrv;
+        TBlockEncrypter*        m_pcrypSecure;
+        TStatsCacheItem         m_sciRegisteredObjs;
+        TStatsCacheItem         m_sciWorkQItems;
 
 
         // -------------------------------------------------------------------

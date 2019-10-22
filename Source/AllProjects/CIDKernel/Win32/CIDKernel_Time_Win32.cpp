@@ -42,10 +42,10 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_Time_Win32
 {
-    volatile tCIDLib::TBoolean  bHighResInit = kCIDLib::False;
-    volatile tCIDLib::TBoolean  bHighResAvail = kCIDLib::False;
-    tCIDLib::TCard4             c4MinUSecs;
-    tCIDLib::TInt8              i8TicksPerUSec;
+    TAtomicFlag         atomHighResInit;
+    tCIDLib::TBoolean   bHighResAvail = kCIDLib::False;
+    tCIDLib::TCard4     c4MinUSecs;
+    tCIDLib::TInt8      i8TicksPerUSec;
 }
 
 
@@ -118,10 +118,10 @@ const tCIDLib::TEncodedTime TKrnlTimeStamp::enctNTPOfs  = 116444738208988800;
 tCIDLib::TBoolean TKrnlTimeStamp::bHighResTimerAvailable()
 {
     // If we've not initializd the high res timer stuff yet, then do so
-    if (!CIDKernel_Time_Win32::bHighResInit)
+    if (!CIDKernel_Time_Win32::atomHighResInit)
     {
         TBaseLock lockInit;
-        if (!CIDKernel_Time_Win32::bHighResInit)
+        if (!CIDKernel_Time_Win32::atomHighResInit)
         {
             LARGE_INTEGER Freq;
             if (::QueryPerformanceFrequency(&Freq))
@@ -142,7 +142,7 @@ tCIDLib::TBoolean TKrnlTimeStamp::bHighResTimerAvailable()
             {
                 CIDKernel_Time_Win32::bHighResAvail = kCIDLib::False;
             }
-            CIDKernel_Time_Win32::bHighResInit = kCIDLib::True;
+            CIDKernel_Time_Win32::atomHighResInit.Set();
         }
     }
     return CIDKernel_Time_Win32::bHighResAvail;
@@ -153,12 +153,8 @@ tCIDLib::TBoolean
 TKrnlTimeStamp::bHighResDelay(const tCIDLib::TCard4 c4MicroSecs)
 {
     // If we've not initializd the high res timer stuff yet, then do so
-    if (!CIDKernel_Time_Win32::bHighResInit)
-    {
-        TBaseLock lockInit;
-        if (!CIDKernel_Time_Win32::bHighResInit)
-            bHighResTimerAvailable();
-    }
+    if (!CIDKernel_Time_Win32::atomHighResInit)
+        bHighResTimerAvailable();
 
     // If no support, then just sleep for millis
     if (!CIDKernel_Time_Win32::bHighResAvail)

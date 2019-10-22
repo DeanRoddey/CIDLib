@@ -41,7 +41,7 @@
 // ---------------------------------------------------------------------------
 struct TKrnlCritSec::TPlatData
 {
-    CRITICAL_SECTION* pCritSec;
+    alignas(kCIDLib::c4CacheAlign) CRITICAL_SECTION CritSec;
 };
 
 
@@ -52,24 +52,14 @@ TKrnlCritSec::TKrnlCritSec() :
 
     m_pPlatData(new TPlatData)
 {
-    // Make sure this guy is 32 bit aligned
-    m_pPlatData->pCritSec = static_cast<CRITICAL_SECTION*>
-    (
-        ::_aligned_malloc(sizeof(CRITICAL_SECTION), 32)
-    );
-    ::InitializeCriticalSection(m_pPlatData->pCritSec);
+    ::InitializeCriticalSection(&m_pPlatData->CritSec);
 }
 
 TKrnlCritSec::~TKrnlCritSec()
 {
     if (m_pPlatData)
     {
-        if (m_pPlatData->pCritSec)
-        {
-            ::DeleteCriticalSection(m_pPlatData->pCritSec);
-            ::_aligned_free(m_pPlatData->pCritSec);
-            m_pPlatData->pCritSec = nullptr;
-        }
+        ::DeleteCriticalSection(&m_pPlatData->CritSec);
 
         delete m_pPlatData;
         m_pPlatData = nullptr;
@@ -82,12 +72,12 @@ TKrnlCritSec::~TKrnlCritSec()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TKrnlCritSec::Enter() const
 {
-    ::EnterCriticalSection(m_pPlatData->pCritSec);
+    ::EnterCriticalSection(&m_pPlatData->CritSec);
 }
 
 
 tCIDLib::TVoid TKrnlCritSec::Exit() const
 {
-    ::LeaveCriticalSection(m_pPlatData->pCritSec);
+    ::LeaveCriticalSection(&m_pPlatData->CritSec);
 }
 

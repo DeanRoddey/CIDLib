@@ -100,14 +100,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  This one is used to force local data to be correctly cache aligned, which
-//  is required if it is going to be interlocked exchanged.
-// ---------------------------------------------------------------------------
-#define CID_CACHEALIGN __declspec(align(32))
-
-
-
-// ---------------------------------------------------------------------------
 //  If our local wide character type (tCIDLib::TCh) is the same as a UTF-16
 //  Unicode character, then define this. Else don't define it. This will allow
 //  some streaming code in CIDLib to be more efficient.

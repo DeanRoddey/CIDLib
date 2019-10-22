@@ -138,8 +138,8 @@ namespace CIDLib_Thread
 //
 static TThreadItem* athriList()
 {
-    static TThreadItem                  athriList[CIDLib_Thread::c4MaxThreads];
-    static volatile tCIDLib::TBoolean   bInitDone = kCIDLib::False;
+    static TThreadItem          athriList[CIDLib_Thread::c4MaxThreads];
+    static tCIDLib::TBoolean    bInitDone = kCIDLib::False;
 
     if (!bInitDone)
     {

@@ -111,6 +111,10 @@ static void LocalTmplCheckFunc()
     {
         TPtrJanitor<const tCIDLib::TBoolean> janTest(pB2, pB4);
     }
+
+    TAtomicFlag atomFlag(kCIDLib::True);
+    if (atomFlag.bValue())
+        atomFlag.SetValue(kCIDLib::False);
 }
 #endif
 

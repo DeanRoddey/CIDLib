@@ -54,7 +54,7 @@ namespace CIDCtrls_CIDGestureEng
     //  Some global init stuff that we will check for once upon the first init
     //  of a gesture engine.
     // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   bGlobalInitDone = kCIDLib::False;
+    TAtomicFlag         atomGlobInitDone;
     tCIDLib::TFloat4    f4InertiaScaler = 1.0F;
 }
 
@@ -239,10 +239,10 @@ tCIDLib::TVoid TCIDGestHandler::CancelGesture()
 //
 tCIDLib::TVoid TCIDGestHandler::Initialize()
 {
-    if (!CIDCtrls_CIDGestureEng::bGlobalInitDone)
+    if (!CIDCtrls_CIDGestureEng::atomGlobInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDCtrls_CIDGestureEng::bGlobalInitDone)
+        if (!CIDCtrls_CIDGestureEng::atomGlobInitDone)
         {
             TString strVal;
             if (TProcEnvironment::bFind(L"CID_GESTSCALER", strVal))
@@ -262,7 +262,7 @@ tCIDLib::TVoid TCIDGestHandler::Initialize()
             }
 
             // Set the flag last;
-            CIDCtrls_CIDGestureEng::bGlobalInitDone = kCIDLib::False;
+            CIDCtrls_CIDGestureEng::atomGlobInitDone.Set();
         }
     }
 }

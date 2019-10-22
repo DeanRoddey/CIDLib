@@ -49,14 +49,14 @@ RTTIDecls(TTextOutStream,TObject)
 // ---------------------------------------------------------------------------
 static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
 {
-    static volatile tCIDLib::TBoolean   bInitDone  = kCIDLib::False;
-    static const tCIDLib::TCh*          pszFalse   = kCIDLib_::pszFalse;
-    static const tCIDLib::TCh*          pszTrue    = kCIDLib_::pszTrue;
+    static TAtomicFlag          atomInitDone;
+    static const tCIDLib::TCh*  pszFalse   = kCIDLib_::pszFalse;
+    static const tCIDLib::TCh*  pszTrue    = kCIDLib_::pszTrue;
 
-    if (!bInitDone)
+    if (!atomInitDone)
     {
         TBaseLock lockInit;
-        if (!bInitDone)
+        if (!atomInitDone)
         {
             const tCIDLib::TCh* pszTmp;
             pszTmp = facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_False);
@@ -67,7 +67,7 @@ static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
             if (pszTmp)
                 pszTrue = TRawStr::pszReplicate(pszTmp);
 
-            bInitDone = kCIDLib::True;
+            atomInitDone.Set();
         }
     }
     if (bVal)

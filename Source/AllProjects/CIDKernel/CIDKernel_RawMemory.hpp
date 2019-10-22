@@ -81,7 +81,7 @@ namespace TRawMem
 
     KRNLEXPORT tCIDLib::TCard4 c4CompareAndExchange
     (
-        volatile tCIDLib::TCard4&        c4ToFill
+                tCIDLib::TCard4&        c4ToFill
         , const tCIDLib::TCard4         c4New
         , const tCIDLib::TCard4         c4Compare
     );
@@ -104,13 +104,13 @@ namespace TRawMem
 
     KRNLEXPORT tCIDLib::TCard4 c4SafeRefAcquire
     (
-        volatile tCIDLib::TCard4&       c4Ref
+                tCIDLib::TCard4&       c4Ref
         ,       tCIDLib::TBoolean&      bRes
     );
 
     KRNLEXPORT tCIDLib::TCard4 c4SafeRefRelease
     (
-        volatile tCIDLib::TCard4&       c4Ref
+                tCIDLib::TCard4&       c4Ref
         ,       tCIDLib::TBoolean&      bRes
     );
 

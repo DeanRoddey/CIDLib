@@ -70,7 +70,7 @@ namespace CIDMacroEng_ParserSrc
     };
 
     // Used to do the one time calc of the hashes of the lookup table
-    volatile tCIDLib::TBoolean  bInitDone = kCIDLib::False;
+    TAtomicFlag                 atomInitDone;
 
     // The modulus that we use for hashing the strings
     tCIDLib::TCard4             c4Modulus = 19;
@@ -124,10 +124,10 @@ TParserSrc::TParserSrc(         TTextInStream* const    pstrmToAdopt
     //  If we haven't initialized the hash table, do it. We have to calc the
     //  hashes for the strings in the map.
     //
-    if (!CIDMacroEng_ParserSrc::bInitDone)
+    if (!CIDMacroEng_ParserSrc::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDMacroEng_ParserSrc::bInitDone)
+        if (!CIDMacroEng_ParserSrc::atomInitDone)
         {
             tCIDLib::TInt4 i4Index = 0;
             for (; i4Index < tCIDLib::i4EnumOrd(tCIDMacroEng::ETokens::Count); i4Index++)
@@ -143,7 +143,7 @@ TParserSrc::TParserSrc(         TTextInStream* const    pstrmToAdopt
             }
 
             // And mark us done now
-            CIDMacroEng_ParserSrc::bInitDone = kCIDLib::True;
+            CIDMacroEng_ParserSrc::atomInitDone.Set();
         }
     }
 }

@@ -45,13 +45,11 @@ namespace CIDGraphDev_ThisFacility
 {
     // -----------------------------------------------------------------------
     //  This is the map that we load up the bitmaps into. This is done lazily
-    //  so we never load one that isn't asked for.
     // -----------------------------------------------------------------------
     TEArray<TBitmap*, tCIDGraphDev::ESysBmps, tCIDGraphDev::ESysBmps::Count>   apbmpMap
     (
         static_cast<TBitmap*>(nullptr)
     );
-    volatile tCIDLib::TBoolean  bFullyLoaded = kCIDLib::False;
 };
 
 
@@ -73,6 +71,24 @@ static tCIDLib::TBoolean bDevErrToIgnore()
     return kCIDLib::False;
 }
 
+// Lazily faults in our system bitmaps
+static tCIDLib::TVoid FaultInBitmaps()
+{
+    // The caller already did one check so assume we have to lock
+    TBaseLock lockBmp;
+    if (!CIDGraphDev_ThisFacility::apbmpMap.bIsLoaded())
+    {
+        tCIDLib::ForEachE<tCIDGraphDev::ESysBmps>
+        (
+            [](const tCIDGraphDev::ESysBmps eBmp)
+            {
+                if (!CIDGraphDev_ThisFacility::apbmpMap[eBmp])
+                    CIDGraphDev_ThisFacility::apbmpMap[eBmp] = new TBitmap(eBmp);
+            }
+        );
+    }
+    CIDGraphDev_ThisFacility::apbmpMap.SetLoaded();
+}
 
 
 
@@ -147,14 +163,9 @@ TBitmap TFacCIDGraphDev::bmpSysBitmaps(const tCIDGraphDev::ESysBmps eBmp) const
         );
     }
 
-    // See if this entry is valid yet, else fault it in
-    if (!CIDGraphDev_ThisFacility::bFullyLoaded
-    ||  !CIDGraphDev_ThisFacility::apbmpMap[eBmp])
-    {
-        TBaseLock lockBmp;
-        if (!CIDGraphDev_ThisFacility::apbmpMap[eBmp])
-            TRawMem::pExchangePtr(&CIDGraphDev_ThisFacility::apbmpMap[eBmp], new TBitmap(eBmp));
-    }
+    // Fault them in if needed
+    if (!CIDGraphDev_ThisFacility::apbmpMap.bIsLoaded())
+        FaultInBitmaps();
 
     //
     //  And now return a copy of the icon. Note that icons ref-count their
@@ -317,27 +328,8 @@ TFacCIDGraphDev::eCalcPlacement(const   TArea&                      areaPlaceIn
 
 tCIDLib::TVoid TFacCIDGraphDev::QuerySysBmps(TCollection<TSysBitmapInfo>& colToFill)
 {
-    //
-    //  This one requires faulting in the whole list of bitmaps, because we
-    //  have to return them all. So its more efficient to just fault them
-    //  all into the list now.
-    //
-    if (!CIDGraphDev_ThisFacility::bFullyLoaded)
-    {
-        TBaseLock lockBmp;
-        if (!CIDGraphDev_ThisFacility::bFullyLoaded)
-        {
-            tCIDLib::ForEachE<tCIDGraphDev::ESysBmps>
-            (
-                [](const tCIDGraphDev::ESysBmps eBmp)
-                {
-                    if (!CIDGraphDev_ThisFacility::apbmpMap[eBmp])
-                        CIDGraphDev_ThisFacility::apbmpMap[eBmp] = new TBitmap(eBmp);
-                }
-            );
-        }
-        CIDGraphDev_ThisFacility::bFullyLoaded = kCIDLib::True;
-    }
+    if (!CIDGraphDev_ThisFacility::apbmpMap.bIsLoaded())
+        FaultInBitmaps();
 
     // Iterate the list and put an item in the list for each one
     tCIDLib::ForEachE<tCIDGraphDev::ESysBmps>
@@ -354,5 +346,4 @@ tCIDLib::TVoid TFacCIDGraphDev::QuerySysBmps(TCollection<TSysBitmapInfo>& colToF
         }
     );
 }
-
 

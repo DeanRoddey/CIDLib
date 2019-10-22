@@ -32,7 +32,7 @@
 // ---------------------------------------------------------------------------
 #include    "CIDLib_.hpp"
 
-tCIDLib::TCard4 TAtomic::c4SafeAcquire(volatile tCIDLib::TCard4& c4Target)
+tCIDLib::TCard4 TAtomic::c4SafeAcquire(tCIDLib::TCard4& c4Target)
 {
     tCIDLib::TBoolean bRes;
     const tCIDLib::TCard4 c4Ret = TRawMem::c4SafeRefAcquire(c4Target, bRes);
@@ -51,7 +51,7 @@ tCIDLib::TCard4 TAtomic::c4SafeAcquire(volatile tCIDLib::TCard4& c4Target)
 }
 
 
-tCIDLib::TCard4 TAtomic::c4SafeRelease(volatile tCIDLib::TCard4& c4Target)
+tCIDLib::TCard4 TAtomic::c4SafeRelease(tCIDLib::TCard4& c4Target)
 {
     tCIDLib::TBoolean bRes;
     const tCIDLib::TCard4 c4Ret = TRawMem::c4SafeRefRelease(c4Target, bRes);

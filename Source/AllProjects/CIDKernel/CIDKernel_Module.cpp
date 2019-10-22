@@ -60,7 +60,7 @@ TKrnlModule::bLoadMessages( const   TModuleHandle&          hmodSrc
                             ,       tCIDLib::TMsgIndex*&    pmiToFill)
 {
     // Assume we won't find anything
-    pmiToFill = 0;
+    pmiToFill = nullptr;
 
     //
     //  Get the name of the module, which we will use to build the name to

@@ -121,9 +121,9 @@ class CIDLIBEXP TUniqueName : public TObject
         //      The text that serves as the template for each name. It must
         //      have the token %(1) in it somewhere.
         // -------------------------------------------------------------------
-        volatile tCIDLib::TCard4    m_c4Number;
-        TCriticalSection            m_crsLock;
-        TString                     m_strText;
+        tCIDLib::TCard4     m_c4Number;
+        TCriticalSection    m_crsLock;
+        TString             m_strText;
 
 
         // -------------------------------------------------------------------

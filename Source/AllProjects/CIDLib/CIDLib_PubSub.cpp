@@ -49,13 +49,13 @@ namespace CIDLib_PubSub
     //  We need a mutex for sync, and we fault it in. Everyone accesses it via the
     //  method below which faults it in, along with some other stuff below.
     //
-    TMutex* pmtxLock = nullptr;
     TMutex* pmtxSync();
 
     //
     //  The lists are faulted in with the mutex above. We support a max of 32K
     //  subscribers, and 8192 topics (as set below when we fault in these lists.)
     //
+    TAtomicFlag             atomInit;
     tCIDLib::TCard4         c4NextId = 1;
     TSubList*               pcolSubList;
     TTopicList*             pcolTopicList;
@@ -66,13 +66,15 @@ namespace CIDLib_PubSub
 }
 
 
-// This is used to access the mutex, and faults it in on first use
+// This is used to access the sync mutex and fault some other bits in as well
 TMutex* CIDLib_PubSub::pmtxSync()
 {
-    if (!CIDLib_PubSub::pmtxLock)
+    static TMutex mtxLock;
+
+    if (!CIDLib_PubSub::atomInit)
     {
-        TBaseLock lockInit;
-        if (!CIDLib_PubSub::pmtxLock)
+        TMtxLocker mtxlSync(&mtxLock);
+        if (!CIDLib_PubSub::atomInit)
         {
             pcolSubList = new TSubList(tCIDLib::EAdoptOpts::NoAdopt, 256);
             pcolTopicList = new TTopicList
@@ -81,14 +83,11 @@ TMutex* CIDLib_PubSub::pmtxSync()
             );
             enctNextScavenge = TTime::enctNowPlusMins(5);
 
-            //
-            //  Do this last so another thread doesn't skip on forward before we
-            //  fault in the other stuff.
-            //
-            CIDLib_PubSub::pmtxLock = new TMutex;
+            CIDLib_PubSub::atomInit.Set();
         }
     }
-    return CIDLib_PubSub::pmtxLock;
+
+    return &mtxLock;
 }
 
 

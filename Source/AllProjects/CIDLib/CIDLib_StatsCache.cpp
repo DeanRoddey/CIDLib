@@ -55,16 +55,6 @@ namespace CIDLib_StatsCache
 
 
     // -----------------------------------------------------------------------
-    //  We have to sync everything we do here. We have to fault this guy in
-    //  so we need a flag for that. The mutex has to be a pointer because
-    //  we can get calls during the destruction of global objects. So we can't
-    //  allow this guy to be destroyed during global dtor calls or it might
-    //  go away before all the stats cache calls are made.
-    // -----------------------------------------------------------------------
-    TKrnlMutex*             pkmtxSync;
-
-
-    // -----------------------------------------------------------------------
     //  If we get a call that provides just the item, and it's not correct,
     //  there's not much we can do, but we bump this counter which can be
     //  read for sanity checking purposes later.
@@ -85,6 +75,15 @@ namespace CIDLib_StatsCache
 };
 
 
+//
+//  Fault in a mutex for local locking. We use a kernel mutex because of the very
+//  low level nature of hte status stuff.
+//
+static TKrnlMutex* pkmtxSync()
+{
+    static TKrnlMutex kmtxSync;
+    return &kmtxSync;
+}
 
 
 
@@ -239,8 +238,6 @@ class TStatsCacheNode
         tCIDLib::TCard8         m_c8Value;
         tCIDLib::EStatItemTypes m_eType;
         tCIDLib::TCh*           m_pszKey;
-
-
 };
 
 
@@ -335,43 +332,25 @@ TStatsCacheNode::Set(const  tCIDLib::TCh*           pszKey
 //   CLASS: TSyncJanitor
 //  PREFIX: jan
 //
-//  A simple local janitor to handle locking/unlocking our sync mutex and
-//  faulting it in upon first use.
+//  A simple local janitor to handle locking/unlocking our sync mutex
 // ---------------------------------------------------------------------------
 class TSyncJanitor
 {
     public :
         TSyncJanitor()
         {
-            // Handle any faulting in
-            if (!CIDLib_StatsCache::pkmtxSync)
-            {
-                TBaseLock lockInit;
-                if (!CIDLib_StatsCache::pkmtxSync)
-                {
-                    // Initialize the last change stamp
-                    CIDLib_StatsCache::enctLastChange = TTime::enctNow();
-
-                    // Create the mutex we use for sync
-                    TKrnlMutex* pkmtxTmp = new TKrnlMutex;
-                    pkmtxTmp->bCreate(tCIDLib::ELockStates::Unlocked);
-
-                    // Store the pointer LAST!!!
-                    CIDLib_StatsCache::pkmtxSync = pkmtxTmp;
-                }
-            }
-
-            CIDLib_StatsCache::pkmtxSync->bLock();
+            pkmtxSync()->bLock();
         }
 
         TSyncJanitor(const TSyncJanitor&) = delete;
+        TSyncJanitor(TSyncJanitor&&) = delete;
 
         ~TSyncJanitor()
         {
-            CIDLib_StatsCache::pkmtxSync->bUnlock();
+            pkmtxSync()->bUnlock();
         }
 
-        tCIDLib::TVoid operator=(const TSyncJanitor) = delete;
+        tCIDLib::TVoid operator=(const TSyncJanitor&) = delete;
 };
 
 

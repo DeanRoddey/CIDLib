@@ -46,13 +46,13 @@ namespace CIDMacroEng_Engine
     // -----------------------------------------------------------------------
     //  A flag to handle local lazy init
     // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   m_bLocalInit;
+    TAtomicFlag         atomInitDone;
 
 
     // -----------------------------------------------------------------------
     //  Some stats cache items we maintain
     // -----------------------------------------------------------------------
-    TStatsCacheItem     m_sciMacroEngCount;
+    TStatsCacheItem     sciMacroEngCount;
 }
 
 
@@ -138,19 +138,18 @@ TCIDMacroEngine::TCIDMacroEngine() :
     facCIDMacroEng();
 
     // Do local lazy init if required
-    if (!CIDMacroEng_Engine::m_bLocalInit)
+    if (!CIDMacroEng_Engine::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDMacroEng_Engine::m_bLocalInit)
+        if (!CIDMacroEng_Engine::atomInitDone)
         {
             TStatsCache::RegisterItem
             (
                 kMacroEng::pszStat_MEng_EngInstCount
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDMacroEng_Engine::m_sciMacroEngCount
+                , CIDMacroEng_Engine::sciMacroEngCount
             );
-
-            CIDMacroEng_Engine::m_bLocalInit = kCIDLib::True;
+            CIDMacroEng_Engine::atomInitDone.Set();
         }
     }
 
@@ -161,13 +160,13 @@ TCIDMacroEngine::TCIDMacroEngine() :
     RegisterBuiltInClasses();
 
     // Increment the count of registered engines
-    TStatsCache::c8IncCounter(CIDMacroEng_Engine::m_sciMacroEngCount);
+    TStatsCache::c8IncCounter(CIDMacroEng_Engine::sciMacroEngCount);
 }
 
 TCIDMacroEngine::~TCIDMacroEngine()
 {
     // Decrement the count of registered engines
-    TStatsCache::c8DecCounter(CIDMacroEng_Engine::m_sciMacroEngCount);
+    TStatsCache::c8DecCounter(CIDMacroEng_Engine::sciMacroEngCount);
 
     try
     {

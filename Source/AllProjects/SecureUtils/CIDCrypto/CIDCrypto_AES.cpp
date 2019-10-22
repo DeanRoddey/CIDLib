@@ -315,11 +315,11 @@ namespace CIDCrypto_AES
 
 
     // The keytables will be faulted in
-    volatile tCIDLib::TBoolean  bKTblsDone = kCIDLib::False;
-    tCIDLib::TCard4             ac4KTbl0[256];
-    tCIDLib::TCard4             ac4KTbl1[256];
-    tCIDLib::TCard4             ac4KTbl2[256];
-    tCIDLib::TCard4             ac4KTbl3[256];
+    TAtomicFlag         atomKTblsDone = kCIDLib::False;
+    tCIDLib::TCard4     ac4KTbl0[256];
+    tCIDLib::TCard4     ac4KTbl1[256];
+    tCIDLib::TCard4     ac4KTbl2[256];
+    tCIDLib::TCard4     ac4KTbl3[256];
 }
 
 
@@ -653,10 +653,10 @@ tCIDLib::TVoid TAESEncrypter::ResetImpl()
     tCIDLib::TCard4 c4Index;
 
     // If we've not done the key tables yet, then fault those in
-    if (!CIDCrypto_AES::bKTblsDone)
+    if (!CIDCrypto_AES::atomKTblsDone)
     {
         TBaseLock lockInit;
-        if (!CIDCrypto_AES::bKTblsDone)
+        if (!CIDCrypto_AES::atomKTblsDone)
         {
             for (c4Index = 0; c4Index < 256; c4Index++)
             {
@@ -669,7 +669,7 @@ tCIDLib::TVoid TAESEncrypter::ResetImpl()
                 CIDCrypto_AES::ac4KTbl3[c4Index]
                     = CIDCrypto_AES::ac4RTbl3[CIDCrypto_AES::ac4FSBox[c4Index]];
             }
-            CIDCrypto_AES::bKTblsDone = kCIDLib::True;
+            CIDCrypto_AES::atomKTblsDone.Set();
         }
     }
 

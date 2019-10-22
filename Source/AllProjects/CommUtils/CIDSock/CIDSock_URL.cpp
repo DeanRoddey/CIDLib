@@ -78,13 +78,13 @@ namespace CIDSock_URL
     // -----------------------------------------------------------------------
     //  Local static data
     //
-    //  bTableLoaded
+    //  atomTableLoaded
     //  ac2CharTable
     //      This is the character attributes table. Each ASCII char (all that
     //      are allowed directly in URIs) can be used to index this table and
     //      see what attributes it has.
     // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   bTableLoaded = kCIDLib::False;
+    TAtomicFlag         atomTableLoaded;
     tCIDLib::TCard2     ac2CharTable[chMaxChar + 1];
 
 
@@ -165,38 +165,39 @@ static tCIDLib::TVoid SetTableMasks(const   tCIDLib::TCh* const pchTable
 
 static tCIDLib::TVoid InitCharTable()
 {
+    // They already checked once before calling, so assume we need to lock
     TBaseLock lockInit;
 
     // If someone else beat us to it, return
-    if (CIDSock_URL::bTableLoaded)
-        return;
+    if (!CIDSock_URL::atomTableLoaded)
+    {
+        //
+        //  Ok, lets run through the lists of characters and set the appropriate
+        //  bits for each char we find. We first do some that are simple to do
+        //  without hard coded char lists, which are the alpha and digits and the
+        //  obviously illegal ones.
+        //
+        tCIDLib::TCh chCur;
+        for (chCur = L'A'; chCur <= L'Z'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2AlphaMask;
+        for (chCur = L'a'; chCur <= L'z'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2AlphaMask;
+        for (chCur = L'0'; chCur <= L'9'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2DigitMask | CIDSock_URL::c2HexDigitMask;
+        for (chCur = L'A'; chCur <= L'F'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2HexDigitMask;
+        for (chCur = L'a'; chCur <= L'f'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2HexDigitMask;
+        for (chCur = 0; chCur < 0x20; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2IllegalMask;
+        CIDSock_URL::ac2CharTable[0x7F] |= CIDSock_URL::c2IllegalMask;
 
-    //
-    //  Ok, lets run through the lists of characters and set the appropriate
-    //  bits for each char we find. We first do some that are simple to do
-    //  without hard coded char lists, which are the alpha and digits and the
-    //  obviously illegal ones.
-    //
-    tCIDLib::TCh chCur;
-    for (chCur = L'A'; chCur <= L'Z'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2AlphaMask;
-    for (chCur = L'a'; chCur <= L'z'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2AlphaMask;
-    for (chCur = L'0'; chCur <= L'9'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2DigitMask | CIDSock_URL::c2HexDigitMask;
-    for (chCur = L'A'; chCur <= L'F'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2HexDigitMask;
-    for (chCur = L'a'; chCur <= L'f'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2HexDigitMask;
-    for (chCur = 0; chCur < 0x20; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2IllegalMask;
-    CIDSock_URL::ac2CharTable[0x7F] |= CIDSock_URL::c2IllegalMask;
+        // And now do the ones that are stored in predone tables
+        SetTableMasks(CIDSock_URL::achProtoChars, CIDSock_URL::c2ProtoMask);
 
-    // And now do the ones that are stored in predone tables
-    SetTableMasks(CIDSock_URL::achProtoChars, CIDSock_URL::c2ProtoMask);
-
-    // Mark the table loaded last of all
-    CIDSock_URL::bTableLoaded = kCIDLib::True;
+        // Mark the table loaded last of all
+        CIDSock_URL::atomTableLoaded.Set();
+    }
 }
 
 
@@ -223,7 +224,7 @@ tCIDLib::TBoolean TURL::bIsFirstProtocolChar(const tCIDLib::TCh chToTest)
         return kCIDLib::False;
 
     // Fault the table in if needed
-    if (!CIDSock_URL::bTableLoaded)
+    if (!CIDSock_URL::atomTableLoaded)
         InitCharTable();
     return (CIDSock_URL::ac2CharTable[chToTest] & CIDSock_URL::c2AlphaMask) != 0;
 }
@@ -238,7 +239,7 @@ tCIDLib::TBoolean TURL::bIsProtocolChar(const tCIDLib::TCh chToTest)
         return kCIDLib::False;
 
     // Fault the table in if needed
-    if (!CIDSock_URL::bTableLoaded)
+    if (!CIDSock_URL::atomTableLoaded)
         InitCharTable();
     return (CIDSock_URL::ac2CharTable[chToTest] & CIDSock_URL::c2ProtoMask) != 0;
 }

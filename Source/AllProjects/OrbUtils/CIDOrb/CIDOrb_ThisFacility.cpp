@@ -271,7 +271,7 @@ tCIDLib::TCard4 TFacCIDOrb::c4TimeoutAdjust() const
 //
 tCIDLib::TCard8 TFacCIDOrb::c8LastNSCookie() const
 {
-    volatile tCIDLib::TCard8 c8Ret;
+    tCIDLib::TCard8 c8Ret;
     {
         TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
         c8Ret = m_c8LastNSCookie;
@@ -789,6 +789,9 @@ tCIDLib::TIPPortNum TFacCIDOrb::ippnORB() const
 //  lot of work. We call the orb client base's static init, and he does
 //  all the real work.
 //
+//  We assume this is done during startup when there are no threading
+//  issues.
+//
 tCIDLib::TVoid TFacCIDOrb::InitClient()
 {
     // If we aren't already initialized, then do it
@@ -828,6 +831,9 @@ tCIDLib::TVoid TFacCIDOrb::InitClient()
 //  only create stuff that hasn't been created already, since some apps
 //  start and stop the server side support and therefore some stuff may
 //  have been created already.
+//
+//  We assume this is done during startup when there are no threading
+//  issues.
 //
 tCIDLib::TVoid
 TFacCIDOrb::InitServer( const   tCIDLib::TIPPortNum ippnListen

@@ -43,7 +43,7 @@ namespace CIDLib_Module
     // -----------------------------------------------------------------------
     //  Local static data
     //
-    //  bInitMsgs
+    //  atomInitMsgs
     //      A flag to control whether we've done local static initialization
     //      yet.
     //
@@ -68,12 +68,12 @@ namespace CIDLib_Module
     //      provided here. They are defaulted so something is there until
     //      they get loaded from translatable text.
     // -----------------------------------------------------------------------
-    volatile tCIDLib::TBoolean  bInitMsgs = kCIDLib::False;
-    const tCIDLib::TCh*         pszTitle1 = kCIDLib_::pszTitle1;
-    const tCIDLib::TCh*         pszTitle2 = kCIDLib_::pszTitle2;
-    const tCIDLib::TCh*         pszExceptDuringLog = kCIDLib_::pszExceptDuringLog;
-    const tCIDLib::TCh*         pszRecursiveError = kCIDLib_::pszRecursiveError;
-    const tCIDLib::TCh*         pszStrLoadFailure = kCIDLib_::pszStrLoadFailure;
+    TAtomicFlag         atomInitMsgs;
+    const tCIDLib::TCh* pszTitle1 = kCIDLib_::pszTitle1;
+    const tCIDLib::TCh* pszTitle2 = kCIDLib_::pszTitle2;
+    const tCIDLib::TCh* pszExceptDuringLog = kCIDLib_::pszExceptDuringLog;
+    const tCIDLib::TCh* pszRecursiveError = kCIDLib_::pszRecursiveError;
+    const tCIDLib::TCh* pszStrLoadFailure = kCIDLib_::pszStrLoadFailure;
 
 
     // -----------------------------------------------------------------------
@@ -84,10 +84,10 @@ namespace CIDLib_Module
     //      We maintain some stats cache values. This is the storage for those
     //      and a lazy init flag to fault them in.
     // -----------------------------------------------------------------------
-    volatile tCIDLib::TBoolean  bInitStats = kCIDLib::False;
-    TStatsCacheItem             sciStartTime;
-    TStatsCacheItem             sciDroppedLogEvs;
-    TStatsCacheItem             sciLogErrors;
+    TAtomicFlag         atomInitStats;
+    TStatsCacheItem     sciStartTime;
+    TStatsCacheItem     sciDroppedLogEvs;
+    TStatsCacheItem     sciLogErrors;
 
 
     //
@@ -150,10 +150,10 @@ namespace CIDLib_Module
 // ---------------------------------------------------------------------------
 static tCIDLib::TVoid InitMsgs(const TModule& modSrc)
 {
-    if (!CIDLib_Module::bInitMsgs)
+    if (!CIDLib_Module::atomInitMsgs)
     {
         TBaseLock lockInit;
-        if (!CIDLib_Module::bInitMsgs)
+        if (!CIDLib_Module::atomInitMsgs)
         {
             tCIDLib::TBoolean   bOk;
             const tCIDLib::TCh* pszTmp;
@@ -170,7 +170,7 @@ static tCIDLib::TVoid InitMsgs(const TModule& modSrc)
             if (bOk)
                 CIDLib_Module::pszStrLoadFailure = pszTmp;
 
-            CIDLib_Module::bInitMsgs = kCIDLib::True;
+            CIDLib_Module::atomInitMsgs.Set();
         }
     }
 }
@@ -2624,7 +2624,7 @@ tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
     //  sure that's what is loading. But it should always be the first module
     //  that loads and uses this class.
     //
-    if (!CIDLib_Module::bInitMsgs)
+    if (!CIDLib_Module::atomInitMsgs)
     {
         if (m_strName == L"CIDLib")
             InitMsgs(*this);
@@ -2652,7 +2652,7 @@ tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
     }
     m_strPath = szModPath;
 
-    // Do the other init, passing the ufll path
+    // Do the other init, passing the full path
     TPathStr pathFull(m_strPath);
     pathFull.AddLevel(szModName);
     DoInit2(pathFull, eFlags);
@@ -2690,10 +2690,10 @@ TModule::DoInit2(const  TString&            strModPath
 tCIDLib::TVoid TModule::InitStats()
 {
     // If we've not faulted in our stats cache stuff yet, then do that.
-    if (!CIDLib_Module::bInitStats)
+    if (!CIDLib_Module::atomInitStats)
     {
         TBaseLock lockInit;
-        if (!CIDLib_Module::bInitStats)
+        if (!CIDLib_Module::atomInitStats)
         {
             //
             //  The start time of the app. We just set it here and it
@@ -2723,7 +2723,7 @@ tCIDLib::TVoid TModule::InitStats()
                 , CIDLib_Module::sciLogErrors
             );
 
-            CIDLib_Module::bInitStats = kCIDLib::True;
+            CIDLib_Module::atomInitStats.Set();
         }
     }
 }

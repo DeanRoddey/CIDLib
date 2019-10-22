@@ -77,6 +77,7 @@ AddTest(new TTest_StringTokens);
     // The most fundamental stuff
     AddTest(new TTest_Types);
     AddTest(new TTest_RawBits);
+    AddTest(new TTest_Atomics);
     AddTest(new TTest_SafeCnt1);
     AddTest(new TTest_FlagJanitor);
     AddTest(new TTest_LambdaJan);

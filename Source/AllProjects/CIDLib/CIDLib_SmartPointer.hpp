@@ -560,8 +560,8 @@ template <typename T> class TCntPtrData
             return c4Ret;
         }
 
-        volatile mutable tCIDLib::TCard4    m_c4RefCnt;
-        T*                                  m_pobjData;
+        mutable tCIDLib::TCard4 m_c4RefCnt;
+        T*                      m_pobjData;
 };
 
 template <typename T, typename TDeleter> class TCntPtrDataDel : public TCntPtrData<T>

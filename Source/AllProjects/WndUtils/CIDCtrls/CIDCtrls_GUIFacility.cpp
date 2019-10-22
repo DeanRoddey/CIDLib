@@ -130,6 +130,8 @@ namespace CIDCtrls_GUIFacility
         , &TAppImgCacheItem::strKey
         , tCIDLib::EMTStates::Safe
     );
+
+    static TAtomicFlag  atomMetricsLoaded;
 }
 
 
@@ -144,7 +146,7 @@ namespace CIDCtrls_GUIFacility
 // ---------------------------------------------------------------------------
 const TArea& TGUIFacility::areaPrimaryMonitor()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return s_areaPrimaryMon;
@@ -153,7 +155,7 @@ const TArea& TGUIFacility::areaPrimaryMonitor()
 
 const TArea& TGUIFacility::areaVirtualScreen()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return s_areaVirtualScr;
@@ -162,7 +164,7 @@ const TArea& TGUIFacility::areaVirtualScreen()
 
 tCIDLib::TVoid TGUIFacility::AdjustDlgUnits(TArea& areaToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     areaToAdjust.Set
@@ -176,7 +178,7 @@ tCIDLib::TVoid TGUIFacility::AdjustDlgUnits(TArea& areaToAdjust)
 
 tCIDLib::TVoid TGUIFacility::AdjustDlgUnits(TSize& szToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     szToAdjust.Set
@@ -188,7 +190,7 @@ tCIDLib::TVoid TGUIFacility::AdjustDlgUnits(TSize& szToAdjust)
 
 tCIDLib::TVoid TGUIFacility::AdjustDlgUnits(TPoint& pntToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     pntToAdjust.Set
@@ -201,7 +203,7 @@ tCIDLib::TVoid TGUIFacility::AdjustDlgUnits(TPoint& pntToAdjust)
 
 tCIDLib::TCard4 TGUIFacility::c4AdjustHDlgUnit(const tCIDLib::TCard4 c4ToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return tCIDLib::TCard4((c4ToAdjust * s_c4HorzDlgUnits) / 4);
@@ -209,7 +211,7 @@ tCIDLib::TCard4 TGUIFacility::c4AdjustHDlgUnit(const tCIDLib::TCard4 c4ToAdjust)
 
 tCIDLib::TCard4 TGUIFacility::c4AdjustVDlgUnit(const tCIDLib::TCard4 c4ToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return tCIDLib::TCard4((c4ToAdjust * s_c4VertDlgUnits) / 8);
@@ -218,7 +220,7 @@ tCIDLib::TCard4 TGUIFacility::c4AdjustVDlgUnit(const tCIDLib::TCard4 c4ToAdjust)
 
 tCIDLib::TVoid TGUIFacility::AdjustWndUnits(TArea& areaToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     areaToAdjust.Set
@@ -232,7 +234,7 @@ tCIDLib::TVoid TGUIFacility::AdjustWndUnits(TArea& areaToAdjust)
 
 tCIDLib::TVoid TGUIFacility::AdjustWndUnits(TSize& szToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     szToAdjust.Set
@@ -244,7 +246,7 @@ tCIDLib::TVoid TGUIFacility::AdjustWndUnits(TSize& szToAdjust)
 
 tCIDLib::TVoid TGUIFacility::AdjustWndUnits(TPoint& pntToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     pntToAdjust.Set
@@ -259,7 +261,7 @@ tCIDLib::TVoid TGUIFacility::AdjustWndUnits(TPoint& pntToAdjust)
 //
 tCIDLib::TCard4 TGUIFacility::c4DefFontHeight()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return s_c4DefFontHeight;
@@ -272,7 +274,7 @@ tCIDLib::TCard4 TGUIFacility::c4DefFontHeight()
 //
 tCIDLib::TCard4 TGUIFacility::c4HorzDlgUnit()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return s_c4VertDlgUnits;
@@ -280,7 +282,7 @@ tCIDLib::TCard4 TGUIFacility::c4HorzDlgUnit()
 
 tCIDLib::TCard4 TGUIFacility::c4VertDlgUnit()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return s_c4HorzDlgUnits;
@@ -294,49 +296,49 @@ tCIDLib::TCard4 TGUIFacility::c4VertDlgUnit()
 //
 const TGUIFont& TGUIFacility::gfontDefBold()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
     return *s_pgfontDefBold;
 }
 
 const TGUIFont& TGUIFacility::gfontDefFixed()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
     return *s_pgfontDefFixed;
 }
 
 const TGUIFont& TGUIFacility::gfontDefLight()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
     return *s_pgfontDefLight;
 }
 
 const TGUIFont& TGUIFacility::gfontDefNorm()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
     return *s_pgfontDefNorm;
 }
 
 const TGUIFont& TGUIFacility::gfontDefSmall()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
     return *s_pgfontDefSmall;
 }
 
 const TGUIFont& TGUIFacility::gfontDefSmallLight()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
     return *s_pgfontDefSmallLight;
 }
 
 const TGUIFont& TGUIFacility::gfontDefTitle()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
     return *s_pgfontDefTitle;
 }
@@ -344,7 +346,7 @@ const TGUIFont& TGUIFacility::gfontDefTitle()
 
 tCIDLib::TInt4 TGUIFacility::i4AdjustHDlgUnit(const tCIDLib::TInt4 i4ToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return (i4ToAdjust * tCIDLib::TInt4(s_c4HorzDlgUnits)) / 4;
@@ -352,7 +354,7 @@ tCIDLib::TInt4 TGUIFacility::i4AdjustHDlgUnit(const tCIDLib::TInt4 i4ToAdjust)
 
 tCIDLib::TInt4 TGUIFacility::i4AdjustHWndUnit(const tCIDLib::TInt4 i4ToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return (i4ToAdjust * 4) / tCIDLib::TInt4(s_c4HorzDlgUnits);
@@ -360,7 +362,7 @@ tCIDLib::TInt4 TGUIFacility::i4AdjustHWndUnit(const tCIDLib::TInt4 i4ToAdjust)
 
 tCIDLib::TInt4 TGUIFacility::i4AdjustVDlgUnit(const tCIDLib::TInt4 i4ToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return (i4ToAdjust * tCIDLib::TInt4(s_c4VertDlgUnits)) / 8;
@@ -368,7 +370,7 @@ tCIDLib::TInt4 TGUIFacility::i4AdjustVDlgUnit(const tCIDLib::TInt4 i4ToAdjust)
 
 tCIDLib::TInt4 TGUIFacility::i4AdjustVWndUnit(const tCIDLib::TInt4 i4ToAdjust)
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return (i4ToAdjust * 8) / tCIDLib::TInt4(s_c4VertDlgUnits);
@@ -377,7 +379,7 @@ tCIDLib::TInt4 TGUIFacility::i4AdjustVWndUnit(const tCIDLib::TInt4 i4ToAdjust)
 
 const TString& TGUIFacility::strDefFontFace()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return s_strDefFontFace;
@@ -386,7 +388,7 @@ const TString& TGUIFacility::strDefFontFace()
 
 TSize TGUIFacility::szDefIcon()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return TSize(::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON));
@@ -395,7 +397,7 @@ TSize TGUIFacility::szDefIcon()
 
 const TSize& TGUIFacility::szPrimaryMonitor()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return s_szPrimaryMon;
@@ -404,7 +406,7 @@ const TSize& TGUIFacility::szPrimaryMonitor()
 
 const TSize& TGUIFacility::szVirtualScreen()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         FaultInMetrics();
 
     return s_szVirtualScr;
@@ -939,7 +941,6 @@ tCIDLib::TVoid TGUIFacility::SetFrameIcon(TWindow& wndTar, const TString& strNam
 // ---------------------------------------------------------------------------
 //  TGUIFacility: Private, static data
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean   TGUIFacility::s_bMetricsLoaded = kCIDLib::False;
 TArea               TGUIFacility::s_areaPrimaryMon;
 TArea               TGUIFacility::s_areaVirtualScr;
 tCIDLib::TCard4     TGUIFacility::s_c4DefFontHeight;
@@ -970,10 +971,10 @@ TSize               TGUIFacility::s_szVirtualScr;
 //
 tCIDLib::TVoid TGUIFacility::FaultInMetrics()
 {
-    if (!s_bMetricsLoaded)
+    if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
     {
         TBaseLock lockInit;
-        if (!s_bMetricsLoaded)
+        if (!CIDCtrls_GUIFacility::atomMetricsLoaded)
         {
             //
             //  Calculate our default font point size in pixels. We use a 9 point
@@ -1070,7 +1071,7 @@ tCIDLib::TVoid TGUIFacility::FaultInMetrics()
             s_szVirtualScr = s_areaVirtualScr.szArea();
             s_szPrimaryMon = s_areaPrimaryMon.szArea();
 
-            s_bMetricsLoaded = kCIDLib::True;
+            CIDCtrls_GUIFacility::atomMetricsLoaded.Set();
         }
     }
 }

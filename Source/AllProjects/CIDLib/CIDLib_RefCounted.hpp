@@ -103,7 +103,7 @@ class CIDLIBEXP MRefCounted
         //  m_c4RefCount
         //      The reference count. Initialized to 1.
         // -------------------------------------------------------------------
-        volatile tCIDLib::TCard4    m_c4MRefCount = 1;
+        tCIDLib::TCard4     m_c4MRefCount = 1;
 
 
         // -------------------------------------------------------------------

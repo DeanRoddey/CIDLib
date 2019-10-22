@@ -329,14 +329,14 @@ TMultiEdit::Create( const   TWindow&                wndParent
                     , const tCIDCtrls::EExWndStyles eExStyles)
 {
     // Load the containing DLL if not already done
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
-    if (!bLoaded)
+    static TAtomicFlag atomLoaded;
+    if (!atomLoaded)
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!atomLoaded)
         {
             ::LoadLibrary(L"Msftedit.dll");
-            bLoaded = kCIDLib::True;
+            atomLoaded.Set();
         }
     }
 

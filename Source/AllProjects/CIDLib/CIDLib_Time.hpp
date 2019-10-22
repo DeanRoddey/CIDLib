@@ -270,6 +270,11 @@ class CIDLIBEXP TTime :
 
         TTime
         (
+            const   tCIDLib::TCh* const     pszDefFormat
+        );
+
+        TTime
+        (
             const   tCIDLib::ESpecialTimes  eSpecial
         );
 

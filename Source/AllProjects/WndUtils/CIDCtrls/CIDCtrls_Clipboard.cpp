@@ -45,15 +45,15 @@ namespace CIDCtrls_Clipboard
     // -----------------------------------------------------------------------
     //  We have to fault in the registration of our custom types
     // -----------------------------------------------------------------------
-    volatile tCIDLib::TBoolean  bInitDone = kCIDLib::False;
-    tCIDLib::TCard4             c4CIDStringListType;
-    const tCIDLib::TCh*         pszCIDStringListTypeName= L"CIDLib.StringList.ClipboardFormat";
-    tCIDLib::TCard4             c4CIDObjectType;
-    const tCIDLib::TCh*         pszCIDObjectTypeName    = L"CIDLib.TObject.ClipboardFormat";
-    tCIDLib::TCard4             c4CIDClassType;
-    const tCIDLib::TCh*         pszCIDClassTypeName     = L"CIDLib.TClass.ClipboardFormat";
-    tCIDLib::TCard4             c4CIDFlatObjType;
-    const tCIDLib::TCh*         pszCIDFlatObjTypeName   = L"CIDLib.TFlatObj.ClipboardFormat";
+    TAtomicFlag         atomInitDone;
+    tCIDLib::TCard4     c4CIDStringListType;
+    const tCIDLib::TCh* pszCIDStringListTypeName= L"CIDLib.StringList.ClipboardFormat";
+    tCIDLib::TCard4     c4CIDObjectType;
+    const tCIDLib::TCh* pszCIDObjectTypeName    = L"CIDLib.TObject.ClipboardFormat";
+    tCIDLib::TCard4     c4CIDClassType;
+    const tCIDLib::TCh* pszCIDClassTypeName     = L"CIDLib.TClass.ClipboardFormat";
+    tCIDLib::TCard4     c4CIDFlatObjType;
+    const tCIDLib::TCh* pszCIDFlatObjTypeName   = L"CIDLib.TFlatObj.ClipboardFormat";
 }
 
 
@@ -87,10 +87,10 @@ void FooBar()
 TGUIClipboard::TGUIClipboard(const TWindow& wndOwner)
 {
     // If we've not faulted in our type registration, then do that
-    if (!CIDCtrls_Clipboard::bInitDone)
+    if (!CIDCtrls_Clipboard::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDCtrls_Clipboard::bInitDone)
+        if (!CIDCtrls_Clipboard::atomInitDone)
         {
             CIDCtrls_Clipboard::c4CIDObjectType = ::RegisterClipboardFormat
             (
@@ -164,7 +164,7 @@ TGUIClipboard::TGUIClipboard(const TWindow& wndOwner)
                 );
             }
         }
-        CIDCtrls_Clipboard::bInitDone = kCIDLib::True;
+        CIDCtrls_Clipboard::atomInitDone.Set();
     }
 
     if (!::OpenClipboard(wndOwner.hwndThis()))

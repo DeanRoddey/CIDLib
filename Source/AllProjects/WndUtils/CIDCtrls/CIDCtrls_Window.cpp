@@ -641,21 +641,22 @@ const TString& TWindow::strExtractName(const TWindow& wndSrc)
 TFrameWnd& TWindow::wndDesktop()
 {
     static TFrameWnd* m_pwndDesktop = nullptr;
-    if (!m_pwndDesktop)
+    if (!TAtomic::pFencedGet<TFrameWnd>(&m_pwndDesktop))
     {
         TBaseLock lockInit;
-        if (!m_pwndDesktop)
+        if (!TAtomic::pFencedGet<TFrameWnd>(&m_pwndDesktop))
         {
-            TRawMem::pExchangePtr(&m_pwndDesktop, new TFrameWnd);
+            TFrameWnd* pwndNew = new TFrameWnd;
 
             //
             //  Note that this adds it to the window list. We tell it not to
             //  adopt the handle.
             //
-            m_pwndDesktop->UseHandle
+            pwndNew->UseHandle
             (
                 ::GetDesktopWindow(), kCIDLib::False, kCIDLib::False
             );
+            TAtomic::FencedSet<TFrameWnd>(&m_pwndDesktop, pwndNew);
         }
     }
     return *m_pwndDesktop;
@@ -7237,11 +7238,11 @@ TWindow::CreateWnd( const   tCIDCtrls::TWndHandle   hwndParOwner
     //  Init the common controls if not done yet, register our two custom window classes,
     //  and initialize our window mapping data.
     //
-    static tCIDLib::TBoolean bInitDone = kCIDLib::False;
-    if (!bInitDone)
+    static TAtomicFlag atomInitDone;
+    if (!atomInitDone)
     {
         TBaseLock lockInit;
-        if (!bInitDone)
+        if (!atomInitDone)
         {
             INITCOMMONCONTROLSEX Init = {0};
             Init.dwSize = sizeof(Init);
@@ -7274,7 +7275,7 @@ TWindow::CreateWnd( const   tCIDCtrls::TWndHandle   hwndParOwner
                 , kCIDLib::False
             );
 
-            bInitDone = kCIDLib::True;
+            atomInitDone.Set();
         }
     }
 

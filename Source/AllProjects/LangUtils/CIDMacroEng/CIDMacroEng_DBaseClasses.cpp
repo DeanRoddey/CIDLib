@@ -51,7 +51,7 @@ namespace CIDMacroEng_DBaseClasses
     const TString   strStmtClassPath(L"MEng.System.Runtime.DBStatement");
     const TString   strStmtName(L"DBStatement");
 
-    volatile tCIDLib::TBoolean bODBCInitDone = kCIDLib::False;
+    TAtomicFlag     atomODBCInitDone;
 }
 
 
@@ -72,13 +72,13 @@ TMEngDBConnVal::TMEngDBConnVal( const   TString&                strName
     , m_pdbconnVal(0)
 {
     // Init the ODBC engine if not already.
-    if (!CIDMacroEng_DBaseClasses::bODBCInitDone)
+    if (!CIDMacroEng_DBaseClasses::atomODBCInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDMacroEng_DBaseClasses::bODBCInitDone)
+        if (!CIDMacroEng_DBaseClasses::atomODBCInitDone)
         {
             facCIDDBase().Initialize();
-            CIDMacroEng_DBaseClasses::bODBCInitDone = kCIDLib::True;
+            CIDMacroEng_DBaseClasses::atomODBCInitDone.Set();
         }
     }
 }

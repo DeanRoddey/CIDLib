@@ -1143,12 +1143,12 @@ tCIDLib::TVoid TFrameWnd::DoInit()
     //  NOTE that we don't use the standard custom window classes that TWindow
     //  registers for use by everyone else. We want our own
     //
-    static tCIDLib::TBoolean bInitDone = kCIDLib::False;
-    if (!bInitDone)
+    static TAtomicFlag atomInitDone;
+    if (!atomInitDone)
     {
         // Lock while we do this
         TBaseLock lockInit;
-        if (!bInitDone)
+        if (!atomInitDone)
         {
             const TRGBClr rgbBgn = facCIDCtrls().rgbSysClr(tCIDCtrls::ESysColors::Window);
             RegWndClass
@@ -1170,7 +1170,7 @@ tCIDLib::TVoid TFrameWnd::DoInit()
                 , rgbBgn
                 , kCIDLib::True
             );
-            bInitDone = kCIDLib::True;
+            atomInitDone.Set();
         }
     }
 }

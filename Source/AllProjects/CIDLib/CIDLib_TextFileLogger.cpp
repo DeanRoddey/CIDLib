@@ -98,27 +98,7 @@ tCIDLib::TVoid TTextFileLogger::LogEvent(const TLogEvent& logevToLog)
     //  because calls to this method are thread serialized by the CIDLib
     //  code that calls it. This lets us avoid the creation on every call.
     //
-    static volatile tCIDLib::TBoolean   bFirstTime = kCIDLib::True;
-    static TTime                        tmCurrent;
-
-    //
-    //  If this is the first time through, then we need to set the default
-    //  format for the time object so that it will naturally format in the
-    //  style we want. It will be in the form:
-    //
-    //  MM:DD HH:MM:SS
-    //
-    //  In a 24 hour format.
-    //
-    if (bFirstTime)
-    {
-        TBaseLock lockInit;
-        if (bFirstTime)
-        {
-            tmCurrent.strDefaultFormat(L"%(M,2,0)/%(D,2,0) %(H,2,0):%(u,2,0):%(s,2,0)");
-            bFirstTime = kCIDLib::False;
-        }
-    }
+    static TTime tmCurrent(L"%(M,2,0)/%(D,2,0) %(H,2,0):%(u,2,0):%(s,2,0)");
 
     // Set the time object to the time in the event
     tmCurrent = logevToLog.enctLogged();

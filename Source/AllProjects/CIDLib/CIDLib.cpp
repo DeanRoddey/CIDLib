@@ -470,6 +470,23 @@ static tCIDLib::TVoid DummyFunc()
     if (tCIDLib::IsTFloatX<decltype(f4Test)>::bState)
     {
     }
+
+    tCIDLib::TCard4 c4Val1 = 16;
+    tCIDLib::TCard4 c4Val2 = 32;
+    alignas(4) tCIDLib::TCard4* pTest1 = &c4Val1;
+    alignas(4) tCIDLib::TCard4* pTest2 = &c4Val2;
+    if (TAtomic::pFencedGet(&pTest1) != &c4Val1)
+    {
+    }
+
+    TAtomicPtr<TString> atomStr;
+    if (!atomStr.pValue())
+    {
+        atomStr.SetValue(new TString());
+    }
+    if (atomStr->bIsEmpty())
+    {
+    }
 }
 #endif
 

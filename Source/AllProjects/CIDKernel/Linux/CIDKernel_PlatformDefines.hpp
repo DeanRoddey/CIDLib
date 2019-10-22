@@ -75,13 +75,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  This one is used to force local data to be correctly cache aligned, which
-//  is required if it is going to be interlocked exchanged.
-// ---------------------------------------------------------------------------
-#define CID_CACHEALIGN __attribute__ ((aligned(32)))
-
-
-// ---------------------------------------------------------------------------
 //  Define our version of the magic main module macro. We need to grab argc
 //  argv here, so that when the TKrnlFileSys command-line related functions
 //  are called, the result is consistent with what people would expect if they

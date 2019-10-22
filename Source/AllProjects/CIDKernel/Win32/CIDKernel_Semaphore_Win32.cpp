@@ -47,7 +47,7 @@ TSemaphoreHandle::TSemaphoreHandle() :
 
     m_phsemiThis(nullptr)
 {
-    m_phsemiThis = (TSemaphoreHandleImpl*)::_aligned_malloc(sizeof(TSemaphoreHandleImpl), 32);
+    m_phsemiThis = new TSemaphoreHandleImpl;
     m_phsemiThis->hSem = 0;
 }
 
@@ -55,13 +55,13 @@ TSemaphoreHandle::TSemaphoreHandle(const TSemaphoreHandle& hsemToCopy) :
 
     m_phsemiThis(nullptr)
 {
-    m_phsemiThis = (TSemaphoreHandleImpl*)::_aligned_malloc(sizeof(TSemaphoreHandleImpl), 32);
+    m_phsemiThis = new TSemaphoreHandleImpl;
     m_phsemiThis->hSem = hsemToCopy.m_phsemiThis->hSem;
 }
 
 TSemaphoreHandle::~TSemaphoreHandle()
 {
-    ::_aligned_free(m_phsemiThis);
+    delete m_phsemiThis;
     m_phsemiThis = nullptr;
 }
 
@@ -76,7 +76,6 @@ TSemaphoreHandle::operator=(const TSemaphoreHandle& hsemToAssign)
         return *this;
 
     m_phsemiThis->hSem = hsemToAssign.m_phsemiThis->hSem;
-
     return *this;
 }
 
@@ -190,7 +189,7 @@ tCIDLib::TBoolean TKrnlSemaphore::bClose()
     }
 
     if (m_hsemThis.m_phsemiThis)
-        TKrnlWin32::AtomicHandleSet(m_hsemThis.m_phsemiThis->hSem, 0);
+        m_hsemThis.m_phsemiThis->hSem = 0;
     return kCIDLib::True;
 }
 
@@ -217,17 +216,12 @@ tCIDLib::TBoolean TKrnlSemaphore::bCreate(const tCIDLib::TCard4 c4InitCount)
     }
 
     // Not named, so create an unnamed one
-    HANDLE hTmp = ::CreateSemaphore(0, c4InitCount, m_c4MaxCount, 0);
-
-    if (!hTmp)
+    m_hsemThis.m_phsemiThis->hSem = ::CreateSemaphore(0, c4InitCount, m_c4MaxCount, 0);
+    if (!m_hsemThis.m_phsemiThis->hSem)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-
-    // We survived, so store the handle
-    TKrnlWin32::AtomicHandleSet(m_hsemThis.m_phsemiThis->hSem, hTmp);
-
     return kCIDLib::True;
 }
 
@@ -257,22 +251,21 @@ tCIDLib::TBoolean TKrnlSemaphore::bDuplicate(const TKrnlSemaphore& ksemToDup)
         m_pszName = TRawStr::pszReplicate(ksemToDup.m_pszName);
 
     // Duplicate the handle
-    HANDLE hTmp;
-    if (!::DuplicateHandle
+    BOOL bRes = ::DuplicateHandle
     (
         ksemToDup.m_hsemThis.m_phsemiThis->hSem
         , TKrnlProcess::hprocThis().hprociThis().hProcess
         , TKrnlProcess::hprocThis().hprociThis().hProcess
-        , &hTmp
+        , &m_hsemThis.m_phsemiThis->hSem
         , 0
         , 0
-        , DUPLICATE_SAME_ACCESS))
+        , DUPLICATE_SAME_ACCESS
+    );
+    if (bRes == FALSE)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-
-    TKrnlWin32::AtomicHandleSet(m_hsemThis.m_phsemiThis->hSem, hTmp);
     return kCIDLib::True;
 }
 
@@ -331,16 +324,12 @@ tCIDLib::TBoolean TKrnlSemaphore::bOpen()
         return kCIDLib::False;
     }
 
-    HANDLE hTmp = ::OpenEvent(EVENT_ALL_ACCESS | SYNCHRONIZE, 0, m_pszName);
-    if (!hTmp)
+    m_hsemThis.m_phsemiThis->hSem = ::OpenEvent(EVENT_ALL_ACCESS | SYNCHRONIZE, 0, m_pszName);
+    if (!m_hsemThis.m_phsemiThis->hSem)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-
-    // We survived, so store the handle
-    TKrnlWin32::AtomicHandleSet(m_hsemThis.m_phsemiThis->hSem, hTmp);
-
     return kCIDLib::True;
 }
 
@@ -389,8 +378,6 @@ TKrnlSemaphore::bCreateNamed(const  tCIDLib::TCard4     c4InitCount
                             , const tCIDLib::TBoolean   bFailIfExists
                             ,       tCIDLib::TBoolean&  bCreated)
 {
-    HANDLE hTmp;
-
     //
     //  The open did not work, so try to create it. Since this one is named,
     //  we have to set a default ACL on it so that it will be shareable from
@@ -431,13 +418,16 @@ TKrnlSemaphore::bCreateNamed(const  tCIDLib::TCard4     c4InitCount
     SAttrs.lpSecurityDescriptor = pSDesc;
     SAttrs.bInheritHandle = TRUE;
 
-    hTmp = ::CreateSemaphore(&SAttrs, c4InitCount, m_c4MaxCount, m_pszName);
+    m_hsemThis.m_phsemiThis->hSem = ::CreateSemaphore
+    (
+        &SAttrs, c4InitCount, m_c4MaxCount, m_pszName
+    );
 
     // Either way now, we can clean up the descriptor
     ::LocalDiscard(pSDesc);
 
     // If it failed, then give up
-    if (!hTmp)
+    if (!m_hsemThis.m_phsemiThis->hSem)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -455,13 +445,12 @@ TKrnlSemaphore::bCreateNamed(const  tCIDLib::TCard4     c4InitCount
     //
     if (!bCreated && bFailIfExists)
     {
-        ::CloseHandle(hTmp);
+        ::CloseHandle(m_hsemThis.m_phsemiThis->hSem);
+        m_hsemThis.m_phsemiThis->hSem = 0;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyExists);
         return kCIDLib::False;
     }
 
-    // It worked, so store the platform specific handle
-    TKrnlWin32::AtomicHandleSet(m_hsemThis.m_phsemiThis->hSem, hTmp);
     return kCIDLib::True;
 }
 

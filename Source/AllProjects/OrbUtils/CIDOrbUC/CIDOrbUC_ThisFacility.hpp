@@ -500,16 +500,16 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         //  m_thrRebinder
         //      This is the rebinding thread that does all of the work.
         // -------------------------------------------------------------------
-        volatile tCIDLib::TBoolean  m_bInitialized;
-        tCIDLib::TCard8             m_c8LastNSCookie;
-        TBindList                   m_colList;
-        tCIDLib::TEncodedTime       m_enctLastNSCheck;
-        tCIDLib::TIPPortNum         m_ippnNS;
-        TLogEvent                   m_logevLast;
-        TMutex                      m_mtxSync;
-        TStatsCacheItem             m_sciRebindFailures;
-        TString                     m_strNSHost;
-        TThread                     m_thrRebinder;
+        TAtomicFlag             m_atomInitDone;
+        tCIDLib::TCard8         m_c8LastNSCookie;
+        TBindList               m_colList;
+        tCIDLib::TEncodedTime   m_enctLastNSCheck;
+        tCIDLib::TIPPortNum     m_ippnNS;
+        TLogEvent               m_logevLast;
+        TMutex                  m_mtxSync;
+        TStatsCacheItem         m_sciRebindFailures;
+        TString                 m_strNSHost;
+        TThread                 m_thrRebinder;
 
 
         // -------------------------------------------------------------------

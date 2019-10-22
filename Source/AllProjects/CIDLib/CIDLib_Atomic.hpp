@@ -31,9 +31,9 @@
 namespace TAtomic
 {
     inline tCIDLib::TCard4
-    c4CompareAndExchange(volatile   tCIDLib::TCard4&    c4ToFill
-                        , const     tCIDLib::TCard4     c4New
-                        , const     tCIDLib::TCard4     c4Compare)
+    c4CompareAndExchange(       tCIDLib::TCard4&    c4ToFill
+                        , const tCIDLib::TCard4     c4New
+                        , const tCIDLib::TCard4     c4Compare)
     {
         return TRawMem::c4CompareAndExchange(c4ToFill, c4New, c4Compare);
     }
@@ -46,12 +46,12 @@ namespace TAtomic
 
     CIDLIBEXP tCIDLib::TCard4 c4SafeAcquire
     (
-        volatile    tCIDLib::TCard4&    c4Target
+                    tCIDLib::TCard4&    c4Target
     );
 
     CIDLIBEXP tCIDLib::TCard4 c4SafeRelease
     (
-        volatile    tCIDLib::TCard4&    c4Target
+                    tCIDLib::TCard4&    c4Target
     );
 
 
@@ -75,6 +75,51 @@ namespace TAtomic
             TRawMem::pCompareAndExchangeRawPtr
             (
                 reinterpret_cast<tCIDLib::TVoid**>(ppToFill), pNew, pCompare
+            )
+        );
+    }
+
+
+    template <class T> T* pFencedGet(T** pToGet)
+    {
+        return reinterpret_cast<T*>
+        (
+            TRawMem::pCompareAndExchangeRawPtr
+            (
+                reinterpret_cast<tCIDLib::TVoid**>(pToGet), nullptr, nullptr
+            )
+        );
+    }
+
+    template <class T> T* pFencedGet(const T** pToGet)
+    {
+        return reinterpret_cast<T*>
+        (
+            TRawMem::pCompareAndExchangeRawPtr
+            (
+                reinterpret_cast<tCIDLib::TVoid**>(pToGet), nullptr, nullptr
+            )
+        );
+    }
+
+    template <class T> tCIDLib::TVoid FencedSet(T** pTarget, T* const pToSet)
+    {
+        reinterpret_cast<T*>
+        (
+            TRawMem::pExchangeRawPtr
+            (
+                reinterpret_cast<tCIDLib::TVoid**>(pTarget), pToSet
+            )
+        );
+    }
+
+    template <class T> tCIDLib::TVoid FencedSet(const T** pTarget, T* const pToSet)
+    {
+        reinterpret_cast<T*>
+        (
+            TRawMem::pExchangeRawPtr
+            (
+                reinterpret_cast<tCIDLib::TVoid**>(pTarget), pToSet
             )
         );
     }

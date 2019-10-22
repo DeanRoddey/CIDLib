@@ -46,7 +46,7 @@ TEventHandle::TEventHandle() :
 
     m_pheviThis(nullptr)
 {
-    m_pheviThis = (TEventHandleImpl*)::_aligned_malloc(sizeof(TEventHandleImpl), 32);
+    m_pheviThis = new TEventHandleImpl;
     m_pheviThis->hEvent = 0;
 }
 
@@ -54,14 +54,13 @@ TEventHandle::TEventHandle(const TEventHandle& hevToCopy) :
 
     m_pheviThis(nullptr)
 {
-    m_pheviThis = (TEventHandleImpl*)::_aligned_malloc(sizeof(TEventHandleImpl), 32);
+    m_pheviThis = new TEventHandleImpl;
     m_pheviThis->hEvent = hevToCopy.m_pheviThis->hEvent;
 }
 
 TEventHandle::~TEventHandle()
 {
-    ::_aligned_free(m_pheviThis);
-    m_pheviThis = nullptr;
+    delete m_pheviThis;
 }
 
 
@@ -74,7 +73,6 @@ TEventHandle& TEventHandle::operator=(const TEventHandle& hevToAssign)
         return *this;
 
     m_pheviThis->hEvent = hevToAssign.m_pheviThis->hEvent;
-
     return *this;
 }
 
@@ -215,7 +213,8 @@ tCIDLib::TBoolean TKrnlEvent::bClose()
             return kCIDLib::False;
         }
     }
-    TKrnlWin32::AtomicHandleSet(m_hevThis.m_pheviThis->hEvent, 0);
+    if (m_hevThis.m_pheviThis)
+        m_hevThis.m_pheviThis->hEvent = 0;
     return kCIDLib::True;
 }
 
@@ -245,15 +244,12 @@ TKrnlEvent::bCreate(const   tCIDLib::EEventStates   eInitState
 
     DWORD ManFlag = (bManual == kCIDLib::True);
     DWORD InitFlag = (eInitState == tCIDLib::EEventStates::Triggered);
-    HANDLE hTmp = ::CreateEvent(0, ManFlag, InitFlag, 0);
-    if (!hTmp)
+    m_hevThis.m_pheviThis->hEvent = ::CreateEvent(0, ManFlag, InitFlag, 0);
+    if (!m_hevThis.m_pheviThis->hEvent)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-
-    // We survived, so store the handle
-    TKrnlWin32::AtomicHandleSet(m_hevThis.m_pheviThis->hEvent, hTmp);
     return kCIDLib::True;
 }
 
@@ -280,21 +276,22 @@ tCIDLib::TBoolean TKrnlEvent::bDuplicate(const TKrnlEvent& kevToDup)
         m_pszName = TRawStr::pszReplicate(kevToDup.m_pszName);
 
     // Duplicate the handle
-    HANDLE hTmp;
-    if (!::DuplicateHandle
+    const BOOL bRes = ::DuplicateHandle
     (
         kevToDup.m_hevThis.m_pheviThis->hEvent
         , GetCurrentProcess()
         , GetCurrentProcess()
-        , &hTmp
+        , &m_hevThis.m_pheviThis->hEvent
         , 0
         , 0
-        , DUPLICATE_SAME_ACCESS))
+        , DUPLICATE_SAME_ACCESS
+    );
+
+    if (bRes == FALSE)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-    TKrnlWin32::AtomicHandleSet(m_hevThis.m_pheviThis->hEvent, hTmp);
     return kCIDLib::True;
 }
 
@@ -320,15 +317,12 @@ tCIDLib::TBoolean TKrnlEvent::bOpen()
         return kCIDLib::False;
     }
 
-    HANDLE hTmp = ::OpenEvent(EVENT_ALL_ACCESS | SYNCHRONIZE, 0, m_pszName);
-    if (!hTmp)
+    m_hevThis.m_pheviThis->hEvent = ::OpenEvent(EVENT_ALL_ACCESS | SYNCHRONIZE, 0, m_pszName);
+    if (!m_hevThis.m_pheviThis->hEvent)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-
-    // We survived, so store the handle
-    TKrnlWin32::AtomicHandleSet(m_hevThis.m_pheviThis->hEvent, hTmp);
     return kCIDLib::True;
 }
 
@@ -446,8 +440,6 @@ TKrnlEvent::bCreateNamed(const  tCIDLib::EEventStates   eState
                         , const tCIDLib::TBoolean       bManual
                         ,       tCIDLib::TBoolean&      bCreated)
 {
-    HANDLE hTmp;
-
     //
     //  The open did not work, so try to create it. Since this one is named,
     //  we have to set a default ACL on it so that it will be shareable from
@@ -490,13 +482,13 @@ TKrnlEvent::bCreateNamed(const  tCIDLib::EEventStates   eState
 
     DWORD ManFlag = (bManual == kCIDLib::True);
     DWORD InitFlag = (eState == tCIDLib::EEventStates::Triggered);
-    hTmp = ::CreateEvent(&SAttrs, ManFlag, InitFlag, m_pszName);
+    m_hevThis.m_pheviThis->hEvent = ::CreateEvent(&SAttrs, ManFlag, InitFlag, m_pszName);
 
     // Either way now, we can clean up the descriptor
     ::LocalDiscard(pSDesc);
 
     // If it failed, then give up
-    if (!hTmp)
+    if (!m_hevThis.m_pheviThis->hEvent)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -514,14 +506,12 @@ TKrnlEvent::bCreateNamed(const  tCIDLib::EEventStates   eState
     //
     if (!bCreated && bFailIfExists)
     {
-        ::CloseHandle(hTmp);
+        ::CloseHandle(m_hevThis.m_pheviThis->hEvent);
+        m_hevThis.m_pheviThis->hEvent = 0;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyExists);
         return kCIDLib::False;
     }
 
-    // It worked, so store the handle
-    TKrnlWin32::AtomicHandleSet(m_hevThis.m_pheviThis->hEvent, hTmp);
     return kCIDLib::True;
 }
-
 

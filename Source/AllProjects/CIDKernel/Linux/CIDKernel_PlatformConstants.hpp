@@ -52,6 +52,8 @@ namespace kCIDLib
     //  Memory related constants
     // -----------------------------------------------------------------------
     const tCIDLib::TCard4           c4MemPageSize   = 4096;
+    const tCIDLib::TCard4           c4CacheAlign    = 4;
+
 
     // -----------------------------------------------------------------------
     //  Our native character encoding

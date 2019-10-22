@@ -140,7 +140,7 @@ namespace CIDKernel_IP_WIN32
     //  one.) This is set via the environment variable CID_AUTOIPINTF being
     //  set.
     // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   bIPProtoAvailLoaded = kCIDLib::False;
+    TAtomicFlag         atomProtoLoaded;
     tCIDLib::TBoolean   bIPV4Avail    = kCIDLib::False;
     tCIDLib::TBoolean   bIPV6Avail    = kCIDLib::False;
     tCIDLib::TBoolean   bAutoIPIntf   = kCIDLib::False;
@@ -248,49 +248,52 @@ CvtAdapterInfo(TKrnlIP::TAdaptorInfo& kadpFill, IP_ADAPTER_ADDRESSES& Adapter)
 //
 static tCIDLib::TVoid LoadIPVAvailInfo()
 {
-    TBaseLock lockInit;
-    if (!CIDKernel_IP_WIN32::bIPProtoAvailLoaded)
+    if (!CIDKernel_IP_WIN32::atomProtoLoaded)
     {
-        // Assume neither till proven otherwise
-        CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::False;
-        CIDKernel_IP_WIN32::bIPV6Avail = kCIDLib::False;
-
-        TKrnlLList<TKrnlIP::TAdaptorInfo> kllstAdapters;
-        if (TKrnlIP::bQueryAdaptorList(kllstAdapters))
+        TBaseLock lockInit;
+        if (!CIDKernel_IP_WIN32::atomProtoLoaded)
         {
-            //
-            //  Query the adapters in the system. Loop through them and for any that
-            //  we care about, check to see if they are enabled for either family.
-            //
-            //  We ignore tunneling interfaces and non-dedicated connections.
-            //
-            if (kllstAdapters.bResetCursor())
+            // Assume neither till proven otherwise
+            CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::False;
+            CIDKernel_IP_WIN32::bIPV6Avail = kCIDLib::False;
+
+            TKrnlLList<TKrnlIP::TAdaptorInfo> kllstAdapters;
+            if (TKrnlIP::bQueryAdaptorList(kllstAdapters))
             {
-                TKrnlIP::TAdaptorInfo* pkaiCur = nullptr;
-                while (kllstAdapters.bNext(pkaiCur))
+                //
+                //  Query the adapters in the system. Loop through them and for any that
+                //  we care about, check to see if they are enabled for either family.
+                //
+                //  We ignore tunneling interfaces and non-dedicated connections.
+                //
+                if (kllstAdapters.bResetCursor())
                 {
-                    if (pkaiCur->bTunnel || !pkaiCur->bDedicated)
-                        continue;
+                    TKrnlIP::TAdaptorInfo* pkaiCur = nullptr;
+                    while (kllstAdapters.bNext(pkaiCur))
+                    {
+                        if (pkaiCur->bTunnel || !pkaiCur->bDedicated)
+                            continue;
 
-                    if (pkaiCur->bIPV4Enabled)
-                        CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::True;
+                        if (pkaiCur->bIPV4Enabled)
+                            CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::True;
 
-                    if (pkaiCur->bIPV6Enabled)
-                        CIDKernel_IP_WIN32::bIPV6Avail = kCIDLib::True;
+                        if (pkaiCur->bIPV6Enabled)
+                            CIDKernel_IP_WIN32::bIPV6Avail = kCIDLib::True;
+                    }
                 }
             }
-        }
-         else
-        {
-            // Not much we can do, assume V4
-            CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::True;
-        }
+            else
+            {
+                // Not much we can do, assume V4
+                CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::True;
+            }
 
-        // See if we should enable the auto-IP interface option
-        if (TKrnlEnvironment::pszFind(L"CID_AUTOIPINTF"))
-            CIDKernel_IP_WIN32::bAutoIPIntf = kCIDLib::True;
+            // See if we should enable the auto-IP interface option
+            if (TKrnlEnvironment::pszFind(L"CID_AUTOIPINTF"))
+                CIDKernel_IP_WIN32::bAutoIPIntf = kCIDLib::True;
 
-        CIDKernel_IP_WIN32::bIPProtoAvailLoaded = kCIDLib::True;
+            CIDKernel_IP_WIN32::atomProtoLoaded.Set();
+        }
     }
 }
 
@@ -708,17 +711,13 @@ TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const pszAppPath
 //
 tCIDLib::TBoolean TKrnlIP::bIPV4Avail()
 {
-    if (!CIDKernel_IP_WIN32::bIPProtoAvailLoaded)
-        LoadIPVAvailInfo();
-
+    LoadIPVAvailInfo();
     return CIDKernel_IP_WIN32::bIPV4Avail;
 }
 
 tCIDLib::TBoolean TKrnlIP::bIPV6Avail()
 {
-    if (!CIDKernel_IP_WIN32::bIPProtoAvailLoaded)
-        LoadIPVAvailInfo();
-
+    LoadIPVAvailInfo();
     return CIDKernel_IP_WIN32::bIPV6Avail;
 }
 

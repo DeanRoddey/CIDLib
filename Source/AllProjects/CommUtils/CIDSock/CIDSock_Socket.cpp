@@ -47,8 +47,8 @@ namespace CIDSock_Socket
     // -----------------------------------------------------------------------
     //  Some stats cache items we maintain
     // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   m_bInitDone = kCIDLib::False;
-    TStatsCacheItem     m_sciSockCnt;
+    TAtomicFlag         atomInitDone;
+    TStatsCacheItem     sciSockCnt;
 }
 
 
@@ -316,7 +316,7 @@ TSocket::~TSocket()
     if (m_ksockImpl.bIsOpen(bOpen) && bOpen)
     {
         // Dec the open socket stat
-        TStatsCache::c8DecCounter(CIDSock_Socket::m_sciSockCnt);
+        TStatsCache::c8DecCounter(CIDSock_Socket::sciSockCnt);
 
         if (!m_ksockImpl.bClose())
         {
@@ -933,7 +933,7 @@ tCIDLib::TVoid TSocket::Close()
     if (m_ksockImpl.bIsOpen(bOpen) && bOpen)
     {
         // Dec the open socket stat
-        TStatsCache::c8DecCounter(CIDSock_Socket::m_sciSockCnt);
+        TStatsCache::c8DecCounter(CIDSock_Socket::sciSockCnt);
 
         if (!m_ksockImpl.bClose())
         {
@@ -1028,19 +1028,19 @@ TSocket::TSocket() :
     , m_bUserFlag(kCIDLib::False)
 {
     // Initialize our stats cache item if needed
-    if (!CIDSock_Socket::m_bInitDone)
+    if (!CIDSock_Socket::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDSock_Socket::m_bInitDone)
+        if (!CIDSock_Socket::atomInitDone)
         {
             TStatsCache::RegisterItem
             (
                 kCIDSock::pszStat_Net_OpenSockCnt
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDSock_Socket::m_sciSockCnt
+                , CIDSock_Socket::sciSockCnt
             );
 
-            CIDSock_Socket::m_bInitDone = kCIDLib::True;
+            CIDSock_Socket::atomInitDone.Set();
         }
     }
 }
@@ -1054,19 +1054,19 @@ TSocket::TSocket(const  tCIDSock::ESocketTypes  eType
     , m_bUserFlag(kCIDLib::False)
 {
     // Initialize our stats cache item if needed
-    if (!CIDSock_Socket::m_bInitDone)
+    if (!CIDSock_Socket::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDSock_Socket::m_bInitDone)
+        if (!CIDSock_Socket::atomInitDone)
         {
             TStatsCache::RegisterItem
             (
                 kCIDSock::pszStat_Net_OpenSockCnt
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDSock_Socket::m_sciSockCnt
+                , CIDSock_Socket::sciSockCnt
             );
 
-            CIDSock_Socket::m_bInitDone = kCIDLib::True;
+            CIDSock_Socket::atomInitDone.Set();
         }
     }
 
@@ -1084,7 +1084,7 @@ TSocket::TSocket(const  tCIDSock::ESocketTypes  eType
     }
 
     // Bump the open socket stat
-    TStatsCache::c8IncCounter(CIDSock_Socket::m_sciSockCnt);
+    TStatsCache::c8IncCounter(CIDSock_Socket::sciSockCnt);
 }
 
 
@@ -1099,26 +1099,25 @@ TSocket::TSocket(const TSocketHandle& hsockToAdopt) :
     , m_bUserFlag(kCIDLib::False)
 {
     // Initialize our stats cache item if needed
-    if (!CIDSock_Socket::m_bInitDone)
+    if (!CIDSock_Socket::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDSock_Socket::m_bInitDone)
+        if (!CIDSock_Socket::atomInitDone)
         {
             TStatsCache::RegisterItem
             (
                 kCIDSock::pszStat_Net_OpenSockCnt
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDSock_Socket::m_sciSockCnt
+                , CIDSock_Socket::sciSockCnt
             );
-
-            CIDSock_Socket::m_bInitDone = kCIDLib::True;
+            CIDSock_Socket::atomInitDone.Set();
         }
     }
 
     // If it's open, then bump the stat
     tCIDLib::TBoolean bOpen;
     if (m_ksockImpl.bIsOpen(bOpen) && bOpen)
-        TStatsCache::c8IncCounter(CIDSock_Socket::m_sciSockCnt);
+        TStatsCache::c8IncCounter(CIDSock_Socket::sciSockCnt);
 }
 
 
@@ -1150,7 +1149,7 @@ tCIDLib::TVoid TSocket::Create( const   tCIDSock::ESocketTypes  eType
     }
 
     // Bump the open socket stat
-    TStatsCache::c8IncCounter(CIDSock_Socket::m_sciSockCnt);
+    TStatsCache::c8IncCounter(CIDSock_Socket::sciSockCnt);
 }
 
 

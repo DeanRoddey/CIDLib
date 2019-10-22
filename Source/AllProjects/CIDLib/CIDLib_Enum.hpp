@@ -123,13 +123,13 @@ class CIDLIBEXP TEnumMap
         tCIDLib::TBoolean bIsValidEnum
         (
             const   tCIDLib::TInt4          i4ToFind
-        );
+        )   const;
 
         tCIDLib::TCard4 c4MapEnumVal
         (
             const tCIDLib::TInt4            i4ToFind
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
 
         tCIDLib::TCard4 c4MapEnumText
@@ -137,13 +137,13 @@ class CIDLIBEXP TEnumMap
             const TString&                  strToFind
             , const ETextVals               eTextVal
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
         tCIDLib::TInt4 eMapEnumAltNum
         (
             const   tCIDLib::TInt4          i4ToFind
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
         tCIDLib::TVoid FormatValues
         (
@@ -151,46 +151,46 @@ class CIDLIBEXP TEnumMap
             , const TString&                strPrefix
             , const tCIDLib::TCh            chSepChar
             , const ETextVals               eTextVal
-        );
+        )   const;
 
         tCIDLib::TInt4 i4MapEnumAltNum
         (
             const  tCIDLib::TInt4           i4EnumToFind
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
         tCIDLib::TInt4 i4MapEnumText
         (
             const   TString&                strToFind
             , const ETextVals               eTextVal
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
         const TString& strMapEnumVal
         (
             const   tCIDLib::TInt4          i4ToFind
             , const ETextVals               eTextVal
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
 
     private :
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid LoadResText();
+        tCIDLib::TVoid LoadResText() const;
 
         tCIDLib::TVoid ThrowBadEnumAltNum
         (
             const   TString&                strTypeName
             , const tCIDLib::TInt4          i4Val
-        );
+        )   const;
 
         tCIDLib::TVoid ThrowBadEnumText
         (
             const   TString&                strTypeName
             , const TString&                strVal
-        );
+        )   const;
 
 
         // -------------------------------------------------------------------
@@ -205,9 +205,8 @@ class CIDLIBEXP TEnumMap
         //
         //  m_pfacLoad
         //      If the _Text value comes from loadable text, this will be the pointer
-        //      to the facility to load from. It will be loaded and then this will be
-        //      cleared so we don't try to do it again. If its inline, this will be null
-        //      from the start.
+        //      to the facility to load from. It will faulted in using the m_atomLoad
+        //      flag.
         //
         //  m_aitemValues
         //      The IDL compiler generates a static initialized list of these and passes
@@ -218,6 +217,7 @@ class CIDLIBEXP TEnumMap
         //  m_strTypeName
         //      The name of the enum type, for error messages and debugging.
         // -------------------------------------------------------------------
+        mutable TAtomicFlag     m_atomLoad;
         tCIDLib::TBoolean       m_bNonContig;
         tCIDLib::TCard4         m_c4ValCount;
         tCIDLib::TInt4          m_i4NotFoundVal;

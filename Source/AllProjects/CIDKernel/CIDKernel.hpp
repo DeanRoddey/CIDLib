@@ -349,13 +349,13 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_ErrorIds.hpp"
 #include    "CIDKernel_LList.hpp"
-#include    "CIDKernel_BaseLock.hpp"
 #include    "CIDKernel_RawBits.hpp"
 #include    "CIDKernel_String.hpp"
 #include    "CIDKernel_KVPair.hpp"
 
 #include    "CIDKernel_Audio.hpp"
 #include    "CIDKernel_RawMemory.hpp"
+#include    "CIDKernel_Atomic.hpp"
 #include    "CIDKernel_RawString.hpp"
 #include    "CIDKernel_FlagJanitors.hpp"
 #include    "CIDKernel_Environment.hpp"

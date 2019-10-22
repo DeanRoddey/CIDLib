@@ -549,14 +549,14 @@ TSrcEditor::CreateSrcEditor(const   TWindow&                wndParent
                             , const   TString&              strPath)
 {
     // Load the implementation DLL if not already done
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
-    if (!bLoaded)
+    static TAtomicFlag atomLoaded;
+    if (!atomLoaded)
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!atomLoaded)
         {
             ::LoadLibrary(L"SciLexer.dll");
-            bLoaded = kCIDLib::True;
+            atomLoaded.Set();
         }
     }
 

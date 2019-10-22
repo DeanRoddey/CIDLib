@@ -105,7 +105,7 @@ TEnumMap::~TEnumMap()
 // ---------------------------------------------------------------------------
 
 // Return whether the passed value is legal for this enum
-tCIDLib::TBoolean TEnumMap::bIsValidEnum(const tCIDLib::TInt4 i4ToFind)
+tCIDLib::TBoolean TEnumMap::bIsValidEnum(const tCIDLib::TInt4 i4ToFind) const
 {
     return c4MapEnumVal(i4ToFind, kCIDLib::False) != kCIDLib::c4MaxCard;
 }
@@ -113,7 +113,7 @@ tCIDLib::TBoolean TEnumMap::bIsValidEnum(const tCIDLib::TInt4 i4ToFind)
 
 tCIDLib::TCard4
 TEnumMap::c4MapEnumVal( const tCIDLib::TInt4        i4ToFind
-                        , const tCIDLib::TBoolean   bThrowIfNot)
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     tCIDLib::TCard4 c4Index = 0;
     if (m_bNonContig)
@@ -149,10 +149,10 @@ TEnumMap::c4MapEnumVal( const tCIDLib::TInt4        i4ToFind
 tCIDLib::TCard4
 TEnumMap::c4MapEnumText(const   TString&            strToFind
                         , const ETextVals           eTextVal
-                        , const tCIDLib::TBoolean   bThrowIfNot)
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     // Fault in loadable text if needed
-    if (m_pfacLoad && (eTextVal == ETextVals::Text))
+    if (m_pfacLoad && !m_atomLoad && (eTextVal == ETextVals::Text))
         LoadResText();
 
     tCIDLib::TCard4 c4Index = 0;
@@ -180,7 +180,7 @@ TEnumMap::c4MapEnumText(const   TString&            strToFind
 //
 tCIDLib::TInt4
 TEnumMap::eMapEnumAltNum(const  tCIDLib::TInt4      i4AltToFind
-                        , const tCIDLib::TBoolean   bThrowIfNot)
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     tCIDLib::TCard4 c4Index = 0;
     while (c4Index < m_c4ValCount)
@@ -204,10 +204,10 @@ tCIDLib::TVoid
 TEnumMap::FormatValues(         TString&        strToFill
                         , const TString&        strPrefix
                         , const tCIDLib::TCh    chSepChar
-                        , const ETextVals       eTextVal)
+                        , const ETextVals       eTextVal) const
 {
     // Fault in loadable text if needed
-    if (m_pfacLoad && (eTextVal == ETextVals::Text))
+    if (m_pfacLoad && !m_atomLoad && (eTextVal == ETextVals::Text))
         LoadResText();
 
     strToFill = strPrefix;
@@ -225,7 +225,7 @@ TEnumMap::FormatValues(         TString&        strToFill
 //
 tCIDLib::TInt4
 TEnumMap::i4MapEnumAltNum(  const   tCIDLib::TInt4      i4EnumToFind
-                            , const tCIDLib::TBoolean   bThrowIfNot)
+                            , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     tCIDLib::TCard4 c4Index = 0;
     if (m_bNonContig)
@@ -261,10 +261,10 @@ TEnumMap::i4MapEnumAltNum(  const   tCIDLib::TInt4      i4EnumToFind
 tCIDLib::TInt4
 TEnumMap::i4MapEnumText(const   TString&            strToFind
                         , const ETextVals           eTextVal
-                        , const tCIDLib::TBoolean   bThrowIfNot)
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     // Fault in loadable text if needed
-    if (m_pfacLoad && (eTextVal == ETextVals::Text))
+    if (m_pfacLoad && !m_atomLoad && (eTextVal == ETextVals::Text))
         LoadResText();
 
     tCIDLib::TCard4 c4Index = 0;
@@ -292,10 +292,10 @@ TEnumMap::i4MapEnumText(const   TString&            strToFind
 const TString&
 TEnumMap::strMapEnumVal(const   tCIDLib::TInt4      i4ToFind
                         , const ETextVals           eTextVal
-                        , const tCIDLib::TBoolean   bThrowIfNot)
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     // Fault in loadable text if needed
-    if (m_pfacLoad && (eTextVal == ETextVals::Text))
+    if (m_pfacLoad && !m_atomLoad && (eTextVal == ETextVals::Text))
         LoadResText();
 
     tCIDLib::TCard4 c4Index = 0;
@@ -330,25 +330,26 @@ TEnumMap::strMapEnumVal(const   tCIDLib::TInt4      i4ToFind
 
 //
 //  This is called to fault in the _Text values if this enum is marked as having loadable
-//  main text. Once done we zero the source facility pointer to indicate it's done.
+//  main text.
 //
-tCIDLib::TVoid TEnumMap::LoadResText()
+tCIDLib::TVoid TEnumMap::LoadResText() const
 {
     // Lock and check again to make sure no one else beat us here
-    TBaseLock lockLoad;
-    if (m_pfacLoad)
+    if (!m_atomLoad.bValue())
     {
-        // Loop through the values and load them
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ValCount; c4Index++)
+        TBaseLock lockLoad;
+        if (!m_atomLoad.bValue())
         {
-            TEnumValItem& eitemCur = m_aeitemValues[c4Index];
-            if (!m_pfacLoad->bLoadCIDMsg(eitemCur.m_midLoad
-                                        , eitemCur.m_astrTextVals[tCIDLib::c4EnumOrd(ETextVals::Text)]))
-                eitemCur.m_astrTextVals[tCIDLib::c4EnumOrd(ETextVals::Text)] = L"???";
+            // Loop through the values and load them
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ValCount; c4Index++)
+            {
+                TEnumValItem& eitemCur = m_aeitemValues[c4Index];
+                if (!m_pfacLoad->bLoadCIDMsg(eitemCur.m_midLoad
+                                            , eitemCur.m_astrTextVals[tCIDLib::c4EnumOrd(ETextVals::Text)]))
+                    eitemCur.m_astrTextVals[tCIDLib::c4EnumOrd(ETextVals::Text)] = L"???";
+            }
+            m_atomLoad.Set();
         }
-
-        // As the last thing, clear the facility pointer
-        m_pfacLoad = nullptr;
     }
 }
 
@@ -359,7 +360,7 @@ tCIDLib::TVoid TEnumMap::LoadResText()
 //  other to throw them.
 //
 tCIDLib::TVoid
-TEnumMap::ThrowBadEnumAltNum(const TString& strType, const tCIDLib::TInt4 i4Val)
+TEnumMap::ThrowBadEnumAltNum(const TString& strType, const tCIDLib::TInt4 i4Val) const
 {
     facCIDLib().ThrowErr
     (
@@ -374,7 +375,7 @@ TEnumMap::ThrowBadEnumAltNum(const TString& strType, const tCIDLib::TInt4 i4Val)
 }
 
 tCIDLib::TVoid
-TEnumMap::ThrowBadEnumText(const TString& strType, const TString& strValue)
+TEnumMap::ThrowBadEnumText(const TString& strType, const TString& strValue) const
 {
     facCIDLib().ThrowErr
     (

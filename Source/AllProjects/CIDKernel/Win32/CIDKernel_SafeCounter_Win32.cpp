@@ -41,30 +41,20 @@
 // ---------------------------------------------------------------------------
 TKrnlSafeCard4Counter::TKrnlSafeCard4Counter() :
 
-    m_pc4Counter(nullptr)
+    m_c4Counter(0)
     , m_pLockData(nullptr)
 {
-    // On this platform we don't use the lock data
-    m_pc4Counter = (tCIDLib::TCard4*)::_aligned_malloc(sizeof(tCIDLib::TCard4), 32);
-    *m_pc4Counter = 0;
-
 }
 
 TKrnlSafeCard4Counter::TKrnlSafeCard4Counter(const tCIDLib::TCard4 c4InitVal) :
 
-    m_pc4Counter(nullptr)
+    m_c4Counter(c4InitVal)
     , m_pLockData(nullptr)
 {
-    // On this platform we don't use the lock data
-    m_pc4Counter = (tCIDLib::TCard4*)::_aligned_malloc(sizeof(tCIDLib::TCard4), 32);
-    *m_pc4Counter = c4InitVal;
 }
 
 TKrnlSafeCard4Counter::~TKrnlSafeCard4Counter()
 {
-    // On this platform we don't use the lock data
-    ::_aligned_free((void*)m_pc4Counter);
-    m_pc4Counter = nullptr;
 }
 
 
@@ -73,7 +63,7 @@ TKrnlSafeCard4Counter::~TKrnlSafeCard4Counter()
 // ---------------------------------------------------------------------------
 tCIDLib::TCard4 TKrnlSafeCard4Counter::c4AddTo(const tCIDLib::TCard4 c4ToAdd)
 {
-    return ::InterlockedAdd((LONG*)m_pc4Counter, LONG(c4ToAdd));
+    return ::InterlockedAdd((LONG*)&m_c4Counter, LONG(c4ToAdd));
 }
 
 tCIDLib::TCard4
@@ -82,40 +72,40 @@ TKrnlSafeCard4Counter::c4CompareAndExchange(const   tCIDLib::TCard4  c4New
 {
     return tCIDLib::TCard4
     (
-        ::InterlockedCompareExchange((LONG*)m_pc4Counter, (LONG)c4New, (LONG)c4Compare)
+        ::InterlockedCompareExchange((LONG*)&m_c4Counter, (LONG)c4New, (LONG)c4Compare)
     );
 }
 
 
 tCIDLib::TCard4 TKrnlSafeCard4Counter::c4Dec()
 {
-    return tCIDLib::TCard4(::InterlockedDecrement((LONG*)m_pc4Counter));
+    return tCIDLib::TCard4(::InterlockedDecrement((LONG*)&m_c4Counter));
 }
 
 
 tCIDLib::TCard4 TKrnlSafeCard4Counter::c4Exchange(const tCIDLib::TCard4 c4New)
 {
-    return tCIDLib::TCard4(::InterlockedExchange((LONG*)m_pc4Counter, (LONG)c4New));
+    return tCIDLib::TCard4(::InterlockedExchange((LONG*)&m_c4Counter, (LONG)c4New));
 }
 
 
 tCIDLib::TCard4 TKrnlSafeCard4Counter::c4Inc()
 {
-    return tCIDLib::TCard4(::InterlockedIncrement((LONG*)m_pc4Counter));
+    return tCIDLib::TCard4(::InterlockedIncrement((LONG*)&m_c4Counter));
 }
 
 
 tCIDLib::TCard4 TKrnlSafeCard4Counter::c4SubFrom(const tCIDLib::TCard4 c4ToSub)
 {
     // There's no substract to add a negative value
-    return  ::InterlockedAdd((LONG*)m_pc4Counter, LONG(c4ToSub) * -1);
+    return  ::InterlockedAdd((LONG*)&m_c4Counter, LONG(c4ToSub) * -1);
 }
 
 
 tCIDLib::TCard4 TKrnlSafeCard4Counter::c4Value() const
 {
     // Do an interlocked add of zero to get the current value
-    return ::InterlockedAdd((LONG*)m_pc4Counter, 0);
+    return ::InterlockedAdd((LONG*)&m_c4Counter, 0);
 }
 
 
@@ -132,31 +122,20 @@ tCIDLib::TCard4 TKrnlSafeCard4Counter::c4Value() const
 // ---------------------------------------------------------------------------
 TKrnlSafeInt4Counter::TKrnlSafeInt4Counter() :
 
-    m_pi4Counter(nullptr)
+    m_i4Counter(0)
     , m_pLockData(nullptr)
 {
-    // On this platform we don't use the lock data
-    m_pi4Counter = (tCIDLib::TInt4*)::_aligned_malloc(sizeof(tCIDLib::TInt4), 32);
-    *m_pi4Counter = 0;
 }
 
 TKrnlSafeInt4Counter::TKrnlSafeInt4Counter(const tCIDLib::TInt4 i4InitVal) :
 
-    m_pi4Counter(nullptr)
+    m_i4Counter(i4InitVal)
     , m_pLockData(nullptr)
 {
-    // On this platform we don't use the lock data
-    m_pi4Counter = (tCIDLib::TInt4*)::_aligned_malloc(sizeof(tCIDLib::TInt4), 32);
-
-    // Store the initial value
-    *m_pi4Counter = i4InitVal;
 }
 
 TKrnlSafeInt4Counter::~TKrnlSafeInt4Counter()
 {
-    // On this platform we don't use the lock data
-    ::_aligned_free((void*)m_pi4Counter);
-    m_pi4Counter = nullptr;
 }
 
 
@@ -166,44 +145,50 @@ TKrnlSafeInt4Counter::~TKrnlSafeInt4Counter()
 // ---------------------------------------------------------------------------
 tCIDLib::TInt4 TKrnlSafeInt4Counter::i4Dec()
 {
-    return ::InterlockedDecrement((LONG*)m_pi4Counter);
+    return ::InterlockedDecrement(&m_i4Counter);
 }
 
 
 tCIDLib::TInt4 TKrnlSafeInt4Counter::i4Inc()
 {
-    return ::InterlockedIncrement((LONG*)m_pi4Counter);
+    return ::InterlockedIncrement(&m_i4Counter);
 }
 
 
 tCIDLib::TInt4 TKrnlSafeInt4Counter::i4AddTo(const tCIDLib::TInt4 i4ToAdd)
 {
-    return ::InterlockedAdd(m_pi4Counter, i4ToAdd);
+    return ::InterlockedAdd(&m_i4Counter, i4ToAdd);
 }
 
 tCIDLib::TInt4
 TKrnlSafeInt4Counter::i4CompareAndExchange( const   tCIDLib::TInt4  i4New
                                             , const tCIDLib::TInt4  i4Compare)
 {
-    return ::InterlockedCompareExchange(m_pi4Counter, i4New, i4Compare);
+    return ::InterlockedCompareExchange(&m_i4Counter, i4New, i4Compare);
 }
 
 
 tCIDLib::TInt4 TKrnlSafeInt4Counter::i4Exchange(const tCIDLib::TInt4 i4New)
 {
-    return ::InterlockedExchange(m_pi4Counter, i4New);
+    return ::InterlockedExchange(&m_i4Counter, i4New);
 }
 
 
 tCIDLib::TInt4 TKrnlSafeInt4Counter::i4SubFrom(const tCIDLib::TInt4 i4ToSub)
 {
-    return ::InterlockedAdd(m_pi4Counter, -i4ToSub);
+    return ::InterlockedAdd(&m_i4Counter, -i4ToSub);
 }
 
 
 tCIDLib::TInt4 TKrnlSafeInt4Counter::i4Value() const
 {
-    // Do an add of zero to get the value
-    return ::InterlockedAdd(m_pi4Counter, 0);
+    //
+    //  Do an add of zero to get the value. We have to cast the const'ness off
+    //  to do this.
+    //
+    return ::InterlockedAdd
+    (
+        const_cast<tCIDLib::TInt4*>(&m_i4Counter), 0
+    );
 }
 

@@ -49,7 +49,7 @@ namespace CIDCtrls_ThisFacility
     // -----------------------------------------------------------------------
     //  This is used to fault in the special text file when/if it is required.
     // -----------------------------------------------------------------------
-    volatile tCIDLib::TBoolean  bSpecialTextLoaded = kCIDLib::False;
+    TAtomicFlag atomInitDone;
 
 
     // -----------------------------------------------------------------------
@@ -1375,10 +1375,10 @@ tCIDLib::TBoolean
 TFacCIDCtrls::bLoadSpecialText(const tCIDLib::TMsgId midToLoad, TString& strToFill)
 {
     // If we've not loaded the special text yet, then do that
-    if (!CIDCtrls_ThisFacility::bSpecialTextLoaded)
+    if (!CIDCtrls_ThisFacility::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDCtrls_ThisFacility::bSpecialTextLoaded)
+        if (!CIDCtrls_ThisFacility::atomInitDone)
         {
             TKrnlModule::bLoadMessages
             (
@@ -1386,7 +1386,7 @@ TFacCIDCtrls::bLoadSpecialText(const tCIDLib::TMsgId midToLoad, TString& strToFi
                 , L"CIDCommonText"
                 , m_pmiSpecialMsgs
             );
-            CIDCtrls_ThisFacility::bSpecialTextLoaded = kCIDLib::True;
+            CIDCtrls_ThisFacility::atomInitDone.Set();
         }
     }
 

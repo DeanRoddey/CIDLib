@@ -91,7 +91,7 @@ namespace CIDGraphDev_Device
     //  functionality that requires it. It may also not load, so we have a
     //  flag to remember if we already tried it.
     // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   bTriedDDLoad = kCIDLib::False;
+    TAtomicFlag         atomDDLoad;
     HINSTANCE           hDDraw;
     IDirectDraw*        pDDraw = nullptr;
 }
@@ -168,57 +168,55 @@ static tCIDLib::TCard4 c4AngleColor(const   tCIDLib::TFloat8    f8Angle
 // Faults in our DirectDraw support
 static tCIDLib::TVoid LoadDDraw()
 {
-    //
-    //  They shouldn't call us if it's already done, but just in case. Also,
-    //  if we've already tried and failed, then do nothing.
-    //
-    if (CIDGraphDev_Device::pDDraw || CIDGraphDev_Device::bTriedDDLoad)
-        return;
-
-    // Try to load the DLL. If it fails, we are done
-    CIDGraphDev_Device::hDDraw = ::LoadLibrary(L"ddraw.dll");
-    if (!CIDGraphDev_Device::hDDraw)
+    // The caller already did one check, so assue we have to lock
+    TBaseLock lockInit;
+    if (!CIDGraphDev_Device::atomDDLoad)
     {
-        // Don't try again
-        CIDGraphDev_Device::bTriedDDLoad = kCIDLib::True;
-        return;
+        // Try to load the DLL. If it fails, we are done
+        CIDGraphDev_Device::hDDraw = ::LoadLibrary(L"ddraw.dll");
+        if (!CIDGraphDev_Device::hDDraw)
+        {
+            // Don't try again
+            CIDGraphDev_Device::atomDDLoad.Set();
+            return;
+        }
+
+        // Alias the function pointer we'll extract
+        using DIRECTDRAWCREATE = HRESULT (WINAPI *)
+        (
+            GUID FAR *lpGUID, IDirectDraw **lplpDD, IUnknown FAR *pUnkOuter
+        );
+
+        // And try to load an instance of that function
+        DIRECTDRAWCREATE pfnDDCreate = (DIRECTDRAWCREATE)::GetProcAddress
+        (
+            CIDGraphDev_Device::hDDraw, "DirectDrawCreate"
+        );
+
+        // If it failed, then we give up
+        if (!pfnDDCreate)
+        {
+            // Don't try again
+            CIDGraphDev_Device::atomDDLoad.Set();
+            return;
+        }
+
+        // Looks like it worked, so try to create our instance
+        try
+        {
+            CIDGraphDev_Device::pDDraw = nullptr;
+            pfnDDCreate(0, &CIDGraphDev_Device::pDDraw, 0);
+        }
+
+        catch(...)
+        {
+            // Eat it and make sure pointer is zero
+            CIDGraphDev_Device::pDDraw = nullptr;
+        }
+
+        // Indicate last that we have tried it
+        CIDGraphDev_Device::atomDDLoad.Set();
     }
-
-    // Alias the function pointer we'll extract
-    using DIRECTDRAWCREATE = HRESULT (WINAPI *)
-    (
-        GUID FAR *lpGUID, IDirectDraw **lplpDD, IUnknown FAR *pUnkOuter
-    );
-
-    // And try to load an instance of that function
-    DIRECTDRAWCREATE pfnDDCreate = (DIRECTDRAWCREATE)::GetProcAddress
-    (
-        CIDGraphDev_Device::hDDraw, "DirectDrawCreate"
-    );
-
-    // If it failed, then we give up
-    if (!pfnDDCreate)
-    {
-        // Don't try again
-        CIDGraphDev_Device::bTriedDDLoad = kCIDLib::True;
-        return;
-    }
-
-    // Looks like it worked, so try to create our instance
-    try
-    {
-        CIDGraphDev_Device::pDDraw = nullptr;
-        pfnDDCreate(0, &CIDGraphDev_Device::pDDraw, 0);
-    }
-
-    catch(...)
-    {
-        // Eat it and make sure pointer is zero
-        CIDGraphDev_Device::pDDraw = nullptr;
-    }
-
-    // Indicate last that we have tried it
-    CIDGraphDev_Device::bTriedDDLoad = kCIDLib::True;
 }
 
 
@@ -375,13 +373,8 @@ tCIDLib::TVoid TGraphicDevice::OneTimeDeviceInit()
 tCIDLib::TVoid TGraphDrawDev::WaitRetrace()
 {
     // Fault in the DirectShow stuff if not done yet
-    if (!CIDGraphDev_Device::bTriedDDLoad)
-    {
-        // Lock and check again that no one beat us to it
-        TBaseLock lockInit;
-        if (!CIDGraphDev_Device::bTriedDDLoad)
-            LoadDDraw();
-    }
+    if (!CIDGraphDev_Device::atomDDLoad)
+        LoadDDraw();
 
     // If we got what we wanted, then do the wait, else we just don't wait
     if (CIDGraphDev_Device::pDDraw)

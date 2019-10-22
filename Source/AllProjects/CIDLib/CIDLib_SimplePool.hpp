@@ -255,9 +255,9 @@ template <typename TElem> class TSimplePoolPtr
         // -------------------------------------------------------------------
         struct TElemRefCnt
         {
-            volatile tCIDLib::TCard4    m_c4RefCnt;
-            TElem*                      m_pobjElem;
-            TSimplePool<TElem>*         m_psplSrc;
+            tCIDLib::TCard4     m_c4RefCnt;
+            TElem*              m_pobjElem;
+            TSimplePool<TElem>* m_psplSrc;
         };
 
 

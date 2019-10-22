@@ -91,7 +91,7 @@ TRawMem::bAllocSysMem(  const   tCIDLib::TCard4         c4Size
 
 
 tCIDLib::TCard4
-TRawMem::c4CompareAndExchange(  volatile    tCIDLib::TCard4&    c4ToFill
+TRawMem::c4CompareAndExchange(              tCIDLib::TCard4&    c4ToFill
                                 , const     tCIDLib::TCard4     c4New
                                 , const     tCIDLib::TCard4     c4Compare)
 {
@@ -99,7 +99,7 @@ TRawMem::c4CompareAndExchange(  volatile    tCIDLib::TCard4&    c4ToFill
     (
         ::InterlockedCompareExchange
         (
-            reinterpret_cast<volatile long*>(&c4ToFill), c4New, c4Compare
+            reinterpret_cast<long*>(&c4ToFill), c4New, c4Compare
         )
     );
 }
@@ -123,7 +123,7 @@ TRawMem::c4Exchange(        tCIDLib::TCard4&    c4ToFill
 //  underflow in the release since that means something went really wrong.
 //
 tCIDLib::TCard4
-TRawMem::c4SafeRefAcquire(volatile tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
+TRawMem::c4SafeRefAcquire(tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
 {
     if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
     {
@@ -136,7 +136,7 @@ TRawMem::c4SafeRefAcquire(volatile tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bR
 }
 
 tCIDLib::TCard4
-TRawMem::c4SafeRefRelease(volatile tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
+TRawMem::c4SafeRefRelease(tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
 {
     if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
     {

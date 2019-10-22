@@ -186,9 +186,9 @@ template <typename TElem> class TFixedPoolPtr
         // -------------------------------------------------------------------
         struct TElemRefCnt
         {
-            volatile tCIDLib::TCard4    m_c4RefCnt;
-            TElem*                      m_pobjElem;
-            TFixedSizePool<TElem>*      m_psplSrc;
+            tCIDLib::TCard4         m_c4RefCnt;
+            TElem*                  m_pobjElem;
+            TFixedSizePool<TElem>*  m_psplSrc;
         };
 
 
