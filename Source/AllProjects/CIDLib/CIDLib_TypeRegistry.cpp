@@ -364,6 +364,7 @@ TClass::RegisterClass(  const   tCIDLib::TCh* const     pszClassName
     TRegNode* pHead = CIDLib_TypeRegistry::apnodeTable[hshOfClass];
     if (!pHead)
     {
+        CIDLib_Suppress(6385)  // The hash is always going to be in range
         CIDLib_TypeRegistry::apnodeTable[hshOfClass] = new TRegNode
         (
             pszClassName, pFactoryFunc
@@ -371,6 +372,7 @@ TClass::RegisterClass(  const   tCIDLib::TCh* const     pszClassName
     }
      else
     {
+        CIDLib_Suppress(6385)  // The hash is always going to be in range
         CIDLib_TypeRegistry::apnodeTable[hshOfClass] = new TRegNode
         (
             pszClassName, pFactoryFunc, pHead

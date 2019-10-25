@@ -554,6 +554,7 @@ TCIDObjStoreImpl::c4UpdateObject(const  TString&        strKey
     try
     {
         // Call the common helper that actually does the work
+        CIDLib_Suppress(6011) // We null checked above
         UpdateItemData(*posiToUpdate, mbufData, c4Size);
 
         // Flush any changes to disk
@@ -629,6 +630,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::DeleteObject(const TString& strKey)
         }
 
         // Give this object's chunk back and remove it from the list
+        CIDLib_Suppress(6011) // We null checked above
         c4GiveBackChunk(posiDel->c4Offset(), posiDel->c4StorageRequired());
         m_colStoreList.bRemoveKey(strKey);
 
@@ -800,6 +802,7 @@ TCIDObjStoreImpl::eReadObject(  const   TString&            strKey
     //  If the version number is the same, then its not changed, so return
     //  false with no data.
     //
+    CIDLib_Suppress(6011) // We null checked above
     if (posiCur->c4Version() == c4Version)
         return tCIDLib::ELoadRes::NoNewData;
 

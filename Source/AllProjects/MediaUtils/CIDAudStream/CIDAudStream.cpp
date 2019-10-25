@@ -35,7 +35,17 @@
 // ---------------------------------------------------------------------------
 TFacCIDAudStream& facCIDAudStream()
 {
-    static TFacCIDAudStream facCIDAudStream;
-    return facCIDAudStream;
+    static TFacCIDAudStream* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDAudStream();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
 

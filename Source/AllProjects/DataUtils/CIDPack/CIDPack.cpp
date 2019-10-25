@@ -37,6 +37,16 @@
 // ---------------------------------------------------------------------------
 TFacCIDPack& facCIDPack()
 {
-    static TFacCIDPack facCIDPack;
-    return facCIDPack;
+    static TFacCIDPack* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDPack();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }

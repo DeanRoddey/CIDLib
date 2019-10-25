@@ -110,7 +110,10 @@ namespace TArrayOps
             {
                 CIDAssert(m_c4PendingCnt < c4MaxPending, L"Pending run overflow");
 
+                CIDLib_Suppress(6386)  // We range checked above
                 m_ac4BaseInd[m_c4PendingCnt] = c4Base;
+
+                CIDLib_Suppress(6386)  // We range checked above
                 m_ac4Len[m_c4PendingCnt] = c4Len;
                 return m_c4PendingCnt++;
             }

@@ -113,11 +113,13 @@ template <typename TElem> class TRefSortedBag : public TRefBag<TElem>
             {
                 if (m_eDir == tCIDLib::ESortDirs::Ascending)
                 {
+                    CIDLib_Suppress(6011)  // We null checked above
                     if (m_pfnComp(*cursAdd, *pobjToAdd) != tCIDLib::ESortComps::FirstLess)
                         break;
                 }
                  else
                 {
+                    CIDLib_Suppress(6011)  // We null checked above
                     if (m_pfnComp(*pobjToAdd, *cursAdd) != tCIDLib::ESortComps::FirstLess)
                         break;
                 }

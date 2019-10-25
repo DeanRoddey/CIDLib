@@ -656,6 +656,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             //  the passed object.
             //
             TNode* pnodeCur = static_cast<TNode*>(m_llstQueue.pnodeTail());
+            CIDLib_Suppress(6011)  // We null checked above
             if (pnodeCur && pfnComp(*pnodeCur->pobjData(), *pobjNew))
             {
                 if (m_eAdopt == tCIDLib::EAdoptOpts::NoAdopt)
@@ -722,6 +723,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             //  we don't add the new one. If we are adopting, we delete the
             //  incoming.
             //
+            CIDLib_Suppress(6011)  // We null checked above
             TNode* pnodeCur = pnodeFindObj(*pobjToPut, pfnComp);
             if (pnodeCur)
             {

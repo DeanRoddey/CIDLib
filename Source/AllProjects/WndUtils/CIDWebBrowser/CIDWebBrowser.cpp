@@ -36,7 +36,17 @@
 // ---------------------------------------------------------------------------
 TFacCIDWebBrowser& facCIDWebBrowser()
 {
-    static TFacCIDWebBrowser facCIDWebBrowser;
-    return facCIDWebBrowser;
+    static TFacCIDWebBrowser* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDWebBrowser();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
 

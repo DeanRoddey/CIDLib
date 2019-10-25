@@ -391,6 +391,12 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
             , const tCIDLib::TCard4         c4Bytes
         );
 
+        tCIDLib::TVoid SetMemBuf
+        (
+                    THeapBuf&&              mbufData
+            , const tCIDLib::TCard4         c4Bytes
+        );
+
         tCIDLib::TVoid SetPoint
         (
             const   TPoint&                 pntToSet

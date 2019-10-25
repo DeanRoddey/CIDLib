@@ -42,7 +42,17 @@
 //
 TFacCIDDBase& facCIDDBase()
 {
-    static TFacCIDDBase facCIDDBase;
-    return facCIDDBase;
+    static TFacCIDDBase* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDDBase();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
 

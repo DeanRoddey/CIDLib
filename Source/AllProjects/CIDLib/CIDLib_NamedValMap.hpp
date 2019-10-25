@@ -365,9 +365,12 @@ template <class TVal> class TNamedValMap : public TObject
         tCIDLib::TBoolean bItemIsEmpty(const TString& strKey) const
         {
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
-            if (!pnvmiTar)
-                NotFound(strKey, 0);
-            return pnvmiTar->bIsEmpty();
+            if (pnvmiTar)
+                return pnvmiTar->bIsEmpty();
+
+            // Make the compiler happy, this will actually throw
+            NotFound(strKey, 0);
+            return kCIDLib::False;
         }
 
         tCIDLib::TBoolean bQueryValue(  const   TString&    strKey
@@ -399,6 +402,8 @@ template <class TVal> class TNamedValMap : public TObject
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
                 NotFound(strKey, 0);
+
+            CIDLib_Suppress(6011)  // We null checked above
             pnvmiTar->Clear();
         }
 
@@ -412,6 +417,8 @@ template <class TVal> class TNamedValMap : public TObject
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
                 NotFound(strKey, 0);
+
+            CIDLib_Suppress(6011)  // We null checked above
             return TValCursor(&pnvmiTar->colPairs());
         }
 
@@ -420,6 +427,8 @@ template <class TVal> class TNamedValMap : public TObject
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
                 NotFound(strKey, 0);
+
+            CIDLib_Suppress(6011)  // We null checked above
             return TNCValCursor(&pnvmiTar->colPairs());
         }
 
@@ -438,9 +447,11 @@ template <class TVal> class TNamedValMap : public TObject
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
                 NotFound(strKey, 0);
+            CIDLib_Suppress(6011)  // We null checked above
             const TVal* pvalRet = pnvmiTar->pobjValue(strSubKey);
             if (!pvalRet)
                 NotFound(strKey, &strSubKey);
+            CIDLib_Suppress(6011)  // We null checked above
             return *pvalRet;
         }
 
@@ -452,6 +463,7 @@ template <class TVal> class TNamedValMap : public TObject
             if (!pnvmiTar)
                 NotFound(strKey, 0);
 
+            CIDLib_Suppress(6011)  // We null checked above
             if (!pnvmiTar->bQueryValue(strSubKey, objToFill))
                 NotFound(strKey, &strSubKey);
         }

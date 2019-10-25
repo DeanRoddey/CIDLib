@@ -20,7 +20,8 @@
 //  the host environment variables. All of it is static and it should be
 //  treaded like a namespace, but it is implemented as a class  because there
 //  is a need to share data between the platform dependent and independent
-//  implementation files. The constructors are hidden to insure this.
+//  implementation files. The constructors are hidden to insure this, and the
+//  destructor is deleted for the same reason.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -178,6 +179,7 @@ class KRNLEXPORT TKrnlEnvironment
         //  Constructors and destructor
         // -------------------------------------------------------------------
         TKrnlEnvironment(const TKrnlEnvironment&) = delete;
+        ~TKrnlEnvironment() = delete;
 
 
         // -------------------------------------------------------------------

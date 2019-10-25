@@ -910,6 +910,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
                 // So we can now toast the found node and reduce the element count
                 delete pnodeToRem;
+                pnodeToRem = nullptr;
                 m_c4CurElements--;
             }
 

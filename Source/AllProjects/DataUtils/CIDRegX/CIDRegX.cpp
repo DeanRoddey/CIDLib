@@ -35,6 +35,16 @@
 //
 TFacCIDRegX& facCIDRegX()
 {
-    static TFacCIDRegX facCIDRegX;
-    return facCIDRegX;
+    static TFacCIDRegX* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDRegX();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }

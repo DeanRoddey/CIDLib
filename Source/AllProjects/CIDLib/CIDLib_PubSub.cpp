@@ -171,6 +171,7 @@ static tCIDLib::TVoid SendMsg(  const   tCIDLib::TCard4 c4SubId
 
     // In debug mode, make sure ths subscriber is subscribed to this topic
     #if CID_DEBUG_ON
+    CIDLib_Suppress(6011)  // We null checked above
     if (!pmpsubTar->bIsSubscribedToTopic(psmsgToSend.strSrcTopicPath()))
     {
         facCIDLib().ThrowErr

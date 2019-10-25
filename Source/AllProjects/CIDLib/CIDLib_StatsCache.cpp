@@ -414,6 +414,8 @@ static TStatsCacheNode* pscnAdd(const   tCIDLib::TCh* const     pszKey
 
     TStatsCacheNode* pscnRet = new TStatsCacheNode(pszKey, eType);
     c4At = CIDLib_StatsCache::c4CacheUsed++;
+
+    CIDLib_Suppress(6386)  // We range checked above already
     CIDLib_StatsCache::apscnCache[c4At] = pscnRet;
 
     // Update the last change time stamp

@@ -59,8 +59,18 @@ RTTIDecls(TFacCIDNet,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDNet& facCIDNet()
 {
-    static TFacCIDNet facCIDNet;
-    return facCIDNet;
+    static TFacCIDNet* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDNet();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
 
 

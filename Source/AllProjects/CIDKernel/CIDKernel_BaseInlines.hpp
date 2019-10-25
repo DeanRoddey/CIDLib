@@ -101,6 +101,9 @@ namespace tCIDLib
     template <typename T> struct RemoveConst { typedef T Type; };
     template <typename T> struct RemoveConst<const T> { typedef T Type; };
 
+    template <typename T> struct AddConst { typedef const T Type; };
+    template <typename T> struct AddConst<const T> { typedef T Type; };
+
 
     //  To force move semantics
     template<class T> struct RemoveRef    {typedef T Type;};
@@ -108,10 +111,23 @@ namespace tCIDLib
     template<class T> struct RemoveRef    <T&&> {typedef T Type;};
 
     template <typename T>
-    typename RemoveRef<T>::Type&& ForceMove(T&& src)
+    typename RemoveRef<T>::Type&& ForceMove(T&& src) noexcept
     {
         return static_cast<typename RemoveRef<T>::Type&&>(src);
     }
+
+
+    // -----------------------------------------------------------------------
+    //  Return a const ref to the passed ref, effectively add const to it if it
+    //  is not already.
+    // -----------------------------------------------------------------------
+    template <typename T>
+    constexpr AddConst<T>& tAsConst(T& tRet) noexcept
+    {
+        return tRet;
+    }
+
+    template <typename T> constexpr AddConst<T>& tAsConst(const T&&) = delete;
 
 
     // -----------------------------------------------------------------------
@@ -137,12 +153,12 @@ namespace tCIDLib
     //  These are just simple templates to return the smaller or larger of two
     //  quantities (with 'quantity' meaning anything with a < and > operator.)
     // -----------------------------------------------------------------------
-    template <typename T> constexpr T MaxVal(const T& v1, const T& v2)
+    template <typename T> constexpr T MaxVal(const T& v1, const T& v2) noexcept
     {
         return (v1 > v2) ? v1 : v2;
     }
 
-    template <typename T> constexpr T MinVal(const T& v1, const T& v2)
+    template <typename T> constexpr T MinVal(const T& v1, const T& v2) noexcept
     {
         return (v1 < v2) ? v1 : v2;
     }
@@ -158,7 +174,7 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     //  Return the absolute value different
     // -----------------------------------------------------------------------
-    template <typename T> constexpr T AbsDiff(const T& v1, const T& v2)
+    template <typename T> constexpr T AbsDiff(const T& v1, const T& v2) noexcept
     {
         if (v1 > v2)
             return v1 - v2;
@@ -169,8 +185,8 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     //  Tests whether the value is within the min/max values passed, inclusive
     // -----------------------------------------------------------------------
-    template <typename T>
-    constexpr tCIDLib::TBoolean bInRange(const T& val, const T& min, const T& max)
+    template <typename T> constexpr tCIDLib::TBoolean
+    bInRange(const T& val, const T& min, const T& max) noexcept
     {
         if ((val < min) || (val > max))
             return kCIDLib::False;
@@ -193,37 +209,37 @@ namespace tCIDLib
     //  This template offsets a pointer by an integral value and casts the
     //  return back to the original type.
     // -----------------------------------------------------------------------
-    template <typename T> const T*
+    template <typename T> constexpr const T*
     pOffsetPtr(const T* pToOffset, const tCIDLib::TInt4 i4Ofs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+i4Ofs);
     }
 
-    template <typename T> const T*
+    template <typename T> constexpr const T*
     pOffsetPtr(const T* pToOffset, const tCIDLib::TCard4 c4Ofs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+c4Ofs);
     }
 
-    template <typename T> const T*
+    template <typename T> constexpr const T*
     pOffsetPtr(const T* pToOffset, const unsigned int uiOfs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+uiOfs);
     }
 
-    template <typename T> T*
+    template <typename T> constexpr T*
     pOffsetNCPtr(T* pToOffset, const tCIDLib::TInt4 i4Ofs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+i4Ofs);
     }
 
-    template <typename T> T*
+    template <typename T> constexpr T*
     pOffsetNCPtr(T* pToOffset, const tCIDLib::TCard4 c4Ofs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+c4Ofs);
     }
 
-    template <typename T> T*
+    template <typename T> constexpr T*
     pOffsetNCPtr(T* pToOffset, const unsigned int uiOfs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+uiOfs);
@@ -354,7 +370,7 @@ namespace tCIDLib
 
 
     // Default relative magnitude comparator for sorting
-    template <typename T> tCIDLib::ESortComps eComp(const T& t1, const T& t2)
+    template <typename T> constexpr tCIDLib::ESortComps eComp(const T& t1, const T& t2)
     {
         if (t1 < t2)
             return tCIDLib::ESortComps::FirstLess;
@@ -364,7 +380,7 @@ namespace tCIDLib
     }
 
     // For reverse sorting
-    template <typename T> tCIDLib::ESortComps eRevComp(const T& t1, const T& t2)
+    template <typename T> constexpr tCIDLib::ESortComps eRevComp(const T& t1, const T& t2)
     {
         if (t2 < t1)
             return tCIDLib::ESortComps::FirstLess;
@@ -375,7 +391,7 @@ namespace tCIDLib
 
 
     // And for pointers
-    template <typename T> tCIDLib::ESortComps eCompPtr(const T* pt1, const T* pt2)
+    template <typename T> constexpr tCIDLib::ESortComps eCompPtr(const T* pt1, const T* pt2)
     {
         if (*pt1 < *pt2)
             return tCIDLib::ESortComps::FirstLess;
@@ -384,7 +400,7 @@ namespace tCIDLib
         return tCIDLib::ESortComps::Equal;
     }
 
-    template <typename T> tCIDLib::ESortComps eRevCompPtr(const T* pt1, const T* pt2)
+    template <typename T> constexpr tCIDLib::ESortComps eRevCompPtr(const T* pt1, const T* pt2)
     {
         if (*pt2 < *pt1)
             return tCIDLib::ESortComps::FirstLess;

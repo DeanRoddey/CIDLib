@@ -293,7 +293,9 @@ TBinFileOutStream::~TBinFileOutStream()
 // ---------------------------------------------------------------------------
 tCIDLib::TCard8 TBinFileOutStream::c8CurSize() const
 {
-    CIDAssert(m_pstrmiFile != 0, L"The stream impl object has not been created");
+    CIDAssert(m_pstrmiFile != nullptr, L"The stream impl object has not been created");
+
+    CIDLib_Suppress(6011)  // We null checked above
     return m_pstrmiFile->c8CurSize();
 }
 
@@ -401,8 +403,8 @@ tCIDLib::TVoid TBinFileOutStream::Open(const tCIDLib::EStdFiles eFile)
     }
 
     // Init these guys so we can clean up in case of error
-    TBinaryFile*        pflToUse    = 0;
-    TFileOutStreamImpl* pstrmiToUse = 0;
+    TBinaryFile*        pflToUse    = nullptr;
+    TFileOutStreamImpl* pstrmiToUse = nullptr;
 
     try
     {
@@ -423,27 +425,28 @@ tCIDLib::TVoid TBinFileOutStream::Open(const tCIDLib::EStdFiles eFile)
         if (pstrmiToUse)
         {
             delete pstrmiToUse;
-            pstrmiToUse = 0;
+            pstrmiToUse = nullptr;
         }
          else
         {
             delete pflToUse;
-            pflToUse = 0;
+            pflToUse = nullptr;
         }
         throw;
     }
 
     catch(...)
     {
+        CIDLib_Suppress(6001)  // Completely bogus warning
         if (pstrmiToUse)
         {
             delete pstrmiToUse;
-            pstrmiToUse = 0;
+            pstrmiToUse = nullptr;
         }
          else
         {
             delete pflToUse;
-            pflToUse = 0;
+            pflToUse = nullptr;
         }
         throw;
     }
@@ -458,24 +461,27 @@ tCIDLib::TVoid TBinFileOutStream::Open(const tCIDLib::EStdFiles eFile)
 
 const TString& TBinFileOutStream::strFileName() const
 {
-    CIDAssert(m_pstrmiFile != 0, L"The stream impl object has not been created");
+    CIDAssert(m_pstrmiFile != nullptr, L"The stream impl object has not been created");
+    CIDLib_Suppress(6011)  // We null checked above
     return m_pstrmiFile->strFileName();
 }
 
 
 tCIDLib::TVoid TBinFileOutStream::SeekToEnd()
 {
-    CIDAssert(m_pstrmiFile != 0, L"The stream impl object has not been created");
+    CIDAssert(m_pstrmiFile != nullptr, L"The stream impl object has not been created");
+    CIDLib_Suppress(6011)  // We null checked above
     m_pstrmiFile->SeekToEnd();
 }
 
 
 tCIDLib::TVoid TBinFileOutStream::TruncateAt(const tCIDLib::TCard8& c8At)
 {
-    CIDAssert(m_pstrmiFile != 0, L"The stream impl object has not been created");
+    CIDAssert(m_pstrmiFile != nullptr, L"The stream impl object has not been created");
 
     // Flush the cache first, then truncate it
     Flush();
+    CIDLib_Suppress(6011)  // We null checked above
     m_pstrmiFile->TruncateAt(c8At);
 }
 

@@ -285,6 +285,8 @@ TSLinkedList::InsertNode(   TSLstNode* const    pnodeAfter
 
 tCIDLib::TVoid TSLinkedList::MoveToHead(TSLstNode* const pnodeToMove)
 {
+    CIDAssert(pnodeToMove != nullptr, L"The passed list node cannot be null")
+
     // If there are not at least 2 nodes, then nothing to do
     if (m_c4ElemCount < 2)
         return;
@@ -326,6 +328,7 @@ tCIDLib::TVoid TSLinkedList::MoveToHead(TSLstNode* const pnodeToMove)
     //  Pull the node out of the list. If its the last one, then handle that
     //  specially. We already checked for it already being at the head.
     //
+    CIDLib_Suppress(6011)  // We null checked above
     if (!pnodeToMove->m_pnodeNext)
     {
         // Set our previous nodes's next node to null
@@ -337,6 +340,7 @@ tCIDLib::TVoid TSLinkedList::MoveToHead(TSLstNode* const pnodeToMove)
      else
     {
         // Set our previous node's next node to our next node
+        CIDLib_Suppress(6011)  // We null checked above
         pnodePrev->m_pnodeNext = pnodeToMove->m_pnodeNext;
     }
 
@@ -350,11 +354,14 @@ tCIDLib::TVoid TSLinkedList::MoveToHead(TSLstNode* const pnodeToMove)
 
 tCIDLib::TVoid TSLinkedList::MoveToTail(TSLstNode* const pnodeToMove)
 {
+    CIDAssert(pnodeToMove != nullptr, L"The passed node cannot be null");
+
     // If there are not at least 2 nodes, then nothng to do
     if (m_c4ElemCount < 2)
         return;
 
     // If this node is already the last, then nothing to do
+    CIDLib_Suppress(6011)  // We null checked above
     if (!pnodeToMove->m_pnodeNext)
         return;
 
@@ -395,11 +402,13 @@ tCIDLib::TVoid TSLinkedList::MoveToTail(TSLstNode* const pnodeToMove)
     if (!pnodePrev)
     {
         // Store the move node's next as the new head
+        CIDLib_Suppress(6011)  // We null checked above
         m_pnodeHead = pnodeToMove->m_pnodeNext;
     }
      else
     {
         // Set our previous node's next node to our next node
+        CIDLib_Suppress(6011)  // We null checked above
         pnodePrev->m_pnodeNext = pnodeToMove->m_pnodeNext;
     }
 
@@ -497,6 +506,7 @@ tCIDLib::TVoid TSLinkedList::RemoveAll()
 tCIDLib::TVoid
 TSLinkedList::RemoveNode(TSLstNode* const pnodeToRemove)
 {
+    CIDAssert(pnodeToRemove != nullptr, L"The passed list node cannot be null")
     //
     //  We need to run up to the node in question and find its previous
     //  node, and this also insures that its in this list as well.
@@ -530,6 +540,7 @@ TSLinkedList::RemoveNode(TSLstNode* const pnodeToRemove)
     //  Get a pointer to the next node of the passed node, so we don't
     //  have to worry about having changed it below.
     //
+    CIDLib_Suppress(6011)  // We null checked above
     TSLstNode* pnodeNext = pnodeToRemove->m_pnodeNext;
 
     //

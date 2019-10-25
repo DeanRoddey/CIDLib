@@ -36,7 +36,17 @@
 // ---------------------------------------------------------------------------
 TFacCIDMetaExtr& facCIDMetaExtr()
 {
-    static TFacCIDMetaExtr facCIDMetaExtr;
-    return facCIDMetaExtr;
+    static TFacCIDMetaExtr* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDMetaExtr();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
 

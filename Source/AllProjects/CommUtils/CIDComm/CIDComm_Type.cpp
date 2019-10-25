@@ -36,7 +36,7 @@
 //  These are in the facility types namespace, so as to match the scheme that the
 //  IDL compiler generates.
 // ---------------------------------------------------------------------------
-const TString& tCIDComm::strXlatEDataBits(const tCIDComm::EDataBits eToXlat)
+TString tCIDComm::strXlatEDataBits(const tCIDComm::EDataBits eToXlat)
 {
     if ((eToXlat < tCIDComm::EDataBits::Min)
     ||  (eToXlat > tCIDComm::EDataBits::Max))
@@ -53,30 +53,26 @@ const TString& tCIDComm::strXlatEDataBits(const tCIDComm::EDataBits eToXlat)
         );
     }
 
-    static TEArray<TString, tCIDComm::EDataBits, tCIDComm::EDataBits::Count>
-    astrValues(TString::strEmpty());
-
-    if (!astrValues.bIsLoaded())
+    //
+    //  We can't use the enums as indicates on these because they are not
+    //  zero based, so just use a raw array. BE SURE to update this if the
+    //  enum definition changes down in CIDKernel_Types.hpp.
+    //
+    static const tCIDLib::TCh* const apszDataBits[tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Count)]
     {
-        TBaseLock lockInit;
-        if (!astrValues.bIsLoaded())
-        {
-            astrValues[tCIDComm::EDataBits::Four]   = L"Four";
-            astrValues[tCIDComm::EDataBits::Five]   = L"Five";
-            astrValues[tCIDComm::EDataBits::Six]    = L"Six";
-            astrValues[tCIDComm::EDataBits::Seven]  = L"Seven";
-            astrValues[tCIDComm::EDataBits::Eight]  = L"Eight";
-
-            astrValues.SetLoaded();
-        }
-    }
-    return astrValues
-    [
-        tCIDComm::EDataBits
-        (
+        L"Four"
+        , L"Five"
+        , L"Six"
+        , L"Seven"
+        , L"Eight"
+    };
+    return TString
+    (
+        apszDataBits
+        [
             tCIDLib::c4EnumOrd(eToXlat) - tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Min)
-        )
-    ];
+        ]
+    );
 }
 
 

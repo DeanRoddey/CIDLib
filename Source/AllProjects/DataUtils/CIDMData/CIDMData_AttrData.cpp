@@ -572,6 +572,7 @@ tCIDLib::TVoid TAttrData::CopyVal(const TAttrData& adatSrc)
         case tCIDMData::EAttrTypes::Binary :
         {
             CIDAssert(m_pmbufVal != nullptr, L"Attribute is binary but no buffer exists");
+            CIDLib_Suppress(6011) // We just null checked it
             m_pmbufVal->Reallocate(adatSrc.m_c4Bytes);
             m_pmbufVal->CopyIn(*adatSrc.m_pmbufVal, adatSrc.m_c4Bytes);
             m_c4Bytes = adatSrc.m_c4Bytes;
@@ -1104,6 +1105,13 @@ tCIDLib::TVoid TAttrData::SetMemBuf(const TMemBuf& mbufData, const tCIDLib::TCar
 {
     CheckType(tCIDMData::EAttrTypes::Binary);
     m_pmbufVal->CopyIn(mbufData, c4Bytes);
+    m_c4Bytes = c4Bytes;
+}
+
+tCIDLib::TVoid TAttrData::SetMemBuf(THeapBuf&& mbufData, const tCIDLib::TCard4 c4Bytes)
+{
+    CheckType(tCIDMData::EAttrTypes::Binary);
+    *m_pmbufVal = tCIDLib::ForceMove(mbufData);
     m_c4Bytes = c4Bytes;
 }
 

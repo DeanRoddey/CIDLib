@@ -1087,6 +1087,7 @@ template <class TElem, class TKeyOps> class THashSet
                 this->NodeNotFound(CID_FILE, CID_LINE);
 
             // we found it so return the object data
+            CIDLib_Suppress(6011)  // We null checked above
             return pnodeRet->objData();
         }
 
@@ -1099,7 +1100,7 @@ template <class TElem, class TKeyOps> class THashSet
             TNode* pnodeRet = pnodeFind(objToFindOrAdd, hshElem);
 
             // Set the added parameter
-            bAdded = (pnodeRet == 0);
+            bAdded = (pnodeRet == nullptr);
 
             // Not found so add it
             if (bAdded)

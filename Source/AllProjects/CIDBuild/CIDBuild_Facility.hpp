@@ -58,6 +58,11 @@ class TFacCIDBuild
         // -------------------------------------------------------------------
         //  Pubic, non-virtual methods
         // -------------------------------------------------------------------
+        inline tCIDLib::TBoolean bCodeAnalysis() const
+        {
+            return m_bCodeAnalysis;
+        }
+
         tCIDLib::TBoolean bDependsOn
         (
             const   TBldStr&                strSrcProj
@@ -342,6 +347,10 @@ class TFacCIDBuild
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_bCodeAnalysis
+        //      This is set by the /Analyze flag. Tools driver can look at this and
+        //      invoke optional analysis modes of the compiler.
+        //
         //  m_bForce
         //      This is set by the /Force flag. It will cause all targets to
         //      appear to be out of date (or if used with the /Debug command will
@@ -492,6 +501,7 @@ class TFacCIDBuild
         //      in some way include the major and minor version, but not the
         //      revision!
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean       m_bCodeAnalysis;
         tCIDLib::TBoolean       m_bForce;
         tCIDLib::TBoolean       m_bLowPrio;
         tCIDLib::TBoolean       m_bMaxWarn;

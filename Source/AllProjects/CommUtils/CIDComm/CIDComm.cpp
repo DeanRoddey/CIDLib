@@ -35,7 +35,16 @@
 // ---------------------------------------------------------------------------
 TFacCIDComm& facCIDComm()
 {
-    static TFacCIDComm facCIDComm;
-    return facCIDComm;
+    static TFacCIDComm* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDComm();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
-

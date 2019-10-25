@@ -521,6 +521,7 @@ template<typename TElem> class TSimplePool : public TObject
             //  know there is space for it since we checked above.
             //
             tCIDLib::TCard4 c4InsertAt;
+            CIDLib_Suppress(6011) // It's NOT ever null here, we create one above if needed
             m_colUsedList.pobjBinarySearch(*pelemRet, eCompAddr, c4InsertAt);
             m_colUsedList.InsertAt(pelemRet, c4InsertAt);
 

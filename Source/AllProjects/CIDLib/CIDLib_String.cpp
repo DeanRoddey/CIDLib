@@ -1741,6 +1741,7 @@ TString::AppendSubStr(  const   tCIDLib::TCh* const pszAppend
     //  Copy over the data. We multiply by the character size to convert
     //  chars to bytes.
     //
+    CIDLib_Suppress(6011)  // We null checked above
     TRawMem::CopyMemBuf
     (
         pszBufferWAt(m_c4CurEnd), &pszAppend[c4Start], c4ActualLen * kCIDLib::c4CharBytes
@@ -2565,7 +2566,6 @@ tCIDLib::TBoolean TString::bToBoolean(tCIDLib::TBoolean& bToFill) const noexcept
      else
     {
         // It might be something like "  1", so try to convert to a number
-        tCIDLib::TBoolean bValid;
         const tCIDLib::TInt4 i4Val = TRawStr::i4AsBinary
         (
             pszBuffer(), bValid, tCIDLib::ERadices::Dec
@@ -2793,6 +2793,7 @@ tCIDLib::TCh TString::chAt(const tCIDLib::TCard4 c4Ind) const
 
     // If we have no buffer, then our end is zero and we couldn't get here
     CIDAssert(m_pszBuffer != nullptr, L"The buffer should not be null here");
+    CIDLib_Suppress(6011)  // We null checked above
     return m_pszBuffer[c4Ind];
 }
 
@@ -4517,6 +4518,7 @@ TString::Replace(const  tCIDLib::TCard4     c4RepStart
                 &m_pszBuffer[c4RepStart], pszRepText, c4ActualLen * kCIDLib::c4CharBytes
             );
 
+            CIDLib_Suppress(6011 28182)  // We null checked above
             TRawMem::CopyMemBuf
             (
                 &m_pszBuffer[c4RepStart + c4ActualLen]
@@ -4533,6 +4535,7 @@ TString::Replace(const  tCIDLib::TCard4     c4RepStart
             //  minus the target length.
             //
             const tCIDLib::TCard4 c4ExpCount = c4ActualLen - c4TargetLen;
+            CIDLib_Suppress(6011)  // We null checked above
             tCIDLib::TCh* pszTarget = &m_pszBuffer[m_c4CurEnd + c4ExpCount];
             tCIDLib::TCh* pszSrc = &m_pszBuffer[m_c4CurEnd];
             while (pszSrc > (m_pszBuffer + c4RepEnd))
@@ -5348,7 +5351,8 @@ TString::ToZStr(        tCIDLib::TCh* const pszTarget
     }
     #endif
 
-    // Clear the target zstring
+    // Clear the target string
+    CIDLib_Suppress(6011)  // We null checked above
     pszTarget[0] = kCIDLib::chNull;
 
     // If no chars in this string, then we are done

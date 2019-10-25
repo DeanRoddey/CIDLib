@@ -547,6 +547,7 @@ TChunkedFileMeta::bValueEquals( const   TString&            strKey
     if (bCaseSensitive)
         return (pkvalFind->strValue() == strCompare);
 
+    CIDLib_Suppress(6011) // We null checked above
     return pkvalFind->strValue().bCompareI(strCompare);
 }
 
@@ -636,6 +637,7 @@ TChunkedFileMeta::bSetValue(const   TString&            strKey
     }
 
     // If the value is different, store it and update our raw data
+    CIDLib_Suppress(6011) // We null checked above
     bFileChange = pkvalfFind->bFlag();
     if (strToSet != pkvalfFind->strValue())
     {
@@ -696,8 +698,7 @@ TChunkedFileMeta::bSetValues(const  tCIDLib::TKVPList&  colNewVals
                 , kvalCur.strKey()
             );
         }
-
-        if (pkvalfFind->strValue() != kvalCur.strValue())
+         else if (pkvalfFind->strValue() != kvalCur.strValue())
         {
             // The value is different so we need to store it and regen
             pkvalfFind->strValue(kvalCur.strValue());
@@ -746,8 +747,7 @@ TChunkedFileMeta::bSetValues(const  tCIDLib::TKVPFList& colNewVals
                 , kvalfCur.strKey()
             );
         }
-
-        if (pkvalfFind->strValue() != kvalfCur.strValue())
+        else if (pkvalfFind->strValue() != kvalfCur.strValue())
         {
             // The value is different so we need to store it and regen
             pkvalfFind->strValue(kvalfCur.strValue());

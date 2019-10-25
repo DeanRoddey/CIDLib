@@ -58,7 +58,16 @@ RTTIDecls(TFacCIDWebSock,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDWebSock& facCIDWebSock()
 {
-    static TFacCIDWebSock facCIDWebSock;
-    return facCIDWebSock;
+    static TFacCIDWebSock* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDWebSock();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
-

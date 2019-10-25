@@ -53,7 +53,7 @@ namespace tCIDComm
     };
 
 
-    CIDCOMMEXP const TString& strXlatEDataBits
+    CIDCOMMEXP TString strXlatEDataBits
     (
         const   tCIDComm::EDataBits     eToXlat
     );

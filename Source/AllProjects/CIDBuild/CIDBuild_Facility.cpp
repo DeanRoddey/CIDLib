@@ -44,7 +44,8 @@
 // ---------------------------------------------------------------------------
 TFacCIDBuild::TFacCIDBuild() :
 
-    m_bForce(kCIDLib::False)
+    m_bCodeAnalysis(kCIDLib::False)
+    , m_bForce(kCIDLib::False)
     , m_bLowPrio(kCIDLib::False)
     , m_bMaxWarn(kCIDLib::False)
     , m_bNonPermissive(kCIDLib::False)
@@ -902,7 +903,11 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
                 throw tCIDBuild::EErrors::BadParams;
             }
 
-            if (!TRawStr::iCompIStr(pszCurParm, L"Force"))
+            if (!TRawStr::iCompIStr(pszCurParm, L"Analyze"))
+            {
+                m_bCodeAnalysis = kCIDLib::True;
+            }
+             else if (!TRawStr::iCompIStr(pszCurParm, L"Force"))
             {
                 m_bForce = kCIDLib::True;
             }
@@ -1256,6 +1261,7 @@ tCIDLib::TVoid TFacCIDBuild::ShowParms()
                 << L"    Verbose: " << (m_bVerbose ? L"Yes" : L"No") << L"\n"
                 << L"   Low Prio: " << (m_bLowPrio ? L"Yes" : L"No") << L"\n"
                 << L"   Max Warn: " << (m_bMaxWarn ? L"Yes" : L"No") << L"\n"
+                << L"    Analyze: " << (m_bCodeAnalysis ? L"Yes" : L"No") << L"\n"
                 << L"    No Logo: " << (m_bSupressLogo ? L"Yes" : L"No") << L"\n";
 
         stdOut << L"     Target: ";
@@ -1290,6 +1296,7 @@ tCIDLib::TVoid TFacCIDBuild::ShowUsage()
             << L"        /Lang=xx       - Set language suffix (en)\n"
             << L"        /LowPrio       - Invoke compiler with lower priority\n"
             << L"        /Single        - Invoke compiler in non-parallel mode\n"
+            << L"        /Analyze       - Invoke code analysis if tools support it\n"
             << L"        /NonPermissive - Invoke compiler in strictest C++ mode. This won't\n"
             << L"                         currently work it's for working towards that goal\n\n"
             << L"       (Not typically used, this comes for the environment)\n"

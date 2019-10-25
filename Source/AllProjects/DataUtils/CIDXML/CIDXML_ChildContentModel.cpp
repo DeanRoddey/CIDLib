@@ -88,6 +88,7 @@ static tCIDLib::TVoid FormatCS(         TTextOutStream&         strmDest
     //  there. If the left is a leaf, we just display the leaf and there will
     //  not be any right child.
     //
+    CIDLib_Suppress(6011) // We null checked above
     const tCIDXML::ECMNodeTypes eType = pxcsnCur->eNodeType();
 
     switch(eType)
@@ -113,7 +114,10 @@ static tCIDLib::TVoid FormatCS(         TTextOutStream&         strmDest
                     , facCIDXML().strMsg(kXMLMsgs::midGen_element)
                 );
             }
-            strmDest << pxdeclLeaf->strFullName();
+             else
+            {
+                strmDest << pxdeclLeaf->strFullName();
+            }
             break;
         }
 
@@ -668,6 +672,7 @@ tCIDLib::TVoid TXMLChildCM::BuildFollowLists(TXMLCMNode* const pxcmnCur)
     #endif
 
     // For convenience, get the node type out
+    CIDLib_Suppress(6011) // We null checked above
     const tCIDXML::ECMNodeTypes eType = pxcmnCur->eNodeType();
 
     switch(eType)

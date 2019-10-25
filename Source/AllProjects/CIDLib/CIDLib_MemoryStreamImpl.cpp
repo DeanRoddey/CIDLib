@@ -80,13 +80,17 @@ TMemInStreamImpl::TMemInStreamImpl( const   TMemBuf* const      pmbufToStream
     m_c4Index(0)
     , m_pmbufSrc(pmbufToStream)
 {
+    CIDAssert(pmbufToStream != nullptr, L"Passed buffer cannot be null")
+
     //
     //  Make sure the initial logical end is not beyond the allocation size
     //  of the memory buffer.
     //
+    CIDLib_Suppress(6011)  // We null checked above
     if (c4InitLogicalEnd > pmbufToStream->c4Size())
     {
-        // If we were to adopt, then clean up the buffer
+        // If we were to adopt, then clean up the buffer. Get the size out first for below
+        const tCIDLib::TCard4 c4Size = pmbufToStream->c4Size();
         if (eAdopt == tCIDLib::EAdoptOpts::Adopt)
             delete pmbufToStream;
 
@@ -98,11 +102,12 @@ TMemInStreamImpl::TMemInStreamImpl( const   TMemBuf* const      pmbufToStream
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::AppError
             , TCardinal(c4InitLogicalEnd)
-            , TCardinal(pmbufToStream->c4Size())
+            , TCardinal(c4Size)
         );
     }
 
     // Looks ok, so create the info object and store it
+    CIDLib_Suppress(6001)  // We null checked above
     m_cptrInfo.SetPointer
     (
         new TMemStreamImplInfo(pmbufToStream, eAdopt, c4InitLogicalEnd)

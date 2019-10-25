@@ -2276,6 +2276,8 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             //
             tCIDLib::TCard4 c4RemovedT = 0;
             tCIDLib::TCard4 c4RemovedNT = 0;
+
+            CIDLib_Suppress(6011)  // We null checked above
             pnodeToRemove->ContainedNodes(c4RemovedT, c4RemovedNT);
 
             //

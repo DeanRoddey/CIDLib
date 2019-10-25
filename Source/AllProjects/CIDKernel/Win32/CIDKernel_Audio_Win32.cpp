@@ -135,7 +135,8 @@ bEnumAudioDevs(GUID* pGUID, TCHAR* pszDesc, TCHAR* pszDevName, VOID* pContext)
     // Format the GUID to a string
     const tCIDLib::TCard4 c4BufSz = 127;
     tCIDLib::TCh achBuf[c4BufSz + 1];
-    ::StringFromGUID2(*pGUID, achBuf, c4BufSz);
+    if (!::StringFromGUID2(*pGUID, achBuf, c4BufSz))
+        return FALSE;
 
     if (pInfo->pchToFill[0] != kCIDLib::chNull)
         TRawStr::CatStr(pInfo->pchToFill, L"\n", pInfo->c4MaxChars);
@@ -241,7 +242,7 @@ tCIDLib::TBoolean TKrnlAudio::bMuteSystemAudio(const tCIDLib::TBoolean bMute)
 
     BOOL SysMute(bMute ? TRUE : FALSE);
     hRes = pAudioEPV->SetMute(SysMute, NULL);
-    if (hRes)
+    if (hRes != S_OK)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcAudio_SetSysMute, hRes);
         return kCIDLib::False;
@@ -335,7 +336,7 @@ tCIDLib::TBoolean TKrnlAudio::bQuerySystemVolume(tCIDLib::TCard4& c4ToFill)
     // Get the scalar volume 0 to 1.0, and scale to our cardinal percent
     float fPerVol;
     hRes = pAudioEPV->GetMasterVolumeLevelScalar(&fPerVol);
-    if (hRes)
+    if (hRes != S_OK)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcAudio_QuerySysVolume, hRes);
         return kCIDLib::False;

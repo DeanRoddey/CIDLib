@@ -759,6 +759,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             TMtxLocker lockSync(this->pmtxLock());
 
             // See if this element is already in the collection
+            CIDLib_Suppress(6011)  // We null checked above
             const TKey& objKey = m_pfnKeyExtract(*pobjToAdd);
             tCIDLib::THashVal hshElem;
             TNode* pnodeCheck = pnodeFind(objKey, hshElem);
@@ -973,6 +974,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
             // See if the element exists
             tCIDLib::THashVal hshElem;
+            CIDLib_Suppress(6011)  // We null checked above
             TNode* pnodeRet = pnodeFind(m_pfnKeyExtract(*pobjToAdd), hshElem);
 
             // If already exists, then return false

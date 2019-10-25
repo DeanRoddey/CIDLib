@@ -36,6 +36,16 @@
 //
 TFacCIDJPEG& facCIDJPEG()
 {
-    static TFacCIDJPEG facCIDJPEG;
-    return facCIDJPEG;
+    static TFacCIDJPEG* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDJPEG();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }

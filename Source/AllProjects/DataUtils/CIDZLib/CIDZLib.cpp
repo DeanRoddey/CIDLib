@@ -35,7 +35,17 @@
 //
 TFacCIDZLib& facCIDZLib()
 {
-    static TFacCIDZLib facCIDZLib;
-    return facCIDZLib;
+    static TFacCIDZLib* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDZLib();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
 

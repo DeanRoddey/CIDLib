@@ -43,7 +43,16 @@ RTTIDecls(TFacCIDOrb,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDOrb& facCIDOrb()
 {
-    static TFacCIDOrb facCIDOrb;
-    return facCIDOrb;
+    static TFacCIDOrb* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDOrb();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
-

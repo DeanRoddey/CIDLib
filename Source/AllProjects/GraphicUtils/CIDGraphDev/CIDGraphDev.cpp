@@ -46,7 +46,17 @@
 // ---------------------------------------------------------------------------
 TFacCIDGraphDev& facCIDGraphDev()
 {
-    static TFacCIDGraphDev facCIDGraphDev;
-    return facCIDGraphDev;
+    static TFacCIDGraphDev* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDGraphDev();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
 

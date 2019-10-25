@@ -479,6 +479,7 @@ static tCIDLib::TVoid DummyFunc()
     {
     }
 
+    CIDLib_Suppress(6386)
     TAtomicPtr<TString> atomStr;
     if (!atomStr.pValue())
     {
@@ -502,8 +503,18 @@ static tCIDLib::TVoid DummyFunc()
 //
 TFacCIDLib& facCIDLib()
 {
-    static TFacCIDLib facCIDLib;
-    return facCIDLib;
+    static TFacCIDLib* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDLib();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
 
 

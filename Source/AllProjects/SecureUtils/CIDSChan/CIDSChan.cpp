@@ -37,6 +37,16 @@
 // ---------------------------------------------------------------------------
 TFacCIDSChan& facCIDSChan()
 {
-    static TFacCIDSChan facCIDSChan;
-    return facCIDSChan;
+    static TFacCIDSChan* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDSChan();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }

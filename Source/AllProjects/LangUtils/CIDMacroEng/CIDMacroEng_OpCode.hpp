@@ -290,9 +290,12 @@ operator<<(TTextOutStream& strmTarget, const TMEngOpCode& meopToFormat);
 inline tCIDLib::TCard2
 TMEngOpCode::operator[](const tCIDLib::TCard4 c4Index) const
 {
-    if (c4Index >= kMacroEng::c4OpIndices)
-        BadIndex(c4Index);
-    return m_uStorage.ac2Indices[c4Index];
+    if (c4Index < kMacroEng::c4OpIndices)
+        return m_uStorage.ac2Indices[c4Index];
+
+    // It's invalid so throw, and a bogus return to make the compiler happy
+    BadIndex(c4Index);
+    return 0;
 }
 
 

@@ -35,7 +35,17 @@
 // ---------------------------------------------------------------------------
 TFacCIDOrbUC& facCIDOrbUC()
 {
-    static TFacCIDOrbUC facCIDOrbUC;
-    return facCIDOrbUC;
+    static TFacCIDOrbUC* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDOrbUC();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
 

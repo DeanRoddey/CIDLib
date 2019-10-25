@@ -38,6 +38,16 @@
 // Fault in our facility object
 TFacCIDAI& facCIDAI()
 {
-    static TFacCIDAI facCIDAI;
-    return facCIDAI;
+    static TFacCIDAI* pfacCIDAI;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacCIDAI = new TFacCIDAI();
+            atomInit.Set();
+        }
+    }
+    return *pfacCIDAI;
 }

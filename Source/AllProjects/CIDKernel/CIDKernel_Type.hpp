@@ -2308,7 +2308,9 @@ namespace tCIDLib
 namespace tCIDComm
 {
     // -----------------------------------------------------------------------
-    //  The data bits supported by comm ports
+    //  The data bits supported by comm ports. BE SURE to update the text mapping
+    //  table in CIDComm_Types if you change this, since we can't use the IDL
+    //  compiler for these enums.
     // -----------------------------------------------------------------------
     enum class EDataBits
     {

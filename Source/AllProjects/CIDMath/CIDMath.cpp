@@ -36,7 +36,16 @@
 // ---------------------------------------------------------------------------
 TFacCIDMath& facCIDMath()
 {
-    static TFacCIDMath facCIDMath;
-    return facCIDMath;
+    static TFacCIDMath* pfacThis;
+    static TAtomicFlag atomInit;
+    if (!atomInit)
+    {
+        TBaseLock lockInit;
+        if (!atomInit)
+        {
+            pfacThis = new TFacCIDMath();
+            atomInit.Set();
+        }
+    }
+    return *pfacThis;
 }
-

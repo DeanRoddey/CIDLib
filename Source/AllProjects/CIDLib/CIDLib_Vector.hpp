@@ -434,7 +434,10 @@ class TVector : public TCollection<TElem>
             try
             {
                 for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+                {
+                    CIDLib_Suppress(6386)  // alloc and count are the same size
                     m_apElems[c4Index] = new TElem(pobjInitVals[c4Index]);
+                }
             }
 
             catch(TError& errToCatch)
@@ -481,7 +484,10 @@ class TVector : public TCollection<TElem>
             try
             {
                 for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+                {
+                    CIDLib_Suppress(6386)
                     m_apElems[c4Index] = new TElem(*colSrc.m_apElems[c4Index]);
+                }
             }
 
             catch(TError& errToCatch)
@@ -537,7 +543,6 @@ class TVector : public TCollection<TElem>
                 TMtxLocker lockUs(this->pmtxLock());
                 TMtxLocker lockSrc(colSrc.pmtxLock());
 
-                // Sanity check the source if debugging
                 #if CID_DEBUG_ON
                 this->CheckAllocAndCount(colSrc.m_c4CurCount, colSrc.m_c4CurAlloc, CID_FILE, CID_LINE);
                 #endif
@@ -559,9 +564,15 @@ class TVector : public TCollection<TElem>
 
                 tCIDLib::TCard4 c4Index;
                 for (c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+                {
+                    CIDLib_Suppress(6386)  // We range checked above
                     m_apElems[c4Index] = new TElem(*colSrc.m_apElems[c4Index]);
+                }
                 for (; c4Index < m_c4CurAlloc; c4Index++)
+                {
+                    CIDLib_Suppress(6386)  // We range checked above
                     m_apElems[c4Index] = 0;
+                }
 
                 this->c4IncSerialNum();
             }
@@ -952,7 +963,6 @@ class TVector : public TCollection<TElem>
             //  one item, then also do a simple check. Else we do the
             //  binary search.
             //
-            tCIDLib::ESortComps eRes;
             if (!m_c4CurCount)
             {
                 objAdd(objToInsert);
@@ -961,8 +971,7 @@ class TVector : public TCollection<TElem>
             }
              else if (m_c4CurCount == 1)
             {
-                eRes = pfnComp(objToInsert, *m_apElems[0]);
-                if (eRes == tCIDLib::ESortComps::FirstLess)
+                if (pfnComp(objToInsert, *m_apElems[0]) == tCIDLib::ESortComps::FirstLess)
                 {
                     tAt = TIndex(0);
                     InsertAt(objToInsert, 0);
@@ -979,6 +988,7 @@ class TVector : public TCollection<TElem>
             //  More than one, so let's do the binary search. So set up the
             //  two end points that are used to subdivide the list.
             //
+            tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
             tCIDLib::TInt4 i4MidPoint = 0;
@@ -1530,6 +1540,7 @@ class TVector : public TCollection<TElem>
             // Now steal all of his elements
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
             {
+                CIDLib_Suppress(6386)  // We range checked above
                 m_apElems[c4Index] = colSrc.m_apElems[c4Index];
                 colSrc.m_apElems[c4Index] = 0;
             }

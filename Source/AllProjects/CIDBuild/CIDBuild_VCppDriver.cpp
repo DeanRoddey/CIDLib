@@ -419,6 +419,10 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         apszArgs[c4CurArg++] = L"/D_DEBUG";
         apszArgs[c4CurArg++] = L"/Zi";
         apszArgs[c4CurArg++] = L"/RTC1";
+
+        // If asked, invoke code analysis
+        if (facCIDBuild.bCodeAnalysis())
+            apszArgs[c4CurArg++] = L"/analyze:stacksize1048576";
     }
      else
     {
