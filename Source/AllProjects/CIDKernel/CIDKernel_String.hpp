@@ -65,6 +65,16 @@ class KRNLEXPORT TKrnlString
             const   TKrnlString&            kstrToAssign
         );
 
+        TKrnlString& operator=
+        (
+            const   tCIDLib::TCh* const     pszRawStr
+        );
+
+        TKrnlString& operator=
+        (
+            const   tCIDLib::TSCh* const    pszRawSStr
+        ); 
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods

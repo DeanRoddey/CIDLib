@@ -38,7 +38,7 @@
 #include <fcntl.h>
 #include <fnmatch.h>
 #include <langinfo.h>
-#include <linux/limits.h>
+#include <limits.h>
 
 //
 //  An error in the headers, this is also included in socket.h below and 
@@ -71,15 +71,12 @@
 #include <sys/utsname.h>
 #include <sys/vfs.h>
 #include <sys/wait.h>
-// #include <term.h>
 #include <termios.h>
+#include <unistd.h>
 #include <utime.h>
 #include <wchar.h>
 #include <wctype.h>
-
-// Including these last eliminates some warnings
-//#include <readline/history.h>
-// #include <readline/readline.h>
+#include <term.h>
 
 
 //
@@ -110,6 +107,12 @@ union semun
 //
 // Internal structures
 //
+struct TCommHandleImpl
+{
+    tCIDLib::TSInt      hComm;
+};
+
+
 struct TConsoleHandleImpl
 {
     struct termios              TermInfo;

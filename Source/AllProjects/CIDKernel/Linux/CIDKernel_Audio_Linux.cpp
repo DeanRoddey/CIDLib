@@ -29,7 +29,6 @@
 //  Facility specific includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
-#include    <unistd.h>
 
 namespace
 {

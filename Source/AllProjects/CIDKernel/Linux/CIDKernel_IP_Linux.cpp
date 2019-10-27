@@ -34,7 +34,7 @@
 #include    "CIDKernel_.hpp"
 
 
-namespace
+namespace CIDKernel_IP_Linux
 {
     // ---------------------------------------------------------------------------
     //  Local types
@@ -59,10 +59,10 @@ namespace
     //      We map a good bit of them to general errors, and some are mapped to
     //      error codes added just for TCP/IP support.
     //
-    //  __c4ErrCount
+    //  CIDKernel_IP_Linux::c4ErrCount
     //      The number of elements in the __aXlatErrors array.
     // ---------------------------------------------------------------------------
-    const TErrorMap __amapErrors[] =
+    const TErrorMap amapErrors[] =
     {
             { NETDB_SUCCESS     , kKrnlErrs::errcNoError }
         ,   { HOST_NOT_FOUND    , kKrnlErrs::errcNet_HostDown }
@@ -70,13 +70,15 @@ namespace
         ,   { NO_RECOVERY       , kKrnlErrs::errcGen_TermError }
         ,   { NO_DATA           , kKrnlErrs::errcGen_NoData }
     };
-    const tCIDLib::TCard4 __c4ErrCount = tCIDLib::c4ArrayElems(__amapErrors);
+    const tCIDLib::TCard4 c4ErrCount = tCIDLib::c4ArrayElems(CIDKernel_IP_Linux::amapErrors);
+
+
 
     // ---------------------------------------------------------------------------
     //  Local functions
     // ---------------------------------------------------------------------------
-    tCIDLib::TBoolean
-    __bQueryHostIPAddrs(const   tCIDLib::TSCh* const    pszHostName
+    static tCIDLib::TBoolean
+    bQueryHostIPAddrs(  const   tCIDLib::TSCh* const    pszHostName
                         ,       tCIDLib::TIPAddr* const aipaToFill
                         , const tCIDLib::TCard4         c4MaxAddrs
                         ,       tCIDLib::TCard4&        c4AddrsFound)
@@ -86,7 +88,7 @@ namespace
 
         if (!pHostInfo)
         {
-            TKrnlError::SetLastKrnlError(TKrnlTCPIP::c4XlatError(h_errno), h_errno);
+            TKrnlError::SetLastKrnlError(TKrnlIP::c4XlatError(h_errno), h_errno);
             return kCIDLib::False;
         }
 
@@ -114,26 +116,21 @@ namespace
 
         return kCIDLib::True;
     }
+
+    //
+    //  This is the version of the host TCP/IP support that we are using.
+    //  It is saved here during init and used by the TCP/IP version support
+    //  method of TKrnlSysInfo that we implement here.    
+    //
+    tCIDLib::TCard2  c2Version = 0;    
 }
-
-
-// ---------------------------------------------------------------------------
-//  Local data
-//
-//  __c2Version
-//      This is the version of the host TCP/IP support that we are using.
-//      It is saved here during init and used by the TCP/IP version support
-//      method of TKrnlSysInfo that we implement here.
-// ---------------------------------------------------------------------------
-static tCIDLib::TCard2  __c2Version = 0;
 
 
 
 // ---------------------------------------------------------------------------
 //  TCIDKrnlModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermTCPIP(const tCIDLib::EInitTerm)
+tCIDLib::TBoolean TCIDKrnlModule::bInitTermIP(const tCIDLib::EInitTerm)
 {
     return kCIDLib::True;
 }
@@ -143,10 +140,76 @@ TCIDKrnlModule::__bInitTermTCPIP(const tCIDLib::EInitTerm)
 // ---------------------------------------------------------------------------
 //  TKrnlSysInfo functions
 // ---------------------------------------------------------------------------
+
 tCIDLib::TBoolean
-TKrnlTCPIP::bQueryIPAddrs(          tCIDLib::TIPAddr* const aipaToFill
-                            , const tCIDLib::TCard4         c4MaxAddrs
-                            ,       tCIDLib::TCard4&        c4AddrsFound)
+TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const     pszAppPath
+                        , const tCIDLib::TCh* const     pszAppName
+                        ,       tCIDLib::TCh* const     pszErrText
+                        , const tCIDLib::TCard4         c4MaxErrChars)
+{
+    // Does this have any meaning on Linux?
+    return kCIDLib::False;
+}                        
+
+
+
+// <TBD> These need to be implemented
+tCIDLib::TBoolean TKrnlIP::bIPV4Avail()
+{
+    return kCIDLib::False;
+}
+
+tCIDLib::TBoolean TKrnlIP::bIPV6Avail()
+{
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlIP::bLoadTCPIPMsg( const   tCIDLib::TOSErrCode errcId
+                        ,       tCIDLib::TCh* const pszBuffer
+                        , const tCIDLib::TCard4     c4MaxChars)
+{
+    //
+    //  Just translate the TCP/IP message into one of our errors and load
+    //  that message into the caller's buffer.
+    //
+    return kmodCIDKernel.bLoadCIDFacMsg(TKrnlIP::c4XlatError(errcId), pszBuffer, c4MaxChars);
+}
+
+
+// <TBD> This needs to be implemented
+tCIDLib::TBoolean
+TKrnlIP::bQueryAdaptorInfo( const   tCIDLib::TCh* const     pszName
+                            ,       TAdaptorInfo&           kadpToFill
+                            ,       tCIDLib::TBoolean&      bFound)
+{
+    return kCIDLib::False;
+}                            
+
+
+// <TBD> This needs to be implemented
+tCIDLib::TBoolean TKrnlIP::bQueryAdaptorList(TKrnlLList<TAdaptorInfo>& kllstToFill)
+{
+    return kCIDLib::False;
+}
+
+
+// <TBD> This needs to be implemented
+tCIDLib::TBoolean
+TKrnlIP::bQueryDefLocalAddr(TKrnlIPAddr& kipaToFill, const tCIDSock::EAddrTypes eType)
+{
+    return kCIDLib::False;
+}
+
+
+
+tCIDLib::TBoolean
+TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
+                            ,       TKrnlLList<TKrnlIPAddr>&    kllstAddrs
+                            , const tCIDSock::EAddrInfoFlags    eFlags
+                            , const tCIDLib::TBoolean           bIncludeLoopback
+                            , const tCIDLib::TBoolean           bAppend)
 {
     struct utsname UtsName;
     if (::uname(&UtsName))
@@ -155,16 +218,25 @@ TKrnlTCPIP::bQueryIPAddrs(          tCIDLib::TIPAddr* const aipaToFill
         return kCIDLib::False;
     }
 
-    return __bQueryHostIPAddrs(UtsName.nodename
+    // <TBD> This has been completed changed and has to be redone
+    /*
+    tCIDLib::TSCh* pszHostCopy = TRawStr::pszConvert(pszHostName);
+    TArrayJanitor<tCIDLib::TSCh> janHost(pszHostCopy);
+
+    return CIDKernel_IP_Linux::bQueryHostIPAddrs(pszHostCopy
                                , aipaToFill
                                , c4MaxAddrs
                                , c4AddrsFound);
+    */
+
+   return kCIDLib::False;
+
+    return kCIDLib::False;
 }
 
 
 tCIDLib::TBoolean
-TKrnlTCPIP::bQueryIPHostName(           tCIDLib::TCh* const pszToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
+TKrnlIP::bQueryLocalName(TKrnlString& kstrToFill)
 {
     //
     //  Create a temporary short character name buffer that we will use for
@@ -185,37 +257,108 @@ TKrnlTCPIP::bQueryIPHostName(           tCIDLib::TCh* const pszToFill
 
     if (!pHostInfo)
     {
-        TKrnlError::SetLastKrnlError(TKrnlTCPIP::c4XlatError(h_errno), h_errno);
+        TKrnlError::SetLastKrnlError(TKrnlIP::c4XlatError(h_errno), h_errno);
         return kCIDLib::False;
     }
 
-    TRawStr::pszConvert(pHostInfo->h_name, pszToFill, c4MaxChars);
-
+    kstrToFill = szTmpName;
     return kCIDLib::True;
 }
 
 
+// <TBD> This needs to be fixed up
 tCIDLib::TBoolean
-TKrnlTCPIP::bQueryTCPVersion(     tCIDLib::TCard4&    c4MajVersion
+TKrnlIP::bQueryNameByAddr(const TKrnlIPAddr& kipaToQuery, TKrnlString& kstrToFill)
+{
+    /*
+    // And get the host info for the indicated address
+    struct hostent* pHostInfo = ::gethostbyaddr(reinterpret_cast<tCIDLib::TSCh*>(kipaToQuery.),
+                                                sizeof(ipaToQuery),
+                                                AF_INET);
+
+    if (!pHostInfo)
+    {
+        TKrnlError::SetLastKrnlError(c4XlatError(h_errno), h_errno);
+        return kCIDLib::False;
+    }
+
+    kstrToFill = pHostInfo->h_name;
+    return kCIDLib::True;
+    */
+   return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlIP::bQueryTCPVersion(     tCIDLib::TCard4&    c4MajVersion
                                 , tCIDLib::TCard4&  c4MinVersion)
 {
     // Major version is in the low byte, minor in the high
-    c4MinVersion = tCIDLib::TCard4(__c2Version >> 8);
-    c4MajVersion = tCIDLib::TCard4(__c2Version & 0xFF);
+    c4MinVersion = tCIDLib::TCard4(CIDKernel_IP_Linux::c2Version >> 8);
+    c4MajVersion = tCIDLib::TCard4(CIDKernel_IP_Linux::c2Version & 0xFF);
 
     // In our implmentation, we have this cached away so it can't fail
     return kCIDLib::True;
 }
 
 
-
-// ---------------------------------------------------------------------------
-//  TKrnlTCPIP: Public, non-virtual methods
-// ---------------------------------------------------------------------------
+// <TBD> This needs to be reworked
 tCIDLib::TBoolean
-TKrnlTCPIP::bIPAFromText(const  tCIDLib::TCh* const pszIPAddrString
-                        ,       tCIDLib::TIPAddr&   ipaRet)
+TKrnlIP::bTextFromIPAddr(const TKrnlIPAddr& kipaCvt, TKrnlString& kstrToFill)
 {
+    /*
+    // Try the conversion
+    tCIDLib::TSCh* pszTmp = inet_ntoa(*(in_addr*)&ipaToConvert);
+
+    // See if it failed and throw and exception if so
+    if (!pszTmp)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddr);
+        return kCIDLib::False;
+    }
+
+    // Get into the caller's buffer
+    TRawStr::pszConvert(pszTmp, pszToFill, c4MaxChars);
+
+    return kCIDLib::True;
+    */
+
+   return kCIDLib::False;
+}
+
+
+tCIDLib::TCard4 TKrnlIP::c4XlatError(const tCIDLib::TSInt iToXlat)
+{
+    //
+    //  Search the list for the passed error. Since it is a pretty short
+    //  list we just do a linear search.
+    //
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < CIDKernel_IP_Linux::c4ErrCount; c4Index++)
+    {
+        if (CIDKernel_IP_Linux::amapErrors[c4Index].iHostErr == iToXlat)
+            return CIDKernel_IP_Linux::amapErrors[c4Index].errcCIDErr;
+    }
+
+    // We did not find it, so return the generic 'TCPIP Error' indicator
+    return kKrnlErrs::errcNet_NetError;
+}
+
+
+// <TBD> This needs to be implemented
+tCIDSock::EAddrTypes TKrnlIP::eDefAddrType()
+{
+    return tCIDSock::EAddrTypes::Count;
+}
+
+
+tCIDSock::EAddrCvtRes
+TKrnlIP::eIPAFromText(  const   tCIDLib::TCh* const     pszIPAddrString
+                        ,       TKrnlIPAddr&            kipaToFill
+                        , const tCIDLib::TBoolean       bDoLookup
+                        , const tCIDSock::EAddrTypes    eReqAddr)
+{
+    // <TBD> This has changed completely since the original
+    /*
     struct in_addr InAddr;
     tCIDLib::TSCh* pszIPAddrCopy = TRawStr::pszConvert(pszIPAddrString);
     TArrayJanitor<tCIDLib::TSCh> janIPAddr(pszIPAddrCopy);
@@ -239,149 +382,13 @@ TKrnlTCPIP::bIPAFromText(const  tCIDLib::TCh* const pszIPAddrString
         // Otherwise, return the 0th address
         ipaRet = *(tCIDLib::TIPAddr*)(pHostInfo->h_addr_list[0]);
     }
+    */
 
-    return kCIDLib::True;
+    return tCIDSock::EAddrCvtRes::Failed;
 }
 
 
-tCIDLib::TBoolean
-TKrnlTCPIP::bQueryHostIPAddrs(  const   tCIDLib::TCh* const     pszHostName
-                                ,       tCIDLib::TIPAddr* const aipaToFill
-                                , const tCIDLib::TCard4         c4MaxAddrs
-                                ,       tCIDLib::TCard4&        c4AddrsFound)
+// <TBD> This needs to be implemented
+tCIDLib::TVoid TKrnlIP::QueryDefAllListen(TKrnlIPAddr& kipaToFill)
 {
-    tCIDLib::TSCh* pszHostCopy = TRawStr::pszConvert(pszHostName);
-    TArrayJanitor<tCIDLib::TSCh> janHost(pszHostCopy);
-
-    return __bQueryHostIPAddrs(pszHostCopy
-                               , aipaToFill
-                               , c4MaxAddrs
-                               , c4AddrsFound);
-}
-
-
-tCIDLib::TBoolean
-TKrnlTCPIP::bQueryHostInfo( const   tCIDLib::TCh* const     pszHostName
-                            ,       tCIDLib::TIPAddr* const aipaToFill
-                            ,       tCIDLib::TCard4&        c4MaxAddrs
-                            ,       tCIDLib::TCh**          ppszAliases
-                            ,       tCIDLib::TCard4&        c4MaxAliases)
-{
-    tCIDLib::TSCh* pszHostCopy = TRawStr::pszConvert(pszHostName);
-    TArrayJanitor<tCIDLib::TSCh> janHost(pszHostCopy);
-
-    // Get the host info for the passed worksation name
-    struct hostent* pHostInfo = ::gethostbyname(pszHostCopy);
-
-    if (!pHostInfo)
-    {
-        TKrnlError::SetLastKrnlError(c4XlatError(h_errno), h_errno);
-        return kCIDLib::False;
-    }
-
-    //
-    //  Give back the caller as many addresses as we can fit into his
-    //  buffer.
-    //
-    tCIDLib::TCard4 c4Index = 0;
-    while ((pHostInfo->h_addr_list[c4Index] != 0) && (c4Index < c4MaxAddrs))
-    {
-        aipaToFill[c4Index] = *(tCIDLib::TIPAddr*)(pHostInfo->h_addr_list[c4Index]);
-        c4Index++;
-    }
-    c4MaxAddrs = c4Index;
-
-    //
-    //  And do the same for the aliases. We have to allocate new buffers that
-    //  hold the Unicode versions of the names. The caller must free these.
-    //
-    c4Index = 0;
-    while ((pHostInfo->h_aliases[c4Index] != 0) && (c4Index < c4MaxAliases))
-    {
-        ppszAliases[c4Index] = TRawStr::pszConvert(pHostInfo->h_aliases[c4Index]);
-        c4Index++;
-    }
-
-    c4MaxAliases = c4Index;
-
-    return kCIDLib::True;
-}
-
-
-tCIDLib::TBoolean
-TKrnlTCPIP::bQueryHostNameByAddr(const  tCIDLib::TIPAddr    ipaToQuery
-                                ,       tCIDLib::TCh* const pszToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
-{
-    // And get the host info for the indicated address
-    struct hostent* pHostInfo = ::gethostbyaddr(reinterpret_cast<tCIDLib::TSCh*>(ipaToQuery),
-                                                sizeof(ipaToQuery),
-                                                AF_INET);
-
-    if (!pHostInfo)
-    {
-        TKrnlError::SetLastKrnlError(c4XlatError(h_errno), h_errno);
-        return kCIDLib::False;
-    }
-
-    TRawStr::pszConvert(pHostInfo->h_name, pszToFill, c4MaxChars);
-
-    return kCIDLib::True;
-}
-
-
-tCIDLib::TBoolean
-TKrnlTCPIP::bTextFromIPAddr(const   tCIDLib::TIPAddr    ipaToConvert
-                            ,       tCIDLib::TCh* const pszToFill
-                            , const tCIDLib::TCard4     c4MaxChars)
-{
-    // Try the conversion
-    tCIDLib::TSCh* pszTmp = inet_ntoa(*(in_addr*)&ipaToConvert);
-
-    // See if it failed and throw and exception if so
-    if (!pszTmp)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddr);
-        return kCIDLib::False;
-    }
-
-    // Get into the caller's buffer
-    TRawStr::pszConvert(pszTmp, pszToFill, c4MaxChars);
-
-    return kCIDLib::True;
-}
-
-
-tCIDLib::TCard4 TKrnlTCPIP::c4XlatError(const tCIDLib::TSInt iToXlat)
-{
-    //
-    //  Search the list for the passed error. Since it is a pretty short
-    //  list we just do a linear search.
-    //
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < __c4ErrCount; c4Index++)
-    {
-        if (__amapErrors[c4Index].iHostErr == iToXlat)
-            return __amapErrors[c4Index].errcCIDErr;
-    }
-
-    // We did not find it, so return the generic 'TCPIP Error' indicator
-    return kKrnlErrs::errcNet_NetError;
-}
-
-
-tCIDLib::TBoolean
-TKrnlTCPIP::bLoadTCPIPMsg(const tCIDLib::TOSErrCode   errcId
-                          ,       tCIDLib::TCh* const pszBuffer
-                          , const tCIDLib::TCard4     c4MaxChars)
-{
-    //
-    //  Just translate the TCP/IP message into one of our errors and load
-    //  that message into the caller's buffer.
-    //
-    return kmodCIDKernel.bLoadCIDMsg
-    (
-        TKrnlTCPIP::c4XlatError(errcId)
-        , pszBuffer
-        , c4MaxChars
-    );
 }

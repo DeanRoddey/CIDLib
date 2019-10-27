@@ -35,11 +35,6 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
-#include    <unistd.h>
-#include    <limits.h>
-#include    <curses.h>
-#include    <term.h>
-#include    <stdio.h>
 #include    <editline/readline.h>
 #include    <editline/history.h>
 

@@ -54,11 +54,11 @@ namespace
     // ---------------------------------------------------------------------------
     TSigMap aSigMap[] =
     {
-        { tCIDLib::ESignals::Break    ,   SIGINT  ,   0   }
-        , { tCIDLib::ESignals::TermReq,   SIGTERM ,   0   }
+          { tCIDLib::ESignals::Break    ,   SIGINT  ,   0   }
+        , { tCIDLib::ESignals::Shutdown ,   SIGTERM ,   0   }
     };
 
-    tCIDLib::TSInt aProgramErrors[] =
+    const tCIDLib::TSInt aProgramErrors[] =
     {
         SIGFPE
         , SIGILL
@@ -94,20 +94,24 @@ namespace
     tCIDLib::TVoid ProgramErrorHandler(tCIDLib::TSInt iSignal)
     {
         // First, dump this signal to a log
-        TKrnlLinux::TKrnlThreadInfo* pThreadInfo =
-            TKrnlLinux::TKrnlThreadInfo::pkthriInstance();
+        TKrnlLinux::TKrnlThreadInfo* pThreadInfo = TKrnlLinux::TKrnlThreadInfo::pkthriInstance();
 
         if (pThreadInfo)
         {
+            // <TBD> Anything we can do with this?
+            /*
             TKrnlThread::DumpException(*pThreadInfo->pkthrThis()
                                        , pThreadInfo->pszName()
                                        , (tCIDLib::TVoid*)iSignal);
+            */
         }
 
+        //
         // This is tricky. Reset the signal action to the default, then raise the
         // signal again. This has two effects: (1) It will cause a core dump to be
         // created if the signal would normally create one, (2) It will set the exit
         // code of the program properly.
+        //
         struct sigaction DefaultAction;
         DefaultAction.sa_handler = SIG_DFL;
         ::sigemptyset(&DefaultAction.sa_mask);

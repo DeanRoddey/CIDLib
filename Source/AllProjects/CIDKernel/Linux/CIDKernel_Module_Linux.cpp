@@ -29,7 +29,6 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
-#include    <unistd.h>
 
 
 namespace CIDKernel_Module_Linux

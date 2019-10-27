@@ -31,9 +31,6 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
-#include    <limits.h>
-#include    <unistd.h>
-
 
 // ---------------------------------------------------------------------------
 //  Local functions
