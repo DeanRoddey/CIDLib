@@ -35,10 +35,9 @@
 
 
 // ---------------------------------------------------------------------------
-//  We need some ICMP and PING oriented structures and constants. Make sure
-//  it's byte packed.
+//  We need some ICMP and PING oriented structures and constants. Make sure it's
+//  byte packed.
 // ---------------------------------------------------------------------------
-
 #pragma CIDLIB_PACK(1)
 
 // IPv4 header
@@ -84,17 +83,6 @@ struct icmp_echohdr
     unsigned short  icmp_checksum;
     unsigned short  icmp_id;
     unsigned short  icmp_sequence;
-};
-
-
-// A simple structure to hold a V6 address and access in two ways
-struct in6_addr
-{
-    union
-    {
-        UCHAR       Byte[16];
-        USHORT      Word[8];
-    } u;
 };
 
 
@@ -164,6 +152,7 @@ struct icmpv6_echohdr
 #define ICMPV6_ERROR_REPLY_TYPE     1
 
 #pragma CIDLIB_POPPACK
+
 
 
 

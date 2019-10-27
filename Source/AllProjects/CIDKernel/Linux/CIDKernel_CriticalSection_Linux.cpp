@@ -37,23 +37,32 @@
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlCritSec: Public data types
+// ---------------------------------------------------------------------------
+
+// Define our own version of the platform data
+struct TKrnlCritSec::TPlatData
+{
+    TKrnlLinux::TRecursiveMutex*  prmtxThis;
+};
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlCritSec: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlCritSec::TKrnlCritSec() :
-    m_pData(0)
+
+    m_pPlatData(new TPlatData)
 {
-    TKrnlLinux::TRecursiveMutex* prmtxThis =
-        new TKrnlLinux::TRecursiveMutex();
+    TKrnlLinux::TRecursiveMutex* prmtxThis = new TKrnlLinux::TRecursiveMutex();
     prmtxThis->iInitialize();
-    m_pData = prmtxThis;
+    m_pPlatData->prmtxThis = prmtxThis;
 }
 
 TKrnlCritSec::~TKrnlCritSec()
 {
-    TKrnlLinux::TRecursiveMutex* prmtxThis =
-        static_cast<TKrnlLinux::TRecursiveMutex*>(m_pData);
-    prmtxThis->iDestroy();
-    delete prmtxThis;
+    m_pPlatData->prmtxThis->iDestroy();
+    delete m_pPlatData;
 }
 
 
@@ -62,15 +71,11 @@ TKrnlCritSec::~TKrnlCritSec()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TKrnlCritSec::Enter() const
 {
-    TKrnlLinux::TRecursiveMutex* prmtxThis =
-        static_cast<TKrnlLinux::TRecursiveMutex*>(m_pData);
-    prmtxThis->iLock();
+    m_pPlatData->prmtxThis->iLock();
 }
 
 
 tCIDLib::TVoid TKrnlCritSec::Exit() const
 {
-    TKrnlLinux::TRecursiveMutex* prmtxThis =
-        static_cast<TKrnlLinux::TRecursiveMutex*>(m_pData);
-    prmtxThis->iUnlock();
+    m_pPlatData->prmtxThis->iUnlock();
 }

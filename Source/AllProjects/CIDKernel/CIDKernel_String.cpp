@@ -80,6 +80,20 @@ TKrnlString& TKrnlString::operator=(const TKrnlString& kstrToAssign)
 }
 
 
+TKrnlString& TKrnlString::operator=(const tCIDLib::TCh* const pszRawStr)
+{
+    delete [] m_pszValue;
+    m_pszValue = TRawStr::pszReplicate(pszRawStr);
+}
+
+
+TKrnlString& TKrnlString::operator=(const tCIDLib::TSCh* const pszRawSStr)
+{
+    delete [] m_pszValue;
+    m_pszValue = TRawStr::pszConvert(pszRawSStr);
+} 
+
+
 // ---------------------------------------------------------------------------
 //  TKrnlString: Public, non-virtual methods
 // ---------------------------------------------------------------------------

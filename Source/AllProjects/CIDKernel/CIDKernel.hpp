@@ -42,11 +42,6 @@
 // ---------------------------------------------------------------------------
 //  Subinclude the really fundamental headers that must be before everything.
 // ---------------------------------------------------------------------------
-
-//
-//  This is a hack to get around Visual Studio Code's apparent innability to ignore
-//  directories in the intellisense stuff, so it sees the Linux files on Windows.
-//
 #include    "CIDKernel_PlatformDefines.hpp"
 #include    "CIDKernel_PlatformIncludes.hpp"
 #include    "CIDKernel_PlatformTypes.hpp"

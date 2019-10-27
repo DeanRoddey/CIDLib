@@ -48,17 +48,12 @@ class KRNLEXPORT TKrnlSocket
         //
         //  We have one for each set of options that have a particular data
         //  representation, i.e. boolean flag, signed value, etc...
-        //
-        //  Note that SETTING linger has it's own special method, it can only
-        //  be read via the generic sock opt methods. And the socket error is
-        //  only readable.
         // -------------------------------------------------------------------
         enum class EBSockOpts
         {
             AllowBroadcast
             , DontRoute
             , KeepAlive
-            , Linger
             , Nagle
             , ReuseAddr
         };
@@ -214,6 +209,11 @@ class KRNLEXPORT TKrnlSocket
             const   TKrnlIPAddr&            kipaGroup
             , const TKrnlIPAddr&            kipaIntf
         );
+
+        tCIDLib::TBoolean bLinger
+        (
+                    tCIDLib::TBoolean&      bToFill
+        )   const;
 
         tCIDLib::TBoolean bLinger
         (

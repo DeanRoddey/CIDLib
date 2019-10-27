@@ -34,25 +34,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  Local, static methods
-// ---------------------------------------------------------------------------
-//
-//  This method is called just after opening a port. It sets up the port
-//  to the portable defaults that we want any opened port to be set up to,
-//  no matter what platform. Otherwise, the client would have to do a
-//  complete setup every time, to insure portability.
-//
-static tCIDLib::TBoolean bInitState(        HANDLE          hToInit
-                                    , const tCIDLib::TCard4 c4ReadBufSz
-                                    , const tCIDLib::TCard4 c4WriteBufSz)
-{
-    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
-    return kCIDLib::False;
-
-}
-
-
-// ---------------------------------------------------------------------------
 //   CLASS: TCommHandle
 //  PREFIX: hcomm
 // ---------------------------------------------------------------------------
@@ -65,7 +46,7 @@ TCommHandle::TCommHandle() :
     m_phcommiThis(nullptr)
 {
     m_phcommiThis = new TCommHandleImpl;
-    m_phcommiThis->hComm = nullptr;
+    m_phcommiThis->hComm = 0;
 }
 
 TCommHandle::TCommHandle(const TCommHandle& hsemToCopy) :
@@ -197,7 +178,6 @@ TKrnlCommPort::~TKrnlCommPort()
 tCIDLib::TBoolean TKrnlCommPort::bClose()
 {
     // Reset the the extra data for next time
-    m_pExtra->c4ReadTimeout = kCIDLib::c4MaxCard;
 
     // If open, then try to close it
 

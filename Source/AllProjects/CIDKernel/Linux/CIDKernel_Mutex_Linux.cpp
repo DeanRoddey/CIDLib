@@ -32,8 +32,6 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
-#include    <unistd.h>
-
 
 // ---------------------------------------------------------------------------
 //   CLASS: TMutexHandle

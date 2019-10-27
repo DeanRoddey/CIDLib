@@ -167,10 +167,10 @@ tCIDLib::TBoolean TUtils::bDeleteFile(const TBldStr& strToDelete)
 
 
 tCIDLib::TBoolean
-TUtils::bExec(  const   tCIDLib::TCh* const*    apszParams
-                , const tCIDLib::TCard4         c4Count
-                ,       tCIDLib::TCard4&        c4Result
-                , const tCIDLib::TCard4         c4Flags)
+TUtils::bExec(  const   tCIDLib::TCh**      apszParams
+                , const tCIDLib::TCard4     c4Count
+                ,       tCIDLib::TCard4&    c4Result
+                , const tCIDLib::TCard4     c4Flags)
 {
     tCIDLib::TUInt uiTmp;
     tCIDLib::TSCh** apszArgs = new tCIDLib::TSCh*[c4Count + 2];

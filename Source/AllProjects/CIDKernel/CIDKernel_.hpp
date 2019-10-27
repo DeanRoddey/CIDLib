@@ -51,7 +51,7 @@
 //  or definitions that are required internally for all per-platform
 //  implementation files.
 // ---------------------------------------------------------------------------
-#include    ".\Win32\CIDKernel_PlatformInternal_.hpp"
+#include    "CIDKernel_PlatformInternal_.hpp"
 
 
 // ---------------------------------------------------------------------------

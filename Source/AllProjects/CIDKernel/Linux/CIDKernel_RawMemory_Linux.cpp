@@ -235,9 +235,9 @@ tCIDLib::TVoid* TRawMem::pPageBaseAdr(const tCIDLib::TVoid* pBufContained)
 
 
 tCIDLib::TCard4
-TRawMem::c4CompareAndExchange(  volatile    tCIDLib::TCard4&    c4ToFill
-                                , const     tCIDLib::TCard4     c4New
-                                , const     tCIDLib::TCard4     c4Compare)
+TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
+                                , const tCIDLib::TCard4     c4New
+                                , const tCIDLib::TCard4     c4Compare)
 {
     ::pthread_mutex_lock(&CIDKernel_RawMemory_Linux::mtxCmpXchg);
 

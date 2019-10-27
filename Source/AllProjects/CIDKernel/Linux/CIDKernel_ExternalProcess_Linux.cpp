@@ -33,8 +33,6 @@
 #include    "CIDKernel_InternalHelpers_.hpp"
 #include    "CIDKernel_PlatformStrOps.hpp"
 
-#include    <unistd.h>
-
 
 namespace CIDKernel_ExtProc_Linux
 {
