@@ -195,7 +195,7 @@ TKrnlSharedMemBuf::bAlloc(  const   tCIDLib::TCh* const     pszName
                             , const tCIDLib::EAllocTypes    eAllocType
                             , const tCIDLib::EMemAccFlags   eAccess
                             ,       tCIDLib::TBoolean&      bCreated
-                            , const tCIDLib::ECreateActs eCreateFlags)
+                            , const tCIDLib::ECreateActs    eCreateFlags)
 {
     if (m_pBuffer)
     {

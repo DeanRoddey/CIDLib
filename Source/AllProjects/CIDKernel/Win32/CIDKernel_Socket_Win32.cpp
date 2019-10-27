@@ -38,7 +38,7 @@
 namespace CIDKernel_Socket_Win32
 {
     // -----------------------------------------------------------------------
-    //  Lock constants
+    //  Socket constants
     // -----------------------------------------------------------------------
     const tCIDLib::TCard4    hInvalid = tCIDLib::TCard4(-1);
 
@@ -1225,12 +1225,6 @@ TKrnlSocket::bGetSockOpt(const  TKrnlSocket::EBSockOpts eOpt
         case EBSockOpts::KeepAlive :
             iLevel = SOL_SOCKET;
             iOpt = SO_KEEPALIVE;
-            break;
-
-        case EBSockOpts::Linger :
-            iLevel = SOL_SOCKET;
-            iOpt = SO_DONTLINGER;
-            bNegate = kCIDLib::True;
             break;
 
         case EBSockOpts::Nagle :

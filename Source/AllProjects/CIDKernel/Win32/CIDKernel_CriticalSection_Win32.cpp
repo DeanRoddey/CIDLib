@@ -39,6 +39,8 @@
 // ---------------------------------------------------------------------------
 //  TKrnlCritSec: Public data types
 // ---------------------------------------------------------------------------
+
+// Define our own version of the platform data
 struct TKrnlCritSec::TPlatData
 {
     alignas(kCIDLib::c4CacheAlign) CRITICAL_SECTION CritSec;
