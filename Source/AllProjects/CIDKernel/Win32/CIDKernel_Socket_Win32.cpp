@@ -1394,7 +1394,29 @@ TKrnlSocket::bJoinMulticastGroup(const  TKrnlIPAddr& kipaGroup
 }
 
 
-// Setting linger has it's own special method
+// Setting linger has it's own special methods
+tCIDLib::TBoolean TKrnlSocket::bLinger(tCIDLib::TBoolean& bNewState) const
+{
+    linger LingerInfo;
+    socklen_t LingerLen = sizeof(linger);
+
+    if (::getsockopt
+    (
+        m_hsockThis.m_phsockiThis->hSock
+        , SOL_SOCKET
+        , SO_LINGER
+        , reinterpret_cast<char*>(&LingerInfo)
+        , &LingerLen) == SOCKET_ERROR)
+    {
+        tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
+        TKrnlError::SetLastKrnlError(TKrnlIP::c4XlatError(c4LastErr), c4LastErr);
+        return kCIDLib::False;
+    }
+
+    bNewState = LingerInfo.l_onoff ? kCIDLib::True : kCIDLib::False;
+    return kCIDLib::True;
+}
+
 tCIDLib::TBoolean
 TKrnlSocket::bLinger(   const   tCIDLib::TBoolean   bNewState
                         , const tCIDLib::TCard4     c4Time)

@@ -157,22 +157,6 @@ namespace tCIDLib
 }
 
 
-// A simple structure to hold a V6 address and access in two ways
-/*
-#pragma CIDLIB_PACK(1)
-struct in6_addr
-{
-    union
-    {
-        tCIDLib::TCard1 Byte[16];
-        tCIDLib::TCard2 Word[8];
-    } u;
-};
-#pragma CIDLIB_POPPACK
-*/
-
-
-
 // ----------------------------------------------------------------------------
 //  These are some types that are used by the graphics oriented facility
 // ----------------------------------------------------------------------------

@@ -448,7 +448,7 @@ tCIDLib::TBoolean TSocket::bIsOpen() const
 tCIDLib::TBoolean TSocket::bLinger() const
 {
     tCIDLib::TBoolean bRet;
-    if (!m_ksockImpl.bGetSockOpt(TKrnlSocket::EBSockOpts::Linger, bRet))
+    if (!m_ksockImpl.bLinger(bRet))
     {
         facCIDSock().ThrowKrnlErr
         (

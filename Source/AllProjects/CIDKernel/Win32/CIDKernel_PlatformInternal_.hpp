@@ -41,6 +41,7 @@
 
 #include    <windows.h>
 #include    <winsock2.h>
+#include    <in6addr.h>
 
 // ---------------------------------------------------------------------------
 //  Define the contents of our 'handle' types. There are small structures
