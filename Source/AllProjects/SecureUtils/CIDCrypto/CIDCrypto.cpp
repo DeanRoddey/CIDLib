@@ -37,7 +37,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDCrypto& facCIDCrypto()
 {
-    static TFacCIDCrypto* pfacThis;
+    static TFacCIDCrypto* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

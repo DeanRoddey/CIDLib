@@ -23,6 +23,10 @@
 //  implementation files. The constructors are hidden to insure this, and the
 //  destructor is deleted for the same reason.
 //
+//  We also create a little janitor class that will clean up an array of pointers
+//  to raw strings, since that's a format required in various places to pass
+//  parameter or environment info to system APIs.
+//
 // CAVEATS/GOTCHAS:
 //
 //  1)  All operations are synchronized so multiple thread access is not
@@ -43,6 +47,77 @@ class   TKrnlHashMap;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStrArrayJan
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+class KRNLEXPORT TStrArrayJan
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TStrArrayJan() = delete;
+
+        TStrArrayJan(const TStrArrayJan&) = delete;
+
+        TStrArrayJan(        tCIDLib::TCh**      apszEnv
+                    , const tCIDLib::TCard4     c4Count
+                    , const tCIDLib::TBoolean   bFreeArray) :
+
+            m_bFreeArray(bFreeArray)
+            , m_apszEnv(apszEnv)
+            , m_c4Count(c4Count)
+        {
+        }
+
+        ~TStrArrayJan()
+        {
+            if (m_apszEnv)
+            {
+                for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Count; c4Index++)
+                    delete [] m_apszEnv[c4Index];
+            }
+
+            if (m_bFreeArray)
+                delete [] m_apszEnv;
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid Orphan()
+        {
+            m_apszEnv = nullptr;
+        }
+
+        tCIDLib::TCh** apszEnv()
+        {
+            return m_apszEnv;
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_bFreeArray
+        //      The array itself may or may not be dynamically allocated. The
+        //      creator tells whether or not we should delete it.
+        //
+        //  m_c4Count
+        //      The size of the array, i.e. the number of strings to delete.
+        //
+        //  m_pszEnv
+        //      The environment data to clean up if we still have it on dtor.
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean   m_bFreeArray;
+        tCIDLib::TCard4     m_c4Count;
+        tCIDLib::TCh**      m_apszEnv;
+};
 
 
 // ---------------------------------------------------------------------------

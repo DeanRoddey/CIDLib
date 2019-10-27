@@ -717,9 +717,11 @@ tCIDLib::TVoid TTextInStream::AdoptStream(TBinInStream* const pstrmToAdopt)
             , clsIsA()
         );
     }
-
-    // We don't already have a stream so store it away
-    m_pstrmIn = pstrmToAdopt;
+     else
+    {
+        // We don't already have a stream so store it away
+        m_pstrmIn = pstrmToAdopt;
+    }
 }
 
 

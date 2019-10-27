@@ -36,7 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDMetaExtr& facCIDMetaExtr()
 {
-    static TFacCIDMetaExtr* pfacThis;
+    static TFacCIDMetaExtr* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

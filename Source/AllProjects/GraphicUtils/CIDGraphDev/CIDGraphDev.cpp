@@ -46,7 +46,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDGraphDev& facCIDGraphDev()
 {
-    static TFacCIDGraphDev* pfacThis;
+    static TFacCIDGraphDev* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

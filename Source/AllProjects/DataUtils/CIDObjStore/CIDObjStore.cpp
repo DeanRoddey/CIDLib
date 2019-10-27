@@ -36,7 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDObjStore& facCIDObjStore()
 {
-    static TFacCIDObjStore* pfacThis;
+    static TFacCIDObjStore* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

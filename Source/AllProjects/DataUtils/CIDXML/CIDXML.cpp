@@ -72,7 +72,7 @@ RTTIDecls(TXMLElemDecl,TObject)
 // ---------------------------------------------------------------------------
 TFacCIDXML& facCIDXML()
 {
-    static TFacCIDXML* pfacThis;
+    static TFacCIDXML* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

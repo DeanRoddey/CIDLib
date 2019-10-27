@@ -39,9 +39,7 @@
 //  Bring in underlying headers that only have to be visible internally
 // ---------------------------------------------------------------------------
 #include    "CIDSock.hpp"
-
 #include    "CIDXML.hpp"
-
 #include    "CIDNet.hpp"
 
 

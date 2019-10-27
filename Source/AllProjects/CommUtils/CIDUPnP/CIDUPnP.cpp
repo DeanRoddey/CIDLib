@@ -50,7 +50,7 @@ template class CIDUPNPEXP TRefKeyedHashSet<TUPnPAsyncFinderItem, TString, TStrin
 // ---------------------------------------------------------------------------
 TFacCIDUPnP& facCIDUPnP()
 {
-    static TFacCIDUPnP* pfacThis;
+    static TFacCIDUPnP* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

@@ -122,6 +122,20 @@ namespace tCIDLib
         , const tCIDLib::TCard4     c4Line
         , const MFormattable&       mfmtblToken1
     );
+
+    CIDLIBEXP tCIDLib::TVoid ThrowPreCond
+    (
+        const   TString&            strCond
+        , const tCIDLib::TCh* const pszFile
+        , const tCIDLib::TCard4     c4Line
+    );
+
+    CIDLIBEXP tCIDLib::TVoid ThrowPostCond
+    (
+        const   TString&            strCond
+        , const tCIDLib::TCh* const pszFile
+        , const tCIDLib::TCard4     c4Line
+    );
 }
 
 
@@ -147,6 +161,16 @@ namespace tCIDLib
     #define CIDAssert2(msg)
     #define CIDAssert2X(msg,tok1)
 #endif
+
+
+// ---------------------------------------------------------------------------
+// These are not debug-only, they are pre-psot condition checks
+// ---------------------------------------------------------------------------
+#define CIDPreCond(test) \
+if (!(test)) { tCIDLib::ThrowPreCond(CIDLib_MakeLStr2(test), CID_FILE, CID_LINE); }
+
+#define CIDPostCond(test) \
+if (!(test)) { tCIDLib::ThrowPostCond(CIDLib_MakeLStr2(test), CID_FILE, CID_LINE); }
 
 #pragma CIDLIB_POPPACK
 

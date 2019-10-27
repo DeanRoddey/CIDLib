@@ -172,6 +172,42 @@ tCIDLib::ThrowAssert(const  TString&            strErr
 }
 
 
+tCIDLib::TVoid
+tCIDLib::ThrowPreCond(  const   TString&            strCond
+                        , const tCIDLib::TCh* const pszFile
+                        , const tCIDLib::TCard4     c4Line)
+{
+    throw TLogEvent
+    (
+        L"CIDLib"
+        , pszFile
+        , c4Line
+        , kCIDErrs::errcDbg_PreCondFailed
+        , facCIDLib().strMsg(kCIDErrs::errcDbg_PreCondFailed)
+        , strCond
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Assert
+    );
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowPostCond( const   TString&            strCond
+                        , const tCIDLib::TCh* const pszFile
+                        , const tCIDLib::TCard4     c4Line)
+{
+    throw TLogEvent
+    (
+        L"CIDLib"
+        , pszFile
+        , c4Line
+        , kCIDErrs::errcDbg_PostCondFailed
+        , facCIDLib().strMsg(kCIDErrs::errcDbg_PreCondFailed)
+        , strCond
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Assert
+    );
+}
+
 
 // ---------------------------------------------------------------------------
 //  If debugging, then force instantiations of some template classes that are not
@@ -488,6 +524,9 @@ static tCIDLib::TVoid DummyFunc()
     if (atomStr->bIsEmpty())
     {
     }
+
+
+    CIDPreCond(c4Val1 > c4Val2);
 }
 #endif
 
@@ -503,7 +542,7 @@ static tCIDLib::TVoid DummyFunc()
 //
 TFacCIDLib& facCIDLib()
 {
-    static TFacCIDLib* pfacThis;
+    static TFacCIDLib* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

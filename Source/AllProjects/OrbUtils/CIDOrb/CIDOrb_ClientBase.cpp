@@ -796,7 +796,7 @@ TOrbClientBase::Dispatch(const  tCIDLib::TCard4     c4WaitFor
 
     // Make sure we have initialized the ORB
     #if CID_DEBUG_ON
-    if (!CIDOrb_ClientBase::pmtxSync)
+    if (!CIDOrb_ClientBase::atomInitDone)
     {
         facCIDOrb().ThrowErr
         (
@@ -1164,6 +1164,8 @@ tCIDLib::TVoid TOrbClientBase::InitializeOrbClient()
             //
             CIDOrb_ClientBase::pmtxSync = new TMutex;
 
+            // Set the initialized flag now
+            CIDOrb_ClientBase::atomInitDone.Set();
 
             // Create and spin up the cache thread
             CIDOrb_ClientBase::pthrCacheScavenger = new TThread
@@ -1171,9 +1173,6 @@ tCIDLib::TVoid TOrbClientBase::InitializeOrbClient()
                 L"CIDOrbClientScavengerThread", &eCacheScavengerThread
             );
             CIDOrb_ClientBase::pthrCacheScavenger->Start();
-
-            // Set the initialized flag now
-            CIDOrb_ClientBase::atomInitDone.Set();
         }
     }
 }

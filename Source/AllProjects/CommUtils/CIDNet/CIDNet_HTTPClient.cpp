@@ -1391,7 +1391,7 @@ THTTPClient::c4GetSrvReply(         TCIDDataSrc&            cdsSrc
             //  as the alt text. Use some of the above strings as temps to
             //  get the output strings. The second one is the error msg text.
             //
-            tCIDLib::TCard4 c4Status = c4ReadResMsg(eRes, strFirstLn, strRepText);
+            c4Status = c4ReadResMsg(eRes, strFirstLn, strRepText);
 
             facCIDNet().ThrowErr
             (

@@ -38,19 +38,6 @@ RTTIDecls(TExternalProcess,TObject)
 
 
 // ---------------------------------------------------------------------------
-//  Local static functions
-// ---------------------------------------------------------------------------
-static tCIDLib::TVoid
-CleanUpStrArray(tCIDLib::TCh** apszToClean, const tCIDLib::TCard4 c4Count)
-{
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-        delete [] apszToClean[c4Index];
-
-    delete [] apszToClean;
-}
-
-
-// ---------------------------------------------------------------------------
 //   CLASS: TExternalProcess
 //  PREFIX: extp
 // ---------------------------------------------------------------------------
@@ -437,7 +424,7 @@ TExternalProcess::Start(const   TString&                strCmdLine
     //  Ok, so lets build up the environment strings that the kernel needs to
     //  do its thing.
     //
-    tCIDLib::TCh**  apszEnv = 0;
+    tCIDLib::TCh**  apszEnv = nullptr;
     tCIDLib::TCard4 c4EnvCount = 0;
     TString         strTmp;
     try
@@ -458,17 +445,23 @@ TExternalProcess::Start(const   TString&                strCmdLine
                 strTmp = cursEnv->strKey();
                 strTmp.Append(kCIDLib::chEquals);
                 strTmp.Append(cursEnv->strValue());
+
+                #pragma warning(suppress : 6386)
                 apszEnv[c4Index++] = strTmp.pszDupBuffer();
             };
         }
+
+        // Make sure the environment gets cleaned up
+        TStrArrayJan janEnv(apszEnv, c4EnvCount, kCIDLib::True);
 
         //
         //  Start it by calling the kernel impl object. We pass along the
         //  command line and any environment info we have.
         //
-        const tCIDLib::TCh* pszInitPath = 0;
+        const tCIDLib::TCh* pszInitPath = nullptr;
         if (!strInitPath.bIsEmpty())
             pszInitPath = strInitPath.pszBuffer();
+
         if (!m_kextpThis.bStart(strCmdLine.pszBuffer()
                                 , pszInitPath
                                 , apszEnv
@@ -487,19 +480,11 @@ TExternalProcess::Start(const   TString&                strCmdLine
                 , strCmdLine
             );
         }
-
-        // Clean up the buffers
-        CleanUpStrArray(apszEnv, c4EnvCount);
-        apszEnv = 0;
     }
 
     catch(TError& errToCatch)
     {
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-        CleanUpStrArray(apszEnv, c4EnvCount);
-        apszEnv = 0;
-
         throw;
     }
 }
@@ -577,9 +562,12 @@ TExternalProcess::Start(const   TString&                strPath
                 strTmp = cursEnv->strKey();
                 strTmp.Append(kCIDLib::chEquals);
                 strTmp.Append(cursEnv->strValue());
+
+                #pragma warning(suppress : 6386) // We know the index is ok
                 apszEnv[c4Index++] = strTmp.pszDupBuffer();
             }
         }
+        TStrArrayJan janEnv(apszEnv, c4EnvCount, kCIDLib::True);
 
         if (colParms.c4ElemCount())
         {
@@ -593,12 +581,14 @@ TExternalProcess::Start(const   TString&                strPath
             tCIDLib::TCard4 c4Index = 0;
             for (; pcursParms->bIsValid(); pcursParms->bNext())
             {
+                #pragma warning(suppress : 6386) // We know the index is ok
                 apszCmdLine[c4Index++] = TRawStr::pszReplicate
                 (
                     pcursParms->objRCur().pszBuffer()
                 );
             }
         }
+        TStrArrayJan janParms(apszCmdLine, c4ParmCount, kCIDLib::True);
 
         //
         //  Ok, lets start up this puppy. We just call our kernel object
@@ -627,23 +617,11 @@ TExternalProcess::Start(const   TString&                strPath
                 , strPath
             );
         }
-
-        // Clean up the buffers
-        CleanUpStrArray(apszEnv, c4EnvCount);
-        apszEnv = nullptr;
-        CleanUpStrArray(apszCmdLine, c4ParmCount);
-        apszCmdLine = nullptr;
     }
 
     catch(TError& errToCatch)
     {
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-        CleanUpStrArray(apszEnv, c4EnvCount);
-        apszEnv = nullptr;
-        CleanUpStrArray(apszCmdLine, c4ParmCount);
-        apszCmdLine = nullptr;
-
         throw;
     }
 }

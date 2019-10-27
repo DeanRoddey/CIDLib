@@ -58,7 +58,7 @@ RTTIDecls(TFacCIDWebSock,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDWebSock& facCIDWebSock()
 {
-    static TFacCIDWebSock* pfacThis;
+    static TFacCIDWebSock* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

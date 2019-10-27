@@ -864,10 +864,10 @@ TSMTPClient::SendMsgs(  const   tCIDLib::TCard4     c4MaxMSPer
                 psockClient->Close();
             }
 
-            catch(TError& errToCatch)
+            catch(TError& errToCatch2)
             {
-                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
+                errToCatch2.AddStackLevel(CID_FILE, CID_LINE);
+                TModule::LogEventObj(errToCatch2);
             }
         }
 
@@ -1317,7 +1317,7 @@ TSMTPClient::c4SplitLine(TString&               strOrgLine
     const tCIDLib::TCh chDiv = strOrgLine[3];
 
     // Split and make sure the first part is a valid number
-    tCIDLib::TCard4 c4Ret;
+    tCIDLib::TCard4 c4Ret = 0;
     if (!strOrgLine.bSplit(strToFill, chDiv)
     ||  !strOrgLine.bToCard4(c4Ret, tCIDLib::ERadices::Dec))
     {

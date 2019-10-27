@@ -626,7 +626,7 @@ tCIDLib::TBoolean TJSONCont::bFindVal(const TString& strToFind) const
         strToFind, kCIDLib::True
     );
 
-    tCIDLib::TBoolean bRet;
+    tCIDLib::TBoolean bRet = kCIDLib::False;;
     if (pjprsnRet->eType() == tCIDNet::EJSONVTypes::False)
         bRet = kCIDLib::False;
     else if (pjprsnRet->eType() == tCIDNet::EJSONVTypes::True)

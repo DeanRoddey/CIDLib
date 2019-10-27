@@ -365,41 +365,54 @@ class TPSTopic
         // We assume the caller has locked, and it really is only called from one place
         tCIDLib::TVoid SendMsg(TObject* const pobjToAdopt)
         {
-            // Make sure it's the right msg type
-            if (!pobjToAdopt->bIsDescendantOf(m_clsMsgType))
+            if (pobjToAdopt)
             {
-                // Clean up the object since we own it
-                delete pobjToAdopt;
+                TJanitor<TObject> janMsg(pobjToAdopt);
+
+                // Make sure it's the right msg type
+                if (!pobjToAdopt->bIsDescendantOf(m_clsMsgType))
+                {
+                    facCIDLib().ThrowErr
+                    (
+                        CID_FILE
+                        , CID_LINE
+                        , kCIDErrs::errcPubSub_MsgCast
+                        , tCIDLib::ESeverities::Failed
+                        , tCIDLib::EErrClasses::TypeMatch
+                        , pobjToAdopt->clsIsA().strClassName()
+                        , m_clsMsgType.strClassName()
+                    );
+                }
+
+                // Optimize for no subscribers
+                const tCIDLib::TCard4 c4Count = m_fcolSubList.c4ElemCount();
+                if (c4Count)
+                {
+                    // Create a msg wrapper, giving it our next available msg id
+                    TPubSubMsg psmsgNew
+                    (
+                        new TPSMsg(janMsg.pobjOrphan(), m_c4NextMsgId++, m_strPath)
+                    );
+
+                    //
+                    //  The object is owned now so if we fail it will get cleaned up, so let's
+                    //  add to each subscriber's queue.
+                    //
+                    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+                        ::SendMsg(m_fcolSubList[c4Index], psmsgNew);
+                }
+            }
+             else
+            {
                 facCIDLib().ThrowErr
                 (
                     CID_FILE
                     , CID_LINE
-                    , kCIDErrs::errcPubSub_MsgCast
+                    , kCIDErrs::errcPubSub_NullMsg
                     , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::TypeMatch
-                    , pobjToAdopt->clsIsA().strClassName()
-                    , m_clsMsgType.strClassName()
+                    , tCIDLib::EErrClasses::BadParms
                 );
             }
-
-            // Optimize for no subscribers
-            const tCIDLib::TCard4 c4Count = m_fcolSubList.c4ElemCount();
-            if (!c4Count)
-            {
-                // We own the object, so clean it up
-                delete pobjToAdopt;
-                return;
-            }
-
-            // Create a msg wrapper, giving it our next available msg id
-            TPubSubMsg psmsgNew(new TPSMsg(pobjToAdopt, m_c4NextMsgId++, m_strPath));
-
-            //
-            //  The object is owned now so if we fail it will get cleaned up, so let's
-            //  add to each subscriber's queue.
-            //
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-                ::SendMsg(m_fcolSubList[c4Index], psmsgNew);
         }
 
 

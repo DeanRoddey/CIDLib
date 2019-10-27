@@ -35,7 +35,7 @@
 //
 TFacCIDMacroDbg& facCIDMacroDbg()
 {
-    static TFacCIDMacroDbg* pfacThis;
+    static TFacCIDMacroDbg* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

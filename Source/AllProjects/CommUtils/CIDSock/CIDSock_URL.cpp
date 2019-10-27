@@ -1919,7 +1919,10 @@ tCIDLib::TVoid TURL::MakeRelativeTo(const TURL& urlRelTo)
                     m_strPath.Cut(0, 3);
                 else
                     m_strPath.Cut(0, 2);
-                *pszRelPart = 0;
+
+                // We know we found a slash since it as least started with one above
+                #pragma warning(suppress : 6011)
+                *pszRelPart = kCIDLib::chNull;
                 pszRelPart = TRawStr::pszFindLastChar(pszRelBase, L'/');
                 if (!pszRelPart)
                 {

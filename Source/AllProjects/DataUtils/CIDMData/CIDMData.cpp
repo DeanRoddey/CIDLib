@@ -37,7 +37,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDMData& facCIDMData()
 {
-    static TFacCIDMData* pfacThis;
+    static TFacCIDMData* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

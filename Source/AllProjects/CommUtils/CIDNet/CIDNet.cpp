@@ -59,7 +59,7 @@ RTTIDecls(TFacCIDNet,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDNet& facCIDNet()
 {
-    static TFacCIDNet* pfacThis;
+    static TFacCIDNet* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

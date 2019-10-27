@@ -35,7 +35,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDOrbUC& facCIDOrbUC()
 {
-    static TFacCIDOrbUC* pfacThis;
+    static TFacCIDOrbUC* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

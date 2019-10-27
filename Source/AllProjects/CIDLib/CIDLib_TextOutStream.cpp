@@ -1014,6 +1014,7 @@ TTextOutStream::WriteChars( const   tCIDLib::TCh* const pszToWrite
 
                 for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Indent; c4Index++)
                 {
+                    #pragma warning(suppress : 6386) // We are flushing and resetting
                     m_achCache[m_c4Index++] = kCIDLib::chSpace;
                     if (m_c4Index == c4CacheBufSize)
                         Flush();
@@ -1024,6 +1025,7 @@ TTextOutStream::WriteChars( const   tCIDLib::TCh* const pszToWrite
             m_bIndentNext = kCIDLib::False;
 
             // And finally put the actual new character out
+            #pragma warning(suppress : 6386) // We are flushing and resetting as required
             m_achCache[m_c4Index++] = chCur;
         }
 
@@ -1070,33 +1072,42 @@ TTextOutStream::TTextOutStream(TTextConverter* const ptcvtToAdopt) :
 tCIDLib::TVoid
 TTextOutStream::AdoptStream(TBinOutStream* const pstrmToAdopt)
 {
-    if (m_pstrmOut)
+    CIDPreCond(pstrmToAdopt != nullptr);
+    if (pstrmToAdopt)
     {
-        // Clean up passed stream since we are responsible for it
-        delete pstrmToAdopt;
+        if (m_pstrmOut)
+        {
+            // Clean up passed stream since we are responsible for it
+            delete pstrmToAdopt;
 
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcTStrm_StrmAlreadySet
-            , tCIDLib::ESeverities::Failed
-             , tCIDLib::EErrClasses::AppError
-            , clsIsA()
-        );
+            facCIDLib().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kCIDErrs::errcTStrm_StrmAlreadySet
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::AppError
+                , clsIsA()
+            );
+        }
+         else
+        {
+            m_pstrmOut = pstrmToAdopt;
+        }
     }
-    m_pstrmOut = pstrmToAdopt;
 }
 
 
 TBinOutStream& TTextOutStream::strmOut()
 {
+    CIDAssert(m_pstrmOut != nullptr, L"The underlying binary stream isn't set");
     return *m_pstrmOut;
 }
 
 
 const TBinOutStream& TTextOutStream::strmOut() const
 {
+    CIDAssert(m_pstrmOut != nullptr, L"The underlying binary stream isn't set");
     return *m_pstrmOut;
 }
 

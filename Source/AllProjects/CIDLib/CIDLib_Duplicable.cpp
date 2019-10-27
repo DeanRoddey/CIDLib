@@ -67,8 +67,7 @@ MDuplicable::TestCanDupTo(  const   MDuplicable* const  pmdupToCast
             , clsToCastTo
         );
     }
-
-    if (!pmdupToCast->bIsDescendantOf(clsToCastTo))
+     else if (!pmdupToCast->bIsDescendantOf(clsToCastTo))
     {
         facCIDLib().ThrowErr
         (

@@ -42,7 +42,7 @@
 //
 TFacCIDWUtils& facCIDWUtils()
 {
-    static TFacCIDWUtils* pfacThis;
+    static TFacCIDWUtils* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

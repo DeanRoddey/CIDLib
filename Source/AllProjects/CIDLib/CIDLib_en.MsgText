@@ -165,8 +165,10 @@ ERRORS=
     errcDSrc_AlreadyInit        1028    The data source is already initialized
     errcDSrc_JanDataNotSet      1029    The data source janitor has a null pointer
 
-    ; Debug mode errors
+    ; Asserts and pre/post conditions
     errcDbg_AssertFailed        1050    An assertion failed
+    errcDbg_PreCondFailed       1051    A pre-condition failed
+    errcDbg_PostCondFailed      1052    A post-condition failed
 
     ; Directory change monitoring errors
     errcDirCh_Start             1160    Could not start directory monitoring. Path=%(1)
@@ -419,6 +421,7 @@ ERRORS=
     errcPubSub_NotReady         2907    The pub/sub %(1) has not been filled in yet
     errcPubSub_NoEvent          2909    There is no event associated with subscription
     errcPubSub_SubQFull         2910    The subscription queue was full, msg dropped
+    errcPubSub_NullMsg          2911    The message object to publish cannot be null
 
     ; TRange errors
     errcRange_BadMinMax         2816    The max (%(1)) cannot be less than the min (%(2))

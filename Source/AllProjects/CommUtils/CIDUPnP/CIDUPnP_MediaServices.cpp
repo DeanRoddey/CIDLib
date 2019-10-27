@@ -939,6 +939,7 @@ TUPnPAVTransService::bParseTimeVal( const   TString&                strTmVal
             ThrowBadOutActParms(strCmdName, CID_LINE);
         }
 
+        // #pragma warning(suppress : 6001) // These values were set above
         enctToSet = (c4Hours * kCIDLib::enctOneHour)
                     + (c4Mins * kCIDLib::enctOneMinute)
                     + (c4Secs * kCIDLib::enctOneSecond);

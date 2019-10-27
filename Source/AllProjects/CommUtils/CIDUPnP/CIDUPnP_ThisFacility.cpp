@@ -139,22 +139,24 @@ tCIDLib::TVoid TUPnPDevice::GetRootDevice(TUPnPDevice& upnpdToSet)
             , tCIDLib::EErrClasses::CantDo
         );
     }
-
-    //
-    //  It all worked so set up the device object.
-    //
-    //  We pass a zero for the sequence id. The async finder uses it, but
-    //  we don't set it here.
-    //
-    upnpdToSet.SetKrnlObj
-    (
-        pkupnpdRoot
-        , kstrUID.pszValue()
-        , kstrName.pszValue()
-        , kstrModel.pszValue()
-        , kstrType.pszValue()
-        , 0
-    );
+     else
+    {
+        //
+        //  It all worked so set up the device object.
+        //
+        //  We pass a zero for the sequence id. The async finder uses it, but
+        //  we don't set it here.
+        //
+        upnpdToSet.SetKrnlObj
+        (
+            pkupnpdRoot
+            , kstrUID.pszValue()
+            , kstrName.pszValue()
+            , kstrModel.pszValue()
+            , kstrType.pszValue()
+            , 0
+        );
+    }
 }
 
 

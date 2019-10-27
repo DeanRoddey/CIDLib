@@ -43,7 +43,7 @@ RTTIDecls(TFacCIDOrb,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDOrb& facCIDOrb()
 {
-    static TFacCIDOrb* pfacThis;
+    static TFacCIDOrb* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

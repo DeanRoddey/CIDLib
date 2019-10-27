@@ -46,7 +46,7 @@
 // Fault in our facility object
 TFacCIDSpReco& facCIDSpReco()
 {
-    static TFacCIDSpReco* pfacThis;
+    static TFacCIDSpReco* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

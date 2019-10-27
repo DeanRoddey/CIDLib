@@ -36,7 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacTestFWLib& facTestFWLib()
 {
-    static TFacTestFWLib* pfacThis;
+    static TFacTestFWLib* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

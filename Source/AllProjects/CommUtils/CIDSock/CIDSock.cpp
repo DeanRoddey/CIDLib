@@ -52,7 +52,7 @@ template class CIDSOCKEXP TVector<TIPAddress>;
 // ---------------------------------------------------------------------------
 TFacCIDSock& facCIDSock()
 {
-    static TFacCIDSock* pfacThis;
+    static TFacCIDSock* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

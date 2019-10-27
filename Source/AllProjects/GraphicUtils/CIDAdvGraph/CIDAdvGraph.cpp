@@ -44,7 +44,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDAdvGraph& facCIDAdvGraph()
 {
-    static TFacCIDAdvGraph* pfacThis;
+    static TFacCIDAdvGraph* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

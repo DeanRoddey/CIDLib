@@ -36,7 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDRTP& facCIDRTP()
 {
-    static TFacCIDRTP* pfacThis;
+    static TFacCIDRTP* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

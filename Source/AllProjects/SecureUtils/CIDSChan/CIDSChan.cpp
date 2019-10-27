@@ -37,7 +37,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDSChan& facCIDSChan()
 {
-    static TFacCIDSChan* pfacThis;
+    static TFacCIDSChan* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

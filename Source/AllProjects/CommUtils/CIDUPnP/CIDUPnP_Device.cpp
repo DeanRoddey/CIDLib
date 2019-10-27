@@ -415,9 +415,8 @@ TUPnPDevice::SetServiceFromID(  const   TString&                strSvcID
     CheckDevSet(CID_LINE);
 
     // See if we can look up the service
-    TKrnlUPnPService* pkupnpsNew;
-    if (!m_pkupnpdThis->bQueryServiceByID(strSvcID.pszBuffer(), pkupnpsNew)
-    ||  !pkupnpsNew)
+    TKrnlUPnPService* pkupnpsNew = nullptr;
+    if (!m_pkupnpdThis->bQueryServiceByID(strSvcID.pszBuffer(), pkupnpsNew) || !pkupnpsNew)
     {
         facCIDUPnP().ThrowKrnlErr
         (
@@ -431,48 +430,50 @@ TUPnPDevice::SetServiceFromID(  const   TString&                strSvcID
             , m_strName
         );
     }
-
-    // Get the service type ID of the service we found
-    TKrnlString kstrTypeID;
-    if (!pkupnpsNew->bQueryServiceType(kstrTypeID))
+     else
     {
-        // Can't get it, so release the object and throw
-        delete pkupnpsNew;
-        facCIDUPnP().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kUPnPErrs::errcSvc_GetAttr
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
-            , TString(L"type id")
-            , strSvcID
-        );
-    }
+        // Get the service type ID of the service we found
+        TKrnlString kstrTypeID;
+        if (!pkupnpsNew->bQueryServiceType(kstrTypeID))
+        {
+            // Can't get it, so release the object and throw
+            delete pkupnpsNew;
+            facCIDUPnP().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kUPnPErrs::errcSvc_GetAttr
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::CantDo
+                , TString(L"type id")
+                , strSvcID
+            );
+        }
 
-    // Make sure it's the right type for the derived class
-    TString strTypeID(kstrTypeID.pszValue());
-    if (!upnpsToSet.bCheckServiceType(strTypeID))
-    {
-        // It cannot, so release the object and throw
-        delete pkupnpsNew;
-        facCIDUPnP().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kUPnPErrs::errcDbg_WrongType
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::NotReady
-            , strTypeID
-            , clsIsA()
-        );
-    }
+        // Make sure it's the right type for the derived class
+        TString strTypeID(kstrTypeID.pszValue());
+        if (!upnpsToSet.bCheckServiceType(strTypeID))
+        {
+            // It cannot, so release the object and throw
+            delete pkupnpsNew;
+            facCIDUPnP().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kUPnPErrs::errcDbg_WrongType
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::NotReady
+                , strTypeID
+                , clsIsA()
+            );
+        }
 
-    //
-    //  Put it on the passed service object. The ref count was set appropriately
-    //  by the query method above.
-    //
-    upnpsToSet.SetKrnlObj(pkupnpsNew, strTypeID, pupnpscbHandler);
+        //
+        //  Put it on the passed service object. The ref count was set appropriately
+        //  by the query method above.
+        //
+        upnpsToSet.SetKrnlObj(pkupnpsNew, strTypeID, pupnpscbHandler);
+    }
 }
 
 

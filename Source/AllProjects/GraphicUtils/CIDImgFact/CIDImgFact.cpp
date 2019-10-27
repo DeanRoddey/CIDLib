@@ -36,7 +36,7 @@
 //
 TFacCIDImgFact& facCIDImgFact()
 {
-    static TFacCIDImgFact* pfacThis;
+    static TFacCIDImgFact* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

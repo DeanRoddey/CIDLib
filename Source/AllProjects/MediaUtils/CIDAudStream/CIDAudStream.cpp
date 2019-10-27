@@ -35,7 +35,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDAudStream& facCIDAudStream()
 {
-    static TFacCIDAudStream* pfacThis;
+    static TFacCIDAudStream* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

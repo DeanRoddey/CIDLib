@@ -38,7 +38,7 @@
 // Fault in our facility object
 TFacCIDAI& facCIDAI()
 {
-    static TFacCIDAI* pfacCIDAI;
+    static TFacCIDAI* pfacCIDAI = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

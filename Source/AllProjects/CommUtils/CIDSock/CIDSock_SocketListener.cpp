@@ -165,8 +165,8 @@ TSocketListener::psockListenFor(const   tCIDLib::TEncodedTime   enctWait
     //  Do a multi select on all of the sockets in our list to see if any
     //  of them have been signaled.
     //
-    tCIDSock::EMSelFlags aeFlags[kCIDSock::c4MaxSelect];
-    tCIDLib::TCard4 c4Count;
+    tCIDSock::EMSelFlags aeFlags[kCIDSock::c4MaxSelect] = {tCIDSock::EMSelFlags::None};
+    tCIDLib::TCard4 c4Count = 0;
 
     // Wait for up to half a second at a time
     tCIDLib::TEncodedTime   enctCur = TKrnlTimeStamp::enctNow();
@@ -325,7 +325,7 @@ tCIDLib::TVoid TSocketListener::Initialize(const tCIDSock::ESockProtos eProtocol
         );
     }
 
-    CIDAssert(m_c4Count <= 2, L"Got more than 2 listening interfaces");
+    CIDAssert(c4TryCnt <= 2, L"Got more than 2 listening interfaces");
 
     // Loop through the ones we got and try to set them up
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4TryCnt; c4Index++)
@@ -350,6 +350,7 @@ tCIDLib::TVoid TSocketListener::Initialize(const tCIDSock::ESockProtos eProtocol
         // If it worked, keep it, else destroy it
         if (bRes)
         {
+            #pragma warning(suppress : 6386) // We make sure above that we won't overflow
             m_apksockList[m_c4Count++] = pksockCur;
 
             //

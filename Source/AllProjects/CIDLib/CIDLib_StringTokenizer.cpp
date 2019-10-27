@@ -737,19 +737,21 @@ tCIDLib::TVoid TStringTokenizer::Reset()
             , tCIDLib::EErrClasses::AppError
         );
     }
+     else
+    {
+        // Reset our two counters
+        m_c4CurOffset = 0;
+        m_c4CurToken = 0;
 
-    // Reset our two counters
-    m_c4CurOffset = 0;
-    m_c4CurToken = 0;
+        // Reset the length of the string
+        m_c4SourceLen = m_pstrSrc->c4Length();
 
-    // Reset the length of the string
-    m_c4SourceLen = m_pstrSrc->c4Length();
-
-    //
-    //  And find the next token. This will get the internal state ready
-    //  return the first token available.
-    //
-    FindNext();
+        //
+        //  And find the next token. This will get the internal state ready
+        //  return the first token available.
+        //
+        FindNext();
+    }
 }
 
 

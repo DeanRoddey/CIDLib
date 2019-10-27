@@ -37,7 +37,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDAppSh& facCIDAppSh()
 {
-    static TFacCIDAppSh* pfacThis;
+    static TFacCIDAppSh* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

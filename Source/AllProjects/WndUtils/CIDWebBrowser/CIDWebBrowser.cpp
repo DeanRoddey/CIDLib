@@ -36,7 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDWebBrowser& facCIDWebBrowser()
 {
-    static TFacCIDWebBrowser* pfacThis;
+    static TFacCIDWebBrowser* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

@@ -35,7 +35,7 @@
 //
 TFacCIDZLib& facCIDZLib()
 {
-    static TFacCIDZLib* pfacThis;
+    static TFacCIDZLib* pfacThis = nullptr;
     static TAtomicFlag atomInit;
     if (!atomInit)
     {

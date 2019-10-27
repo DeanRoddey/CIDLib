@@ -109,8 +109,6 @@ TFacCIDOrb::TFacCIDOrb() :
         , kCIDLib::c4Revision
         , tCIDLib::EModFlags::HasMsgFile
     )
-    , m_bClientInit(kCIDLib::False)
-    , m_bServerInit(kCIDLib::False)
     , m_c4CmdOverhead(0)
     , m_c4ReplyOverhead(0)
     , m_c4TimeoutAdjust(0)
@@ -327,7 +325,7 @@ tCIDLib::TVoid TFacCIDOrb::ClearOnlyAcceptFrom()
 tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
 {
     #if CID_DEBUG_ON
-    if (!m_bServerInit)
+    if (!m_atomServerInit)
     {
         facCIDOrb().ThrowErr
         (
@@ -767,7 +765,7 @@ tCIDLib::TVoid TFacCIDOrb::FlushOIDCache()
 tCIDLib::TIPPortNum TFacCIDOrb::ippnORB() const
 {
     #if CID_DEBUG_ON
-    if (!m_bServerInit)
+    if (!m_atomServerInit)
     {
         facCIDOrb().ThrowErr
         (
@@ -795,10 +793,10 @@ tCIDLib::TIPPortNum TFacCIDOrb::ippnORB() const
 tCIDLib::TVoid TFacCIDOrb::InitClient()
 {
     // If we aren't already initialized, then do it
-    if (!m_bClientInit)
+    if (!m_atomClientInit)
     {
         TBaseLock lockInit;
-        if (!m_bClientInit)
+        if (!m_atomClientInit)
         {
             //  Reset some client side stuff
             m_c8LastNSCookie = 0;
@@ -820,7 +818,7 @@ tCIDLib::TVoid TFacCIDOrb::InitClient()
             }
 
             // Indicate that client support is initialized (do this last!)
-            m_bClientInit = kCIDLib::True;
+            m_atomClientInit.Set();
         }
     }
 }
@@ -840,10 +838,10 @@ TFacCIDOrb::InitServer( const   tCIDLib::TIPPortNum ippnListen
                         , const tCIDLib::TCard4     c4MaxClients)
 {
     // If we aren't initialized, then do it
-    if (!m_bServerInit)
+    if (!m_atomServerInit)
     {
         TBaseLock lockInit;
-        if (!m_bServerInit)
+        if (!m_atomServerInit)
         {
             // Initialize some server side stuff
             TStatsCache::SetValue(m_sciRegisteredObjs, 0);
@@ -861,7 +859,7 @@ TFacCIDOrb::InitServer( const   tCIDLib::TIPPortNum ippnListen
                 m_poccmSrv = new TOrbClientConnMgr(ippnListen, c4MaxClients);
 
             // Indicate that server support is initialized (do this last!)
-            m_bServerInit = kCIDLib::True;
+            m_atomServerInit.Set();
 
             // If verbose logging, then log a server initialized message
             if (bLogInfo())
@@ -974,7 +972,7 @@ TFacCIDOrb::RegisterObject(         TOrbServerBase* const   porbsToReg
                             , const tCIDLib::EAdoptOpts     eAdopt)
 {
     #if CID_DEBUG_ON
-    if (!m_bServerInit)
+    if (!m_atomServerInit)
     {
         facCIDOrb().ThrowErr
         (
@@ -1157,7 +1155,7 @@ TFacCIDOrb::SendMsg(        TStreamSocket&          sockTar
 tCIDLib::TVoid TFacCIDOrb::SetEncrypter(TBlockEncrypter* const pcrypToAdopt)
 {
     // This can only be done before the ORB is started up
-    if (m_bServerInit || m_bClientInit)
+    if (m_atomServerInit || m_atomClientInit)
     {
         // Clean up the encrypter first, since we own it
         delete pcrypToAdopt;
@@ -1262,10 +1260,10 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
         );
     }
 
-    if (m_bClientInit)
+    if (m_atomClientInit)
     {
         // Clear the flag first
-        m_bClientInit = kCIDLib::False;
+        m_atomClientInit.SetValue(kCIDLib::False);
 
         TOrbClientBase::TerminateOrbClient();
 
@@ -1286,10 +1284,10 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
         }
     }
 
-    if (m_bServerInit)
+    if (m_atomServerInit)
     {
         // Clear the flag first
-        m_bServerInit = kCIDLib::False;
+        m_atomServerInit.SetValue(kCIDLib::False);
 
         //
         //  Tell the client connection manager to stop accepting client
