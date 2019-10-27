@@ -37,53 +37,51 @@
 //  Global variables
 // ---------------------------------------------------------------------------
 
-//
-// These are used to pick off argc and argv as they go by. That way I don't have
-// to try to reproduce the array provided by the startup code. The proc file
-// system only provides the full command line, and using these global variables
-// saves me a lot of possible errors involving parsing inconsistencies between
-// me and Linux.
-//
-int CIDKernel_SystemInfo_Linux_argc = -1;
-char** CIDKernel_SystemInfo_Linux_argv = 0;
-
-namespace
+namespace CIDKernel_SystemInfo_Linux
 {
+    //
+    // These are used to pick off argc and argv as they go by. That way I don't have
+    // to try to reproduce the array provided by the startup code. The proc file
+    // system only provides the full command line, and using these global variables
+    // saves me a lot of possible errors involving parsing inconsistencies between
+    // me and Linux.
+    //
+    int argc = -1;
+    char** argv = 0;
+
+
     // ---------------------------------------------------------------------------
     //  Local types
     //
     //  This structure is used to hold the system info data that we cache during
     //  init and keep around.
     //
-    //  __apszArgList
+    //  apszArgList
     //      This is storage for the command line parameters.
     //
-    //  __c4ArgCnt
+    //  c4ArgCnt
     //      This is the number of command line arguments that show to to the
     //      outside world (we strip out the standard ones.)
     //
-    //  __c4CPUCount
+    //  c4CPUCount
     //      The number of CPUs in the system, from the OS's perspective. If the
     //      hardware allows some to be taken off line, then I would assume you
     //      would only see the active ones here.
     //
-    //  __c4OSBuildNum
-    //  __c4OSMajVersion
-    //  __c4OSMinVersion
+    //  c4OSBuildNum
+    //  c4OSMajVersion
+    //  c4OSMinVersion
     //      These are all about the version of the OS that we find ourselves
     //      running on.
     //
-    //  __c4TotalPhysicalMem
+    //  c8TotalPhysicalMem
     //      The amount of memory installed in the machine.
     //
-    //  __eCPUType
-    //      The type of CPUs in this machine.
-    //
-    //  __szNodeName
+    //  szNodeName
     //      The name assigned to this machine in the system setup. This size
     //      should be grotesquely overkill for any node name.
     //
-    //  __szProcessName
+    //  szProcessName
     //      The name of the process that this DLL is running in the context of.
     // ---------------------------------------------------------------------------
     struct TCachedInfo
@@ -95,8 +93,7 @@ namespace
         tCIDLib::TCard4         c4OSMajVersion;
         tCIDLib::TCard4         c4OSMinVersion;
         tCIDLib::TCard4         c4OSRev;
-        tCIDLib::TCard4         c4TotalPhysicalMem;
-        tCIDLib::ECPUTypes      eCPUType;
+        tCIDLib::TCard8         c8TotalPhysicalMem;
         tCIDLib::TZStr64        szNodeName;
         tCIDLib::TZStr128       szProcessName;
     };
@@ -105,16 +102,16 @@ namespace
     // ---------------------------------------------------------------------------
     //  Local data
     //
-    //  __CachedInfo
+    //  CIDKernel_SystemInfo_Linux::CachedInfo
     //      The cached system info that we cache up init and hang onto.
     // ---------------------------------------------------------------------------
-    TCachedInfo      __CachedInfo;
+    TCachedInfo      CachedInfo;
 
 
     // ---------------------------------------------------------------------------
     //  Intra-facility methods
     // ---------------------------------------------------------------------------
-    tCIDLib::TBoolean __bQueryVersionInfo(const struct utsname& UtsName)
+    tCIDLib::TBoolean bQueryVersionInfo(const struct utsname& UtsName)
     {
         tCIDLib::TSCh* pszBegin = const_cast<tCIDLib::TSCh*>(UtsName.release);
         tCIDLib::TSCh* pszEnd;
@@ -124,7 +121,7 @@ namespace
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
             return kCIDLib::False;
         }
-        __CachedInfo.c4OSMajVersion = c4Tmp;
+        CachedInfo.c4OSMajVersion = c4Tmp;
 
         pszBegin = ++pszEnd;
         c4Tmp = ::strtoul(pszBegin, &pszEnd, 10);
@@ -133,7 +130,7 @@ namespace
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
             return kCIDLib::False;
         }
-        __CachedInfo.c4OSMinVersion = c4Tmp;
+        CachedInfo.c4OSMinVersion = c4Tmp;
 
         pszBegin = ++pszEnd;
         c4Tmp = ::strtoul(pszBegin, &pszEnd, 10);
@@ -142,7 +139,7 @@ namespace
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
             return kCIDLib::False;
         }
-        __CachedInfo.c4OSRev = c4Tmp;
+        CachedInfo.c4OSRev = c4Tmp;
 
         tCIDLib::TSCh szVerCopy[SYS_NMLN];
         ::strcpy(szVerCopy, &UtsName.version[1]);
@@ -153,31 +150,13 @@ namespace
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
             return kCIDLib::False;
         }
-        __CachedInfo.c4OSBuildNum = c4Tmp;
+        CachedInfo.c4OSBuildNum = c4Tmp;
 
         return kCIDLib::True;
     }
 
-    tCIDLib::TBoolean __bQueryCPUInfo(const struct utsname& UtsName)
+    tCIDLib::TBoolean bQueryCPUInfo(const struct utsname& UtsName)
     {
-        if (!::strcmp(UtsName.machine, "i386"))
-        {
-            __CachedInfo.eCPUType = tCIDLib::ECPUTypes::386DX;
-        }
-        else if (!::strcmp(UtsName.machine, "i486"))
-        {
-            __CachedInfo.eCPUType = tCIDLib::ECPUTypes::486DX;
-        }
-        else if (!::strcmp(UtsName.machine, "i586")
-             ||  !::strcmp(UtsName.machine, "i686"))
-        {
-            __CachedInfo.eCPUType = tCIDLib::ECPUTypes::Pentium;
-        }
-        else
-        {
-            __CachedInfo.eCPUType = tCIDLib::ECPUTypes::Unknown;
-        }
-
         FILE* CPUFile = ::fopen("/proc/cpuinfo", "r");
         if (!CPUFile)
         {
@@ -199,12 +178,12 @@ namespace
 
         ::fclose(CPUFile);
 
-        __CachedInfo.c4CPUCount = c4ProcessorCount;
+        CachedInfo.c4CPUCount = c4ProcessorCount;
 
         return kCIDLib::True;
     }
 
-    tCIDLib::TBoolean __bQueryProcMemInfo()
+    tCIDLib::TBoolean bQueryProcMemInfo()
     {
         FILE* MemFile = ::fopen("/proc/meminfo", "r");
         if (!MemFile)
@@ -232,12 +211,13 @@ namespace
             return kCIDLib::False;
         }
 
-        __CachedInfo.c4TotalPhysicalMem = c4Tmp;
+        CachedInfo.c8TotalPhysicalMem = c4Tmp;
+        CachedInfo.c8TotalPhysicalMem *= 1024;
 
         return kCIDLib::True;
     }
 
-    tCIDLib::TBoolean __bQueryNameFromPID(pid_t pid)
+    tCIDLib::TBoolean bQueryNameFromPID(pid_t pid)
     {
         tCIDLib::TSCh szProcPid[128];
         ::sprintf(szProcPid, "/proc/%i/stat", pid);
@@ -270,36 +250,36 @@ namespace
         szParenName[c4Len - 1] = '\000';
 
         TRawStr::pszConvert(&szParenName[1]
-                            , __CachedInfo.szProcessName
-                            , c4MaxBufChars(__CachedInfo.szProcessName));
+                            , CachedInfo.szProcessName
+                            , c4MaxBufChars(CachedInfo.szProcessName));
 
         return kCIDLib::True;
     }
 
-    tCIDLib::TVoid __InitArgArray()
+    tCIDLib::TVoid InitArgArray()
     {
-        __CachedInfo.c4ArgCnt = CIDKernel_SystemInfo_Linux_argc;
-        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < __CachedInfo.c4ArgCnt; c4Idx++)
+        CachedInfo.c4ArgCnt = CIDKernel_SystemInfo_Linux::argc;
+        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < CachedInfo.c4ArgCnt; c4Idx++)
         {
-            __CachedInfo.apszArgList[c4Idx] =
-                TRawStr::pszConvert(CIDKernel_SystemInfo_Linux_argv[c4Idx]);
+            CachedInfo.apszArgList[c4Idx] =
+                TRawStr::pszConvert(CIDKernel_SystemInfo_Linux::argv[c4Idx]);
         }
-        CIDKernel_SystemInfo_Linux_argc = -1;
+        CIDKernel_SystemInfo_Linux::argc = -1;
     }
 }
 
 
 tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermSysInfo(const tCIDLib::EInitTerm eInitTerm)
+TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eInitTerm)
 {
     // We only have pre-constructor init
     if (eInitTerm == tCIDLib::EInitTerm::Initialize)
     {
-        if (!__bQueryProcMemInfo())
+        if (!CIDKernel_SystemInfo_Linux::bQueryProcMemInfo())
             return kCIDLib::False;
 
         tCIDLib::TProcessId pidThis = ::getpid();
-        if (!__bQueryNameFromPID(pidThis))
+        if (!CIDKernel_SystemInfo_Linux::bQueryNameFromPID(pidThis))
             return kCIDLib::False;
 
         if (::getpagesize() != kCIDLib::c4MemPageSize)
@@ -316,13 +296,13 @@ TCIDKrnlModule::__bInitTermSysInfo(const tCIDLib::EInitTerm eInitTerm)
             return kCIDLib::False;
         }
         TRawStr::pszConvert(UtsName.nodename
-                            , __CachedInfo.szNodeName
-                            , c4MaxBufChars(__CachedInfo.szNodeName));
+                            , CIDKernel_SystemInfo_Linux::CachedInfo.szNodeName
+                            , c4MaxBufChars(CIDKernel_SystemInfo_Linux::CachedInfo.szNodeName));
 
-        if (!__bQueryVersionInfo(UtsName))
+        if (!CIDKernel_SystemInfo_Linux::bQueryVersionInfo(UtsName))
             return kCIDLib::False;
 
-        if (!__bQueryCPUInfo(UtsName))
+        if (!CIDKernel_SystemInfo_Linux::bQueryCPUInfo(UtsName))
             return kCIDLib::False;
     }
 
@@ -338,27 +318,18 @@ tCIDLib::TBoolean
 TKrnlSysInfo::bCmdLineArg(  const   tCIDLib::TCard4 c4Index
                             , const tCIDLib::TCh*&  pszToFill)
 {
-    if (CIDKernel_SystemInfo_Linux_argc != -1)
-        __InitArgArray();
+    if (CIDKernel_SystemInfo_Linux::argc != -1)
+        CIDKernel_SystemInfo_Linux::InitArgArray();
 
-    if (c4Index >= __CachedInfo.c4ArgCnt)
+    if (c4Index >= CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_IndexError);
         return kCIDLib::False;
     }
-    pszToFill = __CachedInfo.apszArgList[c4Index];
+    pszToFill = CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4Index];
     return kCIDLib::True;
 }
 
-
-tCIDLib::TBoolean
-TKrnlSysInfo::bLoadOSMsg(const  tCIDLib::TOSErrCode  errcId
-                         ,       tCIDLib::TCh* const pszBuffer
-                         , const tCIDLib::TCard4     c4MaxChars)
-{
-    TRawStr::pszConvert(::strerror(errcId), pszBuffer, c4MaxChars);
-    return kCIDLib::True;
-}
 
 
 tCIDLib::TBoolean
@@ -388,77 +359,71 @@ TKrnlSysInfo::bQueryUserName(       tCIDLib::TCh* const pszBuffer
 tCIDLib::TBoolean
 TKrnlSysInfo::bRemoveCmdLineArg(const tCIDLib::TCard4 c4Index)
 {
-    if (CIDKernel_SystemInfo_Linux_argc != -1)
-        __InitArgArray();
+    if (CIDKernel_SystemInfo_Linux::argc != -1)
+        CIDKernel_SystemInfo_Linux::InitArgArray();
 
-    if (!c4Index || (c4Index >= __CachedInfo.c4ArgCnt))
+    if (!c4Index || (c4Index >= CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_IndexError);
         return kCIDLib::False;
     }
 
     // Delete the string in this element
-    delete [] __CachedInfo.apszArgList[c4Index];
+    delete [] CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4Index];
 
     // If this is the only element, then we are done
-    if (__CachedInfo.c4ArgCnt == 1)
+    if (CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt == 1)
     {
-        __CachedInfo.c4ArgCnt = 0;
+        CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt = 0;
         return kCIDLib::True;
     }
 
     // If this is the last element, we are done
-    if (c4Index == __CachedInfo.c4ArgCnt-1)
+    if (c4Index == CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt-1)
     {
-        __CachedInfo.c4ArgCnt--;
+        CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt--;
         return kCIDLib::True;
     }
 
     // Move the elements down
-    for (tCIDLib::TCard4 c4MoveIndex = c4Index; c4MoveIndex < __CachedInfo.c4ArgCnt-1; c4MoveIndex++)
-        __CachedInfo.apszArgList[c4MoveIndex] = __CachedInfo.apszArgList[c4MoveIndex+1];
+    for (tCIDLib::TCard4 c4MoveIndex = c4Index; c4MoveIndex < CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt-1; c4MoveIndex++)
+        CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4MoveIndex] = CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4MoveIndex+1];
 
-    __CachedInfo.c4ArgCnt--;
+    CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt--;
     return kCIDLib::True;
 }
 
 
 tCIDLib::TCard4 TKrnlSysInfo::c4CPUCount()
 {
-    return __CachedInfo.c4CPUCount;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.c4CPUCount;
 }
 
 
 tCIDLib::TCard4 TKrnlSysInfo::c4CmdLineArgCount()
 {
-    if (CIDKernel_SystemInfo_Linux_argc != -1)
-        __InitArgArray();
+    if (CIDKernel_SystemInfo_Linux::argc != -1)
+        CIDKernel_SystemInfo_Linux::InitArgArray();
 
-    return __CachedInfo.c4ArgCnt;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt;
 }
 
 
-tCIDLib::TCard4 TKrnlSysInfo::c4TotalPhysicalMem()
+tCIDLib::TCard8 TKrnlSysInfo::c8TotalPhysicalMem()
 {
-    return __CachedInfo.c4TotalPhysicalMem;
-}
-
-
-tCIDLib::ECPUTypes TKrnlSysInfo::eCPUType()
-{
-    return __CachedInfo.eCPUType;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.c8TotalPhysicalMem;
 }
 
 
 const tCIDLib::TCh* TKrnlSysInfo::pszNodeName()
 {
-    return __CachedInfo.szNodeName;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.szNodeName;
 }
 
 
 const tCIDLib::TCh* TKrnlSysInfo::pszProcessName()
 {
-    return __CachedInfo.szProcessName;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.szProcessName;
 }
 
 
@@ -468,8 +433,8 @@ TKrnlSysInfo::QueryOSInfo(  tCIDLib::TCard4&    c4OSMajVersion
                             , tCIDLib::TCard4&  c4OSRev
                             , tCIDLib::TCard4&  c4OSBuildNum)
 {
-    c4OSBuildNum    = __CachedInfo.c4OSBuildNum;
-    c4OSMajVersion  = __CachedInfo.c4OSMajVersion;
-    c4OSMinVersion  = __CachedInfo.c4OSMinVersion;
-    c4OSRev         = __CachedInfo.c4OSRev;
+    c4OSBuildNum    = CIDKernel_SystemInfo_Linux::CachedInfo.c4OSBuildNum;
+    c4OSMajVersion  = CIDKernel_SystemInfo_Linux::CachedInfo.c4OSMajVersion;
+    c4OSMinVersion  = CIDKernel_SystemInfo_Linux::CachedInfo.c4OSMinVersion;
+    c4OSRev         = CIDKernel_SystemInfo_Linux::CachedInfo.c4OSRev;
 }

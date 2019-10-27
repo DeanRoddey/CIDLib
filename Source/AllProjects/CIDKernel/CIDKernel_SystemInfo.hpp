@@ -90,8 +90,6 @@ namespace TKrnlSysInfo
 
     KRNLEXPORT tCIDLib::TCard8 c8TotalPhysicalMem();
 
-    KRNLEXPORT tCIDLib::ECPUTypes eCPUType();
-
     KRNLEXPORT const tCIDLib::TCh* pszNodeName();
 
     KRNLEXPORT const tCIDLib::TCh* pszProcessName();

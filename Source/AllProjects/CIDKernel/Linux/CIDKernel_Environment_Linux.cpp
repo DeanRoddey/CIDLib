@@ -102,3 +102,78 @@ TCIDKrnlModule::bInitTermEnvironment(const tCIDLib::EInitTerm eInitTerm)
     }
     return kCIDLib::True;
 }
+
+
+// ---------------------------------------------------------------------------
+//  TCIDKrnlModule: Public, static methods
+// ---------------------------------------------------------------------------
+tCIDLib::TBoolean
+TKrnlEnvironment::bAddToExePath(const   tCIDLib::TCh* const pszToAdd
+                                , const tCIDLib::EStartEnd  eWhere)
+{
+    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlEnvironment::bAddToLibPath(const   tCIDLib::TCh* const pszToAdd
+                                , const tCIDLib::EStartEnd  eWhere)
+{
+    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;    
+}
+
+
+tCIDLib::TBoolean
+TKrnlEnvironment::bFindExePath(         tCIDLib::TCh* const pszToFill
+                                , const tCIDLib::TCard4     c4MaxChars)
+{
+    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlEnvironment::bFindLibPath(         tCIDLib::TCh* const pszToFill
+                                , const tCIDLib::TCard4     c4MaxChars)
+{
+    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlEnvironment::bFindTempPath(        tCIDLib::TCh* const pszToFill
+                                , const tCIDLib::TCard4     c4MaxChars)
+{
+    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TKrnlEnvironment: Private, static methods
+// ---------------------------------------------------------------------------
+tCIDLib::TBoolean
+TKrnlEnvironment::bSetSysVar(const  tCIDLib::TCh* const pszKey
+                            , const tCIDLib::TCh* const pszNewValue)
+{
+    // Build up the string
+    const tCIDLib::TCard4 c4BufLen(TRawStr::c4StrLen(pszKey) + TRawStr::c4StrLen(pszNewValue));
+    tCIDLib::TCh* apszBuf = nullptr;
+    apszBuf = new tCIDLib::TCh[c4BufLen + 1];
+    TArrayJanitor<tCIDLib::TCh> janBuf(apszBuf);
+    TRawStr::CopyCatStr(apszBuf, c4BufLen, pszKey, L"=", pszNewValue);
+
+    tCIDLib::TSCh* pszShortBuf = TRawStr::pszConvert(apszBuf);
+    TArrayJanitor<tCIDLib::TSCh> janShortBuf(pszShortBuf);
+
+    if (::putenv(pszShortBuf))
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
+

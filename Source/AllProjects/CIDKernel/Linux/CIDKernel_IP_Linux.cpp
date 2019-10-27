@@ -344,12 +344,6 @@ tCIDLib::TCard4 TKrnlIP::c4XlatError(const tCIDLib::TSInt iToXlat)
 }
 
 
-// <TBD> This needs to be implemented
-tCIDSock::EAddrTypes TKrnlIP::eDefAddrType()
-{
-    return tCIDSock::EAddrTypes::Count;
-}
-
 
 tCIDSock::EAddrCvtRes
 TKrnlIP::eIPAFromText(  const   tCIDLib::TCh* const     pszIPAddrString

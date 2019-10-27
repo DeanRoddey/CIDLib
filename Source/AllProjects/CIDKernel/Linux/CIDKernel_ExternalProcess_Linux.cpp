@@ -727,68 +727,9 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
                         , const tCIDLib::EExtProcFlags  eFlag
                         , const tCIDLib::EExtProcShows  eShow)
 {
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }                        
-
-
-tCIDLib::TBoolean
-TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
-                        , const tCIDLib::TCh* const     pszInitPath
-                        , const tCIDLib::EExtProcFlags  eFlag
-                        , const tCIDLib::EExtProcShows  eShow)
-{
-    /*
-    //  Ok, first check to make sure that we are not already running. If
-    //  we are, then that's this is not legal.
-    tCIDLib::TBoolean bRun;
-    if (!bIsRunning(bRun))
-        return kCIDLib::False;
-
-    if (bRun)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyStarted);
-        return kCIDLib::False;
-    }
-
-    //
-    //  Parse the command line into its components. This both makes sure that
-    //  its legal, and allows us to separate out the program part of the
-    //  command line (so that we can see that type of program it is.)
-    //
-    const tCIDLib::TCard4 c4MaxParmCnt = 512;
-    tCIDLib::TCh** apszParms = new tCIDLib::TCh*[c4MaxParmCnt];
-
-    const tCIDLib::TCard4 c4ActualParmCnt = c4BreakOutParms
-    (
-        pszStartString, apszParms, c4MaxParmCnt
-    );
-
-    tCIDLib::TBoolean bRet;
-    if (c4ActualParmCnt != 0)
-    {
-        bRet = bStart(apszParms[0]
-                      , &apszParms[1]
-                      , c4ActualParmCnt - 1
-                      , eFlag
-                      , eShow);
-    }
-    else
-    {
-        bRet = kCIDLib::False;
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcExtP_EmptyCmdLine);
-    }
-
-    // Clean up the params
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ActualParmCnt; c4Index++)
-        delete [] apszParms[c4Index];
-    delete [] apszParms;
-
-    return bRet;
-    */
-
-   return kCIDLib::False;
-}
-
 
 
 tCIDLib::TBoolean
@@ -796,6 +737,7 @@ TKrnlExtProcess::bStartAsOpen(  const   tCIDLib::TCh* const     pszDocPath
                                 , const tCIDLib::EExtProcShows  eShow
                                 , const tCIDLib::TBoolean       bAdminPrivs)
 {
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }                                
 
@@ -845,6 +787,7 @@ tCIDLib::TBoolean
 TKrnlExtProcess::bTryAttachTo(  const   tCIDLib::TCh* const pszAttachInfo
                                 ,       tCIDLib::TBoolean&  bAttached)
 {
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 

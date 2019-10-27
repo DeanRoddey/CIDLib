@@ -501,9 +501,11 @@ tCIDLib::TVoid TGCCDriver::Link()
     // Multi-threaded support
     apszArgs[c4CurArg++] = L"-lpthread";
 
+    // Cursor support
+    apszArgs[c4CurArg++] = L"-lncurses";
+
     if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Executable)
     {
-        apszArgs[c4CurArg++] = L"-lncurses";
         apszArgs[c4CurArg++] = L"-ldl";
         apszArgs[c4CurArg++] = L"-lm";
     }
@@ -512,7 +514,6 @@ tCIDLib::TVoid TGCCDriver::Link()
         apszArgs[c4CurArg++] = L"-lreadline";
         apszArgs[c4CurArg++] = L"-lhistory";
     }
-
 
     if (facCIDBuild.bVerbose())
     {

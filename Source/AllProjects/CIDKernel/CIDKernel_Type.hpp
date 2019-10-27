@@ -405,27 +405,6 @@ namespace tCIDLib
     };
 
 
-    // -----------------------------------------------------------------------
-    //  The CPU types that we might find outselves running on, for reporting
-    //  back in system information.
-    // -----------------------------------------------------------------------
-    enum class ECPUTypes
-    {
-        Unknown
-        , Alpha
-        , Alpha64
-        , Arm
-        , Intel32
-        , Intel64
-        , MIPS
-        , PPC
-        , SPARC
-
-        , Count
-        , Min           = Unknown
-        , Max           = SPARC
-    };
-
 
     // -----------------------------------------------------------------------
     //  These are flags used when creating or opening files or other

@@ -746,7 +746,7 @@ TKrnlSocket::bQuerySelStatus(       tCIDLib::TBoolean&      bIsReadable
     //  have a totally blocking select (which means a nul time structure
     //  passed to select.) Otherwise, we have to set up the structure.
     //
-    timeval* pTime = 0;
+    timeval* pTime = nullptr;
     timeval ActualTime;
     if (enctWait != kCIDLib::enctMaxWait)
     {

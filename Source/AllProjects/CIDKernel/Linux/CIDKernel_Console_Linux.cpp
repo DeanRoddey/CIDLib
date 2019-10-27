@@ -678,12 +678,14 @@ TKrnlConIn::bReadLine(          tCIDLib::TCh* const pszToFill
     return kCIDLib::True;
 }
 
-tCIDLib::TBoolean TKrnlConIn::bOpen()
+
+tCIDLib::TBoolean TKrnlConIn::bOpenCon()
 {
     m_hconThis.m_phconiThis->bValid = kCIDLib::True;
     m_hconThis.m_phconiThis->bSingleCharMode = kCIDLib::False;
     return kCIDLib::True;
 }
+
 
 tCIDLib::TBoolean TKrnlConIn::bSetInsertMode(const tCIDLib::TBoolean)
 {
@@ -707,7 +709,7 @@ TKrnlConIn::pInitPlatform(const tCIDLib::TCard4 c4MaxRecall)
     return 0;
 }
 
-tCIDLib::TVoid TKrnlConIn::ResetRecallBuf()
+tCIDLib::TVoid TKrnlConIn::ResetRecall()
 {
     ::clear_history();
 }
@@ -817,7 +819,7 @@ TKrnlConOut::bWriteLine(const tCIDLib::TCh* const pszToWrite)
 // ---------------------------------------------------------------------------
 //  TKrnlConOut: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TKrnlConOut::bOpen()
+tCIDLib::TBoolean TKrnlConOut::bOpenCon()
 {
     return bInitTerminalInfo();
 }

@@ -148,6 +148,7 @@ namespace CIDKernel_FileSys_Linux
         return kCIDLib::True;
     }
 
+    // <TBD> deal with this
     tCIDLib::TBoolean
     bQueryVolumeInfo(const  tCIDLib::TSCh* const    pszSrcPath
                     , const TMountEntry&            MountEntry
@@ -339,6 +340,21 @@ namespace CIDKernel_FileSys_Linux
     }
 }
 
+
+// ---------------------------------------------------------------------------
+//  TCIDKrnlModule: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TBoolean
+TCIDKrnlModule::bInitTermFileSys(const tCIDLib::EInitTerm eState)
+{
+    if (eState == tCIDLib::EInitTerm::Initialize)
+    {
+    }
+    else
+    {
+    }
+    return kCIDLib::True;
+}
 
 
 

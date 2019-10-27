@@ -96,12 +96,22 @@ MUPnPSvcCallback& MUPnPSvcCallback::operator=(const MUPnPSvcCallback&)
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlUPnPService: Public data types
+// ---------------------------------------------------------------------------
+struct TKrnlUPnPService::TPlatData
+{
+};
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlUPnPService: Destructor
 // ---------------------------------------------------------------------------
 
 TKrnlUPnPService::~TKrnlUPnPService()
 {
     // Release our per-platform data
+    delete m_pPlatData;
+    m_pPlatData = nullptr;
 }
 
 
@@ -116,7 +126,7 @@ TKrnlUPnPService::~TKrnlUPnPService()
 //
 tCIDLib::TVoid TKrnlUPnPService::AddCallback(MUPnPSvcCallback* pupnpscbTar)
 {
-    CIDAssert2(L"TKrnlUPnPService::AddCallback is not implemented yet on Linux");
+    // <TBD> Deal with this
 }
 
 
@@ -124,7 +134,7 @@ tCIDLib::TVoid TKrnlUPnPService::AddCallback(MUPnPSvcCallback* pupnpscbTar)
 tCIDLib::TBoolean
 TKrnlUPnPService::bQueryServiceType(TKrnlString& kstrToFill) const
 {
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -134,7 +144,7 @@ tCIDLib::TBoolean
 TKrnlUPnPService::bQueryStateVar(const  tCIDLib::TCh* const pszVarName
                                 ,       TKrnlString&        kstrVal) const
 {
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -159,7 +169,7 @@ TKrnlUPnPService::bInvokeAct(const  tCIDLib::TCh* const         pszCmdName
                             ,       TKrnlLList<TKrnlString>&    kllstOutVals
                             ,       TKrnlString&                kstrRetVal) const
 {
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -171,7 +181,7 @@ TKrnlUPnPService::bInvokeAct(const  tCIDLib::TCh* const         pszCmdName
 //
 TKrnlUPnPService* TKrnlUPnPService::pkupnpsClone()
 {
-    CIDAssert2(L"TKrnlUPnPService::pkupnpsClone() is not supported yet on Linux");
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return nullptr;
 }
 
@@ -183,7 +193,7 @@ TKrnlUPnPService* TKrnlUPnPService::pkupnpsClone()
 
 TKrnlUPnPService::TKrnlUPnPService(tCIDLib::TVoid* const pData) :
 
-    m_pData(pData)
+    m_pPlatData(new TKrnlUPnPService::TPlatData)
 {
 }
 
@@ -197,13 +207,24 @@ TKrnlUPnPService::TKrnlUPnPService(tCIDLib::TVoid* const pData) :
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlUPnPDevice: Public data types
+// ---------------------------------------------------------------------------
+struct TKrnlUPnPDevice::TPlatData
+{
+
+};
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlUPnPDevice: Destructor
 // ---------------------------------------------------------------------------
 TKrnlUPnPDevice::~TKrnlUPnPDevice()
 {
     // Let our perploatfrom data go
-    if (m_pData)
+    if (m_pPlatData)
     {
+        delete m_pPlatData;
+        m_pPlatData = nullptr;
     }
 }
 
@@ -221,7 +242,7 @@ TKrnlUPnPDevice::bGetRootDevice(TKrnlUPnPDevice*& pkupnpdToFill)
 {
     pkupnpdToFill = nullptr;
 
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -230,7 +251,7 @@ TKrnlUPnPDevice::bGetRootDevice(TKrnlUPnPDevice*& pkupnpdToFill)
 tCIDLib::TBoolean
 TKrnlUPnPDevice::bHasChildren(tCIDLib::TBoolean& bToFill) const
 {
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -238,7 +259,7 @@ TKrnlUPnPDevice::bHasChildren(tCIDLib::TBoolean& bToFill) const
 // Indicate whether this device is a root device
 tCIDLib::TBoolean TKrnlUPnPDevice::bIsRoot(tCIDLib::TBoolean& bToFill) const
 {
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -258,7 +279,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
 {
     // Empty the incoming list first
     kllistFound.RemoveAll();
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -267,7 +288,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
 // Query the device description URL
 tCIDLib::TBoolean TKrnlUPnPDevice::bQueryDevDescrURL(TKrnlString& kstrToFill) const
 {
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -279,7 +300,7 @@ TKrnlUPnPDevice::bQueryDevInfo( TKrnlString&    kstrUID
                                 , TKrnlString&  kstrModel
                                 , TKrnlString&  kstrType) const
 {
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -288,7 +309,7 @@ TKrnlUPnPDevice::bQueryDevInfo( TKrnlString&    kstrUID
 tCIDLib::TBoolean
 TKrnlUPnPDevice::bQueryManufacturer(TKrnlString& kstrToFill) const
 {
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -310,7 +331,7 @@ TKrnlUPnPDevice::bQueryServiceByID( const   tCIDLib::TCh* const pszServiceId
     // Default just in case we fail
     pkupnpsToFill = nullptr;
 
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -321,8 +342,7 @@ TKrnlUPnPDevice::bQueryServiceByID( const   tCIDLib::TCh* const pszServiceId
 //
 TKrnlUPnPDevice* TKrnlUPnPDevice::pkupnpdClone()
 {
-    CIDAssert(L"TKrnlUPnPDevice::pkupnpdClone() is not supported on Linux yet");
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return nullptr;
 }
 
@@ -335,11 +355,20 @@ TKrnlUPnPDevice* TKrnlUPnPDevice::pkupnpdClone()
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlUPnPFinder: Public data types
+// ---------------------------------------------------------------------------
+struct TKrnlUPnPFinder::TPlatData
+{
+};
+
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlUPnPFinder: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlUPnPFinder::TKrnlUPnPFinder() :
 
-    m_pData(nullptr)
+    m_pPlatData(nullptr)
 {
 }
 
@@ -347,8 +376,10 @@ TKrnlUPnPFinder::TKrnlUPnPFinder() :
 TKrnlUPnPFinder::~TKrnlUPnPFinder()
 {
     // Clean up our per-platform data
-    if (m_pData)
+    if (m_pPlatData)
     {
+        delete m_pPlatData;
+        m_pPlatData = nullptr;
     }
 }
 
@@ -373,7 +404,7 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
     // Clear the output list so we can fill it in
     kllistFound.RemoveAll();
 
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -389,7 +420,7 @@ TKrnlUPnPFinder::bSearchByUID(  const   tCIDLib::TCh* const pszUID
     if (!bCheckData())
         return kCIDLib::False;
 
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -403,7 +434,7 @@ TKrnlUPnPFinder::bSearchByUID(  const   tCIDLib::TCh* const pszUID
 tCIDLib::TBoolean TKrnlUPnPFinder::bCheckData()
 {
     // If not initialized already, try to do it and return that status
-    if (!m_pData)
+    if (!m_pPlatData)
         return bInit();
     return kCIDLib::True;
 }
@@ -412,7 +443,7 @@ tCIDLib::TBoolean TKrnlUPnPFinder::bCheckData()
 // This is called to fault in the underlying finder object
 tCIDLib::TBoolean TKrnlUPnPFinder::bInit()
 {
-    m_pData = nullptr;
+    m_pPlatData = nullptr;
     return kCIDLib::True;
 }
 
@@ -445,42 +476,39 @@ MUPnPAsyncFinderCB::MUPnPAsyncFinderCB()
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlUPnPAsyncFinder: Public types
+// ---------------------------------------------------------------------------
+struct TKrnlUPnPAsyncFinder::TPlatData
+{
+
+};
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlUPnPAsyncFinder: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlUPnPAsyncFinder::TKrnlUPnPAsyncFinder() :
 
-    m_pFinderInfo(nullptr)
+    m_pPlatData(new TPlatData)
     , m_pmkupnpfcbTar(nullptr)
 {
-    // Create our per-platform info structure
-    TAFinderInfo* pInfo = new TAFinderInfo;
-    m_pFinderInfo = pInfo;
 }
 
 // Set the callback up front
 TKrnlUPnPAsyncFinder::
 TKrnlUPnPAsyncFinder(MUPnPAsyncFinderCB* const pmkupnpfcbTar) :
 
-    m_pFinderInfo(nullptr)
+    m_pPlatData(new TPlatData)
     , m_pmkupnpfcbTar(pmkupnpfcbTar)
 {
-    //
-    //  Create our per-platform info structure, and we can go ahead and set
-    //  the callback object.
-    //
-    TAFinderInfo* pInfo = new TAFinderInfo;
-    m_pFinderInfo = pInfo;
 }
 
 TKrnlUPnPAsyncFinder::~TKrnlUPnPAsyncFinder()
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
-
     // Call our own cleanup method
     bCleanup();
 
-    m_pFinderInfo = nullptr;
-    delete pInfo;
+    m_pPlatData = nullptr;
 }
 
 
@@ -496,7 +524,6 @@ TKrnlUPnPAsyncFinder::~TKrnlUPnPAsyncFinder()
 //
 tCIDLib::TBoolean TKrnlUPnPAsyncFinder::bCleanup()
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
 
     return kCIDLib::True;
 }
@@ -510,8 +537,7 @@ tCIDLib::TBoolean
 TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
                                 ,       TKrnlString&        kstrSearchID)
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 
@@ -523,8 +549,6 @@ TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
 tCIDLib::TBoolean
 TKrnlUPnPAsyncFinder::bSetCallback(MUPnPAsyncFinderCB* const pmkupnpfcbTar)
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
-
     // Make sure the finder hasn't already been set
     if (m_pmkupnpfcbTar)
     {
@@ -540,9 +564,7 @@ TKrnlUPnPAsyncFinder::bSetCallback(MUPnPAsyncFinderCB* const pmkupnpfcbTar)
 tCIDLib::TBoolean
 TKrnlUPnPAsyncFinder::bStopListeningFor(const tCIDLib::TCh* const pszSearchID)
 {
-    TAFinderInfo* pInfo = static_cast<TAFinderInfo*>(m_pFinderInfo);
-
-    TKrnlError::SetLast(kKrnlErrs::errcGen_NotSupported);
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
     return kCIDLib::False;
 }
 

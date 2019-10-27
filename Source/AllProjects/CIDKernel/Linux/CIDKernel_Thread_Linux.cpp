@@ -34,7 +34,7 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
-namespace
+namespace CIDKernel_Thread_Linux
 {
     // ---------------------------------------------------------------------------
     //  Local types
@@ -58,12 +58,12 @@ namespace
     // ---------------------------------------------------------------------------
     //  Local data
     //
-    //  __tidPrimary
+    //  CIDKernel_Thread_Linux::tidPrimary
     //      Used to save the primary thread id. This is the thread that our
     //      initialization occurs on, so we just store away the calling thread
     //      id during it.
     // ---------------------------------------------------------------------------
-    tCIDLib::TThreadId  __tidPrimary;
+    tCIDLib::TThreadId  tidPrimary;
 
     // ---------------------------------------------------------------------------
     //  Local methods
@@ -75,7 +75,7 @@ namespace
     //  the thread handle. Then it calls the real CIDLib level thread function,
     //  passing along the information it needs.
     //
-    tCIDLib::TVoid* __ThreadStart(tCIDLib::TVoid* pStartUp)
+    tCIDLib::TVoid* ThreadStart(tCIDLib::TVoid* pStartUp)
     {
         TStartupData* pData = static_cast<TStartupData*>(pStartUp);
 
@@ -109,11 +109,11 @@ namespace
 //  TCIDKrnlModule: Private, static methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermThread(const tCIDLib::EInitTerm eState)
+TCIDKrnlModule::bInitTermThread(const tCIDLib::EInitTerm eState)
 {
     if (eState == tCIDLib::EInitTerm::Initialize)
     {
-        __tidPrimary = ::pthread_self();
+        CIDKernel_Thread_Linux::tidPrimary = ::pthread_self();
     }
 
     return TKrnlLinux::TThreadTimer::bInitTerm(eState)
@@ -130,26 +130,28 @@ TCIDKrnlModule::__bInitTermThread(const tCIDLib::EInitTerm eState)
 //  TThreadHandle: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TThreadHandle::TThreadHandle() :
-    __phthriThis(0)
+
+    m_phthriThis(nullptr)
 {
-    __phthriThis = new TThreadHandleImpl;
-    __phthriThis->tidThis = kCIDLib::tidInvalid;
-    __phthriThis->eExit = tCIDLib::EExitCodes::Normal;
-    __phthriThis->bJoined = kCIDLib::False;
+    m_phthriThis = new TThreadHandleImpl;
+    m_phthriThis->tidThis = kCIDLib::tidInvalid;
+    m_phthriThis->eExit = tCIDLib::EExitCodes::Normal;
+    m_phthriThis->bJoined = kCIDLib::False;
 }
 
 TThreadHandle::TThreadHandle(const TThreadHandle& hthrToCopy) :
-    __phthriThis(0)
+
+    m_phthriThis(nullptr)
 {
-    __phthriThis->tidThis = hthrToCopy.__phthriThis->tidThis;
-    __phthriThis->eExit = hthrToCopy.__phthriThis->eExit;
-    __phthriThis->bJoined = hthrToCopy.__phthriThis->bJoined;
+    m_phthriThis->tidThis = hthrToCopy.m_phthriThis->tidThis;
+    m_phthriThis->eExit = hthrToCopy.m_phthriThis->eExit;
+    m_phthriThis->bJoined = hthrToCopy.m_phthriThis->bJoined;
 }
 
 TThreadHandle::~TThreadHandle()
 {
-    delete __phthriThis;
-    __phthriThis = 0;
+    delete m_phthriThis;
+    m_phthriThis = nullptr;
 }
 
 
@@ -161,9 +163,9 @@ TThreadHandle& TThreadHandle::operator=(const TThreadHandle& hthrToAssign)
     if (this == &hthrToAssign)
         return *this;
 
-    __phthriThis->tidThis = hthrToAssign.__phthriThis->tidThis;
-    __phthriThis->eExit = hthrToAssign.__phthriThis->eExit;
-    __phthriThis->bJoined = hthrToAssign.__phthriThis->bJoined;
+    m_phthriThis->tidThis = hthrToAssign.m_phthriThis->tidThis;
+    m_phthriThis->eExit = hthrToAssign.m_phthriThis->eExit;
+    m_phthriThis->bJoined = hthrToAssign.m_phthriThis->bJoined;
 
     return *this;
 }
@@ -172,8 +174,10 @@ TThreadHandle& TThreadHandle::operator=(const TThreadHandle& hthrToAssign)
 tCIDLib::TBoolean
 TThreadHandle::operator==(const TThreadHandle& hthrToCompare) const
 {
-    return ::pthread_equal(__phthriThis->tidThis
-                           , hthrToCompare.__phthriThis->tidThis);
+    return ::pthread_equal
+    (
+        m_phthriThis->tidThis, hthrToCompare.m_phthriThis->tidThis
+    );
 }
 
 
@@ -181,16 +185,16 @@ TThreadHandle::operator==(const TThreadHandle& hthrToCompare) const
 // -------------------------------------------------------------------
 //  TThreadHandle: Public, non-virtual methods
 // -------------------------------------------------------------------
-tCIDLib::TBoolean TThreadHandle::bValid() const
+tCIDLib::TBoolean TThreadHandle::bIsValid() const
 {
-    return (__phthriThis->tidThis != kCIDLib::tidInvalid);
+    return (m_phthriThis->tidThis != kCIDLib::tidInvalid);
 }
 
 tCIDLib::TVoid TThreadHandle::Clear()
 {
-    __phthriThis->tidThis = kCIDLib::tidInvalid;
-    __phthriThis->eExit = tCIDLib::EExitCodes::Normal;
-    __phthriThis->bJoined = kCIDLib::False;
+    m_phthriThis->tidThis = kCIDLib::tidInvalid;
+    m_phthriThis->eExit = tCIDLib::EExitCodes::Normal;
+    m_phthriThis->bJoined = kCIDLib::False;
 }
 
 tCIDLib::TVoid
@@ -198,21 +202,14 @@ TThreadHandle::FormatToStr(         tCIDLib::TCh* const pszToFill
                             , const tCIDLib::TCard4     c4MaxChars) const
 {
     tCIDLib::TZStr64    szTmp;
-
-    TRawStr::bFormatVal
-    (
-        tCIDLib::TCard4(__phthriThis->tidThis)
-        , szTmp
-        , 64
-    );
-
+    TRawStr::bFormatVal(tCIDLib::TCard4(m_phthriThis->tidThis), szTmp, 64);
     TRawStr::CopyStr(pszToFill, szTmp, c4MaxChars);
 }
 
 
 tCIDLib::TThreadId TThreadHandle::tidThis() const
 {
-    return __phthriThis->tidThis;
+    return m_phthriThis->tidThis;
 }
 
 
@@ -230,8 +227,10 @@ tCIDLib::TBoolean TKrnlThread::bIsCaller(const TKrnlThread& kthrToTest)
 {
     return
     (
-        ::pthread_equal(kthrToTest.__hthrThis.__phthriThis->tidThis
-                        , ::pthread_self())
+        ::pthread_equal
+        (
+            kthrToTest.m_hthrThis.m_phthriThis->tidThis, ::pthread_self()
+        )
     );
 }
 
@@ -243,7 +242,10 @@ TKrnlThread::bPriorityOf(const  TKrnlThread&            kthrToQuery
     // First, figure out which scheduler we're using
     struct sched_param sch;
     tCIDLib::TSInt iPolicy;
-    tCIDLib::TOSErrCode errc = ::pthread_getschedparam(kthrToQuery.__hthrThis.__phthriThis->tidThis, &iPolicy, &sch);
+    tCIDLib::TOSErrCode errc = ::pthread_getschedparam
+    (
+        kthrToQuery.m_hthrThis.m_phthriThis->tidThis, &iPolicy, &sch
+    );
     if (errc)
     {
         TKrnlError::SetLastHostError(errc);
@@ -320,7 +322,7 @@ tCIDLib::TVoid TKrnlThread::Exit(const tCIDLib::EExitCodes eExitCode)
 
 tCIDLib::TThreadId TKrnlThread::tidPrimary()
 {
-    return __tidPrimary;
+    return CIDKernel_Thread_Linux::tidPrimary;
 }
 
 
@@ -362,22 +364,22 @@ TKrnlThread::~TKrnlThread()
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TKrnlThread::bAdoptCaller()
 {
-    if (__hthrThis.__phthriThis->tidThis != kCIDLib::tidInvalid)
+    if (m_hthrThis.m_phthriThis->tidThis != kCIDLib::tidInvalid)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadySet);
         return kCIDLib::False;
     }
 
-    __hthrThis.__phthriThis->tidThis = ::pthread_self();
-    __hthrThis.__phthriThis->eExit = tCIDLib::EExitCodes::Normal;
-    __hthrThis.__phthriThis->bJoined = kCIDLib::False;
+    m_hthrThis.m_phthriThis->tidThis = ::pthread_self();
+    m_hthrThis.m_phthriThis->eExit = tCIDLib::EExitCodes::Normal;
+    m_hthrThis.m_phthriThis->bJoined = kCIDLib::False;
 
     return kCIDLib::True;
 }
 
 tCIDLib::TBoolean TKrnlThread::bIsRunning(tCIDLib::TBoolean& bToFill) const
 {
-    bToFill = (::pthread_kill(__hthrThis.__phthriThis->tidThis, 0) == 0);
+    bToFill = (::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0) == 0);
     return kCIDLib::True;
 }
 
@@ -390,7 +392,7 @@ TKrnlThread::bBeginThread(  const   TKrnlThread::TCallBack  pfnFunc
                             ,       TThread* const          pthrStart
                             , const tCIDLib::TCh* const     pszThreadName)
 {
-    if (__hthrThis.__phthriThis->tidThis != kCIDLib::tidInvalid)
+    if (m_hthrThis.m_phthriThis->tidThis != kCIDLib::tidInvalid)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyStarted);
         return kCIDLib::False;
@@ -399,7 +401,7 @@ TKrnlThread::bBeginThread(  const   TKrnlThread::TCallBack  pfnFunc
     pthread_mutex_t mtxStart = PTHREAD_MUTEX_INITIALIZER;
 
     pthread_t tidTmp = kCIDLib::tidInvalid;
-    TStartupData* pStartupData = new TStartupData;
+    CIDKernel_Thread_Linux::TStartupData* pStartupData = new CIDKernel_Thread_Linux::TStartupData;
     pStartupData->pfnCallBack = pfnFunc;
     pStartupData->pUserData = pData;
     pStartupData->pthrStarting = pthrStart;
@@ -409,10 +411,14 @@ TKrnlThread::bBeginThread(  const   TKrnlThread::TCallBack  pfnFunc
 
     ::pthread_mutex_lock(&mtxStart);
 
-    tCIDLib::TOSErrCode HostErr = ::pthread_create(&tidTmp
-                                                   , 0
-                                                   , __ThreadStart
-                                                   , pStartupData);
+    tCIDLib::TOSErrCode HostErr = ::pthread_create
+    (
+        &tidTmp
+        , 0
+        , CIDKernel_Thread_Linux::ThreadStart
+        , pStartupData
+    );
+
     if (HostErr)
     {
         ::pthread_mutex_unlock(&mtxStart);
@@ -423,7 +429,7 @@ TKrnlThread::bBeginThread(  const   TKrnlThread::TCallBack  pfnFunc
         return kCIDLib::False;
     }
 
-    __hthrThis.__phthriThis->tidThis = tidTmp;
+    m_hthrThis.m_phthriThis->tidThis = tidTmp;
 
     // The thread we just started is waiting on this, so it will
     // destroy the mutex.
@@ -434,12 +440,12 @@ TKrnlThread::bBeginThread(  const   TKrnlThread::TCallBack  pfnFunc
 
 tCIDLib::TBoolean TKrnlThread::bBlockMyself()
 {
-    if (__hthrThis.__phthriThis->tidThis != ::pthread_self())
+    if (m_hthrThis.m_phthriThis->tidThis != ::pthread_self())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcProc_NotThisThread);
         return kCIDLib::False;
     }
-    ::pthread_kill(__hthrThis.__phthriThis->tidThis, SIGSTOP);
+    ::pthread_kill(m_hthrThis.m_phthriThis->tidThis, SIGSTOP);
     return kCIDLib::True;
 }
 
@@ -455,7 +461,7 @@ tCIDLib::TBoolean TKrnlThread::bSetPriority(const tCIDLib::EPrioLevels eLevel)
     // First, figure out which scheduler we're using
     struct sched_param sch;
     tCIDLib::TSInt iPolicy;
-    tCIDLib::TOSErrCode errc = ::pthread_getschedparam(__hthrThis.__phthriThis->tidThis, &iPolicy, &sch);
+    tCIDLib::TOSErrCode errc = ::pthread_getschedparam(m_hthrThis.m_phthriThis->tidThis, &iPolicy, &sch);
     if (errc)
     {
         TKrnlError::SetLastHostError(errc);
@@ -521,7 +527,10 @@ tCIDLib::TBoolean TKrnlThread::bSetPriority(const tCIDLib::EPrioLevels eLevel)
             return kCIDLib::False;
         }
 
-        tCIDLib::TInt4 i4ChunkSize = (i4MaxPrio - i4MinPrio + 1) / tCIDLib::EPrioLevels::Count;
+        const tCIDLib::TInt4 i4ChunkSize
+        (
+            (i4MaxPrio - i4MinPrio + 1) / tCIDLib::c4EnumOrd(tCIDLib::EPrioLevels::Count)
+        );
 
         tCIDLib::TInt4 i4Prio;
         switch (eLevel)
@@ -544,7 +553,7 @@ tCIDLib::TBoolean TKrnlThread::bSetPriority(const tCIDLib::EPrioLevels eLevel)
         }
 
         sch.sched_priority = i4Prio;
-        errc = ::pthread_setschedparam(__hthrThis.__phthriThis->tidThis, iPolicy, &sch);
+        errc = ::pthread_setschedparam(m_hthrThis.m_phthriThis->tidThis, iPolicy, &sch);
         if (errc)
         {
             TKrnlError::SetLastHostError(errc);
@@ -559,16 +568,16 @@ tCIDLib::TBoolean TKrnlThread::bSetPriority(const tCIDLib::EPrioLevels eLevel)
 tCIDLib::TBoolean
 TKrnlThread::bQueryExitCode(tCIDLib::EExitCodes& eToFill) const
 {
-    if (!::pthread_kill(__hthrThis.__phthriThis->tidThis, 0))
+    if (!::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_StillRunning);
         return kCIDLib::False;
     }
 
-    if (!__hthrThis.__phthriThis->bJoined)
+    if (!m_hthrThis.m_phthriThis->bJoined)
     {
         tCIDLib::TVoid* pHostExit = 0;
-        tCIDLib::TOSErrCode HostErr = ::pthread_join(__hthrThis.__phthriThis->tidThis
+        tCIDLib::TOSErrCode HostErr = ::pthread_join(m_hthrThis.m_phthriThis->tidThis
                                                      , &pHostExit);
         if (HostErr)
         {
@@ -576,19 +585,19 @@ TKrnlThread::bQueryExitCode(tCIDLib::EExitCodes& eToFill) const
             return kCIDLib::False;
         }
 
-        __hthrThis.__phthriThis->eExit = tCIDLib::EExitCodes(tCIDLib::TSInt(pHostExit));
-        __hthrThis.__phthriThis->bJoined = kCIDLib::True;
-        __hthrThis.__phthriThis->tidThis = kCIDLib::tidInvalid;
+        m_hthrThis.m_phthriThis->eExit = tCIDLib::EExitCodes(tCIDLib::TSInt(pHostExit));
+        m_hthrThis.m_phthriThis->bJoined = kCIDLib::True;
+        m_hthrThis.m_phthriThis->tidThis = kCIDLib::tidInvalid;
     }
 
-    eToFill = __hthrThis.__phthriThis->eExit;
+    eToFill = m_hthrThis.m_phthriThis->eExit;
 
     return kCIDLib::True;
 }
 
 tCIDLib::TBoolean TKrnlThread::bUnblock()
 {
-    if (::pthread_kill(__hthrThis.__phthriThis->tidThis, SIGCONT))
+    if (::pthread_kill(m_hthrThis.m_phthriThis->tidThis, SIGCONT))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotRunning);
         return kCIDLib::False;
@@ -596,13 +605,16 @@ tCIDLib::TBoolean TKrnlThread::bUnblock()
     return kCIDLib::True;
 }
 
+
+// <TBD> Deal with new bState parameter
 tCIDLib::TBoolean
-TKrnlThread::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
-                            , const tCIDLib::TCard4      c4MilliSeconds) const
+TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
+                            ,       tCIDLib::EExitCodes&    eToFill
+                            , const tCIDLib::TCard4         c4MilliSeconds) const
 {
-    if (__hthrThis.__phthriThis->bJoined)
+    if (m_hthrThis.m_phthriThis->bJoined)
     {
-        eToFill = __hthrThis.__phthriThis->eExit;
+        eToFill = m_hthrThis.m_phthriThis->eExit;
         return kCIDLib::True;
     }
 
@@ -619,7 +631,7 @@ TKrnlThread::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
                 return kCIDLib::False;
         }
 
-        tCIDLib::TOSErrCode HostErr = ::pthread_join(__hthrThis.__phthriThis->tidThis
+        tCIDLib::TOSErrCode HostErr = ::pthread_join(m_hthrThis.m_phthriThis->tidThis
                                                      , &pHostExit);
 
         thtWaitFor.Cancel();
@@ -636,11 +648,11 @@ TKrnlThread::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
         return kCIDLib::False;
     }
 
-    __hthrThis.__phthriThis->eExit = tCIDLib::EExitCodes(tCIDLib::TSInt(pHostExit));
-    __hthrThis.__phthriThis->bJoined = kCIDLib::True;
-    __hthrThis.__phthriThis->tidThis = kCIDLib::tidInvalid;
+    m_hthrThis.m_phthriThis->eExit = tCIDLib::EExitCodes(tCIDLib::TSInt(pHostExit));
+    m_hthrThis.m_phthriThis->bJoined = kCIDLib::True;
+    m_hthrThis.m_phthriThis->tidThis = kCIDLib::tidInvalid;
 
-    eToFill = __hthrThis.__phthriThis->eExit;
+    eToFill = m_hthrThis.m_phthriThis->eExit;
 
     return kCIDLib::True;
 }
@@ -648,8 +660,8 @@ TKrnlThread::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
 
 tCIDLib::TVoid TKrnlThread::Orphan()
 {
-    if (!::pthread_kill(__hthrThis.__phthriThis->tidThis, 0))
-        ::pthread_detach(__hthrThis.__phthriThis->tidThis);
+    if (!::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0))
+        ::pthread_detach(m_hthrThis.m_phthriThis->tidThis);
 }
 
 
@@ -659,5 +671,5 @@ tCIDLib::TVoid TKrnlThread::SetNotRunning()
 
 tCIDLib::TThreadId TKrnlThread::tidThis() const
 {
-    return __hthrThis.__phthriThis->tidThis;
+    return m_hthrThis.m_phthriThis->tidThis;
 }
