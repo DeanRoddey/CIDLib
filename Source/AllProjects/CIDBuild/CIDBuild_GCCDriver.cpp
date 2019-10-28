@@ -504,12 +504,19 @@ tCIDLib::TVoid TGCCDriver::Link()
     // Cursor support
     apszArgs[c4CurArg++] = L"-lncurses";
 
-    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Executable)
+    if ((m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Executable)
+    ||  (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Service))
     {
         apszArgs[c4CurArg++] = L"-ldl";
         apszArgs[c4CurArg++] = L"-lm";
     }
-     else if (m_pprojiTarget->strProjectName() == TBldStr(L"CIDKernel"))
+     else if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
+    {
+        apszArgs[c4CurArg++] = L"-shared";
+    }
+   
+
+    if (m_pprojiTarget->strProjectName() == TBldStr(L"CIDKernel"))
     {
         apszArgs[c4CurArg++] = L"-lreadline";
         apszArgs[c4CurArg++] = L"-lhistory";
