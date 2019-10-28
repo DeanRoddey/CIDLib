@@ -492,13 +492,6 @@ tCIDLib::TCard8 TSysInfo::c8TotalPhysicalMem()
 }
 
 
-// Return the CPU type
-tCIDLib::ECPUTypes TSysInfo::eCPUType()
-{
-    return TKrnlSysInfo::eCPUType();
-}
-
-
 //
 //  This provides access to the info in the /MODULELOG= parameter, or the
 //  CID_MODULELOG environment variable, which is used to allow the user to

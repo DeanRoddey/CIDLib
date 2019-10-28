@@ -361,10 +361,10 @@ TClass::RegisterClass(  const   tCIDLib::TCh* const     pszClassName
     //  find the slot in the hash table. If the slot is open, then this is
     //  the new head of that slot. Else insert at the start of the list.
     //
+    CIDLib_Suppress(6385)  // The modulus is the size of the table
     TRegNode* pHead = CIDLib_TypeRegistry::apnodeTable[hshOfClass];
     if (!pHead)
     {
-        CIDLib_Suppress(6385)  // The hash is always going to be in range
         CIDLib_TypeRegistry::apnodeTable[hshOfClass] = new TRegNode
         (
             pszClassName, pFactoryFunc
@@ -372,7 +372,7 @@ TClass::RegisterClass(  const   tCIDLib::TCh* const     pszClassName
     }
      else
     {
-        CIDLib_Suppress(6385)  // The hash is always going to be in range
+        CIDLib_Suppress(6386)  // The hash is always going to be in range
         CIDLib_TypeRegistry::apnodeTable[hshOfClass] = new TRegNode
         (
             pszClassName, pFactoryFunc, pHead

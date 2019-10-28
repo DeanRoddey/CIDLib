@@ -401,6 +401,8 @@ static TThread* pthrFindName(const TString& strName)
 //
 tCIDLib::EExitCodes eThreadStart(TThread* const pthrStarting, tCIDLib::TVoid* pData)
 {
+    CIDPreCond(pthrStarting != nullptr);
+
     //
     //  Add a new node to the thread list. We can't add us to the list until
     //  we are running, since our thread id isn't set until then. We don't
@@ -438,6 +440,7 @@ tCIDLib::EExitCodes eThreadStart(TThread* const pthrStarting, tCIDLib::TVoid* pD
         //  in the list directly allows us to search the list by id without having
         //  to dereference the thread objects to do it.
         //
+        #pragma warning(suppress : 6011) // We already null checked as a precond
         athriList()[pthrStarting->m_c4ListInd].tidThread = TKrnlThread::tidCaller();
     }
 

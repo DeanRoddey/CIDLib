@@ -942,59 +942,6 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDLib::TBoolean bBool)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDLib::ECPUTypes eCPUType)
-{
-    switch(eCPUType)
-    {
-        case tCIDLib::ECPUTypes::Alpha :
-            strmToWriteTo << L"Alpha";
-            break;
-
-        case tCIDLib::ECPUTypes::Alpha64 :
-            strmToWriteTo << L"Alpha";
-            break;
-
-        case tCIDLib::ECPUTypes::Arm :
-            strmToWriteTo << L"ARM";
-            break;
-
-        case tCIDLib::ECPUTypes::Intel32 :
-            strmToWriteTo << L"Intel32";
-            break;
-
-        case tCIDLib::ECPUTypes::Intel64 :
-            strmToWriteTo << L"Intel64";
-            break;
-
-        case tCIDLib::ECPUTypes::MIPS :
-            strmToWriteTo << L"MIPS";
-            break;
-
-        case tCIDLib::ECPUTypes::PPC :
-            strmToWriteTo << L"PPC";
-            break;
-
-        case tCIDLib::ECPUTypes::SPARC :
-            strmToWriteTo << L"SPARC";
-            break;
-
-        default :
-            facCIDLib().ThrowErr
-            (
-                CID_FILE
-                , CID_LINE
-                , kCIDErrs::errcGen_BadEnumValue
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::BadParms
-                , TCardinal(tCIDLib::c4EnumOrd(eCPUType))
-                , TString(L"tCIDLib::ECPUTypes")
-            );
-    }
-    return strmToWriteTo;
-}
-
-
-TTextOutStream&
 operator<<(TTextOutStream& strmToWriteTo, const tCIDLib::ECreateActs eAction)
 {
     if (eAction == tCIDLib::ECreateActs::None)

@@ -330,8 +330,6 @@ class CIDLIBEXP TSysInfo : public TObject
             const   TString&                strModule
         );
 
-        static tCIDLib::ECPUTypes eCPUType();
-
         static inline tCIDLib::EEndianModes eEndianMode()
         {
             #if defined(CIDLIB_LITTLEENDIAN)

@@ -315,7 +315,6 @@ static tCIDLib::TVoid ShowSysInfo()
             << L"        Node Name: " << TKrnlSysInfo::pszNodeName() << L"\n"
             << L"       Machine Id: " << szMachineId << L"\n"
             << L"   CIDLib Version: " << kCIDLib::pszVersion << "\n"
-            << L"         CPU Type: " << tCIDLib::TInt4(TKrnlSysInfo::eCPUType()) << "\n"
             << L"        CPU Count: " << TKrnlSysInfo::c4CPUCount() << "\n"
             << L"     Total Memory: " << c4TotalMem << "K\n"
             << L"     Avail Memory: " << c4AvailMem << "K\n"

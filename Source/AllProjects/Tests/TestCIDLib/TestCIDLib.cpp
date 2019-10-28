@@ -366,9 +366,6 @@ tCIDLib::TVoid TFacTestCIDLib::ShowSystemInfo()
             << strmfData << facTestCIDLib.strPath()
             << kCIDLib::NewLn
 
-            << strmfLegend << L"CPU Type: "
-            << strmfData << TSysInfo::eCPUType() << kCIDLib::NewLn
-
             << strmfLegend << L"OS Version: "
             << strmfData << c4OSMajVer << L"." << c4OSMinVer << L"." << c4OSRev
             << L", Build: " << c4BuildNum << kCIDLib::NewLn

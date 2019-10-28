@@ -118,7 +118,7 @@ tCIDLib::TBoolean TDTDAttrDefCursor::bReset()
 
 const TXMLAttrDef& TDTDAttrDefCursor::xadCur() const
 {
-    CIDAssert(m_pxnipcThis != 0, L"Accessed unset attr def cursor");
+    CIDAssert(m_pxnipcThis != nullptr, L"Accessed unset attr def cursor");
 
     //
     //  NOTE: The name id pool that we use for our storage returns the

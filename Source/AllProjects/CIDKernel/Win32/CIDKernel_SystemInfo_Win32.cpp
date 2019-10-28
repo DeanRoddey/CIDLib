@@ -90,10 +90,6 @@
 //  c8TotalPhysicalMem
 //      The amount of memory installed in the machine.
 //
-//  eCPUType
-//      The type of CPUs in this machine. I don't know what will happen
-//      if NT ever supports dissimilar CPU types in the same machine.
-//
 //  szNodeName
 //      The name assigned to this machine in the system setup. This size should be
 //      grotesquely overkill for any node name. This cannot be a kernel string since
@@ -120,7 +116,6 @@ struct TCachedInfo
     tCIDLib::TCard4     c4OSServicePack;
     tCIDLib::TCard4     c4SSELevel;
     tCIDLib::TCard8     c8TotalPhysicalMem;
-    tCIDLib::ECPUTypes  eCPUType;
     tCIDLib::TZStr128   szNodeName;
     tCIDLib::TZStr512   szProcessName;
 };
@@ -183,15 +178,6 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
         //
         CIDKernel_SystemInfo_Win32::CachedInfo.c4CPUCount = SystemInfo.dwNumberOfProcessors;
         CIDKernel_SystemInfo_Win32::CachedInfo.c2ProcRev = SystemInfo.wProcessorRevision;
-
-        if (SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
-            CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType = tCIDLib::ECPUTypes::Intel32;
-        else if (SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64)
-            CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType = tCIDLib::ECPUTypes::Intel64;
-        else if (SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
-            CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType = tCIDLib::ECPUTypes::Intel64;
-        else
-            CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType = tCIDLib::ECPUTypes::Unknown;
 
         //
         //  Confirm that our page size constant matches that of the system,
@@ -689,12 +675,6 @@ tCIDLib::TCard4 TKrnlSysInfo::c4SSELevel()
 tCIDLib::TCard8 TKrnlSysInfo::c8TotalPhysicalMem()
 {
     return CIDKernel_SystemInfo_Win32::CachedInfo.c8TotalPhysicalMem;
-}
-
-
-tCIDLib::ECPUTypes TKrnlSysInfo::eCPUType()
-{
-    return CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType;
 }
 
 
