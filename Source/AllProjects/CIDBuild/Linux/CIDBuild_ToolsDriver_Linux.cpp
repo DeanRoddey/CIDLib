@@ -51,6 +51,6 @@ TToolsDriver::BuildLibName( const   TBldStr&    strTargetProject
 {
     strToFill = L"lib";
     strToFill.Append(strTargetProject);
+    strToFill.Append(facCIDBuild.strVersionSuffix());
     strToFill.Append(kCIDBuild::pszDllExt);
 }
-

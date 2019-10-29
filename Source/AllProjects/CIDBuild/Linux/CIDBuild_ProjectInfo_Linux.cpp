@@ -52,15 +52,12 @@ tCIDLib::TVoid TProjectInfo::BuildOutputFileName()
     }
      else
     {
-        // Build up the name of the DLL/Exe/Lib file
-        m_strOutBin.Append(m_strProjectName);
-        if (m_bVersioned)
-            m_strOutBin.Append(facCIDBuild.strVersionSuffix());
-
-        if ((m_eType == tCIDBuild::EProjTypes::SharedLib)
-        ||  (m_eType == tCIDBuild::EProjTypes::SharedObj))
+        if (m_eType == tCIDBuild::EProjTypes::SharedLib)
         {
-            m_strOutBin.Append(L".so");
+            m_strOutBin.Append(L"lib");                        
+            m_strOutBin.Append(m_strProjectName);            
+            m_strOutBin.Append(facCIDBuild.strVersionSuffix());
+            m_strOutBin.Append(kCIDBuild::pszDllExt);
         }
          else if (m_eType == tCIDBuild::EProjTypes::StaticLib)
         {
@@ -70,6 +67,7 @@ tCIDLib::TVoid TProjectInfo::BuildOutputFileName()
               ||  (m_eType == tCIDBuild::EProjTypes::Service))
         {
             // No extension for executables
+            m_strOutBin.Append(m_strProjectName);
         }
          else
         {

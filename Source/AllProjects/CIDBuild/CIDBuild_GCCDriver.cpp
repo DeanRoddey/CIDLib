@@ -180,7 +180,6 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
     apszArgs[c4CurArg++] = L"-m32";
     apszArgs[c4CurArg++] = L"-DPLATFORM_LINUX";
     apszArgs[c4CurArg++] = L"-std=c++17";
-    apszArgs[c4CurArg++] = L"-m32";
 
     if (m_bDebug)
         apszArgs[c4CurArg++] = L"-D_DEBUG";
@@ -273,15 +272,14 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
     }
 
     //
-    //  Set up the flags for the runtime library mode.
+    //  Set up the flags for the runtime library mode, always multithreaded
     apszArgs[c4CurArg++] = L"-D_REENTRANT";
 
     //
-    //  Set up the stuff driven by the 'PUREANSI' setting. This is temporary
-    //  until all platform specific stuff is split into per-platform dirs
+    //  If not a pure cpp type project, enable permissive mode?
     //
-    if (m_pprojiTarget->bPureCpp())
-        apszArgs[c4CurArg++] = L"-ansi";
+//    if (m_pprojiTarget->bPureCpp())
+//        apszArgs[c4CurArg++] = L"-fpermissive";
 
     //
     //  Every project has a define which is in the form PROJ_XXX, where XXX
@@ -447,29 +445,28 @@ tCIDLib::TBoolean TGCCDriver::bObjsNewer(const TFindInfo& fndiTarget) const
 
 tCIDLib::TVoid TGCCDriver::Link()
 {
-    const tCIDBuild::TCh* apszArgs[128];
-    tCIDLib::TUInt c4CurArg = 0;
+    TList<TBldStr> listParms;
 
     // Set up the standard stuff
-    apszArgs[c4CurArg++] = L"g++";
+    listParms.Add(new TBldStr(L"g++"));
 
     // Set up the output file
-    apszArgs[c4CurArg++] = L"-o";
-    apszArgs[c4CurArg++] = m_strTargetFile.pszBuffer();
+    listParms.Add(new TBldStr(L"-o"));
+    listParms.Add(new TBldStr(m_strTargetFile));
 
     // And the debug vs. production flags
     if (m_bDebug)
     {
-        apszArgs[c4CurArg++] = L"-g";
+        listParms.Add(new TBldStr(L"-g"));
     }
      else
     {
-        apszArgs[c4CurArg++] = L"-O3";
+        listParms.Add(new TBldStr(L"-O3"));
     }
 
     // 32 bit mode and standard C++ libraries
-    apszArgs[c4CurArg++] = L"-lstdc++";
-    apszArgs[c4CurArg++] = L"-m32";
+    listParms.Add(new TBldStr(L"-lstdc++"));
+    listParms.Add(new TBldStr(L"-m32"));
 
     //
     //  And now add in all of the Obj and Lib files. We built them up above
@@ -481,7 +478,9 @@ tCIDLib::TVoid TGCCDriver::Link()
     {
         do
         {
-            apszArgs[c4CurArg++] = cursLibs.tCurElement().strFileName().pszBuffer();
+            TBldStr* pstrLib = new TBldStr(L"-l");
+            pstrLib->Append(cursLibs.tCurElement().strFileName());
+            listParms.Add(pstrLib);
         }   while (cursLibs.bNext());
     }
 
@@ -494,47 +493,67 @@ tCIDLib::TVoid TGCCDriver::Link()
             const TDepInfo& depiCur = cursCpps.tCurElement();
 
             // And add its object file name to the list of args
-            apszArgs[c4CurArg++] = depiCur.strObjFileName().pszBuffer();
+            listParms.Add(new TBldStr(depiCur.strObjFileName()));
         }   while (cursCpps.bNext());
     }
 
     // Multi-threaded support
-    apszArgs[c4CurArg++] = L"-lpthread";
+    listParms.Add(new TBldStr(L"-lpthread"));
 
     // Cursor support
-    apszArgs[c4CurArg++] = L"-lncurses";
+    listParms.Add(new TBldStr(L"-lncurses"));
 
     if ((m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Executable)
     ||  (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Service))
     {
-        apszArgs[c4CurArg++] = L"-ldl";
-        apszArgs[c4CurArg++] = L"-lm";
+        listParms.Add(new TBldStr(L"-ldl"));
+        listParms.Add(new TBldStr(L"-lm"));
     }
      else if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
     {
-        apszArgs[c4CurArg++] = L"-shared";
+        listParms.Add(new TBldStr(L"-shared"));
     }
    
 
     if (m_pprojiTarget->strProjectName() == TBldStr(L"CIDKernel"))
     {
-        apszArgs[c4CurArg++] = L"-lreadline";
-        apszArgs[c4CurArg++] = L"-lhistory";
+        listParms.Add(new TBldStr(L"-lreadline"));
+        listParms.Add(new TBldStr(L"-lhistory"));
     }
 
+    TListCursor<TBldStr> cursParms(&listParms);
     if (facCIDBuild.bVerbose())
     {
-        for (tCIDLib::TUInt uiInd = 0; uiInd < c4CurArg; uiInd++)
-            stdOut << apszArgs[uiInd] << L" ";
+        cursParms.bResetIter();
+        do
+        {
+            stdOut << *cursParms << L" ";
+        }   while (cursParms.bNext());        
         stdOut << kCIDBuild::EndLn;
     }
+
+    // Get an array of points to all of the parameters that we pass into the exec
+    if (listParms.c4ElemCount() > 128)
+    {
+        stdOut << L"Too many linker parameters" << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::BuildError;        
+    }
+
+    tCIDLib::TCard4 c4ParmInd = 0;
+    const tCIDBuild::TCh* apszArgs[128];
+    cursParms.bResetIter();
+    do
+    {
+        apszArgs[c4ParmInd++] = cursParms->pszBuffer();
+    }   while (cursParms.bNext());
+    
 
     // And invoke the link
     tCIDLib::TCard4 c4ExecFlags = kCIDBuild::c4ExecFlag_None;
     if (facCIDBuild.bLowPrio())
         c4ExecFlags |= kCIDBuild::c4ExecFlag_LowPrio;
     tCIDLib::TCard4 c4Result;
-    if (!TUtils::bExec(apszArgs, c4CurArg, c4Result, c4ExecFlags))
+    if (!TUtils::bExec(apszArgs, c4ParmInd, c4Result, c4ExecFlags))
     {
         stdOut << L"Could not execute the linker" << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::BuildError;
@@ -549,7 +568,6 @@ tCIDLib::TVoid TGCCDriver::Link()
     if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
     {
         TBldStr strRealName(m_strTargetFile);
-        strRealName.Append(facCIDBuild.strVersionSuffix());
 
         tCIDBuild::TSCh* pszRealName = TRawStr::pszTranscode(strRealName.pszBuffer());
         TArrayJanitor<tCIDBuild::TSCh> janReal(pszRealName);
@@ -562,10 +580,10 @@ tCIDLib::TVoid TGCCDriver::Link()
             throw tCIDBuild::EErrors::BuildError;
         }
 
-        if (::symlink(pszRealName, pszTarget))
-        {
-            stdOut << L"Unable to create symbolic link" << kCIDBuild::EndLn;
-            throw tCIDBuild::EErrors::BuildError;
-        }
+//        if (::symlink(pszRealName, pszTarget))
+//        {
+//            stdOut << L"Unable to create symbolic link" << kCIDBuild::EndLn;
+//            throw tCIDBuild::EErrors::BuildError;
+//        }
     }
 }

@@ -651,7 +651,7 @@ tCIDLib::TBoolean bTestTypes()
 //  This is the program entry point. It will do some overall setup and
 //  announcement, then call each of the testing modules in the correct order.
 //
-tCIDLib::TSInt main(const tCIDLib::TInt4 i4ArgC, tCIDLib::TSCh* apszArgs[])
+int main(const int i4ArgC, tCIDLib::TSCh* apszArgs[])
 {
     // Turn off buffering for output stream
     strmOut.setf(std::ios::unitbuf, std::ios::unitbuf);

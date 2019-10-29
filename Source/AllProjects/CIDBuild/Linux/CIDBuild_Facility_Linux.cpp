@@ -39,9 +39,9 @@ TFacCIDBuild::BuildVersionString(       TBldStr&        strToFill
                                 , const tCIDLib::TCard4 c4MajVer
                                 , const tCIDLib::TCard4 c4MinVer)
 {
-    strToFill = L".";
+    strToFill = L"_";
     strToFill.Append(c4MajVer);
-    strToFill.Append(L".");
+    strToFill.Append(L"_");
     strToFill.Append(c4MinVer);
 }
 
