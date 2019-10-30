@@ -478,7 +478,8 @@ tCIDLib::TVoid TGCCDriver::Link()
     {
         do
         {
-            TBldStr* pstrLib = new TBldStr(L"-l");
+            TBldStr* pstrLib = new TBldStr(L"-L");
+            pstrLib->Append(facCIDBuild.strOutDir());
             pstrLib->Append(cursLibs.tCurElement().strFileName());
             listParms.Add(pstrLib);
         }   while (cursLibs.bNext());
