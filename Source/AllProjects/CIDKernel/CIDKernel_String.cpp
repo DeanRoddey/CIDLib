@@ -106,6 +106,12 @@ tCIDLib::TBoolean TKrnlString::bIsEmpty() const
 }
 
 
+tCIDLib::TCard4 TKrnlString::c4Length() const
+{
+    return TRawStr::c4StrLen(m_pszValue);
+}
+
+
 tCIDLib::TVoid TKrnlString::Clear()
 {
     m_pszValue[0] = kCIDLib::chNull;

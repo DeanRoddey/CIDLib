@@ -101,13 +101,11 @@ static tCIDLib::TVoid RestoreConInfo(const TKrnlExtProcess::TPlatData& SaveInfo)
 
 
 //
-//  This method is called to build up an environment block from an array of
-//  pointers to environment strings. If successful, it allocates a buffer
-//  which becomes the property of the caller.
+//  This method is called to build up an environment block from a list of
+//  environment strings. If successful, it allocates a buffer which becomes
+//  the property of the caller.
 //
-static tCIDLib::TCh*
-pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
-                , const tCIDLib::TCard4 c4EnvironCount)
+static tCIDLib::TCh* pszBuildEnviron(tCIDKernel::TStrList& klistSrc)
 {
     //
     //  First lets see how much space we need to create the environment
@@ -116,9 +114,17 @@ pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
     //  1.)
     //
     tCIDLib::TCard4 c4BufSize = 1;
-    tCIDLib::TCard4 c4Index;
-    for (c4Index = 0; c4Index < c4EnvironCount; c4Index++)
-        c4BufSize += TRawStr::c4StrLen(apszEnviron[c4Index]) + 1;
+
+    tCIDLib::TCard4 c4EnvCount = 0;
+    if (klistSrc.bResetCursor())
+    {
+        TKrnlString* pkstrCur = klistSrc.pobjHead();
+        do
+        {
+            c4BufSize += pkstrCur->c4Length() + 1;
+            c4EnvCount++;
+        }   while (klistSrc.bNext(pkstrCur));
+    }
 
     // Allocate the buffer
     tCIDLib::TCh* pszEnvBuffer = new tCIDLib::TCh[c4BufSize];
@@ -129,33 +135,36 @@ pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
 
     // And now fill it in
     tCIDLib::TCh* pszTmp = pszEnvBuffer;
-    for (c4Index = 0; c4Index < c4EnvironCount; c4Index++)
+    if (klistSrc.bResetCursor())
     {
-        // Get the length of this string
-        tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(apszEnviron[c4Index]);
-
-        // And copy it into the buffer
-        TRawMem::CopyMemBuf
-        (
-            pszTmp
-            , apszEnviron[c4Index]
-            , (c4Len+1) * kCIDLib::c4UniBytes
-        );
-
-        // Move the temp pointer past this string's nul
-        pszTmp += c4Len+1;
-
-        // If debug then keep track of chars used so far
-        #if CID_DEBUG_ON
-        if (c4CharsLeft < c4Len+1)
+        TKrnlString* pkstrCur = klistSrc.pobjHead();
+        do
         {
-            delete [] pszEnvBuffer;
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_BufferOverflow);
-            return 0;
-        }
+            // Get the length of this string
+            tCIDLib::TCard4 c4Len = pkstrCur->c4Length();
 
-        c4CharsLeft -= c4Len+1;
-        #endif
+            // And copy it into the buffer
+            TRawMem::CopyMemBuf
+            (
+                pszTmp, pkstrCur->pszValue(), (c4Len + 1) * kCIDLib::c4UniBytes
+            );
+
+            // Move the temp pointer past this string's nul
+            pszTmp += c4Len + 1;
+
+            // If debug then keep track of chars used so far
+            #if CID_DEBUG_ON
+            if (c4CharsLeft < c4Len+1)
+            {
+                delete [] pszEnvBuffer;
+                TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_BufferOverflow);
+                return nullptr;
+            }
+
+            c4CharsLeft -= c4Len+1;
+            #endif
+
+        }   while (klistSrc.bNext(pkstrCur));
     }
 
     // Add in the second terminating nul for the end of buffer
@@ -164,7 +173,7 @@ pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
     {
         delete [] pszEnvBuffer;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_BufferOverflow);
-        return 0;
+        return nullptr;
     }
     #endif
 
@@ -472,10 +481,8 @@ TKrnlExtProcess::bSetPriorityClass(const tCIDLib::EPrioClasses eNewClass)
 tCIDLib::TBoolean
 TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
                         , const tCIDLib::TCh*           pszInitPath
-                        ,       tCIDLib::TCh**          apszParms
-                        , const tCIDLib::TCard4         c4ParmCount
-                        ,       tCIDLib::TCh**          apszEnviron
-                        , const tCIDLib::TCard4         c4EnvironCount
+                        ,       tCIDKernel::TStrList&   klistParms
+                        ,       tCIDKernel::TStrList&   klistEnviron
                         , const tCIDLib::EExtProcFlags  eFlags
                         , const tCIDLib::EExtProcShows  eShow)
 {
@@ -500,11 +507,15 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
     //  room for a space after it (if there are any parameters) and quote
     //  characters around it (in case it has whitespace in it.)
     //
-    tCIDLib::TCard4 c4Index;
     tCIDLib::TCard4 c4BufSize = TRawStr::c4StrLen(pszPath) + 3;
-
-    for (c4Index = 0; c4Index < c4ParmCount; c4Index++)
-        c4BufSize += TRawStr::c4StrLen(apszParms[c4Index]) + 3;
+    if (klistParms.bResetCursor())
+    {
+        TKrnlString* pkstrCur = klistParms.pobjHead();
+        do
+        {
+            c4BufSize += pkstrCur->c4Length();
+        }   while (klistParms.bNext(pkstrCur));
+    }
 
     // Ok, now lets allocate the buffer and put a janitor on it.
     tCIDLib::TCh* pszCmdLine = new tCIDLib::TCh[c4BufSize + 1];
@@ -518,22 +529,26 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
     //  the command line. We prepend a separator space between each one and
     //  put quotes around them. The storage for this was accounted for above.
     //
-    for (c4Index = 0; c4Index < c4ParmCount; c4Index++)
+    if (klistParms.bResetCursor())
     {
-        TRawStr::CatStr(pszCmdLine, L" \"");
-        TRawStr::CatStr(pszCmdLine, apszParms[c4Index]);
-        TRawStr::CatStr(pszCmdLine, L"\"");
+        TKrnlString* pkstrCur = klistParms.pobjHead();
+        do
+        {
+            TRawStr::CatStr(pszCmdLine, L" \"");
+            TRawStr::CatStr(pszCmdLine, klistParms.pobjHead()->pszValue());
+            TRawStr::CatStr(pszCmdLine, L"\"");
+        }   while (klistParms.bNext(pkstrCur));
     }
 
+
     // And call the other version
-    return bStart(pszCmdLine, pszInitPath, apszEnviron, c4EnvironCount, eFlags, eShow);
+    return bStart(pszCmdLine, pszInitPath, klistEnviron, eFlags, eShow);
 }
 
 tCIDLib::TBoolean
 TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
                         , const tCIDLib::TCh*           pszInitPath
-                        ,       tCIDLib::TCh**          apszEnviron
-                        , const tCIDLib::TCard4         c4EnvironCount
+                        ,       tCIDKernel::TStrList&   klistEnviron
                         , const tCIDLib::EExtProcFlags  eFlags
                         , const tCIDLib::EExtProcShows  eShow)
 {
@@ -674,10 +689,10 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
     //  Now lets build up the environment buffer, if we have any environment
     //  strings. If not, it just stays zero.
     //
-    tCIDLib::TCh* pszEnvBuffer = 0;
-    if (c4EnvironCount)
+    tCIDLib::TCh* pszEnvBuffer = nullptr;
+    if (!klistEnviron.bIsEmpty())
     {
-        pszEnvBuffer = pszBuildEnviron(apszEnviron, c4EnvironCount);
+        pszEnvBuffer = pszBuildEnviron(klistEnviron);
         if (!pszEnvBuffer)
             return kCIDLib::False;
     }

@@ -321,12 +321,12 @@ tCIDLib::TBoolean TSrvTarget::bMakeSocket()
                 delete psockNew;
             }
 
-            catch(TError& errToCatch)
+            catch(TError& errInner)
             {
-                if (facCIDOrb().bShouldLog(errToCatch))
+                if (facCIDOrb().bShouldLog(errInner))
                 {
-                    errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                    TModule::LogEventObj(errToCatch);
+                    errInner.AddStackLevel(CID_FILE, CID_LINE);
+                    TModule::LogEventObj(errInner);
                 }
 
                 if (facCIDOrb().bLogFailures())

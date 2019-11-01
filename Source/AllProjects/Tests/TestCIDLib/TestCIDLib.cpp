@@ -196,10 +196,6 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
         try
         {
-            tCIDLib::TCard4 c4Val1 = 10;
-            tCIDLib::TCard4 c4Val2 = 20;
-            CIDPreCond(c4Val1 > c4Val2);
-
             RunTests();
 
             //

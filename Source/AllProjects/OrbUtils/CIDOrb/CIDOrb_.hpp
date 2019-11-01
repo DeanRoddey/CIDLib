@@ -46,13 +46,13 @@ namespace kCIDOrb_
     //  Magic values used in the packet header as brackets around the other
     //  fields, as a sanity check.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MagicVal  = 0xDEADBEEF;
-    const tCIDLib::TCard4   c4MagicVal2 = 0xEADABEBA;
+    constexpr tCIDLib::TCard4   c4MagicVal  = 0xDEADBEEF;
+    constexpr tCIDLib::TCard4   c4MagicVal2 = 0xEADABEBA;
 
     // -----------------------------------------------------------------------
     //  The modulus for hashing the packet data
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4PacketHashMod = 109;
+    constexpr tCIDLib::TCard4   c4PacketHashMod = 109;
 
 
     // -----------------------------------------------------------------------
@@ -60,7 +60,7 @@ namespace kCIDOrb_
     //  formatting out data, mostly on the server side. If it's bigger than
     //  this a temp buffer is allocated.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4SmallIOBufSz = 1024 * 32;
+    constexpr tCIDLib::TCard4   c4SmallIOBufSz = 1024 * 32;
 };
 
 

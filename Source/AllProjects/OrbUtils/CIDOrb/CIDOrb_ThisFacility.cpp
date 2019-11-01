@@ -336,6 +336,7 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
             , tCIDLib::EErrClasses::NotReady
         );
     }
+    #endif
 
     if (!porbsToDereg)
     {
@@ -347,8 +348,10 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::AppError
         );
+
+        // Won't happen but makes analyzer happy
+        return;
     }
-    #endif
 
     //
     //  Lock the object list while we do this and orphan this object out of
@@ -376,6 +379,9 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
             , tCIDLib::EErrClasses::NotFound
             , porbsToDereg->ooidThis()
         );
+
+        // Won't get here but makes analyzer happy
+        return;
     }
 
     // Put a janitor on it that will delete it if we adopted it
@@ -1150,7 +1156,8 @@ TFacCIDOrb::SendMsg(        TStreamSocket&          sockTar
 
 //
 //  When an encrypter is set on the ORB, each packet sent out and recieved
-//  is encrypted/decrypted using this encrypter.
+//  is encrypted/decrypted using this encrypter. It can be null to disable
+//  encryption.
 //
 tCIDLib::TVoid TFacCIDOrb::SetEncrypter(TBlockEncrypter* const pcrypToAdopt)
 {
@@ -1177,7 +1184,8 @@ tCIDLib::TVoid TFacCIDOrb::SetEncrypter(TBlockEncrypter* const pcrypToAdopt)
         m_pcrypSecure = nullptr;
     }
 
-    // And store the new one
+    // And store the new one. It can be null sohave to suppress warning
+    #pragma warning(suppress : 6001)
     m_pcrypSecure = pcrypToAdopt;
 }
 

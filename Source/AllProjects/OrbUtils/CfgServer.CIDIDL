@@ -63,7 +63,7 @@
 
             <!-- =============================================================
               - Adds an object to the object store. If the key already exists,
-            - then an exception will be thrown. So it is for unconditionally
+              - then an exception will be thrown. So it is for unconditionally
               - adding objects. It's version number will be 1 upon successful
               - return.
               -  =============================================================

@@ -347,6 +347,15 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
 #include    "CIDKernel_String.hpp"
 #include    "CIDKernel_KVPair.hpp"
 
+// ---------------------------------------------------------------------------
+//  And some common types
+// ---------------------------------------------------------------------------
+namespace tCIDKernel
+{
+    // For things like external process environment/parameter lists
+    using TStrList  = TKrnlLList<TKrnlString>;
+}
+
 #include    "CIDKernel_Audio.hpp"
 #include    "CIDKernel_RawMemory.hpp"
 #include    "CIDKernel_Atomic.hpp"

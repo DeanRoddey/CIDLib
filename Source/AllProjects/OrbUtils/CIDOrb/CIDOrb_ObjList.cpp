@@ -156,8 +156,7 @@ tCIDLib::TBoolean TOrbSObjList::bNext()
     if (m_c4BucketInd == kCIDOrb::c4IdModulus)
         return kCIDLib::False;
 
-    #if CID_DEBUG_ON
-    // If the bucket index is valid, then the iter pionter must be non-zero
+    // If the bucket index is valid, then the iter pointer must be non-zero
     if (!m_pbiIter)
     {
         facCIDOrb().ThrowErr
@@ -168,8 +167,10 @@ tCIDLib::TBoolean TOrbSObjList::bNext()
             , tCIDLib::ESeverities::ProcFatal
             , tCIDLib::EErrClasses::Internal
         );
+
+        // Won't get here, but makes the analyzer happy
+        return kCIDLib::False;
     }
-    #endif
 
     //
     //  Move the current node up to the next available node. If we are at the
@@ -272,8 +273,7 @@ const TOrbServerBase& TOrbSObjList::objCur() const
         );
     }
 
-    #if CID_DEBUG_ON
-    // If the bucket index is valid, then the iter pionter must be non-zero
+    // If the bucket index is valid, then the iter pointer must be non-zero
     if (!m_pbiIter)
     {
         facCIDOrb().ThrowErr
@@ -284,8 +284,10 @@ const TOrbServerBase& TOrbSObjList::objCur() const
             , tCIDLib::ESeverities::ProcFatal
             , tCIDLib::EErrClasses::Internal
         );
+
+        // Won't get here but makes the analyzer happy
+        return *static_cast<TOrbServerBase*>(nullptr);
     }
-    #endif
 
     return *m_pbiIter->porbsThis;
 }
@@ -304,8 +306,7 @@ TOrbServerBase& TOrbSObjList::objCur()
         );
     }
 
-    #if CID_DEBUG_ON
-    // If the bucket index is valid, then the iter pionter must be non-zero
+    // If the bucket index is valid, then the iter pointer must be non-zero
     if (!m_pbiIter)
     {
         facCIDOrb().ThrowErr
@@ -316,8 +317,10 @@ TOrbServerBase& TOrbSObjList::objCur()
             , tCIDLib::ESeverities::ProcFatal
             , tCIDLib::EErrClasses::Internal
         );
+
+        // Won't get here but makes the analyzer happy
+        return *static_cast<TOrbServerBase*>(nullptr);
     }
-    #endif
 
     return *m_pbiIter->porbsThis;
 }

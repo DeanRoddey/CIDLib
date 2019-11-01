@@ -135,6 +135,14 @@ namespace tCIDLib
 }
 
 tCIDLib::TVoid
+tCIDLib::ThrowAssert(const  tCIDLib::TCh* const pszErr
+                    , const tCIDLib::TCh* const pszFile
+                    , const tCIDLib::TCard4     c4Line)
+{
+    ThrowAssert(TString(pszErr), pszFile, c4Line);
+}
+
+tCIDLib::TVoid
 tCIDLib::ThrowAssert(const  TString&            strErr
                     , const tCIDLib::TCh* const pszFile
                     , const tCIDLib::TCard4     c4Line)
@@ -149,6 +157,15 @@ tCIDLib::ThrowAssert(const  TString&            strErr
         , tCIDLib::ESeverities::Failed
         , tCIDLib::EErrClasses::Assert
     );
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowAssert(const  tCIDLib::TCh* const pszErr
+                    , const tCIDLib::TCh* const pszFile
+                    , const tCIDLib::TCard4     c4Line
+                    , const MFormattable&       mfbtlToken1)
+{
+    ThrowAssert(TString(pszErr), pszFile, c4Line, mfbtlToken1);
 }
 
 tCIDLib::TVoid
@@ -173,6 +190,14 @@ tCIDLib::ThrowAssert(const  TString&            strErr
 
 
 tCIDLib::TVoid
+tCIDLib::ThrowPreCond(  const   tCIDLib::TCh* const pszCond
+                        , const tCIDLib::TCh* const pszFile
+                        , const tCIDLib::TCard4     c4Line)
+{
+    ThrowPreCond(TString(pszCond), pszFile, c4Line);
+}
+
+tCIDLib::TVoid
 tCIDLib::ThrowPreCond(  const   TString&            strCond
                         , const tCIDLib::TCh* const pszFile
                         , const tCIDLib::TCard4     c4Line)
@@ -188,6 +213,14 @@ tCIDLib::ThrowPreCond(  const   TString&            strCond
         , tCIDLib::ESeverities::Failed
         , tCIDLib::EErrClasses::Assert
     );
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowPostCond( const   tCIDLib::TCh* const pszCond
+                        , const tCIDLib::TCh* const pszFile
+                        , const tCIDLib::TCard4     c4Line)
+{
+    ThrowPostCond(TString(pszCond), pszFile, c4Line);
 }
 
 tCIDLib::TVoid
@@ -526,7 +559,17 @@ static tCIDLib::TVoid DummyFunc()
     }
 
 
-    CIDPreCond(c4Val1 > c4Val2);
+    if (bCIDPreCond(c4Val1 > c4Val2) || !bCIDPostCond(c4Val1 < c4Val2))
+    {
+    }
+
+    if (!bCIDAssert(c4Val1 > c4Val2, L"It was wrong, dude"))
+    {
+    }
+
+    if (!bCIDAssertX(c4Val1 > c4Val2, L"It was wrong, %(1)", TString(L"Dude")))
+    {
+    }
 }
 #endif
 

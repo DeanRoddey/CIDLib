@@ -110,9 +110,24 @@ namespace tCIDLib
 {
     CIDLIBEXP tCIDLib::TVoid ThrowAssert
     (
+        const   tCIDLib::TCh* const pszErr
+        , const tCIDLib::TCh* const pszFile
+        , const tCIDLib::TCard4     c4Line
+    );
+
+    CIDLIBEXP tCIDLib::TVoid ThrowAssert
+    (
         const   TString&            strErr
         , const tCIDLib::TCh* const pszFile
         , const tCIDLib::TCard4     c4Line
+    );
+
+    CIDLIBEXP tCIDLib::TVoid ThrowAssert
+    (
+        const   tCIDLib::TCh* const pszErr
+        , const tCIDLib::TCh* const pszFile
+        , const tCIDLib::TCard4     c4Line
+        , const MFormattable&       mfmtblToken1
     );
 
     CIDLIBEXP tCIDLib::TVoid ThrowAssert
@@ -125,7 +140,21 @@ namespace tCIDLib
 
     CIDLIBEXP tCIDLib::TVoid ThrowPreCond
     (
+        const   tCIDLib::TCh* const pszCond
+        , const tCIDLib::TCh* const pszFile
+        , const tCIDLib::TCard4     c4Line
+    );
+
+    CIDLIBEXP tCIDLib::TVoid ThrowPreCond
+    (
         const   TString&            strCond
+        , const tCIDLib::TCh* const pszFile
+        , const tCIDLib::TCard4     c4Line
+    );
+
+    CIDLIBEXP tCIDLib::TVoid ThrowPostCond
+    (
+        const   tCIDLib::TCh* const pszCond
         , const tCIDLib::TCh* const pszFile
         , const tCIDLib::TCard4     c4Line
     );
@@ -155,22 +184,83 @@ namespace tCIDLib
 
     #define CIDAssert2X(msg,tok1)  tCIDLib::ThrowAssert(msg, CID_FILE, CID_LINE, tok1);
 
+    // Never actually returns, this is for code analysis reasons
+    inline tCIDLib::TBoolean
+    bAssertTest(const   tCIDLib::TBoolean       bResult
+                , const tCIDLib::TCh* const     pszMsg
+                , const tCIDLib::TCh* const     pszFile
+                , const tCIDLib::TCard4         c4Line)
+    {
+        if (bResult)
+            return kCIDLib::True;
+        tCIDLib::ThrowAssert(pszMsg, pszFile, c4Line);
+        return kCIDLib::False;
+    }
+
+    inline tCIDLib::TBoolean
+    bAssertTest1(const  tCIDLib::TBoolean       bResult
+                , const tCIDLib::TCh* const     pszMsg
+                , const tCIDLib::TCh* const     pszFile
+                , const tCIDLib::TCard4         c4Line
+                , const MFormattable&           mfmtblTok1)
+    {
+        if (bResult)
+            return kCIDLib::True;
+        tCIDLib::ThrowAssert(pszMsg, pszFile, c4Line, mfmtblTok1);
+        return kCIDLib::False;
+    }
+
+    #define bCIDAssert(test,msg) \
+    bAssertTest((test), msg, CID_FILE, CID_LINE)
+
+    #define bCIDAssertX(test,msg, tok1) \
+    bAssertTest1((test), msg, CID_FILE, CID_LINE, tok1)
+
 #else
-    #define CIDAssert(test,msg)
-    #define CIDAssertX(test,msg,tok1)
-    #define CIDAssert2(msg)
-    #define CIDAssert2X(msg,tok1)
+    #define CIDAssert(test,msg) {}
+    #define CIDAssertX(test,msg,tok1) {}
+    #define CIDAssert2(msg) {}
+    #define CIDAssert2X(msg,tok1) {}
+
+    #define bCIDAssert(test,msg) kCIDLib::True
+    #define bCIDAssertX(test,msg,tok1) kCIDLib::True
+    #define bCIDAssert2(msg) kCIDLib::True
+    #define bCIDAssert2X(msg,tok1) kCIDLib::True
 #endif
 
 
 // ---------------------------------------------------------------------------
 // These are not debug-only, they are pre-psot condition checks
 // ---------------------------------------------------------------------------
-#define CIDPreCond(test) \
-if (!(test)) { tCIDLib::ThrowPreCond(CIDLib_MakeLStr2(test), CID_FILE, CID_LINE); }
+inline tCIDLib::TBoolean
+bPreCondTest(const  tCIDLib::TBoolean       bResult
+            , const tCIDLib::TCh* const     pszMsg
+            , const tCIDLib::TCh* const     pszFile
+            , const tCIDLib::TCard4         c4Line)
+{
+    if (bResult)
+        return kCIDLib::True;
+    tCIDLib::ThrowPreCond(pszMsg, pszFile, c4Line);
+    return kCIDLib::False;
+}
 
-#define CIDPostCond(test) \
-if (!(test)) { tCIDLib::ThrowPostCond(CIDLib_MakeLStr2(test), CID_FILE, CID_LINE); }
+inline tCIDLib::TBoolean
+bPostCondTest(  const   tCIDLib::TBoolean       bResult
+                , const tCIDLib::TCh* const     pszMsg
+                , const tCIDLib::TCh* const     pszFile
+                , const tCIDLib::TCard4         c4Line)
+{
+    if (bResult)
+        return kCIDLib::True;
+    tCIDLib::ThrowPostCond(pszMsg, pszFile, c4Line);
+    return kCIDLib::False;
+}
+
+
+#define bCIDPreCond(test) \
+bPreCondTest((test), CIDLib_MakeLStr2(test), CID_FILE, CID_LINE)
+
+#define bCIDPostCond(test) \
+bPostCondTest((test), CIDLib_MakeLStr2(test), CID_FILE, CID_LINE)
 
 #pragma CIDLIB_POPPACK
-

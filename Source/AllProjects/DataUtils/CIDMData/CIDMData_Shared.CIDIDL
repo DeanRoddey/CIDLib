@@ -14,7 +14,7 @@
         <CIDIDL:Constants>
 
             <CIDIDL:Constant CIDIDL:Name="strAttrLim_Required"
-                             CIDIDL:Type="TString" CIDIDL:Value="[Required]">
+                            CIDIDL:Type="TString" CIDIDL:Value="[Required]">
                 <CIDIDL:DocText>
                     Attributes passed to the attribute editor window (in CIDWUtils)
                     can have limit info provided, to help it do more validation

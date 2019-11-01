@@ -1192,7 +1192,6 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
             //  We need to decrement the active commands count as well.
             //
             TStatsCache::c8DecCounter(m_sciActiveCmds);
-            TOrbClientConnImpl* poccReply = nullptr;
             {
                 TMtxLocker mtxlSync(&m_mtxSync);
 

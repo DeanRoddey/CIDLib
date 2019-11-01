@@ -1072,42 +1072,37 @@ TTextOutStream::TTextOutStream(TTextConverter* const ptcvtToAdopt) :
 tCIDLib::TVoid
 TTextOutStream::AdoptStream(TBinOutStream* const pstrmToAdopt)
 {
-    CIDPreCond(pstrmToAdopt != nullptr);
-    if (pstrmToAdopt)
-    {
-        if (m_pstrmOut)
-        {
-            // Clean up passed stream since we are responsible for it
-            delete pstrmToAdopt;
+    //
+    //  We are responsible for the new stream, so make sure it's
+    //  cleaned up if we don't end up taking it.
+    //
+    TJanitor<TBinOutStream> janAdopt(pstrmToAdopt);
 
-            facCIDLib().ThrowErr
-            (
-                CID_FILE
-                , CID_LINE
-                , kCIDErrs::errcTStrm_StrmAlreadySet
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::AppError
-                , clsIsA()
-            );
-        }
-         else
-        {
-            m_pstrmOut = pstrmToAdopt;
-        }
+    // The passed stream can't be null and we can't already have a stream
+    if (bCIDPreCond(pstrmToAdopt != nullptr)
+    &&  bCIDPreCond(m_pstrmOut == nullptr))
+    {
+        m_pstrmOut = janAdopt.pobjOrphan();
     }
 }
 
 
 TBinOutStream& TTextOutStream::strmOut()
 {
-    CIDAssert(m_pstrmOut != nullptr, L"The underlying binary stream isn't set");
+    // It won't actually ever return false, it'll throw
+    if (!bCIDAssert(m_pstrmOut != nullptr, L"The underlying binary stream isn't set"))
+        return *static_cast<TBinOutStream*>(nullptr);
+
     return *m_pstrmOut;
 }
 
 
 const TBinOutStream& TTextOutStream::strmOut() const
 {
-    CIDAssert(m_pstrmOut != nullptr, L"The underlying binary stream isn't set");
+    // It won't actually ever return false, it'll throw
+    if (!bCIDAssert(m_pstrmOut != nullptr, L"The underlying binary stream isn't set"))
+        return *static_cast<TBinOutStream*>(nullptr);
+
     return *m_pstrmOut;
 }
 

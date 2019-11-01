@@ -934,7 +934,7 @@ TCppGenerator::GenConstant( const   TString&            strName
         }
          else
         {
-            m_strmHeader << L"    const "
+            m_strmHeader << L"    constexpr "
                          << strRealType << L" " << strName << L" = ";
             if (strRealType == L"tCIDLib::TBoolean")
                 m_strmHeader << L"kCIDLib::";
@@ -944,11 +944,19 @@ TCppGenerator::GenConstant( const   TString&            strName
     }
      else
     {
-        m_strmHeader << L"        static const "
-                     << strRealType
-                     << L" "
-                     << strName
-                     << L";\n";
+        if (strRealType == L"TString")
+        {
+            m_strmHeader << L"        static const " << strRealType << L" " << strName;
+        }
+         else
+        {
+            m_strmHeader << L"        static constexpr "
+                         << strRealType << L" " << strName << L" = ";
+            if (strRealType == L"tCIDLib::TBoolean")
+                m_strmHeader << L"kCIDLib::";
+            m_strmHeader << strValue;
+        }
+        m_strmHeader << L";\n";
     }
 
     // If doing client or server, then we have to do the cpp file also
@@ -975,6 +983,7 @@ TCppGenerator::GenConstant( const   TString&            strName
                        << strValue
                        << L");\n";
         }
+        /*
          else
         {
             m_strmImpl << L"const "
@@ -985,6 +994,7 @@ TCppGenerator::GenConstant( const   TString&            strName
                        << strValue
                        << L");\n";
         }
+        */
     }
 }
 

@@ -701,27 +701,19 @@ TTextInStream::TTextInStream(TTextConverter* const ptcvtToAdopt) :
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TTextInStream::AdoptStream(TBinInStream* const pstrmToAdopt)
 {
-    // If the stream is already set, then that's an error
-    if (m_pstrmIn)
-    {
-        // Clean up passed stream since we are responsible for it
-        delete pstrmToAdopt;
+    //
+    //  We are responsible for the new stream, so make sure it's
+    //  cleaned up if we don't end up taking it.
+    //
+    TJanitor<TBinInStream> janAdopt(pstrmToAdopt);
 
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcTStrm_StrmAlreadySet
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::AppError
-            , clsIsA()
-        );
-    }
-     else
+    // The passed stream can't be null and we can't already have a stream
+    if (bCIDPreCond(pstrmToAdopt != nullptr)
+    &&  bCIDPreCond(m_pstrmIn == nullptr))
     {
-        // We don't already have a stream so store it away
-        m_pstrmIn = pstrmToAdopt;
+        m_pstrmIn = janAdopt.pobjOrphan();
     }
+    // No ELSE clause!
 }
 
 

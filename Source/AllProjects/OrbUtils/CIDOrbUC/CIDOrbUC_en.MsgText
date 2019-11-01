@@ -38,6 +38,9 @@ ERRORS=
     ; General error ids
     errcGen_NoError             0       No Error
 
+    ; Config server client stuff
+    errcCfgSC_UpdateObject      1500    Could not update key
+
     ; Log server logger errors
     errcLSLgr_SpoolErr          3000    An error occured while spooling out locally logged events
 

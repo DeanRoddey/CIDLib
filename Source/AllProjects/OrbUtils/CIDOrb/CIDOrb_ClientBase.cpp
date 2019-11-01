@@ -793,7 +793,6 @@ tCIDLib::TVoid
 TOrbClientBase::Dispatch(const  tCIDLib::TCard4     c4WaitFor
                         ,       TCmdQItem* const    pcqiToUse)
 {
-
     // Make sure we have initialized the ORB
     #if CID_DEBUG_ON
     if (!CIDOrb_ClientBase::atomInitDone)
@@ -844,6 +843,9 @@ TOrbClientBase::Dispatch(const  tCIDLib::TCard4     c4WaitFor
                 , m_ipepSrv
                 , m_ooidThis.strClientProxyClass()
             );
+
+            // This won't happen, but it makes the analyzer happier
+            return;
         }
 
         #if CID_DEBUG_ON
@@ -1025,7 +1027,6 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
                                 ,       tCIDLib::TCard4&    c4Index
                                 , const tCIDLib::TBoolean   bReclaimScavenged)
 {
-    #if CID_DEBUG_ON
     if (!CIDOrb_ClientBase::pcolServers)
     {
         facCIDOrb().ThrowErr
@@ -1036,12 +1037,14 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::NotReady
         );
+
+        // Won't actually happen, but make sthe analyzer happy
+        return nullptr;
     }
-    #endif
 
     // Check the list of active servers
     TSrvTarget* psrvtRet = nullptr;
-    const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::pcolServers->c4ElemCount();
+    tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::pcolServers->c4ElemCount();
     for (c4Index = 0; c4Index < c4Count; c4Index++)
     {
         TSrvTarget* psrvtCur = CIDOrb_ClientBase::pcolServers->pobjAt(c4Index);
@@ -1059,8 +1062,8 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
     //
     if (!psrvtRet && bReclaimScavenged && CIDOrb_ClientBase::pcolCache)
     {
-        const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::pcolCache->c4ElemCount();
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+        c4Count = CIDOrb_ClientBase::pcolCache->c4ElemCount();
+        for (c4Index = 0; c4Index < c4Count; c4Index++)
         {
             TSrvTarget* psrvtCur = CIDOrb_ClientBase::pcolCache->pobjAt(c4Index);
 
@@ -1284,6 +1287,21 @@ tCIDLib::TVoid TOrbClientBase::TerminateOrbClient()
 //
 tCIDLib::TBoolean TOrbClientBase::bIsProxyConnected() const
 {
+    // Make sure we have initialized the ORB
+    #if CID_DEBUG_ON
+    if (!CIDOrb_ClientBase::atomInitDone)
+    {
+        facCIDOrb().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kOrbErrs::errcClient_NotReady
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::LostConnection
+        );
+    }
+    #endif
+
     //
     //  No need to lock for this quick check. If we don't even have a server
     //  object at this point, then we clearly aren't connected.
@@ -1628,23 +1646,6 @@ tCIDLib::TVoid TOrbClientBase::RemoveSrvRef()
                 );
             }
         }
-    }
-     else
-    {
-        #if CID_DEBUG_ON
-        if (psrvtOurs->m_ipepServer != m_ipepSrv)
-        {
-            TPopUp::PopUpMsg
-            (
-                CID_FILE
-                , CID_LINE
-                , L"CIDOrb Client Debug Error"
-                , L"Charmed Quark Software"
-                , L"Client proxy was marked, but found no server target"
-                , 0
-            );
-        }
-        #endif
     }
 }
 

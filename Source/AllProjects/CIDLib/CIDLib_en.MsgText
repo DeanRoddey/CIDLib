@@ -597,7 +597,6 @@ ERRORS=
     errcTReg_NotFound           4402    The class name %(1) was not in the type registry
 
     ; Text stream errors
-    errcTStrm_StrmAlreadySet    4500    The binary stream is already set for this %(1) text stream
     errcTStrm_WriteFailed       4501    Could not write transcoded text to the underlying binary stream
     errcTStrm_FormatFor         4502    Failed when formatting a fundamental value to write to the text stream
     errcTStrm_BadSpecial        4503    %(1) is not a valid value for the TTextOutStream::ESpecial enum

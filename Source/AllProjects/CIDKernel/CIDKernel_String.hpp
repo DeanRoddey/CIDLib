@@ -51,7 +51,7 @@ class KRNLEXPORT TKrnlString
 
         TKrnlString
         (
-            const   TKrnlString&            kstrToCopy
+            const   TKrnlString&            kstrSrc
         );
 
         ~TKrnlString();
@@ -62,7 +62,7 @@ class KRNLEXPORT TKrnlString
         // -------------------------------------------------------------------
         TKrnlString& operator=
         (
-            const   TKrnlString&            kstrToAssign
+            const   TKrnlString&            kstrSrc
         );
 
         TKrnlString& operator=
@@ -73,13 +73,15 @@ class KRNLEXPORT TKrnlString
         TKrnlString& operator=
         (
             const   tCIDLib::TSCh* const    pszRawSStr
-        ); 
+        );
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bIsEmpty() const;
+
+        tCIDLib::TCard4 c4Length() const;
 
         tCIDLib::TVoid Clear();
 

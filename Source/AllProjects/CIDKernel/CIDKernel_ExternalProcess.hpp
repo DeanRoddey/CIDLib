@@ -166,10 +166,8 @@ class KRNLEXPORT TKrnlExtProcess
         (
             const   tCIDLib::TCh* const     pszPath
             , const tCIDLib::TCh* const     pszInitPath
-            ,       tCIDLib::TCh**          apszParms
-            , const tCIDLib::TCard4         c4ParmCount
-            ,       tCIDLib::TCh**          apszEnviron
-            , const tCIDLib::TCard4         c4EnvironCount
+            ,       tCIDKernel::TStrList&   klistParms
+            ,       tCIDKernel::TStrList&   klistEnviron
             , const tCIDLib::EExtProcFlags  eFlag
             , const tCIDLib::EExtProcShows  eShow
         );
@@ -178,8 +176,7 @@ class KRNLEXPORT TKrnlExtProcess
         (
             const   tCIDLib::TCh* const     pszStartString
             , const tCIDLib::TCh* const     pszInitPath
-            ,       tCIDLib::TCh**          apszEnviron
-            , const tCIDLib::TCard4         c4EnvironCount
+            ,       tCIDKernel::TStrList&   klistEnviron
             , const tCIDLib::EExtProcFlags  eFlag
             , const tCIDLib::EExtProcShows  eShow
         );
