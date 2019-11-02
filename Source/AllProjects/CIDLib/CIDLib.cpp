@@ -570,6 +570,8 @@ static tCIDLib::TVoid DummyFunc()
     if (!bCIDAssertX(c4Val1 > c4Val2, L"It was wrong, %(1)", TString(L"Dude")))
     {
     }
+
+    TSingleton<TString> singleTest;
 }
 #endif
 
@@ -585,18 +587,8 @@ static tCIDLib::TVoid DummyFunc()
 //
 TFacCIDLib& facCIDLib()
 {
-    static TFacCIDLib* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDLib();
-            atomInit.Set();
-        }
-    }
-    return *pfacThis;
+    static TSingleton<TFacCIDLib> singleFacility;
+    return *singleFacility;
 }
 
 

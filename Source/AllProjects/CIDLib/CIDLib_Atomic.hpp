@@ -20,6 +20,10 @@
 //  because they don't know about such things. Really low level code should use
 //  the CIDKernel versions. But other stuff can use these.
 //
+//  We also define a singleton class that will lazily fault in an object. By
+//  default it can only default construct the object, but you can do a derivative
+//  if needed to allocate it yourself.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -124,3 +128,114 @@ namespace TAtomic
         );
     }
 }
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TSingleton
+//  PREFIX: single
+// ---------------------------------------------------------------------------
+template <typename T> class TSingleton
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TSingleton() : m_ptInstance(nullptr)
+        {
+        }
+
+        TSingleton(const TSingleton&) = delete;
+        TSingleton(TSingleton&&) = delete;
+        TSingleton& operator=(const TSingleton&) = delete;
+        TSingleton& operator=(TSingleton&&) = delete;
+
+        ~TSingleton()
+        {
+            //
+            //  We don't destroy it. These are used for globals and order of
+            //  destruction isn't under our control.
+            //
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        const T* operator->() const
+        {
+            // If alreayd set, we are done
+            if (m_ptInstance)
+                return m_ptInstance;
+
+            FaultIn();
+            return m_ptInstance;
+        }
+
+        T* operator->()
+        {
+            // If alreayd set, we are done
+            if (m_ptInstance)
+                return m_ptInstance;
+
+            FaultIn();
+            return m_ptInstance;
+        }
+
+        const T& operator*() const
+        {
+            // If alreayd set, we are done
+            if (m_ptInstance)
+                return *m_ptInstance;
+
+            FaultIn();
+            return *m_ptInstance;
+        }
+
+        T& operator*()
+        {
+            // If alreayd set, we are done
+            if (m_ptInstance)
+                return *m_ptInstance;
+
+            FaultIn();
+            return *m_ptInstance;
+        }
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  Protected, virtual methods
+        // -------------------------------------------------------------------
+
+        // If not overridden, then just default construct a T
+        virtual T* ptMakeIt()
+        {
+            return new T();
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid FaultIn()
+        {
+            if (!TAtomic::pFencedGet(&m_ptInstance))
+            {
+                TBaseLock lockInit;
+                if (!TAtomic::pFencedGet(&m_ptInstance))
+                    TAtomic::FencedSet(&m_ptInstance, this->ptMakeIt());
+            }
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_ptInstance
+        //      The pointer to our instance object we fault in. It has to be cache
+        //      aligned. Has to be mutable so we can fault it in from const methods.
+        // -------------------------------------------------------------------
+        mutable alignas(kCIDLib::c4CacheAlign)  T* m_ptInstance;
+};
+

@@ -352,6 +352,8 @@ tCIDLib::TVoid TOrbClientBase::SetObjId(const   TOrbObjId&          ooidSrc
                                         , const TString&            strNSBinding
                                         , const tCIDLib::TBoolean   bCheck)
 {
+    CIDAssert(CIDOrb_ClientBase::atomInitDone, L"ORB client is not initialized yet");
+
     //
     //  The client proxy class name stored in this object id better damn
     //  well be that of our most derived class' name, unless we were told
@@ -495,6 +497,8 @@ tCIDLib::TVoid TOrbClientBase::SetObjId(const   TOrbObjId&          ooidSrc
 //
 tCIDLib::TBoolean TOrbClientBase::bCheckForLostConnection()
 {
+    CIDAssert(CIDOrb_ClientBase::atomInitDone, L"ORB client is not initialized yet");
+
     return !bIsProxyConnected();
 }
 
@@ -502,6 +506,8 @@ tCIDLib::TBoolean TOrbClientBase::bCheckForLostConnection()
 tCIDLib::TBoolean
 TOrbClientBase::bCheckForLostConnection(const TError& errToCheck)
 {
+    CIDAssert(CIDOrb_ClientBase::atomInitDone, L"ORB client is not initialized yet");
+
     //
     //  If the object is no longer there on the server, the we haven't lost
     //  the actual object pipe connection, but the server object has probably
@@ -538,6 +544,8 @@ const TOrbObjId& TOrbClientBase::ooidThis() const
 // Drop our server reference, disconnecting us
 tCIDLib::TVoid TOrbClientBase::ResetProxy()
 {
+    CIDAssert(CIDOrb_ClientBase::atomInitDone, L"ORB client is not initialized yet");
+
     // Remove our server reference if we have one
     RemoveSrvRef();
 }
@@ -550,6 +558,8 @@ tCIDLib::TVoid TOrbClientBase::ResetProxy()
 //
 tCIDLib::TVoid TOrbClientBase::SendORBPing()
 {
+    CIDAssert(CIDOrb_ClientBase::atomInitDone, L"ORB client is not initialized yet");
+
     TCmdQItem* pcqiToUse = pcqiGetCmdItem(m_ooidThis.oidKey());
     TOrbCmd& ocmdToUse = pcqiToUse->ocmdData();
     try
