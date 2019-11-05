@@ -62,9 +62,9 @@ namespace CIDMacroEng_RandomClass
 // ---------------------------------------------------------------------------
 //  TMEngRandomNumVal: Constuctors and Destructor
 // ---------------------------------------------------------------------------
-TMEngRandomNumVal::TMEngRandomNumVal(const  TString&                strName
-                                    , const tCIDLib::TCard2         c2Id
-                                    , const tCIDMacroEng::EConstTypes  eConst) :
+TMEngRandomNumVal::TMEngRandomNumVal(const  TString&                    strName
+                                    , const tCIDLib::TCard2             c2Id
+                                    , const tCIDMacroEng::EConstTypes   eConst) :
 
     TMEngClassVal(strName, c2Id, eConst)
     , m_prandValue(new TRandomNum)

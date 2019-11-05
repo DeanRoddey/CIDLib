@@ -47,7 +47,7 @@ namespace kCIDMacroEng_ThisFacility
     //  There is a replacement token that is used to put in the actual new
     //  class path. So it creates an initial valid and compilable class.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh* pszDefClassText =
+    static constexpr const tCIDLib::TCh* pszDefClassText =
     (
         L"Class=[NonFinal]\n"
         L"    ClassPath %(1);\n"

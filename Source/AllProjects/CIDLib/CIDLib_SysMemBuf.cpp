@@ -46,13 +46,13 @@ namespace CIDLib_SysMemBuf
     // -----------------------------------------------------------------------
     //  Our persistent format versions
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    constexpr tCIDLib::TCard2   c2FmtVersion = 1;
 
 
     // -----------------------------------------------------------------------
     //  If they don't provide a size, we use this default size
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4DefMinSize = 1024;
+    constexpr tCIDLib::TCard4   c4DefMinSize = 1024;
 }
 
 

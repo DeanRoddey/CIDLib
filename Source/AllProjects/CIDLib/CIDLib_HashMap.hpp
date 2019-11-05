@@ -912,10 +912,13 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 delete pnodeToRem;
                 pnodeToRem = nullptr;
                 m_c4CurElements--;
+
+                // And return that we found it and remove it
+                return kCIDLib::True;
             }
 
-            // Return a boolean to indicate whether we removed it or not
-            return (pnodeToRem != nullptr);
+            // We never removed it
+            return kCIDLib::False;
         }
 
         tCIDLib::TCard4 c4HashModulus() const

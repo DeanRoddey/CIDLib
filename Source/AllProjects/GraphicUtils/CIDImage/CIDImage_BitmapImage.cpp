@@ -101,15 +101,15 @@ namespace CIDImage_BitmapImage
         , tCIDLib::c4EnumOrd(tCIDImage::EBitDepths::One)
         , 0
     };
-    const tCIDLib::TCard2   c2BA  = 0x4142;
-    const tCIDLib::TCard2   c2BM  = 0x4D42;
-    const tCIDLib::TCard4   c4Size1xHeader = 10;
-    const tCIDLib::TCard4   c4SizeBasicHeader = 12;
-    const tCIDLib::TCard4   c4Size3xHeader = 40;
-    const tCIDLib::TCard4   c4Size4xHeader = 108;
-    const tCIDLib::TCard4   c4SizeOS2Max = 64;
-    const tCIDLib::TCard4   c4SizeFileHeader = 14;
-    const tCIDLib::TCard4   c4LinePadding = 4;
+    constexpr tCIDLib::TCard2   c2BA  = 0x4142;
+    constexpr tCIDLib::TCard2   c2BM  = 0x4D42;
+    constexpr tCIDLib::TCard4   c4Size1xHeader = 10;
+    constexpr tCIDLib::TCard4   c4SizeBasicHeader = 12;
+    constexpr tCIDLib::TCard4   c4Size3xHeader = 40;
+    constexpr tCIDLib::TCard4   c4Size4xHeader = 108;
+    constexpr tCIDLib::TCard4   c4SizeOS2Max = 64;
+    constexpr tCIDLib::TCard4   c4SizeFileHeader = 14;
+    constexpr tCIDLib::TCard4   c4LinePadding = 4;
 
 
     // -----------------------------------------------------------------------

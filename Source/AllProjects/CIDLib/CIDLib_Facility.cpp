@@ -69,8 +69,8 @@ namespace CIDLib_Facility
     //      This is the format string for the version member. The provided maj,
     //      min, and revision values are formatted into it during construction.
     // -----------------------------------------------------------------------
-    const tCIDLib::THashVal     hshModulus = 29;
-    const tCIDLib::TCh* const   pszVersionFmt = L"%(1).%(2).%(3)";
+    static const tCIDLib::THashVal      hshModulus = 29;
+    static const tCIDLib::TCh* const    pszVersionFmt = L"%(1).%(2).%(3)";
 
 
     // -----------------------------------------------------------------------
@@ -79,19 +79,18 @@ namespace CIDLib_Facility
     //  pfliHead
     //      The head of the facility list.
     // -----------------------------------------------------------------------
-    TFacListItem*               pfliHead = 0;
+    static TFacListItem*        pfliHead = nullptr;
+
+    // -----------------------------------------------------------------------
+    //  We need some light locking here
+    // -----------------------------------------------------------------------
+    static TCriticalSection*    pcrsList = new TCriticalSection();
 }
 
 
 // ---------------------------------------------------------------------------
 //  Local methods
 // ---------------------------------------------------------------------------
-static TCriticalSection* pcrsList()
-{
-    static TCriticalSection crsList;
-    return &crsList;
-}
-
 static tCIDLib::TVoid AddToList(TFacility* const pfacNew)
 {
     TFacListItem* pfliNew = new TFacListItem;
@@ -99,7 +98,7 @@ static tCIDLib::TVoid AddToList(TFacility* const pfacNew)
     pfliNew->pfacThis = pfacNew;
 
     // Lock the list and add the new facility
-    TCritSecLocker lockList(pcrsList());
+    TCritSecLocker lockList(CIDLib_Facility::pcrsList);
 
     pfliNew->pfliNext = CIDLib_Facility::pfliHead;
     CIDLib_Facility::pfliHead = pfliNew;
@@ -109,7 +108,7 @@ static tCIDLib::TVoid AddToList(TFacility* const pfacNew)
 static tCIDLib::TVoid RemoveFromList(TFacility* const pfacToRemove)
 {
     // Lock the list while we search
-    TCritSecLocker lockList(pcrsList());
+    TCritSecLocker lockList(CIDLib_Facility::pcrsList);
 
     TFacListItem* pfliCur = CIDLib_Facility::pfliHead;
     TFacListItem* pfliPrev = 0;
@@ -168,7 +167,7 @@ TFacility* TFacility::pfacFromName(const TString& strFacName)
     const tCIDLib::THashVal hshName = strFacName.hshCalcHash(CIDLib_Facility::hshModulus);
 
     // Lock the list while we search
-    TCritSecLocker lockList(pcrsList());
+    TCritSecLocker lockList(CIDLib_Facility::pcrsList);
 
     // Try to find the passed name in the local hash table
     TFacListItem* pfliCur = CIDLib_Facility::pfliHead;

@@ -63,17 +63,7 @@ template class CIDCTRLSEXP TRefKeyedHashSet<TWindow,TString,TStringKeyOps>;
 // ---------------------------------------------------------------------------
 TFacCIDCtrls& facCIDCtrls()
 {
-    static TFacCIDCtrls* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDCtrls();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDCtrls* pfacThis = new TFacCIDCtrls();
     return *pfacThis;
 }
 

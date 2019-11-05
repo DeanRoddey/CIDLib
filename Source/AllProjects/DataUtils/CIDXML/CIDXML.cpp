@@ -72,17 +72,7 @@ RTTIDecls(TXMLElemDecl,TObject)
 // ---------------------------------------------------------------------------
 TFacCIDXML& facCIDXML()
 {
-    static TFacCIDXML* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDXML();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDXML* pfacThis = new TFacCIDXML();
     return *pfacThis;
 }
 

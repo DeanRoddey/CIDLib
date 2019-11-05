@@ -206,34 +206,43 @@ TFacCIDOrb::bCheckOOIDCache(const   TString&    strBindingName
 {
     TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
 
-    //
-    //  If we have gone beyond the next scheduled forced name server trip
-    //  time, then say we didn't find it. Reset the timer for the next
-    //  time around before we return.
-    //
-    const tCIDLib::TEncodedTime enctNow = TTime::enctNow();
-    if (m_enctNextForcedNS < enctNow)
+    try
     {
-        if (strBindingName != strFauxNSBinding)
+        //
+        //  If we have gone beyond the next scheduled forced name server trip
+        //  time, then say we didn't find it. Reset the timer for the next
+        //  time around before we return.
+        //
+        const tCIDLib::TEncodedTime enctNow = TTime::enctNow();
+        if (m_enctNextForcedNS < enctNow)
         {
-            m_enctNextForcedNS = enctNow + CIDOrb_ThisFacility::enctForcedNSTO;
+            if (strBindingName != strFauxNSBinding)
+            {
+                m_enctNextForcedNS = enctNow + CIDOrb_ThisFacility::enctForcedNSTO;
+                return kCIDLib::False;
+            }
+        }
+
+        // See if this guy is in the cache
+        TObjIdCache::TPair* pkobjBinding = m_colNSCache.pkobjFindByKey(strBindingName);
+        if (!pkobjBinding)
+            return kCIDLib::False;
+
+        // If it's timed out, remove it and force them to go back the name server
+        if (pkobjBinding->objValue().enctCache() < enctNow)
+        {
+            m_colNSCache.RemoveKey(strBindingName);
             return kCIDLib::False;
         }
+
+        ooidToFill = pkobjBinding->objValue();
     }
 
-    // See if this guy is in the cache
-    TObjIdCache::TPair* pkobjBinding = m_colNSCache.pkobjFindByKey(strBindingName);
-    if (!pkobjBinding)
-        return kCIDLib::False;
-
-    // If it's timed out, remove it and force them to go back the name server
-    if (pkobjBinding->objValue().enctCache() < enctNow)
+    catch(TError& errToCatch)
     {
-        m_colNSCache.RemoveKey(strBindingName);
-        return kCIDLib::False;
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        throw;
     }
-
-    ooidToFill = pkobjBinding->objValue();
     return kCIDLib::True;
 }
 

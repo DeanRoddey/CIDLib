@@ -71,15 +71,15 @@ namespace CIDLib_UTFConverter
     //  apszEncodings
     //      Strings that represent the descriptions of the EEncodings type.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard1 ac1FirstByteMark[7] =
+    static constexpr const tCIDLib::TCard1 ac1FirstByteMark[7] =
     {
         0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
     };
-    const tCIDLib::TCard4 ac4UTFOffsets[6] =
+    static constexpr const tCIDLib::TCard4 ac4UTFOffsets[6] =
     {
         0, 0x3080, 0xE2080, 0x3C82080, 0xFA082080, 0x82082080
     };
-    const tCIDLib::TCard1 ac1UTFBytes[256] =
+    static constexpr const tCIDLib::TCard1 ac1UTFBytes[256] =
     {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -98,7 +98,7 @@ namespace CIDLib_UTFConverter
         ,   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
         ,   3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
     };
-    const tCIDLib::TCh* const apszEncodingVals[] =
+    static constexpr const tCIDLib::TCh* const apszEncodingVals[] =
     {
         L"US-ASCII"
         , L"UTF-8"
@@ -106,7 +106,7 @@ namespace CIDLib_UTFConverter
         , L"UTF-16BE"
     };
 
-    TEArray<const tCIDLib::TCh*, TUTFConverter::EEncodings, TUTFConverter::EEncodings::Count>
+    static TEArray<const tCIDLib::TCh*, TUTFConverter::EEncodings, TUTFConverter::EEncodings::Count>
     apszEncodings(apszEncodingVals);
 }
 

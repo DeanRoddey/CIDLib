@@ -37,16 +37,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDCrypto& facCIDCrypto()
 {
-    static TFacCIDCrypto* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDCrypto();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDCrypto* pfacThis = new TFacCIDCrypto();
     return *pfacThis;
 }

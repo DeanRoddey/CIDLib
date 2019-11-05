@@ -42,17 +42,7 @@
 //
 TFacCIDWUtils& facCIDWUtils()
 {
-    static TFacCIDWUtils* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDWUtils();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDWUtils* pfacThis = new TFacCIDWUtils();
     return *pfacThis;
 }
 

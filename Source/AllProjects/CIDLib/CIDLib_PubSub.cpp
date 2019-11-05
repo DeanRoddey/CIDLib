@@ -49,45 +49,22 @@ namespace CIDLib_PubSub
     //  We need a mutex for sync, and we fault it in. Everyone accesses it via the
     //  method below which faults it in, along with some other stuff below.
     //
-    TMutex* pmtxSync();
+    static TMutex*  pmtxSync = new TMutex();
 
     //
     //  The lists are faulted in with the mutex above. We support a max of 32K
     //  subscribers, and 8192 topics (as set below when we fault in these lists.)
     //
-    TAtomicFlag             atomInit;
-    tCIDLib::TCard4         c4NextId = 1;
-    TSubList*               pcolSubList;
-    TTopicList*             pcolTopicList;
-    tCIDLib::TEncodedTime   enctNextScavenge;
+    static tCIDLib::TCard4          c4NextId = 1;
+    static TSubList*                pcolSubList = new TSubList(tCIDLib::EAdoptOpts::NoAdopt, 256);
+    static TTopicList*              pcolTopicList = new TTopicList
+                                    (
+                                        109, TStringKeyOps(kCIDLib::False), &TPubSubTopic::strKey
+                                    );
+    static tCIDLib::TEncodedTime    enctNextScavenge = TTime::enctNowPlusMins(5);
 
     // The max size we'll let the msg queue grow to before we start dropping them
-    const tCIDLib::TCard4   c4MaxMsgQSz = 4192;
-}
-
-
-// This is used to access the sync mutex and fault some other bits in as well
-TMutex* CIDLib_PubSub::pmtxSync()
-{
-    static TMutex mtxLock;
-
-    if (!CIDLib_PubSub::atomInit)
-    {
-        TMtxLocker mtxlSync(&mtxLock);
-        if (!CIDLib_PubSub::atomInit)
-        {
-            pcolSubList = new TSubList(tCIDLib::EAdoptOpts::NoAdopt, 256);
-            pcolTopicList = new TTopicList
-            (
-                109, TStringKeyOps(kCIDLib::False), &TPubSubTopic::strKey
-            );
-            enctNextScavenge = TTime::enctNowPlusMins(5);
-
-            CIDLib_PubSub::atomInit.Set();
-        }
-    }
-
-    return &mtxLock;
+    constexpr tCIDLib::TCard4       c4MaxMsgQSz = 4192;
 }
 
 
@@ -572,7 +549,7 @@ tCIDLib::TVoid TPubSubMsg::CheckMsgType(const TClass& clsToCheck) const
 //
 MPubSubscription::~MPubSubscription()
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
     if (m_c4SubscriberId)
     {
         try
@@ -683,7 +660,7 @@ tCIDLib::TVoid
 MPubSubscription::SubscribeToTopic( const   TString&            strTopicPath
                                     , const tCIDLib::TBoolean   bMustExist)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
 
     //
     //  Invoke a scavenger pass. This isn't something that happens very often, so it's
@@ -736,7 +713,7 @@ MPubSubscription::SubscribeToTopic( const   TString&            strTopicPath
 tCIDLib::TVoid
 MPubSubscription::UnsubscribeFromTopic(const TString& strTopicPath)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
     try
     {
         //
@@ -1009,7 +986,7 @@ tCIDLib::TVoid TPubSubAsyncSub::ProcessPubMsg(const TPubSubMsg& psmsgIn)
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TPubSubTopic::bTopicExists(const TString& strTopicPath)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
     TPubSubTopic* pstopFind = CIDLib_PubSub::pcolTopicList->pobjFindByKey(strTopicPath);
 
     //
@@ -1036,7 +1013,7 @@ tCIDLib::TBoolean TPubSubTopic::bTopicExists(const TString& strTopicPath)
 TPubSubTopic
 TPubSubTopic::pstopCreateTopic(const TString& strTopicPath, const TClass& clsMsgType)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
 
     //
     //  Invoke a scavenger pass. This isn't something that happens very often, so it's
@@ -1169,7 +1146,7 @@ tCIDLib::TCard4 TPubSubTopic::c4SubCount() const
 {
     CheckReady();
 
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
     return m_cptrImpl->c4SubCount();
 }
 
@@ -1191,7 +1168,7 @@ tCIDLib::TCard4 TPubSubTopic::c4TopicId() const
 //
 tCIDLib::TVoid TPubSubTopic::DropTopic()
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
     m_cptrImpl.DropRef();
 }
 
@@ -1205,7 +1182,7 @@ tCIDLib::TVoid TPubSubTopic::DropTopic()
 //
 tCIDLib::TVoid TPubSubTopic::Publish(TObject* const pobjToAdopt)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
     CheckReady();
     m_cptrImpl->SendMsg(pobjToAdopt);
 }
@@ -1229,7 +1206,7 @@ tCIDLib::TVoid TPubSubTopic::AddSubscriber(const tCIDLib::TCard4 c4SubId)
         , m_strTopicPath
     );
 
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
     return m_cptrImpl->AddSubscriber(c4SubId);
 }
 
@@ -1248,7 +1225,7 @@ tCIDLib::TVoid TPubSubTopic::RemoveSubscriber(const tCIDLib::TCard4 c4SubId)
         , m_strTopicPath
     );
 
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
     return m_cptrImpl->RemoveSubscriber(c4SubId);
 }
 

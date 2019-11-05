@@ -36,16 +36,6 @@
 // ---------------------------------------------------------------------------
 TFacTestFWLib& facTestFWLib()
 {
-    static TFacTestFWLib* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacTestFWLib();
-            atomInit.Set();
-        }
-    }
+    static TFacTestFWLib* pfacThis = new TFacTestFWLib();
     return *pfacThis;
 }

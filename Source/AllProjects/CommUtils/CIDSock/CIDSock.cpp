@@ -52,16 +52,6 @@ template class CIDSOCKEXP TVector<TIPAddress>;
 // ---------------------------------------------------------------------------
 TFacCIDSock& facCIDSock()
 {
-    static TFacCIDSock* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDSock();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDSock* pfacThis = new TFacCIDSock();
     return *pfacThis;
 }

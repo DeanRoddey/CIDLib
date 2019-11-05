@@ -106,7 +106,7 @@ TResCompiler::pc1ParseMenuItemFlds( tCIDLib::TCard1* const  pc1Start
             // Write out the the symbol to the header, if needed
             if (m_bGenHeaders)
             {
-                tflResHpp   << L"    const tCIDLib::TCard4  "
+                tflResHpp   << L"    constexpr tCIDLib::TCard4  "
                             << blkfCur.strField(0)
                             << L" = " << blkfCur.strField(1) << L";\n";
             }
@@ -215,7 +215,7 @@ TResCompiler::pc1ParseSubMenu(          tCIDCtrls::TRawMenuDesc&  rmdToFill
         // Write out the the symbol to the header, if needed
         if (m_bGenHeaders)
         {
-            tflResHpp   << L"    const tCIDLib::TCard4  "
+            tflResHpp   << L"    constexpr tCIDLib::TCard4  "
                         << astrFlds[0]
                         << L" = " << astrFlds[1] << L";\n";
         }
@@ -413,7 +413,7 @@ TResCompiler::ProcessMenu(TBinFile& bflBinOut, TTextFile& tflResHpp)
     // Output the header field for this id
     if (m_bGenHeaders)
     {
-        tflResHpp   << L"    const tCIDLib::TResId  "
+        tflResHpp   << L"    constexpr tCIDLib::TResId  "
                     << astrFlds[0] << L" = " << rimCur.ridRes << L";\n";
     }
 

@@ -180,7 +180,7 @@ TResCompiler::ProcessDialog(TBinFile& bflBinOut, TTextFile& tflResHpp)
                 // Write out the the symbol to the header, if needed
                 if (m_bGenHeaders)
                 {
-                    tflResHpp   << L"    const tCIDLib::TResId  "
+                    tflResHpp   << L"    constexpr tCIDLib::TResId  "
                                 << blkfCur.strField(0)
                                 << L" = " << blkfCur.strField(1) << L";\n";
                 }
@@ -600,7 +600,7 @@ ProcessDialogWidget(const   TBldStr&                    strDlgName
             // Write out the the symbol to the header, if needed
             if (m_bGenHeaders)
             {
-                tflResHpp   << L"    const tCIDLib::TResId  "
+                tflResHpp   << L"    constexpr tCIDLib::TResId  "
                             << blkfCur.strField(0)
                             << L" = " << rdlgiToFill.ridThis << L";\n";
             }

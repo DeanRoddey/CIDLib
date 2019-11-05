@@ -42,16 +42,6 @@ RTTIDecls(TFacCIDSIP,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDSIP& facCIDSIP()
 {
-    static TFacCIDSIP* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDSIP();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDSIP* pfacThis = new TFacCIDSIP();
     return *pfacThis;
 }

@@ -93,6 +93,7 @@ class CIDLIBEXP TOutStreamImpl : public TObject
         //  Destructor
         // -------------------------------------------------------------------
         TOutStreamImpl(const TOutStreamImpl&) = delete;
+        TOutStreamImpl(TOutStreamImpl&&) = delete;
 
         ~TOutStreamImpl() {}
 
@@ -101,6 +102,7 @@ class CIDLIBEXP TOutStreamImpl : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TOutStreamImpl& operator=(const TOutStreamImpl&) = delete;
+        TOutStreamImpl& operator=(TOutStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -153,6 +155,7 @@ class CIDLIBEXP TBinOutStream : public TObject
         );
 
         TBinOutStream(const TBinOutStream&) = delete;
+        TBinOutStream(TBinOutStream&&) = delete;
 
         ~TBinOutStream();
 
@@ -241,6 +244,7 @@ class CIDLIBEXP TBinOutStream : public TObject
         );
 
         TBinOutStream& operator=(const TBinOutStream&) = delete;
+        TBinOutStream& operator=(TBinOutStream&&) = delete;
 
 
         // -------------------------------------------------------------------

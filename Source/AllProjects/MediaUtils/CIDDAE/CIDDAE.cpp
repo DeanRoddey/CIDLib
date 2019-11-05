@@ -36,17 +36,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDDAE& facCIDDAE()
 {
-    static TFacCIDDAE* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDDAE();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDDAE* pfacThis = new TFacCIDDAE();
     return *pfacThis;
 }
 

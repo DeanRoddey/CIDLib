@@ -36,17 +36,7 @@
 //
 TFacCIDImgFact& facCIDImgFact()
 {
-    static TFacCIDImgFact* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDImgFact();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDImgFact* pfacThis = new TFacCIDImgFact();
     return *pfacThis;
 }
 

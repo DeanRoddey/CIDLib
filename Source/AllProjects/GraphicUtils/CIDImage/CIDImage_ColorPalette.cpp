@@ -45,7 +45,7 @@ RTTIDecls(TClrPalette,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDImage_ColorPalette
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    constexpr tCIDLib::TCard2   c2FmtVersion = 1;
 }
 
 

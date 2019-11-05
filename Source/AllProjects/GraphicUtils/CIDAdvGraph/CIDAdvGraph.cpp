@@ -44,16 +44,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDAdvGraph& facCIDAdvGraph()
 {
-    static TFacCIDAdvGraph* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDAdvGraph();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDAdvGraph* pfacThis = new TFacCIDAdvGraph();
     return *pfacThis;
 }

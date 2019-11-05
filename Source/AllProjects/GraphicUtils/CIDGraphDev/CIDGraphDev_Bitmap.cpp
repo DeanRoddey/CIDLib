@@ -94,7 +94,7 @@ namespace CIDGraphDev_Bitmap
         ,   { tCIDGraphDev::ESysBmps::Halftone9    , kCIDGraphDev::ridBmp_Halftone9 , L"Halftone9" }
     };
 
-    TEArray<TBmpMap, tCIDGraphDev::ESysBmps, tCIDGraphDev::ESysBmps::Count> amapList
+    static TEArray<TBmpMap, tCIDGraphDev::ESysBmps, tCIDGraphDev::ESysBmps::Count> amapList
     (
         amapVals
     );
@@ -103,7 +103,7 @@ namespace CIDGraphDev_Bitmap
     // -----------------------------------------------------------------------
     //  Our persistent format versions
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FCBFmtVersion = 1;
+    constexpr tCIDLib::TCard2   c2FCBFmtVersion = 1;
 }
 
 

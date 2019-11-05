@@ -57,22 +57,22 @@ namespace CIDMacroEng_SockClasses
     //  The names for the types that we support here. Each derivative has to
     //  be able to return strings that contain its name and full name.
     // -----------------------------------------------------------------------
-    const TString   strIPEP(L"IPEndPoint");
-    const TString   strIPEPClassPath(L"MEng.System.Runtime.IPEndPoint");
-    const TString   strIPAddrTypesPath(L"MEng.System.Runtime.IPEndPoint.IPAddrTypes");
+    static const TString   strIPEP(L"IPEndPoint");
+    static const TString   strIPEPClassPath(L"MEng.System.Runtime.IPEndPoint");
+    static const TString   strIPAddrTypesPath(L"MEng.System.Runtime.IPEndPoint.IPAddrTypes");
 
-    const TString   strSocket(L"Socket");
-    const TString   strSocketClassPath(L"MEng.System.Runtime.Socket");
-    const TString   strProtoEnumClassPath(L"MEng.System.Runtime.Socket.SockProtos");
+    static const TString   strSocket(L"Socket");
+    static const TString   strSocketClassPath(L"MEng.System.Runtime.Socket");
+    static const TString   strProtoEnumClassPath(L"MEng.System.Runtime.Socket.SockProtos");
 
-    const TString   strStreamSocket(L"StreamSocket");
-    const TString   strStreamSocketClassPath(L"MEng.System.Runtime.StreamSocket");
+    static const TString   strStreamSocket(L"StreamSocket");
+    static const TString   strStreamSocketClassPath(L"MEng.System.Runtime.StreamSocket");
 
-    const TString   strDGramSocket(L"DGramSocket");
-    const TString   strDGramSocketClassPath(L"MEng.System.Runtime.DGramSocket");
+    static const TString   strDGramSocket(L"DGramSocket");
+    static const TString   strDGramSocketClassPath(L"MEng.System.Runtime.DGramSocket");
 
-    const TString   strSockPinger(L"SockPinger");
-    const TString   strSockPingerClassPath(L"MEng.System.Runtime.SockPinger");
+    static const TString   strSockPinger(L"SockPinger");
+    static const TString   strSockPingerClassPath(L"MEng.System.Runtime.SockPinger");
 }
 
 

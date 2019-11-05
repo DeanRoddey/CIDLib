@@ -57,7 +57,7 @@ namespace CIDLib_TypeRegistry
     //      hash table's size is driven by the modulus value used by the TClass
     //      class' internally.
     // ---------------------------------------------------------------------------
-    TRegNode*   apnodeTable[kCIDLib::c4ClassModulus];
+    static TRegNode*   apnodeTable[kCIDLib::c4ClassModulus];
 }
 
 

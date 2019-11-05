@@ -62,9 +62,9 @@ namespace CIDLib_LogEvent
     //  it's there, so we need to know whether to stream it back out. So we
     //  use the top bit of the flags value for this purpose.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2Logged        = 0x0001;
-    const tCIDLib::TCard2   c2Reported      = 0x0002;
-    const tCIDLib::TCard2   c2AuxText       = 0x8000;
+    constexpr tCIDLib::TCard2   c2Logged        = 0x0001;
+    constexpr tCIDLib::TCard2   c2Reported      = 0x0002;
+    constexpr tCIDLib::TCard2   c2AuxText       = 0x8000;
 
 
     // -----------------------------------------------------------------------
@@ -73,7 +73,7 @@ namespace CIDLib_LogEvent
     //  Version 2 -
     //      We added the stack dump string.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FmtVersion    = 2;
+    constexpr tCIDLib::TCard2   c2FmtVersion    = 2;
 
 
 
@@ -81,7 +81,7 @@ namespace CIDLib_LogEvent
     //  Format version for the kernel error that we provide global streaming
     //  operators for.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2KErrFmtVersion = 1;
+    constexpr tCIDLib::TCard2   c2KErrFmtVersion = 1;
 }
 
 

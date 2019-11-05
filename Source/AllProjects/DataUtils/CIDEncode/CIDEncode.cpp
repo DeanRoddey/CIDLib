@@ -37,17 +37,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDEncode& facCIDEncode()
 {
-    static TFacCIDEncode* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDEncode();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDEncode* pfacThis = new TFacCIDEncode();
     return *pfacThis;
 }
 

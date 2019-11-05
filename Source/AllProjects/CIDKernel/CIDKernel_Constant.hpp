@@ -37,61 +37,61 @@ namespace kCIDLib
     // -----------------------------------------------------------------------
     //  The environment variables that are looked for by this facility
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const       pszErrDumpDir   = L"CID_ERRDUMPDIR";
+    constexpr const tCIDLib::TCh* const pszErrDumpDir   = L"CID_ERRDUMPDIR";
 
 
     // -----------------------------------------------------------------------
     //  Our mapped boolean values, which just map to the built in C++ boolean
     //  values. Note that TBoolean is just an alias for 'bool'.
     // -----------------------------------------------------------------------
-    const   tCIDLib::TBoolean       True            = true;
-    const   tCIDLib::TBoolean       False           = false;
+    constexpr   tCIDLib::TBoolean   True            = true;
+    constexpr   tCIDLib::TBoolean   False           = false;
 
 
     // -----------------------------------------------------------------------
     //  Some very basic constants.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard1           c1MaxCard       = 0xFF;
-    const tCIDLib::TCard2           c2MaxCard       = 0xFFFF;
-    const tCIDLib::TCard4           c4MaxCard       = 0xFFFFFFFF;
-    const tCIDLib::TCard8           c8MaxCard       = 0xFFFFFFFFFFFFFFFF;
+    constexpr tCIDLib::TCard1       c1MaxCard       = 0xFF;
+    constexpr tCIDLib::TCard2       c2MaxCard       = 0xFFFF;
+    constexpr tCIDLib::TCard4       c4MaxCard       = 0xFFFFFFFF;
+    constexpr tCIDLib::TCard8       c8MaxCard       = 0xFFFFFFFFFFFFFFFF;
 
-    const tCIDLib::TInt1            i1MaxInt        = 127;
-    const tCIDLib::TInt2            i2MaxInt        = 32767;
-    const tCIDLib::TInt4            i4MaxInt        = 2147483647;
-    const tCIDLib::TInt8            i8MaxInt        = 9223372036854775807;
+    constexpr tCIDLib::TInt1        i1MaxInt        = 127;
+    constexpr tCIDLib::TInt2        i2MaxInt        = 32767;
+    constexpr tCIDLib::TInt4        i4MaxInt        = 2147483647;
+    constexpr tCIDLib::TInt8        i8MaxInt        = 9223372036854775807;
 
-    const tCIDLib::TInt1            i1MinInt        = -128;
-    const tCIDLib::TInt2            i2MinInt        = -32768;
-    const tCIDLib::TInt4            i4MinInt        = -2147483647 - 1;
-    const tCIDLib::TInt8            i8MinInt        = -9223372036854775807 - 1;
+    constexpr tCIDLib::TInt1        i1MinInt        = -128;
+    constexpr tCIDLib::TInt2        i2MinInt        = -32768;
+    constexpr tCIDLib::TInt4        i4MinInt        = -2147483647 - 1;
+    constexpr tCIDLib::TInt8        i8MinInt        = -9223372036854775807 - 1;
 
-    const tCIDLib::TFloat4          f4MaxFloat      = 3.402823466e+38F;
-    const tCIDLib::TFloat8          f8MaxFloat      = 1.7976931348623158e+308;
+    constexpr tCIDLib::TFloat4      f4MaxFloat      = 3.402823466e+38F;
+    constexpr tCIDLib::TFloat8      f8MaxFloat      = 1.7976931348623158e+308;
 
-    const tCIDLib::TFloat4          f4MinFloat      = 1.175494351e-38F;
-    const tCIDLib::TFloat8          f8MinFloat      = 2.2250738585072014e-308;
+    constexpr tCIDLib::TFloat4      f4MinFloat      = 1.175494351e-38F;
+    constexpr tCIDLib::TFloat8      f8MinFloat      = 2.2250738585072014e-308;
 
-    const tCIDLib::TFloat4          f4Epsilon       = 1.192092896e-07F;
-    const tCIDLib::TFloat4          f8Epsilon       = 2.2204460492503131e-016;
+    constexpr tCIDLib::TFloat4      f4Epsilon       = 1.192092896e-07F;
+    constexpr tCIDLib::TFloat4      f8Epsilon       = 2.2204460492503131e-016;
 
-    const tCIDLib::TCard4           c4Sz_1K         = 1024;
-    const tCIDLib::TCard4           c4Sz_2K         = 2048;
-    const tCIDLib::TCard4           c4Sz_4K         = 4096;
-    const tCIDLib::TCard4           c4Sz_8K         = 8192;
-    const tCIDLib::TCard4           c4Sz_16K        = 16384;
-    const tCIDLib::TCard4           c4Sz_32K        = 32768;
-    const tCIDLib::TCard4           c4Sz_64K        = 0x10000;
-    const tCIDLib::TCard4           c4Sz_128K       = 0x20000;
-    const tCIDLib::TCard4           c4Sz_256K       = 0x40000;
-    const tCIDLib::TCard4           c4Sz_1M         = 0x100000;
-    const tCIDLib::TCard4           c4Sz_2M         = 0x200000;
-    const tCIDLib::TCard4           c4Sz_4M         = 0x400000;
-    const tCIDLib::TCard4           c4Sz_8M         = 0x800000;
-    const tCIDLib::TCard4           c4Sz_16M        = 0x1000000;
-    const tCIDLib::TCard4           c4Sz_32M        = 0x2000000;
-    const tCIDLib::TCard4           c4Sz_64M        = 0x4000000;
-    const tCIDLib::TCard4           c4Sz_128M       = 0x8000000;
+    constexpr tCIDLib::TCard4       c4Sz_1K         = 1024;
+    constexpr tCIDLib::TCard4       c4Sz_2K         = 2048;
+    constexpr tCIDLib::TCard4       c4Sz_4K         = 4096;
+    constexpr tCIDLib::TCard4       c4Sz_8K         = 8192;
+    constexpr tCIDLib::TCard4       c4Sz_16K        = 16384;
+    constexpr tCIDLib::TCard4       c4Sz_32K        = 32768;
+    constexpr tCIDLib::TCard4       c4Sz_64K        = 0x10000;
+    constexpr tCIDLib::TCard4       c4Sz_128K       = 0x20000;
+    constexpr tCIDLib::TCard4       c4Sz_256K       = 0x40000;
+    constexpr tCIDLib::TCard4       c4Sz_1M         = 0x100000;
+    constexpr tCIDLib::TCard4       c4Sz_2M         = 0x200000;
+    constexpr tCIDLib::TCard4       c4Sz_4M         = 0x400000;
+    constexpr tCIDLib::TCard4       c4Sz_8M         = 0x800000;
+    constexpr tCIDLib::TCard4       c4Sz_16M        = 0x1000000;
+    constexpr tCIDLib::TCard4       c4Sz_32M        = 0x2000000;
+    constexpr tCIDLib::TCard4       c4Sz_64M        = 0x4000000;
+    constexpr tCIDLib::TCard4       c4Sz_128M       = 0x8000000;
 
 
     // -----------------------------------------------------------------------
@@ -104,16 +104,16 @@ namespace kCIDLib
     //  their encoding MUST use Unicode code points, regardless of the storage
     //  size of chars.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4           c4UniBytes      = 2;
-    const tCIDLib::TCh              uchMaxUniChar   = tCIDLib::TCh(0xFFFF);
-    const tCIDLib::TCard4           c4MaxUTF8Bytes  = 6;
+    constexpr tCIDLib::TCard4   c4UniBytes      = 2;
+    constexpr tCIDLib::TCh      uchMaxUniChar   = tCIDLib::TCh(0xFFFF);
+    constexpr tCIDLib::TCard4   c4MaxUTF8Bytes  = 6;
 
 
     // -----------------------------------------------------------------------
     //  A magic encoding string which always represents the local tCIDLib::TCh
     //  format in memory, and how it would be in a string object.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const       pszNativeWCEncoding = L"$NativeWideChar$";
+    constexpr const tCIDLib::TCh* const   pszNativeWCEncoding = L"$NativeWideChar$";
 
 
     // -----------------------------------------------------------------------
@@ -122,25 +122,25 @@ namespace kCIDLib
     //  The c4XXX time values are in milliseconds. The enctXXX ones are in
     //  100 nanosecond increments.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4           c4MinYear       = 1601;
-    const tCIDLib::TCard4           c4MaxYear       = 2100;
-    const tCIDLib::TCard4           c4OneSecond     = 1000;
-    const tCIDLib::TCard4           c4OneMinute     = 60 * 1000;
-    const tCIDLib::TCard4           c4OneHour       = 60 * c4OneMinute;
-    const tCIDLib::TCard4           c4OneDay        = 24 * c4OneHour;
+    constexpr tCIDLib::TCard4           c4MinYear       = 1601;
+    constexpr tCIDLib::TCard4           c4MaxYear       = 2100;
+    constexpr tCIDLib::TCard4           c4OneSecond     = 1000;
+    constexpr tCIDLib::TCard4           c4OneMinute     = 60 * 1000;
+    constexpr tCIDLib::TCard4           c4OneHour       = 60 * c4OneMinute;
+    constexpr tCIDLib::TCard4           c4OneDay        = 24 * c4OneHour;
 
-    const tCIDLib::TEncodedTime     enctHalfSecond  = 5000000;
-    const tCIDLib::TEncodedTime     enctOneMilliSec = 10000;
-    const tCIDLib::TEncodedTime     enctOneSecond   = 10000000;
-    const tCIDLib::TEncodedTime     enctOnePtFiveSec= 15000000;
-    const tCIDLib::TEncodedTime     enctTwoSeconds  = 20000000;
-    const tCIDLib::TEncodedTime     enctThreeSeconds= 30000000;
-    const tCIDLib::TEncodedTime     enctFourSeconds = 40000000;
-    const tCIDLib::TEncodedTime     enctFiveSeconds = 50000000;
-    const tCIDLib::TEncodedTime     enctTenSeconds  = 100000000;
-    const tCIDLib::TEncodedTime     enctOneMinute   = 60 * enctOneSecond;
-    const tCIDLib::TEncodedTime     enctOneHour     = 60 * enctOneMinute;
-    const tCIDLib::TEncodedTime     enctOneDay      = 24 * enctOneHour;
+    constexpr tCIDLib::TEncodedTime     enctHalfSecond  = 5000000;
+    constexpr tCIDLib::TEncodedTime     enctOneMilliSec = 10000;
+    constexpr tCIDLib::TEncodedTime     enctOneSecond   = 10000000;
+    constexpr tCIDLib::TEncodedTime     enctOnePtFiveSec= 15000000;
+    constexpr tCIDLib::TEncodedTime     enctTwoSeconds  = 20000000;
+    constexpr tCIDLib::TEncodedTime     enctThreeSeconds= 30000000;
+    constexpr tCIDLib::TEncodedTime     enctFourSeconds = 40000000;
+    constexpr tCIDLib::TEncodedTime     enctFiveSeconds = 50000000;
+    constexpr tCIDLib::TEncodedTime     enctTenSeconds  = 100000000;
+    constexpr tCIDLib::TEncodedTime     enctOneMinute   = 60 * enctOneSecond;
+    constexpr tCIDLib::TEncodedTime     enctOneHour     = 60 * enctOneMinute;
+    constexpr tCIDLib::TEncodedTime     enctOneDay      = 24 * enctOneHour;
 
 
     // -----------------------------------------------------------------------
@@ -148,52 +148,52 @@ namespace kCIDLib
     //  is the Julian for that special date. So subtract this from a regular
     //  Julian date to get the 1900 based date.
     // -----------------------------------------------------------------------
-    const   tCIDLib::TCard4         c4Julian1900    = 2415021;
+    constexpr   tCIDLib::TCard4         c4Julian1900    = 2415021;
 
 
     // -----------------------------------------------------------------------
     //  Common mathematical constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TFloat4          f4PI            = 3.141592653589F;
-    const tCIDLib::TFloat8          f8PI            = 3.141592653589;
-    const tCIDLib::TFloat4          f4PIx2          = (3.141592653589F * 2.0F);
-    const tCIDLib::TFloat8          f8PIx2          = (3.141592653589 * 2.0);
-    const tCIDLib::TFloat8          f8HalfPI        = 1.570796325;
-    const tCIDLib::TFloat4          f4PI_Sqr        = 9.869604379F;
-    const tCIDLib::TFloat8          f8PI_Sqr        = 9.869604379;
-    const tCIDLib::TFloat4          f4OneDegree     = (180.0F / f4PI);
-    const tCIDLib::TFloat8          f8OneDegree     = (180.0 / f8PI);
-    const tCIDLib::TFloat4          f4OneRadian     = 57.296F;
-    const tCIDLib::TFloat8          f8OneRadian     = 57.296;
-    const tCIDLib::TFloat8          f8Log10_PI      = 049.71;
-    const tCIDLib::TFloat8          f8Log10_e       = 0.4343;
-    const tCIDLib::TFloat8          f8Log10_2       = 0.30103;
-    const tCIDLib::TFloat8          f8Log2_e        = 1.4427;
-    const tCIDLib::TFloat8          f8Log2_10       = 3.32193;
-    const tCIDLib::TFloat8          f8Loge_2        = 0.693147;
-    const tCIDLib::TFloat4          f4e             = 2.7183F;
-    const tCIDLib::TFloat8          f8e             = 2.7183;
+    constexpr tCIDLib::TFloat4          f4PI            = 3.141592653589F;
+    constexpr tCIDLib::TFloat8          f8PI            = 3.141592653589;
+    constexpr tCIDLib::TFloat4          f4PIx2          = (3.141592653589F * 2.0F);
+    constexpr tCIDLib::TFloat8          f8PIx2          = (3.141592653589 * 2.0);
+    constexpr tCIDLib::TFloat8          f8HalfPI        = 1.570796325;
+    constexpr tCIDLib::TFloat4          f4PI_Sqr        = 9.869604379F;
+    constexpr tCIDLib::TFloat8          f8PI_Sqr        = 9.869604379;
+    constexpr tCIDLib::TFloat4          f4OneDegree     = (180.0F / f4PI);
+    constexpr tCIDLib::TFloat8          f8OneDegree     = (180.0 / f8PI);
+    constexpr tCIDLib::TFloat4          f4OneRadian     = 57.296F;
+    constexpr tCIDLib::TFloat8          f8OneRadian     = 57.296;
+    constexpr tCIDLib::TFloat8          f8Log10_PI      = 049.71;
+    constexpr tCIDLib::TFloat8          f8Log10_e       = 0.4343;
+    constexpr tCIDLib::TFloat8          f8Log10_2       = 0.30103;
+    constexpr tCIDLib::TFloat8          f8Log2_e        = 1.4427;
+    constexpr tCIDLib::TFloat8          f8Log2_10       = 3.32193;
+    constexpr tCIDLib::TFloat8          f8Loge_2        = 0.693147;
+    constexpr tCIDLib::TFloat4          f4e             = 2.7183F;
+    constexpr tCIDLib::TFloat8          f8e             = 2.7183;
 
 
     // -----------------------------------------------------------------------
     //  Miscellaneous constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4           c4MaxWait       = 0xFFFFFFFF;
-    const tCIDLib::TCard4           c4MaxCmdLineParms = 128;
-    const tCIDLib::TCard4           c4ClassModulus  = 109;
-    const tCIDLib::TEncodedTime     enctMaxWait     = 0xFFFFFFFFFFFFFFFF;
-    const tCIDLib::TCh* const       pszEmptyZStr    = L"";
-    const tCIDLib::TCard4           c4MsgIdModulus  = 109;
-    const tCIDLib::TCh* const       pszNullStr      = L"<Null>";
-    const tCIDLib::TCh* const       pszErrInfExt    = L".ErrorInf";
-    const tCIDLib::TCh* const       pszPrimaryThrdName = L"$PrimaryThread$";
+    constexpr tCIDLib::TCard4           c4MaxWait       = 0xFFFFFFFF;
+    constexpr tCIDLib::TCard4           c4MaxCmdLineParms = 128;
+    constexpr tCIDLib::TCard4           c4ClassModulus  = 109;
+    constexpr tCIDLib::TEncodedTime     enctMaxWait     = 0xFFFFFFFFFFFFFFFF;
+    constexpr const tCIDLib::TCh* const pszEmptyZStr    = L"";
+    constexpr tCIDLib::TCard4           c4MsgIdModulus  = 109;
+    constexpr const tCIDLib::TCh* const pszNullStr      = L"<Null>";
+    constexpr const tCIDLib::TCh* const pszErrInfExt    = L".ErrorInf";
+    constexpr const tCIDLib::TCh* const pszPrimaryThrdName = L"$PrimaryThread$";
 
 
 
     // -----------------------------------------------------------------------
     //  The standard 16 bit CRC lookup table
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2 ac2CRCTable[256] =
+    static constexpr tCIDLib::TCard2 ac2CRCTable[256] =
     {
          0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241
        , 0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440
@@ -233,7 +233,7 @@ namespace kCIDLib
     // -----------------------------------------------------------------------
     //  A map from the language enum to the suffix
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh apszLangSuffixes[tCIDLib::TCard4(tCIDLib::ELanguages::Count)][3] =
+    static constexpr tCIDLib::TCh apszLangSuffixes[tCIDLib::TCard4(tCIDLib::ELanguages::Count)][3] =
     {
         L"af"       // ELanguage_Afrikaans
         , L"al"     // ELanguage_Albanian
@@ -281,8 +281,8 @@ namespace kCIDLib
     // ------------------------------------------------------------------------
     //  Message file related constants
     // ------------------------------------------------------------------------
-    const tCIDLib::TCh* const   szMsgFileExt    = L"MsgText";
-    const tCIDLib::TCh* const   szBinMsgFileExt = L"CIDMsg";
+    constexpr const tCIDLib::TCh* const   szMsgFileExt    = L"MsgText";
+    constexpr const tCIDLib::TCh* const   szBinMsgFileExt = L"CIDMsg";
 
 
     // ------------------------------------------------------------------------
@@ -290,14 +290,14 @@ namespace kCIDLib
     //  keep them in these non-overlapping ranges to make it easy to know what type
     //  of text to load, just from the id.
     // ------------------------------------------------------------------------
-    const tCIDLib::TCard4   c4ErrId_First   = 0;
-    const tCIDLib::TCard4   c4ErrId_Last    = 12999;
+    constexpr tCIDLib::TCard4   c4ErrId_First   = 0;
+    constexpr tCIDLib::TCard4   c4ErrId_Last    = 12999;
 
-    const tCIDLib::TCard4   c4MsgId_First   = 13000;
-    const tCIDLib::TCard4   c4MsgId_Last    = 29999;
+    constexpr tCIDLib::TCard4   c4MsgId_First   = 13000;
+    constexpr tCIDLib::TCard4   c4MsgId_Last    = 29999;
 
-    const tCIDLib::TCard4   c4ComId_First   = 30000;
-    const tCIDLib::TCard4   c4ComId_Last    = 50000;
+    constexpr tCIDLib::TCard4   c4ComId_First   = 30000;
+    constexpr tCIDLib::TCard4   c4ComId_Last    = 50000;
 }
 
 
@@ -310,11 +310,11 @@ namespace kCIDSock
     // -----------------------------------------------------------------------
     //  Host info constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MaxAddrs          = 32;
-    const tCIDLib::TCard4   c4MaxHWAddrSz       = 64;
-    const tCIDLib::TCard4   c4MaxAdapterNameLn  = 260;
-    const tCIDLib::TCard4   c4MaxAdapterDescLn  = 132;
-    const tCIDLib::TCard4   c4MaxIPAddrBytes    = 16;
+    constexpr tCIDLib::TCard4   c4MaxAddrs          = 32;
+    constexpr tCIDLib::TCard4   c4MaxHWAddrSz       = 64;
+    constexpr tCIDLib::TCard4   c4MaxAdapterNameLn  = 260;
+    constexpr tCIDLib::TCard4   c4MaxAdapterDescLn  = 132;
+    constexpr tCIDLib::TCard4   c4MaxIPAddrBytes    = 16;
 }
 
 
@@ -328,13 +328,13 @@ namespace kCIDCtrls
     // ------------------------------------------------------------------------
     //  Resource file constants
     // ------------------------------------------------------------------------
-    const tCIDLib::TCard4           c4ResFmtVersion = 1;
-    const tCIDLib::TCard4           c4ResMagicVal   = 0xFACEBEEF;
+    constexpr tCIDLib::TCard4           c4ResFmtVersion = 1;
+    constexpr tCIDLib::TCard4           c4ResMagicVal   = 0xFACEBEEF;
 
 
     // ------------------------------------------------------------------------
     //  Max touch points supported for multi-touch
     // ------------------------------------------------------------------------
-    const tCIDLib::TCard4           c4MaxTouchPoints = 10;
+    constexpr tCIDLib::TCard4           c4MaxTouchPoints = 10;
 }
 

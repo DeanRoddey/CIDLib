@@ -49,8 +49,8 @@ namespace CIDMacroEng_MemBufClass
     //  The names for the types that we support here. Each derivative has to
     //  be able to return strings that contain its name and full name.
     // -----------------------------------------------------------------------
-    const TString   strMemBuf(L"MemBuf");
-    const TString   strMemBufClassPath(L"MEng.System.Runtime.MemBuf");
+    static const TString   strMemBuf(L"MemBuf");
+    static const TString   strMemBufClassPath(L"MEng.System.Runtime.MemBuf");
 }
 
 

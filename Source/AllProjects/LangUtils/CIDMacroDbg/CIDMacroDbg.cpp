@@ -35,16 +35,6 @@
 //
 TFacCIDMacroDbg& facCIDMacroDbg()
 {
-    static TFacCIDMacroDbg* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDMacroDbg();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDMacroDbg* pfacThis = new TFacCIDMacroDbg();
     return *pfacThis;
 }

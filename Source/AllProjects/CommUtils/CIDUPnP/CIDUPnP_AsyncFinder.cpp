@@ -78,7 +78,7 @@ TUPnPAsyncFinderItem::~TUPnPAsyncFinderItem()
 {
     // Clean up the kernel level object
     delete m_pkupnpdThis;
-    m_pkupnpdThis = 0;
+    m_pkupnpdThis = nullptr;
 }
 
 

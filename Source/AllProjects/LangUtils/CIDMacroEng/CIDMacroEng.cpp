@@ -65,16 +65,6 @@ template class TRefVector<TMEngStringVal>;
 // ---------------------------------------------------------------------------
 TFacCIDMacroEng& facCIDMacroEng()
 {
-    static TFacCIDMacroEng* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDMacroEng();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDMacroEng* pfacThis = new TFacCIDMacroEng();
     return *pfacThis;
 }

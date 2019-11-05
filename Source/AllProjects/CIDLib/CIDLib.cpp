@@ -587,8 +587,8 @@ static tCIDLib::TVoid DummyFunc()
 //
 TFacCIDLib& facCIDLib()
 {
-    static TSingleton<TFacCIDLib> singleFacility;
-    return *singleFacility;
+    static TFacCIDLib* pfacCIDLib = new TFacCIDLib();
+    return *pfacCIDLib;
 }
 
 

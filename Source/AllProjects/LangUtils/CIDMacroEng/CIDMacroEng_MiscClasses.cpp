@@ -56,21 +56,21 @@ namespace CIDMacroEng_MiscClasses
     //  since lots of classes derive from the formattable class and override
     //  this. We'll set this when the formattable class is initialized.
     // -----------------------------------------------------------------------
-    tCIDLib::TCard2 c2FormatToId;
+    static tCIDLib::TCard2 c2FormatToId;
 
 
     // -----------------------------------------------------------------------
     //  The names for the types that we support here. Each derivative has to
     //  be able to return strings that contain its name and full name.
     // -----------------------------------------------------------------------
-    const TString   strException(L"Exception");
-    const TString   strExceptClassPath(L"MEng.Exception");
-    const TString   strFormattable(L"Formattable");
-    const TString   strFormattableClassPath(L"MEng.Formattable");
-    const TString   strObject(L"Object");
-    const TString   strObjectClassPath(L"MEng.Object");
-    const TString   strVoid(L"Void");
-    const TString   strVoidClassPath(L"MEng.Void");
+    static const TString   strException(L"Exception");
+    static const TString   strExceptClassPath(L"MEng.Exception");
+    static const TString   strFormattable(L"Formattable");
+    static const TString   strFormattableClassPath(L"MEng.Formattable");
+    static const TString   strObject(L"Object");
+    static const TString   strObjectClassPath(L"MEng.Object");
+    static const TString   strVoid(L"Void");
+    static const TString   strVoidClassPath(L"MEng.Void");
 }
 
 

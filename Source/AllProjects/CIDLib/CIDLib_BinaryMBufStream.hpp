@@ -86,6 +86,7 @@ class CIDLIBEXP TBinMBufInStream : public TBinInStream
         );
 
         TBinMBufInStream(const TBinMBufInStream&) = delete;
+        TBinMBufInStream(TBinMBufInStream&&) = delete;
 
         ~TBinMBufInStream();
 
@@ -94,6 +95,7 @@ class CIDLIBEXP TBinMBufInStream : public TBinInStream
         //  Public operators
         // -------------------------------------------------------------------
         TBinMBufInStream& operator=(const TBinMBufInStream&) = delete;
+        TBinMBufInStream& operator=(TBinMBufInStream&&) = delete;
 
 
         // -------------------------------------------------------------------

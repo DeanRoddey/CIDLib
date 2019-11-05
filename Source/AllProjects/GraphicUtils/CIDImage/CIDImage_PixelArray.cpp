@@ -49,7 +49,7 @@ namespace CIDImage_PixelArray
     //  2.  Moved to the pixelfmt/depth combination to describe the data format
     //      and added new formats to cover the full range of PNG images.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FmtVersion = 2;
+    constexpr tCIDLib::TCard2   c2FmtVersion = 2;
 }
 
 

@@ -50,8 +50,8 @@ namespace CIDLib_StreamLexer
     //  c4MaxUnget
     //      This is the maximum size of the character unget stack.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MaxTokens  = 64;
-    const tCIDLib::TCard4   c4MaxUnget   = 4096;
+    constexpr tCIDLib::TCard4   c4MaxTokens  = 64;
+    constexpr tCIDLib::TCard4   c4MaxUnget   = 4096;
 }
 
 

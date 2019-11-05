@@ -49,9 +49,9 @@ namespace CIDLib_StatsCache
     //  We just use a simple array of pointers to cache items. It's of fixed
     //  size, large enough to more than handle the number of items we'll need.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4CacheSz(2048);
-    tCIDLib::TCard4         c4CacheUsed(0);
-    TStatsCacheNode*        apscnCache[c4CacheSz];
+    static constexpr tCIDLib::TCard4    c4CacheSz(2048);
+    static tCIDLib::TCard4              c4CacheUsed(0);
+    static TStatsCacheNode*             apscnCache[c4CacheSz];
 
 
     // -----------------------------------------------------------------------
@@ -59,31 +59,26 @@ namespace CIDLib_StatsCache
     //  there's not much we can do, but we bump this counter which can be
     //  read for sanity checking purposes later.
     // -----------------------------------------------------------------------
-    tCIDLib::TCard8         c8BadItemRefs;
+    static tCIDLib::TCard8              c8BadItemRefs;
 
 
     // -----------------------------------------------------------------------
     //  The persistent format version for our info class
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    static constexpr tCIDLib::TCard2    c2FmtVersion = 1;
 
 
     // -----------------------------------------------------------------------
     //  A time stamp of the last time that the list was changed
     // -----------------------------------------------------------------------
-    tCIDLib::TEncodedTime   enctLastChange;
-};
+    static tCIDLib::TEncodedTime        enctLastChange;
 
-
-//
-//  Fault in a mutex for local locking. We use a kernel mutex because of the very
-//  low level nature of hte status stuff.
-//
-static TKrnlMutex* pkmtxSync()
-{
+    // -----------------------------------------------------------------------
+    //  A mutex for local locking. We use a kernel one because of the low level
+    //  natur eof this stuff.
+    // -----------------------------------------------------------------------
     static TKrnlMutex kmtxSync;
-    return &kmtxSync;
-}
+};
 
 
 
@@ -339,7 +334,7 @@ class TSyncJanitor
     public :
         TSyncJanitor()
         {
-            pkmtxSync()->bLock();
+            CIDLib_StatsCache::kmtxSync.bLock();
         }
 
         TSyncJanitor(const TSyncJanitor&) = delete;
@@ -347,7 +342,7 @@ class TSyncJanitor
 
         ~TSyncJanitor()
         {
-            pkmtxSync()->bUnlock();
+            CIDLib_StatsCache::kmtxSync.bUnlock();
         }
 
         tCIDLib::TVoid operator=(const TSyncJanitor&) = delete;
@@ -415,7 +410,7 @@ static TStatsCacheNode* pscnAdd(const   tCIDLib::TCh* const     pszKey
     TStatsCacheNode* pscnRet = new TStatsCacheNode(pszKey, eType);
     c4At = CIDLib_StatsCache::c4CacheUsed++;
 
-    CIDLib_Suppress(6386)  // We range checked above already
+    CIDLib_Suppress(6386);  // We range checked above already
     CIDLib_StatsCache::apscnCache[c4At] = pscnRet;
 
     // Update the last change time stamp

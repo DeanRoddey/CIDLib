@@ -52,7 +52,7 @@ TBitSeq::TBitSeq(const tCIDLib::TCard4 c4InitAlloc) :
     , m_c4CurRByte(0)
     , m_c4CurWBit(7)
     , m_c4CurWByte(0)
-    , m_pc1Buffer(0)
+    , m_pc1Buffer(nullptr)
 {
     if (!m_c4CurAlloc)
         m_c4CurAlloc = 64;
@@ -70,7 +70,7 @@ TBitSeq::TBitSeq(const  tCIDLib::TCard1* const  pc1InitData
     , m_c4CurRByte(0)
     , m_c4CurWBit(7)
     , m_c4CurWByte(c4Bytes)
-    , m_pc1Buffer(0)
+    , m_pc1Buffer(nullptr)
 {
     m_pc1Buffer = new tCIDLib::TCard1[m_c4CurAlloc];
     TRawMem::CopyMemBuf(m_pc1Buffer, pc1InitData, m_c4CurAlloc);
@@ -83,7 +83,7 @@ TBitSeq::TBitSeq(const TBitSeq& bsqToCopy) :
     , m_c4CurRByte(bsqToCopy.m_c4CurRByte)
     , m_c4CurWBit(bsqToCopy.m_c4CurWBit)
     , m_c4CurWByte(bsqToCopy.m_c4CurWByte)
-    , m_pc1Buffer(0)
+    , m_pc1Buffer(nullptr)
 {
     // Allocate a buffer of the same size
     m_pc1Buffer = new tCIDLib::TCard1[m_c4CurAlloc];
@@ -126,7 +126,6 @@ TBitSeq& TBitSeq::operator=(const TBitSeq& bsqToAssign)
     //  have live data in them.
     //
     TRawMem::CopyMemBuf(m_pc1Buffer, bsqToAssign.m_pc1Buffer, m_c4CurWByte + 1);
-
     return *this;
 }
 
@@ -163,9 +162,7 @@ tCIDLib::TBoolean TBitSeq::operator==(const TBitSeq& bsqToCompare) const
     //
     const tCIDLib::ESortComps eRes = TRawMem::eCompareMemBuf
     (
-        m_pc1Buffer
-        , bsqToCompare.m_pc1Buffer
-        , m_c4CurWByte + 1
+        m_pc1Buffer, bsqToCompare.m_pc1Buffer, m_c4CurWByte + 1
     );
     return (eRes == tCIDLib::ESortComps::Equal);
 }

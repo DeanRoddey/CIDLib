@@ -36,14 +36,14 @@ namespace kCIDLib
     // -----------------------------------------------------------------------
     //  Tree collection constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh          chTreeSepChar   = L'/';
-    const tCIDLib::TCh* const   pszTreeSepChar  = L"/";
+    constexpr tCIDLib::TCh              chTreeSepChar   = L'/';
+    constexpr const tCIDLib::TCh* const pszTreeSepChar  = L"/";
 
 
     // -----------------------------------------------------------------------
     //  Default max size for memory buffers if no max is given, 16MB.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4DefMaxBufferSz = kCIDLib::c4Sz_16M;
+    constexpr tCIDLib::TCard4       c4DefMaxBufferSz = kCIDLib::c4Sz_16M;
 
 
     // -----------------------------------------------------------------------
@@ -65,17 +65,17 @@ namespace kCIDLib
     //                support thread farm type functionality, such as the
     //                queue collection.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4TWLReason_All       = 0xFFFFFFFE;
-    const tCIDLib::TCard4 c4TWLReason_None      = 0xFFFFFFFF;
-    const tCIDLib::TCard4 c4TWLReason_WaitData  = 0xFFAFD4A2;
-    const tCIDLib::TCard4 c4TWLReason_WaitSpace = 0xAA8F34AC;
+    constexpr tCIDLib::TCard4 c4TWLReason_All       = 0xFFFFFFFE;
+    constexpr tCIDLib::TCard4 c4TWLReason_None      = 0xFFFFFFFF;
+    constexpr tCIDLib::TCard4 c4TWLReason_WaitData  = 0xFFAFD4A2;
+    constexpr tCIDLib::TCard4 c4TWLReason_WaitSpace = 0xAA8F34AC;
 
 
     // -----------------------------------------------------------------------
     //  The name we use for the company name in any of the named resources
     //  we create (which use the TResourceName class.)
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const   pszResCompany   = L"CharmedQuark";
+    constexpr const tCIDLib::TCh* const   pszResCompany   = L"CharmedQuark";
 
 
     // -----------------------------------------------------------------------
@@ -88,22 +88,22 @@ namespace kCIDLib
     //
     //  And we define the paths for some values that we maintain at this level.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const   pszStat_Scope_Ctrl          = L"/Ctrl/";
-    const tCIDLib::TCh* const   pszStat_Scope_Info          = L"/Info/";
-    const tCIDLib::TCh* const   pszStat_Scope_Settings      = L"/Settings/";
-    const tCIDLib::TCh* const   pszStat_Scope_Stats         = L"/Stats/";
+    constexpr const tCIDLib::TCh* const   pszStat_Scope_Ctrl          = L"/Ctrl/";
+    constexpr const tCIDLib::TCh* const   pszStat_Scope_Info          = L"/Info/";
+    constexpr const tCIDLib::TCh* const   pszStat_Scope_Settings      = L"/Settings/";
+    constexpr const tCIDLib::TCh* const   pszStat_Scope_Stats         = L"/Stats/";
 
-    const tCIDLib::TCh* const   pszStat_Scope_LogThresh     = L"/Settings/LogThresh/";
-    const tCIDLib::TCh* const   pszStat_Scope_LogFlags      = L"/Settings/LogFlags/";
-    const tCIDLib::TCh* const   pszStat_Scope_LogTrace      = L"/Settings/LogTrace/";
+    constexpr const tCIDLib::TCh* const   pszStat_Scope_LogThresh     = L"/Settings/LogThresh/";
+    constexpr const tCIDLib::TCh* const   pszStat_Scope_LogFlags      = L"/Settings/LogFlags/";
+    constexpr const tCIDLib::TCh* const   pszStat_Scope_LogTrace      = L"/Settings/LogTrace/";
 
-    const tCIDLib::TCh* const   pszStat_Scope_AppInfo       = L"/Info/App/";
-    const tCIDLib::TCh* const   pszStat_AppInfo_DroppedLogEvs = L"/Info/App/DroppedLogEvs";
-    const tCIDLib::TCh* const   pszStat_AppInfo_LogErrors   = L"/Info/App/LogErrors";
-    const tCIDLib::TCh* const   pszStat_AppInfo_UpSince     = L"/Info/App/UpSince";
+    constexpr const tCIDLib::TCh* const   pszStat_Scope_AppInfo       = L"/Info/App/";
+    constexpr const tCIDLib::TCh* const   pszStat_AppInfo_DroppedLogEvs = L"/Info/App/DroppedLogEvs";
+    constexpr const tCIDLib::TCh* const   pszStat_AppInfo_LogErrors   = L"/Info/App/LogErrors";
+    constexpr const tCIDLib::TCh* const   pszStat_AppInfo_UpSince     = L"/Info/App/UpSince";
 
-    const tCIDLib::TCh* const   pszStat_Scope_Core          = L"/Stats/Core/";
-    const tCIDLib::TCh* const   pszStat_Core_ThreadCount    = L"/Stats/Core/ThreadCnt";
+    constexpr const tCIDLib::TCh* const   pszStat_Scope_Core          = L"/Stats/Core/";
+    constexpr const tCIDLib::TCh* const   pszStat_Core_ThreadCount    = L"/Stats/Core/ThreadCnt";
 }
 
 namespace tCIDLib

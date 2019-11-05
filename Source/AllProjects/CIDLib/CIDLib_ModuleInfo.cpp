@@ -42,7 +42,7 @@ RTTIDecls(TCIDModuleInfo,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_ModuleInfo
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    constexpr tCIDLib::TCard2   c2FmtVersion = 1;
 }
 
 

@@ -530,7 +530,6 @@ TExternalProcess::Start(const   TString&                strPath
     {
         if (!TEnvironment::bIsNullObject(envToUse))
         {
-            TString strTmp;
             TEnvironment::TCursor cursEnv = envToUse.cursThis();
 
             tCIDLib::TCard4 c4Index = 0;

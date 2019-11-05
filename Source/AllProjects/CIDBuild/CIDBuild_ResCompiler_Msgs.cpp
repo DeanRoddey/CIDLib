@@ -640,7 +640,7 @@ tCIDLib::TVoid TResCompiler::WriteMsgHeaders()
 
                 if (idiCur.eType() == TIdInfo::ETypes::Msg)
                 {
-                    tflMsgHpp   << "    const tCIDLib::TMsgId "
+                    tflMsgHpp   << "    constexpr tCIDLib::TMsgId "
                                 << idiCur.strName().pszBuffer()
                                 << " = "
                                 << strIdFmt
@@ -648,7 +648,7 @@ tCIDLib::TVoid TResCompiler::WriteMsgHeaders()
                 }
                  else
                 {
-                    tflErrHpp   << "    const tCIDLib::TErrCode "
+                    tflErrHpp   << "    constexpr tCIDLib::TErrCode "
                                 << idiCur.strName().pszBuffer()
                                 << " = "
                                 << strIdFmt

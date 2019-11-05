@@ -740,7 +740,7 @@ TResCompiler::ProcessImages(const   tCIDLib::TCh* const pszEndText
         // Write out the header entry for this one, if needed
         if (m_bGenHeaders)
         {
-            tflResHpp   << L"    const tCIDLib::TResId  "
+            tflResHpp   << L"    constexpr tCIDLib::TResId  "
                         << pszSymbol << L" = " << pszId << L";\n";
         }
 

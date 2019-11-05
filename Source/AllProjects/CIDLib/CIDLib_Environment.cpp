@@ -48,7 +48,7 @@ namespace CIDLib_Environment
     //  c4Modulus
     //      This is the modulus used in the hashing of the key strings.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    c4Modulus = 23;
+    constexpr tCIDLib::TCard4    c4Modulus = 23;
 }
 
 

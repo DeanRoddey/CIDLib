@@ -46,16 +46,6 @@
 // Fault in our facility object
 TFacCIDSpReco& facCIDSpReco()
 {
-    static TFacCIDSpReco* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDSpReco();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDSpReco* pfacThis = new TFacCIDSpReco();
     return *pfacThis;
 }

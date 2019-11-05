@@ -36,16 +36,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDObjStore& facCIDObjStore()
 {
-    static TFacCIDObjStore* pfacThis = nullptr;
-    static TAtomicFlag atomInit;
-    if (!atomInit)
-    {
-        TBaseLock lockInit;
-        if (!atomInit)
-        {
-            pfacThis = new TFacCIDObjStore();
-            atomInit.Set();
-        }
-    }
+    static TFacCIDObjStore* pfacThis = new TFacCIDObjStore();
     return *pfacThis;
 }
