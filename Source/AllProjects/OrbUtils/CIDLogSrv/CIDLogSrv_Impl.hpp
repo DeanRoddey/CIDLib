@@ -60,20 +60,20 @@ class TCIDLogServerImpl : public TCIDLogSrvServerBase
         (
                     tCIDLib::TCard4&        c4NextEventId
             ,       TVector<TLogEvent>&     colToFill
-        )   override;
+        )   final;
 
         tCIDLib::TCard4 c4QueryEvents
         (
                     TVector<TLogEvent>&     colToFill
             , const tCIDLib::TCard4         c4MaxToReturn
-        )   override;
+        )   final;
 
         tCIDLib::TCard4 c4QueryEvents
         (
                     TVector<TLogEvent>&     colToFill
             , const tCIDLib::TCard4         c4Minutes
             , const tCIDLib::TCard4         c4MaxToReturn
-        )   override;
+        )   final;
 
         tCIDLib::TCard4 c4QueryEvents
         (
@@ -85,41 +85,41 @@ class TCIDLogServerImpl : public TCIDLogSrvServerBase
             , const TString&                strThreadExpr
             , const tCIDLib::TCard8         c8SevLevels
             , const tCIDLib::TCard8         c8ErrClasses
-        )   override;
+        )   final;
 
         tCIDLib::TVoid DebugDump
         (
                     tCIDLib::TCard4&        c4BufSz
             ,       THeapBuf&               mbufData
-        )   override;
+        )   final;
 
         tCIDLib::TVoid LogSingle
         (
             const   TLogEvent&              logevToSend
-        )   override;
+        )   final;
 
         tCIDLib::TVoid LogMultiple
         (
             const   TBag<TLogEvent>&        colToSend
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid RemoveAll() override;
+        tCIDLib::TVoid RemoveAll() final;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Initialize() override;
+        tCIDLib::TVoid Initialize() final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLogSrv::TKeyItem** apitemMakeSortedKeyList
+        [[nodiscard]] tCIDLogSrv::TKeyItem** apitemMakeSortedKeyList
         (
             const   tCIDLogSrv::EKeyListKeys eKey
         );

@@ -68,20 +68,20 @@ class CIDAUDSTREAMEXP TWaveInSrcStream : public TCIDAudioSrcStream
             , const tCIDLib::TCard4         c4MaxBytes
             ,       tCIDLib::TCard4&        c4BytesRead
             , const tCIDLib::TCard4         c4WaitMSs
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid FlushBufs() override;
+        tCIDLib::TVoid FlushBufs() final;
 
         tCIDLib::TVoid QueryFormat
         (
                     tCIDLib::TCard4&        c4Channels
             ,       tCIDLib::TCard4&        c4SamplesPerSec
             ,       tCIDLib::TCard4&        c4BytesPerSample
-        )   const override;
+        )   const final;
 
-        tCIDLib::TVoid Initialize() override;
+        tCIDLib::TVoid Initialize() final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :

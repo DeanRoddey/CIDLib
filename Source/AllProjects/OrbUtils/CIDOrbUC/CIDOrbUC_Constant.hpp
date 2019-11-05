@@ -43,10 +43,10 @@ namespace kCIDOrbUC
     //      The name server must have a fixed instance id, because it must be
     //      findable by everyone, so that they can then find everything else.
     // -----------------------------------------------------------------------
-    const tCIDLib::TIPPortNum   ippnNameSrvDefPort  = 13502;
-    const tCIDLib::TIPPortNum   ippnLogSrvDefPort   = 13503;
-    const tCIDLib::TIPPortNum   ippnCfgSrvDefPort   = 13504;
-    const tCIDLib::TCh* const   pszNSInstanceId     = L"C7D1445942EA2EAA-0EE3FF7875548D09";
+    constexpr tCIDLib::TIPPortNum       ippnNameSrvDefPort  = 13502;
+    constexpr tCIDLib::TIPPortNum       ippnLogSrvDefPort   = 13503;
+    constexpr tCIDLib::TIPPortNum       ippnCfgSrvDefPort   = 13504;
+    constexpr const tCIDLib::TCh* const pszNSInstanceId     = L"C7D1445942EA2EAA-0EE3FF7875548D09";
 
 
     // -----------------------------------------------------------------------
@@ -69,8 +69,8 @@ namespace kCIDOrbUC
     //      hosts, i.e. they don't always (though usually) talk to their own
     //      local server. %h represents the host.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard8       c8LogFlRolloverSz       = 128 * 1024;
-    const tCIDLib::TCard8       c8LogFlReopenSz         = 96 * 1024;
+    constexpr tCIDLib::TCard8       c8LogFlRolloverSz       = 128 * 1024;
+    constexpr tCIDLib::TCard8       c8LogFlReopenSz         = 96 * 1024;
 
 
     // -----------------------------------------------------------------------
@@ -80,10 +80,10 @@ namespace kCIDOrbUC
     //  servers to block indefinitely on and by other processes to ask them
     //  to exit.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const   pszEvCfgSrv             = L"CIDCfgSrv";
-    const tCIDLib::TCh* const   pszEvLogSrv             = L"CIDLogSrv";
-    const tCIDLib::TCh* const   pszEvNameSrv            = L"CIDNameSrv";
-    const tCIDLib::TCh* const   pszEvResource           = L"BlockEvent";
+    constexpr const tCIDLib::TCh* const   pszEvCfgSrv       = L"CIDCfgSrv";
+    constexpr const tCIDLib::TCh* const   pszEvLogSrv       = L"CIDLogSrv";
+    constexpr const tCIDLib::TCh* const   pszEvNameSrv      = L"CIDNameSrv";
+    constexpr const tCIDLib::TCh* const   pszEvResource     = L"BlockEvent";
 }
 
 #pragma CIDLIB_POPPACK

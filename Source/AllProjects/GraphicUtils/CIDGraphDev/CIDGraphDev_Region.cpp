@@ -187,6 +187,9 @@ tCIDLib::TBoolean TGUIRegion::bSetFromDev(TGraphDrawDev& gdevSrc)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen but makes analyzer happy
+        return kCIDLib::False;
     }
 
     // Try to get the current clip
@@ -207,6 +210,9 @@ tCIDLib::TBoolean TGUIRegion::bSetFromDev(TGraphDrawDev& gdevSrc)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen but makes analyzer happy
+        return kCIDLib::False;
     }
 
     // If we have one already, then get rid of it

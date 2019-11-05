@@ -76,6 +76,9 @@ TGraphPaintDev::~TGraphPaintDev()
                 , tCIDLib::ESeverities::Warn
                 , tCIDLib::EErrClasses::CantDo
             );
+
+            // Won't happen, but makes analyzer happy
+            return;
         }
 
         // And pass it to the end paint
@@ -91,6 +94,9 @@ TGraphPaintDev::~TGraphPaintDev()
                 , tCIDLib::ESeverities::Warn
                 , tCIDLib::EErrClasses::CantDo
             );
+
+            // Won't happen, but makes analyzer happy
+            return;
         }
     }
     delete m_phpiThis;

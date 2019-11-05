@@ -69,13 +69,14 @@ TFacCIDNameSrv::TFacCIDNameSrv() :
 TFacCIDNameSrv::~TFacCIDNameSrv()
 {
     delete m_pevWait;
+    m_pevWait = nullptr;
 
     // NOTE: We don't own the cache object, the Orb does!
 }
 
 
 // ---------------------------------------------------------------------------
-//  TFacCIDNameSrv: Public, non-virtual methods
+//  TFacCIDNameSrv: Public, inherited virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TFacCIDNameSrv::bHandleSignal(const tCIDLib::ESignals eSig)
 {
@@ -93,6 +94,9 @@ tCIDLib::TBoolean TFacCIDNameSrv::bHandleSignal(const tCIDLib::ESignals eSig)
 }
 
 
+// ---------------------------------------------------------------------------
+//  TFacCIDNameSrv: Public, non-virtual methods
+// ---------------------------------------------------------------------------
 tCIDLib::EExitCodes TFacCIDNameSrv::eMainThread(TThread& thrThis, tCIDLib::TVoid*)
 {
     // Let our caller go

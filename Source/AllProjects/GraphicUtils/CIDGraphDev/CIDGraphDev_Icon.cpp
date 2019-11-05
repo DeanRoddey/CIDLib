@@ -385,7 +385,7 @@ TIcon::hicoLoadRaw( const   tCIDLib::TCh* const pszLibName
     // Load the library without any executtion, just to look up resources
     HINSTANCE hMod = ::LoadLibraryEx(pszLibName, 0, LOAD_LIBRARY_AS_DATAFILE);
     if (!hMod)
-        return 0;
+        return kCIDGraphDev::hicoInvalid;
 
     // We'll break out (if successful) with the single icon resource id
     tCIDLib::TResId ridFind = kCIDLib::c4MaxCard;
@@ -438,27 +438,30 @@ TIcon::hicoLoadRaw( const   tCIDLib::TCh* const pszLibName
         }
     }
 
-    tCIDGraphDev::TIconHandle hicoRet = 0;
+    tCIDGraphDev::TIconHandle hicoRet = kCIDGraphDev::hicoInvalid;
 
     // If we found an id, then look up the icon info
     if (ridFind != kCIDLib::c4MaxCard)
     {
         hRes = ::FindResource(hMod, MAKEINTRESOURCE(ridFind), RT_ICON);
-        HGLOBAL hMem = ::LoadResource(hMod, hRes);
-        if (hMem)
+        if (hRes != nullptr)
         {
-            const tCIDLib::TCard1* pc1Res
-            (
-                (const tCIDLib::TCard1*)::LockResource(hMem)
-            );
-
-            if (pc1Res)
+            HGLOBAL hMem = ::LoadResource(hMod, hRes);
+            if (hMem)
             {
-                // We got it so let's create the icon from this data
-                hicoRet = ::CreateIconFromResourceEx
+                const tCIDLib::TCard1* pc1Res
                 (
-                    (PBYTE)pc1Res, c4Size, 1, 0x00030000, 0, 0, 0
+                    (const tCIDLib::TCard1*)::LockResource(hMem)
                 );
+
+                if (pc1Res != nullptr)
+                {
+                    // We got it so let's create the icon from this data
+                    hicoRet = ::CreateIconFromResourceEx
+                    (
+                        (PBYTE)pc1Res, c4Size, 1, 0x00030000, 0, 0, 0
+                    );
+                }
             }
         }
     }

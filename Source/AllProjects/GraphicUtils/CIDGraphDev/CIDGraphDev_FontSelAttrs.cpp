@@ -125,6 +125,9 @@ TFontSelAttrs::TFontSelAttrs(const TGraphDrawDev& gdevSource) :
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::AppError
         );
+
+        // Won't happen, but makes analyzer happy
+        return;
     }
 
     // And get the logical font data from it

@@ -670,7 +670,7 @@ TBitmap::hbmpFromImage( const   TGraphicDevice&     gdevTarget
     //  a possible non-exact floating point, so multiply it up and take the
     //  integral part.
     //
-    const tCIDLib::TBoolean bGamma = kCIDLib::False;
+    const tCIDLib::TBoolean bGamma
     (
         (tCIDLib::c4EnumOrd(eDepth) > 1) && (tCIDLib::TCard4(f8Gamma * 10) != 22)
     );
@@ -697,7 +697,7 @@ TBitmap::hbmpFromImage( const   TGraphicDevice&     gdevTarget
     //  -   If we are doing gamma and it's not a palette based image. If a
     //      palette, then we gamma the palette values.
     //
-    if (!pc1BitPtr
+    if ((pc1BitPtr == nullptr)
     &&  ((bGamma && !tCIDLib::bAllBitsOn(eNewFmt, tCIDImage::EPixFmts::Palette))
     ||   tCIDLib::bAllBitsOn(eNewFmt, tCIDImage::EPixFmts::Alpha)))
     {
@@ -926,11 +926,11 @@ TBitmap::hbmpFromImage( const   TGraphicDevice&     gdevTarget
                             for (c4XInd = 0; c4XInd < c4CX; c4XInd++)
                             {
                                 *pc1Cur = ac1GTbl[*pc1Cur];
-                                *pc1Cur++;
+                                pc1Cur++;
                                 *pc1Cur = ac1GTbl[*pc1Cur];
-                                *pc1Cur++;
+                                pc1Cur++;
                                 *pc1Cur = ac1GTbl[*pc1Cur];
-                                *pc1Cur++;
+                                pc1Cur++;
 
                                 if (tCIDLib::bAllBitsOn(eNewFmt, tCIDImage::EPixFmts::Alpha))
                                     pc1Cur++;
@@ -952,7 +952,7 @@ TBitmap::hbmpFromImage( const   TGraphicDevice&     gdevTarget
                             c1Cur = *pc1Cur;
                             if (c1Cur != c4TransClr)
                                 *pc1Cur = ac1GTbl[c1Cur];
-                            *pc1Cur++;
+                            pc1Cur++;
                         }
                     }
                 }
@@ -2248,6 +2248,9 @@ TBitmap::bmpMakeMask(const  TGraphDrawDev&      gdevCompat
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return *static_cast<TBitmap*>(nullptr);
     }
 
     //
@@ -2268,6 +2271,9 @@ TBitmap::bmpMakeMask(const  TGraphDrawDev&      gdevCompat
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return *static_cast<TBitmap*>(nullptr);
     }
 
     // Get the color out at the pixel
@@ -2288,6 +2294,9 @@ TBitmap::bmpMakeMask(const  TGraphDrawDev&      gdevCompat
             , tCIDLib::ESeverities::Warn
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return *static_cast<TBitmap*>(nullptr);
     }
 
     // And now we can delete our device handle
@@ -2303,6 +2312,9 @@ TBitmap::bmpMakeMask(const  TGraphDrawDev&      gdevCompat
             , tCIDLib::ESeverities::Warn
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return *static_cast<TBitmap*>(nullptr);
     }
 
     // Now we can call the other version

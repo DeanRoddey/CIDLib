@@ -1735,6 +1735,9 @@ TGraphDrawDev::DrawIconPart(const   TIcon&                  icoToDraw
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::CantDo
             );
+
+            // Won't happen, but makes analyzer happy
+            return;
         }
     }
 
@@ -1817,6 +1820,9 @@ TGraphDrawDev::DrawIconPart(const   TIcon&                  icoToDraw
                 , tCIDLib::ESeverities::Warn
                 , tCIDLib::EErrClasses::CantDo
             );
+
+            // Won't happen, but makes analyzer happy
+            return;
         }
     }
 
@@ -1835,6 +1841,9 @@ TGraphDrawDev::DrawIconPart(const   TIcon&                  icoToDraw
                 , tCIDLib::EErrClasses::CantDo
                 , TString(L"Memory Device")
             );
+
+            // Won't happen, but makes analyzer happy
+            return;
         }
     }
 
@@ -3257,7 +3266,7 @@ TGraphDrawDev::DrawStringFX(const   TString&                strText
         gdevDraw.SetTextColor(rgbClr1);
 
         {
-            TRegionJanitor janClip(this, areaZTar, tCIDGraphDev::EClipModes::And);
+            TRegionJanitor janClip2(this, areaZTar, tCIDGraphDev::EClipModes::And);
             if (bNoTextWrap)
             {
                 gdevDraw.DrawString(strText, areaZText);
@@ -3547,6 +3556,9 @@ TGraphDrawDev::hrgnSetClipArea( const   tCIDGraphDev::EClipModes    eMode
             , tCIDLib::EErrClasses::CantDo
             , strMsg
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     // Now set it on us
@@ -3569,6 +3581,9 @@ TGraphDrawDev::hrgnSetClipArea( const   tCIDGraphDev::EClipModes    eMode
             , tCIDLib::EErrClasses::CantDo
             , TString(L"Region")
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     // Clean up the temp region now that it's set
@@ -3597,6 +3612,9 @@ TGraphDrawDev::hrgnSetClipRegion(const  tCIDGraphDev::EClipModes    eMode
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     tCIDGraphDev::TDeviceHandle hdevTarget = hdevThis();
@@ -3616,6 +3634,9 @@ TGraphDrawDev::hrgnSetClipRegion(const  tCIDGraphDev::EClipModes    eMode
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     // If there was no clip region, then return an invalid handle
@@ -3644,6 +3665,9 @@ TGraphDrawDev::hrgnSetClipRegion(const  tCIDGraphDev::EClipModes    eMode
             , tCIDLib::EErrClasses::CantDo
             , TString(L"Region")
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     // And return the old one
@@ -5012,7 +5036,7 @@ TRGBClr TGraphDrawDev::rgbTextColor() const
 
 tCIDLib::TVoid TGraphDrawDev::ResetBoundsArea()
 {
-    if (!SetBoundsRect(hdevThis(), 0, DCB_RESET) & DCB_RESET)
+    if ((::SetBoundsRect(hdevThis(), 0, DCB_RESET) & DCB_RESET) == 0)
     {
         if (!bDevErrToIgnore())
         {

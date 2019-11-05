@@ -63,11 +63,7 @@ TCIDNameServerImpl::TCIDNameServerImpl( const   TOrbObjId&          ooidToUse
     , m_thrLandlord
       (
         L"CIDNameSrvLandLordThread"
-        , TMemberFunc<TCIDNameServerImpl>
-          (
-            this
-            , &TCIDNameServerImpl::eLandlordThread
-          )
+        , TMemberFunc<TCIDNameServerImpl>(this, &TCIDNameServerImpl::eLandlordThread)
       )
 {
 }

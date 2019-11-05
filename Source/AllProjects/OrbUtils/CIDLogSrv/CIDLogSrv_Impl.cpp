@@ -1042,15 +1042,10 @@ TCIDLogServerImpl::AddToLiveQueue(const TLogEvent& logevToAdd)
      else
     {
         // Calc the cutoff time
-        const tCIDLib::TEncodedTime enctCutoff = TTime::enctNow()
-                                                 - enctCutoffRange;
+        const tCIDLib::TEncodedTime enctCutoff = TTime::enctNow() - enctCutoffRange;
 
         // Get the head node
-        TLogSrvQNode* pnodeTmp = static_cast<TLogSrvQNode*>
-        (
-            m_colLiveData.pnodeHead()
-        );
-
+        TLogSrvQNode* pnodeTmp = static_cast<TLogSrvQNode*>(m_colLiveData.pnodeHead());
         if (pnodeTmp->m_plogevData->enctLogged() < enctCutoff)
         {
             // Move the head node to the tail
@@ -1184,7 +1179,7 @@ TCIDLogServerImpl::c4CompactFreeList(const tCIDLib::TCard4 c4Needed)
         //  If we created one that's big enough, don't bother with the full
         //  compaction.
         //
-        tCIDLib::TCard4 c4FIndex = 0;
+        c4FIndex = 0;
         while (c4FIndex < m_c4FreesUsed)
         {
             if (pFreeList[c4FIndex].c4Size >= c4Needed)

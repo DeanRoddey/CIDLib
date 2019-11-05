@@ -420,6 +420,9 @@ TCIDMacroEngine::bInvokeDefCtor(        TMEngClassVal&      mecvTarget
                 , tCIDLib::EErrClasses::NotFound
                 , meciTarget.strClassPath()
             );
+
+            // Won't happen but makes analyzer happy
+            return kCIDLib::False;
         }
 
         //
@@ -1402,6 +1405,7 @@ TCIDMacroEngine::ExpandFilePath(const   TString&    strMacroPath
     //  forward slashes instead of back. So if the native path sep
     //  isn't forward, then replace them with the native one.
     //
+    #pragma warning(suppress : 6326) // chPathSep is per-platform, so this is legit check
     if (kCIDLib::chPathSep != L'/')
     {
         TString strTmp(strMacroPath);
@@ -3336,10 +3340,10 @@ TCIDMacroEngine::FormatAFrame(          TTextOutStream& strmTarget
     {
         // Get the description of the parameter and the type and value
         const TMEngParmInfo& mepiCur = methiCur.mepiFind(c2ParmId);
-        const TMEngClassInfo& meciCur = *m_colClassesById[mepiCur.c2ClassId()];
+        const TMEngClassInfo& meciCur2 = *m_colClassesById[mepiCur.c2ClassId()];
 
         strmTarget  << mepiCur.eDir() << kCIDLib::chSpace
-                    << meciCur.strClassPath() << kCIDLib::chSpace
+                    << meciCur2.strClassPath() << kCIDLib::chSpace
                     << mepiCur.strName();
 
         c4ParmStack++;

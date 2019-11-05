@@ -33,6 +33,6 @@ namespace kCIDGraphDev
     // ------------------------------------------------------------------------
     //  Some GUI oriented character constants
     // ------------------------------------------------------------------------
-    const tCIDLib::TCh              chMnemonic      = L'~';
+    constexpr tCIDLib::TCh      chMnemonic      = L'~';
 }
 

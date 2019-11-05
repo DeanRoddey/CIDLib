@@ -189,6 +189,9 @@ TMEngClassInfo::AddMethodImpl(TMEngMethodImpl* const pmethToAdopt)
             , pmethToAdopt->strName()
             , m_strClassPath
         );
+
+        // Won't happen but makes analyzer happy
+        return;
     }
 
     // Make sure that they both have the same id, which should be the case
@@ -206,6 +209,9 @@ TMEngClassInfo::AddMethodImpl(TMEngMethodImpl* const pmethToAdopt)
             , TCardinal(pmethToAdopt->c2Id())
             , TCardinal(pmethiTarget->c2Id())
         );
+
+        // Won't happen but makes analyzer happy
+        return;
     }
 
     //
@@ -224,6 +230,9 @@ TMEngClassInfo::AddMethodImpl(TMEngMethodImpl* const pmethToAdopt)
             , pmethToAdopt->strName()
             , m_strClassPath
         );
+
+        // Won't happen but makes analyzer happy
+        return;
     }
 
     // Add it to the method implementation list
@@ -525,6 +534,9 @@ tCIDLib::TCard2 TMEngClassInfo::c2MethodId(const TString& strToFind) const
             , strToFind
             , m_strClassPath
         );
+
+        // Won't happen but makes analyzer happy
+        return 0;
     }
     return pmethiRet->c2Id();
 }
@@ -545,6 +557,9 @@ tCIDLib::TCard2 TMEngClassInfo::c2MemberId(const TString& strToFind) const
             , strToFind
             , m_strClassPath
         );
+
+        // Won't happen but makes analyzer happy
+        return 0;
     }
     return pmemiRet->c2Id();
 }

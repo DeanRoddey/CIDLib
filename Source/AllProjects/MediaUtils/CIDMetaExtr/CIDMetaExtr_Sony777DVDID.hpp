@@ -45,7 +45,17 @@ class CIDMETAEXTREXP TCIDSony777DVDID : public TObject
         // -------------------------------------------------------------------
         TCIDSony777DVDID();
 
+        TCIDSony777DVDID(const TCIDSony777DVDID&) = delete;
+        TCIDSony777DVDID(TCIDSony777DVDID&&) = delete;
+
         ~TCIDSony777DVDID();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TCIDSony777DVDID& operator=(const TCIDSony777DVDID&) = delete;
+        TCIDSony777DVDID& operator=(TCIDSony777DVDID&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -60,13 +70,6 @@ class CIDMETAEXTREXP TCIDSony777DVDID : public TObject
 
     private :
         // -------------------------------------------------------------------
-        //  Unimpleemnted
-        // -------------------------------------------------------------------
-        TCIDSony777DVDID(const TCIDSony777DVDID&);
-        tCIDLib::TVoid operator=(const TCIDSony777DVDID&);
-
-
-        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::TVoid GenChapterLen
@@ -77,7 +80,7 @@ class CIDMETAEXTREXP TCIDSony777DVDID : public TObject
             ,       TString&                strToFill
         )   const;
 
-        tCIDLib::TCard1* pc1ReadDVDFile
+        [[nodiscard]] tCIDLib::TCard1* pc1ReadDVDFile
         (
             const   TString&                strFilePath
             ,       tCIDLib::TCard4&        c4Size

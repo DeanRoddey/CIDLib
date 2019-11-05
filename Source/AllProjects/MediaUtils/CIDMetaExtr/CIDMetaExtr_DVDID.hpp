@@ -48,7 +48,17 @@ class CIDMETAEXTREXP TCIDDVDID : public TObject
         // -------------------------------------------------------------------
         TCIDDVDID();
 
+        TCIDDVDID(const TCIDDVDID&) = delete;
+        TCIDDVDID(TCIDDVDID&&) = delete;
+
         ~TCIDDVDID();
+
+
+        // -------------------------------------------------------------------
+        //  Public oeprators
+        // -------------------------------------------------------------------
+        TCIDDVDID& operator=(const TCIDDVDID&) = delete;
+        TCIDDVDID& operator=( TCIDDVDID&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -64,13 +74,6 @@ class CIDMETAEXTREXP TCIDDVDID : public TObject
 
     private :
         // -------------------------------------------------------------------
-        //  Unimpleemnted
-        // -------------------------------------------------------------------
-        TCIDDVDID(const TCIDDVDID&);
-        tCIDLib::TVoid operator=(const TCIDDVDID&);
-
-
-        // -------------------------------------------------------------------
         //  We need a small class to hold the per-file data. Unfortunately we
         //  have to sort the list based on UTF_8 encoded file names, so we
         //  can't just store the find buffers themselves. So we just go ahead
@@ -85,15 +88,19 @@ class CIDMETAEXTREXP TCIDDVDID : public TObject
                     ,       TUTF8Converter& tcvtToUse
                     ,       TMemBuf&        mbufTmp
                 );
+
+                TPerFileInfo(const TPerFileInfo&) = delete;
+                TPerFileInfo(TPerFileInfo&&) = delete;
+
                 ~TPerFileInfo();
+
+                TPerFileInfo& operator=(const TPerFileInfo&) = delete;
+                TPerFileInfo& operator=(TPerFileInfo&&) = delete;
 
                 tCIDLib::TCard4 m_c4NameBytes;
                 tCIDLib::TCard4 m_c4Size;
                 tCIDLib::TCard8 m_c8Time;
                 tCIDLib::TSCh*  m_pschName;
-
-            private :
-                TPerFileInfo(const TPerFileInfo&);
         };
 
 
