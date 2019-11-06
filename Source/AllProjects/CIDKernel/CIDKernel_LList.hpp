@@ -43,7 +43,8 @@ template <class TElem> class TKrnlLList
         // -------------------------------------------------------------------
         TKrnlLList() :
 
-            m_pCursor(nullptr)
+            m_c4ElemCount(0)
+            , m_pCursor(nullptr)
             , m_pHead(nullptr)
             , m_pTail(nullptr)
         {
@@ -103,6 +104,11 @@ template <class TElem> class TKrnlLList
             return (m_pHead != nullptr);
         }
 
+        tCIDLib::TCard4 c4ElemCount() const
+        {
+            return m_c4ElemCount;
+        }
+
         TElem* pobjAddNew(TElem* const pobjToAdd)
         {
             // Remember the current tail
@@ -119,6 +125,7 @@ template <class TElem> class TKrnlLList
             if (!m_pHead)
                 m_pHead = m_pTail;
 
+            m_c4ElemCount++;
             return pobjToAdd;
         }
 
@@ -136,7 +143,7 @@ template <class TElem> class TKrnlLList
             return m_pHead->m_pobjVal;
         }
 
-        TElem* pobjOrphanCur()
+        [[nodiscard]] TElem* pobjOrphanCur()
         {
             // If the cursor isn't valid, return null
             if (!m_pCursor)
@@ -181,6 +188,8 @@ template <class TElem> class TKrnlLList
             delete m_pCursor;
             m_pCursor = pNextCursor;
 
+            m_c4ElemCount--;
+
             // Give back the orphaned user object
             return pRet;
         }
@@ -195,7 +204,10 @@ template <class TElem> class TKrnlLList
             // Orphan the current. If we get one, delete it
             TElem* pobjRemove = pobjOrphanCur();
             if (pobjRemove)
+            {
                 delete pobjRemove;
+                m_c4ElemCount--;
+            }
         }
 
 
@@ -244,10 +256,16 @@ template <class TElem> class TKrnlLList
                 delete pCur;
                 pCur = pSaveN;
             }
+
+            m_c4ElemCount = 0;
         }
 
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_c4ElemCount
+        //      The current count of elements, to avoid having to iterate the list to
+        //      figure that out.
         //
         //  m_pCursor
         //      Our internal cursor node pointer. These are not intended for
@@ -260,9 +278,10 @@ template <class TElem> class TKrnlLList
         //      A pointer to the last node in the list, to make adding new ones
         //      far more efficient.
         // -------------------------------------------------------------------
-        TNode*  m_pCursor;
-        TNode*  m_pHead;
-        TNode*  m_pTail;
+        tCIDLib::TCard4 m_c4ElemCount;
+        TNode*          m_pCursor;
+        TNode*          m_pHead;
+        TNode*          m_pTail;
 };
 
 #pragma CIDLIB_POPPACK

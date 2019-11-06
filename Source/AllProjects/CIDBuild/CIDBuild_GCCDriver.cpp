@@ -83,6 +83,16 @@ tCIDLib::TBoolean TGCCDriver::bBuild(const TProjectInfo& projiTarget)
     m_strTargetFile.CopyAt(m_pprojiTarget->strOutBin(), c4Name);
 
     //
+    // If it's a shared library then we've got to strip the version
+    // part for compilation. We'll add it back later.
+    //
+    if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
+    {
+        m_strTargetFile.CapAt(m_strTargetFile.c4Length()
+                              - facCIDBuild.strVersionSuffix().c4Length());
+    }
+
+    //
     //  Lets do our Cpp compilations. We just run through each of the Cpp
     //  files, which our parent class has has already set up, and ask if
     //  each one needs to be compiled. If so, we build it.
@@ -481,7 +491,6 @@ tCIDLib::TVoid TGCCDriver::Link()
             TBldStr* pstrLib = new TBldStr(L"-L");
             pstrLib->Append(facCIDBuild.strOutDir());
             pstrLib->Append(cursLibs.tCurElement().strFileName());
-            listParms.Add(pstrLib);
         }   while (cursLibs.bNext());
     }
 
@@ -569,6 +578,7 @@ tCIDLib::TVoid TGCCDriver::Link()
     if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
     {
         TBldStr strRealName(m_strTargetFile);
+        strRealName.Append(facCIDBuild.strVersionSuffix());        
 
         tCIDBuild::TSCh* pszRealName = TRawStr::pszTranscode(strRealName.pszBuffer());
         TArrayJanitor<tCIDBuild::TSCh> janReal(pszRealName);
@@ -581,10 +591,10 @@ tCIDLib::TVoid TGCCDriver::Link()
             throw tCIDBuild::EErrors::BuildError;
         }
 
-//        if (::symlink(pszRealName, pszTarget))
-//        {
-//            stdOut << L"Unable to create symbolic link" << kCIDBuild::EndLn;
-//            throw tCIDBuild::EErrors::BuildError;
-//        }
+        if (::symlink(pszRealName, pszTarget))
+        {
+            stdOut << L"Unable to create symbolic link" << kCIDBuild::EndLn;
+            throw tCIDBuild::EErrors::BuildError;
+        }
     }
 }

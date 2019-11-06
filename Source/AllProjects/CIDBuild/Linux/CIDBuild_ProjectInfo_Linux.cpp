@@ -54,9 +54,10 @@ tCIDLib::TVoid TProjectInfo::BuildOutputFileName()
     {
         if (m_eType == tCIDBuild::EProjTypes::SharedLib)
         {
-            m_strOutBin.Append(m_strProjectName);            
-            m_strOutBin.Append(facCIDBuild.strVersionSuffix());
+            m_strOutBin.Append(L"lib");
+            m_strOutBin.Append(m_strProjectName);
             m_strOutBin.Append(kCIDBuild::pszDllExt);
+            m_strOutBin.Append(facCIDBuild.strVersionSuffix());
         }
          else if (m_eType == tCIDBuild::EProjTypes::StaticLib)
         {

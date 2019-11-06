@@ -574,10 +574,8 @@ TKrnlExtProcess::bSetPriorityClass(const tCIDLib::EPrioClasses eNewClass)
 tCIDLib::TBoolean
 TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
                         , const tCIDLib::TCh* const     pszInitPath
-                        ,       tCIDLib::TCh**          apszParms
-                        , const tCIDLib::TCard4         c4ParmCount
-                        ,       tCIDLib::TCh**          apszEnviron
-                        , const tCIDLib::TCard4         c4EnvironCount
+                        ,       tCIDKernel::TStrList&   klistParms
+                        ,       tCIDKernel::TStrList&   klistEnviron
                         , const tCIDLib::EExtProcFlags  eFlag
                         , const tCIDLib::EExtProcShows  eShow)
 {
@@ -591,35 +589,54 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
         return kCIDLib::False;
     }
 
+    //
     // Make the array for arguments. Add two to the size because the first argument
     // should be the name of the file to execute and the last should be zero.
-    tCIDLib::TCard4 c4Counter;
-    tCIDLib::TSCh** apszParamCopy = new tCIDLib::TSCh*[c4ParmCount + 2];
+    //
+    tCIDLib::TSCh** apszParamCopy = new tCIDLib::TSCh*[klistParms.c4ElemCount() + 2];
 
     tCIDLib::TCh szNameExt[kCIDLib::c4MaxPathLen + 1];
     TKrnlPathStr::bQueryNameExt(pszPath, szNameExt, c4MaxBufChars(szNameExt));
-    apszParamCopy[0] = TRawStr::pszConvert(szNameExt);
+    tCIDLib::TCard4 c4ArrayIndex = 0;
+    
+    apszParamCopy[c4ArrayIndex++] = TRawStr::pszConvert(szNameExt);
 
-    for (c4Counter = 1; c4Counter <= c4ParmCount; c4Counter++)
-        apszParamCopy[c4Counter] = TRawStr::pszConvert(apszParms[c4Counter - 1]);
-    apszParamCopy[c4Counter] = 0;
+    if (klistParms.bResetCursor())
+    {
+        TKrnlString* pkstrCur = klistParms.pobjHead();
+        do
+        {
+            apszParamCopy[c4ArrayIndex++] = TRawStr::pszConvert(pkstrCur->pszValue());            
+        }   while (klistParms.bNext(pkstrCur));
+    }
+    apszParamCopy[c4ArrayIndex++] = 0;
 
-    // Now convert the file name.
-    // Search for it manually in the path for simplicity. The other option
-    // would be to call "execvp", but that would only work if there is no
-    // environment passed in. It doesn't make sense to introduce the extra
-    // complexity.
+    //
+    //  Now convert the file name.
+    //
+    //  Search for it manually in the path for simplicity. The other option
+    //  would be to call "execvp", but that would only work if there is no
+    //  environment passed in. It doesn't make sense to introduce the extra
+    //  complexity.
+    //
     tCIDLib::TSCh* pszFileName = TKrnlLinux::pszFindInPath(pszPath);
     TArrayJanitor<tCIDLib::TSCh> janPath(pszFileName);
 
     // Only worry about the environment if there is one.
-    tCIDLib::TSCh** apszEnvironCopy = 0;
-    if (c4EnvironCount)
+    tCIDLib::TSCh** apszEnvironCopy = nullptr;
+    if (!klistEnviron.bIsEmpty())
     {
-        apszEnvironCopy = new tCIDLib::TSCh*[c4EnvironCount + 1];
-        for (c4Counter = 0; c4Counter < c4ParmCount; c4Counter++)
-            apszEnvironCopy[c4Counter] = TRawStr::pszConvert(apszEnviron[c4Counter]);
-        apszEnvironCopy[c4Counter] = 0;
+        apszEnvironCopy = new tCIDLib::TSCh*[klistEnviron.c4ElemCount() + 1];
+        c4ArrayIndex = 0;
+        if (klistEnviron.bResetCursor())
+        {
+            TKrnlString* pkstrCur = klistEnviron.pobjHead();
+            do
+            {
+                apszEnvironCopy[c4ArrayIndex++] = TRawStr::pszConvert(pkstrCur->pszValue());            
+            }   while (klistEnviron.bNext(pkstrCur));
+        }
+        apszEnvironCopy[c4ArrayIndex] = 0;
     }
 
     // Before we make the new process, we need to block child signals.
@@ -644,26 +661,29 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
         ::sigprocmask(SIG_SETMASK, &OldSigSet, 0);
 
         // Clean up the strings we converted
-        c4Counter = 0;
-        while (apszParamCopy[c4Counter])
-            delete [] apszParamCopy[c4Counter++];
+        c4ArrayIndex = 0;
+        while (apszParamCopy[c4ArrayIndex])
+            delete [] apszParamCopy[c4ArrayIndex++];
         delete [] apszParamCopy;
-        if (c4EnvironCount)
+
+        if (apszEnvironCopy)
         {
-            c4Counter = 0;
-            while (apszEnvironCopy[c4Counter])
-                delete [] apszEnvironCopy[c4Counter++];
+            c4ArrayIndex = 0;
+            while (apszEnvironCopy[c4ArrayIndex])
+                delete [] apszEnvironCopy[c4ArrayIndex++];
             delete [] apszEnvironCopy;
         }
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
 
+    //
     // pidTmp equals zero if we're in the child process. In that case
     // we need to execute the file.
+    //
     if (pidTmp == 0)
     {
-        if (c4EnvironCount)
+        if (apszEnvironCopy)
             ::execve(pszFileName, apszParamCopy, apszEnvironCopy);
         else
             ::execv(pszFileName, apszParamCopy);
@@ -703,15 +723,16 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
     ::sigprocmask(SIG_SETMASK, &OldSigSet, 0);
 
     // Delete the strings we converted
-    c4Counter = 0;
-    while (apszParamCopy[c4Counter])
-        delete [] apszParamCopy[c4Counter++];
+    c4ArrayIndex = 0;
+    while (apszParamCopy[c4ArrayIndex])
+        delete [] apszParamCopy[c4ArrayIndex++];
     delete [] apszParamCopy;
-    if (c4EnvironCount)
+
+    if (apszEnvironCopy)
     {
-        c4Counter = 0;
-        while (apszEnvironCopy[c4Counter])
-            delete [] apszEnvironCopy[c4Counter++];
+        c4ArrayIndex = 0;
+        while (apszEnvironCopy[c4ArrayIndex])
+            delete [] apszEnvironCopy[c4ArrayIndex++];
         delete [] apszEnvironCopy;
     }
 
@@ -722,12 +743,13 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
 tCIDLib::TBoolean
 TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
                         , const tCIDLib::TCh* const     pszInitPath
-                        ,       tCIDLib::TCh**          apszEnviron
-                        , const tCIDLib::TCard4         c4EnvironCount
+                        ,       tCIDKernel::TStrList&   klistEnviron
                         , const tCIDLib::EExtProcFlags  eFlag
                         , const tCIDLib::EExtProcShows  eShow)
 {
-    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    // Break out the start string into a program to run plus parameters
+    
+
     return kCIDLib::False;
 }                        
 
