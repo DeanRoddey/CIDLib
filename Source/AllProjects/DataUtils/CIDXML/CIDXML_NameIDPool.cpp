@@ -186,6 +186,9 @@ tCIDLib::TCard4 TXMLNameIDPool<TElem>::c4AddNew(TElem* const pobjToAdd)
             , TCardinal(hshKey)
             , TCardinal(c4Modulus)
         );
+
+        // Won't happen, but makes analyzer happy
+        return 0;
     }
     #endif
 
@@ -220,7 +223,7 @@ template <class TElem>
 TElem* TXMLNameIDPool<TElem>::pobjById(const tCIDLib::TCard4 c4Id)
 {
     if (c4Id >= m_c4IdIndex)
-        return 0;
+        return nullptr;
 
     return m_apobjById[c4Id];
 }
@@ -245,6 +248,9 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const TString& strName)
             , TCardinal(hshKey)
             , TCardinal(c4Modulus)
         );
+
+        // Won't happen, but makes analyzer happy
+        return nullptr;
     }
     #endif
 
@@ -253,7 +259,7 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const TString& strName)
     //  gonna match and can return now.
     //
     if (!m_aBuckets[hshKey])
-        return 0;
+        return nullptr;
 
     // We have to search the list and compare the names to find the actual one
     TBucketElem* pCur = m_aBuckets[hshKey];
@@ -268,7 +274,7 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const TString& strName)
     }
 
     // Never found it
-    return 0;
+    return nullptr;
 }
 
 template <class TElem>
@@ -290,6 +296,9 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const tCIDLib::TCh* const pszName)
             , TCardinal(hshKey)
             , TCardinal(c4Modulus)
         );
+
+        // Won't happen, but makes analyzer happy
+        return nullptr;
     }
     #endif
 
@@ -298,7 +307,7 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const tCIDLib::TCh* const pszName)
     //  gonna match and can return now.
     //
     if (!m_aBuckets[hshKey])
-        return 0;
+        return nullptr;
 
     // We have to search the list and compare the names to find the actual one
     TBucketElem* pCur = m_aBuckets[hshKey];
@@ -313,7 +322,7 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const tCIDLib::TCh* const pszName)
     }
 
     // Never found it
-    return 0;
+    return nullptr;
 }
 
 

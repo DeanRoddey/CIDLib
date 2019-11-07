@@ -772,11 +772,11 @@ tCIDLib::TBoolean TXMLEntityMgr::bPopEntity()
         //
         delete m_pxesCurrent;
         m_c4StackTop--;
-        TEMStackElem& elemTop = m_pcolEntityStack->objAt(m_c4StackTop);
-        m_pxesCurrent   = elemTop.pxesThis;
-        m_pxdeclCurrent = elemTop.pxdeclThis;
-        elemTop.pxesThis = 0;
-        elemTop.pxdeclThis = 0;
+        TEMStackElem& elemCur = m_pcolEntityStack->objAt(m_c4StackTop);
+        m_pxesCurrent   = elemCur.pxesThis;
+        m_pxdeclCurrent = elemCur.pxdeclThis;
+        elemCur.pxesThis = nullptr;
+        elemCur.pxdeclThis = nullptr;
     }
     return kCIDLib::True;
 }

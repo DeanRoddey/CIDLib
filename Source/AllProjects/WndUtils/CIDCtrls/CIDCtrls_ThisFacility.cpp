@@ -1593,10 +1593,10 @@ TFacCIDCtrls::hwndChildFromText(const   tCIDCtrls::TWndHandle   hwndParent
     const tCIDLib::TCard4 c4BufSz = 1024;
     tCIDLib::TCh achBuf[c4BufSz + 1];
 
-    tCIDCtrls::TWndHandle hwndRet;
+    tCIDCtrls::TWndHandle hwndRet = kCIDCtrls::hwndInvalid;
     if (bDirectChild)
     {
-        tCIDCtrls::TWndHandle hwndRet = ::GetWindow(hwndParent, GW_CHILD);
+        hwndRet = ::GetWindow(hwndParent, GW_CHILD);
         while (hwndRet)
         {
             // See if this window has the expected text

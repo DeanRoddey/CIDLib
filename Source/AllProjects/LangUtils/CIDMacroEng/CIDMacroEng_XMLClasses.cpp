@@ -308,19 +308,21 @@ bNextPrevChild(         TMEngXMLTreeAnchorVal&  mecvToUpdate
     //  only the root would have no parent and therefore cannot ever be the
     //  incoming child anchor.
     //
-    CIDAssert(m_pxtnodeValue != 0, L"The parent anchor is invalid");
+    CIDAssert(m_pxtnodeValue != nullptr, L"The parent anchor is invalid");
     tCIDLib::TCard4 c4Index = mecvToUpdate.m_c4Index;
     CIDAssert(c4Index != kCIDLib::c4MaxCard, L"The child anchor is invalid");
-    const TXMLTreeElement& xtnodeCur = m_pxtnodeValue->xtnodeChildAtAsElement(c4Index);
-    CIDAssert
-    (
-        &xtnodeCur == mecvToUpdate.m_pxtnodeValue
-        , L"The child anchor is not a child of the provided parent anchor"
-    );
+    {
+        const TXMLTreeElement& xtnodeCur = m_pxtnodeValue->xtnodeChildAtAsElement(c4Index);
+        CIDAssert
+        (
+            &xtnodeCur == mecvToUpdate.m_pxtnodeValue
+            , L"The child anchor is not a child of the provided parent anchor"
+        );
+    }
 
     // Looks ok, so let's try to move to the next or previous node
     const tCIDLib::TCard4 c4Count = m_pxtnodeValue->c4ChildCount();
-    const TXMLTreeElement* pxtnodeNew = 0;
+    const TXMLTreeElement* pxtnodeNew = nullptr;
     if (bNext)
     {
         c4Index++;
@@ -1222,13 +1224,12 @@ TMEngXMLTreeParserInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
         if (mecvRet.bValue(pxtnodeFind != nullptr))
         {
             mecvRet.bValue(kCIDLib::True);
-
-            TMEngXMLTreeAnchorVal& mecvAnchor
+            mecvActual.SetAnchorInfo
             (
-                meOwner.mecvStackAtAs<TMEngXMLTreeAnchorVal>(c4FirstInd + 4)
+                pxtnodeFind
+                , c4At
+                , meOwner.mecvStackAtAs<TMEngXMLTreeAnchorVal>(c4FirstInd + 4)
             );
-            mecvActual.SetAnchorInfo(pxtnodeFind, c4At, mecvAnchor);
-
             meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd + 3).c4Value(c4At);
         }
     }

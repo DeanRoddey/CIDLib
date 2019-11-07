@@ -1256,6 +1256,9 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 {
                     IssueErr(psrcClass, kMEngErrs::errcPrs_ExpectedLitStr);
                     ThrowUnrecoverable();
+
+                    // Won't happen but makes the analyzer happy
+                    return;
                 }
 
                 strPath = pmelvFound->strValueAs();
@@ -1275,6 +1278,9 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                     {
                         IssueErr(psrcClass, kMEngErrs::errcPrs_EmptySpecDynRef);
                         ThrowUnrecoverable();
+
+                        // Won't happen, but makes analyzer happy
+                        return;
                     }
                 }
             }
@@ -1303,6 +1309,9 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
         {
             IssueErr(psrcClass, kMEngErrs::errcEng_ClassNotFound, strPath);
             ThrowUnrecoverable();
+
+            // Won't happen, but makes analyzer hapy
+            return;
         }
 
         //
@@ -2309,8 +2318,7 @@ TMacroEngParser::ValidateClass(         TParserSrc&     psrcClass
                     , methiCur.strName()
                 );
             }
-
-            if (pmethCur->c2Id() != methiCur.c2Id())
+             else if (pmethCur->c2Id() != methiCur.c2Id())
             {
                 IssueErr
                 (

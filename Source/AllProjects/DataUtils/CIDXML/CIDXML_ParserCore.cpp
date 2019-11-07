@@ -1082,7 +1082,6 @@ TXMLParserCore::bParseStartTag(const tCIDLib::TCard4 c4SpoolerId)
         //  Look up this attribute on the parent element. It will be faulted
         //  in if it does not exist.
         //
-        tCIDLib::TBoolean bAdded;
         TXMLAttrDef* pxadCur = pxdeclElem->pxadFindAttrDef(m_strName, bAdded);
 
         //
@@ -1124,9 +1123,9 @@ TXMLParserCore::bParseStartTag(const tCIDLib::TCard4 c4SpoolerId)
             //
             PostXMLError(kXMLErrs::errcXMLE_ExpectedEqualSign);
 
-            const tCIDLib::TCh chNext = m_xemThis.chPeekNext();
-            if ((chNext != kCIDLib::chQuotation)
-            &&  (chNext != kCIDLib::chApostrophe))
+            const tCIDLib::TCh chTmp = m_xemThis.chPeekNext();
+            if ((chTmp != kCIDLib::chQuotation)
+            &&  (chTmp != kCIDLib::chApostrophe))
             {
                 ThrowParseError(kXMLErrs::errcParse_CannotContinue);
             }
@@ -1146,14 +1145,14 @@ TXMLParserCore::bParseStartTag(const tCIDLib::TCard4 c4SpoolerId)
             //
             while (kCIDLib::True)
             {
-                tCIDLib::TCh chNext = m_xemThis.chPeekNext();
+                const tCIDLib::TCh chTmp = m_xemThis.chPeekNext();
 
-                if (!chNext)
+                if (!chTmp)
                     ThrowParseError(kXMLErrs::errcParse_UnexpectedEOI);
 
-                if (chNext == kCIDLib::chGreaterThan)
+                if (chTmp == kCIDLib::chGreaterThan)
                     break;
-                if (TXMLCharFlags::bIsNameChar(chNext))
+                if (TXMLCharFlags::bIsNameChar(chTmp))
                     break;
 
                 m_xemThis.chGetNext();

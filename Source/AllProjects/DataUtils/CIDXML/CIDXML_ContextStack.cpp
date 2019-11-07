@@ -183,7 +183,11 @@ tCIDLib::TBoolean TXMLContextStack::bPopLevel()
 
     // Update the text type field, if we are not empty
     if (m_c4LevelTop)
-        m_eTextType = m_pLevels[m_c4LevelTop - 1].pxdeclLevel->eTextType();
+    {
+        TXMLElemDecl* pxdeclTop = m_pLevels[m_c4LevelTop - 1].pxdeclLevel;
+        CIDAssert(pxdeclTop != nullptr, L"Popped back to null XMLDecl level");
+        m_eTextType = pxdeclTop->eTextType();
+    }
 
     // Return whether we are empty or not
     return (m_c4LevelTop == 0);

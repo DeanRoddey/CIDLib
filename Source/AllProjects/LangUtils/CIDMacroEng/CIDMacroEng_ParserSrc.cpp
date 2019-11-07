@@ -583,7 +583,7 @@ tCIDLib::TVoid TParserSrc::EatWhitespace()
     {
         chCur = chGetNextChar();
         while (TRawStr::bIsSpace(chCur)
-        ||     (chCur == kCIDLib::chLF)
+        ||     (chCur == kCIDLib::chCR)
         ||     (chCur == kCIDLib::chLF)
         ||     (chCur == kCIDLib::chTab))
         {

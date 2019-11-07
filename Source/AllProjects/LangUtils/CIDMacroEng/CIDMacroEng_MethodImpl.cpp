@@ -797,8 +797,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                             // It's a parm already on the stack
                             pmecvTarget = &meOwner.mecvStackAt
                             (
-                                (c4BasePointer - (methiThis.c4ParmCount() + 1))
-                                + meopCur[0]
+                                (c4BasePointer - (methiThis.c4ParmCount() + 1)) + meopCur[0]
                             );
                         }
                          else
@@ -813,6 +812,9 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                                 , tCIDLib::EErrClasses::Unknown
                                 , TInteger(tCIDLib::i4EnumOrd(meopCur.eOpCode()))
                             );
+
+                            // Won't happen but makes analyzer happy
+                            break;
                         }
 
                         // Get the class info for the class of the target
@@ -1804,18 +1806,15 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                     // Push a temp pool value of the target type
                     meOwner.PushPoolValue
                     (
-                        meopCur.c2Immediate()
-                        , tCIDMacroEng::EConstTypes::Const
+                        meopCur.c2Immediate(), tCIDMacroEng::EConstTypes::Const
                     );
                     TMEngClassVal& mecvTmp = meOwner.mecvStackAtTop();
 
                     // And ask the temp object to cast from the stack top value
-                    TMEngClassInfo& meciTarget = meOwner.meciFind(meopCur.c2Immediate());
-                    const tCIDMacroEng::ECastRes eRes = meciTarget.eCastFrom
+                    TMEngClassInfo& meciTarType = meOwner.meciFind(meopCur.c2Immediate());
+                    const tCIDMacroEng::ECastRes eRes = meciTarType.eCastFrom
                     (
-                        meOwner
-                        , mecvToCast
-                        , mecvTmp
+                        meOwner, mecvToCast, mecvTmp
                     );
 
                     if (eRes == tCIDMacroEng::ECastRes::Incompatible)
@@ -1829,7 +1828,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                             , tCIDLib::ESeverities::Failed
                             , tCIDLib::EErrClasses::Internal
                             , meOwner.strClassPathForId(mecvToCast.c2ClassId())
-                            , meciTarget.strClassPath()
+                            , meciTarType.strClassPath()
                         );
                     }
 

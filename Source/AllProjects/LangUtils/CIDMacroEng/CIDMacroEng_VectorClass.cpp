@@ -271,12 +271,17 @@ TMEngVectorVal::InsertObject(       TCIDMacroEngine&        meOwner
                             ,       TMEngClassVal* const    pmecvToAdd
                             , const tCIDLib::TCard4         c4InsertAt)
 {
+    CIDAssert(pmecvToAdd != nullptr, L"Passed class value is null");
+
     // In this case, insert at the end is ok, so just check for greater than
     if (c4InsertAt > m_colElems.c4ElemCount())
     {
         // We own the passed object, so clean it up before we throw
         delete pmecvToAdd;
         m_pmeciBase->IndexErr(meOwner, c4InsertAt, meOwner.strClassPathForId(c2ClassId()));
+
+        // Won't happen, since the above, throws, but makes the analyzer happy
+        return;
     }
     m_colElems.InsertAt(pmecvToAdd, c4InsertAt);
 }

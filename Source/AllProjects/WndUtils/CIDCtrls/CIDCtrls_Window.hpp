@@ -1640,7 +1640,12 @@ tCIDLib::TVoid CastChildWnd(        TWindow&            wndParent
     // Get the child window, throw if no child with that id
     TWindow* pwndChild = wndParent.pwndChildById(widChild);
     if (!pwndChild)
+    {
         TWindow::ThrowNoChildWithId(widChild);
+
+        // Won't happen but makes analyzer happy
+        return;
+    }
 
     // Try the dynamic cast. If it fails, throw
     pwndToFill = dynamic_cast<T*>(pwndChild);

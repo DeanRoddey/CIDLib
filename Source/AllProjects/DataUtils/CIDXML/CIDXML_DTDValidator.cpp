@@ -373,6 +373,9 @@ TDTDValidator::bValidateContent(const   TXMLElemDecl&           xdeclParent
                     , TCardinal(pc4Children[c4FailedAt])
                     , facCIDXML().strMsg(kXMLMsgs::midGen_element)
                 );
+
+                // Won't happen but makes analyzer happy
+                return kCIDLib::False;
             }
 
             // We found it, so issue the error and show the content model

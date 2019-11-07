@@ -64,9 +64,9 @@ namespace CIDCtrls_Clipboard
 #if CID_DEBUG_ON
 void FooBar()
 {
-    TWindow* pwndTmp = 0;
+    TWindow* pwndTmp = new TCheckBox();
     TGUIClipboard gclipTmp(*pwndTmp);
-    TArea* pareaTmp = 0;
+    TArea* pareaTmp = new TArea();
 
     gclipTmp.WriteObj(*pareaTmp);
     if (!gclipTmp.bReadObj<TArea>(pareaTmp))
@@ -276,6 +276,9 @@ TGUIClipboard::bGetAsClass(         TString&            strToFill
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::NotFound
             );
+
+            // Won't happen, but makes analyzer happy
+            return kCIDLib::False;
         }
 
         const tCIDLib::TCh* pszData = (tCIDLib::TCh*)::GlobalLock(hMem);
@@ -490,14 +493,18 @@ TGUIClipboard::bGetAsText(          TString&            strToFill
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::NotFound
             );
+
+            // Won't happen, but makes the analyzer
+            return kCIDLib::False;
         }
 
         tCIDLib::TCh* pszData = (tCIDLib::TCh*)::GlobalLock(hMem);
+        CIDAssert(pszData != nullptr, L"Could not get global clipboard memory pointer");
         try
         {
             const tCIDLib::TCard4 c4MaxLen = 64 * (1024 * 1024);
             if (TRawStr::c4StrLen(pszData) > c4MaxLen)
-                pszData[c4MaxLen] = 0;
+                pszData[c4MaxLen] = kCIDLib::chNull;
 
             strToFill = pszData;
             ::GlobalUnlock(hMem);
@@ -506,7 +513,6 @@ TGUIClipboard::bGetAsText(          TString&            strToFill
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
             ::GlobalUnlock(hMem);
             throw;
         }
@@ -789,6 +795,9 @@ tCIDLib::TVoid TGUIClipboard::StoreData(const   TMemBuf&        mbufToStore
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer nappy
+        return;
     }
 
     //
@@ -796,7 +805,9 @@ tCIDLib::TVoid TGUIClipboard::StoreData(const   TMemBuf&        mbufToStore
     //  we allocated it 4 bytes larger, so that we could store the size as
     //  the first field of the stored data.
     //
-    tCIDLib::TCard1* pc1Target = reinterpret_cast<tCIDLib::TCard1*>(::GlobalLock(hMem));
+    tCIDLib::TCard1* pc1Target = static_cast<tCIDLib::TCard1*>(::GlobalLock(hMem));
+    CIDAssert(pc1Target != nullptr, L"Could not get the global clipbard member pointer");
+
     *reinterpret_cast<tCIDLib::TCard4*>(pc1Target) = c4Bytes;
     mbufToStore.CopyOut(pc1Target + sizeof(c4Bytes), c4Bytes);
     ::GlobalUnlock(hMem);
@@ -858,6 +869,9 @@ TGUIClipboard::StoreStringData( const   tCIDLib::TCard1* const  pc1Data
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen but makes analyzer happy
+        return;
     }
 
     // Get a writeable view of the data, copy our text into it, and unlock

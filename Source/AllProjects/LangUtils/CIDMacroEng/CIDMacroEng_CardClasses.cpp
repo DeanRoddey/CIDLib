@@ -3835,6 +3835,11 @@ TMEngCard8Info::bInvokeMethod(          TCIDMacroEngine&    meOwner
         //  then clip it to the low byte.
         //
         tCIDLib::TCard8 c8Ret = mecvActual.c8Value();
+        //
+        //  The analyzer is confused here. We aren't assigning the shipped
+        //  value to the 64 bit value. We are creating a shift count.
+        //
+        #pragma warning(suppress : 6297)
         c8Ret >>= (c4Byte << 3);
         c8Ret &= 0xFF;
         mecvRet.c1Value(tCIDLib::TCard1(c8Ret));

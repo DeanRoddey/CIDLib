@@ -1418,7 +1418,7 @@ TDTDValidator::ParseExtEntity(const tCIDLib::TBoolean bExpectDecl)
             ExpandPEntityRef(kCIDLib::True, tCIDXML::EPERefOpts::None);
             continue;
         }
-         else if (!bExpectDecl & (chNext == kCIDLib::chCloseBracket))
+         else if (!bExpectDecl && (chNext == kCIDLib::chCloseBracket))
         {
             // Eat the close bracket
             xemOwner().chGetNext();

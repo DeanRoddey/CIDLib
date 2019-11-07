@@ -2026,6 +2026,9 @@ TMacroEngParser::ParseInitializers( TParserSrc&             psrcClass
                 , meciToFill.strClassPath()
             );
             ThrowUnrecoverable();
+
+            // Won't happen, but makes analyzer happy
+            return;
         }
 
         //
@@ -3968,7 +3971,7 @@ TMacroEngParser::ParseSwitchCase(const  tCIDMacroEng::ETokens  eOrgToken
             c4Count++;
 
             tCIDLib::TCard2 c2Id = 0;
-            TMEngClassVal*  pmecvCase = 0;
+            TMEngClassVal*  pmecvCase = nullptr;
             if (eTok == tCIDMacroEng::ETokens::CharLiteral)
             {
                 // Escape the literal first
@@ -4049,6 +4052,9 @@ TMacroEngParser::ParseSwitchCase(const  tCIDMacroEng::ETokens  eOrgToken
                         , m_pmeTarget->strClassPathForId(meopSwitch[1])
                     );
                     ThrowUnrecoverable();
+
+                    // Won't happen, but makes analyzer happy
+                    return;
                 }
             }
              else
@@ -4066,7 +4072,7 @@ TMacroEngParser::ParseSwitchCase(const  tCIDMacroEng::ETokens  eOrgToken
                 // Issue an error but keep going
                 IssueErr(psrcClass, kMEngErrs::errcPrs_NotSwitchType);
             }
-             else
+             else if (pmecvCase != nullptr)
             {
                 // Make sure this case hasn't already been used
                 tCIDLib::TCard4 c4Dummy;

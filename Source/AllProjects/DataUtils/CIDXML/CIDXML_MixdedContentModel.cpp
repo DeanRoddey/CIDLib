@@ -137,6 +137,9 @@ TXMLMixedCM::FormatTo(          TTextOutStream& strmDest
                 , tCIDLib::EErrClasses::Internal
                 , TCardinal(m_pc4ChildIds[c4Index])
             );
+
+            // Won't happen, but makes the analyzer happy
+            return;
         }
 
         strmDest << L"|" << pxdeclCur->strFullName();

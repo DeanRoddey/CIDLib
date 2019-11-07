@@ -378,6 +378,9 @@ TRegEx::bFullyMatches(  const   tCIDLib::TCh* const pszToTest
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::NotReady
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDLib::False;
     }
 
     // Get the length of the string to search

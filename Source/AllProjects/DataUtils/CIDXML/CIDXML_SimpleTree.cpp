@@ -1595,8 +1595,6 @@ TXMLTreeText::PrintTo(          TTextOutStream&     strmTarget
                         , const tCIDLib::TCard4     c4Indent
                         , const tCIDLib::TBoolean   bEscape) const
 {
-    strmTarget << TTextOutStream::RepChars(kCIDLib::chSpace, c4Indent * 4);
-
     // If ignorable, or all whitespace, ignore it
     if (!m_bIsIgnorable)
     {
@@ -1614,6 +1612,7 @@ TXMLTreeText::PrintTo(          TTextOutStream&     strmTarget
         // Escape the text if asked to, else just show it as is
         if (bShow)
         {
+            strmTarget << TTextOutStream::RepChars(kCIDLib::chSpace, c4Indent * 4);
             if (bEscape)
                 facCIDXML().EscapeFor(m_strText, strmTarget, tCIDXML::EEscTypes::ElemText);
             else
@@ -1801,60 +1800,21 @@ TXMLTreeElement& TXMLTreeDocument::xtnodeRoot()
 
 tCIDLib::TVoid
 TXMLTreeDocument::PrintTo(          TTextOutStream&     strmTarget
-                            , const tCIDLib::TCard4     c4Indent
+                            , const tCIDLib::TCard4
                             , const tCIDLib::TBoolean   bEscape) const
 {
     //
-    //  Iterate our children and print each one of them. To make it nicer we
-    //  put out the decl and root at zero indent, then 1 indent until we hit the
-    //  last one.
+    //  Iterate our children and print each one of them. Everything here is
+    //  at indent level zero.
     //
-    enum EStates
-    {
-        EState_Decl
-        , EState_Root
-        , EState_Content
-    }   eState = EState_Decl;
-
+    tCIDLib::TCard4 c4Indent = 0;
     const tCIDLib::TCard4 c4ChildCount = m_pcolChildren->c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChildCount; c4Index++)
     {
         const TXMLTreeNode& xtnodeCur = *m_pcolChildren->pobjAt(c4Index);
+        xtnodeCur.PrintTo(strmTarget, 0, bEscape);
 
-        tCIDLib::TCard4 c4Indent = 0;
-        switch(eState)
-        {
-            case EState_Decl :
-                //
-                //  If the current node is a decl, then keep zero indent, else
-                //  fall through to root.
-                //
-                if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Decl)
-                {
-                    eState = EState_Root;
-                    break;
-                }
-                 else
-                {
-                    eState = EState_Root;
-                }
-
-            case EState_Root :
-                // Stay at zero, go to content
-                eState = EState_Content;
-            break;
-
-            case EState_Content :
-                // If the last one, go back to zero, else 1
-                if (c4Index != c4ChildCount - 1)
-                    c4Indent = 1;
-            break;
-
-            default :
-                break;
-        };
-
-        xtnodeCur.PrintTo(strmTarget, c4Indent, bEscape);
+        strmTarget.Flush();
     }
 }
 
