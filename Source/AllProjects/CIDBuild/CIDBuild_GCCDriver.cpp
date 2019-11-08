@@ -478,22 +478,18 @@ tCIDLib::TVoid TGCCDriver::Link()
     listParms.Add(new TBldStr(L"-lstdc++"));
     listParms.Add(new TBldStr(L"-m32"));
 
-    //
-    //  And now add in all of the Obj and Lib files. We built them up above
-    //  when we needed to check all of the source for staleness of the target.
-    //  So we just reference those existing names with our argument list.
-    //
-    TList<TFindInfo>::TCursor cursLibs(&listLibs());
-    if (cursLibs.bResetIter())
+    if ((m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Executable)
+    ||  (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Service))
     {
-        do
-        {
-            TBldStr* pstrLib = new TBldStr(L"-L");
-            pstrLib->Append(facCIDBuild.strOutDir());
-            pstrLib->Append(cursLibs.tCurElement().strFileName());
-        }   while (cursLibs.bNext());
+        listParms.Add(new TBldStr(L"-lm"));
+    }
+     else if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
+    {
+        listParms.Add(new TBldStr(L"-shared"));
     }
 
+
+    //  And now add in all of the object files
     TList<TDepInfo>::TCursor cursCpps(&listCpps());
     if (cursCpps.bResetIter())
     {
@@ -513,22 +509,23 @@ tCIDLib::TVoid TGCCDriver::Link()
     // Cursor support
     listParms.Add(new TBldStr(L"-lncurses"));
 
-    if ((m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Executable)
-    ||  (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::Service))
-    {
-        listParms.Add(new TBldStr(L"-ldl"));
-        listParms.Add(new TBldStr(L"-lm"));
-    }
-     else if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
-    {
-        listParms.Add(new TBldStr(L"-shared"));
-    }
-   
-
+    // Some special case stuff for CIDKernel
     if (m_pprojiTarget->strProjectName() == TBldStr(L"CIDKernel"))
     {
         listParms.Add(new TBldStr(L"-lreadline"));
         listParms.Add(new TBldStr(L"-lhistory"));
+        listParms.Add(new TBldStr(L"-ldl"));                    
+    }
+
+    // And now all of the libraries, the system ones then ours
+    TList<TFindInfo>::TCursor cursLibs(&listLibs());
+    if (cursLibs.bResetIter())
+    {
+        do
+        {
+            TBldStr* pstrNew = new TBldStr(L"-lCIDKernel");
+            listParms.Add(pstrNew);
+        }   while (cursLibs.bNext());
     }
 
     TListCursor<TBldStr> cursParms(&listParms);

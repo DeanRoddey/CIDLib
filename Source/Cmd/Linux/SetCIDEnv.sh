@@ -49,8 +49,9 @@ export CIDLIB_SRCDIR=${CID_SRCTREE}
 # Add our command directory and result directory the path
 PATH=$PATH:${CID_RESDIR}:${CID_SRCTREE}/Source/Cmd/Linux
 
-# Add our result directory to the library path
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CID_RESDIR}
+# Add our result directory to the library paths
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CID_RESDIR}
+export LIBRARY_PATH=${LIBRARY_PATH}:${CID_RESDIR}
 
 # Set our terminal title to reflect what we are set up for
 echo -ne "\033]0;CIDLib[${CID_BUILDMODE}, ${CID_VERSION}]\007"
