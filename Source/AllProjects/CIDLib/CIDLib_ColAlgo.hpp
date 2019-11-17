@@ -30,6 +30,10 @@
 //  The others will generally take a TCollection<T> or TRefCollection<T> and can
 //  work on any type of collection of that sort (by value or by reference.)
 //
+//
+//  We also define here some templates for accessing raw arrays, since there's
+//  not really a better place for them.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -341,6 +345,52 @@ namespace tCIDColAlgo
             }
         }
         return tLastBest;
+    }
+}
+
+namespace tCIDLib
+{
+    // Access a raw array safely
+    template <typename T, tCIDLib::TCard4 c4Size>
+    T& c4ArrayAt(T(& aSrc)[c4Size], const tCIDLib::TCard4 c4At)
+    {
+        if (c4At >= c4Size)
+        {
+            ThrowArrayIndexErr(c4At, c4Size);
+
+            // Won't happen but make the analyzer happy
+            return *static_cast<T*>(nullptr);
+        }
+        return aSrc[c4At];
+    }
+
+    template <typename T, tCIDLib::TCard4 c4Size>
+    const T& c4ArrayAt(const T(& aSrc)[c4Size], const tCIDLib::TCard4 c4At)
+    {
+        if (c4At >= c4Size)
+        {
+            ThrowArrayIndexErr(c4At, c4Size);
+
+            // Won't happen but make the analyzer happy
+            return *static_cast<T*>(nullptr);
+        }
+        return aSrc[c4At];
+    }
+
+
+    //
+    //  Get a pointer to the element past the end, for use with pointer
+    //  increment type loops.
+    //
+    template <typename T, tCIDLib::TCard4 c4Size> T* pArrayEndPtr(T(& aSrc)[c4Size])
+    {
+        return &aSrc[c4Size];
+    }
+
+    template <typename T, tCIDLib::TCard4 c4Size>
+    const T* pArrayEndPtr(const T(& aSrc)[c4Size])
+    {
+        return &aSrc[c4Size];
     }
 }
 

@@ -46,335 +46,328 @@
 // ---------------------------------------------------------------------------
 namespace CIDLib_Type
 {
-    // -----------------------------------------------------------------------
-    //  The arrays of message ids and hard coded text for respectively loading
-    //  up the human readable text for and translating between text/binary
-    //  formats of some of our enums.
-    //
-    //  Normally this stuff is provided by the IDL compiler, but we exist
-    //  below the IDL compiler and cannot use it.
-    // -----------------------------------------------------------------------
-    static const tCIDLib::TCh* const apszDirsVals[] =
+    namespace
     {
-        L"Left"
-        , L"Right"
-        , L"Down"
-        , L"Up"
-        , L"???"
-    };
-    static const
-    TEArray<const tCIDLib::TCh*, tCIDLib::EDirs, tCIDLib::EDirs::Count> apszDirs(apszDirsVals);
+        // -----------------------------------------------------------------------
+        //  The arrays of message ids and hard coded text for respectively loading
+        //  up the human readable text for and translating between text/binary
+        //  formats of some of our enums.
+        //
+        //  Normally this stuff is provided by the IDL compiler, but we exist
+        //  below the IDL compiler and cannot use it.
+        // -----------------------------------------------------------------------
+        constexpr const tCIDLib::TCh* const apszDirsVals[] =
+        {
+            L"Left"
+            , L"Right"
+            , L"Down"
+            , L"Up"
+            , L"???"
+        };
+        const TEArray<const tCIDLib::TCh*, tCIDLib::EDirs, tCIDLib::EDirs::Count> apszDirs(apszDirsVals);
 
 
-    static const tCIDLib::TMsgId amidErrClassVals[] =
-    {
-        kCIDMsgs::midGen_None
-        , kCIDMsgs::midErrC_OutResource
-        , kCIDMsgs::midErrC_TempSituation
-        , kCIDMsgs::midErrC_Authority
-        , kCIDMsgs::midErrC_Internal
-        , kCIDMsgs::midErrC_HardwareError
-        , kCIDMsgs::midErrC_SystemError
-        , kCIDMsgs::midErrC_AppError
-        , kCIDMsgs::midErrC_BadParms
-        , kCIDMsgs::midErrC_Locked
-        , kCIDMsgs::midErrC_Media
-        , kCIDMsgs::midErrC_Already
-        , kCIDMsgs::midErrC_Unknown
-        , kCIDMsgs::midErrC_CantDo
-        , kCIDMsgs::midErrC_TimeOut
-        , kCIDMsgs::midErrC_DynamicType
-        , kCIDMsgs::midErrC_TypeMatch
-        , kCIDMsgs::midErrC_Format
-        , kCIDMsgs::midErrC_UserInput
-        , kCIDMsgs::midErrC_NotReady
-        , kCIDMsgs::midErrC_ObjState
-        , kCIDMsgs::midErrC_NotSupported
-        , kCIDMsgs::midErrC_AppStatus
-        , kCIDMsgs::midErrC_NotFound
-        , kCIDMsgs::midErrC_Protocol
-        , kCIDMsgs::midErrC_Range
-        , kCIDMsgs::midErrC_Duplicate
-        , kCIDMsgs::midErrC_Config
-        , kCIDMsgs::midErrC_Index
-        , kCIDMsgs::midErrC_NotAllRead
-        , kCIDMsgs::midErrC_NotAllWritten
-        , kCIDMsgs::midErrC_LostConnection
-        , kCIDMsgs::midErrC_Overflow
-        , kCIDMsgs::midErrC_Underflow
-        , kCIDMsgs::midErrC_InitFailed
-        , kCIDMsgs::midErrC_OutOfSync
-        , kCIDMsgs::midErrC_XmitFailed
-        , kCIDMsgs::midErrC_ReceiveFailed
-        , kCIDMsgs::midErrC_NoReply
-        , kCIDMsgs::midErrC_Assert
-        , kCIDMsgs::midErrC_InUse
-        , kCIDMsgs::midErrC_Term
-        , kCIDMsgs::midErrC_Init
-        , kCIDMsgs::midErrC_Shutdown
-        , kCIDMsgs::midErrC_RejectedConn
-        , kCIDMsgs::midErrC_Busy
-        , kCIDMsgs::midErrC_Nak
-    };
-    static const
-    TEArray<tCIDLib::TMsgId, tCIDLib::EErrClasses, tCIDLib::EErrClasses::Count> amidErrClasses
-    (
-        amidErrClassVals
-    );
+        constexpr tCIDLib::TMsgId amidErrClassVals[] =
+        {
+            kCIDMsgs::midGen_None
+            , kCIDMsgs::midErrC_OutResource
+            , kCIDMsgs::midErrC_TempSituation
+            , kCIDMsgs::midErrC_Authority
+            , kCIDMsgs::midErrC_Internal
+            , kCIDMsgs::midErrC_HardwareError
+            , kCIDMsgs::midErrC_SystemError
+            , kCIDMsgs::midErrC_AppError
+            , kCIDMsgs::midErrC_BadParms
+            , kCIDMsgs::midErrC_Locked
+            , kCIDMsgs::midErrC_Media
+            , kCIDMsgs::midErrC_Already
+            , kCIDMsgs::midErrC_Unknown
+            , kCIDMsgs::midErrC_CantDo
+            , kCIDMsgs::midErrC_TimeOut
+            , kCIDMsgs::midErrC_DynamicType
+            , kCIDMsgs::midErrC_TypeMatch
+            , kCIDMsgs::midErrC_Format
+            , kCIDMsgs::midErrC_UserInput
+            , kCIDMsgs::midErrC_NotReady
+            , kCIDMsgs::midErrC_ObjState
+            , kCIDMsgs::midErrC_NotSupported
+            , kCIDMsgs::midErrC_AppStatus
+            , kCIDMsgs::midErrC_NotFound
+            , kCIDMsgs::midErrC_Protocol
+            , kCIDMsgs::midErrC_Range
+            , kCIDMsgs::midErrC_Duplicate
+            , kCIDMsgs::midErrC_Config
+            , kCIDMsgs::midErrC_Index
+            , kCIDMsgs::midErrC_NotAllRead
+            , kCIDMsgs::midErrC_NotAllWritten
+            , kCIDMsgs::midErrC_LostConnection
+            , kCIDMsgs::midErrC_Overflow
+            , kCIDMsgs::midErrC_Underflow
+            , kCIDMsgs::midErrC_InitFailed
+            , kCIDMsgs::midErrC_OutOfSync
+            , kCIDMsgs::midErrC_XmitFailed
+            , kCIDMsgs::midErrC_ReceiveFailed
+            , kCIDMsgs::midErrC_NoReply
+            , kCIDMsgs::midErrC_Assert
+            , kCIDMsgs::midErrC_InUse
+            , kCIDMsgs::midErrC_Term
+            , kCIDMsgs::midErrC_Init
+            , kCIDMsgs::midErrC_Shutdown
+            , kCIDMsgs::midErrC_RejectedConn
+            , kCIDMsgs::midErrC_Busy
+            , kCIDMsgs::midErrC_Nak
+        };
+        const TEArray<tCIDLib::TMsgId, tCIDLib::EErrClasses, tCIDLib::EErrClasses::Count> amidErrClasses
+        (
+            amidErrClassVals
+        );
 
-    static const tCIDLib::TCh* const apszErrClassVals[] =
-    {
-        L"None"
-        , L"OutResource"
-        , L"TempSituation"
-        , L"Authority"
-        , L"Internal"
-        , L"HardwareFailure"
-        , L"SystemFailure"
-        , L"AppError"
-        , L"BadParms"
-        , L"Locked"
-        , L"Media"
-        , L"Already"
-        , L"Unknown"
-        , L"CantDo"
-        , L"Timeout"
-        , L"DynamicType"
-        , L"TypeMatch"
-        , L"Format"
-        , L"UserInput"
-        , L"NotReady"
-        , L"ObjState"
-        , L"NotSupported"
-        , L"AppStatus"
-        , L"NotFound"
-        , L"Protocol"
-        , L"Range"
-        , L"Duplicate"
-        , L"Config"
-        , L"Index"
-        , L"NotAllRead"
-        , L"NotAllWritten"
-        , L"LostConnection"
-        , L"Overflow"
-        , L"Underflow"
-        , L"InitFailed"
-        , L"OutOfSync"
-        , L"XmitFailed"
-        , L"ReceiveFailed"
-        , L"NoReply"
-        , L"Assert"
-        , L"InUse"
-        , L"Termination"
-        , L"Initialization"
-        , L"Shutdown"
-        , L"RejectedConn"
-        , L"Busy"
-        , L"Nak"
-        , L"???"
-    };
-    static const
-    TEArray<const tCIDLib::TCh*, tCIDLib::EErrClasses, tCIDLib::EErrClasses::Count, 1> apszErrClasses
-    (
-        apszErrClassVals
-    );
+        constexpr const tCIDLib::TCh* const apszErrClassVals[] =
+        {
+            L"None"
+            , L"OutResource"
+            , L"TempSituation"
+            , L"Authority"
+            , L"Internal"
+            , L"HardwareFailure"
+            , L"SystemFailure"
+            , L"AppError"
+            , L"BadParms"
+            , L"Locked"
+            , L"Media"
+            , L"Already"
+            , L"Unknown"
+            , L"CantDo"
+            , L"Timeout"
+            , L"DynamicType"
+            , L"TypeMatch"
+            , L"Format"
+            , L"UserInput"
+            , L"NotReady"
+            , L"ObjState"
+            , L"NotSupported"
+            , L"AppStatus"
+            , L"NotFound"
+            , L"Protocol"
+            , L"Range"
+            , L"Duplicate"
+            , L"Config"
+            , L"Index"
+            , L"NotAllRead"
+            , L"NotAllWritten"
+            , L"LostConnection"
+            , L"Overflow"
+            , L"Underflow"
+            , L"InitFailed"
+            , L"OutOfSync"
+            , L"XmitFailed"
+            , L"ReceiveFailed"
+            , L"NoReply"
+            , L"Assert"
+            , L"InUse"
+            , L"Termination"
+            , L"Initialization"
+            , L"Shutdown"
+            , L"RejectedConn"
+            , L"Busy"
+            , L"Nak"
+            , L"???"
+        };
+        const TEArray<const tCIDLib::TCh*, tCIDLib::EErrClasses, tCIDLib::EErrClasses::Count, 1> apszErrClasses
+        (
+            apszErrClassVals
+        );
 
 
-    static const tCIDLib::TMsgId amidHJustifications[tCIDLib::c4EnumOrd(tCIDLib::EHJustify::Count)] =
-    {
-        kCIDMsgs::midGen_Left
-        , kCIDMsgs::midGen_Right
-        , kCIDMsgs::midGen_Center
-    };
+        constexpr tCIDLib::TMsgId amidHJustifications[tCIDLib::c4EnumOrd(tCIDLib::EHJustify::Count)] =
+        {
+            kCIDMsgs::midGen_Left
+            , kCIDMsgs::midGen_Right
+            , kCIDMsgs::midGen_Center
+        };
 
-    static const tCIDLib::TCh* const apszHJustVals[] =
-    {
-        L"EHJustify_Left"
-        , L"EHJustify_Right"
-        , L"EHJustify_Center"
-        , L"???"
-    };
-    static const
-    TEArray<const tCIDLib::TCh*, tCIDLib::EHJustify, tCIDLib::EHJustify::Count, 1> apszHJustifications
-    (
-        apszHJustVals
-    );
+        constexpr const tCIDLib::TCh* const apszHJustVals[] =
+        {
+            L"EHJustify_Left"
+            , L"EHJustify_Right"
+            , L"EHJustify_Center"
+            , L"???"
+        };
+        const TEArray<const tCIDLib::TCh*, tCIDLib::EHJustify, tCIDLib::EHJustify::Count, 1> apszHJustifications
+        (
+            apszHJustVals
+        );
 
-    static const tCIDLib::TCh* const apszAltHJustVals[] =
-    {
-        L"Left"
-        , L"Right"
-        , L"Center"
-        , L"???"
-    };
-    static const
-    TEArray<const tCIDLib::TCh*, tCIDLib::EHJustify, tCIDLib::EHJustify::Count, 1> apszAltHJustifications
-    (
-        apszHJustVals
-    );
+        constexpr const tCIDLib::TCh* const apszAltHJustVals[] =
+        {
+            L"Left"
+            , L"Right"
+            , L"Center"
+            , L"???"
+        };
+        const TEArray<const tCIDLib::TCh*, tCIDLib::EHJustify, tCIDLib::EHJustify::Count, 1> apszAltHJustifications
+        (
+            apszAltHJustVals
+        );
 
-    //
-    //  These are added onto the overall stats cache path for the logging flags
-    //  stats cache item. THESE MUST be in the same order as the enum, as all these
-    //  lists are, but most important here since it will be used to translate from
-    //  a text path to a stats cache index.
-    //
-    static const tCIDLib::TCh* apszLogFlagVals[] =
-    {
-        L"CIDLib/Audio"
-        , L"CIDLib/Base64"
-        , L"CIDLib/BinStreams"
-        , L"CIDLib/BitsBytes"
-        , L"CIDLib/Collects"
-        , L"CIDLib/Color"
-        , L"CIDLib/Coords"
-        , L"CIDLib/DataSrc"
-        , L"CIDLib/Facility"
-        , L"CIDLib/Files"
-        , L"CIDLib/FileSystem"
-        , L"CIDLib/FundCollects"
-        , L"CIDLib/MemBuf"
-        , L"CIDLib/Other"
-        , L"CIDLib/Processes"
-        , L"CIDLib/Speech"
-        , L"CIDLib/SearchNSort"
-        , L"CIDLib/Strings"
-        , L"CIDLib/Synchro"
-        , L"CIDLib/TextConvert"
-        , L"CIDLib/TextStreams"
-        , L"CIDLib/Threads"
-        , L"CIDLib/ValFormat"
-        , L"CIDLib/Volumes"
-        , L"CIDLib/Trace"
-        , L"CIDLib/Verbose"
+        //
+        //  These are added onto the overall stats cache path for the logging flags
+        //  stats cache item. THESE MUST be in the same order as the enum, as all these
+        //  lists are, but most important here since it will be used to translate from
+        //  a text path to a stats cache index.
+        //
+        constexpr const tCIDLib::TCh* apszLogFlagVals[] =
+        {
+            L"CIDLib/Audio"
+            , L"CIDLib/Base64"
+            , L"CIDLib/BinStreams"
+            , L"CIDLib/BitsBytes"
+            , L"CIDLib/Collects"
+            , L"CIDLib/Color"
+            , L"CIDLib/Coords"
+            , L"CIDLib/DataSrc"
+            , L"CIDLib/Facility"
+            , L"CIDLib/Files"
+            , L"CIDLib/FileSystem"
+            , L"CIDLib/FundCollects"
+            , L"CIDLib/MemBuf"
+            , L"CIDLib/Other"
+            , L"CIDLib/Processes"
+            , L"CIDLib/Speech"
+            , L"CIDLib/SearchNSort"
+            , L"CIDLib/Strings"
+            , L"CIDLib/Synchro"
+            , L"CIDLib/TextConvert"
+            , L"CIDLib/TextStreams"
+            , L"CIDLib/Threads"
+            , L"CIDLib/ValFormat"
+            , L"CIDLib/Volumes"
+            , L"CIDLib/Trace"
+            , L"CIDLib/Verbose"
 
-        , L"CIDLib/Unknown"
-    };
-    static const
-    TEArray<const tCIDLib::TCh*, tCIDLib::ELogFlags, tCIDLib::ELogFlags::Count, 1> apszLogFlags
-    (
-        apszLogFlagVals
-    );
+            , L"CIDLib/Unknown"
+        };
+        const TEArray<const tCIDLib::TCh*, tCIDLib::ELogFlags, tCIDLib::ELogFlags::Count, 1> apszLogFlags
+        (
+            apszLogFlagVals
+        );
 
-    static const tCIDLib::TMsgId amidLanguages[tCIDLib::c4EnumOrd(tCIDLib::ELanguages::Count)] =
-    {
-        kCIDMsgs::midLang_Afrikaans
-        , kCIDMsgs::midLang_Albanian
-        , kCIDMsgs::midLang_Arabic
-        , kCIDMsgs::midLang_Basque
-        , kCIDMsgs::midLang_Belarusian
-        , kCIDMsgs::midLang_Bulgarian
-        , kCIDMsgs::midLang_Catalan
-        , kCIDMsgs::midLang_Chinese
-        , kCIDMsgs::midLang_Croatian
-        , kCIDMsgs::midLang_Czech
-        , kCIDMsgs::midLang_Danish
-        , kCIDMsgs::midLang_Dutch
-        , kCIDMsgs::midLang_English
-        , kCIDMsgs::midLang_Farsi
-        , kCIDMsgs::midLang_Finnish
-        , kCIDMsgs::midLang_French
-        , kCIDMsgs::midLang_German
-        , kCIDMsgs::midLang_Greek
-        , kCIDMsgs::midLang_Hebrew
-        , kCIDMsgs::midLang_Hungarian
-        , kCIDMsgs::midLang_Icelandic
-        , kCIDMsgs::midLang_Indonesian
-        , kCIDMsgs::midLang_Italian
-        , kCIDMsgs::midLang_Japanese
-        , kCIDMsgs::midLang_Korean
-        , kCIDMsgs::midLang_Latvian
-        , kCIDMsgs::midLang_Lithuanian
-        , kCIDMsgs::midLang_Norwegian
-        , kCIDMsgs::midLang_Polish
-        , kCIDMsgs::midLang_Portuguese
-        , kCIDMsgs::midLang_Romanian
-        , kCIDMsgs::midLang_Russian
-        , kCIDMsgs::midLang_Serbian
-        , kCIDMsgs::midLang_Slovak
-        , kCIDMsgs::midLang_Slovenian
-        , kCIDMsgs::midLang_Spanish
-        , kCIDMsgs::midLang_Swedish
-        , kCIDMsgs::midLang_Turkish
-        , kCIDMsgs::midLang_Ukrainian
-        , kCIDMsgs::midLang_Vietnamese
-    };
+        constexpr tCIDLib::TMsgId amidLanguages[tCIDLib::c4EnumOrd(tCIDLib::ELanguages::Count)] =
+        {
+            kCIDMsgs::midLang_Afrikaans
+            , kCIDMsgs::midLang_Albanian
+            , kCIDMsgs::midLang_Arabic
+            , kCIDMsgs::midLang_Basque
+            , kCIDMsgs::midLang_Belarusian
+            , kCIDMsgs::midLang_Bulgarian
+            , kCIDMsgs::midLang_Catalan
+            , kCIDMsgs::midLang_Chinese
+            , kCIDMsgs::midLang_Croatian
+            , kCIDMsgs::midLang_Czech
+            , kCIDMsgs::midLang_Danish
+            , kCIDMsgs::midLang_Dutch
+            , kCIDMsgs::midLang_English
+            , kCIDMsgs::midLang_Farsi
+            , kCIDMsgs::midLang_Finnish
+            , kCIDMsgs::midLang_French
+            , kCIDMsgs::midLang_German
+            , kCIDMsgs::midLang_Greek
+            , kCIDMsgs::midLang_Hebrew
+            , kCIDMsgs::midLang_Hungarian
+            , kCIDMsgs::midLang_Icelandic
+            , kCIDMsgs::midLang_Indonesian
+            , kCIDMsgs::midLang_Italian
+            , kCIDMsgs::midLang_Japanese
+            , kCIDMsgs::midLang_Korean
+            , kCIDMsgs::midLang_Latvian
+            , kCIDMsgs::midLang_Lithuanian
+            , kCIDMsgs::midLang_Norwegian
+            , kCIDMsgs::midLang_Polish
+            , kCIDMsgs::midLang_Portuguese
+            , kCIDMsgs::midLang_Romanian
+            , kCIDMsgs::midLang_Russian
+            , kCIDMsgs::midLang_Serbian
+            , kCIDMsgs::midLang_Slovak
+            , kCIDMsgs::midLang_Slovenian
+            , kCIDMsgs::midLang_Spanish
+            , kCIDMsgs::midLang_Swedish
+            , kCIDMsgs::midLang_Turkish
+            , kCIDMsgs::midLang_Ukrainian
+            , kCIDMsgs::midLang_Vietnamese
+        };
 
-    const tCIDLib::TCh* apszSevTextVals[] =
-    {
-        L"Info"
-        , L"Warn"
-        , L"Failed"
-        , L"ProcFatal"
-        , L"SysFatal"
-        , L"Status"
-        , L"Unknown"
-    };
-    static const
-    TEArray<const tCIDLib::TCh*, tCIDLib::ESeverities, tCIDLib::ESeverities::Count, 1> apszSeveritiesTxt
-    (
-        apszSevTextVals
-    );
+        constexpr const tCIDLib::TCh* apszSevTextVals[] =
+        {
+            L"Info"
+            , L"Warn"
+            , L"Failed"
+            , L"ProcFatal"
+            , L"SysFatal"
+            , L"Status"
+            , L"Unknown"
+        };
+        const TEArray<const tCIDLib::TCh*, tCIDLib::ESeverities, tCIDLib::ESeverities::Count, 1> apszSeveritiesTxt
+        (
+            apszSevTextVals
+        );
 
-    const tCIDLib::TCh* apszSeverVals[] =
-    {
-        L"ESev_Info"
-        , L"ESev_Warn"
-        , L"ESev_Failed"
-        , L"ESev_ProcFatal"
-        , L"ESev_SysFatal"
-        , L"ESev_Status"
-        , L"???"
-    };
-    static const
-    TEArray<const tCIDLib::TCh*, tCIDLib::ESeverities, tCIDLib::ESeverities::Count, 1> apszSeverities
-    (
-        apszSeverVals
-    );
+        constexpr const tCIDLib::TCh* apszSeverVals[] =
+        {
+            L"ESev_Info"
+            , L"ESev_Warn"
+            , L"ESev_Failed"
+            , L"ESev_ProcFatal"
+            , L"ESev_SysFatal"
+            , L"ESev_Status"
+            , L"???"
+        };
+        const TEArray<const tCIDLib::TCh*, tCIDLib::ESeverities, tCIDLib::ESeverities::Count, 1> apszSeverities
+        (
+            apszSeverVals
+        );
 
-    const tCIDLib::TMsgId amidVJustifications[tCIDLib::c4EnumOrd(tCIDLib::EVJustify::Count)] =
-    {
-        kCIDMsgs::midGen_Bottom
-        , kCIDMsgs::midGen_Center
-        , kCIDMsgs::midGen_Top
-    };
+        constexpr tCIDLib::TMsgId amidVJustifications[tCIDLib::c4EnumOrd(tCIDLib::EVJustify::Count)] =
+        {
+            kCIDMsgs::midGen_Bottom
+            , kCIDMsgs::midGen_Center
+            , kCIDMsgs::midGen_Top
+        };
 
-    static const tCIDLib::TCh* const apszVJustVals[] =
-    {
-        L"EVJustify_Bottom"
-        , L"EVJustify_Center"
-        , L"EVJustify_Top"
-        , L"???"
-    };
-    static const
-    TEArray<const tCIDLib::TCh*, tCIDLib::EVJustify, tCIDLib::EVJustify::Count, 1> apszVJustifications
-    (
-        apszVJustVals
-    );
+        constexpr const tCIDLib::TCh* const apszVJustVals[] =
+        {
+            L"EVJustify_Bottom"
+            , L"EVJustify_Center"
+            , L"EVJustify_Top"
+            , L"???"
+        };
+        const TEArray<const tCIDLib::TCh*, tCIDLib::EVJustify, tCIDLib::EVJustify::Count, 1> apszVJustifications
+        (
+            apszVJustVals
+        );
 
-    static const tCIDLib::TCh* const apszAltVJustVals[] =
-    {
-        L"Bottom"
-        , L"Center"
-        , L"Top"
-        , L"???"
-    };
-    static const
-    TEArray<const tCIDLib::TCh*, tCIDLib::EVJustify, tCIDLib::EVJustify::Count, 1> apszAltVJustifications
-    (
-        apszAltVJustVals
-    );
+        constexpr const tCIDLib::TCh* const apszAltVJustVals[] =
+        {
+            L"Bottom"
+            , L"Center"
+            , L"Top"
+            , L"???"
+        };
+        const TEArray<const tCIDLib::TCh*, tCIDLib::EVJustify, tCIDLib::EVJustify::Count, 1> apszAltVJustifications
+        (
+            apszAltVJustVals
+        );
 
 
-    // -----------------------------------------------------------------------
-    //  Our list of text values for the enums we support loadable human text
-    //  for. We fault them in upon use.
-    // -----------------------------------------------------------------------
-    TEArray<TString, tCIDLib::EErrClasses, tCIDLib::EErrClasses::Count> astrErrClasses(TString::strEmpty());
-    TEArray<TString, tCIDLib::EHJustify, tCIDLib::EHJustify::Count> apstrHJustifications(TString::strEmpty());
-    TEArray<TString, tCIDLib::ELanguages, tCIDLib::ELanguages::Count> apstrLanguages(TString::strEmpty());
-    TEArray<TString, tCIDLib::ESeverities, tCIDLib::ESeverities::Count> apstrSeverities(TString::strEmpty());
-    TEArray<TString, tCIDLib::EVJustify, tCIDLib::EVJustify::Count> apstrVJustifications(TString::strEmpty());
+        // -----------------------------------------------------------------------
+        //  Our list of text values for the enums we support loadable human text
+        //  for. We fault them in upon use.
+        // -----------------------------------------------------------------------
+        TEArray<TString, tCIDLib::EErrClasses, tCIDLib::EErrClasses::Count> astrErrClasses(TString::strEmpty());
+        TEArray<TString, tCIDLib::EHJustify, tCIDLib::EHJustify::Count> apstrHJustifications(TString::strEmpty());
+        TEArray<TString, tCIDLib::ELanguages, tCIDLib::ELanguages::Count> apstrLanguages(TString::strEmpty());
+        TEArray<TString, tCIDLib::ESeverities, tCIDLib::ESeverities::Count> apstrSeverities(TString::strEmpty());
+        TEArray<TString, tCIDLib::EVJustify, tCIDLib::EVJustify::Count> apstrVJustifications(TString::strEmpty());
+    }
 }
 
 

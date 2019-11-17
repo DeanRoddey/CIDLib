@@ -41,11 +41,14 @@ RTTIDecls(TDirChangeInfo, TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_DirChange
 {
-    //
-    //  The max changes we will accumulate at a time. If the client doesn't read
-    //  them before then, we post an outof sync error.
-    //
-    const tCIDLib::TCard4 c4MaxChangeBlock = 4096;
+    namespace
+    {
+        //
+        //  The max changes we will accumulate at a time. If the client doesn't read
+        //  them before then, we post an outof sync error.
+        //
+        constexpr tCIDLib::TCard4 c4MaxChangeBlock = 4096;
+    }
 }
 
 

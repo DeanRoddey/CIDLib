@@ -43,16 +43,19 @@ RTTIDecls(TSysBuf,TMemBuf)
 // ---------------------------------------------------------------------------
 namespace CIDLib_SysMemBuf
 {
-    // -----------------------------------------------------------------------
-    //  Our persistent format versions
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our persistent format versions
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
 
 
-    // -----------------------------------------------------------------------
-    //  If they don't provide a size, we use this default size
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard4   c4DefMinSize = 1024;
+        // -----------------------------------------------------------------------
+        //  If they don't provide a size, we use this default size
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4DefMinSize = 1024;
+    }
 }
 
 

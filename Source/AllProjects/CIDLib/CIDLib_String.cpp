@@ -47,16 +47,19 @@ AdvRTTIDecls(TString,TObject)
 
 namespace CIDLib_String
 {
-    // -----------------------------------------------------------------------
-    //  c1FmtVersion
-    //      A format version that we stream out, so that we can upgrade the
-    //      persistence format automatically later if needed.
-    //
-    //  c4ReallocBlock
-    //      The steps that we try to alloc strings in.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1FmtVersion    = 1;
-    const tCIDLib::TCard4   c4ReallocBlock  = 64;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  c1FmtVersion
+        //      A format version that we stream out, so that we can upgrade the
+        //      persistence format automatically later if needed.
+        //
+        //  c4ReallocBlock
+        //      The steps that we try to alloc strings in.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard1   c1FmtVersion    = 1;
+        constexpr tCIDLib::TCard4   c4ReallocBlock  = 64;
+    }
 }
 
 

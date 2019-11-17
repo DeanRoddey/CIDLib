@@ -45,69 +45,72 @@ AdvRTTIDecls(TUTF8Converter,TUTFConverter)
 
 namespace CIDLib_UTFConverter
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  ac1FirstByteMark
-    //      A mask to mask onto the first byte of an encoded UTF-8 sequence.
-    //      Its indexed by the number of bytes required to encode it.
-    //
-    //  ac1UTFBytes
-    //      This is an array of values that are indexed by the first encoded
-    //      char of a UTF-8 encoded char, resulting in the number of bytes it
-    //      uses to encode the UTF-16 char.
-    //
-    //  ac4UTFOffsets
-    //      This array is indexed by the count of bytes required to encode
-    //      the value. Its provides an amount to offset the decoded UTF-16
-    //      value by.
-    //
-    //  eDefEncoding
-    //      The default encoding of a TCh value for this host workstation.
-    //      Byte knowing this value, we can optimize when the source and
-    //      target encodings are the same. And its used in the default ctor,
-    //      to create a converter with those characteristics.
-    //
-    //  apszEncodings
-    //      Strings that represent the descriptions of the EEncodings type.
-    // -----------------------------------------------------------------------
-    static constexpr const tCIDLib::TCard1 ac1FirstByteMark[7] =
+    namespace
     {
-        0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
-    };
-    static constexpr const tCIDLib::TCard4 ac4UTFOffsets[6] =
-    {
-        0, 0x3080, 0xE2080, 0x3C82080, 0xFA082080, 0x82082080
-    };
-    static constexpr const tCIDLib::TCard1 ac1UTFBytes[256] =
-    {
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-        ,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-        ,   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
-        ,   3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
-    };
-    static constexpr const tCIDLib::TCh* const apszEncodingVals[] =
-    {
-        L"US-ASCII"
-        , L"UTF-8"
-        , L"UTF-16LE"
-        , L"UTF-16BE"
-    };
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  ac1FirstByteMark
+        //      A mask to mask onto the first byte of an encoded UTF-8 sequence.
+        //      Its indexed by the number of bytes required to encode it.
+        //
+        //  ac1UTFBytes
+        //      This is an array of values that are indexed by the first encoded
+        //      char of a UTF-8 encoded char, resulting in the number of bytes it
+        //      uses to encode the UTF-16 char.
+        //
+        //  ac4UTFOffsets
+        //      This array is indexed by the count of bytes required to encode
+        //      the value. Its provides an amount to offset the decoded UTF-16
+        //      value by.
+        //
+        //  eDefEncoding
+        //      The default encoding of a TCh value for this host workstation.
+        //      Byte knowing this value, we can optimize when the source and
+        //      target encodings are the same. And its used in the default ctor,
+        //      to create a converter with those characteristics.
+        //
+        //  apszEncodings
+        //      Strings that represent the descriptions of the EEncodings type.
+        // -----------------------------------------------------------------------
+        constexpr const tCIDLib::TCard1 ac1FirstByteMark[7] =
+        {
+            0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
+        };
+        constexpr const tCIDLib::TCard4 ac4UTFOffsets[6] =
+        {
+            0, 0x3080, 0xE2080, 0x3C82080, 0xFA082080, 0x82082080
+        };
+        constexpr const tCIDLib::TCard1 ac1UTFBytes[256] =
+        {
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+            ,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+            ,   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+            ,   3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
+        };
+        constexpr const tCIDLib::TCh* const apszEncodingVals[] =
+        {
+            L"US-ASCII"
+            , L"UTF-8"
+            , L"UTF-16LE"
+            , L"UTF-16BE"
+        };
 
-    static TEArray<const tCIDLib::TCh*, TUTFConverter::EEncodings, TUTFConverter::EEncodings::Count>
-    apszEncodings(apszEncodingVals);
+        TEArray<const tCIDLib::TCh*, TUTFConverter::EEncodings, TUTFConverter::EEncodings::Count>
+        apszEncodings(apszEncodingVals);
+    }
 }
 
 

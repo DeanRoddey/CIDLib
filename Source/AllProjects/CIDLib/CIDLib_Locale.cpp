@@ -31,86 +31,90 @@
 #include    "CIDLib_.hpp"
 
 
-// ---------------------------------------------------------------------------
-//  Local types
-//
-//  ECacheStrs
-//      This is the list of fields that are in the cache of strings. These
-//      are used to index the astrCache array below.
-// ---------------------------------------------------------------------------
-enum class ECacheStrs
-{
-    AMString
-    , Country
-    , DateFormat
-    , Sunday
-    , Monday
-    , Tuesday
-    , Wednesday
-    , Thursday
-    , Friday
-    , Saturday
-    , ASunday
-    , AMonday
-    , ATuesday
-    , AWednesday
-    , AThursday
-    , AFriday
-    , ASaturday
-    , DefLanguageSuffix
-    , EnglishCountry
-    , EnglishLanguage
-    , ISOCountry
-    , ISOLanguage
-    , Language
-    , LanguageSuffix
-    , January
-    , February
-    , March
-    , April
-    , May
-    , June
-    , July
-    , August
-    , September
-    , October
-    , November
-    , December
-    , AJanuary
-    , AFebruary
-    , AMarch
-    , AApril
-    , AMay
-    , AJune
-    , AJuly
-    , AAugust
-    , ASeptember
-    , AOctober
-    , ANovember
-    , ADecember
-    , NegMonFormat
-    , PosMonFormat
-    , PMString
-    , TimeFormat
-
-    , Count
-};
-
-
 namespace CIDLib_Locale
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  astrCache
-    //      This is an array of string object pointers which serves as a cache
-    //      for locale info. The TKrnlLocale class provides raw strings, but
-    //      we provide string objects. And we don't want to create a string
-    //      object every time they call. So we fault in a string object when
-    //      a field is requested and store the results here.
-    // -----------------------------------------------------------------------
-    static
-    TEArray<TString*, ECacheStrs, ECacheStrs::Count> apstrCache((TString*)nullptr);
+    namespace
+    {
+        // ---------------------------------------------------------------------------
+        //  Local types
+        //
+        //  ECacheStrs
+        //      This is the list of fields that are in the cache of strings. These
+        //      are used to index the astrCache array below.
+        // ---------------------------------------------------------------------------
+        enum class ECacheStrs
+        {
+            AMString
+            , Country
+            , DateFormat
+            , Sunday
+            , Monday
+            , Tuesday
+            , Wednesday
+            , Thursday
+            , Friday
+            , Saturday
+            , ASunday
+            , AMonday
+            , ATuesday
+            , AWednesday
+            , AThursday
+            , AFriday
+            , ASaturday
+            , DefLanguageSuffix
+            , EnglishCountry
+            , EnglishLanguage
+            , ISOCountry
+            , ISOLanguage
+            , Language
+            , LanguageSuffix
+            , January
+            , February
+            , March
+            , April
+            , May
+            , June
+            , July
+            , August
+            , September
+            , October
+            , November
+            , December
+            , AJanuary
+            , AFebruary
+            , AMarch
+            , AApril
+            , AMay
+            , AJune
+            , AJuly
+            , AAugust
+            , ASeptember
+            , AOctober
+            , ANovember
+            , ADecember
+            , NegMonFormat
+            , PosMonFormat
+            , PMString
+            , TimeFormat
+
+            , Count
+        };
+
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  astrCache
+        //      This is an array of string object pointers which serves as a cache
+        //      for locale info. The TKrnlLocale class provides raw strings, but
+        //      we provide string objects. And we don't want to create a string
+        //      object every time they call. So we fault in a string object when
+        //      a field is requested and store the results here.
+        // -----------------------------------------------------------------------
+        TEArray<TString*, ECacheStrs, CIDLib_Locale::ECacheStrs::Count> apstrCache
+        (
+            static_cast<TString*>(nullptr)
+        );
+    }
 }
 
 
@@ -205,62 +209,62 @@ tCIDLib::EMonths TLocale::eXlatLocMonth(const TString& strToXlat)
 const TString& TLocale::strAMString()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::AMString])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::AMString])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::AMString])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::AMString])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::AMString);
-            CIDLib_Locale::apstrCache[ECacheStrs::AMString] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::AMString] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::AMString];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::AMString];
 }
 
 const TString& TLocale::strCountry()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::Country])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Country])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
         tCIDLib::TZStr128   szTmp;
         LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::Country);
-        CIDLib_Locale::apstrCache[ECacheStrs::Country] = new TString(szTmp);
+        CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Country] = new TString(szTmp);
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::Country];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Country];
 }
 
 
 const TString& TLocale::strDateFormat()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::DateFormat])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DateFormat])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::DateFormat])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DateFormat])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::DateFormat);
-            CIDLib_Locale::apstrCache[ECacheStrs::DateFormat] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DateFormat] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::DateFormat];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DateFormat];
 }
 
 
 const TString& TLocale::strDay(const tCIDLib::EWeekDays eDay)
 {
     // Have we cached this day yet? If not, then do so
-    const ECacheStrs eStr = ECacheStrs
+    const CIDLib_Locale::ECacheStrs eStr = CIDLib_Locale::ECacheStrs
     (
-        tCIDLib::c4EnumOrd(ECacheStrs::Sunday) + tCIDLib::c4EnumOrd(eDay)
+        tCIDLib::c4EnumOrd(CIDLib_Locale::ECacheStrs::Sunday) + tCIDLib::c4EnumOrd(eDay)
     );
 
     if (!CIDLib_Locale::apstrCache[eStr])
@@ -292,9 +296,9 @@ const TString& TLocale::strDay(const tCIDLib::EWeekDays eDay)
 const TString& TLocale::strDayAbbrev(const tCIDLib::EWeekDays eDay)
 {
     // Have we cached this day yet? If not, then do so
-    const ECacheStrs eStr = ECacheStrs
+    const CIDLib_Locale::ECacheStrs eStr = CIDLib_Locale::ECacheStrs
     (
-        tCIDLib::c4EnumOrd(ECacheStrs::ASunday) + tCIDLib::c4EnumOrd(eDay)
+        tCIDLib::c4EnumOrd(CIDLib_Locale::ECacheStrs::ASunday) + tCIDLib::c4EnumOrd(eDay)
     );
 
     if (!CIDLib_Locale::apstrCache[eStr])
@@ -327,12 +331,12 @@ const TString& TLocale::strDayAbbrev(const tCIDLib::EWeekDays eDay)
 const TString& TLocale::strDefLanguageSuffix()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::DefLanguageSuffix])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DefLanguageSuffix])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::DefLanguageSuffix])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DefLanguageSuffix])
         {
             const tCIDLib::TCh* pszSuffix;
             if (!TKrnlLocale::bDefLangSuffix(pszSuffix))
@@ -347,79 +351,79 @@ const TString& TLocale::strDefLanguageSuffix()
                     , tCIDLib::EErrClasses::CantDo
                 );
             }
-            CIDLib_Locale::apstrCache[ECacheStrs::DefLanguageSuffix] = new TString(pszSuffix);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DefLanguageSuffix] = new TString(pszSuffix);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::DefLanguageSuffix];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DefLanguageSuffix];
 }
 
 
 const TString& TLocale::strEnglishCountry()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::EnglishCountry])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishCountry])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::EnglishCountry])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishCountry])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::EnglishCountry);
-            CIDLib_Locale::apstrCache[ECacheStrs::EnglishCountry] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishCountry] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::EnglishCountry];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishCountry];
 }
 
 
 const TString& TLocale::strEnglishLanguage()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::EnglishLanguage])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishLanguage])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::EnglishLanguage])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishLanguage])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::EnglishLanguage);
-            CIDLib_Locale::apstrCache[ECacheStrs::EnglishLanguage] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishLanguage] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::EnglishLanguage];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishLanguage];
 }
 
 
 const TString& TLocale::strLanguage()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::Language])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Language])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::Language])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Language])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::Language);
-            CIDLib_Locale::apstrCache[ECacheStrs::Language] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Language] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::Language];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Language];
 }
 
 
 const TString& TLocale::strLanguageSuffix()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::LanguageSuffix])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::LanguageSuffix])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::LanguageSuffix])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::LanguageSuffix])
         {
             const tCIDLib::TCh* pszSuffix;
             if (!TKrnlLocale::bLangSuffix(pszSuffix))
@@ -434,10 +438,10 @@ const TString& TLocale::strLanguageSuffix()
                     , tCIDLib::EErrClasses::CantDo
                 );
             }
-            CIDLib_Locale::apstrCache[ECacheStrs::LanguageSuffix] = new TString(pszSuffix);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::LanguageSuffix] = new TString(pszSuffix);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::LanguageSuffix];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::LanguageSuffix];
 }
 
 
@@ -462,104 +466,104 @@ TString TLocale::strLanguageSuffixFor(const tCIDLib::ELanguages eLangFor)
 const TString& TLocale::strISOCountry()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::ISOCountry])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOCountry])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::ISOCountry])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOCountry])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::ISOCountry);
-            CIDLib_Locale::apstrCache[ECacheStrs::ISOCountry] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOCountry] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::ISOCountry];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOCountry];
 }
 
 
 const TString& TLocale::strISOLanguage()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::ISOLanguage])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOLanguage])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::ISOLanguage])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOLanguage])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::ISOLanguage);
-            CIDLib_Locale::apstrCache[ECacheStrs::ISOLanguage] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOLanguage] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::ISOLanguage];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOLanguage];
 }
 
 
 const TString& TLocale::strNegMonFormat()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::NegMonFormat])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::NegMonFormat])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::NegMonFormat])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::NegMonFormat])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::NegMonFormat);
-            CIDLib_Locale::apstrCache[ECacheStrs::NegMonFormat] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::NegMonFormat] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::NegMonFormat];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::NegMonFormat];
 }
 
 
 const TString& TLocale::strPosMonFormat()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::PosMonFormat])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PosMonFormat])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::PosMonFormat])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PosMonFormat])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::PosMonFormat);
-            CIDLib_Locale::apstrCache[ECacheStrs::PosMonFormat] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PosMonFormat] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::PosMonFormat];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PosMonFormat];
 }
 
 
 const TString& TLocale::strPMString()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::PMString])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PMString])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::PMString])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PMString])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::PMString);
-            CIDLib_Locale::apstrCache[ECacheStrs::PMString] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PMString] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::PMString];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PMString];
 }
 
 
 const TString& TLocale::strMonth(const tCIDLib::EMonths eMonth)
 {
     // Have we cached this month yet? If not, then do so
-    const ECacheStrs eStr = ECacheStrs
+    const CIDLib_Locale::ECacheStrs eStr = CIDLib_Locale::ECacheStrs
     (
-        tCIDLib::c4EnumOrd(ECacheStrs::January) + tCIDLib::c4EnumOrd(eMonth)
+        tCIDLib::c4EnumOrd(CIDLib_Locale::ECacheStrs::January) + tCIDLib::c4EnumOrd(eMonth)
     );
 
     if (!CIDLib_Locale::apstrCache[eStr])
@@ -591,9 +595,9 @@ const TString& TLocale::strMonth(const tCIDLib::EMonths eMonth)
 const TString& TLocale::strMonthAbbrev(const tCIDLib::EMonths eMonth)
 {
     // Have we cached this month yet? If not, then do so
-    const ECacheStrs eStr = ECacheStrs
+    const CIDLib_Locale::ECacheStrs eStr = CIDLib_Locale::ECacheStrs
     (
-        tCIDLib::c4EnumOrd(ECacheStrs::AJanuary) + tCIDLib::c4EnumOrd(eMonth)
+        tCIDLib::c4EnumOrd(CIDLib_Locale::ECacheStrs::AJanuary) + tCIDLib::c4EnumOrd(eMonth)
     );
 
     if (!CIDLib_Locale::apstrCache[eStr])
@@ -626,17 +630,17 @@ const TString& TLocale::strMonthAbbrev(const tCIDLib::EMonths eMonth)
 const TString& TLocale::strTimeFormat()
 {
     // Is this string cached up already? If not, then cache it
-    if (!CIDLib_Locale::apstrCache[ECacheStrs::TimeFormat])
+    if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::TimeFormat])
     {
         // Protected the cache while doing this
         TCritSecLocker lockCache(pcrsSync());
 
-        if (!CIDLib_Locale::apstrCache[ECacheStrs::TimeFormat])
+        if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::TimeFormat])
         {
             tCIDLib::TZStr128   szTmp;
             LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::TimeFormat);
-            CIDLib_Locale::apstrCache[ECacheStrs::TimeFormat] = new TString(szTmp);
+            CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::TimeFormat] = new TString(szTmp);
         }
     }
-    return *CIDLib_Locale::apstrCache[ECacheStrs::TimeFormat];
+    return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::TimeFormat];
 }

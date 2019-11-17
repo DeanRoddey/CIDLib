@@ -39,77 +39,80 @@ AdvRTTIDecls(TTime,TObject)
 
 namespace CIDLib_Time
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  atomInitDone
-    //      This is a flag used to trigger all of the lazy evaluation that is
-    //      required for this class. Since there are multiple lazy statics,
-    //      this is easier.
-    //
-    //  pfcolXXX
-    //      Some prefab time component parsing format lists which will be
-    //      lazily faulted in as required.
-    //
-    //  pstrXXX
-    //      Some prefab format strings which will be lazily faulted in as
-    //      required.
-    // -----------------------------------------------------------------------
-    TAtomicFlag         atomInitDone;
-    TTime::TCompList*   pfcol12HHMM = nullptr;
-    TTime::TCompList*   pfcol24HHMMSS = nullptr;
-    TTime::TCompList*   pfcol24HHMM = nullptr;
-    TTime::TCompList*   pfcolCTime = nullptr;
-    TTime::TCompList*   pfcolDDMMYY = nullptr;
-    TTime::TCompList*   pfcolDDMMYYYY = nullptr;
-    TTime::TCompList*   pfcolDTStamp = nullptr;
-    TTime::TCompList*   pfcolFullDate = nullptr;
-    TTime::TCompList*   pfcolISO8601NTZ = nullptr;
-    TTime::TCompList*   pfcolMMDDYY = nullptr;
-    TTime::TCompList*   pfcolMMDDYYYY = nullptr;
-    TTime::TCompList*   pfcolRFC822 = nullptr;
-    TTime::TCompList*   pfcolYYMMDD = nullptr;
-    TTime::TCompList*   pfcolYYYYMMDD = nullptr;
-    TTime::TCompList*   pfcolYYYYMMDD24HHMM = nullptr;
-    TString*            pstr24HHMM = nullptr;
-    TString*            pstr24HHMMSS = nullptr;
-    TString*            pstr24HM = nullptr;
-    TString*            pstrCTime = nullptr;
-    TString*            pstrDTStamp = nullptr;
-    TString*            pstrDDMMYY = nullptr;
-    TString*            pstrDDMMYYYY = nullptr;
-    TString*            pstrFullDate = nullptr;
-    TString*            pstrHHMM = nullptr;
-    TString*            pstrHHMMap = nullptr;
-    TString*            pstrHHMMSS = nullptr;
-    TString*            pstrHM = nullptr;
-    TString*            pstrMediaTime = nullptr;
-    TString*            pstrMMSS = nullptr;
-    TString*            pstrMMDD_24HHMM = nullptr;
-    TString*            pstrMMDD_24HHMMSS = nullptr;
-    TString*            pstrMMDDYY = nullptr;
-    TString*            pstrMMDDYYYY = nullptr;
-    TString*            pstrMMDD_HHMM = nullptr;
-    TString*            pstrMMDD_HHMMSS = nullptr;
-    TString*            pstrISO8601Basic = nullptr;
-    TString*            pstrYYMMDD = nullptr;
-    TString*            pstrYYYYMMDD = nullptr;
-    TString*            pstrYYYYMMDD_NoSep = nullptr;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  atomInitDone
+        //      This is a flag used to trigger all of the lazy evaluation that is
+        //      required for this class. Since there are multiple lazy statics,
+        //      this is easier.
+        //
+        //  pfcolXXX
+        //      Some prefab time component parsing format lists which will be
+        //      lazily faulted in as required.
+        //
+        //  pstrXXX
+        //      Some prefab format strings which will be lazily faulted in as
+        //      required.
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomInitDone;
+        TTime::TCompList*   pfcol12HHMM = nullptr;
+        TTime::TCompList*   pfcol24HHMMSS = nullptr;
+        TTime::TCompList*   pfcol24HHMM = nullptr;
+        TTime::TCompList*   pfcolCTime = nullptr;
+        TTime::TCompList*   pfcolDDMMYY = nullptr;
+        TTime::TCompList*   pfcolDDMMYYYY = nullptr;
+        TTime::TCompList*   pfcolDTStamp = nullptr;
+        TTime::TCompList*   pfcolFullDate = nullptr;
+        TTime::TCompList*   pfcolISO8601NTZ = nullptr;
+        TTime::TCompList*   pfcolMMDDYY = nullptr;
+        TTime::TCompList*   pfcolMMDDYYYY = nullptr;
+        TTime::TCompList*   pfcolRFC822 = nullptr;
+        TTime::TCompList*   pfcolYYMMDD = nullptr;
+        TTime::TCompList*   pfcolYYYYMMDD = nullptr;
+        TTime::TCompList*   pfcolYYYYMMDD24HHMM = nullptr;
+        TString*            pstr24HHMM = nullptr;
+        TString*            pstr24HHMMSS = nullptr;
+        TString*            pstr24HM = nullptr;
+        TString*            pstrCTime = nullptr;
+        TString*            pstrDTStamp = nullptr;
+        TString*            pstrDDMMYY = nullptr;
+        TString*            pstrDDMMYYYY = nullptr;
+        TString*            pstrFullDate = nullptr;
+        TString*            pstrHHMM = nullptr;
+        TString*            pstrHHMMap = nullptr;
+        TString*            pstrHHMMSS = nullptr;
+        TString*            pstrHM = nullptr;
+        TString*            pstrMediaTime = nullptr;
+        TString*            pstrMMSS = nullptr;
+        TString*            pstrMMDD_24HHMM = nullptr;
+        TString*            pstrMMDD_24HHMMSS = nullptr;
+        TString*            pstrMMDDYY = nullptr;
+        TString*            pstrMMDDYYYY = nullptr;
+        TString*            pstrMMDD_HHMM = nullptr;
+        TString*            pstrMMDD_HHMMSS = nullptr;
+        TString*            pstrISO8601Basic = nullptr;
+        TString*            pstrYYMMDD = nullptr;
+        TString*            pstrYYYYMMDD = nullptr;
+        TString*            pstrYYYYMMDD_NoSep = nullptr;
 
 
-    // -----------------------------------------------------------------------
-    //  Some info we cache about time zone settings, to optimize some things
-    //  a bit.
-    // -----------------------------------------------------------------------
-    TAtomicInt          atomLastTZ;
-    TString*            pstrTZName = nullptr;
+        // -----------------------------------------------------------------------
+        //  Some info we cache about time zone settings, to optimize some things
+        //  a bit.
+        // -----------------------------------------------------------------------
+        TAtomicInt          atomLastTZ;
+        TString*            pstrTZName = nullptr;
 
 
-    // -----------------------------------------------------------------------
-    //  Used in the sunrise/sunset calculations below
-    // -----------------------------------------------------------------------
-    const tCIDLib::TFloat8 f8Rads = kCIDLib::f8PI / 180.0;
-    const tCIDLib::TFloat8 f8Degs = 180.0 / kCIDLib::f8PI;
+        // -----------------------------------------------------------------------
+        //  Used in the sunrise/sunset calculations below
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TFloat8 f8Rads = kCIDLib::f8PI / 180.0;
+        constexpr tCIDLib::TFloat8 f8Degs = 180.0 / kCIDLib::f8PI;
+    }
 }
 
 

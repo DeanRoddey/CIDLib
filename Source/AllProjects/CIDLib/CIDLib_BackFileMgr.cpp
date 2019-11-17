@@ -43,7 +43,10 @@ RTTIDecls(TBackFileMgr,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_BackFileMgr
 {
-    constexpr   tCIDLib::TCard4     c4MaxBackups = 8;
+    namespace
+    {
+        constexpr   tCIDLib::TCard4     c4MaxBackups = 8;
+    }
 }
 
 

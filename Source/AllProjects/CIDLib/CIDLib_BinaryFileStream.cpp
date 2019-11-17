@@ -53,13 +53,13 @@ RTTIDecls(TBinFileOutStream,TBinOutStream)
 // ---------------------------------------------------------------------------
 TBinFileInStream::TBinFileInStream() :
 
-    m_pstrmiFile(0)
+    m_pstrmiFile(nullptr)
 {
 }
 
 TBinFileInStream::TBinFileInStream(const tCIDLib::EStdFiles eFile) :
 
-    m_pstrmiFile(0)
+    m_pstrmiFile(nullptr)
 {
     Open(eFile);
 }

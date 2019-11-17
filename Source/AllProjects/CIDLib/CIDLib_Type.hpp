@@ -288,7 +288,7 @@ namespace tCIDLib
 
 
     // To support TEArray below
-    CIDLIBEXP tCIDLib::TVoid ThrowEArrayIndexErr
+    CIDLIBEXP tCIDLib::TVoid ThrowArrayIndexErr
     (
         const   tCIDLib::TCard4         c4At
         , const tCIDLib::TCard4         c4Size
@@ -360,14 +360,14 @@ template
         ElemType& operator[](const IndexType eAt)
         {
             if (tCIDLib::TCard4(eAt) >= m_c4Size)
-                tCIDLib::ThrowEArrayIndexErr(tCIDLib::TCard4(eAt), m_c4Size);
+                tCIDLib::ThrowArrayIndexErr(tCIDLib::TCard4(eAt), m_c4Size);
             return m_aetArray[tCIDLib::TCard4(eAt)];
         }
 
         const ElemType& operator[](const IndexType eAt) const
         {
             if (tCIDLib::TCard4(eAt) >= m_c4Size)
-                tCIDLib::ThrowEArrayIndexErr(tCIDLib::TCard4(eAt), m_c4Size);
+                tCIDLib::ThrowArrayIndexErr(tCIDLib::TCard4(eAt), m_c4Size);
             return m_aetArray[tCIDLib::TCard4(eAt)];
         }
 

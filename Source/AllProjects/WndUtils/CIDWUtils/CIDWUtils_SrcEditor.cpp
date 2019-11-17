@@ -1043,7 +1043,7 @@ TSrcEditor::SetSearchFlag(  const   tCIDWUtils::EFindOpts   eOpt
     }
      else
     {
-        tCIDCtrls::TWParam wNewFlag;
+        tCIDCtrls::TWParam wNewFlag = 0;
         switch(eOpt)
         {
             case tCIDWUtils::EFindOpts::Case :

@@ -42,22 +42,25 @@ RTTIDecls(TOrbClientConnMgr,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDOrb_ClientConnMgr
 {
-    // -----------------------------------------------------------------------
-    //  The maximum number of worker threads we can have.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4MaxThreads  = 128;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The maximum number of worker threads we can have.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4MaxThreads  = 128;
 
 
-    // -----------------------------------------------------------------------
-    //  The maximum number of clients connections we'll accept.
-    //
-    //  Since there is some lag between the time that we see that a client
-    //  has dropped and we get it out of the list, we make this a little
-    //  higher than the actual live connections we want to support, to handle
-    //  a pathological scenario where a number of clients drop at once, and
-    //  then reconnect before we get them cleaned up.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4MaxClients  = 256;
+        // -----------------------------------------------------------------------
+        //  The maximum number of clients connections we'll accept.
+        //
+        //  Since there is some lag between the time that we see that a client
+        //  has dropped and we get it out of the list, we make this a little
+        //  higher than the actual live connections we want to support, to handle
+        //  a pathological scenario where a number of clients drop at once, and
+        //  then reconnect before we get them cleaned up.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4MaxClients  = 256;
+    }
 }
 
 

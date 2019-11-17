@@ -824,7 +824,13 @@ class TRefVector : public TRefCollection<TElem>
                     ,       TIndex&             tAt)
         {
             if (!pobjToInsert)
+            {
                 this->NullNodeAdded(CID_FILE, CID_LINE);
+
+                // Won't happen but makes analyzer happy
+                return;
+            }
+
             TMtxLocker lockThis(this->pmtxLock());
 
             //
@@ -833,7 +839,7 @@ class TRefVector : public TRefCollection<TElem>
             //  one item, then also do a simple check. Else we do the
             //  binary search.
             //
-            tCIDLib::ESortComps eRes;
+            tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             if (!m_c4CurCount)
             {
                 Add(pobjToInsert);

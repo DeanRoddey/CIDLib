@@ -45,10 +45,13 @@ RTTIDecls(TVolFailureInfo, TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_FileSys
 {
-    // -----------------------------------------------------------------------
-    //  Our persistent format versions
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2VolFailFmtVer = 2;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our persistent format versions
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2VolFailFmtVer = 2;
+    }
 }
 
 

@@ -44,13 +44,19 @@ RTTIDecls(TRandomNum,TObject)
 // ---------------------------------------------------------------------------
 //  Local constants
 // ---------------------------------------------------------------------------
-static const tCIDLib::TCard2 c2RandSeed0    = 0x330E;
-static const tCIDLib::TCard2 c2RandSeed1    = 0xABCD;
-static const tCIDLib::TCard2 c2RandSeed2    = 0x1234;
-static const tCIDLib::TCard2 c2RandMult0    = 0xE66D;
-static const tCIDLib::TCard2 c2RandMult1    = 0xDEEC;
-static const tCIDLib::TCard2 c2RandMult2    = 0x0005;
-static const tCIDLib::TCard4 c4RandAdd      = 0xB;
+namespace CIDLib_Random
+{
+    namespace
+    {
+        constexpr tCIDLib::TCard2 c2RandSeed0    = 0x330E;
+        constexpr tCIDLib::TCard2 c2RandSeed1    = 0xABCD;
+        constexpr tCIDLib::TCard2 c2RandSeed2    = 0x1234;
+        constexpr tCIDLib::TCard2 c2RandMult0    = 0xE66D;
+        constexpr tCIDLib::TCard2 c2RandMult1    = 0xDEEC;
+        constexpr tCIDLib::TCard2 c2RandMult2    = 0x0005;
+        constexpr tCIDLib::TCard4 c4RandAdd      = 0xB;
+    }
+}
 
 
 
@@ -66,12 +72,12 @@ static const tCIDLib::TCard4 c4RandAdd      = 0xB;
 TRandomNum::TRandomNum()
 {
     // Set up the initial default state
-    m_ac2Seed[0] = c2RandSeed0;
-    m_ac2Seed[1] = c2RandSeed1;
-    m_ac2Seed[2] = c2RandSeed2;
-    m_ac2Mult[0] = c2RandMult0;
-    m_ac2Mult[1] = c2RandMult1;
-    m_ac2Mult[2] = c2RandMult2;
+    m_ac2Seed[0] = CIDLib_Random::c2RandSeed0;
+    m_ac2Seed[1] = CIDLib_Random::c2RandSeed1;
+    m_ac2Seed[2] = CIDLib_Random::c2RandSeed2;
+    m_ac2Mult[0] = CIDLib_Random::c2RandMult0;
+    m_ac2Mult[1] = CIDLib_Random::c2RandMult1;
+    m_ac2Mult[2] = CIDLib_Random::c2RandMult2;
 }
 
 TRandomNum::~TRandomNum()
@@ -105,12 +111,12 @@ tCIDLib::TFloat8 TRandomNum::f8GetNextNum()
 
 tCIDLib::TVoid TRandomNum::Seed(const tCIDLib::TCard4 c4Seed)
 {
-    m_ac2Seed[0] = c2RandSeed0;
+    m_ac2Seed[0] = CIDLib_Random::c2RandSeed0;
     m_ac2Seed[1] = TRawBits::c2Low16From32(c4Seed);
     m_ac2Seed[2] = TRawBits::c2High16From32(c4Seed);;
-    m_ac2Mult[0] = c2RandMult0;
-    m_ac2Mult[1] = c2RandMult1;
-    m_ac2Mult[2] = c2RandMult2;
+    m_ac2Mult[0] = CIDLib_Random::c2RandMult0;
+    m_ac2Mult[1] = CIDLib_Random::c2RandMult1;
+    m_ac2Mult[2] = CIDLib_Random::c2RandMult2;
 }
 
 
@@ -123,7 +129,7 @@ void TRandomNum::DoRand48(tCIDLib::TCard2 ac2Seed[3])
     tCIDLib::TCard2 c2Temp[2];
 
     c4Accum = (tCIDLib::TCard4(m_ac2Mult[0]) * tCIDLib::TCard4(ac2Seed[0]))
-              + c4RandAdd;
+              + CIDLib_Random::c4RandAdd;
 
     // Do the low half
     c2Temp[0] = tCIDLib::TCard2(c4Accum);

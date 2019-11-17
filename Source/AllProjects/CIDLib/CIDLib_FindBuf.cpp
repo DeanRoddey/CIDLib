@@ -42,25 +42,28 @@ AdvRTTIDecls(TFindBuf,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_FindBuf
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  c2FmtVersion
-    //      A current format version, so that we can auto upgrade our
-    //      persistence format later if needed.
-    //
-    //      V2 - Added the creation time
-    //
-    //  pszDateFmt
-    //  pszDefFmt
-    //  pszTimeFmt
-    //      These are the default formats used if there is not one set for a
-    //      particular instance.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard2     c2FmtVersion = 2;
-    const tCIDLib::TCh* const pszDateFmt = L"%(M,2,0)/%(D,2,0)/%(Y)";
-    const tCIDLib::TCh* const pszDefFmt = L"%(m) %(M) %(S,10) %(N)";
-    const tCIDLib::TCh* const pszTimeFmt = L"%(h,2,0):%(u,2,0)%(p)";
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  c2FmtVersion
+        //      A current format version, so that we can auto upgrade our
+        //      persistence format later if needed.
+        //
+        //      V2 - Added the creation time
+        //
+        //  pszDateFmt
+        //  pszDefFmt
+        //  pszTimeFmt
+        //      These are the default formats used if there is not one set for a
+        //      particular instance.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2     c2FmtVersion = 2;
+        constexpr const tCIDLib::TCh* const pszDateFmt = L"%(M,2,0)/%(D,2,0)/%(Y)";
+        constexpr const tCIDLib::TCh* const pszDefFmt = L"%(m) %(M) %(S,10) %(N)";
+        constexpr const tCIDLib::TCh* const pszTimeFmt = L"%(h,2,0):%(u,2,0)%(p)";
+    }
 }
 
 

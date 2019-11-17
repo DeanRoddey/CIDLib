@@ -42,7 +42,10 @@ RTTIDecls(TLogLimiter,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_LogLimiter
 {
-    constexpr tCIDLib::TCard4   c4ListSz = 64;
+    namespace
+    {
+        constexpr tCIDLib::TCard4   c4ListSz = 64;
+    }
 }
 
 

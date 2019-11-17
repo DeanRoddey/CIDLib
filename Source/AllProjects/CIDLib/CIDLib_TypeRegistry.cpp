@@ -47,17 +47,20 @@ class   TRegNode;
 
 namespace CIDLib_TypeRegistry
 {
-    // ---------------------------------------------------------------------------
-    //  Local, static data
-    //
-    //  apnodeTable
-    //      This is the hash table for type names. It is an array of pointers
-    //      to nodes. Each pointer is a slot in the hash table and all of the
-    //      entries in that slot's linked list has the same hash value. The
-    //      hash table's size is driven by the modulus value used by the TClass
-    //      class' internally.
-    // ---------------------------------------------------------------------------
-    static TRegNode*   apnodeTable[kCIDLib::c4ClassModulus];
+    namespace
+    {
+        // ---------------------------------------------------------------------------
+        //  Local, static data
+        //
+        //  apnodeTable
+        //      This is the hash table for type names. It is an array of pointers
+        //      to nodes. Each pointer is a slot in the hash table and all of the
+        //      entries in that slot's linked list has the same hash value. The
+        //      hash table's size is driven by the modulus value used by the TClass
+        //      class' internally.
+        // ---------------------------------------------------------------------------
+        TRegNode*   apnodeTable[kCIDLib::c4ClassModulus];
+    }
 }
 
 

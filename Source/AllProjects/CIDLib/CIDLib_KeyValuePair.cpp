@@ -51,8 +51,11 @@ RTTIDecls(TKeyValues,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_KeyValuePair
 {
-    // The persistent format version for the key/value/flag class
-    constexpr tCIDLib::TCard1       c1KVPFFmtVersion = 1;
+    namespace
+    {
+        // The persistent format version for the key/value/flag class
+        constexpr tCIDLib::TCard1       c1KVPFFmtVersion = 1;
+    }
 }
 
 

@@ -41,17 +41,20 @@ RTTIDecls(TStreamLexer,TObject)
 
 namespace CIDLib_StreamLexer
 {
-    // -----------------------------------------------------------------------
-    //  Local constant data
-    //
-    //  c4MaxTokens
-    //      This is the maximum number of predefined tokens.
-    //
-    //  c4MaxUnget
-    //      This is the maximum size of the character unget stack.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard4   c4MaxTokens  = 64;
-    constexpr tCIDLib::TCard4   c4MaxUnget   = 4096;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local constant data
+        //
+        //  c4MaxTokens
+        //      This is the maximum number of predefined tokens.
+        //
+        //  c4MaxUnget
+        //      This is the maximum size of the character unget stack.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4MaxTokens  = 64;
+        constexpr tCIDLib::TCard4   c4MaxUnget   = 4096;
+    }
 }
 
 

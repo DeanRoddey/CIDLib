@@ -45,39 +45,47 @@ RTTIDecls(TStatsCacheItemInfo,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_StatsCache
 {
-    // -----------------------------------------------------------------------
-    //  We just use a simple array of pointers to cache items. It's of fixed
-    //  size, large enough to more than handle the number of items we'll need.
-    // -----------------------------------------------------------------------
-    static constexpr tCIDLib::TCard4    c4CacheSz(2048);
-    static tCIDLib::TCard4              c4CacheUsed(0);
-    static TStatsCacheNode*             apscnCache[c4CacheSz];
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  We just use a simple array of pointers to cache items. It's of fixed
+        //  size, large enough to more than handle the number of items we'll need.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4    c4CacheSz(2048);
+        tCIDLib::TCard4              c4CacheUsed(0);
+        TStatsCacheNode*             apscnCache[c4CacheSz];
 
 
-    // -----------------------------------------------------------------------
-    //  If we get a call that provides just the item, and it's not correct,
-    //  there's not much we can do, but we bump this counter which can be
-    //  read for sanity checking purposes later.
-    // -----------------------------------------------------------------------
-    static tCIDLib::TCard8              c8BadItemRefs;
+        // -----------------------------------------------------------------------
+        //  If we get a call that provides just the item, and it's not correct,
+        //  there's not much we can do, but we bump this counter which can be
+        //  read for sanity checking purposes later.
+        // -----------------------------------------------------------------------
+        tCIDLib::TCard8              c8BadItemRefs;
 
 
-    // -----------------------------------------------------------------------
-    //  The persistent format version for our info class
-    // -----------------------------------------------------------------------
-    static constexpr tCIDLib::TCard2    c2FmtVersion = 1;
+        // -----------------------------------------------------------------------
+        //  The persistent format version for our info class
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2    c2FmtVersion = 1;
 
 
-    // -----------------------------------------------------------------------
-    //  A time stamp of the last time that the list was changed
-    // -----------------------------------------------------------------------
-    static tCIDLib::TEncodedTime        enctLastChange;
+        // -----------------------------------------------------------------------
+        //  A time stamp of the last time that the list was changed
+        // -----------------------------------------------------------------------
+        tCIDLib::TEncodedTime        enctLastChange;
 
-    // -----------------------------------------------------------------------
-    //  A mutex for local locking. We use a kernel one because of the low level
-    //  natur eof this stuff.
-    // -----------------------------------------------------------------------
-    static TKrnlMutex kmtxSync;
+
+        // -----------------------------------------------------------------------
+        //  A mutex for local locking. We use a kernel one because of the low level
+        //  nature of this stuff.
+        // -----------------------------------------------------------------------
+        TKrnlMutex& kmtxSync()
+        {
+            static TKrnlMutex kmtxRet;
+            return kmtxRet;
+        }
+    }
 };
 
 
@@ -334,7 +342,7 @@ class TSyncJanitor
     public :
         TSyncJanitor()
         {
-            CIDLib_StatsCache::kmtxSync.bLock();
+            CIDLib_StatsCache::kmtxSync().bLock();
         }
 
         TSyncJanitor(const TSyncJanitor&) = delete;
@@ -342,10 +350,11 @@ class TSyncJanitor
 
         ~TSyncJanitor()
         {
-            CIDLib_StatsCache::kmtxSync.bUnlock();
+            CIDLib_StatsCache::kmtxSync().bUnlock();
         }
 
-        tCIDLib::TVoid operator=(const TSyncJanitor&) = delete;
+        TSyncJanitor& operator=(const TSyncJanitor&) = delete;
+        TSyncJanitor& operator=(TSyncJanitor&&) = delete;
 };
 
 

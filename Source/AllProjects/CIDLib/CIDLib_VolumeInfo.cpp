@@ -40,7 +40,10 @@ AdvRTTIDecls(TVolumeInfo,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_VolumeInfo
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 

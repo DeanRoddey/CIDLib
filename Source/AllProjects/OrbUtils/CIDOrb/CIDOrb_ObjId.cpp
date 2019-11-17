@@ -42,15 +42,18 @@ RTTIDecls(TOrbObjId,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDOrb_ObjId
 {
-    // -----------------------------------------------------------------------
-    //  Our persistent format version.
-    //
-    //
-    //  Note that, so far, these are never persisted, they are just streamed
-    //  around live and stored in the name server and such. So there's been
-    //  no need to bump this, though the format has changed.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our persistent format version.
+        //
+        //
+        //  Note that, so far, these are never persisted, they are just streamed
+        //  around live and stored in the name server and such. So there's been
+        //  no need to bump this, though the format has changed.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 // ---------------------------------------------------------------------------

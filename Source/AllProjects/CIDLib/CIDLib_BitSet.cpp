@@ -44,13 +44,15 @@ RTTIDecls(TBitset,TBitsetBase)
 // ---------------------------------------------------------------------------
 namespace CIDLib_BitSet
 {
-    //
-    //  Format version for the base class
-    //
-    //      Version 2 - Get rid of the big endian flag which we never used
-    //
-    const tCIDLib::TCard2   c2FmtVersion = 2;
-
+    namespace
+    {
+        //
+        //  Format version for the base class
+        //
+        //      Version 2 - Get rid of the big endian flag which we never used
+        //
+        constexpr tCIDLib::TCard2   c2FmtVersion = 2;
+    }
 }
 
 

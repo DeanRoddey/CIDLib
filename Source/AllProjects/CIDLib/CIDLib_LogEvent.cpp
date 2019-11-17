@@ -50,38 +50,41 @@ AdvRTTIAlias(TLogEvent,TError)
 // ---------------------------------------------------------------------------
 namespace CIDLib_LogEvent
 {
-    // -----------------------------------------------------------------------
-    //  Streaming stuff.
-    //
-    //  To compact the format a bit, and leave space for adding more flags
-    //  in the future with minimal overhead, we stream the boolean members
-    //  into a TCard2 value, and need a set of masks to put them in and get
-    //  them out.
-    //
-    //  We also need a marker for the aux text, which isn't streamed unless
-    //  it's there, so we need to know whether to stream it back out. So we
-    //  use the top bit of the flags value for this purpose.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard2   c2Logged        = 0x0001;
-    constexpr tCIDLib::TCard2   c2Reported      = 0x0002;
-    constexpr tCIDLib::TCard2   c2AuxText       = 0x8000;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Streaming stuff.
+        //
+        //  To compact the format a bit, and leave space for adding more flags
+        //  in the future with minimal overhead, we stream the boolean members
+        //  into a TCard2 value, and need a set of masks to put them in and get
+        //  them out.
+        //
+        //  We also need a marker for the aux text, which isn't streamed unless
+        //  it's there, so we need to know whether to stream it back out. So we
+        //  use the top bit of the flags value for this purpose.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2Logged        = 0x0001;
+        constexpr tCIDLib::TCard2   c2Reported      = 0x0002;
+        constexpr tCIDLib::TCard2   c2AuxText       = 0x8000;
 
 
-    // -----------------------------------------------------------------------
-    //  The persistent format version.
-    //
-    //  Version 2 -
-    //      We added the stack dump string.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard2   c2FmtVersion    = 2;
+        // -----------------------------------------------------------------------
+        //  The persistent format version.
+        //
+        //  Version 2 -
+        //      We added the stack dump string.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2FmtVersion    = 2;
 
 
 
-    // -----------------------------------------------------------------------
-    //  Format version for the kernel error that we provide global streaming
-    //  operators for.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard2   c2KErrFmtVersion = 1;
+        // -----------------------------------------------------------------------
+        //  Format version for the kernel error that we provide global streaming
+        //  operators for.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2KErrFmtVersion = 1;
+    }
 }
 
 

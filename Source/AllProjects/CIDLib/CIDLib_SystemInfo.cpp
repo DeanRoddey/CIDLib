@@ -43,8 +43,11 @@ RTTIDecls(TSysInfo,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_SystemInfo
 {
-    // An atomic flag to support faulting in system info pub first use
-    TAtomicFlag atomInitDone;
+    namespace
+    {
+        // An atomic flag to support faulting in system info pub first use
+        TAtomicFlag atomInitDone;
+    }
 }
 
 

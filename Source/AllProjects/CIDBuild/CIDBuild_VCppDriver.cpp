@@ -343,13 +343,14 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     apszArgs[c4CurArg++] = L"/c";
     apszArgs[c4CurArg++] = L"/EHa";     // Needed for /GR+
     apszArgs[c4CurArg++] = L"/GR";      // Enable RTTI
-//    apszArgs[c4CurArg++] = L"/FD";
     apszArgs[c4CurArg++] = L"/DSTRICT";
     apszArgs[c4CurArg++] = L"/nologo";
     apszArgs[c4CurArg++] = L"/DWIN32";
     apszArgs[c4CurArg++] = L"/Zp8";     // Pack on 8 bytes unless forced otherwise
 
-    // Enable multi-processor compiles. We'll use half the CPUs, or at least one.
+    //
+    //  Now that we are enabling pre-compiled headers, this seems to be an issue
+    //  though in theory it's ok.
     TBldStr strMP = L"/MP";
     if (!facCIDBuild.bLowPrio() && !facCIDBuild.bSingle())
     {
@@ -422,7 +423,14 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
 
         // If asked, invoke code analysis
         if (facCIDBuild.bCodeAnalysis())
-            apszArgs[c4CurArg++] = L"/analyze:stacksize1048576";
+        {
+            apszArgs[c4CurArg++] = L"/analyze:ruleset";
+
+            TBldStr* pstrNew  = new TBldStr(L"\"");
+            pstrNew->Append(facCIDBuild.strCIDLibSrcDir());
+            pstrNew->Append(L"Source\\Cmd\\Win32\\Standard.ruleset\"");
+            apszArgs[c4CurArg++] = pstrNew->pszBuffer();
+        }
     }
      else
     {
@@ -537,8 +545,7 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         {
             tCIDLib::TCh* pszNew = new tCIDLib::TCh
             [
-                TRawStr::c4StrLen(cursIncludePaths.tCurElement().pszBuffer())
-                + 8
+                TRawStr::c4StrLen(cursIncludePaths.tCurElement().pszBuffer()) + 8
             ];
             TRawStr::CopyStr(pszNew, L"/I");
             TRawStr::CatStr(pszNew, cursIncludePaths.tCurElement().pszBuffer());
@@ -573,12 +580,21 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     strProjDef.UpperCase();
     apszArgs[c4CurArg++] = strProjDef.pszBuffer();
 
-    // Set up the debug database
+    //
+    //  Set up the debug database. Let the compiler choose the name to
+    //  avoid weirdness that showed up in 2019, where compiler and linker
+    //  could use the same name if we name this one in the way we normally
+    //  would. Then the linker overwrites the compiler one which then doesn't
+    //  match the PCH's version, which causes a mess.
+    //
     TBldStr strPDBName(L"/Fd");
     strPDBName.Append(facCIDBuild.strOutDir());
+    /*
     strPDBName.Append(m_pprojiTarget->strProjectName());
     if (m_pprojiTarget->bVersioned())
         strPDBName.Append(facCIDBuild.strVersionSuffix());
+    strPDBName.Append(L".pdb");
+    */
     apszArgs[c4CurArg++] = strPDBName.pszBuffer();
 
     // Set up the Obj output directory param
@@ -614,13 +630,24 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
                 strPCHHeader.Append(L'_');
             strPCHHeader.Append(L".hpp");
 
+            //
+            //  Build the name of the main cpp file that we will use to create the
+            //  precompiled headers.
+            //
+            TBldStr strPCHCpp = m_pprojiTarget->strProjectName().pszBuffer();
+            strPCHCpp.Append(L".cpp");
+
             // If that doesn't exist, then no PCH
             if (!TUtils::bExists(strPCHHeader))
                 bDoPCH = kCIDLib::False;
 
-            // This one we will pass to all files to use the PCH header
+            // This one gets passed to all but the main cpp file
             TBldStr strPCHUse = L"/Yu";
             strPCHUse.Append(strPCHHeader);
+
+            // This is used for just the main cpp file
+            TBldStr strPCHCreate = L"/Yc";
+            strPCHCreate.Append(strPCHHeader);
 
             // The actual PCH file we want to create and use. It's always included
             TBldStr strPCHFile = L"/Fp";
@@ -628,36 +655,23 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
             strPCHFile.AppendPathComp(m_pprojiTarget->strProjectName().pszBuffer());
             strPCHFile.Append(L".pch");
 
-            if (bDoPCH)
-            {
-                apszArgs[c4CurArg++] = strPCHUse.pszBuffer();
-                apszArgs[c4CurArg++] = strPCHFile.pszBuffer();
-            }
-
-            // The main or internal header is used with the /Yc option
-            TBldStr strPCHCreate = L"/Yc";
-            strPCHCreate.Append(m_pprojiTarget->strProjectName().pszBuffer());
-            if ((m_pprojiTarget->eType() != tCIDBuild::EProjTypes::Executable)
-            &&  (m_pprojiTarget->eType() != tCIDBuild::EProjTypes::Service))
-            {
-                strPCHCreate.Append(L'_');
-            }
-            strPCHCreate.Append(L".hpp");
-
-
             TList<TBldStr>::TCursor cursBuildList(&listToBuild);
             cursBuildList.bResetIter();
-            tCIDLib::TBoolean bFirstFile = kCIDLib::True;
             do
             {
+                // Reset our per-file options index
                 tCIDLib::TCard4 c4RealCnt = c4CurArg;
 
-                // If the first file, we need to create the PCH
-                if (bFirstFile)
+                if (bDoPCH)
                 {
-                    bFirstFile = kCIDLib::False;
-                    if (bDoPCH)
+                    // Either create or user the precompiled headers
+                    if (*cursBuildList == strPCHCpp)
                         apszArgs[c4RealCnt++] = strPCHCreate.pszBuffer();
+                    else
+                        apszArgs[c4RealCnt++] = strPCHUse.pszBuffer();
+
+                    // The PCH file we either use or create
+                    apszArgs[c4RealCnt++] = strPCHFile.pszBuffer();
                 }
 
                 // Add the current file as the target to compile

@@ -48,10 +48,13 @@ RTTIDecls(TChunkedTextOutStream,TTextOutStream)
 // ---------------------------------------------------------------------------
 namespace CIDLib_ChunkedMemStream
 {
-    //
-    //  The size of our memory chunks. We grow by 1MB chunks.
-    //
-    const tCIDLib::TCard4 c4ChunkSz = 0x100000;
+    namespace
+    {
+        //
+        //  The size of our memory chunks. We grow by 1MB chunks.
+        //
+        const tCIDLib::TCard4 c4ChunkSz = 0x100000;
+    }
 }
 
 

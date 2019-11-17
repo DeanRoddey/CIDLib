@@ -40,97 +40,104 @@ RTTIDecls(TModule,TObject)
 
 namespace CIDLib_Module
 {
-    // -----------------------------------------------------------------------
-    //  Local static data
-    //
-    //  atomInitMsgs
-    //      A flag to control whether we've done local static initialization
-    //      yet.
-    //
-    //  eAdoptLogger
-    //      Indicates whether we own the installed logger (if any) or not.
-    //
-    //  plgrCurrent
-    //      This is the current logger that we send all errors and messages
-    //      logged through this process to. We don't own it. We may own it or not
-    //      depending on the eAdoptLogger value.
-    //
-    //  pszTitle1
-    //  pszTitle2
-    //      The two title strings used in standard popups, support for which
-    //      is provided here. They are defaulted so something is there until
-    //      they get loaded from translatable text.
-    //
-    //  pszExceptDuringLog
-    //  pszRecursiveError
-    //  pszStrLoadFailure
-    //      Errors displayed when things go wrong during fundamental ops
-    //      provided here. They are defaulted so something is there until
-    //      they get loaded from translatable text.
-    // -----------------------------------------------------------------------
-    static TAtomicFlag          atomInitMsgs;
-    static const tCIDLib::TCh*  pszTitle1 = kCIDLib_::pszTitle1;
-    static const tCIDLib::TCh*  pszTitle2 = kCIDLib_::pszTitle2;
-    static const tCIDLib::TCh*  pszExceptDuringLog = kCIDLib_::pszExceptDuringLog;
-    static const tCIDLib::TCh*  pszRecursiveError = kCIDLib_::pszRecursiveError;
-    static const tCIDLib::TCh*  pszStrLoadFailure = kCIDLib_::pszStrLoadFailure;
-
-
-    // -----------------------------------------------------------------------
-    //  m_bInitStats
-    //  m_sciStartTime
-    //  m_sciDroppedLogEvs
-    //  m_sciLogErrors
-    //      We maintain some stats cache values. This is the storage for those
-    //      and a lazy init flag to fault them in.
-    // -----------------------------------------------------------------------
-    static TAtomicFlag      atomInitStats;
-    static TStatsCacheItem  sciStartTime;
-    static TStatsCacheItem  sciDroppedLogEvs;
-    static TStatsCacheItem  sciLogErrors;
-
-    // We need a mutex to sync some stuff here
-    static TMutex* pmtxLogSync = new TMutex(tCIDLib::ELockStates::Unlocked);
-
-    //
-    //  We need a little structure we use to maintain a list of log event objects
-    //  to be spooled out by our spooling thread. We don't want to use any
-    //  high level stuff since it may log messages and get us into a circular
-    //  freakout. So we just maintain a simple linked list, and all we ever do
-    //  with it is add at the start and remove at the end. The spooling thread
-    //  keeps a head and tail pointer (new ones are added at the head and removed
-    //  at from the tail by the thread.
-    //
-    //  If the events aren't time stamped and marked, we do that
-    //
-    struct TLogQEvent
+    namespace
     {
-        TLogQEvent(const TLogEvent& logevSrc) :
+        // -----------------------------------------------------------------------
+        //  Local static data
+        //
+        //  atomInitMsgs
+        //      A flag to control whether we've done local static initialization
+        //      yet.
+        //
+        //  eAdoptLogger
+        //      Indicates whether we own the installed logger (if any) or not.
+        //
+        //  plgrCurrent
+        //      This is the current logger that we send all errors and messages
+        //      logged through this process to. We don't own it. We may own it or not
+        //      depending on the eAdoptLogger value.
+        //
+        //  pszTitle1
+        //  pszTitle2
+        //      The two title strings used in standard popups, support for which
+        //      is provided here. They are defaulted so something is there until
+        //      they get loaded from translatable text.
+        //
+        //  pszExceptDuringLog
+        //  pszRecursiveError
+        //  pszStrLoadFailure
+        //      Errors displayed when things go wrong during fundamental ops
+        //      provided here. They are defaulted so something is there until
+        //      they get loaded from translatable text.
+        // -----------------------------------------------------------------------
+        TAtomicFlag          atomInitMsgs;
+        const tCIDLib::TCh*  pszTitle1 = kCIDLib_::pszTitle1;
+        const tCIDLib::TCh*  pszTitle2 = kCIDLib_::pszTitle2;
+        const tCIDLib::TCh*  pszExceptDuringLog = kCIDLib_::pszExceptDuringLog;
+        const tCIDLib::TCh*  pszRecursiveError = kCIDLib_::pszRecursiveError;
+        const tCIDLib::TCh*  pszStrLoadFailure = kCIDLib_::pszStrLoadFailure;
 
-            logevData(logevSrc)
+
+        // -----------------------------------------------------------------------
+        //  m_bInitStats
+        //  m_sciStartTime
+        //  m_sciDroppedLogEvs
+        //  m_sciLogErrors
+        //      We maintain some stats cache values. This is the storage for those
+        //      and a lazy init flag to fault them in.
+        // -----------------------------------------------------------------------
+        TAtomicFlag      atomInitStats;
+        TStatsCacheItem  sciStartTime;
+        TStatsCacheItem  sciDroppedLogEvs;
+        TStatsCacheItem  sciLogErrors;
+
+        //
+        //  We need a little structure we use to maintain a list of log event objects
+        //  to be spooled out by our spooling thread. We don't want to use any
+        //  high level stuff since it may log messages and get us into a circular
+        //  freakout. So we just maintain a simple linked list, and all we ever do
+        //  with it is add at the start and remove at the end. The spooling thread
+        //  keeps a head and tail pointer (new ones are added at the head and removed
+        //  at from the tail by the thread.
+        //
+        //  If the events aren't time stamped and marked, we do that
+        //
+        struct TLogQEvent
         {
-            logevData.SetLogged();
-        }
+            TLogQEvent(const TLogEvent& logevSrc) :
 
-        TLogQEvent(TLogEvent&& logevSrc) :
+                logevData(logevSrc)
+            {
+                logevData.SetLogged();
+            }
 
-            logevData(tCIDLib::ForceMove(logevSrc))
-        {
-            logevData.SetLogged();
-        }
+            TLogQEvent(TLogEvent&& logevSrc) :
 
-        // For emplacement via the log msg variations
-        template <typename... TArgs> TLogQEvent(TArgs&&... Args) :
+                logevData(tCIDLib::ForceMove(logevSrc))
+            {
+                logevData.SetLogged();
+            }
 
-            logevData(tCIDLib::Forward<TArgs>(Args)...)
-        {
-            logevData.SetLogged();
-        }
+            // For emplacement via the log msg variations
+            template <typename... TArgs> TLogQEvent(TArgs&&... Args) :
 
-        TLogQEvent*     plogqevPrev = nullptr;
-        TLogQEvent*     plogqevNext = nullptr;
-        TLogEvent       logevData;
-    };
+                logevData(tCIDLib::Forward<TArgs>(Args)...)
+            {
+                logevData.SetLogged();
+            }
+
+            TLogQEvent*     plogqevPrev = nullptr;
+            TLogQEvent*     plogqevNext = nullptr;
+            TLogEvent       logevData;
+        };
+    }
+
+    // We need a lazily faulted in mutex for local sync
+    static TMutex* pmtxLogSync()
+    {
+        static TMutex mtxLogSync(tCIDLib::ELockStates::Unlocked);
+        return &mtxLogSync;
+    }
 }
 
 
@@ -227,7 +234,7 @@ class TLogSpoolThread : public TThread
         tCIDLib::TVoid SetLogger(       MLogger* const          plgrNew
                                 , const tCIDLib::EAdoptOpts     eAdopt)
         {
-            TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync);
+            TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
 
             // If there is one that hasn't been gotten yet we have to deal with it
             if (m_plgrNew && (m_eAdoptNew == tCIDLib::EAdoptOpts::Adopt))
@@ -262,7 +269,7 @@ class TLogSpoolThread : public TThread
         // For TModule to create directly, mostl for emplacement scenarios
         tCIDLib::TVoid QueueEvent(CIDLib_Module::TLogQEvent* const plogqevNew)
         {
-            TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync);
+            TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
 
             //
             //  Make sure there is space available. If not, then we need to reject this
@@ -411,7 +418,7 @@ tCIDLib::EExitCodes TLogSpoolThread::eProcess()
             // If there's a new logger, let's get that
             if (m_plgrNew)
             {
-                TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync);
+                TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
                 if (m_plgrNew)
                 {
                     // Clean up any current one if we adopted it
@@ -445,7 +452,7 @@ tCIDLib::EExitCodes TLogSpoolThread::eProcess()
             {
                 CIDLib_Module::TLogQEvent* plogqevCur = nullptr;
                 {
-                    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync);
+                    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
 
                     // We have some special cases to deal with.
                     if (m_plogqevHead == m_plogqevTail)
@@ -538,7 +545,7 @@ tCIDLib::TVoid TLogSpoolThread::SetDefaultLogger()
     //  resources that could fail if multiple threads tried to do it. And we
     //  ultimately need to set the logger pointer.
     //
-    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync);
+    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
 
     //
     //  Some one could have beaten us to it. We don't want to lock every time
@@ -690,7 +697,7 @@ static TLogSpoolThread* pthrSpooler()
     static TLogSpoolThread* pthrSpooler = nullptr;
     if (!pthrSpooler)
     {
-        TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync);
+        TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
         if (!pthrSpooler)
         {
             pthrSpooler = new TLogSpoolThread();
@@ -1008,7 +1015,7 @@ TModule::c8ParseVersionStr( const   TString&            strToParse
 //
 tCIDLib::TVoid TModule::OrphanLogger()
 {
-    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync);
+    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
     TLogSpoolThread* pthrTar = pthrSpooler();
     pthrTar->SetLogger(nullptr, tCIDLib::EAdoptOpts::NoAdopt);
 }
@@ -1018,7 +1025,7 @@ tCIDLib::TVoid TModule::OrphanLogger()
 tCIDLib::TVoid
 TModule::InstallLogger(MLogger* const plgrToSet, const tCIDLib::EAdoptOpts eAdopt)
 {
-    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync);
+    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
     pthrSpooler()->SetLogger(plgrToSet, eAdopt);
 }
 

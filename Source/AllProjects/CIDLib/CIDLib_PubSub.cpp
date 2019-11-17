@@ -42,29 +42,44 @@ RTTIDecls(TPubSubTopic, TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_PubSub
 {
-    using TTopicList    = TKeyedHashSet<TPubSubTopic, TString, TStringKeyOps>;
-    using TSubList      = TRefVector<MPubSubscription>;
+    namespace
+    {
+        using TTopicList    = TKeyedHashSet<TPubSubTopic, TString, TStringKeyOps>;
+        using TSubList      = TRefVector<MPubSubscription>;
 
-    //
-    //  We need a mutex for sync, and we fault it in. Everyone accesses it via the
-    //  method below which faults it in, along with some other stuff below.
-    //
-    static TMutex*  pmtxSync = new TMutex();
+        //
+        //  We need a mutex for sync, and we fault it in. Everyone accesses it via the
+        //  method below which faults it in, along with some other stuff below.
+        //
+        static TMutex* pmtxSync()
+        {
+            static TMutex mtxSync;
+            return &mtxSync;
+        }
 
-    //
-    //  The lists are faulted in with the mutex above. We support a max of 32K
-    //  subscribers, and 8192 topics (as set below when we fault in these lists.)
-    //
-    static tCIDLib::TCard4          c4NextId = 1;
-    static TSubList*                pcolSubList = new TSubList(tCIDLib::EAdoptOpts::NoAdopt, 256);
-    static TTopicList*              pcolTopicList = new TTopicList
-                                    (
-                                        109, TStringKeyOps(kCIDLib::False), &TPubSubTopic::strKey
-                                    );
-    static tCIDLib::TEncodedTime    enctNextScavenge = TTime::enctNowPlusMins(5);
+        //
+        //  The lists are faulted in with the mutex above. We support a max of 32K
+        //  subscribers, and 8192 topics (as set below when we fault in these lists.)
+        //
+        tCIDLib::TCard4 c4NextId = 1;
 
-    // The max size we'll let the msg queue grow to before we start dropping them
-    constexpr tCIDLib::TCard4       c4MaxMsgQSz = 4192;
+        TSubList& colSubList()
+        {
+            static TSubList colRet(tCIDLib::EAdoptOpts::NoAdopt, 256);
+            return colRet;
+        }
+
+        TTopicList& colTopicList()
+        {
+            static TTopicList colRet(109, TStringKeyOps(kCIDLib::False), &TPubSubTopic::strKey);
+            return colRet;
+        }
+
+        tCIDLib::TEncodedTime   enctNextScavenge = TTime::enctNowPlusMins(5);
+
+        // The max size we'll let the msg queue grow to before we start dropping them
+        constexpr tCIDLib::TCard4   c4MaxMsgQSz = 4192;
+    }
 }
 
 
@@ -98,11 +113,11 @@ static tCIDLib::TVoid ScavengePubs()
     CIDLib_PubSub::enctNextScavenge = TTime::enctNowPlusMins(5);
 
     // For the topics we have to do a cursor
-    CIDLib_PubSub::TTopicList::TNCCursor cursTopics(CIDLib_PubSub::pcolTopicList);
+    CIDLib_PubSub::TTopicList::TNCCursor cursTopics(&CIDLib_PubSub::colTopicList());
     while (cursTopics.bIsValid())
     {
         if (cursTopics->c4RefCount() < 2)
-            CIDLib_PubSub::pcolTopicList->RemoveAt(cursTopics);
+            CIDLib_PubSub::colTopicList().RemoveAt(cursTopics);
         else
             ++cursTopics;
     }
@@ -127,7 +142,7 @@ static tCIDLib::TVoid SendMsg(  const   tCIDLib::TCard4 c4SubId
 
     // Find the indicated subcriber
     tCIDLib::TCard4 c4At;
-    MPubSubscription* pmpsubTar = CIDLib_PubSub::pcolSubList->pobjKeyedBinarySearch
+    MPubSubscription* pmpsubTar = CIDLib_PubSub::colSubList().pobjKeyedBinarySearch
     (
         c4SubId, eCompSubId, c4At
     );
@@ -549,7 +564,7 @@ tCIDLib::TVoid TPubSubMsg::CheckMsgType(const TClass& clsToCheck) const
 //
 MPubSubscription::~MPubSubscription()
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
     if (m_c4SubscriberId)
     {
         try
@@ -564,7 +579,7 @@ MPubSubscription::~MPubSubscription()
                     try
                     {
                         // Find the topic. If active, then let's remove ourself from his list
-                        pstopFind = CIDLib_PubSub::pcolTopicList->pobjFindByKey(*pstrCurTopic);
+                        pstopFind = CIDLib_PubSub::colTopicList().pobjFindByKey(*pstrCurTopic);
                         if (pstopFind)
                             pstopFind->RemoveSubscriber(m_c4SubscriberId);
                     }
@@ -579,8 +594,8 @@ MPubSubscription::~MPubSubscription()
 
             // Now find us in the subscriber list and remove us if found
             tCIDLib::TCard4 c4At;
-            if (CIDLib_PubSub::pcolSubList->pobjKeyedBinarySearch(m_c4SubscriberId, eCompSubId, c4At))
-                CIDLib_PubSub::pcolSubList->RemoveAt(c4At);
+            if (CIDLib_PubSub::colSubList().pobjKeyedBinarySearch(m_c4SubscriberId, eCompSubId, c4At))
+                CIDLib_PubSub::colSubList().RemoveAt(c4At);
         }
 
         catch(TError& errToCatch)
@@ -660,7 +675,7 @@ tCIDLib::TVoid
 MPubSubscription::SubscribeToTopic( const   TString&            strTopicPath
                                     , const tCIDLib::TBoolean   bMustExist)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
 
     //
     //  Invoke a scavenger pass. This isn't something that happens very often, so it's
@@ -673,7 +688,7 @@ MPubSubscription::SubscribeToTopic( const   TString&            strTopicPath
     //  Find the topic if it already exists. Since we did a scavenge above, we won't
     //  find any abandoned ones left in the list.
     //
-    TPubSubTopic* pstopFind = CIDLib_PubSub::pcolTopicList->pobjFindByKey(strTopicPath);
+    TPubSubTopic* pstopFind = CIDLib_PubSub::colTopicList().pobjFindByKey(strTopicPath);
 
     // If not and they say it must, then we give up
     if (!pstopFind && bMustExist)
@@ -697,7 +712,7 @@ MPubSubscription::SubscribeToTopic( const   TString&            strTopicPath
     if (!m_c4SubscriberId)
     {
         m_c4SubscriberId = CIDLib_PubSub::c4NextId++;
-        CIDLib_PubSub::pcolSubList->Add(this);
+        CIDLib_PubSub::colSubList().Add(this);
     }
 
     // If not already subscribed to this topic, then add it to our path list
@@ -713,7 +728,7 @@ MPubSubscription::SubscribeToTopic( const   TString&            strTopicPath
 tCIDLib::TVoid
 MPubSubscription::UnsubscribeFromTopic(const TString& strTopicPath)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
     try
     {
         //
@@ -751,7 +766,7 @@ MPubSubscription::UnsubscribeFromTopic(const TString& strTopicPath)
         m_kllstTopicPaths.RemoveCurrent();
 
         // Now find the topic and remove us from its subscriber list if found
-        TPubSubTopic* pstopFind = CIDLib_PubSub::pcolTopicList->pobjFindByKey(strTopicPath);
+        TPubSubTopic* pstopFind = CIDLib_PubSub::colTopicList().pobjFindByKey(strTopicPath);
         if (pstopFind)
             pstopFind->RemoveSubscriber(m_c4SubscriberId);
     }
@@ -986,8 +1001,8 @@ tCIDLib::TVoid TPubSubAsyncSub::ProcessPubMsg(const TPubSubMsg& psmsgIn)
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TPubSubTopic::bTopicExists(const TString& strTopicPath)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
-    TPubSubTopic* pstopFind = CIDLib_PubSub::pcolTopicList->pobjFindByKey(strTopicPath);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TPubSubTopic* pstopFind = CIDLib_PubSub::colTopicList().pobjFindByKey(strTopicPath);
 
     //
     //  If we found it, but the ref count is less than 2, then it has abandoned
@@ -996,7 +1011,7 @@ tCIDLib::TBoolean TPubSubTopic::bTopicExists(const TString& strTopicPath)
     if (pstopFind && (pstopFind->c4RefCount() < 2))
     {
         pstopFind = nullptr;
-        CIDLib_PubSub::pcolTopicList->bRemoveKey(strTopicPath);
+        CIDLib_PubSub::colTopicList().bRemoveKey(strTopicPath);
     }
 
     return (pstopFind != nullptr);
@@ -1013,7 +1028,7 @@ tCIDLib::TBoolean TPubSubTopic::bTopicExists(const TString& strTopicPath)
 TPubSubTopic
 TPubSubTopic::pstopCreateTopic(const TString& strTopicPath, const TClass& clsMsgType)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
 
     //
     //  Invoke a scavenger pass. This isn't something that happens very often, so it's
@@ -1025,7 +1040,7 @@ TPubSubTopic::pstopCreateTopic(const TString& strTopicPath, const TClass& clsMsg
     //  See if we already have this guy. We removed any above that were abandoned,
     //  so if it's in the list it's still active and a dup.
     //
-    TPubSubTopic* pstopFind = CIDLib_PubSub::pcolTopicList->pobjFindByKey(strTopicPath);
+    TPubSubTopic* pstopFind = CIDLib_PubSub::colTopicList().pobjFindByKey(strTopicPath);
     if (pstopFind)
     {
         facCIDLib().ThrowErr
@@ -1046,17 +1061,17 @@ TPubSubTopic::pstopCreateTopic(const TString& strTopicPath, const TClass& clsMsg
     //  the next available unique topic id.
     //
     TPubSubTopic pstopRet(strTopicPath, clsMsgType);
-    CIDLib_PubSub::pcolTopicList->objAdd(pstopRet);
+    CIDLib_PubSub::colTopicList().objAdd(pstopRet);
 
     //
     //  Go through our current list of subscribers and see if any are for this
     //  topic, and just got registered before him. If so, we need to add them to
     //  his list of subscribers.
     //
-    const tCIDLib::TCard4 c4Count = CIDLib_PubSub::pcolSubList->c4ElemCount();
+    const tCIDLib::TCard4 c4Count = CIDLib_PubSub::colSubList().c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
-        MPubSubscription* pmpsubCur = CIDLib_PubSub::pcolSubList->pobjAt(c4Index);
+        MPubSubscription* pmpsubCur = CIDLib_PubSub::colSubList().pobjAt(c4Index);
         if (pmpsubCur->bIsSubscribedToTopic(strTopicPath))
             pstopRet.AddSubscriber(pmpsubCur->c4SubscriberId());
     }
@@ -1146,7 +1161,7 @@ tCIDLib::TCard4 TPubSubTopic::c4SubCount() const
 {
     CheckReady();
 
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
     return m_cptrImpl->c4SubCount();
 }
 
@@ -1168,7 +1183,7 @@ tCIDLib::TCard4 TPubSubTopic::c4TopicId() const
 //
 tCIDLib::TVoid TPubSubTopic::DropTopic()
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
     m_cptrImpl.DropRef();
 }
 
@@ -1182,7 +1197,7 @@ tCIDLib::TVoid TPubSubTopic::DropTopic()
 //
 tCIDLib::TVoid TPubSubTopic::Publish(TObject* const pobjToAdopt)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
     CheckReady();
     m_cptrImpl->SendMsg(pobjToAdopt);
 }
@@ -1206,7 +1221,7 @@ tCIDLib::TVoid TPubSubTopic::AddSubscriber(const tCIDLib::TCard4 c4SubId)
         , m_strTopicPath
     );
 
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
     return m_cptrImpl->AddSubscriber(c4SubId);
 }
 
@@ -1225,7 +1240,7 @@ tCIDLib::TVoid TPubSubTopic::RemoveSubscriber(const tCIDLib::TCard4 c4SubId)
         , m_strTopicPath
     );
 
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync);
+    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
     return m_cptrImpl->RemoveSubscriber(c4SubId);
 }
 

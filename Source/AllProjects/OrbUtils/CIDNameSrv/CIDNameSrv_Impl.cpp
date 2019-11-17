@@ -267,6 +267,9 @@ TCIDNameServerImpl::bQueryScopeKeys(        tCIDLib::TCard4&    c4SerialNum
                 , tCIDLib::EErrClasses::TypeMatch
                 , strScopePath
             );
+
+            // Won't happen but makes analyzer happy
+            return kCIDLib::False;
         }
 
         const TNSCache::TNodeNT* pnodeNT = static_cast<const TNSCache::TNodeNT*>(pnodeSrc);

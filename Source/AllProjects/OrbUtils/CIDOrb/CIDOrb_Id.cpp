@@ -44,7 +44,10 @@ RTTIDecls(TOrbIdKeyOps,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDOrb_Id
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 

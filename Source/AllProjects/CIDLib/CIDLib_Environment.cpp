@@ -42,13 +42,16 @@ RTTIDecls(TEnvironment,TObject)
 
 namespace CIDLib_Environment
 {
-    // -----------------------------------------------------------------------
-    //  Local, const data
-    //
-    //  c4Modulus
-    //      This is the modulus used in the hashing of the key strings.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard4    c4Modulus = 23;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local, const data
+        //
+        //  c4Modulus
+        //      This is the modulus used in the hashing of the key strings.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4    c4Modulus = 23;
+    }
 }
 
 

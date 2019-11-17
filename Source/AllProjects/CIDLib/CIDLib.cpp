@@ -109,17 +109,17 @@ template class CIDLIBEXP TRefVector<TThread>;
 namespace tCIDLib
 {
     //
-    //  For the TEArray template class, to keep this out of line. We do this very
-    //  primitively, creating the event ourself and throwing it directly, to avoid
-    //  possible issues, since these simple arrays might be used in some lower
-    //  level code.
+    //  For the TEArray template class and some raw array indexing templates, to
+    //  keep this out of line. We do this very primitively, creating the event
+    //  ourself and throwing it directly, to avoid possible issues, since these
+    //  simple and raw arrays might be used in some lower level code.
     //
-    tCIDLib::TVoid ThrowEArrayIndexErr( const   tCIDLib::TCard4     c4At
+    tCIDLib::TVoid ThrowArrayIndexErr( const   tCIDLib::TCard4     c4At
                                         , const tCIDLib::TCard4     c4Size)
     {
         TString strMsg(L"Bad index (", 32UL);
         strMsg.AppendFormatted(c4At);
-        strMsg.Append(L") used for TEArray, size is ");
+        strMsg.Append(L") used for array, size is ");
         strMsg.AppendFormatted(c4Size);
         TLogEvent errToThrow
         (
@@ -572,6 +572,20 @@ static tCIDLib::TVoid DummyFunc()
     }
 
     TSingleton<TString> singleTest;
+
+    tCIDLib::TCard4 ac4Test[4] = { 0, 1, 2, 3 };
+    tCIDLib::c4ArrayElems(ac4Test);
+    if (tCIDLib::c4ArrayAt(ac4Test, 2) != 3)
+    {
+        tCIDLib::TCard4* pc4End = tCIDLib::pArrayEndPtr(ac4Test);
+    }
+
+    const tCIDLib::TCard4 ac4TestC[4] = { 0, 1, 2, 3 };
+    tCIDLib::c4ArrayElems(ac4TestC);
+    if (tCIDLib::c4ArrayAt(ac4TestC, 2) != 3)
+    {
+        const tCIDLib::TCard4* pc4End = tCIDLib::pArrayEndPtr(ac4TestC);
+    }
 }
 #endif
 

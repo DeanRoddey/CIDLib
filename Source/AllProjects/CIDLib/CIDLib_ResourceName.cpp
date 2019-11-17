@@ -43,7 +43,10 @@ RTTIDecls(TResourceName,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_ResourceName
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 

@@ -36,43 +36,46 @@
 // ---------------------------------------------------------------------------
 namespace CIDOrb_ThisFacility
 {
-    // -----------------------------------------------------------------------
-    //  The timeout period for the name server object id cache. We set it
-    //  pretty low, to 50 seconds. For the most important, high traffic
-    //  object ids, we just continue to update the object's timeout stamp each
-    //  time the object id is successfully used.
-    //
-    //  This way, it will time out pretty fast when not used often, so that
-    //  there's little danger of a bad one hanging around in the cache, but
-    //  the often used ones will remain cached as long as they are still
-    //  working.
-    //
-    //  The auto-rebinder regularly hits the name server at least once every
-    //  enctForcedNSTO seconds if no one else is hitting it for other reasons,
-    //  so as long as we keep this time not too large, but enough larger than
-    //  the forced NS ping timeout, that will insure that the name server
-    //  itself doesn't time out of the object id cache ever as long as it
-    //  is being successfully accessed.
-    //
-    //  That will avoid lots of name resolutions since the name server is
-    //  accessed a lot.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TEncodedTime enctCacheTO = kCIDLib::enctOneSecond * 50;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The timeout period for the name server object id cache. We set it
+        //  pretty low, to 50 seconds. For the most important, high traffic
+        //  object ids, we just continue to update the object's timeout stamp each
+        //  time the object id is successfully used.
+        //
+        //  This way, it will time out pretty fast when not used often, so that
+        //  there's little danger of a bad one hanging around in the cache, but
+        //  the often used ones will remain cached as long as they are still
+        //  working.
+        //
+        //  The auto-rebinder regularly hits the name server at least once every
+        //  enctForcedNSTO seconds if no one else is hitting it for other reasons,
+        //  so as long as we keep this time not too large, but enough larger than
+        //  the forced NS ping timeout, that will insure that the name server
+        //  itself doesn't time out of the object id cache ever as long as it
+        //  is being successfully accessed.
+        //
+        //  That will avoid lots of name resolutions since the name server is
+        //  accessed a lot.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TEncodedTime enctCacheTO = kCIDLib::enctOneSecond * 50;
 
 
-    // -----------------------------------------------------------------------
-    //  If we've not accessed the name server for some reason within this
-    //  length of time, next time someone does an object lookup, we'll force
-    //  a trip to the name server, even if the object being accessed is in
-    //  the cache and good.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TEncodedTime enctForcedNSTO = (kCIDLib::enctOneSecond * 30);
+        // -----------------------------------------------------------------------
+        //  If we've not accessed the name server for some reason within this
+        //  length of time, next time someone does an object lookup, we'll force
+        //  a trip to the name server, even if the object being accessed is in
+        //  the cache and good.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TEncodedTime enctForcedNSTO = (kCIDLib::enctOneSecond * 30);
 
 
-    // -----------------------------------------------------------------------
-    //  Max entries we'll keep in the name server cache
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4MaxNSQSize = 2048;
+        // -----------------------------------------------------------------------
+        //  Max entries we'll keep in the name server cache
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4MaxNSQSize = 2048;
+    }
 }
 
 

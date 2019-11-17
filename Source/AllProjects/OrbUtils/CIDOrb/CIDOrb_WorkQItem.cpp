@@ -97,7 +97,10 @@ class TWorkQItemPool : public TSimplePool<TWorkQItem>
 //
 namespace CIDOrb_WorkQItem
 {
-    TWorkQItemPool  splWorkQPool;
+    namespace
+    {
+        TWorkQItemPool  splWorkQPool;
+    }
 }
 
 
