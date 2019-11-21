@@ -626,7 +626,7 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
 
             // Build up the name of the header that will drive them
             TBldStr strPCHHeader = m_pprojiTarget->strProjectName().pszBuffer();
-            if (m_pprojiTarget->eType() != tCIDBuild::EProjTypes::Executable)
+            if (m_pprojiTarget->eType() == tCIDBuild::EProjTypes::SharedLib)
                 strPCHHeader.Append(L'_');
             strPCHHeader.Append(L".hpp");
 
@@ -639,7 +639,11 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
 
             // If that doesn't exist, then no PCH
             if (!TUtils::bExists(strPCHHeader))
+            {
                 bDoPCH = kCIDLib::False;
+                if (facCIDBuild.bVerbose())
+                    stdOut << L"!!Precompiled header was not found" << kCIDBuild::EndLn;
+            }
 
             // This one gets passed to all but the main cpp file
             TBldStr strPCHUse = L"/Yu";
@@ -659,23 +663,29 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
             cursBuildList.bResetIter();
             do
             {
+                const TBldStr& strCurFl = cursBuildList.tCurElement();
+
                 // Reset our per-file options index
                 tCIDLib::TCard4 c4RealCnt = c4CurArg;
 
                 if (bDoPCH)
                 {
-                    // Either create or user the precompiled headers
-                    if (*cursBuildList == strPCHCpp)
-                        apszArgs[c4RealCnt++] = strPCHCreate.pszBuffer();
-                    else
-                        apszArgs[c4RealCnt++] = strPCHUse.pszBuffer();
+                    // We have a few .c files that we need to skip, so only do cpp files
+                    const tCIDLib::TCh* pszExt = TRawStr::pszFindChar(strCurFl.pszBuffer(), L'.');
+                    if (!TRawStr::iCompIStr(pszExt, L".cpp"))
+                    {
+                        // Either create or user the precompiled headers
+                        if (*cursBuildList == strPCHCpp)
+                            apszArgs[c4RealCnt++] = strPCHCreate.pszBuffer();
+                        else
+                            apszArgs[c4RealCnt++] = strPCHUse.pszBuffer();
 
-                    // The PCH file we either use or create
-                    apszArgs[c4RealCnt++] = strPCHFile.pszBuffer();
+                        // The PCH file we either use or create
+                        apszArgs[c4RealCnt++] = strPCHFile.pszBuffer();
+                    }
                 }
 
                 // Add the current file as the target to compile
-                const TBldStr& strCurFl = cursBuildList.tCurElement();
                 apszArgs[c4RealCnt++] = strCurFl.pszBuffer();
 
                 tCIDLib::TCard4 c4ErrCode;

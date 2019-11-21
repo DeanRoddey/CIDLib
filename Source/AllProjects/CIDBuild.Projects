@@ -311,11 +311,6 @@ PROJECT=CIDJPEG
         CIDImage
     END DEPENDENTS
 
-    OPTIONS [WIN32_*]
-        ; We have some c files, which CIDBuild doesn't deal with yet
-        NOPCH = Yes
-    END OPTIONS
-
     INCLUDEPATHS
         .\JLibInc
     END INCLUDEPATHS
@@ -979,11 +974,6 @@ PROJECT=CIDWebBrowser [Win32_*]
         CIDLib
         CIDCtrls
     END DEPENDENTS
-
-    OPTIONS [WIN32_*]
-        ; We have a c file, which CIDBuild doesn't deal with yet
-        NOPCH = Yes
-    END OPTIONS
 
 END PROJECT
 

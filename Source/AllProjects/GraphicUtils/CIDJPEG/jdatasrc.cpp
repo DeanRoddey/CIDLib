@@ -13,7 +13,7 @@
  */
 
 /* this is not a core library module, so it doesn't define JPEG_INTERNALS */
-#include "CIDLib.hpp"
+#include "CIDJPEG_.hpp"
 
 extern "C"
 {
@@ -189,7 +189,7 @@ jpeg_stdio_src (j_decompress_ptr cinfo, TBinInStream* pstrmSrc)
 
     /* first time for this JPEG object? */
     if (cinfo->src == NULL)
-    {	
+    {
         cinfo->src = (struct jpeg_source_mgr *)
           (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
         			  SIZEOF(my_source_mgr));

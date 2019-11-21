@@ -3027,6 +3027,12 @@ tCIDLib::TVoid TFacCIDCtrls::ValidatePrevWindowPos(TPoint& pntToVal)
 }
 
 
+// Get a window's id
+tCIDCtrls::TWndId TFacCIDCtrls::widFromHandle(const tCIDCtrls::TWndHandle hwndSrc)
+{
+    return ::GetWindowLong(hwndSrc, GWL_ID);
+}
+
 
 // ---------------------------------------------------------------------------
 //  TFacCIDCtrls: Private, non-virtual methods
