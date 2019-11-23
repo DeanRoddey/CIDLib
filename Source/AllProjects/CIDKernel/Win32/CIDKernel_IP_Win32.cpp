@@ -33,9 +33,7 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
-//#include  <winsock2.h>
 #include    <Iphlpapi.h>
-#include    <ws2tcpip.h>
 #include    <netfw.h>
 
 
@@ -70,7 +68,7 @@ namespace CIDKernel_IP_WIN32
     //  c2MinVersion
     //      The minimium version of the WinSock subsystem that we require.
     // -----------------------------------------------------------------------
-    const TErrorMap amapErrors[] =
+    constexpr TErrorMap amapErrors[] =
     {
             { WSAEINTR          , kKrnlErrs::errcGen_Interrupted }
         ,   { WSAEBADF          , kKrnlErrs::errcData_InvalidHandle }
@@ -118,8 +116,8 @@ namespace CIDKernel_IP_WIN32
         ,   { WSAEDISCON        , kKrnlErrs::errcNet_Disconnect }
         ,   { WSANOTINITIALISED , kKrnlErrs::errcGen_NotInitialized }
     };
-    const tCIDLib::TCard4 c4ErrCount = tCIDLib::c4ArrayElems(amapErrors);
-    const tCIDLib::TCard2 c2MinVersion = 0x0202;
+    constexpr tCIDLib::TCard4 c4ErrCount = tCIDLib::c4ArrayElems(amapErrors);
+    constexpr tCIDLib::TCard2 c2MinVersion = 0x0202;
 
 
     // -----------------------------------------------------------------------
@@ -341,221 +339,6 @@ TCIDKrnlModule::bInitTermIP(const tCIDLib::EInitTerm eState)
     }
     return kCIDLib::True;
 }
-
-
-
-// ---------------------------------------------------------------------------
-//  Some platform specific methods of TKrnlIPAddr
-// ---------------------------------------------------------------------------
-
-//
-//  Set from a platform specific socket address. The passed value is assumed
-//  on this platform to be a SOCKADDR (or one of it's family specific variants.)
-//
-//  We are getting in incoming address here, so we flip the port to little
-//  endian mode if that's the local order.
-//
-tCIDLib::TBoolean
-TKrnlIPAddr::bFromSockAddr( const   tCIDLib::TVoid* const   pAddr
-                            , const tCIDLib::TCard4         c4Len
-                            ,       tCIDLib::TIPPortNum&    ippnToFill)
-{
-    // Cast it to the generic socket address class to look at the family
-    const SOCKADDR* pSockAddr = (const SOCKADDR*)pAddr;
-
-    tCIDLib::TBoolean bRet = kCIDLib::False;
-    if (pSockAddr->sa_family == AF_INET)
-    {
-        // It's V4
-        if (c4Len < sizeof(sockaddr_in))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-        const sockaddr_in* p4Addr = reinterpret_cast<const sockaddr_in*>(pSockAddr);
-
-        // If we are little endian, swap the port number bytes
-        #if defined(CIDLIB_LITTLEENDIAN)
-        ippnToFill = tCIDLib::TIPPortNum(TRawBits::c2SwapBytes(p4Addr->sin_port));
-        #else
-        ippnToFill = p4Addr->sin_port;
-        #endif
-
-        bRet = bSet
-        (
-            (tCIDLib::TCard1*)&p4Addr->sin_addr, 4, tCIDSock::EAddrTypes::IPV4, 0, 0
-        );
-    }
-     else if (pSockAddr->sa_family == AF_INET6)
-    {
-        // It's V6
-        if (c4Len < sizeof(sockaddr_in6))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-        const sockaddr_in6* p6Addr = reinterpret_cast<const sockaddr_in6*>(pSockAddr);
-
-        // If we are little endian, we have to flip some stuff
-        tCIDLib::TCard4 c4ScopeId;
-        tCIDLib::TCard4 c4FlowInfo;
-        #if defined(CIDLIB_LITTLEENDIAN)
-        ippnToFill = tCIDLib::TIPPortNum(TRawBits::c2SwapBytes(p6Addr->sin6_port));
-        c4ScopeId = TRawBits::c4SwapBytes(p6Addr->sin6_scope_id);
-        c4FlowInfo = TRawBits::c4SwapBytes(p6Addr->sin6_flowinfo);
-        #else
-        ippnToFill = p6Addr->sin6_port;
-        c4ScopeId = p6Addr->sin6_scope_id;
-        c4FlowInfo = p6Addr->sin6_flowinfo;
-        #endif
-
-        // And store the address info, passing in the native order values!
-        bRet = bSet
-        (
-            (tCIDLib::TCard1*)&p6Addr->sin6_addr
-            , kCIDSock::c4MaxIPAddrBytes
-            , tCIDSock::EAddrTypes::IPV6
-            , c4ScopeId
-            , c4FlowInfo
-        );
-    }
-     else
-    {
-        // Unknown, so reset it
-        Reset();
-    }
-    return bRet;
-}
-
-
-//
-//  Copies out our address info when the caller only wants the in_addr stuff,
-//  not the whole sockaddr_in stuff.
-//
-tCIDLib::TBoolean
-TKrnlIPAddr::bToInAddr( tCIDLib::TVoid* const   pAddr
-                        , tCIDLib::TCard4&      c4SzInOut) const
-{
-    TRawMem::SetMemBuf(pAddr, tCIDLib::TCard1(0), c4SzInOut);
-
-    if (m_eType == tCIDSock::EAddrTypes::IPV4)
-    {
-        if (c4SzInOut < sizeof(in_addr))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-
-        c4SzInOut = sizeof(in_addr);
-        TRawMem::CopyMemBuf(pAddr, m_ac1Data, 4);
-    }
-     else if (m_eType == tCIDSock::EAddrTypes::IPV6)
-    {
-        if (c4SzInOut < sizeof(in_addr6))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-
-        c4SzInOut = sizeof(in_addr6);
-        TRawMem::CopyMemBuf(pAddr, m_ac1Data, 16);
-    }
-     else
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_UnknownAddrType);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
-}
-
-
-//
-//  Set up a socket address in the passed data buffer. We get the size coming
-//  in so we can be sure it's large enough. And we set the actual size of the
-//  structure we put into it as the output.
-//
-//  We are creating an address for outgoing here, so we flip the port to
-//  network order if that's not the native endian order.
-//
-tCIDLib::TBoolean
-TKrnlIPAddr::bToSockAddr(       tCIDLib::TVoid* const  pAddr
-                        ,       tCIDLib::TCard4&       c4SzInOut
-                        , const tCIDLib::TIPPortNum    ippnPort) const
-{
-    TRawMem::SetMemBuf(pAddr, tCIDLib::TCard1(0), c4SzInOut);
-
-    if (m_eType == tCIDSock::EAddrTypes::IPV4)
-    {
-        if (c4SzInOut < sizeof(sockaddr_in))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-
-        sockaddr_in* pRealAddr = (sockaddr_in*)pAddr;
-        c4SzInOut = sizeof(sockaddr_in);
-        pRealAddr->sin_family = AF_INET;
-
-        // If we are little endian, swap the port number, else take it as is
-        pRealAddr->sin_port = tCIDLib::TCard2(ippnPort);
-        #if defined(CIDLIB_LITTLEENDIAN)
-        pRealAddr->sin_port = TRawBits::c2SwapBytes(pRealAddr->sin_port);
-        #endif
-
-        TRawMem::CopyMemBuf(&pRealAddr->sin_addr, m_ac1Data, 4);
-    }
-     else if (m_eType == tCIDSock::EAddrTypes::IPV6)
-    {
-        if (c4SzInOut < sizeof(sockaddr_in6))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-
-        sockaddr_in6* pRealAddr = (sockaddr_in6*)pAddr;
-        c4SzInOut = sizeof(sockaddr_in6);
-        pRealAddr->sin6_family = AF_INET6;
-
-        // Handle endian specific stuff
-        #if defined(CIDLIB_LITTLEENDIAN)
-        pRealAddr->sin6_port = TRawBits::c2SwapBytes(tCIDLib::TCard2(ippnPort));
-        pRealAddr->sin6_scope_id = TRawBits::c4SwapBytes(m_c4ScopeId);
-        pRealAddr->sin6_flowinfo = TRawBits::c4SwapBytes(m_c4FlowInfo);
-        #else
-        pRealAddr->sin6_port = tCIDLib::TCard2(ippnPort);
-        pRealAddr->sin6_scope_id = m_c4ScopeId;
-        pRealAddr->sin6_flowinfo = m_c4FlowInfo;
-        #endif
-
-        TRawMem::CopyMemBuf(&pRealAddr->sin6_addr, m_ac1Data, 16);
-    }
-     else
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_UnknownAddrType);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
-}
-
-
-//
-//  This one is more for higher level code that doesn't have access to the socket
-//  headers but needs to get raw IP address data. We allocate a buffer for them
-//  and tell them how big it is.
-//
-tCIDLib::TCard1*
-TKrnlIPAddr::pc1ToSockAddr(tCIDLib::TCard4& c4SzOut, const tCIDLib::TIPPortNum ippnPort) const
-{
-    // We call the other version with a buffer big enough for whatever it is
-    SOCKADDR_STORAGE Addr;
-    if (!bToSockAddr(&Addr, c4SzOut, ippnPort))
-        return nullptr;
-
-    tCIDLib::TCard1* pc1Ret = new tCIDLib::TCard1[c4SzOut];
-    TRawMem::CopyMemBuf(pc1Ret, &Addr, c4SzOut);
-    return pc1Ret;
-}
-
 
 
 

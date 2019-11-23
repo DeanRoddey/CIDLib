@@ -474,13 +474,6 @@ tCIDLib::TVoid TKrnlThread::Sleep(const tCIDLib::TCard4 c4WaitMillis)
 
 
 
-// Return the thread if of the primary thread (the first one started)
-tCIDLib::TThreadId TKrnlThread::tidPrimary()
-{
-    return CIDKernel_Thread_Win32::tidPrimary;
-}
-
-
 //
 //  Return the thread id of the calling thread, which is useful if the caller doesn't
 //  have or need to pay the cost of getting the thread object for the calling thread.
@@ -488,6 +481,13 @@ tCIDLib::TThreadId TKrnlThread::tidPrimary()
 tCIDLib::TThreadId TKrnlThread::tidCaller()
 {
     return ::GetCurrentThreadId();
+}
+
+
+// Return the thread if of the primary thread (the first one started)
+tCIDLib::TThreadId TKrnlThread::tidPrimary()
+{
+    return CIDKernel_Thread_Win32::tidPrimary;
 }
 
 
