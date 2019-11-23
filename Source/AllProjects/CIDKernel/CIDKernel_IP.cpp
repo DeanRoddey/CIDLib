@@ -348,13 +348,13 @@ TKrnlIPAddr::bToInAddr( tCIDLib::TVoid* const   pAddr
     }
      else if (m_eType == tCIDSock::EAddrTypes::IPV6)
     {
-        if (c4SzInOut < sizeof(in_addr6))
+        if (c4SzInOut < sizeof(in6_addr))
         {
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
             return kCIDLib::False;
         }
 
-        c4SzInOut = sizeof(in_addr6);
+        c4SzInOut = sizeof(in6_addr);
         TRawMem::CopyMemBuf(pAddr, m_ac1Data, 16);
     }
      else
