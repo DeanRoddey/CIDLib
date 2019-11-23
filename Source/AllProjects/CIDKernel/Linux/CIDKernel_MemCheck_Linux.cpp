@@ -47,7 +47,7 @@
 // ---------------------------------------------------------------------------
 TKrnlMemCheck::TKrnlMemCheck() :
 
-    m_pSnapShot(0)
+    m_pSnapShot(nullptr)
 {
 }
 
@@ -59,6 +59,11 @@ TKrnlMemCheck::~TKrnlMemCheck()
 // ---------------------------------------------------------------------------
 //  TKrnlMemCheck: Public, static methods
 // ---------------------------------------------------------------------------
+tCIDLib::TVoid TKrnlMemCheck::DumpLeaks()
+{
+}
+
+
 tCIDLib::TVoid TKrnlMemCheck::ReportToFile(const tCIDLib::TCh* const)
 {
 }
@@ -70,6 +75,12 @@ tCIDLib::TVoid TKrnlMemCheck::ReportToStdOut()
 
 
 tCIDLib::TVoid TKrnlMemCheck::ValidateHeap()
+{
+}
+
+tCIDLib::TVoid
+TKrnlMemCheck::SetHeapCheckLevel(const  tCIDLib::EHeapChkLevels eToSet
+                                , const tCIDLib::TBoolean       bNonFreeing)
 {
 }
 

@@ -152,6 +152,12 @@ tCIDLib::TBoolean TKrnlPathStr::bHasPath(const tCIDLib::TCh* const pszToCheck)
     return bFindPart(pszToCheck, c4Start, c4End, tCIDLib::EPathParts::Path);
 }
 
+tCIDLib::TBoolean TKrnlPathStr::bHasVolume(const tCIDLib::TCh* const pszToCheck)
+{
+    // Never the case on Linux, AFAIK
+    return kCIDLib::False;
+}
+
 tCIDLib::TBoolean
 TKrnlPathStr::bIsFullyQualified(const tCIDLib::TCh* const pszToCheck)
 {
@@ -225,6 +231,15 @@ TKrnlPathStr::bQueryPath(   const  tCIDLib::TCh* const pszSrc
                             , const tCIDLib::TCard4     c4MaxChars)
 {
     return bQueryPart(pszSrc, pszToFill, c4MaxChars, tCIDLib::EPathParts::Path);
+}
+
+
+tCIDLib::TBoolean
+TKrnlPathStr::bQueryVolume( const   tCIDLib::TCh* const
+                            ,       tCIDLib::TCh* const
+                            , const tCIDLib::TCard4)
+{
+    return kCIDLib::False;
 }
 
 

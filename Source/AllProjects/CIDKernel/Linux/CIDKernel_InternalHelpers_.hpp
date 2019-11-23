@@ -48,109 +48,113 @@ namespace TKrnlLinux
 
     class TThreadTimer
     {
-    public:
-        TThreadTimer(tCIDLib::TCard4 c4MilliSecs);
-        ~TThreadTimer();
+        public:
+            TThreadTimer(tCIDLib::TCard4 c4MilliSecs);
+            ~TThreadTimer();
 
-        tCIDLib::TBoolean bBegin();
-        tCIDLib::TBoolean bTriggered() const;
-        tCIDLib::TVoid    Cancel();
-        sigjmp_buf&       JumpEnvironment() const;
-        tCIDLib::TVoid    JumpOnSignal(tCIDLib::TBoolean bAction);
-        tCIDLib::TVoid    Reset();
+            tCIDLib::TBoolean bBegin();
+            tCIDLib::TBoolean bTriggered() const;
+            tCIDLib::TVoid    Cancel();
+            sigjmp_buf&       JumpEnvironment() const;
+            tCIDLib::TVoid    JumpOnSignal(tCIDLib::TBoolean bAction);
+            tCIDLib::TVoid    Reset();
 
-        static tCIDLib::TBoolean bInitTerm(tCIDLib::EInitTerm eInitTerm);
+            static tCIDLib::TBoolean bInitTerm(tCIDLib::EInitTerm eInitTerm);
 
-    private:
-        static tCIDLib::TVoid* __TimerFunc(tCIDLib::TVoid* pParam);
-        static tCIDLib::TVoid  __HandleSignal(tCIDLib::TSInt);
+        private:
+            static tCIDLib::TVoid* TimerFunc(tCIDLib::TVoid* pParam);
+            static tCIDLib::TVoid  HandleSignal(tCIDLib::TSInt);
 
-        tCIDLib::TThreadId   __tidThis;
-        tCIDLib::TCard4      __c4MilliSecs;
-        struct sigaction     __SavedSigAction;
-        sigset_t             __SavedSigSet;
+            tCIDLib::TThreadId   m_tidThis;
+            tCIDLib::TCard4      m_c4MilliSecs;
+            struct sigaction     m_SavedSigAction;
+            sigset_t             m_SavedSigSet;
     };
 
     class TRecursiveMutex
     {
-    public:
-        tCIDLib::TSInt  iDestroy()
-        {
-            return ::pthread_mutex_destroy(&__mtx);
-        }
+        public:
+            tCIDLib::TSInt  iDestroy()
+            {
+                return ::pthread_mutex_destroy(&m_mtx);
+            }
 
-        tCIDLib::TSInt  iInitialize();
-        tCIDLib::TSInt  iLock();
-        tCIDLib::TSInt  iUnlock();
+            tCIDLib::TSInt  iInitialize();
+            tCIDLib::TSInt  iLock();
+            tCIDLib::TSInt  iUnlock();
 
-        const pthread_mutex_t* pPthreadMutex() const
-        {
-            return &__mtx;
-        }
+            const pthread_mutex_t* pPthreadMutex() const
+            {
+                return &m_mtx;
+            }
 
-    private:
-        pthread_mutex_t     __mtx;
-        tCIDLib::TCard4     __c4Count;
-        tCIDLib::TThreadId  __tidOwner;
+        private:
+            pthread_mutex_t     m_mtx;
+            tCIDLib::TCard4     m_c4Count;
+            tCIDLib::TThreadId  m_tidOwner;
     };
 
     class TKrnlThreadInfo
     {
-    public:
-        TKrnlThreadInfo(TKrnlThread*    pKrnlThread
-                        , tCIDLib::TCh* pszName);
-        ~TKrnlThreadInfo();
+        public:
+            TKrnlThreadInfo
+            (
+                    TKrnlThread*    pKrnlThread
+                    , tCIDLib::TCh* pszName
+            );
 
-        tCIDLib::TCh*   pszName() const
-        {
-            return __pszName;
-        }
+            ~TKrnlThreadInfo();
 
-        TKrnlThread*    pkthrThis() const
-        {
-            return __pkthrThis;
-        }
+            tCIDLib::TCh*   pszName() const
+            {
+                return m_pszName;
+            }
 
-        static TKrnlThreadInfo*     pkthriInstance();
-        static tCIDLib::TBoolean    bInitTerm(tCIDLib::EInitTerm eInitTerm);
+            TKrnlThread*    pkthrThis() const
+            {
+                return m_pkthrThis;
+            }
 
-    private:
-        static pthread_key_t    __keyThreadInfo;
-        TKrnlThread*            __pkthrThis;
-        tCIDLib::TCh*           __pszName;
+            static TKrnlThreadInfo*     pkthriInstance();
+            static tCIDLib::TBoolean    bInitTerm(tCIDLib::EInitTerm eInitTerm);
+
+        private:
+            static pthread_key_t    m_keyThreadInfo;
+            TKrnlThread*            m_pkthrThis;
+            tCIDLib::TCh*           m_pszName;
     };
 
     class TTermFifo
     {
-    public:
-        TTermFifo(tCIDLib::TCard4 c4Size);
-        ~TTermFifo();
+        public:
+            TTermFifo(tCIDLib::TCard4 c4Size);
+            ~TTermFifo();
 
-        tCIDLib::TBoolean   bIsEmpty() const;
-        tCIDLib::TBoolean   bPush();
-        tCIDLib::TSCh       chPeek();
-        tCIDLib::TSCh       chPull();
-        tCIDLib::TVoid      Clear();
-        tCIDLib::TVoid      ClearPeeked();
-        tCIDLib::TVoid      ResetPeek();
+            tCIDLib::TBoolean   bIsEmpty() const;
+            tCIDLib::TBoolean   bPush();
+            tCIDLib::TSCh       chPeek();
+            tCIDLib::TSCh       chPull();
+            tCIDLib::TVoid      Clear();
+            tCIDLib::TVoid      ClearPeeked();
+            tCIDLib::TVoid      ResetPeek();
 
-    private:
-        tCIDLib::TSCh*  __pchFifo;
-        tCIDLib::TCard4 __c4Size;
-        tCIDLib::TCard4 __c4Head;
-        tCIDLib::TCard4 __c4Tail;
-        tCIDLib::TCard4 __c4Peek;
+        private:
+            tCIDLib::TSCh*  m_pchFifo;
+            tCIDLib::TCard4 m_c4Size;
+            tCIDLib::TCard4 m_c4Head;
+            tCIDLib::TCard4 m_c4Tail;
+            tCIDLib::TCard4 m_c4Peek;
     };
 
     class TTermValueNode
     {
-    public:
-        TTermValueNode();
-        ~TTermValueNode();
+        public:
+            TTermValueNode();
+            ~TTermValueNode();
 
-        TTermValueNode*     pnodeChild;
-        TTermValueNode*     pnodeSibling;
-        tCIDLib::TCard2     c2Code;
-        tCIDLib::TSCh       chThis;
+            TTermValueNode*     pnodeChild;
+            TTermValueNode*     pnodeSibling;
+            tCIDLib::TCard2     c2Code;
+            tCIDLib::TSCh       chThis;
     };
 }

@@ -65,6 +65,7 @@ namespace CIDKernel_Thread_Linux
     // ---------------------------------------------------------------------------
     tCIDLib::TThreadId  tidPrimary;
 
+
     // ---------------------------------------------------------------------------
     //  Local methods
     // ---------------------------------------------------------------------------
@@ -79,19 +80,24 @@ namespace CIDKernel_Thread_Linux
     {
         TStartupData* pData = static_cast<TStartupData*>(pStartUp);
 
+        //
         // We're waiting for the parent thread to initialize the thread
         // handle.
+        //
         ::pthread_mutex_lock(pData->pmtxStart);
+
         // Ok, it's done. Now clean up the mutex.
         ::pthread_mutex_unlock(pData->pmtxStart);
         ::pthread_mutex_destroy(pData->pmtxStart);
 
-        // Set the thread info for the program error signals' benefit
+        //
+        //  Set the thread info for the program error signals' benefit. This isn't a
+        //  leak. This guy sets himself as the per-thread info for this thread.
+        //
         new TKrnlLinux::TKrnlThreadInfo(pData->pkthrStarting, pData->pszName);
 
         // Now fire it up
-        tCIDLib::EExitCodes eRet =
-            pData->pfnCallBack(pData->pthrStarting, pData->pUserData);
+        const tCIDLib::EExitCodes eRet = pData->pfnCallBack(pData->pthrStarting, pData->pUserData);
 
         delete pData;
 
@@ -116,8 +122,11 @@ TCIDKrnlModule::bInitTermThread(const tCIDLib::EInitTerm eState)
         CIDKernel_Thread_Linux::tidPrimary = ::pthread_self();
     }
 
-    return TKrnlLinux::TThreadTimer::bInitTerm(eState)
-           && TKrnlLinux::TKrnlThreadInfo::bInitTerm(eState);
+    return
+    (
+        TKrnlLinux::TThreadTimer::bInitTerm(eState)
+        && TKrnlLinux::TKrnlThreadInfo::bInitTerm(eState)
+    );
 }
 
 
@@ -320,12 +329,6 @@ tCIDLib::TVoid TKrnlThread::Exit(const tCIDLib::EExitCodes eExitCode)
 }
 
 
-tCIDLib::TThreadId TKrnlThread::tidPrimary()
-{
-    return CIDKernel_Thread_Linux::tidPrimary;
-}
-
-
 tCIDLib::TVoid TKrnlThread::Sleep(const tCIDLib::TCard4 c4MilliSeconds)
 {
     struct timespec TimeRequested;
@@ -344,6 +347,24 @@ tCIDLib::TThreadId TKrnlThread::tidCaller()
 {
     return ::pthread_self();
 }
+
+
+tCIDLib::TThreadId TKrnlThread::tidPrimary()
+{
+    return CIDKernel_Thread_Linux::tidPrimary;
+}
+
+
+//
+//  Handle per-thread initializiation. We may need to call this for a special
+//  case other than from the internal thread startup method above. For now we
+//  don't have any.
+//
+tCIDLib::TVoid TKrnlThread::KrnlThreadInit()
+{
+
+}
+
 
 
 // ---------------------------------------------------------------------------

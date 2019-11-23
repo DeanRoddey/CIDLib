@@ -130,6 +130,11 @@ TProcessHandle::FormatToStr(        tCIDLib::TCh* const pszToFill
     TRawStr::bFormatVal(tCIDLib::TCard4(m_phprociThis->pidThis), pszToFill, c4MaxChars);
 }
 
+const TProcessHandleImpl& TProcessHandle::hprociThis() const
+{
+    return *m_phprociThis;
+}
+
 
 
 // ---------------------------------------------------------------------------

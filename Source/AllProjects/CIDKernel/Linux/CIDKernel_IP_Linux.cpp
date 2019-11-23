@@ -136,9 +136,8 @@ tCIDLib::TBoolean TCIDKrnlModule::bInitTermIP(const tCIDLib::EInitTerm)
 }
 
 
-
 // ---------------------------------------------------------------------------
-//  TKrnlSysInfo functions
+//  TKrnlTCPIP: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 
 tCIDLib::TBoolean
@@ -147,6 +146,7 @@ TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const     pszAppPath
                         ,       tCIDLib::TCh* const     pszErrText
                         , const tCIDLib::TCard4         c4MaxErrChars)
 {
+
     // Does this have any meaning on Linux?
     return kCIDLib::False;
 }                        
@@ -228,8 +228,6 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
                                , c4MaxAddrs
                                , c4AddrsFound);
     */
-
-   return kCIDLib::False;
 
     return kCIDLib::False;
 }

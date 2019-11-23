@@ -192,7 +192,10 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
     apszArgs[c4CurArg++] = L"-std=c++17";
 
     if (m_bDebug)
+    {
+        apszArgs[c4CurArg++] = L"-g";
         apszArgs[c4CurArg++] = L"-D_DEBUG";
+    }
     
 
     //

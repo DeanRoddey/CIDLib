@@ -66,7 +66,7 @@ namespace CIDKernel_Module_Linux
                                             ,       tCIDLib::TCh* const     pszToFill
                                             , const tCIDLib::TCard4         c4MaxChars)
     {
-        if (!::access(pszPath, X_OK))
+        if (::access(pszPath, X_OK) == 0)
         {
             tCIDLib::TSCh szRealPath[kCIDLib::c4MaxPathLen + 1];
             if (::realpath(pszPath, szRealPath))
@@ -119,11 +119,11 @@ namespace CIDKernel_Module_Linux
                     goto NextOne;
 
                 ::strcpy(szCurDir, pszCurPath);
-                if (szCurDir[c4CurLen - 1] != '\\')
+                if (szCurDir[c4CurLen - 1] != '/')
                 {
                     if (++c4Required > kCIDLib::c4MaxPathLen)
                         goto NextOne;
-                    ::strcat(szCurDir, "\\");
+                    ::strcat(szCurDir, "/");
                 }
                 ::strcat(szCurDir, pszLocLib);
 

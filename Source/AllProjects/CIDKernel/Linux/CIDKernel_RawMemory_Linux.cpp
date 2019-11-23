@@ -61,7 +61,6 @@ namespace CIDKernel_RawMemory_Linux
     // ---------------------------------------------------------------------------
     //  Local data
     // ---------------------------------------------------------------------------
-    pthread_mutex_t mtxCmpXchg = PTHREAD_MUTEX_INITIALIZER;
     TLinuxMemInfo* aLinuxMemInfo = nullptr;
     tCIDLib::TCard4 c4Capacity = 0;
 
@@ -227,29 +226,28 @@ TRawMem::bAllocSysMem(  const   tCIDLib::TCard4         c4Size
 }
 
 
-tCIDLib::TVoid* TRawMem::pPageBaseAdr(const tCIDLib::TVoid* pBufContained)
-{
-    CIDKernel_RawMemory_Linux::TLinuxMemInfo* pMemInfo = CIDKernel_RawMemory_Linux::FindInfo(pBufContained);
-    return pMemInfo ? pMemInfo->pRegion : nullptr;
-}
-
-
 tCIDLib::TCard4
 TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
                                 , const tCIDLib::TCard4     c4New
                                 , const tCIDLib::TCard4     c4Compare)
 {
-    ::pthread_mutex_lock(&CIDKernel_RawMemory_Linux::mtxCmpXchg);
+    tCIDLib::TCard4 c4Tmp = c4Compare;
+    const tCIDLib::TBoolean bRes = __atomic_compare_exchange
+    (
+        &c4ToFill
+        , &c4Tmp
+        , &c4New
+        , kCIDLib::False
+        , __ATOMIC_SEQ_CST
+        , __ATOMIC_SEQ_CST
+    );
 
-    tCIDLib::TCard4 c4Return = c4ToFill;
+    // If true, then it was equal to compare and so that we the original value
+    if (bRes)
+        return c4Compare;
 
-    if (c4ToFill == c4Compare)
-    {
-        c4ToFill = c4New;
-    }
-
-    ::pthread_mutex_unlock(&CIDKernel_RawMemory_Linux::mtxCmpXchg);
-    return c4Return;
+    // The original value is in c4Tmp
+    return c4Tmp;
 }
 
 
@@ -257,13 +255,58 @@ tCIDLib::TCard4
 TRawMem::c4Exchange(        tCIDLib::TCard4&        c4ToFill
                     , const tCIDLib::TCard4         c4New)
 {
-    ::pthread_mutex_lock(&CIDKernel_RawMemory_Linux::mtxCmpXchg);
+    tCIDLib::TCard4 c4Ret;
+    __atomic_exchange(&c4ToFill, &c4New, &c4Ret, __ATOMIC_SEQ_CST);
+    return c4Ret;
+}
 
-    tCIDLib::TCard4 c4Return = c4ToFill;
-    c4ToFill = c4New;
 
-    ::pthread_mutex_unlock(&CIDKernel_RawMemory_Linux::mtxCmpXchg);
-    return c4Return;
+//
+//  Returns the original value in ppToFill. If that's the same as pCompare,
+//  then the exchange occurred.
+//
+tCIDLib::TVoid*
+TRawMem::pCompareAndExchangeRawPtr(         tCIDLib::TVoid**    ppToFill
+                                    , const tCIDLib::TVoid*     pNew
+                                    , const tCIDLib::TVoid*     pCompare)
+{
+    tCIDLib::TVoid* pTmp = const_cast<tCIDLib::TVoid*>(pCompare);
+    const tCIDLib::TBoolean bRes = __atomic_compare_exchange
+    (
+        ppToFill
+        , &pTmp
+        , &pNew
+        , kCIDLib::False
+        , __ATOMIC_SEQ_CST
+        , __ATOMIC_SEQ_CST
+    );
+
+    // If true, then it was equal to compare and so that we the original value
+    if (bRes)
+        return const_cast<tCIDLib::TVoid*>(pCompare);
+
+    // The original value is in pTmp
+    return pTmp;
+}
+
+
+//
+//  Atomically updates the to fill pointer with the new pointer. Returns the
+//  original value that was replaced.
+//
+tCIDLib::TVoid*
+TRawMem::pExchangeRawPtr(tCIDLib::TVoid** ppToFill, const tCIDLib::TVoid* pNew)
+{
+    tCIDLib::TVoid* pRet = nullptr;
+    __atomic_exchange(ppToFill, const_cast<tCIDLib::TVoid**>(&pNew), &pRet, __ATOMIC_SEQ_CST);
+    return pRet;
+}
+
+
+tCIDLib::TVoid* TRawMem::pPageBaseAdr(const tCIDLib::TVoid* pBufContained)
+{
+    CIDKernel_RawMemory_Linux::TLinuxMemInfo* pMemInfo = CIDKernel_RawMemory_Linux::FindInfo(pBufContained);
+    return pMemInfo ? pMemInfo->pRegion : nullptr;
 }
 
 
