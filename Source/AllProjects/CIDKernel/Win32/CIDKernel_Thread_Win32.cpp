@@ -31,7 +31,12 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <process.h>
+#pragma     warning(pop)
 
 
 // ---------------------------------------------------------------------------

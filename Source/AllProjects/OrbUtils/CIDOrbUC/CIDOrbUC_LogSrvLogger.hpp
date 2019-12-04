@@ -47,6 +47,7 @@ class CIDORBUCEXP TLogSrvLogger : public TObject, public MLogger
         );
 
         TLogSrvLogger(const TLogSrvLogger&) = delete;
+        TLogSrvLogger(TLogSrvLogger&&) = delete;
 
         ~TLogSrvLogger();
 
@@ -55,6 +56,7 @@ class CIDORBUCEXP TLogSrvLogger : public TObject, public MLogger
         //  Public operators
         // -------------------------------------------------------------------
         TLogSrvLogger& operator=(const TLogSrvLogger&) = delete;
+        TLogSrvLogger& operator=(TLogSrvLogger&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -63,7 +65,7 @@ class CIDORBUCEXP TLogSrvLogger : public TObject, public MLogger
         tCIDLib::TVoid LogEvent
         (
             const   TLogEvent&              logevToLog
-        );
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -80,6 +82,9 @@ class CIDORBUCEXP TLogSrvLogger : public TObject, public MLogger
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
         tCIDLib::TVoid Initialize();
 
         tCIDLib::TVoid LogLocal

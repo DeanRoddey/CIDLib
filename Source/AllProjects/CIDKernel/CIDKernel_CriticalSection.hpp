@@ -75,9 +75,9 @@ class KRNLEXPORT TKrnlCritSec
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Enter() const;
+        tCIDLib::TVoid Enter() const noexcept;
 
-        tCIDLib::TVoid Exit() const;
+        tCIDLib::TVoid Exit() const noexcept;
 
 
     private :
@@ -130,7 +130,7 @@ class KRNLEXPORT TKrnlCritSecLocker
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Release()
+        tCIDLib::TVoid Release() noexcept
         {
             // If its been released or never was set, don't bother
             if (!m_pkcrsLocked)

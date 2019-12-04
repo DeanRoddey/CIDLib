@@ -843,6 +843,7 @@ TMEngHTTPClientInfo::TMEngHTTPClientInfo(TCIDMacroEngine& meOwner) :
     , m_c2MethId_SendRUPOST2(kMacroEng::c2BadId)
     , m_c2MethId_SendRUPUT(kMacroEng::c2BadId)
     , m_c2MethId_SetAddrType(kMacroEng::c2BadId)
+    , m_c2MethId_SetAuthInfo(kMacroEng::c2BadId)
     , m_c2MethId_SetAutoAuth(kMacroEng::c2BadId)
     , m_c2MethId_SetProxy(kMacroEng::c2BadId)
     , m_c2MethId_Reset(kMacroEng::c2BadId)
@@ -3062,6 +3063,7 @@ TMEngURLInfo::TMEngURLInfo(TCIDMacroEngine& meOwner) :
         , L"MEng.Formattable"
     )
     , m_c2MethId_BuildURL(kMacroEng::c2BadId)
+    , m_c2MethId_BuildURL2(kMacroEng::c2BadId)
     , m_c2MethId_Clear(kMacroEng::c2BadId)
     , m_c2MethId_DefCtor(kMacroEng::c2BadId)
     , m_c2MethId_Encode(kMacroEng::c2BadId)

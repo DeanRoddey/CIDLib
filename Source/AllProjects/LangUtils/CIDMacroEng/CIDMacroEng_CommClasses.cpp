@@ -211,6 +211,12 @@ TMEngCommCfgInfo::TMEngCommCfgInfo(TCIDMacroEngine& meOwner) :
     , m_c2TypeId_PortFlags(kMacroEng::c2BadId)
     , m_c2TypeId_RTSFlags(kMacroEng::c2BadId)
     , m_c2TypeId_StopBits(kMacroEng::c2BadId)
+    , m_pmeciDataBits(nullptr)
+    , m_pmeciDTRFlags(nullptr)
+    , m_pmeciParities(nullptr)
+    , m_pmeciPortFlags(nullptr)
+    , m_pmeciRTSFlags(nullptr)
+    , m_pmeciStopBits(nullptr)
 {
 }
 

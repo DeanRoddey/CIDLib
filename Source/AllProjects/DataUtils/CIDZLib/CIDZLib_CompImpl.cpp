@@ -60,6 +60,7 @@ TZLibCompImpl::TZLibCompImpl(const  tCIDZLib::ECompLevels   eLevel
     , m_c4BytesAvail(0)
     , m_c4CurOfs(0)
     , m_c4GoodLen(0)
+    , m_c4InflBuf(0)
     , m_c4InputBytes(0)
     , m_c4MaxChainLen(0)
     , m_c4MaxLazyLen(0)
@@ -68,6 +69,7 @@ TZLibCompImpl::TZLibCompImpl(const  tCIDZLib::ECompLevels   eLevel
     , m_c4TotalOut(0)
     , m_eCompLevel(eLevel)
     , m_eDataType(tCIDZLib_::EDataTypes::Unknown)
+    , m_eMode(tCIDZLib_::EModes::Compress)
     , m_eStrategy(eStrategy)
     , m_pc1LLAccum(nullptr)
     , m_pc1WndBuf(nullptr)
@@ -89,6 +91,8 @@ TZLibCompImpl::TZLibCompImpl(const  tCIDZLib::ECompLevels   eLevel
         kCIDZLib_::c4HeapSz
         , &s_stdLens
       )
+    , m_pstrmIn(nullptr)
+    , m_pstrmOut(nullptr)
 {
     // Set the tuning parameters that are controlled by the compression level
     const tCIDLib::TCard4 c4TblIndex = tCIDLib::c4EnumOrd(eLevel);

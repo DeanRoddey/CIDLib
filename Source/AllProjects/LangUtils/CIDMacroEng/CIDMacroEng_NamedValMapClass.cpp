@@ -178,6 +178,7 @@ TMEngNamedValMapInfo::TMEngNamedValMapInfo(TCIDMacroEngine& meOwner) :
     , m_c2MethId_ClearItem(kMacroEng::c2BadId)
     , m_c2MethId_DefCtor(kMacroEng::c2BadId)
     , m_c2MethId_GetValue(kMacroEng::c2BadId)
+    , m_c2MethId_GetValueIfExists(kMacroEng::c2BadId)
     , m_c2MethId_IsEmpty(kMacroEng::c2BadId)
     , m_c2MethId_ItemExists(kMacroEng::c2BadId)
     , m_c2MethId_ItemIsEmpty(kMacroEng::c2BadId)

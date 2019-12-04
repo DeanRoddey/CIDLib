@@ -360,7 +360,7 @@ TEnvironment::TEnvironment(const tCIDLib::TBoolean bInherit) :
     if (bInherit)
     {
         // Load up a list of key value pair objects
-        TKrnlEnvironment::TElem* pelemList;
+        TKrnlEnvironment::TElem* pelemList = nullptr;
 
         tCIDLib::TCard4 c4Count = 0;
         if (!TKrnlEnvironment::bQueryState(pelemList, c4Count))

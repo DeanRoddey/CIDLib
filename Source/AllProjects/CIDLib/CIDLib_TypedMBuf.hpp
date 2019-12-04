@@ -245,7 +245,7 @@ template <typename T> class TTypedMBuf : public TTypedMBufBase
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
+        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom) final
         {
             // Destroy the existing buffer and read in the new one
             delete m_pmbufData;
@@ -253,7 +253,7 @@ template <typename T> class TTypedMBuf : public TTypedMBufBase
             ::PolymorphicRead(m_pmbufData, strmToReadFrom);
         }
 
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
+        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const final
         {
             if (!m_pmbufData)
                 ThrowNotReady(CID_LINE);

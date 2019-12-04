@@ -117,6 +117,12 @@ TBinInStream::CheckRelationship(const   TObject* const  pobjTest
 // ---------------------------------------------------------------------------
 //  TBinInStream: Constructors and Destructor
 // ---------------------------------------------------------------------------
+
+//
+//	We don't initialize the cache array since it's just overhead we don't need. The
+//	index tells us what bytes are valid.
+//
+#pragma warning(suppress : 26495)
 TBinInStream::TBinInStream(TInStreamImpl* const pstrmiToAdopt) :
 
     m_c4CurAvail(0)
@@ -299,9 +305,9 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TCh& chToFill)
     //
     //  It was stored in a UTF-8 format, so read it in and convert. The
     //  first byte is the count of bytes that were flattened. This avoids
-    //  any byte order issues.
+    //  any byte order issues. Init enough to make the analyzer happy.
     //
-    tCIDLib::TCard1 ac1InBuf[kCIDLib::c4MaxUTF8Bytes];
+    tCIDLib::TCard1 ac1InBuf[kCIDLib::c4MaxUTF8Bytes] = {0};
 
     tCIDLib::TCard1 c1Count;
     c4ReadRawBuffer(&c1Count, sizeof(c1Count));
@@ -459,7 +465,7 @@ TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
         return 0;
 
     // We need to see it as a byte array for our purposes below
-    tCIDLib::TCard1* pc1Tar = reinterpret_cast<tCIDLib::TCard1*>(pBufToFill);
+    tCIDLib::TCard1* pc1Tar = static_cast<tCIDLib::TCard1*>(pBufToFill);
 
     // If the pushback stack is not empty, we get as much as we can out of that
     tCIDLib::TCard4 c4BytesRead = 0;
@@ -885,9 +891,9 @@ TBinInStream::ReadArray(        tCIDLib::TBoolean* const    abList
     //  back to local boolean format.
     //
     const tCIDLib::TCard4 c4Buf = 128;
-    tCIDLib::TCard1 ac1Tmp[c4Buf];
-    tCIDLib::TCard1* pc1Buf;
-    tCIDLib::TCard1* pc1End;
+    tCIDLib::TCard1 ac1Tmp[c4Buf] = {0};
+    tCIDLib::TCard1* pc1Buf = nullptr;
+    tCIDLib::TCard1* pc1End = nullptr;
 
     // Get a pointer we can move up through the caller's array
     tCIDLib::TBoolean* pbOut = abList;
@@ -983,12 +989,12 @@ TBinInStream::ReadArray(        tCIDLib::TCh* const pszToFill
 
     // It was written out in chunks of up to 255 UTF-8 bytes
     const tCIDLib::TCard4 c4BufSz = 255;
-    tCIDLib::TCard1 ac1Buf[c4BufSz + 1];
+    tCIDLib::TCard1 ac1Buf[c4BufSz + 1] = {0};
 
-    tCIDLib::TCard1 c1ChunkBytes;
-    tCIDLib::TCard2 c2NextChunkInd;
-    tCIDLib::TCard4 c4SrcDone;
-    tCIDLib::TCard4 c4OutChars;
+    tCIDLib::TCard1 c1ChunkBytes = 0;
+    tCIDLib::TCard2 c2NextChunkInd = 0;
+    tCIDLib::TCard4 c4SrcDone = 0;
+    tCIDLib::TCard4 c4OutChars = 0;
     tCIDLib::TCard4 c4Total = 0;
     tCIDLib::TCard2 c2ChunkInd = 1;
     TUTF8Converter  tcvtData;
@@ -1234,6 +1240,12 @@ tCIDLib::TVoid TBinInStream::SkipForwardBy(const tCIDLib::TCard4 c4SkipBy)
 // ---------------------------------------------------------------------------
 //  TBinInStream: Hidden Constructors
 // ---------------------------------------------------------------------------
+
+//
+//	We don't initialize the cache array since it's just overhead we don't need. The
+//	index tells us what bytes are valid.
+//
+#pragma warning(suppress : 26495)
 TBinInStream::TBinInStream() :
 
     m_c4CurAvail(0)

@@ -72,13 +72,13 @@ TKrnlCritSec::~TKrnlCritSec()
 // ---------------------------------------------------------------------------
 //  TKrnlCritSec: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TKrnlCritSec::Enter() const
+tCIDLib::TVoid TKrnlCritSec::Enter() const noexcept
 {
     ::EnterCriticalSection(&m_pPlatData->CritSec);
 }
 
 
-tCIDLib::TVoid TKrnlCritSec::Exit() const
+tCIDLib::TVoid TKrnlCritSec::Exit() const noexcept
 {
     ::LeaveCriticalSection(&m_pPlatData->CritSec);
 }

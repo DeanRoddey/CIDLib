@@ -74,8 +74,10 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
 
         TOrbId
         (
-            const   TOrbId&                 oidToCopy
+            const   TOrbId&                 oidSrc
         );
+
+        TOrbId(TOrbId&&) = delete;
 
         ~TOrbId();
 
@@ -85,17 +87,19 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
         // -------------------------------------------------------------------
         TOrbId& operator=
         (
-            const   TOrbId&                 oidToAssign
+            const   TOrbId&                 oidSrc
         );
+
+        TOrbId& operator=(TOrbId&&) = delete;
 
         tCIDLib::TBoolean operator==
         (
-            const   TOrbId&                 oidToCompare
+            const   TOrbId&                 oidSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TOrbId&                 oidToCompare
+            const   TOrbId&                 oidSrc
         )   const;
 
 
@@ -144,17 +148,17 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private :
@@ -189,7 +193,6 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TOrbId,TObject)
-        DefPolyDup(TOrbId)
 };
 
 
@@ -205,7 +208,8 @@ class CIDORBEXP TOrbIdKeyOps : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         TOrbIdKeyOps();
 
-        TOrbIdKeyOps(const TOrbIdKeyOps& kopsToCopy);
+        TOrbIdKeyOps(const TOrbIdKeyOps& kopsSrc);
+        TOrbIdKeyOps(TOrbIdKeyOps&&) = delete;
 
         ~TOrbIdKeyOps();
 
@@ -214,6 +218,7 @@ class CIDORBEXP TOrbIdKeyOps : public TObject, public MDuplicable
         //  Public operators
         // -------------------------------------------------------------------
         TOrbIdKeyOps& operator=(const TOrbIdKeyOps&);
+        TOrbIdKeyOps& operator=(TOrbIdKeyOps&&) = delete;
 
 
         // -------------------------------------------------------------------

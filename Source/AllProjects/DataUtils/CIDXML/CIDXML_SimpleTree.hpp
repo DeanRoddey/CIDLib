@@ -233,7 +233,7 @@ class CIDXMLEXP TXMLTreeNode : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const override;
 
 
     private :
@@ -287,7 +287,7 @@ class CIDXMLEXP TXMLTreeComment : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -366,7 +366,7 @@ class CIDXMLEXP TXMLTreeDecl : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -456,7 +456,7 @@ class CIDXMLEXP TXMLTreeDTD : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -544,7 +544,7 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -944,7 +944,7 @@ class CIDXMLEXP TXMLTreePI : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -1031,7 +1031,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -1163,8 +1163,12 @@ class CIDXMLEXP TXMLTreeDocument : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const final;
 
+
+        // -------------------------------------------------------------------
+        //  Protected, non-virtual methods
+        // -------------------------------------------------------------------
         tCIDLib::TVoid AddChild
         (
                     TXMLTreeNode* const     pxtnodeToAdopt

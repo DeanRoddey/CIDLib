@@ -80,6 +80,12 @@ REM Add a tweak directory where we put stuff we have to modify or pull down sepa
 SET INCLUDE=%CID_DEPENDS%\SDKTweaks;%INCLUDE%
 SET LIB=%CID_DEPENDS%\SDKTweaks;%LIB%
 
+
+REM ---------------------------------------------------------------------------
+REM  Needed for the code analysis stuff
+REM ---------------------------------------------------------------------------
+SET Esp.Extensions=CppCoreCheck.dll
+
 REM ---------------------------------------------------------------------------
 REM Add to the path the appropriate runtime library path
 REM ---------------------------------------------------------------------------

@@ -139,12 +139,16 @@ namespace tCIDLib
     template <typename T>
     constexpr T&& Forward(typename RemoveRef<T>::Type& t) noexcept
     {
+        // Often causes an unneeded cast warning, but we can never know when so suppress
+        #pragma warning(suppress : 26473)
         return static_cast<T&&>(t);
     }
 
     template <typename T>
     constexpr T&& Forward(typename RemoveRef<T>::type&& t) noexcept
     {
+        // Often causes an unneeded cast warning, but we can never know when so suppress
+        #pragma warning(suppress : 26473)
         return static_cast<T&&>(t);
     }
 

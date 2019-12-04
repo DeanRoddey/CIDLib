@@ -191,7 +191,7 @@ TCIDDataSrc::c4ReadBytes(       tCIDLib::TVoid* const   pToFill
                         , const tCIDLib::TBoolean       bReadAll)
 {
     // Look at the buffer as byte array internally
-    tCIDLib::TCard1* pc1Tar = reinterpret_cast<tCIDLib::TCard1*>(pToFill);
+    tCIDLib::TCard1* pc1Tar = static_cast<tCIDLib::TCard1*>(pToFill);
 
     tCIDLib::TCard4 c4RetCnt = 0;
     while (c4RetCnt < c4MaxBytes)
@@ -338,10 +338,10 @@ TCIDDataSrc::eGetLine(          TString&                strToFill
 
     // If we never set the return to anything else, then assume a timeout
     tCIDLib::ELineRes eRet = tCIDLib::ELineRes::Timeout;
-    TThread* pthrCaller = 0;
+    TThread* pthrCaller = nullptr;
     try
     {
-        tCIDLib::TCard4 c4Eaten;
+        tCIDLib::TCard4 c4Eaten = 0;
         tCIDLib::TEncodedTime enctCur = TTime::enctNow();
         while (enctCur < enctEnd)
         {

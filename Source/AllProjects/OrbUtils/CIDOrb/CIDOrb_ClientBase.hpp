@@ -54,7 +54,17 @@ class CIDORBEXP TCmdQItem
         // -------------------------------------------------------------------
         TCmdQItem();
 
+        TCmdQItem(const TCmdQItem&) = delete;
+        TCmdQItem(TCmdQItem&&) = delete;
+
         ~TCmdQItem();
+
+
+        // -------------------------------------------------------------------
+        //  Unimplemented
+        // -------------------------------------------------------------------
+        TCmdQItem& operator=(const TCmdQItem&) = delete;
+        TCmdQItem& operator=(TCmdQItem&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -128,14 +138,6 @@ class CIDORBEXP TCmdQItem
         TEvent                  m_evWait;
         TMutex                  m_mtxSync;
         TOrbCmd                 m_ocmdData;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TCmdQItem(const TCmdQItem&);
-        tCIDLib::TVoid operator=(const TCmdQItem&);
 };
 
 

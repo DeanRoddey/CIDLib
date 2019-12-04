@@ -111,7 +111,7 @@ static tCIDLib::TVoid AddToList(TFacility* const pfacNew)
 }
 
 
-static tCIDLib::TVoid RemoveFromList(TFacility* const pfacToRemove)
+static tCIDLib::TVoid RemoveFromList(const TFacility* const pfacToRemove)
 {
     // Lock the list while we search
     TCritSecLocker lockList(CIDLib_Facility::pcrsList());

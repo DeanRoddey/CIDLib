@@ -302,14 +302,14 @@ class TKeyedHashSet : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const
+                tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
                 {
                     if (clsTarget == clsThis())
                         return kCIDLib::True;
                     return TParent::bIsDescendantOf(clsTarget);
                 }
 
-                tCIDLib::TBoolean bIsValid() const
+                tCIDLib::TBoolean bIsValid() const override
                 {
                     if (!TParent::bIsValid())
                         return kCIDLib::False;
@@ -322,7 +322,7 @@ class TKeyedHashSet : public TCollection<TElem>
                     );
                 }
 
-                tCIDLib::TBoolean bNext()
+                tCIDLib::TBoolean bNext() override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -338,7 +338,7 @@ class TKeyedHashSet : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bPrevious()
+                tCIDLib::TBoolean bPrevious() override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -354,7 +354,7 @@ class TKeyedHashSet : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bReset()
+                tCIDLib::TBoolean bReset() override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -368,7 +368,7 @@ class TKeyedHashSet : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bSeekToEnd()
+                tCIDLib::TBoolean bSeekToEnd() override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -382,17 +382,17 @@ class TKeyedHashSet : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                const TClass& clsIsA() const
+                const TClass& clsIsA() const override
                 {
                     return clsThis();
                 }
 
-                const TClass& clsParent() const
+                const TClass& clsParent() const override
                 {
                     return TParent::clsThis();
                 }
 
-                const TElem& objRCur() const
+                const TElem& objRCur() const override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -594,19 +594,19 @@ class TKeyedHashSet : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const
+                tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
                 {
                     if (clsTarget == clsThis())
                         return kCIDLib::True;
                     return TParent::bIsDescendantOf(clsTarget);
                 }
 
-                const TClass& clsIsA() const
+                const TClass& clsIsA() const final
                 {
                     return clsThis();
                 }
 
-                const TClass& clsParent() const
+                const TClass& clsParent() const final
                 {
                     return TParent::clsThis();
                 }
@@ -840,36 +840,36 @@ class TKeyedHashSet : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
         {
             if (clsTarget == clsThis())
                 return kCIDLib::True;
             return TCollection<TElem>::bIsDescendantOf(clsTarget);
         }
 
-        tCIDLib::TBoolean bIsEmpty() const
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             return (m_c4CurElements == 0);
         }
 
-        tCIDLib::TCard4 c4ElemCount() const
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
              return m_c4CurElements;
         }
 
-        const TClass& clsIsA() const
+        const TClass& clsIsA() const final
         {
             return clsThis();
         }
 
-        const TClass& clsParent() const
+        const TClass& clsParent() const final
         {
             return TCollection<TElem>::clsThis();
         }
 
-        tCIDLib::TVoid RemoveAll()
+        tCIDLib::TVoid RemoveAll() final
         {
             TMtxLocker lockSync(this->pmtxLock());
             if (!m_c4CurElements)
@@ -898,7 +898,7 @@ class TKeyedHashSet : public TCollection<TElem>
              m_c4CurElements = 0;
         }
 
-        TElem& objAdd(const TElem& objToAdd)
+        TElem& objAdd(const TElem& objToAdd) final
         {
             TMtxLocker lockSync(this->pmtxLock());
 
@@ -928,13 +928,13 @@ class TKeyedHashSet : public TCollection<TElem>
             return m_apBuckets[hshElem]->objData();
         }
 
-        [[nodiscard]] TCursor* pcursNew() const
+        [[nodiscard]] TCursor* pcursNew() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);
         }
 
-        [[nodiscard]] TObject* pobjDuplicate() const
+        [[nodiscard]] TObject* pobjDuplicate() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TMyType(*this);
@@ -1527,7 +1527,7 @@ class TKeyedHashSet : public TCollection<TElem>
         //  passed. Null if we are aleady at teh first. The hash is updated to
         //  the bucket that the next one is found it otherwise.
         //
-        TNode* pnodeFindPrevious(TNode* pnodeLast, tCIDLib::THashVal& hshToUpdate) const
+        TNode* pnodeFindPrevious(const TNode* pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
             //
             //  Move back to the previous node in the current bucket. If its a legal
@@ -1579,7 +1579,7 @@ class TKeyedHashSet : public TCollection<TElem>
                     return pnodeCur;
                 pnodeCur = pnodeCur->pnodeNext();
             }
-            return kCIDLib::False;
+            return nullptr;
         }
 
         // Finds the passed key and returns the node and the key hash
@@ -1667,7 +1667,7 @@ class TKeyedHashSet : public TCollection<TElem>
                         this->DuplicateKey(objKey, CID_FILE, CID_LINE);
 
                     // Create a new node with a copy of the src's data
-                    pnodeCur = new TNode(pnodeSrc->objData(), 0);
+                    pnodeCur = new TNode(pnodeSrc->objData(), nullptr);
 
                     //
                     //  Set last node's next to this one, if there was a

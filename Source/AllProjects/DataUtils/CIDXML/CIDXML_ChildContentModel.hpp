@@ -56,6 +56,7 @@ class CIDXMLEXP TXMLChildCM : public TXMLContentModel
         );
 
         TXMLChildCM(const TXMLChildCM&) = delete;
+        TXMLChildCM(TXMLChildCM&&) = delete;
 
         ~TXMLChildCM();
 
@@ -64,6 +65,7 @@ class CIDXMLEXP TXMLChildCM : public TXMLContentModel
         //  Public operators
         // -------------------------------------------------------------------
         TXMLChildCM& operator=(const TXMLChildCM&) = delete;
+        TXMLChildCM& operator=(TXMLChildCM&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -74,13 +76,13 @@ class CIDXMLEXP TXMLChildCM : public TXMLContentModel
             const   tCIDLib::TCard4* const  pc4ChildIds
             , const tCIDLib::TCard4         c4ChildCount
             ,       tCIDLib::TCard4&        c4FailedAt
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const override;
+        )   const final;
 
 
     protected :
@@ -111,7 +113,7 @@ class CIDXMLEXP TXMLChildCM : public TXMLContentModel
 
         tCIDLib::TCard4* pc4NewTransTableEntry() const;
 
-        TXMLCMNode* pxcmnRewriteTree
+        [[nodiscard]] TXMLCMNode* pxcmnRewriteTree
         (
             const   TXMLCMSpecNode* const   pxcsnCur
         );
@@ -199,12 +201,6 @@ class CIDXMLEXP TXMLChildCM : public TXMLContentModel
         TXMLCMLeaf**        m_pxcmnLeaves;
         TXMLCMNode*         m_pxcmnRoot;
         TXMLCMSpecNode*     m_pxcsnRoot;
-
-
-        // -------------------------------------------------------------------
-        //  Magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TXMLChildCM,TXMLContentModel)
 };
 
 #pragma CIDLIB_POPPACK

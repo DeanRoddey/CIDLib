@@ -857,8 +857,8 @@ class TVector : public TCollection<TElem>
             //  range and put it back at the end. If down, then orphan the one after
             //  the range and put it back at the start.
             //
-            tCIDLib::TCard4 c4From;
-            tCIDLib::TCard4 c4To;
+            tCIDLib::TCard4 c4From = 0;
+            tCIDLib::TCard4 c4To = 0;
             if (bUp)
             {
                 c4From = c4StartIndex - 1;
@@ -1696,7 +1696,7 @@ class TVector : public TCollection<TElem>
 
                 catch(...)
                 {
-                    m_apElems[c4Index] = 0;
+                    m_apElems[c4Index] = nullptr;
                 }
             }
 
@@ -1704,12 +1704,7 @@ class TVector : public TCollection<TElem>
             //  Zero out all the slots now. For safety's sake, don't do the
             //  current count but the current alloc.
             //
-            TRawMem::SetMemBuf
-            (
-                m_apElems
-                , tCIDLib::TCard1(0)
-                , sizeof(TElem*) * m_c4CurAlloc
-            );
+            TRawMem::SetMemBuf(m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc);
 
             // And we now have zero elements
             m_c4CurCount = 0;

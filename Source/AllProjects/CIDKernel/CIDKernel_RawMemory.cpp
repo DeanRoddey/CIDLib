@@ -230,8 +230,8 @@ TRawMem::hshHashBufferAdler32(  const   tCIDLib::THashVal       hshAdler
     #define Do16(buf)    Do8(buf,0); Do8(buf,8);
 
     // Some constants uses in the calculation. Base is the largest 16 bit prime
-    const tCIDLib::TCard4 c4Base(65521);
-    const tCIDLib::TCard4 c4NMax(5552);
+    constexpr tCIDLib::TCard4 c4Base(65521);
+    constexpr tCIDLib::TCard4 c4NMax(5552);
 
     // If an empty buffer, return 1
     if (!c4Bytes)

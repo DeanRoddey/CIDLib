@@ -163,16 +163,14 @@ tCIDLib::TVoid TArea::operator|=(const TArea& areaToOR)
     if (&areaToOR == this)
         return;
 
-    tCIDLib::TInt4   i4L, i4R, i4B, i4T;
-
     //
     //  Take the smaller of the origin points and the larger of the upper
     //  and right points.
     //
-    i4L = tCIDLib::MinVal(m_i4X, areaToOR.m_i4X);
-    i4T = tCIDLib::MinVal(m_i4Y, areaToOR.m_i4Y);
-    i4R = tCIDLib::MaxVal(i4Right(), areaToOR.i4Right());
-    i4B = tCIDLib::MaxVal(i4Bottom(), areaToOR.i4Bottom());
+    const tCIDLib::TInt4 i4L = tCIDLib::MinVal(m_i4X, areaToOR.m_i4X);
+    const tCIDLib::TInt4 i4T = tCIDLib::MinVal(m_i4Y, areaToOR.m_i4Y);
+    const tCIDLib::TInt4 i4R = tCIDLib::MaxVal(i4Right(), areaToOR.i4Right());
+    const tCIDLib::TInt4 i4B = tCIDLib::MaxVal(i4Bottom(), areaToOR.i4Bottom());
 
     m_i4X   = i4L;
     m_i4Y   = i4T;
@@ -250,16 +248,14 @@ tCIDLib::TVoid TArea::operator&=(const TArea& areaToAND)
     if (&areaToAND == this)
         return;
 
-    tCIDLib::TInt4   i4L, i4T, i4R, i4B;
-
     //
     //  Take the larger of the origin points and the smaller of the upper
     //  and right points. Bump the L/R values for the calculations.
     //
-    i4L = tCIDLib::MaxVal(m_i4X, areaToAND.m_i4X);
-    i4T = tCIDLib::MaxVal(m_i4Y, areaToAND.m_i4Y);
-    i4R = tCIDLib::MinVal(i4Right(), areaToAND.i4Right());
-    i4B = tCIDLib::MinVal(i4Bottom(), areaToAND.i4Bottom());
+    const tCIDLib::TInt4 i4L = tCIDLib::MaxVal(m_i4X, areaToAND.m_i4X);
+    const tCIDLib::TInt4 i4T = tCIDLib::MaxVal(m_i4Y, areaToAND.m_i4Y);
+    const tCIDLib::TInt4 i4R = tCIDLib::MinVal(i4Right(), areaToAND.i4Right());
+    const tCIDLib::TInt4 i4B = tCIDLib::MinVal(i4Bottom(), areaToAND.i4Bottom());
 
     //
     //  See if there is any common area. If the right is less than the
@@ -287,16 +283,13 @@ tCIDLib::TBoolean TArea::operator==(const TArea& areaToTest) const
     if (this == &areaToTest)
         return kCIDLib::True;
 
-    if (m_i4X != areaToTest.m_i4X)
-        return kCIDLib::False;
-    if (m_i4Y != areaToTest.m_i4Y)
-        return kCIDLib::False;
-    if (m_c4CX != areaToTest.m_c4CX)
-        return kCIDLib::False;
-    if (m_c4CY != areaToTest.m_c4CY)
-        return kCIDLib::False;
-
-    return kCIDLib::True;
+    return
+    (
+        (m_i4X == areaToTest.m_i4X)
+        && (m_i4Y == areaToTest.m_i4Y)
+        && (m_c4CX == areaToTest.m_c4CX)
+        && (m_c4CY == areaToTest.m_c4CY)
+    );
 }
 
 tCIDLib::TBoolean TArea::operator!=(const TArea& areaToTest) const
@@ -430,10 +423,10 @@ tCIDLib::TBoolean TArea::bIntersects(const TArea& areaTest) const
         return kCIDLib::False;
 
     // Get the upper extremes of each area
-    tCIDLib::TInt4  i4ThisRight    = i4Right();
-    tCIDLib::TInt4  i4ThisBottom   = i4Bottom();
-    tCIDLib::TInt4  i4TestRight    = areaTest.i4Right();
-    tCIDLib::TInt4  i4TestBottom   = areaTest.i4Bottom();
+    const tCIDLib::TInt4  i4ThisRight    = i4Right();
+    const tCIDLib::TInt4  i4ThisBottom   = i4Bottom();
+    const tCIDLib::TInt4  i4TestRight    = areaTest.i4Right();
+    const tCIDLib::TInt4  i4TestBottom   = areaTest.i4Bottom();
 
     // Check the sides
     if (areaTest.m_i4X > i4ThisRight)
@@ -521,33 +514,29 @@ TArea::bParseFromText(  const   TString&            strText
     strTmp.Append(kCIDLib::chSpace);
     TStringTokenizer stokParse(&strText, strTmp);
 
-    tCIDLib::TBoolean bOk;
-    tCIDLib::TInt4 i4X;
-    tCIDLib::TInt4 i4Y;
-    tCIDLib::TCard4 c4CX;
-    tCIDLib::TCard4 c4CY;
+    tCIDLib::TBoolean bOk = kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    i4X = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TInt4 i4X = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    i4Y = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TInt4 i4Y = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    c4CX = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TCard4 c4CX = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    c4CY = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TCard4 c4CY = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
@@ -1717,7 +1706,7 @@ tCIDLib::TVoid
 TArea::DoAdjustments(   const   tCIDLib::TInt4  i4XOfs
                         , const tCIDLib::TInt4  i4YOfs)
 {
-    tCIDLib::TBoolean  bNegX, bNegY;
+    tCIDLib::TBoolean  bNegX = kCIDLib::False, bNegY = kCIDLib::False;
 
     // Get copies of the values that we can abuse
     tCIDLib::TInt4  i4XAdj = i4XOfs;
@@ -1734,10 +1723,7 @@ TArea::DoAdjustments(   const   tCIDLib::TInt4  i4XOfs
         bNegX = kCIDLib::True;
         i4XAdj *= -1;
     }
-     else
-    {
-        bNegX = kCIDLib::False;
-    }
+
     if (bNegX && (tCIDLib::TCard4(i4XAdj << 1) >= m_c4CX))
         i4XAdj = tCIDLib::TInt4(m_c4CX >> 1);
 
@@ -1746,10 +1732,7 @@ TArea::DoAdjustments(   const   tCIDLib::TInt4  i4XOfs
         bNegY = kCIDLib::True;
         i4YAdj *= -1;
     }
-     else
-    {
-        bNegY = kCIDLib::False;
-    }
+
     if (bNegY && (tCIDLib::TCard4(i4YAdj << 1) >= m_c4CY))
         i4YAdj = tCIDLib::TInt4(m_c4CY >> 1);
 

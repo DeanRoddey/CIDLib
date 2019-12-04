@@ -923,6 +923,40 @@ class TTest_FixedSizePool : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_FixedSizePoolPtr
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_FixedSizePoolPtr : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_FixedSizePoolPtr();
+
+        ~TTest_FixedSizePoolPtr();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_FixedSizePoolPtr,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TTest_FundVectorLambda
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------

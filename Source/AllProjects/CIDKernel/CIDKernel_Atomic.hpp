@@ -41,17 +41,15 @@
 //
 //      tCIDLib::TVoid SomeMethod()
 //      {
-//          tCIDLib::TBoolean bDone = atomDone.bValue();
-//          if (!bDone)
+//          if (!atomDone)
 //          {
 //              TBaseLock lockInit;
-//              bDone = atomDone.bValue();
-//              if (!bDone)
+//              if (!atomDone)
 //              {
 //                  // Do init
 //                  // ....
 //
-//                  atomDone.SetValue(kCIDLib::True);
+//                  atomDone.Set();
 //              }
 //          }
 //      }
@@ -64,7 +62,7 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  This stuff is not to be used for general purpose synchronization because
+//  1)  The base lock is not to be used for general purpose synchronization because
 //      it would become a bottleneck. Use it for fundamental bootstrapping stuff
 //      where single object (compiler provided) safe static init isn't enough.
 //
@@ -92,6 +90,7 @@ class KRNLEXPORT TBaseLock
         TBaseLock();
 
         TBaseLock(const TBaseLock&) = delete;
+        TBaseLock(TBaseLock&&) = delete;
 
         ~TBaseLock();
 
@@ -100,6 +99,8 @@ class KRNLEXPORT TBaseLock
         //  Public operators
         // -------------------------------------------------------------------
         TBaseLock& operator=(const TBaseLock&) = delete;
+        TBaseLock& operator=(TBaseLock&&) = delete;
+
         tCIDLib::TVoid* operator new(const size_t) = delete;
 };
 
@@ -116,7 +117,7 @@ class TAtomicCard
         // -------------------------------------------------------------------
         //  Constuctors and Destructor
         // -------------------------------------------------------------------
-        TAtomicCard() : m_c4Value(0) {}
+        TAtomicCard() noexcept : m_c4Value(0) {}
         TAtomicCard(const tCIDLib::TInt4 c4InitVal) : m_c4Value(c4InitVal) {}
         TAtomicCard(const TAtomicCard&) = delete;
         TAtomicCard(TAtomicCard&&) = delete;

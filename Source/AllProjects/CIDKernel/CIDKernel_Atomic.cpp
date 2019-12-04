@@ -34,7 +34,7 @@
 
 
 // To get a safely faulted in lock
-static TKrnlCritSec* pkcrsBaseLock()
+static TKrnlCritSec* pkcrsBaseLock() noexcept
 {
     static TKrnlCritSec kcrsBaseLock;
     return &kcrsBaseLock;

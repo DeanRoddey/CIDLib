@@ -47,7 +47,7 @@ template <class T> class TFundStack : public TFundColBase, public MDuplicable
 
             m_c4MaxElements(c4MaxElements)
             , m_c4Top(0)
-            , m_ptElements(0)
+            , m_ptElements(nullptr)
         {
             // Allocate the buffer
             m_ptElements = new T[m_c4MaxElements];
@@ -57,7 +57,7 @@ template <class T> class TFundStack : public TFundColBase, public MDuplicable
 
             m_c4MaxElements(fcolToCopy.m_c4MaxElements)
             , m_c4Top(fcolToCopy.m_c4Top)
-            , m_ptElements(0)
+            , m_ptElements(nullptr)
         {
             // Allocate the buffer and copy over the source contents
             m_ptElements = new T[m_c4MaxElements];
@@ -70,7 +70,7 @@ template <class T> class TFundStack : public TFundColBase, public MDuplicable
         ~TFundStack()
         {
             delete [] m_ptElements;
-            m_ptElements = 0;
+            m_ptElements = nullptr;
         }
 
 

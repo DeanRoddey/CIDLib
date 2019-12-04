@@ -45,7 +45,17 @@ class CIDXMLEXP TXMLValidator : public TObject
         // -------------------------------------------------------------------
         //  Destructor
         // -------------------------------------------------------------------
+        TXMLValidator(const TXMLValidator&) = delete;
+        TXMLValidator(TXMLValidator&&) = delete;
+
         ~TXMLValidator();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLValidator& operator=(const TXMLValidator&) = delete;
+        TXMLValidator& operator=(TXMLValidator&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -129,19 +139,23 @@ class CIDXMLEXP TXMLValidator : public TObject
         // -------------------------------------------------------------------
         //  Protected, non-virtual methods
         // -------------------------------------------------------------------
-        TXMLBufMgr& xbmOwner();
-        TXMLEntityMgr& xemOwner();
-        TXMLParserCore& xprsOwner();
+        TXMLBufMgr& xbmOwner()
+        {
+            return *m_pxbmOwner;
+        }
+
+        TXMLEntityMgr& xemOwner()
+        {
+            return *m_pxemOwner;
+        }
+
+        TXMLParserCore& xprsOwner()
+        {
+            return *m_pxprsOwner;
+        }
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLValidator(const TXMLValidator&);
-        tCIDLib::TVoid operator=(const TXMLValidator&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -170,23 +184,4 @@ class CIDXMLEXP TXMLValidator : public TObject
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TXMLValidator: Protected, non-virtual methods
-// ---------------------------------------------------------------------------
-inline TXMLBufMgr& TXMLValidator::xbmOwner()
-{
-    return *m_pxbmOwner;
-}
-
-inline TXMLEntityMgr& TXMLValidator::xemOwner()
-{
-    return *m_pxemOwner;
-}
-
-inline TXMLParserCore& TXMLValidator::xprsOwner()
-{
-    return *m_pxprsOwner;
-}
 

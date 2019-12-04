@@ -45,6 +45,7 @@ class CIDORBEXP TOrbSObjList : public TObject
         TOrbSObjList();
 
         TOrbSObjList(const TOrbSObjList&) = delete;
+        TOrbSObjList(TOrbSObjList&&) = delete;
 
         ~TOrbSObjList();
 
@@ -53,6 +54,7 @@ class CIDORBEXP TOrbSObjList : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TOrbSObjList& operator=(const TOrbSObjList&) = delete;
+        TOrbSObjList& operator=(TOrbSObjList&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -70,7 +72,7 @@ class CIDORBEXP TOrbSObjList : public TObject
 
         tCIDLib::TBoolean bRemove
         (
-                    TOrbServerBase* const   porbsToRemove
+            const   TOrbServerBase* const   porbsToRemove
         );
 
         tCIDLib::TCard4 c4ElemCount() const;
@@ -91,7 +93,7 @@ class CIDORBEXP TOrbSObjList : public TObject
 
         TOrbServerBase* porbsOrphan
         (
-                    TOrbServerBase* const   porbsToOrphan
+            const   TOrbServerBase* const   porbsToOrphan
             ,       tCIDLib::EAdoptOpts&    eAdopt
         );
 

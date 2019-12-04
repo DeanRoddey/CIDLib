@@ -112,7 +112,7 @@ class CIDMACROENGEXP TMacroEngParser : public TObject
         tCIDLib::TBoolean bParse
         (
             const   TString&                strMainClass
-            ,       TMemBuf&                mbufContent
+            , const TMemBuf&                mbufContent
             , const tCIDLib::TCard4         c4Bytes
             , const TString&                strEncoding
             ,       TMEngClassInfo*&        pmeciMainClass
@@ -408,13 +408,13 @@ class CIDMACROENGEXP TMacroEngParser : public TObject
 
         TMEngClassInfo& meciResolvePath
         (
-                    TParserSrc&             psrcClass
+            const   TParserSrc&             psrcClass
             , const TString&                strPath
         );
 
         TMEngClassInfo* pmeciCheckClassLoad
         (
-                    TParserSrc&             psrcClass
+            const   TParserSrc&             psrcClass
             , const TString&                strClassPath
         );
 

@@ -1263,8 +1263,9 @@ template <class TElem, class TKeyOps> class THashSet
             return nullptr;
         }
 
-        TNode* pnodeFindNext(THashSetNode<TElem>* const pnodeLast
-                            , tCIDLib::THashVal&        hshToUpdate) const
+        #pragma warning(suppress : 26461) // Can't make last node const
+        TNode* pnodeFindNext( TNode* const        pnodeLast
+                            , tCIDLib::THashVal&  hshToUpdate) const
         {
             // Move up to the next node
             TNode* m_pnodeCur = pnodeLast->pnodeNext();
@@ -1287,7 +1288,8 @@ template <class TElem, class TKeyOps> class THashSet
             return nullptr;
         }
 
-        TNode* pnodeFindPrevious(TNode* pnodeLast, tCIDLib::THashVal& hshToUpdate) const
+        #pragma warning(suppress : 26461) // Can't make last node const
+        TNode* pnodeFindPrevious(TNode* const pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
             //
             //  Move back to the previous node. If its a legal node, then we

@@ -195,29 +195,29 @@ namespace kCIDZLib_
     // -----------------------------------------------------------------------
     //  The bits for the compression type in block headers
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1NoComp  = 0;
-    const tCIDLib::TCard1   c1Fixed   = 1;
-    const tCIDLib::TCard1   c1Dynamic = 2;
-    const tCIDLib::TCard1   c1Reserved= 3;
+    constexpr tCIDLib::TCard1   c1NoComp  = 0;
+    constexpr tCIDLib::TCard1   c1Fixed   = 1;
+    constexpr tCIDLib::TCard1   c1Dynamic = 2;
+    constexpr tCIDLib::TCard1   c1Reserved= 3;
 
 
     // -----------------------------------------------------------------------
     //  Some ZLib constants related to tree and code sizes
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4BitLenCodes   = 19;
-    const tCIDLib::TCard2   c2EndBlock      = 256;
-    const tCIDLib::TCard4   c4DistCodes     = 30;
-    const tCIDLib::TCard4   c4DistCodeLen   = 512;
-    const tCIDLib::TCard4   c4LengthCodes   = 29;
-    const tCIDLib::TCard4   c4Literals      = 256;
-    const tCIDLib::TCard4   c4LLCodes       = c4Literals + 1 + c4LengthCodes;
-    const tCIDLib::TCard4   c4HeapSz        = (2 * c4LLCodes) + 1;
-    const tCIDLib::TCard4   c4MaxBits       = 15;
-    const tCIDLib::TCard4   c4MaxLenBits    = 7;
-    const tCIDLib::TCard2   c2Rep_3_6       = 16;
-    const tCIDLib::TCard2   c2RepZ_3_10     = 17;
-    const tCIDLib::TCard2   c2RepZ_11_138   = 18;
-    const tCIDLib::TCard4   c4TooFar        = 4096;
+    constexpr tCIDLib::TCard4   c4BitLenCodes   = 19;
+    constexpr tCIDLib::TCard2   c2EndBlock      = 256;
+    constexpr tCIDLib::TCard4   c4DistCodes     = 30;
+    constexpr tCIDLib::TCard4   c4DistCodeLen   = 512;
+    constexpr tCIDLib::TCard4   c4LengthCodes   = 29;
+    constexpr tCIDLib::TCard4   c4Literals      = 256;
+    constexpr tCIDLib::TCard4   c4LLCodes       = c4Literals + 1 + c4LengthCodes;
+    constexpr tCIDLib::TCard4   c4HeapSz        = (2 * c4LLCodes) + 1;
+    constexpr tCIDLib::TCard4   c4MaxBits       = 15;
+    constexpr tCIDLib::TCard4   c4MaxLenBits    = 7;
+    constexpr tCIDLib::TCard2   c2Rep_3_6       = 16;
+    constexpr tCIDLib::TCard2   c2RepZ_3_10     = 17;
+    constexpr tCIDLib::TCard2   c2RepZ_11_138   = 18;
+    constexpr tCIDLib::TCard4   c4TooFar        = 4096;
 
 
     // -----------------------------------------------------------------------
@@ -226,59 +226,59 @@ namespace kCIDZLib_
     //  window size, since as a practical matter we don't want to constantly
     //  have to be sliding the data downwards as we move through it.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4WndMask       =  0x7FFF;
-    const tCIDLib::TCard4   c4WndSz         =  0x8000;
-    const tCIDLib::TCard4   c4WndBufSz      = 0x10000;
-    const tCIDLib::TCard4   c4WndBits       = 15;
+    constexpr tCIDLib::TCard4   c4WndMask       =  0x7FFF;
+    constexpr tCIDLib::TCard4   c4WndSz         =  0x8000;
+    constexpr tCIDLib::TCard4   c4WndBufSz      = 0x10000;
+    constexpr tCIDLib::TCard4   c4WndBits       = 15;
 
 
     // -----------------------------------------------------------------------
     //  Min and match strings we'll try to match and related values
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MinMatch      = 3;
-    const tCIDLib::TCard4   c4MaxMatch      = 258;
-    const tCIDLib::TCard4   c4MinLookAhead  = c4MaxMatch - c4MinMatch + 1;
-    const tCIDLib::TCard4   c4MaxDist       = c4WndSz - c4MinLookAhead;
+    constexpr tCIDLib::TCard4   c4MinMatch      = 3;
+    constexpr tCIDLib::TCard4   c4MaxMatch      = 258;
+    constexpr tCIDLib::TCard4   c4MinLookAhead  = c4MaxMatch - c4MinMatch + 1;
+    constexpr tCIDLib::TCard4   c4MaxDist       = c4WndSz - c4MinLookAhead;
 
 
     // -----------------------------------------------------------------------
     //  Hash table related values
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4HashBits      = 15;
-    const tCIDLib::TCard4   c4HashSz        = 1UL << c4HashBits;
-    const tCIDLib::TCard4   c4HashMask      = 0x7FFF;
-    const tCIDLib::TCard4   c4HashShift     = (c4HashBits + c4MinMatch - 1)
+    constexpr tCIDLib::TCard4   c4HashBits      = 15;
+    constexpr tCIDLib::TCard4   c4HashSz        = 1UL << c4HashBits;
+    constexpr tCIDLib::TCard4   c4HashMask      = 0x7FFF;
+    constexpr tCIDLib::TCard4   c4HashShift     = (c4HashBits + c4MinMatch - 1)
                                               / c4MinMatch;
 
 
     // -----------------------------------------------------------------------
     //  Some buffer sizes
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4LitBufSz      = 0x4000;
+    constexpr tCIDLib::TCard4   c4LitBufSz      = 0x4000;
 
 
     // -----------------------------------------------------------------------
     //  The 'extra bits' arrays, for each possible length code, distance code,
     //  and bit length code.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   ac1ExtraLBits[c4LengthCodes] =
+    constexpr tCIDLib::TCard1   ac1ExtraLBits[c4LengthCodes] =
     {
         0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2
       , 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0
     };
 
-    const tCIDLib::TCard1   ac1ExtraDBits[c4DistCodes] =
+    constexpr tCIDLib::TCard1   ac1ExtraDBits[c4DistCodes] =
     {
         0, 0, 0, 0, 1, 1, 2, 2,  3,  3,  4,  4,  5,  5,  6
       , 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13
     };
 
-    const tCIDLib::TCard1   ac1ExtraLenBits[c4BitLenCodes] =
+    constexpr tCIDLib::TCard1   ac1ExtraLenBits[c4BitLenCodes] =
     {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7
     };
 
-    const tCIDLib::TCard4   ac4BitLenOrder[c4BitLenCodes]=
+    constexpr tCIDLib::TCard4   ac4BitLenOrder[c4BitLenCodes]=
     {
         16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
     };
@@ -298,7 +298,7 @@ namespace kCIDZLib_
         tCIDZLib_::ECompFuncs   eFunc;
     };
 
-    const StratInfo aStratTable[tCIDLib::c4EnumOrd(tCIDZLib::ECompLevels::Count)] =
+    constexpr StratInfo aStratTable[tCIDLib::c4EnumOrd(tCIDZLib::ECompLevels::Count)] =
     {
         {  0,    0,   0,    0, tCIDZLib_::ECompFuncs::Store }
       , {  4,    4,   8,    4, tCIDZLib_::ECompFuncs::Fast }
@@ -325,7 +325,7 @@ namespace kCIDZLib_
 // ---------------------------------------------------------------------------
 //  Some simple inline methods for speed
 // ---------------------------------------------------------------------------
-inline tCIDLib::TCard1 c1DistCode(const tCIDLib::TCard4 c4Dist)
+constexpr tCIDLib::TCard1 c1DistCode(const tCIDLib::TCard4 c4Dist)
 {
     if (c4Dist < 256)
         return ac1DistCode[c4Dist];

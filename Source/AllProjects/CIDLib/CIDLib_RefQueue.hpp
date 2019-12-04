@@ -306,7 +306,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
                     TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
-                    return *static_cast<const TRefQueueNode<TElem>*>(pnodeCur())->pobjData();
+                    return *pnodeCur()->pobjData();
                 }
 
                 // -----------------------------------------------------------
@@ -858,11 +858,11 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             // Get the head node. If none, nothing to do
             TNode* pnodeHead = static_cast<TNode*>(m_llstQueue.pnodeHead());
             if (!pnodeHead)
-                return 0;
+                return nullptr;
 
             // Compare it. If no match, return zero
             if (!pfnComp(*pnodeHead->pobjData(), objComp))
-                return 0;
+                return nullptr;
 
             // Orphan the object out of it and then flush the node
             TElem* pobjRet = pnodeHead->pobjOrphan();
@@ -940,7 +940,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
 
             TNode* pnodeLast = static_cast<TNode*>(m_llstQueue.pnodeTail());
             if (!pnodeLast)
-                return 0;
+                return nullptr;
 
             // Orphan the object out of the node, then remove the node.
             TElem* pobjRet = pnodeLast->pobjOrphan();

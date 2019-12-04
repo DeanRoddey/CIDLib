@@ -177,6 +177,7 @@ TMEngCard1Info::TMEngCard1Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
+    , m_c2MethId_Add(kMacroEng::c2BadId)
     , m_c2MethId_And(kMacroEng::c2BadId)
     , m_c2MethId_AndEq(kMacroEng::c2BadId)
     , m_c2MethId_Dec(kMacroEng::c2BadId)

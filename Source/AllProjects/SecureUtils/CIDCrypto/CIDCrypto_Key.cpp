@@ -134,7 +134,7 @@ TCryptoKey::TCryptoKey(const TCryptoKey& ckeySrc) :
 
 TCryptoKey::TCryptoKey(TCryptoKey&& ckeySrc) :
 
-    TCryptoKey()
+    TCryptoKey(2)
 {
     *this = tCIDLib::ForceMove(ckeySrc);
 }

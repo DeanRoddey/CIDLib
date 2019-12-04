@@ -67,9 +67,9 @@ TKrnlModule::bLoadMessages( const   TModuleHandle&          hmodSrc
     //  the message file, which should be in the same directory and have the
     //  same base part of the name (to which we add stuff.)
     //
-    const tCIDLib::TCard4 c4NameChars = kCIDLib::c4MaxPathLen;
-    tCIDLib::TCh szModPath[c4NameChars+1];
-    tCIDLib::TCh szModName[c4NameChars+1];
+    constexpr tCIDLib::TCard4 c4NameChars = kCIDLib::c4MaxPathLen;
+    tCIDLib::TCh szModPath[c4NameChars + 1];
+    tCIDLib::TCh szModName[c4NameChars + 1];
     if (!bRawQueryModName(hmodSrc, szModName, szModPath, c4NameChars))
         return kCIDLib::False;
     return bLoadMessages(szModPath, szModName, pmiToFill);

@@ -36,8 +36,13 @@
 // Bring in a DDK header with the IOCTLS we need
 #define     _ANONYMOUS_UNION
 #pragma     warning(disable : 4200)
+
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <ntddcdrm.h>
 #include    <ntddscsi.h>
+#pragma     warning(pop)
 
 //
 // We have to define a couple things that aren't in any of the headers

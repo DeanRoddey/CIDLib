@@ -150,6 +150,7 @@ AddTest(new TTest_StringTokens);
     AddTest(new TTest_SimplePool);
     AddTest(new TTest_SimplePoolPtr);
     AddTest(new TTest_FixedSizePool);
+    AddTest(new TTest_FixedSizePoolPtr);
 
     // Higher level stuff
     AddTest(new TTest_GenCache1);

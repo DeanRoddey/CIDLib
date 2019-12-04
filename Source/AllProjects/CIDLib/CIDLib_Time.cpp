@@ -1387,29 +1387,29 @@ bGetTimeVal(const   TString&            strToParse
 tCIDLib::TBoolean
 TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLocal)
 {
-    enum EStates
+    enum class EStates
     {
-        EState_StartWS
-        , EState_Year
-        , EState_YearSep
-        , EState_Month
-        , EState_MonthSep
-        , EState_Day
-        , EState_Divider
-        , EState_Hour
-        , EState_HourSep
-        , EState_Min
-        , EState_MinSep
-        , EState_Sec
-        , EState_TZSep
-        , EState_TZHour
-        , EState_TZHourSep
-        , EState_TZMin
-        , EState_TZEnd
-        , EState_EndWS
+        StartWS
+        , Year
+        , YearSep
+        , Month
+        , MonthSep
+        , Day
+        , Divider
+        , Hour
+        , HourSep
+        , Min
+        , MinSep
+        , Sec
+        , TZSep
+        , TZHour
+        , TZHourSep
+        , TZMin
+        , TZEnd
+        , EndWS
     };
 
-    EStates eState = EState_StartWS;
+    EStates eState = EStates::StartWS;
 
     // Default ones that don't have to be provided
     tCIDLib::TCard4 c4Year;
@@ -1440,34 +1440,34 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 
             switch(eState)
             {
-                case EState_StartWS :
+                case EStates::StartWS :
                     // Break out on a non-whitespace
                     if (TRawStr::bIsSpace(chCur))
                         c4Index++;
                     else
-                        eState = EState_Year;
+                        eState = EStates::Year;
                     break;
 
-                case EState_Year :
+                case EStates::Year :
                     // Has to be four digits
                     strToParse.CopyOutSubStr(strTmp, c4Index, 4);
                     c4Year = strTmp.c4Val(tCIDLib::ERadices::Dec);
                     c4Index += 4;
 
-                    eState = EState_YearSep;
+                    eState = EStates::YearSep;
                     break;
 
-                case EState_YearSep :
+                case EStates::YearSep :
                     // If a separator, then skip it
                     bGotYearSep = (chCur == kCIDLib::chHyphenMinus);
                     if (bGotYearSep)
                         c4Index++;
 
                     // Have to get the month now
-                    eState = EState_Month;
+                    eState = EStates::Month;
                     break;
 
-                case EState_Month :
+                case EStates::Month :
                     // Has to be two digits
                     strToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     c4Month = strTmp.c4Val(tCIDLib::ERadices::Dec);
@@ -1486,15 +1486,15 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     {
                         if (!bGotYearSep)
                             return kCIDLib::False;
-                        eState = EState_Divider;
+                        eState = EStates::Divider;
                     }
                      else
                     {
-                        eState = EState_MonthSep;
+                        eState = EStates::MonthSep;
                     }
                     break;
 
-                case EState_MonthSep :
+                case EStates::MonthSep :
                     //
                     //  If a separator, eat it, else move to the day. If not, and
                     //  we got a year separator, then that's a failure.
@@ -1505,10 +1505,10 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         return kCIDLib::False;
 
                     // We have to be moving to the day
-                    eState = EState_Day;
+                    eState = EStates::Day;
                     break;
 
-                case EState_Day :
+                case EStates::Day :
                     // Has to be two digits, since we don't support the ordinal or week types
                     strToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     c4Day = strTmp.c4Val(tCIDLib::ERadices::Dec);
@@ -1522,20 +1522,20 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     bSkippedDay = kCIDLib::False;
 
                     // Next is the divider if anything left
-                    eState = EState_Divider;
+                    eState = EStates::Divider;
                     break;
 
-                case EState_Divider :
+                case EStates::Divider :
                     // If a divider, skip it. Either way, move to the hour now
                     if (chCur == L'T')
                     {
                         bGotDivider = kCIDLib::True;
                         c4Index++;
                     }
-                    eState = EState_Hour;
+                    eState = EStates::Hour;
                     break;
 
-                case EState_Hour :
+                case EStates::Hour :
                     if (bGetTimeVal(strToParse, c4Count, c4Index, strTmp, c4Hour, f8DecVal))
                     {
                         //
@@ -1543,11 +1543,11 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         //  this.
                         //
                         c4Min = tCIDLib::TCard4(60.0 * f8DecVal);
-                        eState = EState_TZSep;
+                        eState = EStates::TZSep;
                     }
                      else
                     {
-                        eState = EState_HourSep;
+                        eState = EStates::HourSep;
                     }
 
                     //
@@ -1564,7 +1564,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         return kCIDLib::False;
                     break;
 
-                case EState_HourSep :
+                case EStates::HourSep :
                     //
                     //  Skip the hour separator if we have one. If we hit the TZ sep
                     //  then move to TZ mode. The only thing required is the hour.
@@ -1572,18 +1572,18 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     if ((chCur == kCIDLib::chHyphenMinus)
                     ||  (chCur == kCIDLib::chPlusSign))
                     {
-                        eState = EState_TZSep;
+                        eState = EStates::TZSep;
                     }
                      else
                     {
                         // Skip the separator if there
                         if (chCur == kCIDLib::chColon)
                             c4Index++;
-                        eState = EState_Min;
+                        eState = EStates::Min;
                     }
                     break;
 
-                case EState_Min :
+                case EStates::Min :
                     // Get the minute value
                     if (bGetTimeVal(strToParse, c4Count, c4Index, strTmp, c4Min, f8DecVal))
                     {
@@ -1592,12 +1592,12 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         //  this.
                         //
                         c4Sec = tCIDLib::TCard4(60.0 * f8DecVal);
-                        eState = EState_TZSep;
+                        eState = EStates::TZSep;
                     }
                      else if (c4Index < c4Count)
                     {
                         // Move up to the seconds
-                        eState = EState_MinSep;
+                        eState = EStates::MinSep;
                     }
 
                     // Make sure it's a valid minute
@@ -1605,7 +1605,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         return kCIDLib::False;
                     break;
 
-                case EState_MinSep :
+                case EStates::MinSep :
                     //
                     //  If we hit the time zone separator, then move to that. Else
                     //  skip the separator and move to the second.
@@ -1613,7 +1613,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     if ((chCur == kCIDLib::chHyphenMinus)
                     ||  (chCur == kCIDLib::chPlusSign))
                     {
-                        eState = EState_TZSep;
+                        eState = EStates::TZSep;
                     }
                      else
                     {
@@ -1626,11 +1626,11 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         else if (bGotHourSep)
                             return kCIDLib::False;
 
-                        eState = EState_Sec;
+                        eState = EStates::Sec;
                     }
                     break;
 
-                case EState_Sec :
+                case EStates::Sec :
                 {
                     // We'll set up millis if we get a decimal value
                     if (bGetTimeVal(strToParse, c4Count, c4Index, strTmp, c4Sec, f8DecVal))
@@ -1641,11 +1641,11 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         return kCIDLib::False;
 
                     // Check for time zone next
-                    eState = EState_TZSep;
+                    eState = EStates::TZSep;
                     break;
                 }
 
-                case EState_TZSep :
+                case EStates::TZSep :
                     //
                     //  If just a Z, then we are done. If a + or -, then move to the
                     //
@@ -1653,47 +1653,47 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     ||  (chCur == kCIDLib::chPlusSign))
                     {
                         c4Index++;
-                        eState = EState_TZHour;
+                        eState = EStates::TZHour;
                         bNegTZ = (chCur == kCIDLib::chHyphenMinus);
                     }
                      else
                     {
-                        eState = EState_TZEnd;
+                        eState = EStates::TZEnd;
                     }
                     break;
 
-                case EState_TZHour :
+                case EStates::TZHour :
                     // Get the hours part of the offset
                     strToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     i4TZOfs = strTmp.i4Val(tCIDLib::ERadices::Dec) * 60;
                     c4Index += 2;
 
-                    eState = EState_TZHourSep;
+                    eState = EStates::TZHourSep;
                     break;
 
-                case EState_TZHourSep :
+                case EStates::TZHourSep :
                     if (chCur == kCIDLib::chColon)
                         c4Index++;
-                    eState = EState_TZMin;
+                    eState = EStates::TZMin;
                     break;
 
 
-                case EState_TZMin :
+                case EStates::TZMin :
                     strToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     i4TZOfs += strTmp.i4Val(tCIDLib::ERadices::Dec);
                     c4Index += 2;
-                    eState = EState_TZEnd;
+                    eState = EStates::TZEnd;
                     break;
 
-                case EState_TZEnd :
+                case EStates::TZEnd :
                     if (chCur != L'Z')
                         return kCIDLib::False;
 
                     c4Index++;
-                    eState = EState_EndWS;
+                    eState = EStates::EndWS;
                     break;
 
-                case EState_EndWS :
+                case EStates::EndWS :
                     // If not whitespace, we failed
                     if (!TRawStr::bIsSpace(chCur))
                         return kCIDLib::False;
@@ -1714,7 +1714,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
         //  The minimum would be a YYYYMM or YYYY-MM. Otherwise, we have already
         //  caught any other errors.
         //
-        if (eState < EState_Month)
+        if (eState < EStates::Month)
             return kCIDLib::False;
 
         // Set us from the collected values
@@ -2610,11 +2610,11 @@ TTime::ParseFromText(const  TString&        strSrc
                     , const tCIDLib::TCh    chTimeSep
                     , const tCIDLib::TCh    chTZSep)
 {
-    enum EHourTypes
+    enum class EHourTypes
     {
-        EHourType_24
-        , EHourType_AM
-        , EHourType_PM
+        Hour24
+        , HourAM
+        , HourPM
     };
 
     //
@@ -2627,8 +2627,8 @@ TTime::ParseFromText(const  TString&        strSrc
     tCIDLib::TCard4     c4Minute = 0;
     tCIDLib::TCard4     c4Second = 0;
     tCIDLib::TCard4     c4MilliSecs = 0;
-    tCIDLib::EWeekDays  eDay;
-    EHourTypes          eHourType = EHourType_24;
+    tCIDLib::EWeekDays  eDay = tCIDLib::EWeekDays::Count;
+    EHourTypes          eHourType = EHourTypes::Hour24;
     tCIDLib::EMonths    eMonth = tCIDLib::EMonths::January;
     tCIDLib::TInt4      i4TZOfs = i4Offset();
 
@@ -2759,9 +2759,9 @@ TTime::ParseFromText(const  TString&        strSrc
                     if (eComp == tCIDLib::ETimeComps::AMPM)
                     {
                         if (strTok == TLocale::strAMString())
-                            eHourType = EHourType_AM;
+                            eHourType = EHourTypes::HourAM;
                         else if (strTok == TLocale::strPMString())
-                            eHourType = EHourType_PM;
+                            eHourType = EHourTypes::HourPM;
                         else
                             bGotIt = kCIDLib::False;
                     }
@@ -3042,18 +3042,10 @@ TTime::ParseFromText(const  TString&        strSrc
     //  adjust the hour if we got a 12 hour format, based on the AM/PM
     //  designation.
     //
-    if (eHourType == EHourType_PM)
+    if (eHourType == EHourTypes::HourPM)
         c4Hour += 12;
 
-    if (!m_ktmsThis.bFromDetails
-    (
-        c4Year
-        , eMonth
-        , c4Day
-        , c4Hour
-        , c4Minute
-        , c4Second
-        , 0))
+    if (!m_ktmsThis.bFromDetails(c4Year, eMonth, c4Day, c4Hour, c4Minute, c4Second, 0))
     {
         facCIDLib().ThrowKrnlErr
         (

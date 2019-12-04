@@ -36,7 +36,7 @@ private : \
 using TParent = ParentClass; \
 public  :   \
 static const TClass& clsThis(); \
-tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const \
+tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override \
 { \
     if (clsTarget == clsThis()) \
         return kCIDLib::True; \
@@ -44,12 +44,12 @@ tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const \
         return ParentClass::bIsDescendantOf(clsTarget); \
 } \
 \
-const TClass& clsIsA() const \
+const TClass& clsIsA() const override \
 { \
     return clsThis(); \
 } \
 \
-const TClass& clsParent() const \
+const TClass& clsParent() const override \
 { \
     return ParentClass::clsThis(); \
 }
@@ -62,17 +62,11 @@ using TParent = ParentClass; \
 public  : \
 static const TClass& clsThis() \
 { \
-    static const TClass* pclsThis = nullptr; \
-    if (!pclsThis) \
-    { \
-        TBaseLock lockInit; \
-        if (!pclsThis) \
-            pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
-    } \
+    static const TClass* pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
     return *pclsThis; \
 } \
 \
-tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const \
+tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override \
 { \
     if (clsTarget == clsThis()) \
         return kCIDLib::True; \
@@ -80,12 +74,12 @@ tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const \
         return ParentClass::bIsDescendantOf(clsTarget); \
 } \
 \
-const TClass& clsIsA() const \
+const TClass& clsIsA() const override \
 { \
     return clsThis(); \
 } \
 \
-const TClass& clsParent() const \
+const TClass& clsParent() const override \
 { \
     return ParentClass::clsThis(); \
 }
@@ -99,13 +93,7 @@ const TClass& clsParent() const \
 #define RTTIDecls(Class,ParentClass) \
 const TClass& Class::clsThis() \
 { \
-    static const TClass* pclsThis = nullptr; \
-    if (!pclsThis) \
-    { \
-        TBaseLock lockInit; \
-        if (!pclsThis) \
-            pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
-    } \
+    static const TClass* pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
     return *pclsThis; \
 }
 
@@ -114,13 +102,7 @@ const TClass& Class::clsThis() \
 static const TTypeFactoryKicker Class##Kicker(CIDLib_MakeLStr2(Class), pMakeNew_##Class); \
 const TClass& Class::clsThis() \
 { \
-    static const TClass* pclsThis = nullptr; \
-    if (!pclsThis) \
-    { \
-        TBaseLock lockInit; \
-        if (!pclsThis) \
-            pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
-    } \
+    static const TClass* pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
     return *pclsThis; \
 }
 

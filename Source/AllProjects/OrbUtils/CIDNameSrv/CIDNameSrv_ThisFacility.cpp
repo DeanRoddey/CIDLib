@@ -60,6 +60,7 @@ TFacCIDNameSrv::TFacCIDNameSrv() :
     )
     , m_bNoLease(kCIDLib::False)
     , m_c4MaxClients(0)
+    , m_eReturn(tCIDLib::EExitCodes::InitFailed)
     , m_ippnListen(kCIDOrbUC::ippnNameSrvDefPort)
     , m_pevWait(nullptr)
     , m_porbsCache(nullptr)

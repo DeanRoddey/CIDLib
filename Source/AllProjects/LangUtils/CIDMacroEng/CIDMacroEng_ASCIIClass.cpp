@@ -86,6 +86,9 @@ TMEngASCIIInfo::TMEngASCIIInfo(TCIDMacroEngine& meOwner) :
     , m_c2MethId_IsHexDigit(kMacroEng::c2BadId)
     , m_c2MethId_ToDecDigit(kMacroEng::c2BadId)
     , m_c2MethId_ToHexDigit(kMacroEng::c2BadId)
+    , m_c4Err_NotDecDig(kCIDLib::c4MaxCard)
+    , m_c4Err_NotHexDig(kCIDLib::c4MaxCard)
+    , m_c4Err_Overflow(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)
 {
 }

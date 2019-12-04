@@ -41,6 +41,7 @@ class TFacCIDLogSrv : public TFacility, public MSignalHandler
         TFacCIDLogSrv();
 
         TFacCIDLogSrv(const TFacCIDLogSrv&) = delete;
+        TFacCIDLogSrv(TFacCIDLogSrv&&) = delete;
 
         ~TFacCIDLogSrv();
 
@@ -49,16 +50,21 @@ class TFacCIDLogSrv : public TFacility, public MSignalHandler
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDLogSrv& operator=(const TFacCIDLogSrv&) = delete;
+        TFacCIDLogSrv& operator=(TFacCIDLogSrv&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bHandleSignal
+        (
+            const   tCIDLib::ESignals       eSignal
+        )   final;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bHandleSignal
-        (
-            const   tCIDLib::ESignals       eSignal
-        );
-
         tCIDLib::EExitCodes eMainThread
         (
                     TThread&                thrThis

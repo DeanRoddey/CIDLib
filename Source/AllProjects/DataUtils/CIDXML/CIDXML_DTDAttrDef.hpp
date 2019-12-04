@@ -82,7 +82,7 @@ class CIDXMLEXP TDTDAttrDef : public TXMLAttrDef
 
         TDTDAttrDef
         (
-            const   TDTDAttrDef&            xadToCopy
+            const   TDTDAttrDef&            xadSrc
         );
 
         ~TDTDAttrDef();
@@ -93,7 +93,7 @@ class CIDXMLEXP TDTDAttrDef : public TXMLAttrDef
         // -------------------------------------------------------------------
         TDTDAttrDef& operator=
         (
-            const   TDTDAttrDef&            xadToAssign
+            const   TDTDAttrDef&            xadSRc
         );
 
 
@@ -104,9 +104,9 @@ class CIDXMLEXP TDTDAttrDef : public TXMLAttrDef
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const;
+        )   const final;
 
-        const TString& strFullName() const;
+        const TString& strFullName() const final;
 
 
         // -------------------------------------------------------------------

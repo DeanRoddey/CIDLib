@@ -62,6 +62,7 @@ class CIDLIBEXP TCIDModuleInfo :
         );
 
         TCIDModuleInfo(const TCIDModuleInfo&) = default;
+        TCIDModuleInfo(TCIDModuleInfo&&) = delete;
 
         ~TCIDModuleInfo() = default;
 
@@ -70,6 +71,7 @@ class CIDLIBEXP TCIDModuleInfo :
         //  Public operators
         // -------------------------------------------------------------------
         TCIDModuleInfo& operator=(const TCIDModuleInfo&) = default;
+        TCIDModuleInfo& operator=(TCIDModuleInfo&&) = delete;
 
         tCIDLib::TBoolean operator==
         (
@@ -134,17 +136,17 @@ class CIDLIBEXP TCIDModuleInfo :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const override;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private             :

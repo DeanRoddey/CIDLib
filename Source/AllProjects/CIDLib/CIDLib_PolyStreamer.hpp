@@ -317,7 +317,7 @@ template <class TElem> class TPolyStreamer : public TObject
             //  See if this object's type has been streamed out yet. If its a
             //  new class, then we stream out the class record first.
             //
-            tCIDLib::TCard2 c2ThisId;
+            tCIDLib::TCard2 c2ThisId = 0;
             const TClass&   clsThisObj = objToStream.clsIsA();
 
             if (bCheckOrAdd(clsThisObj, c2ThisId))

@@ -111,13 +111,13 @@ namespace kCIDGraphDev
     // ------------------------------------------------------------------------
     //  These are the invalid values for some graphics oriented types
     // ------------------------------------------------------------------------
-    constexpr tCIDGraphDev::TBmpHandle      hbmpInvalid     = 0;
-    constexpr tCIDGraphDev::TBrushHandle    hbrInvalid      = 0;
-    constexpr tCIDGraphDev::TDeviceHandle   hdevInvalid     = 0;
-    constexpr tCIDGraphDev::TFontHandle     hfontInvalid    = 0;
-    constexpr tCIDGraphDev::TIconHandle     hicoInvalid     = 0;
-    constexpr tCIDGraphDev::TPenHandle      hpenInvalid     = 0;
-    constexpr tCIDGraphDev::TRegionHandle   hrgnInvalid     = 0;
+    constexpr tCIDGraphDev::TBmpHandle      hbmpInvalid     = nullptr;
+    constexpr tCIDGraphDev::TBrushHandle    hbrInvalid      = nullptr;
+    constexpr tCIDGraphDev::TDeviceHandle   hdevInvalid     = nullptr;
+    constexpr tCIDGraphDev::TFontHandle     hfontInvalid    = nullptr;
+    constexpr tCIDGraphDev::TIconHandle     hicoInvalid     = nullptr;
+    constexpr tCIDGraphDev::TPenHandle      hpenInvalid     = nullptr;
+    constexpr tCIDGraphDev::TRegionHandle   hrgnInvalid     = nullptr;
 }
 
 
@@ -126,9 +126,9 @@ namespace kCIDCtrls
     // ------------------------------------------------------------------------
     //  Invalid handle values
     // ------------------------------------------------------------------------
-    constexpr tCIDCtrls::TAccelHandle       haccelInvalid   = 0;
-    constexpr tCIDCtrls::TMenuHandle        hmenuInvalid    = 0;
-    constexpr tCIDCtrls::TWndHandle         hwndInvalid     = 0;
+    constexpr tCIDCtrls::TAccelHandle       haccelInvalid   = nullptr;
+    constexpr tCIDCtrls::TMenuHandle        hmenuInvalid    = nullptr;
+    constexpr tCIDCtrls::TWndHandle         hwndInvalid     = nullptr;
     constexpr tCIDCtrls::TTimerId           tmidInvalid     = 0;
     constexpr tCIDCtrls::TWndId             widInvalid      = 0xFFFFFFFF;
 }

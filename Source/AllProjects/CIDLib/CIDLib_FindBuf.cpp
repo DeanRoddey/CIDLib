@@ -719,7 +719,7 @@ tCIDLib::TVoid TFindBuf::StreamFrom(TBinInStream& strmToReadFrom)
     //  Stream in the formating strings. There is a leading boolean that
     //  indicates whether each one was streamed or not.
     //
-    tCIDLib::TBoolean bLoad;
+    tCIDLib::TBoolean bLoad = kCIDLib::False;
 
     delete m_pstrDateFormat;
     m_pstrDateFormat = nullptr;

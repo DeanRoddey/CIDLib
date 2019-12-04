@@ -44,6 +44,7 @@ class CIDMDATAEXP TFacCIDMData : public TFacility
         TFacCIDMData();
 
         TFacCIDMData(const TFacCIDMData&) = delete;
+        TFacCIDMData(TFacCIDMData&&) = delete;
 
         ~TFacCIDMData();
 
@@ -52,6 +53,7 @@ class CIDMDATAEXP TFacCIDMData : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDMData& operator=(const TFacCIDMData&) = delete;
+        TFacCIDMData& operator=(TFacCIDMData&&) = delete;
 
 
         // -------------------------------------------------------------------

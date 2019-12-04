@@ -191,7 +191,11 @@ class CIDLIBEXP TMtxLocker
         {
             // If we have it locked, then unlock it
             if (m_bLocked && m_pmtxToLock)
+            {
+                // This can throw, though it's highly unlikely. If so, we die
+                #pragma warning(suppress : 26447)
                 m_pmtxToLock->Unlock();
+            }
         }
 
 

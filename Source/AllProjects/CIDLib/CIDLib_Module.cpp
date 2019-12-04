@@ -191,6 +191,8 @@ class TLogSpoolThread : public TThread
             TThread(L"CIDLibIntLogSpoolerThread")
             , m_bTriedDefault(kCIDLib::False)
             , m_c4QueueSize(0)
+            , m_eAdopt(tCIDLib::EAdoptOpts::NoAdopt)
+            , m_eAdoptNew(tCIDLib::EAdoptOpts::NoAdopt)
             , m_plgrNew(nullptr)
             , m_plgrTarget(nullptr)
             , m_plogqevHead(nullptr)
@@ -1096,6 +1098,11 @@ tCIDLib::TVoid TModule::LogEventObj(TLogEvent&& logevToLog)
 //  sense in the context of a server handling errors from a remote client. The
 //  client is the one who needs to do all of that stuff, in its own context.
 //
+//  NOTE that the elements are moved to the queue, so the collection will be
+//  full of empty elements on return. This is slightly more efficient than just
+//  making copies.
+//
+#pragma warning(suppress : 26460) // Parm can't be const because we move elements from it
 tCIDLib::TVoid TModule::LogEventObjs(TCollection<TLogEvent>& colToLog)
 {
     TLogSpoolThread* pthrTar = pthrSpooler();

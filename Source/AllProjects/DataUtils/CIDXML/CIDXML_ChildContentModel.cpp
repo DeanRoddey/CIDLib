@@ -32,13 +32,6 @@
 #include    "CIDXML_CMNodes_.hpp"
 
 
-
-// ---------------------------------------------------------------------------
-//  Magic RTTI macros
-// ---------------------------------------------------------------------------
-RTTIDecls(TXMLChildCM,TXMLContentModel)
-
-
 namespace CIDXML_ChildCM
 {
     // -----------------------------------------------------------------------
@@ -50,8 +43,8 @@ namespace CIDXML_ChildCM
     //      which are used like element ids but which are not real element
     //      decls. So we provide these very large fake ids for that.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    c4EOCId       = kCIDLib::c4MaxCard - 1;
-    const tCIDLib::TCard4    c4EpsilonId   = kCIDLib::c4MaxCard - 2;
+    constexpr tCIDLib::TCard4    c4EOCId       = kCIDLib::c4MaxCard - 1;
+    constexpr tCIDLib::TCard4    c4EpsilonId   = kCIDLib::c4MaxCard - 2;
 }
 
 
@@ -88,7 +81,7 @@ static tCIDLib::TVoid FormatCS(         TTextOutStream&         strmDest
     //  there. If the left is a leaf, we just display the leaf and there will
     //  not be any right child.
     //
-    CIDLib_Suppress(6011) // We null checked above
+    CIDLib_Suppress(6011); // We null checked above
     const tCIDXML::ECMNodeTypes eType = pxcsnCur->eNodeType();
 
     switch(eType)
@@ -775,7 +768,7 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
             , tCIDLib::EErrClasses::Internal
         );
     }
-     else if (c4CurIndex >= m_c4LeafCount)
+    else if (c4CurIndex >= m_c4LeafCount)
     {
         facCIDLib().ThrowErr
         (
@@ -785,7 +778,7 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Index
             , TCardinal(c4CurIndex)
-            , clsIsA()
+            , TString(L"TXMLChildCM")
             , TCardinal(m_c4LeafCount)
         );
     }

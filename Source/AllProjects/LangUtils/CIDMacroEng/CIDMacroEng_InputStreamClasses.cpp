@@ -121,14 +121,14 @@ const TString& TMEngTextInStreamVal::strExtra(const TString& strToSet)
 
 // Provide access to the source stream
 const TTextInStream&
-TMEngTextInStreamVal::strmSrc(TCIDMacroEngine& meOwner) const
+TMEngTextInStreamVal::strmSrc(const TCIDMacroEngine& meOwner) const
 {
     // If not set up yet, then that's an error
     CheckStreamSet(meOwner);
     return *m_pstrmSrc;
 }
 
-TTextInStream& TMEngTextInStreamVal::strmSrc(TCIDMacroEngine& meOwner)
+TTextInStream& TMEngTextInStreamVal::strmSrc(const TCIDMacroEngine& meOwner)
 {
     // If not set up yet, then that's an error
     CheckStreamSet(meOwner);

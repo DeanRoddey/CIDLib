@@ -53,13 +53,13 @@ namespace CIDOrbUC_NSInfo
     //  Version 3 -
     //      Added support for a fourth extra string value
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2NSInfoFmtVersion = 3;
+    constexpr tCIDLib::TCard2   c2NSInfoFmtVersion = 3;
 
 
     // -----------------------------------------------------------------------
     //  The persistent format for the derived rebind info class
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2NSRBIFmtVersion = 1;
+    constexpr tCIDLib::TCard2   c2NSRBIFmtVersion = 1;
 }
 
 

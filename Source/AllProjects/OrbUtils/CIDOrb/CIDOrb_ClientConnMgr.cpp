@@ -246,11 +246,11 @@ tCIDLib::TVoid TOrbClientConnMgr::ClearOnlyAcceptFrom()
 //  is calling us now, it cannot close itself down while it is in here.
 //
 tCIDOrb::EReadRes
-TOrbClientConnMgr::eQueueUpWork(TThread&                thrSpooler
-                                , TServerStreamSocket&  sockThis
-                                , TOrbClientConnImpl&   occiReplyTo
-                                , TMemBuf&              mbufTmp
-                                , TBinMBufInStream&     strmTmp)
+TOrbClientConnMgr::eQueueUpWork(        TThread&                thrSpooler
+                                ,       TServerStreamSocket&    sockThis
+                                , const TOrbClientConnImpl&     occiReplyTo
+                                ,       TMemBuf&                mbufTmp
+                                ,       TBinMBufInStream&       strmTmp)
 {
     tCIDLib::TCard4 c4SeqId;
     TWorkQItemPtr wqipNew;
@@ -315,7 +315,7 @@ TOrbClientConnMgr::eQueueUpWork(TThread&                thrSpooler
             //  value directly. We have to trust that we are inc/dec'ing it correctly.
             //
             TStatsCache::c8IncCounter(m_sciQueuedCmds);
-            m_colWorkQ.objAdd(wqipNew);
+            m_colWorkQ.objPut(tCIDLib::ForceMove(wqipNew));
         }
 
         catch(TError& errToCatch)
@@ -594,7 +594,7 @@ tCIDLib::TVoid TOrbClientConnMgr::Terminate()
         try
         {
             TWorkQItemPtr wqipCur;
-            m_colWorkQ.bGetNext(wqipCur, kCIDLib::False);
+            m_colWorkQ.bGetNextMv(wqipCur, 0, kCIDLib::False);
         }
 
         catch(TError& errToCatch)
@@ -1152,7 +1152,7 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
             //  weight and don't allocate anything unless we get something.
             //
             TWorkQItemPtr wqipCur;
-            if (!m_colWorkQ.bGetNext(wqipCur, 1500, kCIDLib::False))
+            if (!m_colWorkQ.bGetNextMv(wqipCur, 1500, kCIDLib::False))
                 continue;
 
             // Update our stats cache of queued cmds
@@ -1186,11 +1186,10 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
 
             //
             //  Ok, it worked. So we want to queue up the reply on the client
-            //  connection object that is stored in the work queue. At this point
-            //  we are no longer responsible for the work item.
+            //  connection object that is referenced by the the work queue item.
             //
-            //  The connection might have gone away, in which case the counted
-            //  pointer will release the work item back to the pool.
+            //  The connection might have gone away, in which case the work item
+            //  pointer will release the item back to the pool.
             //
             //  We need to decrement the active commands count as well.
             //
@@ -1208,6 +1207,10 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
                     //  else we couldn't keep the mutex locked while we
                     //  are in here. It just queues up the item to be
                     //  sent by the connection object's spooler thread.
+                    //  The work item gets moved into the send queue,
+                    //  so it's empty if it gets sent. Otherwise, it'll
+                    //  release the item when the pool item pointer goes
+                    //  out of scope below.
                     //
                     poccReply->SendReply(wqipCur);
                 }
@@ -1216,6 +1219,11 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
                     TStatsCache::c8IncCounter(m_sciDroppedRetPacks);
                 }
             }
+
+            //
+            //  DO NOT access the work queue item here since will have been
+            //  moved in most cases (if it was queued up for send successfully.)
+            //
         }
 
         catch(TError& errToCatch)

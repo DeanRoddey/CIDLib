@@ -63,6 +63,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         TFacCIDOrbUC();
 
         TFacCIDOrbUC(const TFacCIDOrbUC&) = delete;
+        TFacCIDOrbUC(TFacCIDOrbUC&&) = delete;
 
         ~TFacCIDOrbUC();
 
@@ -71,6 +72,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDOrbUC& operator=(const TFacCIDOrbUC&) = delete;
+        TFacCIDOrbUC& operator=(TFacCIDOrbUC&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -94,7 +96,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         //  insure they are going to the name server and getting the freshest
         //  info.
         // -------------------------------------------------------------------
-        template <class T> T*
+        template <class T> [[nodiscard]] T*
         porbcMakeClient(const   TString&            strNSBinding
                         , const tCIDLib::TCard4     c4WaitMillis = 0
                         , const tCIDLib::TBoolean   bNoCache = kCIDLib::False

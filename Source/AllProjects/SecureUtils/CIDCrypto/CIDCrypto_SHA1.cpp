@@ -436,5 +436,5 @@ TSHA1Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Block)
 tCIDLib::TVoid TSHA1Hasher::ScrubContext()
 {
     for (tCIDLib::TCard4 c4Index = 0; c4Index < tCIDLib::c4ArrayElems(m_ac4H); c4Index++)
-        m_ac4H[c4BufCnt] = 0;
+        m_ac4H[c4Index] = 0;
 }

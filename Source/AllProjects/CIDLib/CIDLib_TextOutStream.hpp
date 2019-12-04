@@ -489,7 +489,7 @@ class CIDLIBEXP TTextOutStream : public TObject
             //  which we just copy straight out as text.
             //
             const tCIDLib::TCh* pszStart = pszFmt;
-            const tCIDLib::TCh* pszEnd;
+            const tCIDLib::TCh* pszEnd = nullptr;
             while (kCIDLib::True)
             {
                 tCIDLib::TCh chToken;

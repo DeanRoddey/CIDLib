@@ -36,8 +36,12 @@
 // ---------------------------------------------------------------------------
 //  Force in some headers and libraries we require
 // ---------------------------------------------------------------------------
-#include <comdef.h>
-#include <taskschd.h>
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
+#include    <comdef.h>
+#include    <taskschd.h>
+#pragma     warning(pop)
 #pragma comment(lib, "taskschd.lib")
 
 

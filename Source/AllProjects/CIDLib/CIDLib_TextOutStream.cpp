@@ -122,6 +122,9 @@ const TStreamFmt& TTextOutStream::strmfHex4()
 // ---------------------------------------------------------------------------
 //  TTextOutStream: Constructors and operators
 // ---------------------------------------------------------------------------
+
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextOutStream::TTextOutStream(         TBinOutStream* const    pstrmToAdopt
                                 ,       TTextConverter* const   ptcvtToAdopt) :
 
@@ -145,6 +148,8 @@ TTextOutStream::TTextOutStream(         TBinOutStream* const    pstrmToAdopt
         m_ptcvtThis = new TUTFConverter;
 }
 
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextOutStream::TTextOutStream(         TBinOutStream* const    pstrmToAdopt
                                 , const TStreamFmt&             strmfToUse
                                 ,       TTextConverter* const   ptcvtToAdopt) :
@@ -168,6 +173,8 @@ TTextOutStream::TTextOutStream(         TBinOutStream* const    pstrmToAdopt
         m_ptcvtThis = new TUTFConverter;
 }
 
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextOutStream::TTextOutStream( const   TStreamFmt&             strmfToUse
                                 ,       TTextConverter* const   ptcvtToAdopt) :
 
@@ -1043,6 +1050,9 @@ TTextOutStream::WriteChars( const   tCIDLib::TCh* const pszToWrite
 // ---------------------------------------------------------------------------
 //  TTextOutStream: Hidden constructors
 // ---------------------------------------------------------------------------
+
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextOutStream::TTextOutStream(TTextConverter* const ptcvtToAdopt) :
 
     m_bIndentNext(kCIDLib::False)
@@ -1057,7 +1067,7 @@ TTextOutStream::TTextOutStream(TTextConverter* const ptcvtToAdopt) :
     , m_eJustification(tCIDLib::EHJustify::Left)
     , m_eNewLineType(tCIDLib::ENewLineTypes::CRLF)
     , m_eRadix(tCIDLib::ERadices::Dec)
-    , m_pstrmOut(0)
+    , m_pstrmOut(nullptr)
     , m_ptcvtThis(ptcvtToAdopt)
 {
     // If no converter is provided, then create a default one

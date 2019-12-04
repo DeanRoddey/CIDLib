@@ -45,15 +45,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  This is the intra-facilities types namespace. It contains non-class types
-//  for use within the facility.
-// ---------------------------------------------------------------------------
-namespace tCIDUPnP_
-{
-}
-
-
-// ---------------------------------------------------------------------------
 //  This is the intra-facilities constants namespace.
 // ---------------------------------------------------------------------------
 namespace kCIDUPnP_

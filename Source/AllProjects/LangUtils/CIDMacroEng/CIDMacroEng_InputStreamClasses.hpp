@@ -93,12 +93,12 @@ class TMEngTextInStreamVal : public TMEngClassVal
 
         TTextInStream& strmSrc
         (
-                    TCIDMacroEngine&        meOwner
+            const   TCIDMacroEngine&        meOwner
         );
 
         const TTextInStream& strmSrc
         (
-                    TCIDMacroEngine&        meOwner
+            const   TCIDMacroEngine&        meOwner
         )   const;
 
         tCIDLib::TVoid SetStream

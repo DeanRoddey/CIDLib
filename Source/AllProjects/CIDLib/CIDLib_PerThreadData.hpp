@@ -116,6 +116,7 @@ template <class T> class TPerThreadDataFor : public TPerThreadImpl
         }
 
         TPerThreadDataFor(const TPerThreadDataFor<T>&) = delete;
+        TPerThreadDataFor(TPerThreadDataFor<T>&&) = delete;
 
         ~TPerThreadDataFor()
         {
@@ -126,6 +127,7 @@ template <class T> class TPerThreadDataFor : public TPerThreadImpl
         //  Public operators
         // -------------------------------------------------------------------
         TPerThreadDataFor<T>& operator=(const TPerThreadDataFor<T>&) = delete;
+        TPerThreadDataFor<T>& operator=(TPerThreadDataFor<T>&&) = delete;
         tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
 
 
@@ -161,7 +163,7 @@ template <class T> class TPerThreadDataFor : public TPerThreadImpl
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        void CleanUpUserData()
+        void CleanUpUserData() final
         {
             delete pobjThis();
             pThis(nullptr);

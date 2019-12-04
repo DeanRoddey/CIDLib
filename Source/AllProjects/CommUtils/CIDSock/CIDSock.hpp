@@ -57,12 +57,6 @@
 namespace kCIDSock
 {
     // -----------------------------------------------------------------------
-    //  Object Pipe constants
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4ObjPipeMV = 0xFEEDBEEF;
-
-
-    // -----------------------------------------------------------------------
     //  Statistics cache paths for any stats we maintain at this level
     // -----------------------------------------------------------------------
     const tCIDLib::TCh* const   pszStat_Scope_Net       = L"/Stats/Net/";

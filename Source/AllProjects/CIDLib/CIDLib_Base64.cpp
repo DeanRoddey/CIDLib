@@ -147,8 +147,10 @@ tCIDLib::TCard4 TBase64::c4Decode(TBinInStream& strmIn, TBinOutStream& strmOut)
 {
     tCIDLib::TCard4 c4BlkCnt = 0;
     tCIDLib::TCard4 c4Count = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4EncBlkSz];
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4EncBlkSz] = { 0 };
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4RawBlkSz] =  { 0 };
 
     try
     {
@@ -235,10 +237,12 @@ tCIDLib::TCard4 TBase64::c4Encode(TBinInStream& strmIn, TBinOutStream& strmOut)
 {
     tCIDLib::TCard4 c4LnWidth = 0;
     tCIDLib::TCard4 c4Count = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz] = {0};
 
     // Twice as big to allow for escapes
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2];
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2] = {0};
     while (kCIDLib::True)
     {
         //
@@ -320,8 +324,10 @@ tCIDLib::TCard4 TBase64::c4LineWidth(const tCIDLib::TCard4 c4ToSet)
 tCIDLib::TVoid TBase64::Decode(TTextInStream& strmIn, TBinOutStream& strmOut)
 {
     tCIDLib::TCard4 c4BlkCnt = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4EncBlkSz];
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4EncBlkSz] = {0};
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4RawBlkSz] = {0};
 
     try
     {
@@ -410,10 +416,12 @@ tCIDLib::TVoid TBase64::Decode(TTextInStream& strmIn, TBinOutStream& strmOut)
 tCIDLib::TVoid TBase64::Encode(TBinInStream& strmIn, TTextOutStream& strmOut)
 {
     tCIDLib::TCard4 c4LnWidth = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz] = {0};
 
     // Possibly twice as big if escaping
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2];
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2] = {0};
     while (kCIDLib::True)
     {
         //
@@ -467,10 +475,12 @@ tCIDLib::TVoid TBase64::Encode(TBinInStream& strmIn, TTextOutStream& strmOut)
 tCIDLib::TVoid TBase64::Encode(const TString& strSrc, TBinOutStream& strmOut)
 {
     tCIDLib::TCard4 c4LnWidth = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz] = {0};
 
     // Could be twice as big if escaping
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2];
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2] = {0};
 
     const tCIDLib::TCh*   pszSrc = strSrc.pszBuffer();
     const tCIDLib::TCh*   pszEnd = pszSrc + strSrc.c4Length();
@@ -527,10 +537,12 @@ tCIDLib::TVoid TBase64::Encode(const TString& strSrc, TBinOutStream& strmOut)
 tCIDLib::TVoid TBase64::Encode(TTextInStream& strmIn, TTextOutStream& strmOut)
 {
     tCIDLib::TCard4 c4LnWidth = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz] = {0};
 
     // Possibly twice as large if padding
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2];
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2] = {0};
     while (kCIDLib::True)
     {
         // Get up a full block of source bytes
@@ -585,7 +597,7 @@ TBase64::c4EncodeBlock( const   tCIDLib::TCard1* const  pc1In
                         , const tCIDLib::TCard4         c4Len)
 {
     tCIDLib::TCard4 c4Ret = 0;
-    tCIDLib::TCard1 c1Cur;
+    tCIDLib::TCard1 c1Cur = 0;
 
     c1Cur = CIDLib_Base64::ac1Encode[pc1In[0] >> 2];
     if (m_bEscapeForwardSlashes && (c1Cur == 0x2F))

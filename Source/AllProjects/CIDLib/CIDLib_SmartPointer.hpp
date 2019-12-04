@@ -248,6 +248,8 @@ template <class T> class TUniquePtr
         template <typename T> struct TDataPtr
         {
             TDataPtr(T* const pobjAdopt) : m_pobjData(pobjAdopt) {}
+            virtual ~TDataPtr() {}
+
             virtual tCIDLib::TVoid DestroyData()
             {
                 delete m_pobjData;
@@ -370,7 +372,7 @@ template <typename T> class TCntPtrData
         //
         tCIDLib::TBoolean bAcquireStrongRef()
         {
-            tCIDLib::TCard4 c4Comp, c4Result, c4New;
+            tCIDLib::TCard4 c4Comp = 0, c4Result = 0, c4New = 0;
             while (kCIDLib::True)
             {
                 c4Comp = m_c4RefCnt;
@@ -411,7 +413,7 @@ template <typename T> class TCntPtrData
         //
         tCIDLib::TBoolean bReleaseStrongRef()
         {
-            tCIDLib::TCard4 c4Comp, c4Result, c4New;
+            tCIDLib::TCard4 c4Comp = 0, c4Result = 0, c4New = 0;
             while (kCIDLib::True)
             {
                 // Get the current value and make sure we aren't going to underflow
@@ -547,7 +549,7 @@ template <typename T> class TCntPtrData
             //  We have to make sure we get a clean value so we get the value and do a
             //  compare and swap with itself until we get the same value back.
             //
-            tCIDLib::TCard4 c4Ret;
+            tCIDLib::TCard4 c4Ret = 0;
             while (kCIDLib::True)
             {
                 const tCIDLib::TCard4 c4Comp = m_c4RefCnt;

@@ -124,7 +124,7 @@ class CIDLIBEXP TCritSecLocker : public  TObject
 inline
 TCritSecLocker::TCritSecLocker(const TCriticalSection* const pcrsToSanitize) :
 
-    m_pcrsSanitize(0)
+    m_pcrsSanitize(nullptr)
 {
     // Enter it and store the pointer, if we got something
     if (pcrsToSanitize)
@@ -147,7 +147,7 @@ inline tCIDLib::TVoid TCritSecLocker::Orphan()
     if (m_pcrsSanitize)
     {
         m_pcrsSanitize->Exit();
-        m_pcrsSanitize = 0;
+        m_pcrsSanitize = nullptr;
     }
 }
 

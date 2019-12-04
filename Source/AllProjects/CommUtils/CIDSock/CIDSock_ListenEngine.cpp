@@ -330,7 +330,7 @@ TSockListenerEng::eListenThread(TThread& thrThis, tCIDLib::TVoid* pData)
     //  Get the passed info, which tells us whether we are doing the secure or non-
     //  secure port.
     //
-    const tCIDLib::TBoolean bSecure = *reinterpret_cast<tCIDLib::TBoolean*>(pData);
+    const tCIDLib::TBoolean bSecure = *static_cast<tCIDLib::TBoolean*>(pData);
 
     // And now let the caller go
     thrThis.Sync();

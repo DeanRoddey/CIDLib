@@ -135,7 +135,7 @@ template <class T> T* pDupObject(const MDuplicable* const pmdupToDup)
 // ---------------------------------------------------------------------------
 #define DefPolyDup(type) \
 public : \
-TObject* pobjDuplicate() const \
+TObject* pobjDuplicate() const override \
 { \
     return new type(*this); \
 }

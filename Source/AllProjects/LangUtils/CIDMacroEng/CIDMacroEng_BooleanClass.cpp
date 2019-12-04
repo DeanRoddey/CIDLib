@@ -206,6 +206,7 @@ TMEngBooleanInfo::TMEngBooleanInfo(TCIDMacroEngine& meOwner) :
     , m_c2MethId_Negate(kMacroEng::c2BadId)
     , m_c2MethId_Or(kMacroEng::c2BadId)
     , m_c2MethId_OrEq(kMacroEng::c2BadId)
+    , m_c2MethId_Set(kMacroEng::c2BadId)
     , m_c2MethId_ValCtor(kMacroEng::c2BadId)
     , m_c2MethId_Xor(kMacroEng::c2BadId)
     , m_c2MethId_XorEq(kMacroEng::c2BadId)

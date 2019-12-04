@@ -230,7 +230,7 @@ tCIDLib::TCard4 TOrbSObjList::c4ElemCount() const
 }
 
 
-tCIDLib::TBoolean TOrbSObjList::bRemove(TOrbServerBase* const porbsToRemove)
+tCIDLib::TBoolean TOrbSObjList::bRemove(const TOrbServerBase* const porbsToRemove)
 {
     //
     //  Call the orphan method to get the object out of the list. He'll tell us
@@ -408,7 +408,7 @@ const TOrbServerBase* TOrbSObjList::porbsFind(const TOrbId& oidToFind) const
 //  was adopted, the caller is assuming responsibility.
 //
 TOrbServerBase*
-TOrbSObjList::porbsOrphan(TOrbServerBase* const porbsToOrphan, tCIDLib::EAdoptOpts& eAdopt)
+TOrbSObjList::porbsOrphan(const TOrbServerBase* const porbsToOrphan, tCIDLib::EAdoptOpts& eAdopt)
 {
     // Get its hash out, since they pre-hash themselves
     const tCIDLib::THashVal hshToOrphan = porbsToOrphan->ooidThis().hshKey();

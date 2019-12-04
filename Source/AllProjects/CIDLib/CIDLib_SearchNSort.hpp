@@ -28,19 +28,19 @@
 namespace TArrayOps
 {
     // A threashold that we use to decide if it's worth qsorting a sub-file
-    const tCIDLib::TCard4   c4MinMergeSz = 32;
+    constexpr tCIDLib::TCard4   c4MinMergeSz = 32;
 
     // Max stack elements required
-    const tCIDLib::TCard4   c4MaxPending = 85;
+    constexpr tCIDLib::TCard4   c4MaxPending = 85;
 
     //
     //  Temp merge array size. Larger than this and we allocate a buffer
     //  to use instead.
     //
-    const tCIDLib::TCard4   c4TmpArraySz = 256;
+    constexpr tCIDLib::TCard4   c4TmpArraySz = 256;
 
     // The default minimum size of a run
-    const tCIDLib::TCard4   c4DefMinGallop = 7;
+    constexpr tCIDLib::TCard4   c4DefMinGallop = 7;
 
     //
     //  Some out of line methods used by the sort stuff below, to limit
@@ -57,15 +57,19 @@ namespace TArrayOps
     template <typename T> class TSortState
     {
         public :
+            //We don't initialize the arrays since that's just unnecessary overhead
+            #pragma warning(suppress : 26495)
             TSortState(T* const pToSort, const tCIDLib::TCard4 c4Size) :
 
                 m_c4PendingCnt(0)
                 , m_c4MemSize(c4TmpArraySz)
                 , m_c4MinGallop(c4DefMinGallop)
                 , m_c4SortSz(c4Size)
-                , m_ptMergeMem(m_ptMergeArray)
+                , m_ptMergeArray()
+                , m_ptMergeMem(nullptr)
                 , m_ptToSort(pToSort)
             {
+                m_ptMergeMem = m_ptMergeArray;
             }
 
             ~TSortState()
@@ -188,7 +192,10 @@ namespace TArrayOps
 
                 // We need more, so free our current one and allocate again
                 if (m_ptMergeMem != m_ptMergeArray)
+                {
                     delete [] m_ptMergeMem;
+                    m_ptMergeMem = nullptr;
+                }
 
                 m_ptMergeMem = new T[c4Size];
                 m_c4MemSize = c4Size;
@@ -237,6 +244,11 @@ namespace TArrayOps
                                 , const tCIDLib::TCard4 c4Low
                                 , const tCIDLib::TCard4 c4High)
     {
+        //
+        //  If it's a fundamental there's no def ctor so we get an uninitialized
+        //  warning.
+        //
+        #pragma warning(suppress : 26494)
         T tTemp;
 
         tCIDLib::TCard4 c4L = c4Low;
@@ -260,7 +272,7 @@ namespace TArrayOps
                                 , const tCIDLib::TInt4      i4High
                                 ,       TCompFunc           pfnComp)
     {
-        tCIDLib::TInt4 i4CurInd;
+        tCIDLib::TInt4 i4CurInd = 0;
 
         CIDAssert(i4Low < i4High, L"Out of order sort run high/low");
 
@@ -317,10 +329,15 @@ namespace TArrayOps
                                 , const tCIDLib::TInt4      i4Start
                                 ,       TCompFunc           pfnComp)
     {
+        //
+        //  If the type happens to be a fundamental, this we get an uninit warning on
+        //  the pivot type because no default constructor.
+        //
+        #pragma warning(suppress : 26494)
         T               tPivot;
-        tCIDLib::TInt4  i4Left;
-        tCIDLib::TInt4  i4Right;
-        tCIDLib::TInt4  i4Middle;
+        tCIDLib::TInt4  i4Left = 0;
+        tCIDLib::TInt4  i4Right = 0;
+        tCIDLib::TInt4  i4Middle = 0;
 
         CIDAssert
         (
@@ -397,11 +414,11 @@ namespace TArrayOps
                                 , const tCIDLib::TInt4      i4Hint
                                 ,       TCompFunc           pfnComp)
     {
-        tCIDLib::TInt4  i4Offset;
-        tCIDLib::TInt4  i4LastOffset;
-        tCIDLib::TInt4  i4MaxOfs;
-        tCIDLib::TInt4  i4Temp;
-        tCIDLib::TInt4  i4Middle;
+        tCIDLib::TInt4  i4Offset = 0;
+        tCIDLib::TInt4  i4LastOffset = 0;
+        tCIDLib::TInt4  i4MaxOfs = 0;
+        tCIDLib::TInt4  i4Temp = 0;
+        tCIDLib::TInt4  i4Middle = 0;
 
         CIDAssert
         (
@@ -533,11 +550,11 @@ namespace TArrayOps
                                 , const tCIDLib::TInt4      i4Hint
                                 ,       TCompFunc           pfnComp)
     {
-        tCIDLib::TInt4  i4Ofs;
-        tCIDLib::TInt4  i4LastOfs;
-        tCIDLib::TInt4  i4MaxOfs;
-        tCIDLib::TInt4  i4Temp;
-        tCIDLib::TInt4  i4Middle;
+        tCIDLib::TInt4  i4Ofs = 0;
+        tCIDLib::TInt4  i4LastOfs = 0;
+        tCIDLib::TInt4  i4MaxOfs = 0;
+        tCIDLib::TInt4  i4Temp = 0;
+        tCIDLib::TInt4  i4Middle = 0;
 
         CIDAssert
         (
@@ -681,13 +698,12 @@ namespace TArrayOps
                             ,       TCompFunc           pfnComp)
     {
         T *ptArray = State.ptToSort();
-        T *ptTmp;
+        T *ptTmp = nullptr;
 
-        tCIDLib::TCard4 c4MinGallop;
-
-        tCIDLib::TInt4  i4Cursor1;    // Indexes into tmp array (run1)
-        tCIDLib::TInt4  i4Cursor2;    // Indexes into original array. run2
-        tCIDLib::TInt4  i4DestIndex;  // Indexes into original array.
+        tCIDLib::TCard4 c4MinGallop = 0;
+        tCIDLib::TInt4  i4Cursor1 = 0;      // Indexes into tmp array (run1)
+        tCIDLib::TInt4  i4Cursor2 = 0;      // Indexes into original array. run2
+        tCIDLib::TInt4  i4DestIndex = 0;    // Indexes into original array.
 
         CIDAssert
         (
@@ -916,12 +932,12 @@ namespace TArrayOps
 
     {
         T *ptArray = State.ptToSort();
-        T *ptTmp;
+        T *ptTmp = nullptr;
 
-        tCIDLib::TCard4 c4MinGallop;
-        tCIDLib::TInt4  i4Cursor1;      // Indexes into original array (run1)
-        tCIDLib::TInt4  i4Cursor2;      // Indexes into tmp array (run2)
-        tCIDLib::TInt4  i4DestInd;      // Indexes into original array
+        tCIDLib::TCard4 c4MinGallop = 0;
+        tCIDLib::TInt4  i4Cursor1 = 0;      // Indexes into original array (run1)
+        tCIDLib::TInt4  i4Cursor2 = 0;      // Indexes into tmp array (run2)
+        tCIDLib::TInt4  i4DestInd = 0;      // Indexes into original array
 
         //
         // Should always prepare temp memory with size s, where
@@ -1123,11 +1139,11 @@ namespace TArrayOps
                             , const tCIDLib::TCard4     c4Where
                             ,       TCompFunc           pfnComp)
     {
-        tCIDLib::TInt4 i4BaseA;
-        tCIDLib::TInt4 i4LenA;
-        tCIDLib::TInt4 i4BaseB;
-        tCIDLib::TInt4 i4LenB;
-        tCIDLib::TInt4 i4K;
+        tCIDLib::TInt4 i4BaseA = 0;
+        tCIDLib::TInt4 i4LenA = 0;
+        tCIDLib::TInt4 i4BaseB = 0;
+        tCIDLib::TInt4 i4LenB = 0;
+        tCIDLib::TInt4 i4K = 0;
 
         const tCIDLib::TCard4 c4InPendCnt = State.c4PendingCnt();
         CIDAssert(c4InPendCnt >= 2, L"Bad pending run count");
@@ -1219,7 +1235,7 @@ namespace TArrayOps
     template <typename T, typename TCompFunc>
     tCIDLib::TVoid MergeCollapse(TSortState<T>&  State, TCompFunc pfnComp)
     {
-        tCIDLib::TCard4  c4N;
+        tCIDLib::TCard4  c4N = 0;
 
         while (State.c4PendingCnt() > 1)
         {
@@ -1249,7 +1265,7 @@ namespace TArrayOps
     template <typename T, typename TCompFunc>
     tCIDLib::TVoid MergeForceCollapse(TSortState<T>&  State, TCompFunc pfnComp)
     {
-        tCIDLib::TInt4  i4N;
+        tCIDLib::TInt4  i4N = 0;
 
         while (State.c4PendingCnt() > 1)
         {
@@ -1276,9 +1292,9 @@ namespace TArrayOps
         tCIDLib::TInt4  i4IndexLow  = 0;
         tCIDLib::TInt4  i4IndexHigh = c4Count;
         tCIDLib::TInt4  i4Remaining = c4Count;
-        tCIDLib::TInt4  i4MinRunLen;
-        tCIDLib::TInt4  i4RunLen;
-        tCIDLib::TInt4  i4ForcedRunLen;
+        tCIDLib::TInt4  i4MinRunLen = 0;
+        tCIDLib::TInt4  i4RunLen = 0;
+        tCIDLib::TInt4  i4ForcedRunLen = 0;
 
         CIDAssert(c4Count <= 0x7fffffff, L"Array is too large to sort");
 
@@ -1414,10 +1430,10 @@ namespace TArrayOps
                                     ,       TComp               pfnComp = TComp())
     {
         // Some special case checks to make the logic below safer
-        tCIDLib::ESortComps eRes;
+        tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
         if (!c4ElemCount)
         {
-            // It's empty so the new insert point is obvious 0
+            // It's empty so the new insert point is obviously 0
             c4Index = 0;
             return kCIDLib::False;
         }
@@ -1501,13 +1517,11 @@ namespace TArrayOps
 
 
     template <typename TElem, typename TKey, typename TComp  = tCIDLib::TDefMagComp<T>>
-    tCIDLib::TBoolean bSearch
-    (
-        const   TElem* const        ptElems
-        , const TKey                tToFind
-        ,       tCIDLib::TCard4&    c4Index
-        , const tCIDLib::TCard4     c4ElemCount
-        ,       TComp               pfnComp = TComp())
+    tCIDLib::TBoolean bSearch(  const   TElem* const        ptElems
+                                , const TKey                tToFind
+                                ,       tCIDLib::TCard4&    c4Index
+                                , const tCIDLib::TCard4     c4ElemCount
+                                ,       TComp               pfnComp = TComp())
     {
         // Set up the two end points that are used to subdivide the list
         tCIDLib::TInt4 i4End = tCIDLib::TInt4(c4ElemCount) - 1;

@@ -73,8 +73,10 @@ class CIDXMLEXP TDTDNotationDecl : public TXMLNotationDecl
 
         TDTDNotationDecl
         (
-            const   TDTDNotationDecl&       xdeclToCopy
+            const   TDTDNotationDecl&       xdeclSrc
         );
+
+        TDTDNotationDecl(TDTDNotationDecl&&) = delete;
 
         ~TDTDNotationDecl();
 
@@ -84,8 +86,10 @@ class CIDXMLEXP TDTDNotationDecl : public TXMLNotationDecl
         // -------------------------------------------------------------------
         TDTDNotationDecl& operator=
         (
-            const   TDTDNotationDecl&       xdeclToAssign
+            const   TDTDNotationDecl&       xdeclSrc
         );
+
+        TDTDNotationDecl& operator=(TDTDNotationDecl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -95,7 +99,7 @@ class CIDXMLEXP TDTDNotationDecl : public TXMLNotationDecl
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const;
+        )   const final;
 
 
     private :

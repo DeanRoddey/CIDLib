@@ -94,6 +94,13 @@ class KRNLEXPORT TKrnlIPAddr
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bFromSockAddr
+        (
+            const   tCIDLib::TVoid* const   pAddr
+            , const tCIDLib::TCard4         c4Len
+            ,       tCIDLib::TIPPortNum&    ippnToFill
+        );
+
         tCIDLib::TBoolean bIsLoopback() const;
 
         tCIDLib::TBoolean bSet
@@ -103,29 +110,6 @@ class KRNLEXPORT TKrnlIPAddr
             , const tCIDSock::EAddrTypes    eType
             , const tCIDLib::TCard4         c4ScopeId
             , const tCIDLib::TCard4         c4FlowInfo
-        );
-
-        tCIDLib::TCard4 c4Count() const;
-
-        tCIDLib::TCard4 c4FlowInfo() const;
-
-        tCIDLib::TCard4 c4ScopeId() const;
-
-        tCIDSock::EAddrTypes eType() const;
-
-        const tCIDLib::TCard1* pc1Data() const;
-
-        tCIDLib::TVoid Reset();
-
-
-
-
-        // These are platform dependent
-        tCIDLib::TBoolean bFromSockAddr
-        (
-            const   tCIDLib::TVoid* const   pAddr
-            , const tCIDLib::TCard4         c4Len
-            ,       tCIDLib::TIPPortNum&    ippnToFill
         );
 
         tCIDLib::TBoolean bToInAddr
@@ -140,6 +124,18 @@ class KRNLEXPORT TKrnlIPAddr
             ,       tCIDLib::TCard4&        c4SzInOut
             , const tCIDLib::TIPPortNum     ippnToSet = 0
         )   const;
+
+        tCIDLib::TCard4 c4Count() const;
+
+        tCIDLib::TCard4 c4FlowInfo() const;
+
+        tCIDLib::TCard4 c4ScopeId() const;
+
+        tCIDSock::EAddrTypes eType() const;
+
+        const tCIDLib::TCard1* pc1Data() const;
+
+        tCIDLib::TVoid Reset();
 
         tCIDLib::TCard1* pc1ToSockAddr
         (
@@ -211,6 +207,24 @@ namespace TKrnlIP
         TKrnlIPAddr         akipaAddrs[kCIDSock::c4MaxAddrs];
         tCIDLib::TCard4     c4AddrCnt;
         TKrnlIPAddr         kipaDNS1;
+
+        // Just to prevent init warnings from analyzer
+        TAdaptorInfo() :
+            szName()
+            , szDescr()
+            , ac1HWAddr()
+            , c4HWAddrSz(0)
+            , bDHCPEnabled(kCIDLib::False)
+            , bDedicated(kCIDLib::False)
+            , bLoopback(kCIDLib::False)
+            , bIPV4Enabled(kCIDLib::False)
+            , bIPV6Enabled(kCIDLib::False)
+            , bReady(kCIDLib::False)
+            , bTunnel(kCIDLib::False)
+            , akipaAddrs()
+            , c4AddrCnt(0)
+        {
+        }
     };
 
     KRNLEXPORT tCIDLib::TBoolean bAddToFirewall

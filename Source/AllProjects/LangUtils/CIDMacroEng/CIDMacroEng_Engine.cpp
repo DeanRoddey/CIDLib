@@ -1236,11 +1236,11 @@ eResolveClassName(  const   TString&                        strName
     //  2. Relative
     //  3. Relative plus nested
     //
-    enum ETypes
+    enum class ETypes
     {
-        EType_Fully
-        , EType_Relative
-        , EType_Nested
+        Fully
+        , Relative
+        , Nested
     };
 
     // Insure that the collection is non-adopting
@@ -1260,7 +1260,7 @@ eResolveClassName(  const   TString&                        strName
     colMatches.RemoveAll();
 
     // First we figure out which scenario we are looking at.
-    ETypes eType;
+    ETypes eType = ETypes::Fully;
     tCIDLib::TCard4 c4Pos1;
     tCIDLib::TCard4 c4Pos2;
     if (strName.bFirstOccurrence(kCIDLib::chPeriod, c4Pos1))
@@ -1273,21 +1273,21 @@ eResolveClassName(  const   TString&                        strName
         if (!strName.bStartsWithI(L"MEng")
         &&  !strName.bNextOccurrence(kCIDLib::chPeriod, c4Pos2))
         {
-            eType = EType_Nested;
+            eType = ETypes::Nested;
         }
          else
         {
-            eType = EType_Fully;
+            eType = ETypes::Fully;
         }
     }
      else
     {
         // No periods so must be relative
-        eType = EType_Relative;
+        eType = ETypes::Relative;
     }
 
     tCIDMacroEng::EClassMatches eRet;
-    if (eType == EType_Fully)
+    if (eType == ETypes::Fully)
     {
         TMEngClassInfo* pmeciTarget = pmeciFind(strName);
         if (!pmeciTarget)
@@ -1296,11 +1296,11 @@ eResolveClassName(  const   TString&                        strName
         colMatches.Add(pmeciTarget);
         eRet = tCIDMacroEng::EClassMatches::Unique;
     }
-     else if (eType == EType_Nested)
+     else if (eType == ETypes::Nested)
     {
         // Get out the first part of the name
         TString strFind(strName);
-        if (eType == EType_Nested)
+        if (eType == ETypes::Nested)
             strFind.Cut(c4Pos1);
 
         // Make sure it's unique and remember which one we hit, if any
@@ -3076,7 +3076,7 @@ tCIDLib::TVoid TCIDMacroEngine::UnknownException()
 
 
 tCIDLib::TVoid
-TCIDMacroEngine::ValidateCallFrame(         TMEngClassVal&  mecvInstance
+TCIDMacroEngine::ValidateCallFrame( const   TMEngClassVal&  mecvInstance
                                     , const tCIDLib::TCard2 c2MethodId) const
 {
     // The call stack obviously cannot be empty

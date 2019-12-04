@@ -66,7 +66,7 @@ inline tCIDLib::TVoid TBinInStream_ReadArray(       TBinInStream&       strmSrc 
                                             ,       eEnumType* const    aeList \
                                             , const tCIDLib::TCard4     c4Count) \
 { \
-    tCIDLib::TCard4 c4Cur; \
+    tCIDLib::TCard4 c4Cur = 0; \
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++) \
     { \
         strmSrc >> c4Cur; \
@@ -320,6 +320,7 @@ template
         // -----------------------------------------------------------------------
         TEArray() = delete;
 
+        #pragma warning(suppress : 26495) // We are going to initialize the array below
         TEArray(const ElemType InitVal) :
 
             m_c4Size(tCIDLib::TCard4(ListSize) + c4Extra)
@@ -328,6 +329,7 @@ template
                 m_aetArray[c4Index] = InitVal;
         }
 
+        #pragma warning(suppress : 26495) // We are going to initialize the array below
         TEArray(const ElemType aValues[tCIDLib::TCard4(ListSize) + c4Extra]) :
 
             m_atomLoaded(kCIDLib::True)

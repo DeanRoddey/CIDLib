@@ -164,6 +164,8 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
             const   TAttrData&              adatSrc
         );
 
+        TAttrData(TAttrData&&) = delete;
+
         ~TAttrData();
 
 
@@ -174,6 +176,8 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
         (
             const   TAttrData&              adatSrc
         );
+
+        TAttrData& operator=(TAttrData&&) = delete;
 
         tCIDLib::TBoolean operator==
         (
@@ -440,12 +444,12 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :

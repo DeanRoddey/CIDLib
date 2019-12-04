@@ -108,6 +108,7 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
         );
 
         TNameServerInfo(const TNameServerInfo&) = default;
+        TNameServerInfo(TNameServerInfo&&) = delete;
 
         ~TNameServerInfo();
 
@@ -116,6 +117,7 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
         //  Public operators
         // -------------------------------------------------------------------
         TNameServerInfo& operator=(const TNameServerInfo&) = default;
+        TNameServerInfo& operator=(TNameServerInfo&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -313,12 +315,12 @@ class CIDORBUCEXP TNSRebindInfo : public TNameServerInfo
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :

@@ -128,7 +128,7 @@ TMemBufEntitySrc::TMemBufEntitySrc( const   TString&                strSysId
       (
         new THeapBuf
         (
-            reinterpret_cast<const tCIDLib::TCard1*>(pDataToCopy)
+            static_cast<const tCIDLib::TCard1*>(pDataToCopy)
             , c4SrcBytes
             , c4SrcBytes
         )

@@ -36,7 +36,12 @@
 #include    "CIDKernel_ScanCodes.hpp"
 #include    "CIDKernel_ConsoleHelpers_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <wchar.h>
+#pragma     warning(pop)
 
 
 namespace CIDKernel_Console

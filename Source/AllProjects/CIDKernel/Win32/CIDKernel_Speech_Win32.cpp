@@ -33,9 +33,12 @@
 #include    "CIDKernel_InternalHelpers_.hpp"
 
 // ---------------------------------------------------------------------------
-//  Force off deprecation warnings for the SD headers
+//  Force off deprecation warnings for the SD headers as well as analysis warnings
+//  and some that the all code warnings thing obviously isn't handling
 // ---------------------------------------------------------------------------
+#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #pragma     warning(disable : 4996)
 #include    <sapi.h>
 #include    <sphelper.h>

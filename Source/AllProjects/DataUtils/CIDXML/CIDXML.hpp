@@ -77,36 +77,36 @@ namespace kCIDXML
     // -----------------------------------------------------------------------
     //  These are constants used by the XML reader class
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4RawBufSize    = 32 * 1024;
-    const tCIDLib::TCard4       c4CharBufSize   = 4096;
+    constexpr tCIDLib::TCard4       c4RawBufSize    = 32 * 1024;
+    constexpr tCIDLib::TCard4       c4CharBufSize   = 4096;
 
 
     // -----------------------------------------------------------------------
     //  These are the character flags used with the TXMLCharFlags class
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard1       c1BaseChar          = 0x1;
-    const tCIDLib::TCard1       c1SpecialCharData   = 0x2;
-    const tCIDLib::TCard1       c1NameChar          = 0x4;
-    const tCIDLib::TCard1       c1MarkupTestChar    = 0x8;
-    const tCIDLib::TCard1       c1StartTagChar      = 0x10;
-    const tCIDLib::TCard1       c1LetterChar        = 0x20;
-    const tCIDLib::TCard1       c1XMLChar           = 0x40;
-    const tCIDLib::TCard1       c1WhitespaceChar    = 0x80;
+    constexpr tCIDLib::TCard1       c1BaseChar          = 0x1;
+    constexpr tCIDLib::TCard1       c1SpecialCharData   = 0x2;
+    constexpr tCIDLib::TCard1       c1NameChar          = 0x4;
+    constexpr tCIDLib::TCard1       c1MarkupTestChar    = 0x8;
+    constexpr tCIDLib::TCard1       c1StartTagChar      = 0x10;
+    constexpr tCIDLib::TCard1       c1LetterChar        = 0x20;
+    constexpr tCIDLib::TCard1       c1XMLChar           = 0x40;
+    constexpr tCIDLib::TCard1       c1WhitespaceChar    = 0x80;
 
 
     // -----------------------------------------------------------------------
     //  Some id constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4InvalidElemId     = kCIDLib::c4MaxCard;
-    const tCIDLib::TCard4       c4PCDataElemId      = kCIDLib::c4MaxCard - 1;
+    constexpr tCIDLib::TCard4       c4InvalidElemId     = kCIDLib::c4MaxCard;
+    constexpr tCIDLib::TCard4       c4PCDataElemId      = kCIDLib::c4MaxCard - 1;
 
 
     // -----------------------------------------------------------------------
     //  Some general constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const   pszXMLVersion       = L"1.0";
-    const tCIDLib::TCard4       c4XMLMajVersion     = 1;
-    const tCIDLib::TCard4       c4XMLMinVersion     = 0;
+    const tCIDLib::TCh* const   pszXMLVersion           = L"1.0";
+    constexpr tCIDLib::TCard4       c4XMLMajVersion     = 1;
+    constexpr tCIDLib::TCard4       c4XMLMinVersion     = 0;
 
 
     // -----------------------------------------------------------------------

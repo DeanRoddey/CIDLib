@@ -50,14 +50,12 @@ class TWorkQItemPool : public TSimplePool<TWorkQItem>
         // -------------------------------------------------------------------
         TWorkQItemPool() :
 
-            TSimplePool
-            (
-                1024, L"ORB Work Item Pool", tCIDLib::EMTStates::Safe
-            )
+            TSimplePool(1024, L"ORB Work Item Pool", tCIDLib::EMTStates::Safe)
         {
         }
 
         TWorkQItemPool(const TWorkQItemPool&) = delete;
+        TWorkQItemPool(TWorkQItemPool&&) = delete;
 
         ~TWorkQItemPool() {}
 
@@ -66,24 +64,25 @@ class TWorkQItemPool : public TSimplePool<TWorkQItem>
         //  Public operators
         // -------------------------------------------------------------------
         TWorkQItemPool& operator=(const TWorkQItemPool&) = delete;
+        TWorkQItemPool& operator=(TWorkQItemPool&&) = delete;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4ElemSize(const TWorkQItem& wqiSrc) override
+        tCIDLib::TCard4 c4ElemSize(const TWorkQItem& wqiSrc) final
         {
             return wqiSrc.c4BufSize();
         }
 
-        // Create a new string with the requested size
-        TWorkQItem* pelemMakeNew(const tCIDLib::TCard4 c4Size) override
+        // Create a new queue item with the requested size
+        [[nodiscard]] TWorkQItem* pelemMakeNew(const tCIDLib::TCard4 c4Size) final
         {
             return new TWorkQItem(c4Size);
         }
 
-        tCIDLib::TVoid PrepElement(TWorkQItem& wqiTar, const tCIDLib::TCard4 c4Size) override
+        tCIDLib::TVoid PrepElement(TWorkQItem& wqiTar, const tCIDLib::TCard4 c4Size) final
         {
             wqiTar.Reset(c4Size);
         }
@@ -99,7 +98,11 @@ namespace CIDOrb_WorkQItem
 {
     namespace
     {
-        TWorkQItemPool  splWorkQPool;
+        TWorkQItemPool& splWorkQPool()
+        {
+            static TWorkQItemPool* psplRet = new TWorkQItemPool;
+            return *psplRet;
+        }
     }
 }
 
@@ -111,6 +114,21 @@ namespace CIDOrb_WorkQItem
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TWorkQItem: Public, static methods
+// ---------------------------------------------------------------------------
+
+//
+//  For the facility object to periodically update a stats cache item that tracks
+//  how many work queue items are currently in use. We really can't afford the
+//  overhead of doing that every time our ctor/dtor gets or releases one.
+//
+tCIDLib::TCard4 TWorkQItem::c4UsedQItems()
+{
+    return CIDOrb_WorkQItem::splWorkQPool().c4ElemsUsed();
+}
+
+
+// ---------------------------------------------------------------------------
 //  TWorkQItem: Constructor and Destructor
 // ---------------------------------------------------------------------------
 TWorkQItem::TWorkQItem(const tCIDLib::TCard4 c4InitSz) :
@@ -118,10 +136,6 @@ TWorkQItem::TWorkQItem(const tCIDLib::TCard4 c4InitSz) :
     m_c8ConnId(0)
     , m_enctStart(TTime::enctNow())
     , m_ocmdThis(c4InitSz)
-{
-}
-
-TWorkQItem::~TWorkQItem()
 {
 }
 
@@ -169,7 +183,6 @@ const TOrbCmd& TWorkQItem::ocmdThis() const
 // Mostly to support the pool
 tCIDLib::TVoid TWorkQItem::Reset(const tCIDLib::TCard4  c4Size)
 {
-    MRefCounted::ResetMRefCount();
     m_ocmdThis.Reset(c4Size);
 }
 
@@ -195,6 +208,7 @@ TWorkQItem::SetConnInfo(const   tCIDLib::TCard8 c8ConnId
 // ---------------------------------------------------------------------------
 TWorkQItemPtr::TWorkQItemPtr(const tCIDLib::TCard4 c4InitSz) :
 
-    TSimplePoolPtr(&CIDOrb_WorkQItem::splWorkQPool, c4InitSz)
+    TSimplePoolPtr(&CIDOrb_WorkQItem::splWorkQPool(), c4InitSz)
 {
 }
+

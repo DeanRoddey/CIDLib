@@ -796,7 +796,7 @@ class CIDMACROENGEXP TCIDMacroEngine : public TObject
 
         tCIDLib::TVoid ValidateCallFrame
         (
-                    TMEngClassVal&          mecvInstance
+            const   TMEngClassVal&          mecvInstance
             , const tCIDLib::TCard2         c2MethodId
         )   const;
 

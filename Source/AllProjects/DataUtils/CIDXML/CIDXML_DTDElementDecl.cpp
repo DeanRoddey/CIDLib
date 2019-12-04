@@ -31,13 +31,6 @@
 #include    "CIDXML_.hpp"
 
 
-// ---------------------------------------------------------------------------
-//  Magic RTTI macros
-// ---------------------------------------------------------------------------
-RTTIDecls(TDTDAttrDefCursor,TAttrDefCursor)
-RTTIDecls(TDTDElemDecl, TXMLElementDecl)
-
-
 
 // ---------------------------------------------------------------------------
 //  TDTDAttrDefCursor: Constructors and Destructor

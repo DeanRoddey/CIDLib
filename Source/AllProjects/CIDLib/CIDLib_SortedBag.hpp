@@ -58,6 +58,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             TParent(eMTSafe)
+            , m_c4UserData(0)
             , m_eDir(eDir)
             , m_pfnComp(pfnComp)
         {
@@ -66,6 +67,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
         TSortedBag(const TMyType& colSrc) :
 
             TParent(colSrc)
+            , m_c4UserData(colSrc.m_c4UserData)
             , m_eDir(colSrc.m_eDir)
             , m_pfnComp(colSrc.m_pfnComp)
         {
@@ -74,6 +76,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
         TSortedBag(TMyType&& colSrc) :
 
             TParent(colSrc.eMTState())
+            , m_c4UserData(0)
             , m_eDir(colSrc.m_eDir)
             , m_pfnComp(nullptr)
         {
@@ -91,6 +94,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
             if (&colSrc != this)
             {
                 TParent::operator=(colSrc);
+                m_c4UserData = colSrc.m_c4UserData;
                 m_eDir = colSrc.m_eDir;
                 m_pfnComp = colSrc.m_pfnComp;
             }
@@ -100,6 +104,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
         TMyType& operator=(TMyType&& colSrc)
         {
             TParent::operator=(tCIDLib::ForceMove(colSrc));
+            tCIDLib::Swap(m_c4UserData, colSrc.m_c4UserData);
             tCIDLib::Swap(m_eDir, colSrc.m_eDir);
             tCIDLib::Swap(m_pfnComp, colSrc.m_pfnComp);
             return *this;

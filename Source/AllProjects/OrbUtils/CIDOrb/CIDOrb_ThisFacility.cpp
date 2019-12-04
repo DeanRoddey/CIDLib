@@ -74,7 +74,7 @@ namespace CIDOrb_ThisFacility
         // -----------------------------------------------------------------------
         //  Max entries we'll keep in the name server cache
         // -----------------------------------------------------------------------
-        constexpr tCIDLib::TCard4 c4MaxNSQSize = 2048;
+        constexpr  tCIDLib::TCard4 c4MaxNSQSize = 2048;
     }
 }
 
@@ -121,6 +121,11 @@ TFacCIDOrb::TFacCIDOrb() :
     , m_enctTimeoutAdjust(0)
     , m_poccmSrv(nullptr)
     , m_pcrypSecure(nullptr)
+    , m_thrMonitor
+      (
+        L"CIDOrbMonitorThread"
+        , TMemberFunc<TFacCIDOrb>(this, &TFacCIDOrb::eMonThread)
+      )
 {
     // See if the timeout adjustment is set
     TString strVal;
@@ -173,6 +178,9 @@ TFacCIDOrb::TFacCIDOrb() :
     ocmdTmp.SetReplyMode();
     strmOut << ocmdTmp << kCIDLib::FlushIt;
     m_c4ReplyOverhead = strmOut.c4CurPos() + 8;
+
+    // Start the monitor thread
+    m_thrMonitor.Start();
 }
 
 
@@ -334,7 +342,7 @@ tCIDLib::TVoid TFacCIDOrb::ClearOnlyAcceptFrom()
 //  A server calls this to de-register one of his objects from the server side
 //  ORB.
 //
-tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
+tCIDLib::TVoid TFacCIDOrb::DeregisterObject(const TOrbServerBase* const porbsToDereg)
 {
     #if CID_DEBUG_ON
     if (!m_atomServerInit)
@@ -616,10 +624,7 @@ TFacCIDOrb::eReadPacket(        TThread&            thrCaller
 {
     // First we call the packet reader
     tCIDOrb::TPacketHdr hdrRead;
-    tCIDOrb::EReadRes eRes = eReadPacketHdr
-    (
-        thrCaller, sockSrc, c4WaitFor, hdrRead
-    );
+    tCIDOrb::EReadRes eRes = eReadPacketHdr(thrCaller, sockSrc, c4WaitFor, hdrRead);
 
     //
     //  Return the sequence id. If we didn't really get a packet, then
@@ -631,12 +636,8 @@ TFacCIDOrb::eReadPacket(        TThread&            thrCaller
 
     // If a packet and it's non-zero, then read the packet
     if ((eRes == tCIDOrb::EReadRes::Packet) && hdrRead.c4DataBytes)
-    {
-        eRes = eReadPacketData
-        (
-            thrCaller, sockSrc, hdrRead, c4DataBytes, mbufToFill
-        );
-    }
+        eRes = eReadPacketData(thrCaller, sockSrc, hdrRead, c4DataBytes, mbufToFill);
+
     return eRes;
 }
 
@@ -695,9 +696,6 @@ TFacCIDOrb::eReadPacket(        TThread&                thrCaller
             return tCIDOrb::EReadRes::Lost;
         }
 
-        // Provisionally get a work item from the pool
-        TWorkQItemPtr wqipTmp(hdrRead.c4DataBytes);
-
         //
         //  If we don't allocate a stream, then the janitor just does
         //  nothing, else it will free the local buffer on the way out.
@@ -725,7 +723,7 @@ TFacCIDOrb::eReadPacket(        TThread&                thrCaller
         // Double check that he got what we asked for
         if (c4BytesRead != hdrRead.c4DataBytes)
         {
-            // <TBD>
+            CIDAssert2(L"Did not read the number of ORB packet bytes expected");
 
             // For now, return a lost connection as a punt
             return tCIDOrb::EReadRes::Lost;
@@ -737,12 +735,15 @@ TFacCIDOrb::eReadPacket(        TThread&                thrCaller
         //
         if (eRes == tCIDOrb::EReadRes::Packet)
         {
+            // Provisionally get a work item from the pool bit enough for the data
+            TWorkQItemPtr wqipTmp(hdrRead.c4DataBytes);
+
             pstrmToUse->Reset();
             pstrmToUse->SetEndIndex(c4BytesRead);
             *pstrmToUse >> wqipTmp->ocmdThis();
 
             // It worked so give it back to the caller
-            wqipNew = wqipTmp;
+            wqipNew = tCIDLib::ForceMove(wqipTmp);
         }
     }
     return eRes;
@@ -1258,12 +1259,8 @@ TFacCIDOrb::StoreObjIDCache(const   TString&    strBindingName
 
 
 //
-//  Stops, but does not fully clean up the ORB. Some server side stuff is
-//  left in place, but all shut down. This is because some apps start and
-//  stop the ORB, and we don't want to recreate it every time. To fully
-//  clean up, use the Cleanup() method. The dtor will call Cleanup() but it
-//  is best to do it proactively, so that it doesn't try to occur in the
-//  global context during app exit.
+//  Stops the ORB (both sides if they are started) and cleans up.) The application
+//  should call this proactively. If they don't we call it in our destructor.
 //
 tCIDLib::TVoid TFacCIDOrb::Terminate()
 {
@@ -1278,6 +1275,19 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
             , tCIDLib::ESeverities::Info
             , tCIDLib::EErrClasses::AppStatus
         );
+    }
+
+    // Stop the monitor thread
+    try
+    {
+        m_thrMonitor.ReqShutdownSync(5000);
+        m_thrMonitor.eWaitForDeath(4000);
+    }
+
+    catch(TError& errToCatch)
+    {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        LogEventObj(errToCatch);
     }
 
     if (m_atomClientInit)
@@ -1331,11 +1341,8 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
 
                 catch(TError& errToCatch)
                 {
-                    if (bShouldLog(errToCatch))
-                    {
-                        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                        LogEventObj(errToCatch);
-                    }
+                    errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                    LogEventObj(errToCatch);
 
                     facCIDOrb().ThrowErr
                     (
@@ -1425,20 +1432,43 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
 }
 
 
-//
-//  The work item pool class will call us every so many times a work item gets
-//  freed, to let us update the work queue items stat.
-//
-tCIDLib::TVoid TFacCIDOrb::UpdateWorkQItemStat(const tCIDLib::TCard4 c4Count)
-{
-    TStatsCache::SetValue(m_sciWorkQItems, c4Count);
-}
-
 
 
 // ---------------------------------------------------------------------------
 //  TFacCIDOrb: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+
+tCIDLib::EExitCodes TFacCIDOrb::eMonThread(TThread& thrThis, tCIDLib::TVoid*)
+{
+    thrThis.Sync();
+
+    // And now loop till asked to shut down
+    while (kCIDLib::True)
+    {
+        try
+        {
+            // Sleep a while and wait for a shutdown request as we do
+            if (!thrThis.bSleep(2000))
+                break;
+
+            // Update our work queue items stat
+            TStatsCache::SetValue(m_sciWorkQItems, TWorkQItem::c4UsedQItems());
+        }
+
+        catch(TError& errToCatch)
+        {
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            TModule::LogEventObj(errToCatch);
+        }
+
+        catch(...)
+        {
+        }
+    }
+
+    return tCIDLib::EExitCodes::Normal;
+}
+
 
 //
 //  Once eReadPacketHdr() has been called to get the newly arriving

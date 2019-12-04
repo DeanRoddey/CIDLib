@@ -47,7 +47,9 @@ RTTIDecls(TMEngEnumInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  TMEngClassInfo::Item: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TMEngEnumInfo::TItem::TItem()
+TMEngEnumInfo::TItem::TItem() :
+
+    m_c4MapVal(0)
 {
 }
 
@@ -60,11 +62,11 @@ TMEngEnumInfo::TItem::TItem(const   TString&        strName
 {
 }
 
-TMEngEnumInfo::TItem::TItem(const TItem& itemToCopy) :
+TMEngEnumInfo::TItem::TItem(const TItem& itemSrc) :
 
-    m_c4MapVal(itemToCopy.m_c4MapVal)
-    , m_strName(itemToCopy.m_strName)
-    , m_strText(itemToCopy.m_strText)
+    m_c4MapVal(itemSrc.m_c4MapVal)
+    , m_strName(itemSrc.m_strName)
+    , m_strText(itemSrc.m_strText)
 {
 }
 
@@ -176,14 +178,14 @@ TMEngEnumVal::bParseFromText(const  TString&        strValue
 
 
 tCIDLib::TVoid
-TMEngEnumVal::CopyFrom( const   TMEngClassVal&      mecvToCopy
+TMEngEnumVal::CopyFrom( const   TMEngClassVal&      mecvSrc
                         ,       TCIDMacroEngine&    meOwner)
 {
     if (meOwner.bValidation())
-        meOwner.CheckSameClasses(*this, mecvToCopy);
+        meOwner.CheckSameClasses(*this, mecvSrc);
 
     // We don't have to copy the max value, which is fixed for this class
-    m_c4OrdValue = static_cast<const TMEngEnumVal&>(mecvToCopy).m_c4OrdValue;
+    m_c4OrdValue = static_cast<const TMEngEnumVal&>(mecvSrc).m_c4OrdValue;
 }
 
 
@@ -309,8 +311,10 @@ TMEngEnumInfo::TMEngEnumInfo(       TCIDMacroEngine&    meOwner
     , m_c2MethId_SetOrd(kMacroEng::c2BadId)
     , m_c2MethId_ValCtor(kMacroEng::c2BadId)
     , m_colItems(c4ExpectedItems ? c4ExpectedItems : 8)
-    , m_c4ErrBadOrdinal(0)
-    , m_pmeciErrors(0)
+    , m_c4ErrBadOrdinal(kCIDLib::c4MaxCard)
+    , m_c4ErrNameNotFound(kCIDLib::c4MaxCard)
+    , m_c4ErrTextNotFound(kCIDLib::c4MaxCard)
+    , m_pmeciErrors(nullptr)
 {
     if (strClassPath() != L"MEng.Enum")
         eExtend(tCIDMacroEng::EClassExt::Final);

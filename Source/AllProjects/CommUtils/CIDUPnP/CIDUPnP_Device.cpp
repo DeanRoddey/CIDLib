@@ -429,6 +429,9 @@ TUPnPDevice::SetServiceFromID(  const   TString&                strSvcID
             , strSvcID
             , m_strName
         );
+
+        // Won't get here but make analyzer happy
+        return;
     }
      else
     {
@@ -448,6 +451,9 @@ TUPnPDevice::SetServiceFromID(  const   TString&                strSvcID
                 , TString(L"type id")
                 , strSvcID
             );
+
+            // Won't get here but make analyzer happy
+            return;
         }
 
         // Make sure it's the right type for the derived class
@@ -466,6 +472,9 @@ TUPnPDevice::SetServiceFromID(  const   TString&                strSvcID
                 , strTypeID
                 , clsIsA()
             );
+
+            // Won't get here but make analyzer happy
+            return;
         }
 
         //

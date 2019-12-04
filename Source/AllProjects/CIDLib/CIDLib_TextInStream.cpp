@@ -79,6 +79,9 @@ static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
 // ---------------------------------------------------------------------------
 //  TTextInStream: Constructors and Destructor
 // ---------------------------------------------------------------------------
+
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextInStream::TTextInStream(TBinInStream* const        pstrmToAdopt
                             ,   TTextConverter* const   ptcvtToAdopt) :
     m_c4CacheOfs(0)
@@ -682,6 +685,9 @@ const TTextConverter& TTextInStream::tcvtThis() const
 // ---------------------------------------------------------------------------
 //  TTextInStream: Hidden Constructors
 // ---------------------------------------------------------------------------
+
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextInStream::TTextInStream(TTextConverter* const ptcvtToAdopt) :
 
     m_c4CacheOfs(0)
@@ -689,7 +695,7 @@ TTextInStream::TTextInStream(TTextConverter* const ptcvtToAdopt) :
     , m_c4SpareBytes(0)
     , m_chUnGet(0)
     , m_eNewLineType(tCIDLib::ENewLineTypes::CRLF)
-    , m_pstrmIn(0)
+    , m_pstrmIn(nullptr)
     , m_ptcvtThis(ptcvtToAdopt)
 {
     // The stream must be set later, before use of this stream

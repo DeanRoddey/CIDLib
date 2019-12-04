@@ -43,6 +43,7 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
         TCIDCfgServerImpl();
 
         TCIDCfgServerImpl(const TCIDCfgServerImpl&) = delete;
+        TCIDCfgServerImpl(TCIDCfgServerImpl&&) = delete;
 
         ~TCIDCfgServerImpl();
 
@@ -51,6 +52,7 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
         //  Public operators
         // -------------------------------------------------------------------
         TCIDCfgServerImpl& operator=(const TCIDCfgServerImpl&) = delete;
+        TCIDCfgServerImpl& operator=(TCIDCfgServerImpl&&) = delete;
 
 
         // -------------------------------------------------------------------

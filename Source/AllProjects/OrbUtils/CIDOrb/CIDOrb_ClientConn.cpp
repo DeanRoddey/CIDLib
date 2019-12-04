@@ -134,7 +134,7 @@ tCIDLib::TVoid TOrbClientConnImpl::SendReply(TWorkQItemPtr& wqipToSend)
      else
     {
         // We take ownership of it to send back
-        m_colReplyQ.objAdd(wqipToSend);
+        m_colReplyQ.objPut(tCIDLib::ForceMove(wqipToSend));
         m_evWorkAvail.Trigger();
     }
 }
@@ -334,7 +334,9 @@ TOrbClientConnImpl::eSpoolThread(TThread& thrThis, tCIDLib::TVoid*)
             }
              else if (c4Which == 1)
             {
-                // Reset the event before we start processing
+                //
+                //  Reset the event before we start processing. If more come in
+                //  while we are working, then
                 m_evWorkAvail.Reset();
                 SendReplies();
             }
@@ -460,7 +462,7 @@ tCIDLib::TVoid TOrbClientConnImpl::SendReplies()
             //  should only create one unneeded one. They are very light weight.
             //
             TWorkQItemPtr wqipCur;
-            if (!m_colReplyQ.bGetNext(wqipCur, 0, kCIDLib::False))
+            if (!m_colReplyQ.bGetNextMv(wqipCur, 0, kCIDLib::False))
                 break;
 
             // Get the command object which has the reply info

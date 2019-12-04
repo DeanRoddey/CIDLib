@@ -36,7 +36,6 @@
 //  Facility specific includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
-#include    <crtdbg.h>
 
 
 // AFTER the header above, since this is defined in there

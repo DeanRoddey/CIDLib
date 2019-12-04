@@ -52,7 +52,19 @@ class TXMLCMNode
         // -------------------------------------------------------------------
         //  Public Destructor
         // -------------------------------------------------------------------
+        TXMLCMNode() = delete;
+
+        TXMLCMNode(const TXMLCMNode&) = delete;
+        TXMLCMNode(TXMLCMNode&&) = delete;
+
         virtual ~TXMLCMNode();
+
+
+        // -------------------------------------------------------------------
+        //  Unimplemented constructors and operators
+        // -------------------------------------------------------------------
+        TXMLCMNode& operator=(const TXMLCMNode&) = delete;
+        TXMLCMNode& operator=(TXMLCMNode&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -64,16 +76,36 @@ class TXMLCMNode
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDXML::ECMNodeTypes eNodeType() const;
+        const TBitset& btsFirstPos() const
+        {
+            if (!m_pbtsFirst)
+            {
+                m_pbtsFirst = new TBitset(m_c4MaxNFAStates);
+                CalculateFirst(*m_pbtsFirst);
+            }
+            return *m_pbtsFirst;
+        }
 
-        const TBitset& btsFirstPos() const;
+        const TBitset& btsLastPos() const
+        {
+            if (!m_pbtsLast)
+            {
+                m_pbtsLast = new TBitset(m_c4MaxNFAStates);
+                CalculateLast(*m_pbtsLast);
+            }
+            return *m_pbtsLast;
+        }
 
-        const TBitset& btsLastPos() const;
+        tCIDLib::TCard4 c4MaxStates(const tCIDLib::TCard4 c4ToSet)
+        {
+            m_c4MaxNFAStates = c4ToSet;
+            return m_c4MaxNFAStates;
+        }
 
-        tCIDLib::TCard4 c4MaxStates
-        (
-            const   tCIDLib::TCard4         c4ToSet
-        );
+        tCIDXML::ECMNodeTypes eNodeType() const
+        {
+            return m_eNodeType;
+        }
 
 
     protected :
@@ -90,18 +122,11 @@ class TXMLCMNode
         //  Protected, virtual methods
         // -------------------------------------------------------------------
         virtual tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const = 0;
+
         virtual tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const = 0;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLCMNode();
-        TXMLCMNode(const TXMLCMNode&);
-        tCIDLib::TVoid operator=(const TXMLCMNode&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -137,19 +162,31 @@ class TXMLCMLeaf : public TXMLCMNode
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TXMLCMLeaf() = delete;
+
         TXMLCMLeaf
         (
             const   tCIDLib::TCard4         c4ElemId
             , const tCIDLib::TCard4         c4StatePos = kCIDLib::c4MaxCard
         );
 
+        TXMLCMLeaf(const TXMLCMNode&) = delete;
+        TXMLCMLeaf(TXMLCMNode&&) = delete;
+
         ~TXMLCMLeaf();
+
+
+        // -------------------------------------------------------------------
+        //  Unimplemented constructors and operators
+        // -------------------------------------------------------------------
+        TXMLCMLeaf& operator=(const TXMLCMLeaf&) = delete;
+        TXMLCMLeaf& operator=(TXMLCMLeaf&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsNullable() const;
+        tCIDLib::TBoolean bIsNullable() const final;
 
 
         // -------------------------------------------------------------------
@@ -169,19 +206,12 @@ class TXMLCMLeaf : public TXMLCMNode
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const;
-        tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const;
+        tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const final;
+
+        tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const final;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLCMLeaf();
-        TXMLCMLeaf(const TXMLCMNode&);
-        tCIDLib::TVoid operator=(const TXMLCMLeaf&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -211,6 +241,8 @@ class TXMLCMBinOp : public TXMLCMNode
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TXMLCMBinOp() = delete;
+
         TXMLCMBinOp
         (
             const   tCIDXML::ECMNodeTypes   eNodeType
@@ -218,21 +250,34 @@ class TXMLCMBinOp : public TXMLCMNode
             ,       TXMLCMNode* const       pcmnRightToAdopt
         );
 
+        TXMLCMBinOp(const TXMLCMBinOp&) = delete;
+        TXMLCMBinOp(TXMLCMBinOp&&) = delete;
+
         ~TXMLCMBinOp();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLCMBinOp& operator=(const TXMLCMBinOp&) = delete;
+        TXMLCMBinOp& operator=(TXMLCMBinOp&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsNullable() const;
+        tCIDLib::TBoolean bIsNullable() const final;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
         TXMLCMNode* pxcmnLeft();
+
         const TXMLCMNode* pxcmnLeft() const;
+
         TXMLCMNode* pxcmnRight();
+
         const TXMLCMNode* pxcmnRight() const;
 
 
@@ -240,19 +285,12 @@ class TXMLCMBinOp : public TXMLCMNode
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const;
-        tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const;
+        tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const final;
+
+        tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const final;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLCMBinOp();
-        TXMLCMBinOp(const TXMLCMBinOp&);
-        tCIDLib::TVoid operator=(const TXMLCMBinOp&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -277,25 +315,38 @@ class TXMLCMUnaryOp : public TXMLCMNode
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TXMLCMUnaryOp() = delete;
+
         TXMLCMUnaryOp
         (
             const   tCIDXML::ECMNodeTypes   eType
             ,       TXMLCMNode* const       pcmnToAdopt
         );
 
+        TXMLCMUnaryOp(const TXMLCMUnaryOp&) = delete;
+        TXMLCMUnaryOp(TXMLCMUnaryOp&&) = delete;
+
         ~TXMLCMUnaryOp();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLCMUnaryOp& operator=(const TXMLCMUnaryOp&) = delete;
+        TXMLCMUnaryOp& operator=(TXMLCMUnaryOp&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsNullable() const;
+        tCIDLib::TBoolean bIsNullable() const final;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
         TXMLCMNode* pxcmnChild();
+
         const TXMLCMNode* pxcmnChild() const;
 
 
@@ -303,19 +354,11 @@ class TXMLCMUnaryOp : public TXMLCMNode
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const;
-        tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const;
+        tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const final;
+        tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const final;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLCMUnaryOp();
-        TXMLCMUnaryOp(const TXMLCMUnaryOp&);
-        tCIDLib::TVoid operator=(const TXMLCMUnaryOp&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -329,37 +372,3 @@ class TXMLCMUnaryOp : public TXMLCMNode
 
 #pragma CIDLIB_POPPACK
 
-
-// ---------------------------------------------------------------------------
-//  TXMLCMNode: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TCard4 TXMLCMNode::c4MaxStates(const tCIDLib::TCard4 c4ToSet)
-{
-    m_c4MaxNFAStates = c4ToSet;
-    return m_c4MaxNFAStates;
-}
-
-inline tCIDXML::ECMNodeTypes TXMLCMNode::eNodeType() const
-{
-    return m_eNodeType;
-}
-
-inline const TBitset& TXMLCMNode::btsFirstPos() const
-{
-    if (!m_pbtsFirst)
-    {
-        m_pbtsFirst = new TBitset(m_c4MaxNFAStates);
-        CalculateFirst(*m_pbtsFirst);
-    }
-    return *m_pbtsFirst;
-}
-
-inline const TBitset& TXMLCMNode::btsLastPos() const
-{
-    if (!m_pbtsLast)
-    {
-        m_pbtsLast = new TBitset(m_c4MaxNFAStates);
-        CalculateLast(*m_pbtsLast);
-    }
-    return *m_pbtsLast;
-}

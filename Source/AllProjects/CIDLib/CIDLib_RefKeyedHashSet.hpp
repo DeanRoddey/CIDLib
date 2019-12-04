@@ -771,7 +771,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             if (pnodeCheck)
             {
                 // We can't delete the object until after the throw!
-                TJanitor<TElem> janElem(0);
+                TJanitor<TElem> janElem(nullptr);
                 if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
                     janElem.Set(pobjToAdd);
                 this->DuplicateKey(objKey, CID_FILE, CID_LINE);
@@ -1371,7 +1371,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     break;
                 c4BucketInd--;
             }
-            return 0;
+            return nullptr;
         }
 
         TNode* pnodeFindNext(TNode* pnodeLast, tCIDLib::THashVal& hshToUpdate) const
@@ -1403,7 +1403,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         //  passed. Null if we are aleady at teh first. The hash is updated to
         //  the bucket that the next one is found it otherwise.
         //
-        TNode* pnodeFindPrevious(TNode* pnodeLast, tCIDLib::THashVal& hshToUpdate) const
+        TNode* pnodeFindPrevious(const TNode* pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
             //
             //  Move back to the previous node in the current bucket. If its a legal

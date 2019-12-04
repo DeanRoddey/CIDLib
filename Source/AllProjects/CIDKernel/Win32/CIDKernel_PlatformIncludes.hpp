@@ -34,9 +34,13 @@
 #define CID_DEBUG_MEM 1
 #if CID_DEBUG_MEM
 #define _CRTDBG_MAP_ALLOC 1
-#include <crtdbg.h>
+
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS)
+#include    <crtdbg.h>
+#pragma     warning(pop)
 #endif
 
 #endif
-
 

@@ -84,13 +84,13 @@ namespace TRawMem
                 tCIDLib::TCard4&        c4ToFill
         , const tCIDLib::TCard4         c4New
         , const tCIDLib::TCard4         c4Compare
-    );
+    )   noexcept;
 
     KRNLEXPORT tCIDLib::TCard4 c4Exchange
     (
                 tCIDLib::TCard4&        c4ToFill
         , const tCIDLib::TCard4         c4New
-    );
+    )   noexcept;
 
     KRNLEXPORT tCIDLib::TCard4 c4PageRounded
     (
@@ -183,13 +183,13 @@ namespace TRawMem
                 tCIDLib::TVoid**        ppToFill
         , const tCIDLib::TVoid*         pNew
         , const tCIDLib::TVoid*         pCompare
-    );
+    )   noexcept;
 
     KRNLEXPORT tCIDLib::TVoid* pExchangeRawPtr
     (
                 tCIDLib::TVoid**        ppToFill
         , const tCIDLib::TVoid*         pNew
-    );
+    )   noexcept;
 
     KRNLEXPORT const tCIDLib::TVoid* pNextPageAdr
     (
@@ -312,8 +312,13 @@ namespace TRawMem
     //  and exchanges on pointers typesafe and convenient. They just work
     //  in terms of the per-platform, untyped ones.
     //
-    template <class T> T* pExchangePtr(T** ppToFill, const T* const pNew)
+    template <class T> T* pExchangePtr(T** ppToFill, const T* const pNew) noexcept
     {
+        //
+        //  Sometimes this is going to be void* return, which will get an analysis
+        //  warning that reinterpret is not required.
+        //
+        #pragma warning(suppress : 26471)
         return reinterpret_cast<T*>
         (
             pExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew)
@@ -322,8 +327,13 @@ namespace TRawMem
 
     template <class T> T* pCompareAndExchangePtr(       T**         ppToFill
                                                 , const T* const    pNew
-                                                , const T* const    pCompare)
+                                                , const T* const    pCompare) noexcept
     {
+        //
+        //  Sometimes this is going to be void* return, which will get an analysis
+        //  warning that reinterpret is not required.
+        //
+        #pragma warning(suppress : 26471)
         return reinterpret_cast<T*>
         (
             pCompareAndExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew, pCompare)
@@ -336,7 +346,7 @@ namespace TRawMem
     //  to do the casting. p2 should be higher in memory.
     // ---------------------------------------------------------------------------
     inline tCIDLib::TCard4 c4AdrDiff(const  tCIDLib::TVoid* const p1
-                                    , const tCIDLib::TVoid* const p2)
+                                    , const tCIDLib::TVoid* const p2) noexcept
     {
         return ((tCIDLib::TCard1*)p2) - ((tCIDLib::TCard1*)p1);
     }

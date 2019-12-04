@@ -46,7 +46,7 @@ namespace CIDLogSrv_Impl
     // -----------------------------------------------------------------------
     //  A magic marker value we use in the log file
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4DeadBeef    = 0xDEADBEEF;
+    constexpr tCIDLib::TCard4       c4DeadBeef    = 0xDEADBEEF;
 
 
     // -----------------------------------------------------------------------
@@ -60,10 +60,8 @@ namespace CIDLogSrv_Impl
     // -----------------------------------------------------------------------
     const tCIDLib::EFileFlags   eLogFileFlags = tCIDLib::EFileFlags
     (
-        tCIDLib::eOREnumBits
-        (
-            tCIDLib::EFileFlags::WriteThrough, tCIDLib::EFileFlags::RandomAccess
-        )
+        tCIDLib::EFileFlags::WriteThrough
+        | tCIDLib::EFileFlags::RandomAccess
     );
 }
 
@@ -109,7 +107,9 @@ class TLogSrvQNode : public TSLstNode
 // ---------------------------------------------------------------------------
 TCIDLogServerImpl::TCIDLogServerImpl() :
 
-    m_c4FreesUsed(0)
+    m_aFreeList()
+    , m_aKeyList()
+    , m_c4FreesUsed(0)
     , m_c4LastFlushSeq(1)
     , m_c4KeysUsed(0)
     , m_c4Seq(1)
@@ -1474,7 +1474,7 @@ tCIDLib::TCard4 TCIDLogServerImpl::c4TossOldest(const tCIDLib::TCard4 c4ToToss)
         {
             RemoveAll();
         }
-         else if (c4KeyCount - c4Removed)
+         else
         {
             // Resort the list by ofs to push the freed up ones to the end
             TArrayOps::TSort<tCIDLogSrv::TKeyItem>
@@ -1499,8 +1499,8 @@ tCIDLib::TCard4 TCIDLogServerImpl::c4TossOldest(const tCIDLib::TCard4 c4ToToss)
                     pFreeList, c4FreeCount, eCompFreeItem
                 );
 
-                tCIDLib::TCard4 c4Index = 0;
-                tCIDLib::TCard4 c4Removed = 0;
+                c4Index = 0;
+                c4Removed = 0;
                 while (c4Index < c4FreeCount)
                 {
                     //
@@ -1509,7 +1509,7 @@ tCIDLib::TCard4 TCIDLogServerImpl::c4TossOldest(const tCIDLib::TCard4 c4ToToss)
                     //  go.
                     //
                     tCIDLogSrv::TFreeItem& itemCur = pFreeList[c4Index++];
-                    tCIDLib::TCard4 c4NextOfs = itemCur.c4Ofs + itemCur.c4Size;
+                    c4NextOfs = itemCur.c4Ofs + itemCur.c4Size;
                     while ((c4Index < c4FreeCount)
                     &&     (pFreeList[c4Index].c4Ofs == c4NextOfs))
                     {
@@ -1534,16 +1534,13 @@ tCIDLib::TCard4 TCIDLogServerImpl::c4TossOldest(const tCIDLib::TCard4 c4ToToss)
                 //
                 if (c4Removed)
                 {
-                    TArrayOps::TSort<tCIDLogSrv::TFreeItem>
-                    (
-                        pFreeList, c4FreeCount, eCompFreeItem
-                    );
+                    TArrayOps::TSort<tCIDLogSrv::TFreeItem>(pFreeList, c4FreeCount, eCompFreeItem);
                     c4FreeCount -= c4Removed;
                 }
             }
 
             //
-            //  Ok, update our actual values with the stuff we just write. To
+            //  Ok, update our actual values with the stuff we just wrote. To
             //  get clean data, we zero out lists out first, then copy only
             //  the used items from the temp lists.
             //
@@ -1827,8 +1824,8 @@ tCIDLib::TVoid TCIDLogServerImpl::DumpDebugInfo(TTextOutStream& strmOut)
     //
     tCIDLib::TCard4         c4NextOfs = 0;
     tCIDLib::TCard4         c4CurSize = 0;
-    tCIDLogSrv::TKeyItem*   pitemKey;
-    tCIDLogSrv::TFreeItem*  pitemFree;
+    tCIDLogSrv::TKeyItem*   pitemKey = nullptr;
+    tCIDLogSrv::TFreeItem*  pitemFree = nullptr;
 
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {

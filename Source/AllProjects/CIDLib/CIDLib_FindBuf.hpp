@@ -236,17 +236,17 @@ class CIDLIBEXP TFindBuf :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------

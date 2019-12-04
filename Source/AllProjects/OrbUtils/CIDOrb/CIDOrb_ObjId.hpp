@@ -100,8 +100,10 @@ class CIDORBEXP TOrbObjId
 
         TOrbObjId
         (
-            const   TOrbObjId&              ooidToCopy
+            const   TOrbObjId&              ooidSrc
         );
+
+        TOrbObjId(TOrbObjId&&) = delete;
 
         ~TOrbObjId();
 
@@ -111,18 +113,20 @@ class CIDORBEXP TOrbObjId
         // -------------------------------------------------------------------
         TOrbObjId& operator=
         (
-            const   TOrbObjId&              ooidToAssign
+            const   TOrbObjId&              ooidSrc
         );
+
+        TOrbObjId& operator=(TOrbObjId&&) = delete;
 
         tCIDLib::TBoolean operator==
         (
-            const   TOrbObjId&              ooidToCompare
+            const   TOrbObjId&              ooidSrc
         )   const;
 
-        tCIDLib::TBoolean operator!=
-        (
-            const   TOrbObjId&              ooidToCompare
-        )   const;
+        tCIDLib::TBoolean operator!=(const TOrbObjId& ooidSrc) const
+        {
+            return !operator==(ooidSrc);
+        }
 
 
         // -------------------------------------------------------------------
@@ -164,17 +168,17 @@ class CIDORBEXP TOrbObjId
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private :
@@ -233,14 +237,4 @@ class CIDORBEXP TOrbObjId
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TOrbObjId: Public operators
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean
-TOrbObjId::operator!=(const TOrbObjId& ooidToCompare) const
-{
-    return !operator==(ooidToCompare);
-}
 

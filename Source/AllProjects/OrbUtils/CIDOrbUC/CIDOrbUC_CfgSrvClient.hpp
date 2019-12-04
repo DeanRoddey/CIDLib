@@ -60,6 +60,7 @@ class CIDORBUCEXP TCfgServerClient : public TObject
         );
 
         TCfgServerClient(const TCfgServerClient&) = delete;
+        TCfgServerClient(TCfgServerClient&&) = delete;
 
         ~TCfgServerClient();
 
@@ -68,6 +69,7 @@ class CIDORBUCEXP TCfgServerClient : public TObject
         //  Pubic operators
         // -------------------------------------------------------------------
         TCfgServerClient& operator=(const TCfgServerClient&) = delete;
+        TCfgServerClient& operator=(TCfgServerClient&&) = delete;
 
 
         // -------------------------------------------------------------------

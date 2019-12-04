@@ -198,7 +198,7 @@ tCIDLib::TVoid TAudio::SetWAVForCue(const   tCIDLib::EAudioCues eCue
     //  If the string is a null string, then we want to empty this cue's
     //  file entry out, so pass in a zero. Else pass in the file name.
     //
-    tCIDLib::TBoolean bRes;
+    tCIDLib::TBoolean bRes = kCIDLib::False;
     if (TString::bIsNullObject(strFileForCue))
         bRes = TKrnlAudio::bSetWAVForCue(eCue, 0);
     else

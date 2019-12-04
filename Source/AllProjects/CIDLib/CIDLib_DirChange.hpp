@@ -56,7 +56,7 @@ class CIDLIBEXP MDirChangeMon
 
         MDirChangeMon(const MDirChangeMon&) = delete;
 
-        ~MDirChangeMon();
+        virtual ~MDirChangeMon();
 
 
         // -------------------------------------------------------------------

@@ -79,6 +79,9 @@ class TCmdLineParm
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TCmdLineParm& operator=(const TCmdLineParm&) = default;
+        TCmdLineParm& operator=(TCmdLineParm&&) = default;
+
         tCIDLib::ECmdLnPTypes eType() const
         {
             return m_eType;
@@ -136,6 +139,12 @@ class CIDLIBEXP TCmdLine
         TCmdLine(TCmdLine&&) = delete;
 
         ~TCmdLine() = default;
+
+        // -------------------------------------------------------------------
+        //  Public opreators
+        // -------------------------------------------------------------------
+        TCmdLine& operator=(const TCmdLine&) = delete;
+        TCmdLine& operator=(TCmdLine&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -251,7 +260,7 @@ class CIDLIBEXP TCmdLine
 //  CLASS: TSysInfo
 // PREFIX: sysi
 // ---------------------------------------------------------------------------
-class CIDLIBEXP TSysInfo : public TObject
+class CIDLIBEXP TSysInfo
 {
     public  :
         // -------------------------------------------------------------------
@@ -259,7 +268,6 @@ class CIDLIBEXP TSysInfo : public TObject
         // -------------------------------------------------------------------
         using TCmdLineList   = TVector<TString>;
         using TCmdLineCursor = TVector<TString>::TConstCursor<TString>;
-
 
 
         // -------------------------------------------------------------------
@@ -488,12 +496,6 @@ class CIDLIBEXP TSysInfo : public TObject
         static TTextInStream*       s_pstrmIn;
         static TTextOutStream*      s_pstrmOut;
         static const tCIDLib::TCh*  s_pszLogInfo;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TSysInfo,TObject)
 };
 
 #pragma CIDLIB_POPPACK

@@ -49,7 +49,7 @@ RTTIDecls(TXMLEntityMgr,TObject)
 TXMLEntityMgr::TXMLEntityMgr() :
 
     m_bExhausted(kCIDLib::False)
-
+    , m_bIgnoreBadChars(kCIDLib::False)
     , m_bThrowAtEnd(kCIDLib::False)
     , m_c4StackTop(0)
     , m_pcolEntityStack(0)

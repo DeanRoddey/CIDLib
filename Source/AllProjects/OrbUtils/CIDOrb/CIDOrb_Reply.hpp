@@ -49,6 +49,7 @@ class CIDORBEXP TOrbReply : public TObject, public MStreamable
         );
 
         TOrbReply(const TOrbReply&) = delete;
+        TOrbReply(TOrbReply&&) = delete;
 
         ~TOrbReply();
 
@@ -57,6 +58,7 @@ class CIDORBEXP TOrbReply : public TObject, public MStreamable
         //  Public operators
         // -------------------------------------------------------------------
         TOrbReply& operator=(const TOrbReply&) = delete;
+        TOrbReply& operator=(TOrbReply&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -101,12 +103,12 @@ class CIDORBEXP TOrbReply : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :

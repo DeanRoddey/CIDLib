@@ -428,12 +428,12 @@ class CIDLIBEXP TKeyValFPair : public TKeyValuePair
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -593,17 +593,17 @@ class CIDLIBEXP TKeyNumPair
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -828,17 +828,17 @@ class CIDLIBEXP TKeyValues
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -914,19 +914,19 @@ template <class TKey, class TValue> class TKeyObjPair : public TObject
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
         {
             if (clsTarget == clsThis())
                 return kCIDLib::True;
             return TObject::bIsDescendantOf(clsTarget);
         }
 
-        const TClass& clsIsA() const
+        const TClass& clsIsA() const final
         {
             return clsThis();
         }
 
-        const TClass& clsParent() const
+        const TClass& clsParent() const final
         {
             return TObject::clsThis();
         }

@@ -31,10 +31,15 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <Mmdeviceapi.h>
 #include    <Mmsystem.h>
 #include    <Endpointvolume.h>
 #include    <dsound.h>
+#pragma     warning(pop)
 
 
 // ---------------------------------------------------------------------------

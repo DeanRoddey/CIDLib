@@ -928,9 +928,9 @@ TUPnPAVTransService::bParseTimeVal( const   TString&                strTmVal
         if (strSecs.bLastOccurrence(kCIDLib::chPeriod, c4At))
             strSecs.CapAt(c4At);
 
-        tCIDLib::TCard4 c4Hours;
-        tCIDLib::TCard4 c4Mins;
-        tCIDLib::TCard4 c4Secs;
+        tCIDLib::TCard4 c4Hours = 0;
+        tCIDLib::TCard4 c4Mins = 0;
+        tCIDLib::TCard4 c4Secs = 0;
 
         if (!strHrs.bToCard4(c4Hours, tCIDLib::ERadices::Dec)
         ||  !strMins.bToCard4(c4Mins, tCIDLib::ERadices::Dec)

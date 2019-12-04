@@ -30,6 +30,10 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <devguid.h>
 #include    <shlwapi.h>
 #include    <shlobj.h>
@@ -37,6 +41,7 @@
 #include    <process.h>
 #include    <Aclapi.h>
 #include    <Winnetwk.h>
+#pragma     warning(pop)
 
 
 // ---------------------------------------------------------------------------

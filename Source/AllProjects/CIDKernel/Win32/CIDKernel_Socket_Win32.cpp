@@ -31,8 +31,13 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
+
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <winhttp.h>
-#include    <Ws2tcpip.h>
+#pragma     warning(pop)
+
 
 
 namespace CIDKernel_Socket_Win32

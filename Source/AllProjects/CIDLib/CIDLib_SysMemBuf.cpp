@@ -613,7 +613,7 @@ tCIDLib::TVoid TSysBuf::Create()
     }
 
     // Store the buffer pointer
-    m_pc1Data = reinterpret_cast<tCIDLib::TCard1*>(pBuf);
+    m_pc1Data = static_cast<tCIDLib::TCard1*>(pBuf);
 
     //
     //  Now if there is any current size and its not the same as the max

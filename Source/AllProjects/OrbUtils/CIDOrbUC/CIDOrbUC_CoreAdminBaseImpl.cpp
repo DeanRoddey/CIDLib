@@ -53,7 +53,8 @@ TCIDCoreAdminBaseImpl::~TCIDCoreAdminBaseImpl()
 //  TCIDCoreAdminBaseImpl: Public, inherited methods
 // ---------------------------------------------------------------------------
 
-// We handle this on behalf of all dervatives
+//
+//  We handle this on behalf of all dervatives
 tCIDLib::TBoolean TCIDCoreAdminBaseImpl::
 bPollValuesInScope( const   TString&                        strParScope
                     , const tCIDLib::TBoolean               bDirectOnly

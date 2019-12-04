@@ -509,7 +509,7 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
             return new TConstCursor<TElem>(this);
         }
 
-        tCIDLib::TVoid RemoveAll()
+        tCIDLib::TVoid RemoveAll() override
         {
             TMtxLocker lockThis(this->pmtxLock());
             if (m_llstCol.bIsEmpty())

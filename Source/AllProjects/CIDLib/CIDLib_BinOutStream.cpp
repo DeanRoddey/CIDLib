@@ -42,6 +42,12 @@ RTTIDecls(TBinOutStream,TObject)
 // ---------------------------------------------------------------------------
 //  TBinOutStream: Constructors and Destructor
 // ---------------------------------------------------------------------------
+
+//
+//	We don't initialize the cache array since it's just overhead we don't need. The
+//	index tells us what bytes are valid.
+//
+#pragma warning(suppress : 26495)
 TBinOutStream::TBinOutStream(TOutStreamImpl* const pstrmiToAdopt) :
 
     m_c4CurIndex(0)
@@ -80,7 +86,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TCard1 c1Val)
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TCard2 c2Val)
 {
     // Do byte swapping if required
-    tCIDLib::TCard2 c2Actual;
+    tCIDLib::TCard2 c2Actual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         c2Actual = TRawBits::c2SwapBytes(c2Val);
     else
@@ -93,7 +99,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TCard2 c2Val)
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TCard4 c4Val)
 {
     // Do byte swapping if required
-    tCIDLib::TCard4 c4Actual;
+    tCIDLib::TCard4 c4Actual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         c4Actual = TRawBits::c4SwapBytes(c4Val);
     else
@@ -106,7 +112,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TCard4 c4Val)
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TCard8 c8Val)
 {
     // Do byte swapping if required
-    tCIDLib::TCard8 c8Actual;
+    tCIDLib::TCard8 c8Actual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         c8Actual = TRawBits::c8SwapBytes(c8Val);
     else
@@ -127,7 +133,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::EStreamMarkers eMarker)
 
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TFloat4 f4Val)
 {
-    tCIDLib::TFloat4 f4Actual;
+    tCIDLib::TFloat4 f4Actual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         f4Actual = TRawBits::f4SwapBytes(f4Val, TSysInfo::bLittleEndian());
     else
@@ -139,7 +145,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TFloat4 f4Val)
 
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TFloat8& f8Val)
 {
-    tCIDLib::TFloat8 f8Actual;
+    tCIDLib::TFloat8 f8Actual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         f8Actual = TRawBits::f8SwapBytes(f8Val, TSysInfo::bLittleEndian());
     else
@@ -158,7 +164,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TInt1 i1Val)
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TInt2 i2Val)
 {
     // Do byte swapping if required
-    tCIDLib::TInt2 i2Actual;
+    tCIDLib::TInt2 i2Actual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         i2Actual = TRawBits::i2SwapBytes(i2Val);
     else
@@ -171,7 +177,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TInt2 i2Val)
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TInt4 i4Val)
 {
     // Do byte swapping if required
-    tCIDLib::TInt4 i4Actual;
+    tCIDLib::TInt4 i4Actual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         i4Actual = TRawBits::i4SwapBytes(i4Val);
     else
@@ -184,7 +190,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TInt4 i4Val)
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TInt8 i8Val)
 {
     // Do byte swapping if required
-    tCIDLib::TInt8 i8Actual;
+    tCIDLib::TInt8 i8Actual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         i8Actual = TRawBits::i8SwapBytes(i8Val);
     else
@@ -197,7 +203,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TInt8 i8Val)
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TUInt uVal)
 {
     // Do byte swapping if required
-    tCIDLib::TUInt uActual;
+    tCIDLib::TUInt uActual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         uActual = TRawBits::c4SwapBytes(uVal);
     else
@@ -210,7 +216,7 @@ TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TUInt uVal)
 TBinOutStream& TBinOutStream::operator<<(const tCIDLib::TSInt iVal)
 {
     // Do byte swapping if required
-    tCIDLib::TSInt iActual;
+    tCIDLib::TSInt iActual = 0;
     if (bLittleEndian() != TSysInfo::bLittleEndian())
         iActual = TRawBits::i4SwapBytes(iVal);
     else
@@ -389,7 +395,7 @@ TBinOutStream::c4WriteRawBuffer(const   tCIDLib::TVoid* const   pBufToUse
         {
             c4Written = m_pstrmiOut->c4WriteBytes
             (
-                reinterpret_cast<const tCIDLib::TCard1*>(pBufToUse)
+                static_cast<const tCIDLib::TCard1*>(pBufToUse)
                 , c4Count
             );
         }
@@ -457,7 +463,7 @@ TBinOutStream::c4WriteRawBuffer(const   tCIDLib::TVoid* const   pBufToUse
 //
 tCIDLib::TCard4 TBinOutStream::c4WriteStream(TBinInStream& strmSrc)
 {
-    const tCIDLib::TCard4 c4ChunkSz(32 * 1024);
+    const tCIDLib::TCard4 c4ChunkSz = kCIDLib::c4Sz_32K;
     THeapBuf mbufTmp(c4ChunkSz, c4ChunkSz);
 
     tCIDLib::TCard4 c4SoFar = 0;
@@ -531,9 +537,9 @@ TBinOutStream::WriteArray(  const   tCIDLib::TBoolean* const    abList
     //  buffer.
     //
     const tCIDLib::TCard4 c4Buf = 128;
-    tCIDLib::TCard1 ac1Tmp[c4Buf];
-    tCIDLib::TCard1* pc1Buf;
-    tCIDLib::TCard1* pc1End;
+    tCIDLib::TCard1 ac1Tmp[c4Buf] = {0};
+    tCIDLib::TCard1* pc1Buf = nullptr;
+    tCIDLib::TCard1* pc1End = nullptr;
 
     // Get a pointer we can move up through the caller's array
     const tCIDLib::TBoolean* pbSrc = abList;
@@ -580,14 +586,12 @@ TBinOutStream::WriteArray(  const   tCIDLib::TCh* const pszToWrite
     //  and to avoid byte order issues.
     //
     const tCIDLib::TCard4 c4BufSz = 255;
-    tCIDLib::TCard1 ac1Buf[c4BufSz + 1];
+    tCIDLib::TCard1 ac1Buf[c4BufSz + 1] = {0};
 
-    tCIDLib::TCard4 c4SrcDone;
-    tCIDLib::TCard4 c4OutBytes;
+    tCIDLib::TCard4 c4SrcDone = 0;
+    tCIDLib::TCard4 c4OutBytes = 0;
     tCIDLib::TCard4 c4Total = 0;
     tCIDLib::TCard2 c2ChunkInd = 1;
-
-    // Create the converter if not created yet
 
     // Loop until we do all of our source chars
     while (c4Total < c4Len)
@@ -659,7 +663,7 @@ TBinOutStream::WriteArray(  const   tCIDLib::TCard2* const  ac2List
     if (bLittleEndian() != TSysInfo::bLittleEndian())
     {
         const tCIDLib::TCard4 c4ChunkSz = 128;
-        tCIDLib::TCard2 ac2Chunk[c4ChunkSz];
+        tCIDLib::TCard2 ac2Chunk[c4ChunkSz] = {0};
 
         tCIDLib::TCard4 c4ChunkInd = 0;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -696,7 +700,7 @@ TBinOutStream::WriteArray(  const   tCIDLib::TCard4* const  ac4List
     if (bLittleEndian() != TSysInfo::bLittleEndian())
     {
         const tCIDLib::TCard4 c4ChunkSz = 128;
-        tCIDLib::TCard4 ac4Chunk[c4ChunkSz];
+        tCIDLib::TCard4 ac4Chunk[c4ChunkSz] = {0};
 
         tCIDLib::TCard4 c4ChunkInd = 0;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -738,7 +742,7 @@ TBinOutStream::WriteArray(  const   tCIDLib::TCard8* const  ac8List
     if (bLittleEndian() != TSysInfo::bLittleEndian())
     {
         const tCIDLib::TCard4 c4ChunkSz = 128;
-        tCIDLib::TCard8 ac8Chunk[c4ChunkSz];
+        tCIDLib::TCard8 ac8Chunk[c4ChunkSz] = {0};
 
         tCIDLib::TCard4 c4ChunkInd = 0;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -787,7 +791,7 @@ TBinOutStream::WriteArray(  const   tCIDLib::TInt2*  const  ai2List
     if (bLittleEndian() != TSysInfo::bLittleEndian())
     {
         const tCIDLib::TCard4 c4ChunkSz = 128;
-        tCIDLib::TInt2 ai2Chunk[c4ChunkSz];
+        tCIDLib::TInt2 ai2Chunk[c4ChunkSz] = {0};
 
         tCIDLib::TCard4 c4ChunkInd = 0;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -824,7 +828,7 @@ TBinOutStream::WriteArray(  const   tCIDLib::TInt4* const   ai4List
     if (bLittleEndian() != TSysInfo::bLittleEndian())
     {
         const tCIDLib::TCard4 c4ChunkSz = 128;
-        tCIDLib::TInt4 ai4Chunk[c4ChunkSz];
+        tCIDLib::TInt4 ai4Chunk[c4ChunkSz] = {0};
 
         tCIDLib::TCard4 c4ChunkInd = 0;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -866,7 +870,7 @@ TBinOutStream::WriteArray(  const   tCIDLib::TInt8* const   ai8List
     if (bLittleEndian() != TSysInfo::bLittleEndian())
     {
         const tCIDLib::TCard4 c4ChunkSz = 128;
-        tCIDLib::TInt8 ai8Chunk[c4ChunkSz];
+        tCIDLib::TInt8 ai8Chunk[c4ChunkSz] = {0};
 
         tCIDLib::TCard4 c4ChunkInd = 0;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -904,7 +908,7 @@ TBinOutStream::WriteArray(  const   tCIDLib::TFloat4* const af4List
     if (bLittleEndian() != bLittle)
     {
         const tCIDLib::TCard4 c4ChunkSz = 128;
-        tCIDLib::TFloat4 af4Chunk[c4ChunkSz];
+        tCIDLib::TFloat4 af4Chunk[c4ChunkSz] = {0};
 
         tCIDLib::TCard4 c4ChunkInd = 0;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -942,7 +946,7 @@ TBinOutStream::WriteArray(  const   tCIDLib::TFloat8* const af8List
     if (bLittleEndian() != bLittle)
     {
         const tCIDLib::TCard4 c4ChunkSz = 128;
-        tCIDLib::TFloat8 af8Chunk[c4ChunkSz];
+        tCIDLib::TFloat8 af8Chunk[c4ChunkSz] = {0};
 
         tCIDLib::TCard4 c4ChunkInd = 0;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -989,7 +993,7 @@ TBinOutStream::WriteClassInfo(const TClass& clsToWrite)
     *this << tCIDLib::EStreamMarkers::TypeName;
 
     // Now get the length of the type name text
-    tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(clsToWrite.pszClassName());
+    const tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(clsToWrite.pszClassName());
 
     // If debugging, check the length
     CIDAssert(c4Len <= kCIDLib::c1MaxCard, L"The class info name is too long");
@@ -1025,6 +1029,12 @@ tCIDLib::TVoid TBinOutStream::WriteEnum(const tCIDLib::TCard4 c4Enum)
 // ---------------------------------------------------------------------------
 //  TBinOutStream: Hidden Constructors
 // ---------------------------------------------------------------------------
+
+//
+//	We don't initialize the cache array since it's just overhead we don't need. The
+//	index tells us what bytes are valid.
+//
+#pragma warning(suppress : 26495)
 TBinOutStream::TBinOutStream() :
 
     m_c4CurIndex(0)
@@ -1069,7 +1079,7 @@ tCIDLib::TVoid TBinOutStream::DeleteImplObject()
     if (m_pstrmiOut)
     {
         delete m_pstrmiOut;
-        m_pstrmiOut = 0;
+        m_pstrmiOut = nullptr;
     }
 }
 

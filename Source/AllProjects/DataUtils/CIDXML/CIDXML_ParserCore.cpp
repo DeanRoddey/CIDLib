@@ -51,6 +51,7 @@ TXMLParserCore::TXMLParserCore() :
     m_bInException(kCIDLib::False)
     , m_bStandalone(kCIDLib::False)
     , m_bValidatorLocked(kCIDLib::False)
+    , m_c4ErrorCount(0)
     , m_c4ErrorMax(1)
     , m_eFlags(tCIDXML::EParseFlags::None)
     , m_eOptions(tCIDXML::EParseOpts::None)
@@ -98,6 +99,7 @@ TXMLParserCore::~TXMLParserCore()
 //  it and clean it up when it's time. If we already have one, this will drop
 //  this reference to the old one and if it's no longer used, it will be freed.
 //
+#pragma warning(suppress : 26461) // Can't make the entity source const
 tCIDLib::TVoid
 TXMLParserCore::AdoptDefExtSS(          TXMLEntitySrc* const    pxesDefExtSS
                                 , const TString&                strDefRootElem)
@@ -418,11 +420,11 @@ tCIDLib::TVoid TXMLParserCore::ParseChars()
     //  In order to catch the illegal ]]> sequence mentioned in the comments
     //  above, we use a little state machine.
     //
-    enum EStates
+    enum class EStates
     {
-        EContent
-        , EFirstBracket
-        , ESecondBracket
+        Content
+        , FirstBracket
+        , SecondBracket
     };
 
 
@@ -444,7 +446,7 @@ tCIDLib::TVoid TXMLParserCore::ParseChars()
     tCIDLib::TBoolean   bLeadingFlag    = kCIDLib::False;
     tCIDLib::TCh        chNext;
     tCIDLib::TCh        chSecond        = kCIDLib::chNull;
-    EStates             eState          = EContent;
+    EStates             eState          = EStates::Content;
     while (!bDone)
     {
         try
@@ -519,7 +521,7 @@ tCIDLib::TVoid TXMLParserCore::ParseChars()
                 if (bEscaped)
                 {
                     // Any escaped char would reset the states
-                    eState = EContent;
+                    eState = EStates::Content;
                     bLeadingFlag = kCIDLib::False;
                 }
                  else
@@ -527,21 +529,21 @@ tCIDLib::TVoid TXMLParserCore::ParseChars()
                     // Its not escaped so maintain the state
                     if (chNext == kCIDLib::chCloseBracket)
                     {
-                        if (eState == EContent)
-                            eState = EFirstBracket;
-                        else if (eState == EFirstBracket)
-                            eState = ESecondBracket;
+                        if (eState == EStates::Content)
+                            eState = EStates::FirstBracket;
+                        else if (eState == EStates::FirstBracket)
+                            eState = EStates::SecondBracket;
                     }
                      else if (chNext == kCIDLib::chGreaterThan)
                     {
-                        if (eState == ESecondBracket)
+                        if (eState == EStates::SecondBracket)
                             PostXMLError(kXMLErrs::errcXMLE_InvalidCharSeq);
-                        eState = EContent;
+                        eState = EStates::Content;
                     }
                      else
                     {
                         // Not a special char so reset state
-                        eState = EContent;
+                        eState = EStates::Content;
                     }
                 }
 
@@ -1588,36 +1590,38 @@ tCIDLib::TVoid TXMLParserCore::ParseExtDecl(const tCIDXML::EDeclTypes eType)
     //  them all first, remembering which order we got them in, and pass
     //  judgement on the order after the fact.
     //
-    enum EOrders
+    enum class EOrders
     {
-        EOrder_Version
-        , EOrder_Encoding
-        , EOrder_Standalone
-        , EOrder_Unknown
+        Version
+        , Encoding
+        , Standalone
+        , Unknown
 
-        , EOrders_Count
+        , Count
     };
 
-    static const TString m_astrNames[EOrders_Count] =
+    static const TString astrNameVals[] =
     {
         TString(L"version")
         , TString(L"encoding")
         , TString(L"standalone")
         , TString(L"unknown")
     };
+    static TEArray<TString, EOrders, EOrders::Count> astrNames(astrNameVals);
 
 
     //
     //  We need to have some buffers to get info into. We just use an array
-    //  of auto string objects.
+    //  of string objects.
     //
-    TString astrList[EOrders_Count];
+    TEArray<TString, EOrders, EOrders::Count> astrList(TString::strEmpty());
 
     //
     //  This array allows us to track whether each string has already been
-    //  seen and what order they were in.
+    //  seen and what order they were in. Default initial values to -1 to mean
+    //  not seen.
     //
-    tCIDLib::TInt4 ai4Flags[EOrders_Count] = { -1, -1, -1, -1 };
+    TEArray<tCIDLib::TInt4, EOrders, EOrders::Count> ai4Flags(-1);
 
     //
     //  Ok, lets enter the loop that gets and stores all of the decl strings
@@ -1645,35 +1649,35 @@ tCIDLib::TVoid TXMLParserCore::ParseExtDecl(const tCIDXML::EDeclTypes eType)
         //  Get a name string. This will be the name of the string that we
         //  are going to get next.
         //
-        if (m_xemThis.bSkippedString(m_astrNames[EOrder_Version]))
-            eOrder = EOrder_Version;
-        else if (m_xemThis.bSkippedString(m_astrNames[EOrder_Encoding]))
-            eOrder = EOrder_Encoding;
-        else if (m_xemThis.bSkippedString(m_astrNames[EOrder_Standalone]))
-            eOrder = EOrder_Standalone;
+        if (m_xemThis.bSkippedString(astrNames[EOrders::Version]))
+            eOrder = EOrders::Version;
+        else if (m_xemThis.bSkippedString(astrNames[EOrders::Encoding]))
+            eOrder = EOrders::Encoding;
+        else if (m_xemThis.bSkippedString(astrNames[EOrders::Standalone]))
+            eOrder = EOrders::Standalone;
         else
-            eOrder = EOrder_Unknown;
+            eOrder = EOrders::Unknown;
 
         //
         //  See if this one has already been done. But only if its not the
         //  unknown string.
         //
-        if (eOrder == EOrder_Unknown)
+        if (eOrder == EOrders::Unknown)
         {
             //
             //  Get a name token, which will be the name string that we did
             //  not understand. We have to skip it to continue and we want to
             //  report it as well.
             //
-            m_xemThis.bGetNameToken(astrList[EOrder_Unknown]);
+            m_xemThis.bGetNameToken(astrList[EOrders::Unknown]);
             PostXMLError
             (
-                kXMLErrs::errcXMLE_UnknownDeclString, astrList[EOrder_Unknown]
+                kXMLErrs::errcXMLE_UnknownDeclString, astrList[EOrders::Unknown]
             );
         }
          else if (ai4Flags[eOrder] != -1)
         {
-            PostXMLError(kXMLErrs::errcXMLE_DeclStringReused, m_astrNames[eOrder]);
+            PostXMLError(kXMLErrs::errcXMLE_DeclStringReused, astrNames[eOrder]);
         }
          else
         {
@@ -1708,18 +1712,18 @@ tCIDLib::TVoid TXMLParserCore::ParseExtDecl(const tCIDXML::EDeclTypes eType)
         //  Some of these strings have known valid values.
         //
         const TString& strValue = astrList[eOrder];
-        if (eOrder == EOrder_Version)
+        if (eOrder == EOrders::Version)
         {
             if (strValue != kCIDXML::pszXMLVersion)
                 PostXMLError(kXMLErrs::errcXMLE_BadVersionStr, strValue);
         }
-         else if (eOrder == EOrder_Encoding)
+         else if (eOrder == EOrders::Encoding)
         {
             // Just make sure its not empty
             if (strValue.bIsEmpty())
                 PostXMLError(kXMLErrs::errcXMLE_EmptyEncodingStr);
         }
-         else if (eOrder == EOrder_Standalone)
+         else if (eOrder == EOrders::Standalone)
         {
             // This one must be yes or no. Update the standalone flag member
             if (strValue == L"yes")
@@ -1758,30 +1762,30 @@ tCIDLib::TVoid TXMLParserCore::ParseExtDecl(const tCIDXML::EDeclTypes eType)
     //
     if (eType == tCIDXML::EDeclTypes::XML)
     {
-        if (ai4Flags[EOrder_Version] != 0)
+        if (ai4Flags[EOrders::Version] != 0)
         {
             PostXMLError(kXMLErrs::errcXMLE_DeclStringsMisordered);
         }
-         else if (ai4Flags[EOrder_Encoding] != -1)
+         else if (ai4Flags[EOrders::Encoding] != -1)
         {
             //
             //  It must be the second string, and the standalone string,
             //  if present, must be third.
             //
-            if (ai4Flags[EOrder_Encoding] != 1)
+            if (ai4Flags[EOrders::Encoding] != 1)
             {
                 PostXMLError(kXMLErrs::errcXMLE_DeclStringsMisordered);
             }
-            else if ((ai4Flags[EOrder_Standalone] != -1)
-                 &&  (ai4Flags[EOrder_Standalone] != 2))
+            else if ((ai4Flags[EOrders::Standalone] != -1)
+                 &&  (ai4Flags[EOrders::Standalone] != 2))
             {
                 PostXMLError(kXMLErrs::errcXMLE_DeclStringsMisordered);
             }
         }
-         else if (ai4Flags[EOrder_Standalone] != -1)
+         else if (ai4Flags[EOrders::Standalone] != -1)
         {
             // It must be the second string
-            if (ai4Flags[EOrder_Standalone] != 1)
+            if (ai4Flags[EOrders::Standalone] != 1)
                 PostXMLError(kXMLErrs::errcXMLE_DeclStringsMisordered);
         }
     }
@@ -1792,20 +1796,20 @@ tCIDLib::TVoid TXMLParserCore::ParseExtDecl(const tCIDXML::EDeclTypes eType)
         //  string is required, and must either be first or after the version.
         //  Standalone is not allowed.
         //
-        if (ai4Flags[EOrder_Version] != -1)
+        if (ai4Flags[EOrders::Version] != -1)
         {
-            if (ai4Flags[EOrder_Version] != 0)
+            if (ai4Flags[EOrders::Version] != 0)
                 PostXMLError(kXMLErrs::errcXMLE_DeclStringsMisordered);
-            else if (ai4Flags[EOrder_Encoding] != 1)
+            else if (ai4Flags[EOrders::Encoding] != 1)
                 PostXMLError(kXMLErrs::errcXMLE_DeclStringsMisordered);
         }
          else
         {
-            if (ai4Flags[EOrder_Encoding] != 0)
+            if (ai4Flags[EOrders::Encoding] != 0)
                 PostXMLError(kXMLErrs::errcXMLE_DeclStringsMisordered);
         }
 
-        if (ai4Flags[EOrder_Standalone] != -1)
+        if (ai4Flags[EOrders::Standalone] != -1)
             PostXMLError(kXMLErrs::errcXMLE_StandaloneInExt);
     }
 
@@ -1817,9 +1821,9 @@ tCIDLib::TVoid TXMLParserCore::ParseExtDecl(const tCIDXML::EDeclTypes eType)
     {
         m_pmxevDocEvents->XMLDecl
         (
-            astrList[EOrder_Version]
-            , astrList[EOrder_Encoding]
-            , astrList[EOrder_Standalone]
+            astrList[EOrders::Version]
+            , astrList[EOrders::Encoding]
+            , astrList[EOrders::Standalone]
         );
     }
 
@@ -1829,6 +1833,6 @@ tCIDLib::TVoid TXMLParserCore::ParseExtDecl(const tCIDXML::EDeclTypes eType)
     //  working off the autosensed base encoding (and the preliminary decode
     //  of the decl based on that.)
     //
-    if (!astrList[EOrder_Encoding].bIsEmpty())
-        m_xemThis.SetDeclEncoding(astrList[EOrder_Encoding]);
+    if (!astrList[EOrders::Encoding].bIsEmpty())
+        m_xemThis.SetDeclEncoding(astrList[EOrders::Encoding]);
 }

@@ -65,7 +65,7 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::EBaseTextFmts eBaseFmt() const override;
+        tCIDLib::EBaseTextFmts eBaseFmt() const final;
 
 
     protected :
@@ -80,7 +80,7 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxChars
             ,       tCIDLib::TCard4&        c4OutChars
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   final;
 
         tCIDLib::TCard4 c4BlockTo
         (
@@ -90,7 +90,7 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxBytes
             ,       tCIDLib::TCard4&        c4OutBytes
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   final;
 
 
     private :

@@ -210,6 +210,8 @@ TMEngTextOutStreamInfo::TMEngTextOutStreamInfo(TCIDMacroEngine& meOwner) :
     , m_c2MethId_FmtCard2R(kMacroEng::c2BadId)
     , m_c2MethId_FmtCard4(kMacroEng::c2BadId)
     , m_c2MethId_FmtCard4R(kMacroEng::c2BadId)
+    , m_c2MethId_FmtCard8(kMacroEng::c2BadId)
+    , m_c2MethId_FmtCard8R(kMacroEng::c2BadId)
     , m_c2MethId_FmtChar(kMacroEng::c2BadId)
     , m_c2MethId_FmtCurLine(kMacroEng::c2BadId)
     , m_c2MethId_FmtFloat4(kMacroEng::c2BadId)
@@ -1065,6 +1067,7 @@ TMEngFileOutStreamInfo::TMEngFileOutStreamInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.System.Runtime.TextOutStream"
     )
+    , m_c2MethId_Close(kMacroEng::c2BadId)
     , m_c2EnumId_CreateAct(kMacroEng::c2BadId)
     , m_c2MethId_DefCtor(kMacroEng::c2BadId)
     , m_c2MethId_EncodingCtor(kMacroEng::c2BadId)
@@ -1307,6 +1310,7 @@ TMEngStringOutStreamInfo::TMEngStringOutStreamInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.System.Runtime.TextOutStream"
     )
+    , m_c2EnumId_Errors(kMacroEng::c2BadId)
     , m_c2MethId_DefCtor(kMacroEng::c2BadId)
     , m_c2MethId_GetText(kMacroEng::c2BadId)
     , m_c2MethId_SizeCtor(kMacroEng::c2BadId)

@@ -341,7 +341,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
 
             if (!pnvmiTar->bAddValue(strSubKey, objToSet))
                 AlreadyExists(strKey, &strSubKey);
@@ -369,7 +369,7 @@ template <class TVal> class TNamedValMap : public TObject
                 return pnvmiTar->bIsEmpty();
 
             // Make the compiler happy, this will actually throw
-            NotFound(strKey, 0);
+            NotFound(strKey, nullptr);
             return kCIDLib::False;
         }
 
@@ -401,7 +401,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
 
             CIDLib_Suppress(6011)  // We null checked above
             pnvmiTar->Clear();
@@ -416,7 +416,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
 
             CIDLib_Suppress(6011)  // We null checked above
             return TValCursor(&pnvmiTar->colPairs());
@@ -426,7 +426,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
 
             CIDLib_Suppress(6011)  // We null checked above
             return TNCValCursor(&pnvmiTar->colPairs());
@@ -446,7 +446,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
             CIDLib_Suppress(6011)  // We null checked above
             const TVal* pvalRet = pnvmiTar->pobjValue(strSubKey);
             if (!pvalRet)
@@ -461,7 +461,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
 
             CIDLib_Suppress(6011)  // We null checked above
             if (!pnvmiTar->bQueryValue(strSubKey, objToFill))
@@ -476,7 +476,7 @@ template <class TVal> class TNamedValMap : public TObject
         tCIDLib::TVoid RemoveKey(const TString& strKey)
         {
             if (!m_colItems.bRemoveKey(strKey))
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
         }
 
         tCIDLib::TVoid RemoveSubKey(const   TString&   strKey
@@ -484,7 +484,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
             if (!pnvmiTar->bRemoveSubKey(strSubKey))
                 NotFound(strKey, &strSubKey);
         }
@@ -495,7 +495,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
             if (!pnvmiTar->bSetValue(strSubKey, objValToSet))
                 NotFound(strKey, &strSubKey);
         }

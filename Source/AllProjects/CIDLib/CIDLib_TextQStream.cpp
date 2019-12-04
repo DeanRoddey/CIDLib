@@ -113,10 +113,7 @@ TQOutStreamImpl::c4WriteBytes(  const   tCIDLib::TVoid* const   pBuffer
     tCIDLib::TCh            achBuf[c4BufSz + 1];
     tCIDLib::TCard4         c4CurChars = 0;
     tCIDLib::TCard4         c4CurIndex = 0;
-    const tCIDLib::TCard1*  pc1Src = reinterpret_cast<const tCIDLib::TCard1*>
-    (
-        pBuffer
-    );
+    const tCIDLib::TCard1*  pc1Src = static_cast<const tCIDLib::TCard1*>(pBuffer);
 
     //
     //  If we have any partial line content from the last flush, then we'll

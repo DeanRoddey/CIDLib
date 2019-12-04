@@ -126,7 +126,7 @@ TCommPort::c4ReadRawBuf(        tCIDLib::TVoid* const   pToFill
     tCIDLib::TCard4         c4ThisTime;
     tCIDLib::TCard4         c4Read = 0;
     tCIDComm::EErrors       eErrors;
-    tCIDLib::TCard1*        pc1Out = reinterpret_cast<tCIDLib::TCard1*>(pToFill);
+    tCIDLib::TCard1*        pc1Out = static_cast<tCIDLib::TCard1*>(pToFill);
     TThread*                pthrCaller = TThread::pthrCaller();
 
     tCIDLib::TEncodedTime   enctCur = TTime::enctNow();

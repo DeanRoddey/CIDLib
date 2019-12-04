@@ -62,6 +62,7 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         );
 
         TRegEx(const TRegEx&) = delete;
+        TRegEx(TRegEx&&) = delete;
 
         ~TRegEx();
 
@@ -70,6 +71,7 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         //  Public operators
         // --------------------------------------------------------------------
         TRegEx& operator=(const TRegEx&) = delete;
+        TRegEx& operator=(TRegEx&&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -152,7 +154,7 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const final;
 
 
     private :

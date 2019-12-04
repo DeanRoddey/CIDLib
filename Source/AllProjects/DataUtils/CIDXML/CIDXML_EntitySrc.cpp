@@ -94,14 +94,14 @@ const TString& TXMLEntitySrc::strSystemId(const TString& strToSet)
 // ---------------------------------------------------------------------------
 //  TXMLEntitySrc: Hidden constructors and operators
 // ---------------------------------------------------------------------------
-TXMLEntitySrc& TXMLEntitySrc::operator=(const TXMLEntitySrc& xsrcToAssign)
+TXMLEntitySrc& TXMLEntitySrc::operator=(const TXMLEntitySrc& xsrcSrc)
 {
-    if (this == &xsrcToAssign)
+    if (this == &xsrcSrc)
         return *this;
 
-    m_strEncoding = xsrcToAssign.m_strEncoding;
-    m_strPublicId = xsrcToAssign.m_strSystemId;
-    m_strSystemId = xsrcToAssign.m_strSystemId;
+    m_strEncoding = xsrcSrc.m_strEncoding;
+    m_strPublicId = xsrcSrc.m_strSystemId;
+    m_strSystemId = xsrcSrc.m_strSystemId;
     return *this;
 }
 
@@ -127,11 +127,11 @@ TXMLEntitySrc::TXMLEntitySrc(const  TString& strSystemId
 {
 }
 
-TXMLEntitySrc::TXMLEntitySrc(const TXMLEntitySrc& xsrcToCopy) :
+TXMLEntitySrc::TXMLEntitySrc(const TXMLEntitySrc& xsrcSrc) :
 
-    m_strEncoding(xsrcToCopy.m_strEncoding)
-    , m_strPublicId(xsrcToCopy.m_strPublicId)
-    , m_strSystemId(xsrcToCopy.m_strSystemId)
+    m_strEncoding(xsrcSrc.m_strEncoding)
+    , m_strPublicId(xsrcSrc.m_strPublicId)
+    , m_strSystemId(xsrcSrc.m_strSystemId)
 {
 }
 

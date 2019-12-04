@@ -502,10 +502,7 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
         //      The usename to use if authentication is required and there is
         //      no info in the URL itself.
         // -------------------------------------------------------------------
-        tCIDLib::TCard1         m_ac1Buf[1024];
         tCIDLib::TBoolean       m_bAutoAuth;
-        tCIDLib::TCard4         m_c4BufCount;
-        tCIDLib::TCard4         m_c4BufIndex;
         tCIDLib::TCard4         m_c4ReqNum;
         tCIDLib::TCard4         m_c4WaitConnSecs;
         tCIDSock::EAddrTypes    m_eAddrType;

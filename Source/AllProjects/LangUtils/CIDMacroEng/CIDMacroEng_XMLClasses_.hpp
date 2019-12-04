@@ -130,7 +130,7 @@ class TMEngXMLTreeParser : public TXMLTreeParser
             , const TString&                strEntityName
             , const TString&                strParentId
             , const tCIDXML::EResolveTypes  eResType
-        )   override;
+        )   final;
 
 
     private :

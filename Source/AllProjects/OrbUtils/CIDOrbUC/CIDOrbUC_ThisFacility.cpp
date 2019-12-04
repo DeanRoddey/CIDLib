@@ -628,14 +628,21 @@ TFacCIDOrbUC::porbcMakeNSProxy(const tCIDLib::TCard4 c4WaitUpTo)
     //  Not available in the cache or bad, so let's create the special
     //  object id for the name server.
     //
-    ooidServer = TOrbObjId
-    (
-        TCIDNameSrvClientProxy::strInterfaceId
-        , kCIDOrbUC::pszNSInstanceId
-        , m_strNSHost
-        , m_ippnNS
-        , L"TCIDNameSrvClientProxy"
-    );
+    //  NOTE: Have to create a temp and then assign it, or the compiler
+    //  will insist on using a move operator even though there's an
+    //  assignment operator available!
+    //
+    {
+        TOrbObjId ooidTmp
+        (
+            TCIDNameSrvClientProxy::strInterfaceId
+            , kCIDOrbUC::pszNSInstanceId
+            , m_strNSHost
+            , m_ippnNS
+            , L"TCIDNameSrvClientProxy"
+        );
+        ooidServer = ooidTmp;
+    }
 
     //
     //  Calc the end time where we'll give up trying to connect. If they

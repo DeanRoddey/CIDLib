@@ -78,12 +78,12 @@ bParseQuotedCommaList(  const   TString&                strText
     //  the source and are in that state, that it was invalid. They are the
     //  same state otherwise for processing purposes.
     //
-    enum EStates
+    enum class EStates
     {
-        EState_StartQ
-        , EState_EndQ
-        , EState_Comma
-        , EState_PostComma
+        StartQ
+        , EndQ
+        , Comma
+        , PostComma
     };
 
 
@@ -93,7 +93,7 @@ bParseQuotedCommaList(  const   TString&                strText
     const tCIDLib::TCh* pszSrc = strText.pszBuffer();
     const tCIDLib::TCh* pszEnd = strText.pszEnd();
 
-    EStates eCurState = EState_StartQ;
+    EStates eCurState = EStates::StartQ;
     TString strAccum;
     while (pszSrc < pszEnd)
     {
@@ -102,8 +102,8 @@ bParseQuotedCommaList(  const   TString&                strText
 
         switch(eCurState)
         {
-            case EState_StartQ :
-            case EState_PostComma :
+            case EStates::StartQ :
+            case EStates::PostComma :
                 //
                 //  It has to be either white space or a quote. If whitespace
                 //  ignore it. If a quote, move to the next state and clear
@@ -112,7 +112,7 @@ bParseQuotedCommaList(  const   TString&                strText
                 if (chCur == kCIDLib::chQuotation)
                 {
                     strAccum.Clear();
-                    eCurState = EState_EndQ;
+                    eCurState = EStates::EndQ;
                 }
                  else if (!TRawStr::bIsSpace(chCur))
                 {
@@ -122,7 +122,7 @@ bParseQuotedCommaList(  const   TString&                strText
                 }
                 break;
 
-            case EState_EndQ :
+            case EStates::EndQ :
                 //
                 //  It's either the ending quote, or a character in the current
                 //  value.
@@ -130,7 +130,7 @@ bParseQuotedCommaList(  const   TString&                strText
                 if (chCur == kCIDLib::chQuotation)
                 {
                     colToFill.objAdd(strAccum);
-                    eCurState = EState_Comma;
+                    eCurState = EStates::Comma;
                 }
                  else
                 {
@@ -169,14 +169,14 @@ bParseQuotedCommaList(  const   TString&                strText
                 }
                 break;
 
-            case EState_Comma :
+            case EStates::Comma :
                 //
                 //  We have to see either whitespace, which we ignore, or
                 //  a comma.
                 //
                 if (chCur == kCIDLib::chComma)
                 {
-                    eCurState = EState_PostComma;
+                    eCurState = EStates::PostComma;
                 }
                  else if (!TRawStr::bIsSpace(chCur))
                 {
@@ -193,7 +193,7 @@ bParseQuotedCommaList(  const   TString&                strText
     }
 
     // We have to end up on StartQ or Comma
-    if ((eCurState != EState_StartQ) && (eCurState != EState_Comma))
+    if ((eCurState != EStates::StartQ) && (eCurState != EStates::Comma))
     {
         c4ErrIndex = (pszSrc - strText.pszBuffer());
         return kCIDLib::False;
@@ -234,13 +234,13 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
     //  treat exactly the same as WaitToken, but it lets us know if we saw
     //  a comma last when we hit the end of source.
     //
-    enum EStates
+    enum class EStates
     {
-        EState_WaitToken
-        , EState_WaitCommaTerm
-        , EState_WaitTermQ
-        , EState_WaitComma
-        , EState_PostComma
+        WaitToken
+        , WaitCommaTerm
+        , WaitTermQ
+        , WaitComma
+        , PostComma
     };
 
 
@@ -250,7 +250,7 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
     const tCIDLib::TCh* pszSrc = strText.pszBuffer();
     const tCIDLib::TCh* pszEnd = pszSrc + strText.c4Length();
 
-    EStates eCurState = EState_WaitToken;
+    EStates eCurState = EStates::WaitToken;
     TString strAccum;
     while (pszSrc < pszEnd)
     {
@@ -259,8 +259,8 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
 
         switch(eCurState)
         {
-            case EState_WaitToken :
-            case EState_PostComma :
+            case EStates::WaitToken :
+            case EStates::PostComma :
                 //
                 //  If it's a quote, se start looking for the end quote. If
                 //  it's not a whitespace, we start looking for the comma term
@@ -273,23 +273,23 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
                 if (chCur == kCIDLib::chQuotation)
                 {
                     strAccum.Clear();
-                    eCurState = EState_WaitTermQ;
+                    eCurState = EStates::WaitTermQ;
                 }
                  else if (chCur == kCIDLib::chComma)
                 {
                     colToFill.objAdd(strAccum);
                     strAccum.Clear();
-                    eCurState = EState_PostComma;
+                    eCurState = EStates::PostComma;
                 }
                  else if (!TRawStr::bIsSpace(chCur))
                 {
                     strAccum.Clear();
                     strAccum.Append(chCur);
-                    eCurState = EState_WaitCommaTerm;
+                    eCurState = EStates::WaitCommaTerm;
                 }
                 break;
 
-            case EState_WaitCommaTerm :
+            case EStates::WaitCommaTerm :
                 //
                 //  If it's a comma, then we are at the end of a non-quoted
                 //  token, so store it and clear the accumulator. If it's
@@ -303,7 +303,7 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
                     //
                     colToFill.objAdd(strAccum);
                     strAccum.Clear();
-                    eCurState = EState_PostComma;
+                    eCurState = EStates::PostComma;
                 }
                  else
                 {
@@ -312,7 +312,7 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
                 }
                 break;
 
-            case EState_WaitTermQ :
+            case EStates::WaitTermQ :
                 //
                 //  It's either the ending quote, or a character in the current
                 //  value.
@@ -325,7 +325,7 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
                     //
                     colToFill.objAdd(strAccum);
                     strAccum.Clear();
-                    eCurState = EState_WaitComma;
+                    eCurState = EStates::WaitComma;
                 }
                  else
                 {
@@ -333,14 +333,14 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
                 }
                 break;
 
-            case EState_WaitComma :
+            case EStates::WaitComma :
                 //
                 //  We have to see either whitespace, which we ignore, or
                 //  a comma. Anything else is an error.
                 //
                 if (chCur == kCIDLib::chComma)
                 {
-                    eCurState = EState_PostComma;
+                    eCurState = EStates::PostComma;
                 }
                  else if (!TRawStr::bIsSpace(chCur))
                 {
@@ -359,7 +359,7 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
     //  We cannot end when waiting for a terminating quote. All the other
     //  ones are possible legal scenarios
     //
-    if (eCurState == EState_WaitTermQ)
+    if (eCurState == EStates::WaitTermQ)
     {
         c4ErrIndex = (pszSrc - strText.pszBuffer());
         return kCIDLib::False;
@@ -369,7 +369,7 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
     //  If the accumulator isn't empty, then there was a trailing token.
     //  If we ended on PostComma, then there's a trailing, empty value
     //
-    if (!strAccum.bIsEmpty() || (eCurState == EState_PostComma))
+    if (!strAccum.bIsEmpty() || (eCurState == EStates::PostComma))
         colToFill.objAdd(strAccum);
 
     return kCIDLib::True;

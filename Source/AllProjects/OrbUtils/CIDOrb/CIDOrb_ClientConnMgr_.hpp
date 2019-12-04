@@ -63,6 +63,7 @@ class TOrbClientConnMgr : public TObject
         );
 
         TOrbClientConnMgr(const TOrbClientConnMgr&) = delete;
+        TOrbClientConnMgr(TOrbClientConnMgr&&) = delete;
 
         ~TOrbClientConnMgr();
 
@@ -71,6 +72,7 @@ class TOrbClientConnMgr : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TOrbClientConnMgr& operator=(const TOrbClientConnMgr&) = delete;
+        TOrbClientConnMgr& operator=(TOrbClientConnMgr&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -82,7 +84,7 @@ class TOrbClientConnMgr : public TObject
         (
                     TThread&                thrSpooler
             ,       TServerStreamSocket&    sockThis
-            ,       TOrbClientConnImpl&     occiReplyTo
+            , const TOrbClientConnImpl&     occiReplyTo
             ,       TMemBuf&                mbufTmp
             ,       TBinMBufInStream&       strmTmp
         );

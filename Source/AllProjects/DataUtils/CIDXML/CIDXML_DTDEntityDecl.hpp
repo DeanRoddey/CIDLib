@@ -75,8 +75,10 @@ class CIDXMLEXP TDTDEntityDecl : public TXMLEntityDecl
 
         TDTDEntityDecl
         (
-            const   TDTDEntityDecl&         xdeclToCopy
+            const   TDTDEntityDecl&         xdeclSrc
         );
+
+        TDTDEntityDecl(TDTDEntityDecl&&) = delete;
 
         ~TDTDEntityDecl();
 
@@ -86,8 +88,10 @@ class CIDXMLEXP TDTDEntityDecl : public TXMLEntityDecl
         // -------------------------------------------------------------------
         TDTDEntityDecl& operator=
         (
-            const   TDTDEntityDecl&         xdeclToAssign
+            const   TDTDEntityDecl&         xdeclSrc
         );
+
+        TDTDEntityDecl& operator=(TDTDEntityDecl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -97,7 +101,7 @@ class CIDXMLEXP TDTDEntityDecl : public TXMLEntityDecl
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------

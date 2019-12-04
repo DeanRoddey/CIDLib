@@ -335,11 +335,15 @@ namespace CIDCrypto_AES
 TAESEncrypter::TAESEncrypter(const tCIDCrypto::EBlockModes eMode) :
 
     TBlockEncrypter(16, eMode)
+    , m_ac4DRK()
+    , m_ac4ERK()
     , m_c4Rounds(0)
     , m_ckeyThis()
 {
 }
 
+// The arrays will be set up by ResetImpl(), no need to zero init them
+#pragma warning(suppress : 26495)
 TAESEncrypter::TAESEncrypter(const  TCryptoKey&             ckeyToUse
                             , const tCIDCrypto::EBlockModes eMode) :
 

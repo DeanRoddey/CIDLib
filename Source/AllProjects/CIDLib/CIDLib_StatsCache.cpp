@@ -850,6 +850,7 @@ TStatsCache::bPollValuesInScope(const   TString&                strScope
     //
     const tCIDLib::TCh* pszScope = strScope.pszBuffer();
     const tCIDLib::TCard4 c4ScopeLen = strScope.c4Length();
+    tCIDLib::TCard8 c8LatestChange = c8PollStamp;
 
     for (tCIDLib::TCard4 c4Index = 0;
                     c4Index < CIDLib_StatsCache::c4CacheUsed; c4Index++)
@@ -878,9 +879,20 @@ TStatsCache::bPollValuesInScope(const   TString&                strScope
             {
                 fcolIdList.c4AddElement(c4Index);
                 fcolValueList.c4AddElement(pscnCur->c8Value());
+
+                // If this one's stamp is later than any so far, remember it
+                if (pscnCur->c8Stamp() > c8LatestChange)
+                    c8LatestChange = pscnCur->c8Stamp();
             }
         }
     }
+
+    //
+    //  Give him the lastest time stamp of any item we are returning. If none were
+    //  newer, we are just returning the value we got.
+    //
+    c8PollStamp = c8LatestChange;
+
     return kCIDLib::True;
 }
 

@@ -36,24 +36,24 @@ namespace CIDCrypto_MD5
     // -----------------------------------------------------------------------
     //  Local constant data
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    c4S11 = 7;
-    const tCIDLib::TCard4    c4S12 = 12;
-    const tCIDLib::TCard4    c4S13 = 17;
-    const tCIDLib::TCard4    c4S14 = 22;
-    const tCIDLib::TCard4    c4S21 = 5;
-    const tCIDLib::TCard4    c4S22 = 9;
-    const tCIDLib::TCard4    c4S23 = 14;
-    const tCIDLib::TCard4    c4S24 = 20;
-    const tCIDLib::TCard4    c4S31 = 4;
-    const tCIDLib::TCard4    c4S32 = 11;
-    const tCIDLib::TCard4    c4S33 = 16;
-    const tCIDLib::TCard4    c4S34 = 23;
-    const tCIDLib::TCard4    c4S41 = 6;
-    const tCIDLib::TCard4    c4S42 = 10;
-    const tCIDLib::TCard4    c4S43 = 15;
-    const tCIDLib::TCard4    c4S44 = 21;
+    constexpr tCIDLib::TCard4    c4S11 = 7;
+    constexpr tCIDLib::TCard4    c4S12 = 12;
+    constexpr tCIDLib::TCard4    c4S13 = 17;
+    constexpr tCIDLib::TCard4    c4S14 = 22;
+    constexpr tCIDLib::TCard4    c4S21 = 5;
+    constexpr tCIDLib::TCard4    c4S22 = 9;
+    constexpr tCIDLib::TCard4    c4S23 = 14;
+    constexpr tCIDLib::TCard4    c4S24 = 20;
+    constexpr tCIDLib::TCard4    c4S31 = 4;
+    constexpr tCIDLib::TCard4    c4S32 = 11;
+    constexpr tCIDLib::TCard4    c4S33 = 16;
+    constexpr tCIDLib::TCard4    c4S34 = 23;
+    constexpr tCIDLib::TCard4    c4S41 = 6;
+    constexpr tCIDLib::TCard4    c4S42 = 10;
+    constexpr tCIDLib::TCard4    c4S43 = 15;
+    constexpr tCIDLib::TCard4    c4S44 = 21;
 
-    const tCIDLib::TCard1    ac1Padding[64] =
+    constexpr tCIDLib::TCard1    ac1Padding[64] =
     {
         0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -362,12 +362,7 @@ tCIDLib::TVoid TMessageDigest5::ScrubContext()
     m_ac4State[2] = 0;
     m_ac4State[3] = 0;
 
-    TRawMem::SetMemBuf
-    (
-        m_ac1Buffer
-        , tCIDLib::TCard4(0)
-        , sizeof(m_ac1Buffer) / sizeof(tCIDLib::TCard4)
-    );
+    TRawMem::SetMemBuf(m_ac1Buffer, tCIDLib::TCard1(1) , sizeof(m_ac1Buffer));
 }
 
 
@@ -461,9 +456,6 @@ TMessageDigest5::Transform(const tCIDLib::TCard1* const pac1Block)
     m_ac4State[3] += c4D;
 
     // Zero out sensitive information.
-    TRawMem::SetMemBuf
-    (
-        ac4X, tCIDLib::TCard4(0), TMessageDigest5::c4HashBytes
-    );
+    TRawMem::SetMemBuf(ac4X, tCIDLib::TCard4(0), TMessageDigest5::c4HashBytes);
 }
 

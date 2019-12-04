@@ -535,7 +535,7 @@ static tCIDLib::TVoid DummyFunc()
 //    {
 //    }
 
-    tCIDLib::TFloat4 f4Test;
+    tCIDLib::TFloat4 f4Test = 0;
     if (tCIDLib::IsTFloatX<decltype(f4Test)>::bState)
     {
     }

@@ -249,6 +249,17 @@ template <typename TElem> class TSimplePoolPtr
         }
 
 
+        // -------------------------------------------------------------------
+        //  Protected, non-virtual methods
+        // -------------------------------------------------------------------
+        TSimplePool<TElem>* psplOwner()
+        {
+            if (!m_percThis)
+                return nullptr;
+            return m_percThis->m_psplSrc;
+        }
+
+
     private :
         // -------------------------------------------------------------------
         //  A little structure to let us wrap and ref count the objects
@@ -435,6 +446,16 @@ template<typename TElem> class TSimplePool : public TObject
         {
             TMtxLocker mtxlSync(m_pmtxSync);
             return (m_c4MaxPoolSize - m_colUsedList.c4ElemCount());
+        }
+
+
+        //
+        //  Return the number of elements in use
+        //
+        tCIDLib::TCard4 c4ElemsUsed() const
+        {
+            TMtxLocker mtxlSync(m_pmtxSync);
+            return m_colUsedList.c4ElemCount();
         }
 
 

@@ -82,7 +82,7 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        TElem& objAdd(const TElem& objNew)
+        TElem& objAdd(const TElem& objNew) override
         {
             // Delegate to our parent
             return TParent::objAddAtTop(objNew);

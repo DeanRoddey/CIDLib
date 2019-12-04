@@ -256,6 +256,8 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
         //  Private class types
         // -------------------------------------------------------------------
         using TNSCache = TBasicTreeCol<TNSNode>;
+        using TImplNode = TBasicTreeCol<TNSNode>::TNode;
+        using TImplNTNode = TBasicTreeCol<TNSNode>::TNodeNT;
 
 
         // -------------------------------------------------------------------
@@ -269,21 +271,21 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
 
         tCIDLib::TVoid RecursiveDumpText
         (
-                    TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
+            const   TImplNTNode* const      pnodeParent
             ,       TTextOutStream&         strmOut
             , const tCIDLib::TCard4         c4Depth
         );
 
         tCIDLib::TVoid RecursiveDumpXML
         (
-                    TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
+            const   TImplNTNode* const      pnodeParent
             ,       TTextOutStream&         strmOut
             , const tCIDLib::TCard4         c4Depth
         );
 
         tCIDLib::TVoid RecursiveLeaseCheck
         (
-                    TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
+                    TImplNTNode* const      pnodeParent
             , const tCIDLib::TEncodedTime   enctNow
         );
 

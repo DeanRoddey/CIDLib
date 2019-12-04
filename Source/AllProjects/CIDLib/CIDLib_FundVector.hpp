@@ -214,17 +214,17 @@ class TFundVector : public TFundColBase, public MDuplicable
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsEmpty() const
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             return (m_c4CurIndex == 0);
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             return m_c4CurIndex;
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
             m_c4CurIndex = 0;
             this->PublishClear();
@@ -468,8 +468,6 @@ class TFundVector : public TFundColBase, public MDuplicable
             }
             return kCIDLib::True;
         }
-
-
 
 
         tCIDLib::TVoid Insert(const TElem tToInsert, const TIndex tAt)

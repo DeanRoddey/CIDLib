@@ -365,6 +365,7 @@ tCIDLib::TVoid TSharedMemBuf::SyncView()
 TSharedMemBuf::TSharedMemBuf() :
 
     TMemBuf()
+    , m_c4Size(0)
 {
 }
 
@@ -374,12 +375,12 @@ TSharedMemBuf::TSharedMemBuf() :
 // ---------------------------------------------------------------------------
 tCIDLib::TCard1* TSharedMemBuf::pc1QueryBuf()
 {
-    return reinterpret_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
+    return static_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
 }
 
 const tCIDLib::TCard1* TSharedMemBuf::pc1QueryBuf() const
 {
-    return reinterpret_cast<const tCIDLib::TCard1*>(m_ksmbThis.pData());
+    return static_cast<const tCIDLib::TCard1*>(m_ksmbThis.pData());
 }
 
 
@@ -389,7 +390,7 @@ TSharedMemBuf::pc1QueryBufInfo( tCIDLib::TCard4&    c4CurSize
 {
     c4CurSize = m_c4Size;
     c4MaxSize = m_ksmbThis.c4MaxSize();
-    return reinterpret_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
+    return static_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
 }
 
 const tCIDLib::TCard1*
@@ -398,7 +399,7 @@ TSharedMemBuf::pc1QueryBufInfo(  tCIDLib::TCard4&    c4CurSize
 {
     c4CurSize = m_c4Size;
     c4MaxSize = m_ksmbThis.c4MaxSize();
-    return reinterpret_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
+    return static_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
 }
 
 

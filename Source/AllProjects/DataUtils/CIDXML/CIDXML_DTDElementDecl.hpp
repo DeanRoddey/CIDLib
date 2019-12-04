@@ -69,9 +69,11 @@ class CIDXMLEXP TDTDAttrDefCursor : public TAttrDefCursor
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bNext();
-        tCIDLib::TBoolean bReset();
-        const TXMLAttrDef& xadCur() const;
+        tCIDLib::TBoolean bNext() final;
+
+        tCIDLib::TBoolean bReset() final;
+
+        const TXMLAttrDef& xadCur() const final;
 
 
     private :
@@ -83,12 +85,6 @@ class CIDXMLEXP TDTDAttrDefCursor : public TAttrDefCursor
         //      uses to store its attribute defs.
         // -------------------------------------------------------------------
         TXMLNameIDPoolCursor<TDTDAttrDef>* m_pxnipcThis;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TDTDAttrDefCursor,TAttrDefCursor)
 };
 
 
@@ -112,58 +108,65 @@ class CIDXMLEXP TDTDElemDecl : public TXMLElemDecl
         // -------------------------------------------------------------------
         //  Public Constructors and Destructor
         // -------------------------------------------------------------------
+        TDTDElemDecl() = delete;
+
         TDTDElemDecl
         (
             const   TString&                strName
             , const tCIDXML::EElemModels    eModel = tCIDXML::EElemModels::Any
         );
 
+        TDTDElemDecl(const TDTDElemDecl&) = delete;
+        TDTDElemDecl(TDTDElemDecl&&) = delete;
+
         ~TDTDElemDecl();
+
+
+        // -------------------------------------------------------------------
+        //  Unimplemented constructors and operators
+        // -------------------------------------------------------------------
+        TDTDElemDecl& operator=(const TDTDElemDecl&) = delete;
+        TDTDElemDecl& operator=(TDTDElemDecl&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        TAttrDefCursor& adcThis() const;
+        TAttrDefCursor& adcThis() const final;
 
-        tCIDLib::TBoolean bClearAttrFlags();
+        tCIDLib::TBoolean bClearAttrFlags() final;
 
-        tCIDXML::EElemTextTypes eTextType() const;
-
-        tCIDXML::EElemTextTypes eTextType
-        (
-            const   tCIDXML::EElemTextTypes eType
-        );
+        tCIDXML::EElemTextTypes eTextType() const final;
 
         tCIDLib::TVoid FormatCMTo
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const;
+        )   const final;
 
         TXMLAttrDef* pxadFindAttrDef
         (
             const   TString&                strName
-        );
+        )   final;
 
         const TXMLAttrDef* pxadFindAttrDef
         (
             const   TString&                strName
-        )   const;
+        )   const final;
 
         TXMLAttrDef* pxadFindAttrDef
         (
             const   TString&                strName
             ,       tCIDLib::TBoolean&      bAdded
-        );
+        )   final;
 
-        const TString& strFullName() const;
+        const TString& strFullName() const final;
 
 
         // -------------------------------------------------------------------
@@ -184,6 +187,11 @@ class CIDXMLEXP TDTDElemDecl : public TXMLElemDecl
         tCIDXML::EElemModels eModel
         (
             const   tCIDXML::EElemModels    eModel
+        );
+
+        tCIDXML::EElemTextTypes eTextType
+        (
+            const   tCIDXML::EElemTextTypes eType
         );
 
         tCIDXML::EValidRes eValidate
@@ -209,14 +217,6 @@ class CIDXMLEXP TDTDElemDecl : public TXMLElemDecl
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TDTDElemDecl();
-        TDTDElemDecl(const TDTDElemDecl&);
-        tCIDLib::TVoid operator=(const TDTDElemDecl&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -252,12 +252,6 @@ class CIDXMLEXP TDTDElemDecl : public TXMLElemDecl
         TXMLContentModel*               m_pxcmThis;
         TXMLNameIDPool<TDTDAttrDef>*    m_pxnipAttrList;
         TString                         m_strName;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TDTDElemDecl,TXMLElemDecl)
 };
 
 #pragma CIDLIB_POPPACK

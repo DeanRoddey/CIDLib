@@ -107,6 +107,7 @@ class TOrbClientConnImpl : public TObject
         );
 
         TOrbClientConnImpl(const TOrbClientConnImpl&) = delete;
+        TOrbClientConnImpl(TOrbClientConnImpl&&) = delete;
 
         ~TOrbClientConnImpl();
 
@@ -115,6 +116,7 @@ class TOrbClientConnImpl : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TOrbClientConnImpl& operator=(const TOrbClientConnImpl&) = delete;
+        TOrbClientConnImpl& operator=(TOrbClientConnImpl&&) = delete;
 
 
         // -------------------------------------------------------------------

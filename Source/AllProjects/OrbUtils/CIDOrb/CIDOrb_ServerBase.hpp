@@ -51,6 +51,7 @@ class CIDORBEXP TOrbServerBase : public TObject
         TOrbServerBase() = delete;
 
         TOrbServerBase(const TOrbServerBase&) = delete;
+        TOrbServerBase(TOrbServerBase&&) = delete;
 
         ~TOrbServerBase() = default;
 
@@ -59,6 +60,7 @@ class CIDORBEXP TOrbServerBase : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TOrbServerBase& operator=(const TOrbServerBase&) = delete;
+        TOrbServerBase& operator=(TOrbServerBase&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -199,6 +201,7 @@ class TOrbSrvEnteredJan
         }
 
         TOrbSrvEnteredJan(const TOrbSrvEnteredJan&) = delete;
+        TOrbSrvEnteredJan(TOrbSrvEnteredJan&&) = delete;
 
         ~TOrbSrvEnteredJan()
         {
@@ -210,6 +213,7 @@ class TOrbSrvEnteredJan
         //  Public operators
         // -------------------------------------------------------------------
         TOrbSrvEnteredJan& operator=(const TOrbSrvEnteredJan&) = delete;
+        TOrbSrvEnteredJan& operator=(TOrbSrvEnteredJan&&) = delete;
 
 
     private :

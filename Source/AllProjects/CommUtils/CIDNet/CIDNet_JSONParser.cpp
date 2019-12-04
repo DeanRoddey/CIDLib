@@ -1534,7 +1534,9 @@ TJSONParser::OutputText(const   TString&            strName
 // ---------------------------------------------------------------------------
 TJSONParser::TJSONParser() :
 
-    m_chPushback(kCIDLib::chNull)
+    m_c4Col(0)
+    , m_c4Line(0)
+    , m_chPushback(kCIDLib::chNull)
 {
 }
 

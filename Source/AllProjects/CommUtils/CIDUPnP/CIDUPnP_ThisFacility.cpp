@@ -93,7 +93,7 @@ TFacCIDUPnP::~TFacCIDUPnP()
 // Get the root device of this device
 tCIDLib::TVoid TUPnPDevice::GetRootDevice(TUPnPDevice& upnpdToSet)
 {
-    TKrnlUPnPDevice* pkupnpdRoot;
+    TKrnlUPnPDevice* pkupnpdRoot = nullptr;
     if (!m_pkupnpdThis->bGetRootDevice(pkupnpdRoot))
     {
         facCIDUPnP().ThrowKrnlErr
@@ -105,6 +105,9 @@ tCIDLib::TVoid TUPnPDevice::GetRootDevice(TUPnPDevice& upnpdToSet)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::NotFound
         );
+
+        // Won't get here but makes the analyzer yappy
+        return;
     }
 
     // If the pointer is null, then we already are the root device
@@ -118,6 +121,9 @@ tCIDLib::TVoid TUPnPDevice::GetRootDevice(TUPnPDevice& upnpdToSet)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Already
         );
+
+        // Won't get here but makes the analyzer yappy
+        return;
     }
 
     // We got the device so query the basic info we store
@@ -138,6 +144,9 @@ tCIDLib::TVoid TUPnPDevice::GetRootDevice(TUPnPDevice& upnpdToSet)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't get here but makes the analyzer yappy
+        return;
     }
      else
     {
@@ -315,6 +324,9 @@ TFacCIDUPnP::bSetDeviceFromUID(const TString& strUID, TUPnPDevice& upnpdToSet)
             , tCIDLib::EErrClasses::NotFound
             , TString(L"general info")
         );
+
+        // Won't get here but makes the analyzer yappy
+        return kCIDLib::False;
     }
 
     #if defined(VERBOSE_LOGGING)

@@ -242,7 +242,7 @@ template <class TElem> class TKrnlLList
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid FreeAll()
+        tCIDLib::TVoid FreeAll() noexcept
         {
             TNode* pCur = m_pHead;
 

@@ -1416,9 +1416,9 @@ TCIDNameServerImpl::eLandlordThread(TThread& thrThis, tCIDLib::TVoid*)
 
 
 tCIDLib::TVoid
-TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
-                                        ,       TTextOutStream&         strmOut
-                                        , const tCIDLib::TCard4         c4Depth)
+TCIDNameServerImpl::RecursiveDumpText(  const   TImplNTNode* const  pnodeParent
+                                        ,       TTextOutStream&     strmOut
+                                        , const tCIDLib::TCard4     c4Depth)
 {
     // Output this scope's start tab
     strmOut << TTextOutStream::Spaces(c4Depth * 3)
@@ -1428,7 +1428,7 @@ TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const p
             << L"{\n";
 
     // Do this node's children, if any
-    TBasicTreeCol<TNSNode>::TNode* pnodeChild = pnodeParent->pnodeFirstChild();
+    const TImplNode* pnodeChild = pnodeParent->pnodeFirstChild();
     while (pnodeChild)
     {
         if (pnodeChild->eType() == tCIDLib::ETreeNodes::NonTerminal)
@@ -1436,9 +1436,7 @@ TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const p
             // Just recurse on this non-terminal node, with a depth of one more
             RecursiveDumpText
             (
-                static_cast<TBasicTreeCol<TNSNode>::TNodeNT*>(pnodeChild)
-                , strmOut
-                , c4Depth + 1
+                static_cast<const TImplNTNode*>(pnodeChild), strmOut, c4Depth + 1
             );
         }
          else
@@ -1450,10 +1448,7 @@ TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const p
                     << L"Binding=" << pnodeChild->strName()
                     << L"  '" << pnodeChild->strDescription() << L"'\n";
 
-            const TNSNode& nodeCur
-            (
-                static_cast<TBasicTreeCol<TNSNode>::TNodeT*>(pnodeChild)->objData()
-            );
+            const TNSNode& nodeCur = pnodeChild->objData();;
 
             // If any extra values, display them
             if (!nodeCur.strExtra1().bIsEmpty())
@@ -1489,9 +1484,9 @@ TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const p
 
 
 tCIDLib::TVoid
-TCIDNameServerImpl::RecursiveDumpXML(TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
-                                    ,       TTextOutStream&         strmOut
-                                    , const tCIDLib::TCard4         c4Depth)
+TCIDNameServerImpl::RecursiveDumpXML(const  TImplNTNode* const  pnodeParent
+                                    ,       TTextOutStream&     strmOut
+                                    , const tCIDLib::TCard4     c4Depth)
 {
     // Output this scope's start tab
     strmOut << TTextOutStream::Spaces(c4Depth * 3)
@@ -1514,7 +1509,7 @@ TCIDNameServerImpl::RecursiveDumpXML(TBasicTreeCol<TNSNode>::TNodeNT* const pnod
             << L"</CIDNS:Desc>\n";
 
     // Do this node's children, if any
-    TBasicTreeCol<TNSNode>::TNode* pnodeChild = pnodeParent->pnodeFirstChild();
+    const TImplNode* pnodeChild = pnodeParent->pnodeFirstChild();
     while (pnodeChild)
     {
         if (pnodeChild->eType() == tCIDLib::ETreeNodes::NonTerminal)
@@ -1522,9 +1517,7 @@ TCIDNameServerImpl::RecursiveDumpXML(TBasicTreeCol<TNSNode>::TNodeNT* const pnod
             // Just recurse on this non-terminal node, with a depth of one more
             RecursiveDumpXML
             (
-                static_cast<TBasicTreeCol<TNSNode>::TNodeNT*>(pnodeChild)
-                , strmOut
-                , c4Depth + 1
+                static_cast<const TImplNTNode*>(pnodeChild), strmOut, c4Depth + 1
             );
         }
          else
@@ -1555,7 +1548,7 @@ RecursiveLeaseCheck(        TBasicTreeCol<TNSNode>::TNodeNT* const  pnodeParent
                     , const tCIDLib::TEncodedTime                   enctNow)
 {
     // Do this node's children, if any
-    TBasicTreeCol<TNSNode>::TNode* pnodeChild = pnodeParent->pnodeFirstChild();
+    TImplNode* pnodeChild = pnodeParent->pnodeFirstChild();
     while (pnodeChild)
     {
         if (pnodeChild->eType() == tCIDLib::ETreeNodes::NonTerminal)
@@ -1571,10 +1564,7 @@ RecursiveLeaseCheck(        TBasicTreeCol<TNSNode>::TNodeNT* const  pnodeParent
          else
         {
             // Get a ref to our own node object out of the tree node
-            TNSNode& nodeCur = static_cast<TBasicTreeCol<TNSNode>::TNodeT*>
-            (
-                pnodeChild
-            )->objData();
+            TNSNode& nodeCur = pnodeChild->objData();
 
             //
             //  Note that, if this node is marked as permanent, this will
@@ -1599,7 +1589,7 @@ RecursiveLeaseCheck(        TBasicTreeCol<TNSNode>::TNodeNT* const  pnodeParent
                     );
                 }
 
-                TBasicTreeCol<TNSNode>::TNode* pnodeTmp = pnodeChild->pnodeNext();
+                TImplNode* pnodeTmp = pnodeChild->pnodeNext();
                 pnodeParent->RemoveChild(pnodeChild);
                 pnodeChild = pnodeTmp;
             }

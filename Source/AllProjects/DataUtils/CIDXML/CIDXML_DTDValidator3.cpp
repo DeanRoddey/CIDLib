@@ -183,10 +183,10 @@ tCIDLib::TBoolean TDTDValidator::bParseDefAttrValue(TDTDAttrDef& xadToFill)
     //  normalization of whitespace. We need to know when we are inside
     //  whitespace and when we are in non-whitespace.
     //
-    enum EWSNormStates
+    enum class EWSNormStates
     {
-        EState_InWS
-        , EState_InNonWS
+        InWS
+        , InNonWS
     };
 
     // We have to have a quote char now or its bad
@@ -215,14 +215,14 @@ tCIDLib::TBoolean TDTDValidator::bParseDefAttrValue(TDTDAttrDef& xadToFill)
     //  we should start in.
     //
     EWSNormStates eState =  TXMLCharFlags::bIsSpace(xemOwner().chPeekNext())
-                            ? EState_InWS : EState_InNonWS;
+                            ? EWSNormStates::InWS : EWSNormStates::InNonWS;
 
     //
     //  Do a preliminary check where we just get rid of leading whitespace
     //  if its not CDATA.
     //
     if ((eType != tCIDXML::EAttrTypes::CData)
-    &&  (eState == EState_InWS))
+    &&  (eState == EWSNormStates::InWS))
     {
         // Skip over any leading spaces
         xemOwner().bSkippedSpaces(kCIDLib::True);
@@ -231,7 +231,7 @@ tCIDLib::TBoolean TDTDValidator::bParseDefAttrValue(TDTDAttrDef& xadToFill)
         if (xemOwner().bSkippedChar(chQuote))
             return kCIDLib::True;
 
-        eState = EState_InNonWS;
+        eState = EWSNormStates::InNonWS;
     }
 
     // Get a buffer to put the value into
@@ -333,7 +333,7 @@ tCIDLib::TBoolean TDTDValidator::bParseDefAttrValue(TDTDAttrDef& xadToFill)
         }
          else
         {
-            if (eState == EState_InWS)
+            if (eState == EWSNormStates::InWS)
             {
                 //
                 //  If its a space, just go back to the top and try again
@@ -348,7 +348,7 @@ tCIDLib::TBoolean TDTDValidator::bParseDefAttrValue(TDTDAttrDef& xadToFill)
                 //  here.
                 //
                 strValue.Append(kCIDLib::chSpace);
-                eState = EState_InNonWS;
+                eState = EWSNormStates::InNonWS;
             }
              else
             {
@@ -358,7 +358,7 @@ tCIDLib::TBoolean TDTDValidator::bParseDefAttrValue(TDTDAttrDef& xadToFill)
                 //
                 if (TXMLCharFlags::bIsSpace(chNext))
                 {
-                    eState = EState_InWS;
+                    eState = EWSNormStates::InWS;
                     continue;
                 }
             }
@@ -1075,18 +1075,18 @@ tCIDLib::TVoid TDTDValidator::ParseComment()
     //  We need to do a little state machine here, go catch the end of
     //  command and to check for illegal -- sequences.
     //
-    enum EStates
+    enum class EStates
     {
-        EState_Content
-        , EState_Dash
-        , EState_DoubleDash
+        Content
+        , Dash
+        , DoubleDash
     };
 
     //
     //  Ok, lets loop until we hit the end of input or the correctly
     //  terminated commented.
     //
-    EStates eState = EState_Content;
+    EStates eState = EStates::Content;
     while (kCIDLib::True)
     {
         // Get our next character
@@ -1107,15 +1107,15 @@ tCIDLib::TVoid TDTDValidator::ParseComment()
         }
 
         // According to the current state, process it
-        if (eState == EState_Content)
+        if (eState == EStates::Content)
         {
             // If its a dash, then change the state, else store it
             if (chCur == kCIDLib::chHyphenMinus)
-                eState = EState_Dash;
+                eState = EStates::Dash;
             else
                 strComment.Append(chCur);
         }
-         else if (eState == EState_Dash)
+         else if (eState == EStates::Dash)
         {
             //
             //  If its a dash, then we change to the double dash state.
@@ -1124,16 +1124,16 @@ tCIDLib::TVoid TDTDValidator::ParseComment()
             //
             if (chCur == kCIDLib::chHyphenMinus)
             {
-                eState = EState_DoubleDash;
+                eState = EStates::DoubleDash;
             }
              else
             {
                 strComment.Append(kCIDLib::chHyphenMinus);
                 strComment.Append(chCur);
-                eState = EState_Content;
+                eState = EStates::Content;
             }
         }
-         else if (eState == EState_DoubleDash)
+         else if (eState == EStates::DoubleDash)
         {
             //
             //  We have to get closing bracket here or its an invalid
@@ -1170,8 +1170,8 @@ tCIDLib::TVoid TDTDValidator::ParseComment()
 //
 TXMLCMSpecNode* TDTDValidator::pxcsnParseCMLevel()
 {
-    TXMLCMSpecNode* pxcsnRet = 0;
-    TDTDElemDecl*   pxdeclCur = 0;
+    TXMLCMSpecNode* pxcsnRet = nullptr;
+    TDTDElemDecl*   pxdeclCur = nullptr;
 
     // Get a buffer to get element names into
     TXMLBufJan  janName(&xbmOwner(), 256);
@@ -1182,7 +1182,7 @@ TXMLCMSpecNode* TDTDValidator::pxcsnParseCMLevel()
     //  see the terminating ')' character, a '(' character which causes us
     //  to recurse, an element name, or a '|' or ',' character.
     //
-    tCIDLib::TCh            chNext;
+    tCIDLib::TCh            chNext = kCIDLib::chNull;
     tCIDXML::ECMNodeTypes   eType = tCIDXML::ECMNodeTypes::Unknown;
     TXMLCMSpecNode*         pxcsnNew = nullptr;
     TXMLCMSpecNode*         pxcsnCur = nullptr;

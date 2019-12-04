@@ -86,6 +86,8 @@ namespace TAtomic
 
     template <class T> T* pFencedGet(T** pToGet)
     {
+        // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
+        #pragma warning(suppress : 26471)
         return reinterpret_cast<T*>
         (
             TRawMem::pCompareAndExchangeRawPtr
@@ -97,6 +99,8 @@ namespace TAtomic
 
     template <class T> T* pFencedGet(const T** pToGet)
     {
+        // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
+        #pragma warning(suppress : 26471)
         return reinterpret_cast<T*>
         (
             TRawMem::pCompareAndExchangeRawPtr
@@ -108,6 +112,8 @@ namespace TAtomic
 
     template <class T> tCIDLib::TVoid FencedSet(T** pTarget, T* const pToSet)
     {
+        // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
+        #pragma warning(suppress : 26471)
         reinterpret_cast<T*>
         (
             TRawMem::pExchangeRawPtr
@@ -119,6 +125,8 @@ namespace TAtomic
 
     template <class T> tCIDLib::TVoid FencedSet(const T** pTarget, T* const pToSet)
     {
+        // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
+        #pragma warning(suppress : 26471)
         reinterpret_cast<T*>
         (
             TRawMem::pExchangeRawPtr
@@ -149,7 +157,7 @@ template <typename T> class TSingleton
         TSingleton& operator=(const TSingleton&) = delete;
         TSingleton& operator=(TSingleton&&) = delete;
 
-        ~TSingleton()
+        virtual ~TSingleton()
         {
             //
             //  We don't destroy it. These are used for globals and order of

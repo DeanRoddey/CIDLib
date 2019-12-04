@@ -43,6 +43,7 @@ class TCIDLogServerImpl : public TCIDLogSrvServerBase
         TCIDLogServerImpl();
 
         TCIDLogServerImpl(const TCIDLogServerImpl&) = delete;
+        TCIDLogServerImpl(TCIDLogServerImpl&&) = delete;
 
         ~TCIDLogServerImpl();
 
@@ -51,6 +52,7 @@ class TCIDLogServerImpl : public TCIDLogSrvServerBase
         //  Public operators
         // -------------------------------------------------------------------
         TCIDLogServerImpl& operator=(const TCIDLogServerImpl&) = delete;
+        TCIDLogServerImpl& operator=(TCIDLogServerImpl&&) = delete;
 
 
         // -------------------------------------------------------------------

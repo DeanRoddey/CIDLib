@@ -86,7 +86,7 @@ class CIDXMLEXP TXMLException : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const final;
 
 
     private :

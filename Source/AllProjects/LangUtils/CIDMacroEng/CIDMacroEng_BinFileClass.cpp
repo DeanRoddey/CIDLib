@@ -175,6 +175,7 @@ TMEngBinFileInfo::TMEngBinFileInfo(TCIDMacroEngine& meOwner) :
     , m_c4ErrCloseFailed(kCIDLib::c4MaxCard)
     , m_c4ErrGenErr(kCIDLib::c4MaxCard)
     , m_c4ErrOpenFailed(kCIDLib::c4MaxCard)
+    , m_c4ErrNotOpen(kCIDLib::c4MaxCard)
     , m_c4ErrReadFailed(kCIDLib::c4MaxCard)
     , m_c4ErrWriteFailed(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)

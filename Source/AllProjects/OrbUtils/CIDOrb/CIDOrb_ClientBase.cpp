@@ -105,32 +105,32 @@ namespace CIDOrb_ClientBase
         tCIDLib::TCard4             c4OIDRefreshSecs = 5;
         const tCIDLib::TEncodedTime enctCachePeriod = 45 * kCIDLib::enctOneSecond;
 
-        static TOrbCSrvList& colCache()
+        TOrbCSrvList& colCache()
         {
             static TOrbCSrvList colRet(tCIDLib::EAdoptOpts::Adopt);
             return colRet;
         }
 
-        static TOrbCmdItemCache& colCmdCache()
+        TOrbCmdItemCache& colCmdCache()
         {
             static TOrbCmdItemCache colRet(tCIDLib::EAdoptOpts::Adopt, 32, tCIDLib::EMTStates::Safe);
             return colRet;
         }
 
-        static TOrbCSrvList& colServers()
+        TOrbCSrvList& colServers()
         {
             static TOrbCSrvList colRet(tCIDLib::EAdoptOpts::Adopt);
             return colRet;
         }
 
-        static TConnWaitList& colConnWaitList()
+        TConnWaitList& colConnWaitList()
         {
             static TConnWaitList colRet(tCIDLib::EAdoptOpts::Adopt, 16);
             return colRet;
         }
 
         // We need a mutex for local sync
-        static TMutex* pmtxSync()
+        TMutex* pmtxSync()
         {
             static TMutex mtxSync;
             return &mtxSync;

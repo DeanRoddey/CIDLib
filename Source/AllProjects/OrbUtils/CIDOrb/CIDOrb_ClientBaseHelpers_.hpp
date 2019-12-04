@@ -104,6 +104,7 @@ class TOrbCConnWait
         }
 
         TOrbCConnWait(const TOrbCConnWait&) = delete;
+        TOrbCConnWait(TOrbCConnWait&&) = delete;
 
         ~TOrbCConnWait() {}
 
@@ -112,6 +113,7 @@ class TOrbCConnWait
         //  Public operators
         // -------------------------------------------------------------------
         TOrbCConnWait& operator=(const TOrbCConnWait&) = delete;
+        TOrbCConnWait& operator=(TOrbCConnWait&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -157,6 +159,7 @@ class TOrbQNode : public TDLstNode
         );
 
         TOrbQNode(const TOrbQNode&) = delete;
+        TOrbQNode(TOrbQNode&&) = delete;
 
         ~TOrbQNode();
 
@@ -165,6 +168,7 @@ class TOrbQNode : public TDLstNode
         //  Public operators
         // -------------------------------------------------------------------
         TOrbQNode& operator=(const TOrbQNode&) = delete;
+        TOrbQNode& operator=(TOrbQNode&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -221,6 +225,7 @@ class TSrvTarget
         );
 
         TSrvTarget(const TSrvTarget&) = delete;
+        TSrvTarget(TSrvTarget&&) = delete;
 
         ~TSrvTarget();
 
@@ -229,6 +234,7 @@ class TSrvTarget
         //  Public operators
         // -------------------------------------------------------------------
         TSrvTarget& operator=(const TSrvTarget&) = delete;
+        TSrvTarget& operator=(TSrvTarget&&) = delete;
 
 
         // -------------------------------------------------------------------

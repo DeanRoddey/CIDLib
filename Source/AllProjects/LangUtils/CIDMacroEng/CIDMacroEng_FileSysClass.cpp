@@ -456,6 +456,7 @@ TMEngFileSysInfo::TMEngFileSysInfo(TCIDMacroEngine& meOwner) :
     )
     , m_c2EnumId_Errors(kMacroEng::c2BadId)
     , m_c2MethId_CopyFile(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
     , m_c2MethId_DelFile(kMacroEng::c2BadId)
     , m_c2MethId_DirExists(kMacroEng::c2BadId)
     , m_c2MethId_FileExists(kMacroEng::c2BadId)

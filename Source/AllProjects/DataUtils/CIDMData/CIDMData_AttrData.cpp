@@ -47,7 +47,7 @@ namespace CIDMData_AttrData
     //  Version 2 -
     //      Added the user data string member
     //
-    const tCIDLib::TCard2   c2FmtVersion = 2;
+    constexpr tCIDLib::TCard2   c2FmtVersion = 2;
 }
 
 

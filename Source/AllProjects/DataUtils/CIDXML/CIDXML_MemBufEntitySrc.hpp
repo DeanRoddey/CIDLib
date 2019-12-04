@@ -140,6 +140,8 @@ class CIDXMLEXP TMemBufEntitySrc : public TXMLEntitySrc
             const   TMemBufEntitySrc&       xsrcSrc
         );
 
+        TMemBufEntitySrc(TMemBufEntitySrc&&) = delete;
+
         ~TMemBufEntitySrc();
 
 
@@ -151,11 +153,13 @@ class CIDXMLEXP TMemBufEntitySrc : public TXMLEntitySrc
             const   TMemBufEntitySrc&       xsrcSrc
         );
 
+        TMemBufEntitySrc& operator=(TMemBufEntitySrc&&) = delete;
+
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        [[nodiscard]] TBinInStream* pstrmMakeNew() const;
+        [[nodiscard]] TBinInStream* pstrmMakeNew() const final;
 
 
         // -------------------------------------------------------------------

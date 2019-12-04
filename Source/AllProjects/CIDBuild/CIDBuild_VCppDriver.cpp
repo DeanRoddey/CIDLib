@@ -351,6 +351,8 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     //
     //  Now that we are enabling pre-compiled headers, this seems to be an issue
     //  though in theory it's ok.
+    //
+    /*
     TBldStr strMP = L"/MP";
     if (!facCIDBuild.bLowPrio() && !facCIDBuild.bSingle())
     {
@@ -360,6 +362,7 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         strMP.Append(c4Count);
         apszArgs[c4CurArg++] = strMP.pszBuffer();
     }
+    */
 
     //
     //  Enable SSE2 support which should be available on anything that CIDLib based apps
@@ -424,12 +427,15 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         // If asked, invoke code analysis
         if (facCIDBuild.bCodeAnalysis())
         {
+            // Tell it to use our standard rulseset
             apszArgs[c4CurArg++] = L"/analyze:ruleset";
-
-            TBldStr* pstrNew  = new TBldStr(L"\"");
-            pstrNew->Append(facCIDBuild.strCIDLibSrcDir());
-            pstrNew->Append(L"Source\\Cmd\\Win32\\Standard.ruleset\"");
+            TBldStr* pstrNew = new TBldStr(facCIDBuild.strCIDLibSrcDir());
+            pstrNew->Append(L"Source\\Cmd\\Win32\\Standard.ruleset");
             apszArgs[c4CurArg++] = pstrNew->pszBuffer();
+
+            // And tell it the analysis plugin to use, which it doesn't seem to do on its own
+            apszArgs[c4CurArg++] = L"/analyze:plugin";
+            apszArgs[c4CurArg++] = L"EspXEngine.dll";
         }
     }
      else
@@ -589,12 +595,6 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     //
     TBldStr strPDBName(L"/Fd");
     strPDBName.Append(facCIDBuild.strOutDir());
-    /*
-    strPDBName.Append(m_pprojiTarget->strProjectName());
-    if (m_pprojiTarget->bVersioned())
-        strPDBName.Append(facCIDBuild.strVersionSuffix());
-    strPDBName.Append(L".pdb");
-    */
     apszArgs[c4CurArg++] = strPDBName.pszBuffer();
 
     // Set up the Obj output directory param
@@ -674,7 +674,7 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
                     const tCIDLib::TCh* pszExt = TRawStr::pszFindChar(strCurFl.pszBuffer(), L'.');
                     if (!TRawStr::iCompIStr(pszExt, L".cpp"))
                     {
-                        // Either create or user the precompiled headers
+                        // Either create or use the precompiled headers
                         if (*cursBuildList == strPCHCpp)
                             apszArgs[c4RealCnt++] = strPCHCreate.pszBuffer();
                         else
@@ -688,7 +688,7 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
                 // Add the current file as the target to compile
                 apszArgs[c4RealCnt++] = strCurFl.pszBuffer();
 
-                tCIDLib::TCard4 c4ErrCode;
+                tCIDLib::TCard4 c4ErrCode = 0;
                 if (!bCompileOne(apszArgs, c4RealCnt, c4ErrCode))
                 {
                     stdOut  << L"Failed compilation of target: "
@@ -844,6 +844,15 @@ tCIDLib::TVoid TVCppDriver::Link(const tCIDLib::TBoolean bHaveResFile)
     // And the debug vs. production flags
     if (m_bDebug)
         apszArgs[c4CurArg++] = L"/DEBUG";
+
+    // Set the PDB to force it into the output directory
+    TBldStr strPDBName(L"/pdb:");
+    strPDBName.Append(facCIDBuild.strOutDir());
+    strPDBName.Append(m_pprojiTarget->strProjectName());
+    if (m_pprojiTarget->bVersioned())
+        strPDBName.Append(facCIDBuild.strVersionSuffix());
+    strPDBName.Append(L".pdb");
+    apszArgs[c4CurArg++] = strPDBName.pszBuffer();
 
 
     //

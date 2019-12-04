@@ -620,12 +620,17 @@ TUPnPService::SetKrnlObj(       TKrnlUPnPService* const pkupnpsToAdopt
             , strTypeID
             , clsIsA()
         );
+
+        // Won't happen, but makes analyzer happy
+        return;
     }
     #endif
 
     // If we have an object already, let it go
     delete m_pkupnpsThis;
-    m_pkupnpsThis = 0;
+    m_pkupnpsThis = nullptr;
+
+    CIDAssert(pkupnpsToAdopt != nullptr, L"The passed UPnP server cannot be null");
 
     m_pkupnpsThis = pkupnpsToAdopt;
     m_strTypeID = strTypeID;

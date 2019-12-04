@@ -186,6 +186,7 @@ TMEngAsyncHTTPClInfo::TMEngAsyncHTTPClInfo(TCIDMacroEngine& meOwner) :
     , m_c2TypeId_KVPair(kMacroEng::c2BadId)
     , m_c2TypeId_Errors(kMacroEng::c2BadId)
     , m_c2TypeId_States(kMacroEng::c2BadId)
+    , m_c4ErrId_Busy(kCIDLib::c4MaxCard)
     , m_c4ErrId_Cancel(kCIDLib::c4MaxCard)
     , m_c4ErrId_Output(kCIDLib::c4MaxCard)
     , m_c4ErrId_Start(kCIDLib::c4MaxCard)

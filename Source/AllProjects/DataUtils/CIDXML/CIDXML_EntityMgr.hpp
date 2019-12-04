@@ -60,7 +60,17 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
         // -------------------------------------------------------------------
         TXMLEntityMgr();
 
+        TXMLEntityMgr(const TXMLEntityMgr&) = delete;
+        TXMLEntityMgr(TXMLEntityMgr&&) = delete;
+
         ~TXMLEntityMgr();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLEntityMgr& operator=(const TXMLEntityMgr&) = delete;
+        TXMLEntityMgr& operator=(TXMLEntityMgr&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -198,13 +208,6 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
 
     private :
         // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLEntityMgr(const TXMLEntityMgr&);
-        tCIDLib::TVoid operator=(const TXMLEntityMgr&);
-
-
-        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bPopEntity();
@@ -230,8 +233,8 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                 // -----------------------------------------------------------
                 TEMStackElem() :
 
-                    pxesThis(0)
-                    , pxdeclThis(0)
+                    pxesThis(nullptr)
+                    , pxdeclThis(nullptr)
                 {
                 }
 

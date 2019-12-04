@@ -66,6 +66,7 @@ TRegEx::TRegEx() :
     m_bEscaped(kCIDLib::False)
     , m_bLetter(kCIDLib::False)
     , m_c4CurInd(0)
+    , m_c4CurState(0)
     , m_c4PatLen(0)
     , m_prxnfaPattern(0)
     , m_pszPattern(0)
@@ -77,6 +78,7 @@ TRegEx::TRegEx(const TString& strExpression) :
     m_bEscaped(kCIDLib::False)
     , m_bLetter(kCIDLib::False)
     , m_c4CurInd(0)
+    , m_c4CurState(0)
     , m_c4PatLen(0)
     , m_prxnfaPattern(0)
     , m_pszPattern(0)
@@ -89,6 +91,7 @@ TRegEx::TRegEx(const tCIDLib::TCh* const pszExpression) :
     m_bEscaped(kCIDLib::False)
     , m_bLetter(kCIDLib::False)
     , m_c4CurInd(0)
+    , m_c4CurState(0)
     , m_c4PatLen(0)
     , m_prxnfaPattern(0)
     , m_pszPattern(0)
@@ -1057,12 +1060,12 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
     //  multiple characters and multiple ranges and it can be "not'ed" as
     //  well.
     //
-    enum EStates
+    enum class EStates
     {
-        EState_FirstChar
-        , EState_Dash
-        , EState_SecondChar
-        , EState_End
+        FirstChar
+        , Dash
+        , SecondChar
+        , End
     };
 
     //
@@ -1106,9 +1109,9 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
 
     // We start in the base state. We have to end in base or char state
     tCIDLib::TCh    chFirst = kCIDLib::chNull;
-    EStates         eCurState = EState_FirstChar;
+    EStates         eCurState = EStates::FirstChar;
     tCIDLib::TCard4 c4RangeCount = 0;
-    while (eCurState != EState_End)
+    while (eCurState != EStates::End)
     {
         //
         //  Get the status flags and then the character. This will throw
@@ -1135,7 +1138,7 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
             );
         }
 
-        if (eCurState == EState_FirstChar)
+        if (eCurState == EStates::FirstChar)
         {
             if (bLetter)
             {
@@ -1144,22 +1147,22 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
                 //  of a range, and move to the dash range since we
                 //  anticipate a dash (though it might be another char.)
                 //
-                eCurState = EState_Dash;
+                eCurState = EStates::Dash;
                 chFirst = chCur;
             }
              else if (chCur == kCIDLib::chCloseBracket)
             {
-                eCurState = EState_End;
+                eCurState = EStates::End;
             }
         }
-         else if (eCurState == EState_Dash)
+         else if (eCurState == EStates::Dash)
         {
             if (bLetter)
             {
                 if (chCur == kCIDLib::chHyphenMinus)
                 {
                     // Just move on to get the potential second character
-                    eCurState = EState_SecondChar;
+                    eCurState = EStates::SecondChar;
                 }
                  else
                 {
@@ -1196,10 +1199,10 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
                 c4RangeCount++;
 
                 // And move to the end state
-                eCurState = EState_End;
+                eCurState = EStates::End;
             }
         }
-         else if (eCurState == EState_SecondChar)
+         else if (eCurState == EStates::SecondChar)
         {
             if (bLetter)
             {
@@ -1232,7 +1235,7 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
                 }
 
                 // And go back to the first char state
-                eCurState = EState_FirstChar;
+                eCurState = EStates::FirstChar;
             }
              else if (chCur == kCIDLib::chCloseBracket)
             {
@@ -1245,7 +1248,7 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
                 c4RangeCount += 2;
 
                 // Move to the end state
-                eCurState = EState_End;
+                eCurState = EStates::End;
             }
         }
         #if CID_DEBUG_ON

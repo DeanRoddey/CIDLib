@@ -35,10 +35,14 @@
 #include    "CIDKernel_InternalHelpers_.hpp"
 #include    "CIDKernel_ServiceWin32.hpp"
 
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #define     SECURITY_WIN32
 #include    <Security.h>
 #include    <shlobj.h>
 #include    <Iphlpapi.h>
+#pragma     warning(pop)
 
 
 // -----------------------------------------------------------------------

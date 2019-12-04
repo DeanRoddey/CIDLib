@@ -384,10 +384,10 @@ TXMLParserCore::bParseAttrValue(const  TXMLAttrDef& xadCur
     //  normalization of whitespace. We need to know when we are inside
     //  whitespace and when we are in non-whitespace.
     //
-    enum EWSNormStates
+    enum class EWSNormStates
     {
-        EState_InWS
-        , EState_InNonWS
+        InWS
+        , InNonWS
     };
 
     // We have to have a quote char now or its bad
@@ -419,14 +419,14 @@ TXMLParserCore::bParseAttrValue(const  TXMLAttrDef& xadCur
     //  we should start in.
     //
     EWSNormStates eState =  TXMLCharFlags::bIsSpace(m_xemThis.chPeekNext())
-                            ? EState_InWS : EState_InNonWS;
+                            ? EWSNormStates::InWS : EWSNormStates::InNonWS;
 
     //
     //  Do a preliminary check where we just get rid of leading whitespace
     //  if its not CDATA.
     //
     if ((eType != tCIDXML::EAttrTypes::CData)
-    &&  (eState == EState_InWS))
+    &&  (eState == EWSNormStates::InWS))
     {
         // Skip over any leading spaces
         m_xemThis.bSkippedSpaces();
@@ -435,7 +435,7 @@ TXMLParserCore::bParseAttrValue(const  TXMLAttrDef& xadCur
         if (m_xemThis.bSkippedChar(chQuote))
             return kCIDLib::True;
 
-        eState = EState_InNonWS;
+        eState = EWSNormStates::InNonWS;
     }
 
     //
@@ -559,7 +559,7 @@ TXMLParserCore::bParseAttrValue(const  TXMLAttrDef& xadCur
         }
          else
         {
-            if (eState == EState_InWS)
+            if (eState == EWSNormStates::InWS)
             {
                 //
                 //  If its a space, just go back to the top and try again
@@ -580,7 +580,7 @@ TXMLParserCore::bParseAttrValue(const  TXMLAttrDef& xadCur
                 {
                     if (!strToFill.bIsEmpty())
                         strToFill.Append(kCIDLib::chSpace);
-                    eState = EState_InNonWS;
+                    eState = EWSNormStates::InNonWS;
                 }
                  else
                 {
@@ -597,7 +597,7 @@ TXMLParserCore::bParseAttrValue(const  TXMLAttrDef& xadCur
                 //
                 if (TXMLCharFlags::bIsSpace(chNext))
                 {
-                    eState = EState_InWS;
+                    eState = EWSNormStates::InWS;
                     continue;
                 }
                  else if (!TXMLCharFlags::bIsXMLChar(chNext))
@@ -908,18 +908,18 @@ tCIDLib::TVoid TXMLParserCore::ParseComment()
     //  We need to do a little state machine here, go catch the end of
     //  command and to check for illegal -- sequences.
     //
-    enum EStates
+    enum class EStates
     {
-        EState_Content
-        , EState_Dash
-        , EState_DoubleDash
+        Content
+        , Dash
+        , DoubleDash
     };
 
     //
     //  Ok, lets loop until we hit the end of input or the correctly
     //  terminated commented.
     //
-    EStates eState = EState_Content;
+    EStates eState = EStates::Content;
     while (kCIDLib::True)
     {
         // Get our next character
@@ -940,15 +940,15 @@ tCIDLib::TVoid TXMLParserCore::ParseComment()
             PostXMLError(kXMLErrs::errcXMLE_NonXMLCharacter);
 
         // According to the current state, process it
-        if (eState == EState_Content)
+        if (eState == EStates::Content)
         {
             // If its a dash, then change the state, else store it
             if (chCur == kCIDLib::chHyphenMinus)
-                eState = EState_Dash;
+                eState = EStates::Dash;
             else
                 strComment.Append(chCur);
         }
-         else if (eState == EState_Dash)
+         else if (eState == EStates::Dash)
         {
             //
             //  If its a dash, then we change to the double dash state.
@@ -957,16 +957,16 @@ tCIDLib::TVoid TXMLParserCore::ParseComment()
             //
             if (chCur == kCIDLib::chHyphenMinus)
             {
-                eState = EState_DoubleDash;
+                eState = EStates::DoubleDash;
             }
              else
             {
                 strComment.Append(kCIDLib::chHyphenMinus);
                 strComment.Append(chCur);
-                eState = EState_Content;
+                eState = EStates::Content;
             }
         }
-         else if (eState == EState_DoubleDash)
+         else if (eState == EStates::DoubleDash)
         {
             //
             //  We have to get closing bracket here or its an invalid

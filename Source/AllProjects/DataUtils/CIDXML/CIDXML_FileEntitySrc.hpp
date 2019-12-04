@@ -65,7 +65,7 @@ class CIDXMLEXP TFileEntitySrc : public TXMLEntitySrc
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        [[nodiscard]] TBinInStream* pstrmMakeNew() const;
+        [[nodiscard]] TBinInStream* pstrmMakeNew() const final;
 
 
     private :

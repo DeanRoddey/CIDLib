@@ -60,17 +60,17 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                                         , tCIDLib::TBoolean&    bExplicit)
 {
     // Scan it to make sure it's legal
-    enum EStates
+    enum class EStates
     {
-        EState_Sign
-        , EState_Initial
-        , EState_LeadingZero
-        , EState_Digits
-        , EState_Decimal
-        , EState_Fraction
-        , EState_Suffix
-        , EState_Suffix2
-        , EState_End
+        Sign
+        , Initial
+        , LeadingZero
+        , Digits
+        , Decimal
+        , Fraction
+        , Suffix
+        , Suffix2
+        , End
     };
 
     // Assume no suffix until proven otherwise
@@ -81,7 +81,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
     const tCIDLib::TCard4   c4Len = strLit.c4Length();
 
     tCIDLib::TBoolean bHasSuffix = kCIDLib::False;
-    EStates eCurState = EState_Sign;
+    EStates eCurState = EStates::Sign;
     tCIDLib::TCard4 c4Index = 0;
     tCIDLib::TCard4 c4DigitCnt = 0;
     while (c4Index < c4Len)
@@ -89,7 +89,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
         const tCIDLib::TCh chCur = strLit[c4Index];
         switch(eCurState)
         {
-            case EState_Sign :
+            case EStates::Sign :
             {
                 // If either sign, then assume Int4 until proven otherwise
                 if (chCur == kCIDLib::chHyphenMinus)
@@ -102,11 +102,11 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     eType = tCIDMacroEng::ENumTypes::Int4;
                     c4Index++;
                 }
-                eCurState = EState_Initial;
+                eCurState = EStates::Initial;
                 break;
             }
 
-            case EState_Initial :
+            case EStates::Initial :
             {
                 if (chCur == kCIDLib::chDigit0)
                 {
@@ -116,7 +116,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     //  to decimal, in case this is the only character.
                     //
                     eRadix = tCIDLib::ERadices::Dec;
-                    eCurState = EState_LeadingZero;
+                    eCurState = EStates::LeadingZero;
                     c4DigitCnt++;
                 }
                  else if ((chCur >= kCIDLib::chDigit1)
@@ -124,7 +124,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 {
                     eRadix = tCIDLib::ERadices::Dec;
                     c4DigitCnt++;
-                    eCurState = EState_Digits;
+                    eCurState = EStates::Digits;
                 }
                  else
                 {
@@ -134,7 +134,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 break;
             }
 
-            case EState_LeadingZero :
+            case EStates::LeadingZero :
             {
                 if ((chCur == kCIDLib::chLatin_x) || (chCur == kCIDLib::chLatin_X))
                 {
@@ -147,7 +147,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     c4DigitCnt = 0;
 
                     // Now we can start checking actual digits
-                    eCurState = EState_Digits;
+                    eCurState = EStates::Digits;
 
                     // Eat this character
                     c4Index++;
@@ -158,7 +158,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     //  Has to be a zero followed by a suffix. Keep the radix and digit
                     //  count we provsionally set above.
                     //
-                    eCurState = EState_Suffix;
+                    eCurState = EStates::Suffix;
 
                     // Eat this character
                     c4Index++;
@@ -170,7 +170,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     //  count. We know it's dec radix now and can move on to processing
                     //  the fractional bit.
                     //
-                    eCurState = EState_Fraction;
+                    eCurState = EStates::Fraction;
                     eRadix = tCIDLib::ERadices::Dec;
                     eType = tCIDMacroEng::ENumTypes::Float8;
 
@@ -184,7 +184,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     //  checking digits. Go back to zero digits
                     //
                     eRadix = tCIDLib::ERadices::Oct;
-                    eCurState = EState_Digits;
+                    eCurState = EStates::Digits;
                     c4DigitCnt = 0;
 
                     // Don't increment index!! This is a digit we want to process below
@@ -192,7 +192,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 break;
             }
 
-            case EState_Digits :
+            case EStates::Digits :
             {
                 if (chCur == kCIDLib::chPeriod)
                 {
@@ -204,13 +204,13 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     if (!c4DigitCnt)
                         return tCIDMacroEng::ENumTypes::None;
 
-                    eCurState = EState_Fraction;
+                    eCurState = EStates::Fraction;
                     eType = tCIDMacroEng::ENumTypes::Float8;
                 }
                  else if (chCur == kCIDLib::chPoundSign)
                 {
                     // Looks like a suffix
-                    eCurState = EState_Suffix;
+                    eCurState = EStates::Suffix;
 
                     // We have to have seen at least one digit
                     if (!c4DigitCnt)
@@ -254,7 +254,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 break;
             }
 
-            case EState_Fraction :
+            case EStates::Fraction :
             {
                 //
                 //  Watch for decimal digits until the end or possibly suffix. WE don't
@@ -267,7 +267,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 }
                  else if (chCur == kCIDLib::chPoundSign)
                 {
-                    eCurState = EState_Suffix;
+                    eCurState = EStates::Suffix;
                     c4Index++;
                 }
                  else
@@ -277,7 +277,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 break;
             }
 
-            case EState_Suffix :
+            case EStates::Suffix :
             {
                 //
                 //  We can see C (card), I (int), or F (float), else it cannot
@@ -293,11 +293,11 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     return tCIDMacroEng::ENumTypes::None;
 
                 c4Index++;
-                eCurState = EState_Suffix2;
+                eCurState = EStates::Suffix2;
                 break;
             }
 
-            case EState_Suffix2 :
+            case EStates::Suffix2 :
             {
                 if (eType == tCIDMacroEng::ENumTypes::Card4)
                 {
@@ -365,13 +365,13 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 }
 
                 // Move to end state, since this is not a legal end state
-                eCurState = EState_End;
+                eCurState = EStates::End;
                 c4Index++;
                 bHasSuffix = kCIDLib::True;
                 break;
             }
 
-            case EState_End :
+            case EStates::End :
             {
                 //
                 //  There's some trailing goop, so it's bad. Otherwise we would not
@@ -388,11 +388,11 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
         return tCIDMacroEng::ENumTypes::None;
 
     // Saw a + or - sign and nothing else
-    if (eCurState == EState_Initial)
+    if (eCurState == EStates::Initial)
         return tCIDMacroEng::ENumTypes::None;
 
     // Never saw the second character of the suffix
-    if (eCurState == EState_Suffix2)
+    if (eCurState == EStates::Suffix2)
         return tCIDMacroEng::ENumTypes::None;
 
     // Remove the suffix if we found any
@@ -415,6 +415,7 @@ TMacroEngParser::TMacroEngParser(const tCIDMacroEng::EOptLevels eOpt) :
     , m_colFlowStack()
     , m_colMatches(tCIDLib::EAdoptOpts::NoAdopt, 8)
     , m_eOptLevel(eOpt)
+    , m_pitResData()
     , m_pmecmToUse(nullptr)
     , m_pmeehToUse(nullptr)
     , m_pmeTarget(nullptr)
@@ -474,7 +475,7 @@ TMacroEngParser::bParse(const   TString&                    strClassPath
 
 tCIDLib::TBoolean
 TMacroEngParser::bParse(const   TString&                    strClassPath
-                        ,       TMemBuf&                    mbufSrc
+                        , const TMemBuf&                    mbufSrc
                         , const tCIDLib::TCard4             c4Bytes
                         , const TString&                    strEncoding
                         ,       TMEngClassInfo*&            pmeciMainClass
@@ -543,7 +544,7 @@ TMacroEngParser::bParse(const   TString&                    strClassPath
 //  TMacroEngParser: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 TMEngClassInfo&
-TMacroEngParser::meciResolvePath(TParserSrc& psrcClass, const TString& strPath)
+TMacroEngParser::meciResolvePath(const TParserSrc& psrcClass, const TString& strPath)
 {
     //
     //  Look it up as a type name. It could be ambiguous, because the type is
@@ -595,7 +596,7 @@ TMacroEngParser::meciResolvePath(TParserSrc& psrcClass, const TString& strPath)
 
 
 TMEngClassInfo*
-TMacroEngParser::pmeciCheckClassLoad(       TParserSrc& psrcClass
+TMacroEngParser::pmeciCheckClassLoad(const  TParserSrc& psrcClass
                                     , const TString&    strClassPath)
 {
     TMEngClassInfo* pmeciRet = m_pmeTarget->pmeciFind(strClassPath);

@@ -736,6 +736,7 @@ TMEngDBStmtInfo::TMEngDBStmtInfo(TCIDMacroEngine& meOwner) :
     , m_c2MethId_GetInt1Col(kMacroEng::c2BadId)
     , m_c2MethId_GetInt2Col(kMacroEng::c2BadId)
     , m_c2MethId_GetInt4Col(kMacroEng::c2BadId)
+    , m_c2MethId_GetInt8Col(kMacroEng::c2BadId)
     , m_c2MethId_GetName(kMacroEng::c2BadId)
     , m_c2MethId_GetStrCol(kMacroEng::c2BadId)
     , m_c2MethId_GetTimeCol(kMacroEng::c2BadId)

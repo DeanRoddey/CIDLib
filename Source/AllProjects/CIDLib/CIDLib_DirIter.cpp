@@ -62,7 +62,7 @@ TDirIter::~TDirIter()
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TDirIter::bFindNext(TFindBuf& fndBuf)
 {
-    TKrnlFileSys::TRawFileFind  FindBuf;
+    TKrnlFileSys::TRawFileFind  FindBuf = {};
 
     // If there is no open search, then log an error and abort
     if (!m_kdsSearch.bSearchIsOpen())
@@ -226,6 +226,7 @@ TDirIterCB::TDirIterCB() :
 
     m_bRecurse(kCIDLib::False)
     , m_colStack(tCIDLib::EAdoptOpts::Adopt)
+    , m_RawFindBuf()
 {
 }
 
@@ -254,7 +255,7 @@ tCIDLib::TBoolean TDirIterCB::bNext()
         tCIDLib::TBoolean bRes = kCIDLib::False;
         if (diCur.bDoingFirst())
         {
-            tCIDLib::EDirSearchFlags eFlags;
+            tCIDLib::EDirSearchFlags eFlags = tCIDLib::EDirSearchFlags::NormalFiles;
             m_pathTmp = diCur.m_strCurPath;
             if (diCur.m_eState == EStates::FirstFile)
             {

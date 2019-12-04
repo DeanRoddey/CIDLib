@@ -108,7 +108,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
 
         tCIDLib::TVoid DeregisterObject
         (
-                    TOrbServerBase* const   porbsToDereg
+            const   TOrbServerBase* const   porbsToDereg
         );
 
         tCIDLib::TVoid DispatchCmd
@@ -209,11 +209,6 @@ class CIDORBEXP TFacCIDOrb : public TFacility
 
         tCIDLib::TVoid Terminate();
 
-        tCIDLib::TVoid UpdateWorkQItemStat
-        (
-            const   tCIDLib::TCard4         c4Count
-        );
-
 
     protected :
         // -------------------------------------------------------------------
@@ -227,6 +222,12 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::EExitCodes eMonThread
+        (
+                    TThread&                thrThis
+            ,       tCIDLib::TVoid*         pData
+        );
+
         tCIDOrb::EReadRes eReadPacketData
         (
                     TThread&                thrCaller
@@ -327,6 +328,10 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //      The number of items (free and reserved) in our work queue item
         //      pool (which is in the WorkQItem file. We call a method on it
         //      periodically to update the stat.
+        //
+        //  m_thrMonitor
+        //      A thread that can sit outside the ORB activity and monitor things
+        //      and keep some status updated and such. We start it on m_eMonThread.
         // -------------------------------------------------------------------
         TAtomicFlag             m_atomClientInit;
         TAtomicFlag             m_atomServerInit;
@@ -344,6 +349,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         TBlockEncrypter*        m_pcrypSecure;
         TStatsCacheItem         m_sciRegisteredObjs;
         TStatsCacheItem         m_sciWorkQItems;
+        TThread                 m_thrMonitor;
 
 
         // -------------------------------------------------------------------

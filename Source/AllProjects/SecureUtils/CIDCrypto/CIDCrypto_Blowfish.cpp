@@ -366,10 +366,14 @@ namespace CIDCrypto_Blowfish
 TBlowfishEncrypter::TBlowfishEncrypter(const tCIDCrypto::EBlockModes eMode) :
 
     TBlockEncrypter(TBlowfishEncrypter::c4BlockBytes, eMode)
+    , m_ac4PArray()
+    , m_ac4SBox()
     , m_ckeyThis()
 {
 }
 
+// The arrays will be set up by ResetImpl(), no need to zero init them
+#pragma warning(suppress : 26495)
 TBlowfishEncrypter::TBlowfishEncrypter( const   TCryptoKey&             ckeyToUse
                                         , const tCIDCrypto::EBlockModes eMode) :
 

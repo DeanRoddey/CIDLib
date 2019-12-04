@@ -145,14 +145,14 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsValid() const
+                tCIDLib::TBoolean bIsValid() const override
                 {
                     if (!TParent::bIsValid())
                         return kCIDLib::False;
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bNext()
+                tCIDLib::TBoolean bNext() override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -164,7 +164,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bPrevious()
+                tCIDLib::TBoolean bPrevious() override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -176,7 +176,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bSeekToEnd()
+                tCIDLib::TBoolean bSeekToEnd() override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -186,7 +186,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bReset()
+                tCIDLib::TBoolean bReset() override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
                     TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
@@ -195,7 +195,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                const TElem& objRCur() const
+                const TElem& objRCur() const override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -481,27 +481,27 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsEmpty() const
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             tCIDLib::TBoolean bRet = m_llstCol.bIsEmpty();
             return bRet;
         }
 
-        tCIDLib::TCard4 c4ElemCount() const
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             tCIDLib::TCard4 c4Ret = m_llstCol.c4ElemCount();
             return c4Ret;
         }
 
-        [[nodiscard]] TCursor* pcursNew() const
+        [[nodiscard]] TCursor* pcursNew() const final
         {
             TMtxLocker lockSync(this->pmtxLock());
             return new TCursor(this);
         }
 
-        tCIDLib::TVoid RemoveAll()
+        tCIDLib::TVoid RemoveAll() final
         {
             TMtxLocker lockSync(this->pmtxLock());
             if (m_llstCol.bIsEmpty())

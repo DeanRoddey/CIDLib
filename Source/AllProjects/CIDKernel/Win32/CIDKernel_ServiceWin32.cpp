@@ -32,7 +32,12 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_ServiceWin32.hpp"
+
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(push)
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <Dbt.h>
+#pragma     warning(pop)
 
 
 // ---------------------------------------------------------------------------

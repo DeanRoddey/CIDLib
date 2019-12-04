@@ -195,7 +195,7 @@ class TRefVector : public TRefCollection<TElem>
                     return bIsValid();
                 }
 
-                const TElem& objRCur() const
+                const TElem& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 

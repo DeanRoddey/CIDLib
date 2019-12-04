@@ -145,6 +145,9 @@ tCIDLib::TVoid TSHA256Hash::ParseFormatted(const TString& strFormatted)
             , tCIDLib::EErrClasses::Format
             , TString(L"SHA256")
         );
+
+        // Won't get here but makes analyzer happy
+        return;
     }
 
     // Make sure the raw buffer we are going to fill in has the right byte count
@@ -182,6 +185,9 @@ tCIDLib::TVoid TSHA256Hash::ParseFormatted(const TString& strFormatted)
                 , tCIDLib::EErrClasses::Format
                 , TString(L"SHA5")
             );
+
+            // Won't get here but makes analyzer happy
+            return;
         }
 
         // Shift up and do the low nibble
@@ -201,6 +207,9 @@ tCIDLib::TVoid TSHA256Hash::ParseFormatted(const TString& strFormatted)
                 , tCIDLib::EErrClasses::Format
                 , TString(L"SHA5")
             );
+
+            // Won't get here but makes analyzer happy
+            return;
         }
 
         // Store the new byte and bump the output index

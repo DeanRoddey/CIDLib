@@ -188,11 +188,9 @@ static CIDLib_Thread::TThreadItem* athriList()
 //
 tCIDLib::TVoid AddThreadAt(TThread* const pthrNew, const tCIDLib::TCard4 c4Index)
 {
-    //
-    //  Get a pointer to the indicated index. Note that we assume our own
-    //  code will not call with bad indexes, i.e. they they've already checked
-    //  any incoming indexes from the outside world.
-    //
+    CIDAssert(c4Index < CIDLib_Thread::c4MaxThreads, L"Invalid thread index");
+
+    // Get a pointer to the indicated index.
     CIDLib_Thread::TThreadItem* pthriCur = &athriList()[c4Index];
 
     // If debugging, make sure its not already in use
@@ -365,7 +363,7 @@ static TThread* pthrFindId(const tCIDLib::TThreadId tidThread)
 
         pthriCur++;
     }
-    return (TThread*)0;
+    return nullptr;
 }
 
 
@@ -2118,10 +2116,12 @@ TThread::TThread() :
     m_bSelfPrio(kCIDLib::True)
     , m_bShutdownRequest(kCIDLib::False)
     , m_bSyncRequest(kCIDLib::False)
+    , m_c4ListInd(CIDLib_Thread::c4MaxThreads)
     , m_c4StackSz(0)
     , m_kthrThis()
     , m_ptfuncToRun(0)
     , m_pfnOnExit(0)
+    , m_tidSyncReq(kCIDLib::tidInvalid)
     , m_strName(kCIDLib::pszPrimaryThrdName)
 {
     if (!m_kthrThis.bAdoptCaller())
@@ -2199,6 +2199,7 @@ tCIDLib::TVoid TThread::ShutdownProcessing()
     //  removed from the list until the thread object is destroyed (since
     //  it might just be restarted.)
     //
+    CIDAssert(m_c4ListInd < CIDLib_Thread::c4MaxThreads, L"Thread index is invalid");
     athriList()[m_c4ListInd].tidThread = kCIDLib::tidInvalid;
 
     // Clean up any per-thread data for this thread
