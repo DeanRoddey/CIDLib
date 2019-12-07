@@ -166,14 +166,14 @@ namespace CIDKernel_SockPinger_Win32
     //  echo data bytes we received. There's no ip header included in the response
     //  under V6.
     //
-    const tCIDLib::TCard4 c4V4NonData(sizeof(ip_hdr) + sizeof(icmp_echohdr));
-    const tCIDLib::TCard4 c4V6NonData(sizeof(icmpv6_echohdr));
+    constexpr tCIDLib::TCard4 c4V4NonData(sizeof(ip_hdr) + sizeof(icmp_echohdr));
+    constexpr tCIDLib::TCard4 c4V6NonData(sizeof(icmpv6_echohdr));
 
     // The number of payload bytes we send in the ping
-    const tCIDLib::TCard4 c4PLBytes(32);
+    constexpr tCIDLib::TCard4 c4PLBytes(32);
 
     // The fill byte we set the echo payload bytes to
-    const tCIDLib::TCard1 c1PLData(0x45);
+    constexpr tCIDLib::TCard1 c1PLData(0x45);
 }
 
 
@@ -591,7 +591,7 @@ tCIDSock::EPingRes
 TKrnlSockPinger::eReadReply(tCIDLib::TCard4& c4RepBytes, TKrnlIPAddr& kipaFrom)
 {
     // A buffer way bigger enough
-    const tCIDLib::TCard4 c4MaxBufSize(4096);
+    constexpr tCIDLib::TCard4 c4MaxBufSize(4096);
     tCIDLib::TCard1 ac1InBuf[c4MaxBufSize];
 
     tCIDLib::TIPPortNum ippnFrom;

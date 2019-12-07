@@ -44,8 +44,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDBuild::TFacCIDBuild() :
 
-    m_bCodeAnalysis(kCIDLib::False)
-    , m_bForce(kCIDLib::False)
+    m_bForce(kCIDLib::False)
     , m_bLowPrio(kCIDLib::False)
     , m_bMaxWarn(kCIDLib::False)
     , m_bNonPermissive(kCIDLib::False)
@@ -55,6 +54,7 @@ TFacCIDBuild::TFacCIDBuild() :
     , m_bVerbose(kCIDLib::False)
     , m_eAction(tCIDBuild::EActions::Build)
     , m_eBldMode(tCIDBuild::EBldModes::Develop)
+    , m_eCodeAnalysis(tCIDBuild::EAnalysisLevels::None)
     , m_eHdrDumpMode(tCIDBuild::EHdrDmpModes::None)
     , m_c4CPUCount(1)
     , m_c4MajVer(0)
@@ -903,9 +903,14 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
                 throw tCIDBuild::EErrors::BadParams;
             }
 
-            if (!TRawStr::iCompIStr(pszCurParm, L"Analyze"))
+            if (!TRawStr::iCompIStr(pszCurParm, L"Analyze")
+            ||  !TRawStr::iCompIStr(pszCurParm, L"Analyze=1"))
             {
-                m_bCodeAnalysis = kCIDLib::True;
+                m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Level1;
+            }
+             else if (!TRawStr::iCompIStr(pszCurParm, L"Analyze=2"))
+            {
+                m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Level2;
             }
              else if (!TRawStr::iCompIStr(pszCurParm, L"Force"))
             {
@@ -1261,7 +1266,7 @@ tCIDLib::TVoid TFacCIDBuild::ShowParms()
                 << L"    Verbose: " << (m_bVerbose ? L"Yes" : L"No") << L"\n"
                 << L"   Low Prio: " << (m_bLowPrio ? L"Yes" : L"No") << L"\n"
                 << L"   Max Warn: " << (m_bMaxWarn ? L"Yes" : L"No") << L"\n"
-                << L"    Analyze: " << (m_bCodeAnalysis ? L"Yes" : L"No") << L"\n"
+                << L"    Analyze: " << tCIDLib::TCard4(m_eCodeAnalysis) << L"\n"
                 << L"    No Logo: " << (m_bSupressLogo ? L"Yes" : L"No") << L"\n";
 
         stdOut << L"     Target: ";
@@ -1296,7 +1301,8 @@ tCIDLib::TVoid TFacCIDBuild::ShowUsage()
             << L"        /Lang=xx       - Set language suffix (en)\n"
             << L"        /LowPrio       - Invoke compiler with lower priority\n"
             << L"        /Single        - Invoke compiler in non-parallel mode\n"
-            << L"        /Analyze       - Invoke code analysis if tools support it\n"
+            << L"        /Analyze=[1|2] - Invoke code analysis if tools support it. We have\n"
+            << L"                         two levels of intensity currently. If no number then 1\n"
             << L"        /NonPermissive - Invoke compiler in strictest C++ mode. This won't\n"
             << L"                         currently work it's for working towards that goal\n\n"
             << L"       (Not typically used, this comes for the environment)\n"

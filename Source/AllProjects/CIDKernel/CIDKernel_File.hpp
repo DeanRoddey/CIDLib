@@ -162,12 +162,12 @@ class KRNLEXPORT TKrnlFile
 
         tCIDLib::TBoolean bSetLastAccessTime(const tCIDLib::TEncodedTime& enctLastAccess)
         {
-            return bSetFileTimes(enctLastAccess, tCIDLib::TEncodedTime(-1));
+            return bSetFileTimes(enctLastAccess, static_cast<tCIDLib::TEncodedTime>(-1));
         }
 
         tCIDLib::TBoolean bSetLastWriteTime(const tCIDLib::TEncodedTime& enctLastWrite)
         {
-            return bSetFileTimes(tCIDLib::TEncodedTime(-1), enctLastWrite);
+            return bSetFileTimes(static_cast<tCIDLib::TEncodedTime>(-1), enctLastWrite);
         }
 
         tCIDLib::TBoolean bSetName

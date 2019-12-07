@@ -261,8 +261,8 @@ namespace tCIDLib
     template <typename T> constexpr tCIDLib::TBoolean
     bAnyBitsOn(const T tCurrent, const T tToCheck)
     {
-        tCIDLib::TEnumMaskType emtCur = tCIDLib::TEnumMaskType(tCurrent);
-        tCIDLib::TEnumMaskType emtToCheck = tCIDLib::TEnumMaskType(tToCheck);
+        const tCIDLib::TEnumMaskType emtCur = tCIDLib::TEnumMaskType(tCurrent);
+        const tCIDLib::TEnumMaskType emtToCheck = tCIDLib::TEnumMaskType(tToCheck);
         return (emtCur & emtToCheck) != 0;
     }
 
@@ -270,7 +270,7 @@ namespace tCIDLib
     bAllBitsOn(const T tCurrent, const T tToCheck)
     {
         tCIDLib::TEnumMaskType emtTmp = tCIDLib::TEnumMaskType(tCurrent);
-        tCIDLib::TEnumMaskType emtToCheck = tCIDLib::TEnumMaskType(tToCheck);
+        const tCIDLib::TEnumMaskType emtToCheck = tCIDLib::TEnumMaskType(tToCheck);
         emtTmp &= emtToCheck;
         return (emtTmp == emtToCheck);
     }
@@ -278,9 +278,9 @@ namespace tCIDLib
     template <typename T> constexpr tCIDLib::TBoolean
     bBitsChanged(const T t1, const T t2, const T tMask)
     {
-        tCIDLib::TEnumMaskType emt1 = tCIDLib::TEnumMaskType(t1);
-        tCIDLib::TEnumMaskType emt2 = tCIDLib::TEnumMaskType(t2);
-        tCIDLib::TEnumMaskType emtMask = tCIDLib::TEnumMaskType(tMask);
+        const tCIDLib::TEnumMaskType emt1 = tCIDLib::TEnumMaskType(t1);
+        const tCIDLib::TEnumMaskType emt2 = tCIDLib::TEnumMaskType(t2);
+        const tCIDLib::TEnumMaskType emtMask = tCIDLib::TEnumMaskType(tMask);
         return T(emt1 & emtMask) != T(emt2 * emtMask);
     }
 
@@ -288,7 +288,7 @@ namespace tCIDLib
     eClearEnumBits(const T tCurrent, const T tBits)
     {
         tCIDLib::TEnumMaskType emtCur = tCIDLib::TEnumMaskType(tCurrent);
-        tCIDLib::TEnumMaskType emtBits = tCIDLib::TEnumMaskType(tBits);
+        const tCIDLib::TEnumMaskType emtBits = tCIDLib::TEnumMaskType(tBits);
         emtCur &= ~emtBits;
         return T(emtCur);
     }
@@ -297,8 +297,8 @@ namespace tCIDLib
     eMaskEnumBits(const T tCurrent, const T tBits, const T tMask)
     {
         tCIDLib::TEnumMaskType emtCur = tCIDLib::TEnumMaskType(tCurrent);
-        tCIDLib::TEnumMaskType emtBits = tCIDLib::TEnumMaskType(tBits);
-        tCIDLib::TEnumMaskType emtMask = tCIDLib::TEnumMaskType(tMask);
+        const tCIDLib::TEnumMaskType emtBits = tCIDLib::TEnumMaskType(tBits);
+        const tCIDLib::TEnumMaskType emtMask = tCIDLib::TEnumMaskType(tMask);
 
         emtCur &= ~emtMask;
         emtCur |= (emtBits & emtMask);

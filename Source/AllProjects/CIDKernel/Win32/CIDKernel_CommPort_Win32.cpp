@@ -332,7 +332,7 @@ TKrnlCommPort::c4EnumPorts(         tCIDLib::TBoolean* const pbToFill
     tCIDLib::TCh szSrcBuf[16];
     TRawStr::CopyStr(szSrcBuf, L"COM");
 
-    const tCIDLib::TCard4 c4BufSz = 1024;
+    constexpr tCIDLib::TCard4 c4BufSz = 1024;
     tCIDLib::TCh szOutBuf[c4BufSz + 1];
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
@@ -349,7 +349,7 @@ TKrnlCommPort::c4EnumPorts(         tCIDLib::TBoolean* const pbToFill
 TKrnlCommPort::TKrnlCommPort() :
 
     m_c4PortNum(0)
-    , m_pExtra(0)
+    , m_pExtra(nullptr)
 {
     m_pExtra = new TPerPlat;
     m_pExtra->c4ReadTimeout = kCIDLib::c4MaxCard;
@@ -359,7 +359,7 @@ TKrnlCommPort::TKrnlCommPort() :
 TKrnlCommPort::TKrnlCommPort(const tCIDLib::TCard4 c4PortNum) :
 
     m_c4PortNum(c4PortNum)
-    , m_pExtra(0)
+    , m_pExtra(nullptr)
 {
     m_pExtra = new TPerPlat;
     m_pExtra->c4ReadTimeout = kCIDLib::c4MaxCard;

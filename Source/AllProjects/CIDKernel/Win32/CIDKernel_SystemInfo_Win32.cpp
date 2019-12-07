@@ -35,8 +35,8 @@
 #include    "CIDKernel_InternalHelpers_.hpp"
 #include    "CIDKernel_ServiceWin32.hpp"
 
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #define     SECURITY_WIN32
 #include    <Security.h>
@@ -128,13 +128,16 @@ struct TCachedInfo
 
 namespace CIDKernel_SystemInfo_Win32
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  CachedInfo
-    //      The cached system info that we cache up init and hang onto.
-    // -----------------------------------------------------------------------
-    TCachedInfo      CachedInfo;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  CachedInfo
+        //      The cached system info that we cache up init and hang onto.
+        // -----------------------------------------------------------------------
+        TCachedInfo      CachedInfo;
+    }
 }
 
 
@@ -231,7 +234,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
         //  Query the module name for the 0 module, which will get us the
         //  main process Exe module's file name.
         //
-        const tCIDLib::TCard4 c4Len = c4MaxBufChars
+        constexpr tCIDLib::TCard4 c4Len = c4MaxBufChars
         (
             CIDKernel_SystemInfo_Win32::CachedInfo.szProcessName
         );
@@ -273,7 +276,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
             , kCIDLib::chPeriod
         );
         if (pszTmp)
-            *pszTmp = 0;
+            *pszTmp = kCIDLib::chNull;
 
 
         // Get a pointer to the command line parms. If none, then we are done
@@ -294,7 +297,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
         // Iterate the IP adapters and create the MAC address hash
         {
             CIDKernel_SystemInfo_Win32::CachedInfo.c4MACAddrHash = 0;
-            const tCIDLib::TCard4 c4MaxAdaptors = 16;
+            constexpr tCIDLib::TCard4 c4MaxAdaptors = 16;
             IP_ADAPTER_INFO AdapterInfo[c4MaxAdaptors];
             DWORD dwBufLen = sizeof(AdapterInfo);
 

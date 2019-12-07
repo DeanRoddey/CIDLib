@@ -82,6 +82,6 @@ namespace kCIDLib_
     //  calculated using the initial/max sizes. If that calcuation comes out
     //  larger than this value, then its clipped back to this value.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4MaxDefMemExpandInc = 8192;
+    constexpr tCIDLib::TCard4   c4MaxDefMemExpandInc = 8192;
 }
 

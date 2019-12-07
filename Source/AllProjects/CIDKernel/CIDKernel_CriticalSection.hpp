@@ -62,6 +62,7 @@ class KRNLEXPORT TKrnlCritSec
         TKrnlCritSec();
 
         TKrnlCritSec(const TKrnlCritSec&) = delete;
+        TKrnlCritSec(TKrnlCritSec&&) = delete;
 
         ~TKrnlCritSec();
 
@@ -70,6 +71,7 @@ class KRNLEXPORT TKrnlCritSec
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlCritSec& operator=(const TKrnlCritSec&) = delete;
+        TKrnlCritSec& operator=(TKrnlCritSec&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -112,6 +114,7 @@ class KRNLEXPORT TKrnlCritSecLocker
         }
 
         TKrnlCritSecLocker(const TKrnlCritSecLocker&) = delete;
+        TKrnlCritSecLocker(TKrnlCritSecLocker&&) = delete;
 
         ~TKrnlCritSecLocker()
         {
@@ -124,6 +127,7 @@ class KRNLEXPORT TKrnlCritSecLocker
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlCritSecLocker& operator=(const TKrnlCritSecLocker&) = delete;
+        TKrnlCritSecLocker& operator=(TKrnlCritSecLocker&&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
 

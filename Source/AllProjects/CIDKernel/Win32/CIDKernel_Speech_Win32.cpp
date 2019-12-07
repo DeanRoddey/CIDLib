@@ -36,10 +36,9 @@
 //  Force off deprecation warnings for the SD headers as well as analysis warnings
 //  and some that the all code warnings thing obviously isn't handling
 // ---------------------------------------------------------------------------
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
-#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
-#pragma     warning(disable : 4996)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812 26814 4996)
 #include    <sapi.h>
 #include    <sphelper.h>
 #pragma     warning(pop)
@@ -60,7 +59,7 @@
 //  voice object, either getting a new one or getting the one they already
 //  previously created.
 //
-static ISpVoice* pcomMakeVoiceObj(tCIDLib::TVoid*& pData)
+static [[nodiscard]] ISpVoice* pcomMakeVoiceObj(tCIDLib::TVoid*& pData)
 {
     ISpVoice* pcomRet;
     if (!pData)
@@ -78,7 +77,7 @@ static ISpVoice* pcomMakeVoiceObj(tCIDLib::TVoid*& pData)
         if (!SUCCEEDED(hRes))
         {
             TKrnlError::SetLastHostError(::GetLastError());
-            return 0;
+            return nullptr;
         }
 
         // And give it back as a void pointer

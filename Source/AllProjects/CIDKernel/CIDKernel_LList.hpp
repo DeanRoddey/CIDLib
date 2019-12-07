@@ -50,10 +50,20 @@ template <class TElem> class TKrnlLList
         {
         }
 
+        TKrnlLList(const TKrnlLList&) = delete;
+        TKrnlLList(TKrnlLList&&) = delete;
+
         ~TKrnlLList()
         {
             FreeAll();
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TKrnlLList& operator=(const TKrnlLList&) = delete;
+        TKrnlLList& operator=(TKrnlLList&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -225,6 +235,9 @@ template <class TElem> class TKrnlLList
                 {
                 }
 
+                TNode(const TNode&) = delete;
+                TNode(TNode&&) = delete;
+
                 ~TNode()
                 {
                     if (m_pobjVal)
@@ -233,6 +246,9 @@ template <class TElem> class TKrnlLList
                         m_pobjVal = nullptr;
                     }
                 }
+
+                TNode& operator=(const TNode&) = delete;
+                TNode& operator=(TNode&&) = delete;
 
                 TNode*  m_pNext;
                 TElem*  m_pobjVal;

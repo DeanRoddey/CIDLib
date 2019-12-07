@@ -78,6 +78,8 @@ class TOrbClientConnMgr : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TCard4 c4QueuedCmds() const;
+
         tCIDLib::TVoid ClearOnlyAcceptFrom();
 
         tCIDOrb::EReadRes eQueueUpWork
@@ -196,11 +198,6 @@ class TOrbClientConnMgr : public TObject
         //      thread. It is a pointer because it is only used if the server
         //      side of the ORB is initialized.
         //
-        //  m_sciActiveCmds
-        //      Each worker thread bumps this when he's processing a command,
-        //      and decrements it when done. So it represents how many threads
-        //      are actually processing commands at the current time.
-        //
         //  m_sciClientHWMark
         //      The maximum clients that have been connected at once so far.
         //
@@ -215,11 +212,6 @@ class TOrbClientConnMgr : public TObject
         //  m_sciMaxClients
         //      The max number of clients that we will serve at once, see
         //      m_c4MaxClients above.
-        //
-        //  m_sciQueuedCmds
-        //      The number of commands currently queued up for processing,
-        //      which is just a reflection of the size of m_colWorkQ, for
-        //      stats purposes.
         //
         //  m_sciWorkerThreads
         //      The number of worker threads we've spun up so far. This is
@@ -241,12 +233,10 @@ class TOrbClientConnMgr : public TObject
         tCIDLib::TIPPortNum     m_ippnListenOn;
         TMutex                  m_mtxSync;
         TSocketListener*        m_psocklServer;
-        TStatsCacheItem         m_sciActiveCmds;
         TStatsCacheItem         m_sciClientHWMark;
         TStatsCacheItem         m_sciCurClients;
         TStatsCacheItem         m_sciDroppedRetPacks;
         TStatsCacheItem         m_sciMaxClients;
-        TStatsCacheItem         m_sciQueuedCmds;
         TStatsCacheItem         m_sciWorkerThreads;
         TThread                 m_thrListener;
 

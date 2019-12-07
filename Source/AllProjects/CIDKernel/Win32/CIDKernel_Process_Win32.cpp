@@ -38,38 +38,41 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_Process_Win32
 {
-    struct TFindWndFiltered
+    namespace
     {
-        tCIDCtrls::TWndHandle   hwndFound;
-        tCIDLib::TProcessId     pidTarget;
-        tCIDLib::TBoolean       bOwned;
-        tCIDLib::TCard4         c4DontWantStyles;
-        tCIDLib::TCard4         c4WantStyles;
-        tCIDLib::TCard4         c4DontWantExStyles;
-        tCIDLib::TCard4         c4WantExStyles;
+        struct TFindWndFiltered
+        {
+            tCIDCtrls::TWndHandle   hwndFound;
+            tCIDLib::TProcessId     pidTarget;
+            tCIDLib::TBoolean       bOwned;
+            tCIDLib::TCard4         c4DontWantStyles;
+            tCIDLib::TCard4         c4WantStyles;
+            tCIDLib::TCard4         c4DontWantExStyles;
+            tCIDLib::TCard4         c4WantExStyles;
 
-        tCIDLib::TCard4         c4FoundStyles;
-        tCIDLib::TCard4         c4FoundExStyles;
-    };
+            tCIDLib::TCard4         c4FoundStyles;
+            tCIDLib::TCard4         c4FoundExStyles;
+        };
 
 
-    //
-    //  We provide a mechanism for supporting single instances of applications
-    //  being runnable. We create a shared memory buffer and put some info into
-    //  it. We need a a little structure for the data in the buffer.
-    //
-    //  pksmbHold is used to keep a copy around if we created the buffer, so
-    //  that we are the active instance until we die, at which time this
-    //  buffer will be released by the OS.
-    //
-    const tCIDLib::TCard4       c4SingleInstVer = 1;
-    struct   TSingleInstInfo
-    {
-        tCIDLib::TCard4         c4Version;
-        HANDLE                  hprocSingle;
-        tCIDLib::TProcessId     pidSingle;
-    };
-    TKrnlSharedMemBuf*          pksmbHold;
+        //
+        //  We provide a mechanism for supporting single instances of applications
+        //  being runnable. We create a shared memory buffer and put some info into
+        //  it. We need a a little structure for the data in the buffer.
+        //
+        //  pksmbHold is used to keep a copy around if we created the buffer, so
+        //  that we are the active instance until we die, at which time this
+        //  buffer will be released by the OS.
+        //
+        constexpr tCIDLib::TCard4   c4SingleInstVer = 1;
+        struct   TSingleInstInfo
+        {
+            tCIDLib::TCard4         c4Version;
+            HANDLE                  hprocSingle;
+            tCIDLib::TProcessId     pidSingle;
+        };
+        TKrnlSharedMemBuf*          pksmbHold;
+    }
 }
 
 

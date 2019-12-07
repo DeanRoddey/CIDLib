@@ -62,7 +62,7 @@
 #define StdEnumTricks(eEnumType) \
 inline constexpr eEnumType operator++(eEnumType& eVal, int) noexcept \
 { \
-    eEnumType eTmp = eVal; \
+    const eEnumType eTmp = eVal; \
     eVal = eEnumType(tCIDLib::TCard4(eVal) + 1); \
     return eTmp; \
 } \
@@ -75,7 +75,7 @@ inline constexpr eEnumType operator++(eEnumType& eVal) noexcept \
 \
 inline constexpr eEnumType operator--(eEnumType& eVal, int) noexcept \
 { \
-    eEnumType eTmp = eVal; \
+    const eEnumType eTmp = eVal; \
     eVal = eEnumType(tCIDLib::TCard4(eVal) - 1); \
     return eTmp; \
 } \

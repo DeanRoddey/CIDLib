@@ -32,8 +32,8 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <psapi.h>
 #pragma     warning(pop)
@@ -59,13 +59,16 @@ struct TKrnlExtProcess::TPlatData
 // ---------------------------------------------------------------------------
 namespace CIDKernel_ExternalProcess_Win32
 {
-    // -----------------------------------------------------------------------
-    //  We suppor the 'reattachment' to processes by persisting a platform
-    //  specific formatted string of attach info for later use. This is used
-    //  as a prefix on our platform's version of that string, to help insure
-    //  later that we are getting a string we formatted.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const pszAttachInfoPref = L"CIDW32AI";
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  We suppor the 'reattachment' to processes by persisting a platform
+        //  specific formatted string of attach info for later use. This is used
+        //  as a prefix on our platform's version of that string, to help insure
+        //  later that we are getting a string we formatted.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCh* const pszAttachInfoPref = L"CIDW32AI";
+    }
 }
 
 
@@ -585,7 +588,7 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
     //  code that understands the portable format and then we put it back
     //  together in our required format.
     //
-    const tCIDLib::TCard4 c4MaxParms = 1024;
+    constexpr tCIDLib::TCard4 c4MaxParms = 1024;
     tCIDLib::TCh* apszParms[c4MaxParms];
     const tCIDLib::TCard4 c4ParmCount = c4BreakOutParms
     (
@@ -937,7 +940,7 @@ TKrnlExtProcess::bSystemEscape( const   tCIDLib::TCh* const     pszCommandLine
     //  code that understands the portable format and then we put it back
     //  together in our required format.
     //
-    const tCIDLib::TCard4 c4MaxParms = 1024;
+    constexpr tCIDLib::TCard4 c4MaxParms = 1024;
     tCIDLib::TCh* apszParms[c4MaxParms];
     const tCIDLib::TCard4 c4ParmCount = c4BreakOutParms
     (

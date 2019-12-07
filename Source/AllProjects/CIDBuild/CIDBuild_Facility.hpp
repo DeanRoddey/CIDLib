@@ -58,11 +58,6 @@ class TFacCIDBuild
         // -------------------------------------------------------------------
         //  Pubic, non-virtual methods
         // -------------------------------------------------------------------
-        inline tCIDLib::TBoolean bCodeAnalysis() const
-        {
-            return m_bCodeAnalysis;
-        }
-
         tCIDLib::TBoolean bDependsOn
         (
             const   TBldStr&                strSrcProj
@@ -130,9 +125,20 @@ class TFacCIDBuild
             return m_c4Revision;
         }
 
-        tCIDBuild::EBldModes eBldMode() const;
+        tCIDBuild::EBldModes eBldMode() const
+        {
+            return m_eBldMode;
+        }
 
-        tCIDBuild::EHdrDmpModes eHdrDumpMode() const;
+        tCIDBuild::EAnalysisLevels eCodeAnalysis() const
+        {
+            return m_eCodeAnalysis;
+        }
+
+        tCIDBuild::EHdrDmpModes eHdrDumpMode() const
+        {
+            return m_eHdrDumpMode;
+        }
 
         tCIDLib::TVoid GenIDL
         (
@@ -150,49 +156,102 @@ class TFacCIDBuild
             return m_listDbgParms;
         }
 
-        const TList<TBldStr>& listExtLibs() const;
+        const TList<TBldStr>& listExtLibs() const
+        {
+            return m_listExtLibs;
+        }
 
-        const TList<TBldStr>& listExtLibPaths() const;
+        const TList<TBldStr>& listExtLibPaths() const
+        {
+            return m_listExtLibPaths;
+        }
 
-        const TList<TBldStr>& listExtIncludePaths() const;
+        const TList<TBldStr>& listExtIncludePaths() const
+        {
+            return m_listExtIncludePaths;
+        }
 
-        const TList<TBldStr>& listIDLMappings() const;
+        const TList<TBldStr>& listIDLMappings() const
+        {
+            return m_listIDLMappings;
+        }
 
         tCIDLib::TVoid ParseAllProjects
         (
                     TLineSpooler&           lsplSrc
         );
 
-        const TProjectInfo& projiByName
-        (
-            const   TBldStr&                strName
-        )   const;
+        const TProjectInfo& projiByName(const TBldStr& strName) const
+        {
+            // Just pass through to the project list
+            return m_pplistProjs->projiByName(strName);
+        }
 
-        const TProjectList& plistProjects() const;
+        const TProjectList& plistProjects() const
+        {
+            return *m_pplistProjs;
+        }
 
-        const TBldStr& strCIDLibSrcDir() const;
+        const TBldStr& strBasePlatform() const
+        {
+            return m_strBasePlatform;
+        }
 
-        const TBldStr& strIncludeDir() const;
+        const TBldStr& strCIDLibSrcDir() const
+        {
+            return m_strCIDLibSrcDir;
+        }
 
-        const TBldStr& strLangSuffix() const;
+        const TBldStr& strIncludeDir() const
+        {
+            return m_strIncludeDir;
+        }
 
-        const TBldStr& strOutDir() const;
+        const TBldStr& strLangSuffix() const
+        {
+            return m_strLangSuffix;
+        }
 
-        const TBldStr& strBasePlatform() const;
+        const TBldStr& strOutDir() const
+        {
+            return m_strOutDir;
+        }
 
-        const TBldStr& strFullPlatform() const;
+        const TBldStr& strFullPlatform() const
+        {
+            return m_strFullPlatform;
+        }
 
-        const TBldStr& strPrivIncludeDir() const;
+        const TBldStr& strPrivIncludeDir() const
+        {
+            return m_strPrivIncludeDir;
+        }
 
-        const TBldStr& strPPIncludeDir() const;
+        const TBldStr& strPPPrivIncludeDir() const
+        {
+            return m_strPPPrivIncludeDir;
+        }
 
-        const TBldStr& strPPPrivIncludeDir() const;
+        const TBldStr& strPPIncludeDir() const
+        {
+            return m_strPPIncludeDir;
+        }
 
-        const TBldStr& strRootDir() const;
+        const TBldStr& strRootDir() const
+        {
+            return m_strRootDir;
+        }
 
-        const TBldStr& strVersionSuffix() const;
+        const TBldStr& strTarget() const
+        {
+            // Either target project, or target directory for release actions
+            return m_strTarget;
+        }
 
-        const TBldStr& strTarget() const;
+        const TBldStr& strVersionSuffix() const
+        {
+            return m_strVersionSuffix;
+        }
 
 
     private :
@@ -347,10 +406,6 @@ class TFacCIDBuild
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_bCodeAnalysis
-        //      This is set by the /Analyze flag. Tools driver can look at this and
-        //      invoke optional analysis modes of the compiler.
-        //
         //  m_bForce
         //      This is set by the /Force flag. It will cause all targets to
         //      appear to be out of date (or if used with the /Debug command will
@@ -406,6 +461,12 @@ class TFacCIDBuild
         //  m_eBldMode
         //      The mode that we are working in, either a production or
         //      development build.
+        //
+        //  m_eCodeAnalysis
+        //      This is set by the /Analyze flag. Tools driver can look at this and
+        //      invoke optional analysis modes of the compiler. If not set it is
+        //      None. If by itself we get level 1. Else you can add a =2 (and possibly
+        //      more later if we add more levels)
         //
         //  m_eHdrDumpMode
         //      This is set by the /HdrDump flag. It will cause us to output
@@ -501,148 +562,42 @@ class TFacCIDBuild
         //      in some way include the major and minor version, but not the
         //      revision!
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean       m_bCodeAnalysis;
-        tCIDLib::TBoolean       m_bForce;
-        tCIDLib::TBoolean       m_bLowPrio;
-        tCIDLib::TBoolean       m_bMaxWarn;
-        tCIDLib::TBoolean       m_bNonPermissive;
-        tCIDLib::TBoolean       m_bNoRecurse;
-        tCIDLib::TBoolean       m_bSingle;
-        tCIDLib::TBoolean       m_bSupressLogo;
-        tCIDLib::TBoolean       m_bVerbose;
-        tCIDLib::TCard4         m_c4CPUCount;
-        tCIDLib::TCard4         m_c4MajVer;
-        tCIDLib::TCard4         m_c4MinVer;
-        tCIDLib::TCard4         m_c4Revision;
-        tCIDBuild::EActions     m_eAction;
-        tCIDBuild::EBldModes    m_eBldMode;
-        tCIDBuild::EHdrDmpModes m_eHdrDumpMode;
-        TList<TBldStr>          m_listDbgParms;
-        TList<TBldStr>          m_listExtLibs;
-        TList<TBldStr>          m_listExtLibPaths;
-        TList<TBldStr>          m_listExtIncludePaths;
-        TList<TBldStr>          m_listIDLMappings;
-        TList<TKeyValuePair>    m_listMacros;
-        TProjectList*           m_pplistProjs;
-        TBldStr                 m_strCIDLibSrcDir;
-        TBldStr                 m_strIncludeDir;
-        TBldStr                 m_strLangSuffix;
-        TBldStr                 m_strOutDir;
-        TBldStr                 m_strBasePlatform;
-        TBldStr                 m_strFullPlatform;
-        TBldStr                 m_strPrivIncludeDir;
-        TBldStr                 m_strPPIncludeDir;
-        TBldStr                 m_strPPPrivIncludeDir;
-        TBldStr                 m_strRootDir;
-        TBldStr                 m_strTarget;
-        TToolsDriver*           m_ptdrvBuild;
-        TBldStr                 m_strVersionSuffix;
+        tCIDLib::TBoolean           m_bForce;
+        tCIDLib::TBoolean           m_bLowPrio;
+        tCIDLib::TBoolean           m_bMaxWarn;
+        tCIDLib::TBoolean           m_bNonPermissive;
+        tCIDLib::TBoolean           m_bNoRecurse;
+        tCIDLib::TBoolean           m_bSingle;
+        tCIDLib::TBoolean           m_bSupressLogo;
+        tCIDLib::TBoolean           m_bVerbose;
+        tCIDLib::TCard4             m_c4CPUCount;
+        tCIDLib::TCard4             m_c4MajVer;
+        tCIDLib::TCard4             m_c4MinVer;
+        tCIDLib::TCard4             m_c4Revision;
+        tCIDBuild::EActions         m_eAction;
+        tCIDBuild::EBldModes        m_eBldMode;
+        tCIDBuild::EAnalysisLevels  m_eCodeAnalysis;
+        tCIDBuild::EHdrDmpModes     m_eHdrDumpMode;
+        TList<TBldStr>              m_listDbgParms;
+        TList<TBldStr>              m_listExtLibs;
+        TList<TBldStr>              m_listExtLibPaths;
+        TList<TBldStr>              m_listExtIncludePaths;
+        TList<TBldStr>              m_listIDLMappings;
+        TList<TKeyValuePair>        m_listMacros;
+        TProjectList*               m_pplistProjs;
+        TBldStr                     m_strCIDLibSrcDir;
+        TBldStr                     m_strIncludeDir;
+        TBldStr                     m_strLangSuffix;
+        TBldStr                     m_strOutDir;
+        TBldStr                     m_strBasePlatform;
+        TBldStr                     m_strFullPlatform;
+        TBldStr                     m_strPrivIncludeDir;
+        TBldStr                     m_strPPIncludeDir;
+        TBldStr                     m_strPPPrivIncludeDir;
+        TBldStr                     m_strRootDir;
+        TBldStr                     m_strTarget;
+        TToolsDriver*               m_ptdrvBuild;
+        TBldStr                     m_strVersionSuffix;
 };
 
-
-// ---------------------------------------------------------------------------
-//  TFacCIDBuild: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDBuild::EBldModes TFacCIDBuild::eBldMode() const
-{
-    return m_eBldMode;
-}
-
-inline tCIDBuild::EHdrDmpModes TFacCIDBuild::eHdrDumpMode() const
-{
-    return m_eHdrDumpMode;
-}
-
-inline const TList<TBldStr>& TFacCIDBuild::listExtLibs() const
-{
-    return m_listExtLibs;
-}
-
-inline const TList<TBldStr>& TFacCIDBuild::listExtLibPaths() const
-{
-    return m_listExtLibPaths;
-}
-
-inline const TList<TBldStr>& TFacCIDBuild::listExtIncludePaths() const
-{
-    return m_listExtIncludePaths;
-}
-
-inline const TList<TBldStr>& TFacCIDBuild::listIDLMappings() const
-{
-    return m_listIDLMappings;
-}
-
-inline const TProjectInfo&
-TFacCIDBuild::projiByName(const TBldStr& strName) const
-{
-    // Just pass through to the project list
-    return m_pplistProjs->projiByName(strName);
-}
-
-inline const TProjectList& TFacCIDBuild::plistProjects() const
-{
-    return *m_pplistProjs;
-}
-
-inline const TBldStr& TFacCIDBuild::strCIDLibSrcDir() const
-{
-    return m_strCIDLibSrcDir;
-}
-
-inline const TBldStr& TFacCIDBuild::strLangSuffix() const
-{
-    return m_strLangSuffix;
-}
-
-inline const TBldStr& TFacCIDBuild::strIncludeDir() const
-{
-    return m_strIncludeDir;
-}
-
-inline const TBldStr& TFacCIDBuild::strPPIncludeDir() const
-{
-    return m_strPPIncludeDir;
-}
-
-inline const TBldStr& TFacCIDBuild::strOutDir() const
-{
-    return m_strOutDir;
-}
-
-inline const TBldStr& TFacCIDBuild::strBasePlatform() const
-{
-    return m_strBasePlatform;
-}
-
-inline const TBldStr& TFacCIDBuild::strFullPlatform() const
-{
-    return m_strFullPlatform;
-}
-
-inline const TBldStr& TFacCIDBuild::strPrivIncludeDir() const
-{
-    return m_strPrivIncludeDir;
-}
-
-inline const TBldStr& TFacCIDBuild::strPPPrivIncludeDir() const
-{
-    return m_strPPPrivIncludeDir;
-}
-
-inline const TBldStr& TFacCIDBuild::strRootDir() const
-{
-    return m_strRootDir;
-}
-
-inline const TBldStr& TFacCIDBuild::strTarget() const
-{
-    // Either target project, or target directory for release actions
-    return m_strTarget;
-}
-
-inline const TBldStr& TFacCIDBuild::strVersionSuffix() const
-{
-    return m_strVersionSuffix;
-}
 

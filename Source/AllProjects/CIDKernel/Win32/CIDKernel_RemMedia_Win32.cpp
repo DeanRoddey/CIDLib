@@ -37,8 +37,8 @@
 #define     _ANONYMOUS_UNION
 #pragma     warning(disable : 4200)
 
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <ntddcdrm.h>
 #include    <ntddscsi.h>
@@ -168,10 +168,13 @@ typedef struct _GET_CONFIGURATION_IOCTL_INPUT
 // ---------------------------------------------------------------------------
 namespace CIDKernel_RemMedia
 {
-    // -----------------------------------------------------------------------
-    //  A template for the device path we need to open a drive.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const aszPathTmpl = L"\\\\.\\ :";
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  A template for the device path we need to open a drive.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCh* const aszPathTmpl = L"\\\\.\\ :";
+    }
 }
 
 

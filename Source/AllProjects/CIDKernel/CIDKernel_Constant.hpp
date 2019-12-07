@@ -105,7 +105,7 @@ namespace kCIDLib
     //  size of chars.
     // -----------------------------------------------------------------------
     constexpr tCIDLib::TCard4   c4UniBytes      = 2;
-    constexpr tCIDLib::TCh      uchMaxUniChar   = tCIDLib::TCh(0xFFFF);
+    constexpr tCIDLib::TCh      uchMaxUniChar   = static_cast<tCIDLib::TCh>(0xFFFF);
     constexpr tCIDLib::TCard4   c4MaxUTF8Bytes  = 6;
 
 

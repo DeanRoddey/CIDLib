@@ -311,9 +311,9 @@ template <typename TElem> class TSimplePoolPtr
 
         //
         //  Do the stuff for us to take on another pointer's object, decrementing
-        //  and releasing ours as required, and incrementing his. We know the source
-        //  cannot change other than the ref count (which cannot go to zero while we
-        //  are here since the copy we are taking from is keeping it alive.)
+        //  and releasing ours as required, and incrementing his. These pointers
+        //  are not thread safe so we expect it cannot change whlie we are in
+        //  here.
         //
         tCIDLib::TVoid TakeSource(const TSimplePoolPtr& spptrSrc)
         {
@@ -429,8 +429,7 @@ template<typename TElem> class TSimplePool : public TObject
         // -------------------------------------------------------------------
 
         //
-        //  Return the overall count of elements. We have to lock here since we
-        //  have to get the current size of both lists.
+        //  Return the overall count of elements, so what's in both lists.
         //
         tCIDLib::TCard4 c4ElemCount() const
         {
@@ -449,9 +448,7 @@ template<typename TElem> class TSimplePool : public TObject
         }
 
 
-        //
-        //  Return the number of elements in use
-        //
+        // Return the number of elements in use
         tCIDLib::TCard4 c4ElemsUsed() const
         {
             TMtxLocker mtxlSync(m_pmtxSync);
@@ -485,6 +482,9 @@ template<typename TElem> class TSimplePool : public TObject
                     , tCIDLib::EErrClasses::OutResource
                     , m_strName
                 );
+
+                // Won't happen, but makes the analyzer happy
+                return nullptr;
             }
 
             //
@@ -525,6 +525,9 @@ template<typename TElem> class TSimplePool : public TObject
                             , tCIDLib::EErrClasses::OutResource
                             , m_strName
                         );
+
+                        // Won't happen but makes the analyzer happyer
+                        return nullptr;
                     }
                 }
             }
@@ -542,7 +545,6 @@ template<typename TElem> class TSimplePool : public TObject
             //  know there is space for it since we checked above.
             //
             tCIDLib::TCard4 c4InsertAt;
-            CIDLib_Suppress(6011) // It's NOT ever null here, we create one above if needed
             m_colUsedList.pobjBinarySearch(*pelemRet, eCompAddr, c4InsertAt);
             m_colUsedList.InsertAt(pelemRet, c4InsertAt);
 

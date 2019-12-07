@@ -147,6 +147,20 @@ TFacCIDOrb::TFacCIDOrb() :
     // Set up any of the stats cache items we support
     TStatsCache::RegisterItem
     (
+        kCIDOrb::pszStat_Srv_ActiveCmds
+        , tCIDLib::EStatItemTypes::Counter
+        , m_sciActiveCmds
+    );
+
+    TStatsCache::RegisterItem
+    (
+        kCIDOrb::pszStat_Srv_QueuedCmds
+        , tCIDLib::EStatItemTypes::Counter
+        , m_sciQueuedCmds
+    );
+
+    TStatsCache::RegisterItem
+    (
         kCIDOrb::pszStat_Srv_RegisteredObjs
         , tCIDLib::EStatItemTypes::Counter
         , m_sciRegisteredObjs
@@ -529,7 +543,7 @@ TFacCIDOrb::DispatchCmd(const TString& strMethod, TOrbCmd& orbcToDispatch)
     //
     //
     //  >>>> IT IS IMPORTANT that we send this particular error, because the
-    //       client side ORB will watch for it, and remove it's object id from
+    //       client side ORB will watch for it, and remove the object id from
     //       the client side object id cache. Otherwise, it would continue to
     //       be used until it timed out of the cache. This way, the client can
     //       recover quickly if a server cycles.
@@ -562,6 +576,9 @@ TFacCIDOrb::DispatchCmd(const TString& strMethod, TOrbCmd& orbcToDispatch)
 
     try
     {
+        // Bump the active server command calblacks counter while we are in here
+        TSafeCard4Janitor janCount(&m_scntActiveCmds);
+
         // Assume it will work
         orbcToDispatch.bRetStatus(kCIDLib::True);
 
@@ -863,7 +880,11 @@ TFacCIDOrb::InitServer( const   tCIDLib::TIPPortNum ippnListen
         if (!m_atomServerInit)
         {
             // Initialize some server side stuff
+            TStatsCache::SetValue(m_sciActiveCmds, 0);
+            TStatsCache::SetValue(m_sciQueuedCmds, 0);
             TStatsCache::SetValue(m_sciRegisteredObjs, 0);
+            m_scntActiveCmds.c4SetValue(0);
+
 
             // Initialize the core Orb server support
             TOrbServerBase::InitializeOrbServer();
@@ -1371,7 +1392,9 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
             }   while (m_colObjList.bNext());
         }
 
-        // Zero out the stats cache item for objects
+        // Zero our server side stats
+        TStatsCache::SetValue(m_sciActiveCmds, 0);
+        TStatsCache::SetValue(m_sciQueuedCmds, 0);
         TStatsCache::SetValue(m_sciRegisteredObjs, 0);
 
         //
@@ -1451,8 +1474,13 @@ tCIDLib::EExitCodes TFacCIDOrb::eMonThread(TThread& thrThis, tCIDLib::TVoid*)
             if (!thrThis.bSleep(2000))
                 break;
 
-            // Update our work queue items stat
+            // Update our various stats
             TStatsCache::SetValue(m_sciWorkQItems, TWorkQItem::c4UsedQItems());
+
+            if (m_poccmSrv)
+                TStatsCache::SetValue(m_sciQueuedCmds, m_poccmSrv->c4QueuedCmds());
+
+            TStatsCache::SetValue(m_sciActiveCmds, m_scntActiveCmds.c4Value());
         }
 
         catch(TError& errToCatch)

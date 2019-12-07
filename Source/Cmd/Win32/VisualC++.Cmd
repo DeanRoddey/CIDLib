@@ -82,11 +82,6 @@ SET LIB=%CID_DEPENDS%\SDKTweaks;%LIB%
 
 
 REM ---------------------------------------------------------------------------
-REM  Needed for the code analysis stuff
-REM ---------------------------------------------------------------------------
-SET Esp.Extensions=CppCoreCheck.dll
-
-REM ---------------------------------------------------------------------------
 REM Add to the path the appropriate runtime library path
 REM ---------------------------------------------------------------------------
 IF "%1"=="Prod" SET Path=%Path%;%CID_DEPENDS%\VCRuntime\Microsoft.CRT;
@@ -115,6 +110,15 @@ REM ---------------------------------------------------------------------------
 SET PATH=%PATH%;%CID_QTSDK%;
 SET INCLUDE=%INCLUDE%;%CID_DEPENDS%\SDKS\iTunes;
 GOTO EXIT
+
+
+REM ---------------------------------------------------------------------------
+REM  Needed for the code analysis stuff (AFTER the include path is set.)
+REM ---------------------------------------------------------------------------
+SET esp.extensions=CppCoreCheck.dll
+SET esp.annotationbuildlevel=ignore
+set caexcludepath=%INCLUDE%
+
 
 
 REM Come here if bad parameters

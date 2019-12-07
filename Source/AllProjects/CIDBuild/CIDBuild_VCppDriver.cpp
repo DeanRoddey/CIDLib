@@ -425,12 +425,23 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         apszArgs[c4CurArg++] = L"/RTC1";
 
         // If asked, invoke code analysis
-        if (facCIDBuild.bCodeAnalysis())
+        if (facCIDBuild.eCodeAnalysis() != tCIDBuild::EAnalysisLevels::None)
         {
-            // Tell it to use our standard rulseset
-            apszArgs[c4CurArg++] = L"/analyze:ruleset";
-            TBldStr* pstrNew = new TBldStr(facCIDBuild.strCIDLibSrcDir());
-            pstrNew->Append(L"Source\\Cmd\\Win32\\Standard.ruleset");
+            TBldStr* pstrNew = new TBldStr(L"/analyze:ruleset\"");
+            pstrNew->Append(facCIDBuild.strCIDLibSrcDir());
+            if (facCIDBuild.eCodeAnalysis() == tCIDBuild::EAnalysisLevels::Level1)
+            {
+                pstrNew->Append(L"Source\\Cmd\\Win32\\Standard.ruleset\"");
+            }
+             else if (facCIDBuild.eCodeAnalysis() == tCIDBuild::EAnalysisLevels::Level2)
+            {
+                pstrNew->Append(L"Source\\Cmd\\Win32\\Standard2.ruleset\"");
+            }
+             else
+            {
+                stdOut  << L"Unknown code analysis level" << kCIDBuild::EndLn;
+                throw tCIDBuild::EErrors::BuildError;
+            }
             apszArgs[c4CurArg++] = pstrNew->pszBuffer();
 
             // And tell it the analysis plugin to use, which it doesn't seem to do on its own
@@ -532,8 +543,7 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         {
             tCIDLib::TCh* pszNew = new tCIDLib::TCh
             [
-                TRawStr::c4StrLen(cursIncludePaths.tCurElement().pszBuffer())
-                + 16
+                TRawStr::c4StrLen(cursIncludePaths.tCurElement().pszBuffer()) + 16
             ];
             TRawStr::CopyStr(pszNew, L"/I");
             TRawStr::CatStr(pszNew, cursIncludePaths.tCurElement().pszBuffer());

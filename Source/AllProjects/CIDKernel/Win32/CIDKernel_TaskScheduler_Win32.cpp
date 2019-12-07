@@ -36,12 +36,13 @@
 // ---------------------------------------------------------------------------
 //  Force in some headers and libraries we require
 // ---------------------------------------------------------------------------
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <comdef.h>
 #include    <taskschd.h>
 #pragma     warning(pop)
+
 #pragma comment(lib, "taskschd.lib")
 
 
@@ -61,7 +62,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
 {
     HRESULT hRes;
 
-    ITaskService* pService = 0;
+    ITaskService* pService = nullptr;
     hRes = ::CoCreateInstance
     (
         CLSID_TaskScheduler
@@ -87,7 +88,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
     }
 
     // Get the root folder
-    ITaskFolder* pRootFolder = 0;
+    ITaskFolder* pRootFolder = nullptr;
     hRes = pService->GetFolder(_bstr_t(L"\\") , &pRootFolder);
     if (FAILED(hRes))
     {
@@ -99,7 +100,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
     pRootFolder->DeleteTask(_bstr_t(pszName), 0);
 
     // Create the task builder object to create the task.
-    ITaskDefinition* pTask = 0;
+    ITaskDefinition* pTask = nullptr;
     hRes = pService->NewTask(0, &pTask);
     if (FAILED(hRes))
     {
@@ -112,7 +113,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
 
     // Set the registration info. If it fails, we don't stop
     {
-        IRegistrationInfo* pRegInfo= 0;
+        IRegistrationInfo* pRegInfo = nullptr;
         hRes = pTask->get_RegistrationInfo(&pRegInfo);
         if (FAILED(hRes))
         {
@@ -125,7 +126,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
     }
 
     // Get the task settings object so we can set it up
-    ITaskSettings* pSettings = 0;
+    ITaskSettings* pSettings = nullptr;
     hRes = pTask->get_Settings(&pSettings);
     if (FAILED(hRes))
     {
@@ -167,7 +168,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
         };
 
         // Create the basic trigger
-        ITrigger* pTrigger = 0;
+        ITrigger* pTrigger = nullptr;
         hRes = pTriggerCol->Create(TrigType, &pTrigger);
         if (FAILED(hRes))
             return kCIDLib::False;
@@ -192,7 +193,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
         {
             case EStartTypes::OnLogon :
             {
-                ILogonTrigger* pLTrigger = 0;
+                ILogonTrigger* pLTrigger = nullptr;
                 hRes = pTrigger->QueryInterface(IID_ILogonTrigger, (void**)&pLTrigger);
                 if (FAILED(hRes))
                 {
@@ -235,7 +236,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
     // Set it up to run at admin level if indicated
     if (bAdminRights)
     {
-        IPrincipal* pPrincipal = 0;
+        IPrincipal* pPrincipal = nullptr;
         hRes = pTask->get_Principal(&pPrincipal);
         if (FAILED(hRes))
         {
@@ -250,13 +251,13 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
 
     // And let's set up the task steps
     {
-        IActionCollection* pActionCol = 0;
+        IActionCollection* pActionCol = nullptr;
         hRes = pTask->get_Actions(&pActionCol);
         if (FAILED(hRes))
             return kCIDLib::False;
 
         TCOMJanitor<IActionCollection> janActCol(&pActionCol);
-        IAction* pAction = 0;
+        IAction* pAction = nullptr;
         hRes = pActionCol->Create(TASK_ACTION_EXEC, &pAction);
         if (FAILED(hRes))
         {
@@ -264,7 +265,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
             return kCIDLib::False;
         }
 
-        IExecAction* pExecAction = NULL;
+        IExecAction* pExecAction = nullptr;
         hRes = pAction->QueryInterface(IID_IExecAction, (void**)&pExecAction);
         pAction->Release();
         if (FAILED(hRes))
@@ -291,7 +292,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
     }
 
     // And finally, a novel later, let's create the task
-    IRegisteredTask* pRegisteredTask = 0;
+    IRegisteredTask* pRegisteredTask = nullptr;
     VARIANT varPassword;
     ::VariantInit(&varPassword);
     varPassword.vt = VT_EMPTY;
@@ -322,7 +323,7 @@ TKrnlTaskSched::bDeleteSchedTask(const tCIDLib::TCh* const pszName)
 {
     HRESULT hRes;
 
-    ITaskService* pService = 0;
+    ITaskService* pService = nullptr;
     hRes = ::CoCreateInstance
     (
         CLSID_TaskScheduler
@@ -342,7 +343,7 @@ TKrnlTaskSched::bDeleteSchedTask(const tCIDLib::TCh* const pszName)
         return kCIDLib::False;
 
     // Get the root folder
-    ITaskFolder* pRootFolder = 0;
+    ITaskFolder* pRootFolder = nullptr;
     hRes = pService->GetFolder(_bstr_t(L"\\") , &pRootFolder);
     if (FAILED(hRes))
         return kCIDLib::False;
@@ -365,7 +366,7 @@ TKrnlTaskSched::bDeleteSchedTask(const tCIDLib::TCh* const pszName)
 //
 tCIDLib::TBoolean TKrnlTaskSched::bSupportAvail()
 {
-    ITaskService* pService = 0;
+    ITaskService* pService = nullptr;
     HRESULT hRes = ::CoCreateInstance
     (
         CLSID_TaskScheduler

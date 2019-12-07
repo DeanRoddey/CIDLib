@@ -82,8 +82,10 @@ class KRNLEXPORT TKrnlVolFailureInfo
 
         TKrnlVolFailureInfo
         (
-            const   TKrnlVolFailureInfo&    kvolfiToCopy
+            const   TKrnlVolFailureInfo&    kvolfiSrc
         );
+
+        TKrnlVolFailureInfo(TKrnlVolFailureInfo&&) = delete;
 
         ~TKrnlVolFailureInfo();
 
@@ -93,8 +95,10 @@ class KRNLEXPORT TKrnlVolFailureInfo
         // -------------------------------------------------------------------
         TKrnlVolFailureInfo& operator=
         (
-            const   TKrnlVolFailureInfo&    kvolfiToAssign
+            const   TKrnlVolFailureInfo&    kvolfiSrc
         );
+
+        TKrnlVolFailureInfo& operator=(TKrnlVolFailureInfo&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -165,8 +169,10 @@ class KRNLEXPORT TKrnlVolumeInfo
 
         TKrnlVolumeInfo
         (
-            const   TKrnlVolumeInfo&        kvoliToCopy
+            const   TKrnlVolumeInfo&        kvoliSrc
         );
+
+        TKrnlVolumeInfo(TKrnlVolumeInfo&&) = delete;
 
         ~TKrnlVolumeInfo();
 
@@ -176,8 +182,10 @@ class KRNLEXPORT TKrnlVolumeInfo
         // -------------------------------------------------------------------
         TKrnlVolumeInfo& operator=
         (
-            const   TKrnlVolumeInfo&        kvoliToAssign
+            const   TKrnlVolumeInfo&        kvoliSrc
         );
+
+        TKrnlVolumeInfo& operator=(TKrnlVolumeInfo&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -248,17 +256,6 @@ class KRNLEXPORT TKrnlVolumeInfo
 };
 
 
-class KRNLEXPORT TKrnlVolLists
-{
-    public :
-        TKrnlVolLists();
-        ~TKrnlVolLists();
-
-
-    private :
-
-};
-
 
 // ---------------------------------------------------------------------------
 //   CLASS: TKrnlDirChangeInfo
@@ -273,6 +270,7 @@ class KRNLEXPORT TKrnlDirChangeInfo
         TKrnlDirChangeInfo();
 
         TKrnlDirChangeInfo(const TKrnlDirChangeInfo&) = delete;
+        TKrnlDirChangeInfo(TKrnlDirChangeInfo&&) = delete;
 
         ~TKrnlDirChangeInfo() {}
 
@@ -284,6 +282,7 @@ class KRNLEXPORT TKrnlDirChangeInfo
         (
             const   TKrnlDirChangeInfo&     kdchiSrc
         );
+        TKrnlDirChangeInfo& operator=(TKrnlDirChangeInfo&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -325,6 +324,7 @@ class KRNLEXPORT TKrnlDirChangeMon
         TKrnlDirChangeMon();
 
         TKrnlDirChangeMon(const TKrnlDirChangeMon&) = delete;
+        TKrnlDirChangeMon(TKrnlDirChangeMon&&) = delete;
 
         ~TKrnlDirChangeMon();
 
@@ -333,6 +333,7 @@ class KRNLEXPORT TKrnlDirChangeMon
         //  Public operator
         // -------------------------------------------------------------------
         TKrnlDirChangeMon& operator=(const TKrnlDirChangeMon&) = delete;
+        TKrnlDirChangeMon& operator=(TKrnlDirChangeMon&&) = delete;
 
 
         // -------------------------------------------------------------------

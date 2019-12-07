@@ -179,6 +179,7 @@ template <class T> class TArrayJanitor
         }
 
         TArrayJanitor(const TArrayJanitor&) = delete;
+        TArrayJanitor(TArrayJanitor&&) = delete;
 
         ~TArrayJanitor()
         {
@@ -191,6 +192,7 @@ template <class T> class TArrayJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TArrayJanitor& operator=(const TArrayJanitor&) = delete;
+        TArrayJanitor& operator=(TArrayJanitor&&) = delete;
         tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
 
 

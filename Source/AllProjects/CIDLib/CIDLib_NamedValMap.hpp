@@ -213,7 +213,7 @@ template <class TVal> class TNamedValMap : public TObject
                     // If the sub-key doesn't exist, return nul for failiure
                     TPair* pkobjRet = m_colPairs.pobjFindByKey(strSubKey);
                     if (!pkobjRet)
-                        return 0;
+                        return nullptr;
                     return &pkobjRet->objValue();
                 }
 
@@ -222,7 +222,7 @@ template <class TVal> class TNamedValMap : public TObject
                     // If the sub-key doesn't exist, return null for failure
                     const TPair* pkobjRet = m_colPairs.pobjFindByKey(strSubKey);
                     if (!pkobjRet)
-                        return 0;
+                        return nullptr;
                     return &pkobjRet->objValue();
                 }
 
@@ -331,7 +331,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (pnvmiTar)
-                AlreadyExists(strKey, 0);
+                AlreadyExists(strKey, nullptr);
             m_colItems.objAdd(TNVMItem<TVal>(strKey));
         }
 

@@ -701,6 +701,8 @@ namespace TRawStr
         tCIDLib::TCard4 c4Count = 0;
         if (pszSrc)
         {
+            // We just tested pszSrc above, so tmp cannot be null
+            #pragma warning(suppress : 26429)
             const tCIDLib::TCh* pszTmp = pszSrc;
             while (*pszTmp)
                 pszTmp++;
@@ -714,6 +716,8 @@ namespace TRawStr
         tCIDLib::TCard4 c4Count = 0;
         if (pszSrc)
         {
+            // We just tested pszSrc above, so tmp cannot be null
+            #pragma warning(suppress : 26429)
             const tCIDLib::TSCh* pszTmp = pszSrc;
             while (*pszTmp)
                 pszTmp++;

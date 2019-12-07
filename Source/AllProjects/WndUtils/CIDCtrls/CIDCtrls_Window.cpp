@@ -3150,7 +3150,7 @@ TWindow* TWindow::pwndFindNamed(const TString& strToFind) const
 {
     // If the collection isn't faulted in yet, just say no
     if (!m_pcolNamedWnds)
-        return kCIDLib::False;
+        return nullptr;
 
     return m_pcolNamedWnds->pobjFindByKey(strToFind, kCIDLib::False);
 }

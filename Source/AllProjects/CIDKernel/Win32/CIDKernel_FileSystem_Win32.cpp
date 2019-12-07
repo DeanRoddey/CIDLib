@@ -31,8 +31,8 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <devguid.h>
 #include    <shlwapi.h>
@@ -49,72 +49,75 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_FileSystem
 {
-    //
-    //  We need a critical section to protect our list of volumes, which
-    //  are only updated when changes have occured in the volume list. The
-    //  current thread calling into bQueryVolumeList() will update the
-    //  list if the flag is set by the background thread to indicate that
-    //  changes have been seen.
-    //
-    TKrnlCritSec*   pkcrsLock;
-
-    //
-    //  Our list of volumes and failures. And a list of volume statuses to
-    //  indicate which volumes should be found in which lists.
-    //
-    enum EVolStatuses
+    namespace
     {
-        EVolStat_NotUsed
-        , EVolStat_Used
-        , EVolStat_Error
-    };
+        //
+        //  We need a critical section to protect our list of volumes, which
+        //  are only updated when changes have occured in the volume list. The
+        //  current thread calling into bQueryVolumeList() will update the
+        //  list if the flag is set by the background thread to indicate that
+        //  changes have been seen.
+        //
+        TKrnlCritSec*   pkcrsLock;
 
-    const tCIDLib::TCard4   c4MaxVolumes = 64;
-    EVolStatuses            aeVolStatuses[c4MaxVolumes];
-    TKrnlVolumeInfo         akvoliCur[c4MaxVolumes];
-    TKrnlVolFailureInfo     akvolfiCur[c4MaxVolumes];
+        //
+        //  Our list of volumes and failures. And a list of volume statuses to
+        //  indicate which volumes should be found in which lists.
+        //
+        enum EVolStatuses
+        {
+            EVolStat_NotUsed
+            , EVolStat_Used
+            , EVolStat_Error
+        };
 
-    // The name of the local window class we register
-    const tCIDLib::TCh* const   pszVolNotClass = L"CIDKrnlVolNot";
+        constexpr tCIDLib::TCard4   c4MaxVolumes = 64;
+        EVolStatuses                aeVolStatuses[c4MaxVolumes];
+        TKrnlVolumeInfo             akvoliCur[c4MaxVolumes];
+        TKrnlVolFailureInfo         akvolfiCur[c4MaxVolumes];
 
-    // The thread handle and id of the volume notification thread
-    HANDLE              hthrVolNot;
-    tCIDLib::TThreadId  tidVolNot;
+        // The name of the local window class we register
+        const tCIDLib::TCh* const   pszVolNotClass = L"CIDKrnlVolNot";
 
-    // Our notification window handle
-    HWND                hwndVolNot;
+        // The thread handle and id of the volume notification thread
+        HANDLE              hthrVolNot;
+        tCIDLib::TThreadId  tidVolNot;
 
-    //
-    //  We have to do an initial full scan, so whichever thread get around
-    //  to it first needs to do this. Usually it'll be our background thread
-    //  but not always, so we need to know if it's already been done.
-    //
-    tCIDLib::TBoolean   bFirstScan = kCIDLib::False;
+        // Our notification window handle
+        HWND                hwndVolNot;
 
-    //
-    //  A change counter that gets bumped each time we get a notification
-    //  that volumes have changed. The next time anyone asks for the info
-    //  that will force an update of the lists above, and this will be
-    //  zeroed out.
-    //
-    tCIDLib::TCard4     c4VolChangeCnt = 1;
+        //
+        //  We have to do an initial full scan, so whichever thread get around
+        //  to it first needs to do this. Usually it'll be our background thread
+        //  but not always, so we need to know if it's already been done.
+        //
+        tCIDLib::TBoolean   bFirstScan = kCIDLib::False;
 
-    //
-    //  We also need an ongoing serial number that we just keep incrementing
-    //  each time we change the volume list. This is required for some special
-    //  case scenarios where client code may need to take actions that it
-    //  only wants to do if it knows the list has changed. So they can store
-    //  this value and watch for a new value to show up.
-    //
-    tCIDLib::TCard4     c4VolListSerialNum = 1;
+        //
+        //  A change counter that gets bumped each time we get a notification
+        //  that volumes have changed. The next time anyone asks for the info
+        //  that will force an update of the lists above, and this will be
+        //  zeroed out.
+        //
+        tCIDLib::TCard4     c4VolChangeCnt = 1;
 
-    //
-    //  For general debugging purposes we keep a counter of how many times we have to do
-    //  retries of file system operations. We make this available to the application.
-    //  No sync, it's just a basic type and even if we missed a bump once in a while it
-    //  wouldn't matter.
-    //
-    tCIDLib::TCard4     c4FSRetryCount = 0;
+        //
+        //  We also need an ongoing serial number that we just keep incrementing
+        //  each time we change the volume list. This is required for some special
+        //  case scenarios where client code may need to take actions that it
+        //  only wants to do if it knows the list has changed. So they can store
+        //  this value and watch for a new value to show up.
+        //
+        tCIDLib::TCard4     c4VolListSerialNum = 1;
+
+        //
+        //  For general debugging purposes we keep a counter of how many times we have to do
+        //  retries of file system operations. We make this available to the application.
+        //  No sync, it's just a basic type and even if we missed a bump once in a while it
+        //  wouldn't matter.
+        //
+        tCIDLib::TCard4     c4FSRetryCount = 0;
+    }
 }
 
 
@@ -472,7 +475,7 @@ LoadNetShares(  NETRESOURCE*                    pRes
         return;
     }
 
-    const tCIDLib::TCard4 c4BufSz(16 * 1024);
+    constexpr tCIDLib::TCard4 c4BufSz(16 * 1024);
     void* pBuf = ::GlobalAlloc(GPTR, c4BufSz);
     NETRESOURCE* pInfo = reinterpret_cast<NETRESOURCE*>(pBuf);
 
@@ -1160,7 +1163,7 @@ TKrnlDirChangeInfo& TKrnlDirChangeInfo::operator=(const TKrnlDirChangeInfo& kdch
 // ---------------------------------------------------------------------------
 //  TKrnlDirChangeMon: Public data
 // ---------------------------------------------------------------------------
-const tCIDLib::TCard4 c4DirMonBufSz = 32 * 1024;
+constexpr tCIDLib::TCard4 c4DirMonBufSz = 32 * 1024;
 struct TKrnlDirChangeMon::TDirChangeMonitorData
 {
     tCIDLib::TVoid* m_pBuffer;
@@ -2546,7 +2549,7 @@ tCIDLib::TBoolean TKrnlFileSys
 tCIDLib::TBoolean
 TKrnlFileSys::bRemoveDir(const tCIDLib::TCh* const pszToDelete)
 {
-    const tCIDLib::TCard4 c4MaxTries = 15;
+    constexpr tCIDLib::TCard4 c4MaxTries = 15;
     tCIDLib::TCard4 c4Tries = 0;
     while (kCIDLib::True)
     {
@@ -2584,7 +2587,7 @@ TKrnlFileSys::bRemoveDir(const tCIDLib::TCh* const pszToDelete)
 tCIDLib::TBoolean
 TKrnlFileSys::bRemoveFile(const tCIDLib::TCh* const pszToDelete)
 {
-    const tCIDLib::TCard4 c4MaxTries = 15;
+    constexpr tCIDLib::TCard4 c4MaxTries = 15;
     tCIDLib::TCard4 c4Tries = 0;
     tCIDLib::TBoolean bRet = kCIDLib::False;
     while (kCIDLib::True)
@@ -2650,7 +2653,7 @@ tCIDLib::TBoolean
 TKrnlFileSys::bRename(  const   tCIDLib::TCh* const pszOldName
                         , const tCIDLib::TCh* const pszNewName)
 {
-    const tCIDLib::TCard4 c4MaxTries = 15;
+    constexpr tCIDLib::TCard4 c4MaxTries = 15;
     tCIDLib::TCard4 c4Tries = 0;
     while (kCIDLib::True)
     {

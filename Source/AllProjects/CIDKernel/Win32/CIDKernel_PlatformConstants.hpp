@@ -73,7 +73,7 @@ namespace kCIDLib
     //  independent way.
     // -----------------------------------------------------------------------
     constexpr tCIDLib::TCard4               c4SCharBytes    = 1;
-    constexpr tCIDLib::TSCh                 schMaxSChar     = char(0x7F);
+    constexpr tCIDLib::TSCh                 schMaxSChar     = static_cast<char>(0x7F);
     constexpr tCIDLib::TCard4               c4CharBytes     = 2;
     constexpr tCIDLib::TCh                  chMaxChar       = 0xFFFF;
 

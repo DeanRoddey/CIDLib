@@ -54,109 +54,112 @@ struct TErrorMap
 
 namespace CIDKernel_IP_WIN32
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  aXlatErrors
-    //      An array of mappings from socket errors to CIDLib kernel errors.
-    //      We map a good bit of them to general errors, and some are mapped
-    //      to error codes added just for TCP/IP support.
-    //
-    //  c4ErrCount
-    //      The number of elements in the aXlatErrors array.
-    //
-    //  c2MinVersion
-    //      The minimium version of the WinSock subsystem that we require.
-    // -----------------------------------------------------------------------
-    constexpr TErrorMap amapErrors[] =
+    namespace
     {
-            { WSAEINTR          , kKrnlErrs::errcGen_Interrupted }
-        ,   { WSAEBADF          , kKrnlErrs::errcData_InvalidHandle }
-        ,   { WSAEACCES         , kKrnlErrs::errcAcc_InvalidAccess }
-        ,   { WSAEFAULT         , kKrnlErrs::errcGen_GeneralFault }
-        ,   { WSAEINVAL         , kKrnlErrs::errcData_InvalidValue }
-        ,   { WSAEMFILE         , kKrnlErrs::errcFl_TooManyOpenFiles }
-        ,   { WSAEWOULDBLOCK    , kKrnlErrs::errcGen_WouldBlock }
-        ,   { WSAEINPROGRESS    , kKrnlErrs::errcGen_InProgress }
-        ,   { WSAEALREADY       , kKrnlErrs::errcGen_Already }
-        ,   { WSAENOTSOCK       , kKrnlErrs::errcNet_NotASocket }
-        ,   { WSAEDESTADDRREQ   , kKrnlErrs::errcNet_DestAdrRequired }
-        ,   { WSAEMSGSIZE       , kKrnlErrs::errcNet_MsgSize }
-        ,   { WSAEPROTOTYPE     , kKrnlErrs::errcNet_ProtoType }
-        ,   { WSAENOPROTOOPT    , kKrnlErrs::errcNet_NoProtoOpts }
-        ,   { WSAEPROTONOSUPPORT, kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAESOCKTNOSUPPORT, kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAEOPNOTSUPP     , kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAEPFNOSUPPORT   , kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAEAFNOSUPPORT   , kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAEADDRINUSE     , kKrnlErrs::errcGen_Busy }
-        ,   { WSAEADDRNOTAVAIL  , kKrnlErrs::errcGen_NotAvailable }
-        ,   { WSAENETDOWN       , kKrnlErrs::errcNet_NetworkDown }
-        ,   { WSAENETUNREACH    , kKrnlErrs::errcNet_NetworkUnreachable }
-        ,   { WSAENETRESET      , kKrnlErrs::errcNet_NetworkReset }
-        ,   { WSAECONNABORTED   , kKrnlErrs::errcNet_ConnAborted }
-        ,   { WSAECONNRESET     , kKrnlErrs::errcNet_ConnReset }
-        ,   { WSAENOBUFS        , kKrnlErrs::errcNet_NoBuffers }
-        ,   { WSAEISCONN        , kKrnlErrs::errcGen_AlreadyConnected }
-        ,   { WSAENOTCONN       , kKrnlErrs::errcGen_NotConnected }
-        ,   { WSAESHUTDOWN      , kKrnlErrs::errcNet_Shutdown }
-        ,   { WSAETOOMANYREFS   , kKrnlErrs::errcGen_TooMany }
-        ,   { WSAETIMEDOUT      , kKrnlErrs::errcGen_Timeout }
-        ,   { WSAECONNREFUSED   , kKrnlErrs::errcNet_ConnRefused }
-        ,   { WSAELOOP          , kKrnlErrs::errcNet_Loop }
-        ,   { WSAENAMETOOLONG   , kKrnlErrs::errcData_NameTooLong }
-        ,   { WSAEHOSTDOWN      , kKrnlErrs::errcNet_HostDown }
-        ,   { WSAEHOSTUNREACH   , kKrnlErrs::errcNet_HostUnreachable }
-        ,   { WSAENOTEMPTY      , kKrnlErrs::errcGen_NotEmpty }
-        ,   { WSAEPROCLIM       , kKrnlErrs::errcProc_ProcessLimit }
-        ,   { WSAEUSERS         , kKrnlErrs::errcNet_Users }
-        ,   { WSAEDQUOT         , kKrnlErrs::errcNet_Quota }
-        ,   { WSAESTALE         , kKrnlErrs::errcNet_Stale }
-        ,   { WSAEREMOTE        , kKrnlErrs::errcNet_Remote }
-        ,   { WSAEDISCON        , kKrnlErrs::errcNet_Disconnect }
-        ,   { WSANOTINITIALISED , kKrnlErrs::errcGen_NotInitialized }
-    };
-    constexpr tCIDLib::TCard4 c4ErrCount = tCIDLib::c4ArrayElems(amapErrors);
-    constexpr tCIDLib::TCard2 c2MinVersion = 0x0202;
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  aXlatErrors
+        //      An array of mappings from socket errors to CIDLib kernel errors.
+        //      We map a good bit of them to general errors, and some are mapped
+        //      to error codes added just for TCP/IP support.
+        //
+        //  c4ErrCount
+        //      The number of elements in the aXlatErrors array.
+        //
+        //  c2MinVersion
+        //      The minimium version of the WinSock subsystem that we require.
+        // -----------------------------------------------------------------------
+        constexpr TErrorMap amapErrors[] =
+        {
+                { WSAEINTR          , kKrnlErrs::errcGen_Interrupted }
+            ,   { WSAEBADF          , kKrnlErrs::errcData_InvalidHandle }
+            ,   { WSAEACCES         , kKrnlErrs::errcAcc_InvalidAccess }
+            ,   { WSAEFAULT         , kKrnlErrs::errcGen_GeneralFault }
+            ,   { WSAEINVAL         , kKrnlErrs::errcData_InvalidValue }
+            ,   { WSAEMFILE         , kKrnlErrs::errcFl_TooManyOpenFiles }
+            ,   { WSAEWOULDBLOCK    , kKrnlErrs::errcGen_WouldBlock }
+            ,   { WSAEINPROGRESS    , kKrnlErrs::errcGen_InProgress }
+            ,   { WSAEALREADY       , kKrnlErrs::errcGen_Already }
+            ,   { WSAENOTSOCK       , kKrnlErrs::errcNet_NotASocket }
+            ,   { WSAEDESTADDRREQ   , kKrnlErrs::errcNet_DestAdrRequired }
+            ,   { WSAEMSGSIZE       , kKrnlErrs::errcNet_MsgSize }
+            ,   { WSAEPROTOTYPE     , kKrnlErrs::errcNet_ProtoType }
+            ,   { WSAENOPROTOOPT    , kKrnlErrs::errcNet_NoProtoOpts }
+            ,   { WSAEPROTONOSUPPORT, kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAESOCKTNOSUPPORT, kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAEOPNOTSUPP     , kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAEPFNOSUPPORT   , kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAEAFNOSUPPORT   , kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAEADDRINUSE     , kKrnlErrs::errcGen_Busy }
+            ,   { WSAEADDRNOTAVAIL  , kKrnlErrs::errcGen_NotAvailable }
+            ,   { WSAENETDOWN       , kKrnlErrs::errcNet_NetworkDown }
+            ,   { WSAENETUNREACH    , kKrnlErrs::errcNet_NetworkUnreachable }
+            ,   { WSAENETRESET      , kKrnlErrs::errcNet_NetworkReset }
+            ,   { WSAECONNABORTED   , kKrnlErrs::errcNet_ConnAborted }
+            ,   { WSAECONNRESET     , kKrnlErrs::errcNet_ConnReset }
+            ,   { WSAENOBUFS        , kKrnlErrs::errcNet_NoBuffers }
+            ,   { WSAEISCONN        , kKrnlErrs::errcGen_AlreadyConnected }
+            ,   { WSAENOTCONN       , kKrnlErrs::errcGen_NotConnected }
+            ,   { WSAESHUTDOWN      , kKrnlErrs::errcNet_Shutdown }
+            ,   { WSAETOOMANYREFS   , kKrnlErrs::errcGen_TooMany }
+            ,   { WSAETIMEDOUT      , kKrnlErrs::errcGen_Timeout }
+            ,   { WSAECONNREFUSED   , kKrnlErrs::errcNet_ConnRefused }
+            ,   { WSAELOOP          , kKrnlErrs::errcNet_Loop }
+            ,   { WSAENAMETOOLONG   , kKrnlErrs::errcData_NameTooLong }
+            ,   { WSAEHOSTDOWN      , kKrnlErrs::errcNet_HostDown }
+            ,   { WSAEHOSTUNREACH   , kKrnlErrs::errcNet_HostUnreachable }
+            ,   { WSAENOTEMPTY      , kKrnlErrs::errcGen_NotEmpty }
+            ,   { WSAEPROCLIM       , kKrnlErrs::errcProc_ProcessLimit }
+            ,   { WSAEUSERS         , kKrnlErrs::errcNet_Users }
+            ,   { WSAEDQUOT         , kKrnlErrs::errcNet_Quota }
+            ,   { WSAESTALE         , kKrnlErrs::errcNet_Stale }
+            ,   { WSAEREMOTE        , kKrnlErrs::errcNet_Remote }
+            ,   { WSAEDISCON        , kKrnlErrs::errcNet_Disconnect }
+            ,   { WSANOTINITIALISED , kKrnlErrs::errcGen_NotInitialized }
+        };
+        constexpr tCIDLib::TCard4 c4ErrCount = tCIDLib::c4ArrayElems(amapErrors);
+        constexpr tCIDLib::TCard2 c2MinVersion = 0x0202;
 
 
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  c2Version
-    //      This is the version of the host TCP/IP support that we are using.
-    //      It is saved here during init and used by the TCP/IP version
-    //      support method of TKrnlSysInfo that we implement here.
-    // -----------------------------------------------------------------------
-    tCIDLib::TCard2     c2Version = 0;
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  c2Version
+        //      This is the version of the host TCP/IP support that we are using.
+        //      It is saved here during init and used by the TCP/IP version
+        //      support method of TKrnlSysInfo that we implement here.
+        // -----------------------------------------------------------------------
+        tCIDLib::TCard2     c2Version = 0;
 
 
-    // -----------------------------------------------------------------------
-    //  We fault in info about whether IPV4 and 6 are installed. And a flag that
-    //  let's the user allow us to auto-decide what interface to use when doing
-    //  name to address translation (when the caller doesn't indicate a specific
-    //  one.) This is set via the environment variable CID_AUTOIPINTF being
-    //  set.
-    // -----------------------------------------------------------------------
-    TAtomicFlag         atomProtoLoaded;
-    tCIDLib::TBoolean   bIPV4Avail    = kCIDLib::False;
-    tCIDLib::TBoolean   bIPV6Avail    = kCIDLib::False;
-    tCIDLib::TBoolean   bAutoIPIntf   = kCIDLib::False;
+        // -----------------------------------------------------------------------
+        //  We fault in info about whether IPV4 and 6 are installed. And a flag that
+        //  let's the user allow us to auto-decide what interface to use when doing
+        //  name to address translation (when the caller doesn't indicate a specific
+        //  one.) This is set via the environment variable CID_AUTOIPINTF being
+        //  set.
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomProtoLoaded;
+        tCIDLib::TBoolean   bIPV4Avail    = kCIDLib::False;
+        tCIDLib::TBoolean   bIPV6Avail    = kCIDLib::False;
+        tCIDLib::TBoolean   bAutoIPIntf   = kCIDLib::False;
 
 
-    // -----------------------------------------------------------------------
-    //  We support an environment variable that lets the user do some things to
-    //  help with name resolution issues that have cropped up in some versions of
-    //  Windows. The values create a bitmap, with the lower two indicating case
-    //  and the 3rd indicating whether to add a trailing period
-    //
-    //      0 = Default, do nothing
-    //      1 = Force it all lower case     (=Lower)
-    //      2 = Force it all upper case     (=Upper)
-    //      5 = Lower plus trailing period  (=LowerPeriod)
-    //      6 = Lower plus trailing period  (=UpperPeriod)
-    // -----------------------------------------------------------------------
-    tCIDLib::TCard4     c4DNSNameStyle = 0;
+        // -----------------------------------------------------------------------
+        //  We support an environment variable that lets the user do some things to
+        //  help with name resolution issues that have cropped up in some versions of
+        //  Windows. The values create a bitmap, with the lower two indicating case
+        //  and the 3rd indicating whether to add a trailing period
+        //
+        //      0 = Default, do nothing
+        //      1 = Force it all lower case     (=Lower)
+        //      2 = Force it all upper case     (=Upper)
+        //      5 = Lower plus trailing period  (=LowerPeriod)
+        //      6 = Lower plus trailing period  (=UpperPeriod)
+        // -----------------------------------------------------------------------
+        tCIDLib::TCard4     c4DNSNameStyle = 0;
+    }
 }
 
 
@@ -754,7 +757,7 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
 //
 tCIDLib::TBoolean TKrnlIP::bQueryLocalName(TKrnlString& kstrToFill)
 {
-    const tCIDLib::TCard4 c4NameBufMax = kCIDLib::c4Sz_1K;
+    constexpr tCIDLib::TCard4 c4NameBufMax = kCIDLib::c4Sz_1K;
     tCIDLib::TCh szName[c4NameBufMax + 2];
     tCIDLib::TCard4 c4ActualSz = c4NameBufMax;
     if (!::GetComputerNameEx(ComputerNameDnsHostname, szName, &c4ActualSz))
@@ -853,7 +856,7 @@ TKrnlIP::bTextFromIPAddr(const  TKrnlIPAddr&    kipaToConvert
         return kCIDLib::False;
 
     // Try the conversion
-    const tCIDLib::TCard4 c4Len = kCIDLib::c4Sz_1K;
+    constexpr tCIDLib::TCard4 c4Len = kCIDLib::c4Sz_1K;
     tCIDLib::TCh achBuf[c4Len + 1];
 
     tCIDLib::TCard4 c4InLen = c4Len;

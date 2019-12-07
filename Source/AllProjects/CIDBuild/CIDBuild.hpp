@@ -119,6 +119,19 @@ namespace tCIDBuild
 
 
     // -----------------------------------------------------------------------
+    //  The code analysis levels, set via the /Analyze option. If just by itself
+    //  we are at level 1. Else they can add an =x to it to set it one of these
+    //  levels.
+    // -----------------------------------------------------------------------
+    enum class EAnalysisLevels
+    {
+        None
+        , Level1
+        , Level2
+    };
+
+
+    // -----------------------------------------------------------------------
     //  This enum represents the two possible build types we do, either a
     //  production or a development build.
     // -----------------------------------------------------------------------

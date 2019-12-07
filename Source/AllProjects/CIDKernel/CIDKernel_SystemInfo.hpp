@@ -32,7 +32,7 @@
 namespace TKrnlSysInfo
 {
     // A simple structure used by the QuerySysId() method below
-    const tCIDLib::TCard4 c4SysIdCnt = 6;
+    constexpr tCIDLib::TCard4 c4SysIdCnt = 6;
     struct TSysId
     {
         tCIDLib::TCard4 ac4Vals[c4SysIdCnt];

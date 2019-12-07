@@ -35,14 +35,17 @@
 
 namespace CIDKernel_Environment_Win32
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  c4Modulus
-    //      The modulus used in the hashing of the key strings. This is
-    //      passed along to the hash map object.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    c4Modulus = 23;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  c4Modulus
+        //      The modulus used in the hashing of the key strings. This is
+        //      passed along to the hash map object.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4    c4Modulus = 23;
+    }
 }
 
 

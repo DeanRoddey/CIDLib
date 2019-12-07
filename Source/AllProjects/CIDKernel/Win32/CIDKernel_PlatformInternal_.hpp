@@ -39,8 +39,8 @@
 #define _WINSOCKAPI_
 #endif
 
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <windows.h>
 #include    <winsock2.h>

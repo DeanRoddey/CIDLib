@@ -32,12 +32,6 @@
 namespace TKrnlWin32
 {
     // -----------------------------------------------------------------------
-    //  Some internal system specific constants
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4NonNormalAttrs =  FILE_ATTRIBUTE_SYSTEM;
-
-
-    // -----------------------------------------------------------------------
     //  The helper functions
     // -----------------------------------------------------------------------
     tCIDLib::TVoid AtomicHandleSet
@@ -94,6 +88,14 @@ namespace TKrnlWin32
         ,       tCIDLib::TCard4&        c4Signaled
         , const tCIDLib::TCard4         c4WaitMillis
     );
+
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Some internal system specific constants
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4NonNormalAttrs =  FILE_ATTRIBUTE_SYSTEM;
+    }
 }
 
 

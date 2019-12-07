@@ -249,6 +249,7 @@ class TAtomicInt
         // -------------------------------------------------------------------
         tCIDLib::TInt4 i4Value() const noexcept
         {
+            #pragma warning(suppress : 26490) // We need the reinterpret cast here
             const tCIDLib::TInt4 i4Value = TRawMem::c4CompareAndExchange
             (
                 reinterpret_cast<tCIDLib::TCard4&>(m_i4Value), 0, 0
@@ -258,6 +259,7 @@ class TAtomicInt
 
         tCIDLib::TVoid SetValue(const tCIDLib::TInt4 i4ToSet) noexcept
         {
+            #pragma warning(suppress : 26490) // We need the reinterpret cast here
             TRawMem::c4Exchange
             (
                 reinterpret_cast<tCIDLib::TCard4&>(m_i4Value), i4ToSet

@@ -44,7 +44,7 @@
 // ---------------------------------------------------------------------------
 TModuleHandle::TModuleHandle() :
 
-    m_phmodiThis(0)
+    m_phmodiThis(nullptr)
 {
     m_phmodiThis = new TModuleHandleImpl;
     m_phmodiThis->hInstance = 0;
@@ -52,7 +52,7 @@ TModuleHandle::TModuleHandle() :
 
 TModuleHandle::TModuleHandle(const TModuleHandle& hmodToCopy) :
 
-    m_phmodiThis(0)
+    m_phmodiThis(nullptr)
 {
     m_phmodiThis = new TModuleHandleImpl;
     m_phmodiThis->hInstance = hmodToCopy.m_phmodiThis->hInstance;
@@ -61,7 +61,7 @@ TModuleHandle::TModuleHandle(const TModuleHandle& hmodToCopy) :
 TModuleHandle::~TModuleHandle()
 {
     delete m_phmodiThis;
-    m_phmodiThis = 0;
+    m_phmodiThis = nullptr;
 }
 
 
@@ -97,13 +97,13 @@ TModuleHandle::operator!=(const TModuleHandle& hmodToCompare) const
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TModuleHandle::bIsValid() const
 {
-    return (m_phmodiThis->hInstance != 0);
+    return (m_phmodiThis->hInstance != nullptr);
 }
 
 
 tCIDLib::TVoid TModuleHandle::Clear()
 {
-    m_phmodiThis->hInstance = 0;
+    m_phmodiThis->hInstance = nullptr;
 }
 
 tCIDLib::TVoid
@@ -282,7 +282,7 @@ TKrnlModule::bLoadFromName( const   tCIDLib::TCh* const pszModName
     //  If the passed name is fully qualified, then we don't do any of this
     //  and just copy it to the buffer.
     //
-    const tCIDLib::TCard4 c4BufSize = 2047;
+    constexpr tCIDLib::TCard4 c4BufSize = 2047;
     tCIDLib::TCh szNameBuf[c4BufSize + 1];
     if (TRawStr::pszFindChar(pszModName, L'\\'))
     {
@@ -386,7 +386,7 @@ TKrnlModule::bQueryFromName(const   tCIDLib::TCh* const pszModName
     //  If the passed name is fully qualified, then we don't do any of this
     //  and just copy it to the buffer.
     //
-    const tCIDLib::TCard4 c4BufSize = 2047;
+    constexpr tCIDLib::TCard4 c4BufSize = 2047;
     tCIDLib::TCh szNameBuf[c4BufSize + 1];
     if (TRawStr::pszFindChar(pszModName, L'\\'))
     {
@@ -396,12 +396,7 @@ TKrnlModule::bQueryFromName(const   tCIDLib::TCh* const pszModName
     {
         TKrnlWin32::BuildModName
         (
-            szNameBuf
-            , c4BufSize
-            , pszModName
-            , c4MajVer
-            , c4MinVer
-            , eModType
+            szNameBuf, c4BufSize, pszModName, c4MajVer, c4MinVer, eModType
         );
     }
 

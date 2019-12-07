@@ -50,23 +50,24 @@ namespace NSAdmin
     // ------------------------------------------------------------------------
     //  Local types
     // ------------------------------------------------------------------------
-    enum ECmds
+    enum class ECmds
     {
-        ECmd_ClearScope
-        , ECmd_Dump
-        , ECmd_MakeScope
-        , ECmd_RemoveScope
-        , ECmd_ShowScope
+        ClearScope
+        , Dump
+        , MakeScope
+        , RemoveScope
+        , ShowScope
+        , ShowStats
 
         , ECmds_Count
     };
 
-    enum ENodeTypes
+    enum class ENodeTypes
     {
-        ENodeType_Scope
-        , ENodeType_Binding
+        Scope
+        , Binding
 
-        , ENodeTypes_Count
+        , Count
     };
 
 
@@ -102,7 +103,7 @@ namespace NSAdmin
     //      If the command has a target, it is stored here
     // ------------------------------------------------------------------------
     ECmds                   eCmd;
-    tCIDOrbUC::EDumpFmts eDumpFmt = tCIDOrbUC::EDumpFmts::PlainText;
+    tCIDOrbUC::EDumpFmts    eDumpFmt = tCIDOrbUC::EDumpFmts::PlainText;
     ENodeTypes              eNodeType;
     TString                 strCmd;
     TString                 strDescription;
@@ -118,9 +119,9 @@ namespace NSAdmin
 static tCIDLib::TBoolean bXlatNodeType(const TString& strText)
 {
     if (strText.bCompareI(L"scope"))
-        NSAdmin::eNodeType = NSAdmin::ENodeType_Scope;
+        NSAdmin::eNodeType = NSAdmin::ENodeTypes::Scope;
     else if (strText.bCompareI(L"binding"))
-        NSAdmin::eNodeType = NSAdmin::ENodeType_Binding;
+        NSAdmin::eNodeType = NSAdmin::ENodeTypes::Binding;
     else
         return kCIDLib::False;
     return kCIDLib::True;
@@ -144,32 +145,34 @@ static tCIDLib::TBoolean bParseParms()
 
     // Translate it to a command enum
     if (strCurParm.bCompareI(L"clearscope"))
-        NSAdmin::eCmd = NSAdmin::ECmd_ClearScope;
+        NSAdmin::eCmd = NSAdmin::ECmds::ClearScope;
     else if (strCurParm.bCompareI(L"dump"))
-        NSAdmin::eCmd = NSAdmin::ECmd_Dump;
+        NSAdmin::eCmd = NSAdmin::ECmds::Dump;
     else if (strCurParm.bCompareI(L"makescope"))
-        NSAdmin::eCmd = NSAdmin::ECmd_MakeScope;
+        NSAdmin::eCmd = NSAdmin::ECmds::MakeScope;
     else if (strCurParm.bCompareI(L"removescope"))
-        NSAdmin::eCmd = NSAdmin::ECmd_RemoveScope;
+        NSAdmin::eCmd = NSAdmin::ECmds::RemoveScope;
     else if (strCurParm.bCompareI(L"showscope"))
-        NSAdmin::eCmd = NSAdmin::ECmd_ShowScope;
+        NSAdmin::eCmd = NSAdmin::ECmds::ShowScope;
+    else if (strCurParm.bCompareI(L"showstats"))
+        NSAdmin::eCmd = NSAdmin::ECmds::ShowStats;
     else
     {
         TSysInfo::strmOut() << strCurParm << L" is not a valid command" << kCIDLib::EndLn;
         return kCIDLib::False;
     }
 
-    if ((NSAdmin::eCmd == NSAdmin::ECmd_ClearScope)
-    ||  (NSAdmin::eCmd == NSAdmin::ECmd_ShowScope)
-    ||  (NSAdmin::eCmd == NSAdmin::ECmd_RemoveScope))
+    if ((NSAdmin::eCmd == NSAdmin::ECmds::ClearScope)
+    ||  (NSAdmin::eCmd == NSAdmin::ECmds::ShowScope)
+    ||  (NSAdmin::eCmd == NSAdmin::ECmds::RemoveScope))
     {
         // We have to have one more parm, which is the scope name
-        if (!cursParms.bIsValid())
+        if (!cursParms)
             return kCIDLib::False;
 
         NSAdmin::strTarget = *cursParms++;
     }
-     else if (NSAdmin::eCmd == NSAdmin::ECmd_MakeScope)
+     else if (NSAdmin::eCmd == NSAdmin::ECmds::MakeScope)
     {
         if (c4Count < 4)
             return kCIDLib::False;
@@ -178,6 +181,13 @@ static tCIDLib::TBoolean bParseParms()
         NSAdmin::strParent = *cursParms++;
         NSAdmin::strTarget = *cursParms++;
         NSAdmin::strDescription = *cursParms++;
+    }
+     else if ((NSAdmin::eCmd == NSAdmin::ECmds::Dump)
+          ||  (NSAdmin::eCmd == NSAdmin::ECmds::ShowStats))
+    {
+        // Should have no parameters
+        if (cursParms)
+            return kCIDLib::False;
     }
 
     // And now look for any remaining optional parameters
@@ -208,12 +218,76 @@ static tCIDLib::TBoolean bParseParms()
 }
 
 
+//
+//  We use the standard ORB admin interface to query stats from the name server
+//  and display them.
+//
+static tCIDLib::TVoid ShowStats(tCIDOrbUC::TNSrvProxy& orbcNS)
+{
+    // Get an admin proxy for the name server
+    tCIDOrbUC::TCoreAdminProxy orbcAdmin
+    (
+        facCIDOrbUC().orbcCoreSrvAdminProxy(orbcNS, TCIDNameSrvClientProxy::strAdminBinding)
+    );
+
+    // And query the stats
+    tCIDLib::TCard8 c8Stamp = 0;
+    TVector<TStatsCacheItemInfo> colValues;
+    tCIDLib::TCard4 c4ValueCnt = orbcAdmin->c4QueryStats
+    (
+        kCIDLib::pszStat_Scope_Stats, colValues, kCIDLib::False, c8Stamp
+    );
+
+    TStreamFmt  strmfName(30, 0, tCIDLib::EHJustify::Right, kCIDLib::chSpace);
+    TStreamFmt  strmfValue(0, 0, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
+    TTextOutStream& strmOut = TSysInfo::strmOut();
+    strmOut << kCIDLib::NewLn;
+
+    // And display them
+    TTime tmVal;
+    tmVal.strDefaultFormat(TTime::strCTime());
+    TVector<TStatsCacheItemInfo>::TCursor cursStats(&colValues);
+    for (; cursStats; ++cursStats)
+    {
+        const TStatsCacheItemInfo& sciiCur = *cursStats;
+
+        strmOut << strmfName << sciiCur.strName()
+                << strmfValue << L": ";
+
+        // We display the various types differently
+        if (sciiCur.eType() == tCIDLib::EStatItemTypes::Time)
+        {
+            tmVal.enctTime(sciiCur.c8Value());
+            strmOut << tmVal;
+        }
+         else if (sciiCur.eType() == tCIDLib::EStatItemTypes::Flag)
+        {
+            if (sciiCur.c8Value())
+                strmOut << L"True";
+            else
+                strmOut << L"False";
+        }
+         else
+        {
+            strmOut << sciiCur.c8Value();
+
+            // If a percent, put the percent sign out
+            if (sciiCur.eType() == tCIDLib::EStatItemTypes::Percent)
+                strmOut << kCIDLib::chPercentSign;
+        }
+        strmOut << kCIDLib::NewLn;
+    }
+
+    strmOut << kCIDLib::EndLn;
+}
+
+
 static tCIDLib::TVoid ShowUsage()
 {
     TSysInfo::strmOut() << L"Usage:\n"
                         << L"   NSAdmin cmd [cmdopts* /NSAddr=xx /Format=xx"
                         << L"\n"
-                        << L"   Cmd = Dump | Show | Make\n"
+                        << L"   Cmd = ClearScope | Dump | MakeScope | ShowScope | ShowStats\n"
                         << L"\n"
                         << L"   Options depend on the command\n"
                         << kCIDLib::FlushIt;
@@ -244,30 +318,28 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         // And get a name server client proxy
         tCIDOrbUC::TNSrvProxy orbcNS = facCIDOrbUC().orbcNameSrvProxy();
 
-        if (NSAdmin::eCmd == NSAdmin::ECmd_ClearScope)
+        if (NSAdmin::eCmd == NSAdmin::ECmds::ClearScope)
         {
             orbcNS->ClearScope(NSAdmin::strTarget);
         }
-         else if (NSAdmin::eCmd == NSAdmin::ECmd_Dump)
+         else if (NSAdmin::eCmd == NSAdmin::ECmds::Dump)
         {
             TString strDump;
             orbcNS->Dump(strDump, NSAdmin::eDumpFmt);
             TSysInfo::strmOut() << strDump << kCIDLib::FlushIt;
         }
-         else if (NSAdmin::eCmd == NSAdmin::ECmd_MakeScope)
+         else if (NSAdmin::eCmd == NSAdmin::ECmds::MakeScope)
         {
             orbcNS->CreateScope
             (
-                NSAdmin::strParent
-                , NSAdmin::strTarget
-                , NSAdmin::strDescription
+                NSAdmin::strParent, NSAdmin::strTarget, NSAdmin::strDescription
             );
         }
-         else if (NSAdmin::eCmd == NSAdmin::ECmd_RemoveScope)
+         else if (NSAdmin::eCmd == NSAdmin::ECmds::RemoveScope)
         {
             orbcNS->RemoveScope(NSAdmin::strTarget);
         }
-         else if (NSAdmin::eCmd == NSAdmin::ECmd_ShowScope)
+         else if (NSAdmin::eCmd == NSAdmin::ECmds::ShowScope)
         {
             // Do the subscopes first
             tCIDLib::TKVPList colSubscopes;
@@ -315,6 +387,11 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 }
             }
         }
+         else if (NSAdmin::eCmd == NSAdmin::ECmds::ShowStats)
+        {
+            // Call a helper for this
+            ShowStats(orbcNS);
+        }
          else
         {
             TSysInfo::strmOut() << L"Got an unknown ECmds value" << kCIDLib::EndLn;
@@ -324,12 +401,8 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
     catch(TError& errToCatch)
     {
-        // If not logged, then log it.
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
 
         TSysInfo::strmOut() << L"An exception occured:\n"
                             << errToCatch << kCIDLib::EndLn;

@@ -68,16 +68,16 @@ namespace TKrnlRemMedia
     #pragma CIDLIB_POPPACK
 
     // Number of LBA blocks per second
-    const tCIDLib::TCard4 c4CDBlksPerSec = 75;
+    constexpr tCIDLib::TCard4 c4CDBlksPerSec = 75;
 
     // Number of bytes in a raw sector
-    const tCIDLib::TCard4 c4CDRawSectorSz = 2352;
+    constexpr tCIDLib::TCard4 c4CDRawSectorSz = 2352;
 
     // Number of bytes in a cookied sector
-    const tCIDLib::TCard4 c4CDCookedSectorSz = 2048;
+    constexpr tCIDLib::TCard4 c4CDCookedSectorSz = 2048;
 
     // Max chars we'll store for a drive id
-    const tCIDLib::TCard4 c4MaxDriveIdLen = 64;
+    constexpr tCIDLib::TCard4 c4MaxDriveIdLen = 64;
 
 
     // -----------------------------------------------------------------------

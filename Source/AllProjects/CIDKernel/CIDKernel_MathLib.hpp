@@ -32,22 +32,22 @@ namespace TMathLib
     // ------------------------------------------------------------------------
     //  Coordinate functions
     // ------------------------------------------------------------------------
-    inline tCIDLib::TFloat4 f4ToDegrees(const tCIDLib::TFloat4 f4Radians)
+    constexpr tCIDLib::TFloat4 f4ToDegrees(const tCIDLib::TFloat4 f4Radians)
     {
         return f4Radians * (180.0F / kCIDLib::f4PI);
     }
 
-    inline tCIDLib::TFloat4 f4ToRadians(const tCIDLib::TFloat4 f4Degrees)
+    constexpr tCIDLib::TFloat4 f4ToRadians(const tCIDLib::TFloat4 f4Degrees)
     {
         return f4Degrees * (kCIDLib::f4PI / 180.0F);
     }
 
-    inline tCIDLib::TFloat8 f8ToDegrees(const tCIDLib::TFloat8& f8Radians)
+    constexpr tCIDLib::TFloat8 f8ToDegrees(const tCIDLib::TFloat8& f8Radians)
     {
         return f8Radians * (180.0 / kCIDLib::f8PI);
     }
 
-    inline tCIDLib::TFloat8 f8ToRadians(const tCIDLib::TFloat8& f8Degrees)
+    constexpr tCIDLib::TFloat8 f8ToRadians(const tCIDLib::TFloat8& f8Degrees)
     {
         return f8Degrees * (kCIDLib::f8PI / 180.0);
     }
@@ -236,12 +236,12 @@ namespace TMathLib
 
     KRNLEXPORT tCIDLib::TFloat8 f8Sine(const tCIDLib::TFloat8& f8Value);
 
-    inline tCIDLib::TFloat4 f4Square(const tCIDLib::TFloat4 f4Value)
+    constexpr tCIDLib::TFloat4 f4Square(const tCIDLib::TFloat4 f4Value)
     {
         return f4Value * f4Value;
     }
 
-    inline tCIDLib::TFloat8 f8Square(const tCIDLib::TFloat8& f8Value)
+    constexpr tCIDLib::TFloat8 f8Square(const tCIDLib::TFloat8& f8Value)
     {
         return f8Value * f8Value;
     }

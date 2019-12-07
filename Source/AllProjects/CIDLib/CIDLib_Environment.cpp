@@ -382,7 +382,7 @@ TEnvironment::TEnvironment(const tCIDLib::TBoolean bInherit) :
             {
                 m_pcolEnv->objPlace
                 (
-                    pelemList[c4Index].pszKey, pelemList[c4Index].pszValue
+                    pelemList[c4Index].m_pszKey, pelemList[c4Index].m_pszValue
                 );
             }
 

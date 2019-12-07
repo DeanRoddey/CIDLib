@@ -320,6 +320,22 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //      use a pointer so that we don't force the crypto facility
         //      headers on our clients.
         //
+        //  m_scntActiveCmds
+        //      This is bumped up by DispatchCmd() and then decremented on exit.
+        //      So we knwo how many server side threads are actively in callbacks.
+        //      The monitor thread periodically grabs this value and updates the
+        //      m_sciActiveCmds stat.
+        //
+        //  m_sciActiveCmds
+        //      The monitor thread periodically updates this from the active
+        //      cmds counter above.
+        //
+        //  m_sciQueuedCmds
+        //      Periodically our monitor thread calls into the client connection
+        //      manager and gets the number of currently queued up commands from
+        //      clients (waiting to be processed by server side objects.) It will
+        //      update this statistic with that value.
+        //
         //  m_sciRegisteredObjs
         //      A stats cache object that we need up to date with the number
         //      of registered ORB objects on the server side.
@@ -347,6 +363,9 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         tCIDLib::TEncodedTime   m_enctTimeoutAdjust;
         TOrbClientConnMgr*      m_poccmSrv;
         TBlockEncrypter*        m_pcrypSecure;
+        TSafeCard4Counter       m_scntActiveCmds;
+        TStatsCacheItem         m_sciActiveCmds;
+        TStatsCacheItem         m_sciQueuedCmds;
         TStatsCacheItem         m_sciRegisteredObjs;
         TStatsCacheItem         m_sciWorkQItems;
         TThread                 m_thrMonitor;

@@ -6,12 +6,12 @@ CIDLib is a C++ development platform. For many C++ developers a point of referen
 
 CIDLib contains about 1100 classes (~450,000 lines of code.) Here is a rough list of the types of functionality it provides:
 
-- Build Tools, project definition system, resource compiler, loadable text system
+- Build Tools, project definition system, resource compiler, loadable resources system
 - 'Virtual Kernel' platform portability layer
-- Full set of standard libraries including streams, collections/cursors, memory buffers, strings, events, mutexes, sockets, threads/processes, serial ports, URLs, UPnP, secure sockets, audio streaming, speech recognition, digital audio extraction, medatada extraction, text transcoding, logging, publish/subscribe, PNG, JPEG, bitmaps, chunked files, ODBC, etc...)
+- Full set of standard libraries including streams, collections/cursors, memory buffers, strings, events, mutexes, sockets, threads/processes, serial ports, URLs, TCP/IP, UPnP, secure sockets, audio streaming, TTS/speech recognition, digital audio extraction, medatada extraction, text transcoding, logging, publish/subscribe, image management framework, chunked files, ODBC, etc...)
 - Custom implementations of various standards such as PNG, zLib, WebSockets, HTTP, SMTP, Blowfish, AES, MD5, SHA-X, regular expressions, XML, JSON, etc...
 - A fairly extensive windowing and 'regular graphics' framework (no 3D graphics yet)
-- A very powerful ORB (Object Request Broker), IDL compiler, and a set of standard servers (name, logging, and configuration.)
+- A very powerful ORB (Object Request Broker), IDL compiler, and a set of standard servers (name, logging, and configuration.) The IDL compiler also supports very advanced C++ enumeration support.
 - An embeddable, virtual machine-based, OO language engine called CML (parser, VM, runtime libraries)
 - An embeddable IDE for CML editing and debugging
 - A simple but nice object store engine (for things like application configuration storage and such, als used by the configuration server mentioned above.)
@@ -21,9 +21,9 @@ CIDLib contains about 1100 classes (~450,000 lines of code.) Here is a rough lis
 
 **Documentation**
 
-For now, the code is just there to explore. I needed to get it uploaded and start working against the remote repository, and figured it made sense to let people go ahead and start looking through it while I get the initial documentation done. The build instructions are in the above Wiki pages, see Building below.
+For now, the code is mostly undocumented, other than in the code itself. I needed to get it uploaded and start working against the remote repository, and figured it made sense to let people go ahead and start looking through it while I get the initial documentation done. The build instructions are in the above Wiki pages, see Building below.
 
-The next goal some high level documentation of the roadmap sort to get people aware of what's available and where it is and how it fits together and so forth. After that, detailed documentation can be dived into.
+I've got a documentation compiler done, which reads in XML content and can spit it out in whatever format desired, currently HTML. I've started work on the documentation but that will be quite a job to complete it.
 
 In the meantime, I had already begin to make some videos about some of the technologies I've created as part of this project. Those are on my personal Youtube channel here:
 
@@ -74,13 +74,13 @@ Otherwise it is just OS APIs and optional OS SDKs (speech recognition, Windows M
 
 **Portability**
 
-Though CIDLib is currently only fielded on Windows, keeping it portable has always been a goal. I have done plenty of cross platform development in the past and understand the issues fairly well. As mentioned above, CIDLib is based on a 'virtual kernel' that abstracts it from the OS. That virtual kernel is in turn split into interface plus per-platform implementations. The build tools understand this situation so that helps a lot as well.
+Though CIDLib is currently only fielded on Windows, keeping it portable has always been a goal. As mentioned above, CIDLib is based on a 'virtual kernel' that abstracts it from the OS. That virtual kernel is in turn split into interface plus per-platform implementations. The build tools understand this situation so that helps a lot as well.
 
-There is a Win32 implementation currently. But there is still an old Linux implementation from a few decades ago that's still down there. It would need to be brought up to speed, but it should not be difficult to get almost all of the back-end stuff buildable onto Win32 and Linux (32 bit.) And that's not in the 'conditional code all over the place' sort of way, but cleanly supporting both platforms, since 95% of the non-UI code is platform independent and written in terms of our own classes.
+There is a Win32 implementation currently, and there is an old Linux implementation that I've been working on updating. I'm to the point where I can build the CIDKernel layer and the first simple test program for it, TestKernel. Now I've got to start using that to bang out the bugs in the implementation. Not being a Linux guy, I could obviously use some help on that bit. The Linux implementation is old and a lot of stuff that were done by hand orignally are probably available out of the box now.
 
-There are still a handful of libraries that need to be given the 'split' treatment, i.e. break out the platform specific stuff from the platform independent parts. A number have already been taken care of since the code was open sourced, and the rest will follow soon.
+There are still a few libraries that need to be given the 'split' treatment, i.e. break out the platform specific stuff from the platform independent parts. A number have already been taken care of since the code was open sourced, and the rest will follow soon. Some of those will now need a Linux implementation. The secure sockets one is the linchpin currently, since a number of facilities would immediately become available on Linux that otherwise won't be.
 
-The UI code is another story, but just getting the back end functionality cleanly supported on both platforms would be a very powerful thing. Not that the UI code is not similarly encapsulated, but there's a lot more to UI portability than that.
+The UI code is another story, but just getting the back end functionality cleanly supported on both platforms would be a very powerful thing. Not that the UI code is similarly encapsulated, but there's a lot more to UI portability than that.
 
 
 **Background**
@@ -94,7 +94,7 @@ Some people seeing this will immediately start ranting about 'not invented here 
 
 Of course, in a code base this large, even someone who consumes as much caffeine as myself cannot delve super-deeply into every aspect of every sub-system. So obviously some of the sub-systems could be fleshed out by others with specific interests in those areas. However, as stated in the goals section below, it should not become about itself, and become so baroque that no one can understand it. So it's not even a goal for every sub-system to be taken to the Nth degree and become incomprehensible for all but specialists. It should be about the whole being greater than the sum of the parts.
 
-There will be a few old classes laying around that were created long ago and not touched since, because there's been no need for them all this time. Or the need for them went away. Don't, jump to conclusions that the system is garbage if you happen on one of them. There are some classes in the CIDMath facility of this type. The vector/matrix classes are just some simple bits that used to be used by a raytracing library I had at one point, for instance, and the value mapping classes might not be worth keeping.
+There will be a few old classes laying around that were created long ago and not touched since, because there's been no need for them all this time. Or the need for them went away. So, don't jump to conclusions that the system is garbage if you happen on one of them. There are some classes in the CIDMath facility of this type. The vector/matrix classes are just some simple bits that used to be used by a raytracing library I had at one point, for instance, and the value mapping classes might not be worth keeping.
 
 Keep in mind that CIDLib must continue to support CQC, which is likely to always be far and away the largest code base built on CIDLib, though I'd love for that to not be the case at some point. So the rate and type of changes allowed will be moderated by that requirement. Of course I'd very much like to move CQC forward quickly to take advantage of improvements. But it's a large and complex product and there's a limit as to how much change can be absorbed without getting dangerous. Change at the periphery will always be more digestable, e.g. new sub-systems that CQC doesn't depend on.
 

@@ -37,8 +37,8 @@
 #include    "CIDKernel_ConsoleHelpers_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <wchar.h>
 #pragma     warning(pop)
@@ -46,40 +46,43 @@
 
 namespace CIDKernel_Console
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  c4TmpOutMode
-    //      These are the flags we turn on when we temporarily want the console
-    //      to do a little work for us, when we write out a string and want it
-    //      to handle new lines and wrap.
-    //
-    //  c4StdInMode
-    //      These are the flags at are used normally for an input console
-    //      handle. It might be temporarily changed, but these are what are
-    //      always put back.
-    //
-    //  c4StdOutMode
-    //      These are the flags at are used normally for an output console
-    //      handle. It might be temporarily changed, but these are what are
-    //      always put back.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4TmpOutMode = ENABLE_PROCESSED_OUTPUT
-                                       | ENABLE_WRAP_AT_EOL_OUTPUT;
-    const tCIDLib::TCard4 c4StdInMode  = ENABLE_PROCESSED_INPUT;
-    const tCIDLib::TCard4 c4StdOutMode = 0;
-
-
-    // -----------------------------------------------------------------------
-    //  The return statuses from our bGetChar() helper
-    // -----------------------------------------------------------------------
-    enum EGetCharRes
+    namespace
     {
-        EGetCharRes_Ok
-        , EGetCharRes_Error
-        , EGetCharRes_Timeout
-        , EGetCharRes_Break
-    };
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  c4TmpOutMode
+        //      These are the flags we turn on when we temporarily want the console
+        //      to do a little work for us, when we write out a string and want it
+        //      to handle new lines and wrap.
+        //
+        //  c4StdInMode
+        //      These are the flags at are used normally for an input console
+        //      handle. It might be temporarily changed, but these are what are
+        //      always put back.
+        //
+        //  c4StdOutMode
+        //      These are the flags at are used normally for an output console
+        //      handle. It might be temporarily changed, but these are what are
+        //      always put back.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4TmpOutMode = ENABLE_PROCESSED_OUTPUT
+                                                | ENABLE_WRAP_AT_EOL_OUTPUT;
+        constexpr tCIDLib::TCard4 c4StdInMode  = ENABLE_PROCESSED_INPUT;
+        constexpr tCIDLib::TCard4 c4StdOutMode = 0;
+
+
+        // -----------------------------------------------------------------------
+        //  The return statuses from our bGetChar() helper
+        // -----------------------------------------------------------------------
+        enum EGetCharRes
+        {
+            EGetCharRes_Ok
+            , EGetCharRes_Error
+            , EGetCharRes_Timeout
+            , EGetCharRes_Break
+        };
+    }
 }
 
 

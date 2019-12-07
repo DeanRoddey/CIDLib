@@ -50,13 +50,18 @@ class KRNLEXPORT TBoolJanitor
         TBoolJanitor(       tCIDLib::TBoolean* const pbToRestore
                     , const tCIDLib::TBoolean        bNewValue) :
 
-            m_bOldValue(*pbToRestore)
+            m_bOldValue(kCIDLib::False)
             , m_pbToSanitize(pbToRestore)
         {
-            *m_pbToSanitize = bNewValue;
+            if (m_pbToSanitize)
+            {
+                m_bOldValue = *m_pbToSanitize;
+                *m_pbToSanitize = bNewValue;
+            }
         }
 
         TBoolJanitor(const TBoolJanitor&) = delete;
+        TBoolJanitor(TBoolJanitor&&) = delete;
 
         ~TBoolJanitor()
         {
@@ -69,6 +74,7 @@ class KRNLEXPORT TBoolJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TBoolJanitor& operator=(const TBoolJanitor&) = delete;
+        TBoolJanitor& operator=(TBoolJanitor&&) = delete;
         tCIDLib::TVoid* operator new(const size_t)  = delete;
 
 
@@ -112,13 +118,18 @@ class KRNLEXPORT TCardJanitor
         TCardJanitor(       tCIDLib::TCard4* const  pc4ToRestore
                     , const tCIDLib::TCard4         c4NewValue) :
 
-            m_c4OldValue(*pc4ToRestore)
+            m_c4OldValue(0)
             , m_pc4ToSanitize(pc4ToRestore)
         {
-            *m_pc4ToSanitize = c4NewValue;
+            if (m_pc4ToSanitize)
+            {
+                m_c4OldValue = *m_pc4ToSanitize;
+                *m_pc4ToSanitize = c4NewValue;
+            }
         }
 
         TCardJanitor(const TCardJanitor&) = delete;
+        TCardJanitor(TCardJanitor&&) = delete;
 
         ~TCardJanitor()
         {
@@ -131,6 +142,7 @@ class KRNLEXPORT TCardJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TCardJanitor& operator=(const TCardJanitor&) = delete;
+        TCardJanitor& operator=(TCardJanitor&&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
         // -------------------------------------------------------------------
@@ -174,13 +186,18 @@ class KRNLEXPORT TIntJanitor
         TIntJanitor(        tCIDLib::TInt4* const   pi4ToRestore
                     , const tCIDLib::TInt4          i4NewValue) :
 
-            m_i4OldValue(*pi4ToRestore)
+            m_i4OldValue(0)
             , m_pi4ToSanitize(pi4ToRestore)
         {
-            *m_pi4ToSanitize = i4NewValue;
+            if (m_pi4ToSanitize)
+            {
+                m_i4OldValue = *m_pi4ToSanitize;
+                *m_pi4ToSanitize = i4NewValue;
+            }
         }
 
         TIntJanitor(const TIntJanitor&) = delete;
+        TIntJanitor(TIntJanitor&&) = delete;
 
         ~TIntJanitor()
         {
@@ -193,6 +210,7 @@ class KRNLEXPORT TIntJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TIntJanitor& operator=(const TIntJanitor&) = delete;
+        TIntJanitor& operator=(TIntJanitor&&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
@@ -240,6 +258,8 @@ template <typename CB> class TLambdaJan
         { }
 
         TLambdaJan(const TLambdaJan&) = delete;
+        TLambdaJan(TLambdaJan&&) = delete;
+
         ~TLambdaJan()
         {
             // If we still have the callback, invoke it
@@ -258,6 +278,7 @@ template <typename CB> class TLambdaJan
         //  Public operators
         // -------------------------------------------------------------------
         TLambdaJan& operator=(const TLambdaJan&) = delete;
+        TLambdaJan& operator=(TLambdaJan&&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
@@ -307,6 +328,7 @@ template <class T> class TPtrJanitor
         }
 
         TPtrJanitor(const TPtrJanitor&) = delete;
+        TPtrJanitor(TPtrJanitor&&) = delete;
 
         ~TPtrJanitor()
         {
@@ -319,6 +341,7 @@ template <class T> class TPtrJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TPtrJanitor& operator=(const TPtrJanitor&) = delete;
+        TPtrJanitor& operator=(TPtrJanitor&&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
@@ -372,13 +395,18 @@ template <class T> class TGFJanitor
 
         TGFJanitor(T* const ptToRestore, const T tNewValue) :
 
-            m_tOldValue(*ptToRestore)
+            m_tOldValue()
             , m_ptToSanitize(ptToRestore)
         {
-            *m_ptToSanitize = tNewValue;
+            if (m_ptToSanitize)
+            {
+                m_tOldValue = *m_ptToSanitize;
+                *m_ptToSanitize = tNewValue;
+            }
         }
 
         TGFJanitor(const TGFJanitor&) = delete;
+        TGFJanitor(TGFJanitor&&) = delete;
 
         ~TGFJanitor()
         {
@@ -391,6 +419,7 @@ template <class T> class TGFJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TGFJanitor& operator=(const TGFJanitor&) = delete;
+        TGFJanitor& operator=(TGFJanitor&&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
 

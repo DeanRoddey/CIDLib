@@ -319,7 +319,7 @@ TKrnlWin32::BuildModName(       tCIDLib::TCh* const pszNameBuf
     }
      else
     {
-        const tCIDLib::TCard4 c4BufSz = 256;
+        constexpr tCIDLib::TCard4 c4BufSz = 256;
         tCIDLib::TCh szTmpBuf[c4BufSz + 1];
 
         TRawStr::CatStr(pszNameBuf, L"_", c4MaxChars);

@@ -137,13 +137,6 @@ TOrbClientConnMgr::TOrbClientConnMgr(const  tCIDLib::TIPPortNum ippnListen
     //
     TStatsCache::RegisterItem
     (
-        kCIDOrb::pszStat_Srv_ActiveCmds
-        , tCIDLib::EStatItemTypes::Counter
-        , m_sciActiveCmds
-    );
-
-    TStatsCache::RegisterItem
-    (
         kCIDOrb::pszStat_Srv_ClientHWMark
         , tCIDLib::EStatItemTypes::Counter
         , m_sciClientHWMark
@@ -167,13 +160,6 @@ TOrbClientConnMgr::TOrbClientConnMgr(const  tCIDLib::TIPPortNum ippnListen
         kCIDOrb::pszStat_Srv_MaxClients
         , m_sciMaxClients
         , m_c4MaxClients
-    );
-
-    TStatsCache::RegisterItem
-    (
-        kCIDOrb::pszStat_Srv_QueuedCmds
-        , tCIDLib::EStatItemTypes::Counter
-        , m_sciQueuedCmds
     );
 
     TStatsCache::RegisterItem
@@ -224,6 +210,17 @@ TOrbClientConnMgr::~TOrbClientConnMgr()
 // ---------------------------------------------------------------------------
 //  TOrbClientConnMgr: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+//
+//  This is for the facility class' monitor thread to periodically ask how many
+//  commands we have queued up so he can update a statistic.
+//
+tCIDLib::TCard4 TOrbClientConnMgr::c4QueuedCmds() const
+{
+    // This guy is thread safe so no need to sync for this
+    return m_colWorkQ.c4ElemCount();
+}
+
 
 // Clear the flag that limits us to the m_ipaOnlyAcceptFrom address
 tCIDLib::TVoid TOrbClientConnMgr::ClearOnlyAcceptFrom()
@@ -310,11 +307,8 @@ TOrbClientConnMgr::eQueueUpWork(        TThread&                thrSpooler
 
             //
             //  Ok, we can put the pointer into our work queue. The queue is separately
-            //  thread safe, and doesn't use the main mutex. But, because of that, we
-            //  can't turn around and get the count and use that to set the stats cache
-            //  value directly. We have to trust that we are inc/dec'ing it correctly.
+            //  thread safe, and doesn't use the main mutex.
             //
-            TStatsCache::c8IncCounter(m_sciQueuedCmds);
             m_colWorkQ.objPut(tCIDLib::ForceMove(wqipNew));
         }
 
@@ -611,7 +605,6 @@ tCIDLib::TVoid TOrbClientConnMgr::Terminate()
             // Probably should log something in debug mode?
         }
     }
-    TStatsCache::SetValue(m_sciQueuedCmds, 0);
 }
 
 
@@ -1155,16 +1148,10 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
             if (!m_colWorkQ.bGetNextMv(wqipCur, 1500, kCIDLib::False))
                 continue;
 
-            // Update our stats cache of queued cmds
-            TStatsCache::c8DecCounter(m_sciQueuedCmds);
-
             try
             {
                 // Store the ip end point for the exception handlers below
                 ipepClient = wqipCur->ipepClient();
-
-                // Bump the active commands count
-                TStatsCache::c8IncCounter(m_sciActiveCmds);
 
                 //
                 //  Get the method name out, and then dispatch it. The stream
@@ -1178,9 +1165,6 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
             catch(TError& errToCatch)
             {
                 errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-                // And decrement the active cmds count again then rethrow
-                TStatsCache::c8DecCounter(m_sciActiveCmds);
                 throw;
             }
 
@@ -1191,9 +1175,6 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
             //  The connection might have gone away, in which case the work item
             //  pointer will release the item back to the pool.
             //
-            //  We need to decrement the active commands count as well.
-            //
-            TStatsCache::c8DecCounter(m_sciActiveCmds);
             {
                 TMtxLocker mtxlSync(&m_mtxSync);
 

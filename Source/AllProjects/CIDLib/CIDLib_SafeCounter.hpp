@@ -238,6 +238,7 @@ class CIDLIBEXP TSafeCard4Janitor
         }
 
         TSafeCard4Janitor(const TSafeCard4Janitor&) = delete;
+        TSafeCard4Janitor(TSafeCard4Janitor&&) = delete;
 
         ~TSafeCard4Janitor()
         {
@@ -249,6 +250,7 @@ class CIDLIBEXP TSafeCard4Janitor
         //  Public operators
         // -------------------------------------------------------------------
         TSafeCard4Janitor& operator=(const TSafeCard4Janitor&) = delete;
+        TSafeCard4Janitor& operator=(TSafeCard4Janitor&&) = delete;
 
 
     private :
@@ -283,6 +285,7 @@ class CIDLIBEXP TSafeInt4Janitor
         }
 
         TSafeInt4Janitor(const TSafeInt4Janitor&) = delete;
+        TSafeInt4Janitor(TSafeInt4Janitor&&) = delete;
 
         ~TSafeInt4Janitor()
         {
@@ -294,6 +297,7 @@ class CIDLIBEXP TSafeInt4Janitor
         //  Public operators
         // -------------------------------------------------------------------
         TSafeInt4Janitor& operator=(const TSafeInt4Janitor&) = delete;
+        TSafeInt4Janitor& operator=(TSafeInt4Janitor&&) = delete;
 
 
     private :

@@ -62,8 +62,9 @@ class KRNLEXPORT TStrArrayJan
         TStrArrayJan() = delete;
 
         TStrArrayJan(const TStrArrayJan&) = delete;
+        TStrArrayJan(TStrArrayJan&&) = delete;
 
-        TStrArrayJan(        tCIDLib::TCh**      apszEnv
+        TStrArrayJan(       tCIDLib::TCh**      apszEnv
                     , const tCIDLib::TCard4     c4Count
                     , const tCIDLib::TBoolean   bFreeArray) :
 
@@ -84,6 +85,13 @@ class KRNLEXPORT TStrArrayJan
             if (m_bFreeArray)
                 delete [] m_apszEnv;
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStrArrayJan& operator=(const TStrArrayJan&) = delete;
+        TStrArrayJan& operator=(TStrArrayJan&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -120,6 +128,7 @@ class KRNLEXPORT TStrArrayJan
 };
 
 
+
 // ---------------------------------------------------------------------------
 //   CLASS: TKrnlEnvironment
 //  PREFIX: kenv
@@ -135,30 +144,32 @@ class KRNLEXPORT TKrnlEnvironment
             public :
                 TElem() :
 
-                    pszKey(nullptr)
-                    , pszValue(nullptr)
+                    m_pszKey(nullptr)
+                    , m_pszValue(nullptr)
                 {
                 }
 
                 TElem(const TElem&) = delete;
+                TElem(TElem&&) = delete;
 
                 ~TElem()
                 {
-                    delete [] pszKey;
-                    delete [] pszValue;
+                    delete [] m_pszKey;
+                    delete [] m_pszValue;
                 }
 
                 TElem& operator=(const TElem&) = delete;
+                TElem& operator=(TElem&&) = delete;
 
                 tCIDLib::TVoid Set( const   tCIDLib::TCh* const pszTheKey
                                     , const tCIDLib::TCh* const pszTheValue)
                 {
-                    pszKey = TRawStr::pszReplicate(pszTheKey);
-                    pszValue = TRawStr::pszReplicate(pszTheValue);
+                    m_pszKey = TRawStr::pszReplicate(pszTheKey);
+                    m_pszValue = TRawStr::pszReplicate(pszTheValue);
                 }
 
-                tCIDLib::TCh*   pszKey;
-                tCIDLib::TCh*   pszValue;
+                tCIDLib::TCh*   m_pszKey;
+                tCIDLib::TCh*   m_pszValue;
         };
 
 
@@ -254,6 +265,7 @@ class KRNLEXPORT TKrnlEnvironment
         //  Constructors and destructor
         // -------------------------------------------------------------------
         TKrnlEnvironment(const TKrnlEnvironment&) = delete;
+        TKrnlEnvironment(TKrnlEnvironment&&) = delete;
         ~TKrnlEnvironment() = delete;
 
 
@@ -261,6 +273,7 @@ class KRNLEXPORT TKrnlEnvironment
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlEnvironment& operator=(const TKrnlEnvironment&) = delete;
+        TKrnlEnvironment& operator=(TKrnlEnvironment&&) = delete;
 
 
     protected :

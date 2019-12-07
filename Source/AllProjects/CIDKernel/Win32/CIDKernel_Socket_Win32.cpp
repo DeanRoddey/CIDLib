@@ -32,9 +32,9 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
-#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812 26814)
 #include    <winhttp.h>
 #pragma     warning(pop)
 
@@ -45,14 +45,14 @@ namespace CIDKernel_Socket_Win32
     // -----------------------------------------------------------------------
     //  Socket constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    hInvalid = tCIDLib::TCard4(-1);
+    constexpr tCIDLib::TCard4   hInvalid = tCIDLib::TCard4(-1);
 
 
     // -----------------------------------------------------------------------
     //  A mapping array to map from our socket protocol enum to the actual
     //  system value for that protocol.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   ac4ProtoMaps[] =
+    const tCIDLib::TCard4       ac4ProtoMaps[] =
     {
         0       // IP
         , 1     // ICMP
@@ -64,7 +64,7 @@ namespace CIDKernel_Socket_Win32
         , 22    // IDP
         , 255   // RawIP
     };
-    const tCIDLib::TCard4   c4ProtoCnt = tCIDLib::c4ArrayElems(ac4ProtoMaps);
+    constexpr tCIDLib::TCard4   c4ProtoCnt = tCIDLib::c4ArrayElems(ac4ProtoMaps);
 }
 
 

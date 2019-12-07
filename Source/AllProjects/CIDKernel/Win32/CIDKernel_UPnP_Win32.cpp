@@ -33,8 +33,8 @@
 #include    "CIDKernel_InternalHelpers_.hpp"
 #include    "CIDKernel_UPnP.hpp"
 
-#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
 #pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <Upnp.h>
 #pragma     warning(pop)
@@ -42,17 +42,19 @@
 
 namespace CIDKernel_UPnP_Win32
 {
-
-    // -----------------------------------------------------------------------
-    //  Windows puts a prefix on the unique ids of devices. But we have to
-    //  remain portable. So we have to remove the prefix in terms of the
-    //  id we expose to the outside world. That means we have to put them
-    //  back on any that we get from the outside world. So a PITA and error
-    //  prone, but we have to do it. Otherwise when portable code used a
-    //  device id as a parameter to some action, it wouldn't work.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const   pszDevIDPref = L"uuid:";
-    const tCIDLib::TCard4       c4DevIdPrefLen = 5;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Windows puts a prefix on the unique ids of devices. But we have to
+        //  remain portable. So we have to remove the prefix in terms of the
+        //  id we expose to the outside world. That means we have to put them
+        //  back on any that we get from the outside world. So a PITA and error
+        //  prone, but we have to do it. Otherwise when portable code used a
+        //  device id as a parameter to some action, it wouldn't work.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCh* const   pszDevIDPref = L"uuid:";
+        constexpr tCIDLib::TCard4   c4DevIdPrefLen = 5;
+    }
 }
 
 
@@ -1445,8 +1447,8 @@ TKrnlUPnPAsyncFinder::~TKrnlUPnPAsyncFinder()
     // Call our own cleanup method
     bCleanup();
 
-    m_pPlatData = nullptr;
     delete m_pPlatData;
+    m_pPlatData = nullptr;
 }
 
 
