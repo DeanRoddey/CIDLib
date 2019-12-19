@@ -115,7 +115,7 @@ if (p) \
    } \
 }
 
-template <class T> class TCOMJanitor
+template <typename T> class TCOMJanitor
 {
     public :
         TCOMJanitor(T** ppPtr) :
@@ -128,17 +128,17 @@ template <class T> class TCOMJanitor
         {
             //
             //  If our pointer to the pointer and the pointer itself are
-            //  non-null, then release it, and zero out the caller's
+            //  non-null, then release it, and null out the caller's
             //  pointer.
             //
             if (m_ppPtr && *m_ppPtr)
             {
                 (*m_ppPtr)->Release();
-                *m_ppPtr = 0;
+                *m_ppPtr = nullptr;
             }
         }
 
-        T* pobjOrphan()
+        [[nodiscard]] T* pobjOrphan()
         {
             T* pRet = *m_ppPtr;
 
@@ -146,8 +146,14 @@ template <class T> class TCOMJanitor
             //  Clear our pointer to the pointer, not the pointer itself.
             //  That's what we are returning.
             //
-            m_ppPtr = 0;
+            m_ppPtr = nullptr;
             return pRet;
+        }
+
+        tCIDLib::TVoid Orphan()
+        {
+            // Just let it go, it is the caller's responsbility now
+            m_ppPtr = nullptr;
         }
 
         T** m_ppPtr;
@@ -171,6 +177,8 @@ class KRNLEXPORT TBSTRJanitor
 
     private :
         TBSTRJanitor(const TBSTRJanitor&);
-        tCIDLib::TVoid operator=(const TBSTRJanitor&);
+        TBSTRJanitor(TBSTRJanitor&&);
+        TBSTRJanitor& operator=(const TBSTRJanitor&);
+        TBSTRJanitor& operator=(TBSTRJanitor&&);
 };
 

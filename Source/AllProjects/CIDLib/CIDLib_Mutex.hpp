@@ -106,7 +106,7 @@ class CIDLIBEXP TMutex : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const   override;
+        )   const   final;
 
 
     private :
@@ -186,6 +186,7 @@ class CIDLIBEXP TMtxLocker
         }
 
         TMtxLocker(const TMtxLocker&) = delete;
+        TMtxLocker(TMtxLocker&&) = delete;
 
         ~TMtxLocker()
         {
@@ -203,7 +204,8 @@ class CIDLIBEXP TMtxLocker
         //  Public operators
         // -------------------------------------------------------------------
         TMtxLocker& operator=(const TMtxLocker&) = delete;
-        tCIDLib::TVoid* operator new(const size_t) = delete;
+        TMtxLocker& operator=(TMtxLocker&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
 
 
         // -------------------------------------------------------------------

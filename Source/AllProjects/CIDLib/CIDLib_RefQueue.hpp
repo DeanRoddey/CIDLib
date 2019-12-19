@@ -35,7 +35,7 @@
 // ---------------------------------------------------------------------------
 //  Forward reference the ref queue and queue cursor classes
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefQueue;
+template <typename TElem> class TRefQueue;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
@@ -44,7 +44,7 @@ template <class TElem> class TRefQueue;
 //   CLASS: TRefQueueNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefQueueNode : public TDLstNode
+template <typename TElem> class TRefQueueNode : public TDLstNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -140,7 +140,7 @@ template <class TElem> class TRefQueueNode : public TDLstNode
 //   CLASS: TRefQueue
 //  PREFIX: que
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefQueue : public TRefCollection<TElem>
+template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -155,7 +155,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -362,7 +362,7 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
                 TemplateRTTIDefs(TMyType::TConstCursor<TElem>, TBiColCursor<TElem>)
         };
 
-        template <class TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -674,6 +674,24 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             return kCIDLib::True;
         }
 
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+            TQueueNode<TElem>* pnodeCur = static_cast<TQueueNode<TElem>*>
+            (
+                m_llstQueue.pnodeHead()
+            );
+            while (pnodeCur)
+            {
+                if (!iterCB(pnodeCur->objData()))
+                    return kCIDLib::False;
+                pnodeCur = static_cast<TQueueNode<TElem>*>(pnodeCur->pnodeNext());
+            }
+            return kCIDLib::True;
+        }
+
+
         tCIDLib::TBoolean
         bPutIfNew(          TElem* const        pobjToPut
                     , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0)
@@ -772,23 +790,6 @@ template <class TElem> class TRefQueue : public TRefCollection<TElem>
             (
                 lockQueue, kCIDLib::c4TWLReason_WaitSpace, c4Millis
             );
-        }
-
-
-        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
-        {
-            TMtxLocker lockThis(this->pmtxLock());
-            TQueueNode<TElem>* pnodeCur = static_cast<TQueueNode<TElem>*>
-            (
-                m_llstQueue.pnodeHead()
-            );
-            while (pnodeCur)
-            {
-                if (!iterCB(pnodeCur->objData()))
-                    return kCIDLib::False;
-                pnodeCur = static_cast<TQueueNode<TElem>*>(pnodeCur->pnodeNext());
-            }
-            return kCIDLib::True;
         }
 
 

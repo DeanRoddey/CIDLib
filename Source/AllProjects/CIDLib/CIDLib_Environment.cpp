@@ -342,25 +342,22 @@ TEnvironment& TEnvironment::Nul_TEnvironment()
 // Make sure key ops is in non-case sensitive mode
 TEnvironment::TEnvironment(const tCIDLib::TBoolean bInherit) :
 
-    m_pcolEnv
-    (
-        new tCIDLib::TKVHashSet
-        (
-            CIDLib_Environment::c4Modulus
-            , TStringKeyOps(kCIDLib::False)
-            , strGetKey
-            , tCIDLib::EMTStates::Unsafe
-        )
-    )
+    m_pcolEnv(nullptr)
 {
     //
     //  If the bInherit parm is set, then we need to query a snapshot of
     //  the environment and load ourself up with the same info.
     //
+    //  If not inheriting, we can be efficient and only fault our list in
+    //  if it is ever actually needed.
+    //
     if (bInherit)
     {
-        // Load up a list of key value pair objects
+        FaultInList();
+
+        // Load up a list of key value pair objects from the kernel
         TKrnlEnvironment::TElem* pelemList = nullptr;
+        TArrayJanitor<TKrnlEnvironment::TElem> janList(pelemList);
 
         tCIDLib::TCard4 c4Count = 0;
         if (!TKrnlEnvironment::bQueryState(pelemList, c4Count))
@@ -374,6 +371,9 @@ TEnvironment::TEnvironment(const tCIDLib::TBoolean bInherit) :
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::Internal
             );
+
+            // Won't happen but makes analyzer happy
+            return;
         }
 
         if (c4Count)
@@ -385,9 +385,6 @@ TEnvironment::TEnvironment(const tCIDLib::TBoolean bInherit) :
                     pelemList[c4Index].m_pszKey, pelemList[c4Index].m_pszValue
                 );
             }
-
-            // Delete the list
-            delete [] pelemList;
         }
     }
 }
@@ -396,22 +393,18 @@ TEnvironment::TEnvironment(const TEnvironment& envSrc) :
 
     m_pcolEnv(nullptr)
 {
-    // Copy construct a new hash map that replicates the source's
-    m_pcolEnv = new tCIDLib::TKVHashSet(*envSrc.m_pcolEnv);
+    // If the source has a list, make a copy
+    if (envSrc.m_pcolEnv)
+        m_pcolEnv = new tCIDLib::TKVHashSet(*envSrc.m_pcolEnv);
 }
 
-// Just create the smallest possible hash set then swap
+
+// We just give away a null pointer and take his, which may also be null
 TEnvironment::TEnvironment(TEnvironment&& envSrc) :
 
-    m_pcolEnv
-    (
-        new tCIDLib::TKVHashSet
-        (
-            1, TStringKeyOps(kCIDLib::False), strGetKey, tCIDLib::EMTStates::Unsafe
-        )
-    )
+    m_pcolEnv(nullptr)
 {
-    *this = operator=(tCIDLib::ForceMove(envSrc));
+    operator=(tCIDLib::ForceMove(envSrc));
 }
 
 TEnvironment::~TEnvironment()
@@ -427,11 +420,25 @@ TEnvironment::~TEnvironment()
 TEnvironment& TEnvironment::operator=(const TEnvironment& envSrc)
 {
     if (&envSrc != this)
-        *m_pcolEnv = *envSrc.m_pcolEnv;
+    {
+        // If he has a list and we don't, then fault ours in
+        if (!m_pcolEnv && envSrc.m_pcolEnv)
+            FaultInList();
+
+        //
+        //  If he has a list, then we will as well at this point, so copy
+        //  his into ours. Else, if we have one, then just clear it out.
+        //
+         if (envSrc.m_pcolEnv)
+            *m_pcolEnv = *envSrc.m_pcolEnv;
+        else if (m_pcolEnv)
+            m_pcolEnv->RemoveAll();
+    }
     return *this;
 }
 
-// We just swap our lists
+
+// We just swap our lists, either of which may be null
 TEnvironment& TEnvironment::operator=(TEnvironment&& envSrc)
 {
     if (&envSrc != this)
@@ -446,6 +453,9 @@ TEnvironment& TEnvironment::operator=(TEnvironment&& envSrc)
 tCIDLib::TVoid
 TEnvironment::Add(const TString& strKey, const TString& strNewValue)
 {
+    if (!m_pcolEnv)
+        FaultInList();
+
     m_pcolEnv->objPlace(strKey, strNewValue);
 }
 
@@ -453,6 +463,9 @@ TEnvironment::Add(const TString& strKey, const TString& strNewValue)
 tCIDLib::TBoolean
 TEnvironment::bAddIfNew(const TString& strKey, const TString& strValue)
 {
+    if (!m_pcolEnv)
+        FaultInList();
+
     TKeyValuePair* pkvalTmp = m_pcolEnv->pobjFindByKey(strKey);
     if (!pkvalTmp)
     {
@@ -467,6 +480,9 @@ TEnvironment::bAddIfNew(const TString& strKey, const TString& strValue)
 tCIDLib::TBoolean
 TEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue)
 {
+    if (!m_pcolEnv)
+        FaultInList();
+
     TKeyValuePair* pkvalTmp = m_pcolEnv->pobjFindByKey(strKey);
     if (pkvalTmp)
     {
@@ -482,6 +498,9 @@ TEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue)
 tCIDLib::TBoolean
 TEnvironment::bFind(const TString& strKey, TString& strToFill) const
 {
+    if (!m_pcolEnv)
+        return kCIDLib::False;
+
     try
     {
         strToFill = m_pcolEnv->objFindByKey(strKey).strValue();
@@ -506,18 +525,27 @@ TEnvironment::bFind(const TString& strKey, TString& strToFill) const
 
 tCIDLib::TBoolean TEnvironment::bKeyExists(const TString& strKey) const
 {
+    if (!m_pcolEnv)
+        return kCIDLib::False;
+
     return (m_pcolEnv->pobjFindByKey(strKey) != nullptr);
 }
 
 
 tCIDLib::TCard4 TEnvironment::c4Entries() const
 {
+    if (!m_pcolEnv)
+        return 0;
+
     return m_pcolEnv->c4ElemCount();
 }
 
 
 tCIDLib::TCard4 TEnvironment::chCharsInValue(const TString& strKey)
 {
+    if (!m_pcolEnv)
+        FaultInList();
+
     const TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strKey);
     return kvalFind.strValue().c4Length();
 }
@@ -525,18 +553,25 @@ tCIDLib::TCard4 TEnvironment::chCharsInValue(const TString& strKey)
 
 TEnvironment::TCursor TEnvironment::cursThis() const
 {
+    if (!m_pcolEnv)
+        FaultInList();
+
     return TCursor(m_pcolEnv);
 }
 
 
 tCIDLib::TVoid TEnvironment::RemoveAll()
 {
-    m_pcolEnv->RemoveAll();
+    if (m_pcolEnv)
+        m_pcolEnv->RemoveAll();
 }
 
 
 const TString& TEnvironment::strFind(const TString& strKey) const
 {
+    if (!m_pcolEnv)
+        FaultInList();
+
     const TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strKey);
     return kvalFind.strValue();
 }
@@ -545,6 +580,36 @@ const TString& TEnvironment::strFind(const TString& strKey) const
 tCIDLib::TVoid TEnvironment::Update(const   TString&    strKey
                                     , const TString&    strNewValue)
 {
+    if (!m_pcolEnv)
+        FaultInList();
+
     TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strKey);
     kvalFind.strValue(strNewValue);
+}
+
+
+// ---------------------------------------------------------------------------
+//  TEnvironment: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TEnvironment::FaultInList() const
+{
+    // Won't ever actually return false, just to make the analyzer happy
+    if (!bCIDPreCond(m_pcolEnv == nullptr))
+        return;
+
+    if (m_pcolEnv)
+    {
+        // If this happens in release mode, be tolerant and just flush the existing lists
+        m_pcolEnv->RemoveAll();
+    }
+     else
+    {
+        m_pcolEnv = new tCIDLib::TKVHashSet
+        (
+            CIDLib_Environment::c4Modulus
+            , TStringKeyOps(kCIDLib::False)
+            , strGetKey
+            , tCIDLib::EMTStates::Unsafe
+        );
+    }
 }

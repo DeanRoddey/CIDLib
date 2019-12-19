@@ -560,6 +560,8 @@ tCIDLib::TVoid TLogSpoolThread::SetDefaultLogger()
     m_bTriedDefault = kCIDLib::True;
 
     const tCIDLib::TCard4 c4MaxBufSz = 1024;
+
+    #pragma warning(suppress : 26494) // We don't need to initialize these
     tCIDLib::TCh szFileName[c4MaxBufSz + 1];
     tCIDLib::TCh szMutexName[c4MaxBufSz + 1];
 
@@ -993,8 +995,8 @@ TModule::c8ParseVersionStr( const   TString&            strToParse
                             , const tCIDLib::TBoolean   bFullFormat)
 {
     // Call the other version to get the values out
-    tCIDLib::TCard4 c4Maj;
-    tCIDLib::TCard4 c4Min;
+    tCIDLib::TCard4 c4Maj = 0;
+    tCIDLib::TCard4 c4Min = 0;
     tCIDLib::TCard4 c4Revision = 0;
     if (bFullFormat)
         ParseVersionStr(strToParse, c4Maj, c4Min, c4Revision);
@@ -1177,7 +1179,7 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
                                         ,       tCIDLib::TCard4&    c4Revision)
 {
     // Find the periods, which separates the threeparts
-    tCIDLib::TCard4 c4Ofs1;
+    tCIDLib::TCard4 c4Ofs1 = 0;
     tCIDLib::TCard4 c4Ofs2 = 0;
     if (!strToParse.bFirstOccurrence(kCIDLib::chPeriod, c4Ofs1)
     ||  !strToParse.bLastOccurrence(kCIDLib::chPeriod, c4Ofs2)
@@ -1282,7 +1284,7 @@ TModule::TModule(const  TString&            strFullPath
     m_strPath = pathTmp;
 
     // Load from the original full path
-    tCIDLib::TBoolean bRes;
+    tCIDLib::TBoolean bRes = kCIDLib::False;
     if (bLoad)
         bRes = m_kmodThis.bLoadFromName(strFullPath.pszBuffer());
     else
@@ -1329,7 +1331,7 @@ TModule::TModule(const  TString&            strFacName
     pathFull.AddLevel(strFacName);
 
     // Load from the full path
-    tCIDLib::TBoolean bRes;
+    tCIDLib::TBoolean bRes = kCIDLib::False;
     if (bLoad)
         bRes = m_kmodThis.bLoadFromName(pathFull.pszBuffer());
     else

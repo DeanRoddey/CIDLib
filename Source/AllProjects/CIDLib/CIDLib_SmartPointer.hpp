@@ -114,7 +114,7 @@ template <typename T> class TWeakPtr;
 //   CLASS: TUniquePtr
 //  PREFIX: uptr
 // ---------------------------------------------------------------------------
-template <class T> class TUniquePtr
+template <typename T> class TUniquePtr
 {
     public  :
         // -------------------------------------------------------------------
@@ -1060,7 +1060,7 @@ template <typename T> class TWeakPtr
 //   CLASS: TMngPtr
 //  PREFIX: mptr
 // ---------------------------------------------------------------------------
-template <class T> class TMngPtr
+template <typename T> class TMngPtr
 {
     public  :
         // -------------------------------------------------------------------
@@ -1190,7 +1190,7 @@ template <class T> class TMngPtr
 //   CLASS: TMemberPtr
 //  PREFIX: mbptr
 // ---------------------------------------------------------------------------
-template <class T> class TMemberPtr
+template <typename T> class TMemberPtr
 {
     public  :
         // -------------------------------------------------------------------

@@ -109,7 +109,7 @@ class CIDCTRLSEXP TWndEvent
 };
 
 
-template <class D> class TWndEventFor : public TWndEvent
+template <typename D> class TWndEventFor : public TWndEvent
 {
     public :
         // -------------------------------------------------------------------

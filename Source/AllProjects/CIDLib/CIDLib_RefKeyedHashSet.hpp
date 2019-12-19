@@ -43,7 +43,7 @@
 // ---------------------------------------------------------------------------
 //  Forward reference some internal structures and classes
 // ---------------------------------------------------------------------------
-template <class TElem,class TKey,class TKeyOps> class TRefKeyedHashSet;
+template <typename TElem,class TKey,class TKeyOps> class TRefKeyedHashSet;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
@@ -52,7 +52,7 @@ template <class TElem,class TKey,class TKeyOps> class TRefKeyedHashSet;
 //   CLASS: TRefKeyedHashSetNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem,class TKey> class TRefKeyedHashSetNode
+template <typename TElem,class TKey> class TRefKeyedHashSetNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -257,6 +257,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     operator=(cursSrc);
                 }
 
+                // Can't actually delete it since that causes problems
+                // TConstCursor(TConstCursor&&) = delete;
+
                 ~TConstCursor() {}
 
 
@@ -282,6 +285,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     }
                     return *this;
                 }
+
+                // Can't actually delete it since that causes problems
+                // TConstCursor& operator=(TConstCursor&&) = delete;
 
                 tCIDLib::TBoolean operator==(const TConstCursor& cursSrc) const
                 {
@@ -552,6 +558,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     operator=(cursSrc);
                 }
 
+                // Can't actually delete it since that causes problems
+                // TNonConstCursor(TNonConstCursor&&) = delete;
+
                 ~TNonConstCursor() {}
 
 
@@ -573,6 +582,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     }
                     return *this;
                 }
+
+                // Can't actually delete it since that causes problems
+                // TNonConstCursor& operator=(TNonConstCursor&&) = delete;
 
                 TElem& operator*() const
                 {
@@ -1110,7 +1122,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         //
         //  DO NOT change the element in a way that would modify the hash!
         //
-        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
         {
             TMtxLocker lockThis(this->pmtxLock());
 

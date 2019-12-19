@@ -155,17 +155,18 @@ class CIDLIBEXP TTextOutStream : public TObject
         TTextOutStream
         (
                     TBinOutStream* const    pstrmToAdopt
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextOutStream
         (
                     TBinOutStream* const    pstrmToAdopt
             , const TStreamFmt&             strmfToUse
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextOutStream(const TTextOutStream&) = delete;
+        TTextOutStream(TTextOutStream&&) = delete;
 
         ~TTextOutStream();
 
@@ -173,6 +174,9 @@ class CIDLIBEXP TTextOutStream : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TTextOutStream& operator=(const TTextOutStream&) = delete;
+        TTextOutStream& operator=(TTextOutStream&&) = delete;
+
         TTextOutStream& operator<<
         (
             const   tCIDLib::TBoolean       bToWrite
@@ -298,8 +302,6 @@ class CIDLIBEXP TTextOutStream : public TObject
             const   TStreamFmt&             strmfNewFmt
         );
 
-        TTextOutStream& operator=(const TTextOutStream&) = delete;
-
 
 
         // -------------------------------------------------------------------
@@ -371,7 +373,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         tCIDLib::TVoid Flush();
 
         //
-        //  Just call the recursive helper with the start of the format buffer. WE
+        //  Just call the recursive helper with the start of the format buffer. We
         //  have another that flushes at the end.
         //
         template <typename... TArgs>
@@ -442,7 +444,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         TTextOutStream
         (
             const   TStreamFmt&             strmfToUse
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextOutStream
@@ -645,11 +647,14 @@ class CIDLIBEXP TStreamJanitor
         TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
 
             m_pstrmToSanitize(pstrmToSanitize)
-            , m_strmfSave(*pstrmToSanitize)
+            , m_strmfSave()
         {
+            if (m_pstrmToSanitize)
+                m_strmfSave.SetFrom(*pstrmToSanitize);
         }
 
         TStreamJanitor(const TStreamJanitor&) = delete;
+        TStreamJanitor(TStreamJanitor&&) = delete;
 
         ~TStreamJanitor()
         {
@@ -662,7 +667,8 @@ class CIDLIBEXP TStreamJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TStreamJanitor& operator=(const TStreamJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const size_t) = delete;
+        TStreamJanitor& operator=(TStreamJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
 
 
         // -------------------------------------------------------------------
@@ -705,15 +711,19 @@ class CIDLIBEXP TStreamIndentJan
         TStreamIndentJan(       TTextOutStream* const   pstrmToSanitize
                         , const tCIDLib::TCard4         c4Adjust) :
 
-            m_c4OldIndent(pstrmToSanitize->c4Indent())
+            m_c4OldIndent(0)
             , m_pstrmToSanitize(pstrmToSanitize)
         {
             // Set the new indent as the old plus the adjustment
             if (m_pstrmToSanitize)
+            {
+                m_c4OldIndent = m_pstrmToSanitize->c4Indent();
                 m_pstrmToSanitize->c4Indent(m_c4OldIndent + c4Adjust);
+            }
         }
 
         TStreamIndentJan(const TStreamIndentJan&) = delete;
+        TStreamIndentJan(TStreamIndentJan&&) = delete;
 
         ~TStreamIndentJan()
         {
@@ -726,7 +736,8 @@ class CIDLIBEXP TStreamIndentJan
         //  Public operators
         // -------------------------------------------------------------------
         TStreamIndentJan& operator=(const TStreamIndentJan&) = delete;
-        tCIDLib::TVoid* operator new(const size_t) = delete;
+        TStreamIndentJan& operator=(TStreamIndentJan&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
 
 
     private :

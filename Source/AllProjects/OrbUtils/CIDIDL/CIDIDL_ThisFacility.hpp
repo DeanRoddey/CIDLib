@@ -57,12 +57,27 @@ class TFacCIDIDL : public TFacility
         // -------------------------------------------------------------------
         TFacCIDIDL();
 
+        TFacCIDIDL(const TFacCIDIDL&) = delete;
+        TFacCIDIDL(TFacCIDIDL&&) = delete;
+
         ~TFacCIDIDL();
+
+
+        // -------------------------------------------------------------------
+        //  Public operator
+        // -------------------------------------------------------------------
+        TFacCIDIDL& operator=(const TFacCIDIDL&) = delete;
+        TFacCIDIDL& operator=(TFacCIDIDL&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDIDL::ETypes eXlatType
+        (
+            const   TString&                strXlat
+        )   const;
+
         tCIDLib::EExitCodes eMainThread
         (
                     TThread&                thrThis
@@ -74,7 +89,7 @@ class TFacCIDIDL : public TFacility
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
             , const tCIDLib::TErrCode       errcToThrow
-        );
+        )   const;
 
         tCIDLib::TVoid GenErr
         (
@@ -82,7 +97,7 @@ class TFacCIDIDL : public TFacility
             , const tCIDLib::TCard4         c4Line
             , const tCIDLib::TErrCode       errcToThrow
             , const MFormattable&           fmtblToken1
-        );
+        )   const;
 
         tCIDLib::TVoid GenErr
         (
@@ -91,7 +106,13 @@ class TFacCIDIDL : public TFacility
             , const tCIDLib::TErrCode       errcToThrow
             , const MFormattable&           fmtblToken1
             , const MFormattable&           fmtblToken2
-        );
+        )   const;
+
+        const TString& strXlatType
+        (
+            const   tCIDIDL::ETypes         eType
+        )   const;
+
 
 
     private :

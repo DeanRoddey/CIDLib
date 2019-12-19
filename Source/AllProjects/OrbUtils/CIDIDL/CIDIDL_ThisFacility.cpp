@@ -79,6 +79,71 @@ TFacCIDIDL::~TFacCIDIDL()
 // ---------------------------------------------------------------------------
 //  TFacCIDIDL: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+//
+//  Translate the XML text for a parameter type into our internal enum. Note that
+//  for parameters and returns, the CIDIDL: prefix will have been stripped off so
+//  that we can use the same enum and translations for returns, parameters and
+//  contents and whatever else. Constants don't use the prefix.
+//
+tCIDIDL::ETypes TFacCIDIDL::eXlatType(const TString& strXlat) const
+{
+    tCIDIDL::ETypes eRet = tCIDIDL::ETypes::Count;
+
+    if (strXlat == L"TBoolean")
+        eRet = tCIDIDL::ETypes::TBoolean;
+    else if (strXlat == L"TCard1")
+        eRet = tCIDIDL::ETypes::TCard1;
+    else if (strXlat == L"TCard2")
+        eRet = tCIDIDL::ETypes::TCard2;
+    else if (strXlat == L"TCard4")
+        eRet = tCIDIDL::ETypes::TCard4;
+    else if (strXlat == L"TCard8")
+        eRet = tCIDIDL::ETypes::TCard8;
+    else if (strXlat == L"TCh")
+        eRet = tCIDIDL::ETypes::TCh;
+    else if (strXlat == L"TFloat8")
+        eRet = tCIDIDL::ETypes::TFloat8;
+    else if (strXlat == L"TInt1")
+        eRet = tCIDIDL::ETypes::TInt1;
+    else if (strXlat == L"TInt2")
+        eRet = tCIDIDL::ETypes::TInt2;
+    else if (strXlat == L"TInt4")
+        eRet = tCIDIDL::ETypes::TInt4;
+    else if (strXlat == L"TInt8")
+        eRet = tCIDIDL::ETypes::TInt8;
+    else if (strXlat == L"TString")
+        eRet = tCIDIDL::ETypes::TString;
+    else if (strXlat == L"Enumerated")
+        eRet = tCIDIDL::ETypes::Enumerated;
+    else if (strXlat == L"TBag")
+        eRet = tCIDIDL::ETypes::TBag;
+    else if (strXlat == L"THashSet")
+        eRet = tCIDIDL::ETypes::THashSet;
+    else if (strXlat == L"TKeyedHashSet")
+        eRet = tCIDIDL::ETypes::TKeyedHashSet;
+    else if (strXlat == L"TVector")
+        eRet = tCIDIDL::ETypes::TVector;
+    else if (strXlat == L"TFundArray")
+        eRet = tCIDIDL::ETypes::TFundArray;
+    else if (strXlat == L"TFundVector")
+        eRet = tCIDIDL::ETypes::TFundVector;
+    else if (strXlat == L"THeapBuf")
+        eRet = tCIDIDL::ETypes::THeapBuf;
+    else if (strXlat == L"TMemBuf")
+        eRet = tCIDIDL::ETypes::TMemBuf;
+    else if (strXlat == L"Object")
+        eRet = tCIDIDL::ETypes::Object;
+    else if (strXlat == L"TVoid")
+        eRet = tCIDIDL::ETypes::TVoid;
+
+    if (eRet == tCIDIDL::ETypes::Count)
+        GenErr(CID_FILE, CID_LINE, kIDLErrs::errcGen_BadType, strXlat);
+
+    return eRet;
+};
+
+
 tCIDLib::EExitCodes TFacCIDIDL::eMainThread(TThread& thrThis, tCIDLib::TVoid*)
 {
     // Let our caller go
@@ -156,7 +221,7 @@ tCIDLib::EExitCodes TFacCIDIDL::eMainThread(TThread& thrThis, tCIDLib::TVoid*)
 tCIDLib::TVoid
 TFacCIDIDL::GenErr( const   tCIDLib::TCh* const pszFile
                     , const tCIDLib::TCard4     c4Line
-                    , const tCIDLib::TErrCode   errcToThrow)
+                    , const tCIDLib::TErrCode   errcToThrow) const
 {
     ThrowErr
     (
@@ -173,7 +238,7 @@ tCIDLib::TVoid
 TFacCIDIDL::GenErr( const   tCIDLib::TCh* const pszFile
                     , const tCIDLib::TCard4     c4Line
                     , const tCIDLib::TErrCode   errcToThrow
-                    , const MFormattable&       fmtblToken1)
+                    , const MFormattable&       fmtblToken1) const
 {
     ThrowErr
     (
@@ -192,7 +257,7 @@ TFacCIDIDL::GenErr( const   tCIDLib::TCh* const pszFile
                     , const tCIDLib::TCard4     c4Line
                     , const tCIDLib::TErrCode   errcToThrow
                     , const MFormattable&       fmtblToken1
-                    , const MFormattable&       fmtblToken2)
+                    , const MFormattable&       fmtblToken2) const
 {
     ThrowErr
     (
@@ -204,6 +269,46 @@ TFacCIDIDL::GenErr( const   tCIDLib::TCh* const pszFile
         , fmtblToken1
         , fmtblToken2
     );
+}
+
+
+//
+//  Translate one of our parameter/return types to a string
+//
+//  MUST REMAIN in sync with the enum definition of course!
+//
+const TString& TFacCIDIDL::strXlatType(const tCIDIDL::ETypes eType) const
+{
+    static const TString astrTypeNames[] =
+    {
+        TString(L"tCIDLib::TBoolean")
+        , TString(L"tCIDLib::TCard1")
+        , TString(L"tCIDLib::TCard2")
+        , TString(L"tCIDLib::TCard4")
+        , TString(L"tCIDLib::TCard8")
+        , TString(L"tCIDLib::TCh")
+        , TString(L"tCIDLib::TFloat4")
+        , TString(L"tCIDLib::TFloat8")
+        , TString(L"tCIDLib::TInt1")
+        , TString(L"tCIDLib::TInt2")
+        , TString(L"tCIDLib::TInt4")
+        , TString(L"tCIDLib::TInt8")
+        , TString(L"TBag")
+        , TString(L"THashSet")
+        , TString(L"TKeyedHashSet")
+        , TString(L"TVector")
+        , TString(L"TFundArray")
+        , TString(L"TFundVector")
+        , TString(L"tCIDLib::TVoid")
+        , TString(L"Enumerated")
+        , TString(L"THeapBuf")
+        , TString(L"TMemBuf")
+        , TString(L"TString")
+        , TString(L"Object")
+    };
+
+    static TEArray<TString, tCIDIDL::ETypes, tCIDIDL::ETypes::Count> astrTypes(astrTypeNames);
+    return astrTypes[eType];
 }
 
 

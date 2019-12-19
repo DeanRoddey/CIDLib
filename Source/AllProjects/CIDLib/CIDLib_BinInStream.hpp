@@ -95,6 +95,7 @@ class CIDLIBEXP TInStreamImpl : public TObject
         //  Destructor
         // -------------------------------------------------------------------
         TInStreamImpl(const TInStreamImpl&) = delete;
+        TInStreamImpl(TInStreamImpl&&) = delete;
 
         ~TInStreamImpl() {}
 
@@ -103,6 +104,7 @@ class CIDLIBEXP TInStreamImpl : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TInStreamImpl& operator=(const TInStreamImpl&) = delete;
+        TInStreamImpl& operator=(TInStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -187,6 +189,7 @@ class CIDLIBEXP TBinInStream : public TObject
         );
 
         TBinInStream(const TBinInStream&) = delete;
+        TBinInStream(TBinInStream&&) = delete;
 
         ~TBinInStream();
 
@@ -275,6 +278,7 @@ class CIDLIBEXP TBinInStream : public TObject
         );
 
         TBinInStream& operator=(const TBinInStream&) = delete;
+        TBinInStream& operator=(TBinInStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -473,7 +477,6 @@ class CIDLIBEXP TBinInStream : public TObject
         tCIDLib::TVoid TrashCache();
 
 
-
     private :
         // -------------------------------------------------------------------
         //  Private class constants
@@ -661,11 +664,11 @@ TBinInStream_ReadArray(         TBinInStream&           strmSrc
 //  operators are in CIDLib_Streamable.Hpp since they have to be friends of
 //  the streamable mixin.
 // ---------------------------------------------------------------------------
-template <class T> tCIDLib::TVoid
+template <typename T> tCIDLib::TVoid
 PolymorphicRead(T*& pobjToFill, TBinInStream& strmToReadFrom)
 {
     // Init caller's pointer to 0 in case of failure
-    pobjToFill = 0;
+    pobjToFill = nullptr;
 
     //
     //  Stream in the class name for this object, and use that class
@@ -684,7 +687,7 @@ PolymorphicRead(T*& pobjToFill, TBinInStream& strmToReadFrom)
     TBinInStream::CheckRelationship(pobjNew, T::clsThis());
 
     // Its ok so we can cast our pointer safely
-    T* pobjTyped = (T*)pobjNew;
+    T* pobjTyped = static_cast<T*>(pobjNew);
 
     //
     //  And now let it stream itself in. If this class does not support

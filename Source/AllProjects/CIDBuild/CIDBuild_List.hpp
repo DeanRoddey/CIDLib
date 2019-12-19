@@ -34,14 +34,14 @@
 // ---------------------------------------------------------------------------
 //  Forward references
 // ---------------------------------------------------------------------------
-template <class T> class TListCursor;
+template <typename T> class TListCursor;
 
 
 // ---------------------------------------------------------------------------
 //   CLASS: TList
 //  PREFIX: list
 // ---------------------------------------------------------------------------
-template <class T> class TList
+template <typename T> class TList
 {
     public :
         // -------------------------------------------------------------------
@@ -228,7 +228,7 @@ template <class T> class TList
 };
 
 
-template <class T> class TListCursor
+template <typename T> class TListCursor
 {
     public :
         // -------------------------------------------------------------------

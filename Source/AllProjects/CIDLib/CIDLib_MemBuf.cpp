@@ -419,8 +419,8 @@ TMemBuf::HexEncode(const    tCIDLib::TCard4     c4Bytes
 
     const tCIDLib::TCard4 c4Count = c4Bytes ? c4Bytes : c4Size();
     const tCIDLib::TCard1* pc1Cur = pc1CheckRange(CID_LINE, 0, c4Count);
-    tCIDLib::TCh   ch1;
-    tCIDLib::TCh   ch2;
+    tCIDLib::TCh   ch1 = kCIDLib::chNull;
+    tCIDLib::TCh   ch2 = kCIDLib::chNull;
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         // If they want a sep char, then add one if time to

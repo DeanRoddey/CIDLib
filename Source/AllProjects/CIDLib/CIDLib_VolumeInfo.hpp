@@ -64,6 +64,7 @@ class CIDLIBEXP  TVolumeInfo
         );
 
         TVolumeInfo(const TVolumeInfo&) = default;
+        TVolumeInfo(TVolumeInfo&&) = default;
 
         TVolumeInfo
         (
@@ -77,6 +78,7 @@ class CIDLIBEXP  TVolumeInfo
         //  Public operators
         // -------------------------------------------------------------------
         TVolumeInfo& operator=(const TVolumeInfo&) = default;
+        TVolumeInfo& operator=(TVolumeInfo&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -124,12 +126,12 @@ class CIDLIBEXP  TVolumeInfo
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :

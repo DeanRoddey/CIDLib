@@ -221,7 +221,7 @@ class TProjIterator
 //   CLASS: TMethProjIterator
 //  PREFIX: piter
 // ---------------------------------------------------------------------------
-template <class T> class TMethProjIterator : public TProjIterator
+template <typename T> class TMethProjIterator : public TProjIterator
 {
     public :
         // -------------------------------------------------------------------

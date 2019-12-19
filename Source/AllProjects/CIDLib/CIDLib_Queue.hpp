@@ -47,7 +47,7 @@
 // ---------------------------------------------------------------------------
 //  Forward reference the queue and queue cursor classes
 // ---------------------------------------------------------------------------
-template <class TElem> class TQueue;
+template <typename TElem> class TQueue;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
@@ -56,7 +56,7 @@ template <class TElem> class TQueue;
 //   CLASS: TQueueNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TQueueNode : public TDLstNode
+template <typename TElem> class TQueueNode : public TDLstNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -94,9 +94,7 @@ template <class TElem> class TQueueNode : public TDLstNode
 
         TQueueNode(const TQueueNode<TElem>&) = delete;
 
-        ~TQueueNode()
-        {
-        }
+        ~TQueueNode() = default;
 
 
         // -------------------------------------------------------------------
@@ -150,7 +148,7 @@ template <class TElem> class TQueueNode : public TDLstNode
 //   CLASS: TQueue
 //  PREFIX: que
 // ---------------------------------------------------------------------------
-template <class TElem> class TQueue : public TCollection<TElem>
+template <typename TElem> class TQueue : public TCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -164,7 +162,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -191,11 +189,14 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     );
                 }
 
-                // We have to lock first, so we can't use member init!
+                // We have to lock first, so we can't use member init! Just call operator
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
+
+                // Can't actually delete it since that causes problems
+                // TConstCursor(TConstCursor&&) = delete;
 
                 ~TConstCursor()
                 {
@@ -222,6 +223,9 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     }
                     return *this;
                 }
+
+                // Can't actually delete it since that causes problems
+                // TConstCursor& operator=(TConstCursor&&) = delete;
 
                 tCIDLib::TBoolean operator==(const TConstCursor& cursSrc) const
                 {
@@ -377,7 +381,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
         };
 
 
-        template <class TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -396,11 +400,14 @@ template <class TElem> class TQueue : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
+                // We have to lock first, so we can't use member init! Just call operator
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
+
+                // Can't actually delete it since that causes problems
+                // TNonConstCursor(TNonConstCursor&&) = delete;
 
                 ~TNonConstCursor()
                 {
@@ -424,6 +431,9 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     }
                     return *this;
                 }
+
+                // Can't actually delete it since that causes problems
+                // TNonConstCursor& operator=(TNonConstCursor&&) = delete;
 
                 TElem& operator*() const
                 {
@@ -525,6 +535,8 @@ template <class TElem> class TQueue : public TCollection<TElem>
             }
         }
 
+        TQueue(TMyType&&) = delete;
+
         ~TQueue() {}
 
 
@@ -570,6 +582,8 @@ template <class TElem> class TQueue : public TCollection<TElem>
 
             return *this;
         }
+
+        TMyType& operator=(TMyType&& colSrc) = delete;
 
 
         // -------------------------------------------------------------------
@@ -677,6 +691,23 @@ template <class TElem> class TQueue : public TCollection<TElem>
 
             // Didn't match, so let's add it as a new one
             objPut(objToPut, ePriority);
+            return kCIDLib::True;
+        }
+
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+            TQueueNode<TElem>* pnodeCur = static_cast<TQueueNode<TElem>*>
+            (
+                m_llstQueue.pnodeHead()
+            );
+            while (pnodeCur)
+            {
+                if (!iterCB(pnodeCur->objData()))
+                    return kCIDLib::False;
+                pnodeCur = static_cast<TQueueNode<TElem>*>(pnodeCur->pnodeNext());
+            }
             return kCIDLib::True;
         }
 
@@ -900,22 +931,6 @@ template <class TElem> class TQueue : public TCollection<TElem>
             );
         }
 
-
-        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
-        {
-            TMtxLocker lockThis(this->pmtxLock());
-            TQueueNode<TElem>* pnodeCur = static_cast<TQueueNode<TElem>*>
-            (
-                m_llstQueue.pnodeHead()
-            );
-            while (pnodeCur)
-            {
-                if (!iterCB(pnodeCur->objData()))
-                    return kCIDLib::False;
-                pnodeCur = static_cast<TQueueNode<TElem>*>(pnodeCur->pnodeNext());
-            }
-            return kCIDLib::True;
-        }
 
         // Construct an element in place
         template <typename... TArgs> TElem& objPlace(TArgs&&... Args)

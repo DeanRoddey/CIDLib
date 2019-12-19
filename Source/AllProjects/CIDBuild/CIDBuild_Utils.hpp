@@ -34,7 +34,7 @@
 //  Forward references
 // ---------------------------------------------------------------------------
 class TFindInfo;
-template <class T> class TList;
+template <typename T> class TList;
 
 
 // ---------------------------------------------------------------------------

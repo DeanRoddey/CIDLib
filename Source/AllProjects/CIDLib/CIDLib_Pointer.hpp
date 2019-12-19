@@ -51,6 +51,7 @@ class CIDLIBEXP TPointer :
         TPointer() = default;
 
         TPointer(const TPointer&) = default;
+        TPointer(TPointer&&) = default;
 
         TPointer
         (
@@ -64,6 +65,7 @@ class CIDLIBEXP TPointer :
         //  Public operators
         // -------------------------------------------------------------------
         TPointer& operator=(const TPointer&) = default;
+        TPointer& operator=(TPointer&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -84,7 +86,7 @@ class CIDLIBEXP TPointer :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
 
     private :

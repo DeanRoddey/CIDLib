@@ -51,7 +51,7 @@
 // ---------------------------------------------------------------------------
 //  Forward references
 // ---------------------------------------------------------------------------
-template <class TElem, class TKey, class TKeyOps> class TKeyedHashSet;
+template <typename TElem, class TKey, class TKeyOps> class TKeyedHashSet;
 
 
 // ---------------------------------------------------------------------------
@@ -76,6 +76,7 @@ class TClassInfo
         }
 
         TClassInfo(const TClassInfo&)  = default;
+        TClassInfo(TClassInfo&&)  = default;
 
         ~TClassInfo() = default;
 
@@ -84,6 +85,7 @@ class TClassInfo
         //  Public operators
         // -------------------------------------------------------------------
         TClassInfo& operator=(const TClassInfo&) = default;
+        TClassInfo& operator=(TClassInfo&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -152,7 +154,7 @@ class TClassKeyOps
 //  CLASS: TPolyStreamer
 // PREFIX: pstmr
 // ---------------------------------------------------------------------------
-template <class TElem> class TPolyStreamer : public TObject
+template <typename TElem> class TPolyStreamer : public TObject
 {
     public  :
         // -------------------------------------------------------------------
@@ -175,6 +177,7 @@ template <class TElem> class TPolyStreamer : public TObject
         }
 
         TPolyStreamer(const TPolyStreamer<TElem>&) = delete;
+        TPolyStreamer(TPolyStreamer<TElem>&&) = delete;
 
         ~TPolyStreamer()
         {
@@ -186,6 +189,7 @@ template <class TElem> class TPolyStreamer : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TPolyStreamer<TElem>& operator=(const TPolyStreamer<TElem>&) = delete;
+        TPolyStreamer<TElem>& operator=(TPolyStreamer<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -33,7 +33,7 @@
 //   CLASS: TBag
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
+template <typename TElem> class TBag : public TBasicDLinkedCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------

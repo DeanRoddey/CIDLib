@@ -16,12 +16,12 @@
                         CIDIDL:InterfaceId="7F1112BEFF72CF9A-1A3600EA74289F30">
 
         <!-- =================================================================
-          - Define some class specific constants
+        - Define some class specific constants
           -  =================================================================
           -->
         <CIDIDL:Constants>
             <CIDIDL:Constant CIDIDL:Name="strScope"
-                             CIDIDL:Type="TString"
+                            CIDIDL:Type="TString"
                              CIDIDL:Value="/CIDLib/CIDLogSrv"/>
 
             <CIDIDL:Constant CIDIDL:Name="strAdminBinding"

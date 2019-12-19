@@ -908,22 +908,20 @@ tCIDLib::TVoid TCppGenerator::EndTypes()
 
 // Generate a single constant
 tCIDLib::TVoid
-TCppGenerator::GenConstant( const   TString&            strName
-                            , const TString&            strType
-                            , const TString&            strValue
-                            , const TString&            strDocs)
+TCppGenerator::GenConstant( const   TString&        strName
+                            , const tCIDIDL::ETypes eType
+                            , const TString&        strValue
+                            , const TString&        strDocs)
 {
     // If any documentation, generate that
     if (!strDocs.bIsEmpty())
         GenDocText(m_strmHeader, strDocs, m_eMode);
 
-    // Translate the IDL type to our local type
-    TString strRealType;
-    FormatConstType(strType, strRealType);
+    const TString strRealType = facCIDIDL.strXlatType(eType);
 
     if (m_eMode == tCIDIDL::EOutputs::Global)
     {
-        if (strRealType == L"TString")
+        if (eType == tCIDIDL::ETypes::TString)
         {
             //
             //  We put the actual intitialization out of line, since
@@ -948,7 +946,7 @@ TCppGenerator::GenConstant( const   TString&            strName
     }
      else
     {
-        if (strRealType == L"TString")
+        if (eType == tCIDIDL::ETypes::TString)
         {
             m_strmHeader << L"        static const " << strRealType << L" " << strName;
         }
@@ -967,10 +965,10 @@ TCppGenerator::GenConstant( const   TString&            strName
     if ((m_eMode == tCIDIDL::EOutputs::Client)
     ||  (m_eMode == tCIDIDL::EOutputs::Server))
     {
-        if (strType == L"TString")
+        if (eType == tCIDIDL::ETypes::TString)
         {
             m_strmImpl << L"const "
-                       << strType
+                       << strRealType
                        << L" "
                        << m_strTargetClass << L"::" << strName
                        << L"(L\""
@@ -1057,7 +1055,7 @@ TCppGenerator::GenMethod(const  TString&            strName
     TString strTmp;
 
     // We need to know a couple times below if we have a non-void return
-    const tCIDLib::TBoolean bNonVoidRet(tinfoRet.strType() != L"CIDIDL:TVoid");
+    const tCIDLib::TBoolean bNonVoidRet(tinfoRet.eType() != tCIDIDL::ETypes::TVoid);
 
     // And we'll also need the parameter count a few times
     const tCIDLib::TCard4 c4ParmCount = colParams.c4ElemCount();
@@ -1119,8 +1117,8 @@ TCppGenerator::GenMethod(const  TString&            strName
                 else
                     m_strmHeader << TTextOutStream::Spaces(12) << L", ";
 
-                if ((mparmCur.tinfoThis().strType() == L"CIDIDL:THeapBuf")
-                ||  (mparmCur.tinfoThis().strType() == L"CIDIDL:TMemBuf"))
+                if ((mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::THeapBuf)
+                ||  (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TMemBuf))
                 {
                     // Get the direction of the parameter
                     const tCIDLib::EParmDirs eDir = mparmCur.eDir();
@@ -1168,7 +1166,7 @@ TCppGenerator::GenMethod(const  TString&            strName
         //
         if (bPollMethod)
         {
-            if (tinfoRet.strType() != L"CIDIDL:TBoolean")
+            if (tinfoRet.eType() != tCIDIDL::ETypes::TBoolean)
                 facCIDIDL.GenErr(CID_FILE, CID_LINE, kIDLErrs::errcGen_PollMethRet, strName);
         }
 
@@ -1202,8 +1200,8 @@ TCppGenerator::GenMethod(const  TString&            strName
                 //  If it's one of the magic memory buffer parms, then we
                 //  need to declare the buffer size parm.
                 //
-                if ((mparmCur.tinfoThis().strType() == L"CIDIDL:THeapBuf")
-                ||  (mparmCur.tinfoThis().strType() == L"CIDIDL:TMemBuf"))
+                if ((mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::THeapBuf)
+                ||  (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TMemBuf))
                 {
                     const tCIDLib::EParmDirs eDir = mparmCur.eDir();
                     if ((eDir == tCIDLib::EParmDirs::Out)
@@ -1346,8 +1344,8 @@ TCppGenerator::GenMethod(const  TString&            strName
                     else
                         m_strmHeader << TTextOutStream::Spaces(12) << L", ";
 
-                    if ((mparmCur.tinfoThis().strType() == L"CIDIDL:THeapBuf")
-                    ||  (mparmCur.tinfoThis().strType() == L"CIDIDL:TMemBuf"))
+                    if ((mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::THeapBuf)
+                    ||  (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TMemBuf))
                     {
                         const tCIDLib::EParmDirs eDir = mparmCur.eDir();
 
@@ -1422,8 +1420,11 @@ TCppGenerator::GenMethod(const  TString&            strName
             //  If it's the TKeyedHashSet type we have a special case because we need to
             //  generate some special constructor parameter.
             //
-            if ((mparmCur.tinfoThis().strType() == L"CIDIDL:THeapBuf")
-            ||  (mparmCur.tinfoThis().strType() == L"CIDIDL:TMemBuf"))
+            //  For fundamental types we have to provide a default value for out parms to
+            //  avoid code analysis warnings.
+            //
+            if ((mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::THeapBuf)
+            ||  (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TMemBuf))
             {
                 m_strmImpl  <<  L"        tCIDLib::TCard4 c4BufSz_"
                             <<  mparmCur.strName();
@@ -1466,7 +1467,7 @@ TCppGenerator::GenMethod(const  TString&            strName
             }
              else
             {
-                if (mparmCur.tinfoThis().strType() == L"CIDIDL:TKeyedHashSet")
+                if (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TKeyedHashSet)
                 {
                     m_strmImpl  << L"        "
                                 << strTmp
@@ -1488,8 +1489,22 @@ TCppGenerator::GenMethod(const  TString&            strName
                     m_strmImpl  << L"        "
                                 << strTmp
                                 << L" "
-                                << mparmCur.strName()
-                                << L";\n";
+                                << mparmCur.strName();
+
+                    //
+                    //  If a fundamental type, and it's only output, then we need
+                    //  to provide a default value. We just use the {} initializer
+                    //  to make the analyzer happy. Don't care really what that
+                    //  results in since it will be updated via an output parameter.
+                    //
+                    if (mparmCur.tinfoThis().bIsFundType()
+                    &&  ((eDir == tCIDLib::EParmDirs::Out)
+                    ||   (eDir == tCIDLib::EParmDirs::InOut)))
+                    {
+                        m_strmImpl << L" = {}";
+                    }
+
+                    m_strmImpl << L";\n";
                 }
 
                 // And stream in it's contents if an input parm
@@ -1537,8 +1552,8 @@ TCppGenerator::GenMethod(const  TString&            strName
             //  If this is one of the magic memory buffer parms, then we
             //  have to pass along the magic buffer size parm.
             //
-            if ((mparmCur.tinfoThis().strType() == L"CIDIDL:THeapBuf")
-            ||  (mparmCur.tinfoThis().strType() == L"CIDIDL:TMemBuf"))
+            if ((mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::THeapBuf)
+            ||  (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TMemBuf))
             {
                 m_strmImpl  << L"c4BufSz_"
                             << mparmCur.strName() << kCIDLib::NewLn
@@ -1587,8 +1602,8 @@ TCppGenerator::GenMethod(const  TString&            strName
             //  back out the data bytes parm, and that many bytes. Else we do the
             //  normal thing.
             //
-            if ((mparmCur.tinfoThis().strType() == L"CIDIDL:THeapBuf")
-            ||  (mparmCur.tinfoThis().strType() == L"CIDIDL:TMemBuf"))
+            if ((mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::THeapBuf)
+            ||  (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TMemBuf))
             {
                 m_strmImpl  << strIndent << L"orbcToDispatch.strmOut() << "
                             << L"c4BufSz_" << mparmCur.strName()
@@ -1617,72 +1632,6 @@ TCppGenerator::GenMethod(const  TString&            strName
 // ---------------------------------------------------------------------------
 //  TCppGenerator: Public, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid
-TCppGenerator::FormatConstType( const   TString&    strRawType
-                                ,       TString&    strToFill) const
-{
-    // According to the type, we do different things
-    strToFill = L"tCIDLib::";
-    if (strRawType == L"TBoolean")
-    {
-        strToFill.Append(L"TBoolean");
-    }
-     else if (strRawType == L"TInt1")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TInt2")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TInt4")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TInt8")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TCard1")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TCard2")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TCard4")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TCh")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TCard8")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TFloat8")
-    {
-        strToFill.Append(strRawType);
-    }
-     else if (strRawType == L"TString")
-    {
-        strToFill = strRawType;
-    }
-     else
-    {
-        facCIDIDL.GenErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kIDLErrs::errcGen_UnknownType
-            , strRawType
-        );
-    }
-}
-
 
 tCIDLib::TVoid
 TCppGenerator::FormatParam( const   TCGenMethodParm&    mparmFmt
@@ -1711,18 +1660,18 @@ TCppGenerator::FormatParam( const   TCGenMethodParm&    mparmFmt
     //  string, or one of the memory buffer types, then we need to make it a
     //  reference.
     //
-    const TString& strRawType = mparmFmt.tinfoThis().strType();
+    const tCIDIDL::ETypes eType = mparmFmt.tinfoThis().eType();
 
     if ((mparmFmt.eDir() == tCIDLib::EParmDirs::Out)
     ||  (mparmFmt.eDir() == tCIDLib::EParmDirs::InOut)
-    ||  (strRawType == L"CIDIDL:Object")
-    ||  (strRawType == L"CIDIDL:TBag")
-    ||  (strRawType == L"CIDIDL:TVector")
-    ||  (strRawType == L"CIDIDL:THeapBuf")
-    ||  (strRawType == L"CIDIDL:TMemBuf")
-    ||  (strRawType == L"CIDIDL:TFundArray")
-    ||  (strRawType == L"CIDIDL:TFundVector")
-    ||  (strRawType == L"CIDIDL:TString"))
+    ||  (eType == tCIDIDL::ETypes::Object)
+    ||  (eType == tCIDIDL::ETypes::TBag)
+    ||  (eType == tCIDIDL::ETypes::TVector)
+    ||  (eType == tCIDIDL::ETypes::THeapBuf)
+    ||  (eType == tCIDIDL::ETypes::TMemBuf)
+    ||  (eType == tCIDIDL::ETypes::TFundArray)
+    ||  (eType == tCIDIDL::ETypes::TFundVector)
+    ||  (eType == tCIDIDL::ETypes::TString))
     {
         if ((m_eMode == tCIDIDL::EOutputs::Server) && mparmFmt.bMoveable())
             strToFill.Append(L"&& ");
@@ -1750,46 +1699,8 @@ tCIDLib::TVoid
 TCppGenerator::FormatType(  const   TCGenTypeInfo&  tinfoFmt
                             ,       TString&        strToFill) const
 {
-    const TString& strRawType = tinfoFmt.strType();
-
-    // According to the type, we do different things
-    if (strRawType == L"CIDIDL:TBoolean")
-    {
-        strToFill = L"tCIDLib::TBoolean";
-    }
-     else if (strRawType == L"CIDIDL:TInt4")
-    {
-         strToFill = L"tCIDLib::TInt4";
-    }
-     else if (strRawType == L"CIDIDL:TInt8")
-    {
-        strToFill = L"tCIDLib::TInt8";
-    }
-     else if (strRawType == L"CIDIDL:TCard4")
-    {
-        strToFill = L"tCIDLib::TCard4";
-    }
-     else if (strRawType == L"CIDIDL:TCh")
-    {
-        strToFill = L"tCIDLib::TCh";
-    }
-     else if (strRawType == L"CIDIDL:TCard8")
-    {
-        strToFill = L"tCIDLib::TCard8";
-    }
-     else if (strRawType == L"CIDIDL:TFloat8")
-    {
-        strToFill = L"tCIDLib::TFloat8";
-    }
-     else if (strRawType == L"CIDIDL:TString")
-    {
-        strToFill = L"TString";
-    }
-     else if (strRawType == L"CIDIDL:THeapBuf")
-    {
-        strToFill = L"THeapBuf";
-    }
-     else if (strRawType == L"CIDIDL:TMemBuf")
+    // Handle any special cases
+    if (tinfoFmt.eType() == tCIDIDL::ETypes::TMemBuf)
     {
         //
         //  On the server side we have to use a concrete class to read in the data
@@ -1801,12 +1712,12 @@ TCppGenerator::FormatType(  const   TCGenTypeInfo&  tinfoFmt
         else
             strToFill = L"THeapBuf";
     }
-     else if (strRawType == L"CIDIDL:Object")
+     else if (tinfoFmt.eType() == tCIDIDL::ETypes::Object)
     {
         // The aux type is the actual type for us
         strToFill = tinfoFmt.strAuxType();
     }
-     else if (strRawType == L"CIDIDL:Enumerated")
+     else if (tinfoFmt.eType() == tCIDIDL::ETypes::Enumerated)
     {
         // The aux type is the actual type for us
         const TString& strAux = tinfoFmt.strAuxType();
@@ -1834,112 +1745,105 @@ TCppGenerator::FormatType(  const   TCGenTypeInfo&  tinfoFmt
             strToFill = strAux;
         }
     }
-     else if (strRawType == L"CIDIDL:TBag")
-    {
-        strToFill = L"TBag<";
-        strToFill.Append(tinfoFmt.strAuxType());
-        strToFill.Append(L">");
-    }
-     else if (strRawType == L"CIDIDL:THashSet")
-    {
-        strToFill = L"THashSet<";
-        strToFill.Append(tinfoFmt.strAuxType());
-        strToFill.Append(L", ");
-        strToFill.Append(tinfoFmt.strKeyOps());
-        strToFill.Append(L">");
-    }
-     else if (strRawType == L"CIDIDL:TKeyedHashSet")
-    {
-        strToFill = L"TKeyedHashSet<";
-        strToFill.Append(tinfoFmt.strAuxType());
-        strToFill.Append(L", ");
-        strToFill.Append(tinfoFmt.strKeyType());
-        strToFill.Append(L", ");
-        strToFill.Append(tinfoFmt.strKeyOps());
-        strToFill.Append(L">");
-    }
-     else if (strRawType == L"CIDIDL:TVector")
-    {
-        strToFill = L"TVector<";
-
-        // The aux type is the actual type for us
-        const TString& strAux = tinfoFmt.strAuxType();
-
-        // If it starts with ?:: then replace the question
-        if (strAux.bStartsWith(L"?::"))
-        {
-            if (m_eMode == tCIDIDL::EOutputs::Client)
-            {
-                strToFill.Append(m_strClientClass);
-            }
-             else if (m_eMode == tCIDIDL::EOutputs::Server)
-            {
-                strToFill.Append(m_strServerClass);
-            }
-             else
-            {
-                strToFill.Append(L"t");
-                strToFill.Append(m_strFacName);
-            }
-            strToFill.AppendSubStr(strAux, 1);
-        }
-         else
-        {
-            strToFill.Append(strAux);
-        }
-
-        strToFill.Append(L">");
-    }
-     else if (strRawType == L"CIDIDL:TFundArray")
-    {
-        strToFill = L"TFundArray<";
-
-        // The aux type is the actual type for us
-        const TString& strAux = tinfoFmt.strAuxType();
-
-        // If it starts with ?:: then replace the question
-        if (strAux.bStartsWith(L"?::"))
-        {
-            if (m_eMode == tCIDIDL::EOutputs::Client)
-            {
-                strToFill.Append(m_strClientClass);
-            }
-             else if (m_eMode == tCIDIDL::EOutputs::Server)
-            {
-                strToFill.Append(m_strServerClass);
-            }
-             else
-            {
-                strToFill.Append(L"t");
-                strToFill.Append(m_strFacName);
-            }
-            strToFill.AppendSubStr(strAux, 1);
-        }
-         else
-        {
-            strToFill.Append(strAux);
-        }
-        strToFill.Append(L">");
-    }
-     else if (strRawType == L"CIDIDL:TFundVector")
-    {
-        strToFill = L"TFundVector<";
-        strToFill.Append(tinfoFmt.strAuxType());
-        strToFill.Append(L">");
-    }
-     else if (strRawType == L"CIDIDL:TVoid")
-    {
-        strToFill = L"tCIDLib::TVoid";
-    }
      else
     {
-        facCIDIDL.GenErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kIDLErrs::errcGen_UnknownType
-            , strRawType
-        );
+        // For the rest we start with the translated actual type
+        strToFill = facCIDIDL.strXlatType(tinfoFmt.eType());
+
+        // And now handle any extra bits that some of them require
+        if (tinfoFmt.eType() == tCIDIDL::ETypes::TBag)
+        {
+            strToFill.Append(L"<");
+            strToFill.Append(tinfoFmt.strAuxType());
+            strToFill.Append(L">");
+        }
+         else if (tinfoFmt.eType() == tCIDIDL::ETypes::THashSet)
+        {
+            strToFill.Append(L"<");
+            strToFill.Append(tinfoFmt.strAuxType());
+            strToFill.Append(L", ");
+            strToFill.Append(tinfoFmt.strKeyOps());
+            strToFill.Append(L">");
+        }
+         else if (tinfoFmt.eType() == tCIDIDL::ETypes::TKeyedHashSet)
+        {
+            strToFill.Append(L"<");
+            strToFill.Append(tinfoFmt.strAuxType());
+            strToFill.Append(L", ");
+            strToFill.Append(tinfoFmt.strKeyType());
+            strToFill.Append(L", ");
+            strToFill.Append(tinfoFmt.strKeyOps());
+            strToFill.Append(L">");
+        }
+         else if (tinfoFmt.eType() == tCIDIDL::ETypes::TVector)
+        {
+            strToFill.Append(L"<");
+
+            // The aux type is the actual type for us
+            const TString& strAux = tinfoFmt.strAuxType();
+
+            // If it starts with ?:: then replace the question
+            if (strAux.bStartsWith(L"?::"))
+            {
+                if (m_eMode == tCIDIDL::EOutputs::Client)
+                {
+                    strToFill.Append(m_strClientClass);
+                }
+                else if (m_eMode == tCIDIDL::EOutputs::Server)
+                {
+                    strToFill.Append(m_strServerClass);
+                }
+                else
+                {
+                    strToFill.Append(L"t");
+                    strToFill.Append(m_strFacName);
+                }
+                strToFill.AppendSubStr(strAux, 1);
+            }
+            else
+            {
+                strToFill.Append(strAux);
+            }
+
+            strToFill.Append(L">");
+        }
+         else if (tinfoFmt.eType() == tCIDIDL::ETypes::TFundArray)
+        {
+            strToFill.Append(L"<");
+
+            // The aux type is the actual type for us
+            const TString& strAux = tinfoFmt.strAuxType();
+
+            // If it starts with ?:: then replace the question
+            if (strAux.bStartsWith(L"?::"))
+            {
+                if (m_eMode == tCIDIDL::EOutputs::Client)
+                {
+                    strToFill.Append(m_strClientClass);
+                }
+                else if (m_eMode == tCIDIDL::EOutputs::Server)
+                {
+                    strToFill.Append(m_strServerClass);
+                }
+                else
+                {
+                    strToFill.Append(L"t");
+                    strToFill.Append(m_strFacName);
+                }
+                strToFill.AppendSubStr(strAux, 1);
+            }
+            else
+            {
+                strToFill.Append(strAux);
+            }
+            strToFill.Append(L">");
+        }
+         else if (tinfoFmt.eType() == tCIDIDL::ETypes::TFundVector)
+        {
+            strToFill.Append(L"<");
+            strToFill.Append(tinfoFmt.strAuxType());
+            strToFill.Append(L">");
+        }
     }
 }
 
@@ -1973,10 +1877,9 @@ TCppGenerator::MarshallClientParms( const   TString&            strMethodName
             //  we generate a magic In TCard4 parm before this parm, which
             //  takes the bytes to stream.
             //
-            const TString& strParmType = mparmCur.tinfoThis().strType();
             const TString& strParmName = mparmCur.strName();
-            if ((strParmType == L"CIDIDL:THeapBuf")
-            ||  (strParmType == L"CIDIDL:TMemBuf"))
+            if ((mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::THeapBuf)
+            ||  (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TMemBuf))
             {
                 m_strmImpl  << L"        ocmdToUse.strmOut() << "
                             << L"c4BufSz_" << strParmName << L";\n"
@@ -2004,7 +1907,7 @@ TCppGenerator::UnMarshallClientParms(const  TString&            strMethodName
     //  If there was a return value, then it is the first thing in the
     //  buffer, so we need to get that out first.
     //
-    if (tinfoRet.strType() != L"CIDIDL:TVoid")
+    if (tinfoRet.eType() != tCIDIDL::ETypes::TVoid)
         m_strmImpl <<  L"        ocmdToUse.strmIn() >> retVal;\n";
 
     //
@@ -2034,9 +1937,8 @@ TCppGenerator::UnMarshallClientParms(const  TString&            strMethodName
             //  unmarshal the magic data bytes parm first. Note that TMemBuf is not
             //  not valid here, so we shouldn't see it.
             //
-            const TString& strParmType = mparmCur.tinfoThis().strType();
             const TString& strParmName = mparmCur.strName();
-            if (strParmType == L"CIDIDL:THeapBuf")
+            if (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::THeapBuf)
             {
                 m_strmImpl  << strIndent << L"ocmdToUse.strmIn() >> c4BufSz_"
                             << strParmName
@@ -2045,14 +1947,14 @@ TCppGenerator::UnMarshallClientParms(const  TString&            strMethodName
                             << strParmName
                             << L", c4BufSz_" << strParmName << L");\n";
             }
-             else if (strParmType == L"CIDIDL:TMemBuf")
+             else if (mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TMemBuf)
             {
                 facCIDIDL.GenErr
                 (
                     CID_FILE
                     , CID_LINE
                     , kIDLErrs::errcInp_InOnly
-                    , strParmType
+                    , facCIDIDL.strXlatType(mparmCur.tinfoThis().eType())
                 );
             }
              else

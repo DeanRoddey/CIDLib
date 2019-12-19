@@ -35,7 +35,7 @@
 //   CLASS: TStack
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
+template <typename TElem> class TStack : public TBasicDLinkedCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -57,7 +57,7 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
 
             TStack(colSrc.eMTState())
         {
-            *this = tCIDLib::ForceMove(colSrc);
+            operator=(tCIDLib::ForceMove(colSrc));
         }
 
         ~TStack()
@@ -150,7 +150,7 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
 //   CLASS: TStackJan
 //  PREFIX: jan
 // ---------------------------------------------------------------------------
-template <class TElem> class TStackJan
+template <typename TElem> class TStackJan
 {
     public  :
         // -------------------------------------------------------------------
@@ -173,6 +173,7 @@ template <class TElem> class TStackJan
         }
 
         TStackJan(const TStackJan&) = delete;
+        TStackJan(TStackJan&&) = delete;
 
         ~TStackJan()
         {
@@ -186,6 +187,7 @@ template <class TElem> class TStackJan
         //  Public operators
         // -------------------------------------------------------------------
         TStackJan& operator=(const TStackJan&) = delete;
+        TStackJan& operator=(TStackJan&&) = delete;
 
 
         // -------------------------------------------------------------------

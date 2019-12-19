@@ -455,29 +455,11 @@ TPubSubMsg::TPubSubMsg(TPSMsg* const psmsgImpl) :
 {
 }
 
-TPubSubMsg::TPubSubMsg(const TPubSubMsg& psmsgSrc) :
-
-    m_cptrMsgImpl(psmsgSrc.m_cptrMsgImpl)
-{
-}
-
 TPubSubMsg::~TPubSubMsg()
 {
     // Our counted pointer will be destroyed and will clean up the msg if appropriate
 }
 
-
-// ---------------------------------------------------------------------------
-//  TPubSubMsg: Public operators
-// ---------------------------------------------------------------------------
-TPubSubMsg& TPubSubMsg::operator=(const TPubSubMsg& psmsgSrc)
-{
-    if (this != &psmsgSrc)
-    {
-        m_cptrMsgImpl = psmsgSrc.m_cptrMsgImpl;
-    }
-    return *this;
-}
 
 
 // ---------------------------------------------------------------------------

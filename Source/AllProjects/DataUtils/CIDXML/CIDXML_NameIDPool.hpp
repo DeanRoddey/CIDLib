@@ -44,14 +44,14 @@
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 
-template <class TElem> class TXMLNameIDPoolCursor;
+template <typename TElem> class TXMLNameIDPoolCursor;
 
 
 // ---------------------------------------------------------------------------
 //  CLASS: TXMLNameIDPool
 // PREFIX: xnip
 // ---------------------------------------------------------------------------
-template <class TElem> class TXMLNameIDPool : public TObject
+template <typename TElem> class TXMLNameIDPool : public TObject
 {
     public  :
         // -------------------------------------------------------------------
@@ -240,7 +240,7 @@ template <class TElem> class TXMLNameIDPool : public TObject
 //  CLASS: TXMLNameIDPoolCursor
 // PREFIX: xnipc
 // ---------------------------------------------------------------------------
-template <class TElem> class TXMLNameIDPoolCursor
+template <typename TElem> class TXMLNameIDPoolCursor
 {
     public :
         // -------------------------------------------------------------------

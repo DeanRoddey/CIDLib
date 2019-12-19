@@ -69,7 +69,7 @@ TFacCIDIDL::GenClient(          TCodeGenerator&         cgenTarget
     cgenTarget.GenConstant
     (
         L"strInterfaceId"
-        , L"TString"
+        , tCIDIDL::ETypes::TString
         , m_strInterfaceId
         , TString::strEmpty()
     );
@@ -225,10 +225,14 @@ TFacCIDIDL::GenConstants(       TCodeGenerator&     cgenTarget
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TXMLTreeElement& xtnodeCur = xtnodeConsts.xtnodeChildAtAsElement(c4Index);
-        const TString& strType = xtnodeCur.xtattrNamed(L"CIDIDL:Type").strValue();
         const TString& strValue = xtnodeCur.xtattrNamed(L"CIDIDL:Value").strValue();
         const TString& strName = xtnodeCur.xtattrNamed(L"CIDIDL:Name").strValue();
         const TString* pstrDocs = &TString::strEmpty();
+
+        const tCIDIDL::ETypes eType = facCIDIDL.eXlatType
+        (
+            xtnodeCur.xtattrNamed(L"CIDIDL:Type").strValue()
+        );
 
         // If there's a child node, it's the docs so get a pointer
         if (xtnodeCur.c4ChildCount())
@@ -236,7 +240,7 @@ TFacCIDIDL::GenConstants(       TCodeGenerator&     cgenTarget
             const TXMLTreeElement& xtnodeDocs = xtnodeCur.xtnodeChildAtAsElement(0);
             pstrDocs = &xtnodeDocs.xtnodeChildAtAsText(0).strText();
         }
-        cgenTarget.GenConstant(strName, strType, strValue, *pstrDocs);
+        cgenTarget.GenConstant(strName, eType, strValue, *pstrDocs);
     }
 
     // Tell the generator that constants are done
@@ -438,7 +442,7 @@ TFacCIDIDL::GenServer(          TCodeGenerator&         cgenTarget
     cgenTarget.GenConstant
     (
         L"strInterfaceId"
-        , L"TString"
+        , tCIDIDL::ETypes::TString
         , m_strInterfaceId
         , TString::strEmpty()
     );
@@ -484,7 +488,7 @@ TFacCIDIDL::GenServer(          TCodeGenerator&         cgenTarget
             );
 
             // There are some illegal options
-            if ((mparmCur.tinfoThis().strType() == L"CIDIDL:TMemBuf")
+            if ((mparmCur.tinfoThis().eType() == tCIDIDL::ETypes::TMemBuf)
             &&  (mparmCur.eDir() != tCIDLib::EParmDirs::In))
             {
                 // TMemBuf is an astract type so only valid on input only parameters
@@ -493,7 +497,7 @@ TFacCIDIDL::GenServer(          TCodeGenerator&         cgenTarget
                     CID_FILE
                     , CID_LINE
                     , kIDLErrs::errcInp_InOnly
-                    , mparmCur.tinfoThis().strType()
+                    , facCIDIDL.strXlatType(mparmCur.tinfoThis().eType())
                 );
             }
         }

@@ -34,7 +34,7 @@
 //   CLASS: TRefDeque
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefDeque :  public TBasicDLinkedRefCol<TElem>
+template <typename TElem> class TRefDeque : public TBasicDLinkedRefCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------

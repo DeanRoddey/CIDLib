@@ -391,9 +391,9 @@ tCIDLib::TBoolean TMainFrame::bCreateMain()
 TLogEvPtr TMainFrame::cptrFindById(const tCIDLib::TCard4 c4IdToFind) const
 {
     TLogEvPtr cptrRet;
-    m_colList.bForEachNC
+    m_colList.bForEach
     (
-        [&cptrRet, c4IdToFind](TLogEvPtr& cptrCur)
+        [&cptrRet, c4IdToFind](const TLogEvPtr& cptrCur)
         {
             if (cptrCur->m_c4UniqueId == c4IdToFind)
             {

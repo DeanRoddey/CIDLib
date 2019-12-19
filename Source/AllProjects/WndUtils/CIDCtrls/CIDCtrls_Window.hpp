@@ -194,7 +194,7 @@ class CIDCTRLSEXP TWindow : public TObject
         //  error prone grunt work by other code. These let them get child controls
         //  as their actual types, with type validation in debug mode.
         // -------------------------------------------------------------------
-        template <class T> T*
+        template <typename T> T*
         pwndChildAs(const tCIDCtrls::TWndId widChild) const
         {
             TWindow* pwndRet = pwndChildById(widChild);
@@ -205,7 +205,7 @@ class CIDCTRLSEXP TWindow : public TObject
             return static_cast<T*>(pwndRet);
         }
 
-        template <class T> T* pwndNamed(const TString& strToFind)
+        template <typename T> T* pwndNamed(const TString& strToFind)
         {
             TWindow* pwndRet = pwndFindNamed(strToFind);
             #if CID_DEBUG_ON
@@ -215,7 +215,7 @@ class CIDCTRLSEXP TWindow : public TObject
             return static_cast<T*>(pwndRet);
         }
 
-        template <class T> T& wndNamed(const TString& strToFind)
+        template <typename T> T& wndNamed(const TString& strToFind)
         {
             TWindow& wndRet = wndFindNamed(strToFind);
             #if CID_DEBUG_ON
@@ -904,7 +904,7 @@ class CIDCTRLSEXP TWindow : public TObject
         //
         //  Both call a non-templatized helper to do the actual work.
         //
-        template <class D> tCIDLib::TVoid
+        template <typename D> tCIDLib::TVoid
         SendAsyncNotify(        D* const            pwnotToAdopt
                         , const TNotificationId&    nidToSend) const
         {
@@ -917,7 +917,7 @@ class CIDCTRLSEXP TWindow : public TObject
             DoAsyncNotification(wnotSend);
         }
 
-        template <class D> tCIDLib::TVoid
+        template <typename D> tCIDLib::TVoid
         SendSyncNotify(         D&                  wnotToSend
                         , const TNotificationId&    nidToSend)
         {
@@ -1632,7 +1632,7 @@ class CIDCTRLSEXP TWindow : public TObject
 //  A second one is provided for scenarions where they just want a temp cast
 //  pointer.
 // ---------------------------------------------------------------------------
-template <class T>
+template <typename T>
 tCIDLib::TVoid CastChildWnd(        TWindow&            wndParent
                             , const tCIDCtrls::TWndId   widChild
                             ,       T*&                 pwndToFill)
@@ -1728,7 +1728,7 @@ class TMouseCapJanitor
 //  method before deleting it, if its been creatded. Its very simple and call
 //  inlined.
 // ---------------------------------------------------------------------------
-template <class T> class TWndJanitor
+template <typename T> class TWndJanitor
 {
     public :
         TWndJanitor(T* const pwndToSanitize) :

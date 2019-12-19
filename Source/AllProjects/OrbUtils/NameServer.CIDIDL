@@ -448,7 +448,8 @@
 
             <!-- =============================================================
               - Create a non-terminal node in the name server. This is a node
-              - which can contain other nodes, but not any data.
+              - which can contain other nodes, but not any data. We can either throw
+              - if it already exists, or not.
               -  =============================================================
               -->
             <CIDIDL:Method CIDIDL:Name="CreateScope">
@@ -463,6 +464,10 @@
                 </CIDIDL:Param>
                 <CIDIDL:Param CIDIDL:Name="strDescription" CIDIDL:Dir="In">
                     <CIDIDL:TString/>
+                </CIDIDL:Param>
+                <CIDIDL:Param CIDIDL:Name="bThrowIfExists" CIDIDL:Dir="In"
+                              CIDIDL:DefVal="kCIDLib::True">
+                    <CIDIDL:TBoolean/>
                 </CIDIDL:Param>
             </CIDIDL:Method>
 

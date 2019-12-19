@@ -51,6 +51,7 @@ class CIDLIBEXP TMoney :
         );
 
         TMoney(const TMoney&) = default;
+        TMoney(TMoney&&) = default;
 
         ~TMoney() = default;
 
@@ -59,6 +60,7 @@ class CIDLIBEXP TMoney :
         //  Public operators
         // -------------------------------------------------------------------
         TMoney& operator=(const TMoney&) = default;
+        TMoney& operator=(TMoney&&) = default;
 
         TMoney& operator=
         (
@@ -144,17 +146,17 @@ class CIDLIBEXP TMoney :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :

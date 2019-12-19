@@ -439,16 +439,6 @@ class TFundVector : public TFundColBase, public MDuplicable
 
 
         // Call back for each elements
-        template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
-        {
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurIndex; c4Index++)
-            {
-                if (!iterCB(m_ptElements[c4Index], TIndex(c4Index)))
-                    return kCIDLib::False;
-            }
-            return kCIDLib::True;
-        }
-
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurIndex; c4Index++)
@@ -459,11 +449,31 @@ class TFundVector : public TFundColBase, public MDuplicable
             return kCIDLib::True;
         }
 
+        template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
+        {
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurIndex; c4Index++)
+            {
+                if (!iterCB(m_ptElements[c4Index], TIndex(c4Index)))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
         template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurIndex; c4Index++)
             {
                 if (!iterCB(m_ptElements[c4Index]))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachNCI(IterCB iterCB)
+        {
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurIndex; c4Index++)
+            {
+                if (!iterCB(m_ptElements[c4Index], TIndex(c4Index)))
                     return kCIDLib::False;
             }
             return kCIDLib::True;

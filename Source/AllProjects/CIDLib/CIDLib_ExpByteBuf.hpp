@@ -54,10 +54,12 @@ class CIDLIBEXP TExpByteBuf : public TObject
             const   TExpByteBuf&            expbSrc
         );
 
-        TExpByteBuf
-        (
-                    TExpByteBuf&&           expbSrc
-        );
+        TExpByteBuf(TExpByteBuf&& expbSrc) :
+
+            TExpByteBuf(1)
+        {
+            operator=(tCIDLib::ForceMove(expbSrc));
+        }
 
         ~TExpByteBuf();
 
@@ -109,7 +111,7 @@ class CIDLIBEXP TExpByteBuf : public TObject
 
         const tCIDLib::TCard1* pc1Buffer() const;
 
-        tCIDLib::TCard1* pszReplicateBuffer();
+        [[nodiscard]] tCIDLib::TCard1* pszReplicateBuffer();
 
         tCIDLib::TVoid Reset();
 

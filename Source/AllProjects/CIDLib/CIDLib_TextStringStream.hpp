@@ -78,15 +78,18 @@ class CIDLIBEXP TTextStringInStream : public TTextInStream
         );
 
         TTextStringInStream(const TTextStringInStream&) = delete;
+        TTextStringInStream(TTextStringInStream&&) = delete;
+
         ~TTextStringInStream();
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        operator const TString&() const;
-
         TTextStringInStream& operator=(const TTextStringInStream&) = delete;
+        TTextStringInStream& operator=(TTextStringInStream&&) = delete;
+
+        operator const TString&() const;
 
 
         // -------------------------------------------------------------------
@@ -156,6 +159,7 @@ class CIDLIBEXP TTextStringOutStream : public TTextOutStream
         );
 
         TTextStringOutStream(const TTextStringOutStream&) = delete;
+        TTextStringOutStream(TTextStringOutStream&&) = delete;
 
         ~TTextStringOutStream();
 
@@ -163,9 +167,10 @@ class CIDLIBEXP TTextStringOutStream : public TTextOutStream
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        operator const TString&() const;
-
         TTextStringOutStream& operator=(const TTextStringOutStream&) = delete;
+        TTextStringOutStream& operator=(TTextStringOutStream&&) = delete;
+
+        operator const TString&() const;
 
 
         // -------------------------------------------------------------------

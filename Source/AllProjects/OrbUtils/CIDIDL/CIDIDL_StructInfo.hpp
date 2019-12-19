@@ -43,7 +43,17 @@ class TStructMem : public TObject
             const   TXMLTreeElement&        xtnodeType
         );
 
+        TStructMem(const TStructMem&) = default;
+        TStructMem(TStructMem&&) = delete;
+
         ~TStructMem();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStructMem& operator=(const TStructMem&) = delete;
+        TStructMem& operator=(TStructMem&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -109,7 +119,17 @@ class TStructInfo : public TObject
             const   TXMLTreeElement&        xtnodeType
         );
 
+        TStructInfo(const TStructInfo&) = delete;
+        TStructInfo(TStructInfo&&) = delete;
+
         ~TStructInfo();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStructInfo& operator=( TStructInfo&) = delete;
+        TStructInfo& operator=(TStructInfo&&) = delete;
 
 
         // -------------------------------------------------------------------

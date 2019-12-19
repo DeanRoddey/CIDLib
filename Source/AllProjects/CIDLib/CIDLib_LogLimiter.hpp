@@ -57,6 +57,7 @@ class CIDLIBEXP TLogLimiter : public TObject
         );
 
         TLogLimiter(const TLogLimiter&) = delete;
+        TLogLimiter(TLogLimiter&&) = delete;
 
         ~TLogLimiter();
 
@@ -65,6 +66,7 @@ class CIDLIBEXP TLogLimiter : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TLogLimiter& operator=(const TLogLimiter&) = delete;
+        TLogLimiter& operator=(TLogLimiter&&) = delete;
 
 
         // -------------------------------------------------------------------

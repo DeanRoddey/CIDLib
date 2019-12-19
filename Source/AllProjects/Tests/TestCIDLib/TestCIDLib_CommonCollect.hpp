@@ -34,7 +34,7 @@
 //  This template does some very basic collection tests that pretty much any
 //  collection must support.
 // ----------------------------------------------------------------------------
-template <class TCol, class TElem> tCIDLib::TVoid
+template <typename TCol, class TElem> tCIDLib::TVoid
 TestColBasics(          TTextOutStream& strmOut
                 ,       TCol&           colToTest
                 , const tCIDLib::TCard4 c4InitialCount)
@@ -128,7 +128,7 @@ TestColBasics(          TTextOutStream& strmOut
 }
 
 
-template <class TCol, class TElem> tCIDLib::TVoid
+template <typename TCol, class TElem> tCIDLib::TVoid
 TestColCopy(TTextOutStream& strmOut, const TCol& colToTest)
 {
     // Create a copy of the collection

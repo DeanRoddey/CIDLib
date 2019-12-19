@@ -107,6 +107,7 @@ class CIDLIBEXP TEnumMap
         );
 
         TEnumMap(const TEnumMap&) = delete;
+        TEnumMap(TEnumMap&&) = delete;
 
         ~TEnumMap();
 
@@ -115,6 +116,7 @@ class CIDLIBEXP TEnumMap
         //  Public operators
         // -------------------------------------------------------------------
         TEnumMap& operator=(const TEnumMap&) = delete;
+        TEnumMap& operator=(TEnumMap&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -195,6 +197,10 @@ class CIDLIBEXP TEnumMap
 
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_atomLoad
+        //      If the enum defines loadable text values, they must be faulted in and
+        //      we need an atomic flag to deal with that.
         //
         //  m_bNonContig
         //      The enum has non-contiguous values. So finding a value by its enum

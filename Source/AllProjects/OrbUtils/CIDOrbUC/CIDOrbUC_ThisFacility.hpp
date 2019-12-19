@@ -96,7 +96,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         //  insure they are going to the name server and getting the freshest
         //  info.
         // -------------------------------------------------------------------
-        template <class T> [[nodiscard]] T*
+        template <typename T> [[nodiscard]] T*
         porbcMakeClient(const   TString&            strNSBinding
                         , const tCIDLib::TCard4     c4WaitMillis = 0
                         , const tCIDLib::TBoolean   bNoCache = kCIDLib::False
@@ -168,7 +168,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
             return porbcRet;
         }
 
-        template <class T> T*
+        template <typename T> T*
         porbcMakeClient(        tCIDOrbUC::TNSrvProxy&  orbcNS
                         , const TString&                strNSBinding
                         , const tCIDLib::TCard4         c4WaitMillis = 0

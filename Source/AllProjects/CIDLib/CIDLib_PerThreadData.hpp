@@ -105,7 +105,7 @@ class CIDLIBEXP TPerThreadImpl : public TObject, public TKrnlPerThreadData
 //   CLASS: TPerThreadDataFor
 //  PREFIX: ptd
 // ---------------------------------------------------------------------------
-template <class T> class TPerThreadDataFor : public TPerThreadImpl
+template <typename T> class TPerThreadDataFor : public TPerThreadImpl
 {
     public  :
         // -------------------------------------------------------------------

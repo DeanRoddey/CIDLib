@@ -41,7 +41,7 @@
 //  Forward reference some internal structures and classes
 // ---------------------------------------------------------------------------
 struct  THashMapList;
-template <class TElem,class TKey,class TKeyOps> class THashMap;
+template <typename TElem,class TKey,class TKeyOps> class THashMap;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
@@ -50,7 +50,7 @@ template <class TElem,class TKey,class TKeyOps> class THashMap;
 //   CLASS: THashMapNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TKey, class TValue> class THashMapNode
+template <typename TKey, class TValue> class THashMapNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -169,7 +169,7 @@ template <class TKey, class TValue> class THashMapNode
 //   CLASS: THashMap
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem, class TKey, class TKeyOps> class THashMap
+template <typename TElem, class TKey, class TKeyOps> class THashMap
 
     : public TMapCollection<TElem, TKey>
 {
@@ -203,7 +203,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem, class TKey, class TKeyOps> class TConstCursor :
+        template <typename TElem, class TKey, class TKeyOps> class TConstCursor :
 
             public TBiColCursor<TPair>
         {
@@ -456,7 +456,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         };
 
 
-        template <class TElem, class TKey, class TKeyOps> class TNonConstCursor :
+        template <typename TElem, class TKey, class TKeyOps> class TNonConstCursor :
 
             public TConstCursor<TElem, TKey, TKeyOps>
         {
@@ -1433,7 +1433,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 //  operator for those folks who want to use it. This means that collections
 //  cannot be streamed polymorphically via the base classes.
 //
-template <class TElem, class TKey, class TKeyOps>
+template <typename TElem, class TKey, class TKeyOps>
 TBinOutStream& operator<<(          TBinOutStream&                  strmOut
                             , const THashMap<TElem, TKey, TKeyOps>& colToStream)
 {
@@ -1469,7 +1469,7 @@ TBinOutStream& operator<<(          TBinOutStream&                  strmOut
 
 
 // We cannot lock the collection, since we might delete the mutex!
-template <class TElem, class TKey, class TKeyOps>
+template <typename TElem, class TKey, class TKeyOps>
 TBinInStream& operator>>(TBinInStream&                      strmIn
                         , THashMap<TElem, TKey, TKeyOps>& colToStream)
 {

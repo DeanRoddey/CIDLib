@@ -116,6 +116,7 @@ class CIDLIBEXP TColPubSubInfo : public TObject
         );
 
         TColPubSubInfo(const TColPubSubInfo&) = default;
+        TColPubSubInfo(TColPubSubInfo&&) = default;
 
         ~TColPubSubInfo() = default;
 
@@ -124,6 +125,7 @@ class CIDLIBEXP TColPubSubInfo : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TColPubSubInfo& operator=(const TColPubSubInfo&) = default;
+        TColPubSubInfo& operator=(TColPubSubInfo&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -592,7 +594,8 @@ class CIDLIBEXP TFundColBase : public TCollectionBase
         {
         }
 
-        tCIDLib::TVoid operator=(const TFundColBase&) = delete;
+        TFundColBase& operator=(const TFundColBase&) = default;
+        TFundColBase& operator=(TFundColBase&&) = default;
 
 
     private :
@@ -609,7 +612,7 @@ class CIDLIBEXP TFundColBase : public TCollectionBase
 //   CLASS: TCollection
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem>
+template <typename TElem>
 class TCollection : public TCollectionBase, public MDuplicable
 {
     public  :
@@ -679,19 +682,11 @@ class TCollection : public TCollectionBase, public MDuplicable
         {
         }
 
-        TCollection(TCollection<TElem>&&) = delete;
+        TCollection(TCollection<TElem>&&) = default;
 
-        TCollection<TElem>& operator=(const TCollection<TElem>& colSrc)
-        {
-            TCollectionBase::operator=(colSrc);
-            return *this;
-        }
+        TCollection<TElem>& operator=(const TCollection<TElem>&) = default;
 
-        TCollection<TElem>& operator=(TCollection<TElem>&&  colSrc)
-        {
-            TCollectionBase::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TCollection<TElem>& operator=(TCollection<TElem>&&) = default;
 
 
     private :
@@ -707,7 +702,7 @@ class TCollection : public TCollectionBase, public MDuplicable
 //   CLASS: TMapCollection
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem, class TKey> class TMapCollection
+template <typename TElem, class TKey> class TMapCollection
 
     : public TCollection<TKeyObjPair<TKey, TElem>>
 {
@@ -766,17 +761,8 @@ template <class TElem, class TKey> class TMapCollection
             return *this;
         }
 
-        TMapCollection(TMyType&& colSrc) :
-
-            TParent(tCIDLib::ForceMove(colSrc))
-        {
-        }
-
-        TMapCollection& operator=(TMyType&& colSrc)
-        {
-            TParent::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TMapCollection(TMyType&& colSrc) = default;
+        TMapCollection& operator=(TMyType&& colSrc) = default;
 };
 
 
@@ -785,7 +771,7 @@ template <class TElem, class TKey> class TMapCollection
 //   CLASS: TBasicColNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicColNode : public TDLstNode
+template <typename TElem> class TBasicColNode : public TDLstNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -813,6 +799,7 @@ template <class TElem> class TBasicColNode : public TDLstNode
         }
 
         TBasicColNode(const TBasicColNode<TElem>&) = delete;
+        TBasicColNode(TBasicColNode<TElem>&&) = delete;
 
         ~TBasicColNode() {}
 
@@ -821,6 +808,7 @@ template <class TElem> class TBasicColNode : public TDLstNode
         //  Public operators
         // -------------------------------------------------------------------
         TBasicColNode<TElem>& operator=(const TBasicColNode<TElem>&) = delete;
+        TBasicColNode<TElem>& operator=(TBasicColNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -859,7 +847,7 @@ template <class TElem> class TBasicColNode : public TDLstNode
 //   CLASS: TRefCollection
 //  PREFIX: curs
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefCollection : public TCollectionBase
+template <typename TElem> class TRefCollection : public TCollectionBase
 {
     public  :
         // -------------------------------------------------------------------
@@ -927,15 +915,11 @@ template <class TElem> class TRefCollection : public TCollectionBase
         {
         }
 
-        TRefCollection(TRefCollection&&) = delete;
-
-        TRefCollection<TElem>& operator=(TRefCollection&& colSrc)
-        {
-             TCollectionBase::operator=(tCIDLib::ForceMove(colSrc));
-             return *this;
-        }
-
+        // We cannot copy but we can move
+        TRefCollection(TRefCollection&&) = default;
         TRefCollection(const TRefCollection&) = delete;
+
+        TRefCollection<TElem>& operator=(TRefCollection&&) = default;
         TRefCollection<TElem>& operator=(const TRefCollection&) = delete;
 
 
@@ -952,7 +936,7 @@ template <class TElem> class TRefCollection : public TCollectionBase
 //   CLASS: TBasicRefColNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicColRefNode : public TDLstNode
+template <typename TElem> class TBasicColRefNode : public TDLstNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -968,6 +952,7 @@ template <class TElem> class TBasicColRefNode : public TDLstNode
         }
 
         TBasicColRefNode(const TBasicColRefNode<TElem>&) = delete;
+        TBasicColRefNode( TBasicColRefNode<TElem>&&) = delete;
 
         ~TBasicColRefNode()
         {
@@ -981,6 +966,7 @@ template <class TElem> class TBasicColRefNode : public TDLstNode
         //  Public operators
         // -------------------------------------------------------------------
         TBasicColRefNode<TElem>& operator=(const TBasicColRefNode<TElem>&) = delete;
+        TBasicColRefNode<TElem>& operator=(TBasicColRefNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -991,7 +977,7 @@ template <class TElem> class TBasicColRefNode : public TDLstNode
             m_pobjData = nullptr;
         }
 
-        TElem* pobjOrphanData()
+        [[nodiscard]] TElem* pobjOrphanData()
         {
             TElem* pobjRet = m_pobjData;
             m_pobjData = nullptr;
@@ -1053,6 +1039,7 @@ class CIDLIBEXP TColBlockModeJan
         );
 
         TColBlockModeJan(const TColBlockModeJan&) = delete;
+        TColBlockModeJan(TColBlockModeJan&&) = delete;
 
         ~TColBlockModeJan();
 
@@ -1061,6 +1048,7 @@ class CIDLIBEXP TColBlockModeJan
         //  Public operators
         // -------------------------------------------------------------------
         TColBlockModeJan& operator=(const TColBlockModeJan&) = delete;
+        TColBlockModeJan& operator=(TColBlockModeJan&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -1241,4 +1229,3 @@ namespace tCIDLib
 }
 
 #pragma CIDLIB_POPPACK
-

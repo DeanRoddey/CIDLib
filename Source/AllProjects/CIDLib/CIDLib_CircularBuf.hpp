@@ -40,7 +40,7 @@
 //   CLASS: TCircularBuf
 //  PREFIX: cbuf
 // ---------------------------------------------------------------------------
-template <class TElem> class TCircularBuf
+template <typename TElem> class TCircularBuf
 {
     public :
         // -------------------------------------------------------------------

@@ -207,7 +207,7 @@ L"<!ELEMENT   CIDIDL:TMemBuf EMPTY>\n"
 L"<!ELEMENT   CIDIDL:TVoid EMPTY>\n"
 
 //
-//  The types we support for parameters
+//  The types we support for parameters. These map to the EParmTypes enum.
 //
 L"<!ENTITY %  IDLPTypes   'CIDIDL:TInt4"
 L"                        | CIDIDL:TInt8"

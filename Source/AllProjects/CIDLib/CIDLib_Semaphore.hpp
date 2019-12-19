@@ -68,6 +68,7 @@ class CIDLIBEXP TSemaphore : public TObject, public MFormattable
         );
 
         TSemaphore(const TSemaphore&) = delete;
+        TSemaphore(TSemaphore&&) = delete;
 
         ~TSemaphore();
 
@@ -76,6 +77,7 @@ class CIDLIBEXP TSemaphore : public TObject, public MFormattable
         //  Public operators
         // -------------------------------------------------------------------
         TSemaphore& operator=(const TSemaphore&) = delete;
+        TSemaphore& operator=(TSemaphore&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -102,7 +104,7 @@ class CIDLIBEXP TSemaphore : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -162,6 +164,7 @@ class CIDLIBEXP TSemJanitor : public TObject
         );
 
         TSemJanitor(const TSemJanitor&) = delete;
+        TSemJanitor(TSemJanitor&&) = delete;
 
         ~TSemJanitor();
 
@@ -170,7 +173,8 @@ class CIDLIBEXP TSemJanitor : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TSemJanitor& operator=(const TSemJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        TSemJanitor& operator=(TSemJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
 
 
     private :

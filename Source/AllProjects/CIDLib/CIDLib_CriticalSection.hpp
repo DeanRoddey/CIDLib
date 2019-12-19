@@ -46,17 +46,19 @@ class CIDLIBEXP TCriticalSection : public TObject, public TKrnlCritSec
         // -------------------------------------------------------------------
         //  Constuctors and Destructor
         // -------------------------------------------------------------------
-        TCriticalSection() {}
+        TCriticalSection() = default;
 
         TCriticalSection(const TCriticalSection&) = delete;
+        TCriticalSection(TCriticalSection&&) = delete;
 
-        ~TCriticalSection() {}
+        ~TCriticalSection() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TCriticalSection& operator=(const TCriticalSection&) = delete;
+        TCriticalSection& operator=(TCriticalSection&&) = delete;
 
 
     private :
@@ -79,27 +81,50 @@ class CIDLIBEXP TCritSecLocker : public  TObject
         // -------------------------------------------------------------------
         TCritSecLocker() = delete;
 
-        TCritSecLocker
-        (
-            const   TCriticalSection* const pcrsToSanitize
-        );
+
+        TCritSecLocker(const TCriticalSection* const pcrsToSanitize) :
+
+            m_pcrsSanitize(nullptr)
+        {
+            // Enter it and store the pointer, if we got something
+            if (pcrsToSanitize != nullptr)
+            {
+                pcrsToSanitize->Enter();
+                m_pcrsSanitize = pcrsToSanitize;
+            }
+        }
 
         TCritSecLocker(const TCritSecLocker&) = delete;
+        TCritSecLocker(TCritSecLocker&&) = delete;
 
-        ~TCritSecLocker();
+        ~TCritSecLocker()
+        {
+            // If we still have it, then exit the lock
+            if (m_pcrsSanitize != nullptr)
+                m_pcrsSanitize->Exit();
+        }
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TCritSecLocker& operator=(const TCritSecLocker&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        TCritSecLocker& operator=(TCritSecLocker&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Orphan();
+        tCIDLib::TVoid Orphan()
+        {
+            // If we still have it, then exit the lock and zero our pointer
+            if (m_pcrsSanitize != nullptr)
+            {
+                m_pcrsSanitize->Exit();
+                m_pcrsSanitize = nullptr;
+            }
+        }
 
 
     private :
@@ -119,35 +144,4 @@ class CIDLIBEXP TCritSecLocker : public  TObject
 };
 
 #pragma CIDLIB_POPPACK
-
-
-inline
-TCritSecLocker::TCritSecLocker(const TCriticalSection* const pcrsToSanitize) :
-
-    m_pcrsSanitize(nullptr)
-{
-    // Enter it and store the pointer, if we got something
-    if (pcrsToSanitize)
-    {
-        pcrsToSanitize->Enter();
-        m_pcrsSanitize = pcrsToSanitize;
-    }
-}
-
-inline TCritSecLocker::~TCritSecLocker()
-{
-    // If we still have it, then exit the lock
-    if (m_pcrsSanitize)
-        m_pcrsSanitize->Exit();
-}
-
-inline tCIDLib::TVoid TCritSecLocker::Orphan()
-{
-    // If we still have it, then exit the lock and zero our pointer
-    if (m_pcrsSanitize)
-    {
-        m_pcrsSanitize->Exit();
-        m_pcrsSanitize = nullptr;
-    }
-}
 

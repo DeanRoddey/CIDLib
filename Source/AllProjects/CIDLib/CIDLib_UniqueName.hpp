@@ -63,6 +63,7 @@ class CIDLIBEXP TUniqueName : public TObject
         );
 
         TUniqueName(const TUniqueName&) = delete;
+        TUniqueName(TUniqueName&&) = delete;
 
         ~TUniqueName();
 
@@ -71,6 +72,7 @@ class CIDLIBEXP TUniqueName : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TUniqueName& operator=(const TUniqueName&) = delete;
+        TUniqueName& operator=(TUniqueName&&) = delete;
 
 
         // -------------------------------------------------------------------

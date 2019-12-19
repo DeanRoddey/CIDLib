@@ -93,7 +93,9 @@ class CIDLIBEXP MRefCounted
         // -------------------------------------------------------------------
         MRefCounted() = default;
         MRefCounted(const MRefCounted&) = default;
+        MRefCounted(MRefCounted&&) = default;
         MRefCounted& operator=(const MRefCounted&) = default;
+        MRefCounted& operator=(MRefCounted&&) = default;
 
 
     private :

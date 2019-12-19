@@ -303,6 +303,16 @@ class TFundArray : public TFundColBase, public MDuplicable
             return kCIDLib::True;
         }
 
+        template <typename IterCB> tCIDLib::TBoolean bForEachNCI(IterCB iterCB)
+        {
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
+            {
+                if (!iterCB(m_ptElements[c4Index], c4Index))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
 
         const TElem* ptElements() const
         {

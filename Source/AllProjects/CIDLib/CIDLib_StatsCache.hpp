@@ -122,6 +122,7 @@ class CIDLIBEXP TStatsCacheItem
         );
 
         TStatsCacheItem(const TStatsCacheItem&) = default;
+        TStatsCacheItem(TStatsCacheItem&&) = default;
 
         ~TStatsCacheItem();
 
@@ -130,6 +131,7 @@ class CIDLIBEXP TStatsCacheItem
         //  Public operators
         // -------------------------------------------------------------------
         TStatsCacheItem& operator=(const TStatsCacheItem&) = default;
+        TStatsCacheItem& operator=(TStatsCacheItem&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -211,6 +213,7 @@ class CIDLIBEXP TStatsCacheItemInfo : public TObject, public MStreamable
         );
 
         TStatsCacheItemInfo(const TStatsCacheItemInfo&)  = default;
+        TStatsCacheItemInfo(TStatsCacheItemInfo&&)  = default;
 
         ~TStatsCacheItemInfo();
 
@@ -219,6 +222,7 @@ class CIDLIBEXP TStatsCacheItemInfo : public TObject, public MStreamable
         //  Public oeprators
         // -------------------------------------------------------------------
         TStatsCacheItemInfo& operator=(const TStatsCacheItemInfo&) = default;
+        TStatsCacheItemInfo& operator=(TStatsCacheItemInfo&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -257,12 +261,12 @@ class CIDLIBEXP TStatsCacheItemInfo : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :

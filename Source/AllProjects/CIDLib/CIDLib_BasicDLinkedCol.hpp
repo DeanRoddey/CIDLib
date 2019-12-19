@@ -41,7 +41,7 @@
 //   CLASS: TBasicDLinkedCol
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
+template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -56,7 +56,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested read-only cursor class
         // -------------------------------------------------------------------
-        template <class TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -272,7 +272,7 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested non-const cursor class
         // -------------------------------------------------------------------
-        template <class TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -515,6 +515,19 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+            TNode* pnodeHead = static_cast<TNode*>(m_llstCol.pnodeHead());
+            while (pnodeHead)
+            {
+                if (!iterCB(pnodeHead->objData()))
+                    return kCIDLib::False;
+                pnodeHead = static_cast<TNode*>(pnodeHead->pnodeNext());
+            }
+            return kCIDLib::True;
+        }
+
         tCIDLib::TBoolean bGetFromBottom(TElem& objToFill)
         {
             TMtxLocker lockSync(TParent::pmtxLock());
@@ -618,19 +631,6 @@ template <class TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     this->c4IncSerialNum();
                 }
             }
-        }
-
-        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
-        {
-            TMtxLocker lockThis(this->pmtxLock());
-            TNode* pnodeHead = static_cast<TNode*>(m_llstCol.pnodeHead());
-            while (pnodeHead)
-            {
-                if (!iterCB(pnodeHead->objData()))
-                    return kCIDLib::False;
-                pnodeHead = static_cast<TNode*>(pnodeHead->pnodeNext());
-            }
-            return kCIDLib::True;
         }
 
         TElem& objAddAtBottom(const TElem& objToAdd)

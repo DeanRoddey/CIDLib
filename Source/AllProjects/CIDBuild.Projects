@@ -1511,7 +1511,7 @@ PROJECT=TestAI
     END DEPENDENTS
 END PROJECT
 
-; Higher level sterss tests
+; Higher level stress tests
 PROJECT=StressTests
     SETTINGS
         DIRECTORY   = Tests2\StressTests
@@ -1521,6 +1521,21 @@ PROJECT=StressTests
         CIDLib
         CIDMath
         CIDObjStore
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; Server stress tests
+PROJECT=TestServers
+    SETTINGS
+        DIRECTORY   = Tests2\TestServers
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDOrb
+        CIDOrbUC
+        CIDCrypto
         TestFWLib
     END DEPENDENTS
 END PROJECT
@@ -1543,6 +1558,7 @@ PROJECT=Tests2
         TestObjStore
         TestORB
         StressTests
+        TestServers
     END DEPENDENTS
 
     DEPENDENTS [WIN32_*]
@@ -1655,6 +1671,7 @@ PROJECT=TestGraphArea [Win32_*]
         CIDCtrls
     END DEPENDENTS
 END PROJECT
+
 
 
 ; ----------------------------------------------------------------------------
@@ -2387,6 +2404,19 @@ PROJECT=ORB1Samp
 
 END PROJECT
 
+
+PROJECT=ThreadPool1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ThreadPool1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+
+END PROJECT
 
 PROJECT=Window1 [Win32_*]
 

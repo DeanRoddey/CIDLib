@@ -904,12 +904,23 @@ class TVector : public TCollection<TElem>
             return kCIDLib::True;
         }
 
-        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
         {
             TMtxLocker lockThis(this->pmtxLock());
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
             {
                 if (!iterCB(*m_apElems[c4Index]))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachNCI(IterCB iterCB)
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+            {
+                if (!iterCB(*m_apElems[c4Index], c4Index))
                     return kCIDLib::False;
             }
             return kCIDLib::True;
@@ -1655,7 +1666,7 @@ class TVector : public TCollection<TElem>
         //  We remove the indicated index from the list and compact it, returning
         //  the removed item.
         //
-        TElem* pobjOrphanAt(const tCIDLib::TCard4 c4At)
+        [[nodiscard]] TElem* pobjOrphanAt(const tCIDLib::TCard4 c4At)
         {
             // Remember the element we are going to orphan
             TElem* pobjRet = m_apElems[c4At];

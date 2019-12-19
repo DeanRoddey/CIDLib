@@ -428,12 +428,6 @@ TLocCardinal::TLocCardinal(const tCIDLib::TCard4 c4Val) :
 {
 }
 
-TLocCardinal::TLocCardinal(const TLocCardinal& cToCopy) :
-
-    TCardinal(cToCopy)
-{
-}
-
 TLocCardinal::~TLocCardinal()
 {
 }
@@ -442,14 +436,6 @@ TLocCardinal::~TLocCardinal()
 // ---------------------------------------------------------------------------
 //  TLocCardinal: Public operators
 // ---------------------------------------------------------------------------
-TLocCardinal& TLocCardinal::operator=(const TLocCardinal& cToAssign)
-{
-    if (this == &cToAssign)
-        return *this;
-    TParent::operator=(cToAssign);
-    return *this;
-}
-
 tCIDLib::TBoolean TLocCardinal::operator==(const TLocCardinal& cToTest) const
 {
     if (this == &cToTest)
@@ -531,12 +517,6 @@ TLocCardinal64::TLocCardinal64(const tCIDLib::TCard8& c8Val) :
 {
 }
 
-TLocCardinal64::TLocCardinal64(const TLocCardinal64& cToCopy) :
-
-    TCardinal64(cToCopy)
-{
-}
-
 TLocCardinal64::~TLocCardinal64()
 {
 }
@@ -545,25 +525,17 @@ TLocCardinal64::~TLocCardinal64()
 // ---------------------------------------------------------------------------
 //  TLocCardinal64: Public operators
 // ---------------------------------------------------------------------------
-TLocCardinal64& TLocCardinal64::operator=(const TLocCardinal64& cToAssign)
+tCIDLib::TBoolean TLocCardinal64::operator==(const TLocCardinal64& cSrc) const
 {
-    if (this == &cToAssign)
-        return *this;
-    TParent::operator=(cToAssign);
-    return *this;
-}
-
-tCIDLib::TBoolean TLocCardinal64::operator==(const TLocCardinal64& cToTest) const
-{
-    if (this == &cToTest)
+    if (this == &cSrc)
         return kCIDLib::True;
 
-    return TParent::operator==(cToTest);
+    return TParent::operator==(cSrc);
 }
 
-tCIDLib::TBoolean TLocCardinal64::operator!=(const TLocCardinal64& cToTest) const
+tCIDLib::TBoolean TLocCardinal64::operator!=(const TLocCardinal64& cSrc) const
 {
-    return !TParent::operator==(cToTest);
+    return !TParent::operator==(cSrc);
 }
 
 tCIDLib::TBoolean TLocCardinal64::operator<(const TLocCardinal64& cComp) const

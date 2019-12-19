@@ -51,7 +51,7 @@
 //   CLASS: TFundDeque
 //  PREFIX: fcol
 // -----------------------------------------------------------------------------
-template <class T> class TFundDeque : public TFundColBase, public MDuplicable
+template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
 {
     public :
         // --------------------------------------------------------------------
@@ -493,7 +493,7 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
 #pragma CIDLIB_POPPACK
 
 
-template <class T> TBinInStream&
+template <typename T> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TFundDeque<T>& fcolToStream)
 {
     // First we should get a stream marker
@@ -544,7 +544,7 @@ operator>>(TBinInStream& strmToReadFrom, TFundDeque<T>& fcolToStream)
 }
 
 
-template <class T> TBinOutStream&
+template <typename T> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TFundDeque<T>& fcolToStream)
 {
     // Store a stream marker for safety, then the max and current sizes

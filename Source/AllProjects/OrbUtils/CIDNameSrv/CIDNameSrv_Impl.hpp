@@ -177,6 +177,7 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
             const   TString&                strParentNode
             , const TString&                strNodeName
             , const TString&                strDescription
+            , const tCIDLib::TBoolean       bThrowIfExists
         )   final;
 
         tCIDLib::TVoid CreateScopePath

@@ -322,7 +322,7 @@ class CIDLIBEXP TTypeFactoryKicker
 //  method of the facility class above. These automatically invoke the method
 //  and do the correct casting.
 // ---------------------------------------------------------------------------
-template <class T> [[nodiscard]] T* pobjMakeNewOfClass(const tCIDLib::TCh* pszClassName)
+template <typename T> [[nodiscard]] T* pobjMakeNewOfClass(const tCIDLib::TCh* pszClassName)
 {
     // Create it as a base object type first, since we know that's ok
     TObject* const pobjTmp = TClass::pobjMakeNewOfClass(pszClassName);
@@ -340,7 +340,7 @@ template <class T> [[nodiscard]] T* pobjMakeNewOfClass(const tCIDLib::TCh* pszCl
     return pobjRet;
 }
 
-template <class T> [[nodiscard]] T* pobjMakeNewOfClass(const TString& strClassName)
+template <typename T> [[nodiscard]] T* pobjMakeNewOfClass(const TString& strClassName)
 {
     // Create it as a base object type first, since we know that's ok
     TObject* const pobjTmp = TClass::pobjMakeNewOfClass(strClassName);
@@ -358,7 +358,7 @@ template <class T> [[nodiscard]] T* pobjMakeNewOfClass(const TString& strClassNa
     return pobjRet;
 }
 
-template <class T> [[nodiscard]] T* pobjMakeNewOfClass(const TClass& clsToMake)
+template <typename T> [[nodiscard]] T* pobjMakeNewOfClass(const TClass& clsToMake)
 {
     // Create it as a base object type first, since we know that's ok
     TObject* const pobjTmp = clsToMake.pobjMakeNew();

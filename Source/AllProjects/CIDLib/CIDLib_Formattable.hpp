@@ -73,7 +73,9 @@ class CIDLIBEXP MFormattable
         // -------------------------------------------------------------------
         MFormattable() = default;
         MFormattable(const MFormattable&) = default;
+        MFormattable(MFormattable&&) = default;
         MFormattable& operator=(const MFormattable&) = default;
+        MFormattable& operator=(MFormattable&&) = default;
 
 
         // -------------------------------------------------------------------

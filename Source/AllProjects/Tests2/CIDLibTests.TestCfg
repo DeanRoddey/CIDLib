@@ -86,6 +86,12 @@ TestPrgs=CIDLib Test Suite
         WorkDir=StressTests
     EndTestPrg;
 
+    TestPrg=TestServers
+        TestPath=<Root>\TestServers.exe
+        Description=Long running ORB server abuse tests
+        WorkDir=StressTests
+    EndTestPrg;
+
 EndTestPrgs;
 
 
@@ -176,6 +182,14 @@ Groups=
         Description=Runs the higher level stress tests
         TestPrgs=
             StressTests
+            TestServers
+        EndTestPrgs;
+    EndGroup;
+
+    Group=Servers
+        Description=Runs the ORB server abuse tests
+        TestPrgs=
+            TestServers
         EndTestPrgs;
     EndGroup;
 
@@ -194,7 +208,6 @@ Groups=
             ArtInt
         EndTestPrgs;
     EndGroup;
-
 
 EndGroups;
 

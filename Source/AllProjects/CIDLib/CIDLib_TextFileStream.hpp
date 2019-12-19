@@ -47,7 +47,7 @@ class CIDLIBEXP TTextFileInStream : public TTextInStream
         // -------------------------------------------------------------------
         explicit TTextFileInStream
         (
-                    TTextConverter* const   ptcvtToAdopt = 0
+                    TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextFileInStream
@@ -57,16 +57,17 @@ class CIDLIBEXP TTextFileInStream : public TTextInStream
             , const tCIDLib::EFilePerms     ePerms
             , const tCIDLib::EFileFlags     eFlags
             , const tCIDLib::EAccessModes   eAccess
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextFileInStream
         (
             const   tCIDLib::EStdFiles      eFile
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextFileInStream(const TTextFileInStream&) = delete;
+        TTextFileInStream(TTextFileInStream&&) = delete;
 
         ~TTextFileInStream();
 
@@ -75,6 +76,7 @@ class CIDLIBEXP TTextFileInStream : public TTextInStream
         //  Public operators
         // -------------------------------------------------------------------
         TTextFileInStream& operator=(const TTextFileInStream&) = delete;
+        TTextFileInStream& operator=(TTextFileInStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -164,6 +166,7 @@ class CIDLIBEXP TTextFileOutStream : public TTextOutStream
         );
 
         TTextFileOutStream(const TTextFileOutStream&) = delete;
+        TTextFileOutStream(TTextFileOutStream&&) = delete;
 
         ~TTextFileOutStream();
 
@@ -172,6 +175,7 @@ class CIDLIBEXP TTextFileOutStream : public TTextOutStream
         //  Public operators
         // -------------------------------------------------------------------
         TTextFileOutStream& operator=(const TTextFileOutStream&) = delete;
+        TTextFileOutStream& operator=(TTextFileOutStream&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -42,7 +42,7 @@
 //   CLASS: TFundQueue
 //  PREFIX: fcol
 // -----------------------------------------------------------------------------
-template <class T> class TFundQueue : public TFundColBase, public MDuplicable
+template <typename T> class TFundQueue : public TFundColBase, public MDuplicable
 {
     public :
         // --------------------------------------------------------------------
@@ -346,7 +346,7 @@ template <class T> class TFundQueue : public TFundColBase, public MDuplicable
 #pragma CIDLIB_POPPACK
 
 
-template <class T> TBinInStream&
+template <typename T> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TFundQueue<T>& colToStream)
 {
     // First we should get a stream marker
@@ -398,7 +398,7 @@ operator>>(TBinInStream& strmToReadFrom, TFundQueue<T>& colToStream)
 }
 
 
-template <class T> TBinOutStream&
+template <typename T> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TFundQueue<T>& colToStream)
 {
     // Store a stream marker for safety

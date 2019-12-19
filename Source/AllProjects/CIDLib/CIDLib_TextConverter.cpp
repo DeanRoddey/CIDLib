@@ -461,24 +461,6 @@ TTextConverter::TTextConverter(const TString& strEncodingName) :
 {
 }
 
-TTextConverter::TTextConverter(const TTextConverter& tcvtToCopy) :
-
-    m_chRepChar(tcvtToCopy.m_chRepChar)
-    , m_eErrAction(tCIDLib::ETCvtActs::Throw)
-    , m_strEncodingName(tcvtToCopy.m_strEncodingName)
-{
-}
-
-tCIDLib::TVoid TTextConverter::operator=(const TTextConverter& tcvtToAssign)
-{
-    if (this != &tcvtToAssign)
-    {
-        m_chRepChar = tcvtToAssign.m_chRepChar;
-        m_eErrAction = tcvtToAssign.m_eErrAction;
-        m_strEncodingName = tcvtToAssign.m_strEncodingName;
-    }
-}
-
 
 // ---------------------------------------------------------------------------
 //  TTextConverter: Protected, non-virtual methods

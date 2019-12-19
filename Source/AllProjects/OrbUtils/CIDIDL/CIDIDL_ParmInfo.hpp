@@ -49,9 +49,19 @@ class TCGenTypeInfo : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bIsFundType() const
+        {
+            return (m_eType <= tCIDIDL::ETypes::LastFundType);
+        }
+
         tCIDLib::TBoolean bIsMoveableType() const
         {
             return m_bMoveableType;
+        }
+
+        tCIDIDL::ETypes eType() const
+        {
+            return m_eType;
         }
 
         const TString& strAuxType() const;
@@ -63,8 +73,6 @@ class TCGenTypeInfo : public TObject
         const TString& strKeyType() const;
 
         const TString& strModulus() const;
-
-        const TString& strType() const;
 
         tCIDLib::TVoid Set
         (
@@ -81,6 +89,10 @@ class TCGenTypeInfo : public TObject
         //      support moves (though we don't always know for sure. If it's an Object
         //      or heap buffer, or one of the moveable collections we allow it, though
         //      it might fail during compile later.
+        //
+        //  m_eType
+        //      The type of the parameter, though in some cases it's the general type
+        //      and the otehr type info is requied.
         //
         //  m_strAuxType
         //      If it's any kind of templatized type, this is the type it is
@@ -103,31 +115,20 @@ class TCGenTypeInfo : public TObject
         //  m_strType
         //      The main type name.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean       m_bMoveableType;
-        TString                 m_strAuxType;
-        TString                 m_strKeyExtract;
-        TString                 m_strKeyOps;
-        TString                 m_strKeyType;
-        TString                 m_strModulus;
-        TString                 m_strType;
+        tCIDLib::TBoolean   m_bMoveableType;
+        tCIDIDL::ETypes     m_eType;
+        TString             m_strAuxType;
+        TString             m_strKeyExtract;
+        TString             m_strKeyOps;
+        TString             m_strKeyType;
+        TString             m_strModulus;
 
-        static const TString    s_strElem_Bag;
         static const TString    s_strElem_ElemType;
-        static const TString    s_strElem_Enumerated;
-        static const TString    s_strElem_FundArray;
-        static const TString    s_strElem_FundVector;
-        static const TString    s_strElem_HashSet;
-        static const TString    s_strElem_HeapBuf;
         static const TString    s_strElem_KeyExtract;
-        static const TString    s_strElem_KeyedHashSet;
         static const TString    s_strElem_KeyOps;
         static const TString    s_strElem_KeyType;
-        static const TString    s_strElem_MemBuf;
         static const TString    s_strElem_Modulus;
-        static const TString    s_strElem_Object;
-        static const TString    s_strElem_String;
         static const TString    s_strElem_Type;
-        static const TString    s_strElem_Vector;
 
 
         // -------------------------------------------------------------------

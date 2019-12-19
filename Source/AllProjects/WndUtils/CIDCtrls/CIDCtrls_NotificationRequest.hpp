@@ -115,7 +115,7 @@ class CIDCTRLSEXP TNotRequestBase
 };
 
 
-template <class T> class TNotifyRequest : public TNotRequestBase
+template <typename T> class TNotifyRequest : public TNotRequestBase
 {
     public :
         // -------------------------------------------------------------------
@@ -179,7 +179,7 @@ template <class T> class TNotifyRequest : public TNotRequestBase
 };
 
 
-template <class T, class D> class TNotifyRequestFor : public TNotRequestBase
+template <typename T, class D> class TNotifyRequestFor : public TNotRequestBase
 {
     public :
         // -------------------------------------------------------------------

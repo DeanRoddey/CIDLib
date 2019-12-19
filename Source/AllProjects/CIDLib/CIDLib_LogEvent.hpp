@@ -125,6 +125,9 @@ class CIDLIBEXP TLogEvent :
             const   TLogEvent&              logevSrc
         );
 
+        // Can't actually delete it since that causes problems
+        // TLogEvent(TLogEvent&&) = delete;
+
         ~TLogEvent();
 
 
@@ -135,6 +138,9 @@ class CIDLIBEXP TLogEvent :
         (
             const   TLogEvent&              logevSrc
         );
+
+        // Can't actually delete it since that causes problems
+        // TLogEvent& operator=(const TLogEvent&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -305,17 +311,17 @@ class CIDLIBEXP TLogEvent :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private       :

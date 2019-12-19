@@ -57,7 +57,7 @@
 //  CLASS: TNamedValMap
 // PREFIX: nvm
 // ---------------------------------------------------------------------------
-template <class TVal> class TNamedValMap : public TObject
+template <typename TVal> class TNamedValMap : public TObject
 {
     public  :
         // -------------------------------------------------------------------
@@ -74,7 +74,7 @@ template <class TVal> class TNamedValMap : public TObject
         using TMyType = TNamedValMap<TVal>;
         using TPair = TKeyObjPair<TString, TVal>;
 
-        template <class TVal> class TNVMItem
+        template <typename TVal> class TNVMItem
         {
             public  :
                 // -----------------------------------------------------------
@@ -574,7 +574,7 @@ template <class TVal> class TNamedValMap : public TObject
 //  We don't want to force the value type in the map to support streaming,
 //  so we do separate global streaming operators for it.
 // ---------------------------------------------------------------------------
-template <class TVal> TBinInStream&
+template <typename TVal> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TNamedValMap<TVal>& nvmToFill)
 {
     // Flush the map first
@@ -645,7 +645,7 @@ operator>>(TBinInStream& strmToReadFrom, TNamedValMap<TVal>& nvmToFill)
 }
 
 
-template <class TVal> TBinOutStream&
+template <typename TVal> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TNamedValMap<TVal>& nvmToWrite)
 {
     const tCIDLib::TCard4 c4Count = nvmToWrite.c4ElemCount();

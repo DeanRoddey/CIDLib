@@ -123,14 +123,14 @@ class CIDMACROENGEXP TMEngClassVal : public TMEngNamedItem
             , const TCIDMacroEngine&        meOwner
         );
 
-        template <class T>
+        template <typename T>
         const T& mecvFindAs(const   tCIDLib::TCard2     c2Id
                             , const TCIDMacroEngine&    meOwner) const
         {
             return static_cast<const T&>(mecvFind(c2Id, meOwner));
         }
 
-        template <class T> T& mecvFindAs(const  tCIDLib::TCard2     c2Id
+        template <typename T> T& mecvFindAs(const  tCIDLib::TCard2     c2Id
                                         , const TCIDMacroEngine&    meOwner)
         {
             return static_cast<T&>(mecvFind(c2Id, meOwner));

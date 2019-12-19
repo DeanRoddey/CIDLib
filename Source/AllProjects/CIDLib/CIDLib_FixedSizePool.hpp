@@ -750,7 +750,7 @@ template <typename TElem> class TFixedSizePoolJan
         //  The caller becomes responsible for return to the pool. Could be null
         //  if already released or orphaned.
         //
-        TElem* pobjOrphan()
+        [[nodiscard]] TElem* pobjOrphan()
         {
             TElem* pobjRet = m_pobjGotten;
             if (m_psplSrc)

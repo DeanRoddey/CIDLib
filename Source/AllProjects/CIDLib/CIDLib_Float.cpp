@@ -304,12 +304,6 @@ TLocFloat::TLocFloat(const  tCIDLib::TInt4      i4Val
 {
 }
 
-TLocFloat::TLocFloat(const TLocFloat& fToCopy) :
-
-    TFloat(fToCopy)
-{
-}
-
 TLocFloat::~TLocFloat()
 {
 }

@@ -275,6 +275,9 @@ TCIDNameServerImpl::bQueryScopeKeys(        tCIDLib::TCard4&    c4SerialNum
         const TNSCache::TNodeNT* pnodeNT = static_cast<const TNSCache::TNodeNT*>(pnodeSrc);
         if (pnodeNT->c4SerialNum() == c4SerialNum)
             return kCIDLib::False;
+
+        // Give back the serial number we have
+        c4SerialNum = pnodeNT->c4SerialNum();
     }
 
     catch(TError& errToCatch)
@@ -878,14 +881,60 @@ tCIDLib::TVoid TCIDNameServerImpl::ClearScope(const TString& strToClear)
 
 
 tCIDLib::TVoid
-TCIDNameServerImpl::CreateScope(const   TString&    strParentNode
-                                , const TString&    strNodeName
-                                , const TString&    strDescription)
+TCIDNameServerImpl::CreateScope(const   TString&            strParentNode
+                                , const TString&            strNodeName
+                                , const TString&            strDescription
+                                , const tCIDLib::TBoolean   bThrowIfExists)
 {
     // Lock the cache
     TMtxLocker lockCache(&m_mtxSync);
 
-    // Just pass it on to the tree collection
+    // See if this scope exists
+    TString strFullPath(strParentNode);
+    if (strFullPath.chLast() != kCIDLib::chForwardSlash)
+        strFullPath.Append(kCIDLib::chForwardSlash);
+    strFullPath.Append(strNodeName);
+
+    //
+    //  If it does, then we either throw or just return. If it does and it's
+    //  not a scope we have to throw a different error.
+    //
+    tCIDLib::ETreeNodes eType;
+    if (m_colCache.bNodeExists(strFullPath, eType))
+    {
+        // We can release the lock early in this case
+        lockCache.Release();
+
+        // If it's not a non-terminal, then this is an error
+        if (eType != tCIDLib::ETreeNodes::NonTerminal)
+        {
+            facCIDOrbUC().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kOrbUCErrs::errcNSP_NotAScope
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::TypeMatch
+                , strFullPath
+            );
+        }
+
+        if (bThrowIfExists)
+        {
+            facCIDOrbUC().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kOrbUCErrs::errcNS_ScopeExists
+                , strFullPath
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::Already
+            );
+        }
+        return;
+    }
+
+    // We need to create it, so pass that on
     m_colCache.pnodeAddNonTerminal(strParentNode, strNodeName, strDescription);
 }
 

@@ -74,6 +74,9 @@ class CIDLIBEXP TSharedMemBuf : public TMemBuf
             const   TSharedMemBuf&          mbufSrc
         );
 
+        // Can't really delete it without possibly causing problems
+        // TSharedMemBuf(TSharedMemBuf&) = delete;
+
         ~TSharedMemBuf();
 
 
@@ -82,17 +85,20 @@ class CIDLIBEXP TSharedMemBuf : public TMemBuf
         // -------------------------------------------------------------------
         TSharedMemBuf& operator=
         (
-            const   TSharedMemBuf&          mbufToAssign
+            const   TSharedMemBuf&          mbufSrc
         );
+
+        // Can't really delete it without possibly causing problems
+        // TSharedMemBuf& operator=(TSharedMemBuf&&) = delete;
 
         tCIDLib::TBoolean operator==
         (
-            const   TSharedMemBuf&          mbufToTest
+            const   TSharedMemBuf&          mbufSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TSharedMemBuf&          mbufToTest
+            const   TSharedMemBuf&          mbufSrc
         )   const;
 
 

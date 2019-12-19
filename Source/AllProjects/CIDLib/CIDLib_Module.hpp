@@ -39,7 +39,7 @@
 class   TLogEvent;
 class   MLogger;
 class   TMutex;
-template <class TLogEvent> class TCollection;
+template <typename TLogEvent> class TCollection;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)

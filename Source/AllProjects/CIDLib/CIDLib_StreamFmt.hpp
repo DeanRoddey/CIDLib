@@ -79,6 +79,7 @@ class CIDLIBEXP TStreamFmt : public TObject, public MDuplicable
         );
 
         TStreamFmt(const TStreamFmt&) = default;
+        TStreamFmt(TStreamFmt&&) = default;
 
         ~TStreamFmt() = default;
 
@@ -87,15 +88,16 @@ class CIDLIBEXP TStreamFmt : public TObject, public MDuplicable
         //  Public operators
         // -------------------------------------------------------------------
         TStreamFmt& operator=(const TStreamFmt&) = default;
+        TStreamFmt& operator=(TStreamFmt&&) = default;
 
         tCIDLib::TBoolean operator==
         (
-            const   TStreamFmt&             strmfOther
+            const   TStreamFmt&             strmfSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TStreamFmt&             strmfOther
+            const   TStreamFmt&             strmfSrc
         )   const;
 
 
@@ -142,6 +144,11 @@ class CIDLIBEXP TStreamFmt : public TObject, public MDuplicable
         tCIDLib::ERadices eRadix
         (
             const   tCIDLib::ERadices       eToSet
+        );
+
+        tCIDLib::TVoid SetFrom
+        (
+            const   TTextOutStream&         strmSrc
         );
 
 

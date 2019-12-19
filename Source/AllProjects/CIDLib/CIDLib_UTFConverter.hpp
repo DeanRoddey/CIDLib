@@ -91,6 +91,7 @@ class CIDLIBEXP TUTFConverter : public TTextConverter
         );
 
         TUTFConverter(const TUTFConverter&) = default;
+        TUTFConverter(TUTFConverter&&) = default;
 
         ~TUTFConverter() = default;
 
@@ -99,6 +100,7 @@ class CIDLIBEXP TUTFConverter : public TTextConverter
         //  Public operators
         // -------------------------------------------------------------------
         TUTFConverter& operator=(const TUTFConverter&) = default;
+        TUTFConverter& operator=(TUTFConverter&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -172,6 +174,7 @@ class CIDLIBEXP TUSASCIIConverter: public TUTFConverter
         }
 
         TUSASCIIConverter(const TUSASCIIConverter&) = default;
+        TUSASCIIConverter(TUSASCIIConverter&&) = default;
 
         ~TUSASCIIConverter() = default;
 
@@ -180,6 +183,7 @@ class CIDLIBEXP TUSASCIIConverter: public TUTFConverter
         //  Public operators
         // -------------------------------------------------------------------
         TUSASCIIConverter& operator=(const TUSASCIIConverter&) = default;
+        TUSASCIIConverter& operator=(TUSASCIIConverter&&) = default;
 
 
     private :
@@ -206,6 +210,7 @@ class CIDLIBEXP TUTF16BEConverter: public TUTFConverter
         }
 
         TUTF16BEConverter(const TUTF16BEConverter&) = default;
+        TUTF16BEConverter(TUTF16BEConverter&&) = default;
 
         ~TUTF16BEConverter() = default;
 
@@ -214,6 +219,7 @@ class CIDLIBEXP TUTF16BEConverter: public TUTFConverter
         //  Public operators
         // -------------------------------------------------------------------
         TUTF16BEConverter& operator=(const TUTF16BEConverter&) = default;
+        TUTF16BEConverter& operator=(TUTF16BEConverter&&) = default;
 
 
     private :
@@ -240,6 +246,7 @@ class CIDLIBEXP TUTF16LEConverter: public TUTFConverter
         }
 
         TUTF16LEConverter(const TUTF16LEConverter&) = default;
+        TUTF16LEConverter(TUTF16LEConverter&&) = default;
 
         ~TUTF16LEConverter() = default;
 
@@ -248,6 +255,7 @@ class CIDLIBEXP TUTF16LEConverter: public TUTFConverter
         //  Public operators
         // -------------------------------------------------------------------
         TUTF16LEConverter& operator=(const TUTF16LEConverter&) = default;
+        TUTF16LEConverter& operator=(TUTF16LEConverter&&) = default;
 
 
     private :
@@ -274,6 +282,7 @@ class CIDLIBEXP TUTF8Converter: public TUTFConverter
         }
 
         TUTF8Converter(const TUTF8Converter&) = default;
+        TUTF8Converter(TUTF8Converter&&) = default;
 
         ~TUTF8Converter() = default;
 
@@ -282,6 +291,7 @@ class CIDLIBEXP TUTF8Converter: public TUTFConverter
         //  Public operators
         // -------------------------------------------------------------------
         TUTF8Converter& operator=(const TUTF8Converter&) = default;
+        TUTF8Converter& operator=(TUTF8Converter&&) = default;
 
 
     private :

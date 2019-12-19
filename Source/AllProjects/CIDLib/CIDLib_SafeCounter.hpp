@@ -52,9 +52,7 @@ class CIDLIBEXP TSafeCard4Counter : public TObject, public TKrnlSafeCard4Counter
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TSafeCard4Counter()
-        {
-        }
+        TSafeCard4Counter() = default;
 
         TSafeCard4Counter(const tCIDLib::TCard4 c4InitVal) :
 
@@ -63,16 +61,16 @@ class CIDLIBEXP TSafeCard4Counter : public TObject, public TKrnlSafeCard4Counter
         }
 
         TSafeCard4Counter(const TSafeCard4Counter&) = delete;
+        TSafeCard4Counter(TSafeCard4Counter&&) = delete;
 
-        ~TSafeCard4Counter()
-        {
-        }
+        ~TSafeCard4Counter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TSafeCard4Counter& operator=(const TSafeCard4Counter&) = delete;
+        TSafeCard4Counter& operator=(TSafeCard4Counter&&) = delete;
 
         tCIDLib::TCard4 operator++()
         {
@@ -130,6 +128,7 @@ class CIDLIBEXP TSafeCard4Counter : public TObject, public TKrnlSafeCard4Counter
 };
 
 
+
 // ---------------------------------------------------------------------------
 //   CLASS: TSafeInt4Counter
 //  PREFIX: scnt
@@ -140,9 +139,7 @@ class CIDLIBEXP TSafeInt4Counter : public TObject, public TKrnlSafeInt4Counter
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TSafeInt4Counter()
-        {
-        }
+        TSafeInt4Counter() = default;
 
         TSafeInt4Counter(const tCIDLib::TInt4 i4InitVal) :
 
@@ -151,16 +148,16 @@ class CIDLIBEXP TSafeInt4Counter : public TObject, public TKrnlSafeInt4Counter
         }
 
         TSafeInt4Counter(const TSafeInt4Counter&) = delete;
+        TSafeInt4Counter(TSafeInt4Counter&&) = delete;
 
-        ~TSafeInt4Counter()
-        {
-        }
+        ~TSafeInt4Counter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TSafeInt4Counter& operator=(const TSafeInt4Counter&) = delete;
+        TSafeInt4Counter& operator=(TSafeInt4Counter&&) = delete;
 
         tCIDLib::TInt4 operator++()
         {

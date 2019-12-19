@@ -49,6 +49,7 @@ ERRORS=
     errcNS_CantSetLocalNS       4502    No name server end point was set, but default local failed also
     errcNS_BadBindingPath       4503    '%(1)' is not a valid name server binding path
     errcNS_BadScopePath         4504    '%(1)' is not a valid name server scope path
+    errcNS_ScopeExists          4505    The scope already exists
 
     ;
     ; Name server protocol errors. These are thrown by the name server

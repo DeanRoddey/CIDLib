@@ -83,6 +83,7 @@ class CIDLIBEXP TCIDDataSrc
         //  Constructors and destructor
         // -------------------------------------------------------------------
         TCIDDataSrc(const TCIDDataSrc&) = delete;
+        TCIDDataSrc(TCIDDataSrc&&) = delete;
 
         virtual ~TCIDDataSrc();
 
@@ -91,6 +92,7 @@ class CIDLIBEXP TCIDDataSrc
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDataSrc& operator=(const TCIDDataSrc&) = delete;
+        TCIDDataSrc& operator=(TCIDDataSrc&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -311,6 +313,7 @@ class CIDLIBEXP TCIDDataSrcJan
         );
 
         TCIDDataSrcJan(const TCIDDataSrcJan&) = delete;
+        TCIDDataSrcJan(TCIDDataSrcJan&&) = delete;
 
         ~TCIDDataSrcJan();
 
@@ -319,6 +322,7 @@ class CIDLIBEXP TCIDDataSrcJan
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDataSrcJan& operator=(const TCIDDataSrcJan&) = delete;
+        TCIDDataSrcJan& operator=(TCIDDataSrcJan&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -73,6 +73,7 @@ class CIDLIBEXP TStringStreamImplInfo
         );
 
         TStringStreamImplInfo(const TStringStreamImplInfo&) = delete;
+        TStringStreamImplInfo(TStringStreamImplInfo&&) = delete;
 
         ~TStringStreamImplInfo();
 
@@ -81,6 +82,7 @@ class CIDLIBEXP TStringStreamImplInfo
         //  Public operators
         // -------------------------------------------------------------------
         TStringStreamImplInfo& operator=(const TStringStreamImplInfo&) = delete;
+        TStringStreamImplInfo& operator=(TStringStreamImplInfo&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -138,6 +140,7 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
         );
 
         TStringInStreamImpl(const TStringInStreamImpl&) = delete;
+        TStringInStreamImpl(TStringInStreamImpl&&) = delete;
 
         ~TStringInStreamImpl();
 
@@ -146,12 +149,13 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
         //  Public operators
         // -------------------------------------------------------------------
         TStringInStreamImpl& operator=(const TStringInStreamImpl&) = delete;
+        TStringInStreamImpl& operator=(TStringInStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsOpen() const override
+        tCIDLib::TBoolean bIsOpen() const final
         {
             // Always true for this type
             return kCIDLib::True;
@@ -161,15 +165,15 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
         (
                     tCIDLib::TVoid* const   pBuffer
             , const tCIDLib::TCard4         c4BytesToRead
-        )   override;
+        )   final;
 
-        tCIDLib::TCard8 c8CurPos() const  override
+        tCIDLib::TCard8 c8CurPos() const  final
         {
             // Convert our character index into a byte count
             return m_c4CurPos * kCIDLib::c4CharBytes;
         }
 
-        tCIDLib::TVoid Reset() override
+        tCIDLib::TVoid Reset() final
         {
             m_c4CurPos = 0;
         }
@@ -177,7 +181,7 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
         tCIDLib::TVoid SkipForwardBy
         (
             const   tCIDLib::TCard4         c4SkipBy
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -256,6 +260,7 @@ class CIDLIBEXP TStringOutStreamImpl : public TOutStreamImpl
         );
 
         TStringOutStreamImpl(const TStringOutStreamImpl&) = delete;
+        TStringOutStreamImpl(TStringOutStreamImpl&&) = delete;
 
         ~TStringOutStreamImpl();
 
@@ -264,12 +269,13 @@ class CIDLIBEXP TStringOutStreamImpl : public TOutStreamImpl
         //  Public operators
         // -------------------------------------------------------------------
         TStringOutStreamImpl& operator==(const TStringOutStreamImpl&) = delete;
+        TStringOutStreamImpl& operator==(TStringOutStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsOpen() const override
+        tCIDLib::TBoolean bIsOpen() const final
         {
             // Always true for this type
             return kCIDLib::True;
@@ -279,21 +285,21 @@ class CIDLIBEXP TStringOutStreamImpl : public TOutStreamImpl
         (
             const   tCIDLib::TVoid* const   pBuffer
             , const tCIDLib::TCard4         c4BytesToWrite
-        )   override;
+        )   final;
 
-        tCIDLib::TCard8 c8CurPos() const override
+        tCIDLib::TCard8 c8CurPos() const final
         {
             // Convert our character index into a byte count
             return m_c4CurPos * kCIDLib::c4CharBytes;
         }
 
-        tCIDLib::TVoid Reset() override
+        tCIDLib::TVoid Reset() final
         {
             m_c4CurPos = 0;
             m_pstrOut->Clear();
         }
 
-        tCIDLib::TVoid SeekToEnd() override
+        tCIDLib::TVoid SeekToEnd() final
         {
             // Reset our current position to the logical end
             m_c4CurPos = m_pstrOut->c4Length();

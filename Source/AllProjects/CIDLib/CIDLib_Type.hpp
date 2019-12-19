@@ -66,6 +66,7 @@ inline tCIDLib::TVoid TBinInStream_ReadArray(       TBinInStream&       strmSrc 
                                             ,       eEnumType* const    aeList \
                                             , const tCIDLib::TCard4     c4Count) \
 { \
+    CIDAssert(aeList != nullptr, L"Null array passed to TBInInStream::ReadArray"); \
     tCIDLib::TCard4 c4Cur = 0; \
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++) \
     { \
@@ -77,6 +78,7 @@ inline tCIDLib::TVoid TBinOutStream_WriteArray(         TBinOutStream&      strm
                                                 , const eEnumType* const    aeList \
                                                 , const tCIDLib::TCard4     c4Count) \
 { \
+    CIDAssert(aeList != nullptr, L"Null array passed to TBInInStream::ReadArray"); \
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++) \
         strmTar << tCIDLib::TCard4(aeList[c4Index]); \
 }

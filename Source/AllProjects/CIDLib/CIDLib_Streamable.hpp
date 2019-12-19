@@ -98,7 +98,9 @@ class CIDLIBEXP MStreamable
         // -------------------------------------------------------------------
         MStreamable() = default;
         MStreamable(const MStreamable&) = default;
+        MStreamable(MStreamable&&) = default;
         MStreamable& operator=(const MStreamable&) = default;
+        MStreamable& operator=(MStreamable&&) = default;
 
 
         // -------------------------------------------------------------------

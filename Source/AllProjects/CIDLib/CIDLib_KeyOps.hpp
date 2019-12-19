@@ -58,6 +58,7 @@ class CIDLIBEXP TStringKeyOps
         );
 
         TStringKeyOps(const TStringKeyOps&) = default;
+        TStringKeyOps(TStringKeyOps&&) = default;
 
         ~TStringKeyOps() = default;
 
@@ -66,6 +67,7 @@ class CIDLIBEXP TStringKeyOps
         //  Public operators
         // -------------------------------------------------------------------
         TStringKeyOps& operator=(const TStringKeyOps&) = default;
+        TStringKeyOps& operator=(TStringKeyOps&&) = default;
 
 
         // -------------------------------------------------------------------

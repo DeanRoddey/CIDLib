@@ -169,15 +169,11 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
             const   TString&                strEncodingName
         );
 
-        TTextConverter
-        (
-            const   TTextConverter&         tcvtSrc
-        );
+        TTextConverter(const TTextConverter&) = default;
+        TTextConverter(TTextConverter&&) = default;
 
-        tCIDLib::TVoid operator=
-        (
-            const   TTextConverter&         tcvtSrc
-        );
+        TTextConverter& operator=(const TTextConverter&) = default;
+        TTextConverter& operator=(TTextConverter&&) = default;
 
 
         // -------------------------------------------------------------------

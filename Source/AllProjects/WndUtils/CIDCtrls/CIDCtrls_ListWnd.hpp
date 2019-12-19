@@ -210,7 +210,7 @@ class CIDCTRLSEXP TListWnd : public TStdCtrlWnd
         //  handlers. Each derived types has to provide its own notification id or they
         //  would conflict, so the derived class provides us with one to use.
         // -------------------------------------------------------------------
-        template <class T> TNotHandlerBase*
+        template <typename T> TNotHandlerBase*
         pnothRegisterHandler(       T* const        pTarget
                             ,       tCIDCtrls::EEvResponses (T::*pfnTarget)(TListChangeInfo&)
                             , const tCIDLib::EEnds  eEnd = tCIDLib::EEnds::Last)

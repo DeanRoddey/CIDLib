@@ -121,7 +121,7 @@ namespace tCIDLib
         strMsg.AppendFormatted(c4At);
         strMsg.Append(L") used for array, size is ");
         strMsg.AppendFormatted(c4Size);
-        TLogEvent errToThrow
+        throw TLogEvent
         (
             L"CIDLib"
             , L"CIDLib.cpp"
@@ -130,7 +130,6 @@ namespace tCIDLib
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Index
         );
-        throw errToThrow;
     }
 }
 

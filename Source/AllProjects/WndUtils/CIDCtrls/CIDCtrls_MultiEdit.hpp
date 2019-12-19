@@ -198,7 +198,7 @@ class CIDCTRLSEXP TMultiEdit : public TStdCtrlWnd
         //  We provide a templatized method to allow for typesafe registration
         //  of event handlers.
         // -------------------------------------------------------------------
-        template <class T> TNotHandlerBase*
+        template <typename T> TNotHandlerBase*
         pnothRegisterHandler(       T* const pTarget
                             ,       tCIDCtrls::EEvResponses (T::*pfnTarget)(TMLEChangeInfo&)
                             , const tCIDLib::EEnds  eEnd = tCIDLib::EEnds::Last)

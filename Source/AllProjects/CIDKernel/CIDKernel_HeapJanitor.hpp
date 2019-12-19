@@ -34,7 +34,7 @@
 //   CLASS: TJanitor
 //  PREFIX: jan
 // ---------------------------------------------------------------------------
-template <class T> class TJanitor
+template <typename T> class TJanitor
 {
     public  :
         // -------------------------------------------------------------------
@@ -98,7 +98,7 @@ template <class T> class TJanitor
         }
 
         // Adoption status doesn't matter, caller is responsible
-        T* pobjOrphan()
+        [[nodiscard]] T* pobjOrphan()
         {
             T* pobjRet = m_pobjToSanitize;
             m_bAdopt = kCIDLib::False;
@@ -154,7 +154,7 @@ template <class T> class TJanitor
 //   CLASS: TArrayJanitor
 //  PREFIX: jan
 // ---------------------------------------------------------------------------
-template <class T> class TArrayJanitor
+template <typename T> class TArrayJanitor
 {
     public  :
         // -------------------------------------------------------------------

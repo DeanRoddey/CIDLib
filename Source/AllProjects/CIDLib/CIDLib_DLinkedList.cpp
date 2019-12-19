@@ -105,6 +105,18 @@ TDLinkedList::~TDLinkedList()
 //  TDLinkedList: Public operators
 // ---------------------------------------------------------------------------
 
+TDLinkedList& TDLinkedList::operator=(TDLinkedList&& llstSrc)
+{
+    if (&llstSrc != this)
+    {
+        tCIDLib::Swap(m_c4ElemCount, llstSrc.m_c4ElemCount);
+        tCIDLib::Swap(m_pnodeHead, llstSrc.m_pnodeHead);
+        tCIDLib::Swap(m_pnodeTail, llstSrc.m_pnodeTail);
+    }
+    return *this;
+}
+
+
 // We cannot compare the elements here. The using class must do that
 tCIDLib::TBoolean
 TDLinkedList::operator==(const TDLinkedList& llstToTest) const
@@ -121,17 +133,6 @@ tCIDLib::TBoolean
 TDLinkedList::operator!=(const TDLinkedList& llstToTest) const
 {
     return !operator==(llstToTest);
-}
-
-TDLinkedList& TDLinkedList::operator=(TDLinkedList&& llstSrc)
-{
-    if (&llstSrc != this)
-    {
-        tCIDLib::Swap(m_c4ElemCount, llstSrc.m_c4ElemCount);
-        tCIDLib::Swap(m_pnodeHead, llstSrc.m_pnodeHead);
-        tCIDLib::Swap(m_pnodeTail, llstSrc.m_pnodeTail);
-    }
-    return *this;
 }
 
 

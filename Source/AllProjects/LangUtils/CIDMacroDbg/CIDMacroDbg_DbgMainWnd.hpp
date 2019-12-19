@@ -354,7 +354,7 @@ TMacroDbgMainWnd : public TPaneWndCont, public MMEngClassMgr, public MMEngDebugI
         //  for some events. We keep it up to date with changes in current file and
         //  current line number for the current file.
         // -------------------------------------------------------------------
-        template <class T> TNotHandlerBase*
+        template <typename T> TNotHandlerBase*
         pnothRegisterHandler(       T* const pTarget
                             ,       tCIDCtrls::EEvResponses (T::*pfnTarget)(TCMLDbgChangeInfo&)
                             , const tCIDLib::EEnds  eEnd = tCIDLib::EEnds::Last)

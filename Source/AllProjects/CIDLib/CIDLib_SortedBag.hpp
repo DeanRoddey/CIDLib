@@ -80,7 +80,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
             , m_eDir(colSrc.m_eDir)
             , m_pfnComp(nullptr)
         {
-            *this = operator=(tCIDLib::ForceMove(colSrc));
+            operator=(tCIDLib::ForceMove(colSrc));
         }
 
         ~TSortedBag() = default;
@@ -103,10 +103,13 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
 
         TMyType& operator=(TMyType&& colSrc)
         {
-            TParent::operator=(tCIDLib::ForceMove(colSrc));
-            tCIDLib::Swap(m_c4UserData, colSrc.m_c4UserData);
-            tCIDLib::Swap(m_eDir, colSrc.m_eDir);
-            tCIDLib::Swap(m_pfnComp, colSrc.m_pfnComp);
+            if (&colSrc != this)
+            {
+                TParent::operator=(tCIDLib::ForceMove(colSrc));
+                tCIDLib::Swap(m_c4UserData, colSrc.m_c4UserData);
+                tCIDLib::Swap(m_eDir, colSrc.m_eDir);
+                tCIDLib::Swap(m_pfnComp, colSrc.m_pfnComp);
+            }
             return *this;
         }
 

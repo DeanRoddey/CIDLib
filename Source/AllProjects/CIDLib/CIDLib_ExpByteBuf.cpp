@@ -61,28 +61,18 @@ TExpByteBuf::TExpByteBuf(const tCIDLib::TCard4 c4InitAlloc) :
 
 TExpByteBuf::TExpByteBuf(const TExpByteBuf& expbSrc) :
 
-    m_c4CurSize(expbSrc.m_c4CurSize)
-    , m_c4CurOfs(expbSrc.m_c4CurOfs)
+    m_c4CurSize(0)
+    , m_c4CurOfs(0)
     , m_pc1Buffer(nullptr)
 {
-    m_pc1Buffer = new tCIDLib::TCard1[m_c4CurSize];
-    try
-    {
-        TRawMem::CopyMemBuf(m_pc1Buffer, expbSrc.m_pc1Buffer, m_c4CurSize);
-    }
+    tCIDLib::TCard1* pszNew = new tCIDLib::TCard1[expbSrc.m_c4CurSize];
+    TArrayJanitor<tCIDLib::TCard1> janBuffer(pszNew);
+    TRawMem::CopyMemBuf(pszNew, expbSrc.m_pc1Buffer, expbSrc.m_c4CurSize);
 
-    catch(...)
-    {
-        delete m_pc1Buffer;
-        throw;
-    }
-}
-
-TExpByteBuf::TExpByteBuf(TExpByteBuf&& expbSrc) :
-
-    TExpByteBuf(1UL)
-{
-    *this = tCIDLib::ForceMove(expbSrc);
+    // It appears to have worked, so store the info away
+    m_c4CurSize = expbSrc.m_c4CurSize;
+    m_c4CurOfs = expbSrc.m_c4CurOfs;
+    m_pc1Buffer = janBuffer.paOrphan();
 }
 
 TExpByteBuf::~TExpByteBuf()
@@ -102,10 +92,12 @@ TExpByteBuf& TExpByteBuf::operator=(const TExpByteBuf& expbSrc)
         // Reallocate our buffer if not the same size
         if (m_c4CurSize != expbSrc.m_c4CurSize)
         {
-            TArrayJanitor<tCIDLib::TCard1> janOld(m_pc1Buffer);
+            // Make sure we can allocate the new buffer before we change anything
+            tCIDLib::TCard1* pc1New = new tCIDLib::TCard1[expbSrc.m_c4CurSize];
 
+            TArrayJanitor<tCIDLib::TCard1> janOld(m_pc1Buffer);
+            m_pc1Buffer = pc1New;
             m_c4CurSize = expbSrc.m_c4CurSize;
-            m_pc1Buffer = new tCIDLib::TCard1[m_c4CurSize];
         }
 
         m_c4CurOfs = expbSrc.m_c4CurOfs;

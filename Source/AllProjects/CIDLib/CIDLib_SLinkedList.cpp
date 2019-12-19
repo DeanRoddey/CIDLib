@@ -90,6 +90,15 @@ TSLinkedList::TSLinkedList() :
 {
 }
 
+TSLinkedList::TSLinkedList(TSLinkedList&& listSrc) :
+
+    m_c4ElemCount(0)
+    , m_pnodeHead(nullptr)
+    , m_pnodeTail(nullptr)
+{
+    operator=(tCIDLib::ForceMove(listSrc));
+}
+
 TSLinkedList::~TSLinkedList()
 {
     RemoveAll();
@@ -99,6 +108,18 @@ TSLinkedList::~TSLinkedList()
 // ---------------------------------------------------------------------------
 //  TSLinkedList: Public operators
 // ---------------------------------------------------------------------------
+TSLinkedList& TSLinkedList::operator=(TSLinkedList&& llstSrc)
+{
+    if (&llstSrc != this)
+    {
+        tCIDLib::Swap(m_c4ElemCount, llstSrc.m_c4ElemCount);
+        tCIDLib::Swap(m_pnodeHead, llstSrc.m_pnodeHead);
+        tCIDLib::Swap(m_pnodeTail, llstSrc.m_pnodeTail);
+    }
+    return *this;
+}
+
+
 tCIDLib::TBoolean TSLinkedList::operator==(const TSLinkedList& llstToTest) const
 {
     if (this != &llstToTest)

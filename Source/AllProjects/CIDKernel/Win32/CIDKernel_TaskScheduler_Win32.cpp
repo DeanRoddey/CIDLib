@@ -135,6 +135,19 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
     }
     TCOMJanitor<ITaskSettings> janSettings(&pSettings);
     hRes = pSettings->put_StartWhenAvailable(VARIANT_TRUE);
+    if (FAILED(hRes))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSchTask_SetupErr, hRes);
+        return kCIDLib::False;
+    }
+
+    // We run indefinitely, so disable the 'kill after time' option
+    hRes = pSettings->put_ExecutionTimeLimit(_bstr_t(L"PT0S"));
+    if (FAILED(hRes))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcSchTask_SetupErr, hRes);
+        return kCIDLib::False;
+    }
 
     // Set the run type and remember a logon type appropriately
     TASK_LOGON_TYPE LoginType = TASK_LOGON_NONE;

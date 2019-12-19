@@ -47,6 +47,7 @@ class CIDLIBEXP TPubSubAsyncSub : public TObject, private MPubSubscription
         );
 
         TPubSubAsyncSub(const TPubSubAsyncSub&) = delete;
+        TPubSubAsyncSub(TPubSubAsyncSub&&) = delete;
 
         ~TPubSubAsyncSub();
 
@@ -55,6 +56,7 @@ class CIDLIBEXP TPubSubAsyncSub : public TObject, private MPubSubscription
         //  Public operators
         // -------------------------------------------------------------------
         TPubSubAsyncSub& operator=(const TPubSubAsyncSub&) = delete;
+        TPubSubAsyncSub& operator=(TPubSubAsyncSub&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -44,7 +44,7 @@
 // ---------------------------------------------------------------------------
 //  Forward reference some internal structures and classes
 // ---------------------------------------------------------------------------
-template <class TElem,class TKey,class TKeyOps> class TKeyedHashSet;
+template <typename TElem,class TKey,class TKeyOps> class TKeyedHashSet;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
@@ -53,7 +53,7 @@ template <class TElem,class TKey,class TKeyOps> class TKeyedHashSet;
 //   CLASS: TKeyedHashSetNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem,class TKey> class TKeyedHashSetNode
+template <typename TElem,class TKey> class TKeyedHashSetNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -146,7 +146,7 @@ template <class TElem,class TKey> class TKeyedHashSetNode
 //   CLASS: TKeyedHashSet
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem, class TKey, class TKeyOps>
+template <typename TElem, class TKey, class TKeyOps>
 class TKeyedHashSet : public TCollection<TElem>
 {
     public  :
@@ -181,7 +181,7 @@ class TKeyedHashSet : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem, class TKey, class TKeyOps> class TConstCursor :
+        template <typename TElem, class TKey, class TKeyOps> class TConstCursor :
 
             public TBiColCursor<TElem>
         {
@@ -493,7 +493,7 @@ class TKeyedHashSet : public TCollection<TElem>
         };
 
 
-        template <class TElem, class TKey, class TKeyOps> class TNonConstCursor :
+        template <typename TElem, class TKey, class TKeyOps> class TNonConstCursor :
         public TConstCursor<TElem, TKey, TKeyOps>
         {
             public  :
@@ -1136,7 +1136,7 @@ class TKeyedHashSet : public TCollection<TElem>
         //
         //  DO NOT change the element in a way that would modify the hash!
         //
-        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
         {
             TMtxLocker lockThis(this->pmtxLock());
 
@@ -1733,7 +1733,7 @@ class TKeyedHashSet : public TCollection<TElem>
 //  operator for those folks who want to use it. This means that collections
 //  cannot be streamed polymorphically via the base classes.
 //
-template <class TElem, class TKey, class TKeyOps>
+template <typename TElem, class TKey, class TKeyOps>
 TBinOutStream& operator<<(          TBinOutStream&                      strmOut
                             , const TKeyedHashSet<TElem,TKey,TKeyOps>&  colToStream)
 {
@@ -1767,7 +1767,7 @@ TBinOutStream& operator<<(          TBinOutStream&                      strmOut
 
 
 // We cannot lock the collection, since we might delete the mutex!
-template <class TElem, class TKey, class TKeyOps>
+template <typename TElem, class TKey, class TKeyOps>
 TBinInStream& operator>>(TBinInStream&                          strmIn
                         , TKeyedHashSet<TElem,TKey,TKeyOps>&    colToStream)
 {

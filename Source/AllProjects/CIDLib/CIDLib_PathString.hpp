@@ -70,6 +70,7 @@ class CIDLIBEXP TPathStr : public TString
         );
 
         TPathStr(const TPathStr&) = default;
+        TPathStr(TPathStr&&) = default;
 
         ~TPathStr();
 
@@ -77,48 +78,17 @@ class CIDLIBEXP TPathStr : public TString
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TPathStr& operator=(const TPathStr& pathSrc) = default;
+        TPathStr& operator=(const TPathStr&) = default;
+        TPathStr& operator=(TPathStr&&) = default;
 
-        TPathStr& operator=(const TString& strSrc)
+        tCIDLib::TBoolean operator!=(const TPathStr& pathSrc) const
         {
-            TString::operator=(strSrc);
-            return *this;
-        }
-
-        TPathStr& operator=(const tCIDLib::TCh* const pszSrc)
-        {
-            TString::operator=(pszSrc);
-            return *this;
-        }
-
-        tCIDLib::TBoolean operator==(const TString& strSrc) const
-        {
-            return TString::operator==(strSrc);
-        }
-
-        tCIDLib::TBoolean operator==(const tCIDLib::TCh* const pszSrc) const
-        {
-            return TString::operator==(pszSrc);
+            return TString::operator!=(pathSrc);
         }
 
         tCIDLib::TBoolean operator==(const TPathStr& pathSrc) const
         {
             return TString::operator==(pathSrc);
-        }
-
-        tCIDLib::TBoolean operator!=(const TString& strSrc) const
-        {
-            return TString::operator!=(strSrc);
-        }
-
-        tCIDLib::TBoolean operator!=(const tCIDLib::TCh* const pszSrc) const
-        {
-            return TString::operator!=(pszSrc);
-        }
-
-        tCIDLib::TBoolean operator!=(const TPathStr& pathSrc) const
-        {
-            return TString::operator!=(pathSrc);
         }
 
 

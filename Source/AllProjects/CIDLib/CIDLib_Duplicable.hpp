@@ -98,7 +98,9 @@ class CIDLIBEXP MDuplicable
         // -------------------------------------------------------------------
         MDuplicable() = default;
         MDuplicable(const MDuplicable&) = default;
+        MDuplicable(MDuplicable&&) = default;
         MDuplicable& operator=(const MDuplicable&) = default;
+        MDuplicable& operator=(MDuplicable&&) = default;
 
 
     private :
@@ -114,14 +116,14 @@ class CIDLIBEXP MDuplicable
 // ---------------------------------------------------------------------------
 //  Inlines for polymorphic duplication
 // ---------------------------------------------------------------------------
-template <class T> T* pDupObject(const MDuplicable& mdupToDup)
+template <typename T> [[nodiscard]] T* pDupObject(const MDuplicable& mdupToDup)
 {
     // Optimize because this is a quick hashed compare
     MDuplicable::TestCanDupTo(mdupToDup, T::clsThis());
     return static_cast<T*>(mdupToDup.pobjDuplicate());
 }
 
-template <class T> T* pDupObject(const MDuplicable* const pmdupToDup)
+template <typename T> [[nodiscard]] T* pDupObject(const MDuplicable* const pmdupToDup)
 {
     // Optimize because this is a quick hashed compare
     MDuplicable::TestCanDupTo(pmdupToDup, T::clsThis());
@@ -135,7 +137,7 @@ template <class T> T* pDupObject(const MDuplicable* const pmdupToDup)
 // ---------------------------------------------------------------------------
 #define DefPolyDup(type) \
 public : \
-TObject* pobjDuplicate() const override \
+[[nodiscard]] TObject* pobjDuplicate() const override \
 { \
     return new type(*this); \
 }

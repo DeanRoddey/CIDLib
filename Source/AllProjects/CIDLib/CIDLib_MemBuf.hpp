@@ -258,12 +258,12 @@ class CIDLIBEXP TMemBuf :
 
         tCIDLib::TVoid* pData();
 
-        template <class T> const T* pDataAs() const
+        template <typename T> const T* pDataAs() const
         {
             return reinterpret_cast<const T*>(pc1CheckRange(CID_LINE, 0, sizeof(T)));
         }
 
-        template <class T> T* pDataAs()
+        template <typename T> T* pDataAs()
         {
             return reinterpret_cast<T*>(pc1CheckRange(CID_LINE, 0, sizeof(T)));
         }
@@ -282,12 +282,12 @@ class CIDLIBEXP TMemBuf :
             const   tCIDLib::TCard4         c4Index
         );
 
-        template <class T> const T* pDataAtAs(const tCIDLib::TCard4 c4At) const
+        template <typename T> const T* pDataAtAs(const tCIDLib::TCard4 c4At) const
         {
             return reinterpret_cast<const T*>(pc1DataAt(c4At));
         }
 
-        template <class T> T* pDataAtAs(const tCIDLib::TCard4 c4At)
+        template <typename T> T* pDataAtAs(const tCIDLib::TCard4 c4At)
         {
             return reinterpret_cast<T*>(pc1DataAt(c4At));
         }

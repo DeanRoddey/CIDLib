@@ -136,7 +136,7 @@ class TWindow3Ed : public TCtrlWnd
         // -------------------------------------------------------------------
         //  A templated method to install a notification handler on us
         // -------------------------------------------------------------------
-        template <class T> TNotHandlerBase*
+        template <typename T> TNotHandlerBase*
         pnothRegisterHandler(        T* const        pTarget
                             ,       tCIDCtrls::EEvResponses (T::*pfnTarget)(TWindow3EdNot&)
                             , const tCIDLib::EEnds  eEnd = tCIDLib::EEnds::Last)

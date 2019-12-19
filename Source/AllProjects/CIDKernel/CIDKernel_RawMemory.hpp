@@ -312,7 +312,7 @@ namespace TRawMem
     //  and exchanges on pointers typesafe and convenient. They just work
     //  in terms of the per-platform, untyped ones.
     //
-    template <class T> T* pExchangePtr(T** ppToFill, const T* const pNew) noexcept
+    template <typename T> T* pExchangePtr(T** ppToFill, const T* const pNew) noexcept
     {
         //
         //  Sometimes this is going to be void* return, which will get an analysis
@@ -325,7 +325,7 @@ namespace TRawMem
         );
     }
 
-    template <class T> T* pCompareAndExchangePtr(       T**         ppToFill
+    template <typename T> T* pCompareAndExchangePtr(    T**         ppToFill
                                                 , const T* const    pNew
                                                 , const T* const    pCompare) noexcept
     {

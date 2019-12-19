@@ -42,7 +42,7 @@
 //   CLASS: TBasicDLinkedRefCol
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
+template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -56,7 +56,7 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursors
         // -------------------------------------------------------------------
-        template <class TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -289,7 +289,7 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
         };
 
 
-        template <class TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -564,6 +564,20 @@ template <class TElem> class TBasicDLinkedRefCol : public TRefCollection<TElem>
             m_llstCol.AppendNode(new TNode(pobjToAdd, m_eAdopt));
             this->c4IncSerialNum();
         }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
+        {
+            TMtxLocker lockThis(this->pmtxLock());
+            TNode* pnodeHead = static_cast<TNode*>(m_llstCol.pnodeHead());
+            while (pnodeHead)
+            {
+                if (!iterCB(pnodeHead->objData()))
+                    return kCIDLib::False;
+                pnodeHead = static_cast<TNode*>(pnodeHead->pnodeNext());
+            }
+            return kCIDLib::True;
+        }
+
 
         // Get the bottom or top. If there is one, then drop it or delete it
         tCIDLib::TVoid DiscardBottom()

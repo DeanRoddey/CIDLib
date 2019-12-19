@@ -311,7 +311,7 @@ template <typename CB> class TLambdaJan
 //  This one will set a pointer on a scoped basis and then put back the original
 //  value. The parameter must in include the constness of the pointer.
 // ---------------------------------------------------------------------------
-template <class T> class TPtrJanitor
+template <typename T> class TPtrJanitor
 {
     public  :
         // -------------------------------------------------------------------
@@ -385,7 +385,7 @@ template <class T> class TPtrJanitor
 //  for things like pointers to things that we want to set on a scoped basis
 //  or enumvalues that need to be set on a scoped basis, that kind of thing.
 // ---------------------------------------------------------------------------
-template <class T> class TGFJanitor
+template <typename T> class TGFJanitor
 {
     public  :
         // -------------------------------------------------------------------

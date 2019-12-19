@@ -47,6 +47,7 @@ class CIDLIBEXP TUndoCmd : public TObject
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TUndoCmd(const TUndoCmd&) = delete;
+        TUndoCmd(TUndoCmd&&) = delete;
 
         ~TUndoCmd();
 
@@ -55,6 +56,7 @@ class CIDLIBEXP TUndoCmd : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TUndoCmd& operator=(const TUndoCmd&) = delete;
+        TUndoCmd& operator=(TUndoCmd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -92,6 +94,7 @@ class CIDLIBEXP TUndoCmdSep : public TUndoCmd
         TUndoCmdSep();
 
         TUndoCmdSep(const TUndoCmdSep&) = delete;
+        TUndoCmdSep(TUndoCmdSep&&) = delete;
 
         ~TUndoCmdSep();
 
@@ -100,12 +103,13 @@ class CIDLIBEXP TUndoCmdSep : public TUndoCmd
         //  Public operators
         // -------------------------------------------------------------------
         TUndoCmdSep& operator=(const TUndoCmdSep&) = delete;
+        TUndoCmdSep& operator=(TUndoCmdSep&&) = delete;
 
 
         // -------------------------------------------------------------------
-        //  Public, virtual methods
+        //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsSame(const TUndoCmdSep&) const;
+        tCIDLib::TBoolean bIsSame(const TUndoCmd&) const final;
 
 
     private :
@@ -133,6 +137,7 @@ class CIDLIBEXP TUndoHandler : public TObject
         );
 
         TUndoHandler(const TUndoHandler&) = delete;
+        TUndoHandler(TUndoHandler&&) = delete;
 
         ~TUndoHandler();
 
@@ -141,6 +146,7 @@ class CIDLIBEXP TUndoHandler : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TUndoHandler& operator=(const TUndoHandler&) = delete;
+        TUndoHandler& operator=(TUndoHandler&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -171,7 +177,7 @@ class CIDLIBEXP TUndoHandler : public TObject
 
         tCIDLib::TVoid PushSep();
 
-        TUndoCmd* pucPop();
+        [[nodiscard]] TUndoCmd* pucPop();
 
         tCIDLib::TVoid Reset();
 
@@ -240,6 +246,7 @@ class CIDLIBEXP TUndoJanitor
         );
 
         TUndoJanitor(const TUndoJanitor&) = delete;
+        TUndoJanitor(TUndoJanitor&&) = delete;
 
         ~TUndoJanitor();
 
@@ -248,6 +255,7 @@ class CIDLIBEXP TUndoJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TUndoJanitor& operator=(const TUndoJanitor&) = delete;
+        TUndoJanitor& operator=(TUndoJanitor&&) = delete;
 
 
         // -------------------------------------------------------------------

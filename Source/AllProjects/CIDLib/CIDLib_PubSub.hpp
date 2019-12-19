@@ -125,10 +125,8 @@ class CIDLIBEXP TPubSubMsg : public TObject
                     TPSMsg* const       psmsgToAdopt = nullptr
         );
 
-        TPubSubMsg
-        (
-            const   TPubSubMsg&         psmsgSrc
-        );
+        TPubSubMsg(const TPubSubMsg&) = default;
+        TPubSubMsg(TPubSubMsg&&) = default;
 
         ~TPubSubMsg();
 
@@ -136,10 +134,8 @@ class CIDLIBEXP TPubSubMsg : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TPubSubMsg& operator=
-        (
-            const   TPubSubMsg&         psmsgSrc
-        );
+        TPubSubMsg& operator=(const TPubSubMsg&) = default;
+        TPubSubMsg& operator=(TPubSubMsg&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -147,7 +143,7 @@ class CIDLIBEXP TPubSubMsg : public TObject
         // -------------------------------------------------------------------
         const TObject& objMsg() const;
 
-        template <class T> const T& objMsgAs() const
+        template <typename T> const T& objMsgAs() const
         {
             CheckMsgType(T::clsThis());
             return static_cast<const T&>(objMsg());
@@ -236,11 +232,13 @@ class CIDLIBEXP MPubSubscription
         (
             const   MPubSubscription&       mpsubSrc
         );
+        MPubSubscription(MPubSubscription&&) = delete;
 
         MPubSubscription& operator=
         (
             const   MPubSubscription&       mpsubSrc
         );
+        MPubSubscription& operator=(MPubSubscription&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -330,6 +328,9 @@ class CIDLIBEXP TPubSubTopic : public TObject
             const   TPubSubTopic&           pstopSrc
         );
 
+        // Can't actually delete it since that causes problems
+        // TPubSubTopic(TPubSubTopic&&) = delete;
+
         ~TPubSubTopic();
 
 
@@ -340,6 +341,9 @@ class CIDLIBEXP TPubSubTopic : public TObject
         (
             const   TPubSubTopic&           pstopSrc
         );
+
+        // Can't actually delete it since that causes problems
+        // TPubSubTopic& operator=(TPubSubTopic&&) = delete;
 
 
         // -------------------------------------------------------------------

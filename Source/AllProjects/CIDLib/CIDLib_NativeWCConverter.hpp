@@ -52,6 +52,7 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
         TNativeWCConverter();
 
         TNativeWCConverter(const TNativeWCConverter&) = default;
+        TNativeWCConverter(TNativeWCConverter&&) = default;
 
         ~TNativeWCConverter() = default;
 
@@ -60,6 +61,7 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
         //  Public operators
         // -------------------------------------------------------------------
         TNativeWCConverter& operator=(const TNativeWCConverter&) = default;
+        TNativeWCConverter& operator=(TNativeWCConverter&&) = default;
 
 
         // -------------------------------------------------------------------

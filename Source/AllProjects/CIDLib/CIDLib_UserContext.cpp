@@ -63,24 +63,6 @@ TCIDUserCtx::TCIDUserCtx(const TString& strUserName, const TString& strUserType)
 }
 
 
-TCIDUserCtx::TCIDUserCtx(const TCIDUserCtx& cuctxToCopy) :
-
-    m_strUserName(cuctxToCopy.m_strUserName)
-    , m_strUserType(cuctxToCopy.m_strUserType)
-{
-}
-
-TCIDUserCtx& TCIDUserCtx::operator=(const TCIDUserCtx& cuctxToAssign)
-{
-    if (this != &cuctxToAssign)
-    {
-        m_strUserName   = cuctxToAssign.m_strUserName;
-        m_strUserType   = cuctxToAssign.m_strUserType;
-    }
-    return *this;
-}
-
-
 // ---------------------------------------------------------------------------
 //  TCIDUserCtx: Public, virtual methods
 // ---------------------------------------------------------------------------

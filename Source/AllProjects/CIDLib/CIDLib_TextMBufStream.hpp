@@ -74,6 +74,7 @@ class CIDLIBEXP TTextMBufInStream : public TTextInStream
         );
 
         TTextMBufInStream(const TTextMBufInStream&) = delete;
+        TTextMBufInStream(TTextMBufInStream&&) = delete;
 
         ~TTextMBufInStream();
 
@@ -82,6 +83,7 @@ class CIDLIBEXP TTextMBufInStream : public TTextInStream
         //  Public operators
         // -------------------------------------------------------------------
         TTextMBufInStream& operator=(const TTextMBufInStream&) = delete;
+        TTextMBufInStream& operator=(TTextMBufInStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -140,6 +142,7 @@ class CIDLIBEXP TTextMBufOutStream : public TTextOutStream
         );
 
         TTextMBufOutStream(const TTextMBufOutStream&) = delete;
+        TTextMBufOutStream(TTextMBufOutStream&&) = delete;
 
         ~TTextMBufOutStream();
 
@@ -148,6 +151,7 @@ class CIDLIBEXP TTextMBufOutStream : public TTextOutStream
         //  Public operators
         // -------------------------------------------------------------------
         TTextMBufOutStream& operator=(const TTextMBufOutStream&) = delete;
+        TTextMBufOutStream& operator=(TTextMBufOutStream&&) = delete;
 
 
         // -------------------------------------------------------------------

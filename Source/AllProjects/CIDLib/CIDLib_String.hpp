@@ -224,9 +224,9 @@ class CIDLIBEXP TString :
 
         static tCIDLib::TCard1 c1ToHex(const tCIDLib::TSCh chToXlat)
         {
-            tCIDLib::TCard1 c1Ret(0);
+            tCIDLib::TCard1 c1Ret =(0);
             if ((chToXlat >= 0x41) && (chToXlat <= 0x46))
-                c1Ret = tCIDLib::TCard1(10) + (chToXlat - 0x41);
+                c1Ret = 10 + (chToXlat - 0x41);
             else if ((chToXlat >= 0x30) && (chToXlat <= 0x39))
                 c1Ret = chToXlat - 0x30;
             else
@@ -238,9 +238,9 @@ class CIDLIBEXP TString :
         {
             tCIDLib::TCard1 c1Ret(0);
             if ((chToXlat >= kCIDLib::chLatin_A) && (chToXlat <= kCIDLib::chLatin_F))
-                c1Ret = tCIDLib::TCard1(10 + (chToXlat - kCIDLib::chLatin_A));
+                c1Ret = static_cast<tCIDLib::TCard1>(10 + (chToXlat - kCIDLib::chLatin_A));
             else if ((chToXlat >= kCIDLib::chDigit0) && (chToXlat <= kCIDLib::chDigit9))
-                c1Ret = tCIDLib::TCard1(chToXlat - kCIDLib::chDigit0);
+                c1Ret = static_cast<tCIDLib::TCard1>(chToXlat - kCIDLib::chDigit0);
             else
                 BadHexChar(chToXlat);
             return c1Ret;

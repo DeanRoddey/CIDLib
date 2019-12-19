@@ -34,7 +34,7 @@
 //   CLASS: TDeque
 //  PREFIX: deq
 // ---------------------------------------------------------------------------
-template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
+template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------

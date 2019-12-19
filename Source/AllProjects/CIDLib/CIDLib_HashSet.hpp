@@ -43,7 +43,7 @@
 //  Forward reference some internal structures and classes
 // ---------------------------------------------------------------------------
 struct  THashSetList;
-template <class TElem, class TKeyOps> class THashSet;
+template <typename TElem, class TKeyOps> class THashSet;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
@@ -52,7 +52,7 @@ template <class TElem, class TKeyOps> class THashSet;
 //   CLASS: THashSetNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class THashSetNode
+template <typename TElem> class THashSetNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -143,7 +143,7 @@ template <class TElem> class THashSetNode
 //   CLASS: THashSet
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem, class TKeyOps> class THashSet
+template <typename TElem, class TKeyOps> class THashSet
 
     : public TCollection<TElem>
 {
@@ -176,7 +176,7 @@ template <class TElem, class TKeyOps> class THashSet
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem, class TKeyOps> class TConstCursor
+        template <typename TElem, class TKeyOps> class TConstCursor
 
             : public TBiColCursor<TElem>
         {
@@ -475,7 +475,7 @@ template <class TElem, class TKeyOps> class THashSet
         };
 
 
-        template <class TElem, class TKeyOps> class TNonConstCursor
+        template <typename TElem, class TKeyOps> class TNonConstCursor
 
             : public TConstCursor<TElem, TKeyOps>
         {
@@ -1457,7 +1457,7 @@ template <class TElem, class TKeyOps> class THashSet
 //  operator for those folks who want to use it. This means that collections
 //  cannot be streamed polymorphically via the base classes.
 //
-template <class TElem, class TKeyOps>
+template <typename TElem, class TKeyOps>
 TBinOutStream& operator<<(          TBinOutStream&              strmOut
                             , const THashSet<TElem,TKeyOps>&    colToStream)
 {
@@ -1491,7 +1491,7 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
 
 
 // We cannot lock the collection, since we might destroy the mutex!
-template <class TElem, class TKeyOps>
+template <typename TElem, class TKeyOps>
 TBinInStream& operator>>(TBinInStream& strmIn, THashSet<TElem,TKeyOps>& colToStream)
 {
     // Flush the collection first

@@ -68,6 +68,7 @@ class CIDLIBEXP TDirIter : public TObject
         TDirIter();
 
         TDirIter(const TDirIter&) = delete;
+        TDirIter(TDirIter&&) = delete;
 
         ~TDirIter();
 
@@ -76,6 +77,7 @@ class CIDLIBEXP TDirIter : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TDirIter& operator=(const TDirIter&) = delete;
+        TDirIter& operator=(TDirIter&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -139,6 +141,7 @@ class CIDLIBEXP TDirIterCB : public TObject
         TDirIterCB();
 
         TDirIterCB(const TDirIterCB&) = delete;
+        TDirIterCB(TDirIterCB&&) = delete;
 
         ~TDirIterCB();
 
@@ -147,6 +150,7 @@ class CIDLIBEXP TDirIterCB : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TDirIterCB& operator=(const TDirIterCB&) = delete;
+        TDirIterCB& operator=(TDirIterCB&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -204,7 +208,11 @@ class CIDLIBEXP TDirIterCB : public TObject
                 TDepthInfo() = delete;
                 TDepthInfo(const TFindBuf& fndbCur);
                 TDepthInfo(const TDepthInfo&) = delete;
+                TDepthInfo(TDepthInfo&&) = delete;
                 ~TDepthInfo() {}
+
+                TDepthInfo& operator=(const TDepthInfo&) = delete;
+                TDepthInfo& operator=(TDepthInfo&&) = delete;
 
                 tCIDLib::TBoolean bDoingDirs() const;
                 tCIDLib::TBoolean bDoingFirst() const;

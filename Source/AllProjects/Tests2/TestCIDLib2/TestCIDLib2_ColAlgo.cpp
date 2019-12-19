@@ -326,7 +326,7 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         //  Do a single element removal first. It should remove the 0th element,
         //  and leave First as the 0th.
         //
-        if (!tCIDColAlgo::bRemoveElem(colRemove, L"Third", kCIDLib::False)
+        if (!tCIDColAlgo::bRemoveMatches(colRemove, L"Third", kCIDLib::False)
         ||  (colRemove[0] != L"First"))
         {
             eRes = tTestFWLib::ETestRes::Failed;
@@ -334,7 +334,7 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         }
 
         // Then remove all remaining
-        if (!tCIDColAlgo::bRemoveElem(colRemove, L"Third", kCIDLib::True)
+        if (!tCIDColAlgo::bRemoveMatches(colRemove, L"Third", kCIDLib::True)
         ||  (colRemove.c4ElemCount() != 4))
         {
             eRes = tTestFWLib::ETestRes::Failed;
@@ -353,6 +353,15 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         {
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"New unique element was rejected\n\n";
+        }
+
+        // Do a remove if which should remove the one we just added
+        if (!tCIDColAlgo::bRemoveIf
+        (
+            colRemove, [](const TString& strCheck) { return strCheck.bCompare(L"Sixth"); }))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Failed to remove new element via bRemoveIf\n\n";
         }
 
         //

@@ -134,7 +134,7 @@ template <typename TElem> class TSimplePoolPtr
 
             TSimplePoolPtr()
         {
-            *this = tCIDLib::ForceMove(spptrSrc);
+            operator=(tCIDLib::ForceMove(spptrSrc));
         }
 
         virtual ~TSimplePoolPtr()
@@ -786,7 +786,7 @@ template<typename TElem> class TSimplePool : public TObject
         }
 
 
-        TElem* pobjFindCandidate(const tCIDLib::TCard4 c4Size)
+        [[nodiscard]] TElem* pobjFindCandidate(const tCIDLib::TCard4 c4Size)
         {
             const tCIDLib::TCard4 c4FreeCnt = m_colFreeList.c4ElemCount();
             tCIDLib::TCard4 c4At;
@@ -1010,7 +1010,7 @@ template <typename TElem> class TSimplePoolJan
         //  The caller becomes responsible for return to the pool. Could be null
         //  if already released or orphaned.
         //
-        TElem* pobjOrphan()
+        [[nodiscard]] TElem* pobjOrphan()
         {
             TElem* pobjRet = m_pobjGotten;
             if (m_psplSrc)
@@ -1200,6 +1200,7 @@ class THeapBufPool : public TSimplePool<THeapBuf>
         }
 
         THeapBufPool(const THeapBufPool&) = delete;
+        THeapBufPool(THeapBufPool&&) = delete;
 
         ~THeapBufPool() {}
 
@@ -1208,6 +1209,7 @@ class THeapBufPool : public TSimplePool<THeapBuf>
         //  Public operators
         // -------------------------------------------------------------------
         THeapBufPool& operator=(const THeapBufPool&) = delete;
+        THeapBufPool& operator=(THeapBufPool&&) = delete;
 
 
         // -------------------------------------------------------------------

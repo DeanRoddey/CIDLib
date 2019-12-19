@@ -74,6 +74,34 @@ namespace tCIDColAlgo
 
 
     //
+    //  Remove elements that the passed test indicates should be removed.
+    //
+    //  This only works for a collection that has a RemoveAt(cursor) method, but
+    //  most do.
+    //
+    template<typename  TCol, typename TTest, typename  TElem = TCol::TMyElemType>
+    tCIDLib::TBoolean bRemoveIf(TCol& colTar, TTest pfnTest)
+    {
+        tCIDLib::TBoolean bRet = kCIDLib::False;
+        TCol::TCursor cursTar(&colTar);
+        while (cursTar)
+        {
+            // Test this one, if a match remove it, else move forward
+            if (pfnTest(*cursTar))
+            {
+                colTar.RemoveAt(cursTar);
+                bRet = kCIDLib::True;
+            }
+             else
+            {
+                ++cursTar;
+            }
+        }
+        return bRet;
+    }
+
+
+    //
     //  If the passed object is in the collection, remove it. It can remove just
     //  the first match, or all. Some collections have built in mechanisms for
     //  this kind of stuff, but this can be used for those that dont. Returns
@@ -85,14 +113,14 @@ namespace tCIDColAlgo
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
             , typename  TElem = TCol::TMyElemType>
-    tCIDLib::TBoolean bRemoveElem(          TCol&               colTar
+    tCIDLib::TBoolean bRemoveMatches(       TCol&               colTar
                                     , const TElem&              objToRem
                                     , const tCIDLib::TBoolean   bRemoveAll
                                     ,       TComp               pfnComp = TComp())
     {
         tCIDLib::TBoolean bRet = kCIDLib::False;
         TCol::TCursor cursTar(&colTar);
-        for (; cursTar; ++cursTar)
+        while (cursTar)
         {
             // If we find a match, remove it
             if (pfnComp(*cursTar, objToRem))
@@ -100,8 +128,14 @@ namespace tCIDColAlgo
                 colTar.RemoveAt(cursTar);
                 bRet = kCIDLib::True;
 
+                // If not removing all, then we are done
                 if (!bRemoveAll)
                     break;
+            }
+             else
+            {
+                // No match, so move forward
+                ++cursTar;
             }
         }
         return bRet;

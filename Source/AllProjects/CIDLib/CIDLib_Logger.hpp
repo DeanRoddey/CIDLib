@@ -51,6 +51,7 @@ class CIDLIBEXP MLogger
         //  Destructor.
         // -------------------------------------------------------------------
         MLogger(const MLogger&) = delete;
+        MLogger(MLogger&&) = delete;
 
         virtual ~MLogger() {}
 
@@ -59,6 +60,7 @@ class CIDLIBEXP MLogger
         //  Public operators
         // -------------------------------------------------------------------
         MLogger& operator=(const MLogger&) = delete;
+        MLogger& operator=(MLogger&&) = delete;
 
 
         // -------------------------------------------------------------------

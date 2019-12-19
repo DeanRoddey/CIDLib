@@ -74,15 +74,11 @@ class CIDLIBEXP TCIDUserCtx : public TObject
             , const TString&                strUserType
         );
 
-        TCIDUserCtx
-        (
-            const   TCIDUserCtx&            cuctxToCopy
-        );
+        TCIDUserCtx(const TCIDUserCtx&) = default;
+        TCIDUserCtx(TCIDUserCtx&&) = default;
 
-        TCIDUserCtx& operator=
-        (
-            const   TCIDUserCtx&            cuctxToAssign
-        );
+        TCIDUserCtx& operator=(const TCIDUserCtx&) = default;
+        TCIDUserCtx& operator=(TCIDUserCtx&&) = default;
 
 
         // -------------------------------------------------------------------

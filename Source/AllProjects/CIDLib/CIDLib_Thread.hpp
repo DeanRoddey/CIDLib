@@ -180,7 +180,7 @@ class CIDLIBEXP TGlobalThreadFunc : public TThreadFunc
 //   CLASS: TMemberFunc
 //  PREFIX: tfunc
 // ---------------------------------------------------------------------------
-template <class T> class TMemberFunc : public TThreadFunc
+template <typename T> class TMemberFunc : public TThreadFunc
 {
     public  :
         // -------------------------------------------------------------------
@@ -322,6 +322,7 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
         );
 
         TThread(const TThread&) = delete;
+        TThread(TThread&&) = delete;
 
         ~TThread();
 
@@ -330,6 +331,7 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
         //  Public operators
         // -------------------------------------------------------------------
         TThread& operator=(const TThread&) = delete;
+        TThread& operator=(TThread&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -458,7 +460,7 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------

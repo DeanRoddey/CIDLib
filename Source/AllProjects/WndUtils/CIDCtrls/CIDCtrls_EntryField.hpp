@@ -204,7 +204,7 @@ class CIDCTRLSEXP TEntryField : public TStdCtrlWnd
         //  We provide a templatized method to allow for typesafe registration
         //  of event handlers.
         // -------------------------------------------------------------------
-        template <class T> TNotHandlerBase*
+        template <typename T> TNotHandlerBase*
         pnothRegisterHandler(       T* const pTarget
                             ,       tCIDCtrls::EEvResponses (T::*pfnTarget)(TEFChangeInfo&)
                             , const tCIDLib::EEnds  eEnd = tCIDLib::EEnds::Last)

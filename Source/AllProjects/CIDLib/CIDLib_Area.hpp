@@ -107,6 +107,7 @@ class CIDLIBEXP TArea :
         );
 
         TArea(const TArea&) = default;
+        TArea(TArea&&) = default;
 
         ~TArea() = default;
 
@@ -115,10 +116,11 @@ class CIDLIBEXP TArea :
         //  Public operators
         // -------------------------------------------------------------------
         TArea& operator=(const TArea&) = default;
+        TArea& operator=(TArea&&) = default;
 
         TArea& operator=
         (
-            const   tCIDLib::TRawArea&      areaToAssign
+            const   tCIDLib::TRawArea&     areaSrc
         );
 
         friend TArea CIDLIBEXP operator|
@@ -707,17 +709,17 @@ class CIDLIBEXP TArea :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private             :

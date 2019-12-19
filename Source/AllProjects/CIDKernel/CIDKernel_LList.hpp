@@ -35,7 +35,7 @@
 //   CLASS: TKrnlLList
 //  PREFIX: kllist
 // ---------------------------------------------------------------------------
-template <class TElem> class TKrnlLList
+template <typename TElem> class TKrnlLList
 {
     public  :
         // -------------------------------------------------------------------

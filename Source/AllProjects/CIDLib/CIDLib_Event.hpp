@@ -76,6 +76,7 @@ class CIDLIBEXP TEvent : public TObject, public MFormattable
         );
 
         TEvent(const TEvent&) = delete;
+        TEvent(TEvent&&) = delete;
 
         ~TEvent();
 
@@ -84,6 +85,7 @@ class CIDLIBEXP TEvent : public TObject, public MFormattable
         //  Public operators
         // -------------------------------------------------------------------
         TEvent& operator=(const TEvent&) = delete;
+        TEvent& operator=(TEvent&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -119,7 +121,7 @@ class CIDLIBEXP TEvent : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :

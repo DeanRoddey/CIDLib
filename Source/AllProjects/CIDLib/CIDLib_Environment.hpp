@@ -134,6 +134,7 @@ class CIDLIBEXP TProcEnvLocker : public TObject
         TProcEnvLocker();
 
         TProcEnvLocker(const TProcEnvLocker&) = delete;
+        TProcEnvLocker(TProcEnvLocker&&) = delete;
 
         ~TProcEnvLocker();
 
@@ -142,6 +143,7 @@ class CIDLIBEXP TProcEnvLocker : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TProcEnvLocker& operator=(const TProcEnvLocker&) = delete;
+        TProcEnvLocker& operator=(TProcEnvLocker&&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
@@ -259,14 +261,23 @@ class CIDLIBEXP TEnvironment : public TObject, public MDuplicable
 
     private :
         // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid FaultInList() const;
+
+
+        // -------------------------------------------------------------------
         //  Private data members
         //
         //  m_pcolEnv
         //      This is a hash map that is used to hold the environment variable data.
         //      We set the key ops object on it in case insensitive mode, so case of the
         //      keys doesn't matter.
+        //
+        //      To support efficient move semantics, it can be null, and we just fault
+        //      it in if needed.That means the list pointer has to be mutable.
         // -------------------------------------------------------------------
-        TList*  m_pcolEnv;
+        mutable TList*  m_pcolEnv;
 
 
         // -------------------------------------------------------------------

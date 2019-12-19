@@ -43,7 +43,7 @@ namespace kCIDLib
     // -----------------------------------------------------------------------
     //  Default max size for memory buffers if no max is given, 16MB.
     // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard4       c4DefMaxBufferSz = kCIDLib::c4Sz_16M;
+    constexpr tCIDLib::TCard4   c4DefMaxBufferSz = kCIDLib::c4Sz_16M;
 
 
     // -----------------------------------------------------------------------

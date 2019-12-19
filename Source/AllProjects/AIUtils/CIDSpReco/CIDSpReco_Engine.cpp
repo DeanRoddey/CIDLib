@@ -482,10 +482,10 @@ tCIDLib::TVoid TCIDSpReco::Initialize(TCIDAudioSrcStream* const pstrmToAdopt)
         }
 
         // It all worked, so release any of the janitors for things we want to keep
-        janGrammar.pobjOrphan();
-        janContext.pobjOrphan();
-        janRecog.pobjOrphan();
-        janStream.pobjOrphan();
+        janGrammar.Orphan();
+        janContext.Orphan();
+        janRecog.Orphan();
+        janStream.Orphan();
 
         //
         //  Release our ref count of the wrapper stream now. DON'T use SafeCOMFree

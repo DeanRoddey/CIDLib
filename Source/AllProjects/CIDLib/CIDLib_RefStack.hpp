@@ -41,7 +41,7 @@
 //   CLASS: TRefStack
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
+template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -160,7 +160,7 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 //   CLASS: TRefStackJan
 //  PREFIX: jan
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefStackJan
+template <typename TElem> class TRefStackJan
 {
     public  :
         // -------------------------------------------------------------------

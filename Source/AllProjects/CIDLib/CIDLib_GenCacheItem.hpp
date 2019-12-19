@@ -171,7 +171,7 @@ class CIDLIBEXP TCIDGenCacheItem : public TObject
 //   CLASS: TCIDCacheItem
 //  PREFIX: cci
 // ---------------------------------------------------------------------------
-template <class T> class TCIDCacheItem : public TCIDGenCacheItem
+template <typename T> class TCIDCacheItem : public TCIDGenCacheItem
 {
     public :
         // -------------------------------------------------------------------

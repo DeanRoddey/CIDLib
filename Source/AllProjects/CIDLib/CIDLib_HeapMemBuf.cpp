@@ -48,7 +48,7 @@ namespace CIDLib_HeapMemBuf
         // -----------------------------------------------------------------------
         //  Some internal constants we use
         // -----------------------------------------------------------------------
-        constexpr tCIDLib::TCard4   c4DefMinAlloc= 64;
+        constexpr tCIDLib::TCard4   c4DefMinAlloc = 64;
     }
 }
 
@@ -416,6 +416,7 @@ THeapBuf::THeapBuf( const   tCIDLib::TCard1* const  apc1InitData
     catch(...)
     {
         delete m_pc1Data;
+        m_pc1Data = nullptr;
         throw;
     }
 }
@@ -478,6 +479,7 @@ THeapBuf::THeapBuf( const   THeapBuf&       mbufSrc
     catch(...)
     {
         delete m_pc1Data;
+        m_pc1Data = nullptr;
         throw;
     }
 }
@@ -500,6 +502,7 @@ THeapBuf::THeapBuf(const THeapBuf& mbufSrc) :
     catch(...)
     {
         delete m_pc1Data;
+        m_pc1Data = nullptr;
         throw;
     }
 }
@@ -510,7 +513,7 @@ THeapBuf::THeapBuf(const THeapBuf& mbufSrc) :
 //
 THeapBuf::THeapBuf(THeapBuf&& mbufSrc) :
 
-    m_c4ExpandIncrement(4096)
+    m_c4ExpandIncrement(8)
     , m_c4Size(8)
     , m_c4MaxSize(kCIDLib::c4DefMaxBufferSz)
     , m_pc1Data(nullptr)

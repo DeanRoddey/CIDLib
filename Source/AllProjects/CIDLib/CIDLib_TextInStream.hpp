@@ -60,6 +60,7 @@ class CIDLIBEXP TTextInStream : public TObject
         );
 
         TTextInStream(const TTextInStream&) = delete;
+        TTextInStream(TTextInStream&&) = delete;
 
         ~TTextInStream();
 
@@ -67,6 +68,9 @@ class CIDLIBEXP TTextInStream : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TTextInStream& operator=(const TTextInStream&) = delete;
+        TTextInStream& operator=(TTextInStream&&) = delete;
+
         TTextInStream& operator>>
         (
                     tCIDLib::TBoolean&      bToFill
@@ -141,8 +145,6 @@ class CIDLIBEXP TTextInStream : public TObject
         (
                     TString&                strToFill
         );
-
-        TTextInStream& operator==(const TTextInStream&) = delete;
 
 
         // -------------------------------------------------------------------

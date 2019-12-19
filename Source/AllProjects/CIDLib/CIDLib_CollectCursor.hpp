@@ -94,8 +94,11 @@ class CIDLIBEXP TCursorBase : public TObject
         );
 
         TCursorBase(const TCursorBase&) = default;
-
         TCursorBase& operator=(const TCursorBase&) = default;
+
+        // Can't actually delete them since that causes problems
+        // TCursorBase(TCursorBase&&) = delete;
+        // TCursorBase& operator=(TCursorBase&&) = delete;
 
         tCIDLib::TBoolean operator==
         (
@@ -106,6 +109,7 @@ class CIDLIBEXP TCursorBase : public TObject
         (
             const   TCursorBase&            cursSrc
         )   const;
+
 
 
         // -------------------------------------------------------------------
@@ -291,22 +295,13 @@ template <typename TElem> class TColCursor : public TCursorBase
         {
         }
 
-        TColCursor(const TColCursor& cursSrc) :
+        TColCursor(const TColCursor&) = default;
+        TColCursor<TElem>& operator=(const TColCursor&) = default;
 
-            TCursorBase(cursSrc)
-            , m_pcolBaseCurs(cursSrc.m_pcolBaseCurs)
-        {
-        }
+        // Can't actually delete them since that causes problems
+        // TColCursor(TColCursor&&) = delete;
+        // TColCursor<TElem>& operator=(TColCursor&&) = delete;
 
-        TColCursor<TElem>& operator=(const TColCursor& cursSrc)
-        {
-            if (&cursSrc != this)
-            {
-                TParent::operator=(cursSrc);
-                m_pcolBaseCurs  = cursSrc.m_pcolBaseCurs;
-            }
-            return *this;
-        }
 
         // -------------------------------------------------------------------
         //  Protected, non-virtual methods
@@ -344,7 +339,7 @@ template <typename TElem> class TColCursor : public TCursorBase
 //   CLASS: TBiColCursor
 //  PREFIX: curs
 // ---------------------------------------------------------------------------
-template <class TElem> class TBiColCursor : public TColCursor<TElem>
+template <typename TElem> class TBiColCursor : public TColCursor<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -386,18 +381,12 @@ template <class TElem> class TBiColCursor : public TColCursor<TElem>
         {
         }
 
-        TBiColCursor(const TBiColCursor& cursSrc) :
+        TBiColCursor(const TBiColCursor&) = default;
+        TBiColCursor<TElem>& operator=(const TBiColCursor&) = default;
 
-            TColCursor<TElem>(cursSrc)
-        {
-        }
-
-        TBiColCursor<TElem>& operator=(const TBiColCursor& cursSrc)
-        {
-            if (&cursSrc != this)
-                TParent::operator=(cursSrc);
-            return *this;
-        }
+        // Can't actually delete them since that causes problems
+        // TBiColCursor(TBiColCursor&&) = delete;
+        // TBiColCursor<TElem>& operator=(TBiColCursor&&) = delete;
 
 
     private :

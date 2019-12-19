@@ -37,7 +37,7 @@
 //   CLASS: TFundStack
 //  PREFIX: fcol
 // -----------------------------------------------------------------------------
-template <class T> class TFundStack : public TFundColBase, public MDuplicable
+template <typename T> class TFundStack : public TFundColBase, public MDuplicable
 {
     public :
         // --------------------------------------------------------------------
@@ -245,7 +245,7 @@ template <class T> class TFundStack : public TFundColBase, public MDuplicable
 //   CLASS: TFundStackJan
 //  PREFIX: jan
 // -----------------------------------------------------------------------------
-template <class T> class TFundStackJan
+template <typename T> class TFundStackJan
 {
     public :
         TFundStackJan(const T tToPush, TFundStack<T>* const pfcolStack) :
@@ -279,7 +279,7 @@ template <class T> class TFundStackJan
 #pragma CIDLIB_POPPACK
 
 
-template <class T> TBinInStream&
+template <typename T> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TFundStack<T>& colToStream)
 {
     // First we should get a stream marker
@@ -328,7 +328,7 @@ operator>>(TBinInStream& strmToReadFrom, TFundStack<T>& colToStream)
     return strmToReadFrom;
 }
 
-template <class T> TBinOutStream&
+template <typename T> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TFundStack<T>& colToStream)
 {
     // Stream out our start marker, max elements and current element count

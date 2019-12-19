@@ -108,7 +108,7 @@ class TObjArray : public TObject, public MDuplicable
 
             TObjArray(1, objaSrc.eMTState())
         {
-            *this = operator=(tCIDLib::ForceMove(objaSrc));
+            operator=(tCIDLib::ForceMove(objaSrc));
         }
 
         ~TObjArray()
@@ -291,20 +291,42 @@ class TObjArray : public TObject, public MDuplicable
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             TMtxLocker lockThis(m_pmtxLock);
-            for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
             {
-                if (!iterCB(m_paobjList[c4Ind]))
+                if (!iterCB(m_paobjList[c4Index]))
                     return kCIDLib::False;
             }
             return kCIDLib::True;
         }
 
-        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB)
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
         {
             TMtxLocker lockThis(m_pmtxLock);
-            for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
             {
-                if (!iterCB(m_paobjList[c4Ind]))
+                if (!iterCB(m_paobjList[c4Index]))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
+        {
+            TMtxLocker lockThis(m_pmtxLock);
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
+            {
+                if (!iterCB(m_paobjList[c4Index], c4Index))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachNCI(IterCB iterCB)
+        {
+            TMtxLocker lockThis(m_pmtxLock);
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
+            {
+                if (!iterCB(m_paobjList[c4Index], c4Index))
                     return kCIDLib::False;
             }
             return kCIDLib::True;

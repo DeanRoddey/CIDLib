@@ -106,7 +106,7 @@ class CIDCTRLSEXP TNotHandlerBase
 };
 
 
-template <class T> class TNotifyHandler : public TNotHandlerBase
+template <typename T> class TNotifyHandler : public TNotHandlerBase
 {
     public :
         // -------------------------------------------------------------------
@@ -164,7 +164,7 @@ template <class T> class TNotifyHandler : public TNotHandlerBase
 };
 
 
-template <class T, class D> class TNotifyHandlerFor : public TNotHandlerBase
+template <typename T, class D> class TNotifyHandlerFor : public TNotHandlerBase
 {
     public :
         // -------------------------------------------------------------------

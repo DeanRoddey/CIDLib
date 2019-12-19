@@ -571,7 +571,7 @@ TBinOutStream_WriteArray(       TBinOutStream&          strmOut
 //  operators are in CIDLib_Streamable.hpp since they have to be friends of
 //  the streamable mixin.
 // ---------------------------------------------------------------------------
-template <class T> tCIDLib::TVoid
+template <typename T> tCIDLib::TVoid
 PolymorphicWrite(const T* const pobjToWrite, TBinOutStream& strmToWriteTo)
 {
     strmToWriteTo.WriteClassInfo(pobjToWrite->clsIsA());

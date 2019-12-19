@@ -62,7 +62,7 @@
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 // Forward ref some local stuff
-template <class TElem> class TTreeNodeNT;
+template <typename TElem> class TTreeNodeNT;
 
 
 // ---------------------------------------------------------------------------
@@ -76,6 +76,7 @@ class CIDLIBEXP TBaseTreeNode : public TObject
         //  Destructor
         // -------------------------------------------------------------------
         TBaseTreeNode(const TBaseTreeNode&) = delete;
+        TBaseTreeNode(TBaseTreeNode&&) = delete;
 
         ~TBaseTreeNode();
 
@@ -84,6 +85,7 @@ class CIDLIBEXP TBaseTreeNode : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TBaseTreeNode& operator=(const TBaseTreeNode&) = delete;
+        TBaseTreeNode& operator=(TBaseTreeNode&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -260,13 +262,14 @@ namespace TBasicTreeHelpers
 //   CLASS: TBasicTreeNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicTreeNode : public TBaseTreeNode
+template <typename TElem> class TBasicTreeNode : public TBaseTreeNode
 {
     public :
         // -------------------------------------------------------------------
         //  Destructor
         // -------------------------------------------------------------------
         TBasicTreeNode(const TBasicTreeNode<TElem>&) = delete;
+        TBasicTreeNode(TBasicTreeNode<TElem>&&) = delete;
 
         ~TBasicTreeNode()
         {
@@ -277,6 +280,7 @@ template <class TElem> class TBasicTreeNode : public TBaseTreeNode
         //  Public operators
         // -------------------------------------------------------------------
         TBasicTreeNode<TElem>& operator=(const TBasicTreeNode<TElem>&) = delete;
+        TBasicTreeNode<TElem>& operator=(TBasicTreeNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -406,13 +410,14 @@ template <class TElem> class TBasicTreeNode : public TBaseTreeNode
 //   CLASS: TTreeNodeT
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TTreeNodeT : public TBasicTreeNode<TElem>
+template <typename TElem> class TTreeNodeT : public TBasicTreeNode<TElem>
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TTreeNodeT(const TTreeNodeT<TElem>&) = delete;
+        TTreeNodeT(TTreeNodeT<TElem>&&) = delete;
 
         TTreeNodeT( const   TElem&                      objToCopy
                     , const TString&                    strName
@@ -439,6 +444,7 @@ template <class TElem> class TTreeNodeT : public TBasicTreeNode<TElem>
         //  Public operators
         // -------------------------------------------------------------------
         TTreeNodeT<TElem>& operator=(const TTreeNodeT<TElem>&) = delete;
+        TTreeNodeT<TElem>& operator=(TTreeNodeT<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -481,13 +487,14 @@ template <class TElem> class TTreeNodeT : public TBasicTreeNode<TElem>
 //   CLASS: TTreeNodeNT
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
+template <typename TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TTreeNodeNT(const TTreeNodeNT<TElem>&) = delete;
+        TTreeNodeNT(TTreeNodeNT<TElem>&&) = delete;
 
         TTreeNodeNT(const   TString&                    strName
                     , const TString&                    strDescription
@@ -533,6 +540,7 @@ template <class TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
         //  Public operators
         // -------------------------------------------------------------------
         TTreeNodeNT<TElem>& operator=(const TTreeNodeNT<TElem>&) = delete;
+        TTreeNodeNT<TElem>& operator=(TTreeNodeNT<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -869,7 +877,7 @@ template <class TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
 //   CLASS: TBasicTreeCol
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicTreeCol : public TCollection<TElem>
+template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 {
     public :
         // -------------------------------------------------------------------
@@ -885,7 +893,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem> class TConstCursor : public TColCursor<TElem>
+        template <typename TElem> class TConstCursor : public TColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1109,7 +1117,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 )
         };
 
-        template <class TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1224,7 +1232,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         };
 
 
-        template <class TElem> class TConstScopeCursor : public TColCursor<TElem>
+        template <typename TElem> class TConstScopeCursor : public TColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1453,7 +1461,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         };
 
 
-        template <class TElem> class TNonConstScopeCursor : public TConstScopeCursor<TElem>
+        template <typename TElem> class TNonConstScopeCursor : public TConstScopeCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------

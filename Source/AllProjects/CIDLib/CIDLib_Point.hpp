@@ -81,6 +81,7 @@ class CIDLIBEXP TPoint :
         }
 
         TPoint(const TPoint&) = default;
+        TPoint(TPoint&&) = default;
 
         ~TPoint() = default;
 
@@ -89,6 +90,7 @@ class CIDLIBEXP TPoint :
         //  Public operators
         // -------------------------------------------------------------------
         TPoint& operator=(const TPoint&) = default;
+        TPoint& operator=(TPoint&&) = default;
 
         explicit operator const tCIDLib::THostPoint*() const;
 
@@ -176,7 +178,7 @@ class CIDLIBEXP TPoint :
         (
             const   TString&                strText
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
-            , const tCIDLib::TCh            chSepChar = L','
+            , const tCIDLib::TCh            chSepChar = kCIDLib::chComma
         );
 
         tCIDLib::TCard4 c4AbsDiff
@@ -188,7 +190,7 @@ class CIDLIBEXP TPoint :
 
         tCIDLib::TVoid Exchange()
         {
-            tCIDLib::TInt4 i4Tmp = m_i4X;
+            const tCIDLib::TInt4 i4Tmp = m_i4X;
             m_i4X=m_i4Y;
             m_i4Y=i4Tmp;
         }
@@ -197,7 +199,7 @@ class CIDLIBEXP TPoint :
         (
                     TString&                strToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
-            , const tCIDLib::TCh            chSepChar = L','
+            , const tCIDLib::TCh            chSepChar = kCIDLib::chComma
             , const tCIDLib::TBoolean       bAppend = kCIDLib::False
         )   const;
 
@@ -322,7 +324,7 @@ class CIDLIBEXP TPoint :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
@@ -332,10 +334,10 @@ class CIDLIBEXP TPoint :
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
-    private     :
+    private :
         // -------------------------------------------------------------------
         //  Private data members
         //

@@ -34,7 +34,7 @@
 //   CLASS: TRefBag
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
+template <typename TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------

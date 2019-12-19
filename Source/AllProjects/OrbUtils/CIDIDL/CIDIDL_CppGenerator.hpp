@@ -117,7 +117,7 @@ class TCppGenerator : public TCodeGenerator
         tCIDLib::TVoid GenConstant
         (
             const   TString&                strName
-            , const TString&                strType
+            , const tCIDIDL::ETypes         Type
             , const TString&                strValue
             , const TString&                strDocs
         );

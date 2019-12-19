@@ -92,6 +92,7 @@ class CIDLIBEXP TChunkedBinInStream : public TBinInStream
         );
 
         TChunkedBinInStream(const TChunkedBinInStream&) = delete;
+        TChunkedBinInStream(TChunkedBinInStream&&) = delete;
 
         ~TChunkedBinInStream();
 
@@ -100,6 +101,7 @@ class CIDLIBEXP TChunkedBinInStream : public TBinInStream
         //  Public operators
         // -------------------------------------------------------------------
         TChunkedBinInStream& operator=(const TChunkedBinInStream&) = delete;
+        TChunkedBinInStream& operator=(TChunkedBinInStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -152,6 +154,7 @@ class CIDLIBEXP TChunkedBinOutStream : public TBinOutStream
         );
 
         TChunkedBinOutStream(const TChunkedBinOutStream&) = delete;
+        TChunkedBinOutStream(TChunkedBinOutStream&&) = delete;
 
         ~TChunkedBinOutStream();
 
@@ -160,6 +163,7 @@ class CIDLIBEXP TChunkedBinOutStream : public TBinOutStream
         //  Public operators
         // -------------------------------------------------------------------
         TChunkedBinOutStream& operator=(const TChunkedBinOutStream&) = delete;
+        TChunkedBinOutStream& operator=(TChunkedBinOutStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -227,6 +231,7 @@ class CIDLIBEXP TChunkedTextInStream : public TTextInStream
         );
 
         TChunkedTextInStream(const TChunkedTextInStream&) = delete;
+        TChunkedTextInStream(TChunkedTextInStream&&) = delete;
 
         ~TChunkedTextInStream();
 
@@ -235,6 +240,7 @@ class CIDLIBEXP TChunkedTextInStream : public TTextInStream
         //  Public operators
         // -------------------------------------------------------------------
         TChunkedTextInStream& operator=(const TChunkedTextInStream&) = delete;
+        TChunkedTextInStream& operator=(TChunkedTextInStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -283,6 +289,7 @@ class CIDLIBEXP TChunkedTextOutStream : public TTextOutStream
         );
 
         TChunkedTextOutStream(const TChunkedTextOutStream&) = delete;
+        TChunkedTextOutStream(TChunkedTextOutStream&&) = delete;
 
         ~TChunkedTextOutStream();
 
@@ -291,6 +298,7 @@ class CIDLIBEXP TChunkedTextOutStream : public TTextOutStream
         //  Public operators
         // -------------------------------------------------------------------
         TChunkedTextOutStream& operator=(const TChunkedTextOutStream&) = delete;
+        TChunkedTextOutStream& operator=(TChunkedTextOutStream&&) = delete;
 
 
         // -------------------------------------------------------------------

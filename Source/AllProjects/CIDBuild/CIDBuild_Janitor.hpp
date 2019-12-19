@@ -25,13 +25,13 @@
 //  $_CIDLib_Log_$
 //
 
-template <class T> class TJanitor
+template <typename T> class TJanitor
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TJanitor() = delete;        
+        TJanitor() = delete;
 
         TJanitor(T* const pToDelete) :
 
@@ -63,7 +63,7 @@ template <class T> class TJanitor
 };
 
 
-template <class T> class TArrayJanitor
+template <typename T> class TArrayJanitor
 {
     public :
         // -------------------------------------------------------------------
