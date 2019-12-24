@@ -56,13 +56,13 @@ namespace CIDKernel_Socket_Win32
     {
         0       // IP
         , 1     // ICMP
-        , 58    // ICMP6
         , 2     // IGMP
         , 6     // TCP
         , 12    // PUP
         , 17    // UDP
         , 22    // IDP
         , 255   // RawIP
+        , 58    // ICMP6
     };
     constexpr tCIDLib::TCard4   c4ProtoCnt = tCIDLib::c4ArrayElems(ac4ProtoMaps);
 }
@@ -83,7 +83,7 @@ static tCIDLib::TCard4 c4XlatProto(const tCIDSock::ESockProtos eToXlat)
             , CID_LINE
         );
     }
-    return CIDKernel_Socket_Win32::ac4ProtoMaps[tCIDLib::TCard4(eToXlat)];
+    return CIDKernel_Socket_Win32::ac4ProtoMaps[tCIDLib::c4EnumOrd(eToXlat)];
 }
 
 
@@ -103,7 +103,7 @@ static unsigned short usConvertFamily(TKrnlIPAddr& kipaSrc)
 // ---------------------------------------------------------------------------
 TSocketHandle::TSocketHandle() :
 
-    m_phsockiThis(0)
+    m_phsockiThis(nullptr)
 {
     m_phsockiThis = new TSocketHandleImpl;
     m_phsockiThis->hSock = CIDKernel_Socket_Win32::hInvalid;
@@ -111,7 +111,7 @@ TSocketHandle::TSocketHandle() :
 
 TSocketHandle::TSocketHandle(const TSocketHandle& hsockToCopy) :
 
-    m_phsockiThis(0)
+    m_phsockiThis(nullptr)
 {
     m_phsockiThis = new TSocketHandleImpl;
     m_phsockiThis->hSock = hsockToCopy.m_phsockiThis->hSock;
@@ -120,7 +120,7 @@ TSocketHandle::TSocketHandle(const TSocketHandle& hsockToCopy) :
 TSocketHandle::~TSocketHandle()
 {
     delete m_phsockiThis;
-    m_phsockiThis = 0;
+    m_phsockiThis = nullptr;
 }
 
 
@@ -219,7 +219,7 @@ TKrnlSocket::bDoSSLPageOp(  const   tCIDNet::ESSLOps                eOp
     HINTERNET           hOpen;
     HINTERNET           hConnect;
     HINTERNET           hRequest;
-    IStream*            pStream;
+    IStream*            pStream = nullptr;
     HRESULT             hRes;
 
     // Try to open the WinHTTP API
@@ -323,7 +323,7 @@ TKrnlSocket::bDoSSLPageOp(  const   tCIDNet::ESSLOps                eOp
         hRequest
         , pszInHdrs ? pszInHdrs : WINHTTP_NO_ADDITIONAL_HEADERS
         , -1
-        , c4ContLen ? pc1OutBuf : 0
+        , c4ContLen ? pc1OutBuf : nullptr
         , c4ContLen
         , c4ContLen
         , 0
@@ -432,7 +432,7 @@ TKrnlSocket::bDoSSLPageOp(  const   tCIDNet::ESSLOps                eOp
                 tCIDLib::TCh* pszKey = (tCIDLib::TCh*)pc1OutHrs;
                 const tCIDLib::TCh* pszEnd = (tCIDLib::TCh*)(pc1OutHrs + cch);
                 tCIDLib::TCard4 c4Len;
-                tCIDLib::TCh* pszVal;
+                tCIDLib::TCh* pszVal = nullptr;
                 while (pszKey < pszEnd)
                 {
                     // Remember the full length before we mangle it
@@ -558,7 +558,7 @@ TKrnlSocket::bDoSSLPageOp(  const   tCIDNet::ESSLOps                eOp
     ::WinHttpCloseHandle(hOpen);
 
     // Null terminate the stream
-    tCIDLib::TCard1* pc1Null = 0;
+    tCIDLib::TCard1* pc1Null = nullptr;
     pStream->Write(&pc1Null, 1, NULL);
 
     HGLOBAL hgl;
@@ -617,7 +617,7 @@ bMultiReadSel(          TKrnlSocket*            apsockList[kCIDSock::c4MaxSelect
     }
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);
@@ -712,7 +712,7 @@ TKrnlSocket::bMultiSel(         TKrnlSocket*            apsockList[kCIDSock::c4M
     }
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);
@@ -1154,11 +1154,7 @@ TKrnlSocket::bCreate(   const   tCIDSock::ESocketTypes  eType
 tCIDLib::TBoolean TKrnlSocket::bDataReady(tCIDLib::TCard4& c4ToFill) const
 {
     // Query the amount of data readable via the next read operation
-    if (::ioctlsocket
-    (
-        m_hsockThis.m_phsockiThis->hSock
-        , FIONREAD
-        , &c4ToFill) == SOCKET_ERROR)
+    if (::ioctlsocket(m_hsockThis.m_phsockiThis->hSock, FIONREAD, &c4ToFill) == SOCKET_ERROR)
     {
         tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
         TKrnlError::SetLastKrnlError(TKrnlIP::c4XlatError(c4LastErr), c4LastErr);
@@ -1871,7 +1867,7 @@ TKrnlSocket::bWaitForConnectReady(          tCIDLib::TBoolean&      bGotConnect
     FDConn.fd_array[0] = m_hsockThis.m_phsockiThis->hSock;
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);
@@ -1915,7 +1911,7 @@ TKrnlSocket::bWaitForDataReady(         tCIDLib::TBoolean&      bGotData
     FDRead.fd_array[0] = m_hsockThis.m_phsockiThis->hSock;
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);
@@ -1966,7 +1962,7 @@ TKrnlSocket::bWaitForSendReady(         tCIDLib::TBoolean&      bReady
     FDRead.fd_array[0] = m_hsockThis.m_phsockiThis->hSock;
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);

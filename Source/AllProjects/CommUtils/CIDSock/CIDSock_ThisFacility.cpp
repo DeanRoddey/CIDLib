@@ -908,17 +908,16 @@ TString TFacCIDSock::strXlatProto(const tCIDSock::ESockProtos eToXlat) const
     {
         L"IP"
         , L"ICMP"
-        , L"ICMP6"
         , L"IGMP"
         , L"TCP"
         , L"PUP"
         , L"UDP"
         , L"IDP"
         , L"RawIP"
+        , L"ICMP6"
     };
     if (eToXlat >= tCIDSock::ESockProtos::Count)
         return TString(L"???");
 
     return TString(apszMap[tCIDLib::c4EnumOrd(eToXlat)]);
 }
-

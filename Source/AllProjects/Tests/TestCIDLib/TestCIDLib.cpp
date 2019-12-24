@@ -68,7 +68,6 @@ static TTestFuncRecord      aTestFunctions[] =
     ,   { TFacTestCIDLib::TestTextConverters, L"TextConverters" , kCIDLib::False }
     ,   { TFacTestCIDLib::TestLocales       , L"Locales"        , kCIDLib::False }
     ,   { TFacTestCIDLib::TestRTTI          , L"RTTI"           , kCIDLib::False }
-    ,   { TFacTestCIDLib::TestPerThreadData , L"PerThread"      , kCIDLib::False }
     ,   { TFacTestCIDLib::TestFundData      , L"FundData"       , kCIDLib::False }
     ,   { TFacTestCIDLib::TestSearchSort    , L"SearchSort"     , kCIDLib::False }
     ,   { TFacTestCIDLib::TestVectors       , L"Vectors"        , kCIDLib::False }

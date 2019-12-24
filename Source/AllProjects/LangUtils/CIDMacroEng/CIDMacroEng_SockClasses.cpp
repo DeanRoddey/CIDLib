@@ -1017,13 +1017,13 @@ tCIDLib::TVoid TMEngSocketInfo::Init(TCIDMacroEngine& meOwner)
         );
         pmeciEnum->c4AddEnumItem(L"IP", L"IP", tCIDSock::ESockProtos::IP);
         pmeciEnum->c4AddEnumItem(L"ICMP", L"ICMP", tCIDSock::ESockProtos::ICMP);
-        pmeciEnum->c4AddEnumItem(L"ICMP6", L"ICMP", tCIDSock::ESockProtos::ICMP6);
         pmeciEnum->c4AddEnumItem(L"IGMP", L"IGMP", tCIDSock::ESockProtos::IGMP);
         pmeciEnum->c4AddEnumItem(L"TCP", L"TCP", tCIDSock::ESockProtos::TCP);
         pmeciEnum->c4AddEnumItem(L"PUP", L"PUP", tCIDSock::ESockProtos::PUP);
         pmeciEnum->c4AddEnumItem(L"UDP", L"UDP", tCIDSock::ESockProtos::UDP);
         pmeciEnum->c4AddEnumItem(L"IDP", L"IDP", tCIDSock::ESockProtos::IDP);
         pmeciEnum->c4AddEnumItem(L"RawIP", L"RawIP", tCIDSock::ESockProtos::RawIP);
+        pmeciEnum->c4AddEnumItem(L"ICMP6", L"ICMP", tCIDSock::ESockProtos::ICMP6);
         pmeciEnum->BaseClassInit(meOwner);
         meOwner.c2AddClass(pmeciEnum);
         bAddNestedType(pmeciEnum->strClassPath());

@@ -50,7 +50,7 @@ namespace CIDCrypto_UniqueId
     //      This is where we store a random number generator for each thread, so
     //      we don't have to re-seed every time.
     // -----------------------------------------------------------------------
-    TPerThreadDataFor<TRandomNum> ptdLastId;
+    thread_local TRandomNum* prandThread;
 }
 
 
@@ -60,15 +60,15 @@ TMD5Hash TUniqueId::mhashMakeId()
     TMD5Hash mhashRet;
 
     // If we haven't set the storage for this thread, then do it now
-    if (!CIDCrypto_UniqueId::ptdLastId.bIsSet())
+    if (!CIDCrypto_UniqueId::prandThread)
     {
-        TRandomNum* prandThread = new TRandomNum;
+        CIDCrypto_UniqueId::prandThread = new TRandomNum;
 
         // Generate a seed for this guy
         tCIDLib::TCard4 c4Seed
         (
             tCIDLib::TCard4(&mhashRet)
-            ^ (tCIDLib::TCard4(prandThread) >> 19)
+            ^ (tCIDLib::TCard4(CIDCrypto_UniqueId::prandThread) >> 19)
             ^ TTime::c4Millis()
             ^ tCIDLib::TCard4(TProcess::pidThis())
             ^ tCIDLib::TCard4(TThread::tidCaller())
@@ -85,15 +85,13 @@ TMD5Hash TUniqueId::mhashMakeId()
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Len; c4Index++)
             c4Seed ^= tCIDLib::TCard4(strThreadName[c4Index] << 3);
 
-        prandThread->Seed(c4Seed);
-        CIDCrypto_UniqueId::ptdLastId.pobjThis(prandThread);
+        CIDCrypto_UniqueId::prandThread->Seed(c4Seed);
     }
 
     // OK, fill a buffer with new random values
-    TRandomNum* prandThread = CIDCrypto_UniqueId::ptdLastId.pobjThis();
     tCIDLib::TCard4 ac4Buf[CIDCrypto_UniqueId::c4SrcBufLen];
     for (tCIDLib::TCard4 c4Index = 0; c4Index < CIDCrypto_UniqueId::c4SrcBufLen; c4Index++)
-        ac4Buf[c4Index] = prandThread->c4GetNextNum();
+        ac4Buf[c4Index] = CIDCrypto_UniqueId::prandThread->c4GetNextNum();
 
     // And hash it using MD5
     TMessageDigest5 mdigTmp;
@@ -150,11 +148,7 @@ TMD5Hash TUniqueId::mhashMakeSystemId()
     tCIDLib::TCard4 c4BinBytes;
     tcvtTmp.c4ConvertTo
     (
-        strSrcData.pszBuffer()
-        , strSrcData.c4Length()
-        , ac1Buf
-        , c4BufSz
-        , c4BinBytes
+        strSrcData.pszBuffer(), strSrcData.c4Length(), ac1Buf, c4BufSz, c4BinBytes
     );
 
     //

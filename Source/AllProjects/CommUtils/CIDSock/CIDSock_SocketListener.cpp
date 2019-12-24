@@ -333,9 +333,7 @@ tCIDLib::TVoid TSocketListener::Initialize(const tCIDSock::ESockProtos eProtocol
         TKrnlSocket* pksockCur = new TKrnlSocket;
         bRes = pksockCur->bCreate
         (
-            tCIDSock::ESocketTypes::Stream
-            , eProtocol
-            , akipaUse[c4Index].eType()
+            tCIDSock::ESocketTypes::Stream, eProtocol, akipaUse[c4Index].eType()
         );
 
         // Try to bind it if we created it

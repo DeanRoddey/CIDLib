@@ -2201,9 +2201,6 @@ tCIDLib::TVoid TThread::ShutdownProcessing()
     //
     CIDAssert(m_c4ListInd < CIDLib_Thread::c4MaxThreads, L"Thread index is invalid");
     athriList()[m_c4ListInd].tidThread = kCIDLib::tidInvalid;
-
-    // Clean up any per-thread data for this thread
-    TKrnlPerThreadData::CleanUpThreadData();
 }
 
 

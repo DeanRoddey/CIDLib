@@ -237,11 +237,6 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
             const   tCIDLib::EInitTerm      eState
         );
 
-        tCIDLib::TBoolean bInitTermPerThread
-        (
-            const   tCIDLib::EInitTerm      eState
-        );
-
         tCIDLib::TBoolean bInitTermSigHandler
         (
             const   tCIDLib::EInitTerm      eState
@@ -379,7 +374,6 @@ namespace tCIDKernel
 #include    "CIDKernel_LowLevelPopUp.hpp"
 #include    "CIDKernel_MathLib.hpp"
 #include    "CIDKernel_PathString.hpp"
-#include    "CIDKernel_PerThreadData.hpp"
 #include    "CIDKernel_SafeCounter.hpp"
 #include    "CIDKernel_Signals.hpp"
 #include    "CIDKernel_SystemInfo.hpp"

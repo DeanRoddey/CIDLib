@@ -133,7 +133,6 @@ class TFacTestCIDLib : public TFacility
         static tCIDLib::TVoid TestLocales();
         static tCIDLib::TVoid TestMemoryClasses();
         static tCIDLib::TVoid TestObjArrays();
-        static tCIDLib::TVoid TestPerThreadData();
         static tCIDLib::TVoid TestPointerClasses();
         static tCIDLib::TVoid TestProcess();
         static tCIDLib::TVoid TestQueues();

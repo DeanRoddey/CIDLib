@@ -2504,23 +2504,25 @@ namespace tCIDSock
 
     // -----------------------------------------------------------------------
     //  The available socket protocols. Keep this in sync with the translation
-    //  methods in the CIDSock facility class.
+    //  methods in the CIDSock facility class, and in the platform implementations
+    //  of sockets, which will have mapping tables to the local ids for these
+    //  things probably. And the CML class that wraps this type as well.
     // -----------------------------------------------------------------------
     enum class ESockProtos
     {
         IP
         , ICMP
-        , ICMP6
         , IGMP
         , TCP
         , PUP
         , UDP
         , IDP
         , RawIP
+        , ICMP6
 
         , Count
         , Min           = IP
-        , Max           = RawIP
+        , Max           = ICMP6
     };
 
 
