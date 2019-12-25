@@ -87,7 +87,7 @@ TMEngExceptVal::TMEngExceptVal( const   TString&                strName
                                 , const tCIDMacroEng::EConstTypes  eConst) :
 
     TMEngClassVal(strName, tCIDLib::TCard2(tCIDMacroEng::EIntrinsics::Exception), eConst)
-    , m_c2ErrClassId(kMacroEng::c2BadId)
+    , m_c2ErrClassId(kCIDMacroEng::c2BadId)
     , m_c4ErrorNum(kCIDLib::c4MaxCard)
     , m_c4LineNum(0)
 {
@@ -162,7 +162,7 @@ tCIDLib::TCard4 TMEngExceptVal::c4LineNum() const
 
 tCIDLib::TVoid TMEngExceptVal::Reset()
 {
-    m_c2ErrClassId  = kMacroEng::c2BadId;
+    m_c2ErrClassId  = kCIDMacroEng::c2BadId;
     m_c4ErrorNum    = kCIDLib::c4MaxCard;
     m_c4LineNum     = 0;
     m_strSrcClassPath.Clear();
@@ -236,13 +236,13 @@ TMEngExceptInfo::TMEngExceptInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Check(kMacroEng::c2BadId)
-    , m_c2MethId_CheckGreater(kMacroEng::c2BadId)
-    , m_c2MethId_GetClass(kMacroEng::c2BadId)
-    , m_c2MethId_GetErrorNum(kMacroEng::c2BadId)
-    , m_c2MethId_GetErrorText(kMacroEng::c2BadId)
-    , m_c2MethId_GetLine(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Check(kCIDMacroEng::c2BadId)
+    , m_c2MethId_CheckGreater(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetClass(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetErrorNum(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetErrorText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLine(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -523,7 +523,7 @@ TMEngFormattableInfo::TMEngFormattableInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::NonFinal
         , L"MEng.Object"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -639,7 +639,7 @@ TMEngObjectInfo::TMEngObjectInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::NonFinal
         , kCIDMacroEng_::pszNoParentClass
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
 {
 }
 

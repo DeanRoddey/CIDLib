@@ -110,9 +110,9 @@ TCIDMacroEngine::TCIDMacroEngine() :
     m_bDebugMode(kCIDLib::False)
     , m_bInIDE(kCIDLib::False)
     , m_bValidation(kCIDLib::False)
-    , m_c2ArrayId(kMacroEng::c2BadId)
+    , m_c2ArrayId(kCIDMacroEng::c2BadId)
     , m_c2NextClassId(0)
-    , m_c2VectorId(kMacroEng::c2BadId)
+    , m_c2VectorId(kCIDMacroEng::c2BadId)
     , m_c4CallStackTop(0)
     , m_c4CurLine(0)
     , m_c4NextUniqueId(1)
@@ -145,7 +145,7 @@ TCIDMacroEngine::TCIDMacroEngine() :
         {
             TStatsCache::RegisterItem
             (
-                kMacroEng::pszStat_MEng_EngInstCount
+                kCIDMacroEng::pszStat_MEng_EngInstCount
                 , tCIDLib::EStatItemTypes::Counter
                 , CIDMacroEng_Engine::sciMacroEngCount
             );
@@ -310,7 +310,7 @@ TCIDMacroEngine::bFormatNextCallFrame(  TTextOutStream&     strmTarget
     //  If the previous id is max card, then we are to do the first one.
     //  Else, we are working down and need to find the previous one.
     //
-    TMEngCallStackItem* pmecsiCur;
+    TMEngCallStackItem* pmecsiCur = nullptr;
     if (c4PrevInd == kCIDLib::c4MaxCard)
     {
         // If we don't have any entries, nothing to do
@@ -536,7 +536,7 @@ TCIDMacroEngine::bIsLiteralClass(const tCIDLib::TCard2 c2IdToCheck) const
     if (c2IdToCheck >= tCIDLib::TCard2(tCIDMacroEng::EIntrinsics::Count))
         return kCIDLib::False;
 
-    tCIDLib::TBoolean bRet;
+    tCIDLib::TBoolean bRet = kCIDLib::False;
     switch(tCIDMacroEng::EIntrinsics(c2IdToCheck))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
@@ -697,7 +697,7 @@ TCIDMacroEngine::c2FindClassId( const   TString&            strClassPath
                 , strClassPath
             );
         }
-        return kMacroEng::c2BadId;
+        return kCIDMacroEng::c2BadId;
     }
     return pmeciRet->c2Id();
 }
@@ -961,7 +961,7 @@ tCIDLib::TVoid TCIDMacroEngine::CheckIDEReq()
     if (!c4Index)
         return;
 
-    TMEngCallStackItem* pmecsiCur;
+    TMEngCallStackItem* pmecsiCur = nullptr;
     do
     {
         c4Index--;
@@ -977,29 +977,20 @@ tCIDLib::TVoid TCIDMacroEngine::CheckIDEReq()
         return;
 
     // Get out the info we need
-    const TMEngClassInfo*       pmeciCaller;
-    const TMEngOpMethodImpl*    pmethCaller;
-    const TMEngMethodInfo*      pmethiCaller;
-    TMEngClassVal*              pmecvCaller;
-    tCIDLib::TCard4             c4CallIP;
+    const TMEngClassInfo*       pmeciCaller = nullptr;
+    const TMEngOpMethodImpl*    pmethCaller = nullptr;
+    const TMEngMethodInfo*      pmethiCaller = nullptr;
+    TMEngClassVal*              pmecvCaller = nullptr;
+    tCIDLib::TCard4             c4CallIP = kCIDLib::c4MaxCard;
 
     tCIDLib::TCard4 c4CallLine = pmecsiCur->c4QueryCallerInfo
     (
-        pmeciCaller
-        , pmethiCaller
-        , pmethCaller
-        , pmecvCaller
-        , c4CallIP
+        pmeciCaller, pmethiCaller, pmethCaller, pmecvCaller, c4CallIP
     );
 
     tCIDMacroEng::EDbgActs eAct = m_pmedbgToUse->eAtLine
     (
-        *pmeciCaller
-        , *pmethiCaller
-        , *pmethCaller
-        , *pmecvCaller
-        , c4CallLine
-        , c4CallIP
+        *pmeciCaller, *pmethiCaller, *pmethCaller, *pmecvCaller, c4CallLine, c4CallIP
     );
 
     //
@@ -1062,11 +1053,9 @@ TCIDMacroEngine::CheckStackTop( const   tCIDLib::TCard2         c2ExpectedClassI
 
     if (mecvVal.eConst() != eConst)
     {
-        tCIDLib::TErrCode errcToThrow;
+        tCIDLib::TErrCode errcToThrow = kMEngErrs::errcEng_NotNConstStackItem;
         if (eConst == tCIDMacroEng::EConstTypes::Const)
             errcToThrow = kMEngErrs::errcEng_NotConstStackItem;
-        else
-            errcToThrow = kMEngErrs::errcEng_NotNConstStackItem;
 
         facCIDMacroEng().ThrowErr
         (
@@ -1261,8 +1250,8 @@ eResolveClassName(  const   TString&                        strName
 
     // First we figure out which scenario we are looking at.
     ETypes eType = ETypes::Fully;
-    tCIDLib::TCard4 c4Pos1;
-    tCIDLib::TCard4 c4Pos2;
+    tCIDLib::TCard4 c4Pos1 = 0;
+    tCIDLib::TCard4 c4Pos2 = 0;
     if (strName.bFirstOccurrence(kCIDLib::chPeriod, c4Pos1))
     {
         //
@@ -1286,7 +1275,7 @@ eResolveClassName(  const   TString&                        strName
         eType = ETypes::Relative;
     }
 
-    tCIDMacroEng::EClassMatches eRet;
+    tCIDMacroEng::EClassMatches eRet = tCIDMacroEng::EClassMatches::NotFound;
     if (eType == ETypes::Fully)
     {
         TMEngClassInfo* pmeciTarget = pmeciFind(strName);
@@ -1304,7 +1293,7 @@ eResolveClassName(  const   TString&                        strName
             strFind.Cut(c4Pos1);
 
         // Make sure it's unique and remember which one we hit, if any
-        TMEngClassInfo* pmeciCur = 0;
+        TMEngClassInfo* pmeciCur = nullptr;
         tCIDLib::TCard4 c4HitCount = 0;
         const tCIDLib::TCard4 c4Count = m_colClassesById.c4ElemCount();
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -2142,10 +2131,10 @@ TCIDMacroEngine::pmeciLastMacroCaller(tCIDLib::TCard4& c4Line)
     //
     tCIDLib::TCard4 c4Index = m_c4CallStackTop;
     if (!c4Index)
-        return 0;
+        return nullptr;
 
-    TMEngCallStackItem* pmecsiCur;
-    const TMEngClassInfo* pmeciRet = 0;
+    TMEngCallStackItem* pmecsiCur = nullptr;
+    const TMEngClassInfo* pmeciRet = nullptr;
     do
     {
         c4Index--;
@@ -2167,8 +2156,7 @@ TCIDMacroEngine::pmeciLoadExternalClass(const TString& strClassPathToLoad)
 {
     TMEngClassInfo* pmeciRet = m_colClasses.pobjFindByKey
     (
-        strClassPathToLoad
-        , kCIDLib::False
+        strClassPathToLoad, kCIDLib::False
     );
 
     // If already loaded, we are done
@@ -3397,9 +3385,9 @@ TCIDMacroEngine::pmecvGet(  const   TString&                    strName
     //
     tCIDMacroEng::TClassValList& colList = *cptrList;
     const tCIDLib::TCard4 c4Count = colList.c4ElemCount();
-    tCIDLib::TCard4 c4Index;
-    TMEngClassVal* pmecvRet = 0;
-    for (c4Index = 0; c4Index < c4Count; c4Index++)
+    tCIDLib::TCard4 c4Index = 0;
+    TMEngClassVal* pmecvRet = nullptr;
+    for (; c4Index < c4Count; c4Index++)
     {
         pmecvRet = colList[c4Index];
 

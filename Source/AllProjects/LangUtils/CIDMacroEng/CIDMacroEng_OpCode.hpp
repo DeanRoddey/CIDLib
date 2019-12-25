@@ -234,7 +234,7 @@ class CIDMACROENGEXP TMEngOpCode
         // -------------------------------------------------------------------
         union UOpStorage
         {
-            tCIDLib::TCard2     ac2Indices[kMacroEng::c4OpIndices];
+            tCIDLib::TCard2     ac2Indices[kCIDMacroEng::c4OpIndices];
             tCIDLib::TBoolean   bImmediate;
             tCIDLib::TCard1     c1Immediate;
             tCIDLib::TCard2     c2Immediate;
@@ -290,7 +290,7 @@ operator<<(TTextOutStream& strmTarget, const TMEngOpCode& meopToFormat);
 inline tCIDLib::TCard2
 TMEngOpCode::operator[](const tCIDLib::TCard4 c4Index) const
 {
-    if (c4Index < kMacroEng::c4OpIndices)
+    if (c4Index < kCIDMacroEng::c4OpIndices)
         return m_uStorage.ac2Indices[c4Index];
 
     // It's invalid so throw, and a bogus return to make the compiler happy

@@ -302,20 +302,14 @@ class CIDLIBEXP TCollectionBase : public TObject
             const   TCollectionBase&        colSrc
         );
 
-        TCollectionBase
-        (
-                    TCollectionBase&&       colSrc
-        );
-
         TCollectionBase& operator=
         (
             const   TCollectionBase&        colSrc
         );
 
-        TCollectionBase& operator=
-        (
-                    TCollectionBase&&       colSrc
-        );
+        // No move support, it's too complicated
+        TCollectionBase(TCollectionBase&&) = delete;
+        TCollectionBase& operator=(TCollectionBase&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -588,14 +582,12 @@ class CIDLIBEXP TFundColBase : public TCollectionBase
             const   tCIDLib::EMTStates      eMTSafe = tCIDLib::EMTStates::Unsafe
         );
 
-        TFundColBase(const TFundColBase& colSrc) :
-
-            TCollectionBase(colSrc)
-        {
-        }
-
+        TFundColBase(const TFundColBase&)  = default;
         TFundColBase& operator=(const TFundColBase&) = default;
-        TFundColBase& operator=(TFundColBase&&) = default;
+
+        // No move support, it's too complicated
+        TFundColBase(TFundColBase&&)  = delete;
+        TFundColBase& operator=(TFundColBase&&) = delete;
 
 
     private :
@@ -619,9 +611,7 @@ class TCollection : public TCollectionBase, public MDuplicable
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TCollection()
-        {
-        }
+        ~TCollection() = default;
 
 
         // -------------------------------------------------------------------
@@ -649,7 +639,9 @@ class TCollection : public TCollectionBase, public MDuplicable
         //
         //  Call back each element, breaking out on false return. Can be a function
         //  pointer or lambda. We use a cursor so it will work for any of our
-        //  collection derivatives.
+        //  collection derivatives. We can only provide the const version here
+        //  since we don't understand the derived class' non-const cursors, and
+        //  it may not even provide one. It has to implement the non-const version.
         //
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
@@ -676,17 +668,11 @@ class TCollection : public TCollectionBase, public MDuplicable
         {
         }
 
-        TCollection(const TCollection<TElem>& colSrc) :
-
-            TCollectionBase(colSrc)
-        {
-        }
-
-        TCollection(TCollection<TElem>&&) = default;
-
+        TCollection(const TCollection<TElem>&) = default;
         TCollection<TElem>& operator=(const TCollection<TElem>&) = default;
 
-        TCollection<TElem>& operator=(TCollection<TElem>&&) = default;
+        TCollection(TCollection<TElem>&&) = delete;
+        TCollection<TElem>& operator=(TCollection<TElem>&&) = delete;
 
 
     private :
@@ -748,21 +734,11 @@ template <typename TElem, class TKey> class TMapCollection
         {
         }
 
-        TMapCollection(const TMyType& colSrc) :
+        TMapCollection(const TMyType&) = default;
+        TMapCollection& operator=(const TMyType&) = default;
 
-            TParent(colSrc)
-        {
-        }
-
-        TMapCollection& operator=(const TMyType& colSrc)
-        {
-            if (&colSrc != this)
-                TParent::operator=(colSrc);
-            return *this;
-        }
-
-        TMapCollection(TMyType&& colSrc) = default;
-        TMapCollection& operator=(TMyType&& colSrc) = default;
+        TMapCollection(TMyType&&) = delete;
+        TMapCollection& operator=(TMyType&&) = delete;
 };
 
 
@@ -888,7 +864,9 @@ template <typename TElem> class TRefCollection : public TCollectionBase
         //
         //  Call back each element, breaking out on false return. Can be a function
         //  pointer or lambda. We use a cursor so it will work for any of our
-        //  collection derivatives.
+        //  collection derivatives. We can only provide a constant version. We don't
+        //  understand constant cursors here, and the derived class may not even
+        //  provide one. They have to provide any non-const version of this.
         //
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
@@ -915,11 +893,10 @@ template <typename TElem> class TRefCollection : public TCollectionBase
         {
         }
 
-        // We cannot copy but we can move
-        TRefCollection(TRefCollection&&) = default;
-        TRefCollection(const TRefCollection&) = delete;
 
-        TRefCollection<TElem>& operator=(TRefCollection&&) = default;
+        TRefCollection(TRefCollection&&) = delete;
+        TRefCollection(const TRefCollection&) = delete;
+        TRefCollection<TElem>& operator=(TRefCollection&&) = delete;
         TRefCollection<TElem>& operator=(const TRefCollection&) = delete;
 
 

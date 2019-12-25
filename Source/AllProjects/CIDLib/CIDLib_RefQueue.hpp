@@ -61,6 +61,7 @@ template <typename TElem> class TRefQueueNode : public TDLstNode
         }
 
         TRefQueueNode(const TRefQueueNode<TElem>&) = delete;
+        TRefQueueNode(TRefQueueNode<TElem>&&) = delete;
 
         ~TRefQueueNode()
         {
@@ -71,6 +72,7 @@ template <typename TElem> class TRefQueueNode : public TDLstNode
         //  Public operators
         // -------------------------------------------------------------------
         TRefQueueNode<TElem>& operator=(const TRefQueueNode<TElem>&) = delete;
+        TRefQueueNode<TElem>& operator=(TRefQueueNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------

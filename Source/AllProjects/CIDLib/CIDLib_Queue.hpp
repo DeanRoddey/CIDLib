@@ -93,6 +93,7 @@ template <typename TElem> class TQueueNode : public TDLstNode
         }
 
         TQueueNode(const TQueueNode<TElem>&) = delete;
+        TQueueNode(TQueueNode<TElem>&&) = delete;
 
         ~TQueueNode() = default;
 
@@ -101,6 +102,7 @@ template <typename TElem> class TQueueNode : public TDLstNode
         //  Public operators
         // -------------------------------------------------------------------
         TQueueNode<TElem>& operator=(const TQueueNode<TElem>&) = delete;
+        TQueueNode<TElem>& operator=(TQueueNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------

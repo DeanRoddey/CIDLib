@@ -466,6 +466,7 @@ ERRORS=
     errcSPtr_RefAcquireErr      3153    A %(1) pointer ref count acquire error occurred
     errcSPtr_AlreadyLocked      3154    The %(1) pointer is already locked
     errcSPtr_CantGetStrongRef   3155    Cannot acquire strong ref to counted pointer
+    errcSPtr_RefOverUnderflow2  3156    Reference count on %(1) pointer is already zero
 
     ; Speech related errors
     errcSpeech_SpeakFailed      3160    Text to speech operation failed

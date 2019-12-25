@@ -88,6 +88,8 @@ template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
             );
         }
 
+        TFundDeque(TFundDeque<T>&&) = delete;
+
         ~TFundDeque()
         {
             delete [] m_ptElements;
@@ -98,6 +100,8 @@ template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
         // --------------------------------------------------------------------
         //  Public operators
         // --------------------------------------------------------------------
+        TFundDeque<T>& operator=(TFundDeque<T>&&) = delete;
+
         TFundDeque<T>& operator=(const TFundDeque<T>& fcolSrc)
         {
             if (this != &fcolSrc)

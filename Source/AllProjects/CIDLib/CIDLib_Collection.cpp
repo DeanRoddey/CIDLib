@@ -132,7 +132,7 @@ TCollectionBase::~TCollectionBase()
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TCollectionBase::bIsMTSafe() const
 {
-    return (m_pmtxLock != 0);
+    return (m_pmtxLock != nullptr);
 }
 
 tCIDLib::TCard4 TCollectionBase::c4SerialNum() const
@@ -347,7 +347,8 @@ TCollectionBase::TCollectionBase(const tCIDLib::EMTStates eMTSafe) :
 //
 //  We don't copy any pub/sub topic if the source has one. The derived class has to
 //  enable it for this instance if he wants reporting. If the source is thread safe
-//  we make this one thread safe.
+//  we make this one thread safe, so that we get the right results if a collection is
+//  a member of a containing class that is copied.
 //
 TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
 
@@ -360,49 +361,23 @@ TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
         m_pmtxLock = new TMutex;
 }
 
-TCollectionBase::TCollectionBase(TCollectionBase&& colSrc) :
-
-    m_bInBlockMode(kCIDLib::False)
-    , m_c4SerialNum(1)
-    , m_pmtxLock(nullptr)
-    , m_ppstopReport(nullptr)
-{
-    if (colSrc.m_pmtxLock)
-        m_pmtxLock = new TMutex;
-}
-
 
 //
-//  The caller should have locked. We bump our serial number. We prevent any messing with
-//  the lock or topic stuff, otherwise we'd get just a copy and it would be a mess.
+//  The caller should have locked. We bump our serial number. The lock and topic
+//  are not part of the contents, so they are not affected.
 //
 TCollectionBase& TCollectionBase::operator=(const TCollectionBase& colSrc)
 {
     if (this != &colSrc)
     {
-        //
-        //  If we are in block mode, the have to just clear it. This shouldn't
-        //  happen, but if it does there's not much else we can do.
-        //
-        if (m_bInBlockMode)
-            m_bInBlockMode = kCIDLib::False;
+        // We cannot be in the middle of a block mode operation
+        CIDAssert(!m_bInBlockMode, L"Collection was assigned while in a block operation");
 
         m_c4SerialNum++;
     }
     return *this;
 }
 
-
-// The caller should have locked. We bump both guy's serial numbers
-TCollectionBase& TCollectionBase::operator=(TCollectionBase&& colSrc)
-{
-    if (this != &colSrc)
-    {
-        m_c4SerialNum++;
-        colSrc.m_c4SerialNum++;
-    }
-    return *this;
-}
 
 
 // ---------------------------------------------------------------------------

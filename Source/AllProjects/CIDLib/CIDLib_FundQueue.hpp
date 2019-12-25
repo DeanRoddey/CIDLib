@@ -79,6 +79,8 @@ template <typename T> class TFundQueue : public TFundColBase, public MDuplicable
             );
         }
 
+        TFundQueue(TFundQueue<T>&&) = delete;
+
         ~TFundQueue()
         {
             delete [] m_ptElements;
@@ -89,6 +91,8 @@ template <typename T> class TFundQueue : public TFundColBase, public MDuplicable
         // --------------------------------------------------------------------
         //  Public operators
         // --------------------------------------------------------------------
+        TFundQueue<T>& operator=(TFundQueue<T>&&) = delete;
+
         TFundQueue<T>& operator=(const TFundQueue<T>& fcolSrc)
         {
             if (this == &fcolSrc)

@@ -224,7 +224,7 @@ const TNotificationId TMacroDbgMainWnd::nidChange(L"CMLDbgChangeEvent");
 TMacroDbgMainWnd::TMacroDbgMainWnd( MMEngClassMgr* const        pmecmToUse
                                     , MMEngFileResolver* const  pmefrToUse) :
 
-    m_c2OneTimeMethod(kMacroEng::c2BadId)
+    m_c2OneTimeMethod(kCIDMacroEng::c2BadId)
     , m_c4GoToLine(0)
     , m_c4LastLine(0)
     , m_c4NewIP(0)
@@ -2239,7 +2239,7 @@ tCIDLib::TVoid TMacroDbgMainWnd::GoOrRestart(const EGoActions eAction)
                 return;
             }
 
-            if (c2EntryPnt == kMacroEng::c2BadId)
+            if (c2EntryPnt == kCIDMacroEng::c2BadId)
             {
                 TErrBox msgbWarn
                 (

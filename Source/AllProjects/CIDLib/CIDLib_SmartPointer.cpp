@@ -98,3 +98,19 @@ TSmartPtrHelpers::ThrowNullRef(const tCIDLib::TCard4 c4Line, const tCIDLib::TCh*
     );
 }
 
+
+tCIDLib::TVoid
+TSmartPtrHelpers::ThrowRefCountUnderflow(const  tCIDLib::TCard4         c4Line
+                                        , const tCIDLib::TCh* const     pszType)
+{
+    facCIDLib().ThrowKrnlErr
+    (
+        CID_FILE
+        , c4Line
+        , kCIDErrs::errcSPtr_RefOverUnderflow2
+        , TKrnlError::kerrLast()
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Internal
+        , TString(pszType)
+    );
+}

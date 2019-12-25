@@ -61,7 +61,7 @@ template <typename T> class TObjLock
 
         TObjLock(TObjLock&& olockSrc) :
 
-            m_pbLocked(nullptr)
+            m_pc4LockCnt(nullptr)
             , m_pmtxLock(nullptr)
             , m_pobjLocked(nullptr)
         {
@@ -73,8 +73,10 @@ template <typename T> class TObjLock
             // If we stil own it, then unlock
             if (m_pmtxLock)
             {
-                // Clear the flag before we unlock
-                *m_pbLocked = kCIDLib::False;
+                // Decrement the lock count since we giving one up
+                if (*m_pc4LockCnt == 0)
+                    TSmartPtrHelpers::ThrowRefCountUnderflow(CID_LINE, L"TObjLock");
+                (*m_pc4LockCnt)--;
                 m_pmtxLock->Unlock();
             }
         }
@@ -90,7 +92,7 @@ template <typename T> class TObjLock
         {
             if (this != &olockSrc)
             {
-                tCIDLib::Swap(m_pbLocked, olockSrc.m_pbLocked);
+                tCIDLib::Swap(m_pc4LockCnt, olockSrc.m_pc4LockCnt);
                 tCIDLib::Swap(m_pmtxLock, olockSrc.m_pmtxLock);
                 tCIDLib::Swap(m_pobjLocked, olockSrc.m_pobjLocked);
             }
@@ -138,9 +140,9 @@ template <typename T> class TObjLock
         // -------------------------------------------------------------------
         TObjLock(TMutex* const              pmtxLock
                 , T* const                  pobjLocked
-                , tCIDLib::TBoolean* const  pbLocked) :
+                , tCIDLib::TCard4* const    pc4LockCnt) :
 
-            m_pbLocked(pbLocked)
+            m_pc4LockCnt(pc4LockCnt)
             , m_pmtxLock(pmtxLock)
             , m_pobjLocked(pobjLocked)
         {
@@ -150,8 +152,12 @@ template <typename T> class TObjLock
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_pbLocked
-        //      We clear the locker's locked flag when we release.
+        //  m_pc4LockCnt
+        //      We decrement the lock count when we destruct. This doesn't require
+        //      sync because this can only move up by the same thread locking the
+        //      object. So if it's > 1 it's just the same thread with multiple
+        //      locks. The only sync is in the locking process by the object locker
+        //      class below.
         //
         //  m_pmtxLock
         //      A pointer to the mutex that our owning locker is using to lock
@@ -161,7 +167,7 @@ template <typename T> class TObjLock
         //  m_pobjLocked
         //      A pointer to the object that we have locked
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean*  m_pbLocked;
+        tCIDLib::TCard4*    m_pc4LockCnt;
         TMutex*             m_pmtxLock;
         T*                  m_pobjLocked;
 };
@@ -180,7 +186,7 @@ template <typename T> class TObjLocker
         // -------------------------------------------------------------------
         template <typename... TArgs> TObjLocker(TArgs&&... Args) :
 
-            m_bLocked(kCIDLib::False)
+            m_c4LockCnt(0)
             , m_objLocked(tCIDLib::Forward<TArgs>(Args)...)
         {
         }
@@ -214,13 +220,8 @@ template <typename T> class TObjLocker
         {
             if (m_mtxLock.bTryLock(c4Millis))
             {
-                if (m_bLocked)
-                {
-                    m_mtxLock.Unlock();
-                    TSmartPtrHelpers::ThrowAlreadyLocked(CID_LINE, L"TObjLocker");
-                }
-                m_bLocked = kCIDLib::True;
-                return TObjLock<T>(&m_mtxLock, &m_objLocked, &m_bLocked);
+                m_c4LockCnt++;
+                return TObjLock<T>(&m_mtxLock, &m_objLocked, &m_c4LockCnt);
             }
 
             return TObjLock<T>(nullptr, nullptr, nullptr);
@@ -230,13 +231,8 @@ template <typename T> class TObjLocker
         TObjLock<T> olockGet(const tCIDLib::TCard4 c4Millis)
         {
             m_mtxLock.Lock(c4Millis);
-            if (m_bLocked)
-            {
-                m_mtxLock.Unlock();
-                TSmartPtrHelpers::ThrowAlreadyLocked(CID_LINE, L"TObjLocker");
-            }
-            m_bLocked = kCIDLib::True;
-            return TObjLock<T>(&m_mtxLock, &m_objLocked, &m_bLocked);
+            m_c4LockCnt++;
+            return TObjLock<T>(&m_mtxLock, &m_objLocked, &m_c4LockCnt);
         }
 
 
@@ -244,9 +240,10 @@ template <typename T> class TObjLocker
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_bLocked
-        //      This is set while we are locked, so that we can reject recursive
-        //      locks.
+        //  m_c4LockCnt
+        //      Each time we get the lock, we bump this. This lets us support
+        //      multiple locks by the same thread. When it goes to zero, then we
+        //      know it's not locked.
         //
         //  m_mtxLock
         //      The mutex we use to lock the object.
@@ -254,7 +251,7 @@ template <typename T> class TObjLocker
         //  m_objLocked
         //      The object we contain and are locking.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bLocked;
+        tCIDLib::TCard4     m_c4LockCnt;
         TMutex              m_mtxLock;
         T                   m_objLocked;
 };

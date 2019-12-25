@@ -97,7 +97,7 @@ class TMCListItemOps : public TMCListOps
         // -------------------------------------------------------------------
         TMCListItemOps(TEvList&& colList) :
 
-            m_colList(tCIDLib::ForceMove(colList))
+            m_colList(colList)
         {
             m_tmFmt.strDefaultFormat(TTime::strMMDD_24HHMMSS());
         }

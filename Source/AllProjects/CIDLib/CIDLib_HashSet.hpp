@@ -162,7 +162,7 @@ template <typename TElem, class TKeyOps> class THashSet
         // -------------------------------------------------------------------
         static const TClass& clsThis()
         {
-            static const TClass* pclsThis = 0;
+            static const TClass* pclsThis = nullptr;
             if (!pclsThis)
             {
                 TBaseLock lockInit;
@@ -491,7 +491,7 @@ template <typename TElem, class TKeyOps> class THashSet
                 // -----------------------------------------------------------
                 static const TClass& clsThis()
                 {
-                    static const TClass* pclsThis = 0;
+                    static const TClass* pclsThis = nullptr;
                     if (!pclsThis)
                     {
                         TBaseLock lockInit;
@@ -697,12 +697,7 @@ template <typename TElem, class TKeyOps> class THashSet
             }
         }
 
-        THashSet(TMyType&& colSrc) :
-
-            THashSet(1, colSrc.m_kopsToUse, colSrc.eMTState())
-        {
-            *this = tCIDLib::ForceMove(colSrc);
-        }
+        THashSet(TMyType&&) = delete;
 
         ~THashSet()
         {
@@ -761,17 +756,7 @@ template <typename TElem, class TKeyOps> class THashSet
         }
 
         // We don't swap key ops, just element content
-        TMyType& operator=(TMyType&& colSrc)
-        {
-            if (&colSrc != this)
-            {
-                TCollection<TElem>::operator=(tCIDLib::ForceMove(colSrc));
-                tCIDLib::Swap(m_apBuckets, colSrc.m_apBuckets);
-                tCIDLib::Swap(m_c4CurElements, colSrc.m_c4CurElements);
-                tCIDLib::Swap(m_c4HashModulus, colSrc.m_c4HashModulus);
-            }
-            return *this;
-        }
+        TMyType& operator=(TMyType&&) = delete;
 
         const TElem& operator[](const TString& strToFind) const
         {

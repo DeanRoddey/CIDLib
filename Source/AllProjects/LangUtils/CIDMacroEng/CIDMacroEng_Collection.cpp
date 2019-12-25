@@ -119,7 +119,7 @@ TMEngCollectInfo::TMEngCollectInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Abstract
         , L"MEng.Object"
     )
-    , m_c2ErrId(kMacroEng::c2BadId)
+    , m_c2ErrId(kCIDMacroEng::c2BadId)
     , m_c4ErrBadInd(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)
 {

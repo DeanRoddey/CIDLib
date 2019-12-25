@@ -131,8 +131,8 @@ TMEngBaseInfoInfo::TMEngBaseInfoInfo(TCIDMacroEngine& meOwner) :
     , c4ErrIdBadEntryParm(0)
     , c4ErrIdNotOpened(0)
 
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_IsInDebugMode(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_IsInDebugMode(kCIDMacroEng::c2BadId)
     , m_pmeciCreateActs(0)
     , m_pmeciFindRes(0)
     , m_pmeciFQTypes(0)

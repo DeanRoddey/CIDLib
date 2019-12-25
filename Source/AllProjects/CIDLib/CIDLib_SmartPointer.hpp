@@ -87,6 +87,11 @@ namespace TSmartPtrHelpers
         , const tCIDLib::TCh* const     pszType
     );
 
+    CIDLIBEXP tCIDLib::TVoid ThrowRefCountUnderflow
+    (
+        const   tCIDLib::TCard4         c4Line
+        , const tCIDLib::TCh* const     pszType
+    );
 
 
     // Default deleter and copier handlers

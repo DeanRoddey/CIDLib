@@ -151,11 +151,11 @@ TMEngDirIterInfo::TMEngDirIterInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_FindFirst(kMacroEng::c2BadId)
-    , m_c2MethId_FindNext(kMacroEng::c2BadId)
-    , m_c4ErrFindFailed(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindFirst(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindNext(kCIDMacroEng::c2BadId)
+    , m_c4ErrFindFailed(kCIDMacroEng::c2BadId)
     , m_pmeciErrors(0)
 {
 }
@@ -273,7 +273,7 @@ TMEngDirIterInfo::bInvokeMethod(        TCIDMacroEngine&    meOwner
             // Set up the search flags
             const tCIDLib::TBoolean bFilesOnly = meOwner.bStackValAt(c4FirstInd + 2);
             const tCIDLib::TBoolean bNormalOnly = meOwner.bStackValAt(c4FirstInd + 3);
-            tCIDLib::EDirSearchFlags eFlags;
+            tCIDLib::EDirSearchFlags eFlags = tCIDLib::EDirSearchFlags::NormalFiles;
             if (bFilesOnly)
             {
                 if (bNormalOnly)
@@ -454,19 +454,19 @@ TMEngFileSysInfo::TMEngFileSysInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2MethId_CopyFile(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_DelFile(kMacroEng::c2BadId)
-    , m_c2MethId_DirExists(kMacroEng::c2BadId)
-    , m_c2MethId_FileExists(kMacroEng::c2BadId)
-    , m_c2MethId_FindDirs(kMacroEng::c2BadId)
-    , m_c2MethId_FindFiles(kMacroEng::c2BadId)
-    , m_c2MethId_HasWildCards(kMacroEng::c2BadId)
-    , m_c2MethId_MakePath(kMacroEng::c2BadId)
-    , m_c2MethId_MakeSubDir(kMacroEng::c2BadId)
-    , m_c2TypeId_PathList(kMacroEng::c2BadId)
-    , m_c4ErrCopyFailed(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_CopyFile(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DelFile(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DirExists(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FileExists(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindDirs(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindFiles(kCIDMacroEng::c2BadId)
+    , m_c2MethId_HasWildCards(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MakePath(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MakeSubDir(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_PathList(kCIDMacroEng::c2BadId)
+    , m_c4ErrCopyFailed(kCIDMacroEng::c2BadId)
     , m_c4ErrCreateFailed(kCIDLib::c4MaxCard)
     , m_c4ErrDelFailed(kCIDLib::c4MaxCard)
     , m_c4ErrGenErr(kCIDLib::c4MaxCard)
@@ -816,7 +816,7 @@ TMEngFileSysInfo::bInvokeMethod(        TCIDMacroEngine&    meOwner
             //  pass it to the c4SearchDir() method. So we do a search loop
             //  ourself, with a directory interator.
             //
-            tCIDLib::EDirSearchFlags eFlags;
+            tCIDLib::EDirSearchFlags eFlags = tCIDLib::EDirSearchFlags::NormalFiles;
             if (methiTarget.c2Id() == m_c2MethId_FindDirs)
             {
                 if (meOwner.bStackValAt(c4FirstInd + 2))
@@ -843,11 +843,7 @@ TMEngFileSysInfo::bInvokeMethod(        TCIDMacroEngine&    meOwner
                 do
                 {
                     // Get the CML level path out
-                    meOwner.ContractFilePath
-                    (
-                        fndbToFill.pathFileName(), m_pathExpand2
-                    );
-
+                    meOwner.ContractFilePath(fndbToFill.pathFileName(), m_pathExpand2);
                     mecvToFill.AddObject
                     (
                         new TMEngStringVal

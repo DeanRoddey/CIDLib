@@ -436,8 +436,8 @@ class TRefVector : public TRefCollection<TElem>
             );
         }
 
-        TRefVector(TMyType&&) = delete;
         TRefVector(const TMyType&) = delete;
+        TRefVector(TMyType&&) = delete;
 
         ~TRefVector()
         {
@@ -471,9 +471,9 @@ class TRefVector : public TRefCollection<TElem>
             return m_apElems[c4Index];
         }
 
-        TMyType& operator=(TMyType&&) = delete;
+        // We don't allow copy, only move
         TMyType& operator=(const TMyType&) = delete;
-
+        TMyType& operator=(TMyType&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -53,11 +53,7 @@ template <typename TElem> class TBag : public TBasicDLinkedCol<TElem>
         }
 
         TBag(const TMyType&) = default;
-
-        TBag(TMyType&& colSrc) : TParent(colSrc.eMTState())
-        {
-            *this = operator=(tCIDLib::ForceMove(colSrc));
-        }
+        TBag(TMyType&&) = delete;
 
         ~TBag() = default;
 
@@ -72,11 +68,7 @@ template <typename TElem> class TBag : public TBasicDLinkedCol<TElem>
             return *this;
         }
 
-        TBag& operator=(TBag&& colSrc)
-        {
-            TParent::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TBag& operator=(TBag&&) = delete;
 
 
         // -------------------------------------------------------------------

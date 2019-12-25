@@ -499,9 +499,9 @@ TMEngArrayInfo::TMEngArrayInfo(         TCIDMacroEngine&    meOwner
         , strParentClassPath
         , c2ElemId
     )
-    , m_c2MethId_Ctor(kMacroEng::c2BadId)
-    , m_c2MethId_GetElemCount(kMacroEng::c2BadId)
-    , m_c2MethId_Reallocate(kMacroEng::c2BadId)
+    , m_c2MethId_Ctor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetElemCount(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Reallocate(kCIDMacroEng::c2BadId)
     , m_pmeciBase(0)
 {
     //

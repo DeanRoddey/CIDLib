@@ -737,9 +737,9 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                 case tCIDMacroEng::EOpCodes::CallStack :
                 case tCIDMacroEng::EOpCodes::CallThis :
                 {
-                    TMEngClassVal*  pmecvTarget;
-                    const TMEngClassInfo* pmeciTarget;
-                    tCIDLib::TCard2 c2MethId;
+                    TMEngClassVal*  pmecvTarget = nullptr;
+                    const TMEngClassInfo* pmeciTarget = nullptr;
+                    tCIDLib::TCard2 c2MethId = kCIDMacroEng::c2BadId;
 
                     if (meopCur.eOpCode() == tCIDMacroEng::EOpCodes::CallExcept)
                     {
@@ -857,19 +857,11 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                         //  dispatch, else do polymorphic to go to the most
                         //  derived.
                         //
-                        tCIDMacroEng::EDispatch eDispatch;
+                        tCIDMacroEng::EDispatch eDispatch = tCIDMacroEng::EDispatch::Poly;
                         if (meopCur.eOpCode() == tCIDMacroEng::EOpCodes::CallParent)
                             eDispatch = tCIDMacroEng::EDispatch::Mono;
-                        else
-                            eDispatch = tCIDMacroEng::EDispatch::Poly;
 
-                        pmeciTarget->Invoke
-                        (
-                            meOwner
-                            , *pmecvTarget
-                            , c2MethId
-                            , eDispatch
-                        );
+                        pmeciTarget->Invoke(meOwner, *pmecvTarget, c2MethId, eDispatch);
 
                         //
                         //  We clean off the call item, since we pushed it,
@@ -939,7 +931,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                         //  have a handler. If so, jump to the catch block,
                         //  else, rethrow.
                         //
-                        tCIDLib::TCard4 c4New;
+                        tCIDLib::TCard4 c4New = 0;
                         const tCIDLib::TCard4 c4Tmp = meOwner.c4FindNextTry(c4New);
                         if ((c4Tmp < c4BasePointer) || (c4Tmp == kCIDLib::c4MaxCard))
                             throw;
@@ -1042,7 +1034,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                     catch(const TExceptException&)
                     {
                         // Do the macro level try/catch handling
-                        tCIDLib::TCard4 c4New;
+                        tCIDLib::TCard4 c4New = 0;
                         const tCIDLib::TCard4 c4Tmp = meOwner.c4FindNextTry(c4New);
                         if ((c4Tmp < c4BasePointer) || (c4Tmp == kCIDLib::c4MaxCard))
                             throw;
@@ -1599,7 +1591,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                     //  been extracted at this point, so there should only be
                     //  tries above the current base pointer.
                     //
-                    tCIDLib::TCard4 c4New;
+                    tCIDLib::TCard4 c4New = 0;
                     while (kCIDLib::True)
                     {
                         const tCIDLib::TCard4 c4PopTo = meOwner.c4FindNextTry(c4New);

@@ -1270,7 +1270,7 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 //  If it's the special type ref, then get the value that has been set
                 //  for that. Else take it as is.
                 //
-                if (strPath.bCompareI(kMacroEng::pszSpecDynTypRef))
+                if (strPath.bCompareI(kCIDMacroEng::pszSpecDynTypRef))
                 {
                     strPath = m_pmeTarget->strSpecialDynRef();
 
@@ -1662,7 +1662,7 @@ TMacroEngParser::ParseLocals(   TParserSrc&             psrcClass
         //  of the non-code value key words. If we don't get the name, then
         //  just skip this one. The error was already issued.
         //
-        tCIDLib::TCard2 c2LocalId = kMacroEng::c2BadId;
+        tCIDLib::TCard2 c2LocalId = kCIDMacroEng::c2BadId;
         if (bGetNameToken(psrcClass, strName, kCIDLib::False))
         {
             //
@@ -1704,7 +1704,7 @@ TMacroEngParser::ParseLocals(   TParserSrc&             psrcClass
         //  If we see an open parent, we have to parse parms and match them
         //  to an appropriate constructor. Else, look for a default.
         //
-        tCIDLib::TCard2 c2CtorToUse = kMacroEng::c2BadId;
+        tCIDLib::TCard2 c2CtorToUse = kCIDMacroEng::c2BadId;
         tCIDLib::TCard4 c4ParmCnt;
         if (psrcClass.bIfPeeked(tCIDMacroEng::ETokens::OpenParen))
         {
@@ -1731,7 +1731,7 @@ TMacroEngParser::ParseLocals(   TParserSrc&             psrcClass
         bCheckSemiColon(psrcClass);
 
         // If a match was found, then generate the call and cleanup.
-        if (c2CtorToUse == kMacroEng::c2BadId)
+        if (c2CtorToUse == kCIDMacroEng::c2BadId)
         {
             IssueErr(psrcClass, kMEngErrs::errcPrs_NoCtorMatch, strName);
         }
@@ -1916,7 +1916,7 @@ TMacroEngParser::ParseMembers(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 //  If it's the special type ref, then get the value that has been set
                 //  for that. Else we take it as is.
                 //
-                if (strName.bCompareI(kMacroEng::pszSpecDynTypRef))
+                if (strName.bCompareI(kCIDMacroEng::pszSpecDynTypRef))
                 {
                     strName= m_pmeTarget->strSpecialDynRef();
 

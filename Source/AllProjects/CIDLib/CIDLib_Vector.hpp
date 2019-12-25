@@ -515,13 +515,7 @@ class TVector : public TCollection<TElem>
             }
         }
 
-        // Do the lightest setup possible then force an assign
-        TVector(TMyType&& colSrc) :
-
-            TVector(1, colSrc.eMTState())
-        {
-            *this = tCIDLib::ForceMove(colSrc);
-        }
+        TVector(TMyType&&) = delete;
 
         ~TVector()
         {
@@ -579,23 +573,7 @@ class TVector : public TCollection<TElem>
             return *this;
         }
 
-        TMyType& operator=(TMyType&& colSrc)
-        {
-            if (&colSrc != this)
-            {
-                TMtxLocker lockUs(this->pmtxLock());
-                TMtxLocker lockSrc(colSrc.pmtxLock());
-
-                TParent::operator=(tCIDLib::ForceMove(colSrc));
-                tCIDLib::Swap(m_c4CurAlloc, colSrc.m_c4CurAlloc);
-                tCIDLib::Swap(m_c4CurCount, colSrc.m_c4CurCount);
-                tCIDLib::Swap(m_apElems, colSrc.m_apElems);
-
-                this->c4IncSerialNum();
-                colSrc.c4IncSerialNum();
-            }
-            return *this;
-        }
+        TMyType& operator=(TMyType&&) = delete;
 
         const TElem& operator[](const TIndex tIndex) const
         {

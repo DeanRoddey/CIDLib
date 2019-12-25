@@ -902,16 +902,6 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
                         << kCIDBuild::EndLn;
                 throw tCIDBuild::EErrors::BadParams;
             }
-
-            if (!TRawStr::iCompIStr(pszCurParm, L"Analyze")
-            ||  !TRawStr::iCompIStr(pszCurParm, L"Analyze=1"))
-            {
-                m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Level1;
-            }
-             else if (!TRawStr::iCompIStr(pszCurParm, L"Analyze=2"))
-            {
-                m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Level2;
-            }
              else if (!TRawStr::iCompIStr(pszCurParm, L"Force"))
             {
                 m_bForce = kCIDLib::True;
@@ -1009,47 +999,60 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
             }
              else if (!TRawStr::iCompIStrN(pszCurParm, L"Action=", 7))
             {
-                if (!TRawStr::iCompIStr(&pszCurParm[7], L"Build"))
+                const tCIDLib::TCh* const pszActVal = &pszCurParm[7];
+                if (!TRawStr::iCompIStr(pszActVal, L"Analyze"))
+                {
+                    // It's a build but with the code analysis level set
+                    m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Level1;
+                    m_eAction = tCIDBuild::EActions::Build;
+                }
+                 else if (!TRawStr::iCompIStr(pszActVal, L"Analyze2"))
+                {
+                    // It's a build but with the code analysis level set
+                    m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Level2;
+                    m_eAction = tCIDBuild::EActions::Build;
+                }
+                 else if (!TRawStr::iCompIStr(pszActVal, L"Build"))
                 {
                     m_eAction = tCIDBuild::EActions::Build;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"Debug"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"Debug"))
                 {
                     m_eAction = tCIDBuild::EActions::Debug;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"MakeDeps"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"MakeDeps"))
                 {
                     m_eAction = tCIDBuild::EActions::MakeDeps;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"ShowProjDeps"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"ShowProjDeps"))
                 {
                     m_eAction = tCIDBuild::EActions::ShowProjDeps;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"ShowProjSettings"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"ShowProjSettings"))
                 {
                     m_eAction = tCIDBuild::EActions::ShowProjSettings;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"CopyHeaders"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"CopyHeaders"))
                 {
                     m_eAction = tCIDBuild::EActions::CopyHeaders;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"MakeRes"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"MakeRes"))
                 {
                     m_eAction = tCIDBuild::EActions::MakeRes;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"MakeBinRel"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"MakeBinRel"))
                 {
                     m_eAction = tCIDBuild::EActions::MakeBinRelease;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"MakeDevRel"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"MakeDevRel"))
                 {
                     m_eAction = tCIDBuild::EActions::MakeDevRelease;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"IDLGen"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"IDLGen"))
                 {
                     m_eAction = tCIDBuild::EActions::IDLGen;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"Bootstrap"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"Bootstrap"))
                 {
                     m_eAction = tCIDBuild::EActions::Bootstrap;
                 }
@@ -1301,8 +1304,6 @@ tCIDLib::TVoid TFacCIDBuild::ShowUsage()
             << L"        /Lang=xx       - Set language suffix (en)\n"
             << L"        /LowPrio       - Invoke compiler with lower priority\n"
             << L"        /Single        - Invoke compiler in non-parallel mode\n"
-            << L"        /Analyze=[1|2] - Invoke code analysis if tools support it. We have\n"
-            << L"                         two levels of intensity currently. If no number then 1\n"
             << L"        /NonPermissive - Invoke compiler in strictest C++ mode. This won't\n"
             << L"                         currently work it's for working towards that goal\n\n"
             << L"       (Not typically used, this comes for the environment)\n"
@@ -1317,7 +1318,7 @@ tCIDLib::TVoid TFacCIDBuild::ShowUsage()
             << L"    Actions:\n"
             << L"        Build, MakeDeps, ShowProjDeps, CopyHeaders, MakeRes\n"
             << L"        ShowProjSettings, MakeBinRel, MakeDevRel, IDLGen,\n"
-            << L"        Debug\n"
+            << L"        Debug, Analyze, Analyze2\n"
             << L"\n"
             << L"      *  Means a required option\n"
             << L"      () Means the default if not provided\n\n"

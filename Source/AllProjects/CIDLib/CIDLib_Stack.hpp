@@ -53,12 +53,7 @@ template <typename TElem> class TStack : public TBasicDLinkedCol<TElem>
         {
         }
 
-        TStack(TStack&& colSrc) :
-
-            TStack(colSrc.eMTState())
-        {
-            operator=(tCIDLib::ForceMove(colSrc));
-        }
+        TStack(TStack&&)  = delete;
 
         ~TStack()
         {
@@ -75,11 +70,7 @@ template <typename TElem> class TStack : public TBasicDLinkedCol<TElem>
             return *this;
         }
 
-        TStack& operator=(TStack&& colSrc)
-        {
-            TParent::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TStack& operator=(TStack&&) = delete;
 
 
         // -------------------------------------------------------------------

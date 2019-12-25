@@ -223,7 +223,7 @@ TMEngMethodInfo::bIsLegalOverride(const TMEngMethodInfo& methiToCheck)
 tCIDLib::TCard2 TMEngMethodInfo::c2AddParm(const TMEngParmInfo& mepiToAdd)
 {
     // Make sure we don't max out on parms
-    if (m_colParmList.c4ElemCount() == kMacroEng::c4MaxMethodParms)
+    if (m_colParmList.c4ElemCount() == kCIDMacroEng::c4MaxMethodParms)
     {
         facCIDMacroEng().ThrowErr
         (
@@ -233,7 +233,7 @@ tCIDLib::TCard2 TMEngMethodInfo::c2AddParm(const TMEngParmInfo& mepiToAdd)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::OutResource
             , strName()
-            , TCardinal(kMacroEng::c4MaxMethodParms)
+            , TCardinal(kCIDMacroEng::c4MaxMethodParms)
         );
     }
 
@@ -250,7 +250,7 @@ TMEngMethodInfo::c2AddInParm(const  TString&        strName
                             , const tCIDLib::TCard2 c2ClassId)
 {
     // Make sure we don't max out on parms
-    if (m_colParmList.c4ElemCount() == kMacroEng::c4MaxMethodParms)
+    if (m_colParmList.c4ElemCount() == kCIDMacroEng::c4MaxMethodParms)
     {
         facCIDMacroEng().ThrowErr
         (
@@ -260,7 +260,7 @@ TMEngMethodInfo::c2AddInParm(const  TString&        strName
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::OutResource
             , strName
-            , TCardinal(kMacroEng::c4MaxMethodParms)
+            , TCardinal(kCIDMacroEng::c4MaxMethodParms)
         );
     }
 
@@ -286,7 +286,7 @@ TMEngMethodInfo::c2AddInOutParm(const   TString&        strName
                                 , const tCIDLib::TCard2 c2ClassId)
 {
     // Make sure we don't max out on parms
-    if (m_colParmList.c4ElemCount() == kMacroEng::c4MaxMethodParms)
+    if (m_colParmList.c4ElemCount() == kCIDMacroEng::c4MaxMethodParms)
     {
         facCIDMacroEng().ThrowErr
         (
@@ -296,7 +296,7 @@ TMEngMethodInfo::c2AddInOutParm(const   TString&        strName
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::OutResource
             , strName
-            , TCardinal(kMacroEng::c4MaxMethodParms)
+            , TCardinal(kCIDMacroEng::c4MaxMethodParms)
         );
     }
 
@@ -323,7 +323,7 @@ TMEngMethodInfo::c2AddOutParm(  const   TString&        strName
                                 , const tCIDLib::TCard2 c2ClassId)
 {
     // Make sure we don't max out on parms
-    if (m_colParmList.c4ElemCount() == kMacroEng::c4MaxMethodParms)
+    if (m_colParmList.c4ElemCount() == kCIDMacroEng::c4MaxMethodParms)
     {
         facCIDMacroEng().ThrowErr
         (
@@ -333,7 +333,7 @@ TMEngMethodInfo::c2AddOutParm(  const   TString&        strName
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::OutResource
             , strName
-            , TCardinal(kMacroEng::c4MaxMethodParms)
+            , TCardinal(kCIDMacroEng::c4MaxMethodParms)
         );
     }
 
@@ -363,7 +363,7 @@ tCIDLib::TCard2 TMEngMethodInfo::c2FindParm(const TString& strName) const
         if (m_colParmList[c4Index].strName() == strName)
             return tCIDLib::TCard2(c4Index);
     }
-    return kMacroEng::c2BadId;
+    return kCIDMacroEng::c2BadId;
 }
 
 

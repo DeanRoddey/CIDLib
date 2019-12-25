@@ -92,7 +92,7 @@ tCIDMacroEng::EExprTypes
 TMEngLiteralVal::ePushImmediate(        TMEngOpMethodImpl&  methToFill
                                 , const tCIDLib::TBoolean   bAvoidDups) const
 {
-    tCIDMacroEng::EExprTypes eRet;
+    tCIDMacroEng::EExprTypes eRet = tCIDMacroEng::EExprTypes::Unknown;
     TMEngOpCode meopTmp;
     switch(tCIDMacroEng::EIntrinsics(m_c2ClassId))
     {

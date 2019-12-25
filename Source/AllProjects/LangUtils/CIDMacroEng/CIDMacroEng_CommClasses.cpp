@@ -188,29 +188,29 @@ TMEngCommCfgInfo::TMEngCommCfgInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_ClearPortFlag(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetBaud(kMacroEng::c2BadId)
-    , m_c2MethId_GetDataBits(kMacroEng::c2BadId)
-    , m_c2MethId_GetDTRFlag(kMacroEng::c2BadId)
-    , m_c2MethId_GetParity(kMacroEng::c2BadId)
-    , m_c2MethId_GetPortFlag(kMacroEng::c2BadId)
-    , m_c2MethId_GetRTSFlag(kMacroEng::c2BadId)
-    , m_c2MethId_GetStopBits(kMacroEng::c2BadId)
-    , m_c2MethId_SetBaud(kMacroEng::c2BadId)
-    , m_c2MethId_SetDataBits(kMacroEng::c2BadId)
-    , m_c2MethId_SetDTRFlag(kMacroEng::c2BadId)
-    , m_c2MethId_SetParity(kMacroEng::c2BadId)
-    , m_c2MethId_SetPortFlag(kMacroEng::c2BadId)
-    , m_c2MethId_SetRTSFlag(kMacroEng::c2BadId)
-    , m_c2MethId_SetStopBits(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
-    , m_c2TypeId_DataBits(kMacroEng::c2BadId)
-    , m_c2TypeId_DTRFlags(kMacroEng::c2BadId)
-    , m_c2TypeId_Parities(kMacroEng::c2BadId)
-    , m_c2TypeId_PortFlags(kMacroEng::c2BadId)
-    , m_c2TypeId_RTSFlags(kMacroEng::c2BadId)
-    , m_c2TypeId_StopBits(kMacroEng::c2BadId)
+    , m_c2MethId_ClearPortFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetBaud(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetDataBits(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetDTRFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetParity(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetPortFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetRTSFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetStopBits(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetBaud(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetDataBits(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetDTRFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetParity(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetPortFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetRTSFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetStopBits(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_DataBits(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_DTRFlags(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Parities(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_PortFlags(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_RTSFlags(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_StopBits(kCIDMacroEng::c2BadId)
     , m_pmeciDataBits(nullptr)
     , m_pmeciDTRFlags(nullptr)
     , m_pmeciParities(nullptr)
@@ -924,31 +924,31 @@ TMEngCommPortInfo::TMEngCommPortInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_AssertCTS(kMacroEng::c2BadId)
-    , m_c2MethId_AssertDSR(kMacroEng::c2BadId)
-    , m_c2MethId_ClearPortFlag(kMacroEng::c2BadId)
-    , m_c2MethId_Close(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetIsOpen(kMacroEng::c2BadId)
-    , m_c2MethId_GetPort(kMacroEng::c2BadId)
-    , m_c2MethId_Open(kMacroEng::c2BadId)
-    , m_c2MethId_OpenCfg(kMacroEng::c2BadId)
-    , m_c2MethId_OpenCfgBufs(kMacroEng::c2BadId)
-    , m_c2MethId_GetCTSOn(kMacroEng::c2BadId)
-    , m_c2MethId_GetDSROn(kMacroEng::c2BadId)
-    , m_c2MethId_GetLineStates(kMacroEng::c2BadId)
-    , m_c2MethId_PurgeReadBuf(kMacroEng::c2BadId)
-    , m_c2MethId_PurgeWriteBuf(kMacroEng::c2BadId)
-    , m_c2MethId_ReadBuf(kMacroEng::c2BadId)
-    , m_c2MethId_ReadByte(kMacroEng::c2BadId)
-    , m_c2MethId_SetBreak(kMacroEng::c2BadId)
-    , m_c2MethId_SetCfg(kMacroEng::c2BadId)
-    , m_c2MethId_SetDTRFlag(kMacroEng::c2BadId)
-    , m_c2MethId_SetPortFlag(kMacroEng::c2BadId)
-    , m_c2MethId_SetRTSFlag(kMacroEng::c2BadId)
-    , m_c2MethId_WriteBuf(kMacroEng::c2BadId)
-    , m_c2MethId_WriteByte(kMacroEng::c2BadId)
-    , m_c2TypeId_Errors(kMacroEng::c2BadId)
+    , m_c2MethId_AssertCTS(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AssertDSR(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ClearPortFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Close(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetIsOpen(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetPort(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Open(kCIDMacroEng::c2BadId)
+    , m_c2MethId_OpenCfg(kCIDMacroEng::c2BadId)
+    , m_c2MethId_OpenCfgBufs(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCTSOn(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetDSROn(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLineStates(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PurgeReadBuf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PurgeWriteBuf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ReadBuf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ReadByte(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetBreak(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetCfg(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetDTRFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetPortFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetRTSFlag(kCIDMacroEng::c2BadId)
+    , m_c2MethId_WriteBuf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_WriteByte(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Errors(kCIDMacroEng::c2BadId)
     , m_c4ErrId_AlreadyOpen(kCIDLib::c4MaxCard)
     , m_c4ErrId_CfgFailed(kCIDLib::c4MaxCard)
     , m_c4ErrId_CloseFailed(kCIDLib::c4MaxCard)
@@ -1363,7 +1363,7 @@ TMEngCommPortInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
         try
         {
             // Set the on/off flag appropriately
-            tCIDComm::EFlags eToSet;
+            tCIDComm::EFlags eToSet = tCIDComm::EFlags::None;
             if (meOwner.bStackValAt(c4FirstInd))
             {
                 if (c2MethId == m_c2MethId_AssertCTS)
@@ -1371,13 +1371,9 @@ TMEngCommPortInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
                 else
                     eToSet = tCIDComm::EFlags::DSROut;
             }
-             else
-            {
-                eToSet = tCIDComm::EFlags::None;
-            }
 
             // And the mask to indicate which flag we are affecting
-            tCIDComm::EFlags eMask;
+            tCIDComm::EFlags eMask = tCIDComm::EFlags::None;
             if (c2MethId == m_c2MethId_AssertCTS)
                 eMask = tCIDComm::EFlags::CTSOut;
             else

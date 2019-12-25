@@ -746,15 +746,7 @@ class TKeyedHashSet : public TCollection<TElem>
         }
 
         // No def ctor, so do minimial setup then swap
-        TKeyedHashSet(const TMyType&& colSrc) :
-
-            TKeyedHashSet
-            (
-                1, colSrc.m_kopsToUse, colSrc.m_pfnKeyExtract, colSrc.eMTState()
-            )
-        {
-            *this = tCIDLib::ForceMove(colSrc);
-        }
+        TKeyedHashSet(const TMyType&&) = delete;
 
         ~TKeyedHashSet()
         {
@@ -810,19 +802,7 @@ class TKeyedHashSet : public TCollection<TElem>
             return *this;
         }
 
-        TMyType& operator=(TMyType&& colSrc)
-        {
-            if (&colSrc != this)
-            {
-                TCollection<TElem>::operator=(tCIDLib::ForceMove(colSrc));
-                tCIDLib::Swap(colSrc.m_apBuckets, m_apBuckets);
-                tCIDLib::Swap(colSrc.m_c4CurElements, m_c4CurElements);
-                tCIDLib::Swap(colSrc.m_c4HashModulus, m_c4HashModulus);
-                tCIDLib::Swap(colSrc.m_pfnKeyExtract, m_pfnKeyExtract);
-                tCIDLib::Swap(colSrc.m_kopsToUse, m_kopsToUse);
-            }
-            return *this;
-        }
+        TMyType& operator=(TMyType&&) = delete;
 
         const TElem& operator[](const TKey& objKeyToFind) const
         {

@@ -1966,7 +1966,7 @@ TMacroEngParser::ParseInitializers( TParserSrc&             psrcClass
         //  If we found a match, generate the call. If not, then he issued
         //  the error, so it doesn't mattter than we don't issue a call.
         //
-        if (c2ToUse == kMacroEng::c2BadId)
+        if (c2ToUse == kCIDMacroEng::c2BadId)
         {
             IssueErr
             (
@@ -2095,7 +2095,7 @@ TMacroEngParser::ParseInitializers( TParserSrc&             psrcClass
         //
         //  If a match was found, then generate the call and cleanup.
         //
-        if (c2CtorToUse == kMacroEng::c2BadId)
+        if (c2CtorToUse == kCIDMacroEng::c2BadId)
         {
             IssueErr
             (

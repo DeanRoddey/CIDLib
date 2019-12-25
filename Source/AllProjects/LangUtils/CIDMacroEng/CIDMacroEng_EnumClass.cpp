@@ -287,29 +287,29 @@ TMEngEnumInfo::TMEngEnumInfo(       TCIDMacroEngine&    meOwner
         , tCIDMacroEng::EClassExt::Abstract
         , strParentClassPath
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2MethId_AtMax(kMacroEng::c2BadId)
-    , m_c2MethId_AtMin(kMacroEng::c2BadId)
-    , m_c2MethId_Dec(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_FromName(kMacroEng::c2BadId)
-    , m_c2MethId_FromText(kMacroEng::c2BadId)
-    , m_c2MethId_FormatList(kMacroEng::c2BadId)
-    , m_c2MethId_GetOrd(kMacroEng::c2BadId)
-    , m_c2MethId_GetOrdCount(kMacroEng::c2BadId)
-    , m_c2MethId_GetName(kMacroEng::c2BadId)
-    , m_c2MethId_GetText(kMacroEng::c2BadId)
-    , m_c2MethId_GreaterThan(kMacroEng::c2BadId)
-    , m_c2MethId_GreaterThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_Inc(kMacroEng::c2BadId)
-    , m_c2MethId_LessThan(kMacroEng::c2BadId)
-    , m_c2MethId_MapFromText(kMacroEng::c2BadId)
-    , m_c2MethId_LessThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_SetMin(kMacroEng::c2BadId)
-    , m_c2MethId_SetMax(kMacroEng::c2BadId)
-    , m_c2MethId_SetOrd(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AtMax(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AtMin(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Dec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FromName(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FromText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FormatList(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetOrd(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetOrdCount(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetName(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GreaterThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GreaterThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Inc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LessThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MapFromText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LessThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetMin(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetMax(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetOrd(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
     , m_colItems(c4ExpectedItems ? c4ExpectedItems : 8)
     , m_c4ErrBadOrdinal(kCIDLib::c4MaxCard)
     , m_c4ErrNameNotFound(kCIDLib::c4MaxCard)
@@ -355,7 +355,7 @@ TMEngEnumInfo::eCastFrom(           TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TCard4 c4New;
+    tCIDLib::TCard4 c4New = kCIDLib::c4MaxCard;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Card1 :
@@ -1101,7 +1101,7 @@ TMEngEnumInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
         //  depending on the second parm.
         //
         const TString& strToFind = meOwner.strStackValAt(c4FirstInd);
-        tCIDLib::TCard4 c4New;
+        tCIDLib::TCard4 c4New = kCIDLib::c4MaxCard;
         if (meOwner.bStackValAt(c4FirstInd + 1))
             c4New = c4FindOrdinal(strToFind);
         else

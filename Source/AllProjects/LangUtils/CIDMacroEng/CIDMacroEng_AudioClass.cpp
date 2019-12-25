@@ -123,9 +123,9 @@ TMEngAudioInfo::TMEngAudioInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_Beep(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_PlayWAV(kMacroEng::c2BadId)
+    , m_c2MethId_Beep(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlayWAV(kCIDMacroEng::c2BadId)
 {
 }
 

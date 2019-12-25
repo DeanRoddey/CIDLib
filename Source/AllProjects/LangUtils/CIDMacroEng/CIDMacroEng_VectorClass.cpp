@@ -354,13 +354,13 @@ TMEngVectorInfo::TMEngVectorInfo(       TCIDMacroEngine&    meOwner
         , strParentClassPath
         , c2ElemId
     )
-    , m_c2MethId_AddObject(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetElemCount(kMacroEng::c2BadId)
-    , m_c2MethId_InsertObject(kMacroEng::c2BadId)
-    , m_c2MethId_IsEmpty(kMacroEng::c2BadId)
-    , m_c2MethId_RemoveAll(kMacroEng::c2BadId)
-    , m_c2MethId_RemoveAt(kMacroEng::c2BadId)
+    , m_c2MethId_AddObject(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetElemCount(kCIDMacroEng::c2BadId)
+    , m_c2MethId_InsertObject(kCIDMacroEng::c2BadId)
+    , m_c2MethId_IsEmpty(kCIDMacroEng::c2BadId)
+    , m_c2MethId_RemoveAll(kCIDMacroEng::c2BadId)
+    , m_c2MethId_RemoveAt(kCIDMacroEng::c2BadId)
     , m_pmeciBase(0)
 {
     //

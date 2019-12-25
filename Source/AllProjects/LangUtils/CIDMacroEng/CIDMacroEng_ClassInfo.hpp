@@ -146,7 +146,7 @@ class CIDMACROENGEXP TMEngClassInfo : public TObject
 
         tCIDLib::TBoolean bHasDefCtor() const
         {
-            return (m_c2DefCtorId != kMacroEng::c2BadId);
+            return (m_c2DefCtorId != kCIDMacroEng::c2BadId);
         }
 
         tCIDLib::TBoolean bHasMember
@@ -523,7 +523,7 @@ class CIDMACROENGEXP TMEngClassInfo : public TObject
         //      We watch the methods added and if we see a default ctor, we'll store its
         //      id here. Default ctors are looked up for a number of reasons, so knowing
         //      if a class has one and finding it quickly is a good efficiency tweak. If
-        //      it doesn't have one, then this is kMacroEng::c2BadId;
+        //      it doesn't have one, then this is kCIDMacroEng::c2BadId;
         //
         //  m_c2FirstMemberId
         //  m_c2FirstMethodId

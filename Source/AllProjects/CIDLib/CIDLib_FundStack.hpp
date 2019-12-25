@@ -53,18 +53,15 @@ template <typename T> class TFundStack : public TFundColBase, public MDuplicable
             m_ptElements = new T[m_c4MaxElements];
         }
 
-        TFundStack(const TFundStack<T>& fcolToCopy) :
+        TFundStack(const TFundStack<T>& fcolSrc) :
 
-            m_c4MaxElements(fcolToCopy.m_c4MaxElements)
-            , m_c4Top(fcolToCopy.m_c4Top)
+            m_c4MaxElements(fcolSrc.m_c4MaxElements)
+            , m_c4Top(fcolSrc.m_c4Top)
             , m_ptElements(nullptr)
         {
             // Allocate the buffer and copy over the source contents
             m_ptElements = new T[m_c4MaxElements];
-            TRawMem::CopyMemBuf
-            (
-                m_ptElements, fcolToCopy.m_ptElements, m_c4Top * sizeof(T)
-            );
+            TRawMem::CopyMemBuf(m_ptElements, fcolSrc.m_ptElements, m_c4Top * sizeof(T));
         }
 
         ~TFundStack()
@@ -77,27 +74,24 @@ template <typename T> class TFundStack : public TFundColBase, public MDuplicable
         // --------------------------------------------------------------------
         //  Public operators
         // --------------------------------------------------------------------
-        TFundStack<T>& operator=(const TFundStack<T>& fcolToAssign)
+        TFundStack<T>& operator=(TFundStack<T>&& fcolSrc) = delete;
+
+        TFundStack<T>& operator=(const TFundStack<T>& fcolSrc)
         {
-            if (this == &fcolToAssign)
+            if (this == &fcolSrc)
                 return *this;
 
             // If different max sizes, then reallocate
-            if (m_c4MaxElements != fcolToAssign.m_c4MaxElements)
+            if (m_c4MaxElements != fcolSrc.m_c4MaxElements)
             {
                 delete [] m_ptElements;
                 m_ptElements = new T[m_c4MaxElements];
-                m_c4MaxElements = fcolToAssign.m_c4MaxElements;
+                m_c4MaxElements = fcolSrc.m_c4MaxElements;
             }
 
             // Set the new top and copy over the source elements
-            m_c4Top = fcolToAssign.m_c4Top;
-            TRawMem::CopyMemBuf
-            (
-                m_ptElements
-                , fcolToAssign.m_ptElements
-                , m_c4Top * sizeof(T)
-            );
+            m_c4Top = fcolSrc.m_c4Top;
+            TRawMem::CopyMemBuf(m_ptElements, fcolSrc.m_ptElements, m_c4Top * sizeof(T));
 
             return *this;
         }

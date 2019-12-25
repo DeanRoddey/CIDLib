@@ -52,12 +52,7 @@ template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
         {
         }
 
-        TDeque(TDeque&& colSrc) :
-
-            TParent(colSrc.eMTState())
-        {
-            *this = operator=(tCIDLib::ForceMove(colSrc));
-        }
+        TDeque(TDeque&&) = delete;
 
         ~TDeque()
         {
@@ -74,11 +69,7 @@ template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
             return *this;
         }
 
-        TDeque& operator=(TDeque&& colSrc)
-        {
-            TParent::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TDeque& operator=(TDeque&&) = delete;
 
 
         // -------------------------------------------------------------------

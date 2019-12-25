@@ -199,17 +199,17 @@ TMEngBooleanInfo::TMEngBooleanInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_And(kMacroEng::c2BadId)
-    , m_c2MethId_AndEq(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_Negate(kMacroEng::c2BadId)
-    , m_c2MethId_Or(kMacroEng::c2BadId)
-    , m_c2MethId_OrEq(kMacroEng::c2BadId)
-    , m_c2MethId_Set(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Xor(kMacroEng::c2BadId)
-    , m_c2MethId_XorEq(kMacroEng::c2BadId)
+    , m_c2MethId_And(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AndEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Negate(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Or(kCIDMacroEng::c2BadId)
+    , m_c2MethId_OrEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Set(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Xor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_XorEq(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -229,7 +229,7 @@ TMEngBooleanInfo::eCastFrom(        TCIDMacroEngine&    meOwner
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2Id();
 
-    tCIDLib::TBoolean bNew;
+    tCIDLib::TBoolean bNew = kCIDLib::False;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
