@@ -337,6 +337,44 @@ TTextInStream::c4GetLine(       TString&            strToFill
 
 
 //
+//  Reads the next token from the stream. We read until we get a non-sep char,
+//  then we collect characters until we hit a separator char (or end of stream.)
+//
+tCIDLib::TCard4
+TTextInStream::c4GetToken(TString& strToFill, const TString& strSepChars)
+{
+    strToFill.Clear();
+    while (!bEndOfStream())
+    {
+        const tCIDLib::TCh chCur = chRead();
+        if (!strSepChars.bContainsChar(chCur))
+        {
+            strToFill.Append(chCur);
+            break;
+        }
+    }
+
+    if (!strToFill.bIsEmpty())
+    {
+        //
+        //  If not empty, we got at least one character, so read until we get
+        //  a sep char or end of stream.
+        //
+        while (!bEndOfStream())
+        {
+            const tCIDLib::TCh chCur = chRead();
+            if (strSepChars.bContainsChar(chCur))
+                break;
+
+            strToFill.Append(chCur);
+        }
+    }
+    return strToFill.c4Length();
+}
+
+
+
+//
 //  Allows for one character of read ahead. We use the same mechanism that
 //  we use internally for single character unget. They can tell us to throw
 //  if we are at the end of stream, or just return a null.

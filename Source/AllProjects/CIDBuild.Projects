@@ -2288,7 +2288,6 @@ PROJECT=CML1 [WIN32_*]
 
 END PROJECT
 
-
 PROJECT=Interview1
 
     SETTINGS
@@ -2299,6 +2298,19 @@ PROJECT=Interview1
     DEPENDENTS
         CIDLib
         CIDMData
+    END DEPENDENTS
+
+END PROJECT
+
+PROJECT=Interview2
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Interview2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
     END DEPENDENTS
 
 END PROJECT

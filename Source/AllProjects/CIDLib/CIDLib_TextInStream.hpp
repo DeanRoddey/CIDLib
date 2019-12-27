@@ -163,6 +163,12 @@ class CIDLIBEXP TTextInStream : public TObject
             , const tCIDLib::TBoolean       bStripWhitespace = kCIDLib::False
         );
 
+        tCIDLib::TCard4 c4GetToken
+        (
+                    TString&                strToFill
+            , const TString&                strSepChars
+        );
+
         tCIDLib::TCh chPeek
         (
             const   tCIDLib::TBoolean       bThrowIfEOS = kCIDLib::False

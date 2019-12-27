@@ -60,6 +60,7 @@ class TString;
 #include    "CIDLib_Formattable.hpp"
 #include    "CIDLib_RefCounted.hpp"
 #include    "CIDLib_Streamable.hpp"
+#include    "CIDLib_Lockable.hpp"
 #include    "CIDLib_Type.hpp"
 
 //

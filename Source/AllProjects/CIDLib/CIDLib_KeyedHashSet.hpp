@@ -672,7 +672,7 @@ class TKeyedHashSet : public TCollection<TElem>
         TKeyedHashSet<TElem, TKey, TKeyOps>() = delete;
 
         TKeyedHashSet(  const   tCIDLib::TCard4     c4Modulus
-                        , const TKeyOps&            kopsToAdopt
+                        , const TKeyOps&            kopsToUse
                         ,       TKeyExtract         pfnKeyExtract
                         , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
@@ -681,7 +681,7 @@ class TKeyedHashSet : public TCollection<TElem>
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
             , m_pfnKeyExtract(pfnKeyExtract)
-            , m_kopsToUse(kopsToAdopt)
+            , m_kopsToUse(kopsToUse)
         {
             try
             {
