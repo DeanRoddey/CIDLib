@@ -82,10 +82,10 @@ class CUPnPFinderCallback : public IUPnPDeviceFinderCallback
         {
             HRESULT hRes = S_OK;
 
-            if(NULL == ppvObject)
+            if (nullptr == ppvObject)
                 hRes = E_POINTER;
             else
-                *ppvObject = NULL;
+                *ppvObject = nullptr;
 
             if(SUCCEEDED(hRes))
             {
@@ -119,16 +119,16 @@ class CUPnPFinderCallback : public IUPnPDeviceFinderCallback
         STDMETHODIMP DeviceAdded(LONG lFindData, IUPnPDevice* pDev)
         {
             tCIDLib::TBoolean bRes = kCIDLib::False;
-            BSTR NameStr = 0;
-            BSTR ModelStr = 0;
-            BSTR TypeStr = 0;
-            BSTR UIDStr = 0;
+            BSTR NameStr = nullptr;
+            BSTR ModelStr = nullptr;
+            BSTR TypeStr = nullptr;
+            BSTR UIDStr = nullptr;
 
             // Make sure our callback is there
             if (!m_pmkupnpfcbTar)
             {
                 pDev->Release();
-                return 0;
+                return S_OK;
             }
 
             const tCIDLib::TCh* pszRealUID = L"";
@@ -191,19 +191,19 @@ class CUPnPFinderCallback : public IUPnPDeviceFinderCallback
             }
 
             // Clean up any strings we got
-            if (TypeStr != 0)
+            if (TypeStr != nullptr)
                 ::SysFreeString(TypeStr);
 
-            if (NameStr != 0)
+            if (NameStr != nullptr)
                 ::SysFreeString(NameStr);
 
-            if (ModelStr != 0)
+            if (ModelStr != nullptr)
                 ::SysFreeString(ModelStr);
 
-            if (UIDStr != 0)
+            if (UIDStr != nullptr)
                 ::SysFreeString(UIDStr);
 
-            return 0;
+            return S_OK;
         }
 
 
@@ -237,7 +237,7 @@ class CUPnPFinderCallback : public IUPnPDeviceFinderCallback
             {
                 if (m_pmkupnpfcbTar)
                 {
-                    tCIDLib::TCh achFindID[32];
+                    tCIDLib::TCh achFindID[32] = {0};
                     TRawStr::bFormatVal(lFindData, achFindID, 31);
                     m_pmkupnpfcbTar->ListComplete(achFindID);
                 }
@@ -278,10 +278,10 @@ class CUPnPServiceCallback : public IUPnPServiceCallback
         {
             HRESULT hRes = S_OK;
 
-            if(NULL == ppvObject)
+            if (nullptr == ppvObject)
                 hRes = E_POINTER;
             else
-                *ppvObject = NULL;
+                *ppvObject = nullptr;
 
             if(SUCCEEDED(hRes))
             {
@@ -293,7 +293,7 @@ class CUPnPServiceCallback : public IUPnPServiceCallback
                 }
                  else
                 {
-                    *ppvObject = 0;
+                    *ppvObject = nullptr;
                     hRes = E_NOINTERFACE;
                 }
             }
@@ -393,7 +393,7 @@ MUPnPSvcCallback& MUPnPSvcCallback::operator=(const MUPnPSvcCallback&)
 // ---------------------------------------------------------------------------
 struct TKrnlUPnPService::TPlatData
 {
-    IUPnPService*   pService;
+    IUPnPService*   pService = nullptr;
 };
 
 
@@ -691,7 +691,7 @@ TKrnlUPnPService::TKrnlUPnPService(tCIDLib::TVoid* const pData) :
 // ---------------------------------------------------------------------------
 struct TKrnlUPnPDevice::TPlatData
 {
-    IUPnPDevice*   pDevice;
+    IUPnPDevice*   pDevice = nullptr;
 };
 
 
@@ -799,12 +799,11 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
                     , const tCIDLib::TCh* const         pszOfType) const
 {
     IUPnPDevices* pDevices = nullptr;
-    HRESULT hRes;
 
     // Empty the incoming list first
     kllistFound.RemoveAll();
 
-    hRes = m_pPlatData->pDevice->get_Children(&pDevices);
+    HRESULT hRes = m_pPlatData->pDevice->get_Children(&pDevices);
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnP_QueryChildDevs, hRes);
@@ -815,7 +814,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
     //
     //  It worked, so get the count of children we have.
     //
-    LONG lCount;
+    LONG lCount = 0;
     hRes = pDevices->get_Count(&lCount);
     if (FAILED(hRes))
     {
@@ -1129,7 +1128,7 @@ TKrnlUPnPDevice::TKrnlUPnPDevice(tCIDLib::TVoid* const pDevInfo) :
 // ---------------------------------------------------------------------------
 struct TKrnlUPnPFinder::TPlatData
 {
-    IUPnPDeviceFinder*   pFinder;
+    IUPnPDeviceFinder*   pFinder = nullptr;
 };
 
 
@@ -1140,7 +1139,7 @@ struct TKrnlUPnPFinder::TPlatData
 // This one we will fault in the platform info if ever used
 TKrnlUPnPFinder::TKrnlUPnPFinder() :
 
-    m_pPlatData(nullptr)
+    m_pPlatData(new TPlatData)
 {
 }
 
@@ -1150,7 +1149,7 @@ TKrnlUPnPFinder::~TKrnlUPnPFinder()
     // Clean up our data
     if (m_pPlatData)
     {
-        // If we still have the COM object, release it
+        // If we have the COM object, release it
         if (m_pPlatData->pFinder)
             m_pPlatData->pFinder->Release();
 
@@ -1183,7 +1182,7 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
     // Get the type into correct COM form of the type URN
     TBSTRJanitor janType(pszType);
 
-    IUPnPDevices* pDevices;
+    IUPnPDevices* pDevices = nullptr;
     HRESULT hRes = m_pPlatData->pFinder->FindByType(janType.bsData, 0, &pDevices);
     if (FAILED(hRes))
     {
@@ -1195,7 +1194,7 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
     //
     //  It worked, so gen up a list of our devices and add them to the linked
     //
-    LONG lCount;
+    LONG lCount = 0;
     hRes = pDevices->get_Count(&lCount);
     if (FAILED(hRes))
     {
@@ -1203,12 +1202,12 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
         return kCIDLib::False;
     }
 
-    IUnknown* pUnk;
+    IUnknown* pUnk = nullptr;
     pDevices->get__NewEnum(&pUnk);
     TCOMJanitor<IUnknown> janUnk(&pUnk);
 
     // Get the enum interface from this enumerator
-    IEnumUnknown* pEnum;
+    IEnumUnknown* pEnum = nullptr;
     hRes = pUnk->QueryInterface(IID_IEnumUnknown, (void**)&pEnum);
     if (FAILED(hRes))
     {
@@ -1220,7 +1219,7 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
     // Enumerate them an fill our list
     for (LONG lIndex = 0; lIndex < lCount; lIndex++)
     {
-        IUPnPDevice* pDev;
+        IUPnPDevice* pDev = nullptr;
         hRes = pEnum->Next(1, (IUnknown**)&pDev, 0);
         if (!FAILED(hRes))
         {
@@ -1228,9 +1227,9 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
 
             const tCIDLib::TCh* pszRealUID = L"";
             tCIDLib::TBoolean bRes = kCIDLib::False;
-            BSTR NameStr = 0;
-            BSTR TypeStr = 0;
-            BSTR UIDStr = 0;
+            BSTR NameStr = nullptr;
+            BSTR TypeStr = nullptr;
+            BSTR UIDStr = nullptr;
             hRes = pDev->get_FriendlyName(&NameStr);
             if (!FAILED(hRes))
             {
@@ -1256,13 +1255,13 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
                 kllistFound.pobjAddNew(new TKrnlKVPair(pszRealUID, NameStr, TypeStr));
 
             // Clean up any strings we got
-            if (TypeStr != 0)
+            if (TypeStr != nullptr)
                 ::SysFreeString(TypeStr);
 
-            if (NameStr != 0)
+            if (NameStr != nullptr)
                 ::SysFreeString(NameStr);
 
-            if (UIDStr != 0)
+            if (UIDStr != nullptr)
                 ::SysFreeString(UIDStr);
         }
     }
@@ -1296,7 +1295,7 @@ TKrnlUPnPFinder::bSearchByUID(  const   tCIDLib::TCh* const pszUID
     // Get the type into correct COM form of the ID
     TBSTRJanitor janType(pszRealUID);
 
-    IUPnPDevice* pDev;
+    IUPnPDevice* pDev = nullptr;
     HRESULT hRes = m_pPlatData->pFinder->FindByUDN(janType.bsData, &pDev);
     if (FAILED(hRes))
     {
@@ -1310,7 +1309,7 @@ TKrnlUPnPFinder::bSearchByUID(  const   tCIDLib::TCh* const pszUID
     //
     if (!pDev)
     {
-        pupnpdToFill = 0;
+        pupnpdToFill = nullptr;
         return kCIDLib::True;
     }
 
@@ -1328,7 +1327,7 @@ TKrnlUPnPFinder::bSearchByUID(  const   tCIDLib::TCh* const pszUID
 tCIDLib::TBoolean TKrnlUPnPFinder::bCheckData()
 {
     // If not initialized already, try to do it and return that status
-    if (!m_pPlatData)
+    if (m_pPlatData->pFinder == nullptr)
         return bInit();
     return kCIDLib::True;
 }
@@ -1338,18 +1337,18 @@ tCIDLib::TBoolean TKrnlUPnPFinder::bCheckData()
 tCIDLib::TBoolean TKrnlUPnPFinder::bInit()
 {
     // If there is already a finder, that's an error
-    if (m_pPlatData->pFinder)
+    if (m_pPlatData && m_pPlatData->pFinder)
     {
         TKrnlError::SetLastError(kKrnlErrs::errcUPnP_AlreadyInit);
         return kCIDLib::False;
     }
 
     // Try to create the interface
-    IUPnPDeviceFinder* pDevFinder;
+    IUPnPDeviceFinder* pDevFinder = nullptr;
     HRESULT hRes = ::CoCreateInstance
     (
         CLSID_UPnPDeviceFinder
-        , NULL
+        , nullptr
         , CLSCTX_INPROC_SERVER
         , IID_IUPnPDeviceFinder
         , (void**)&pDevFinder
@@ -1400,10 +1399,10 @@ MUPnPAsyncFinderCB::MUPnPAsyncFinderCB()
 struct TKrnlUPnPAsyncFinder::TPlatData
 {
     // The finder callback we created and pointed to the finder class instance
-    CUPnPFinderCallback*    pcbTar;
+    CUPnPFinderCallback*    pcbTar = nullptr;
 
     // The OS level async finder object
-    IUPnPDeviceFinder*      pFinder;
+    IUPnPDeviceFinder*      pFinder = nullptr;
 };
 
 
@@ -1418,9 +1417,6 @@ TKrnlUPnPAsyncFinder::TKrnlUPnPAsyncFinder() :
 {
     // Create our per-platform info structure
     m_pPlatData = new TPlatData;
-    m_pPlatData->pcbTar = nullptr;
-    m_pPlatData->pFinder = nullptr;
-
 }
 
 // Set the callback up front
@@ -1435,8 +1431,6 @@ TKrnlUPnPAsyncFinder(MUPnPAsyncFinderCB* const pmkupnpfcbTar) :
     //  the callback object.
     //
     m_pPlatData = new TPlatData;
-    m_pPlatData->pcbTar = nullptr;
-    m_pPlatData->pFinder = nullptr;
 
     CUPnPFinderCallback* pcbNew = new CUPnPFinderCallback(pmkupnpfcbTar);
     m_pPlatData->pcbTar = pcbNew;
@@ -1506,7 +1500,7 @@ TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
         HRESULT hRes = ::CoCreateInstance
         (
             CLSID_UPnPDeviceFinder
-            , NULL
+            , nullptr
             , CLSCTX_INPROC_SERVER
             , IID_IUPnPDeviceFinder
             , (void**)&pNewFinder
@@ -1527,10 +1521,9 @@ TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
 
     // Try to create a new find for our finder
     LONG lFindData = 0;
-    HRESULT hRes;
 
     TBSTRJanitor janType(pszFindType);
-    hRes = m_pPlatData->pFinder->CreateAsyncFind
+    HRESULT hRes = m_pPlatData->pFinder->CreateAsyncFind
     (
         janType.bsData, 0, m_pPlatData->pcbTar, &lFindData
     );
@@ -1558,7 +1551,7 @@ TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
     }
 
     // Give back the search id
-    tCIDLib::TCh achFindID[32];
+    tCIDLib::TCh achFindID[32] = {0};
     TRawStr::bFormatVal(lFindData, achFindID, 31);
     kstrSearchID.Set(achFindID);
 
@@ -1597,7 +1590,7 @@ tCIDLib::TBoolean
 TKrnlUPnPAsyncFinder::bStopListeningFor(const tCIDLib::TCh* const pszSearchID)
 {
     // It has to be the long value we formatted into earlier
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     LONG lID = TRawStr::i4AsBinary(pszSearchID, bValid, tCIDLib::ERadices::Dec);
     if (!bValid)
     {

@@ -317,10 +317,6 @@ class KRNLEXPORT TKrnlUPnPFinder
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_c4RefCount
-        //      For various reasons these devices are reference counted. When
-        //      it hits zero, we delete ourself.
-        //
         //  m_pPlatData
         //      This is an opaque pointer to whatever information the per-
         //      platform implementation needs to maintain.

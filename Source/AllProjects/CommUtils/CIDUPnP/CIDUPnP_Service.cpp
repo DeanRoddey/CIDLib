@@ -371,7 +371,7 @@ TUPnPService::QueryStateVar(const   TString&                strVarName
 tCIDLib::TVoid TUPnPService::Release()
 {
     delete m_pkupnpsThis;
-    m_pkupnpsThis = 0;
+    m_pkupnpsThis = nullptr;
 
     m_bIsDead = kCIDLib::True;
     m_bIsEvented = kCIDLib::False;

@@ -44,13 +44,13 @@
 // ---------------------------------------------------------------------------
 struct TKrnlExtProcess::TPlatData
 {
-    BOOL        bInCon;
-    HANDLE      hIn;
-    DWORD       dwInFlags;
+    BOOL        bInCon = 0;
+    HANDLE      hIn = nullptr;
+    DWORD       dwInFlags = 0;
 
-    BOOL        bOutCon;
-    HANDLE      hOut;
-    DWORD       dwOutFlags;
+    BOOL        bOutCon = 0;
+    HANDLE      hOut = nullptr;
+    DWORD       dwOutFlags = 0;
 };
 
 
@@ -62,7 +62,7 @@ namespace CIDKernel_ExternalProcess_Win32
     namespace
     {
         // -----------------------------------------------------------------------
-        //  We suppor the 'reattachment' to processes by persisting a platform
+        //  We support the 'reattachment' to processes by persisting a platform
         //  specific formatted string of attach info for later use. This is used
         //  as a prefix on our platform's version of that string, to help insure
         //  later that we are getting a string we formatted.
@@ -113,7 +113,7 @@ static tCIDLib::TVoid RestoreConInfo(const TKrnlExtProcess::TPlatData& SaveInfo)
 //  environment strings. If successful, it allocates a buffer which becomes
 //  the property of the caller.
 //
-static tCIDLib::TCh* pszBuildEnviron(tCIDKernel::TStrList& klistSrc)
+static [[nodiscard]] tCIDLib::TCh* pszBuildEnviron(tCIDKernel::TStrList& klistSrc)
 {
     //
     //  First lets see how much space we need to create the environment
@@ -126,12 +126,12 @@ static tCIDLib::TCh* pszBuildEnviron(tCIDKernel::TStrList& klistSrc)
     tCIDLib::TCard4 c4EnvCount = 0;
     if (klistSrc.bResetCursor())
     {
-        TKrnlString* pkstrCur = klistSrc.pobjHead();
-        do
+        TKrnlString* pkstrCur = nullptr;
+        while (klistSrc.bNext(pkstrCur))
         {
             c4BufSize += pkstrCur->c4Length() + 1;
             c4EnvCount++;
-        }   while (klistSrc.bNext(pkstrCur));
+        }
     }
 
     // Allocate the buffer
@@ -145,8 +145,8 @@ static tCIDLib::TCh* pszBuildEnviron(tCIDKernel::TStrList& klistSrc)
     tCIDLib::TCh* pszTmp = pszEnvBuffer;
     if (klistSrc.bResetCursor())
     {
-        TKrnlString* pkstrCur = klistSrc.pobjHead();
-        do
+        TKrnlString* pkstrCur = nullptr;
+        while (klistSrc.bNext(pkstrCur))
         {
             // Get the length of this string
             tCIDLib::TCard4 c4Len = pkstrCur->c4Length();
@@ -171,8 +171,7 @@ static tCIDLib::TCh* pszBuildEnviron(tCIDKernel::TStrList& klistSrc)
 
             c4CharsLeft -= c4Len+1;
             #endif
-
-        }   while (klistSrc.bNext(pkstrCur));
+        }
     }
 
     // Add in the second terminating nul for the end of buffer
@@ -209,10 +208,6 @@ TKrnlExtProcess::TKrnlExtProcess() :
 
     // And allocate our per-platform data structure and init it
     m_pPlatData = new TPlatData;
-    m_pPlatData->bInCon = 0;
-    m_pPlatData->bOutCon = 0;
-    m_pPlatData->hIn = 0;
-    m_pPlatData->hOut = 0;
 }
 
 TKrnlExtProcess::~TKrnlExtProcess()
@@ -518,11 +513,9 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
     tCIDLib::TCard4 c4BufSize = TRawStr::c4StrLen(pszPath) + 3;
     if (klistParms.bResetCursor())
     {
-        TKrnlString* pkstrCur = klistParms.pobjHead();
-        do
-        {
-            c4BufSize += pkstrCur->c4Length();
-        }   while (klistParms.bNext(pkstrCur));
+        TKrnlString* pkstrCur = nullptr;
+        while (klistParms.bNext(pkstrCur))
+            c4BufSize += pkstrCur->c4Length() + 3;
     }
 
     // Ok, now lets allocate the buffer and put a janitor on it.
@@ -539,15 +532,14 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
     //
     if (klistParms.bResetCursor())
     {
-        TKrnlString* pkstrCur = klistParms.pobjHead();
-        do
+        TKrnlString* pkstrCur = nullptr;
+        while (klistParms.bNext(pkstrCur))
         {
             TRawStr::CatStr(pszCmdLine, L" \"");
-            TRawStr::CatStr(pszCmdLine, klistParms.pobjHead()->pszValue());
+            TRawStr::CatStr(pszCmdLine, pkstrCur->pszValue());
             TRawStr::CatStr(pszCmdLine, L"\"");
-        }   while (klistParms.bNext(pkstrCur));
+        }
     }
-
 
     // And call the other version
     return bStart(pszCmdLine, pszInitPath, klistEnviron, eFlags, eShow);

@@ -662,7 +662,7 @@ tCIDLib::TCard4 TFileSys
     // Copy over the volumes we found
     if (kllistGood.bResetCursor())
     {
-        TKrnlVolumeInfo* pkvoliCur;
+        TKrnlVolumeInfo* pkvoliCur = nullptr;
         while (kllistGood.bNext(pkvoliCur))
             colVolsToFill.objAdd(TVolumeInfo(*pkvoliCur));
     }
@@ -670,7 +670,7 @@ tCIDLib::TCard4 TFileSys
     // Copy over the failres we got
     if (kllistBad.bResetCursor())
     {
-        TKrnlVolFailureInfo* pkvolfiList;
+        TKrnlVolFailureInfo* pkvolfiList = nullptr;
         while (kllistBad.bNext(pkvolfiList))
             colErrsToFill.objAdd(TVolFailureInfo(*pkvolfiList));
     }

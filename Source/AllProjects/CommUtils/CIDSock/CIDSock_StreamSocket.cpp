@@ -1037,8 +1037,12 @@ tCIDLib::TVoid TStreamSocket::DumpConnection()
 // ---------------------------------------------------------------------------
 //  TClientStreamSocket: Constructors and Destructor
 // ---------------------------------------------------------------------------
+TClientStreamSocket::TClientStreamSocket()
+{
+}
+
 TClientStreamSocket::
-TClientStreamSocket(const   tCIDSock::ESockProtos eProtocol
+TClientStreamSocket(const   tCIDSock::ESockProtos   eProtocol
                     , const tCIDSock::EAddrTypes    eAddrType) :
 
     TStreamSocket(eProtocol, eAddrType)
@@ -1046,7 +1050,7 @@ TClientStreamSocket(const   tCIDSock::ESockProtos eProtocol
 }
 
 TClientStreamSocket::
-TClientStreamSocket(const   tCIDSock::ESockProtos eProtocol
+TClientStreamSocket(const   tCIDSock::ESockProtos   eProtocol
                     , const TIPEndPoint&            ipepTarget) :
 
     TStreamSocket(eProtocol, ipepTarget.eAddrType())

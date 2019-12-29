@@ -231,7 +231,7 @@ class CIDSOCKEXP TClientStreamSocket : public TStreamSocket
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TClientStreamSocket()  =delete;
+        TClientStreamSocket();
 
         TClientStreamSocket
         (
