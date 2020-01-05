@@ -304,7 +304,7 @@ TMainFrame::TMainFrame() :
     , m_c4NextMsgId(0)
     , m_c4NextUID(1)
     , m_colList()
-    , m_colNewEvents(CIDLogMon::c4MaxItems, tCIDLib::EMTStates::Safe)
+    , m_colNewEvents(CIDLogMon::c4MaxItems)
     , m_colQuery()
     , m_porbcLogger(nullptr)
     , m_pwndAuxText(nullptr)
@@ -612,7 +612,7 @@ TMainFrame::CodeReceived(const  tCIDLib::TInt4  i4Code
     //
     TEvRefList colKeepers;
     {
-        TMtxLocker lockEvents(m_colNewEvents.pmtxLock());
+        TLocker lockrEvents(&m_colNewEvents);
 
         const tCIDLib::TCard4 c4Count = m_colNewEvents.c4ElemCount();
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -970,7 +970,7 @@ tCIDLib::TVoid TMainFrame::GetNewMsgs()
         //  and move the query list contents to the new events list en masse.
         //  But we have to copy them.
         //
-        TMtxLocker lockEvents(m_colNewEvents.pmtxLock());
+        TLocker lockrEvents(&m_colNewEvents);
 
         try
         {

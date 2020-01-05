@@ -27,11 +27,9 @@
 //  It doesn't work on an existing object, since that would make it less safe.
 //  It constructs the object in place as a member.
 //
-//  Because of how these guys work, we can't allow recursive locking. So we keep
-//  a locked flag and, if we get the lock and then see it's already set, we unlock
-//  and throw an already locked error. It has to be the same thread or we couldn't
-//  have gotten the lock again, so it's safe to unlock it before we throw.
-//
+//  We support recursive locking by using a count. As long as the same thread
+//  locks, we bump the count. When unlocked, we decrement. When we get back to
+//  zero, we release the lock.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -209,11 +207,18 @@ template <typename T> class TObjLocker
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
 
+        // Mostly just for unit testing
+        tCIDLib::TCard4 c4LockCount() const noexcept
+        {
+            return m_c4LockCnt;
+        }
+
+
         //
         //  We lock first so we know we have the object and can create the lock object
         //  and return it. The lock object unlocks when the last instance dies.
         //
-        //  The try version will return a nulled lobk object if it cannot get the
+        //  The try version will return a nulled lock object if it cannot get the
         //  lock.
         //
         TObjLock<T> olockTryGet(const tCIDLib::TCard4 c4Millis)
@@ -228,6 +233,7 @@ template <typename T> class TObjLocker
         }
 
 
+        // This one either locks or throws
         TObjLock<T> olockGet(const tCIDLib::TCard4 c4Millis)
         {
             m_mtxLock.Lock(c4Millis);

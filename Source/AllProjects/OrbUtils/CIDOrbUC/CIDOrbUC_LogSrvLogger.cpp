@@ -472,9 +472,7 @@ tCIDLib::TVoid TLogSrvLogger::SpoolLocal(TCIDLogSrvClientProxy& orbcToUse)
     //
     TSortedBag<TFindBuf> colFiles
     (
-        TFindBuf::eCompByLastMod
-        , tCIDLib::ESortDirs::Ascending
-        , tCIDLib::EMTStates::Unsafe
+        TFindBuf::eCompByLastMod, tCIDLib::ESortDirs::Ascending
     );
 
     // If there aren't any, then return

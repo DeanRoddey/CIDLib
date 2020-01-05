@@ -368,7 +368,7 @@ TTextFileLogger::Open(  const   tCIDLib::TCh* const     pszFile
     if (!TResourceName::bIsNullObject(rsnMutex))
         m_pmtxSync = new TMutex(rsnMutex);
 
-    TMtxLocker lockFile(m_pmtxSync);
+    TLocker lockrFile(m_pmtxSync);
 
     // See if it exists yet
     TPathStr pathTmp;

@@ -298,7 +298,7 @@ TFacCIDMacroEng::AddClassLoader(        MMEngExtClassLoader* const  pmeclToAdd
                                 , const tCIDLib::EEnds              eEnd)
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Add the new loader where indicated
     if (eEnd == tCIDLib::EEnds::First)
@@ -458,7 +458,7 @@ TMEngClassInfo* TFacCIDMacroEng
                             , const TString&            strClassPathToLoad)
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  Loop through the installed class loaders till we get a hit or run

@@ -136,7 +136,7 @@ TCIDLogServerImpl::bGetLiveEvents(  tCIDLib::TCard4&        c4NextEventId
                                     , TVector<TLogEvent>&   colToFill)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  If the passed message id is the same as our current id, then we
@@ -263,7 +263,7 @@ TCIDLogServerImpl::c4QueryEvents(       TVector<TLogEvent>& colToFill
                                 , const tCIDLib::TCard4     c4MaxToReturn)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // If we have no keys, then we are done now
     if (!m_c4KeysUsed)
@@ -380,7 +380,7 @@ TCIDLogServerImpl::c4QueryEvents(       TVector<TLogEvent>& colToFill
                                 , const tCIDLib::TCard4     c4MaxToReturn)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // If we have no keys, then we are done now
     if (!m_c4KeysUsed)
@@ -552,7 +552,7 @@ TCIDLogServerImpl::c4QueryEvents(       TVector<TLogEvent>& colToFill
     TJanitor<TRegEx> janThread(pregxThreadExpr);
 
     // Lock the mutex now before we go further
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  Figure out the real max. If its larger than the number of events
@@ -723,7 +723,7 @@ TCIDLogServerImpl::DebugDump(tCIDLib::TCard4& c4BufSz, THeapBuf& mbufData)
     // Run through all of the items and make sure we can read them in
     {
         // Lock the mutex during this
-        TMtxLocker lockSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         // This is just for debugging purposes, so leave it out otherwise
         // DumpDebugInfo(strmOut);
@@ -829,7 +829,7 @@ TCIDLogServerImpl::DebugDump(tCIDLib::TCard4& c4BufSz, THeapBuf& mbufData)
 tCIDLib::TVoid TCIDLogServerImpl::LogSingle(const TLogEvent&  logevToSend)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     WriteOne(logevToSend);
 }
 
@@ -837,7 +837,7 @@ tCIDLib::TVoid TCIDLogServerImpl::LogSingle(const TLogEvent&  logevToSend)
 tCIDLib::TVoid TCIDLogServerImpl::LogMultiple(const TBag<TLogEvent>& colToSend)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     TBag<TLogEvent>::TCursor cursFmt(&colToSend);
     if (cursFmt.bReset())
     {
@@ -852,7 +852,7 @@ tCIDLib::TVoid TCIDLogServerImpl::LogMultiple(const TBag<TLogEvent>& colToSend)
 tCIDLib::TVoid TCIDLogServerImpl::RemoveAll()
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Get the current file size
     const tCIDLib::TCard4 c4CurSize = tCIDLib::TCard4(m_flLog.c8CurSize());
@@ -1886,7 +1886,7 @@ TCIDLogServerImpl::eFlusherThread(TThread& thrThis, tCIDLib::TVoid*)
 
             // Lock the mutex and see if we need to save the header
             {
-                TMtxLocker lockSync(&m_mtxSync);
+                TLocker lockrSync(&m_mtxSync);
 
                 // If new stuff has arrived, then store it out
                 if (m_c4LastFlushSeq != m_c4Seq)

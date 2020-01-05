@@ -116,7 +116,7 @@ TWaveInSrcStream::bReadBytes(       tCIDLib::TCard1* const  pc1ToFill
         ThrowNotReady();
 
     // Lock while we do this
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  If we have some left over data from last time, return it first. It's even
@@ -223,7 +223,7 @@ tCIDLib::TVoid TWaveInSrcStream::FlushBufs()
     if (!m_pInfo)
         ThrowNotReady();
 
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Just move through the buffers until we find one not ready
     while (kCIDLib::True)
@@ -393,7 +393,7 @@ TWaveInSrcStream::QueryFormat(  tCIDLib::TCard4&    c4Channels
     if (!m_pInfo)
         ThrowNotReady();
 
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     c4Channels = CIDAudStream_WaveInSrcStream_Win32::c4Channels;
     c4SamplesPerSec = CIDAudStream_WaveInSrcStream_Win32::c4SampleRate;
     c4BytesPerSample = CIDAudStream_WaveInSrcStream_Win32::c4SampleBytes;
@@ -406,7 +406,7 @@ TWaveInSrcStream::QueryFormat(  tCIDLib::TCard4&    c4Channels
 //
 tCIDLib::TVoid TWaveInSrcStream::Terminate()
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     if (m_pInfo)
     {

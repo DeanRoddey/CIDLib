@@ -35,8 +35,8 @@
 // ---------------------------------------------------------------------------
 //  Local types
 // ---------------------------------------------------------------------------
-typedef TRefVector<TSrvTarget>  TOrbCSrvList;
-typedef TRefVector<TCmdQItem>   TOrbCmdItemCache;
+typedef TRefVector<TSrvTarget>      TOrbCSrvList;
+typedef TSafeRefVector<TCmdQItem>   TOrbCmdItemCache;
 
 
 // ---------------------------------------------------------------------------
@@ -105,7 +105,7 @@ namespace CIDOrb_ClientBase
         tCIDLib::TCard4             c4OIDRefreshSecs = 5;
         const tCIDLib::TEncodedTime enctCachePeriod = 45 * kCIDLib::enctOneSecond;
         TOrbCSrvList                colCache(tCIDLib::EAdoptOpts::Adopt);
-        TOrbCmdItemCache            colCmdCache(tCIDLib::EAdoptOpts::Adopt, 32, tCIDLib::EMTStates::Safe);
+        TOrbCmdItemCache            colCmdCache(tCIDLib::EAdoptOpts::Adopt, 32);
         TOrbCSrvList                colServers(tCIDLib::EAdoptOpts::Adopt);
         TConnWaitList               colConnWaitList(tCIDLib::EAdoptOpts::Adopt, 16);
         TMutex                      mtxSync;
@@ -161,8 +161,8 @@ eCacheScavengerThread(TThread& thrThis, tCIDLib::TVoid*)
                 //  the top, else we got it and the lock janitor will let
                 //  it go normally when it goes out of scope.
                 //
-                TMtxLocker lockSrv(&CIDOrb_ClientBase::mtxSync, kCIDLib::False);
-                if (!lockSrv.bLock(250))
+                TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync, kCIDLib::False);
+                if (!lockrSrv.bLock(250))
                     continue;
 
                 tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::colCache.c4ElemCount();
@@ -595,7 +595,7 @@ tCIDLib::TVoid TOrbClientBase::SendORBPing()
 tCIDLib::TVoid TOrbClientBase::GiveBackCmdItem(TCmdQItem* const pcqiGiveBack)
 {
     // Lock the object, so we can be sure of the stage
-    TMtxLocker lockCmd(pcqiGiveBack->pmtxLock());
+    TLocker lockrCmd(pcqiGiveBack->pmtxLock());
 
     switch(pcqiGiveBack->eStage())
     {
@@ -629,7 +629,7 @@ tCIDLib::TVoid TOrbClientBase::GiveBackCmdItem(TCmdQItem* const pcqiGiveBack)
 TCmdQItem* TOrbClientBase::pcqiGetCmdItem(const TOrbId& oidToSet)
 {
     // Lock the collection to sync this non-atomic op
-    TMtxLocker lockSrv(CIDOrb_ClientBase::colCmdCache.pmtxLock());
+    TLocker lockrSrv(&CIDOrb_ClientBase::colCmdCache);
 
     //
     //  And search the cache for a free cmd item. If none are found, then
@@ -845,7 +845,7 @@ TOrbClientBase::Dispatch(const  tCIDLib::TCard4     c4WaitFor
     // Lock the overall mutex and look up our server target
     tCIDLib::TCard4 c4SeqNum = 0;
     {
-        TMtxLocker lockSrv(&CIDOrb_ClientBase::mtxSync, 5000UL);
+        TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync, 5000UL);
 
         psrvtOurs = psrvtFindServer(m_ipepSrv, kCIDLib::False);
         if (!psrvtOurs)
@@ -931,7 +931,7 @@ TOrbClientBase::Dispatch(const  tCIDLib::TCard4     c4WaitFor
         //  Oops, it either timed out, or something went really awry in the
         //  mutex wait. So lock the object so we can clean up.
         //
-        TMtxLocker lockCmd(pcqiToUse->pmtxLock());
+        TLocker lockrCmd(pcqiToUse->pmtxLock());
 
         //
         //  It's possible that it came in just after we timed out, so check
@@ -1131,7 +1131,7 @@ tCIDLib::TVoid TOrbClientBase::InitializeOrbClient()
 {
     if (!CIDOrb_ClientBase::atomClientReady)
     {
-        TMtxLocker mtxlSync(&CIDOrb_ClientBase::mtxSync);
+        TLocker lockrSync(&CIDOrb_ClientBase::mtxSync);
         if (!CIDOrb_ClientBase::atomClientReady)
         {
             //
@@ -1183,7 +1183,7 @@ tCIDLib::TVoid TOrbClientBase::InitializeOrbClient()
 
 tCIDLib::TVoid TOrbClientBase::TerminateOrbClient()
 {
-    TMtxLocker mtxlSync(&CIDOrb_ClientBase::mtxSync);
+    TLocker lockrSync(&CIDOrb_ClientBase::mtxSync);
 
     // Stop the cache scavenger thread
     try
@@ -1290,7 +1290,7 @@ tCIDLib::TBoolean TOrbClientBase::bIsProxyConnected() const
         return kCIDLib::False;
 
     // Lock and find our server reference
-    TMtxLocker lockSrv(&CIDOrb_ClientBase::mtxSync);
+    TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
     TSrvTarget* psrvtUs = psrvtFindServer(m_ipepSrv, kCIDLib::False);
 
     // If we didn't find one, then obviously not connected
@@ -1335,7 +1335,7 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
     //
     TOrbCConnWait* poccwUs = nullptr;
     {
-        TMtxLocker lockSrv(&CIDOrb_ClientBase::mtxSync);
+        TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
 
         //
         //  Find our server target object. We look up the one with the end point
@@ -1420,7 +1420,7 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
         //
         TOrbCConnWait::EWaitStates eRes = poccwUs->m_eState;
         {
-            TMtxLocker lockSrv(&CIDOrb_ClientBase::mtxSync);
+            TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
             CIDOrb_ClientBase::colConnWaitList.bRemoveIfMember(poccwUs);
             TStatsCache::c8DecCounter(CIDOrb_ClientBase::sciWaitList);
             poccwUs = nullptr;
@@ -1437,7 +1437,7 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
             //  fail since it has to be some pretty pathological scenario
             //  We have to re-lock the main mutex here.
             //
-            TMtxLocker lockSrv(&CIDOrb_ClientBase::mtxSync);
+            TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
             psrvtNew = psrvtFindServer(m_ipepSrv, kCIDLib::True);
 
             // If we got one, then bump the ref count and indicate we have a ref
@@ -1476,7 +1476,7 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
         //  either way, wake up any waiting threads and give them the good or
         //  bad news. We need to relock the list again.
         //
-        TMtxLocker lockSrv(&CIDOrb_ClientBase::mtxSync);
+        TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
 
         // If we created a new server target, then add it to the list
         if (psrvtNew)
@@ -1533,7 +1533,7 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
 tCIDLib::TVoid TOrbClientBase::RemoveSrvRef()
 {
     // Lock the overall mutex while we do this
-    TMtxLocker lockSrv(&CIDOrb_ClientBase::mtxSync);
+    TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
 
     // If we've not referenced a server yet, then return
     if (!m_bSrvRefd)

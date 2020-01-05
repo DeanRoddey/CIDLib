@@ -88,33 +88,35 @@ TTest_ObjLocker1::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWa
         }
 
         //
-        //  Since we are on the same thread, this will be a recursive lock, so
-        //  it should throw.
+        //  Since we are on the same thread, this will be a recursive lock,
+        //  which should work.
         //
-        try
         {
             TObjLock<TArea> olockTest2 = olockrTest.olockTryGet(50);
-            strmOut << TFWCurLn << L"Should not have gotten a recursive lock\n\n";
-            eRes = tTestFWLib::ETestRes::Failed;
-        }
-
-        catch(...)
-        {
-        }
-
-        try
-        {
-            TObjLock<TArea> olockTest2 = olockrTest.olockGet(50);
-            strmOut << TFWCurLn << L"Should not have gotten a recursive lock\n\n";
-            eRes = tTestFWLib::ETestRes::Failed;
-        }
-
-        catch(...)
-        {
+            if (olockrTest.c4LockCount() != 2)
+            {
+                strmOut << TFWCurLn << L"The lock count should be 2 here\n\n";
+                eRes = tTestFWLib::ETestRes::Failed;
+            }
+             else
+            {
+                TObjLock<TArea> olockTest3 = olockrTest.olockGet(50);
+                if (olockrTest.c4LockCount() != 3)
+                {
+                    strmOut << TFWCurLn << L"The lock count should be 3 here\n\n";
+                    eRes = tTestFWLib::ETestRes::Failed;
+                }
+            }
         }
     }
 
-    // Now we should be able to get a lock again
+    // We should be back to zero now
+    if (olockrTest.c4LockCount() != 0)
+    {
+        strmOut << TFWCurLn << L"The lock count should be 0 here\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+     else
     {
         TObjLock<TArea> olockTest = olockrTest.olockTryGet(50);
         if (!olockTest)
@@ -151,8 +153,17 @@ TTest_ObjLocker1::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWa
 
         if (!olockTest2)
         {
-            strmOut << TFWCurLn << L"Target lock is still null\n\n";
+            strmOut << TFWCurLn << L"Target lock is still null after move\n\n";
             eRes = tTestFWLib::ETestRes::Failed;
+        }
+         else
+        {
+            // The lock count should still be 1, since it shoudl have come over in the move
+            if (olockrTest.c4LockCount() != 1)
+            {
+                strmOut << TFWCurLn << L"The lock count should be 1 after the move\n\n";
+                eRes = tTestFWLib::ETestRes::Failed;
+            }
         }
 
         if (*olockTest2 != TArea(20, 22, 24, 26))

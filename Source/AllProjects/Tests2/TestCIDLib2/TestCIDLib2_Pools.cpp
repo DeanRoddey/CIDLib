@@ -48,7 +48,7 @@ class TTestFSPool : public TFixedSizePool<TString>
     public :
         TTestFSPool() :
 
-            TFixedSizePool(8, L"Test Fixed Size Pool", tCIDLib::EMTStates::Unsafe)
+            TFixedSizePool(8, L"Test Fixed Size Pool")
         {
         }
 

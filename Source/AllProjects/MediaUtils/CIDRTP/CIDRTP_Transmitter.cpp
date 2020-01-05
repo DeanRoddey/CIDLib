@@ -65,8 +65,8 @@ TCIDRTPTrans::TCIDRTPTrans() :
     , m_c4SampleBytes(0)
     , m_c4TotalBytes(0)
     , m_c4TotalMSs(0)
-    , m_colFreeMQ(tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::EMTStates::Safe)
-    , m_colProcQ(tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::EMTStates::Safe)
+    , m_colFreeMQ(tCIDLib::EAdoptOpts::NoAdopt)
+    , m_colProcQ(tCIDLib::EAdoptOpts::NoAdopt)
     , m_prtpioIn(nullptr)
     , m_thrReader
       (

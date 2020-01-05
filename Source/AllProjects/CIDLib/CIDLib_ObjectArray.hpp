@@ -37,7 +37,7 @@
 //  PREFIX: obja
 // ---------------------------------------------------------------------------
 template <typename TElem, typename TIndex = tCIDLib::TCard4>
-class TObjArray : public TObject, public MDuplicable
+class TObjArray : public TObject, public MDuplicable, public MLockable
 {
     public  :
         // -------------------------------------------------------------------
@@ -47,17 +47,25 @@ class TObjArray : public TObject, public MDuplicable
 
 
         // -------------------------------------------------------------------
+        //  Public, static methods
+        // -------------------------------------------------------------------
+        static const TClass& clsThis()
+        {
+            static const TClass clsRet(L"TObjArrary<TElem,TIndex>");
+            return clsRet;
+        }
+
+
+        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TObjArray() = delete;
 
-        TObjArray(  const   TIndex              tElemCount
-                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
+        TObjArray(const TIndex tElemCount) :
 
             m_c4ElemCount(0)
             , m_c4SerialNum(0)
             , m_paobjList(nullptr)
-            , m_pmtxLock(nullptr)
         {
             const tCIDLib::TCard4 c4ElemCount = tCIDLib::TCard4(tElemCount);
 
@@ -77,9 +85,6 @@ class TObjArray : public TObject, public MDuplicable
             // Allocate the object array
             m_c4ElemCount = c4ElemCount;
             m_paobjList = new TElem[c4ElemCount];
-
-            if (eMTSafe == tCIDLib::EMTStates::Safe)
-                m_pmtxLock = new TMutex;
         }
 
         TObjArray(const TMyType& objaSrc) :
@@ -87,26 +92,21 @@ class TObjArray : public TObject, public MDuplicable
             m_c4ElemCount(objaSrc.m_c4ElemCount)
             , m_c4SerialNum(0)
             , m_paobjList(nullptr)
-            , m_pmtxLock(nullptr)
         {
             // Lock the source
-            TMtxLocker lockSource(objaSrc.m_pmtxLock);
+            TLocker lockrSource(&objaSrc);
 
             // Allocate the node array
             m_paobjList = new TElem[m_c4ElemCount];
 
             for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
                 m_paobjList[c4Ind] = objaSrc.m_paobjList[c4Ind];
-
-            // Create a mutex if the source has one
-            if (objaSrc.m_pmtxLock)
-                m_pmtxLock = new TMutex;
         }
 
-        // Set up a with 1 element, if the srce is thread safe we should be
+        // Set up a with 1 element
         TObjArray(TMyType&& objaSrc) :
 
-            TObjArray(1, objaSrc.eMTState())
+            TObjArray(1)
         {
             operator=(tCIDLib::ForceMove(objaSrc));
         }
@@ -117,9 +117,6 @@ class TObjArray : public TObject, public MDuplicable
             {
                 delete [] m_paobjList;
                 m_paobjList = nullptr;
-
-                delete m_pmtxLock;
-                m_pmtxLock = nullptr;
             }
 
             catch(TError& errToCatch)
@@ -138,7 +135,7 @@ class TObjArray : public TObject, public MDuplicable
             const tCIDLib::TCard4 c4Index = tCIDLib::TCard4(tIndex);
 
             // Lock this object
-            TMtxLocker lockSource(m_pmtxLock);
+            TLocker lockrSource(this);
             VerifyIndex(c4Index, CID_LINE);
             return m_paobjList[c4Index];
         }
@@ -148,7 +145,7 @@ class TObjArray : public TObject, public MDuplicable
             const tCIDLib::TCard4 c4Index = tCIDLib::TCard4(tIndex);
 
             // Lock this object
-            TMtxLocker lockSource(m_pmtxLock);
+            TLocker lockrSource(this);
             VerifyIndex(c4Index, CID_LINE);
             return m_paobjList[c4Index];
         }
@@ -159,8 +156,8 @@ class TObjArray : public TObject, public MDuplicable
                 return kCIDLib::True;
 
             // Lock this object and the source
-            TMtxLocker lockThis(m_pmtxLock);
-            TMtxLocker lockSource(objaSrc.m_pmtxLock);
+            TLocker lockrThis(this);
+            TLocker lockrSource(&objaSrc);
 
             if (objaSrc.m_c4ElemCount != m_c4ElemCount)
                 return kCIDLib::False;
@@ -183,8 +180,8 @@ class TObjArray : public TObject, public MDuplicable
         {
             if (this != &objaSrc)
             {
-                TMtxLocker lockUs(m_pmtxLock);
-                TMtxLocker lockSource(objaSrc.m_pmtxLock);
+                TLocker lockrUs(this);
+                TLocker lockrSource(&objaSrc);
 
                 // Delete and reallocate and if not the same size
                 if (m_c4ElemCount != objaSrc.m_c4ElemCount)
@@ -209,8 +206,8 @@ class TObjArray : public TObject, public MDuplicable
         {
             if (this != &objaSrc)
             {
-                TMtxLocker lockUs(m_pmtxLock);
-                TMtxLocker lockSource(objaSrc.m_pmtxLock);
+                TLocker lockrUs(this);
+                TLocker lockrSource(&objaSrc);
 
                 tCIDLib::Swap(objaSrc.m_c4ElemCount, m_c4ElemCount);
                 tCIDLib::Swap(objaSrc.m_paobjList, m_paobjList);
@@ -223,22 +220,98 @@ class TObjArray : public TObject, public MDuplicable
 
 
         // -------------------------------------------------------------------
-        //  Public, non-virtual methods
+        //  Public, virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsMTSafe() const
+        virtual tCIDLib::EMTStates eMTSafe() const
         {
-            return (m_pmtxLock != nullptr);
+            return tCIDLib::EMTStates::Unsafe;
         }
 
-        TIndex tElemCount() const
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
         {
-            // Lock this object
-            tCIDLib::TCard4 c4Ret;
+            if (clsTarget == clsThis())
+                return kCIDLib::True;
+            return TObject::bIsDescendantOf(clsTarget);
+        }
+
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMSs) const override
+        {
+            // WE aren't lockable, so just say it worked
+            return kCIDLib::True;
+        }
+
+        const TClass& clsIsA() const final
+        {
+            return clsThis();
+        }
+
+        const TClass& clsParent() const final
+        {
+            return TObject::clsThis();
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4) const override
+        {
+            // A no-op for us
+        }
+
+        tCIDLib::TVoid Unlock() const override
+        {
+            // A no-op for us
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+
+        // Call back for each element. Can be a lambda or function
+        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
+        {
+            TLocker lockrThis(this);
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
             {
-                TMtxLocker lockThis(m_pmtxLock);
-                c4Ret = m_c4ElemCount;
+                if (!iterCB(m_paobjList[c4Index]))
+                    return kCIDLib::False;
             }
-            return TIndex(c4Ret);
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
+        {
+            TLocker lockrThis(this);
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
+            {
+                if (!iterCB(m_paobjList[c4Index]))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
+        {
+            TLocker lockrThis(this);
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
+            {
+                if (!iterCB(m_paobjList[c4Index], c4Index))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachNCI(IterCB iterCB)
+        {
+            TLocker lockrThis(this);
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
+            {
+                if (!iterCB(m_paobjList[c4Index], c4Index))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
         }
 
         tCIDLib::TCard4 c4SerialNum() const
@@ -246,17 +319,10 @@ class TObjArray : public TObject, public MDuplicable
             // Lock this object
             tCIDLib::TCard4 c4Ret;
             {
-                TMtxLocker lockThis(m_pmtxLock);
+                TLocker lockrThis(this);
                 c4Ret = m_c4SerialNum;
             }
             return c4Ret;
-        }
-
-        tCIDLib::EMTStates eMTState() const
-        {
-            if (m_pmtxLock)
-                return tCIDLib::EMTStates::Safe;
-            return tCIDLib::EMTStates::Unsafe;
         }
 
         tCIDLib::TVoid ExchangeElems(   const   TIndex  tFirst
@@ -266,7 +332,7 @@ class TObjArray : public TObject, public MDuplicable
             const tCIDLib::TCard4 c4Second = tCIDLib::TCard4(tSecond);
 
             // Lock this object
-            TMtxLocker lockThis(m_pmtxLock);
+            TLocker lockrThis(this);
 
             // Sanity check both element indexes
             VerifyIndex(c4First, CID_LINE);
@@ -287,66 +353,17 @@ class TObjArray : public TObject, public MDuplicable
         }
 
 
-        // Call back for each element. Can be a lambda or function
-        template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
+        TIndex tElemCount() const
         {
-            TMtxLocker lockThis(m_pmtxLock);
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
+            // Lock this object
+            tCIDLib::TCard4 c4Ret;
             {
-                if (!iterCB(m_paobjList[c4Index]))
-                    return kCIDLib::False;
+                TLocker lockrThis(this);
+                c4Ret = m_c4ElemCount;
             }
-            return kCIDLib::True;
+            return TIndex(c4Ret);
         }
 
-        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
-        {
-            TMtxLocker lockThis(m_pmtxLock);
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
-            {
-                if (!iterCB(m_paobjList[c4Index]))
-                    return kCIDLib::False;
-            }
-            return kCIDLib::True;
-        }
-
-        template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
-        {
-            TMtxLocker lockThis(m_pmtxLock);
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
-            {
-                if (!iterCB(m_paobjList[c4Index], c4Index))
-                    return kCIDLib::False;
-            }
-            return kCIDLib::True;
-        }
-
-        template <typename IterCB> tCIDLib::TBoolean bForEachNCI(IterCB iterCB)
-        {
-            TMtxLocker lockThis(m_pmtxLock);
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
-            {
-                if (!iterCB(m_paobjList[c4Index], c4Index))
-                    return kCIDLib::False;
-            }
-            return kCIDLib::True;
-        }
-
-
-        tCIDLib::TVoid
-        Lock(const tCIDLib::TCard4 c4Timeout = kCIDLib::c4MaxWait) const
-        {
-            // If this one is lockable, then do the lock
-            if (m_pmtxLock)
-                m_pmtxLock->Lock(c4Timeout);
-        }
-
-        tCIDLib::TVoid Unlock() const
-        {
-            // If this one is lockable, then do the unlock
-            if (m_pmtxLock)
-                m_pmtxLock->Unlock();
-        }
 
         const TElem& objAt(const TIndex tIndex) const
         {
@@ -355,7 +372,7 @@ class TObjArray : public TObject, public MDuplicable
             // Lock this object and get the reference out
             TElem* pobjRet = nullptr;
             {
-                TMtxLocker lockThis(m_pmtxLock);
+                TLocker lockrThis(this);
                 VerifyIndex(c4Index, CID_LINE);
                 pobjRet = &m_paobjList[c4Index];
             }
@@ -369,16 +386,11 @@ class TObjArray : public TObject, public MDuplicable
             // Lock this object and get the reference out
             TElem* pobjRet = nullptr;
             {
-                TMtxLocker lockThis(m_pmtxLock);
+                TLocker lockrThis(this);
                 VerifyIndex(c4Index, CID_LINE);
                 pobjRet = &m_paobjList[c4Index];
             }
             return *pobjRet;
-        }
-
-        TMutex* pmtxLock() const
-        {
-            return m_pmtxLock;
         }
 
         tCIDLib::TVoid Realloc(const TIndex tNewSz)
@@ -386,7 +398,7 @@ class TObjArray : public TObject, public MDuplicable
             const tCIDLib::TCard4 c4NewSz = tCIDLib::TCard4(tNewSz);
 
             // Lock this object
-            TMtxLocker lockThis(m_pmtxLock);
+            TLocker lockrThis(this);
 
             // If our current size is different, the delete and reallocate
             if (m_c4ElemCount != c4NewSz)
@@ -400,7 +412,7 @@ class TObjArray : public TObject, public MDuplicable
         tCIDLib::TVoid SetAll(const TElem& objToSet)
         {
             // Lock this object
-            TMtxLocker lockThis(m_pmtxLock);
+            TLocker lockrThis(this);
 
             for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
                 m_paobjList[c4Ind] = objToSet;
@@ -413,8 +425,8 @@ class TObjArray : public TObject, public MDuplicable
             if (this != &objaSrc)
             {
                 // Lock both
-                TMtxLocker lockThis(m_pmtxLock);
-                TMtxLocker lockSource(objaSrc.m_pmtxLock);
+                TLocker lockrThis(this);
+                TLocker lockrSource(&objaSrc);
 
                 // Swap the content
                 tCIDLib::Swap(m_c4ElemCount, objaSrc.m_c4ElemCount);
@@ -439,7 +451,7 @@ class TObjArray : public TObject, public MDuplicable
         {
             const tCIDLib::TCard4 c4StartAt = tCIDLib::TCard4(tStartAt);
 
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
 			//
 			//	We can allow the start index to be at the item past the end. We just
@@ -479,27 +491,13 @@ class TObjArray : public TObject, public MDuplicable
         //  Needed by our input streamer friend, so that he can reset us if the
         //  stored object is different.
         //
-        tCIDLib::TVoid Reset(tCIDLib::TCard4 c4Count, tCIDLib::EMTStates  eMTState)
+        tCIDLib::TVoid Reset(tCIDLib::TCard4 c4Count)
         {
             if (c4Count != m_c4ElemCount)
             {
                 delete [] m_paobjList;
                 m_c4ElemCount = c4Count;
                 m_paobjList = new TElem[m_c4ElemCount];
-            }
-
-            if (eMTState == tCIDLib::EMTStates::Safe)
-            {
-                if (!m_pmtxLock)
-                    m_pmtxLock = new TMutex;
-            }
-             else
-            {
-                if (!m_pmtxLock)
-                {
-                    delete m_pmtxLock;
-                    m_pmtxLock = nullptr;
-                }
             }
         }
 
@@ -555,8 +553,116 @@ class TObjArray : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
-        TemplateRTTIDefs(TMyType,TObject)
         DefPolyDup(TMyType)
+};
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TObjArray
+//  PREFIX: obja
+// ---------------------------------------------------------------------------
+template <typename TElem, typename TIndex = tCIDLib::TCard4>
+class TSafeObjArray : public TObjArray<TElem, TIndex>
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Class types
+        // -------------------------------------------------------------------
+        using TMyType = TSafeObjArray<TElem, TIndex>;
+        using TParType = TObjArray<TElem, TIndex>;
+
+
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TSafeObjArray() = delete;
+
+        TSafeObjArray(const TIndex tElemCount) : TParType(tElemCount)
+        {
+        }
+
+        TSafeObjArray(const TMyType& objaSrc) : TParType(objaSrc)
+        {
+        }
+
+        // Set up a with 1 element
+        TSafeObjArray(TMyType&& objaSrc) :
+
+            TParType(1)
+        {
+            *this = tCIDLib::ForceMove(objaSrc);
+        }
+
+        ~TSafeObjArray()
+        {
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TMyType& operator=(const TMyType& objaSrc)
+        {
+            return TParType::operator=(objaSrc);
+        }
+
+        // As always only swap content, not the lock. Both serial numbers are bumped
+        TMyType& operator=(TMyType&& objaSrc)
+        {
+            return TParType::operator=(tCIDLib::ForceMove(objaSrc));
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
+        {
+            if (clsTarget == clsThis())
+                return kCIDLib::True;
+            return TCollection<TElem>::bIsDescendantOf(clsTarget);
+        }
+
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMSs) const final
+        {
+            return m_mtxSync.bTryLock(c4WaitMSs);
+        }
+
+        const TClass& clsIsA() const final
+        {
+            return clsThis();
+        }
+
+        const TClass& clsParent() const final
+        {
+            return TParType::clsThis();
+        }
+
+        tCIDLib::EMTStates eMTSafe() const final
+        {
+            return tCIDLib::EMTStates::Safe;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4) const final
+        {
+            m_mtxSync.Lock();
+        }
+
+        tCIDLib::TVoid Unlock() const final
+        {
+            m_mtxSync
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_mtxSync
+        //      We override the MLockable methods and implement them in terms of
+        //      this mutex.
+        // -------------------------------------------------------------------
+        TMutex  m_mtxSync;
 };
 
 #pragma CIDLIB_POPPACK
@@ -573,7 +679,7 @@ template <typename T, typename I>
 TBinOutStream& operator<<(TBinOutStream& strmOut, const TObjArray<T, I>& colToStream)
 {
     // Don't let it change during this
-    TMtxLocker lockThis(colToStream.pmtxLock());
+    TLocker lockrThis(&colToStream);
 
     //
     //  Stream out a leading stream marker, then the element count, and the
@@ -581,7 +687,7 @@ TBinOutStream& operator<<(TBinOutStream& strmOut, const TObjArray<T, I>& colToSt
     //
     strmOut     <<  tCIDLib::EStreamMarkers::StartObject
                 <<  tCIDLib::TCard4(colToStream.tElemCount())
-                <<  colToStream.eMTState();
+                <<  colToStream.eMTSafe();
 
     // If there were any elements, then stream them
     const tCIDLib::TCard4 c4Count = tCIDLib::c4EnumOrd(colToStream.tElemCount());
@@ -603,12 +709,11 @@ TBinInStream& operator>>(TBinInStream& strmIn, TObjArray<T,I>& colToStream)
 
     // Stream in the count and MT state
     tCIDLib::TCard4     c4Count;
-    tCIDLib::EMTStates  eMTState;
-    strmIn  >> c4Count
-            >> eMTState;
+    tCIDLib::EMTStates  eMTSafeDummy;
+    strmIn  >> c4Count >> eMTSafeDummy;
 
     // We are a friend so we can call the reset method
-    colToStream.Reset(c4Count, eMTState);
+    colToStream.Reset(c4Count);
     if (c4Count)
     {
         T objTmp;

@@ -358,7 +358,7 @@ TMacroDbgMainWnd::eAtLine(  const   TMEngClassInfo&     meciCurrent
     if (m_eActionReq == EActionReqs::None)
     {
         // See if the class is currently loaded
-        TMtxLocker lockSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         TSrcTab* pwndCur = pwndFindSrcTab(meciCurrent.strClassPath());
         TSrcEditor* pwndEdit = 0;
@@ -421,7 +421,7 @@ TMacroDbgMainWnd::eAtLine(  const   TMEngClassInfo&     meciCurrent
 
         // Sync while we update the data members, reset the event, and post
         {
-            TMtxLocker lockSync(&m_mtxSync);
+            TLocker lockrSync(&m_mtxSync);
 
             // Save the old new values to the last values
             m_c4LastLine    = m_c4NewLine;
@@ -1526,7 +1526,7 @@ TMacroDbgMainWnd::MenuCommand(  const   tCIDLib::TResId     ridItem
         //
         if (m_eCurState == EStates::Running)
         {
-            TMtxLocker mtxSync(&m_mtxSync);
+            TLocker mtxSync(&m_mtxSync);
             m_eActionReq = EActionReqs::Break;
         }
     }
@@ -1563,7 +1563,7 @@ TMacroDbgMainWnd::MenuCommand(  const   tCIDLib::TResId     ridItem
         //
         if ((m_eCurState == EStates::Running) || (m_eCurState == EStates::Stopped))
         {
-            TMtxLocker mtxSync(&m_mtxSync);
+            TLocker mtxSync(&m_mtxSync);
             m_eActionReq = EActionReqs::Exit;
             if (m_eCurState == EStates::Stopped)
                 m_evSync.Trigger();

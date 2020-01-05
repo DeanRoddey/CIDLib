@@ -42,13 +42,14 @@ RTTIDecls(TFacCIDComm,TFacility)
 // ---------------------------------------------------------------------------
 namespace CIDComm_ThisFacility
 {
-    // -----------------------------------------------------------------------
-    //  This is our port factory list. We fault it in when the facility class
-    //  is faulted in.
-    // -----------------------------------------------------------------------
-    using TFactoryList = TRefVector<TComPortFactory>;
-    TAtomicFlag     atomInitDone;
-    TFactoryList*   pcolFList;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  This is our port factory list
+        // -----------------------------------------------------------------------
+        using TFactoryList = TSafeRefVector<TComPortFactory>;
+        TFactoryList colFList(tCIDLib::EAdoptOpts::Adopt, 4);
+    }
 }
 
 
@@ -80,27 +81,33 @@ TFacCIDComm::TFacCIDComm() :
         , tCIDLib::EModFlags::HasMsgFile
     )
 {
-    //
-    //  Fault in the factory list, and add the factory for local ports that
-    //  are always supported.
-    //
-    if (!CIDComm_ThisFacility::atomInitDone)
-    {
-        TBaseLock lockInit;
-        if (!CIDComm_ThisFacility::atomInitDone)
-        {
-            TRefVector<TComPortFactory>* pcolList = new TRefVector<TComPortFactory>
-            (
-                tCIDLib::EAdoptOpts::Adopt, 4, tCIDLib::EMTStates::Safe
-            );
-            TJanitor<TRefVector<TComPortFactory> > janCol(pcolList);
-            pcolList->Add(new TLocalComPortFactory);
-            CIDComm_ThisFacility::pcolFList = janCol.pobjOrphan();
-
-            CIDComm_ThisFacility::atomInitDone.Set();
-        }
-    }
 }
+
+
+// ---------------------------------------------------------------------------
+//  TFacCIDComm:: Public, inherited methods
+// ---------------------------------------------------------------------------
+
+//
+//  In order for higher level code to atomically update our port factory list,
+//  we implement the MLockable interface, just in terms of our internal safe
+//  collection.
+//
+tCIDLib::TBoolean TFacCIDComm::bTryLock(const tCIDLib::TCard4 c4WaitMSs) const
+{
+    return CIDComm_ThisFacility::colFList.bTryLock(c4WaitMSs);
+}
+
+tCIDLib::TVoid TFacCIDComm::Lock(const tCIDLib::TCard4 c4WaitMSs) const
+{
+    CIDComm_ThisFacility::colFList.Lock(c4WaitMSs);
+}
+
+tCIDLib::TVoid TFacCIDComm::Unlock() const
+{
+    CIDComm_ThisFacility::colFList.Unlock();
+}
+
 
 
 // ---------------------------------------------------------------------------
@@ -110,13 +117,13 @@ TFacCIDComm::TFacCIDComm() :
 tCIDLib::TBoolean TFacCIDComm::bCanConfigure(const TString& strToCheck) const
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(CIDComm_ThisFacility::pcolFList->pmtxLock());
+    TLocker lockrSync(&CIDComm_ThisFacility::colFList);
 
     //
     //  Iterate all of the installed port factories and ask each one if it owns this
     //  port. If so, return his can configure flag.
     //
-    CIDComm_ThisFacility::TFactoryList::TCursor cursList(CIDComm_ThisFacility::pcolFList);
+    CIDComm_ThisFacility::TFactoryList::TCursor cursList(&CIDComm_ThisFacility::colFList);
     for (; cursList; ++cursList)
     {
         if (cursList->bOwnsThisPort(strToCheck))
@@ -131,14 +138,14 @@ tCIDLib::TBoolean TFacCIDComm::bCanConfigure(const TString& strToCheck) const
 tCIDLib::TBoolean TFacCIDComm::bIsValidPortName(const TString& strToCheck) const
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(CIDComm_ThisFacility::pcolFList->pmtxLock());
+    TLocker lockrSync(&CIDComm_ThisFacility::colFList);
 
     //
     //  Iterate all of the installed port factories and ask each one if it
     //  owns this port. If none say yes, it's a bad path. If one says yes,
     //  then ask it to validate the name and return that result.
     //
-    CIDComm_ThisFacility::TFactoryList::TCursor cursList(CIDComm_ThisFacility::pcolFList);
+    CIDComm_ThisFacility::TFactoryList::TCursor cursList(&CIDComm_ThisFacility::colFList);
     for (; cursList; ++cursList)
     {
         if (cursList->bOwnsThisPort(strToCheck))
@@ -156,7 +163,7 @@ TFacCIDComm::bQueryPorts(       tCIDLib::TStrCollect& colToFill
                         , const tCIDLib::TBoolean     bAvailOnly) const
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(CIDComm_ThisFacility::pcolFList->pmtxLock());
+    TLocker lockrSync(&CIDComm_ThisFacility::colFList);
 
     //
     //  Iterate the installed factories and ask each of them to add their
@@ -165,13 +172,13 @@ TFacCIDComm::bQueryPorts(       tCIDLib::TStrCollect& colToFill
     //
     const tCIDLib::TCard4 c4Count
     (
-        bLocalOnly ? 1 : CIDComm_ThisFacility::pcolFList->c4ElemCount()
+        bLocalOnly ? 1 : CIDComm_ThisFacility::colFList.c4ElemCount()
     );
 
     colToFill.RemoveAll();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
-        TComPortFactory* pfactCur = CIDComm_ThisFacility::pcolFList->pobjAt(c4Index);
+        TComPortFactory* pfactCur = CIDComm_ThisFacility::colFList.pobjAt(c4Index);
         pfactCur->bQueryPorts(colToFill, bAvailOnly);
     }
 
@@ -188,16 +195,16 @@ tCIDLib::TVoid
 TFacCIDComm::DeregisterFactory(const TString& strFactoryId)
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(CIDComm_ThisFacility::pcolFList->pmtxLock());
+    TLocker lockrSync(&CIDComm_ThisFacility::colFList);
 
     // Find this factory by its id, and remove it
-    const tCIDLib::TCard4 c4Count = CIDComm_ThisFacility::pcolFList->c4ElemCount();
+    const tCIDLib::TCard4 c4Count = CIDComm_ThisFacility::colFList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
-        TComPortFactory* pfactCur = CIDComm_ThisFacility::pcolFList->pobjAt(c4Index);
+        TComPortFactory* pfactCur = CIDComm_ThisFacility::colFList.pobjAt(c4Index);
         if (pfactCur->strId() == strFactoryId)
         {
-            CIDComm_ThisFacility::pcolFList->RemoveAt(c4Index);
+            CIDComm_ThisFacility::colFList.RemoveAt(c4Index);
             break;
         }
     }
@@ -212,13 +219,13 @@ TFacCIDComm::DeregisterFactory(const TString& strFactoryId)
 TCommPortBase* TFacCIDComm::pcommMakeNew(const TString& strPath)
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(CIDComm_ThisFacility::pcolFList->pmtxLock());
+    TLocker lockrSync(&CIDComm_ThisFacility::colFList);
 
     TCommPortBase* pcommRet = nullptr;
-    const tCIDLib::TCard4 c4Count = CIDComm_ThisFacility::pcolFList->c4ElemCount();
+    const tCIDLib::TCard4 c4Count = CIDComm_ThisFacility::colFList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
-        TComPortFactory* pfactCur = CIDComm_ThisFacility::pcolFList->pobjAt(c4Index);
+        TComPortFactory* pfactCur = CIDComm_ThisFacility::colFList.pobjAt(c4Index);
         if (pfactCur->bOwnsThisPort(strPath))
         {
             pcommRet = pfactCur->pcommMakeNew(strPath);
@@ -238,26 +245,16 @@ TCommPortBase* TFacCIDComm::pcommMakeNew(const TString& strPath)
 TComPortFactory* TFacCIDComm::pfactById(const TString& strId)
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(CIDComm_ThisFacility::pcolFList->pmtxLock());
+    TLocker lockrSync(&CIDComm_ThisFacility::colFList);
 
-    const tCIDLib::TCard4 c4Count = CIDComm_ThisFacility::pcolFList->c4ElemCount();
+    const tCIDLib::TCard4 c4Count = CIDComm_ThisFacility::colFList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
-        TComPortFactory* pfactCur = CIDComm_ThisFacility::pcolFList->pobjAt(c4Index);
+        TComPortFactory* pfactCur = CIDComm_ThisFacility::colFList.pobjAt(c4Index);
         if (pfactCur->strId() == strId)
             return pfactCur;
     }
-    return 0;
-}
-
-
-//
-//  Proivde access to our lock mutex in case the caller needs to access a
-//  factory directly.
-//
-TMutex* TFacCIDComm::pmtxlLock()
-{
-    return CIDComm_ThisFacility::pcolFList->pmtxLock();
+    return nullptr;
 }
 
 
@@ -269,14 +266,14 @@ tCIDLib::TVoid
 TFacCIDComm::RegisterFactory(TComPortFactory* const pfactToAdopt)
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(CIDComm_ThisFacility::pcolFList->pmtxLock());
+    TLocker lockrSync(&CIDComm_ThisFacility::colFList);
 
     #if CID_DEBUG_ON
     const TString& strNew = pfactToAdopt->strId();
-    const tCIDLib::TCard4 c4Count = CIDComm_ThisFacility::pcolFList->c4ElemCount();
+    const tCIDLib::TCard4 c4Count = CIDComm_ThisFacility::colFList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
-        TComPortFactory* pfactCur = CIDComm_ThisFacility::pcolFList->pobjAt(c4Index);
+        TComPortFactory* pfactCur = CIDComm_ThisFacility::colFList.pobjAt(c4Index);
         if (pfactCur->strId() == strNew)
         {
             facCIDComm().ThrowErr
@@ -293,7 +290,7 @@ TFacCIDComm::RegisterFactory(TComPortFactory* const pfactToAdopt)
     #endif
 
     // Looks ok so add it
-    CIDComm_ThisFacility::pcolFList->Add(pfactToAdopt);
+    CIDComm_ThisFacility::colFList.Add(pfactToAdopt);
 }
 
 

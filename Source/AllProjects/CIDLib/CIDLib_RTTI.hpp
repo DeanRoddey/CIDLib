@@ -62,8 +62,8 @@ using TParent = ParentClass; \
 public  : \
 static const TClass& clsThis() \
 { \
-    static const TClass* pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
-    return *pclsThis; \
+    static const TClass clsRet(CIDLib_MakeLStr2(Class)); \
+    return clsRet; \
 } \
 \
 tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override \
@@ -93,8 +93,8 @@ const TClass& clsParent() const override \
 #define RTTIDecls(Class,ParentClass) \
 const TClass& Class::clsThis() \
 { \
-    static const TClass* pclsThis = new TClass(CIDLib_MakeLStr2(Class)); \
-    return *pclsThis; \
+    static const TClass clsRet(CIDLib_MakeLStr2(Class)); \
+    return clsRet; \
 }
 
 #define AdvRTTIDecls(Class,ParentClass) \

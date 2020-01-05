@@ -153,7 +153,7 @@ static CIDLib_Thread::TThreadItem* athriList()
     if (!atomDone)
     {
         // Lock the list first
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // Always check again to make sure we weren't beat to the punch
         if (!atomDone)
@@ -412,7 +412,7 @@ tCIDLib::EExitCodes eThreadStart(TThread* const pthrStarting, tCIDLib::TVoid* pD
     //  since it would have to be the same object literally.
     //
     {
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // See if this thread object is already in the list
         CIDLib_Thread::TThreadItem* pthriCur = athriList();
@@ -580,7 +580,7 @@ TThread* pthrCurrent()
     // Dummy scope so we don't stay locked if popup occurs below!
     {
         // Get access to the thread list
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // Look for this thread id
         pthrRet = pthrFindId(tidCaller);
@@ -987,7 +987,7 @@ TThread::~TThread()
     //
     {
         // Get access to the thread list
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
         bRemoveName(m_strName);
     }
 
@@ -1367,7 +1367,7 @@ tCIDLib::TVoid TThread::Release()
     //  mutex in every thread object just for this stuff.
     //
     {
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // Make sure the caller is the one that did the sync
         #if CID_DEBUG_ON
@@ -1739,7 +1739,7 @@ tCIDLib::TVoid TThread::Start(          tCIDLib::TVoid* const   pData
     if (!m_kthrThis.bWaitEvOrDeath(m_kevResponse, bDied, c4TimeOut))
     {
         // Something has gone fundamentally wrong, bu tlet's try to clean up
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         m_bSyncRequest = kCIDLib::False;
         m_tidSyncReq = kCIDLib::tidInvalid;
@@ -1809,7 +1809,7 @@ tCIDLib::TVoid TThread::Sync()
     //
     if (m_bSyncRequest)
     {
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
         if (!m_bSyncRequest)
             return;
 
@@ -1838,7 +1838,7 @@ tCIDLib::TVoid TThread::Sync()
     tCIDLib::TBoolean bDied;
     if (!m_kthrThis.bWaitEvOrDeath(m_kevSync, bDied, 60000))
     {
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         const TKrnlError& kerrLast = TKrnlError::kerrLast();
         tCIDLib::TErrCode errcLog = kCIDErrs::errcEv_Wait;
@@ -1947,7 +1947,7 @@ tCIDLib::TVoid TThread::WaitSync(const tCIDLib::TCard4 c4Timeout)
     // A faux block to minimize thread list lock time
     try
     {
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // If there is already a request, then we can't do it
         if (m_bSyncRequest)
@@ -2011,7 +2011,7 @@ tCIDLib::TVoid TThread::WaitSync(const tCIDLib::TCard4 c4Timeout)
     {
         // Lock and clean up then rethrow
         {
-            TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+            TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
             m_bSyncRequest = kCIDLib::False;
             m_tidSyncReq = kCIDLib::tidInvalid;
             m_kevResponse.bTrigger();
@@ -2035,7 +2035,7 @@ tCIDLib::TVoid TThread::WaitSync(const tCIDLib::TCard4 c4Timeout)
         TKrnlError kerrLast = TKrnlError::kerrLast();
 
         // Lock again so we can clean up
-        TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // Clear the flags back out
         m_bSyncRequest = kCIDLib::False;
@@ -2178,7 +2178,7 @@ TThread::CheckCallerIsSelf(const   tCIDLib::TCard4     c4LineNum
 tCIDLib::TVoid TThread::ShutdownProcessing()
 {
     // Lock while we clean up
-    TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+    TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
     //
     //  Call the on-exit function to let the thread object clean up. This
@@ -2264,7 +2264,7 @@ tCIDLib::TVoid TThread::FormatTo(TTextOutStream& strmToWriteTo) const
 tCIDLib::TVoid TThread::CommonInit()
 {
     // Get access to the thread list
-    TMtxLocker mtxlAccess(CIDLib_Thread::pmtxListAccess());
+    TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
     //
     //  Check the thread list and see if there is already a thread with

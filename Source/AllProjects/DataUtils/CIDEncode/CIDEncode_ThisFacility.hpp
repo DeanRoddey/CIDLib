@@ -129,7 +129,7 @@ class CIDENCODEEXP TFacCIDEncode : public TFacility
         // -------------------------------------------------------------------
         //  Private class types
         // -------------------------------------------------------------------
-        using TMapList = tCIDLib::TKVHashSet;
+        using TMapList = tCIDLib::TSafeKVHashSet;
 
 
         // -------------------------------------------------------------------

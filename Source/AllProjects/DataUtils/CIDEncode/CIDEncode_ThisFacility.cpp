@@ -68,10 +68,7 @@ TFacCIDEncode::TFacCIDEncode() :
     //
     m_pcolMap = new TMapList
     (
-        29
-        , TStringKeyOps(kCIDLib::False)
-        , &TKeyValuePair::strExtractKey
-        , tCIDLib::EMTStates::Safe
+        29, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
      );
 
 
@@ -238,7 +235,7 @@ tCIDLib::TVoid
 TFacCIDEncode::AddMapping(const TString& strName, const TString& strClass)
 {
     // Lock the map before we change it
-    TMtxLocker lockMap(m_pcolMap->pmtxLock());
+    TLocker lockrMap(m_pcolMap);
 
     // See if this name exists already. If so, then update it, else add it
     TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
@@ -298,7 +295,7 @@ TFacCIDEncode::bProbeForEncoding(const  TMemBuf&        mbufSrc
 tCIDLib::TBoolean
 TFacCIDEncode::bSupportsEncoding(const TString& strToCheck) const
 {
-    TMtxLocker lockMap(m_pcolMap->pmtxLock());
+    TLocker lockrMap(m_pcolMap);
     return m_pcolMap->bKeyExists(strToCheck);
 }
 
@@ -336,7 +333,7 @@ TFacCIDEncode::ptcvtMake(const  TString&            strName
     //
     TString strClassName;
     {
-        TMtxLocker lockMap(m_pcolMap->pmtxLock());
+        TLocker lockrMap(m_pcolMap);
         TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
         if (pkvalFound)
             strClassName = pkvalFound->strValue();
@@ -415,7 +412,7 @@ TFacCIDEncode::cptrMake(const   TString&        strName
 //
 TString TFacCIDEncode::strBaseNameFor(const TString& strName) const
 {
-    TMtxLocker lockMap(m_pcolMap->pmtxLock());
+    TLocker lockrMap(m_pcolMap);
 
     TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
     if (!pkvalFound)

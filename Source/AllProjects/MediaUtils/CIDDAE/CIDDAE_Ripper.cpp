@@ -94,16 +94,12 @@ class TDAEBufPool : public TFixedSizePool<TDAEBuf>
         // -------------------------------------------------------------------
         TDAEBufPool() :
 
-            TFixedSizePool
-            (
-                CIDDAE_Ripper::c4MaxBufs * 2
-                , L"DAE Buffer Pool"
-                , tCIDLib::EMTStates::Safe
-            )
+            TFixedSizePool(CIDDAE_Ripper::c4MaxBufs * 2, L"DAE Buffer Pool")
         {
         }
 
         TDAEBufPool(const TDAEBufPool&) = delete;
+        TDAEBufPool(TDAEBufPool&&) = delete;
 
         ~TDAEBufPool() {}
 
@@ -112,6 +108,7 @@ class TDAEBufPool : public TFixedSizePool<TDAEBuf>
         //  Public operators
         // -------------------------------------------------------------------
         TDAEBufPool& operator=(const TDAEBufPool&) = delete;
+        TDAEBufPool& operator=(TDAEBufPool&&) = delete;
 
 
     protected :
@@ -158,7 +155,7 @@ TCIDDAERipper::TCIDDAERipper() :
     , m_c4Stitches(0)
     , m_c4StartBlk(0)
     , m_c4TrackNum(0)
-    , m_colWorkQ(tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::EMTStates::Safe)
+    , m_colWorkQ(tCIDLib::EAdoptOpts::NoAdopt)
     , m_eJitterOpt(tCIDDAE::EJitterOpts::None)
     , m_pbBreakFlag(nullptr)
     , m_pdaeeToUse(nullptr)

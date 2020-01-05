@@ -562,7 +562,7 @@ tCIDLib::EExitCodes TTest_ObjStore3::eTestThread(TThread& thrThis, tCIDLib::TVoi
                                             , ac4Versions[c4CurIndex]
                                             , strTmp))
                 {
-                    TMtxLocker lockOut(&m_mtxOut);
+                    TLocker lockrOut(&m_mtxOut);
                     m_c4ThreadErrs++;
                     *m_pstrmOut << TFWCurLn
                                 << L"Should not have gotten a new value\n\n";
@@ -572,7 +572,7 @@ tCIDLib::EExitCodes TTest_ObjStore3::eTestThread(TThread& thrThis, tCIDLib::TVoi
                 tCIDLib::TCard4 c4TmpId = 0;
                 if (!m_oseTest.bReadObject(astrKeys[c4CurIndex], c4TmpId, strTmp))
                 {
-                    TMtxLocker lockOut(&m_mtxOut);
+                    TLocker lockrOut(&m_mtxOut);
                     m_c4ThreadErrs++;
                     *m_pstrmOut << TFWCurLn
                                 << L"Did not get value with forced version\n\n";
@@ -581,7 +581,7 @@ tCIDLib::EExitCodes TTest_ObjStore3::eTestThread(TThread& thrThis, tCIDLib::TVoi
                 // Compare the value to what we last wrote
                 if (strTmp != astrValues[c4CurIndex])
                 {
-                    TMtxLocker lockOut(&m_mtxOut);
+                    TLocker lockrOut(&m_mtxOut);
                     m_c4ThreadErrs++;
                     *m_pstrmOut << TFWCurLn
                                 << L"Didn't equal last written value\n\n";
@@ -610,7 +610,7 @@ tCIDLib::EExitCodes TTest_ObjStore3::eTestThread(TThread& thrThis, tCIDLib::TVoi
     // Catch any CIDLib runtime errors
     catch(const TError& errToCatch)
     {
-        TMtxLocker lockOut(&m_mtxOut);
+        TLocker lockrOut(&m_mtxOut);
         m_c4ThreadErrs++;
         *m_pstrmOut << L"\nA CIDLib runtime error occured. Thread="
                     << thrThis.strName() << L"\n   Error: "
@@ -624,7 +624,7 @@ tCIDLib::EExitCodes TTest_ObjStore3::eTestThread(TThread& thrThis, tCIDLib::TVoi
     //
     catch(const TKrnlError& kerrToCatch)
     {
-        TMtxLocker lockOut(&m_mtxOut);
+        TLocker lockrOut(&m_mtxOut);
         m_c4ThreadErrs++;
         *m_pstrmOut << L"A kernel error occured. Thread="
                     << thrThis.strName() << L"\n   Error: "
@@ -635,7 +635,7 @@ tCIDLib::EExitCodes TTest_ObjStore3::eTestThread(TThread& thrThis, tCIDLib::TVoi
     // Catch a general exception
     catch(...)
     {
-        TMtxLocker lockOut(&m_mtxOut);
+        TLocker lockrOut(&m_mtxOut);
         m_c4ThreadErrs++;
         *m_pstrmOut << L"\nA general exception occured. Thread="
                     << thrThis.strName() << kCIDLib::DNewLn;
@@ -666,7 +666,7 @@ TTest_ObjStore4::TTest_ObjStore4() :
     )
     , m_c4NextKeyId(1)
     , m_c4ThreadErrs(0)
-    , m_colKeys(tCIDLib::EMTStates::Safe)
+    , m_colKeys()
     , m_evStart(tCIDLib::EEventStates::Reset)
     , m_pstrmOut(nullptr)
 {
@@ -827,7 +827,7 @@ tCIDLib::EExitCodes TTest_ObjStore4::eAddThread(TThread& thrThis, tCIDLib::TVoid
             // Create a key based on the next available id
             strKey = L"/Test/Key";
             {
-                TMtxLocker lockOut(&m_mtxOut);
+                TLocker lockrOut(&m_mtxOut);
                 strKey.AppendFormatted(m_c4NextKeyId++);
             }
 
@@ -864,7 +864,7 @@ tCIDLib::EExitCodes TTest_ObjStore4::eAddThread(TThread& thrThis, tCIDLib::TVoid
     // Catch any CIDLib runtime errors
     catch(const TError& errToCatch)
     {
-        TMtxLocker lockOut(&m_mtxOut);
+        TLocker lockrOut(&m_mtxOut);
         m_c4ThreadErrs++;
         *m_pstrmOut << L"\nA CIDLib runtime error occured. Thread="
                     << thrThis.strName() << L"\n   Error: "
@@ -878,7 +878,7 @@ tCIDLib::EExitCodes TTest_ObjStore4::eAddThread(TThread& thrThis, tCIDLib::TVoid
     //
     catch(const TKrnlError& kerrToCatch)
     {
-        TMtxLocker lockOut(&m_mtxOut);
+        TLocker lockrOut(&m_mtxOut);
         m_c4ThreadErrs++;
         *m_pstrmOut << L"A kernel error occured. Thread="
                     << thrThis.strName() << L"\n   Error: "
@@ -889,7 +889,7 @@ tCIDLib::EExitCodes TTest_ObjStore4::eAddThread(TThread& thrThis, tCIDLib::TVoid
     // Catch a general exception
     catch(...)
     {
-        TMtxLocker lockOut(&m_mtxOut);
+        TLocker lockrOut(&m_mtxOut);
         m_c4ThreadErrs++;
         *m_pstrmOut << L"\nA general exception occured. Thread="
                     << thrThis.strName() << kCIDLib::DNewLn;
@@ -935,7 +935,7 @@ tCIDLib::EExitCodes TTest_ObjStore4::eDelThread(TThread& thrThis, tCIDLib::TVoid
     // Catch any CIDLib runtime errors
     catch(const TError& errToCatch)
     {
-        TMtxLocker lockOut(&m_mtxOut);
+        TLocker lockrOut(&m_mtxOut);
         m_c4ThreadErrs++;
         *m_pstrmOut << L"\nA CIDLib runtime error occured. Thread="
                     << thrThis.strName() << L"\n   Error: "
@@ -949,7 +949,7 @@ tCIDLib::EExitCodes TTest_ObjStore4::eDelThread(TThread& thrThis, tCIDLib::TVoid
     //
     catch(const TKrnlError& kerrToCatch)
     {
-        TMtxLocker lockOut(&m_mtxOut);
+        TLocker lockrOut(&m_mtxOut);
         m_c4ThreadErrs++;
         *m_pstrmOut << L"A kernel error occured. Thread="
                     << thrThis.strName() << L"\n   Error: "
@@ -960,7 +960,7 @@ tCIDLib::EExitCodes TTest_ObjStore4::eDelThread(TThread& thrThis, tCIDLib::TVoid
     // Catch a general exception
     catch(...)
     {
-        TMtxLocker lockOut(&m_mtxOut);
+        TLocker lockrOut(&m_mtxOut);
         m_c4ThreadErrs++;
         *m_pstrmOut << L"\nA general exception occured. Thread="
                     << thrThis.strName() << kCIDLib::DNewLn;

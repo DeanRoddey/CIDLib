@@ -63,6 +63,7 @@ class CIDRTPEXP TCIDRTPTrans : public TObject
         TCIDRTPTrans();
 
         TCIDRTPTrans(const TCIDRTPTrans&) = delete;
+        TCIDRTPTrans(TCIDRTPTrans&&) = delete;
 
         ~TCIDRTPTrans();
 
@@ -71,6 +72,7 @@ class CIDRTPEXP TCIDRTPTrans : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TCIDRTPTrans& operator=(const TCIDRTPTrans&) = delete;
+        TCIDRTPTrans& operator=(TCIDRTPTrans&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -100,8 +102,8 @@ class CIDRTPEXP TCIDRTPTrans : public TObject
         // -------------------------------------------------------------------
         //  Private data types
         // -------------------------------------------------------------------
-        typedef TRefQueue<TCIDRTPMediaBuf>  TMediaQ;
-        typedef TRefQueue<TCIDRTPMediaBuf>  TProcQ;
+        using TMediaQ   = TSafeRefQueue<TCIDRTPMediaBuf>;
+        using TProcQ    = TSafeRefQueue<TCIDRTPMediaBuf>;
 
 
         // -------------------------------------------------------------------

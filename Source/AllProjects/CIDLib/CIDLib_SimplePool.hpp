@@ -355,7 +355,7 @@ template <typename TElem> class TSimplePoolPtr
 //  CLASS: TSimplePool
 // PREFIX: spl
 // ---------------------------------------------------------------------------
-template<typename TElem> class TSimplePool : public TObject
+template<typename TElem> class TSimplePool : public TObject, public MLockable
 {
     public  :
         // -------------------------------------------------------------------
@@ -374,7 +374,7 @@ template<typename TElem> class TSimplePool : public TObject
         {
             {
                 // Lock if we are MT safe
-                TMtxLocker mtxlSync(m_pmtxSync);
+                TLocker lockrSync(m_pmtxSync);
 
                 //
                 //  Neither our free or used lists are adopting, so we have to
@@ -425,6 +425,31 @@ template<typename TElem> class TSimplePool : public TObject
 
 
         // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
+        {
+            if (m_pmtxSync)
+                return m_pmtxSync->bTryLock(c4WaitMS);
+
+            return kCIDLib::True;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
+        {
+            if (m_pmtxSync)
+                m_pmtxSync->Lock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Unlock() const override
+        {
+            if (m_pmtxSync)
+                m_pmtxSync->Unlock();
+        }
+
+
+
+        // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
 
@@ -433,7 +458,7 @@ template<typename TElem> class TSimplePool : public TObject
         //
         tCIDLib::TCard4 c4ElemCount() const
         {
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
             return m_colFreeList.c4ElemCount() + m_colUsedList.c4ElemCount();
         }
 
@@ -443,7 +468,7 @@ template<typename TElem> class TSimplePool : public TObject
         //
         tCIDLib::TCard4 c4ElemsAvail() const
         {
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
             return (m_c4MaxPoolSize - m_colUsedList.c4ElemCount());
         }
 
@@ -451,7 +476,7 @@ template<typename TElem> class TSimplePool : public TObject
         // Return the number of elements in use
         tCIDLib::TCard4 c4ElemsUsed() const
         {
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
             return m_colUsedList.c4ElemCount();
         }
 
@@ -467,7 +492,7 @@ template<typename TElem> class TSimplePool : public TObject
         [[nodiscard]] TElem* pobjReserveElem(const tCIDLib::TCard4 c4Size)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             // Make sure that we can add another used object
             const tCIDLib::TCard4 c4UsedCnt = m_colUsedList.c4ElemCount();
@@ -553,18 +578,11 @@ template<typename TElem> class TSimplePool : public TObject
         }
 
 
-        // In case someone needs to do more than atomic ops
-        TMutex* pmtxSync()
-        {
-            return m_pmtxSync;
-        }
-
-
         // Return the current sizes of our used and free lists
         tCIDLib::TVoid QueryListSizes(tCIDLib::TCard4& c4Used, tCIDLib::TCard4& c4Free)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             c4Used = m_colUsedList.c4ElemCount();
             c4Free = m_colFreeList.c4ElemCount();
@@ -580,7 +598,7 @@ template<typename TElem> class TSimplePool : public TObject
         tCIDLib::TVoid ReleaseAll()
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             //
             //  Take all of the elements from the used list and put them back into
@@ -624,7 +642,7 @@ template<typename TElem> class TSimplePool : public TObject
         tCIDLib::TVoid ReleaseElem(TElem* const pobjToRelease)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             // Find this guy in the used list, which is by address
             tCIDLib::TCard4 c4AtUsed;

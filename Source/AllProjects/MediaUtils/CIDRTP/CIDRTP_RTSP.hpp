@@ -187,8 +187,8 @@ class CIDRTPEXP TCIDRTSPSrv : public TObject
         // -------------------------------------------------------------------
         //  Public class types
         // -------------------------------------------------------------------
-        typedef TCntPtr<TCIDRTSPSess>                           TSessPtr;
-        typedef TKeyedHashSet<TSessPtr, TString, TStringKeyOps> TSessList;
+        using TSessPtr  = TCntPtr<TCIDRTSPSess>;
+        using TSessList = TSafeKeyedHashSet<TSessPtr, TString, TStringKeyOps>;
 
 
         // -------------------------------------------------------------------

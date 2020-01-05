@@ -52,7 +52,6 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         using TNode = TBasicColNode<TElem>;
 
 
-
         // -------------------------------------------------------------------
         //  Our nested read-only cursor class
         // -------------------------------------------------------------------
@@ -102,12 +101,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     if (this != &cursSrc)
                     {
                         // Lock the src if it's been set and is thread safe
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolCursoring
-                            ? cursSrc.m_pcolCursoring->pmtxLock() : nullptr
-                        );
-
+                        TLocker lockrCol(cursSrc.m_pcolCursoring);
                         TParent::operator=(cursSrc);
                         m_pllstCursoring = cursSrc.m_pllstCursoring;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
@@ -156,7 +150,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
@@ -168,7 +162,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrSync(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
@@ -180,7 +174,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrSync(m_pcolCursoring);
                     m_pnodeCur = static_cast<TNode*>(m_pllstCursoring->pnodeTail());
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
                     return (m_pnodeCur != nullptr);
@@ -189,7 +183,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 tCIDLib::TBoolean bReset() override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrSync(m_pcolCursoring);
                     m_pnodeCur = static_cast<TNode*>(m_pllstCursoring->pnodeHead());
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
                     return (m_pnodeCur != nullptr);
@@ -199,7 +193,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrSync(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_pnodeCur->objData();
@@ -214,7 +208,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock the collection and check the serial number
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrSync(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -224,7 +218,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock the collection and check the serial number
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrSync(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -307,7 +301,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 TElem& operator*() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return const_cast<TElem&>(this->pnodeCur()->objData());
@@ -315,7 +309,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
                 TElem* operator->() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return &const_cast<TElem&>(this->pnodeCur()->objData());
@@ -325,12 +319,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolNCCursoring
-                            ? cursSrc.m_pcolNCCursoring->pmtxLock() : nullptr
-                        );
-
+                        TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
                     }
@@ -359,7 +348,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock the collection and check the serial number
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return const_cast<TElem&>(this->pnodeCur()->objData());
@@ -397,9 +386,9 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TBasicDLinkedCol(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
+        TBasicDLinkedCol() :
 
-            TCollection<TElem>(eMTSafe)
+            TCollection<TElem>()
             , m_llstCol()
         {
         }
@@ -410,7 +399,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
             , m_llstCol()
         {
             // Lock the source collection so it won't change during this
-            TMtxLocker lockSrc(colSrc.pmtxLock());
+            TLocker lockrSrc(&colSrc);
 
             // And copy any source elements
             if (colSrc.c4ElemCount())
@@ -440,7 +429,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
             if (this != &colSrc)
             {
                 // Lock the source while we do this. We CANNOT lock ourself!
-                TMtxLocker lockSrc(colSrc.pmtxLock());
+                TLocker lockrSrc(&colSrc);
 
                 // Call our parent first
                 TParent::operator=(colSrc);
@@ -470,27 +459,27 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bIsEmpty() const final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
             tCIDLib::TBoolean bRet = m_llstCol.bIsEmpty();
             return bRet;
         }
 
         tCIDLib::TCard4 c4ElemCount() const final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
             tCIDLib::TCard4 c4Ret = m_llstCol.c4ElemCount();
             return c4Ret;
         }
 
         [[nodiscard]] TCursor* pcursNew() const final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
             return new TCursor(this);
         }
 
         tCIDLib::TVoid RemoveAll() final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
             if (m_llstCol.bIsEmpty())
                 return;
 
@@ -504,7 +493,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             TNode* pnodeHead = static_cast<TNode*>(m_llstCol.pnodeHead());
             while (pnodeHead)
             {
@@ -517,7 +506,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         tCIDLib::TBoolean bGetFromBottom(TElem& objToFill)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, return false
             if (m_llstCol.bIsEmpty())
@@ -538,7 +527,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         tCIDLib::TBoolean bGetFromTop(TElem& objToFill)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, return false
             if (m_llstCol.bIsEmpty())
@@ -560,7 +549,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         tCIDLib::TVoid DiscardBottom()
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, throw an exception
             if (m_llstCol.bIsEmpty())
@@ -574,7 +563,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         tCIDLib::TVoid DiscardTop()
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, throw an exception
             if (m_llstCol.bIsEmpty())
@@ -588,7 +577,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         tCIDLib::TVoid ExchangeBottom()
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // Get the head and and the next
             TNode* pnodeHead = static_cast<TNode*>(m_llstCol.pnodeHead());
@@ -605,7 +594,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         tCIDLib::TVoid ExchangeTop()
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // Get the tail and and the previous
             TNode* pnodeTail = static_cast<TNode*>(m_llstCol.pnodeTail());
@@ -622,7 +611,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TElem& objAddAtBottom(const TElem& objToAdd)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
             TNode* pnodeNew = new TNode(objToAdd);
             m_llstCol.PrependNode(pnodeNew);
             this->c4IncSerialNum();
@@ -631,7 +620,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TElem& objAddAtBottom(TElem&& objToAdd)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
             TNode* pnodeNew = new TNode(tCIDLib::ForceMove(objToAdd));
             m_llstCol.PrependNode(pnodeNew);
             this->c4IncSerialNum();
@@ -640,7 +629,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TElem& objAddAtTop(const TElem& objToAdd)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
             TNode* pnodeNew = new TNode(objToAdd);
             m_llstCol.AppendNode(pnodeNew);
             this->c4IncSerialNum();
@@ -649,7 +638,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TElem& objAddAtTop(TElem&& objToAdd)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
             TNode* pnodeNew = new TNode(tCIDLib::ForceMove(objToAdd));
             m_llstCol.AppendNode(pnodeNew);
             this->c4IncSerialNum();
@@ -658,7 +647,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         const TElem& objPeekAtBottom() const
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, throw an exception
             if (m_llstCol.bIsEmpty())
@@ -671,7 +660,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TElem& objPeekAtBottom()
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, throw an exception
             if (m_llstCol.bIsEmpty())
@@ -684,7 +673,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         const TElem& objPeekAtTop() const
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, throw an exception
             if (m_llstCol.bIsEmpty())
@@ -697,7 +686,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TElem& objPeekAtTop()
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, throw an exception
             if (m_llstCol.bIsEmpty())
@@ -710,7 +699,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TElem objGetFromBottom()
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, throw an exception
             if (m_llstCol.bIsEmpty())
@@ -733,7 +722,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TElem objGetFromTop()
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // See if there are any nodes. If not, throw an exception
             if (m_llstCol.bIsEmpty())
@@ -756,7 +745,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         TElem& objInsertAfter(const TElem& objToInsert, TCursor& cursPos)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // Create a new node to add
             TNode* pnodeNew = new TNode(objToInsert);
@@ -782,7 +771,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         template <typename... TArgs> TElem& objPlaceAtBottom(TArgs&&... Args)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
             TNode* pnodeNew = new TNode(tCIDLib::Forward<TArgs>(Args)...);
             m_llstCol.PrependNode(pnodeNew);
             this->c4IncSerialNum();
@@ -791,7 +780,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         template <typename... TArgs> TElem& objPlaceAtTop(TArgs&&... Args)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
             TNode* pnodeNew = new TNode(tCIDLib::Forward<TArgs>(Args)...);
             m_llstCol.AppendNode(pnodeNew);
             this->c4IncSerialNum();
@@ -802,7 +791,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         template <typename... TArgs>
         TElem& objPlaceAfter(TCursor& cursPos, TArgs&&... Args)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // Create a new node to add
             TNode* pnodeNew = new TNode(tCIDLib::Forward<TArgs>(Args)...);
@@ -829,7 +818,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
         tCIDLib::TVoid RemoveAt(TCursor& cursAt)
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // Make sure the cursor is valid and belongs to this collection
             this->CheckCursorValid(cursAt, CID_FILE, CID_LINE);
@@ -853,15 +842,12 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         }
 
 
-        tCIDLib::TVoid Set(const tCIDLib::EMTStates  eToSet)
+        tCIDLib::TVoid Reset()
         {
-            TMtxLocker lockSync(TParent::pmtxLock());
+            TLocker lockrSync(this);
 
             // Flush it all out
             RemoveAll();
-
-            // Call our parent to set the new thread state
-            this->eMTState(eToSet);
         }
 
 
@@ -905,6 +891,95 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         TemplateRTTIDefs(TBasicDLinkedCol<TElem>,TCollection<TElem>)
 };
 
+
+// ---------------------------------------------------------------------------
+//   CLASS: TSafeBasicDLinkedCol
+//  PREFIX: col
+// ---------------------------------------------------------------------------
+template <typename TElem> class TSafeBasicDLinkedCol : public TBasicDLinkedCol<TElem>
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Nested aliases for the cursors and types used.
+        // -------------------------------------------------------------------
+        using TMyElemType = TElem;
+        using TMyType = TSafeBasicDLinkedCol<TElem>;
+        using TParType = TBasicDLinkedCol<TElem>;
+
+
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TSafeBasicDLinkedCol() : TParType()
+        {
+        }
+
+        TSafeBasicDLinkedCol(const TSafeBasicDLinkedCol<TElem>& colSrc) :
+
+            TParType(colSrc)
+        {
+        }
+
+        TSafeBasicDLinkedCol(TSafeBasicDLinkedCol<TElem>&&)  = delete;
+
+        ~TSafeBasicDLinkedCol()
+        {
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TMyType& operator=(const TMyType& colSrc)
+        {
+            return TParType::operator=(colSrc);
+        }
+
+        TMyType& operator=(TMyType&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
+        {
+            return m_mtxSync.bTryLock(c4WaitMS);
+        }
+
+        tCIDLib::EMTStates eIsMTSafe() const final
+        {
+            return tCIDLib::EMTStates::Safe;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
+        {
+            m_mtxSync.Lock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Unlock() const final
+        {
+            m_mtxSync.Unlock();
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_mtxSync
+        //      We override the MLockable interface and implement them in terms
+        //      of this guy.
+        // -------------------------------------------------------------------
+        TMutex  m_mtxSync;
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        TemplateRTTIDefs(TSafeBasicDLinkedCol<TElem>,TBasicDLinkedCol<TElem>)
+};
+
+
 #pragma CIDLIB_POPPACK
 
 
@@ -920,7 +995,7 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
                             , const TBasicDLinkedCol<TElem>&    colToStream)
 {
     // Don't let it change during this
-    TMtxLocker lockThis(colToStream.pmtxLock());
+    TLocker lockrThis(&colToStream);
 
     //
     //  Stream out a leading stream marker, then the element count, and the
@@ -936,7 +1011,7 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
             <<  c4Count
             <<  tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard)
             <<  tCIDLib::TCard4(0)
-            <<  colToStream.eMTState();
+            <<  colToStream.eMTSafe();
 
     // If there were any elements, then stream them
     if (c4Count)
@@ -954,11 +1029,13 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
 }
 
 
-// We cannot lock the collection, since we might delete the mutex
 template <typename TElem>
 TBinInStream& operator>>(TBinInStream&              strmIn
                         , TBasicDLinkedCol<TElem>&  colToStream)
 {
+    // Don't let it change during this
+    TLocker lockrThis(&colToStream);
+
     // Flush the collection first
     colToStream.RemoveAll();
 
@@ -978,10 +1055,8 @@ TBinInStream& operator>>(TBinInStream&              strmIn
     if (c4XORCount != tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard))
         TCollectionBase::BadStoredCount(colToStream.clsIsA());
 
-    // Set the thread safety on this guy
-    colToStream.Set(eMTState);
-
-    // If there were any elements, then stream them in
+    // Reset this guy before reloading
+    colToStream.Reset();
     if (c4Count)
     {
         TElem objTmp;

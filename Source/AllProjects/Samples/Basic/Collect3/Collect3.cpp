@@ -105,11 +105,9 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
         //
         //  We make it a thread safe collection by passing EMTStates::Safe.
         //
-        TSortedBag<TCardinal> colTest
+        TSafeSortedBag<TCardinal> colTest
         (
-            tCIDLib::eComp<TCardinal>
-            , tCIDLib::ESortDirs::Ascending
-            , tCIDLib::EMTStates::Safe
+            tCIDLib::eComp<TCardinal>, tCIDLib::ESortDirs::Ascending
         );
 
         //

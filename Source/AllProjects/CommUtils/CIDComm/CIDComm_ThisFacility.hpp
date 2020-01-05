@@ -34,7 +34,7 @@
 //  CLASS: TFacCIDComm
 // PREFIX: fac
 // ---------------------------------------------------------------------------
-class CIDCOMMEXP TFacCIDComm : public TFacility
+class CIDCOMMEXP TFacCIDComm : public TFacility, public MLockable
 {
     public  :
         // -------------------------------------------------------------------
@@ -50,6 +50,7 @@ class CIDCOMMEXP TFacCIDComm : public TFacility
         TFacCIDComm();
 
         TFacCIDComm(const TFacCIDComm&) = delete;
+        TFacCIDComm(TFacCIDComm&&) = delete;
 
         ~TFacCIDComm() = default;
 
@@ -58,6 +59,23 @@ class CIDCOMMEXP TFacCIDComm : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDComm& operator=(const TFacCIDComm&) = delete;
+        TFacCIDComm& operator=(TFacCIDComm&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock
+        (
+            const   tCIDLib::TCard4         c4WaitMSs
+        )   const final;
+
+        tCIDLib::TVoid Lock
+        (
+            const   tCIDLib::TCard4         c4WaitMSs
+        )   const final;
+
+        tCIDLib::TVoid Unlock() const final;
 
 
         // -------------------------------------------------------------------
@@ -95,12 +113,11 @@ class CIDCOMMEXP TFacCIDComm : public TFacility
             const   TString&                strID
         );
 
-        TMutex* pmtxlLock();
-
         tCIDLib::TVoid RegisterFactory
         (
                     TComPortFactory* const  pfactToAdopt
         );
+
 
     private :
         // -------------------------------------------------------------------

@@ -116,7 +116,7 @@ TFacCIDOrb::TFacCIDOrb() :
     , m_c4ReplyOverhead(0)
     , m_c4TimeoutAdjust(0)
     , m_c8LastNSCookie(0)
-    , m_colNSCache(173, TStringKeyOps(), tCIDLib::EMTStates::Safe)
+    , m_colNSCache(173, TStringKeyOps())
     , m_enctNextForcedNS(0)
     , m_enctTimeoutAdjust(0)
     , m_poccmSrv(nullptr)
@@ -229,7 +229,7 @@ tCIDLib::TBoolean
 TFacCIDOrb::bCheckOOIDCache(const   TString&    strBindingName
                             ,       TOrbObjId&  ooidToFill)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
     try
     {
@@ -305,7 +305,7 @@ tCIDLib::TCard8 TFacCIDOrb::c8LastNSCookie() const
 {
     tCIDLib::TCard8 c8Ret;
     {
-        TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+        TLocker lockrCache(&m_colNSCache);
         c8Ret = m_c8LastNSCookie;
     }
     return c8Ret;
@@ -321,7 +321,7 @@ tCIDLib::TCard8 TFacCIDOrb::c8LastNSCookie() const
 //
 tCIDLib::TVoid TFacCIDOrb::CheckNSCookie(const tCIDLib::TCard8 c8NSCookie)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
     if (c8NSCookie != m_c8LastNSCookie)
     {
@@ -968,7 +968,7 @@ tCIDLib::TVoid
 TFacCIDOrb::RefreshObjIDCache(  const   TString&    strBindingName
                                 , const TOrbObjId&  ooidToCheck)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
     // Calculate the new timeout time
     const tCIDLib::TEncodedTime enctNewTO
@@ -1055,7 +1055,7 @@ TFacCIDOrb::RegisterObject(         TOrbServerBase* const   porbsToReg
 // Removes the passed binding from the object id cache if it exists
 tCIDLib::TVoid TFacCIDOrb::RemoveFromOIDCache(const TString& strBindingName)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
     m_colNSCache.bRemoveIfExists(strBindingName);
 }
 
@@ -1073,7 +1073,7 @@ tCIDLib::TVoid TFacCIDOrb::RemoveFromOIDCache(const TString& strBindingName)
 //
 tCIDLib::TVoid TFacCIDOrb::RemoveFromOIDCache(const TOrbObjId& ooidToRemove)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
     try
     {
@@ -1237,7 +1237,7 @@ tCIDLib::TVoid
 TFacCIDOrb::StoreObjIDCache(const   TString&    strBindingName
                             , const TOrbObjId&  ooidToStore)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
     const tCIDLib::TEncodedTime enctNow = TTime::enctNow();
 

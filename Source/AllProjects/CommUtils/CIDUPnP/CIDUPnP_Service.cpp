@@ -52,10 +52,7 @@ TUPnPService::TUPnPService() :
     , m_bIsDead(kCIDLib::False)
     , m_bLogErrs(kCIDLib::False)
     , m_c4SerialNum(1)
-    , m_colVarList
-      (
-        109, TStringKeyOps(), &TKeyValuePair::strExtractKey, tCIDLib::EMTStates::Safe
-      )
+    , m_colVarList(109, TStringKeyOps(), &TKeyValuePair::strExtractKey)
     , m_pkupnpsThis(nullptr)
 {
 }
@@ -110,7 +107,7 @@ tCIDLib::TVoid
 TUPnPService::UPnPVarChanged(const  tCIDLib::TCh* const pszVarName
                             , const tCIDLib::TCh* const pszVarVal)
 {
-    TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+    TLocker lockrVars(&m_colVarList);
 
     //
     //  See if it's there or not. Since already have to lock because of the
@@ -208,7 +205,7 @@ TUPnPService::bQueryStateVar(const  TString&            strVarName
     }
 
     // See if it's in our list
-    TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+    TLocker lockrVars(&m_colVarList);
 
     c4SerialNum = m_c4SerialNum;
     TKeyValuePair* pkvalVar = m_colVarList.pobjFindByKey(strVarName);
@@ -267,7 +264,7 @@ TUPnPService::QueryStateVar(const   TString&            strVarName
     //
     if (m_bIsEvented)
     {
-        TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+        TLocker lockrVars(&m_colVarList);
 
         c4SerialNum = m_c4SerialNum;
         TKeyValuePair* pkvalVar = m_colVarList.pobjFindByKey(strVarName);
@@ -473,7 +470,7 @@ TUPnPService::bParseXML(        TXMLTreeParser& xtprsItems
 tCIDLib::TVoid TUPnPService::BumpSerialNum() const
 {
     // We have to lock since we could need to do two operations if we wrap
-    TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+    TLocker lockrVars(&m_colVarList);
 
     m_c4SerialNum++;
     if (!m_c4SerialNum)
@@ -671,7 +668,7 @@ tCIDLib::TVoid
 TUPnPService::SetStateVar(  const   TString& strVarName
                             , const TString& strVarVal) const
 {
-    TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+    TLocker lockrVars(&m_colVarList);
 
     //
     //  For efficiency we lock first and do a check to see if we can

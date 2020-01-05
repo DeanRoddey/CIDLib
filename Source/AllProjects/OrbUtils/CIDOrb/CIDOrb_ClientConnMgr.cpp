@@ -81,17 +81,13 @@ TOrbClientConnMgr::TOrbClientConnMgr(const  tCIDLib::TIPPortNum ippnListen
     , m_c8NextConnId(0)
     , m_colClientList
       (
-        tCIDLib::EAdoptOpts::Adopt
-        , CIDOrb_ClientConnMgr::c4MaxClients
-        , tCIDLib::EMTStates::Unsafe
+        tCIDLib::EAdoptOpts::Adopt, CIDOrb_ClientConnMgr::c4MaxClients
       )
     , m_colThreads
       (
-        tCIDLib::EAdoptOpts::Adopt
-        , CIDOrb_ClientConnMgr::c4MaxThreads
-        , tCIDLib::EMTStates::Unsafe
+        tCIDLib::EAdoptOpts::Adopt, CIDOrb_ClientConnMgr::c4MaxThreads
       )
-    , m_colWorkQ(tCIDLib::EMTStates::Safe)
+    , m_colWorkQ()
     , m_ipaOnlyAcceptFrom()
     , m_ippnListenOn(ippnListen)
     , m_psocklServer(nullptr)
@@ -289,7 +285,7 @@ TOrbClientConnMgr::eQueueUpWork(        TThread&                thrSpooler
             //
             #if CID_DEBUG_ON
             {
-                TMtxLocker mtxlSync(&m_mtxSync);
+                TLocker lockrSync(&m_mtxSync);
                 if (!poccFindConn(c8RepId))
                 {
                     facCIDOrb().ThrowErr
@@ -346,7 +342,7 @@ tCIDLib::TVoid TOrbClientConnMgr::IncDroppedPackets()
 //
 tCIDLib::TVoid TOrbClientConnMgr::OnlyAcceptFrom(const TIPAddress& ipaSource)
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     m_ipaOnlyAcceptFrom = ipaSource;
     m_bLimitAccess = kCIDLib::True;
 }
@@ -709,7 +705,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
     //  get close to saturation.
     //
     {
-        TMtxLocker mtxlSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         tCIDLib::TBoolean bChanges = kCIDLib::False;
         tCIDLib::TCard4 c4Index = 0;
@@ -851,7 +847,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
         //  above.) We give this guy the next available connection id.
         //
         {
-            TMtxLocker mtxlSync(&m_mtxSync);
+            TLocker lockrSync(&m_mtxSync);
 
             // Get the next connection id. Don't let it be zero
             m_c8NextConnId++;
@@ -916,7 +912,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
     //
     if (!(m_c4LoopCnt % 8))
     {
-        TMtxLocker mtxlSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         const tCIDLib::TCard4 c4Cmds = m_colWorkQ.c4ElemCount();
         const tCIDLib::TCard4 c4Threads = m_colThreads.c4ElemCount();
@@ -1176,7 +1172,7 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
             //  pointer will release the item back to the pool.
             //
             {
-                TMtxLocker mtxlSync(&m_mtxSync);
+                TLocker lockrSync(&m_mtxSync);
 
                 // Now let's see if we can find it
                 const tCIDLib::TCard8 c8RepId = wqipCur->c8ConnId();

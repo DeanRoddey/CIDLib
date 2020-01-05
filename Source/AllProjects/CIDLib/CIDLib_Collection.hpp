@@ -176,7 +176,7 @@ class CIDLIBEXP TColPubSubInfo : public TObject
 //   CLASS: TCollectionBase
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-class CIDLIBEXP TCollectionBase : public TObject
+class CIDLIBEXP TCollectionBase : public TObject, public MLockable
 {
     public  :
         // -------------------------------------------------------------------
@@ -195,11 +195,38 @@ class CIDLIBEXP TCollectionBase : public TObject
 
 
         // -------------------------------------------------------------------
-        //  Public, pure virtual methods
+        //  Public, inherited methods
+        //
+        //  At this level, we just always say the lock worked, because there is
+        //  no lock. Derived classes that provide locking will override these.
+        //  This lets all collections (internally and externally) be locked via
+        //  the standard MLockable interface and TLocker lock janitor.
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4) const override
+        {
+            return kCIDLib::True;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const override
+        {
+        }
+
+        tCIDLib::TVoid Unlock() const override
+        {
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public, virtual methods
         // -------------------------------------------------------------------
         virtual tCIDLib::TBoolean bIsEmpty() const = 0;
 
         virtual tCIDLib::TCard4 c4ElemCount() const = 0;
+
+        virtual tCIDLib::EMTStates eMTSafe() const
+        {
+            return tCIDLib::EMTStates::Unsafe;
+        }
 
         virtual tCIDLib::TVoid RemoveAll() = 0;
 
@@ -212,7 +239,10 @@ class CIDLIBEXP TCollectionBase : public TObject
             return (c4ElemCount() >= c4Limit);
         }
 
-        tCIDLib::TBoolean bIsMTSafe() const;
+        tCIDLib::TBoolean bIsMTSafe() const
+        {
+            return (eMTSafe() == tCIDLib::EMTStates::Safe);
+        }
 
         tCIDLib::TBoolean bPublishEnabled() const
         {
@@ -226,20 +256,6 @@ class CIDLIBEXP TCollectionBase : public TObject
             const   tCIDLib::TCard4         c4Limit
             , const tCIDLib::TCh* const     pszDescr
         );
-
-        tCIDLib::EMTStates eMTState() const;
-
-        TMutex* pmtxLock() const
-        {
-            return m_pmtxLock;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4Timeout = kCIDLib::c4MaxWait) const
-        {
-            // If this one is lockable, then do the lock
-            if (m_pmtxLock)
-                m_pmtxLock->Lock(c4Timeout);
-        }
 
         tCIDLib::TVoid PublishBlockChanged
         (
@@ -261,13 +277,6 @@ class CIDLIBEXP TCollectionBase : public TObject
             return m_ppstopReport->strPath();
         }
 
-        tCIDLib::TVoid Unlock() const
-        {
-            // If this one is lockable, then do the unlock
-            if (m_pmtxLock)
-                m_pmtxLock->Unlock();
-        }
-
 
     protected   :
         // -------------------------------------------------------------------
@@ -281,7 +290,7 @@ class CIDLIBEXP TCollectionBase : public TObject
         // -------------------------------------------------------------------
         static tCIDLib::TBoolean bWaitForData
         (
-                    TMtxLocker&             mtxlQueue
+                    TLocker&                lockrQueue
             , const TCollectionBase&        colSrc
             , const tCIDLib::TCard4         c4WaitMSs
             ,       TThreadWaitList&        twlWaitList
@@ -292,10 +301,7 @@ class CIDLIBEXP TCollectionBase : public TObject
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TCollectionBase
-        (
-            const   tCIDLib::EMTStates      eMTSafe = tCIDLib::EMTStates::Unsafe
-        );
+        TCollectionBase();
 
         TCollectionBase
         (
@@ -399,11 +405,6 @@ class CIDLIBEXP TCollectionBase : public TObject
             , const tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
-
-        tCIDLib::EMTStates eMTState
-        (
-            const   tCIDLib::EMTStates      eState
-        );
 
         tCIDLib::TVoid EnablePublish
         (
@@ -537,18 +538,12 @@ class CIDLIBEXP TCollectionBase : public TObject
         //      needs to watch for changes. They can set their last serial number to
         //      zero, and it will always trigger an initial inequality.
         //
-        //  m_pmtxLock
-        //      This is the optional mutex that allows this collection to be lockable.
-        //      The derived class indicates to our constructor whether this collection
-        //      should be mutlti-thread safe.
-        //
         //  m_ppstopReport
         //      A topic to report changes to subscribers. See the header comments above
         //      for details. Only created if the derived class sets it up.
         // -------------------------------------------------------------------
         tCIDLib::TBoolean   m_bInBlockMode;
         tCIDLib::TCard4     m_c4SerialNum;
-        TMutex*             m_pmtxLock;
         TPubSubTopic*       m_ppstopReport;
 
 
@@ -577,10 +572,7 @@ class CIDLIBEXP TFundColBase : public TCollectionBase
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TFundColBase
-        (
-            const   tCIDLib::EMTStates      eMTSafe = tCIDLib::EMTStates::Unsafe
-        );
+        TFundColBase();
 
         TFundColBase(const TFundColBase&)  = default;
         TFundColBase& operator=(const TFundColBase&) = default;
@@ -645,7 +637,7 @@ class TCollection : public TCollectionBase, public MDuplicable
         //
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             TColCursor<TElem>* pcursEach = pcursNew();
             TJanitor<TColCursor<TElem>> janCursor(pcursEach);
             while (pcursEach->bIsValid())
@@ -662,9 +654,9 @@ class TCollection : public TCollectionBase, public MDuplicable
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TCollection(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
+        TCollection() :
 
-            TCollectionBase(eMTSafe)
+            TCollectionBase()
         {
         }
 
@@ -728,9 +720,7 @@ template <typename TElem, class TKey> class TMapCollection
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TMapCollection(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
-
-            TParent(eMTSafe)
+        TMapCollection() : TParent()
         {
         }
 
@@ -870,7 +860,7 @@ template <typename TElem> class TRefCollection : public TCollectionBase
         //
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             TColCursor<TElem>* pcursEach = pcursNew();
             TJanitor<TColCursor<TElem>> janCursor(pcursEach);
             while (pcursEach->bIsValid())
@@ -887,9 +877,7 @@ template <typename TElem> class TRefCollection : public TCollectionBase
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TRefCollection(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
-
-            TCollectionBase(eMTSafe)
+        TRefCollection() : TCollectionBase()
         {
         }
 
@@ -1070,8 +1058,8 @@ tCIDLib::TBoolean operator==(const TCollection<TElem>& col1, const TCollection<T
         return kCIDLib::True;
 
     // Lock both of the collections while we do this
-    TMtxLocker lockThis(col1.pmtxLock());
-    TMtxLocker lockSrc(col2.pmtxLock());
+    TLocker lockrThis(&col1);
+    TLocker lockrSrc(&col2);
 
     if (col1.c4ElemCount() != col2.c4ElemCount())
         return kCIDLib::False;
@@ -1105,8 +1093,8 @@ operator==(const TRefCollection<TElem>& col1, const TRefCollection<TElem>& col2)
         return kCIDLib::True;
 
     // Lock both of the collections while we do this
-    TMtxLocker lockThis(col1.pmtxLock());
-    TMtxLocker lockSrc(col2.pmtxLock());
+    TLocker lockrThis(&col1);
+    TLocker lockrSrc(&col2);
 
     if (col1.c4ElemCount() != col2.c4ElemCount())
         return kCIDLib::False;
@@ -1149,8 +1137,8 @@ namespace tCIDLib
             return kCIDLib::True;
 
         // Lock both of the collections while we do this
-        TMtxLocker lockThis(col1.pmtxLock());
-        TMtxLocker lockSrc(col2.pmtxLock());
+        TLocker lockrThis(&col1);
+        TLocker lockrSrc(&col2);
 
         if (col1.c4ElemCount() != col2.c4ElemCount())
             return kCIDLib::False;
@@ -1182,8 +1170,8 @@ namespace tCIDLib
             return kCIDLib::True;
 
         // Lock both of the collections while we do this
-        TMtxLocker lockThis(col1.pmtxLock());
-        TMtxLocker lockSrc(col2.pmtxLock());
+        TLocker lockrThis(&col1);
+        TLocker lockrSrc(&col2);
 
         if (col1.c4ElemCount() != col2.c4ElemCount())
             return kCIDLib::False;

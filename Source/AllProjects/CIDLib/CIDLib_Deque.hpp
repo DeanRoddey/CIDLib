@@ -40,9 +40,7 @@ template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TDeque(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
-
-            TParent(eMTSafe)
+        TDeque() : TParent()
         {
         }
 
@@ -161,6 +159,89 @@ template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
         DefPolyDup(TDeque<TElem>)
         TemplateRTTIDefs(TDeque<TElem>,TBasicDLinkedCol<TElem>)
 };
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TSafeDeque
+//  PREFIX: col
+// ---------------------------------------------------------------------------
+template <typename TElem> class TSafeDeque : public TDeque<TElem>
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TSafeDeque() : TParent()
+        {
+        }
+
+        TSafeDeque(const TSafeDeque& colSrc) : TParent(colSrc)
+        {
+        }
+
+        TSafeDeque(TSafeDeque&&)  = delete;
+
+        ~TSafeDeque()
+        {
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TSafeDeque& operator=(const TSafeDeque& colSrc)
+        {
+            if (this != &colSrc)
+                TParent::operator=(colSrc);
+            return *this;
+        }
+
+        TSafeDeque& operator=(TSafeDeque&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
+        {
+            return m_mtxSync.bTryLock(c4WaitMS);
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
+        {
+            m_mtxSync.Lock(c4WaitMSs);
+        }
+
+        tCIDLib::EMTStates eMTSafe() const final
+        {
+            return tCIDLib::EMTStates::Safe;
+        }
+
+        tCIDLib::TVoid Unlock() const final
+        {
+            m_mtxSync.Unlock();
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_mtxSync
+        //      We override the MLockable interface and implement it in terms
+        //      of this guy.
+        // -------------------------------------------------------------------
+        TMutex  m_mtxSync;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        DefPolyDup(TSafeDeque<TElem>)
+        TemplateRTTIDefs(TSafeDeque<TElem>,TDeque<TElem>)
+};
+
 
 #pragma CIDLIB_POPPACK
 

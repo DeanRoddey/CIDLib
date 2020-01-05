@@ -49,10 +49,9 @@ template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
         // -------------------------------------------------------------------
         TRefStack() = delete;
 
-        TRefStack(  const   tCIDLib::EAdoptOpts eAdopt
-                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
+        TRefStack(const tCIDLib::EAdoptOpts eAdopt) :
 
-            TBasicDLinkedRefCol<TElem>(eAdopt, eMTSafe)
+            TBasicDLinkedRefCol<TElem>(eAdopt)
         {
         }
 
@@ -108,10 +107,10 @@ template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 
         [[nodiscard]] TRefStack* pcolMakeNewOf() const
         {
-            TMtxLocker lockStack(this->pmtxLock());
+            TLocker lockrStack(this);
 
             // Make a new one with the same basic state, but not content!
-            return new TRefStack(this->eAdopt(), this->eMTState());
+            return new TRefStack(this->eAdopt());
         }
 
         [[nodiscard]] const TElem* pobjPeek() const
@@ -154,6 +153,81 @@ template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
         TemplateRTTIDefs(TRefStack<TElem>,TBasicDLinkedRefCol<TElem>)
 };
 
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TSafeRefStack
+//  PREFIX: col
+// ---------------------------------------------------------------------------
+template <typename TElem> class TSafeRefStack : public TRefStack<TElem>
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TSafeRefStack() = delete;
+
+        TSafeRefStack(const tCIDLib::EAdoptOpts eAdopt) :
+
+            TParent(eAdopt)
+        {
+        }
+
+        TSafeRefStack(const TSafeRefStack&) = delete;
+        TSafeRefStack(TSafeRefStack&&) = delete;
+
+        ~TSafeRefStack()
+        {
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TSafeRefStack& operator=(const TSafeRefStack&) = delete;
+        TSafeRefStack& operator=(TSafeRefStack&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const override
+        {
+            return m_mtxSync.bTryLock(c4WaitMS);
+        }
+
+        tCIDLib::EMTStates eMTSafe() const final
+        {
+            return tCIDLib::EMTStates::Safe;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const override
+        {
+            m_mtxSync.Lock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Unlock() const override
+        {
+            m_mtxSync.Unlock();
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_mtxSync
+        //      We override the MLockable interface and implement it in terms
+        //      of this guy.
+        // -------------------------------------------------------------------
+        TMutex  m_mtxSync;
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        TemplateRTTIDefs(TSafeRefStack<TElem>,TRefStack<TElem>)
+};
 
 
 // ---------------------------------------------------------------------------

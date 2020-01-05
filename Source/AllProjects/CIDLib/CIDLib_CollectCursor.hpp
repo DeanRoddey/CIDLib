@@ -243,7 +243,7 @@ template <typename TElem> class TColCursor : public TCursorBase
                 return kCIDLib::True;
 
             // Lock the collection
-            TMtxLocker lockCol(m_pcolBaseCurs->pmtxLock());
+            TLocker lockrCol(m_pcolBaseCurs);
             return m_pcolBaseCurs->bIsEmpty();
         }
 
@@ -262,7 +262,7 @@ template <typename TElem> class TColCursor : public TCursorBase
             this->CheckInitialized(CID_FILE, CID_LINE);
 
             // Lock the collection and check the serial number
-            TMtxLocker lockCol(m_pcolBaseCurs->pmtxLock());
+            TLocker lockrCol(m_pcolBaseCurs);
             CheckSerialNum(m_pcolBaseCurs->c4SerialNum(), CID_FILE, CID_LINE);
             return m_pcolBaseCurs->c4ElemCount();
         }
@@ -364,7 +364,6 @@ template <typename TElem> class TBiColCursor : public TColCursor<TElem>
         virtual tCIDLib::TBoolean bPrevious() = 0;
 
         virtual tCIDLib::TBoolean bSeekToEnd() = 0;
-
 
 
     protected   :

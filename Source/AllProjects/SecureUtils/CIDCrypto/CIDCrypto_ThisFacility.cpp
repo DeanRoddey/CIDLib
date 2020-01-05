@@ -88,7 +88,7 @@ TFacCIDCrypto::~TFacCIDCrypto()
 //
 tCIDLib::TCard4 TFacCIDCrypto::c4GetRandom(const tCIDLib::TBoolean bNonZero) const
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     const tCIDLib::TCard4 c4MaxTries = 32;
     tCIDLib::TCard4 c4Count = 0;
@@ -239,7 +239,7 @@ TFacCIDCrypto::GetRandomBytes(          TMemBuf&            mbufTarget
                                 , const tCIDLib::TCard4     c4At
                                 , const tCIDLib::TCard4     c4Count)
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         mbufTarget.PutCard1(tCIDLib::TCard1(m_prandGen->c4GetNextNum()), c4At + c4Index);
 }
@@ -250,7 +250,7 @@ tCIDLib::TVoid
 TFacCIDCrypto::GetRandomBytes(          tCIDLib::TCard1* const  pc1Target
                                 , const tCIDLib::TCard4         c4Count)
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         pc1Target[c4Index] = tCIDLib::TCard1(m_prandGen->c4GetNextNum());
 }

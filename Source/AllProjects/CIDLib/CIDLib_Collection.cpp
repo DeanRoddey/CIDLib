@@ -107,9 +107,6 @@ tCIDLib::TVoid TCollectionBase::BadStoredCount(const TClass& clsCol)
 // ---------------------------------------------------------------------------
 TCollectionBase::~TCollectionBase()
 {
-    if (m_pmtxLock)
-        delete m_pmtxLock;
-
     // If we registered a pub/sub topic, then clean that up
     if (m_ppstopReport)
     {
@@ -130,16 +127,11 @@ TCollectionBase::~TCollectionBase()
 // ---------------------------------------------------------------------------
 //  TCollectionBase: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TCollectionBase::bIsMTSafe() const
-{
-    return (m_pmtxLock != nullptr);
-}
-
 tCIDLib::TCard4 TCollectionBase::c4SerialNum() const
 {
-    if (m_pmtxLock)
+    if (bIsMTSafe())
     {
-        TMtxLocker lockCol(m_pmtxLock);
+        TLocker lockrCol(this);
         tCIDLib::TCard4 c4Ret = m_c4SerialNum;
         return c4Ret;
     }
@@ -167,14 +159,6 @@ TCollectionBase::CheckIsFull(   const   tCIDLib::TCard4     c4Limit
             , TString(pszDescr)
         );
     }
-}
-
-
-tCIDLib::EMTStates TCollectionBase::eMTState() const
-{
-    if (m_pmtxLock)
-        return tCIDLib::EMTStates::Safe;
-    return tCIDLib::EMTStates::Unsafe;
 }
 
 
@@ -237,7 +221,7 @@ tCIDLib::TVoid TCollectionBase::PublishReload()
 //  any type of collection.
 //
 tCIDLib::TBoolean
-TCollectionBase::bWaitForData(          TMtxLocker&         mtxlQueue
+TCollectionBase::bWaitForData(          TLocker&         lockrQueue
                                 , const TCollectionBase&    colSrc
                                 , const tCIDLib::TCard4     c4WaitMSs
                                 ,       TThreadWaitList&    twlWaitList
@@ -291,7 +275,7 @@ TCollectionBase::bWaitForData(          TMtxLocker&         mtxlQueue
         //
         twlWaitList.bWaitOnList
         (
-            mtxlQueue, kCIDLib::c4TWLReason_WaitData, c4MillisLeft
+            lockrQueue, kCIDLib::c4TWLReason_WaitData, c4MillisLeft
         );
 
         //
@@ -332,15 +316,12 @@ TCollectionBase::bWaitForData(          TMtxLocker&         mtxlQueue
 // ---------------------------------------------------------------------------
 //  TCollectionBase: Hidden constructors and operators
 // ---------------------------------------------------------------------------
-TCollectionBase::TCollectionBase(const tCIDLib::EMTStates eMTSafe) :
+TCollectionBase::TCollectionBase() :
 
     m_bInBlockMode(kCIDLib::False)
     , m_c4SerialNum(1)
-    , m_pmtxLock(nullptr)
     , m_ppstopReport(nullptr)
 {
-    if (eMTSafe == tCIDLib::EMTStates::Safe)
-        m_pmtxLock = new TMutex;
 }
 
 
@@ -354,11 +335,8 @@ TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
 
     m_bInBlockMode(kCIDLib::False)
     , m_c4SerialNum(1)
-    , m_pmtxLock(nullptr)
     , m_ppstopReport(nullptr)
 {
-    if (colSrc.m_pmtxLock)
-        m_pmtxLock = new TMutex;
 }
 
 
@@ -474,7 +452,7 @@ tCIDLib::TVoid TCollectionBase::BlockModeStart()
 //
 tCIDLib::TCard4 TCollectionBase::c4IncSerialNum()
 {
-    TMtxLocker lockCol(m_pmtxLock);
+    TLocker lockrCol(this);
     m_c4SerialNum++;
     return m_c4SerialNum;
 }
@@ -668,29 +646,6 @@ TCollectionBase::DuplicateKey(  const   TObject&            objKey
 }
 
 
-tCIDLib::EMTStates TCollectionBase::eMTState(const tCIDLib::EMTStates eState)
-{
-    if (eState == tCIDLib::EMTStates::Safe)
-    {
-        if (!m_pmtxLock)
-        {
-            m_pmtxLock = new TMutex;
-            m_c4SerialNum++;
-        }
-    }
-     else
-    {
-        if (m_pmtxLock)
-        {
-            delete m_pmtxLock;
-            m_pmtxLock = nullptr;
-            m_c4SerialNum++;
-        }
-    }
-    return eState;
-}
-
-
 //
 //  If not already enabled, we enable our publishing topic. They provide a topic path
 //  they want us to use.
@@ -704,8 +659,8 @@ tCIDLib::EMTStates TCollectionBase::eMTState(const tCIDLib::EMTStates eState)
 tCIDLib::TVoid
 TCollectionBase::EnablePublish(const TString& strDesired, TString& strActual)
 {
-    // Lock if we have a mutex
-    TMtxLocker lockCol(m_pmtxLock);
+    // Lock if we are lockable
+    TLocker lockrCol(this);
 
     if (m_ppstopReport)
     {
@@ -1011,9 +966,7 @@ TFundColBase::~TFundColBase()
 // ---------------------------------------------------------------------------
 //  TFundColBase: Hidden constructors and operators
 // ---------------------------------------------------------------------------
-TFundColBase::TFundColBase(const tCIDLib::EMTStates eMTSafe) :
-
-    TCollectionBase(eMTSafe)
+TFundColBase::TFundColBase() : TCollectionBase()
 {
 }
 

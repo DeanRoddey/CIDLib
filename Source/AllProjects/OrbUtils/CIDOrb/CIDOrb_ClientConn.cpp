@@ -54,7 +54,7 @@ TOrbClientConnImpl(         TServerStreamSocket* const  psockThis
 
     m_bOffline(kCIDLib::False)
     , m_c8ConnId(c8ConnId)
-    , m_colReplyQ(tCIDLib::EMTStates::Safe)
+    , m_colReplyQ()
     , m_enctLastMsg(TTime::enctNow())
     , m_evSocket(tCIDLib::EEventStates::Reset)
     , m_evWorkAvail(tCIDLib::EEventStates::Reset)
@@ -124,7 +124,7 @@ const TIPEndPoint& TOrbClientConnImpl::ipepClient() const
 //
 tCIDLib::TVoid TOrbClientConnImpl::SendReply(TWorkQItemPtr& wqipToSend)
 {
-    TMtxLocker mtxlSync(m_colReplyQ.pmtxLock());
+    TLocker lockrSync(&m_colReplyQ);
 
     if (m_bOffline)
     {
@@ -212,7 +212,7 @@ tCIDLib::TVoid TOrbClientConnImpl::Shutdown()
     //  in while we are shutting down. When we unblock, they'll wake up
     //  and see that we are down and just drop the reply on the floor.
     //
-    TMtxLocker mtxlSync(m_colReplyQ.pmtxLock());
+    TLocker lockrSync(&m_colReplyQ);
 
     // Shut down the socket if not already
     if (m_psockThis && !m_psockThis->bIsShutdown())

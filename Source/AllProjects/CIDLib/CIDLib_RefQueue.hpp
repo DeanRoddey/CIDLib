@@ -202,12 +202,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolCursoring
-                            ? cursSrc.m_pcolCursoring->pmtxLock() : nullptr
-                        );
-
+                        TLocker lockrCol(cursSrc.m_pcolCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pllstCursoring = cursSrc.m_pllstCursoring;
@@ -255,7 +250,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
@@ -267,7 +262,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
@@ -279,7 +274,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
                     m_pnodeCur = static_cast<TRefQueueNode<TElem>*>
                     (
@@ -292,7 +287,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     m_pnodeCur = static_cast<TRefQueueNode<TElem>*>
                     (
                         m_pllstCursoring->pnodeHead()
@@ -305,7 +300,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return *pnodeCur()->pobjData();
@@ -401,11 +396,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolNCCursoring
-                            ? cursSrc.m_pcolNCCursoring->pmtxLock() : nullptr
-                        );
+                        TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
                     }
@@ -414,7 +405,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
                 TElem& operator*() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return *const_cast<TElem*>(this->pnodeCur()->pobjData());
@@ -422,7 +413,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
                 TElem* operator->() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return const_cast<TElem*>(this->pnodeCur()->pobjData());
@@ -449,7 +440,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return *const_cast<TElem*>(this->pnodeCur()->pobjData());
@@ -488,10 +479,9 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TRefQueue(  const   tCIDLib::EAdoptOpts eAdopt = tCIDLib::EAdoptOpts::Adopt
-                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
+        TRefQueue(const tCIDLib::EAdoptOpts eAdopt = tCIDLib::EAdoptOpts::Adopt) :
 
-            TRefCollection<TElem>(eMTSafe)
+            TRefCollection<TElem>()
             , m_eAdopt(eAdopt)
             , m_llstQueue()
         {
@@ -521,13 +511,13 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
         tCIDLib::TBoolean bIsEmpty() const final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
             return m_llstQueue.bIsEmpty();
         }
 
         tCIDLib::TCard4 c4ElemCount() const final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
             return m_llstQueue.c4ElemCount();
         }
 
@@ -539,7 +529,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) final
         {
             // Look and add all of our items to the target
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Orphan all the data objects over to the target collection
             TNode* pnodeCur = static_cast<TNode*>(m_llstQueue.pnodeHead());
@@ -561,7 +551,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
         tCIDLib::TVoid OrphanElem(TElem* const pobjToRemove) final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Get the node to flush
             TNode* pnodeToRemove = pnodeFindObj(pobjToRemove);
@@ -586,13 +576,13 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
         [[nodiscard]] TCursor* pcursNew() const final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
             return new TCursor(this);
         }
 
         tCIDLib::TVoid RemoveAll() final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
             if (m_llstQueue.bIsEmpty())
                 return;
             m_llstQueue.RemoveAll();
@@ -604,7 +594,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
         tCIDLib::TVoid RemoveElem(TElem* const pobjToRemove) final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Get the node to flush
             TNode* pnodeToRemove = pnodeFindObj(pobjToRemove);
@@ -651,7 +641,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             if (!pobjNew)
                 this->NullNodeAdded(CID_FILE, CID_LINE);
 
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             //
             //  Get the tail node, if any. If there is one, and it matches
@@ -679,7 +669,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
         template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             TQueueNode<TElem>* pnodeCur = static_cast<TQueueNode<TElem>*>
             (
                 m_llstQueue.pnodeHead()
@@ -700,7 +690,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         {
             if (!pobjToPut)
                 this->NullNodeAdded(CID_FILE, CID_LINE);
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
            //
             //  See if this element is already in the queue. If so, return
@@ -736,7 +726,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         {
             if (!pobjToPut)
                 this->NullNodeAdded(CID_FILE, CID_LINE);
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             //
             //  See if another element in the queue matches this one. If so,
@@ -778,7 +768,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         tCIDLib::TBoolean
         bWaitForSpace(const tCIDLib::TCard4 c4Millis, const tCIDLib::TCard4 c4Limit)
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // If it's not 'full', then return true now
             if (m_llstQueue.c4ElemCount() < c4Limit)
@@ -790,17 +780,17 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             //
             return m_twlWaiters.bWaitOnList
             (
-                lockQueue, kCIDLib::c4TWLReason_WaitSpace, c4Millis
+                lockrQueue, kCIDLib::c4TWLReason_WaitSpace, c4Millis
             );
         }
 
 
         [[nodiscard]] TRefQueue<TElem>* pcolMakeNewOf() const
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Make a new one with the same basic state, but not content!
-            return new TRefQueue<TElem>(m_eAdopt, this->eMTState());
+            return new TRefQueue<TElem>(m_eAdopt);
         }
 
 
@@ -809,12 +799,12 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                     , const tCIDLib::TBoolean   bThrowTimeout = kCIDLib::True)
         {
             // Lock the queue
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Call a helper to wait for something to show up
             tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
             (
-                lockQueue, *this, c4Millis, m_twlWaiters, bThrowTimeout
+                lockrQueue, *this, c4Millis, m_twlWaiters, bThrowTimeout
             );
 
             //
@@ -856,7 +846,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         pobjGetNextIfMatches(const TElem& objComp, TObjEqFunc pfnComp)
         {
             // Lock the queue
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Get the head node. If none, nothing to do
             TNode* pnodeHead = static_cast<TNode*>(m_llstQueue.pnodeHead());
@@ -884,12 +874,12 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         pobjGetHighestPrio(const tCIDLib::TCard4 c4Millis = kCIDLib::c4MaxCard)
         {
             // Lock the queue
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Call a helper to wait for something to show up
             tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
             (
-                lockQueue, *this, c4Millis, m_twlWaiters, kCIDLib::True
+                lockrQueue, *this, c4Millis, m_twlWaiters, kCIDLib::True
             );
 
             //
@@ -939,7 +929,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
         [[nodiscard]] TElem* pobjOrphanNewest()
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             TNode* pnodeLast = static_cast<TNode*>(m_llstQueue.pnodeTail());
             if (!pnodeLast)
@@ -965,7 +955,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             if (!pobjToPut)
                 this->NullNodeAdded(CID_FILE, CID_LINE);
 
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Add the new node
             m_llstQueue.AppendNode(new TNode(pobjToPut, ePriority));
@@ -982,7 +972,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
         tCIDLib::TVoid RemoveAt(TCursor& cursAt)
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Make sure the cursor is valid and belongs to this collection
             this->CheckCursorValid(cursAt, CID_FILE, CID_LINE);
@@ -1092,7 +1082,84 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 };
 
 
+
+// ---------------------------------------------------------------------------
+//   CLASS: TSafeRefQueue
+//  PREFIX: que
+// ---------------------------------------------------------------------------
+template <typename TElem> class TSafeRefQueue : public TRefQueue<TElem>
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Class type aliases
+        // -------------------------------------------------------------------
+        using TMyType       = TSafeRefQueue<TElem>;
+        using TParType      = TRefQueue<TElem>;
+
+
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TSafeRefQueue(const tCIDLib::EAdoptOpts eAdopt = tCIDLib::EAdoptOpts::Adopt) :
+
+            TParType(eAdopt)
+        {
+        }
+
+        TSafeRefQueue(const TSafeRefQueue<TElem>&) = delete;
+        TSafeRefQueue(TSafeRefQueue<TElem>&&) = delete;
+
+        ~TSafeRefQueue() {}
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TSafeRefQueue<TElem>& operator=(const TSafeRefQueue<TElem>&) = delete;
+        TSafeRefQueue<TElem>& operator=(TSafeRefQueue<TElem>&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const override
+        {
+            return m_mtxSync.bTryLock(c4WaitMS);
+        }
+
+        tCIDLib::EMTStates eMTSafe() const final
+        {
+            return tCIDLib::EMTStates::Safe;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const override
+        {
+            m_mtxSync.Lock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Unlock() const override
+        {
+            m_mtxSync.Unlock();
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_mtxSync
+        //      We override the MLockable interface and implement it in terms
+        //      of this guy.
+        // -------------------------------------------------------------------
+        TMutex  m_mtxSync;
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        TemplateRTTIDefs(TSafeRefQueue<TElem>,TRefQueue<TElem>)
+};
+
+
 #pragma CIDLIB_POPPACK
-
-
 

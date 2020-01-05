@@ -244,7 +244,7 @@ TThreadWaitList::bWaitOnList(const  tCIDLib::TCard4 c4Reason
 
 
 tCIDLib::TBoolean
-TThreadWaitList::bWaitOnList(       TMtxLocker&     lockSync
+TThreadWaitList::bWaitOnList(       TLocker&     lockSync
                             , const tCIDLib::TCard4 c4Reason
                             , const tCIDLib::TCard4 c4Millis)
 {

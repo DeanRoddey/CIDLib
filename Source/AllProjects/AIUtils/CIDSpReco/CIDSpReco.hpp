@@ -60,7 +60,7 @@
 
 namespace tCIDSpReco
 {
-    using TSpEventQ = TQueue<TCIDSpeechRecoEv>;
+    using TSpEventQ = TSafeQueue<TCIDSpeechRecoEv>;
 }
 
 #include    "CIDSpReco_Engine.hpp"

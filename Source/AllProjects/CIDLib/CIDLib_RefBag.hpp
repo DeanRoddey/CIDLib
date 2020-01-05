@@ -42,10 +42,9 @@ template <typename TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
         // -------------------------------------------------------------------
         TRefBag() = delete;
 
-        TRefBag(const   tCIDLib::EAdoptOpts eAdopt
-                , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
+        TRefBag(const tCIDLib::EAdoptOpts eAdopt) :
 
-            TParent(eAdopt, eMTSafe)
+            TParent(eAdopt)
         {
         }
 
@@ -81,6 +80,79 @@ template <typename TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
         TemplateRTTIDefs(TRefBag<TElem>,TBasicDLinkedRefCol<TElem>)
 };
 
+
+// ---------------------------------------------------------------------------
+//   CLASS: TSafeRefBag
+//  PREFIX: col
+// ---------------------------------------------------------------------------
+template <typename TElem> class TSafeRefBag : public TRefBag<TElem>
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TSafeRefBag() = delete;
+
+        TSafeRefBag(const tCIDLib::EAdoptOpts eAdopt) :
+
+            TParent(eAdopt)
+        {
+        }
+
+        TSafeRefBag(const TSafeRefBag&) = delete;
+        TSafeRefBag(TSafeRefBag&&) = delete;
+
+        ~TSafeRefBag()
+        {
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TSafeRefBag& operator=(const TSafeRefBag&) = delete;
+        TSafeRefBag& operator=(TSafeRefBag&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
+        {
+            return m_mtxSync.bTryLock(c4WaitMS);
+        }
+
+        tCIDLib::EMTStates eMTSafe() const final
+        {
+            return tCIDLib::EMTStates::Safe;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
+        {
+            m_mtxSync.Lock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Unlock() const final
+        {
+            m_mtxSync.Unlock();
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_mtxSync
+        //      We override the MLockable interface and implement them in terms
+        //      of this guy.
+        // -------------------------------------------------------------------
+        TMutex  m_mtxSync;
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        TemplateRTTIDefs(TSafeRefBag<TElem>, TRefBag<TElem>)
+};
+
 #pragma CIDLIB_POPPACK
-
-

@@ -606,10 +606,7 @@ tCIDLib::TVoid TEnvironment::FaultInList() const
     {
         m_pcolEnv = new tCIDLib::TKVHashSet
         (
-            CIDLib_Environment::c4Modulus
-            , TStringKeyOps(kCIDLib::False)
-            , strGetKey
-            , tCIDLib::EMTStates::Unsafe
+            CIDLib_Environment::c4Modulus, TStringKeyOps(kCIDLib::False), strGetKey
         );
     }
 }

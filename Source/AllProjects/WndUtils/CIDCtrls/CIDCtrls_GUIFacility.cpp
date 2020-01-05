@@ -67,12 +67,9 @@ namespace CIDCtrls_GUIFacility
             TString m_strName;
     };
 
-    TKeyedHashSet<TBmpCacheItem, TString, TStringKeyOps> colBmpCache
+    TSafeKeyedHashSet<TBmpCacheItem, TString, TStringKeyOps> colBmpCache
     (
-        29
-        , TStringKeyOps()
-        , &TBmpCacheItem::strKey
-        , tCIDLib::EMTStates::Safe
+        107, TStringKeyOps(), &TBmpCacheItem::strKey
     );
 
 
@@ -96,12 +93,9 @@ namespace CIDCtrls_GUIFacility
             TString m_strName;
     };
 
-    TKeyedHashSet<TIconCacheItem, TString, TStringKeyOps> colIconCache
+    TSafeKeyedHashSet<TIconCacheItem, TString, TStringKeyOps> colIconCache
     (
-        29
-        , TStringKeyOps()
-        , &TIconCacheItem::strKey
-        , tCIDLib::EMTStates::Safe
+        29, TStringKeyOps(), &TIconCacheItem::strKey
     );
 
 
@@ -123,12 +117,9 @@ namespace CIDCtrls_GUIFacility
             TString     m_strName;
     };
 
-    static TKeyedHashSet<TAppImgCacheItem, TString, TStringKeyOps> colAppImgCache
+    static TSafeKeyedHashSet<TAppImgCacheItem, TString, TStringKeyOps> colAppImgCache
     (
-        29
-        , TStringKeyOps()
-        , &TAppImgCacheItem::strKey
-        , tCIDLib::EMTStates::Safe
+        107, TStringKeyOps(), &TAppImgCacheItem::strKey
     );
 
     static TAtomicFlag  atomMetricsLoaded;
@@ -817,7 +808,7 @@ TGUIFacility::imgLoadAppImg(const   TString&                strName
     MakeAppImgName(strName, eSize, pathActName, strCacheName);
 
     // Lock the cache while we do this
-    TMtxLocker mtxlCache(CIDCtrls_GUIFacility::colAppImgCache.pmtxLock());
+    TLocker lockrCache(&CIDCtrls_GUIFacility::colAppImgCache);
 
     // See if it's in our cache first. If so, return that
     CIDCtrls_GUIFacility::TAppImgCacheItem* pitemCache

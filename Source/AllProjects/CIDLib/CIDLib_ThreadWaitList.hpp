@@ -106,7 +106,7 @@ class CIDLIBEXP TThreadWaitList : public TObject
 
         tCIDLib::TBoolean bWaitOnList
         (
-                    TMtxLocker&             lockSync
+                    TLocker&             lockSync
             , const tCIDLib::TCard4         c4Reason
             , const tCIDLib::TCard4         c4Millis
         );

@@ -409,7 +409,7 @@ tCIDLib::TBoolean TDirChangeMon::bReadChanges(tCIDLib::TDirChanges& colToFill)
     colToFill.RemoveAll();
 
     // We need to sync this
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  If in overflow state, clear that. There will be an out of sync event
@@ -454,7 +454,7 @@ tCIDLib::TBoolean
 TDirChangeMon::bProcessDirChanges(  const   tCIDLib::TDirChanges&   colNewChanges
                                     , const tCIDLib::TCard4         c4Count)
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // IF the overflow flag is already on, just ignore these
     if (m_bOverflow)
@@ -488,7 +488,7 @@ TDirChangeMon::bProcessDirChanges(  const   tCIDLib::TDirChanges&   colNewChange
 //
 tCIDLib::TVoid TDirChangeMon::DirChangeOutOfSync()
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     if (!m_bOverflow)
     {
         m_colChanges.RemoveAll();

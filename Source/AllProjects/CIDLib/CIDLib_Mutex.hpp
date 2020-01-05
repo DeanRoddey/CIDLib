@@ -15,17 +15,23 @@
 //
 // DESCRIPTION:
 //
-//  This is the header for the CIDLib_Mutex.Cpp file. It implements the
-//  TMutex class, which is a mutual exclusion class. We also define a
-//  lock janitor for the mutex, so that scope based locking can be done
-//  very conveniently.
+//  This is the header for the CIDLib_Mutex.Cpp file. It implements the TMutex
+//  class, which is a mutual exclusion class.
+//
+//  We also define a very common derivative of MLockable that works in terms of
+//  a mutex. This lets things that wnat to implement MLockable and don't need
+//  to provide their own locking for any other purpose, just mix in this
+//  convenient implementation. It assumes that the mutex will never be copied or
+//  assigned, so it just provides empty assign, copy, move stuff.
+//
+//  As per MLockable, the locking methods are const, because it's so common for
+//  mutexes to just be an internal detail and used for locking within both const
+//  and non-const methods.
+//
+//  As per the
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  The lock janitor is intended to be tolerant of a null mutex pointer
-//      so that we can do optional locking even while getting the benefits
-//      of a lock janitor. The code can either have a mutex or or not and
-//      can still use the janitor.
 //
 // LOG:
 //
@@ -40,7 +46,7 @@
 //  CLASS: TMutex
 // PREFIX: mtx
 // ---------------------------------------------------------------------------
-class CIDLIBEXP TMutex : public TObject, public MFormattable
+class CIDLIBEXP TMutex : public TObject, public MFormattable, public MLockable
 {
     public  :
         // -------------------------------------------------------------------
@@ -80,21 +86,25 @@ class CIDLIBEXP TMutex : public TObject, public MFormattable
 
 
         // -------------------------------------------------------------------
-        //  Public, non-virtual methods
+        //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsNamed() const;
-
         tCIDLib::TBoolean bTryLock
         (
             const   tCIDLib::TCard4         c4Timeout = kCIDLib::c4MaxWait
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid Lock
         (
             const   tCIDLib::TCard4         c4Timeout = kCIDLib::c4MaxWait
-        )   const;
+        )   const final;
 
-        tCIDLib::TVoid Unlock() const;
+        tCIDLib::TVoid Unlock() const final;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bIsNamed() const;
 
         const TResourceName& rsnName() const;
 
@@ -147,143 +157,61 @@ class CIDLIBEXP TMutex : public TObject, public MFormattable
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TMtxLocker
-// PREFIX: lock
+//  CLASS: MMtxLockable
+// PREFIX: mlock
 // ---------------------------------------------------------------------------
-class CIDLIBEXP TMtxLocker
+class CIDLIBEXP MMtxLockable : public MLockable
 {
     public  :
         // -------------------------------------------------------------------
-        //  Constructors and Destructor.
+        //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TMtxLocker() = delete;
-
-        TMtxLocker( const   TMutex* const       pmtxToLock
-                    , const tCIDLib::TCard4     c4Timeout = kCIDLib::c4MaxWait) :
-
-            m_bLocked(kCIDLib::False)
-            , m_pmtxToLock(pmtxToLock)
-        {
-            if (m_pmtxToLock)
-            {
-                m_pmtxToLock->Lock(c4Timeout);
-                m_bLocked = kCIDLib::True;
-            }
-        }
-
-        TMtxLocker( const   TMutex* const       pmtxToLock
-                    , const tCIDLib::TBoolean   bLockIt
-                    , const tCIDLib::TCard4     c4Timeout = kCIDLib::c4MaxWait) :
-
-            m_bLocked(kCIDLib::False)
-            , m_pmtxToLock(pmtxToLock)
-        {
-            if (pmtxToLock && bLockIt)
-            {
-                m_pmtxToLock->Lock(c4Timeout);
-                m_bLocked = kCIDLib::True;
-            }
-        }
-
-        TMtxLocker(const TMtxLocker&) = delete;
-        TMtxLocker(TMtxLocker&&) = delete;
-
-        ~TMtxLocker()
-        {
-            // If we have it locked, then unlock it
-            if (m_bLocked && m_pmtxToLock)
-            {
-                // This can throw, though it's highly unlikely. If so, we die
-                #pragma warning(suppress : 26447)
-                m_pmtxToLock->Unlock();
-            }
-        }
+        ~MMtxLockable() {}
 
 
         // -------------------------------------------------------------------
-        //  Public operators
+        //  Public, virtual methods
         // -------------------------------------------------------------------
-        TMtxLocker& operator=(const TMtxLocker&) = delete;
-        TMtxLocker& operator=(TMtxLocker&&) = delete;
-        tCIDLib::TVoid* operator new(size_t) = delete;
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMSs) const override
+        {
+            return m_mtxSync.bTryLock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const override
+        {
+            m_mtxSync.Lock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Unlock() const override
+        {
+            m_mtxSync.Unlock();
+        }
 
 
+    protected :
         // -------------------------------------------------------------------
-        //  Public, non-virtual methods
+        //  See the class comments above. We assume the mutex is never copied or
+        //  moved or assigned. It's an internal detail, not data of the class.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bLock(const tCIDLib::TCard4 c4Timeout)
-        {
-            if (m_pmtxToLock)
-            {
-                CheckLocked(kCIDLib::True);
-                m_bLocked = m_pmtxToLock->bTryLock(c4Timeout);
-            }
-             else
-            {
-                // We don't have a mutex, so just say it's locked
-                m_bLocked = kCIDLib::True;
-            }
-            return m_bLocked;
-        }
-
-        tCIDLib::TBoolean bLocked() const
-        {
-            return m_bLocked;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4Timeout = kCIDLib::c4MaxWait)
-        {
-            if (m_pmtxToLock)
-            {
-                CheckLocked(kCIDLib::True);
-                m_pmtxToLock->Lock(c4Timeout);
-            }
-            m_bLocked = kCIDLib::True;
-        }
-
-        tCIDLib::TVoid Orphan()
-        {
-            m_pmtxToLock = nullptr;
-            m_bLocked = kCIDLib::False;
-        }
-
-        tCIDLib::TVoid Release()
-        {
-            if (m_pmtxToLock)
-            {
-                CheckLocked(kCIDLib::False);
-                m_pmtxToLock->Unlock();
-            }
-            m_bLocked = kCIDLib::False;
-        }
+        MMtxLockable() = default;
+        MMtxLockable(const MMtxLockable&) {};
+        MMtxLockable(MMtxLockable&&) {};
+        MMtxLockable& operator=(const MMtxLockable&) { return *this; };
+        MMtxLockable& operator=(MMtxLockable&&) { return *this; };
 
 
     private :
         // -------------------------------------------------------------------
-        //  Private, non-virtual methods
-        // -------------------------------------------------------------------
-        tCIDLib::TVoid CheckLocked
-        (
-            const   tCIDLib::TBoolean       bToCheck
-        );
-
-
-        // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_bLocked
-        //      This indicates whether we currently have it locked or not.
-        //
-        //  m_pmtxToLock
-        //      This is a pointer to the target mutex we will release upon
-        //      destruction. It may be zero. We are designed to be tolerant
-        //      of this so that optional scope based locking can be done. See
-        //      the file notes above.
+        //  m_mtxSync
+        //      The mutex we use to implement the lockable interface. Our overrides
+        //      above are just forwards to this. It is not moved or assigned or
+        //      copied. See the class comments above. It has to be mutable because
+        //      the locking methods are const (see the header comments of the
+        //      base lockable class.)
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bLocked;
-        const TMutex*       m_pmtxToLock;
+        TMutex  m_mtxSync;
 };
 
 #pragma CIDLIB_POPPACK
-
-

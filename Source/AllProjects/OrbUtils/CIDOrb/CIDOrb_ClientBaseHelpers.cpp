@@ -93,7 +93,7 @@ TSrvTarget::TSrvTarget(const TIPEndPoint& ipepSrv) :
     m_bReconnMode(kCIDLib::True)
     , m_c4RefCount(0)
     , m_c4SequenceId(1)
-    , m_colRepList(tCIDLib::EAdoptOpts::NoAdopt, 64, tCIDLib::EMTStates::Unsafe)
+    , m_colRepList(tCIDLib::EAdoptOpts::NoAdopt, 64)
     , m_enctCacheStamp(0)
     , m_errUnknown
       (
@@ -172,14 +172,14 @@ tCIDLib::TBoolean TSrvTarget::bInitialize()
 tCIDLib::TCard4 TSrvTarget::c4QueueCmd(TCmdQItem* const pcqiToQ)
 {
     // Lock the sync mutex
-    TMtxLocker lockSrv(&m_mtxSync);
+    TLocker lockrSrv(&m_mtxSync);
 
     // Get the next sequence number available for this target
     const tCIDLib::TCard4 c4Ret = m_c4SequenceId++;
 
     // Lock the command and update it
     {
-        TMtxLocker lockCmd(pcqiToQ->pmtxLock());
+        TLocker lockrCmd(pcqiToQ->pmtxLock());
         pcqiToQ->eStage(tCIDOrb::ECmdStages::CmdQ);
         pcqiToQ->c4SequenceId(c4Ret);
 
@@ -491,7 +491,7 @@ tCIDLib::TVoid
 TSrvTarget::CancelCmdWithErr(TCmdQItem& cqiCan, const TError& errLostConn)
 {
     // Lock the command while we update it
-    TMtxLocker lockCmd(cqiCan.pmtxLock());
+    TLocker lockrCmd(cqiCan.pmtxLock());
 
     //
     //  If it's already orphaned, then we can just free it and leave it
@@ -718,7 +718,7 @@ tCIDLib::TVoid TSrvTarget::ErrorOutWaiting()
     //  client queing calls should be rejecting themselves when they see
     //  the flag anyway, and not even trying to queue.
     //
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // If any replies in the list, then error them out
     tCIDLib::TCard4 c4Count = m_colRepList.c4ElemCount();
@@ -901,7 +901,7 @@ TSrvTarget::PollReplies(TThread& thrCaller
         TCmdQItem* pcqiCur = pcqiExtractReply(c4SeqId);
         if (pcqiCur)
         {
-            TMtxLocker lockCmd(pcqiCur->pmtxLock());
+            TLocker lockrCmd(pcqiCur->pmtxLock());
 
             //
             //  If it has not already been orphaned by the waiting thread,
@@ -1002,7 +1002,7 @@ tCIDLib::TVoid TSrvTarget::SendQueued(TThread&, TBinMBufOutStream& strmWrite)
         }
 
         // Don't let the queue continue to grow, just flush it
-        TMtxLocker lockSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
         m_colCmdQ.RemoveAll();
         return;
     }
@@ -1023,7 +1023,7 @@ tCIDLib::TVoid TSrvTarget::SendQueued(TThread&, TBinMBufOutStream& strmWrite)
         //
         TCmdQItem* pcqiCur;
         {
-            TMtxLocker lockSync(&m_mtxSync);
+            TLocker lockrSync(&m_mtxSync);
 
             // If we don't have any more, then break out
             TDLstNode* pnodeNext = m_colCmdQ.pnodeHead();
@@ -1037,7 +1037,7 @@ tCIDLib::TVoid TSrvTarget::SendQueued(TThread&, TBinMBufOutStream& strmWrite)
 
         // Lock the item while we work with it
         {
-            TMtxLocker lockCmd(pcqiCur->pmtxLock());
+            TLocker lockrCmd(pcqiCur->pmtxLock());
 
             //
             //  If the command has  been orphaned (which means that the thread
@@ -1104,7 +1104,7 @@ tCIDLib::TVoid TSrvTarget::SendQueued(TThread&, TBinMBufOutStream& strmWrite)
 
         // It all worked, so add it and mark it as being in the reply list
         {
-            TMtxLocker lockCmd(pcqiCur->pmtxLock());
+            TLocker lockrCmd(pcqiCur->pmtxLock());
             pcqiCur->eStage(tCIDOrb::ECmdStages::ReplyList);
             m_colRepList.Add(pcqiCur);
 

@@ -33,6 +33,12 @@
 
 
 // ---------------------------------------------------------------------------
+//  Magic macros
+// ---------------------------------------------------------------------------
+
+
+
+// ---------------------------------------------------------------------------
 //   CLASS: MLockable
 //  PREFIX: mlock
 // ---------------------------------------------------------------------------
@@ -47,7 +53,5 @@ MLockable& MLockable::Nul_MLockable()
     //  so we just use a mutex which implements this interface.
     //
     static TMutex mlockNull;
-    //return mlockNull;
-
-    return *static_cast<MLockable*>(nullptr);
+    return mlockNull;
 }

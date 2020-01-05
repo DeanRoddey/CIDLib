@@ -56,10 +56,9 @@ template <typename TElem> class TRefSortedBag : public TRefBag<TElem>
 
         TRefSortedBag(  const   tCIDLib::EAdoptOpts eAdopt
                         ,       TCompFunc           pfnComp
-                        , const tCIDLib::ESortDirs  eDir = tCIDLib::ESortDirs::Ascending
-                        , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
+                        , const tCIDLib::ESortDirs  eDir = tCIDLib::ESortDirs::Ascending) :
 
-            TRefBag<TElem>(eAdopt, eMTSafe)
+            TRefBag<TElem>(eAdopt)
             , m_eDir(eDir)
             , m_pfnComp(pfnComp)
         {
@@ -93,7 +92,7 @@ template <typename TElem> class TRefSortedBag : public TRefBag<TElem>
                 this->NullNodeAdded(CID_FILE, CID_LINE);
 
             // Lock the collection
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
 
             // Optimize if the bag is empty
             if (this->bIsEmpty())
@@ -152,7 +151,93 @@ template <typename TElem> class TRefSortedBag : public TRefBag<TElem>
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
-        TemplateRTTIDefs(TMyType,TRefBag<TElem>)
+        TemplateRTTIDefs(TRefSortedBag<TElem>,TRefBag<TElem>)
+};
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TSafeRefSortedBag
+//  PREFIX: col
+// ---------------------------------------------------------------------------
+template <typename TElem> class TSafeRefSortedBag : public TRefSortedBag<TElem>
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Public types
+        // -------------------------------------------------------------------
+        using TMyType = TSafeRefSortedBag<TElem>;
+        using TParType = TRefSortedBag<TElem>;
+
+
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TSafeRefSortedBag() = delete;
+
+        TSafeRefSortedBag(  const   tCIDLib::EAdoptOpts eAdopt
+                            ,       TParType::TCompFunc pfnComp
+                            , const tCIDLib::ESortDirs  eDir = tCIDLib::ESortDirs::Ascending) :
+
+            TParType(eAdopt)
+            , m_eDir(eDir)
+            , m_pfnComp(pfnComp)
+        {
+        }
+
+        TSafeRefSortedBag(const TMyType&) = delete;
+        TSafeRefSortedBag(TMyType&&) = delete;
+
+        ~TSafeRefSortedBag()
+        {
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TMyType& operator=(const TMyType&) = delete;
+        TMyType& operator=(TMyType&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const override
+        {
+            return m_mtxSync.bTryLock(c4WaitMS);
+        }
+
+        tCIDLib::EMTStates eMTSafe() const final
+        {
+            return tCIDLib::EMTStates::Safe;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const override
+        {
+            m_mtxSync.Lock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Unlock() const override
+        {
+            m_mtxSync.Unlock();
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_mtxSync
+        //      We override the MLockable interface and implement it in terms
+        //      of this guy.
+        // -------------------------------------------------------------------
+        TMutex  m_mtxSync;
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        TemplateRTTIDefs(TSafeRefSortedBag<TElem>,TRefSortedBag<TElem>)
 };
 
 #pragma CIDLIB_POPPACK

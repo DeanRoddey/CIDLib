@@ -546,7 +546,7 @@ tCIDLib::TVoid TPubSubMsg::CheckMsgType(const TClass& clsToCheck) const
 //
 MPubSubscription::~MPubSubscription()
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
     if (m_c4SubscriberId)
     {
         try
@@ -657,7 +657,7 @@ tCIDLib::TVoid
 MPubSubscription::SubscribeToTopic( const   TString&            strTopicPath
                                     , const tCIDLib::TBoolean   bMustExist)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
 
     //
     //  Invoke a scavenger pass. This isn't something that happens very often, so it's
@@ -710,7 +710,7 @@ MPubSubscription::SubscribeToTopic( const   TString&            strTopicPath
 tCIDLib::TVoid
 MPubSubscription::UnsubscribeFromTopic(const TString& strTopicPath)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
     try
     {
         //
@@ -794,7 +794,7 @@ tCIDLib::TVoid MPubSubscription::CheckSubIsReady() const
 TPubSubAsyncSub::TPubSubAsyncSub(const tCIDLib::TBoolean bCreateEvent) :
 
     m_c4BlockingCnt(0)
-    , m_colMsgs(tCIDLib::EMTStates::Safe)
+    , m_colMsgs()
     , m_pevWait(nullptr)
 {
     //
@@ -864,7 +864,7 @@ TPubSubAsyncSub::bGetNextMsg(TPubSubMsg& psmsgToFill, const tCIDLib::TCard4 c4Wa
         //
         if (m_pevWait)
         {
-            TMtxLocker mtxlSync(m_colMsgs.pmtxLock());
+            TLocker lockrSync(&m_colMsgs);
             if (m_colMsgs.bIsEmpty())
                 m_pevWait->Reset();
         }
@@ -908,7 +908,7 @@ tCIDLib::TVoid TPubSubAsyncSub::FlushMsgs()
     //  one. So lock, remove all, then reset the event. That way no one can get another
     //  msg into the queue before we reset.
     //
-    TMtxLocker mtxlSync(m_colMsgs.pmtxLock());
+    TLocker lockrSync(&m_colMsgs);
     m_colMsgs.RemoveAll();
 
     if (m_pevWait)
@@ -947,7 +947,7 @@ tCIDLib::TVoid TPubSubAsyncSub::ProcessPubMsg(const TPubSubMsg& psmsgIn)
     //  msg. The client can know this if desired by watching the msg sequence numbers,
     //  which will now have a gap.
     //
-    TMtxLocker mtxlSync(m_colMsgs.pmtxLock());
+    TLocker lockrSync(&m_colMsgs);
     const tCIDLib::TCard4 c4OrgCount = m_colMsgs.c4ElemCount();
     if (c4OrgCount >= CIDLib_PubSub::c4MaxMsgQSz)
     {
@@ -983,7 +983,7 @@ tCIDLib::TVoid TPubSubAsyncSub::ProcessPubMsg(const TPubSubMsg& psmsgIn)
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TPubSubTopic::bTopicExists(const TString& strTopicPath)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
     TPubSubTopic* pstopFind = CIDLib_PubSub::colTopicList().pobjFindByKey(strTopicPath);
 
     //
@@ -1010,7 +1010,7 @@ tCIDLib::TBoolean TPubSubTopic::bTopicExists(const TString& strTopicPath)
 TPubSubTopic
 TPubSubTopic::pstopCreateTopic(const TString& strTopicPath, const TClass& clsMsgType)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
 
     //
     //  Invoke a scavenger pass. This isn't something that happens very often, so it's
@@ -1143,7 +1143,7 @@ tCIDLib::TCard4 TPubSubTopic::c4SubCount() const
 {
     CheckReady();
 
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
     return m_cptrImpl->c4SubCount();
 }
 
@@ -1165,7 +1165,7 @@ tCIDLib::TCard4 TPubSubTopic::c4TopicId() const
 //
 tCIDLib::TVoid TPubSubTopic::DropTopic()
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
     m_cptrImpl.DropRef();
 }
 
@@ -1179,7 +1179,7 @@ tCIDLib::TVoid TPubSubTopic::DropTopic()
 //
 tCIDLib::TVoid TPubSubTopic::Publish(TObject* const pobjToAdopt)
 {
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
     CheckReady();
     m_cptrImpl->SendMsg(pobjToAdopt);
 }
@@ -1203,7 +1203,7 @@ tCIDLib::TVoid TPubSubTopic::AddSubscriber(const tCIDLib::TCard4 c4SubId)
         , m_strTopicPath
     );
 
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
     return m_cptrImpl->AddSubscriber(c4SubId);
 }
 
@@ -1222,7 +1222,7 @@ tCIDLib::TVoid TPubSubTopic::RemoveSubscriber(const tCIDLib::TCard4 c4SubId)
         , m_strTopicPath
     );
 
-    TMtxLocker mtxlSync(CIDLib_PubSub::pmtxSync());
+    TLocker lockrSync(CIDLib_PubSub::pmtxSync());
     return m_cptrImpl->RemoveSubscriber(c4SubId);
 }
 

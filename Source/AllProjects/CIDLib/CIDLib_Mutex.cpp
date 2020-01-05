@@ -41,14 +41,14 @@ RTTIDecls(TMutex,TObject)
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TMtxLocker
+//  CLASS: TLocker
 // PREFIX: lock
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TMtxLocker: Private, non-virtual methods
+//  TLocker: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TMtxLocker::CheckLocked(const tCIDLib::TBoolean bToCheck)
+tCIDLib::TVoid TLocker::CheckLocked(const tCIDLib::TBoolean bToCheck)
 {
     // If we already have it locked/unlocked, this is illegal
     if (m_bLocked == bToCheck)
@@ -152,14 +152,8 @@ TMutex::~TMutex()
 
 
 // ---------------------------------------------------------------------------
-//  TMutex: Public, non-virtual methods
+//  TMutex: Public, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TMutex::bIsNamed() const
-{
-    return m_bNamed;
-}
-
-
 tCIDLib::TBoolean TMutex::bTryLock(const tCIDLib::TCard4 c4Timeout) const
 {
     if (!m_kmtxImpl.bLock(c4Timeout))
@@ -212,12 +206,6 @@ tCIDLib::TVoid TMutex::Lock(const tCIDLib::TCard4 c4Timeout) const
 }
 
 
-const TResourceName& TMutex::rsnName() const
-{
-    return m_rsnThis;
-}
-
-
 tCIDLib::TVoid TMutex::Unlock() const
 {
     if (!m_kmtxImpl.bUnlock())
@@ -233,6 +221,22 @@ tCIDLib::TVoid TMutex::Unlock() const
             , m_rsnThis.strFullName(tCIDLib::ENamedRscTypes::Mutex)
         );
     }
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  TMutex: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TBoolean TMutex::bIsNamed() const
+{
+    return m_bNamed;
+}
+
+
+const TResourceName& TMutex::rsnName() const
+{
+    return m_rsnThis;
 }
 
 

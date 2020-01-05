@@ -281,7 +281,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         // -------------------------------------------------------------------
         //  Public types
         // -------------------------------------------------------------------
-        using TElemList = TRefVector<TElem>;
+        using TElemList = TSafeRefVector<TElem>;
 
 
         // -------------------------------------------------------------------
@@ -295,7 +295,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         {
             {
                 // Lock if we are MT safe
-                TMtxLocker mtxlSync(m_pmtxSync);
+                TLocker lockrSync(m_pmtxSync);
 
                 //
                 //  Neither our free or used lists are adopting, so we have to
@@ -351,7 +351,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         //
         tCIDLib::TCard4 c4ElemCount() const
         {
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
             return m_colFreeList.c4ElemCount() + m_colUsedList.c4ElemCount();
         }
 
@@ -361,7 +361,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         //
         tCIDLib::TCard4 c4ElemsAvail() const
         {
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
             return (m_c4MaxPoolSize - m_colUsedList.c4ElemCount());
         }
 
@@ -382,7 +382,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         [[nodiscard]] TElem* pobjReserveElem()
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             // Make sure that we can reserve another one
             const tCIDLib::TCard4 c4FreeCnt = m_colFreeList.c4ElemCount();
@@ -439,7 +439,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         tCIDLib::TVoid QueryListSizes(tCIDLib::TCard4& c4Used, tCIDLib::TCard4& c4Free)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             c4Used = m_colUsedList.c4ElemCount();
             c4Free = m_colFreeList.c4ElemCount();
@@ -455,7 +455,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         tCIDLib::TVoid ReleaseAll()
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             //
             //  Take all of the elements from the used list and put them back into
@@ -484,7 +484,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         tCIDLib::TVoid ReleaseElem(TElem* const pobjToRelease)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             // Find this guy in the used list, which is sorted by address
             tCIDLib::TCard4 c4AtUsed;
@@ -568,8 +568,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         //  Hidden constructors
         // -------------------------------------------------------------------
         TFixedSizePool(const   tCIDLib::TCard4  c4MaxAlloc
-                    , const TString&            strName
-                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
+                    , const TString&            strName) :
 
             m_c4MaxPoolSize(c4MaxAlloc ? c4MaxAlloc : 8192)
             , m_colFreeList
@@ -585,9 +584,6 @@ template <typename TElem> class TFixedSizePool : public TObject
             , m_pmtxSync(nullptr)
             , m_strName(strName)
         {
-            // If MT safe, then allocate the critical section
-            if (eMTSafe == tCIDLib::EMTStates::Safe)
-                m_pmtxSync = new TMutex;
         }
 
 

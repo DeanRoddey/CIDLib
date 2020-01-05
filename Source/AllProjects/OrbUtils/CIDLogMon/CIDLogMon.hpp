@@ -42,7 +42,6 @@
 // ----------------------------------------------------------------------------
 #include    "CIDOrbUC.hpp"
 #include    "CIDCtrls.hpp"
-
 #include    "CIDLogMon_MessageIds.hpp"
 #include    "CIDLogMon_ResourceIds.hpp"
 
@@ -118,7 +117,7 @@ class TLogItem : public TLogEvent
 using TLogEvPtr = TCntPtr<TLogItem>;
 using TLogEvRef = TWeakPtr<TLogItem>;
 using TLogEvDeque = TDeque<TLogEvPtr>;
-using TEvList = TVector<TLogEvPtr>;
+using TEvList = TSafeVector<TLogEvPtr>;
 using TEvRefList = TVector<TLogEvRef>;
 
 

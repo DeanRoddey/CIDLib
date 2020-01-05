@@ -224,7 +224,7 @@ class CIDUPNPEXP TUPnPAsyncFinder : public TObject, public MUPnPAsyncFinderCB
         //  Private data types
         // -------------------------------------------------------------------
         using TSearchList   = tCIDLib::TKValsList;
-        using TDevList      = TRefKeyedHashSet<TUPnPAsyncFinderItem, TString, TStringKeyOps>;
+        using TDevList      = TSafeRefKeyedHashSet<TUPnPAsyncFinderItem, TString, TStringKeyOps>;
 
 
         // -------------------------------------------------------------------

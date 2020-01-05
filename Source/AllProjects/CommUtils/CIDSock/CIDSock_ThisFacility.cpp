@@ -139,13 +139,10 @@ namespace CIDSock_ThisFacility
     //  with entries that never get used again. And, should it get full, we'll
     //  also do a pass to remove out of date entries.
     // -----------------------------------------------------------------------
-    using TIPCache = TKeyedHashSet<TIPLookupItem, TString, TStringKeyOps>;
+    using TIPCache = TSafeKeyedHashSet<TIPLookupItem, TString, TStringKeyOps>;
     TIPCache colNameCache
     (
-        173
-        , TStringKeyOps()
-        , &TIPLookupItem::strKey
-        , tCIDLib::EMTStates::Safe
+        173, TStringKeyOps(), &TIPLookupItem::strKey
     );
     const tCIDLib::TCard4 c4MaxCacheItems = 2048;
     TString strKeyTemp;
@@ -631,7 +628,7 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
     //  If so, and it's not out of date, then return it.
     //
     {
-        TMtxLocker mtxlSync(CIDSock_ThisFacility::colNameCache.pmtxLock());
+        TLocker lockrSync(&CIDSock_ThisFacility::colNameCache);
 
         // Create the cache key for this address and type
         MakeCacheKey(strAddr, eType, CIDSock_ThisFacility::strKeyTemp);
@@ -752,7 +749,7 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
         //
         if (eRes == tCIDSock::EAddrCvtRes::ViaLookup)
         {
-            TMtxLocker mtxlSync(CIDSock_ThisFacility::colNameCache.pmtxLock());
+            TLocker lockrSync(&CIDSock_ThisFacility::colNameCache);
             MakeCacheKey(strAddr, eType, CIDSock_ThisFacility::strKeyTemp);
 
             tCIDLib::TBoolean bAdded;

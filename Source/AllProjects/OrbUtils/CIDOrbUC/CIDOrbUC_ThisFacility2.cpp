@@ -69,7 +69,7 @@ TFacCIDOrbUC::bDeregRebindObj(  const   TString&            strNodePath
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
     // We have to lock during this, since the binder thread is running
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -134,7 +134,7 @@ TFacCIDOrbUC::RegRebindObj( const   TOrbObjId&  ooidSrvObject
                             , const TString&    strExtra4)
 {
     // We have to lock since the binder thread is probably running now
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // See if this path is already in our list. This isn't legal
     TNSRebindInfo* pnsrbiFound = pnsrbiFind(strNodePath);
@@ -260,7 +260,7 @@ TFacCIDOrbUC::UpdateExtraNSVal( const   TString&        strNodePath
     //  We have to lock since the binder thread is probably running now.
     //
     {
-        TMtxLocker lockSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         // Look up the binding info for this path
         TNSRebindInfo* pnsrbiFound = pnsrbiFind(strNodePath);
@@ -647,7 +647,7 @@ TFacCIDOrbUC::eBinderThread(TThread& thrThis, tCIDLib::TVoid*)
         try
         {
             // Now we have to lock
-            TMtxLocker lockSync(&m_mtxSync);
+            TLocker lockrSync(&m_mtxSync);
 
             tCIDOrbUC::TNSrvProxy orbcNS;
 
@@ -774,7 +774,7 @@ TFacCIDOrbUC::eBinderThread(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Make sure the list is cleared
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     m_colList.RemoveAll();
 
     return tCIDLib::EExitCodes::Normal;

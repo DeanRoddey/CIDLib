@@ -52,13 +52,14 @@ template <typename TElem,class TKey,class TKeyOps> class TRefKeyedHashSet;
 //   CLASS: TRefKeyedHashSetNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <typename TElem,class TKey> class TRefKeyedHashSetNode
+template <typename TElem, class TKey> class TRefKeyedHashSetNode
 {
     public  :
         // -------------------------------------------------------------------
         //  Public types
         // -------------------------------------------------------------------
         using TMyType = TRefKeyedHashSetNode<TElem, TKey>;
+
 
 
         // -------------------------------------------------------------------
@@ -172,13 +173,8 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         static const TClass& clsThis()
         {
-            static const TClass* pclsThis = nullptr;
-            if (!pclsThis)
-            {
-                TBaseLock lockInit;
-                pclsThis = new TClass(L"TRefKeyedHashSet<TElem,TKey,TKeyOps>");
-            }
-            return *pclsThis;
+            static const TClass clsRet(L"TRefKeyedHashSet<TElem,TKey,TKeyOps>");
+            return clsRet;
         }
 
 
@@ -189,7 +185,8 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         using TMyElemType = TElem;
         using TMyType = TRefKeyedHashSet<TElem, TKey, TKeyOps>;
-        using TNode = TRefKeyedHashSetNode<TElem,TKey> ;
+        using TParType = TRefCollection<TElem>;
+        using TNode = TRefKeyedHashSetNode<TElem,TKey>;
         using TKeyExtract = const TKey& (*)(const TElem&);
 
 
@@ -271,12 +268,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     // Don't have to copy bad first, it's the same for everyone
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolCursoring
-                            ? cursSrc.m_pcolCursoring->pmtxLock() : nullptr
-                        );
-
+                        TLocker lockCol(cursSrc.m_pcolCursoring);
                         TParent::operator=(cursSrc);
                         m_hshBadLast    = cursSrc.m_hshBadLast;
                         m_hshCurBucket  = cursSrc.m_hshCurBucket;
@@ -347,7 +339,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(bIsValid(), CID_FILE, CID_LINE);
                     if (m_pnodeCur)
@@ -363,7 +355,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(bIsValid(), CID_FILE, CID_LINE);
                     if (m_pnodeCur)
@@ -379,7 +371,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolCursoring);
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
                     m_pnodeCur = m_pcolCursoring->pnodeFindFirst(m_hshCurBucket);
 
@@ -393,7 +385,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolCursoring);
                     m_pnodeCur = m_pcolCursoring->pnodeFindLast(m_hshCurBucket);
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
 
@@ -417,7 +409,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(bIsValid(), CID_FILE, CID_LINE);
                     return m_pnodeCur->objData();
@@ -431,7 +423,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(bIsValid(), CID_FILE, CID_LINE);
                     return m_hshCurBucket;
@@ -441,7 +433,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -450,7 +442,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -571,12 +563,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolNCCursoring
-                            ? cursSrc.m_pcolNCCursoring->pmtxLock() : nullptr
-                        );
-
+                        TLocker lockCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
                     }
@@ -588,7 +575,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
                 TElem& operator*() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return const_cast<TElem&>(this->pnodeCur()->objData());
@@ -596,7 +583,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
                 TElem* operator->() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return &const_cast<TElem&>(this->pnodeCur()->objData());
@@ -644,7 +631,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return const_cast<TElem&>(this->pnodeCur()->objData());
@@ -698,10 +685,9 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         TRefKeyedHashSet(const  tCIDLib::EAdoptOpts eAdopt
                         , const tCIDLib::TCard4     c4Modulus
                         , const TKeyOps&            kopsToUse
-                        ,       TKeyExtract         pfnKeyExtract
-                        , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
+                        ,       TKeyExtract         pfnKeyExtract) :
 
-            TRefCollection<TElem>(eMTSafe)
+            TParType()
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
@@ -768,7 +754,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             if (!pobjToAdd)
                 this->NullNodeAdded(CID_FILE, CID_LINE);
 
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             // See if this element is already in the collection
             CIDLib_Suppress(6011)  // We null checked above
@@ -804,33 +790,33 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             m_c4CurElements++;
         }
 
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
         {
             if (clsTarget == clsThis())
                 return kCIDLib::True;
-            return TRefCollection<TElem>::bIsDescendantOf(clsTarget);
+            return TParType::bIsDescendantOf(clsTarget);
         }
 
         tCIDLib::TBoolean bIsEmpty() const final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
             return (m_c4CurElements == 0);
         }
 
         tCIDLib::TCard4 c4ElemCount() const final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
              return m_c4CurElements;
         }
 
-        const TClass& clsIsA() const final
+        const TClass& clsIsA() const override
         {
             return clsThis();
         }
 
-        const TClass& clsParent() const final
+        const TClass& clsParent() const override
         {
-            return TRefCollection<TElem>::clsThis();
+            return TParType::clsThis();
         }
 
         tCIDLib::EAdoptOpts eAdopt() const final
@@ -838,10 +824,10 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             return m_eAdopt;
         }
 
-        tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) final
+        tCIDLib::TVoid GiveAllTo(TParType& colTarget) final
         {
             // Look and add all of our items to the target
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockThis(this);
 
             // Orphan all the user data objects to the target collection
             tCIDLib::THashVal hshCur;
@@ -862,7 +848,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
         tCIDLib::TVoid OrphanElem(TElem* const pobjToOrphan) final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             // Get the hash of the element
             const TKey& objKey = m_pfnKeyExtract(*pobjToOrphan);
@@ -910,13 +896,13 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
         [[nodiscard]] TCursor* pcursNew() const final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
             return new TCursor(this);
         }
 
         tCIDLib::TVoid RemoveAll() final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
             if (!m_c4CurElements)
                 return;
 
@@ -929,7 +915,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
         tCIDLib::TVoid RemoveElem(TElem* const pobjToRemove) final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             // Get the hash of the element
             const TKey& objKey = m_pfnKeyExtract(*pobjToRemove);
@@ -982,7 +968,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             if (!pobjToAdd)
                 this->NullNodeAdded(CID_FILE, CID_LINE);
 
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             // See if the element exists
             tCIDLib::THashVal hshElem;
@@ -1005,7 +991,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
         tCIDLib::TBoolean bKeyExists(const TKey& keyToFind) const
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             // See if the element exists
             tCIDLib::THashVal hshElem;
@@ -1018,7 +1004,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         bRemoveKey( const   TKey&               objKeyToRemove
                     , const tCIDLib::TBoolean   bThrowIfNot = kCIDLib::True)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             // Get the hash of the element
             const tCIDLib::THashVal hshElem = m_kopsToUse.hshKey
@@ -1082,7 +1068,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
         tCIDLib::TCard4 c4HashModulus() const
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
             return m_c4HashModulus;
         }
 
@@ -1094,7 +1080,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         //
         TCursor cursFindByKey(const TKey& objKeyToFind) const
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             tCIDLib::THashVal hshKey;
             TNode* pnodeRet = pnodeFind(objKeyToFind, hshKey);
@@ -1105,7 +1091,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
         TNCCursor cursFindByKey(const TKey& objKeyToFind)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             tCIDLib::THashVal hshKey;
             TNode* pnodeRet = pnodeFind(objKeyToFind, hshKey);
@@ -1124,7 +1110,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         //
         template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockThis(this);
 
             tCIDLib::THashVal   hshCurBucket = 0;
             TNode*              pnodeCur = pnodeFindFirst(hshCurBucket);
@@ -1152,7 +1138,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         // If the key exists, extract the associated element
         [[nodiscard]] TElem* pobjExtract(const TKey& keyToFind)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             // Get the hash of the element
             const tCIDLib::THashVal hshElem = m_kopsToUse.hshKey
@@ -1205,7 +1191,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         TElem* pobjFindByKey(const  TKey&               objKeyToFind
                             , const tCIDLib::TBoolean   bThrowIfNotFound = kCIDLib::True)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             tCIDLib::THashVal hshKey;
             TNode* pnodeRet = pnodeFind(objKeyToFind, hshKey);
@@ -1226,7 +1212,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                                     , const tCIDLib::TBoolean bThrowIfNotFound = kCIDLib::True) const
 
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             tCIDLib::THashVal hshKey;
             TNode* pnodeRet = pnodeFind(objKeyToFind, hshKey);
@@ -1250,7 +1236,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         //
         tCIDLib::TVoid OrphanAll()
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             // Remove all elements and tell it not to delete user data
             RemoveAllElems(kCIDLib::False);
@@ -1258,7 +1244,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
         tCIDLib::TVoid RemoveAt(TCursor& cursAt)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             // Make sure the cursor is valid and belongs to this collection
             this->CheckCursorValid(cursAt, CID_FILE, CID_LINE);
@@ -1302,20 +1288,16 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             cursAt.c4SerialNum(this->c4SerialNum());
         }
 
-        tCIDLib::TVoid Set( const   tCIDLib::TCard4     c4MaxCount
-                            , const tCIDLib::EMTStates  eToSet
+        tCIDLib::TVoid Reset(const  tCIDLib::TCard4     c4MaxCount
                             , const tCIDLib::TCard4     c4HashModulus)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockSync(this);
 
             //
             //  First we have to remove all elements from the collection, deleting
             //  all user data if we are adopting.
             //
             RemoveAllElems(m_eAdopt == tCIDLib::EAdoptOpts::Adopt);
-
-            // Call our parent to set the thread safety state
-            this->eMTState(eToSet);
 
             // Reset the buckets if the hash mod changed
             if (c4HashModulus != m_c4HashModulus)
@@ -1560,6 +1542,116 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         tCIDLib::EAdoptOpts m_eAdopt;
         TKeyOps             m_kopsToUse;
         TKeyExtract         m_pfnKeyExtract;
+};
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TSafeRefKeyedHashSet
+//  PREFIX: col
+// ---------------------------------------------------------------------------
+template <typename TElem, typename TKey, typename TKeyOps>
+class TSafeRefKeyedHashSet : public TRefKeyedHashSet<TElem, TKey, TKeyOps>
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Public, static methods
+        // -------------------------------------------------------------------
+        static const TClass& clsThis()
+        {
+            static const TClass clsRet(L"TSafeRefKeyedHashSet<TElem,TKey,TKeyOps>");
+            return clsRet;
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Nested aliases for the node and key ops types used by a keyed hash
+        //  set. And one for the key field extraction function that the
+        //  user provides.
+        // -------------------------------------------------------------------
+        using TMyElemType = TElem;
+        using TMyType = TSafeRefKeyedHashSet<TElem, TKey, TKeyOps>;
+        using TParType = TRefKeyedHashSet<TElem, TKey, TKeyOps>;
+
+
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TSafeRefKeyedHashSet<TElem, TKey, TKeyOps>() = delete;
+
+        TSafeRefKeyedHashSet(const  tCIDLib::EAdoptOpts eAdopt
+                            , const tCIDLib::TCard4     c4Modulus
+                            , const TKeyOps&            kopsToUse
+                            ,       TParType::TKeyExtract pfnKeyExtract) :
+
+            TParType(eAdopt, c4Modulus, kopsToUse, pfnKeyExtract)
+        {
+        }
+
+        TSafeRefKeyedHashSet(const TMyType&) = delete;
+        TSafeRefKeyedHashSet(TMyType&&) = delete;
+
+        ~TSafeRefKeyedHashSet()
+        {
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TMyType& operator=(const TMyType&) = delete;
+        TMyType& operator=( TMyType&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
+        {
+            if (clsTarget == clsThis())
+                return kCIDLib::True;
+            return TParType::bIsDescendantOf(clsTarget);
+        }
+
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
+        {
+            return m_mtxSync.bTryLock(c4WaitMS);
+        }
+
+        const TClass& clsIsA() const final
+        {
+            return clsThis();
+        }
+
+        const TClass& clsParent() const final
+        {
+            return TParType::clsThis();
+        }
+
+        tCIDLib::EMTStates eMTSafe() const final
+        {
+            return tCIDLib::EMTStates::Safe;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
+        {
+            m_mtxSync.Lock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Unlock() const override
+        {
+            m_mtxSync.Unlock();
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_mtxSync
+        //      We override the MLockable interface and implement them in terms
+        //      of this guy.
+        // -------------------------------------------------------------------
+        TMutex  m_mtxSync;
 };
 
 #pragma CIDLIB_POPPACK

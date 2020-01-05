@@ -283,8 +283,8 @@ namespace tCIDColAlgo
             return;
 
         // Lock both collections
-        TMtxLocker lockNew(colDest.pmtxLock());
-        TMtxLocker lockToDup(colSource.pmtxLock());
+        TLocker lockrNew(&colDest);
+        TLocker lockrToDup(&colSource);
 
         // Nothing to do if no elements!
         if (!colSource.c4ElemCount())

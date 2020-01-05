@@ -236,7 +236,7 @@ class TLogSpoolThread : public TThread
         tCIDLib::TVoid SetLogger(       MLogger* const          plgrNew
                                 , const tCIDLib::EAdoptOpts     eAdopt)
         {
-            TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
+            TLocker lockrSync(CIDLib_Module::pmtxLogSync());
 
             // If there is one that hasn't been gotten yet we have to deal with it
             if (m_plgrNew && (m_eAdoptNew == tCIDLib::EAdoptOpts::Adopt))
@@ -271,7 +271,7 @@ class TLogSpoolThread : public TThread
         // For TModule to create directly, mostl for emplacement scenarios
         tCIDLib::TVoid QueueEvent(CIDLib_Module::TLogQEvent* const plogqevNew)
         {
-            TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
+            TLocker lockrSync(CIDLib_Module::pmtxLogSync());
 
             //
             //  Make sure there is space available. If not, then we need to reject this
@@ -420,7 +420,7 @@ tCIDLib::EExitCodes TLogSpoolThread::eProcess()
             // If there's a new logger, let's get that
             if (m_plgrNew)
             {
-                TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
+                TLocker lockrSync(CIDLib_Module::pmtxLogSync());
                 if (m_plgrNew)
                 {
                     // Clean up any current one if we adopted it
@@ -454,7 +454,7 @@ tCIDLib::EExitCodes TLogSpoolThread::eProcess()
             {
                 CIDLib_Module::TLogQEvent* plogqevCur = nullptr;
                 {
-                    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
+                    TLocker lockrSync(CIDLib_Module::pmtxLogSync());
 
                     // We have some special cases to deal with.
                     if (m_plogqevHead == m_plogqevTail)
@@ -547,7 +547,7 @@ tCIDLib::TVoid TLogSpoolThread::SetDefaultLogger()
     //  resources that could fail if multiple threads tried to do it. And we
     //  ultimately need to set the logger pointer.
     //
-    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
+    TLocker lockrSync(CIDLib_Module::pmtxLogSync());
 
     //
     //  Some one could have beaten us to it. We don't want to lock every time
@@ -701,7 +701,7 @@ static TLogSpoolThread* pthrSpooler()
     static TLogSpoolThread* pthrSpooler = nullptr;
     if (!pthrSpooler)
     {
-        TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
+        TLocker lockrSync(CIDLib_Module::pmtxLogSync());
         if (!pthrSpooler)
         {
             pthrSpooler = new TLogSpoolThread();
@@ -1019,7 +1019,7 @@ TModule::c8ParseVersionStr( const   TString&            strToParse
 //
 tCIDLib::TVoid TModule::OrphanLogger()
 {
-    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
+    TLocker lockrSync(CIDLib_Module::pmtxLogSync());
     TLogSpoolThread* pthrTar = pthrSpooler();
     pthrTar->SetLogger(nullptr, tCIDLib::EAdoptOpts::NoAdopt);
 }
@@ -1029,7 +1029,7 @@ tCIDLib::TVoid TModule::OrphanLogger()
 tCIDLib::TVoid
 TModule::InstallLogger(MLogger* const plgrToSet, const tCIDLib::EAdoptOpts eAdopt)
 {
-    TMtxLocker mtxlSync(CIDLib_Module::pmtxLogSync());
+    TLocker lockrSync(CIDLib_Module::pmtxLogSync());
     pthrSpooler()->SetLogger(plgrToSet, eAdopt);
 }
 
