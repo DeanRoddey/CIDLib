@@ -19,13 +19,22 @@ CIDLib contains about 1100 classes (~450,000 lines of code.) Here is a rough lis
 - A file packaging system
 
 
+**Portability**
+
+CIDLib is primarily developed on Windows, but it has always been designed to be portable, since it is really a virtual OS sort of system and has a full platform abstraction layer. So everything above that is built purely in terms of our own pure C++ interfaces, which makes them highly portable. The lowest level, CIDKernel, is split into interfaces plus optional platform drivers. There are currently platform drivers for Windows and Linux.
+
+However, the Linux one was left unused for a long time and I've only recently begun to rehabilitate it. I've made good progress on it, but I'm not a Linux guy and I could definitely use some help on it. I have it to the point that the build tool is building on Linux and I can build CIDKernel and the lowest level test of CIDKernel, and I'm now working through that to get the core functionality working on Linux.
+
+Not all of the per-platform functionality is in CIDKernel. There are a handful of other libraries that provide some less fundamental functionality that is still, at least for the immediate term, going to require per-platform support. They are similarly structured with an interface and per-platfrom implementations. These don't currently have any Linux side implementation. The secure sockets one is a linchpin currently, since it is blocking a number of important higher level facilities from becoming available on Linux.
+
+The UI code is another story, but just getting the back end functionality cleanly supported on both platforms would be a very powerful thing. Note that the UI code is similarly encapsulated, but there's a lot more to UI portability than that.
+
+
 **Documentation**
 
-For now, the code is mostly undocumented, other than in the code itself. I needed to get it uploaded and start working against the remote repository, and figured it made sense to let people go ahead and start looking through it while I get the initial documentation done. The build instructions are in the above Wiki pages, see Building below.
+For now, the code is mostly undocumented, other than in the code itself. The build instructions are in the above Wiki pages, see Building below. I've got a documentation compiler done, which reads in XML content and can spit it out in whatever format desired, currently HTML. I've started work on the documentation but that will be quite a job to complete it.
 
-I've got a documentation compiler done, which reads in XML content and can spit it out in whatever format desired, currently HTML. I've started work on the documentation but that will be quite a job to complete it.
-
-In the meantime, I had already begin to make some videos about some of the technologies I've created as part of this project. Those are on my personal Youtube channel here:
+In the meantime, I had already begun to make some videos about some of the technologies I've created as part of this project. Those are on my personal Youtube channel here:
 
 https://www.youtube.com/channel/UCAxCoATHgFBvqZhxFRnZsfw
 
@@ -44,9 +53,7 @@ https://www.reddit.com/r/CIDLib/
 
 As mentioned above, the build instructions are in the Wiki pages of this repository. The rest of the documentation (as it gets created) will be in the actual repository. But you'd need to build CIDLib first before you can then generate the documentation. So the build instructions need to be separate.
 
-CIDLib isn't hard to build because it has its own build system. There are no crazily complex make files or anything. Currently there's one simple make file to build the build tool itself. After that it's all done via the CIDBuild utility.
-
-It currently is setup for Visual C++ 2017. Once 2019 is more stable, we can move it forward to that. For now, 2017 is a better choice. And you can install them side by side easily enough if you need to use 2019 for some other work. CIDLib's setup will not interfere with anything else.
+CIDLib isn't hard to build because it has its own build system. There are no crazily complex make files or anything. Currently there's one simple make file to build the build tool itself. After that it's all done via the CIDBuild utility. It currently is setup for Visual C++ 2019 on Windows and G++ on Linux. But the build tool uses a pluggable tools interface and can support other tool sets as well.
 
 Let me know if you have any questions or issues with the build instructions.
 
@@ -69,23 +76,13 @@ Though CIDLib very much tries to avoid use of any third party code beyond the OS
 - Scintilla - A version of the Scintilla engine is wrapped and used as the CML language source editor. Your own CIDLib based applications wouldn't need it unless they used the embedded CML IDE.
 - Standard JPEG Libaries - Some of the guts of the standard JPEG libraries are wrapped to provide the JPEG file format support.
 
-Otherwise it is just OS APIs and optional OS SDKs (speech recognition, Windows Media Format, etc...)
+Otherwise, on Windows, it is just OS APIs and optional OS SDKs (speech platform, Windows Media Format, etc...) On Linux it will require the installation of various common libraries of course.
 
-
-**Portability**
-
-Though CIDLib is currently only fielded on Windows, keeping it portable has always been a goal. As mentioned above, CIDLib is based on a 'virtual kernel' that abstracts it from the OS. That virtual kernel is in turn split into interface plus per-platform implementations. The build tools understand this situation so that helps a lot as well.
-
-There is a Win32 implementation currently, and there is an old Linux implementation that I've been working on updating. I'm to the point where I can build the CIDKernel layer and the first simple test program for it, TestKernel. Now I've got to start using that to bang out the bugs in the implementation. Not being a Linux guy, I could obviously use some help on that bit. The Linux implementation is old and a lot of stuff that were done by hand orignally are probably available out of the box now.
-
-There are still a few libraries that need to be given the 'split' treatment, i.e. break out the platform specific stuff from the platform independent parts. A number have already been taken care of since the code was open sourced, and the rest will follow soon. Some of those will now need a Linux implementation. The secure sockets one is the linchpin currently, since a number of facilities would immediately become available on Linux that otherwise won't be.
-
-The UI code is another story, but just getting the back end functionality cleanly supported on both platforms would be a very powerful thing. Not that the UI code is similarly encapsulated, but there's a lot more to UI portability than that.
 
 
 **Background**
 
-CIDLib and the CQC automation system that is built on it is the product of decades of work by the author, representing almost 50 man-years of work taken together. The very earliest roots go back to around 1992 on OS/2, and the first C++ compiler I had access to. I started writing a string class and it was all downhill from there. The two projects combined are currently around 1,100,000 lines of code.
+CIDLib and the CQC automation system that is built on it is the product of decades of work by the author, representing about 50 man-years of work taken together. The very earliest roots go back to around 1992 on OS/2, and the first C++ compiler I had access to. I started writing a string class and it was all downhill from there. The two projects combined are currently around 1.1 million lines of code.
 
 Some people seeing this will immediately start ranting about 'not invented here syndrome', but it's nothing of the sort. My personal interests are in general purpose framework development, so the whole point of it was to do this. It's what I enjoy. And once you have experienced C++ within the context of a unified, coherent system, you really see what it should have become.
 
@@ -103,7 +100,7 @@ Keep in mind that CIDLib must continue to support CQC, which is likely to always
 
 The primary goal of CIDLib is to provide an alternative to the status quo for those who might be interested. I understand of course that the status quo is the status quo because almost everyone lives in that neighborhood. But, some people may like to have an alternative, and this is one.
 
-Not being based on the standard C++/STL libraries, CIDLib is very much a different sort of beast from what is common today. It's use of templates is far lighter, which makes it much more debuggable and comprehensible in my opinion. It does not subscribe to the 'modern' notion that OOP is somehow bad, it uses OOP to huge benefit.
+Not being based on the standard C++/STL libraries, CIDLib is very much a different sort of beast from what is common today. It's use of templates is far lighter, which makes it much more debuggable and comprehensible in my opinion. It does not subscribe to the 'modern' notion that OOP or runtime inheritance is somehow bad, it uses both to huge benefit.
 
 And, being a comprehensive system, used to create applications that are not put together from pieces and parts, that also makes it pretty different from the standard thing today. Most people have never experienced this type of system, and some actually get agitated if anyone (aka me) implies that it might be a superior way of working, at least for some folks.
 
