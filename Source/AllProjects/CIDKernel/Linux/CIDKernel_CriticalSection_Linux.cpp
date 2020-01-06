@@ -69,13 +69,13 @@ TKrnlCritSec::~TKrnlCritSec()
 // ---------------------------------------------------------------------------
 //  TKrnlCritSec: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TKrnlCritSec::Enter() const
+tCIDLib::TVoid TKrnlCritSec::Enter() const noexcept
 {
     m_pPlatData->prmtxThis->iLock();
 }
 
 
-tCIDLib::TVoid TKrnlCritSec::Exit() const
+tCIDLib::TVoid TKrnlCritSec::Exit() const noexcept
 {
     m_pPlatData->prmtxThis->iUnlock();
 }

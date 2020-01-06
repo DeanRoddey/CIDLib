@@ -229,7 +229,7 @@ TRawMem::bAllocSysMem(  const   tCIDLib::TCard4         c4Size
 tCIDLib::TCard4
 TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
                                 , const tCIDLib::TCard4     c4New
-                                , const tCIDLib::TCard4     c4Compare)
+                                , const tCIDLib::TCard4     c4Compare) noexcept
 {
     tCIDLib::TCard4 c4Tmp = c4Compare;
     const tCIDLib::TBoolean bRes = __atomic_compare_exchange
@@ -253,7 +253,7 @@ TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
 
 tCIDLib::TCard4
 TRawMem::c4Exchange(        tCIDLib::TCard4&        c4ToFill
-                    , const tCIDLib::TCard4         c4New)
+                    , const tCIDLib::TCard4         c4New) noexcept
 {
     tCIDLib::TCard4 c4Ret;
     __atomic_exchange(&c4ToFill, &c4New, &c4Ret, __ATOMIC_SEQ_CST);
@@ -268,7 +268,7 @@ TRawMem::c4Exchange(        tCIDLib::TCard4&        c4ToFill
 tCIDLib::TVoid*
 TRawMem::pCompareAndExchangeRawPtr(         tCIDLib::TVoid**    ppToFill
                                     , const tCIDLib::TVoid*     pNew
-                                    , const tCIDLib::TVoid*     pCompare)
+                                    , const tCIDLib::TVoid*     pCompare) noexcept
 {
     tCIDLib::TVoid* pTmp = const_cast<tCIDLib::TVoid*>(pCompare);
     const tCIDLib::TBoolean bRes = __atomic_compare_exchange
@@ -295,7 +295,7 @@ TRawMem::pCompareAndExchangeRawPtr(         tCIDLib::TVoid**    ppToFill
 //  original value that was replaced.
 //
 tCIDLib::TVoid*
-TRawMem::pExchangeRawPtr(tCIDLib::TVoid** ppToFill, const tCIDLib::TVoid* pNew)
+TRawMem::pExchangeRawPtr(tCIDLib::TVoid** ppToFill, const tCIDLib::TVoid* pNew) noexcept
 {
     tCIDLib::TVoid* pRet = nullptr;
     __atomic_exchange(ppToFill, const_cast<tCIDLib::TVoid**>(&pNew), &pRet, __ATOMIC_SEQ_CST);

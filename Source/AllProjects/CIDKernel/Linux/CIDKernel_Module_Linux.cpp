@@ -54,10 +54,10 @@ namespace CIDKernel_Module_Linux
         );
         const tCIDLib::TCard4 c4ValBufSize = 256;
         tCIDLib::TCh szValBuf[c4ValBufSize + 1];
-        TRawStr::CatStr(pszNameBuf, L".", c4MaxChars);
+        TRawStr::CatStr(pszNameBuf, L"_", c4MaxChars);
         TRawStr::bFormatVal(c4MajVer, szValBuf, c4ValBufSize);
         TRawStr::CatStr(pszNameBuf, szValBuf, c4MaxChars);
-        TRawStr::CatStr(pszNameBuf, L".", c4MaxChars);
+        TRawStr::CatStr(pszNameBuf, L"_", c4MaxChars);
         TRawStr::bFormatVal(c4MinVer, szValBuf, c4ValBufSize);
         TRawStr::CatStr(pszNameBuf, szValBuf, c4MaxChars);
     }

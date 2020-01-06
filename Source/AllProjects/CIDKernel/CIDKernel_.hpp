@@ -87,8 +87,6 @@ namespace kCIDKernel_
     const tCIDLib::TCh* const   pszResNotFound  = L"Could not find string resource";
     const tCIDLib::TCh* const   pszNoMsgFile    = L"The module's message file could not be loaded, locale messages not available";
     const tCIDLib::TCh* const   pszUnknownErr   = L"An unknown error occured";
-
-   const tCIDLib::TCh* pszTest = 0;
 }
 
 
