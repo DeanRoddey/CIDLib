@@ -1357,58 +1357,74 @@ TMEngJSONParserInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
         if (!pjprsnFnd && meOwner.bStackValAt(c4FirstInd + 2))
             ThrowAnErr(meOwner, m_c4ErrNameNotFound, strToFind);
 
-        //
-        //  Either we found it, or they don't want to throw in which case we will
-        //  return the default value they provided. First, check that it's a
-        //  valid value type for what the caller wants.
-        //
-        try
+        tCIDLib::TBoolean bGoodVal = kCIDLib::False;
+        if (pjprsnFnd && (pjprsnFnd->eType() != tCIDNet::EJSONVTypes::Null))
+        {
+            try
+            {
+                if (c2MethId == m_c2MethId_FindBoolValue)
+                {
+                    TMEngBooleanVal& mecvRet = meOwner.mecvStackAtAs<TMEngBooleanVal>(c4FirstInd - 1);
+                    if (pjprsnFnd->eType() == tCIDNet::EJSONVTypes::False)
+                    {
+                        mecvRet.bValue(kCIDLib::False);
+                        bGoodVal = kCIDLib::True;
+                    }
+                     else if (pjprsnFnd->eType() == tCIDNet::EJSONVTypes::True)
+                    {
+                        mecvRet.bValue(kCIDLib::True);
+                        bGoodVal = kCIDLib::True;
+                    }
+                }
+                 else if (c2MethId == m_c2MethId_FindCardValue)
+                {
+                    TMEngCard4Val& mecvRet = meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd - 1);
+                    mecvRet.c4Value(pjprsnCont->c4FindVal(strToFind));
+                    bGoodVal = kCIDLib::True;
+                }
+                 else if (c2MethId == m_c2MethId_FindFloatValue)
+                {
+                    TMEngFloat8Val& mecvRet = meOwner.mecvStackAtAs<TMEngFloat8Val>(c4FirstInd - 1);
+                    mecvRet.f8Value(pjprsnCont->f8FindVal(strToFind));
+                    bGoodVal = kCIDLib::True;
+                }
+                 else if (c2MethId == m_c2MethId_FindIntValue)
+                {
+                    TMEngInt4Val& mecvRet = meOwner.mecvStackAtAs<TMEngInt4Val>(c4FirstInd - 1);
+                    mecvRet.i4Value(pjprsnCont->i4FindVal(strToFind));
+                    bGoodVal = kCIDLib::True;
+                }
+            }
+
+            catch(TError& errToCatch)
+            {
+                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                ThrowAnErr(meOwner, m_c4ErrGetValAs, errToCatch);
+            }
+        }
+
+        if (!bGoodVal)
         {
             if (c2MethId == m_c2MethId_FindBoolValue)
             {
                 TMEngBooleanVal& mecvRet = meOwner.mecvStackAtAs<TMEngBooleanVal>(c4FirstInd - 1);
-                if (pjprsnFnd)
-                {
-                    if (pjprsnFnd->eType() == tCIDNet::EJSONVTypes::False)
-                        mecvRet.bValue(kCIDLib::False);
-                    else
-                        mecvRet.bValue(kCIDLib::True);
-                }
-                 else
-                {
-                    mecvRet.bValue(meOwner.bStackValAt(c4FirstInd + 3));
-                }
+                mecvRet.bValue(meOwner.bStackValAt(c4FirstInd + 3));
             }
              else if (c2MethId == m_c2MethId_FindCardValue)
             {
                 TMEngCard4Val& mecvRet = meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd - 1);
-                if (pjprsnFnd)
-                    mecvRet.c4Value(pjprsnCont->c4FindVal(strToFind));
-                else
-                    mecvRet.c4Value(meOwner.c4StackValAt(c4FirstInd + 3));
+                mecvRet.c4Value(meOwner.c4StackValAt(c4FirstInd + 3));
             }
              else if (c2MethId == m_c2MethId_FindFloatValue)
             {
                 TMEngFloat8Val& mecvRet = meOwner.mecvStackAtAs<TMEngFloat8Val>(c4FirstInd - 1);
-                if (pjprsnFnd)
-                    mecvRet.f8Value(pjprsnCont->f8FindVal(strToFind));
-                else
-                    mecvRet.f8Value(meOwner.f8StackValAt(c4FirstInd + 3));
+                mecvRet.f8Value(meOwner.f8StackValAt(c4FirstInd + 3));
             }
              else if (c2MethId == m_c2MethId_FindIntValue)
             {
                 TMEngInt4Val& mecvRet = meOwner.mecvStackAtAs<TMEngInt4Val>(c4FirstInd - 1);
-                if (pjprsnFnd)
-                    mecvRet.i4Value(pjprsnCont->i4FindVal(strToFind));
-                else
-                    mecvRet.i4Value(meOwner.i4StackValAt(c4FirstInd + 3));
+                mecvRet.i4Value(meOwner.i4StackValAt(c4FirstInd + 3));
             }
-        }
-
-        catch(TError& errToCatch)
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            ThrowAnErr(meOwner, m_c4ErrGetValAs, errToCatch);
         }
     }
      else if (c2MethId == m_c2MethId_FindChild)
