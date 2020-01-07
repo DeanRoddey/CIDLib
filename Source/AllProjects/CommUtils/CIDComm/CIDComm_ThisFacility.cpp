@@ -81,6 +81,12 @@ TFacCIDComm::TFacCIDComm() :
         , tCIDLib::EModFlags::HasMsgFile
     )
 {
+    //
+    //  Fault in the local port factory, so that it's always first in the list. Note
+    //  that this doesn't require sync. Our facility object creation is serialized, and
+    //  they can't access the list except through our facility object.
+    //
+    CIDComm_ThisFacility::colFList.Add(new TLocalComPortFactory);
 }
 
 
