@@ -205,19 +205,16 @@ TPoint::bParseFromText( const   TString&            strText
     strTmp.Append(kCIDLib::chSpace);
     TStringTokenizer stokParse(&strText, strTmp);
 
-    tCIDLib::TBoolean bOk;
-    tCIDLib::TInt4 i4X;
-    tCIDLib::TInt4 i4Y;
-
+    tCIDLib::TBoolean bOk = kCIDLib::False;
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    i4X = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TInt4 i4X = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    i4Y = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TInt4 i4Y = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
@@ -235,8 +232,8 @@ TPoint::bParseFromText( const   TString&            strText
 //
 tCIDLib::TCard4 TPoint::c4AbsDiff(const TPoint& pntOther) const
 {
-    tCIDLib::TInt4 i4XDiff;
-    tCIDLib::TInt4 i4YDiff;
+    tCIDLib::TInt4 i4XDiff = 0;
+    tCIDLib::TInt4 i4YDiff = 0;
 
     if (m_i4X > pntOther.m_i4X)
         i4XDiff = m_i4X - pntOther.m_i4X;

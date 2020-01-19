@@ -59,37 +59,40 @@ RTTIDecls(TCIDDAEWMAEnc,TCIDDAEEncoder)
 // ---------------------------------------------------------------------------
 namespace CIDDAE_WMAEncoder
 {
-    // -----------------------------------------------------------------------
-    //  We use an internal structure to hold the WMA specific info for the
-    //  encoding process, so that we don't expose the Windows headers to the
-    //  world. WE also have one for the decoding process.
-    // -----------------------------------------------------------------------
-    struct TWMAWInfo
+    namespace
     {
-        WM_MEDIA_TYPE   MediaType;
-        WAVEFORMATEX    WaveFmt;
-        IWMWriter*      pWriter;
-        IWMProfile*     pProfile;
-        tCIDLib::TCard8 c8CurTime;
-    };
+        // -----------------------------------------------------------------------
+        //  We use an internal structure to hold the WMA specific info for the
+        //  encoding process, so that we don't expose the Windows headers to the
+        //  world. WE also have one for the decoding process.
+        // -----------------------------------------------------------------------
+        struct TWMAWInfo
+        {
+            WM_MEDIA_TYPE   MediaType;
+            WAVEFORMATEX    WaveFmt;
+            IWMWriter*      pWriter;
+            IWMProfile*     pProfile;
+            tCIDLib::TCard8 c8CurTime;
+        };
 
-    struct TWMARInfo
-    {
-        IWMSyncReader*  pReader;
-        tCIDLib::TCard2 c2StreamNum;
-    };
+        struct TWMARInfo
+        {
+            IWMSyncReader*  pReader;
+            tCIDLib::TCard2 c2StreamNum;
+        };
 
 
-    // -----------------------------------------------------------------------
-    //  We fault in a single profile manager and just keep using it
-    // -----------------------------------------------------------------------
-    IWMProfileManager*  pProfMgr = 0;
+        // -----------------------------------------------------------------------
+        //  We fault in a single profile manager and just keep using it
+        // -----------------------------------------------------------------------
+        IWMProfileManager*  pProfMgr = nullptr;
 
 
-    // -----------------------------------------------------------------------
-    //  Our coded name
-    // -----------------------------------------------------------------------
-    const TString strCodecName(L"MS-WMA");
+        // -----------------------------------------------------------------------
+        //  Our coded name
+        // -----------------------------------------------------------------------
+        const TString strCodecName(L"MS-WMA");
+    }
 }
 
 
@@ -103,7 +106,7 @@ static tCIDLib::TVoid CIDDAE_XlatSysErr(tCIDLib::TCard4 c4Err, TString& strToFil
     tCIDLib::TCh achBuf[c4BufSz + 1];
 
     achBuf[0] = kCIDLib::chNull;
-    ::FormatMessage
+    ::FormatMessageW
     (
         FORMAT_MESSAGE_FROM_SYSTEM
         , NULL

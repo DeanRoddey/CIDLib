@@ -50,17 +50,20 @@ RTTIDecls(TMEngInt4Info,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_IntClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strInt1(L"Int1");
-    const TString   strInt2(L"Int2");
-    const TString   strInt4(L"Int4");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strInt1(L"Int1");
+        const TString   strInt2(L"Int2");
+        const TString   strInt4(L"Int4");
 
-    const TString   strInt1ClassPath(L"MEng.Int1");
-    const TString   strInt2ClassPath(L"MEng.Int2");
-    const TString   strInt4ClassPath(L"MEng.Int4");
+        const TString   strInt1ClassPath(L"MEng.Int1");
+        const TString   strInt2ClassPath(L"MEng.Int2");
+        const TString   strInt4ClassPath(L"MEng.Int4");
+    }
 }
 
 

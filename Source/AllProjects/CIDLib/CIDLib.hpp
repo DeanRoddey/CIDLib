@@ -80,11 +80,12 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_CriticalSection.hpp"
 #include    "CIDLib_Event.hpp"
 #include    "CIDLib_Mutex.hpp"
-#include    "CIDLib_ObjLocker.hpp"
 #include    "CIDLib_ModuleInfo.hpp"
 #include    "CIDLib_Module.hpp"
 #include    "CIDLib_KeyValuePair.hpp"
+#include    "CIDLib_Atomic.hpp"
 #include    "CIDLib_SmartPointer.hpp"
+#include    "CIDLib_ObjLocker.hpp"
 #include    "CIDLib_SearchNSort.hpp"
 #include    "CIDLib_PubSub.hpp"
 #include    "CIDLib_ExpByteBuf.hpp"
@@ -93,6 +94,7 @@ StdEnumTricks(tCIDLib::ELogFlags)
 
 #include    "CIDLib_DLinkedList.hpp"
 #include    "CIDLib_SLinkedList.hpp"
+#include    "CIDLib_CollectionBase.hpp"
 #include    "CIDLib_CollectCursor.hpp"
 #include    "CIDLib_Collection.hpp"
 
@@ -199,7 +201,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_ExpCharBuf.hpp"
 #include    "CIDLib_NativeWCConverter.hpp"
 
-#include    "CIDLib_Atomic.hpp"
 #include    "CIDLib_Base64.hpp"
 #include    "CIDLib_BitSet.hpp"
 #include    "CIDLib_Color.hpp"

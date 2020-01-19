@@ -45,12 +45,15 @@ RTTIDecls(TMEngAsyncHTTPClInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_NetClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strAsyncHTTP(L"AsyncHTTPCl");
-    const TString   strAsyncHTTPPath(L"MEng.System.Runtime.AsyncHTTPCl");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strAsyncHTTP(L"AsyncHTTPCl");
+        const TString   strAsyncHTTPPath(L"MEng.System.Runtime.AsyncHTTPCl");
+    }
 }
 
 

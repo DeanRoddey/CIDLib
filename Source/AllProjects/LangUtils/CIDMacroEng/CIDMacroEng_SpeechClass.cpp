@@ -44,12 +44,15 @@ RTTIDecls(TMEngSpeechInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_SpeechClass
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strSpeech(L"Speech");
-    const TString   strSpeechClassPath(L"MEng.System.Runtime.Speech");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strSpeech(L"Speech");
+        const TString   strSpeechClassPath(L"MEng.System.Runtime.Speech");
+    }
 }
 
 

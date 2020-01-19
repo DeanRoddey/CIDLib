@@ -125,28 +125,33 @@ class TIPLookupItem
 // ---------------------------------------------------------------------------
 namespace CIDSock_ThisFacility
 {
-    // -----------------------------------------------------------------------
-    //  We implement a name to IP address cache. We use a keyed has set. We
-    //  make it thread safe so that we can use its mutex for sync. We make the
-    //  modulus fairly large relative to the size, so that we minimimze search
-    //  time here. This is a very performance sensitive cache.
-    //
-    //  We also provide a string for building up keys. Since we have to sync
-    //  anyway, we can avoid constantly creating/destroying a string.
-    //
-    //  And we have a time stamp that we use to go through and fully flush any
-    //  out of date items every couple hours, so that it doesn't accumulate
-    //  with entries that never get used again. And, should it get full, we'll
-    //  also do a pass to remove out of date entries.
-    // -----------------------------------------------------------------------
-    using TIPCache = TSafeKeyedHashSet<TIPLookupItem, TString, TStringKeyOps>;
-    TIPCache colNameCache
-    (
-        173, TStringKeyOps(), &TIPLookupItem::strKey
-    );
-    const tCIDLib::TCard4 c4MaxCacheItems = 2048;
-    TString strKeyTemp;
-    tCIDLib::TEncodedTime enctFlushPass = 0;
+    namespace
+    {
+        // -------------------------------------------------------------------
+        //  We implement a name to IP address cache. We use a keyed has set. We
+        //  make it thread safe so that we can use its mutex for sync. We make the
+        //  modulus fairly large relative to the size, so that we minimimze search
+        //  time here. This is a very performance sensitive cache.
+        //
+        //  We also provide a string for building up keys. Since we have to sync
+        //  anyway, we can avoid constantly creating/destroying a string.
+        //
+        //  And we have a time stamp that we use to go through and fully flush any
+        //  out of date items every couple hours, so that it doesn't accumulate
+        //  with entries that never get used again. And, should it get full, we'll
+        //  also do a pass to remove out of date entries.
+        // -------------------------------------------------------------------
+        using TIPCache = TSafeKeyedHashSet<TIPLookupItem, TString, TStringKeyOps>;
+        const tCIDLib::TCard4 c4MaxCacheItems = 2048;
+        TString strKeyTemp;
+        tCIDLib::TEncodedTime enctFlushPass = 0;
+
+        TIPCache* pcolNameCache()
+        {
+            static TIPCache colRet(173, TStringKeyOps(), &TIPLookupItem::strKey);
+            return &colRet;
+        }
+    }
 }
 
 
@@ -419,7 +424,7 @@ TFacCIDSock::TFacCIDSock() :
     TFacility
     (
         L"CIDSock"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -628,7 +633,7 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
     //  If so, and it's not out of date, then return it.
     //
     {
-        TLocker lockrSync(&CIDSock_ThisFacility::colNameCache);
+        TLocker lockrSync(CIDSock_ThisFacility::pcolNameCache());
 
         // Create the cache key for this address and type
         MakeCacheKey(strAddr, eType, CIDSock_ThisFacility::strKeyTemp);
@@ -645,7 +650,7 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
         //
         const tCIDLib::TEncodedTime enctNow = TTime::enctNow();
         if ((CIDSock_ThisFacility::enctFlushPass < enctNow)
-        ||  CIDSock_ThisFacility::colNameCache.bIsFull(CIDSock_ThisFacility::c4MaxCacheItems))
+        ||  CIDSock_ThisFacility::pcolNameCache()->bIsFull(CIDSock_ThisFacility::c4MaxCacheItems))
         {
             // Reset the time stamp to an hour from now
             CIDSock_ThisFacility::enctFlushPass = enctNow + kCIDLib::enctOneHour;
@@ -653,7 +658,7 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
             // And use a cursor to go all the way through the list
             CIDSock_ThisFacility::TIPCache::TNCCursor cursList
             (
-                &CIDSock_ThisFacility::colNameCache
+                CIDSock_ThisFacility::pcolNameCache()
             );
 
             while (cursList.bIsValid())
@@ -662,7 +667,7 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
                 if (ipliCur.m_enctEnd < enctNow)
                 {
                     // This one is hosed, so remove it, don't bump cursor
-                    CIDSock_ThisFacility::colNameCache.RemoveAt(cursList);
+                    CIDSock_ThisFacility::pcolNameCache()->RemoveAt(cursList);
                 }
                  else
                 {
@@ -680,7 +685,7 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
          else
         {
             // Don't need to do a flush pass, so just do a fast hash lookup
-            pipliFind = CIDSock_ThisFacility::colNameCache.pobjFindByKey
+            pipliFind = CIDSock_ThisFacility::pcolNameCache()->pobjFindByKey
             (
                 CIDSock_ThisFacility::strKeyTemp
             );
@@ -692,7 +697,7 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
             if (pipliFind && (pipliFind->m_enctEnd < enctNow))
             {
                 pipliFind = nullptr;
-                CIDSock_ThisFacility::colNameCache.bRemoveKeyIfExists
+                CIDSock_ThisFacility::pcolNameCache()->bRemoveKeyIfExists
                 (
                     CIDSock_ThisFacility::strKeyTemp
                 );
@@ -720,8 +725,8 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
         //  reason is a change in the system clock which made our stamps wrong,
         //  so just flush the cache and start over.
         //
-        if (CIDSock_ThisFacility::colNameCache.bIsFull(CIDSock_ThisFacility::c4MaxCacheItems))
-            CIDSock_ThisFacility::colNameCache.RemoveAll();
+        if (CIDSock_ThisFacility::pcolNameCache()->bIsFull(CIDSock_ThisFacility::c4MaxCacheItems))
+            CIDSock_ThisFacility::pcolNameCache()->RemoveAll();
     }
 
     // Let's do the actual lookup
@@ -749,11 +754,11 @@ TFacCIDSock::eResolveAddr(  const   TString&                strAddr
         //
         if (eRes == tCIDSock::EAddrCvtRes::ViaLookup)
         {
-            TLocker lockrSync(&CIDSock_ThisFacility::colNameCache);
+            TLocker lockrSync(CIDSock_ThisFacility::pcolNameCache());
             MakeCacheKey(strAddr, eType, CIDSock_ThisFacility::strKeyTemp);
 
             tCIDLib::TBoolean bAdded;
-            CIDSock_ThisFacility::colNameCache.objAddOrUpdate
+            CIDSock_ThisFacility::pcolNameCache()->objAddOrUpdate
             (
                 TIPLookupItem(CIDSock_ThisFacility::strKeyTemp, kipaToFill)
                 , bAdded

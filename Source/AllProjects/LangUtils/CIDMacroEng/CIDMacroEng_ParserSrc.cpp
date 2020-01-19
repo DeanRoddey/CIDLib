@@ -37,62 +37,65 @@
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_ParserSrc
 {
-    //
-    //  The list of special chars that always, if not in a quoted string,
-    //  will stop parsing of the current token, beceause these are always
-    //  considered tokens themselves otherwise.
-    //
-    const tCIDLib::TCh aszSpecialChars[] =
+    namespace
     {
-        kCIDLib::chAmpersand
-        , kCIDLib::chApostrophe
-        , kCIDLib::chAsterisk
-        , kCIDLib::chCircumflex
-        , kCIDLib::chCloseBracket
-        , kCIDLib::chCloseParen
-        , kCIDLib::chColon
-        , kCIDLib::chComma
-        , kCIDLib::chEquals
-        , kCIDLib::chExclamation
-        , kCIDLib::chForwardSlash
-        , kCIDLib::chGreaterThan
-        , kCIDLib::chHyphenMinus
-        , kCIDLib::chLessThan
-        , kCIDLib::chOpenBracket
-        , kCIDLib::chOpenParen
-        , kCIDLib::chPercentSign
-        , kCIDLib::chPeriod
-        , kCIDLib::chPlusSign
-        , kCIDLib::chQuotation
-        , kCIDLib::chSemiColon
-        , kCIDLib::chVerticalBar
-        , kCIDLib::chNull
-    };
+        //
+        //  The list of special chars that always, if not in a quoted string,
+        //  will stop parsing of the current token, beceause these are always
+        //  considered tokens themselves otherwise.
+        //
+        constexpr tCIDLib::TCh aszSpecialChars[] =
+        {
+            kCIDLib::chAmpersand
+            , kCIDLib::chApostrophe
+            , kCIDLib::chAsterisk
+            , kCIDLib::chCircumflex
+            , kCIDLib::chCloseBracket
+            , kCIDLib::chCloseParen
+            , kCIDLib::chColon
+            , kCIDLib::chComma
+            , kCIDLib::chEquals
+            , kCIDLib::chExclamation
+            , kCIDLib::chForwardSlash
+            , kCIDLib::chGreaterThan
+            , kCIDLib::chHyphenMinus
+            , kCIDLib::chLessThan
+            , kCIDLib::chOpenBracket
+            , kCIDLib::chOpenParen
+            , kCIDLib::chPercentSign
+            , kCIDLib::chPeriod
+            , kCIDLib::chPlusSign
+            , kCIDLib::chQuotation
+            , kCIDLib::chSemiColon
+            , kCIDLib::chVerticalBar
+            , kCIDLib::chNull
+        };
 
-    // Used to do the one time calc of the hashes of the lookup table
-    TAtomicFlag                 atomInitDone;
+        // Used to do the one time calc of the hashes of the lookup table
+        TAtomicFlag                 atomInitDone;
 
-    // The modulus that we use for hashing the strings
-    tCIDLib::TCard4             c4Modulus = 19;
+        // The modulus that we use for hashing the strings
+        constexpr tCIDLib::TCard4   c4Modulus = 19;
 
-    // We have an array of these items to do token matching
-    struct TMapItem
-    {
-        const   tCIDLib::TCh*   pszName;
-        tCIDLib::THashVal       hshName;
-        tCIDMacroEng::ETokens   eToken;
-    };
+        // We have an array of these items to do token matching
+        struct TMapItem
+        {
+            const   tCIDLib::TCh*   pszName;
+            tCIDLib::THashVal       hshName;
+            tCIDMacroEng::ETokens   eToken;
+        };
 
-    //
-    //  This maps to the ETokens enum value. We look up the string in here and,
-    //  if found, cast that index to the enum value.
-    //
-    //  NOTE:   Keep this in sync with the enum of course!
-    //
-    //  Also note that, because of it's size, we put it in a separate header
-    //  and include it here.
-    //
-    #include "CIDMacroEng_ParserTokenMap_.hpp"
+        //
+        //  This maps to the ETokens enum value. We look up the string in here and,
+        //  if found, cast that index to the enum value.
+        //
+        //  NOTE:   Keep this in sync with the enum of course!
+        //
+        //  Also note that, because of it's size, we put it in a separate header
+        //  and include it here.
+        //
+        #include "CIDMacroEng_ParserTokenMap_.hpp"
+    }
 }
 
 

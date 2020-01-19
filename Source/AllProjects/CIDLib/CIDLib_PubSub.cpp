@@ -51,7 +51,7 @@ namespace CIDLib_PubSub
         //  We need a mutex for sync, and we fault it in. Everyone accesses it via the
         //  method below which faults it in, along with some other stuff below.
         //
-        static TMutex* pmtxSync()
+        TMutex* pmtxSync()
         {
             static TMutex mtxSync;
             return &mtxSync;
@@ -552,7 +552,7 @@ MPubSubscription::~MPubSubscription()
         try
         {
             // Remove us from the subscriber list of any topics we are subscribed to
-            TPubSubTopic* pstopFind;
+            TPubSubTopic* pstopFind = nullptr;
             if (m_kllstTopicPaths.bResetCursor())
             {
                 TString* pstrCurTopic = nullptr;
@@ -575,7 +575,7 @@ MPubSubscription::~MPubSubscription()
             }
 
             // Now find us in the subscriber list and remove us if found
-            tCIDLib::TCard4 c4At;
+            tCIDLib::TCard4 c4At = 0;
             if (CIDLib_PubSub::colSubList().pobjKeyedBinarySearch(m_c4SubscriberId, eCompSubId, c4At))
                 CIDLib_PubSub::colSubList().RemoveAt(c4At);
         }

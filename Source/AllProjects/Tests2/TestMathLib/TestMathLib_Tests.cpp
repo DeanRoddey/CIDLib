@@ -83,6 +83,88 @@ TTest_Basic::eRunTest(TTextStringOutStream&  strmOut
         strmOut << TFWCurLn << L"f8Ceiling failed";
     }
 
+    // Test rounding
+    {
+        tCIDLib::TFloat4 f4Val = 3.7F;
+        TMathLib::Round(f4Val, tCIDLib::ERoundTypes::Down);
+        tCIDLib::TFloat8 f8Val = 3.7;
+        TMathLib::Round(f8Val, tCIDLib::ERoundTypes::Down);
+        if ((f4Val != 3.0) || (f8Val != 3.0))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Rounding down failed";
+        }
+
+        f4Val = -3.7F;
+        TMathLib::Round(f4Val, tCIDLib::ERoundTypes::Down);
+        f8Val = -3.75;
+        TMathLib::Round(f8Val, tCIDLib::ERoundTypes::Down);
+        if ((f4Val != -3.0) || (f8Val != -3.0))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Rounding negative down failed";
+        }
+
+        f4Val = -3.7F;
+        TMathLib::Round(f4Val, tCIDLib::ERoundTypes::Up);
+        f8Val = -3.75;
+        TMathLib::Round(f8Val, tCIDLib::ERoundTypes::Up);
+        if ((f4Val != -4.0) || (f8Val != -4.0))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Rounding negative up failed";
+        }
+
+        f4Val = 3.2F;
+        TMathLib::Round(f4Val, tCIDLib::ERoundTypes::Up);
+        f8Val = 3.2;
+        TMathLib::Round(f8Val, tCIDLib::ERoundTypes::Up);
+        if ((f4Val != 4.0) || (f8Val != 4.0))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Rounding up failed";
+        }
+
+        f4Val = 3.45F;
+        TMathLib::Round(f4Val, tCIDLib::ERoundTypes::Closest);
+        f8Val = 3.45;
+        TMathLib::Round(f8Val, tCIDLib::ERoundTypes::Closest);
+        if ((f4Val != 3.0) || (f8Val != 3.0))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Rounding closest down failed";
+        }
+
+        f4Val = 3.51F;
+        TMathLib::Round(f4Val, tCIDLib::ERoundTypes::Closest);
+        f8Val = 3.51;
+        TMathLib::Round(f8Val, tCIDLib::ERoundTypes::Closest);
+        if ((f4Val != 4.0) || (f8Val != 4.0))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Rounding closest up failed";
+        }
+
+        f4Val = -3.51F;
+        TMathLib::Round(f4Val, tCIDLib::ERoundTypes::Closest);
+        f8Val = -3.51;
+        TMathLib::Round(f8Val, tCIDLib::ERoundTypes::Closest);
+        if ((f4Val != -4.0) || (f8Val != -4.0))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Rounding negative closest up failed";
+        }
+
+        f4Val = -3.49F;
+        TMathLib::Round(f4Val, tCIDLib::ERoundTypes::Closest);
+        f8Val = -3.49;
+        TMathLib::Round(f8Val, tCIDLib::ERoundTypes::Closest);
+        if ((f4Val != -3.0) || (f8Val != -3.0))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Rounding negative closest down failed";
+        }
+    }
 
     return eRes;
 }

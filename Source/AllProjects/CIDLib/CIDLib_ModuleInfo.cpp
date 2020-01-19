@@ -145,10 +145,18 @@ tCIDLib::TVoid TCIDModuleInfo::Set( const   TString&            strBaseName
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TCIDModuleInfo::FormatTo(TTextOutStream& strmDest) const
 {
-    // Build up the platform specific name and format it
-    TString strTmp;
-    TModule::BuildRawModName(*this, strTmp);
-    strmDest << strTmp;
+    TString strPortable, strLoadable;
+    TModule::BuildModName
+    (
+        m_strBaseName
+        , m_c4MajVersion
+        , m_c4MinVersion
+        , m_eModType
+        , strPortable
+        , strLoadable
+    );
+
+    strmDest << L"(" << strPortable << L"/" << strLoadable << L")";
 }
 
 

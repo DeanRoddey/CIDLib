@@ -83,9 +83,10 @@ namespace CIDLib_Facility
 
 
         // -----------------------------------------------------------------------
-        //  We need some light locking here
+        //  We need some light locking here. Because of the fundamental nature of
+        //  modules and facilities, we use a lazy fault in scheme here.
         // -----------------------------------------------------------------------
-        static TCriticalSection* pcrsList()
+        TCriticalSection* pcrsList()
         {
             static TCriticalSection crsList;
             return &crsList;
@@ -247,16 +248,17 @@ TFacility::TFacility(   const   TString&            strFacName
     AddToList(this);
 }
 
+
+// This one is always a load, not a query, since it's from a path
 TFacility::TFacility(   const   TString&            strFacName
-                        , const TString&            strLoadPath
+                        , const TString&            strFromPath
                         , const tCIDLib::EModTypes  eModType
                         , const tCIDLib::TCard4     c4MajVer
                         , const tCIDLib::TCard4     c4MinVer
                         , const tCIDLib::TCard4     c4Revision
-                        , const tCIDLib::EModFlags  eFlags
-                        , const tCIDLib::TBoolean   bLoad) :
+                        , const tCIDLib::EModFlags  eFlags) :
 
-    TModule(strFacName, strLoadPath, eModType, eFlags, bLoad)
+    TModule(strFacName, strFromPath, eModType, c4MajVer, c4MinVer, eFlags)
     , m_c4MajVer(c4MajVer)
     , m_c4MinVer(c4MinVer)
     , m_c4Revision(c4Revision)

@@ -42,14 +42,17 @@ RTTIDecls(TPixelArray,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDImage_PixelArray
 {
-    // -----------------------------------------------------------------------
-    //  Our persistent format version
-    //
-    //  1.  Original version
-    //  2.  Moved to the pixelfmt/depth combination to describe the data format
-    //      and added new formats to cover the full range of PNG images.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard2   c2FmtVersion = 2;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our persistent format version
+        //
+        //  1.  Original version
+        //  2.  Moved to the pixelfmt/depth combination to describe the data format
+        //      and added new formats to cover the full range of PNG images.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2FmtVersion = 2;
+    }
 }
 
 

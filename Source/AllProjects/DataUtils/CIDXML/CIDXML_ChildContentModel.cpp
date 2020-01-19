@@ -34,17 +34,20 @@
 
 namespace CIDXML_ChildCM
 {
-    // -----------------------------------------------------------------------
-    //  Local static data
-    //
-    //  c4EOCId
-    //  c4EpsilonId
-    //      There are a couple of special case values that are used here,
-    //      which are used like element ids but which are not real element
-    //      decls. So we provide these very large fake ids for that.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard4    c4EOCId       = kCIDLib::c4MaxCard - 1;
-    constexpr tCIDLib::TCard4    c4EpsilonId   = kCIDLib::c4MaxCard - 2;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local static data
+        //
+        //  c4EOCId
+        //  c4EpsilonId
+        //      There are a couple of special case values that are used here,
+        //      which are used like element ids but which are not real element
+        //      decls. So we provide these very large fake ids for that.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4    c4EOCId       = kCIDLib::c4MaxCard - 1;
+        constexpr tCIDLib::TCard4    c4EpsilonId   = kCIDLib::c4MaxCard - 2;
+    }
 }
 
 

@@ -48,22 +48,25 @@ RTTIDecls(TMEngCommPortInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_CommClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strCommCfg(L"CommCfg");
-    const TString   strCommCfgClassPath(L"MEng.System.Runtime.CommCfg");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strCommCfg(L"CommCfg");
+        const TString   strCommCfgClassPath(L"MEng.System.Runtime.CommCfg");
 
-    const TString   strDataBitsClassPath(L"MEng.System.Runtime.CommCfg.DataBits");
-    const TString   strDTRFlagsClassPath(L"MEng.System.Runtime.CommCfg.DTRFlags");
-    const TString   strParitiesClassPath(L"MEng.System.Runtime.CommCfg.Parities");
-    const TString   strCommPortFlagsClassPath(L"MEng.System.Runtime.CommCfg.CommPortFlags");
-    const TString   strRTSFlagsClassPath(L"MEng.System.Runtime.CommCfg.RTSFlags");
-    const TString   strStopBitsClassPath(L"MEng.System.Runtime.CommCfg.StopBits");
+        const TString   strDataBitsClassPath(L"MEng.System.Runtime.CommCfg.DataBits");
+        const TString   strDTRFlagsClassPath(L"MEng.System.Runtime.CommCfg.DTRFlags");
+        const TString   strParitiesClassPath(L"MEng.System.Runtime.CommCfg.Parities");
+        const TString   strCommPortFlagsClassPath(L"MEng.System.Runtime.CommCfg.CommPortFlags");
+        const TString   strRTSFlagsClassPath(L"MEng.System.Runtime.CommCfg.RTSFlags");
+        const TString   strStopBitsClassPath(L"MEng.System.Runtime.CommCfg.StopBits");
 
-    const TString   strCommPort(L"CommPort");
-    const TString   strCommPortClassPath(L"MEng.System.Runtime.CommPort");
+        const TString   strCommPort(L"CommPort");
+        const TString   strCommPortClassPath(L"MEng.System.Runtime.CommPort");
+    }
 }
 
 

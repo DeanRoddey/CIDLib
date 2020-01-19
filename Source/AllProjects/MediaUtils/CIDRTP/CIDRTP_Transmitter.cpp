@@ -42,7 +42,10 @@ RTTIDecls(TCIDRTPTrans,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDRTP_Transmitter
 {
-    const tCIDLib::TCard4 c4MaxFreeMQSz = 256;
+    namespace
+    {
+        const tCIDLib::TCard4 c4MaxFreeMQSz = 256;
+    }
 }
 
 

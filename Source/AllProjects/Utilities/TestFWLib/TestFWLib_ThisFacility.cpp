@@ -91,7 +91,7 @@ TFacTestFWLib::TFacTestFWLib() :
     TFacility
     (
         L"TestFWLib"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision

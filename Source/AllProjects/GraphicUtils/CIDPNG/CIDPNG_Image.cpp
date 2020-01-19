@@ -42,118 +42,121 @@ RTTIDecls(TPNGImage,TCIDImage)
 // ---------------------------------------------------------------------------
 namespace CIDPNG_Image
 {
-    // -----------------------------------------------------------------------
-    //  Line filter constants
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1Filter_None   = 0;
-    const tCIDLib::TCard1   c1Filter_Sub    = 1;
-    const tCIDLib::TCard1   c1Filter_Up     = 2;
-    const tCIDLib::TCard1   c1Filter_Avg    = 3;
-    const tCIDLib::TCard1   c1Filter_Paeth  = 4;
-
-
-    // -----------------------------------------------------------------------
-    //  Contants from the data stream, some correctly flipped if necessary for
-    //  the local endianness.
-    // -----------------------------------------------------------------------
-    #ifdef CIDLIB_LITTLEENDIAN
-    const tCIDLib::TCard8   c8FileMarker    = 0x0A1A0A0D474E5089;
-    const tCIDLib::TCard4   c4Chunk_BgnClr  = 0x624B4744;
-    const tCIDLib::TCard4   c4Chunk_Data    = 0x49444154;
-    const tCIDLib::TCard4   c4Chunk_End     = 0x49454E44;
-    const tCIDLib::TCard4   c4Chunk_Gamma   = 0x67414D41;
-    const tCIDLib::TCard4   c4Chunk_Header  = 0x49484452;
-    const tCIDLib::TCard4   c4Chunk_Palette = 0x504C5445;
-    const tCIDLib::TCard4   c4Chunk_Trans   = 0x74524E53;
-
-    // Private chunk
-    const tCIDLib::TCard4   c4Chunk_TransClr= 0x63644243;
-
-    #else
-    const tCIDLib::TCard4   c8FileMarker    = 0x89504E470D0A1A0A;
-    const tCIDLib::TCard4   c4Chunk_BgnClr  = 0x44474B62;
-    const tCIDLib::TCard4   c4Chunk_Data    = 0x54414449;
-    const tCIDLib::TCard4   c4Chunk_End     = 0x444E4549;
-    const tCIDLib::TCard4   c4Chunk_Gamma   = 0x414D4167;
-    const tCIDLib::TCard4   c4Chunk_Header  = 0x52444849;
-    const tCIDLib::TCard4   c4Chunk_Palette = 0x45544C50;
-    const tCIDLib::TCard4   c4Chunk_Trans   = 0x534E5274;
-
-    // Private chunk
-    const tCIDLib::TCard4   c4Chunk_TransClr= 0x43426463;
-
-    #endif
-
-    //
-    //  We screwed up the transparency chunk id and used this bad one in
-    //  some early CQC 1.3.5 code. So we have to check for this on import and
-    //  treat it the same as the correct one.
-    //
-    #ifdef CIDLIB_LITTLEENDIAN
-    const tCIDLib::TCard4   c4Chunk_BadTrans= 0x72524E53;
-    #else
-    const tCIDLib::TCard4   c4Chunk_BadTrans= 0x534E5272;
-    #endif
-
-
-    // -----------------------------------------------------------------------
-    //  For interlaced format, we have tables that tell us how many bits of
-    //  each h/v 8 bits we are going to get on each pass, and how many rows
-    //  we will get. That let's us calculate the expected width and height of
-    //  the scan lines for each pass. The method that we call to load the data
-    //  to the pixel array will be told the pass and he will have separate
-    //  loops to pull out the data appropriately for each pass, so all we have
-    //  to do is calculate the amount of data to pull out on each pass. The
-    //  lines are always padded to the nearest byte, so we don't have to worry
-    //  here about whether the last bits in the byte are really there or not.
-    // -----------------------------------------------------------------------
-    static const tCIDLib::TCard4 ac4XCnt[7] = { 1, 1, 2, 2, 4, 4, 8 };
-    static const tCIDLib::TCard4 ac4YCnt[7] = { 1, 1, 1, 2, 2, 4, 4 };
-
-    // -----------------------------------------------------------------------
-    //  There is a special case where some rows might not exist, because the
-    //  image is less than 5 bits in one or both directions. But it depends on
-    //  the offsets from the original of the 8x8 area as to whether this is
-    //  true or not. So we keep a set of flags that indicate where the bits
-    //  start for that pass.
-    //
-    //  And we need to keep up with, if the image is wide enough to get some
-    //  bits, how many it will get if the image is less than
-    // -----------------------------------------------------------------------
-    static const tCIDLib::TCard4 ac4XOfs[7] = { 0, 4, 0, 2, 0, 1, 0 };
-    static const tCIDLib::TCard4 ac4YOfs[7] = { 0, 0, 4, 0, 2, 0, 1 };
-
-    // -----------------------------------------------------------------------
-    //  Many images will not be an even multiple of 8 samples, so we have to
-    //  figure out how many pixels we'll get in that trailing fractional part
-    //  of the interlace pattern. These tables tell us how many pixels we will
-    //  get for pass X (first dimension) if we have Y trailing pixels.
-    //
-    //  So we multiply dim/8 times the correct pass entry in the Cnt arrays
-    //  above for each dimention, then we look up [pass][(dim-1)%8] in this
-    //  table and add it to the previous values.
-    // -----------------------------------------------------------------------
-    static const tCIDLib::TCard4 ac4XLeft[7][8] =
+    namespace
     {
-          { 1, 1, 1, 1, 1, 1, 1, 1 }
-        , { 0, 0, 0, 0, 1, 1, 1, 1 }
-        , { 1, 1, 1, 1, 2, 2, 2, 2 }
-        , { 0, 0, 1, 1, 1, 1, 2, 2 }
-        , { 1, 1, 2, 2, 3, 3, 4, 4 }
-        , { 0, 1, 1, 2, 2, 3, 3, 4 }
-        , { 1, 2, 3, 4, 5, 6, 7, 8 }
-    };
+        // -----------------------------------------------------------------------
+        //  Line filter constants
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard1   c1Filter_None   = 0;
+        constexpr tCIDLib::TCard1   c1Filter_Sub    = 1;
+        constexpr tCIDLib::TCard1   c1Filter_Up     = 2;
+        constexpr tCIDLib::TCard1   c1Filter_Avg    = 3;
+        constexpr tCIDLib::TCard1   c1Filter_Paeth  = 4;
 
-    static const tCIDLib::TCard4 ac4YLeft[7][8] =
-    {
-          { 1, 1, 1, 1, 1, 1, 1, 1 }
-        , { 1, 1, 1, 1, 1, 1, 1, 1 }
-        , { 0, 0, 0, 0, 1, 1, 1, 1 }
-        , { 1, 1, 1, 1, 2, 2, 2, 2 }
-        , { 0, 0, 1, 1, 1, 1, 2, 2 }
-        , { 1, 1, 2, 2, 3, 3, 4, 4 }
-        , { 0, 1, 1, 2, 2, 3, 3, 4 }
-    };
+
+        // -----------------------------------------------------------------------
+        //  Contants from the data stream, some correctly flipped if necessary for
+        //  the local endianness.
+        // -----------------------------------------------------------------------
+        #ifdef CIDLIB_LITTLEENDIAN
+        constexpr tCIDLib::TCard8   c8FileMarker    = 0x0A1A0A0D474E5089;
+        constexpr tCIDLib::TCard4   c4Chunk_BgnClr  = 0x624B4744;
+        constexpr tCIDLib::TCard4   c4Chunk_Data    = 0x49444154;
+        constexpr tCIDLib::TCard4   c4Chunk_End     = 0x49454E44;
+        constexpr tCIDLib::TCard4   c4Chunk_Gamma   = 0x67414D41;
+        constexpr tCIDLib::TCard4   c4Chunk_Header  = 0x49484452;
+        constexpr tCIDLib::TCard4   c4Chunk_Palette = 0x504C5445;
+        constexpr tCIDLib::TCard4   c4Chunk_Trans   = 0x74524E53;
+
+        // Private chunk
+        constexpr tCIDLib::TCard4   c4Chunk_TransClr= 0x63644243;
+
+        #else
+        constexpr tCIDLib::TCard4   c8FileMarker    = 0x89504E470D0A1A0A;
+        constexpr tCIDLib::TCard4   c4Chunk_BgnClr  = 0x44474B62;
+        constexpr tCIDLib::TCard4   c4Chunk_Data    = 0x54414449;
+        constexpr tCIDLib::TCard4   c4Chunk_End     = 0x444E4549;
+        constexpr tCIDLib::TCard4   c4Chunk_Gamma   = 0x414D4167;
+        constexpr tCIDLib::TCard4   c4Chunk_Header  = 0x52444849;
+        constexpr tCIDLib::TCard4   c4Chunk_Palette = 0x45544C50;
+        constexpr tCIDLib::TCard4   c4Chunk_Trans   = 0x534E5274;
+
+        // Private chunk
+        constexpr tCIDLib::TCard4   c4Chunk_TransClr= 0x43426463;
+
+        #endif
+
+        //
+        //  We screwed up the transparency chunk id and used this bad one in
+        //  some early CQC 1.3.5 code. So we have to check for this on import and
+        //  treat it the same as the correct one.
+        //
+        #ifdef CIDLIB_LITTLEENDIAN
+        constexpr tCIDLib::TCard4   c4Chunk_BadTrans= 0x72524E53;
+        #else
+        constexpr tCIDLib::TCard4   c4Chunk_BadTrans= 0x534E5272;
+        #endif
+
+
+        // -----------------------------------------------------------------------
+        //  For interlaced format, we have tables that tell us how many bits of
+        //  each h/v 8 bits we are going to get on each pass, and how many rows
+        //  we will get. That let's us calculate the expected width and height of
+        //  the scan lines for each pass. The method that we call to load the data
+        //  to the pixel array will be told the pass and he will have separate
+        //  loops to pull out the data appropriately for each pass, so all we have
+        //  to do is calculate the amount of data to pull out on each pass. The
+        //  lines are always padded to the nearest byte, so we don't have to worry
+        //  here about whether the last bits in the byte are really there or not.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 ac4XCnt[7] = { 1, 1, 2, 2, 4, 4, 8 };
+        constexpr tCIDLib::TCard4 ac4YCnt[7] = { 1, 1, 1, 2, 2, 4, 4 };
+
+        // -----------------------------------------------------------------------
+        //  There is a special case where some rows might not exist, because the
+        //  image is less than 5 bits in one or both directions. But it depends on
+        //  the offsets from the original of the 8x8 area as to whether this is
+        //  true or not. So we keep a set of flags that indicate where the bits
+        //  start for that pass.
+        //
+        //  And we need to keep up with, if the image is wide enough to get some
+        //  bits, how many it will get if the image is less than
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 ac4XOfs[7] = { 0, 4, 0, 2, 0, 1, 0 };
+        constexpr tCIDLib::TCard4 ac4YOfs[7] = { 0, 0, 4, 0, 2, 0, 1 };
+
+        // -----------------------------------------------------------------------
+        //  Many images will not be an even multiple of 8 samples, so we have to
+        //  figure out how many pixels we'll get in that trailing fractional part
+        //  of the interlace pattern. These tables tell us how many pixels we will
+        //  get for pass X (first dimension) if we have Y trailing pixels.
+        //
+        //  So we multiply dim/8 times the correct pass entry in the Cnt arrays
+        //  above for each dimention, then we look up [pass][(dim-1)%8] in this
+        //  table and add it to the previous values.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 ac4XLeft[7][8] =
+        {
+            { 1, 1, 1, 1, 1, 1, 1, 1 }
+            , { 0, 0, 0, 0, 1, 1, 1, 1 }
+            , { 1, 1, 1, 1, 2, 2, 2, 2 }
+            , { 0, 0, 1, 1, 1, 1, 2, 2 }
+            , { 1, 1, 2, 2, 3, 3, 4, 4 }
+            , { 0, 1, 1, 2, 2, 3, 3, 4 }
+            , { 1, 2, 3, 4, 5, 6, 7, 8 }
+        };
+
+        constexpr tCIDLib::TCard4 ac4YLeft[7][8] =
+        {
+            { 1, 1, 1, 1, 1, 1, 1, 1 }
+            , { 1, 1, 1, 1, 1, 1, 1, 1 }
+            , { 0, 0, 0, 0, 1, 1, 1, 1 }
+            , { 1, 1, 1, 1, 2, 2, 2, 2 }
+            , { 0, 0, 1, 1, 1, 1, 2, 2 }
+            , { 1, 1, 2, 2, 3, 3, 4, 4 }
+            , { 0, 1, 1, 2, 2, 3, 3, 4 }
+        };
+    }
 }
 
 

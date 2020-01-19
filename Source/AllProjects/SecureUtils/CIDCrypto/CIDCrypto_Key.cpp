@@ -43,7 +43,10 @@ AdvRTTIDecls(TCryptoKey, TObject)
 // ---------------------------------------------------------------------------
 namespace CIDCrypto_Key
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 

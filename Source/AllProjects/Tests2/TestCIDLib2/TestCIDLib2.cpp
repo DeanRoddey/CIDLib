@@ -72,7 +72,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     //  we'd want to test them, so that within a given test level they will
     //  be seen in this order.
     //
-AddTest(new TTest_StringTokens);
+    AddTest(new TTest_StringTokens);
 
     // The most fundamental stuff
     AddTest(new TTest_Types);

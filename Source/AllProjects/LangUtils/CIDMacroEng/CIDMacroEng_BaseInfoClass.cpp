@@ -44,20 +44,22 @@ RTTIDecls(TMEngBaseInfoInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_BaseInfoClass
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strBaseInfo(L"BaseInfo");
-    const TString   strBaseInfoClassPath(L"MEng.BaseInfo");
-    const TString   strCreateActsPath(L"MEng.BaseInfo.CreateActs");
-    const TString   strFindResPath(L"MEng.BaseInfo.FindRes");
-    const TString   strFQTypesPath(L"MEng.BaseInfo.FQTypes");
-    const TString   strHJustifyClassPath(L"MEng.BaseInfo.HorzJustify");
-    const TString   strRadixClassPath(L"MEng.BaseInfo.Radices");
-    const TString   strEngErrorClassPath(L"MEng.BaseInfo.MEngErrors");
-    const TString   strUpDnClClassPath(L"MEng.BaseInfo.UpDnClosest");
-
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strBaseInfo(L"BaseInfo");
+        const TString   strBaseInfoClassPath(L"MEng.BaseInfo");
+        const TString   strCreateActsPath(L"MEng.BaseInfo.CreateActs");
+        const TString   strFindResPath(L"MEng.BaseInfo.FindRes");
+        const TString   strFQTypesPath(L"MEng.BaseInfo.FQTypes");
+        const TString   strHJustifyClassPath(L"MEng.BaseInfo.HorzJustify");
+        const TString   strRadixClassPath(L"MEng.BaseInfo.Radices");
+        const TString   strEngErrorClassPath(L"MEng.BaseInfo.MEngErrors");
+        const TString   strUpDnClClassPath(L"MEng.BaseInfo.UpDnClosest");
+    }
 }
 
 

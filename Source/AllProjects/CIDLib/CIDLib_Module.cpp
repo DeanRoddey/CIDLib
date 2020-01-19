@@ -130,13 +130,17 @@ namespace CIDLib_Module
             TLogQEvent*     plogqevNext = nullptr;
             TLogEvent       logevData;
         };
-    }
 
-    // We need a lazily faulted in mutex for local sync
-    static TMutex* pmtxLogSync()
-    {
-        static TMutex mtxLogSync(tCIDLib::ELockStates::Unlocked);
-        return &mtxLogSync;
+        //
+        //  We need a mutex for local sync. Because module stuff can be called
+        //  early in the process, we use a lazy faulting in scheme here, to be
+        //  sure it'll be available when needed.
+        //
+        TMutex* pmtxLogSync()
+        {
+            static TMutex mtxLogSync(tCIDLib::ELockStates::Unlocked);
+            return &mtxLogSync;
+        }
     }
 }
 
@@ -563,6 +567,7 @@ tCIDLib::TVoid TLogSpoolThread::SetDefaultLogger()
 
     #pragma warning(suppress : 26494) // We don't need to initialize these
     tCIDLib::TCh szFileName[c4MaxBufSz + 1];
+    #pragma warning(suppress : 26494) // We don't need to initialize these
     tCIDLib::TCh szMutexName[c4MaxBufSz + 1];
 
     szFileName[0] = kCIDLib::chNull;
@@ -743,11 +748,12 @@ TModule::bLoadOSMsg(const tCIDLib::TOSErrCode errcId, TString& strMsgBuf)
 
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TString&            strBaseName
+TModule::BuildModName(  const   TString&            strBaseName
                         , const tCIDLib::TCard4     c4MajVersion
                         , const tCIDLib::TCard4     c4MinVersion
                         , const tCIDLib::EModTypes  eModType
-                        ,       TString&            strToFill)
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable)
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
@@ -756,14 +762,16 @@ TModule::BuildRawModName(const  TString&            strBaseName
     //  to be insane to have an actual file name longer than this.
     //
     const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
+    tCIDLib::TCh achPortable[c4BufSz + 1];
+    tCIDLib::TCh achLoadable[c4BufSz + 1];
 
-    if (!TKrnlModule::bBuildRawModName( strBaseName.pszBuffer()
-                                        , c4MajVersion
-                                        , c4MinVersion
-                                        , eModType
-                                        , c4BufSz
-                                        , achBuf))
+    if (!TKrnlModule::bBuildModName(achPortable
+                                    , achLoadable
+                                    , c4BufSz
+                                    , strBaseName.pszBuffer()
+                                    , c4MajVersion
+                                    , c4MinVersion
+                                    , eModType))
     {
         facCIDLib().ThrowErr
         (
@@ -776,13 +784,14 @@ TModule::BuildRawModName(const  TString&            strBaseName
         );
     }
 
-    // Just copy the result back to the caller's string
-    strToFill = achBuf;
+    strPortable = achPortable;
+    strLoadable = achLoadable;
 }
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TCIDModuleInfo&     modiSrc
-                        ,       TString&            strToFill)
+TModule::BuildModName(  const   TCIDModuleInfo&     modiSrc
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable)
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
@@ -791,14 +800,16 @@ TModule::BuildRawModName(const  TCIDModuleInfo&     modiSrc
     //  to be insane to have an actual file name longer than this.
     //
     const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
+    tCIDLib::TCh achPortable[c4BufSz + 1];
+    tCIDLib::TCh achLoadable[c4BufSz + 1];
 
-    if (!TKrnlModule::bBuildRawModName( modiSrc.strBaseName().pszBuffer()
-                                        , modiSrc.c4MajVersion()
-                                        , modiSrc.c4MinVersion()
-                                        , modiSrc.eModType()
-                                        , c4BufSz
-                                        , achBuf))
+    if (!TKrnlModule::bBuildModName(achPortable
+                                    , achLoadable
+                                    , c4BufSz
+                                    , modiSrc.strBaseName().pszBuffer()
+                                    , modiSrc.c4MajVersion()
+                                    , modiSrc.c4MinVersion()
+                                    , modiSrc.eModType()))
     {
         facCIDLib().ThrowErr
         (
@@ -812,16 +823,18 @@ TModule::BuildRawModName(const  TCIDModuleInfo&     modiSrc
     }
 
     // Just copy the result back to the caller's string
-    strToFill = achBuf;
+    strPortable = achPortable;
+    strLoadable = achLoadable;
 }
 
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TString&            strBaseName
+TModule::BuildModName(  const   TString&            strBaseName
                         , const tCIDLib::TCard4     c4MajVersion
                         , const tCIDLib::TCard4     c4MinVersion
                         , const tCIDLib::EModTypes  eModType
-                        ,       TString&            strToFill
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable
                         ,       TString&            strPrefLangMsgs
                         ,       TString&            strDefLangMsgs)
 {
@@ -832,14 +845,16 @@ TModule::BuildRawModName(const  TString&            strBaseName
     //  to be insane to have an actual file name longer than this.
     //
     const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
+    tCIDLib::TCh achPortable[c4BufSz + 1];
+    tCIDLib::TCh achLoadable[c4BufSz + 1];
 
-    if (!TKrnlModule::bBuildRawModName( strBaseName.pszBuffer()
-                                        , c4MajVersion
-                                        , c4MinVersion
-                                        , eModType
-                                        , c4BufSz
-                                        , achBuf))
+    if (!TKrnlModule::bBuildModName(achPortable
+                                    , achLoadable
+                                    , c4BufSz
+                                    , strBaseName.pszBuffer()
+                                    , c4MajVersion
+                                    , c4MinVersion
+                                    , eModType))
     {
         facCIDLib().ThrowErr
         (
@@ -852,22 +867,23 @@ TModule::BuildRawModName(const  TString&            strBaseName
         );
     }
 
-    // Just copy the result back to the caller's string
-    strToFill = achBuf;
+    // Copy the result back to the caller's string
+    strPortable = achPortable;
+    strLoadable = achLoadable;
 
     //
     //  Now lets fill in the prefered and default language versions of the
-    //  associated message file name. It has the same base name, plus the
+    //  associated message file name. It uses the portable base name, plus the
     //  language suffix and the CIDMsg extension.
     //
-    TPathStr pathTmp = strToFill;
+    TPathStr pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strLanguageSuffix());
     pathTmp.AppendExt(L"CIDMsgs");
     strPrefLangMsgs = pathTmp;
 
-    pathTmp = strToFill;
+    pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strDefLanguageSuffix());
@@ -876,32 +892,35 @@ TModule::BuildRawModName(const  TString&            strBaseName
 }
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TCIDModuleInfo& modiSrc
-                        ,       TString&        strToFill
+TModule::BuildModName(  const   TCIDModuleInfo& modiSrc
+                        ,       TString&        strPortable
+                        ,       TString&        strLoadable
                         ,       TString&        strPrefLangMsgs
                         ,       TString&        strDefLangMsgs)
 {
     // Just call the other version
-    BuildRawModName
+    BuildModName
     (
         modiSrc.strBaseName()
         , modiSrc.c4MajVersion()
         , modiSrc.c4MinVersion()
         , modiSrc.eModType()
-        , strToFill
+        , strPortable
+        , strLoadable
         , strPrefLangMsgs
         , strDefLangMsgs
     );
 }
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TString&            strBaseName
+TModule::BuildModName(  const   TString&            strBaseName
                         , const tCIDLib::TCard4     c4MajVersion
                         , const tCIDLib::TCard4     c4MinVersion
                         , const tCIDLib::EModTypes  eModType
                         , const tCIDLib::ELanguages ePrefLanguage
                         , const tCIDLib::ELanguages eDefLanguage
-                        ,       TString&            strToFill
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable
                         ,       TString&            strPrefLangMsgs
                         ,       TString&            strDefLangMsgs
                         ,       TString&            strEnLangMsgs)
@@ -913,14 +932,16 @@ TModule::BuildRawModName(const  TString&            strBaseName
     //  to be insane to have an actual file name longer than this.
     //
     const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
+    tCIDLib::TCh achPortable[c4BufSz + 1];
+    tCIDLib::TCh achLoadable[c4BufSz + 1];
 
-    if (!TKrnlModule::bBuildRawModName( strBaseName.pszBuffer()
-                                        , c4MajVersion
-                                        , c4MinVersion
-                                        , eModType
-                                        , c4BufSz
-                                        , achBuf))
+    if (!TKrnlModule::bBuildModName(achPortable
+                                    , achLoadable
+                                    , c4BufSz
+                                    , strBaseName.pszBuffer()
+                                    , c4MajVersion
+                                    , c4MinVersion
+                                    , eModType))
     {
         facCIDLib().ThrowErr
         (
@@ -933,29 +954,30 @@ TModule::BuildRawModName(const  TString&            strBaseName
         );
     }
 
-    // Just copy the result back to the caller's string
-    strToFill = achBuf;
+    // Copy the result back to the caller's string
+    strPortable = achPortable;
+    strLoadable = achLoadable;
 
     //
     //  Now lets fill in the prefered, default, and english language
-    //  versions of the associated message file name. It has the same base
-    //  name, plus the language suffix and the CIDMsg extension.
+    //  versions of the associated message file name. It uses the portable
+    //  module name, plus the language suffix and the CIDMsg extension.
     //
-    TPathStr pathTmp = strToFill;
+    TPathStr pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strLanguageSuffixFor(ePrefLanguage));
     pathTmp.AppendExt(L"CIDMsg");
     strPrefLangMsgs = pathTmp;
 
-    pathTmp = strToFill;
+    pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strLanguageSuffixFor(eDefLanguage));
     pathTmp.AppendExt(L"CIDMsg");
     strDefLangMsgs = pathTmp;
 
-    pathTmp = strToFill;
+    pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strLanguageSuffixFor(tCIDLib::ELanguages::English));
@@ -965,16 +987,17 @@ TModule::BuildRawModName(const  TString&            strBaseName
 
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TCIDModuleInfo&     modiSrc
+TModule::BuildModName(  const   TCIDModuleInfo&     modiSrc
                         , const tCIDLib::ELanguages ePrefLanguage
                         , const tCIDLib::ELanguages eDefLanguage
-                        ,       TString&            strToFill
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable
                         ,       TString&            strPrefLangMsgs
                         ,       TString&            strDefLangMsgs
                         ,       TString&            strEnLangMsgs)
 {
     // Just call the other version
-    BuildRawModName
+    BuildModName
     (
         modiSrc.strBaseName()
         , modiSrc.c4MajVersion()
@@ -982,7 +1005,8 @@ TModule::BuildRawModName(const  TCIDModuleInfo&     modiSrc
         , modiSrc.eModType()
         , ePrefLanguage
         , eDefLanguage
-        , strToFill
+        , strPortable
+        , strLoadable
         , strPrefLangMsgs
         , strDefLangMsgs
         , strEnLangMsgs
@@ -1230,15 +1254,18 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
 TModule::TModule(const  TCIDModuleInfo&     modiSrc
                 , const tCIDLib::TBoolean   bLoad) :
 
-    m_eModType(modiSrc.eModType())
-    , m_kmodThis()
+    m_kmodThis()
     , m_pc1Res(nullptr)
-    , m_strName(modiSrc.strBaseName())
 {
-    // Call a common init that builds up names based on type and version info
     DoInit
     (
-        modiSrc.c4MajVersion(), modiSrc.c4MinVersion(), modiSrc.eFlags(), bLoad
+        modiSrc.strBaseName()
+        , modiSrc.c4MajVersion()
+        , modiSrc.c4MinVersion()
+        , modiSrc.eModType()
+        , modiSrc.eFlags()
+        , bLoad
+        , nullptr
     );
 }
 
@@ -1249,46 +1276,50 @@ TModule::TModule(   const   TString&            strName
                     , const tCIDLib::EModFlags  eFlags
                     , const tCIDLib::TBoolean   bLoad) :
 
-    m_eModType(eModType)
-    , m_kmodThis()
+    m_kmodThis()
     , m_pc1Res(nullptr)
-    , m_strName(strName)
 {
-    // Call a common init that builds up names based on type and version info
-    DoInit(c4MajVer, c4MinVer, eFlags, bLoad);
+    DoInit(strName, c4MajVer, c4MinVer, eModType, eFlags, bLoad, nullptr);
+}
+
+TModule::TModule(   const   TString&            strName
+                    , const TString&            strFromPath
+                    , const tCIDLib::EModTypes  eModType
+                    , const tCIDLib::TCard4     c4MajVer
+                    , const tCIDLib::TCard4     c4MinVer
+                    , const tCIDLib::EModFlags  eFlags) :
+
+    m_kmodThis()
+    , m_pc1Res(nullptr)
+{
+    // Create our other names, then do common init. This is always a load
+    DoInit
+    (
+        strName, c4MajVer, c4MinVer, eModType, eFlags, kCIDLib::True, &strFromPath
+    );
 }
 
 
 //
-//  Load a facility from a specific path, not via the library path. It may or may not
-//  be version stamped, we don't care at this level.
+//  Load an external module on a specific path. This is not for CIDLib facilities
+//  but to load other modules that we may need to mess with. They can pass just the
+//  name or the full path, as required.
 //
-TModule::TModule(const  TString&            strFullPath
-                , const tCIDLib::EModTypes  eModType
-                , const tCIDLib::EModFlags  eFlags
+TModule::TModule(const  TString&            strPath
                 , const tCIDLib::TBoolean   bLoad) :
 
-    m_eModType(eModType)
-    , m_kmodThis()
+    m_kmodThis()
     , m_pc1Res(nullptr)
 {
     // If not already done, initialize statistics
     InitStats();
 
-    // Get a copy of the name part (no extension) and store that
-    TPathStr pathTmp(strFullPath);
-    pathTmp.bQueryName(m_strName);
-
-    // Remove the name part and store that as the path
-    pathTmp.bRemoveNameExt();
-    m_strPath = pathTmp;
-
-    // Load from the original full path
+    // Load or query from the original full path
     tCIDLib::TBoolean bRes = kCIDLib::False;
     if (bLoad)
-        bRes = m_kmodThis.bLoadFromName(strFullPath.pszBuffer());
+        bRes = m_kmodThis.bLoadExternal(strPath.pszBuffer());
     else
-        bRes = m_kmodThis.bQueryFromName(strFullPath.pszBuffer());
+        bRes = m_kmodThis.bQueryExternal(strPath.pszBuffer());
 
     if (!bRes)
     {
@@ -1300,59 +1331,11 @@ TModule::TModule(const  TString&            strFullPath
             , TKrnlError::kerrLast()
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Unknown
-            , m_strName
+            , strPath
         );
     }
-
-    DoInit2(strFullPath, eFlags);
 }
 
-//
-//  Load a facility from a specific path, not the library path. It may or may not be
-//  version stamped, we don't care at this level.
-//
-TModule::TModule(const  TString&            strFacName
-                , const TString&            strLoadFrom
-                , const tCIDLib::EModTypes  eModType
-                , const tCIDLib::EModFlags  eFlags
-                , const tCIDLib::TBoolean   bLoad) :
-
-    m_eModType(eModType)
-    , m_kmodThis()
-    , m_pc1Res(nullptr)
-    , m_strName(strFacName)
-    , m_strPath(strLoadFrom)
-{
-    // If not already done, initialize statistics
-    InitStats();
-
-    // Create the full path to load
-    TPathStr pathFull(strLoadFrom);
-    pathFull.AddLevel(strFacName);
-
-    // Load from the full path
-    tCIDLib::TBoolean bRes = kCIDLib::False;
-    if (bLoad)
-        bRes = m_kmodThis.bLoadFromName(pathFull.pszBuffer());
-    else
-        bRes = m_kmodThis.bQueryFromName(pathFull.pszBuffer());
-
-    if (!bRes)
-    {
-        facCIDLib().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , bLoad ? kCIDErrs::errcMod_LoadByName : kCIDErrs::errcMod_QueryByName
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Unknown
-            , m_strName
-        );
-    }
-
-    DoInit2(pathFull, eFlags);
-}
 
 TModule::~TModule()
 {
@@ -1424,7 +1407,7 @@ TModule::bLoadCIDMsg(const  tCIDLib::TMsgId     midToLoad
 
 tCIDLib::EModTypes TModule::eModType() const
 {
-    return m_eModType;
+    return m_kmodThis.eModType();
 }
 
 
@@ -2206,17 +2189,26 @@ TString TModule::strMsg(const   tCIDLib::TMsgId midToLoad
 }
 
 
-// REturn the name of this module
-TString TModule::strName() const
+TString TModule::strLoadableName() const
 {
-    return m_strName;
+    return TString(m_kmodThis.pszLoadableName());
 }
 
 
-// Return the path to this module
 TString TModule::strPath() const
 {
-    return m_strPath;
+    return TString(m_kmodThis.pszSrcPath());
+}
+
+
+// This one may not be set if this is not a CIDLib facility type module
+TString TModule::strPortableName() const
+{
+    if (m_kmodThis.pszPortableName())
+        return TString(m_kmodThis.pszPortableName());
+
+    // We just return the loadable name instead
+    return TString(m_kmodThis.pszLoadableName());
 }
 
 
@@ -2577,12 +2569,24 @@ tCIDLib::TVoid TModule::ShowLogFailure(const TLogEvent& logevShow)
 // ---------------------------------------------------------------------------
 //  TModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
-                                , const tCIDLib::TCard4     c4MinVer
-                                , const tCIDLib::EModFlags  eFlags
-                                , const tCIDLib::TBoolean   bLoad)
+
+//
+//  Ths is the common init needed for all of the CIDLib facility loading type
+//  ctors. We have all the names and any path stored at this point.
+//
+tCIDLib::TVoid
+TModule::DoInit(const   TString&            strBaseName
+                , const tCIDLib::TCard4     c4MajVer
+                , const tCIDLib::TCard4     c4MinVer
+                , const tCIDLib::EModTypes  eModType
+                , const tCIDLib::EModFlags  eFlags
+                , const tCIDLib::TBoolean   bLoad
+                , const TString* const      pstrSrcPath)
 {
-    tCIDLib::TBoolean bRes;
+    tCIDLib::TBoolean bRes = kCIDLib::False;
+
+    // Initialize our stats if not alreayd done
+    InitStats();
 
     //
     //  Init the module handle data member. According to the bLoad parameter
@@ -2590,24 +2594,32 @@ tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
     //
     if (bLoad)
     {
-        bRes = m_kmodThis.bLoadFromName
-        (
-            m_strName.pszBuffer()
-            , m_eModType
-            , c4MajVer
-            , c4MinVer
-            , eFlags
-        );
+        if (pstrSrcPath)
+        {
+            bRes = m_kmodThis.bLoadFromPath
+            (
+                strBaseName.pszBuffer()
+                , c4MajVer
+                , c4MinVer
+                , pstrSrcPath->pszBuffer()
+                , eModType
+                , eFlags
+            );
+        }
+         else
+        {
+            bRes = m_kmodThis.bLoadFromName
+            (
+                strBaseName.pszBuffer(), c4MajVer, c4MinVer, eModType, eFlags
+            );
+        }
     }
      else
     {
+        // This only uses the name since we are querying something already loaded
         bRes = m_kmodThis.bQueryFromName
         (
-            m_strName.pszBuffer()
-            , m_eModType
-            , c4MajVer
-            , c4MinVer
-            , eFlags
+            strBaseName.pszBuffer(), c4MajVer, c4MinVer, eModType, eFlags
         );
     }
 
@@ -2621,9 +2633,15 @@ tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
             , TKrnlError::kerrLast()
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Unknown
-            , m_strName
+            , strBaseName
         );
     }
+
+    //
+    //  It worked, so store away the base name. We store our own copy of this because
+    //  we use it a lot.
+    //
+    m_strName = strBaseName;
 
     //
     //  Ok, lets try to load up the local strings that are preloaded and
@@ -2633,62 +2651,25 @@ tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
     //
     if (!CIDLib_Module::atomInitMsgs)
     {
-        if (m_strName == L"CIDLib")
+        if (strBaseName == L"CIDLib")
             InitMsgs(*this);
     }
 
-    // Find the module path and save it
-    const tCIDLib::TCard4 c4NameChars = kCIDLib::c4MaxPathLen;
-    tCIDLib::TCh szModPath[c4NameChars+1];
-    tCIDLib::TCh szModName[c4NameChars+1];
-    if (!TKrnlModule::bRawQueryModName( m_kmodThis.hmodThis()
-                                        , szModName
-                                        , szModPath
-                                        , c4NameChars))
-    {
-        facCIDLib().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcMod_QueryModPath
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::NotFound
-            , m_strName
-        );
-    }
-    m_strPath = szModPath;
 
-    // Do the other init, passing the full path
-    TPathStr pathFull(m_strPath);
-    pathFull.AddLevel(szModName);
-    DoInit2(pathFull, eFlags);
-}
-
-
-//
-//  We get the full module path loaded from which will include the version stamp
-//  if the module is versioned. So we can us that to build the path to the resource
-//  file.
-//
-tCIDLib::TVoid
-TModule::DoInit2(const  TString&            strModPath
-                , const tCIDLib::EModFlags  eFlags)
-{
-    //
-    //  If we have a resource file, then load it up. We build up the file
-    //  name and load up the raw resource buffer pointer.
-    //
+        // If it has a resource file, we need to load that
     if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EModFlags::HasResFile))
     {
-        TPathStr pathTmp(strModPath);
-
-        // Remove the module's extension and add the resource file's
-        pathTmp.bRemoveExt();
-        pathTmp.AppendExt(L"CIDRes");
+        //
+        //  All the associated resources are based on the portable name. That should
+        //  always be set here since this is only called for CIDLib facility type
+        //  modules.
+        //
+        TPathStr pathResFile(m_kmodThis.pszSrcPath());
+        pathResFile.AddLevel(m_kmodThis.pszPortableName());
+        pathResFile.AppendExt(L"CIDRes");
 
         // And load up the resources
-        LoadRes(pathTmp);
+        LoadRes(pathResFile);
     }
 }
 

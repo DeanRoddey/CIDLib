@@ -47,13 +47,16 @@ RTTIDecls(TSrcEditor, TStdCtrlWnd)
 // ---------------------------------------------------------------------------
 namespace CIDWUtils_SrcEditor
 {
-    //
-    //  The Scintilla marker ids we use. Order is important, since they overlay
-    //  each other based on lower ids.
-    //
-    const tCIDLib::TCard4   c4Marker_BreakPoint     = 0;
-    const tCIDLib::TCard4   c4Marker_BreakPointD    = 1;
-    const tCIDLib::TCard4   c4Marker_CurLine        = 2;
+    namespace
+    {
+        //
+        //  The Scintilla marker ids we use. Order is important, since they overlay
+        //  each other based on lower ids.
+        //
+        constexpr tCIDLib::TCard4   c4Marker_BreakPoint     = 0;
+        constexpr tCIDLib::TCard4   c4Marker_BreakPointD    = 1;
+        constexpr tCIDLib::TCard4   c4Marker_CurLine        = 2;
+    }
 };
 
 

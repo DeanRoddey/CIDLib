@@ -46,12 +46,15 @@ RTTIDecls(TMEngDBStmtVal,TMEngClassVal)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_DBaseClasses
 {
-    const TString   strConnClassPath(L"MEng.System.Runtime.DBConnect");
-    const TString   strConnName(L"DBConnect");
-    const TString   strStmtClassPath(L"MEng.System.Runtime.DBStatement");
-    const TString   strStmtName(L"DBStatement");
+    namespace
+    {
+        const TString   strConnClassPath(L"MEng.System.Runtime.DBConnect");
+        const TString   strConnName(L"DBConnect");
+        const TString   strStmtClassPath(L"MEng.System.Runtime.DBStatement");
+        const TString   strStmtName(L"DBStatement");
 
-    TAtomicFlag     atomODBCInitDone;
+        TAtomicFlag     atomODBCInitDone;
+    }
 }
 
 

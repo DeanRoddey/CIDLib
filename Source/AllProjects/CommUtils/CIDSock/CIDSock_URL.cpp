@@ -62,14 +62,14 @@ namespace CIDSock_URL
     //      The list of characters (other than alphanumerics) that can be
     //      a part of a protocol name.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2DigitMask       = 0x0001;
-    const tCIDLib::TCard2   c2AlphaMask       = 0x0002;
-    const tCIDLib::TCard2   c2HexDigitMask    = 0x0004;
-    const tCIDLib::TCard2   c2ProtoMask       = 0x0008;
-    const tCIDLib::TCard2   c2IllegalMask     = 0x0010;
-    const tCIDLib::TCard2   c2HostMask        = 0x0020;
-    const tCIDLib::TCh      chMaxChar = 0x7F;
-    const tCIDLib::TCh      achProtoChars[] =
+    constexpr tCIDLib::TCard2   c2DigitMask       = 0x0001;
+    constexpr tCIDLib::TCard2   c2AlphaMask       = 0x0002;
+    constexpr tCIDLib::TCard2   c2HexDigitMask    = 0x0004;
+    constexpr tCIDLib::TCard2   c2ProtoMask       = 0x0008;
+    constexpr tCIDLib::TCard2   c2IllegalMask     = 0x0010;
+    constexpr tCIDLib::TCard2   c2HostMask        = 0x0020;
+    constexpr tCIDLib::TCh      chMaxChar = 0x7F;
+    constexpr tCIDLib::TCh      achProtoChars[] =
     {
         L'+', L'.', L'-', kCIDLib::chNull
     };

@@ -43,13 +43,16 @@ RTTIDecls(TFacCIDGraphDev,TFacility)
 // ---------------------------------------------------------------------------
 namespace CIDGraphDev_ThisFacility
 {
-    // -----------------------------------------------------------------------
-    //  This is the map that we load up the bitmaps into. This is done lazily
-    // -----------------------------------------------------------------------
-    TEArray<TBitmap*, tCIDGraphDev::ESysBmps, tCIDGraphDev::ESysBmps::Count>   apbmpMap
-    (
-        static_cast<TBitmap*>(nullptr)
-    );
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  This is the map that we load up the bitmaps into. This is done lazily
+        // -----------------------------------------------------------------------
+        TEArray<TBitmap*, tCIDGraphDev::ESysBmps, tCIDGraphDev::ESysBmps::Count>   apbmpMap
+        (
+            static_cast<TBitmap*>(nullptr)
+        );
+    }
 };
 
 
@@ -106,7 +109,7 @@ TFacCIDGraphDev::TFacCIDGraphDev() :
     TFacility
     (
         L"CIDGraphDev"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision

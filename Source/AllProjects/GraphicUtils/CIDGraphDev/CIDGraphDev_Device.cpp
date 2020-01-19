@@ -86,14 +86,17 @@ RTTIDecls(TGraphDrawDev,TGraphicDevice)
 // ---------------------------------------------------------------------------
 namespace CIDGraphDev_Device
 {
-    // -----------------------------------------------------------------------
-    //  We may fault in a DD object if the client code invokes any of our
-    //  functionality that requires it. It may also not load, so we have a
-    //  flag to remember if we already tried it.
-    // -----------------------------------------------------------------------
-    TAtomicFlag         atomDDLoad;
-    HINSTANCE           hDDraw;
-    IDirectDraw*        pDDraw = nullptr;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  We may fault in a DD object if the client code invokes any of our
+        //  functionality that requires it. It may also not load, so we have a
+        //  flag to remember if we already tried it.
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomDDLoad;
+        HINSTANCE           hDDraw;
+        IDirectDraw*        pDDraw = nullptr;
+    }
 }
 
 

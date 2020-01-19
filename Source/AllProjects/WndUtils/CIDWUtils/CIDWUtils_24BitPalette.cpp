@@ -44,8 +44,11 @@ AdvRTTIDecls(T24BitPalette,TCtrlWnd)
 // ---------------------------------------------------------------------------
 namespace CIDWUtils_24BitPalette
 {
-    const tCIDLib::TCard4   c4BorderWidth       = 2;
-    const tCIDLib::TCard4   c4AreaBorderWidth   = 2;
+    namespace
+    {
+        constexpr tCIDLib::TCard4   c4BorderWidth       = 2;
+        constexpr tCIDLib::TCard4   c4AreaBorderWidth   = 2;
+    }
 }
 
 

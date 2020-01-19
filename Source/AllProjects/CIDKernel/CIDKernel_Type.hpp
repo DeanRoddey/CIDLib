@@ -1157,11 +1157,11 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     enum class EModTypes
     {
-        Dll
+        SharedLib
         , Exe
 
         , Count
-        , Min               = Dll
+        , Min               = SharedLib
         , Max               = Exe
     };
 

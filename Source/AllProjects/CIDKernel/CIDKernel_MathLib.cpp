@@ -239,7 +239,7 @@ tCIDLib::TVoid TMathLib::Round(         tCIDLib::TFloat4&       f4ToRound
     // Split it out into integral and fractional parts
     tCIDLib::TFloat4 f4Int;
     tCIDLib::TFloat4 f4Frac;
-    f4Frac = modff(f4ToRound, &f4Int);
+    f4Frac = static_cast<tCIDLib::TFloat4>(fabs(modff(f4ToRound, &f4Int)));
 
     if (eType == tCIDLib::ERoundTypes::Closest)
     {
@@ -267,7 +267,7 @@ tCIDLib::TVoid TMathLib::Round(         tCIDLib::TFloat8&       f8ToRound
     // Split it out into integral and fractional parts
     tCIDLib::TFloat8 f8Int;
     tCIDLib::TFloat8 f8Frac;
-    f8Frac = modf(f8ToRound, &f8Int);
+    f8Frac = fabs(modf(f8ToRound, &f8Int));
 
     if (eType == tCIDLib::ERoundTypes::Closest)
     {

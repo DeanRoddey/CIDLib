@@ -35,8 +35,8 @@
 // ---------------------------------------------------------------------------
 //  Local types
 // ---------------------------------------------------------------------------
-typedef TRefVector<TSrvTarget>      TOrbCSrvList;
-typedef TSafeRefVector<TCmdQItem>   TOrbCmdItemCache;
+using TOrbCSrvList = TRefVector<TSrvTarget>;
+using TOrbCmdItemCache = TSafeRefVector<TCmdQItem>;
 
 
 // ---------------------------------------------------------------------------
@@ -46,74 +46,94 @@ namespace CIDOrb_ClientBase
 {
     namespace
     {
-        // -----------------------------------------------------------------------
-        //  atomClientReady
-        //      Used to remember whether the client side of the ORB has been initialized
-        //      or not. We fault in some stuff and have to spin up/down the scanvenger
-        //      thread.
         //
-        //  c4OIDRefreshSecs
-        //      The number of seconds we throttle between automatic refreshes
-        //      of the object id cache.
+        //  This is a structure to hold our state info. It's a bit less convenient
+        //  in terms of accessing it, but it means we can have a very simple, atomic
+        //  swap in of all of the state.
         //
-        //  colCmdCache
-        //      Each queued command requires a 'cmd Q item' object to flow through
-        //      the ORB, holding the command and the event that the client thread
-        //      sleeps on until the response comes back. These are relatively
-        //      heavy objects so we keep a cache of them and give them out to
-        //      clients.
+        struct TStateInfo
+        {
+            TStateInfo() :
+
+                c4OIDRefreshSecs(5)
+                , enctCachePeriod(45 * kCIDLib::enctOneSecond)
+                , colCache(tCIDLib::EAdoptOpts::Adopt)
+                , colCmdCache(tCIDLib::EAdoptOpts::Adopt, 32)
+                , colServers(tCIDLib::EAdoptOpts::Adopt)
+                , colConnWaitList(tCIDLib::EAdoptOpts::Adopt, 16)
+                , pthrCacheScavenger(nullptr)
+            {
+            }
+
+            // ---------------------------------------------------------------
+            //  c4OIDRefreshSecs
+            //      The number of seconds we throttle between automatic refreshes
+            //      of the object id cache.
+            //
+            //  colCmdCache
+            //      Each queued command requires a 'cmd Q item' object to flow through
+            //      the ORB, holding the command and the event that the client thread
+            //      sleeps on until the response comes back. These are relatively
+            //      heavy objects so we keep a cache of them and give them out to
+            //      clients.
+            //
+            //      It is thread safe, because WE CANNOT use the overall mutex to sync
+            //      it due to deadlocking potential!!
+            //
+            //  enctCacheTimeout
+            //  colCache
+            //      To be much more efficient in the face of client threads which
+            //      follow the common pattern of creating a proxy, making a call or
+            //      two, and the destroying the proxy, we don't actually drop a target
+            //      server immediately upon the last proxy dereferencing it. We will
+            //      put it on this list and time stamp it. It will be dropped after a
+            //      short period of time (currently hard coded, but eventually
+            //      perhaps settable.) But, if it is reused, it will be far more
+            //      efficient, since target server objects are a bit heavy to spin
+            //      up rapidly.
+            //
+            //  colConnWaitList
+            //      This is a list used in psrvtAddSrvRef, to coordinate when
+            //      multiple threads are trying to connect to a server at once.
+            //
+            //  colServers
+            //      A collection of TSrvTarget objects for the currently active
+            //      targets.
+            //
+            //  mtxSync
+            //      A mutex used to synchronize updates to the file level info
+            //      here in this name space.
+            //
+            //  pthrCacheScavenger
+            //      We need a thread internally to periodically scan the connection
+            //      cache collection, to see if any of them have timed out and need
+            //      to be removed.
+            //
+            //  sciXXX
+            //      These are stats cache items where we echo the sies of the above
+            //      collections for stats purposes. It's kind of unfortunate that
+            //      we store this info in two places, but necessary. So be careful
+            //      and keep them in sync.
+            // -----------------------------------------------------------------------
+            tCIDLib::TCard4             c4OIDRefreshSecs;
+            const tCIDLib::TEncodedTime enctCachePeriod;
+            TOrbCSrvList                colCache;
+            TOrbCmdItemCache            colCmdCache;
+            TOrbCSrvList                colServers;
+            TConnWaitList               colConnWaitList;
+            TMutex                      mtxSync;
+            TThread*                    pthrCacheScavenger;
+            TStatsCacheItem             sciCmdCache;
+            TStatsCacheItem             sciSrvCache;
+            TStatsCacheItem             sciSrvTargets;
+            TStatsCacheItem             sciWaitList;
+        };
+
         //
-        //      It is thread safe, because WE CANNOT use the overall mutex to sync
-        //      it due to deadlocking potential!!
+        //  A pointer to our state. We can use this as a 'ready' flag and we
+        //  can also atomically swap it in when we are initialized.
         //
-        //  enctCacheTimeout
-        //  colCache
-        //      To be much more efficient in the face of client threads which
-        //      follow the common pattern of creating a proxy, making a call or
-        //      two, and the destroying the proxy, we don't actually drop a target
-        //      server immediately upon the last proxy dereferencing it. We will
-        //      put it on this list and time stamp it. It will be dropped after a
-        //      short period of time (currently hard coded, but eventually
-        //      perhaps settable.) But, if it is reused, it will be far more
-        //      efficient, since target server objects are a bit heavy to spin
-        //      up rapidly.
-        //
-        //  colConnWaitList
-        //      This is a list used in psrvtAddSrvRef, to coordinate when
-        //      multiple threads are trying to connect to a server at once.
-        //
-        //  colServers
-        //      A collection of TSrvTarget objects for the currently active
-        //      targets.
-        //
-        //  mtxSync
-        //      A mutex used to synchronize updates to the file level info
-        //      here in this name space.
-        //
-        //  pthrCacheScavenger
-        //      We need a thread internally to periodically scan the connection
-        //      cache collection, to see if any of them have timed out and need
-        //      to be removed.
-        //
-        //  sciXXX
-        //      These are stats cache items where we echo the sies of the above
-        //      collections for stats purposes. It's kind of unfortunate that
-        //      we store this info in two places, but necessary. So be careful
-        //      and keep them in sync.
-        // -----------------------------------------------------------------------
-        TAtomicFlag                 atomClientReady;
-        tCIDLib::TCard4             c4OIDRefreshSecs = 5;
-        const tCIDLib::TEncodedTime enctCachePeriod = 45 * kCIDLib::enctOneSecond;
-        TOrbCSrvList                colCache(tCIDLib::EAdoptOpts::Adopt);
-        TOrbCmdItemCache            colCmdCache(tCIDLib::EAdoptOpts::Adopt, 32);
-        TOrbCSrvList                colServers(tCIDLib::EAdoptOpts::Adopt);
-        TConnWaitList               colConnWaitList(tCIDLib::EAdoptOpts::Adopt, 16);
-        TMutex                      mtxSync;
-        TThread*                    pthrCacheScavenger = nullptr;
-        TStatsCacheItem             sciCmdCache;
-        TStatsCacheItem             sciSrvCache;
-        TStatsCacheItem             sciSrvTargets;
-        TStatsCacheItem             sciWaitList;
+        TStateInfo*     m_pState = nullptr;
     }
 }
 
@@ -161,11 +181,11 @@ eCacheScavengerThread(TThread& thrThis, tCIDLib::TVoid*)
                 //  the top, else we got it and the lock janitor will let
                 //  it go normally when it goes out of scope.
                 //
-                TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync, kCIDLib::False);
+                TLocker lockrSrv(&CIDOrb_ClientBase::m_pState->mtxSync, kCIDLib::False);
                 if (!lockrSrv.bLock(250))
                     continue;
 
-                tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::colCache.c4ElemCount();
+                tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::m_pState->colCache.c4ElemCount();
 
                 // If none, then give up now
                 if (!c4Count)
@@ -175,7 +195,7 @@ eCacheScavengerThread(TThread& thrThis, tCIDLib::TVoid*)
                 tCIDLib::TCard4 c4Index = 0;
                 while (c4Index < c4Count)
                 {
-                    TSrvTarget* psrvtCur = CIDOrb_ClientBase::colCache.pobjAt(c4Index);
+                    TSrvTarget* psrvtCur = CIDOrb_ClientBase::m_pState->colCache.pobjAt(c4Index);
 
                     if (psrvtCur->m_enctCacheStamp < TTime::enctNow())
                     {
@@ -187,8 +207,8 @@ eCacheScavengerThread(TThread& thrThis, tCIDLib::TVoid*)
                         try
                         {
                             c4Count--;
-                            CIDOrb_ClientBase::colCache.RemoveAt(c4Index);
-                            TStatsCache::c8DecCounter(CIDOrb_ClientBase::sciSrvCache);
+                            CIDOrb_ClientBase::m_pState->colCache.RemoveAt(c4Index);
+                            TStatsCache::c8DecCounter(CIDOrb_ClientBase::m_pState->sciSrvCache);
                         }
 
                         catch(TError& errToCatch)
@@ -356,7 +376,7 @@ tCIDLib::TVoid TOrbClientBase::SetObjId(const   TOrbObjId&          ooidSrc
                                         , const TString&            strNSBinding
                                         , const tCIDLib::TBoolean   bCheck)
 {
-    CIDAssert(CIDOrb_ClientBase::atomClientReady, L"ORB client is not initialized yet");
+    CIDAssert(CIDOrb_ClientBase::m_pState != nullptr, L"ORB client is not initialized yet");
 
     //
     //  The client proxy class name stored in this object id better damn
@@ -486,7 +506,7 @@ tCIDLib::TVoid TOrbClientBase::SetObjId(const   TOrbObjId&          ooidSrc
         facCIDOrb().StoreObjIDCache(m_strNSBinding, m_ooidThis);
 
     // Set the next object id refresh interval from now
-    m_enctNextOIDFresh = TTime::enctNowPlusSecs(CIDOrb_ClientBase::c4OIDRefreshSecs);
+    m_enctNextOIDFresh = TTime::enctNowPlusSecs(CIDOrb_ClientBase::m_pState->c4OIDRefreshSecs);
 }
 
 
@@ -501,7 +521,7 @@ tCIDLib::TVoid TOrbClientBase::SetObjId(const   TOrbObjId&          ooidSrc
 //
 tCIDLib::TBoolean TOrbClientBase::bCheckForLostConnection()
 {
-    CIDAssert(CIDOrb_ClientBase::atomClientReady, L"ORB client is not initialized yet");
+    CIDAssert(CIDOrb_ClientBase::m_pState != nullptr, L"ORB client is not initialized yet");
 
     return !bIsProxyConnected();
 }
@@ -510,7 +530,7 @@ tCIDLib::TBoolean TOrbClientBase::bCheckForLostConnection()
 tCIDLib::TBoolean
 TOrbClientBase::bCheckForLostConnection(const TError& errToCheck)
 {
-    CIDAssert(CIDOrb_ClientBase::atomClientReady, L"ORB client is not initialized yet");
+    CIDAssert(CIDOrb_ClientBase::m_pState != nullptr, L"ORB client is not initialized yet");
 
     //
     //  If the object is no longer there on the server, the we haven't lost
@@ -546,7 +566,7 @@ const TOrbObjId& TOrbClientBase::ooidThis() const
 // Drop our server reference, disconnecting us
 tCIDLib::TVoid TOrbClientBase::ResetProxy()
 {
-    CIDAssert(CIDOrb_ClientBase::atomClientReady, L"ORB client is not initialized yet");
+    CIDAssert(CIDOrb_ClientBase::m_pState != nullptr, L"ORB client is not initialized yet");
 
     // Remove our server reference if we have one
     RemoveSrvRef();
@@ -560,7 +580,7 @@ tCIDLib::TVoid TOrbClientBase::ResetProxy()
 //
 tCIDLib::TVoid TOrbClientBase::SendORBPing()
 {
-    CIDAssert(CIDOrb_ClientBase::atomClientReady, L"ORB client is not initialized yet");
+    CIDAssert(CIDOrb_ClientBase::m_pState != nullptr, L"ORB client is not initialized yet");
 
     TCmdQItem* pcqiToUse = pcqiGetCmdItem(m_ooidThis.oidKey());
     TOrbCmd& ocmdToUse = pcqiToUse->ocmdData();
@@ -629,18 +649,18 @@ tCIDLib::TVoid TOrbClientBase::GiveBackCmdItem(TCmdQItem* const pcqiGiveBack)
 TCmdQItem* TOrbClientBase::pcqiGetCmdItem(const TOrbId& oidToSet)
 {
     // Lock the collection to sync this non-atomic op
-    TLocker lockrSrv(&CIDOrb_ClientBase::colCmdCache);
+    TLocker lockrSrv(&CIDOrb_ClientBase::m_pState->colCmdCache);
 
     //
     //  And search the cache for a free cmd item. If none are found, then
     //  add a new one.
     //
-    const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::colCmdCache.c4ElemCount();
+    const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::m_pState->colCmdCache.c4ElemCount();
     tCIDLib::TCard4 c4Index;
     TCmdQItem* pcqiCur = nullptr;
     for (c4Index = 0; c4Index < c4Count; c4Index++)
     {
-        pcqiCur = CIDOrb_ClientBase::colCmdCache.pobjAt(c4Index);
+        pcqiCur = CIDOrb_ClientBase::m_pState->colCmdCache.pobjAt(c4Index);
         if (pcqiCur->eStage() == tCIDOrb::ECmdStages::Free)
             break;
     }
@@ -665,8 +685,8 @@ TCmdQItem* TOrbClientBase::pcqiGetCmdItem(const TOrbId& oidToSet)
         }
 
         pcqiCur = new TCmdQItem;
-        CIDOrb_ClientBase::colCmdCache.Add(pcqiCur);
-        TStatsCache::c8IncCounter(CIDOrb_ClientBase::sciCmdCache);
+        CIDOrb_ClientBase::m_pState->colCmdCache.Add(pcqiCur);
+        TStatsCache::c8IncCounter(CIDOrb_ClientBase::m_pState->sciCmdCache);
     }
 
     // Reset this one for new use
@@ -684,7 +704,7 @@ TOrbClientBase::TOrbClientBase() :
     , m_enctNextOIDFresh(0)
 {
     // Make sure the client side has been initialized
-    CIDAssert(CIDOrb_ClientBase::atomClientReady, L"ORB client is not initialized yet");
+    CIDAssert(CIDOrb_ClientBase::m_pState != nullptr, L"ORB client is not initialized yet");
 }
 
 TOrbClientBase::TOrbClientBase( const   TOrbObjId&  ooidSrc
@@ -695,7 +715,7 @@ TOrbClientBase::TOrbClientBase( const   TOrbObjId&  ooidSrc
     , m_strNSBinding(strNSBinding)
 {
     // Make sure the client side has been initialized
-    CIDAssert(CIDOrb_ClientBase::atomClientReady, L"ORB client is not initialized yet");
+    CIDAssert(CIDOrb_ClientBase::m_pState != nullptr, L"ORB client is not initialized yet");
 
     // Remember if the incoming address is an already cached one
     const tCIDLib::TBoolean bWasCached = ooidSrc.bHasCachedAddr();
@@ -792,7 +812,7 @@ TOrbClientBase::TOrbClientBase( const   TOrbObjId&  ooidSrc
         facCIDOrb().StoreObjIDCache(m_strNSBinding, m_ooidThis);
 
     // Set the next object id refresh interval from now
-    m_enctNextOIDFresh = TTime::enctNowPlusSecs(CIDOrb_ClientBase::c4OIDRefreshSecs);
+    m_enctNextOIDFresh = TTime::enctNowPlusSecs(CIDOrb_ClientBase::m_pState->c4OIDRefreshSecs);
 }
 
 
@@ -812,7 +832,7 @@ TOrbClientBase::Dispatch(const  tCIDLib::TCard4     c4WaitFor
 {
     // Make sure we have initialized the ORB
     #if CID_DEBUG_ON
-    if (!CIDOrb_ClientBase::atomClientReady)
+    if (CIDOrb_ClientBase::m_pState == nullptr)
     {
         facCIDOrb().ThrowErr
         (
@@ -845,7 +865,7 @@ TOrbClientBase::Dispatch(const  tCIDLib::TCard4     c4WaitFor
     // Lock the overall mutex and look up our server target
     tCIDLib::TCard4 c4SeqNum = 0;
     {
-        TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync, 5000UL);
+        TLocker lockrSrv(&CIDOrb_ClientBase::m_pState->mtxSync, 5000UL);
 
         psrvtOurs = psrvtFindServer(m_ipepSrv, kCIDLib::False);
         if (!psrvtOurs)
@@ -1013,7 +1033,7 @@ TOrbClientBase::Dispatch(const  tCIDLib::TCard4     c4WaitFor
         {
             // Update the throttling stamp first just in case, then refresh
             m_enctNextOIDFresh = enctNow +
-                (CIDOrb_ClientBase::c4OIDRefreshSecs * kCIDLib::enctOneSecond);
+                (CIDOrb_ClientBase::m_pState->c4OIDRefreshSecs * kCIDLib::enctOneSecond);
             facCIDOrb().RefreshObjIDCache(m_strNSBinding, m_ooidThis);
         }
     }
@@ -1044,7 +1064,7 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
                                 ,       tCIDLib::TCard4&    c4Index
                                 , const tCIDLib::TBoolean   bReclaimScavenged)
 {
-    if (!CIDOrb_ClientBase::atomClientReady)
+    if (!CIDOrb_ClientBase::m_pState)
     {
         facCIDOrb().ThrowErr
         (
@@ -1061,10 +1081,10 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
 
     // Check the list of active servers
     TSrvTarget* psrvtRet = nullptr;
-    tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::colServers.c4ElemCount();
+    tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::m_pState->colServers.c4ElemCount();
     for (c4Index = 0; c4Index < c4Count; c4Index++)
     {
-        TSrvTarget* psrvtCur = CIDOrb_ClientBase::colServers.pobjAt(c4Index);
+        TSrvTarget* psrvtCur = CIDOrb_ClientBase::m_pState->colServers.pobjAt(c4Index);
         if (psrvtCur->m_ipepServer == ipepServer)
         {
             psrvtRet = psrvtCur;
@@ -1078,10 +1098,10 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
     //
     if (!psrvtRet && bReclaimScavenged)
     {
-        c4Count = CIDOrb_ClientBase::colCache.c4ElemCount();
+        c4Count = CIDOrb_ClientBase::m_pState->colCache.c4ElemCount();
         for (c4Index = 0; c4Index < c4Count; c4Index++)
         {
-            TSrvTarget* psrvtCur = CIDOrb_ClientBase::colCache.pobjAt(c4Index);
+            TSrvTarget* psrvtCur = CIDOrb_ClientBase::m_pState->colCache.pobjAt(c4Index);
 
             // If this is our guy, process it
             if (psrvtCur->m_ipepServer == ipepServer)
@@ -1090,8 +1110,8 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
                 //  Orphan it out of the cache. Suppress nodiscard error by setting
                 //  the current pointer again from the orphan call.
                 //
-                psrvtCur = CIDOrb_ClientBase::colCache.pobjOrphanAt(c4Index);
-                TStatsCache::c8DecCounter(CIDOrb_ClientBase::sciSrvCache);
+                psrvtCur = CIDOrb_ClientBase::m_pState->colCache.pobjOrphanAt(c4Index);
+                TStatsCache::c8DecCounter(CIDOrb_ClientBase::m_pState->sciSrvCache);
 
                 //
                 //  See if it's gone offline while it was in the cache. If
@@ -1102,9 +1122,9 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
                 {
                     if (psrvtCur->bIsConnected())
                     {
-                        CIDOrb_ClientBase::colServers.Add(psrvtCur);
+                        CIDOrb_ClientBase::m_pState->colServers.Add(psrvtCur);
                         psrvtRet = psrvtCur;
-                        TStatsCache::c8IncCounter(CIDOrb_ClientBase::sciSrvTargets);
+                        TStatsCache::c8IncCounter(CIDOrb_ClientBase::m_pState->sciSrvTargets);
                     }
                      else
                     {
@@ -1129,11 +1149,14 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
 // Called to iniitalize the client side of the ORB interface.
 tCIDLib::TVoid TOrbClientBase::InitializeOrbClient()
 {
-    if (!CIDOrb_ClientBase::atomClientReady)
+    if (!TAtomic::pFencedGet(&CIDOrb_ClientBase::m_pState))
     {
-        TLocker lockrSync(&CIDOrb_ClientBase::mtxSync);
-        if (!CIDOrb_ClientBase::atomClientReady)
+        TBaseLock lockBase;
+        if (!TAtomic::pFencedGet(&CIDOrb_ClientBase::m_pState))
         {
+            CIDOrb_ClientBase::TStateInfo* pNewState = new CIDOrb_ClientBase::TStateInfo();
+            TJanitor<CIDOrb_ClientBase::TStateInfo> janState(pNewState);
+
             //
             //  Force our stats cache items into the cache so that from here on out
             //  we can just use the cache item for fast access. If the client
@@ -1144,38 +1167,39 @@ tCIDLib::TVoid TOrbClientBase::InitializeOrbClient()
             (
                 kCIDOrb::pszStat_Cl_CmdCache
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDOrb_ClientBase::sciCmdCache
+                , pNewState->sciCmdCache
             );
 
             TStatsCache::RegisterItem
             (
                 kCIDOrb::pszStat_Cl_SrvCache
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDOrb_ClientBase::sciSrvCache
+                , pNewState->sciSrvCache
             );
 
             TStatsCache::RegisterItem
             (
                 kCIDOrb::pszStat_Cl_SrvTargets
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDOrb_ClientBase::sciSrvTargets
+                , pNewState->sciSrvTargets
             );
 
             TStatsCache::RegisterItem
             (
                 kCIDOrb::pszStat_Cl_WaitList
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDOrb_ClientBase::sciWaitList
+                , pNewState->sciWaitList
             );
 
-            CIDOrb_ClientBase::atomClientReady.Set();
+            // And now atomically swap in the state pointer
+            TAtomic::FencedSet(&CIDOrb_ClientBase::m_pState, janState.pobjOrphan());
 
             // Create and spin up the cache thread
-            CIDOrb_ClientBase::pthrCacheScavenger = new TThread
+            CIDOrb_ClientBase::m_pState->pthrCacheScavenger = new TThread
             (
                 L"CIDOrbClientScavengerThread", &eCacheScavengerThread
             );
-            CIDOrb_ClientBase::pthrCacheScavenger->Start();
+            CIDOrb_ClientBase::m_pState->pthrCacheScavenger->Start();
         }
     }
 }
@@ -1183,14 +1207,14 @@ tCIDLib::TVoid TOrbClientBase::InitializeOrbClient()
 
 tCIDLib::TVoid TOrbClientBase::TerminateOrbClient()
 {
-    TLocker lockrSync(&CIDOrb_ClientBase::mtxSync);
+    TLocker lockrSync(&CIDOrb_ClientBase::m_pState->mtxSync);
 
     // Stop the cache scavenger thread
     try
     {
-        CIDOrb_ClientBase::pthrCacheScavenger->ReqShutdownSync(10000);
-        CIDOrb_ClientBase::pthrCacheScavenger->eWaitForDeath(5000);
-        delete CIDOrb_ClientBase::pthrCacheScavenger;
+        CIDOrb_ClientBase::m_pState->pthrCacheScavenger->ReqShutdownSync(10000);
+        CIDOrb_ClientBase::m_pState->pthrCacheScavenger->eWaitForDeath(5000);
+        delete CIDOrb_ClientBase::m_pState->pthrCacheScavenger;
     }
 
     catch(TError& errToCatch)
@@ -1201,25 +1225,11 @@ tCIDLib::TVoid TOrbClientBase::TerminateOrbClient()
             TModule::LogEventObj(errToCatch);
         }
     }
-    CIDOrb_ClientBase::pthrCacheScavenger = nullptr;
+    CIDOrb_ClientBase::m_pState->pthrCacheScavenger = nullptr;
 
     try
     {
-        CIDOrb_ClientBase::colCache.RemoveAll();
-    }
-
-    catch(TError& errToCatch)
-    {
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-    }
-
-    try
-    {
-        CIDOrb_ClientBase::colServers.RemoveAll();
+        CIDOrb_ClientBase::m_pState->colCache.RemoveAll();
     }
 
     catch(TError& errToCatch)
@@ -1231,10 +1241,24 @@ tCIDLib::TVoid TOrbClientBase::TerminateOrbClient()
         }
     }
 
+    try
+    {
+        CIDOrb_ClientBase::m_pState->colServers.RemoveAll();
+    }
+
+    catch(TError& errToCatch)
+    {
+        if (!errToCatch.bLogged())
+        {
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            TModule::LogEventObj(errToCatch);
+        }
+    }
+
 
     try
     {
-        CIDOrb_ClientBase::colCmdCache.RemoveAll();
+        CIDOrb_ClientBase::m_pState->colCmdCache.RemoveAll();
     }
 
     catch(TError& errToCatch)
@@ -1248,12 +1272,20 @@ tCIDLib::TVoid TOrbClientBase::TerminateOrbClient()
 
 
     // Zero out our stats cache values
-    TStatsCache::SetValue(kCIDOrb::pszStat_Cl_CmdCache, CIDOrb_ClientBase::sciCmdCache, 0);
-    TStatsCache::SetValue(kCIDOrb::pszStat_Cl_SrvCache, CIDOrb_ClientBase::sciSrvCache, 0);
-    TStatsCache::SetValue(kCIDOrb::pszStat_Cl_SrvTargets, CIDOrb_ClientBase::sciSrvTargets, 0);
-    TStatsCache::SetValue(kCIDOrb::pszStat_Cl_WaitList, CIDOrb_ClientBase::sciWaitList, 0);
+    TStatsCache::SetValue(kCIDOrb::pszStat_Cl_CmdCache, CIDOrb_ClientBase::m_pState->sciCmdCache, 0);
+    TStatsCache::SetValue(kCIDOrb::pszStat_Cl_SrvCache, CIDOrb_ClientBase::m_pState->sciSrvCache, 0);
+    TStatsCache::SetValue(kCIDOrb::pszStat_Cl_SrvTargets, CIDOrb_ClientBase::m_pState->sciSrvTargets, 0);
+    TStatsCache::SetValue(kCIDOrb::pszStat_Cl_WaitList, CIDOrb_ClientBase::m_pState->sciWaitList, 0);
 
-    CIDOrb_ClientBase::atomClientReady.SetValue(kCIDLib::False);
+    // Atomically swap in a null pointer and delete the original
+    CIDOrb_ClientBase::TStateInfo* pOldState = TAtomic::pExchangePtr
+    (
+        &CIDOrb_ClientBase::m_pState, static_cast<CIDOrb_ClientBase::TStateInfo*>(nullptr)
+    );
+
+    // Release the lock and then we can delete the state data
+    lockrSync.Orphan();
+    delete pOldState;
 }
 
 
@@ -1269,7 +1301,7 @@ tCIDLib::TBoolean TOrbClientBase::bIsProxyConnected() const
 {
     // Make sure we have initialized the ORB
     #if CID_DEBUG_ON
-    if (!CIDOrb_ClientBase::atomClientReady)
+    if (!CIDOrb_ClientBase::m_pState)
     {
         facCIDOrb().ThrowErr
         (
@@ -1290,7 +1322,7 @@ tCIDLib::TBoolean TOrbClientBase::bIsProxyConnected() const
         return kCIDLib::False;
 
     // Lock and find our server reference
-    TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
+    TLocker lockrSrv(&CIDOrb_ClientBase::m_pState->mtxSync);
     TSrvTarget* psrvtUs = psrvtFindServer(m_ipepSrv, kCIDLib::False);
 
     // If we didn't find one, then obviously not connected
@@ -1335,7 +1367,7 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
     //
     TOrbCConnWait* poccwUs = nullptr;
     {
-        TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
+        TLocker lockrSrv(&CIDOrb_ClientBase::m_pState->mtxSync);
 
         //
         //  Find our server target object. We look up the one with the end point
@@ -1361,12 +1393,12 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
         //
         TOrbCConnWait* poccwConn = nullptr;
 
-        const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::colConnWaitList.c4ElemCount();
+        const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::m_pState->colConnWaitList.c4ElemCount();
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
             TOrbCConnWait* poccwCur
             (
-                CIDOrb_ClientBase::colConnWaitList.pobjAt(c4Index)
+                CIDOrb_ClientBase::m_pState->colConnWaitList.pobjAt(c4Index)
             );
 
             // It's for our server, so check it
@@ -1400,8 +1432,8 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
         //  are the one connecting, so that later threads have a way to know
         //  that we are already here and connecting.
         //
-        CIDOrb_ClientBase::colConnWaitList.Add(poccwUs);
-        TStatsCache::c8IncCounter(CIDOrb_ClientBase::sciWaitList);
+        CIDOrb_ClientBase::m_pState->colConnWaitList.Add(poccwUs);
+        TStatsCache::c8IncCounter(CIDOrb_ClientBase::m_pState->sciWaitList);
     }
 
     // If we weren't first in line on this server, then let's block
@@ -1420,9 +1452,9 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
         //
         TOrbCConnWait::EWaitStates eRes = poccwUs->m_eState;
         {
-            TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
-            CIDOrb_ClientBase::colConnWaitList.bRemoveIfMember(poccwUs);
-            TStatsCache::c8DecCounter(CIDOrb_ClientBase::sciWaitList);
+            TLocker lockrSrv(&CIDOrb_ClientBase::m_pState->mtxSync);
+            CIDOrb_ClientBase::m_pState->colConnWaitList.bRemoveIfMember(poccwUs);
+            TStatsCache::c8DecCounter(CIDOrb_ClientBase::m_pState->sciWaitList);
             poccwUs = nullptr;
         }
 
@@ -1437,7 +1469,7 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
             //  fail since it has to be some pretty pathological scenario
             //  We have to re-lock the main mutex here.
             //
-            TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
+            TLocker lockrSrv(&CIDOrb_ClientBase::m_pState->mtxSync);
             psrvtNew = psrvtFindServer(m_ipepSrv, kCIDLib::True);
 
             // If we got one, then bump the ref count and indicate we have a ref
@@ -1476,28 +1508,28 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
         //  either way, wake up any waiting threads and give them the good or
         //  bad news. We need to relock the list again.
         //
-        TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
+        TLocker lockrSrv(&CIDOrb_ClientBase::m_pState->mtxSync);
 
         // If we created a new server target, then add it to the list
         if (psrvtNew)
         {
-            CIDOrb_ClientBase::colServers.Add(psrvtNew);
-            TStatsCache::c8IncCounter(CIDOrb_ClientBase::sciSrvTargets);
+            CIDOrb_ClientBase::m_pState->colServers.Add(psrvtNew);
+            TStatsCache::c8IncCounter(CIDOrb_ClientBase::m_pState->sciSrvTargets);
         }
 
         // Remove our wait item from the list
-        CIDOrb_ClientBase::colConnWaitList.bRemoveIfMember(poccwUs);
-        TStatsCache::c8DecCounter(CIDOrb_ClientBase::sciWaitList);
+        CIDOrb_ClientBase::m_pState->colConnWaitList.bRemoveIfMember(poccwUs);
+        TStatsCache::c8DecCounter(CIDOrb_ClientBase::m_pState->sciWaitList);
 
         //
         //  And search for other waiters. Note that we are not responsible for
         //  removing them from the wait list. They do that themselves.
         //
-        const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::colConnWaitList.c4ElemCount();
+        const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::m_pState->colConnWaitList.c4ElemCount();
         TOrbCConnWait* poccwCur;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
-            poccwCur = CIDOrb_ClientBase::colConnWaitList.pobjAt(c4Index);
+            poccwCur = CIDOrb_ClientBase::m_pState->colConnWaitList.pobjAt(c4Index);
 
             // It's for our server, so check it.
             if (poccwCur->m_ipepTarget == m_ipepSrv)
@@ -1533,7 +1565,7 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
 tCIDLib::TVoid TOrbClientBase::RemoveSrvRef()
 {
     // Lock the overall mutex while we do this
-    TLocker lockrSrv(&CIDOrb_ClientBase::mtxSync);
+    TLocker lockrSrv(&CIDOrb_ClientBase::m_pState->mtxSync);
 
     // If we've not referenced a server yet, then return
     if (!m_bSrvRefd)
@@ -1594,19 +1626,19 @@ tCIDLib::TVoid TOrbClientBase::RemoveSrvRef()
                     //  it out of one collection and into the other.
                     //
                     psrvtOurs->m_enctCacheStamp = TTime::enctNow()
-                                                  + CIDOrb_ClientBase::enctCachePeriod;
-                    CIDOrb_ClientBase::colCache.Add
+                                                  + CIDOrb_ClientBase::m_pState->enctCachePeriod;
+                    CIDOrb_ClientBase::m_pState->colCache.Add
                     (
-                        CIDOrb_ClientBase::colServers.pobjOrphanAt(c4Index)
+                        CIDOrb_ClientBase::m_pState->colServers.pobjOrphanAt(c4Index)
                     );
-                    TStatsCache::c8IncCounter(CIDOrb_ClientBase::sciSrvCache);
-                    TStatsCache::c8DecCounter(CIDOrb_ClientBase::sciSrvTargets);
+                    TStatsCache::c8IncCounter(CIDOrb_ClientBase::m_pState->sciSrvCache);
+                    TStatsCache::c8DecCounter(CIDOrb_ClientBase::m_pState->sciSrvTargets);
                 }
                  else
                 {
                     // It was offline anyway, so drop it
-                    CIDOrb_ClientBase::colServers.RemoveAt(c4Index);
-                    TStatsCache::c8DecCounter(CIDOrb_ClientBase::sciSrvTargets);
+                    CIDOrb_ClientBase::m_pState->colServers.RemoveAt(c4Index);
+                    TStatsCache::c8DecCounter(CIDOrb_ClientBase::m_pState->sciSrvTargets);
                 }
             }
 

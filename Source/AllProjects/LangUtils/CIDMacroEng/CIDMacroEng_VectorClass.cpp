@@ -46,12 +46,15 @@ RTTIDecls(TMEngVectorInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_VectorClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strVector(L"Vector");
-    const TString   strClassPath(L"MEng.System.Runtime.Vector");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strVector(L"Vector");
+        const TString   strClassPath(L"MEng.System.Runtime.Vector");
+    }
 }
 
 

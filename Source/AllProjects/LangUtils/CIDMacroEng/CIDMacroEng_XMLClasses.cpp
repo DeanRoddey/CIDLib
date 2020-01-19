@@ -52,15 +52,18 @@ RTTIDecls(TMEngXMLTreeParserInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_XMLTreeParserClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the classes that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strXMLTreeAnchor(L"XMLTreeAnchor");
-    const TString   strXMLTreeAnchorClassPath(L"MEng.System.Runtime.XMLTreeAnchor");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the classes that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strXMLTreeAnchor(L"XMLTreeAnchor");
+        const TString   strXMLTreeAnchorClassPath(L"MEng.System.Runtime.XMLTreeAnchor");
 
-    const TString   strXMLTreeParser(L"XMLTreeParser");
-    const TString   strXMLTreeParserClassPath(L"MEng.System.Runtime.XMLTreeParser");
+        const TString   strXMLTreeParser(L"XMLTreeParser");
+        const TString   strXMLTreeParserClassPath(L"MEng.System.Runtime.XMLTreeParser");
+    }
 }
 
 

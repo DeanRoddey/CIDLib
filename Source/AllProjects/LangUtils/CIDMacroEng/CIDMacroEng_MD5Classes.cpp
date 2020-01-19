@@ -47,13 +47,16 @@ RTTIDecls(TMEngMD5Info,TMacroEngClass)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_MD5Class
 {
-    // -----------------------------------------------------------------------
-    //  The names of our classes
-    // -----------------------------------------------------------------------
-    const TString   strDigestName(L"MD5Digest");
-    const TString   strDigestPath(L"MEng.System.Runtime.MD5Digest");
-    const TString   strHashName(L"MD5Hash");
-    const TString   strHashClassPath(L"MEng.System.Runtime.MD5Hash");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names of our classes
+        // -----------------------------------------------------------------------
+        const TString   strDigestName(L"MD5Digest");
+        const TString   strDigestPath(L"MEng.System.Runtime.MD5Digest");
+        const TString   strHashName(L"MD5Hash");
+        const TString   strHashClassPath(L"MEng.System.Runtime.MD5Hash");
+    }
 }
 
 

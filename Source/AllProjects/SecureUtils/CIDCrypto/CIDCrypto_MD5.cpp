@@ -33,33 +33,36 @@
 
 namespace CIDCrypto_MD5
 {
-    // -----------------------------------------------------------------------
-    //  Local constant data
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard4    c4S11 = 7;
-    constexpr tCIDLib::TCard4    c4S12 = 12;
-    constexpr tCIDLib::TCard4    c4S13 = 17;
-    constexpr tCIDLib::TCard4    c4S14 = 22;
-    constexpr tCIDLib::TCard4    c4S21 = 5;
-    constexpr tCIDLib::TCard4    c4S22 = 9;
-    constexpr tCIDLib::TCard4    c4S23 = 14;
-    constexpr tCIDLib::TCard4    c4S24 = 20;
-    constexpr tCIDLib::TCard4    c4S31 = 4;
-    constexpr tCIDLib::TCard4    c4S32 = 11;
-    constexpr tCIDLib::TCard4    c4S33 = 16;
-    constexpr tCIDLib::TCard4    c4S34 = 23;
-    constexpr tCIDLib::TCard4    c4S41 = 6;
-    constexpr tCIDLib::TCard4    c4S42 = 10;
-    constexpr tCIDLib::TCard4    c4S43 = 15;
-    constexpr tCIDLib::TCard4    c4S44 = 21;
-
-    constexpr tCIDLib::TCard1    ac1Padding[64] =
+    namespace
     {
-        0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
+        // -------------------------------------------------------------------
+        //  Local constant data
+        // -------------------------------------------------------------------
+        constexpr tCIDLib::TCard4    c4S11 = 7;
+        constexpr tCIDLib::TCard4    c4S12 = 12;
+        constexpr tCIDLib::TCard4    c4S13 = 17;
+        constexpr tCIDLib::TCard4    c4S14 = 22;
+        constexpr tCIDLib::TCard4    c4S21 = 5;
+        constexpr tCIDLib::TCard4    c4S22 = 9;
+        constexpr tCIDLib::TCard4    c4S23 = 14;
+        constexpr tCIDLib::TCard4    c4S24 = 20;
+        constexpr tCIDLib::TCard4    c4S31 = 4;
+        constexpr tCIDLib::TCard4    c4S32 = 11;
+        constexpr tCIDLib::TCard4    c4S33 = 16;
+        constexpr tCIDLib::TCard4    c4S34 = 23;
+        constexpr tCIDLib::TCard4    c4S41 = 6;
+        constexpr tCIDLib::TCard4    c4S42 = 10;
+        constexpr tCIDLib::TCard4    c4S43 = 15;
+        constexpr tCIDLib::TCard4    c4S44 = 21;
+
+        constexpr tCIDLib::TCard1    ac1Padding[64] =
+        {
+            0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        };
+    }
 }
 
 
@@ -159,6 +162,8 @@ tCIDLib::TVoid
 TMessageDigest5::DigestRaw( const   tCIDLib::TCard1* const  pc1Input
                             , const tCIDLib::TCard4         c4Bytes)
 {
+    CIDAssert(pc1Input != nullptr, L"Null input to DigestRaw");
+
     tCIDLib::TCard4     c4Index;
     tCIDLib::TCard4     c4PartLen;
 
@@ -275,7 +280,7 @@ tCIDLib::TVoid TMessageDigest5::StartNew()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TMessageDigest5::Complete(tCIDLib::TCard1* const pc1Digest)
 {
-    tCIDLib::TCard1   ac1Bits[8];
+    tCIDLib::TCard1   ac1Bits[8] = {0};
     tCIDLib::TCard4   c4Index;
     tCIDLib::TCard4   c4PadLen;
 

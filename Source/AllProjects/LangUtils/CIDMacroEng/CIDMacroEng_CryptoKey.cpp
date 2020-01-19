@@ -45,12 +45,14 @@ RTTIDecls(TMEngCryptoKeyInfo,TMacroEngClass)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_CryptoKey
 {
-    // -----------------------------------------------------------------------
-    //  The names of our classes
-    // -----------------------------------------------------------------------
-    const TString   strKeyName(L"CryptoKey");
-    const TString   strKeyClassPath(L"MEng.System.Runtime.CryptoKey");
-
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names of our classes
+        // -----------------------------------------------------------------------
+        const TString   strKeyName(L"CryptoKey");
+        const TString   strKeyClassPath(L"MEng.System.Runtime.CryptoKey");
+    }
 }
 
 

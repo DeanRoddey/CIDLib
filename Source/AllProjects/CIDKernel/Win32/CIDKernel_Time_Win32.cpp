@@ -42,7 +42,6 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_Time_Win32
 {
-    TAtomicFlag         atomHighResInit;
     tCIDLib::TBoolean   bHighResAvail = kCIDLib::False;
     tCIDLib::TCard4     c4MinUSecs;
     tCIDLib::TInt8      i8TicksPerUSec;
@@ -92,6 +91,27 @@ tCIDLib::TBoolean TCIDKrnlModule::bInitTermTime(const tCIDLib::EInitTerm eState)
             FlTime.dwLowDateTime, FlTime.dwHighDateTime
         );
         #endif
+
+        // See if highe perf timers are available
+        LARGE_INTEGER Freq;
+        if (::QueryPerformanceFrequency(&Freq))
+        {
+            // Make sure we actually have counter support also
+            LARGE_INTEGER TestTicks;
+            if (::QueryPerformanceCounter(&TestTicks))
+            {
+                //
+                //  We allow sleeps for microsecond intervals, so calculate
+                //  the ticks per microsecond.
+                //
+                CIDKernel_Time_Win32::i8TicksPerUSec = Freq.QuadPart / 1000000;
+                CIDKernel_Time_Win32::bHighResAvail = kCIDLib::True;
+            }
+        }
+         else
+        {
+            CIDKernel_Time_Win32::bHighResAvail = kCIDLib::False;
+        }
     }
     return kCIDLib::True;
 }
@@ -117,34 +137,6 @@ const tCIDLib::TEncodedTime TKrnlTimeStamp::enctNTPOfs  = 116444738208988800;
 //
 tCIDLib::TBoolean TKrnlTimeStamp::bHighResTimerAvailable()
 {
-    // If we've not initializd the high res timer stuff yet, then do so
-    if (!CIDKernel_Time_Win32::atomHighResInit)
-    {
-        TBaseLock lockInit;
-        if (!CIDKernel_Time_Win32::atomHighResInit)
-        {
-            LARGE_INTEGER Freq;
-            if (::QueryPerformanceFrequency(&Freq))
-            {
-                // Make sure we actually have counter support also
-                LARGE_INTEGER TestTicks;
-                if (::QueryPerformanceCounter(&TestTicks))
-                {
-                    //
-                    //  We allow sleeps for microsecond intervals, so calculate
-                    //  the ticks per microsecond.
-                    //
-                    CIDKernel_Time_Win32::i8TicksPerUSec = Freq.QuadPart / 1000000;
-                    CIDKernel_Time_Win32::bHighResAvail = kCIDLib::True;
-                }
-            }
-             else
-            {
-                CIDKernel_Time_Win32::bHighResAvail = kCIDLib::False;
-            }
-            CIDKernel_Time_Win32::atomHighResInit.Set();
-        }
-    }
     return CIDKernel_Time_Win32::bHighResAvail;
 }
 
@@ -152,10 +144,6 @@ tCIDLib::TBoolean TKrnlTimeStamp::bHighResTimerAvailable()
 tCIDLib::TBoolean
 TKrnlTimeStamp::bHighResDelay(const tCIDLib::TCard4 c4MicroSecs)
 {
-    // If we've not initializd the high res timer stuff yet, then do so
-    if (!CIDKernel_Time_Win32::atomHighResInit)
-        bHighResTimerAvailable();
-
     // If no support, then just sleep for millis
     if (!CIDKernel_Time_Win32::bHighResAvail)
     {

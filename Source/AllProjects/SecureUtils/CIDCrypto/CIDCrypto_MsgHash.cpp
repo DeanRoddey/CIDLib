@@ -42,7 +42,10 @@ RTTIDecls(TMsgHash,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDCrypto_MsgHash
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 

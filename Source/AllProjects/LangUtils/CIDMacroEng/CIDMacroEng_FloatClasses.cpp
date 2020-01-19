@@ -47,15 +47,18 @@ RTTIDecls(TMEngFloat8Info,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_FloatClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strFloat4(L"Float4");
-    const TString   strFloat8(L"Float8");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strFloat4(L"Float4");
+        const TString   strFloat8(L"Float8");
 
-    const TString   strFloat4ClassPath(L"MEng.Float4");
-    const TString   strFloat8ClassPath(L"MEng.Float8");
+        const TString   strFloat4ClassPath(L"MEng.Float4");
+        const TString   strFloat8ClassPath(L"MEng.Float8");
+    }
 }
 
 

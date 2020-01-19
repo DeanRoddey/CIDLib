@@ -41,14 +41,17 @@ RTTIDecls(TDlgDesc,TObject)
 
 namespace CIDCtrls_DlgDesc
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  c2FmtVersion
-    //      This is the current version of the format. It is currently just 1,
-    //      but will be used in the future to handle format expansion.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  c2FmtVersion
+        //      This is the current version of the format. It is currently just 1,
+        //      but will be used in the future to handle format expansion.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 

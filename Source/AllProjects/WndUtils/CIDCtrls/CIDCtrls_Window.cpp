@@ -185,24 +185,32 @@ class TWndMapItemKeyOps
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_Window
 {
-    // ------------------------------------------------------------------------
-    //  We have to be able to map from window handles (which we get in the window proc) and
-    //  our window objects. Storing a pointer in the window's window's extra data is kludgey
-    //  and can't tell the difference between non-CIDLib windows and CIDLib windows until
-    //  its too late. So we need a mapping mechanism.
-    //
-    //  So we just use a keyed hash set.
-    //
-    //  Syncrhonization is not required since this map is only accessed from window messages
-    //  and they are serialized within a single process.
-    // ------------------------------------------------------------------------
-    TRefKeyedHashSet<TWndMapItem, TWndMapItemH, TWndMapItemKeyOps> colWndItemMap
-    (
-        tCIDLib::EAdoptOpts::Adopt
-        , 1024
-        , TWndMapItemKeyOps()
-        , &TWndMapItem::wmihKey
-    );
+    namespace
+    {
+        // ------------------------------------------------------------------------
+        //  We have to be able to map from window handles (which we get in the window proc) and
+        //  our window objects. Storing a pointer in the window's window's extra data is kludgey
+        //  and can't tell the difference between non-CIDLib windows and CIDLib windows until
+        //  its too late. So we need a mapping mechanism.
+        //
+        //  So we just use a keyed hash set.
+        //
+        //  Syncrhonization is not required since this map is only accessed from window messages
+        //  and they are serialized within a single process.
+        // ------------------------------------------------------------------------
+        using TWndItemMap = TRefKeyedHashSet<TWndMapItem, TWndMapItemH, TWndMapItemKeyOps>;
+        TWndItemMap& colWndItemMap()
+        {
+            static TWndItemMap* pcolMap = new TWndItemMap
+            (
+                tCIDLib::EAdoptOpts::Adopt
+                , 1024
+                , TWndMapItemKeyOps()
+                , &TWndMapItem::wmihKey
+            );
+            return *pcolMap;
+        }
+    }
 }
 
 
@@ -331,7 +339,7 @@ mresCIDCtrlsDispatch(const  tCIDCtrls::TWndHandle   hwndThis
             pwmiData->m_pwndWnd->SetIsDialog();
         }
 
-        CIDCtrls_Window::colWndItemMap.Add(pwmiData);
+        CIDCtrls_Window::colWndItemMap().Add(pwmiData);
 
         // And store the window handle on the window object
         pwmiData->m_pwndWnd->StoreHandle(hwndThis);
@@ -464,7 +472,7 @@ mresCIDCtrlsDispatch(const  tCIDCtrls::TWndHandle   hwndThis
             //  NOT delete the window itself. This window may not be dynamically allocated.
             //  Each window that creates children is responsible for cleaning them up.
             //
-            if (!CIDCtrls_Window::colWndItemMap.bRemoveKey(hwndThis, kCIDLib::False))
+            if (!CIDCtrls_Window::colWndItemMap().bRemoveKey(hwndThis, kCIDLib::False))
             {
                 #if CID_DEBUG_ON
                 TAudio::Beep(880, 50);
@@ -618,7 +626,7 @@ TWindow& TWindow::Nul_TWindow()
 //
 TWindow* TWindow::pwndGetWndLinkPtr(const tCIDCtrls::TWndHandle hwndSrc)
 {
-    TWndMapItem* pwmiCur = CIDCtrls_Window::colWndItemMap.pobjFindByKey
+    TWndMapItem* pwmiCur = CIDCtrls_Window::colWndItemMap().pobjFindByKey
     (
         hwndSrc, kCIDLib::False
     );
@@ -2148,7 +2156,7 @@ tCIDLib::TVoid TWindow::Destroy()
         if (m_bOwnsHandle)
             ::DestroyWindow(m_hwndThis);
         else
-            CIDCtrls_Window::colWndItemMap.bRemoveKey(m_hwndThis, kCIDLib::False);
+            CIDCtrls_Window::colWndItemMap().bRemoveKey(m_hwndThis, kCIDLib::False);
     }
 }
 
@@ -7398,7 +7406,7 @@ TWindow::CreateWnd( const   tCIDCtrls::TWndHandle   hwndParOwner
     {
         // Store a pointer to our window structure in the extra window data
         TWndMapItem* pwmiNew = new TWndMapItem(hwndTmp, this);
-        CIDCtrls_Window::colWndItemMap.Add(pwmiNew);
+        CIDCtrls_Window::colWndItemMap().Add(pwmiNew);
 
         // Store the handle before we do anything else
         m_hwndThis = hwndTmp;
@@ -8118,7 +8126,7 @@ TWindow::UseHandle(         tCIDCtrls::TWndHandle   hwndToUse
 
     // Store a pointer to our window structure in the extra window data
     TWndMapItem* pwmiNew = new TWndMapItem(hwndToUse, this);
-    CIDCtrls_Window::colWndItemMap.Add(pwmiNew);
+    CIDCtrls_Window::colWndItemMap().Add(pwmiNew);
 
     if (bSubClass)
         SetSubclass();

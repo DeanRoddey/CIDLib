@@ -39,13 +39,16 @@ RTTIDecls(TMD5Hash,TObject)
 
 namespace CIDCrypto_MD5Hash
 {
-    // -----------------------------------------------------------------------
-    //  Local constants
-    //
-    //  c4HyphenOfs
-    //      The offset of the hypen in the formatted unique id string.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4HyphenOfs  = 16;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local constants
+        //
+        //  c4HyphenOfs
+        //      The offset of the hypen in the formatted unique id string.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4HyphenOfs  = 16;
+    }
 }
 
 

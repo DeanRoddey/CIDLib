@@ -45,84 +45,87 @@ RTTIDecls(TGUIFacility,TFacility)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_GUIFacility
 {
-    //
-    //  Our cache for bitmaps. It is thread safe, so we use it for locking
-    //  during access.
-    //
-    class TBmpCacheItem
+    namespace
     {
-        public :
-            static const TString& strKey(const TBmpCacheItem& itemSrc)
-            {
-                return itemSrc.m_strName;
-            }
+        //
+        //  Our cache for bitmaps. It is thread safe, so we use it for locking
+        //  during access.
+        //
+        class TBmpCacheItem
+        {
+            public :
+                static const TString& strKey(const TBmpCacheItem& itemSrc)
+                {
+                    return itemSrc.m_strName;
+                }
 
-            TBmpCacheItem(const TString& strName, TBitmap& bmpItem) :
-                m_bmpItem(bmpItem)
-                , m_strName(strName)
-            {
-            }
+                TBmpCacheItem(const TString& strName, TBitmap& bmpItem) :
+                    m_bmpItem(bmpItem)
+                    , m_strName(strName)
+                {
+                }
 
-            TBitmap m_bmpItem;
-            TString m_strName;
-    };
+                TBitmap m_bmpItem;
+                TString m_strName;
+        };
 
-    TSafeKeyedHashSet<TBmpCacheItem, TString, TStringKeyOps> colBmpCache
-    (
-        107, TStringKeyOps(), &TBmpCacheItem::strKey
-    );
-
-
-
-    // Save as above but for icons in this case
-    class TIconCacheItem
-    {
-        public :
-            static const TString& strKey(const TIconCacheItem& itemSrc)
-            {
-                return itemSrc.m_strName;
-            }
-
-            TIconCacheItem(const TString& strName, TIcon& icoItem) :
-                m_icoItem(icoItem)
-                , m_strName(strName)
-            {
-            }
-
-            TIcon   m_icoItem;
-            TString m_strName;
-    };
-
-    TSafeKeyedHashSet<TIconCacheItem, TString, TStringKeyOps> colIconCache
-    (
-        29, TStringKeyOps(), &TIconCacheItem::strKey
-    );
+        TSafeKeyedHashSet<TBmpCacheItem, TString, TStringKeyOps> colBmpCache
+        (
+            107, TStringKeyOps(), &TBmpCacheItem::strKey
+        );
 
 
-    // And yet another for app images
-    class TAppImgCacheItem
-    {
-        public :
-            static const TString& strKey(const TAppImgCacheItem& itemSrc)
-            {
-                return itemSrc.m_strName;
-            }
 
-            TAppImgCacheItem(const TString& strName) :
-                m_strName(strName)
-            {
-            }
+        // Save as above but for icons in this case
+        class TIconCacheItem
+        {
+            public :
+                static const TString& strKey(const TIconCacheItem& itemSrc)
+                {
+                    return itemSrc.m_strName;
+                }
 
-            TPNGImage   m_imgItem;
-            TString     m_strName;
-    };
+                TIconCacheItem(const TString& strName, TIcon& icoItem) :
+                    m_icoItem(icoItem)
+                    , m_strName(strName)
+                {
+                }
 
-    static TSafeKeyedHashSet<TAppImgCacheItem, TString, TStringKeyOps> colAppImgCache
-    (
-        107, TStringKeyOps(), &TAppImgCacheItem::strKey
-    );
+                TIcon   m_icoItem;
+                TString m_strName;
+        };
 
-    static TAtomicFlag  atomMetricsLoaded;
+        TSafeKeyedHashSet<TIconCacheItem, TString, TStringKeyOps> colIconCache
+        (
+            29, TStringKeyOps(), &TIconCacheItem::strKey
+        );
+
+
+        // And yet another for app images
+        class TAppImgCacheItem
+        {
+            public :
+                static const TString& strKey(const TAppImgCacheItem& itemSrc)
+                {
+                    return itemSrc.m_strName;
+                }
+
+                TAppImgCacheItem(const TString& strName) :
+                    m_strName(strName)
+                {
+                }
+
+                TPNGImage   m_imgItem;
+                TString     m_strName;
+        };
+
+        TSafeKeyedHashSet<TAppImgCacheItem, TString, TStringKeyOps> colAppImgCache
+        (
+            107, TStringKeyOps(), &TAppImgCacheItem::strKey
+        );
+
+        TAtomicFlag  atomMetricsLoaded;
+    }
 }
 
 

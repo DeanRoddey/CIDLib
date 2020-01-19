@@ -523,15 +523,7 @@ TKrnlSysInfo::bQuerySpecialPath(        tCIDLib::TCh* const     pszBuffer
     };
 
     tCIDLib::TCh szBuf[kCIDLib::c4MaxPathLen + 1];
-    HRESULT hRes = ::SHGetFolderPathW
-    (
-        0
-        , iFolder
-        , 0
-        , SHGFP_TYPE_CURRENT
-        , szBuf
-    );
-
+    HRESULT hRes = ::SHGetFolderPathW(0, iFolder, 0, SHGFP_TYPE_CURRENT, szBuf);
     if (!SUCCEEDED(hRes))
     {
         TKrnlError::SetLastHostError(::GetLastError());
@@ -539,7 +531,11 @@ TKrnlSysInfo::bQuerySpecialPath(        tCIDLib::TCh* const     pszBuffer
     }
 
     // Normalize it to the caller's buffer
-    return TKrnlFileSys::bNormalizePath(szBuf, pszBuffer, c4MaxChars);
+    if (!TKrnlFileSys::bNormalizePath(szBuf, pszBuffer, c4MaxChars))
+        return kCIDLib::False;
+
+    // Make sure it ends with a separator
+    return TKrnlPathStr::bAddTrailingSep(pszBuffer, c4MaxChars);
 }
 
 

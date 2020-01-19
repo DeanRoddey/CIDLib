@@ -50,7 +50,7 @@ TFacCIDOrbUC::TFacCIDOrbUC() :
     TFacility
     (
         L"CIDOrbUC"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision

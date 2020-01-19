@@ -43,31 +43,34 @@ RTTIDecls(TIPEndPoint,TIPAddress)
 // ---------------------------------------------------------------------------
 namespace CIDSock_IPAddr
 {
-    // -----------------------------------------------------------------------
-    //  The streaming format version for the IP address class
-    //
-    //  Version 2 -
-    //      We started storing the host name along with the address info
-    //
-    //  Version 3 -
-    //      The changes required for the IP V4/6 agnosticism, so we have to
-    //      store a variable sized byte array for the address info.
-    //
-    //  Version 4 -
-    //      We need to store the scope id as well, which is required for some
-    //      IPV6 addresses.
-    //
-    //  Version 5 -
-    //      And, again, we failed to store the flow info value of an IPV6
-    //      address, so that was added as well.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1IPAddrFmtVersion = 5;
+    namespace
+    {
+        // -------------------------------------------------------------------
+        //  The streaming format version for the IP address class
+        //
+        //  Version 2 -
+        //      We started storing the host name along with the address info
+        //
+        //  Version 3 -
+        //      The changes required for the IP V4/6 agnosticism, so we have to
+        //      store a variable sized byte array for the address info.
+        //
+        //  Version 4 -
+        //      We need to store the scope id as well, which is required for some
+        //      IPV6 addresses.
+        //
+        //  Version 5 -
+        //      And, again, we failed to store the flow info value of an IPV6
+        //      address, so that was added as well.
+        // -------------------------------------------------------------------
+        const tCIDLib::TCard1   c1IPAddrFmtVersion = 5;
 
 
-    // -----------------------------------------------------------------------
-    //  The straeming format version for the IP end point class
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1EndPntFmtVersion = 1;
+        // -------------------------------------------------------------------
+        //  The straeming format version for the IP end point class
+        // -------------------------------------------------------------------
+        const tCIDLib::TCard1   c1EndPntFmtVersion = 1;
+    }
 }
 
 

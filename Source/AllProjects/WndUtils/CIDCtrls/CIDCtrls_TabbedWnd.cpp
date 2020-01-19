@@ -44,9 +44,12 @@ AdvRTTIDecls(TTabbedWnd, TCtrlWnd)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_TabbedWnd
 {
-    // Pseudo menu command ids for use in our accelerator table
-    const tCIDLib::TResId ridMenu_Close     = 100;
-    const tCIDLib::TResId ridMenu_NextTab   = 101;
+    namespace
+    {
+        // Pseudo menu command ids for use in our accelerator table
+        constexpr tCIDLib::TResId ridMenu_Close     = 100;
+        constexpr tCIDLib::TResId ridMenu_NextTab   = 101;
+    }
 }
 
 

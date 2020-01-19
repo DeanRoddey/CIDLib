@@ -933,7 +933,7 @@ TTestFrameWnd::MenuCommand( const   tCIDLib::TResId     ridItem
         (
             *this
             , L"Open a Manifest File"
-            , L"C:\\Tmp"
+            , TSysInfo::strSpecialPath(tCIDLib::ESpecialPaths::UserAppData)
             , colSel
             , colTypes
             , tCIDLib::eOREnumBits

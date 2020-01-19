@@ -538,16 +538,10 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
         //  m_paobjList
         //      This is a pointer to the the array of objects. It is
         //      allocated in the constructor to be as big as the user wants.
-        //
-        //  m_pmtxLock
-        //      This is the optional mutex that allows this array to
-        //      be lockable. The derived class indicates to our constructor
-        //      whether this collection should be mutlti-thread safe.
         // -------------------------------------------------------------------
         tCIDLib::TCard4     m_c4ElemCount;
         tCIDLib::TCard4     m_c4SerialNum;
         TElem*              m_paobjList;
-        TMutex*             m_pmtxLock;
 
 
         // -------------------------------------------------------------------

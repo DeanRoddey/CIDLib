@@ -45,8 +45,11 @@ RTTIDecls(TMEngBinFileVal,TMEngClassVal)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_BinFileClass
 {
-    const TString   strName(L"BinFile");
-    const TString   strClassPath(L"MEng.System.Runtime.BinFile");
+    namespace
+    {
+        const TString   strName(L"BinFile");
+        const TString   strClassPath(L"MEng.System.Runtime.BinFile");
+    }
 }
 
 

@@ -45,12 +45,15 @@ RTTIDecls(TMEngBooleanInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_BooleanClass
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strBoolean(L"Boolean");
-    const TString   strBooleanClassPath(L"MEng.Boolean");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strBoolean(L"Boolean");
+        const TString   strBooleanClassPath(L"MEng.Boolean");
+    }
 }
 
 

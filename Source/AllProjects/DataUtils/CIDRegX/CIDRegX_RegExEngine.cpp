@@ -40,15 +40,18 @@ RTTIDecls(TRegEx,TObject)
 
 namespace CIDRegX_Engine
 {
-    // -----------------------------------------------------------------------
-    //  Local, const data
-    //
-    //  c4Scan
-    //      This is a special value that is put into the deque while running
-    //      the DFA. It separates the states for the current character and
-    //      those for the next character.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    c4Scan = kCIDLib::c4MaxCard;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local, const data
+        //
+        //  c4Scan
+        //      This is a special value that is put into the deque while running
+        //      the DFA. It separates the states for the current character and
+        //      those for the next character.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCard4    c4Scan = kCIDLib::c4MaxCard;
+    }
 }
 
 

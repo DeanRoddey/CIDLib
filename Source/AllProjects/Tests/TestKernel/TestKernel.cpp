@@ -683,9 +683,9 @@ int main(const int i4ArgC, tCIDLib::TSCh* apszArgs[])
         if (!kmodTestKernel.bQueryFromName
         (
             L"TestKernel"
-            , tCIDLib::EModTypes::Exe
             , kCIDLib::c4MajVersion
             , kCIDLib::c4MinVersion
+            , tCIDLib::EModTypes::Exe
             , tCIDLib::EModFlags::HasMsgFile))
         {
             throw TKrnlError::kerrLast();

@@ -33,24 +33,27 @@
 
 namespace CIDCrypto_UniqueId
 {
-    // -----------------------------------------------------------------------
-    //  Local constants
-    //
-    //  c4SrcBufLen
-    //      The size of the buffer we fill with data to hash and create the
-    //      unique id. We fill it with this many random Card4 values.
-    /// -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4SrcBufLen = 8;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local constants
+        //
+        //  c4SrcBufLen
+        //      The size of the buffer we fill with data to hash and create the
+        //      unique id. We fill it with this many random Card4 values.
+        /// -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4SrcBufLen = 8;
 
 
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  ptdLastId
-    //      This is where we store a random number generator for each thread, so
-    //      we don't have to re-seed every time.
-    // -----------------------------------------------------------------------
-    thread_local TRandomNum* prandThread;
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  ptdLastId
+        //      This is where we store a random number generator for each thread, so
+        //      we don't have to re-seed every time.
+        // -----------------------------------------------------------------------
+        thread_local TRandomNum* prandThread;
+    }
 }
 
 

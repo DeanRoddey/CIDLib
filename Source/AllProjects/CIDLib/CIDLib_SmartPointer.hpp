@@ -239,7 +239,7 @@ template <typename T> class TUniquePtr
         {
             T* pobjRet = m_pdpInfo->m_pobjData;
             m_pdpInfo->m_pobjData = nullptr;
-            return pRet;
+            return pobjRet;
         }
 
 
@@ -252,14 +252,16 @@ template <typename T> class TUniquePtr
         // -------------------------------------------------------------------
         template <typename T> struct TDataPtr
         {
-            TDataPtr(T* const pobjAdopt) : m_pobjData(pobjAdopt) {}
-            virtual ~TDataPtr() {}
+            public :
+                TDataPtr(T* const pobjAdopt) : m_pobjData(pobjAdopt) {}
+                virtual ~TDataPtr() {}
 
-            virtual tCIDLib::TVoid DestroyData()
-            {
-                delete m_pobjData;
-            }
-            T*  m_pobjData;
+                virtual tCIDLib::TVoid DestroyData()
+                {
+                    delete m_pobjData;
+                }
+
+                T*  m_pobjData;
         };
 
         template <typename T, typename TDeleter> struct TDataPtrDel : public TDataPtr<T>
@@ -273,7 +275,7 @@ template <typename T> class TUniquePtr
 
             tCIDLib::TVoid DestroyData() final
             {
-                m_fnDeleter(m_pobjData);
+                m_fnDeleter(this->m_pobjData);
             }
 
             TDeleter    m_fnDeleter;
@@ -452,9 +454,6 @@ template <typename T> class TCntPtrData
                 catch(...)
                 {
                     m_pobjData = nullptr;
-                    #if CID_DEBUG_ON
-                    TAudio::Beep(880, 100);
-                    #endif
                 }
             }
 
@@ -725,9 +724,6 @@ template <typename T> class TCntPtr
             catch(...)
             {
                 // There's not much we can do. Even logging in this code is dangerous
-                #if CID_DEBUG_ON
-                TAudio::Beep(880, 100);
-                #endif
             }
         }
 
@@ -1322,7 +1318,7 @@ template <typename T> class TMemberPtr
         {
             T* pobjRet = m_pdpInfo->m_pobjData;
             m_pdpInfo->m_pobjData = nullptr;
-            return pRet;
+            return pobjRet;
         }
 
         // Drop any current data and create a new default handler for the new data

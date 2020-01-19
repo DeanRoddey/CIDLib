@@ -43,11 +43,14 @@ RTTIDecls(TAttrData, TObject)
 // ---------------------------------------------------------------------------
 namespace CIDMData_AttrData
 {
-    //
-    //  Version 2 -
-    //      Added the user data string member
-    //
-    constexpr tCIDLib::TCard2   c2FmtVersion = 2;
+    namespace
+    {
+        //
+        //  Version 2 -
+        //      Added the user data string member
+        //
+        constexpr tCIDLib::TCard2   c2FmtVersion = 2;
+    }
 }
 
 

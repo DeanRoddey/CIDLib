@@ -85,13 +85,12 @@ class CIDLIBEXP TFacility : public TModule
         TFacility
         (
             const   TString&                strFacName
-            , const TString&                strLoadPath
+            , const TString&                strFromPath
             , const tCIDLib::EModTypes      eModType
             , const tCIDLib::TCard4         c4MajVer
             , const tCIDLib::TCard4         c4MinVer
             , const tCIDLib::TCard4         c4Revision
             , const tCIDLib::EModFlags      eFlags
-            , const tCIDLib::TBoolean       bLoad = kCIDLib::False
         );
 
         TFacility(const TFacility&) = delete;

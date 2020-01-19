@@ -38,14 +38,6 @@
 RTTIDecls(TFacCIDAdvGraph,TFacility)
 
 
-// ---------------------------------------------------------------------------
-//  Local data
-// ---------------------------------------------------------------------------
-namespace CIDAdvGraph_ThisFacility
-{
-};
-
-
 
 // ---------------------------------------------------------------------------
 //   CLASS: TFacCIDAdvGraph
@@ -60,7 +52,7 @@ TFacCIDAdvGraph::TFacCIDAdvGraph() :
     TFacility
     (
         L"CIDAdvGraph"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision

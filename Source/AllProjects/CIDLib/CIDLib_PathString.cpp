@@ -208,8 +208,8 @@ tCIDLib::TVoid TPathStr::AppendExt(const TString& strExt)
 
 tCIDLib::TBoolean TPathStr::bExtractExt(TString& strBuf)
 {
-    tCIDLib::TCard4     c4End;
-    tCIDLib::TCard4     c4Start;
+    tCIDLib::TCard4     c4End = 0;
+    tCIDLib::TCard4     c4Start = 0;
     const tCIDLib::TCh* pszBuf = pszBuffer();
 
     if (!TKrnlPathStr::bFindPart(pszBuf, c4Start, c4End, tCIDLib::EPathParts::Extension))
@@ -232,8 +232,8 @@ tCIDLib::TBoolean TPathStr::bExtractExt(TString& strBuf)
 
 tCIDLib::TBoolean TPathStr::bExtractNameExt(TString& strBuf)
 {
-    tCIDLib::TCard4     c4End;
-    tCIDLib::TCard4     c4Start;
+    tCIDLib::TCard4     c4End = 0;
+    tCIDLib::TCard4     c4Start = 0;
     const tCIDLib::TCh* pszBuf = pszBuffer();
 
     if (!TKrnlPathStr::bFindPart(pszBuf, c4Start, c4End, tCIDLib::EPathParts::Name))
@@ -253,8 +253,8 @@ tCIDLib::TBoolean TPathStr::bExtractNameExt(TString& strBuf)
 
 tCIDLib::TBoolean TPathStr::bExtractPath(TString& strBuf)
 {
-    tCIDLib::TCard4     c4End;
-    tCIDLib::TCard4     c4Start;
+    tCIDLib::TCard4     c4End = 0;
+    tCIDLib::TCard4     c4Start = 0;
     const tCIDLib::TCh* pszBuf = pszBuffer();
 
     if (!TKrnlPathStr::bFindPart(pszBuf, c4Start, c4End, tCIDLib::EPathParts::Path))

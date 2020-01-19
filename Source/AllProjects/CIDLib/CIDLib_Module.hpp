@@ -60,41 +60,45 @@ class CIDLIBEXP TModule : public TObject
             ,       TString&                strToFill
         );
 
-        static tCIDLib::TVoid BuildRawModName
+        static tCIDLib::TVoid BuildModName
         (
             const   TString&                strBaseName
             , const tCIDLib::TCard4         c4MajVersion
             , const tCIDLib::TCard4         c4MinVersion
             , const tCIDLib::EModTypes      eModType
-            ,       TString&                strToFill
+            ,       TString&                strPortable
+            ,       TString&                strLoadable
         );
 
-        static tCIDLib::TVoid BuildRawModName
+        static tCIDLib::TVoid BuildModName
         (
             const   TCIDModuleInfo&         modiSrc
-            ,       TString&                strToFill
+            ,       TString&                strPortable
+            ,       TString&                strLoadable
         );
 
-        static tCIDLib::TVoid BuildRawModName
+        static tCIDLib::TVoid BuildModName
         (
             const   TString&                strBaseName
             , const tCIDLib::TCard4         c4MajVersion
             , const tCIDLib::TCard4         c4MinVersion
             , const tCIDLib::EModTypes      eModType
-            ,       TString&                strToFill
+            ,       TString&                strPortable
+            ,       TString&                strLoadable
             ,       TString&                strPrefLangMsgs
             ,       TString&                strDefLangMsgs
         );
 
-        static tCIDLib::TVoid BuildRawModName
+        static tCIDLib::TVoid BuildModName
         (
             const   TCIDModuleInfo&         modiSrc
-            ,       TString&                strToFill
+            ,       TString&                strPortable
+            ,       TString&                strLoadable
             ,       TString&                strPrefLangMsgs
             ,       TString&                strDefLangMsgs
         );
 
-        static tCIDLib::TVoid BuildRawModName
+        static tCIDLib::TVoid BuildModName
         (
             const   TString&                strBaseName
             , const tCIDLib::TCard4         c4MajVersion
@@ -102,18 +106,20 @@ class CIDLIBEXP TModule : public TObject
             , const tCIDLib::EModTypes      eModType
             , const tCIDLib::ELanguages     ePrefLanguage
             , const tCIDLib::ELanguages     eDefLanguage
-            ,       TString&                strToFill
+            ,       TString&                strPortable
+            ,       TString&                strLoadable
             ,       TString&                strPrefLangMsgs
             ,       TString&                strDefLangMsgs
             ,       TString&                strEnLangMsgs
         );
 
-        static tCIDLib::TVoid BuildRawModName
+        static tCIDLib::TVoid BuildModName
         (
             const   TCIDModuleInfo&         modiSrc
             , const tCIDLib::ELanguages     ePrefLanguage
             , const tCIDLib::ELanguages     eDefLanguage
-            ,       TString&                strToFill
+            ,       TString&                strPortable
+            ,       TString&                strLoadable
             ,       TString&                strPrefLangMsgs
             ,       TString&                strDefLangMsgs
             ,       TString&                strEnLangMsgs
@@ -182,24 +188,23 @@ class CIDLIBEXP TModule : public TObject
 
         TModule
         (
+            const   TString&                strName
+            , const TString&                strFromPath
+            , const tCIDLib::EModTypes      eModType
+            , const tCIDLib::TCard4         c4MajVer
+            , const tCIDLib::TCard4         c4MinVer
+            , const tCIDLib::EModFlags      eFlags
+        );
+
+        TModule
+        (
             const   TCIDModuleInfo&         modiSrc
             , const tCIDLib::TBoolean       bLoad = kCIDLib::False
         );
 
         TModule
         (
-            const   TString&                strFullPath
-            , const tCIDLib::EModTypes      eModType
-            , const tCIDLib::EModFlags      eFlags
-            , const tCIDLib::TBoolean       bLoad = kCIDLib::False
-        );
-
-        TModule
-        (
-            const   TString&                strFacName
-            , const TString&                strLoadFrom
-            , const tCIDLib::EModTypes      eModType
-            , const tCIDLib::EModFlags      eFlags
+            const   TString&                strPath
             , const tCIDLib::TBoolean       bLoad = kCIDLib::False
         );
 
@@ -426,9 +431,16 @@ class CIDLIBEXP TModule : public TObject
             , const MFormattable&           fmtblToken4 = MFormattable::Nul_MFormattable()
         )   const;
 
+        TString strLoadableName() const;
+
+        TString strName() const
+        {
+            return m_strName;
+        }
+
         TString strPath() const;
 
-        TString strName() const;
+        TString strPortableName() const;
 
         tCIDLib::TVoid ThrowErr
         (
@@ -535,16 +547,13 @@ class CIDLIBEXP TModule : public TObject
         // -------------------------------------------------------------------
         tCIDLib::TVoid DoInit
         (
-            const   tCIDLib::TCard4         c4MajVer
+            const   TString&                strBaseName
+            , const tCIDLib::TCard4         c4MajVer
             , const tCIDLib::TCard4         c4MinVer
+            , const tCIDLib::EModTypes      eModType
             , const tCIDLib::EModFlags      eFlags
             , const tCIDLib::TBoolean       bLoad
-        );
-
-        tCIDLib::TVoid DoInit2
-        (
-            const   TString&                strModPath
-            , const tCIDLib::EModFlags      eFlags
+            , const TString* const          pstrSrcPath
         );
 
         tCIDLib::TVoid InitStats();
@@ -562,9 +571,6 @@ class CIDLIBEXP TModule : public TObject
         //      We need to synchronize some operations internally in this
         //      class, mainly oriented towards loading and caching resources.
         //
-        //  m_eModType
-        //      The type of this facility, set during the constructor.
-        //
         //  m_kmodThis
         //      The facility module object. This is set by the constructor.
         //
@@ -573,18 +579,14 @@ class CIDLIBEXP TModule : public TObject
         //      into and used from.
         //
         //  m_strName
-        //      The name of the facility, passed in the constructor and stored here.
-        //      No extension, no version stamp.
-        //
-        //  m_strPath
-        //      The path where the facility is located, just the path, no file name.
+        //      The kernel level module has this, but we use it way too much to
+        //      want to convert to a string object every time, so we redundantly
+        //      store it here.
         // -------------------------------------------------------------------
         TCriticalSection    m_crsSync;
-        tCIDLib::EModTypes  m_eModType;
         TKrnlModule         m_kmodThis;
         tCIDLib::TCard1*    m_pc1Res;
         TString             m_strName;
-        TString             m_strPath;
 
 
         // -------------------------------------------------------------------

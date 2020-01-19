@@ -46,8 +46,11 @@ RTTIDecls(TMEngAudioVal,TMEngClassVal)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_AudioClass
 {
-    const TString   strName(L"Audio");
-    const TString   strClassPath(L"MEng.System.Runtime.Audio");
+    namespace
+    {
+        const TString   strName(L"Audio");
+        const TString   strClassPath(L"MEng.System.Runtime.Audio");
+    }
 }
 
 

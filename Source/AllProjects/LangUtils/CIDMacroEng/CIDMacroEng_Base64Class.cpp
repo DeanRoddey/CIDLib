@@ -45,12 +45,14 @@ RTTIDecls(TMEngBase64Info,TMacroEngClass)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_Base64
 {
-    // -----------------------------------------------------------------------
-    //  The names of our classes
-    // -----------------------------------------------------------------------
-    const TString   strB64Name(L"Base64");
-    const TString   strB64ClassPath(L"MEng.System.Runtime.Base64");
-
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names of our classes
+        // -----------------------------------------------------------------------
+        const TString   strB64Name(L"Base64");
+        const TString   strB64ClassPath(L"MEng.System.Runtime.Base64");
+    }
 }
 
 

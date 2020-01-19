@@ -42,18 +42,21 @@ RTTIDecls(TGUIClipboard,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_Clipboard
 {
-    // -----------------------------------------------------------------------
-    //  We have to fault in the registration of our custom types
-    // -----------------------------------------------------------------------
-    TAtomicFlag         atomInitDone;
-    tCIDLib::TCard4     c4CIDStringListType;
-    const tCIDLib::TCh* pszCIDStringListTypeName= L"CIDLib.StringList.ClipboardFormat";
-    tCIDLib::TCard4     c4CIDObjectType;
-    const tCIDLib::TCh* pszCIDObjectTypeName    = L"CIDLib.TObject.ClipboardFormat";
-    tCIDLib::TCard4     c4CIDClassType;
-    const tCIDLib::TCh* pszCIDClassTypeName     = L"CIDLib.TClass.ClipboardFormat";
-    tCIDLib::TCard4     c4CIDFlatObjType;
-    const tCIDLib::TCh* pszCIDFlatObjTypeName   = L"CIDLib.TFlatObj.ClipboardFormat";
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  We have to fault in the registration of our custom types
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomInitDone;
+        tCIDLib::TCard4     c4CIDStringListType;
+        const tCIDLib::TCh* pszCIDStringListTypeName= L"CIDLib.StringList.ClipboardFormat";
+        tCIDLib::TCard4     c4CIDObjectType;
+        const tCIDLib::TCh* pszCIDObjectTypeName    = L"CIDLib.TObject.ClipboardFormat";
+        tCIDLib::TCard4     c4CIDClassType;
+        const tCIDLib::TCh* pszCIDClassTypeName     = L"CIDLib.TClass.ClipboardFormat";
+        tCIDLib::TCard4     c4CIDFlatObjType;
+        const tCIDLib::TCh* pszCIDFlatObjTypeName   = L"CIDLib.TFlatObj.ClipboardFormat";
+    }
 }
 
 

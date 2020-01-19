@@ -42,24 +42,27 @@ AdvRTTIDecls(TNSRebindInfo, TNameServerInfo)
 // ---------------------------------------------------------------------------
 namespace CIDOrbUC_NSInfo
 {
-    // -----------------------------------------------------------------------
-    //  Our NS info persistent format version number. We aren't actually ever
-    //  persisted, but in case of the need to support older clients we do
-    //  version our data.
-    //
-    //  Version 2 -
-    //      Added support for the three extra string values.
-    //
-    //  Version 3 -
-    //      Added support for a fourth extra string value
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard2   c2NSInfoFmtVersion = 3;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our NS info persistent format version number. We aren't actually ever
+        //  persisted, but in case of the need to support older clients we do
+        //  version our data.
+        //
+        //  Version 2 -
+        //      Added support for the three extra string values.
+        //
+        //  Version 3 -
+        //      Added support for a fourth extra string value
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2NSInfoFmtVersion = 3;
 
 
-    // -----------------------------------------------------------------------
-    //  The persistent format for the derived rebind info class
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard2   c2NSRBIFmtVersion = 1;
+        // -----------------------------------------------------------------------
+        //  The persistent format for the derived rebind info class
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2NSRBIFmtVersion = 1;
+    }
 }
 
 

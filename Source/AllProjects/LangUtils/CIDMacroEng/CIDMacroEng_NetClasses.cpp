@@ -48,19 +48,22 @@ RTTIDecls(TMEngURLInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_NetClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    static const TString   strDataSrc(L"DataSrc");
-    static const TString   strDataSrcClassPath(L"MEng.System.Runtime.DataSrc");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strDataSrc(L"DataSrc");
+        const TString   strDataSrcClassPath(L"MEng.System.Runtime.DataSrc");
 
-    static const TString   strHTTPClient(L"HTTPClient");
-    static const TString   strHTTPClientClassPath(L"MEng.System.Runtime.HTTPClient");
+        const TString   strHTTPClient(L"HTTPClient");
+        const TString   strHTTPClientClassPath(L"MEng.System.Runtime.HTTPClient");
 
-    static const TString   strURL(L"URL");
-    static const TString   strURLClassPath(L"MEng.System.Runtime.URL");
-    static const TString   strURLProtosClassPath(L"MEng.System.Runtime.URL.URLProtos");
+        const TString   strURL(L"URL");
+        const TString   strURLClassPath(L"MEng.System.Runtime.URL");
+        const TString   strURLProtosClassPath(L"MEng.System.Runtime.URL.URLProtos");
+    }
 }
 
 

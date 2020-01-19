@@ -42,8 +42,11 @@ RTTIDecls(TFrameWnd, TWindow)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_FrameWnd
 {
-    static const tCIDLib::TCh* pszClass = L"CIDCtrlsStdFrame";
-    static const tCIDLib::TCh* pszClassHV = L"CIDCtrlsStdHVFrame";
+    namespace
+    {
+        const tCIDLib::TCh* pszClass = L"CIDCtrlsStdFrame";
+        const tCIDLib::TCh* pszClassHV = L"CIDCtrlsStdHVFrame";
+    }
 }
 
 

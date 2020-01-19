@@ -46,50 +46,53 @@ RTTIDecls(TFacCIDCtrls, TGUIFacility)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_ThisFacility
 {
-    // -----------------------------------------------------------------------
-    //  This is used to fault in the special text file when/if it is required.
-    // -----------------------------------------------------------------------
-    TAtomicFlag atomInitDone;
-
-
-    // -----------------------------------------------------------------------
-    //  These are used in the window enumeration callback, so that we can pass
-    //  info through.
-    // -----------------------------------------------------------------------
-    struct TFindWndText
+    namespace
     {
-                tCIDLib::TBoolean       bStartsWith;
-        const   tCIDLib::TCh*           pszText;
-        const   tCIDLib::TCh*           pszClass;
-                tCIDLib::TCard4         c4TextLen;
-                tCIDCtrls::TWndHandle   hwndFound;
-                tCIDLib::TProcessId     pidTarget;
-                tCIDLib::TCh*           pchTmpBuf;
-                tCIDLib::TCard4         c4TmpBufSz;
-    };
+        // -----------------------------------------------------------------------
+        //  This is used to fault in the special text file when/if it is required.
+        // -----------------------------------------------------------------------
+        TAtomicFlag atomInitDone;
 
-    struct TFindWndOwnedPopup
-    {
-        tCIDCtrls::TWndHandle   hwndFound;
-        tCIDCtrls::TWndHandle   hwndRootOwner;
-        tCIDLib::TBoolean       bModalOnly;
-    };
 
-    struct TFindWndFiltered
-    {
-                tCIDCtrls::TWndHandle   hwndFound;
-                tCIDLib::TProcessId     pidTarget;
-                tCIDLib::TBoolean       bOwned;
-                tCIDCtrls::TWndHandle   hwndOwner;
-        const   tCIDLib::TCh*           pszClass;
-                tCIDLib::TCard4         c4DontWantStyles;
-                tCIDLib::TCard4         c4WantStyles;
-                tCIDLib::TCard4         c4DontWantExStyles;
-                tCIDLib::TCard4         c4WantExStyles;
+        // -----------------------------------------------------------------------
+        //  These are used in the window enumeration callback, so that we can pass
+        //  info through.
+        // -----------------------------------------------------------------------
+        struct TFindWndText
+        {
+                    tCIDLib::TBoolean       bStartsWith;
+            const   tCIDLib::TCh*           pszText;
+            const   tCIDLib::TCh*           pszClass;
+                    tCIDLib::TCard4         c4TextLen;
+                    tCIDCtrls::TWndHandle   hwndFound;
+                    tCIDLib::TProcessId     pidTarget;
+                    tCIDLib::TCh*           pchTmpBuf;
+                    tCIDLib::TCard4         c4TmpBufSz;
+        };
 
-                tCIDLib::TCard4         c4FoundStyles;
-                tCIDLib::TCard4         c4FoundExStyles;
-    };
+        struct TFindWndOwnedPopup
+        {
+            tCIDCtrls::TWndHandle   hwndFound;
+            tCIDCtrls::TWndHandle   hwndRootOwner;
+            tCIDLib::TBoolean       bModalOnly;
+        };
+
+        struct TFindWndFiltered
+        {
+                    tCIDCtrls::TWndHandle   hwndFound;
+                    tCIDLib::TProcessId     pidTarget;
+                    tCIDLib::TBoolean       bOwned;
+                    tCIDCtrls::TWndHandle   hwndOwner;
+            const   tCIDLib::TCh*           pszClass;
+                    tCIDLib::TCard4         c4DontWantStyles;
+                    tCIDLib::TCard4         c4WantStyles;
+                    tCIDLib::TCard4         c4DontWantExStyles;
+                    tCIDLib::TCard4         c4WantExStyles;
+
+                    tCIDLib::TCard4         c4FoundStyles;
+                    tCIDLib::TCard4         c4FoundExStyles;
+        };
+    }
 }
 
 
@@ -680,7 +683,7 @@ TFacCIDCtrls::TFacCIDCtrls() :
     TGUIFacility
     (
         L"CIDCtrls"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -1016,7 +1019,7 @@ TFacCIDCtrls::bOpenFileDlg( const   TWindow&                wndOwner
             ITEMIDLIST* pItemList = ::SHSimpleIDListFromPath(strInitPath.pszBuffer());
             if (pItemList)
             {
-                IShellItem* pShellItem = 0;
+                IShellItem* pShellItem = nullptr;
                 hRes = ::SHCreateShellItem
                 (
                     NULL, NULL, pItemList, &pShellItem

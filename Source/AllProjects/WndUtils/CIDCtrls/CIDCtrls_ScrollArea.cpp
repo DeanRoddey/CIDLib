@@ -42,7 +42,10 @@ AdvRTTIDecls(TScrollArea, TStdCtrlWnd)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_ScrollArea
 {
-    const tCIDLib::TInt4 i4LnSz = 16;
+    namespace
+    {
+        constexpr tCIDLib::TInt4 i4LnSz = 16;
+    }
 }
 
 

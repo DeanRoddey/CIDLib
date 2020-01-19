@@ -466,15 +466,12 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         apszArgs[c4CurArg++] = L"/Za";
 
     //
-    //  Non-permissive mode is the default but they can ask us to enable permissive
-    //  mode via.
+    //  Permissive mode is the default but they can ask us to enable permissive
+    //  mode via. This is to allow for incremental movement towards full
+    //  conformance.
     //
-    const TKeyValuePair* pkvpOpt = m_pprojiTarget->pkvpFindOption(L"PERMISSIVE");
-    if (!pkvpOpt || !pkvpOpt->strValue().bIEquals(L"Yes"))
-    {
+    if (facCIDBuild.bNonPermissive())
         apszArgs[c4CurArg++] = L"/permissive-";
-        apszArgs[c4CurArg++] = L"/Zc:twoPhase-";
-    }
 
     // For now always build in C++17 mode
     apszArgs[c4CurArg++] = L"/std:c++17";

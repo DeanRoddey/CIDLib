@@ -68,7 +68,7 @@ tCIDLib::TVoid TSpeech::QuerySpeechOutputs(tCIDLib::TKVPCollect& colToFill)
     // We got them so copy them over to the caller's CIDLib level collection
     colToFill.RemoveAll();
 
-    TKrnlKVPair* pkkvpCur;
+    TKrnlKVPair* pkkvpCur = nullptr;
     TKeyValuePair kvalCur;
     if (kllstOutputs.bResetCursor())
     {
@@ -104,7 +104,7 @@ tCIDLib::TVoid TSpeech::QueryVoiceList(tCIDLib::TStrCollect& colToFill)
 
     if (kllstVoices.bResetCursor())
     {
-        TKrnlString* pkstrCur;
+        TKrnlString* pkstrCur = nullptr;
         while (kllstVoices.bNext(pkstrCur))
             colToFill.objAdd(TString(pkstrCur->pszValue()));
     }
@@ -122,7 +122,7 @@ TSpeech::SpeakToFile(const  TString&            strToSay
                     , const tCIDLib::EAudioFmts eFormat
                     , const TString&            strVoice)
 {
-    const tCIDLib::TCh* pszVoice = 0;
+    const tCIDLib::TCh* pszVoice = nullptr;
     if (!strVoice.bIsEmpty())
         pszVoice = strVoice.pszBuffer();
 
@@ -255,11 +255,7 @@ tCIDLib::TVoid TSpeech::Speak(  const   TString&                strToSay
     //  and watch for a shutdown request, since these can take a while
     //  sometimes.
     //
-    tCIDLib::ESpeechFlags eActual = tCIDLib::eOREnumBits
-    (
-        eFlags, tCIDLib::ESpeechFlags::Async
-    );
-
+    const tCIDLib::ESpeechFlags eActual = eFlags | tCIDLib::ESpeechFlags::Async;
     if (!m_kspchImpl.bSpeak(strToSay.pszBuffer(), eActual))
     {
         facCIDLib().LogKrnlErr

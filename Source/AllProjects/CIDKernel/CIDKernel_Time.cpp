@@ -38,17 +38,20 @@
 
 namespace CIDKernel_Time
 {
-    // -----------------------------------------------------------------------
-    //  Local constant values
-    //
-    //  c4MonDays
-    //      The number of days in each month, in a non-leap year.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4MonDays[tCIDLib::c4EnumOrd(tCIDLib::EMonths::Count)] =
+    namespace
     {
-           31,  28,  31,  30,  31,  30
-        ,  31,  31,  30,  31,  30,  31
-    };
+        // -----------------------------------------------------------------------
+        //  Local constant values
+        //
+        //  c4MonDays
+        //      The number of days in each month, in a non-leap year.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCard4 c4MonDays[tCIDLib::c4EnumOrd(tCIDLib::EMonths::Count)] =
+        {
+            31,  28,  31,  30,  31,  30
+            ,  31,  31,  30,  31,  30,  31
+        };
+    }
 };
 
 

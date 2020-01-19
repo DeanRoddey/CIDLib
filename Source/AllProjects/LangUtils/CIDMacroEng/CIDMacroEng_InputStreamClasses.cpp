@@ -49,10 +49,13 @@ RTTIDecls(TMEngStringInStreamInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_InputStreamClasses
 {
-    const TString   strTextInStreamClassPath(L"MEng.System.Runtime.TextInStream");
-    const TString   strConsoleInStreamClassPath(L"MEng.System.Runtime.ConsoleInStream");
-    const TString   strFileInStreamClassPath(L"MEng.System.Runtime.FileInStream");
-    const TString   strStringInStreamClassPath(L"MEng.System.Runtime.StringInStream");
+    namespace
+    {
+        const TString   strTextInStreamClassPath(L"MEng.System.Runtime.TextInStream");
+        const TString   strConsoleInStreamClassPath(L"MEng.System.Runtime.ConsoleInStream");
+        const TString   strFileInStreamClassPath(L"MEng.System.Runtime.FileInStream");
+        const TString   strStringInStreamClassPath(L"MEng.System.Runtime.StringInStream");
+    }
 }
 
 

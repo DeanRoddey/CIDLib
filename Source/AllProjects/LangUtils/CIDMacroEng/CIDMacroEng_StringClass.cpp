@@ -52,24 +52,27 @@ RTTIDecls(TMEngTextXCoderInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_StringClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strChar(L"Char");
-    const TString   strCharClassPath(L"MEng.Char");
-    const TString   strString(L"String");
-    const TString   strStringClassPath(L"MEng.String");
-    const TString   strStrList(L"StringList");
-    const TString   strStrListClassPath(L"MEng.StringList");
-    const TString   strXCoder(L"TextXCoder");
-    const TString   strXCoderClassPath(L"MEng.System.Runtime.TextXCoder");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strChar(L"Char");
+        const TString   strCharClassPath(L"MEng.Char");
+        const TString   strString(L"String");
+        const TString   strStringClassPath(L"MEng.String");
+        const TString   strStrList(L"StringList");
+        const TString   strStrListClassPath(L"MEng.StringList");
+        const TString   strXCoder(L"TextXCoder");
+        const TString   strXCoderClassPath(L"MEng.System.Runtime.TextXCoder");
 
 
-    // -----------------------------------------------------------------------
-    //  The max chars we'll let a string grow to
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MaxChars = 0x10000000;
+        // -----------------------------------------------------------------------
+        //  The max chars we'll let a string grow to
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4MaxChars = 0x10000000;
+    }
 }
 
 

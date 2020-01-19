@@ -42,14 +42,17 @@ RTTIDecls(TXorStreamEncrypter,TStreamEncrypter)
 
 namespace CIDCrypto_Xor
 {
-    // -----------------------------------------------------------------------
-    //  Local, constant data
-    //
-    //  c4StreamBlockSize
-    //      The size of the block of bytes that the TXorStreamEncypter class
-    //      works on at a time (or up to that many at a time.)
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4StreamBlockSize = 512;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local, constant data
+        //
+        //  c4StreamBlockSize
+        //      The size of the block of bytes that the TXorStreamEncypter class
+        //      works on at a time (or up to that many at a time.)
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4StreamBlockSize = 512;
+    }
 }
 
 

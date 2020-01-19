@@ -292,47 +292,62 @@ TKrnlWin32::bQueryExeHdr(   const   tCIDLib::TCh* const     pszExePath
 }
 
 
-
-// Builds up a module (dll/exe) name in the format that CIDLib uses
+//
+//  Build up the name of a CIDLib module, both the portable part (the basic name
+//  that would be used to build up the names of related files (msg text, resources,
+//  etc...) and the loadable version that would be used to load a module dynamically
+//  or to run an executable.
+//
+//  So, for a facility named Foobar, and a version of 1.2, we get:
+//
+//  Library:
+//      Portable: FooBar_1_2
+//      Loadable: FooBar_1_2    (DLLs don't use the extension for loading.)
+//
+//  Exe:
+//      Portable: FooBar
+//      Loadable: FooBar.exe    (Exe's are not versioned)
+//
 tCIDLib::TVoid
-TKrnlWin32::BuildModName(       tCIDLib::TCh* const pszNameBuf
-                        , const tCIDLib::TCard4     c4MaxChars
-                        , const tCIDLib::TCh* const pszModName
-                        , const tCIDLib::TCard4     c4MajVer
-                        , const tCIDLib::TCard4     c4MinVer
-                        , const tCIDLib::EModTypes  eModType)
+TKrnlWin32::BuildModName(       tCIDLib::TCh* const     pszPortableBuf
+                        ,       tCIDLib::TCh* const     pszLoadableBuf
+                        , const tCIDLib::TCard4         c4MaxChars
+                        , const tCIDLib::TCh* const     pszModName
+                        , const tCIDLib::TCard4         c4MajVer
+                        , const tCIDLib::TCard4         c4MinVer
+                        , const tCIDLib::EModTypes      eModType)
 {
-    // Start off with the basic bmodule name
-    TRawStr::CopyStr(pszNameBuf, pszModName, c4MaxChars);
+    // Start off with the basic module name
+    TRawStr::CopyStr(pszPortableBuf, pszModName, c4MaxChars);
 
-    //
-    //  If the passed type is an Exe facility, then we need to add the Exe
-    //  extension under the NT platform or it won't work. The facility names
-    //  names that we get here never have extensions.
-    //
-    //  Else, its if a DLL type, then we need to add on the version
-    //  extension.
-    //
-    if (eModType == tCIDLib::EModTypes::Exe)
-    {
-        TRawStr::CatStr(pszNameBuf, kCIDLib::szExeExtension, c4MaxChars);
-    }
-     else
+    // If a shared library, we have to to add the versioning info
+    if (eModType == tCIDLib::EModTypes::SharedLib)
     {
         constexpr tCIDLib::TCard4 c4BufSz = 256;
         tCIDLib::TCh szTmpBuf[c4BufSz + 1];
 
-        TRawStr::CatStr(pszNameBuf, L"_", c4MaxChars);
+        TRawStr::CatStr(pszPortableBuf, L"_", c4MaxChars);
         TRawStr::bFormatVal(c4MajVer, szTmpBuf, c4BufSz);
-        TRawStr::CatStr(pszNameBuf, szTmpBuf, c4MaxChars);
+        TRawStr::CatStr(pszPortableBuf, szTmpBuf, c4MaxChars);
 
-        TRawStr::CatStr(pszNameBuf, L"_", c4MaxChars);
+        TRawStr::CatStr(pszPortableBuf, L"_", c4MaxChars);
         TRawStr::bFormatVal(c4MinVer, szTmpBuf, c4BufSz);
-        TRawStr::CatStr(pszNameBuf, szTmpBuf, c4MaxChars);
+        TRawStr::CatStr(pszPortableBuf, szTmpBuf, c4MaxChars);
+
+        // The loadable version is the same for us
+        TRawStr::CopyStr(pszLoadableBuf, pszPortableBuf, c4MaxChars);
+    }
+     else
+    {
+        TRawStr::CopyStr(pszLoadableBuf, pszModName, c4MaxChars);
+        TRawStr::CatStr(pszLoadableBuf, kCIDLib::szExeExtension, c4MaxChars);
     }
 }
 
 
+
+
+// Translate our create actions into a Win32 create action flag.
 tCIDLib::TCard4
 TKrnlWin32::c4XlatCreateAction(const tCIDLib::ECreateActs eAction)
 {
@@ -359,6 +374,7 @@ TKrnlWin32::c4XlatCreateAction(const tCIDLib::ECreateActs eAction)
 }
 
 
+// Convert Win32 file attributes to in our file attributes enum
 tCIDLib::EFileInfoFlags
 TKrnlWin32::eConvertAttrs(  const   tCIDLib::TCard4     c4Win32Attrs
                             , const tCIDLib::TCh* const pszFileName)

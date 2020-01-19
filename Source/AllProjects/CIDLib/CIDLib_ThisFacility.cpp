@@ -52,7 +52,7 @@ TFacCIDLib::TFacCIDLib() :
     TFacility
     (
         L"CIDLib"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision

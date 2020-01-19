@@ -353,10 +353,10 @@ const TString& TTextFileOutStream::strFileName() const
 
 tCIDLib::TVoid TTextFileOutStream::SeekToEnd()
 {
-    if (m_pstrmOut)
-        m_pstrmOut->SeekToEnd();
+    if (!m_pstrmOut)
+        ThrowNotReady(CID_LINE);
 
-    ThrowNotReady(CID_LINE);
+    m_pstrmOut->SeekToEnd();
 }
 
 

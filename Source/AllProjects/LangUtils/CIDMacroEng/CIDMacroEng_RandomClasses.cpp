@@ -45,11 +45,14 @@ RTTIDecls(TMEngRandomNumInfo,TMacroEngClass)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_RandomClass
 {
-    // -----------------------------------------------------------------------
-    //  The names of our classes and their paths.
-    // -----------------------------------------------------------------------
-    const TString   strName(L"RandomNum");
-    const TString   strPath(L"MEng.System.Runtime.RandomNum");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names of our classes and their paths.
+        // -----------------------------------------------------------------------
+        const TString   strName(L"RandomNum");
+        const TString   strPath(L"MEng.System.Runtime.RandomNum");
+    }
 }
 
 

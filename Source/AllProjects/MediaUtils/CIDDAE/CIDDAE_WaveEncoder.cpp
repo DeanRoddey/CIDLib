@@ -43,18 +43,21 @@ RTTIDecls(TCIDDAEWaveEnc,TCIDDAEEncoder)
 // ---------------------------------------------------------------------------
 namespace CIDDAE_WaveEncoder
 {
-    // -----------------------------------------------------------------------
-    //  The names we return for our codec and format
-    // -----------------------------------------------------------------------
-    const TString strCodecName(L"DefaultWAV");
-    const TString strFormatName(L"44Khz, 2Ch, 16Bit, PCM");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names we return for our codec and format
+        // -----------------------------------------------------------------------
+        const TString strCodecName(L"DefaultWAV");
+        const TString strFormatName(L"44Khz, 2Ch, 16Bit, PCM");
 
 
-    // -----------------------------------------------------------------------
-    //  The maximum amount of data we'll decode in a single chunk decode
-    //  call.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MaxReadChunkSz = 16 * 1024;
+        // -----------------------------------------------------------------------
+        //  The maximum amount of data we'll decode in a single chunk decode
+        //  call.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4MaxReadChunkSz = 16 * 1024;
+    }
 }
 
 

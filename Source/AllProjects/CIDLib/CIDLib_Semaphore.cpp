@@ -212,7 +212,7 @@ TSemaphore::InitNamed(          tCIDLib::TBoolean&      bCreated
         if (!m_ksemImpl.bCreate(c4InitCount))
         {
             const TKrnlError& kerrLast = TKrnlError::kerrLast();
-            tCIDLib::TErrCode errcToThrow;
+            tCIDLib::TErrCode errcToThrow = kKrnlErrs::errcNoError;
             if (kerrLast.errcId() == kKrnlErrs::errcGen_AlreadyExists)
                 errcToThrow = kCIDErrs::errcSem_AlreadyExists;
             else

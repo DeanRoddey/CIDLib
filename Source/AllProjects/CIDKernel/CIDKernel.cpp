@@ -215,9 +215,9 @@ TCIDKrnlModule::TCIDKrnlModule() :
     if (!bQueryFromName
     (
         L"CIDKernel"
-        , tCIDLib::EModTypes::Dll
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
+        , tCIDLib::EModTypes::SharedLib
         , tCIDLib::EModFlags::HasMsgFile))
     {
         const TKrnlError& kerrToShow = TKrnlError::kerrLast();

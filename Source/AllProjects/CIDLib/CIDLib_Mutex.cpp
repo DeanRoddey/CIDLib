@@ -265,7 +265,7 @@ TMutex::InitNamed(          tCIDLib::TBoolean&      bCreated
         if (!m_kmtxImpl.bCreate(eInitState))
         {
             const TKrnlError& kerrLast = TKrnlError::kerrLast();
-            tCIDLib::TErrCode errcToThrow;
+            tCIDLib::TErrCode errcToThrow = kKrnlErrs::errcNoError;
             if (kerrLast.errcId() == kKrnlErrs::errcGen_AlreadyExists)
                 errcToThrow = kCIDErrs::errcMtx_AlreadyExists;
             else

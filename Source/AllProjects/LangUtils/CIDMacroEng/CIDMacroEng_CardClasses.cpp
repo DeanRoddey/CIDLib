@@ -51,19 +51,22 @@ RTTIDecls(TMEngCard8Info,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_CardClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strCard1(L"Card1");
-    const TString   strCard2(L"Card2");
-    const TString   strCard4(L"Card4");
-    const TString   strCard8(L"Card8");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strCard1(L"Card1");
+        const TString   strCard2(L"Card2");
+        const TString   strCard4(L"Card4");
+        const TString   strCard8(L"Card8");
 
-    const TString   strCard1ClassPath(L"MEng.Card1");
-    const TString   strCard2ClassPath(L"MEng.Card2");
-    const TString   strCard4ClassPath(L"MEng.Card4");
-    const TString   strCard8ClassPath(L"MEng.Card8");
+        const TString   strCard1ClassPath(L"MEng.Card1");
+        const TString   strCard2ClassPath(L"MEng.Card2");
+        const TString   strCard4ClassPath(L"MEng.Card4");
+        const TString   strCard8ClassPath(L"MEng.Card8");
+    }
 }
 
 

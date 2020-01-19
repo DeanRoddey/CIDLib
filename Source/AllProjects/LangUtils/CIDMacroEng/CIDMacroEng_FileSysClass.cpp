@@ -47,13 +47,16 @@ RTTIDecls(TMEngFileSysVal,TMEngClassVal)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_FileSysClass
 {
-    // The path and name for the directory iteration class
-    const TString   strDirIterClassPath(L"MEng.System.Runtime.DirIter");
-    const TString   strDirIterName(L"DirIter");
+    namespace
+    {
+        // The path and name for the directory iteration class
+        const TString   strDirIterClassPath(L"MEng.System.Runtime.DirIter");
+        const TString   strDirIterName(L"DirIter");
 
-    // The path and name for the file system class
-    const TString   strFileSysClassPath(L"MEng.System.Runtime.FileSystem");
-    const TString   strFileSysName(L"FileSystem");
+        // The path and name for the file system class
+        const TString   strFileSysClassPath(L"MEng.System.Runtime.FileSystem");
+        const TString   strFileSysName(L"FileSystem");
+    }
 }
 
 

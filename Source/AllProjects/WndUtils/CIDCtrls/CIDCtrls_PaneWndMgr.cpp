@@ -43,15 +43,18 @@ RTTIDecls(TPaneWndCont, TWindow)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_PaneWndMgr
 {
-    // The pixels between panes (where the resizing is done)
-    const tCIDLib::TCard4 c4DivMargin(4);
+    namespace
+    {
+        // The pixels between panes (where the resizing is done)
+        constexpr tCIDLib::TCard4 c4DivMargin = 4;
 
-    //
-    //  The space around the div that we use to decide whether the mouse is on the div
-    //  or not.
-    //
-    const tCIDLib::TInt4  i4DivMinus = 7;
-    const tCIDLib::TInt4  i4DivPlus = 8;
+        //
+        //  The space around the div that we use to decide whether the mouse is on the div
+        //  or not.
+        //
+        constexpr tCIDLib::TInt4  i4DivMinus = 7;
+        constexpr tCIDLib::TInt4  i4DivPlus = 8;
+    }
 }
 
 

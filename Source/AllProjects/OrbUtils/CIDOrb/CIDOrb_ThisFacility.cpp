@@ -106,7 +106,7 @@ TFacCIDOrb::TFacCIDOrb() :
     TFacility
     (
         L"CIDOrb"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -840,7 +840,16 @@ tCIDLib::TVoid TFacCIDOrb::InitClient()
             // Init the client support
             TOrbClientBase::InitializeOrbClient();
 
-            // If verbose logging, then log a client initialized message
+            // Indicate that client support is initialized (do this last!)
+            m_atomClientInit.Set();
+
+            //
+            //  If verbose logging, then log a client initialized message
+            //
+            //  DO THIS AFTER we set the atom, or we could come back into here
+            //  again and try to initailize again if an ORB based logger is
+            //  in use.
+            //
             if (bLogStatus())
             {
                 LogMsg
@@ -852,9 +861,6 @@ tCIDLib::TVoid TFacCIDOrb::InitClient()
                     , tCIDLib::EErrClasses::AppStatus
                 );
             }
-
-            // Indicate that client support is initialized (do this last!)
-            m_atomClientInit.Set();
         }
     }
 }

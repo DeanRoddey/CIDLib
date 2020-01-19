@@ -47,13 +47,16 @@ RTTIDecls(TMEngSHA1Info,TMacroEngClass)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_SHA1Class
 {
-    // -----------------------------------------------------------------------
-    //  The names of our classes
-    // -----------------------------------------------------------------------
-    const TString   strDigestName(L"SHA1Digest");
-    const TString   strDigestPath(L"MEng.System.Runtime.SHA1Digest");
-    const TString   strHashName(L"SHA1Hash");
-    const TString   strHashClassPath(L"MEng.System.Runtime.SHA1Hash");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names of our classes
+        // -----------------------------------------------------------------------
+        const TString   strDigestName(L"SHA1Digest");
+        const TString   strDigestPath(L"MEng.System.Runtime.SHA1Digest");
+        const TString   strHashName(L"SHA1Hash");
+        const TString   strHashClassPath(L"MEng.System.Runtime.SHA1Hash");
+    }
 }
 
 

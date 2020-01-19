@@ -43,42 +43,51 @@ RTTIDecls(TCIDDAERipper,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDDAE_Ripper
 {
-    // -----------------------------------------------------------------------
-    //  We need to be able to provide unique thread names for our read/write
-    //  threads.
-    // -----------------------------------------------------------------------
-    TUniqueName unamInstance(L"CIDDAEThread%(1)");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  We need to be able to provide unique thread names for our read/write
+        //  threads.
+        // -----------------------------------------------------------------------
+        TUniqueName unamInstance(L"CIDDAEThread%(1)");
 
 
-    // -----------------------------------------------------------------------
-    //  The maximum number of buffers we can have outstanding at once. This
-    //  is how many buffers the buffer pool objects are set up for. The read
-    //  thread will stop and wait for the write thread to catch up.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MaxBufs(12);
+        // -----------------------------------------------------------------------
+        //  The maximum number of buffers we can have outstanding at once. This
+        //  is how many buffers the buffer pool objects are set up for. The read
+        //  thread will stop and wait for the write thread to catch up.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4MaxBufs = 12;
 
 
-    // -----------------------------------------------------------------------
-    //  The number of sectors we read per pass. We may actually read more if
-    //  jitter is enabled. The buffer size below is big enough to adjust for
-    //  the jitter overlap.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4SectorsPerRead(20);
+        // -----------------------------------------------------------------------
+        //  The number of sectors we read per pass. We may actually read more if
+        //  jitter is enabled. The buffer size below is big enough to adjust for
+        //  the jitter overlap.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4SectorsPerRead = 20;
 
 
-    // -----------------------------------------------------------------------
-    //  The bytes we try to read per pass, and the size of the buffers. We
-    //  make the buffer size larger by the jitter overlap we do.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4BytesPerRead(c4SectorsPerRead * TKrnlRemMedia::c4CDRawSectorSz);
-    const tCIDLib::TCard4   c4BufSz((c4SectorsPerRead + 2) * TKrnlRemMedia::c4CDRawSectorSz);
+        // -----------------------------------------------------------------------
+        //  The bytes we try to read per pass, and the size of the buffers. We
+        //  make the buffer size larger by the jitter overlap we do.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4BytesPerRead
+        (
+            c4SectorsPerRead * TKrnlRemMedia::c4CDRawSectorSz
+        );
+        constexpr tCIDLib::TCard4   c4BufSz
+        (
+            (c4SectorsPerRead + 2) * TKrnlRemMedia::c4CDRawSectorSz
+        );
 
 
-    // -----------------------------------------------------------------------
-    //  The bytes and blocks in our overlap area.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4OverlapBlocks(2);
-    const tCIDLib::TCard4   c4OverlapBytes(TKrnlRemMedia::c4CDRawSectorSz * 2);
+        // -----------------------------------------------------------------------
+        //  The bytes and blocks in our overlap area.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4OverlapBlocks(2);
+        constexpr tCIDLib::TCard4   c4OverlapBytes(TKrnlRemMedia::c4CDRawSectorSz * 2);
+    }
 }
 
 

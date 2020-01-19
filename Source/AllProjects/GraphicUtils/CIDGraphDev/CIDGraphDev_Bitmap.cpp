@@ -42,68 +42,71 @@ RTTIDecls(TSysBitmapInfo,TObject)
 
 namespace CIDGraphDev_Bitmap
 {
-    // ---------------------------------------------------------------------------
-    //  A little array of mapping structures that let us turn our generic system
-    //  bitmap enum into a system specific one.
-    // ---------------------------------------------------------------------------
-    struct TBmpMap
+    namespace
     {
-        tCIDGraphDev::ESysBmps  eBmp;
-        tCIDLib::TResId         ridThis;
-        const tCIDLib::TCh*     pszName;
-    };
+        // ---------------------------------------------------------------------------
+        //  A little array of mapping structures that let us turn our generic system
+        //  bitmap enum into a system specific one.
+        // ---------------------------------------------------------------------------
+        struct TBmpMap
+        {
+            tCIDGraphDev::ESysBmps  eBmp;
+            tCIDLib::TResId         ridThis;
+            const tCIDLib::TCh*     pszName;
+        };
 
-    static TBmpMap  amapVals[] =
-    {
-        // These are Win32 bitmaps
-            { tCIDGraphDev::ESysBmps::None         , 0                            , L"None" }
-        ,   { tCIDGraphDev::ESysBmps::Close        , 32754                        , L"Close" }
-        ,   { tCIDGraphDev::ESysBmps::UpArrow      , 32753                        , L"UpArrow" }
-        ,   { tCIDGraphDev::ESysBmps::DownArrow    , 32752                        , L"DownArrow" }
-        ,   { tCIDGraphDev::ESysBmps::RightArrow   , 32751                        , L"RightArrow" }
-        ,   { tCIDGraphDev::ESysBmps::LeftArrow    , 32750                        , L"LeftArrow" }
-        ,   { tCIDGraphDev::ESysBmps::Reduce       , 32749                        , L"Reduce" }
-        ,   { tCIDGraphDev::ESysBmps::Zoom         , 32748                        , L"Zoom" }
-        ,   { tCIDGraphDev::ESysBmps::Restore      , 32747                        , L"Restore" }
-        ,   { tCIDGraphDev::ESysBmps::Reduced      , 32746                        , L"Reduced" }
-        ,   { tCIDGraphDev::ESysBmps::Zoomed       , 32745                        , L"Zoomed" }
-        ,   { tCIDGraphDev::ESysBmps::Restored     , 32744                        , L"Restored" }
-        ,   { tCIDGraphDev::ESysBmps::UpArrowD     , 32743                        , L"UpArrowD" }
-        ,   { tCIDGraphDev::ESysBmps::DownArrowD   , 32742                        , L"DownArrowD" }
-        ,   { tCIDGraphDev::ESysBmps::RightArrowD  , 32741                        , L"RightArrowD" }
-        ,   { tCIDGraphDev::ESysBmps::LeftArrowD   , 32740                        , L"LeftArrowD" }
-        ,   { tCIDGraphDev::ESysBmps::MnArrow      , 32739                        , L"MnArrow" }
-        ,   { tCIDGraphDev::ESysBmps::Combo        , 32738                        , L"Combo" }
-        ,   { tCIDGraphDev::ESysBmps::UpArrowI     , 32737                        , L"UpArrowI" }
-        ,   { tCIDGraphDev::ESysBmps::DownArrowI   , 32736                        , L"DownArrowI" }
-        ,   { tCIDGraphDev::ESysBmps::RightArrowI  , 32735                        , L"RightArrowI" }
-        ,   { tCIDGraphDev::ESysBmps::LeftArrowI   , 32734                        , L"LeftArrowI" }
-        ,   { tCIDGraphDev::ESysBmps::Size         , 32766                        , L"Size" }
-        ,   { tCIDGraphDev::ESysBmps::BtSize       , 32761                        , L"BtSize" }
-        ,   { tCIDGraphDev::ESysBmps::Check        , 32760                        , L"Check" }
+        static TBmpMap  amapVals[] =
+        {
+            // These are Win32 bitmaps
+                { tCIDGraphDev::ESysBmps::None         , 0                            , L"None" }
+            ,   { tCIDGraphDev::ESysBmps::Close        , 32754                        , L"Close" }
+            ,   { tCIDGraphDev::ESysBmps::UpArrow      , 32753                        , L"UpArrow" }
+            ,   { tCIDGraphDev::ESysBmps::DownArrow    , 32752                        , L"DownArrow" }
+            ,   { tCIDGraphDev::ESysBmps::RightArrow   , 32751                        , L"RightArrow" }
+            ,   { tCIDGraphDev::ESysBmps::LeftArrow    , 32750                        , L"LeftArrow" }
+            ,   { tCIDGraphDev::ESysBmps::Reduce       , 32749                        , L"Reduce" }
+            ,   { tCIDGraphDev::ESysBmps::Zoom         , 32748                        , L"Zoom" }
+            ,   { tCIDGraphDev::ESysBmps::Restore      , 32747                        , L"Restore" }
+            ,   { tCIDGraphDev::ESysBmps::Reduced      , 32746                        , L"Reduced" }
+            ,   { tCIDGraphDev::ESysBmps::Zoomed       , 32745                        , L"Zoomed" }
+            ,   { tCIDGraphDev::ESysBmps::Restored     , 32744                        , L"Restored" }
+            ,   { tCIDGraphDev::ESysBmps::UpArrowD     , 32743                        , L"UpArrowD" }
+            ,   { tCIDGraphDev::ESysBmps::DownArrowD   , 32742                        , L"DownArrowD" }
+            ,   { tCIDGraphDev::ESysBmps::RightArrowD  , 32741                        , L"RightArrowD" }
+            ,   { tCIDGraphDev::ESysBmps::LeftArrowD   , 32740                        , L"LeftArrowD" }
+            ,   { tCIDGraphDev::ESysBmps::MnArrow      , 32739                        , L"MnArrow" }
+            ,   { tCIDGraphDev::ESysBmps::Combo        , 32738                        , L"Combo" }
+            ,   { tCIDGraphDev::ESysBmps::UpArrowI     , 32737                        , L"UpArrowI" }
+            ,   { tCIDGraphDev::ESysBmps::DownArrowI   , 32736                        , L"DownArrowI" }
+            ,   { tCIDGraphDev::ESysBmps::RightArrowI  , 32735                        , L"RightArrowI" }
+            ,   { tCIDGraphDev::ESysBmps::LeftArrowI   , 32734                        , L"LeftArrowI" }
+            ,   { tCIDGraphDev::ESysBmps::Size         , 32766                        , L"Size" }
+            ,   { tCIDGraphDev::ESysBmps::BtSize       , 32761                        , L"BtSize" }
+            ,   { tCIDGraphDev::ESysBmps::Check        , 32760                        , L"Check" }
 
-        // These are our own bitmaps
-        ,   { tCIDGraphDev::ESysBmps::Halftone1    , kCIDGraphDev::ridBmp_Halftone1 , L"Halftone1" }
-        ,   { tCIDGraphDev::ESysBmps::Halftone2    , kCIDGraphDev::ridBmp_Halftone2 , L"Halftone2" }
-        ,   { tCIDGraphDev::ESysBmps::Halftone3    , kCIDGraphDev::ridBmp_Halftone3 , L"Halftone3" }
-        ,   { tCIDGraphDev::ESysBmps::Halftone4    , kCIDGraphDev::ridBmp_Halftone4 , L"Halftone4" }
-        ,   { tCIDGraphDev::ESysBmps::Halftone5    , kCIDGraphDev::ridBmp_Halftone5 , L"Halftone5" }
-        ,   { tCIDGraphDev::ESysBmps::Halftone6    , kCIDGraphDev::ridBmp_Halftone6 , L"Halftone6" }
-        ,   { tCIDGraphDev::ESysBmps::Halftone7    , kCIDGraphDev::ridBmp_Halftone7 , L"Halftone7" }
-        ,   { tCIDGraphDev::ESysBmps::Halftone8    , kCIDGraphDev::ridBmp_Halftone8 , L"Halftone8" }
-        ,   { tCIDGraphDev::ESysBmps::Halftone9    , kCIDGraphDev::ridBmp_Halftone9 , L"Halftone9" }
-    };
+            // These are our own bitmaps
+            ,   { tCIDGraphDev::ESysBmps::Halftone1    , kCIDGraphDev::ridBmp_Halftone1 , L"Halftone1" }
+            ,   { tCIDGraphDev::ESysBmps::Halftone2    , kCIDGraphDev::ridBmp_Halftone2 , L"Halftone2" }
+            ,   { tCIDGraphDev::ESysBmps::Halftone3    , kCIDGraphDev::ridBmp_Halftone3 , L"Halftone3" }
+            ,   { tCIDGraphDev::ESysBmps::Halftone4    , kCIDGraphDev::ridBmp_Halftone4 , L"Halftone4" }
+            ,   { tCIDGraphDev::ESysBmps::Halftone5    , kCIDGraphDev::ridBmp_Halftone5 , L"Halftone5" }
+            ,   { tCIDGraphDev::ESysBmps::Halftone6    , kCIDGraphDev::ridBmp_Halftone6 , L"Halftone6" }
+            ,   { tCIDGraphDev::ESysBmps::Halftone7    , kCIDGraphDev::ridBmp_Halftone7 , L"Halftone7" }
+            ,   { tCIDGraphDev::ESysBmps::Halftone8    , kCIDGraphDev::ridBmp_Halftone8 , L"Halftone8" }
+            ,   { tCIDGraphDev::ESysBmps::Halftone9    , kCIDGraphDev::ridBmp_Halftone9 , L"Halftone9" }
+        };
 
-    static TEArray<TBmpMap, tCIDGraphDev::ESysBmps, tCIDGraphDev::ESysBmps::Count> amapList
-    (
-        amapVals
-    );
+        static TEArray<TBmpMap, tCIDGraphDev::ESysBmps, tCIDGraphDev::ESysBmps::Count> amapList
+        (
+            amapVals
+        );
 
 
-    // -----------------------------------------------------------------------
-    //  Our persistent format versions
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard2   c2FCBFmtVersion = 1;
+        // -----------------------------------------------------------------------
+        //  Our persistent format versions
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2FCBFmtVersion = 1;
+    }
 }
 
 

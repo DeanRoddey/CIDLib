@@ -55,30 +55,14 @@ const tCIDLib::TCh* TKrnlModule::s_pszNoMessages  = kCIDKernel_::pszNoMsgFile;
 // ---------------------------------------------------------------------------
 //  TKrnlModule: Public, static methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean
-TKrnlModule::bLoadMessages( const   TModuleHandle&          hmodSrc
-                            ,       tCIDLib::TMsgIndex*&    pmiToFill)
-{
-    // Assume we won't find anything
-    pmiToFill = nullptr;
 
-    //
-    //  Get the name of the module, which we will use to build the name to
-    //  the message file, which should be in the same directory and have the
-    //  same base part of the name (to which we add stuff.)
-    //
-    constexpr tCIDLib::TCard4 c4NameChars = kCIDLib::c4MaxPathLen;
-    tCIDLib::TCh szModPath[c4NameChars + 1];
-    tCIDLib::TCh szModName[c4NameChars + 1];
-    if (!bRawQueryModName(hmodSrc, szModName, szModPath, c4NameChars))
-        return kCIDLib::False;
-    return bLoadMessages(szModPath, szModName, pmiToFill);
-}
-
-
+//
+//  We get the portable module name, since that's what all of the loadable resource
+//  file names are based off of.
+//
 tCIDLib::TBoolean
 TKrnlModule::bLoadMessages( const   tCIDLib::TCh* const     pszPath
-                            , const tCIDLib::TCh* const     pszFile
+                            , const tCIDLib::TCh* const     pszPortName
                             ,       tCIDLib::TMsgIndex*&    pmiToFill)
 {
     //
@@ -128,14 +112,7 @@ TKrnlModule::bLoadMessages( const   tCIDLib::TCh* const     pszPath
         //  language suffix in the list.
         //
         tCIDLib::TCh szFileName[kCIDLib::c4MaxPathLen + 1];
-        TRawStr::CopyCatStr
-        (
-            szFileName
-            , kCIDLib::c4MaxPathLen
-            , pszPath
-            , L"\\"
-            , pszFile
-        );
+        TKrnlPathStr::bCombinePath(szFileName, pszPath, pszPortName, kCIDLib::c4MaxPathLen);
         TRawStr::CatStr(szFileName, L"_", kCIDLib::c4MaxPathLen);
         TRawStr::CatStr(szFileName, apszSuffixes[c4Index], kCIDLib::c4MaxPathLen);
         TRawStr::CatStr(szFileName, L".", kCIDLib::c4MaxPathLen);

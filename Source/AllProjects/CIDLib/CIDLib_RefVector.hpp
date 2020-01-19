@@ -1205,7 +1205,7 @@ class TRefVector : public TRefCollection<TElem>
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
 
-            tCIDLib::ESortComps eRes;
+            tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             tCIDLib::TInt4 i4MidPoint = 0;
             while (i4Begin <= i4End)
             {
@@ -1265,7 +1265,7 @@ class TRefVector : public TRefCollection<TElem>
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
 
-            tCIDLib::ESortComps eRes;
+            tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             tCIDLib::TInt4 i4MidPoint = 0;
             while (i4Begin <= i4End)
             {

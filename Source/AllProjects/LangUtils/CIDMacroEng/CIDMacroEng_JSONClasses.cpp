@@ -48,15 +48,18 @@ RTTIDecls(TMEngJSONParserInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_NetClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strJSONAnchor(L"JSONAnchor");
-    const TString   strJSONAnchorClassPath(L"MEng.System.Runtime.JSONAnchor");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strJSONAnchor(L"JSONAnchor");
+        const TString   strJSONAnchorClassPath(L"MEng.System.Runtime.JSONAnchor");
 
-    const TString   strJSONParser(L"JSONParser");
-    const TString   strJSONParserClassPath(L"MEng.System.Runtime.JSONParser");
+        const TString   strJSONParser(L"JSONParser");
+        const TString   strJSONParserClassPath(L"MEng.System.Runtime.JSONParser");
+    }
 }
 
 

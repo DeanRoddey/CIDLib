@@ -125,8 +125,8 @@ tCIDLib::TVoid TRandomNum::Seed(const tCIDLib::TCard4 c4Seed)
 // ---------------------------------------------------------------------------
 void TRandomNum::DoRand48(tCIDLib::TCard2 ac2Seed[3])
 {
-    tCIDLib::TCard4 c4Accum;
-    tCIDLib::TCard2 c2Temp[2];
+    tCIDLib::TCard4 c4Accum = 0;
+    tCIDLib::TCard2 c2Temp[2] = {0};
 
     c4Accum = (tCIDLib::TCard4(m_ac2Mult[0]) * tCIDLib::TCard4(ac2Seed[0]))
               + CIDLib_Random::c4RandAdd;

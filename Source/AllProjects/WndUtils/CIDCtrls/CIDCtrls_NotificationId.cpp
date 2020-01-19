@@ -43,10 +43,13 @@ RTTIDecls(TNotificationId,TObject)
 
 namespace CIDCtrls_NotificationId
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    // -----------------------------------------------------------------------
-    const tCIDLib::THashVal hshModulus = 109;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local const data
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::THashVal hshModulus = 109;
+    }
 }
 
 

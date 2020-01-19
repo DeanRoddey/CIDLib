@@ -56,7 +56,8 @@ namespace TKrnlWin32
 
     tCIDLib::TVoid BuildModName
     (
-                tCIDLib::TCh* const     pszNameBuf
+                tCIDLib::TCh* const     pszPortableBuf
+        ,       tCIDLib::TCh* const     pszLoadableBuf
         , const tCIDLib::TCard4         c4MaxChars
         , const tCIDLib::TCh* const     pszModName
         , const tCIDLib::TCard4         c4MajVer

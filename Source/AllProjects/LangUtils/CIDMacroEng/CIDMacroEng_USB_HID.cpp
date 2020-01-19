@@ -45,12 +45,15 @@ RTTIDecls(TMEngUSBHIDInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_USBHIDClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strUSBHID(L"USBHID");
-    const TString   strUSBHIDClassPath(L"MEng.System.Runtime.USBHID");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strUSBHID(L"USBHID");
+        const TString   strUSBHIDClassPath(L"MEng.System.Runtime.USBHID");
+    }
 }
 
 

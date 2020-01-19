@@ -44,12 +44,15 @@ RTTIDecls(TMEngArrayInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_ArrayClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strArray(L"Array");
-    const TString   strClassPath(L"MEng.System.Runtime.Array");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strArray(L"Array");
+        const TString   strClassPath(L"MEng.System.Runtime.Array");
+    }
 }
 
 
