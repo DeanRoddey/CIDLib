@@ -43,7 +43,6 @@
 //  Include our underlying headers
 // ---------------------------------------------------------------------------
 #include    "CIDLib.hpp"
-
 #include    "CIDAudStream.hpp"
 
 
@@ -55,12 +54,11 @@
 #include    "CIDSpReco_ErrorIds.hpp"
 #include    "CIDSpReco_MessageIds.hpp"
 #include    "CIDSpReco_Shared.hpp"
-
 #include    "CIDSpReco_Event.hpp"
 
 namespace tCIDSpReco
 {
-    using TSpEventQ = TSafeQueue<TCIDSpeechRecoEv>;
+    using TSpEventQ = TQueue<TCIDSpeechRecoEv>;
 }
 
 #include    "CIDSpReco_Engine.hpp"

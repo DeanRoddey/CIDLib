@@ -52,7 +52,13 @@ TUPnPService::TUPnPService() :
     , m_bIsDead(kCIDLib::False)
     , m_bLogErrs(kCIDLib::False)
     , m_c4SerialNum(1)
-    , m_colVarList(109, TStringKeyOps(), &TKeyValuePair::strExtractKey)
+    , m_colVarList
+      (
+          109
+          , TStringKeyOps()
+          , &TKeyValuePair::strExtractKey
+          , tCIDLib::EMTStates::Safe
+        )
     , m_pkupnpsThis(nullptr)
 {
 }

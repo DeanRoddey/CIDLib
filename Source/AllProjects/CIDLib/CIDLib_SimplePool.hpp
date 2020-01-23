@@ -733,13 +733,11 @@ template<typename TElem> class TSimplePool : public TObject, public MLockable
             m_c4MaxPoolSize(c4MaxAlloc ? c4MaxAlloc : 8192)
             , m_colFreeList
               (
-                tCIDLib::EAdoptOpts::NoAdopt
-                , tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
+                tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
               )
             , m_colUsedList
               (
-                tCIDLib::EAdoptOpts::NoAdopt
-                , tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
+                tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
               )
             , m_pmtxSync(nullptr)
             , m_strName(strName)

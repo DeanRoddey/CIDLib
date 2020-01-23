@@ -386,9 +386,9 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TBasicDLinkedCol() :
+        TBasicDLinkedCol(const tCIDLib::EMTStates eMTSafe) :
 
-            TCollection<TElem>()
+            TCollection<TElem>(eMTSafe)
             , m_llstCol()
         {
         }
@@ -842,12 +842,15 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         }
 
 
-        tCIDLib::TVoid Reset()
+        tCIDLib::TVoid Reset(const tCIDLib::EMTStates eMTSafe)
         {
             TLocker lockrSync(this);
 
             // Flush it all out
             RemoveAll();
+
+            // Call our parent to set up the new thread state
+            this->SetMTState(eMTSafe);
         }
 
 
@@ -890,95 +893,6 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         TemplateRTTIDefs(TBasicDLinkedCol<TElem>,TCollection<TElem>)
 };
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeBasicDLinkedCol
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-template <typename TElem> class TSafeBasicDLinkedCol : public TBasicDLinkedCol<TElem>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Nested aliases for the cursors and types used.
-        // -------------------------------------------------------------------
-        using TMyElemType = TElem;
-        using TMyType = TSafeBasicDLinkedCol<TElem>;
-        using TParType = TBasicDLinkedCol<TElem>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeBasicDLinkedCol() : TParType()
-        {
-        }
-
-        TSafeBasicDLinkedCol(const TSafeBasicDLinkedCol<TElem>& colSrc) :
-
-            TParType(colSrc)
-        {
-        }
-
-        TSafeBasicDLinkedCol(TSafeBasicDLinkedCol<TElem>&&)  = delete;
-
-        ~TSafeBasicDLinkedCol()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType& colSrc)
-        {
-            return TParType::operator=(colSrc);
-        }
-
-        TMyType& operator=(TMyType&&) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        tCIDLib::EMTStates eIsMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::TVoid Unlock() const final
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement them in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        TemplateRTTIDefs(TSafeBasicDLinkedCol<TElem>,TBasicDLinkedCol<TElem>)
-};
-
 
 #pragma CIDLIB_POPPACK
 
@@ -1056,7 +970,7 @@ TBinInStream& operator>>(TBinInStream&              strmIn
         TCollectionBase::BadStoredCount(colToStream.clsIsA());
 
     // Reset this guy before reloading
-    colToStream.Reset();
+    colToStream.Reset(eMTState);
     if (c4Count)
     {
         TElem objTmp;

@@ -380,9 +380,9 @@ class TVector : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TVector() :
+        TVector(const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TCollection<TElem>()
+            TCollection<TElem>(eMTSafe)
             , m_apElems(nullptr)
             , m_c4CurAlloc(8)
             , m_c4CurCount(0)
@@ -395,9 +395,10 @@ class TVector : public TCollection<TElem>
             );
         }
 
-        TVector(const TIndex tInitAlloc) :
+        TVector(const   TIndex              tInitAlloc
+                , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TCollection<TElem>()
+            TCollection<TElem>(eMTSafe)
             , m_apElems(nullptr)
             , m_c4CurAlloc(tCIDLib::c4EnumOrd(tInitAlloc))
             , m_c4CurCount(0)
@@ -415,9 +416,10 @@ class TVector : public TCollection<TElem>
         }
 
         TVector(const   TElem* const        pobjInitVals
-                , const TIndex              tCount) :
+                , const TIndex              tCount
+                , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TCollection<TElem>()
+            TCollection<TElem>(eMTSafe)
             , m_apElems(nullptr)
             , m_c4CurAlloc(tCIDLib::c4EnumOrd(tCount))
             , m_c4CurCount(tCIDLib::c4EnumOrd(tCount))
@@ -592,7 +594,7 @@ class TVector : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
         {
             if (clsTarget == clsThis())
                 return kCIDLib::True;
@@ -611,12 +613,12 @@ class TVector : public TCollection<TElem>
             return m_c4CurCount;
         }
 
-        const TClass& clsIsA() const override
+        const TClass& clsIsA() const final
         {
             return clsThis();
         }
 
-        const TClass& clsParent() const override
+        const TClass& clsParent() const final
         {
             return TParType::clsThis();
         }
@@ -1429,12 +1431,15 @@ class TVector : public TCollection<TElem>
         //  NOTE: This one cannot be done thread safe because it can change the
         //  thread safe state!
         //
-        tCIDLib::TVoid Reset(const tCIDLib::TCard4 c4Init)
+        tCIDLib::TVoid Reset(const  tCIDLib::EMTStates  eMTSafe
+                            , const tCIDLib::TCard4     c4Init)
         {
             // Flush all elements
             RemoveAllElems();
             delete [] m_apElems;
             m_c4CurAlloc = 0;
+
+            this->SetMTState(eMTSafe);
 
             //
             //  Allocate the new stuff and copy the source elements, zeroing
@@ -1738,128 +1743,6 @@ class TVector : public TCollection<TElem>
 };
 
 
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeVector
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-template <typename TElem, typename TIndex = tCIDLib::TCard4>
-class TSafeVector : public TVector<TElem>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Nested class type aliases
-        // -------------------------------------------------------------------
-        using TMyType       = TSafeVector<TElem, TIndex>;
-        using TParType      = TVector<TElem,TIndex>;
-
-
-        // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static const TClass& clsThis()
-        {
-            static const TClass clsRet(L"TSafeVector<TElem,TIndex>");
-            return clsRet;
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeVector() : TParType()
-        {
-        }
-
-        TSafeVector(const TIndex tInitAlloc) :
-
-            TParType(tInitAlloc)
-        {
-        }
-
-        TSafeVector(const   TElem* const    pobjInitVals
-                    , const TIndex          tCount) :
-
-            TParType(pobjInitVals, tCount)
-        {
-        }
-
-        TSafeVector(const TMyType& colSrc) :
-
-            TParType(colSrc)
-        {
-        }
-
-        TSafeVector(TMyType&&) = delete;
-
-        ~TSafeVector()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType& colSrc)
-        {
-            return TParType::opreator=(colSrc);
-        }
-
-        TMyType& operator=(TMyType&& colSrc) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
-        {
-            if (clsTarget == clsThis())
-                return kCIDLib::True;
-            return TParType::bIsDescendantOf(clsTarget);
-        }
-
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        const TClass& clsIsA() const final
-        {
-            return clsThis();
-        }
-
-        const TClass& clsParent() const final
-        {
-            return TParType::clsThis();
-        }
-
-        tCIDLib::EMTStates eMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::TVoid Unlock() const final
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement them in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
-};
-
-
 #pragma CIDLIB_POPPACK
 
 
@@ -1913,14 +1796,14 @@ operator>>(TBinInStream& strmIn, TVector<TElem, TIndex>& colToStream)
     tCIDLib::TCard4     c4Count;
     tCIDLib::TCard4     c4XORCount;
     tCIDLib::TCard4     c4OldMaxCount;
-    tCIDLib::EMTStates  eMTSafeDummy;
-    strmIn >> c4Count >> c4XORCount >> c4OldMaxCount >> eMTSafeDummy;
+    tCIDLib::EMTStates  eMTSafe;
+    strmIn >> c4Count >> c4XORCount >> c4OldMaxCount >> eMTSafe;
 
     if (c4XORCount != tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard))
         TCollectionBase::BadStoredCount(colToStream.clsIsA());
 
     // Update it to at leats hold the new count of elements
-    colToStream.Reset(c4Count);
+    colToStream.Reset(eMTSafe, c4Count);
 
     // If there were any elements, then stream them in
     if (c4Count)

@@ -121,9 +121,9 @@ class TCollection : public TCollectionBase, public MDuplicable
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TCollection() :
+        TCollection(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TCollectionBase()
+            TCollectionBase(eMTSafe)
         {
         }
 
@@ -187,7 +187,9 @@ template <typename TElem, class TKey> class TMapCollection
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TMapCollection() : TParent()
+        TMapCollection(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
+
+            TParent(eMTSafe)
         {
         }
 
@@ -344,7 +346,9 @@ template <typename TElem> class TRefCollection : public TCollectionBase
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TRefCollection() : TCollectionBase()
+        TRefCollection(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
+
+            TCollectionBase(eMTSafe)
         {
         }
 

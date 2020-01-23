@@ -47,7 +47,7 @@ namespace CIDComm_ThisFacility
         // -----------------------------------------------------------------------
         //  This is our port factory list
         // -----------------------------------------------------------------------
-        using TFactoryList = TSafeRefVector<TComPortFactory>;
+        using TFactoryList = TRefVector<TComPortFactory>;
         TFactoryList& colFList()
         {
             static TFactoryList* pcolRet = new TFactoryList(tCIDLib::EAdoptOpts::Adopt, 4);

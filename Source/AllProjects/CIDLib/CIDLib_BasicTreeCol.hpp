@@ -1553,10 +1553,11 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TBasicTreeCol(  const   tCIDLib::TBoolean   bCasePaths = kCIDLib::True
+        TBasicTreeCol(  const   tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe
+                        , const tCIDLib::TBoolean   bCasePaths = kCIDLib::True
                         , const tCIDLib::TBoolean   bSorted = kCIDLib::True) :
 
-            TCollection<TElem>()
+            TCollection<TElem>(eMTSafe)
             , m_bCasePath(bCasePaths)
             , m_bSorted(bSorted)
             , m_c4NTCount(0)
@@ -2599,89 +2600,6 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         DefPolyDup(TMyType)
         TemplateRTTIDefs(TMyType,TCollection<TElem>)
-};
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeBasicTreeCol
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-template <typename TElem> class TSafeBasicTreeCol : public TBasicTreeCol<TElem>
-{
-    public :
-        // -------------------------------------------------------------------
-        //  Nested aliases for our types
-        // -------------------------------------------------------------------
-        using TMyType = TSafeBasicTreeCol<TElem>;
-        using TParType = TBasicTreeCol<TElem>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeBasicTreeCol(  const   tCIDLib::TBoolean   bCasePaths = kCIDLib::True
-                            , const tCIDLib::TBoolean   bSorted = kCIDLib::True) :
-
-            TParType(bCasePaths, bSorted)
-        {
-        }
-
-        TSafeBasicTreeCol(const TMyType& colSrc) : TParType(colSrc)
-        {
-        }
-
-        TSafeBasicTreeCol(TMyType&&) = delete;
-
-        ~TSafeBasicTreeCol()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType& colSrc)
-        {
-            return TParType::operator=(colSrc);
-        }
-
-        TMyType& operator=(TMyType&& colSrc) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::EMTStates eMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Unlock() const final
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement it in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
 };
 
 #pragma CIDLIB_POPPACK

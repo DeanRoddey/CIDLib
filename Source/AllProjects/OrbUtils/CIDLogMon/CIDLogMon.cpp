@@ -304,7 +304,7 @@ TMainFrame::TMainFrame() :
     , m_c4NextMsgId(0)
     , m_c4NextUID(1)
     , m_colList()
-    , m_colNewEvents(CIDLogMon::c4MaxItems)
+    , m_colNewEvents(CIDLogMon::c4MaxItems, tCIDLib::EMTStates::Safe)
     , m_colQuery()
     , m_porbcLogger(nullptr)
     , m_pwndAuxText(nullptr)

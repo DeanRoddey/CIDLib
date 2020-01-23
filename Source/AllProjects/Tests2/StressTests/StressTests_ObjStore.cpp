@@ -666,7 +666,7 @@ TTest_ObjStore4::TTest_ObjStore4() :
     )
     , m_c4NextKeyId(1)
     , m_c4ThreadErrs(0)
-    , m_colKeys()
+    , m_colKeys(tCIDLib::EMTStates::Safe)
     , m_evStart(tCIDLib::EEventStates::Reset)
     , m_pstrmOut(nullptr)
 {

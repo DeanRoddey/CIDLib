@@ -102,8 +102,8 @@ class CIDRTPEXP TCIDRTPTrans : public TObject
         // -------------------------------------------------------------------
         //  Private data types
         // -------------------------------------------------------------------
-        using TMediaQ   = TSafeRefQueue<TCIDRTPMediaBuf>;
-        using TProcQ    = TSafeRefQueue<TCIDRTPMediaBuf>;
+        using TMediaQ   = TRefQueue<TCIDRTPMediaBuf>;
+        using TProcQ    = TRefQueue<TCIDRTPMediaBuf>;
 
 
         // -------------------------------------------------------------------

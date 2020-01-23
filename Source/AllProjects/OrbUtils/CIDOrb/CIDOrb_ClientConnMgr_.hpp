@@ -50,7 +50,7 @@ class TOrbClientConnMgr : public TObject
         // -------------------------------------------------------------------
         //  Class types
         // -------------------------------------------------------------------
-        using TClientList = TSafeRefVector<TOrbClientConnImpl>;
+        using TClientList = TRefVector<TOrbClientConnImpl>;
 
 
         // -------------------------------------------------------------------

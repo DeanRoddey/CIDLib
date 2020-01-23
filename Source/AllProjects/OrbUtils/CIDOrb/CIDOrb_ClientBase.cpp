@@ -36,7 +36,7 @@
 //  Local types
 // ---------------------------------------------------------------------------
 using TOrbCSrvList = TRefVector<TSrvTarget>;
-using TOrbCmdItemCache = TSafeRefVector<TCmdQItem>;
+using TOrbCmdItemCache = TRefVector<TCmdQItem>;
 
 
 // ---------------------------------------------------------------------------
@@ -58,7 +58,7 @@ namespace CIDOrb_ClientBase
                 c4OIDRefreshSecs(5)
                 , enctCachePeriod(45 * kCIDLib::enctOneSecond)
                 , colCache(tCIDLib::EAdoptOpts::Adopt)
-                , colCmdCache(tCIDLib::EAdoptOpts::Adopt, 32)
+                , colCmdCache(tCIDLib::EAdoptOpts::Adopt, 32, tCIDLib::EMTStates::Safe)
                 , colServers(tCIDLib::EAdoptOpts::Adopt)
                 , colConnWaitList(tCIDLib::EAdoptOpts::Adopt, 16)
                 , pthrCacheScavenger(nullptr)

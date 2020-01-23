@@ -100,7 +100,7 @@ class CIDLIBEXP TPubSubAsyncSub : public TObject, private MPubSubscription
         // -------------------------------------------------------------------
         //  Private types
         // -------------------------------------------------------------------
-        using TMsgList = TSafeQueue<TPubSubMsg>;
+        using TMsgList = TQueue<TPubSubMsg>;
 
 
         // -------------------------------------------------------------------

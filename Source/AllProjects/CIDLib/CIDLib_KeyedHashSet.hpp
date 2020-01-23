@@ -659,9 +659,10 @@ class TKeyedHashSet : public TCollection<TElem>
 
         TKeyedHashSet(  const   tCIDLib::TCard4     c4Modulus
                         , const TKeyOps&            kopsToUse
-                        ,       TKeyExtract         pfnKeyExtract) :
+                        ,       TKeyExtract         pfnKeyExtract
+                        , const tCIDLib::EMTStates  eMTState = tCIDLib::EMTStates::Unsafe) :
 
-            TCollection<TElem>()
+            TCollection<TElem>(eMTState)
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
@@ -805,7 +806,7 @@ class TKeyedHashSet : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
         {
             if (clsTarget == clsThis())
                 return kCIDLib::True;
@@ -824,12 +825,12 @@ class TKeyedHashSet : public TCollection<TElem>
              return m_c4CurElements;
         }
 
-        const TClass& clsIsA() const override
+        const TClass& clsIsA() const final
         {
             return clsThis();
         }
 
-        const TClass& clsParent() const override
+        const TClass& clsParent() const final
         {
             return TCollection<TElem>::clsThis();
         }
@@ -1383,12 +1384,15 @@ class TKeyedHashSet : public TCollection<TElem>
         }
 
 
-        tCIDLib::TVoid SetModulus(const tCIDLib::TCard4 c4HashModulus)
+        tCIDLib::TVoid Reset(const  tCIDLib::EMTStates  eMTSafe
+                            , const tCIDLib::TCard4     c4HashModulus)
         {
             TLocker lockrSync(this);
 
             // First we have to remove all elements from the collection
             RemoveAll();
+
+            this->SetMTState(eMTSafe);
 
             // Reset the buckets if the hash mod changed
             if (c4HashModulus != m_c4HashModulus)
@@ -1685,124 +1689,6 @@ class TKeyedHashSet : public TCollection<TElem>
         TKeyExtract         m_pfnKeyExtract;
 };
 
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeKeyedHashSet
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-template <typename TElem, class TKey, class TKeyOps>
-class TSafeKeyedHashSet : public TKeyedHashSet<TElem, TKey, TKeyOps>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static const TClass& clsThis()
-        {
-            static const TClass clsRet(L"TSafeKeyedHashSet<TElem,TKey,TKeyOps>");
-            return clsRet;
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Nested aliases for the node and key ops types used by a keyed hash
-        //  set. And one for the key field extraction function that the
-        //  user provides. And another is provided for the object equality
-        //  function the user provides in some methods.
-        // -------------------------------------------------------------------
-        using TMyType = TSafeKeyedHashSet<TElem, TKey, TKeyOps>;
-        using TParType = TKeyedHashSet<TElem, TKey, TKeyOps>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeKeyedHashSet<TElem, TKey, TKeyOps>() = delete;
-
-        TSafeKeyedHashSet(  const   tCIDLib::TCard4     c4Modulus
-                            , const TKeyOps&            kopsToUse
-                            ,       TParType::TKeyExtract pfnKeyExtract) :
-
-            TParType(c4Modulus, kopsToUse, pfnKeyExtract)
-        {
-        }
-
-        TSafeKeyedHashSet(const TMyType& colSrc) : TParType(colSrc)
-        {
-        }
-
-        TSafeKeyedHashSet(const TMyType&&) = delete;
-
-        ~TSafeKeyedHashSet()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType& colSrc)
-        {
-            return TParType::operator=(colSrc);
-        }
-
-        TMyType& operator=(TMyType&&) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
-        {
-            if (clsTarget == clsThis())
-                return kCIDLib::True;
-            return TParType::bIsDescendantOf(clsTarget);
-        }
-
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        const TClass& clsIsA() const final
-        {
-            return clsThis();
-        }
-
-        const TClass& clsParent() const final
-        {
-            return TParType::clsThis();
-        }
-
-        tCIDLib::EMTStates eMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::TVoid Unlock() const final
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement them in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
-};
-
-
 #pragma CIDLIB_POPPACK
 
 
@@ -1862,14 +1748,14 @@ TBinInStream& operator>>(TBinInStream&                          strmIn
     tCIDLib::TCard4     c4XORCount;
     tCIDLib::TCard4     c4HashModulus;
     tCIDLib::TCard4     c4OldMax;
-    tCIDLib::EMTStates  eMTSafeDummy;
-    strmIn >> c4Count >> c4XORCount >> c4OldMax >> eMTSafeDummy >> c4HashModulus;
+    tCIDLib::EMTStates  eMTSafe;
+    strmIn >> c4Count >> c4XORCount >> c4OldMax >> eMTSafe >> c4HashModulus;
 
     if (c4XORCount != tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard))
         TCollectionBase::BadStoredCount(colToStream.clsIsA());
 
     // Update it for this new modulus if it's different
-    colToStream.SetModulus(c4HashModulus);
+    colToStream.Reset(eMTSafe, c4HashModulus);
 
     // If there were any elements, then stream them in
     if (c4Count)

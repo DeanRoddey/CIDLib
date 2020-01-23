@@ -278,7 +278,7 @@ static tCIDLib::TVoid TestTreeBasic2(TTextOutStream& strmOut)
 static tCIDLib::TVoid TestTreeCase(TTextOutStream& strmOut)
 {
     // Make one that uses case insensitive paths
-    TTreeOfTString  colTest(kCIDLib::False);
+    TTreeOfTString  colTest(tCIDLib::EMTStates::Unsafe, kCIDLib::False);
 
     // And some nodes with all upper case names
     colTest.pnodeAddNonTerminal(L"/", L"NT1");

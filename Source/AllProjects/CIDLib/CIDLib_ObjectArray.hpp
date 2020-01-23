@@ -61,11 +61,13 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
         // -------------------------------------------------------------------
         TObjArray() = delete;
 
-        TObjArray(const TIndex tElemCount) :
+        TObjArray(  const   TIndex              tElemCount
+                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             m_c4ElemCount(0)
             , m_c4SerialNum(0)
             , m_paobjList(nullptr)
+            , m_pmtxLock(nullptr)
         {
             const tCIDLib::TCard4 c4ElemCount = tCIDLib::TCard4(tElemCount);
 
@@ -85,6 +87,9 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
             // Allocate the object array
             m_c4ElemCount = c4ElemCount;
             m_paobjList = new TElem[c4ElemCount];
+
+            if (eMTSafe == tCIDLib::EMTStates::Safe)
+                m_pmtxLock = new TMutex;
         }
 
         TObjArray(const TMyType& objaSrc) :
@@ -92,6 +97,7 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
             m_c4ElemCount(objaSrc.m_c4ElemCount)
             , m_c4SerialNum(0)
             , m_paobjList(nullptr)
+            , m_pmtxLock(nullptr)
         {
             // Lock the source
             TLocker lockrSource(&objaSrc);
@@ -101,12 +107,16 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
 
             for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
                 m_paobjList[c4Ind] = objaSrc.m_paobjList[c4Ind];
+
+           // Create a mutex if the source has one
+            if (objaSrc.m_pmtxLock)
+                m_pmtxLock = new TMutex;
         }
 
         // Set up a with 1 element
         TObjArray(TMyType&& objaSrc) :
 
-            TObjArray(1)
+            TObjArray(1, objaSrc.eMTState())
         {
             operator=(tCIDLib::ForceMove(objaSrc));
         }
@@ -117,6 +127,9 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
             {
                 delete [] m_paobjList;
                 m_paobjList = nullptr;
+
+                delete m_pmtxLock;
+                m_pmtxLock = nullptr;
             }
 
             catch(TError& errToCatch)
@@ -314,6 +327,11 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
             return kCIDLib::True;
         }
 
+        tCIDLib::TBoolean bIsMTSafe() const
+        {
+            return (m_pmtxLock != nullptr);
+        }
+
         tCIDLib::TCard4 c4SerialNum() const
         {
             // Lock this object
@@ -323,6 +341,13 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
                 c4Ret = m_c4SerialNum;
             }
             return c4Ret;
+        }
+
+        tCIDLib::EMTStates eMTState() const
+        {
+            if (m_pmtxLock)
+                return tCIDLib::EMTStates::Safe;
+            return tCIDLib::EMTStates::Unsafe;
         }
 
         tCIDLib::TVoid ExchangeElems(   const   TIndex  tFirst
@@ -491,13 +516,28 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
         //  Needed by our input streamer friend, so that he can reset us if the
         //  stored object is different.
         //
-        tCIDLib::TVoid Reset(tCIDLib::TCard4 c4Count)
+        tCIDLib::TVoid Reset(const  tCIDLib::TCard4     c4Count
+                            , const tCIDLib::EMTStates  eMTState)
         {
             if (c4Count != m_c4ElemCount)
             {
                 delete [] m_paobjList;
                 m_c4ElemCount = c4Count;
                 m_paobjList = new TElem[m_c4ElemCount];
+            }
+
+            if (eMTState == tCIDLib::EMTStates::Safe)
+            {
+                if (!m_pmtxLock)
+                    m_pmtxLock = new TMutex;
+            }
+             else
+            {
+                if (!m_pmtxLock)
+                {
+                    delete m_pmtxLock;
+                    m_pmtxLock = nullptr;
+                }
             }
         }
 
@@ -538,10 +578,16 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
         //  m_paobjList
         //      This is a pointer to the the array of objects. It is
         //      allocated in the constructor to be as big as the user wants.
+        //
+        //  m_pmtxLock
+        //      This is the optional mutex that allows this array to
+        //      be lockable. The derived class indicates to our constructor
+        //      whether this collection should be mutlti-thread safe.
         // -------------------------------------------------------------------
         tCIDLib::TCard4     m_c4ElemCount;
         tCIDLib::TCard4     m_c4SerialNum;
         TElem*              m_paobjList;
+        TMutex*             m_pmtxLock;
 
 
         // -------------------------------------------------------------------
@@ -550,114 +596,6 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
         DefPolyDup(TMyType)
 };
 
-
-// ---------------------------------------------------------------------------
-//   CLASS: TObjArray
-//  PREFIX: obja
-// ---------------------------------------------------------------------------
-template <typename TElem, typename TIndex = tCIDLib::TCard4>
-class TSafeObjArray : public TObjArray<TElem, TIndex>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Class types
-        // -------------------------------------------------------------------
-        using TMyType = TSafeObjArray<TElem, TIndex>;
-        using TParType = TObjArray<TElem, TIndex>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeObjArray() = delete;
-
-        TSafeObjArray(const TIndex tElemCount) : TParType(tElemCount)
-        {
-        }
-
-        TSafeObjArray(const TMyType& objaSrc) : TParType(objaSrc)
-        {
-        }
-
-        // Set up a with 1 element
-        TSafeObjArray(TMyType&& objaSrc) :
-
-            TParType(1)
-        {
-            *this = tCIDLib::ForceMove(objaSrc);
-        }
-
-        ~TSafeObjArray()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType& objaSrc)
-        {
-            return TParType::operator=(objaSrc);
-        }
-
-        // As always only swap content, not the lock. Both serial numbers are bumped
-        TMyType& operator=(TMyType&& objaSrc)
-        {
-            return TParType::operator=(tCIDLib::ForceMove(objaSrc));
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
-        {
-            if (clsTarget == clsThis())
-                return kCIDLib::True;
-            return TCollection<TElem>::bIsDescendantOf(clsTarget);
-        }
-
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMSs) const final
-        {
-            return m_mtxSync.bTryLock(c4WaitMSs);
-        }
-
-        const TClass& clsIsA() const final
-        {
-            return clsThis();
-        }
-
-        const TClass& clsParent() const final
-        {
-            return TParType::clsThis();
-        }
-
-        tCIDLib::EMTStates eMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4) const final
-        {
-            m_mtxSync.Lock();
-        }
-
-        tCIDLib::TVoid Unlock() const final
-        {
-            m_mtxSync
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable methods and implement them in terms of
-        //      this mutex.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
-};
 
 #pragma CIDLIB_POPPACK
 
@@ -703,11 +641,11 @@ TBinInStream& operator>>(TBinInStream& strmIn, TObjArray<T,I>& colToStream)
 
     // Stream in the count and MT state
     tCIDLib::TCard4     c4Count;
-    tCIDLib::EMTStates  eMTSafeDummy;
-    strmIn  >> c4Count >> eMTSafeDummy;
+    tCIDLib::EMTStates  eMTSafe;
+    strmIn  >> c4Count >> eMTSafe;
 
     // We are a friend so we can call the reset method
-    colToStream.Reset(c4Count);
+    colToStream.Reset(c4Count, eMTSafe);
     if (c4Count)
     {
         T objTmp;

@@ -601,9 +601,10 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         THashMap<TElem,TKey,TKeyOps>() = delete;
 
         THashMap(   const   tCIDLib::TCard4     c4Modulus
-                    , const TKeyOps&            kopsToUse) :
+                    , const TKeyOps&            kopsToUse
+                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TMapCollection<TElem, TKey>()
+            TMapCollection<TElem, TKey>(eMTSafe)
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
@@ -1137,12 +1138,16 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 this->KeyNotFound(CID_FILE, CID_LINE);
         }
 
-        tCIDLib::TVoid SetModulus(const tCIDLib::TCard4 c4HashModulus)
+        tCIDLib::TVoid Reset(const  tCIDLib::EMTStates  eMTSafe
+                            , const tCIDLib::TCard4     c4HashModulus)
         {
             TLocker lockrSync(this);
 
             // First we have to remove all elements from the collection
             RemoveAll();
+
+            // Set the thread safe state
+            this->SetMTState(eMTSafe);
 
             // If the hash modulus changed we have to re-do our buckets
             if (c4HashModulus != m_c4HashModulus)
@@ -1406,118 +1411,6 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
 };
 
 
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeHashMap
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-template <typename TElem, class TKey, class TKeyOps> class TSafeHashMap
-
-    : public THashMap<TElem, TKey, TKeyOps>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static const TClass& clsThis()
-        {
-            static const TClass clsRet(L"TSafeHashMap<TElem,TKey,TKeyOps>");
-            return clsRet;
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Nested aliases s for the node and key ops types used by a keyed
-        //  hash map.
-        // -------------------------------------------------------------------
-        using TMyType = TSafeHashMap<TElem, TKey, TKeyOps>;
-        using TParType = THashMap<TElem, TKey, TKeyOps>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeHashMap<TElem,TKey,TKeyOps>() = delete;
-
-        TSafeHashMap(const  tCIDLib::TCard4     c4Modulus
-                    , const TKeyOps&            kopsToUse) :
-
-            TParType(c4Modulus, kopsToUse)
-        {
-        }
-
-        TSafeHashMap(const TMyType& colSrc) : TParType(colSrc)
-        {
-        }
-
-        ~TSafeHashMap()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType& colSrc)
-        {
-            return TParType::operator=(colSrc);
-        }
-
-        TMyType& operator=(TMyType&&) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
-        {
-            if (clsTarget == clsThis())
-                return kCIDLib::True;
-            return TParType::bIsDescendantOf(clsTarget);
-        }
-
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        const TClass& clsIsA() const final
-        {
-            return clsThis();
-        }
-
-        const TClass& clsParent() const final
-        {
-            return TParType::clsThis();
-        }
-
-        tCIDLib::EMTStates eMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::TVoid Unlock() const final
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement them in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
-};
-
-
 #pragma CIDLIB_POPPACK
 
 
@@ -1579,8 +1472,8 @@ TBinInStream& operator>>(TBinInStream&                      strmIn
     tCIDLib::TCard4     c4XORCount;
     tCIDLib::TCard4     c4HashModulus;
     tCIDLib::TCard4     c4OldMax;
-    tCIDLib::EMTStates  eMTSafeDummy;
-    strmIn >> c4Count >> c4XORCount >> c4OldMax >> eMTSafeDummy >> c4HashModulus;
+    tCIDLib::EMTStates  eMTSafe;
+    strmIn >> c4Count >> c4XORCount >> c4OldMax >> eMTSafe >> c4HashModulus;
 
     if (c4XORCount != tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard))
         TCollectionBase::BadStoredCount(colToStream.clsIsA());
@@ -1589,7 +1482,7 @@ TBinInStream& operator>>(TBinInStream&                      strmIn
     //  Set these new attributes on the collection, except for the current
     //  count, which will get set implicitly by our loading the stored elements.
     //
-    colToStream.SetModulus(c4HashModulus);
+    colToStream.Reset(eMTSafe, c4HashModulus);
 
     // If there were any elements, then stream them in
     if (c4Count)
@@ -1600,10 +1493,7 @@ TBinInStream& operator>>(TBinInStream&                      strmIn
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
             strmIn >> objKey >> objValue;
-            colToStream.objAdd
-            (
-                THashMap<TElem, TKey, TKeyOps>::TPair(objKey, objValue)
-            );
+            colToStream.objAdd(THashMap<TElem, TKey, TKeyOps>::TPair(objKey, objValue));
         }
     }
 

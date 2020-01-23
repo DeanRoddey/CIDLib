@@ -89,7 +89,7 @@ class CIDRTPEXP TCIDRTPRec : public TObject
         // -------------------------------------------------------------------
         //  Private data types
         // -------------------------------------------------------------------
-        using TBufferQ = TSafeRefQueue<TCIDRTPMediaBuf>;
+        using TBufferQ = TRefQueue<TCIDRTPMediaBuf>;
 
 
         // -------------------------------------------------------------------

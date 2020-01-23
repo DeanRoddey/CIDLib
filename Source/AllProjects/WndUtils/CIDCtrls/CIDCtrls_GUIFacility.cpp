@@ -69,9 +69,9 @@ namespace CIDCtrls_GUIFacility
                 TString m_strName;
         };
 
-        TSafeKeyedHashSet<TBmpCacheItem, TString, TStringKeyOps> colBmpCache
+        TKeyedHashSet<TBmpCacheItem, TString, TStringKeyOps> colBmpCache
         (
-            107, TStringKeyOps(), &TBmpCacheItem::strKey
+            107, TStringKeyOps(), &TBmpCacheItem::strKey, tCIDLib::EMTStates::Safe
         );
 
 
@@ -95,9 +95,9 @@ namespace CIDCtrls_GUIFacility
                 TString m_strName;
         };
 
-        TSafeKeyedHashSet<TIconCacheItem, TString, TStringKeyOps> colIconCache
+        TKeyedHashSet<TIconCacheItem, TString, TStringKeyOps> colIconCache
         (
-            29, TStringKeyOps(), &TIconCacheItem::strKey
+            29, TStringKeyOps(), &TIconCacheItem::strKey, tCIDLib::EMTStates::Safe
         );
 
 
@@ -119,9 +119,9 @@ namespace CIDCtrls_GUIFacility
                 TString     m_strName;
         };
 
-        TSafeKeyedHashSet<TAppImgCacheItem, TString, TStringKeyOps> colAppImgCache
+        TKeyedHashSet<TAppImgCacheItem, TString, TStringKeyOps> colAppImgCache
         (
-            107, TStringKeyOps(), &TAppImgCacheItem::strKey
+            107, TStringKeyOps(), &TAppImgCacheItem::strKey, tCIDLib::EMTStates::Safe
         );
 
         TAtomicFlag  atomMetricsLoaded;

@@ -44,6 +44,7 @@ class CIDENCODEEXP TFacCIDEncode : public TFacility
         TFacCIDEncode();
 
         TFacCIDEncode(const TFacCIDEncode&) = delete;
+        TFacCIDEncode(TFacCIDEncode&&) = delete;
 
         ~TFacCIDEncode();
 
@@ -52,6 +53,7 @@ class CIDENCODEEXP TFacCIDEncode : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDEncode& operator=(const TFacCIDEncode&) = delete;
+        TFacCIDEncode& operator=(TFacCIDEncode&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -129,7 +131,7 @@ class CIDENCODEEXP TFacCIDEncode : public TFacility
         // -------------------------------------------------------------------
         //  Private class types
         // -------------------------------------------------------------------
-        using TMapList = tCIDLib::TSafeKVHashSet;
+        using TMapList = tCIDLib::TKVHashSet;
 
 
         // -------------------------------------------------------------------

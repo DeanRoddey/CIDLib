@@ -794,7 +794,7 @@ tCIDLib::TVoid MPubSubscription::CheckSubIsReady() const
 TPubSubAsyncSub::TPubSubAsyncSub(const tCIDLib::TBoolean bCreateEvent) :
 
     m_c4BlockingCnt(0)
-    , m_colMsgs()
+    , m_colMsgs(tCIDLib::EMTStates::Safe)
     , m_pevWait(nullptr)
 {
     //

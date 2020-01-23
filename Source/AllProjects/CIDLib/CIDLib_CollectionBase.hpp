@@ -303,17 +303,24 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
         //  This lets all collections (internally and externally) be locked via
         //  the standard MLockable interface and TLocker lock janitor.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4) const override
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
         {
+            if (m_pmtxLock)
+                return m_pmtxLock->bTryLock(c4WaitMS);
+
             return kCIDLib::True;
         }
 
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const override
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMS) const final
         {
+            if (m_pmtxLock)
+                m_pmtxLock->Lock(c4WaitMS);
         }
 
         tCIDLib::TVoid Unlock() const override
         {
+            if (m_pmtxLock)
+                m_pmtxLock->Unlock();
         }
 
 
@@ -323,11 +330,6 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
         virtual tCIDLib::TBoolean bIsEmpty() const = 0;
 
         virtual tCIDLib::TCard4 c4ElemCount() const = 0;
-
-        virtual tCIDLib::EMTStates eMTSafe() const
-        {
-            return tCIDLib::EMTStates::Unsafe;
-        }
 
         virtual tCIDLib::TVoid RemoveAll() = 0;
 
@@ -342,7 +344,7 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
 
         tCIDLib::TBoolean bIsMTSafe() const
         {
-            return (eMTSafe() == tCIDLib::EMTStates::Safe);
+            return (m_pmtxLock != nullptr);
         }
 
         tCIDLib::TBoolean bPublishEnabled() const
@@ -357,6 +359,13 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
             const   tCIDLib::TCard4         c4Limit
             , const tCIDLib::TCh* const     pszDescr
         );
+
+        tCIDLib::EMTStates eMTSafe() const
+        {
+            if (m_pmtxLock == nullptr)
+                return tCIDLib::EMTStates::Unsafe;
+            return tCIDLib::EMTStates::Safe;
+        }
 
         tCIDLib::TVoid PublishBlockChanged
         (
@@ -402,7 +411,10 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TCollectionBase();
+        TCollectionBase
+        (
+            const   tCIDLib::EMTStates      eMTSafe = tCIDLib::EMTStates::Unsafe
+        );
 
         TCollectionBase
         (
@@ -600,6 +612,11 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
             , const tCIDLib::TCard4         c4At2
         );
 
+        tCIDLib::TVoid SetMTState
+        (
+            const   tCIDLib::EMTStates      eToSet
+        );
+
         tCIDLib::TVoid SrcTooBig
         (
             const   tCIDLib::TCh* const     pszFile
@@ -639,12 +656,16 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
         //      needs to watch for changes. They can set their last serial number to
         //      zero, and it will always trigger an initial inequality.
         //
+        //  m_pmtxLock
+        //      If this collection is thread safe, this is allocated, else null.
+        //
         //  m_ppstopReport
         //      A topic to report changes to subscribers. See the header comments above
         //      for details. Only created if the derived class sets it up.
         // -------------------------------------------------------------------
         tCIDLib::TBoolean   m_bInBlockMode;
         tCIDLib::TCard4     m_c4SerialNum;
+        TMutex*             m_pmtxLock;
         TPubSubTopic*       m_ppstopReport;
 
 
@@ -673,7 +694,10 @@ class CIDLIBEXP TFundColBase : public TCollectionBase
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TFundColBase();
+        TFundColBase
+        (
+            const   tCIDLib::EMTStates      eMTSafe = tCIDLib::EMTStates::Unsafe
+        );
 
         TFundColBase(const TFundColBase&)  = default;
         TFundColBase& operator=(const TFundColBase&) = default;

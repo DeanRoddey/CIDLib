@@ -78,7 +78,7 @@ class TFacThreadPool1 : public TFacility
         // -------------------------------------------------------------------
         TFacThreadPool1() :
             TFacility(L"ThreadPool1", tCIDLib::EModTypes::Exe, 1, 0, 0, tCIDLib::EModFlags::None)
-            , m_colWorkQ()
+            , m_colWorkQ(tCIDLib::EMTStates::Safe)
             , m_colWorkers(tCIDLib::EAdoptOpts::Adopt)
         {
         }
@@ -202,7 +202,7 @@ class TFacThreadPool1 : public TFacility
         //  m_scntTotal
         //      A total that our worker threads accumulate into.
         // -------------------------------------------------------------------
-        TSafeQueue<TWorkItem>   m_colWorkQ;
+        TQueue<TWorkItem>       m_colWorkQ;
         TRefVector<TThread>     m_colWorkers;
         TSafeCard4Counter       m_scntTotal;
 };

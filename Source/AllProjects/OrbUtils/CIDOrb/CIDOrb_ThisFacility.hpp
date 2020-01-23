@@ -45,7 +45,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         // -------------------------------------------------------------------
         //  Class types
         // -------------------------------------------------------------------
-        using TObjIdCache = TSafeHashMap<TOrbObjId, TString, TStringKeyOps>;
+        using TObjIdCache = THashMap<TOrbObjId, TString, TStringKeyOps>;
 
 
         // -------------------------------------------------------------------

@@ -117,7 +117,7 @@ class TLogItem : public TLogEvent
 using TLogEvPtr = TCntPtr<TLogItem>;
 using TLogEvRef = TWeakPtr<TLogItem>;
 using TLogEvDeque = TDeque<TLogEvPtr>;
-using TEvList = TSafeVector<TLogEvPtr>;
+using TEvList = TVector<TLogEvPtr>;
 using TEvRefList = TVector<TLogEvRef>;
 
 

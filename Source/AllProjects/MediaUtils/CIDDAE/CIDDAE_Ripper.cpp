@@ -103,7 +103,10 @@ class TDAEBufPool : public TFixedSizePool<TDAEBuf>
         // -------------------------------------------------------------------
         TDAEBufPool() :
 
-            TFixedSizePool(CIDDAE_Ripper::c4MaxBufs * 2, L"DAE Buffer Pool")
+            TFixedSizePool
+            (
+                CIDDAE_Ripper::c4MaxBufs * 2, L"DAE Buffer Pool", tCIDLib::EMTStates::Safe
+            )
         {
         }
 

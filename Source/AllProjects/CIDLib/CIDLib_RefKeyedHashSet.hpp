@@ -685,9 +685,10 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         TRefKeyedHashSet(const  tCIDLib::EAdoptOpts eAdopt
                         , const tCIDLib::TCard4     c4Modulus
                         , const TKeyOps&            kopsToUse
-                        ,       TKeyExtract         pfnKeyExtract) :
+                        ,       TKeyExtract         pfnKeyExtract
+                        , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TParType()
+            TParType(eMTSafe)
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
@@ -1545,115 +1546,5 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 };
 
 
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeRefKeyedHashSet
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-template <typename TElem, typename TKey, typename TKeyOps>
-class TSafeRefKeyedHashSet : public TRefKeyedHashSet<TElem, TKey, TKeyOps>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static const TClass& clsThis()
-        {
-            static const TClass clsRet(L"TSafeRefKeyedHashSet<TElem,TKey,TKeyOps>");
-            return clsRet;
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Nested aliases for the node and key ops types used by a keyed hash
-        //  set. And one for the key field extraction function that the
-        //  user provides.
-        // -------------------------------------------------------------------
-        using TMyElemType = TElem;
-        using TMyType = TSafeRefKeyedHashSet<TElem, TKey, TKeyOps>;
-        using TParType = TRefKeyedHashSet<TElem, TKey, TKeyOps>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeRefKeyedHashSet<TElem, TKey, TKeyOps>() = delete;
-
-        TSafeRefKeyedHashSet(const  tCIDLib::EAdoptOpts eAdopt
-                            , const tCIDLib::TCard4     c4Modulus
-                            , const TKeyOps&            kopsToUse
-                            ,       TParType::TKeyExtract pfnKeyExtract) :
-
-            TParType(eAdopt, c4Modulus, kopsToUse, pfnKeyExtract)
-        {
-        }
-
-        TSafeRefKeyedHashSet(const TMyType&) = delete;
-        TSafeRefKeyedHashSet(TMyType&&) = delete;
-
-        ~TSafeRefKeyedHashSet()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType&) = delete;
-        TMyType& operator=( TMyType&&) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
-        {
-            if (clsTarget == clsThis())
-                return kCIDLib::True;
-            return TParType::bIsDescendantOf(clsTarget);
-        }
-
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        const TClass& clsIsA() const final
-        {
-            return clsThis();
-        }
-
-        const TClass& clsParent() const final
-        {
-            return TParType::clsThis();
-        }
-
-        tCIDLib::EMTStates eMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::TVoid Unlock() const override
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement them in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
-};
-
 #pragma CIDLIB_POPPACK
-
 

@@ -391,9 +391,10 @@ class TRefVector : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         TRefVector() = delete;
 
-        TRefVector(const tCIDLib::EAdoptOpts eAdopt) :
+        TRefVector( const   tCIDLib::EAdoptOpts eAdopt
+                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TParType()
+            TParType(eMTSafe)
             , m_apElems(nullptr)
             , m_c4CurAlloc(8)
             , m_c4CurCount(0)
@@ -412,9 +413,10 @@ class TRefVector : public TRefCollection<TElem>
         }
 
         TRefVector( const   tCIDLib::EAdoptOpts eAdopt
-                    , const TIndex              tInitAlloc) :
+                    , const TIndex              tInitAlloc
+                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TParType()
+            TParType(eMTSafe)
             , m_apElems(nullptr)
             , m_c4CurAlloc(tCIDLib::c4EnumOrd(tInitAlloc))
             , m_c4CurCount(0)
@@ -485,7 +487,7 @@ class TRefVector : public TRefCollection<TElem>
             c4Append(pobjNew);
         }
 
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const override
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
         {
             if (clsTarget == clsThis())
                 return kCIDLib::True;
@@ -504,12 +506,12 @@ class TRefVector : public TRefCollection<TElem>
             return m_c4CurCount;
         }
 
-        const TClass& clsIsA() const override
+        const TClass& clsIsA() const final
         {
             return clsThis();
         }
 
-        const TClass& clsParent() const override
+        const TClass& clsParent() const final
         {
             return TParType::clsThis();
         }
@@ -1751,117 +1753,6 @@ class TRefVector : public TRefCollection<TElem>
         tCIDLib::TCard4     m_c4CurAlloc;
         tCIDLib::TCard4     m_c4CurCount;
         tCIDLib::EAdoptOpts m_eAdopt;
-};
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeRefVector
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-template <typename TElem, typename TIndex = tCIDLib::TCard4>
-class TSafeRefVector : public TRefVector<TElem>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Nested class type aliases
-        // -------------------------------------------------------------------
-        using TMyType       = TSafeRefVector<TElem, TIndex>;
-        using TParType      = TRefVector<TElem,TIndex>;
-
-        // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static const TClass& clsThis()
-        {
-            static const TClass clsRet(L"TSafeRefVector<TElem,TIndex>");
-            return clsRet;
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeRefVector() = delete;
-
-        TSafeRefVector(const tCIDLib::EAdoptOpts eAdopt) :
-
-            TParType(eAdopt)
-        {
-        }
-
-        TSafeRefVector( const   tCIDLib::EAdoptOpts eAdopt
-                        , const TIndex              tInitAlloc) :
-
-            TParType(eAdopt, tInitAlloc)
-        {
-        }
-
-        TSafeRefVector(const TMyType&) = delete;
-        TSafeRefVector(TMyType&&) = delete;
-
-        ~TSafeRefVector()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType&) = delete;
-        TMyType& operator=(TMyType&& colSrc) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
-        {
-            if (clsTarget == clsThis())
-                return kCIDLib::True;
-            return TParType::bIsDescendantOf(clsTarget);
-        }
-
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const override
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        const TClass& clsIsA() const final
-        {
-            return clsThis();
-        }
-
-        const TClass& clsParent() const final
-        {
-            return TParType::clsThis();
-        }
-
-        tCIDLib::EMTStates eMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const override
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::TVoid Unlock() const override
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement them in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
 };
 
 

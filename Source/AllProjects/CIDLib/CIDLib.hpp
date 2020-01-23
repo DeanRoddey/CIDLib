@@ -319,13 +319,11 @@ namespace tCIDLib
     using TKVPTree          = TBasicTreeCol<TKeyValuePair>;
     using TStrArray         = TObjArray<TString>;
     using TStrBag           = TBag<TString>;
-    using TSafeStrBag       = TSafeBag<TString>;
     using TStrCollect       = TCollection<TString>;
     using TKVPCollect       = TCollection<TKeyValuePair>;
     using TKVPFCollect      = TCollection<TKeyValFPair>;
     using TKValsCollect     = TCollection<TKeyValues>;
     using TStrList          = TVector<TString>;
-    using TSafeStrList      = TSafeVector<TString>;
     using TStrIdList        = TVector<TStringId>;
     using TKVPList          = TVector<TKeyValuePair>;
     using TKVPFList         = TVector<TKeyValFPair>;
@@ -335,9 +333,7 @@ namespace tCIDLib
     using TThreadList       = TRefVector<TThread>;
     using TLogEventQ        = TQueue<TLogEvent>;
     using TStringQ          = TQueue<TString>;
-    using TSafeStringQ      = TSafeQueue<TString>;
     using TKVPairQ          = TQueue<TKeyValuePair>;
-    using TSafeKVPairQ      = TSafeQueue<TKeyValuePair>;
     using TBoolArray        = TFundArray<tCIDLib::TBoolean>;
     using TCardArray        = TFundArray<tCIDLib::TCard4>;
     using TFloatArray       = TFundArray<tCIDLib::TFloat8>;
@@ -353,11 +349,8 @@ namespace tCIDLib
     using TByteStack        = TFundStack<tCIDLib::TCard1>;
     using TCardStack        = TFundStack<tCIDLib::TCard4>;
     using TKVHashSet        = TKeyedHashSet<TKeyValuePair,TString,TStringKeyOps>;
-    using TSafeKVHashSet    = TSafeKeyedHashSet<TKeyValuePair,TString,TStringKeyOps>;
     using TStrHashSet       = THashSet<TString,TStringKeyOps>;
-    using TSafeStrHashSet   = TSafeHashSet<TString,TStringKeyOps>;
     using TGenCache         = TKeyedHashSet<TCIDGenCacheItem, TString, TStringKeyOps>;
-    using TSafeGenCache     = TSafeKeyedHashSet<TCIDGenCacheItem, TString, TStringKeyOps>;
 }
 
 

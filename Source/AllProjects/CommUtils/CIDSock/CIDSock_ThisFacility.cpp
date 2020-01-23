@@ -141,14 +141,17 @@ namespace CIDSock_ThisFacility
         //  with entries that never get used again. And, should it get full, we'll
         //  also do a pass to remove out of date entries.
         // -------------------------------------------------------------------
-        using TIPCache = TSafeKeyedHashSet<TIPLookupItem, TString, TStringKeyOps>;
+        using TIPCache = TKeyedHashSet<TIPLookupItem, TString, TStringKeyOps>;
         const tCIDLib::TCard4 c4MaxCacheItems = 2048;
         TString strKeyTemp;
         tCIDLib::TEncodedTime enctFlushPass = 0;
 
         TIPCache* pcolNameCache()
         {
-            static TIPCache colRet(173, TStringKeyOps(), &TIPLookupItem::strKey);
+            static TIPCache colRet
+            (
+                173, TStringKeyOps(), &TIPLookupItem::strKey, tCIDLib::EMTStates::Safe
+            );
             return &colRet;
         }
     }

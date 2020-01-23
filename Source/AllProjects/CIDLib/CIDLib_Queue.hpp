@@ -505,9 +505,9 @@ template <typename TElem> class TQueue : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TQueue() :
+        TQueue(const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TCollection<TElem>()
+            TCollection<TElem>(eMTSafe)
             , m_llstQueue()
         {
         }
@@ -1096,88 +1096,6 @@ template <typename TElem> class TQueue : public TCollection<TElem>
         TemplateRTTIDefs(TMyType,TCollection<TElem>)
 };
 
-
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeQueue
-//  PREFIX: que
-// ---------------------------------------------------------------------------
-template <typename TElem> class TSafeQueue : public TQueue<TElem>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Nested aliases for the cursor and node types used by a queue.
-        // -------------------------------------------------------------------
-        using TMyElemType = TElem;
-        using TMyType = TSafeQueue<TElem>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeQueue() : TParent()
-        {
-        }
-
-        TSafeQueue(const TMyType& colSrc) : TParent(colSrc)
-        {
-        }
-
-        TSafeQueue(TMyType&&) = delete;
-
-        ~TSafeQueue() {}
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType& colSrc)
-        {
-            TParent::operator=(colSrc);
-        }
-
-        TMyType& operator=(TMyType&&) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::EMTStates eMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Unlock() const final
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement it in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        TemplateRTTIDefs(TSafeQueue<TElem>,TQueue<TElem>)
-};
 
 #pragma CIDLIB_POPPACK
 

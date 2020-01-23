@@ -89,7 +89,7 @@ tCIDLib::EExitCodes eWorkerThreadFunc(TThread&, tCIDLib::TVoid*);
 //  evWait
 //      We hold the threads back until they are all created.
 // ---------------------------------------------------------------------------
-static TSafeQueue<TString>  colTest;
+static TQueue<TString>      colTest(tCIDLib::EMTStates::Safe);
 static TOutConsole          conOut;
 static TEvent               evWait(tCIDLib::EEventStates::Reset);
 

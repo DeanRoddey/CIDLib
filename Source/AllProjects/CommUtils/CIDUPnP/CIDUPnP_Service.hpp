@@ -266,7 +266,7 @@ class CIDUPNPEXP TUPnPService : public TObject, public MUPnPSvcCallback
         // -------------------------------------------------------------------
         //  Class types
         // -------------------------------------------------------------------
-        using TVarList = tCIDLib::TSafeKVHashSet;
+        using TVarList = tCIDLib::TKVHashSet;
 
 
         // -------------------------------------------------------------------

@@ -281,7 +281,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         // -------------------------------------------------------------------
         //  Public types
         // -------------------------------------------------------------------
-        using TElemList = TSafeRefVector<TElem>;
+        using TElemList = TRefVector<TElem>;
 
 
         // -------------------------------------------------------------------
@@ -567,24 +567,26 @@ template <typename TElem> class TFixedSizePool : public TObject
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        TFixedSizePool(const   tCIDLib::TCard4  c4MaxAlloc
-                    , const TString&            strName) :
+        TFixedSizePool( const   tCIDLib::TCard4     c4MaxAlloc
+                        , const TString&            strName
+                        , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             m_c4MaxPoolSize(c4MaxAlloc ? c4MaxAlloc : 8192)
             , m_colFreeList
               (
-                tCIDLib::EAdoptOpts::NoAdopt
-                , tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
+                tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
               )
             , m_colUsedList
               (
-                tCIDLib::EAdoptOpts::NoAdopt
-                , tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
+                tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
               )
             , m_pmtxSync(nullptr)
             , m_strName(strName)
         {
-        }
+            // If MT safe, then allocate the critical section
+            if (eMTSafe == tCIDLib::EMTStates::Safe)
+                m_pmtxSync = new TMutex;
+         }
 
 
         // -------------------------------------------------------------------

@@ -102,6 +102,7 @@ TUPnPAsyncFinder::TUPnPAsyncFinder() :
         , 109
         , TStringKeyOps()
         , &TUPnPAsyncFinderItem::strKey
+        , tCIDLib::EMTStates::Safe
       )
     , m_kupnpafThis(this)
 {

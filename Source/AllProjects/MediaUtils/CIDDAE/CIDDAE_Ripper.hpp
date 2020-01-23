@@ -239,7 +239,7 @@ class CIDDAEEXP TCIDDAERipper : public TObject
         tCIDLib::TCard4             m_c4StitchErrs;
         tCIDLib::TCard4             m_c4Stitches;
         tCIDLib::TCard4             m_c4TrackNum;
-        TSafeRefQueue<TDAEBuf>      m_colWorkQ;
+        TRefQueue<TDAEBuf>          m_colWorkQ;
         TError                      m_errRead;
         TError                      m_errWrite;
         tCIDDAE::EJitterOpts        m_eJitterOpt;

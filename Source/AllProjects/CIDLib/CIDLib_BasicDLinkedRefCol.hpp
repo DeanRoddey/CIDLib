@@ -403,9 +403,10 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TBasicDLinkedRefCol(const tCIDLib::EAdoptOpts eAdopt) :
+        TBasicDLinkedRefCol(const   tCIDLib::EAdoptOpts eAdopt
+                            , const tCIDLib::EMTStates  eMTSafe) :
 
-            TRefCollection<TElem>()
+            TRefCollection<TElem>(eMTSafe)
             , m_eAdopt(eAdopt)
             , m_llstCol()
         {
@@ -846,82 +847,5 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
 };
 
 
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeBasicDLinkedRefCol
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-template <typename TElem> class TSafeBasicDLinkedRefCol : public TBasicDLinkedRefCol<TElem>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Nested aliases for some of our types
-        // -------------------------------------------------------------------
-        using TMyType = TSafeBasicDLinkedRefCol<TElem>;
-        using TParType = TBasicDLinkedRefCol<TElem>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeBasicDLinkedRefCol(const tCIDLib::EAdoptOpts eAdopt) : TParType(eAdopt)
-        {
-        }
-
-        TSafeBasicDLinkedRefCol(TMyType&) = delete;
-        TSafeBasicDLinkedRefCol(TMyType&&) = delete;
-
-        ~TSafeBasicDLinkedRefCol()
-        {
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TMyType& operator=(const TMyType&) = delete;
-        TMyType& operator=(TMyType&&) = delete;
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        tCIDLib::EMTStates eIsMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::TVoid Unlock() const final
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement them in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        TemplateRTTIDefs(TSafeBasicDLinkedRefCol<TElem>,TBasicDLinkedRefCol<TElem>)
-};
-
 #pragma CIDLIB_POPPACK
-
 

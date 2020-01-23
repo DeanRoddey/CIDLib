@@ -80,7 +80,7 @@
 // ----------------------------------------------------------------------------
 //  Local types
 // ----------------------------------------------------------------------------
-using TClientQ = TSafeRefQueue<TServerStreamSocket>;
+using TClientQ = TRefQueue<TServerStreamSocket>;
 
 
 
@@ -129,7 +129,7 @@ using TClientQ = TSafeRefQueue<TServerStreamSocket>;
 static tCIDLib::TBoolean        bSecure = kCIDLib::False;
 static tCIDLib::TBoolean        bSingleThread = kCIDLib::False;
 static const tCIDLib::TCard4    c4DefThreadCnt = 8;
-static TClientQ                 colSockQ(tCIDLib::EAdoptOpts::Adopt);
+static TClientQ                 colSockQ(tCIDLib::EAdoptOpts::Adopt, tCIDLib::EMTStates::Safe);
 static TMutex                   mtxSyncOut;
 static TString                  strCertInfo;
 static TString                  strRootPath;

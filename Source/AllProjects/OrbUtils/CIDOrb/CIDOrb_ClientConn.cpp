@@ -54,7 +54,7 @@ TOrbClientConnImpl(         TServerStreamSocket* const  psockThis
 
     m_bOffline(kCIDLib::False)
     , m_c8ConnId(c8ConnId)
-    , m_colReplyQ()
+    , m_colReplyQ(tCIDLib::EMTStates::Safe)
     , m_enctLastMsg(TTime::enctNow())
     , m_evSocket(tCIDLib::EEventStates::Reset)
     , m_evWorkAvail(tCIDLib::EEventStates::Reset)

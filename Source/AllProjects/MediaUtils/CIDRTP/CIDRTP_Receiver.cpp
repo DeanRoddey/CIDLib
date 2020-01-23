@@ -56,7 +56,7 @@ TCIDRTPRec::TCIDRTPRec() :
     , m_c4Stat_TotalPackets(0)
     , m_c4Stat_WrongSrc(0)
     , m_c4SyncSrc(0)
-    , m_colProcQ(tCIDLib::EAdoptOpts::NoAdopt)
+    , m_colProcQ(tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::EMTStates::Safe)
     , m_enctLastMsg(0)
     , m_prtpioOut(nullptr)
     , m_psockRTP(nullptr)

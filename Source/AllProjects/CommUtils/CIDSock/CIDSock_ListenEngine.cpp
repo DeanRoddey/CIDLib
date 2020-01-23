@@ -147,7 +147,7 @@ tCIDLib::TVoid TSockLEngConn::Cleanup()
 TSockListenerEng::TSockListenerEng() :
 
     m_c4MaxWaiting(1)
-    , m_colConnQ(tCIDLib::EAdoptOpts::Adopt)
+    , m_colConnQ(tCIDLib::EAdoptOpts::Adopt, tCIDLib::EMTStates::Safe)
     , m_eProtocol(tCIDSock::ESockProtos::Count)
     , m_ippnNonSecure(0)
     , m_ippnSecure(0)

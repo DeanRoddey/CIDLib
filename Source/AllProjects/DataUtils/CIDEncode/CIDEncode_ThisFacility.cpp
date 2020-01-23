@@ -68,7 +68,10 @@ TFacCIDEncode::TFacCIDEncode() :
     //
     m_pcolMap = new TMapList
     (
-        29, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
+        29
+        , TStringKeyOps(kCIDLib::False)
+        , &TKeyValuePair::strExtractKey
+        , tCIDLib::EMTStates::Safe
      );
 
 

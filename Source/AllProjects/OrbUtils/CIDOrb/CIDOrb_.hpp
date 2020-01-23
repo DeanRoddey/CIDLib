@@ -78,7 +78,7 @@ namespace tCIDOrb_
     //  that will release the item back to the facility class' pool when the last
     //  use of it is done.
     // -----------------------------------------------------------------------
-    using TWorkQ = TSafeQueue<TWorkQItemPtr>;
+    using TWorkQ = TQueue<TWorkQItemPtr>;
 }
 
 

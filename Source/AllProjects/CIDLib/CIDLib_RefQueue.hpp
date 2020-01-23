@@ -479,9 +479,10 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TRefQueue(const tCIDLib::EAdoptOpts eAdopt = tCIDLib::EAdoptOpts::Adopt) :
+        TRefQueue(  const   tCIDLib::EAdoptOpts eAdopt = tCIDLib::EAdoptOpts::Adopt
+                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TRefCollection<TElem>()
+            TRefCollection<TElem>(eMTSafe)
             , m_eAdopt(eAdopt)
             , m_llstQueue()
         {
@@ -1079,85 +1080,6 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         TemplateRTTIDefs(TRefQueue<TElem>,TRefCollection<TElem>)
-};
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeRefQueue
-//  PREFIX: que
-// ---------------------------------------------------------------------------
-template <typename TElem> class TSafeRefQueue : public TRefQueue<TElem>
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Class type aliases
-        // -------------------------------------------------------------------
-        using TMyType       = TSafeRefQueue<TElem>;
-        using TParType      = TRefQueue<TElem>;
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeRefQueue(const tCIDLib::EAdoptOpts eAdopt = tCIDLib::EAdoptOpts::Adopt) :
-
-            TParType(eAdopt)
-        {
-        }
-
-        TSafeRefQueue(const TSafeRefQueue<TElem>&) = delete;
-        TSafeRefQueue(TSafeRefQueue<TElem>&&) = delete;
-
-        ~TSafeRefQueue() {}
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TSafeRefQueue<TElem>& operator=(const TSafeRefQueue<TElem>&) = delete;
-        TSafeRefQueue<TElem>& operator=(TSafeRefQueue<TElem>&&) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const override
-        {
-            return m_mtxSync.bTryLock(c4WaitMS);
-        }
-
-        tCIDLib::EMTStates eMTSafe() const final
-        {
-            return tCIDLib::EMTStates::Safe;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const override
-        {
-            m_mtxSync.Lock(c4WaitMSs);
-        }
-
-        tCIDLib::TVoid Unlock() const override
-        {
-            m_mtxSync.Unlock();
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_mtxSync
-        //      We override the MLockable interface and implement it in terms
-        //      of this guy.
-        // -------------------------------------------------------------------
-        TMutex  m_mtxSync;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        TemplateRTTIDefs(TSafeRefQueue<TElem>,TRefQueue<TElem>)
 };
 
 

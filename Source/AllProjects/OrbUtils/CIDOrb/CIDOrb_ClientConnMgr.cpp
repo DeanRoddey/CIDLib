@@ -79,15 +79,9 @@ TOrbClientConnMgr::TOrbClientConnMgr(const  tCIDLib::TIPPortNum ippnListen
     , m_c4LoopCnt(1)
     , m_c4MaxClients(CIDOrb_ClientConnMgr::c4MaxClients)
     , m_c8NextConnId(0)
-    , m_colClientList
-      (
-        tCIDLib::EAdoptOpts::Adopt, CIDOrb_ClientConnMgr::c4MaxClients
-      )
-    , m_colThreads
-      (
-        tCIDLib::EAdoptOpts::Adopt, CIDOrb_ClientConnMgr::c4MaxThreads
-      )
-    , m_colWorkQ()
+    , m_colClientList(tCIDLib::EAdoptOpts::Adopt, CIDOrb_ClientConnMgr::c4MaxClients)
+    , m_colThreads(tCIDLib::EAdoptOpts::Adopt, CIDOrb_ClientConnMgr::c4MaxThreads)
+    , m_colWorkQ(tCIDLib::EMTStates::Safe)
     , m_ipaOnlyAcceptFrom()
     , m_ippnListenOn(ippnListen)
     , m_psocklServer(nullptr)
@@ -856,10 +850,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
 
             m_colClientList.Add
             (
-                new TOrbClientConnImpl
-                (
-                    janSock.pobjOrphan(), ipepClient, this, m_c8NextConnId
-                )
+                new TOrbClientConnImpl(janSock.pobjOrphan(), ipepClient, this, m_c8NextConnId)
             );
             c4Count = m_colClientList.c4ElemCount();
 

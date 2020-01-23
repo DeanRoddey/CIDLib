@@ -165,7 +165,7 @@ class CIDSOCKEXP TSockListenerEng : public TObject
         // -------------------------------------------------------------------
         //  Public data types
         // -------------------------------------------------------------------
-        using TConnQueue = TSafeRefQueue<TSockLEngConn>;
+        using TConnQueue = TRefQueue<TSockLEngConn>;
 
 
         // -------------------------------------------------------------------

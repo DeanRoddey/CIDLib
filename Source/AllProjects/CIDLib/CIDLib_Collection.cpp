@@ -107,6 +107,9 @@ tCIDLib::TVoid TCollectionBase::BadStoredCount(const TClass& clsCol)
 // ---------------------------------------------------------------------------
 TCollectionBase::~TCollectionBase()
 {
+    if (m_pmtxLock)
+        delete m_pmtxLock;
+
     // If we registered a pub/sub topic, then clean that up
     if (m_ppstopReport)
     {
@@ -221,7 +224,7 @@ tCIDLib::TVoid TCollectionBase::PublishReload()
 //  any type of collection.
 //
 tCIDLib::TBoolean
-TCollectionBase::bWaitForData(          TLocker&         lockrQueue
+TCollectionBase::bWaitForData(          TLocker&            lockrQueue
                                 , const TCollectionBase&    colSrc
                                 , const tCIDLib::TCard4     c4WaitMSs
                                 ,       TThreadWaitList&    twlWaitList
@@ -316,12 +319,15 @@ TCollectionBase::bWaitForData(          TLocker&         lockrQueue
 // ---------------------------------------------------------------------------
 //  TCollectionBase: Hidden constructors and operators
 // ---------------------------------------------------------------------------
-TCollectionBase::TCollectionBase() :
+TCollectionBase::TCollectionBase(const tCIDLib::EMTStates eMTSafe) :
 
     m_bInBlockMode(kCIDLib::False)
     , m_c4SerialNum(1)
+    , m_pmtxLock(nullptr)
     , m_ppstopReport(nullptr)
 {
+    if (eMTSafe == tCIDLib::EMTStates::Safe)
+        m_pmtxLock = new TMutex;
 }
 
 
@@ -335,8 +341,11 @@ TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
 
     m_bInBlockMode(kCIDLib::False)
     , m_c4SerialNum(1)
+    , m_pmtxLock(nullptr)
     , m_ppstopReport(nullptr)
 {
+    if (colSrc.m_pmtxLock)
+        m_pmtxLock = new TMutex;
 }
 
 
@@ -898,6 +907,28 @@ TCollectionBase::PublishSwap(const  tCIDLib::TCard4 c4At1
 }
 
 
+tCIDLib::TVoid TCollectionBase::SetMTState(const tCIDLib::EMTStates eState)
+{
+    if (eState == tCIDLib::EMTStates::Safe)
+    {
+        if (!m_pmtxLock)
+        {
+            m_pmtxLock = new TMutex;
+            m_c4SerialNum++;
+        }
+    }
+     else
+    {
+        if (m_pmtxLock)
+        {
+            delete m_pmtxLock;
+            m_pmtxLock = nullptr;
+            m_c4SerialNum++;
+        }
+    }
+}
+
+
 // A debug helper that will throw a source too big exception
 tCIDLib::TVoid
 TCollectionBase::SrcTooBig( const   tCIDLib::TCh* const pszFile
@@ -966,7 +997,9 @@ TFundColBase::~TFundColBase()
 // ---------------------------------------------------------------------------
 //  TFundColBase: Hidden constructors and operators
 // ---------------------------------------------------------------------------
-TFundColBase::TFundColBase() : TCollectionBase()
+TFundColBase::TFundColBase(const tCIDLib::EMTStates eMTSafe) :
+
+    TCollectionBase(eMTSafe)
 {
 }
 

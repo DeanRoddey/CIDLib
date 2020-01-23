@@ -228,13 +228,13 @@ class TTest_ObjStore4: public TTestFWTest
         // -------------------------------------------------------------------
         //  Private data members
         // -------------------------------------------------------------------
-        tCIDLib::TCard4         m_c4NextKeyId;
-        tCIDLib::TCard4         m_c4ThreadErrs;
-        tCIDLib::TSafeStringQ   m_colKeys;
-        TEvent                  m_evStart;
-        TMutex                  m_mtxOut;
-        TCIDObjStore            m_oseTest;
-        TTextOutStream*         m_pstrmOut;
+        tCIDLib::TCard4     m_c4NextKeyId;
+        tCIDLib::TCard4     m_c4ThreadErrs;
+        tCIDLib::TStringQ   m_colKeys;
+        TEvent              m_evStart;
+        TMutex              m_mtxOut;
+        TCIDObjStore        m_oseTest;
+        TTextOutStream*     m_pstrmOut;
 
 
 

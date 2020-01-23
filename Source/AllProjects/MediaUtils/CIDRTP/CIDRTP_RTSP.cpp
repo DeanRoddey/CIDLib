@@ -423,7 +423,10 @@ const TString& TCIDRTSPSrv::strKey(const TSessPtr& cptrSrc)
 //
 TCIDRTSPSrv::TCIDRTSPSrv() :
 
-    m_colSessions(109, TStringKeyOps(), &TCIDRTSPSrv::strKey)
+    m_colSessions
+    (
+        109, TStringKeyOps(), &TCIDRTSPSrv::strKey, tCIDLib::EMTStates::Safe
+    )
     , m_colThreads(tCIDLib::EAdoptOpts::Adopt, kCIDRTP::c4MaxSessions)
     , m_fcolPortMap(kCIDRTP::c4MaxSessions, kCIDLib::False)
     , m_ippnFirst(kCIDRTP::ippnFirstRTP)

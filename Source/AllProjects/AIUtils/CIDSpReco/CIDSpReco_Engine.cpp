@@ -105,7 +105,7 @@ struct TSpRecoInfo
 TCIDSpReco::TCIDSpReco(const TString& strSpRecoName) :
 
     m_bDynGrammar(kCIDLib::False)
-    , m_colEventQ()
+    , m_colEventQ(tCIDLib::EMTStates::Safe)
     , m_pInfo(nullptr)
     , m_strNoSemValue(L"RuleText")
     , m_strRoot(L"/")
