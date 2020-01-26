@@ -16,6 +16,7 @@ TestPrgs=CIDLib Test Suite
     TestPrg=CIDLib
         TestPath=<Root>\TestCIDLib2.exe
         Description=Tests the core classes in CIDLib
+        WorkDir=TestCIDLib2
     EndTestPrg;
 
     TestPrg=MathLib

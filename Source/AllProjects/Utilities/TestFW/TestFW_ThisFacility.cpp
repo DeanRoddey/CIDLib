@@ -330,11 +330,21 @@ tCIDLib::TVoid TFacTestFW::InvokeGroups()
                 //  then we make it relative to the directory where the test
                 //  config file was found.
                 //
-                TPathStr pathWD = tfwtpiCur.strWorkDir();
-                if (!pathWD.bIsFullyQualified())
+                TPathStr pathWD;
+                if (tfwtpiCur.strWorkDir().bIsEmpty())
                 {
-                    pathWD.AddToBasePath(m_pathTestBaseDir);
-                    pathWD.Normalize();
+                    // Use the project's actual path
+                    pathWD = tfwtpiCur.strPath();
+                    pathWD.bRemoveNameExt();
+                }
+                 else
+                {
+                    pathWD = tfwtpiCur.strWorkDir();
+                    if (!pathWD.bIsFullyQualified())
+                    {
+                        pathWD.AddToBasePath(m_pathTestBaseDir);
+                        pathWD.Normalize();
+                    }
                 }
 
                 // Start it and wait for it to end

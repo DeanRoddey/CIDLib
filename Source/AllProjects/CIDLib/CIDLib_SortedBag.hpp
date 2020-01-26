@@ -47,6 +47,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         using TMyElemType = TElem;
         using TMyType = TSortedBag<TElem>;
+        using TParType = TBasicDLinkedCol<TElem>;
         using TCompFunc = tCIDLib::ESortComps (*)(const TElem&, const TElem&);
 
 
@@ -57,7 +58,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
                     , const tCIDLib::ESortDirs  eDir = tCIDLib::ESortDirs::Ascending
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TParent(eMTSafe)
+            TParType(eMTSafe)
             , m_c4UserData(0)
             , m_eDir(eDir)
             , m_pfnComp(pfnComp)
@@ -66,14 +67,23 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
 
         TSortedBag(const TMyType& colSrc) :
 
-            TParent(colSrc)
+            TParType(colSrc)
             , m_c4UserData(colSrc.m_c4UserData)
             , m_eDir(colSrc.m_eDir)
             , m_pfnComp(colSrc.m_pfnComp)
         {
         }
 
-        TSortedBag(TMyType&&) = delete;
+        // Do a basic setup and call the move operator
+        TSortedBag(TMyType&& colSrc) :
+
+            TParType(colSrc)
+            , m_c4UserData(0)
+            , m_eDir(tCIDLib::ESortDirs::Ascending)
+            , m_pfnComp(colSrc.m_pfnComp)
+        {
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~TSortedBag() = default;
 
@@ -85,7 +95,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
         {
             if (&colSrc != this)
             {
-                TParent::operator=(colSrc);
+                TParType::operator=(colSrc);
                 m_c4UserData = colSrc.m_c4UserData;
                 m_eDir = colSrc.m_eDir;
                 m_pfnComp = colSrc.m_pfnComp;
@@ -93,7 +103,25 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
             return *this;
         }
 
-        TMyType& operator=(TMyType&&) = delete;
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                // Lock both while we do this
+                TLocker lockrSrc(&colSrc);
+                TLocker lockrThis(this);
+
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+                tCIDLib::Swap(m_c4UserData, colSrc.m_c4UserData);
+                tCIDLib::Swap(m_eDir, colSrc.m_eDir);
+                tCIDLib::Swap(m_pfnComp, colSrc.m_pfnComp);
+
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
@@ -109,7 +137,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
                 return this->objAddAtTop(objNew);
 
             // If the cursor is invalid, it will go at the end
-            TParent::TCursor cursAt = cursFindInsert(objNew);
+            TParType::TCursor cursAt = cursFindInsert(objNew);
             TElem& objRet = this->objInsertAfter(objNew, cursAt);
 
             // Invalidate any cursors
@@ -150,7 +178,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
 
             // If the cursor is invalid, it will go at the end
             TElem objNew(tCIDLib::Forward<TArgs>(Args)...);
-            TParent::TCursor cursAt(cursFindInsert(objNew));
+            TParType::TCursor cursAt(cursFindInsert(objNew));
             TElem& objRet = this->objInsertAfter(objNew, cursAt);
 
             // Invalidate any cursors

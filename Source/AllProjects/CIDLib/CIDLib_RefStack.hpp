@@ -45,6 +45,13 @@ template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
+        //  Public class types
+        // -------------------------------------------------------------------
+        using TMyType = TRefStack<TElem>;
+        using TParType = TBasicDLinkedRefCol<TElem>;
+
+
+        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TRefStack() = delete;
@@ -52,12 +59,12 @@ template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
         TRefStack(  const   tCIDLib::EAdoptOpts eAdopt
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TBasicDLinkedRefCol<TElem>(eAdopt, eMTSafe)
+            TParType(eAdopt, eMTSafe)
         {
         }
 
         TRefStack(const TRefStack&) = delete;
-        TRefStack(TRefStack&&) = delete;
+        TRefStack(TRefStack&&) = default;
 
         ~TRefStack()
         {
@@ -68,7 +75,7 @@ template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
         //  Public operators
         // -------------------------------------------------------------------
         TRefStack& operator=(const TRefStack&) = delete;
-        TRefStack& operator=(TRefStack&&) = delete;
+        TRefStack& operator=(TRefStack&&) = default;
 
 
         // -------------------------------------------------------------------

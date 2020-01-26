@@ -38,6 +38,13 @@ template <typename TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
+        //  Public types
+        // -------------------------------------------------------------------
+        using TMyType = TRefBag<TElem>;
+        using TParType = TBasicDLinkedRefCol<TElem>;
+
+
+        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TRefBag() = delete;
@@ -45,23 +52,20 @@ template <typename TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
         TRefBag(const   tCIDLib::EAdoptOpts eAdopt
                 , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TParent(eAdopt, eMTSafe)
+            TParType(eAdopt, eMTSafe)
         {
         }
 
         TRefBag(const TRefBag&) = delete;
-        TRefBag(TRefBag&&) = delete;
-
-        ~TRefBag()
-        {
-        }
+        TRefBag(TRefBag&& colSrc) = default;
+        ~TRefBag() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TRefBag& operator=(const TRefBag&) = delete;
-        TRefBag& operator=(TRefBag&&) = delete;
+        TRefBag& operator=(TRefBag&&) = default;
 
 
         // -------------------------------------------------------------------

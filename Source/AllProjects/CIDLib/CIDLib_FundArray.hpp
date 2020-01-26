@@ -117,6 +117,7 @@ class TFundArray : public TFundColBase, public MDuplicable
             );
         }
 
+        // Do a minimal setup and call move operator
         TFundArray(TMyType&& fcolSrc) :
 
             m_c4ElemCount(1)

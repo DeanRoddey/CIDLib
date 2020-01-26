@@ -123,6 +123,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_Bitset1);
 
     // Fundamental collection tests
+    AddTest(new TTest_FundArrayMove);
     AddTest(new TTest_FundVectorLambda);
 
     // Collection tests
@@ -138,7 +139,10 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_VectorPlace);
     AddTest(new TTest_DequeMoveSem);
     AddTest(new TTest_DequePlace);
+    AddTest(new TTest_HashSetMove);
     AddTest(new TTest_HashSetPlace);
+    AddTest(new TTest_BagMove);
+    AddTest(new TTest_BagPlace);
     AddTest(new TTest_ColAlgo1);
 
     AddTest(new TTest_ColCursors);
@@ -165,6 +169,9 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     // Cicular buffer
     AddTest(new TTest_CircularBuf);
 
+    // Directory change monitoring
+    AddTest(new TTest_DirChange1);
+
     //
     //  High level tests that can gen up some threads and take a while
     //
@@ -177,9 +184,6 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     // Publish/subscribe
     AddTest(new TTest_PubSub1);
     AddTest(new TTest_PubSubVector);
-
-    // Directory change monitoring
-    AddTest(new TTest_DirChange1);
 }
 
 tCIDLib::TVoid TCIDLibTestApp::PostTest(const TTestFWTest&)

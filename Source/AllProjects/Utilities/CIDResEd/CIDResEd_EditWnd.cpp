@@ -1223,9 +1223,9 @@ tCIDLib::TVoid TResEdEditor::DeleteSelected()
     if (c4Count)
     {
         //
-        //  Get a copy of all of the selected items, so that we can clear the
-        //  selection list before we do this. Otherwise, we'll keep redrawing
-        //  selection handles over non-existant items when the display
+        //  Get a copy of all of the selected items list, so that we can clear
+        //  the selection list before we do this. Otherwise, we'll keep
+        //  redrawing selection handles over non-existant items when the display
         //  window starts redrawing the areas uncovered by the destruction
         //  of the controls.
         //
@@ -1234,7 +1234,7 @@ tCIDLib::TVoid TResEdEditor::DeleteSelected()
         (
             tCIDLib::EAdoptOpts::NoAdopt, m_colSelList.c4ElemCount()
         );
-        m_colSelList.GiveAllTo(colTmp);
+        colTmp = tCIDLib::ForceMove(m_colSelList);
 
         // Now we can can ask the display window to delete these controls
         m_pwndDisplay->DeleteCtrls(colTmp);

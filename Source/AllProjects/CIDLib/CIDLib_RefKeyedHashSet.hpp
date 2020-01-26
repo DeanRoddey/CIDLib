@@ -688,11 +688,10 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                         ,       TKeyExtract         pfnKeyExtract
                         , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TParType(eMTSafe)
+            TParType(eAdopt, eMTSafe)
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
-            , m_eAdopt(eAdopt)
             , m_pfnKeyExtract(pfnKeyExtract)
             , m_kopsToUse(kopsToUse)
         {
@@ -716,12 +715,35 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         }
 
         TRefKeyedHashSet(const TMyType&) = delete;
-        TRefKeyedHashSet( TMyType&&) = delete;
+
+        //
+        //  Do a minimal setup, then call the operator. We take the source's adoption
+        //  and thread safety, so there's no worries about different adoptiong causing
+        //  leaks.
+        //
+        TRefKeyedHashSet(TMyType&& colSrc) :
+
+            TParType(colSrc.eAdopt(), colSrc.eMTSafe())
+            , m_apBuckets(nullptr)
+            , m_c4CurElements(0)
+            , m_c4HashModulus(3)
+            , m_pfnKeyExtract(colSrc.m_pfnKeyExtract)
+            , m_kopsToUse(colSrc.m_kopsToUse)
+        {
+            // Allocate and initialize the bucket array
+            m_apBuckets = new TNode*[m_c4HashModulus];
+            TRawMem::SetMemBuf
+            (
+                m_apBuckets, tCIDLib::TCard1(0), sizeof(tCIDLib::TVoid*) * m_c4HashModulus
+            );
+
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~TRefKeyedHashSet()
         {
             // Flush the collection, destroying user data if we are adopting
-            RemoveAllElems(m_eAdopt == tCIDLib::EAdoptOpts::Adopt);
+            RemoveAllElems(this->eAdopt() == tCIDLib::EAdoptOpts::Adopt);
 
             // And delete the bucket list itself
             delete [] m_apBuckets;
@@ -732,7 +754,36 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         //  Public operators
         // -------------------------------------------------------------------
         TMyType& operator=(const TMyType&) = delete;
-        TMyType& operator=( TMyType&&) = delete;
+
+        //
+        //  We have to swap the modulus and key ops as well since they affect the
+        //  buckets and where the elements are in them.
+        //
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                // We must have the same adoption type
+                if (colSrc.eAdopt() != this->eAdopt())
+                    this->MovedAdopted(CID_FILE, CID_LINE);
+
+                TLocker lockrSrc(&colSrc);
+                TLocker lockrThis(this);
+
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+
+                tCIDLib::Swap(m_apBuckets, colSrc.m_apBuckets);
+                tCIDLib::Swap(m_c4CurElements, colSrc.m_c4CurElements);
+                tCIDLib::Swap(m_c4HashModulus, colSrc.m_c4HashModulus);
+                tCIDLib::Swap(m_pfnKeyExtract, colSrc.m_pfnKeyExtract);
+                tCIDLib::Swap(m_kopsToUse, colSrc.m_kopsToUse);
+
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
+            }
+            return *this;
+        }
 
         const TElem& operator[](const TKey& objKeyToFind) const
         {
@@ -771,7 +822,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             {
                 // We can't delete the object until after the throw!
                 TJanitor<TElem> janElem(nullptr);
-                if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+                if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                     janElem.Set(pobjToAdd);
                 this->DuplicateKey(objKey, CID_FILE, CID_LINE);
             }
@@ -818,33 +869,6 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         const TClass& clsParent() const override
         {
             return TParType::clsThis();
-        }
-
-        tCIDLib::EAdoptOpts eAdopt() const final
-        {
-            return m_eAdopt;
-        }
-
-        tCIDLib::TVoid GiveAllTo(TParType& colTarget) final
-        {
-            // Look and add all of our items to the target
-            TLocker lockThis(this);
-
-            // Orphan all the user data objects to the target collection
-            tCIDLib::THashVal hshCur;
-            TNode* pnodeCur = pnodeFindFirst(hshCur);
-            while (pnodeCur)
-            {
-                colTarget.Add(pnodeCur->pobjOrphan());
-                pnodeCur = pnodeFindNext(pnodeCur, hshCur);
-            }
-
-            //
-            //  Now flush ourself, which leaves them in his hands. This will
-            //  clean up our node data, but there won't be any user data to
-            //  destroy now.
-            //
-            RemoveAll();
         }
 
         tCIDLib::TVoid OrphanElem(TElem* const pobjToOrphan) final
@@ -908,7 +932,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 return;
 
             // If adopting, we delete all user data as well
-            RemoveAllElems(m_eAdopt == tCIDLib::EAdoptOpts::Adopt);
+            RemoveAllElems(this->eAdopt() == tCIDLib::EAdoptOpts::Adopt);
 
             // Bump the serial number to invalidate cursors
             this->c4IncSerialNum();
@@ -954,7 +978,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             //  We can now toast the found node and reduce the element count.
             //  If we are adopting, then clean up the user data.
             //
-            if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+            if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                 pnodeToRemove->DeleteData();
             delete pnodeToRemove;
             m_c4CurElements--;
@@ -980,7 +1004,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             if (pnodeRet)
             {
                 // If adopting, clean up the object since it's our responsibility
-                if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+                if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                     delete pobjToAdd;
                 return kCIDLib::False;
             }
@@ -1054,7 +1078,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             //  We can now toast the found node and reduce the element count.
             //  If we are adopting, then clean up the user data.
             //
-            if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+            if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                 pnodeToRemove->DeleteData();
             delete pnodeToRemove;
             m_c4CurElements--;
@@ -1277,7 +1301,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             //  So we can now toast the found node and bump the element count.
             //  If we are adopting, then clean up the user data.
             //
-            if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+            if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                 pnodeToRemove->DeleteData();
             delete pnodeToRemove;
             m_c4CurElements--;
@@ -1298,7 +1322,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             //  First we have to remove all elements from the collection, deleting
             //  all user data if we are adopting.
             //
-            RemoveAllElems(m_eAdopt == tCIDLib::EAdoptOpts::Adopt);
+            RemoveAllElems(this->eAdopt() == tCIDLib::EAdoptOpts::Adopt);
 
             // Reset the buckets if the hash mod changed
             if (c4HashModulus != m_c4HashModulus)
@@ -1526,9 +1550,6 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         //      The modulus divisor for the hash. This is also the number
         //      elements allocated for the m_alstTable array.
         //
-        //  m_eAdopt
-        //      Indicates whether we are to adopt our element.
-        //
         //  m_kopsToUse
         //      A key ops object that provides all of the operations that
         //      we have to do on key field objects.
@@ -1540,7 +1561,6 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         TNode**             m_apBuckets;
         tCIDLib::TCard4     m_c4CurElements;
         tCIDLib::TCard4     m_c4HashModulus;
-        tCIDLib::EAdoptOpts m_eAdopt;
         TKeyOps             m_kopsToUse;
         TKeyExtract         m_pfnKeyExtract;
 };

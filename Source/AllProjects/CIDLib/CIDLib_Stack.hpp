@@ -47,13 +47,8 @@ template <typename TElem> class TStack : public TBasicDLinkedCol<TElem>
         {
         }
 
-        TStack(const TStack& colSrc) :
-
-            TParent(colSrc)
-        {
-        }
-
-        TStack(TStack&&)  = delete;
+        TStack(const TStack&) = default;
+        TStack(TStack&&)  = default;
 
         ~TStack()
         {
@@ -63,14 +58,8 @@ template <typename TElem> class TStack : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TStack& operator=(const TStack& colSrc)
-        {
-            if (this != &colSrc)
-                TParent::operator=(colSrc);
-            return *this;
-        }
-
-        TStack& operator=(TStack&&) = delete;
+        TStack& operator=(const TStack&) = default;
+        TStack& operator=(TStack&&) = default;
 
 
         // -------------------------------------------------------------------

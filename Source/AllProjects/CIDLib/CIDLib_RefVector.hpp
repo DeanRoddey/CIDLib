@@ -394,11 +394,10 @@ class TRefVector : public TRefCollection<TElem>
         TRefVector( const   tCIDLib::EAdoptOpts eAdopt
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TParType(eMTSafe)
+            TParType(eAdopt, eMTSafe)
             , m_apElems(nullptr)
             , m_c4CurAlloc(8)
             , m_c4CurCount(0)
-            , m_eAdopt(eAdopt)
         {
             //
             //  Allocate the array of elem pointers. For sanity's sake, we
@@ -416,11 +415,10 @@ class TRefVector : public TRefCollection<TElem>
                     , const TIndex              tInitAlloc
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TParType(eMTSafe)
+            TParType(eAdopt, eMTSafe)
             , m_apElems(nullptr)
             , m_c4CurAlloc(tCIDLib::c4EnumOrd(tInitAlloc))
             , m_c4CurCount(0)
-            , m_eAdopt(eAdopt)
         {
             // Watch for a zero sized initial alloc and use 8
             if (!m_c4CurAlloc)
@@ -439,12 +437,29 @@ class TRefVector : public TRefCollection<TElem>
         }
 
         TRefVector(const TMyType&) = delete;
-        TRefVector(TMyType&&) = delete;
+
+        //
+        //  If the source is adopting, so we are, so we don't have to worry about
+        //  leaks here in the ctor. We set up a minimal setup to be swapped out.
+        //
+        TRefVector(TMyType&& colSrc) :
+
+            TParType(colSrc.eAdopt(), colSrc.eMTSafe())
+            , m_apElems(new TElem*[1])
+            , m_c4CurAlloc(1)
+            , m_c4CurCount(0)
+        {
+            TRawMem::SetMemBuf
+            (
+                m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
+            );
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~TRefVector()
         {
             // If we adopted, then clean up the elements in use
-            RemoveAllElems(m_eAdopt);
+            RemoveAllElems(this->eAdopt());
 
             // And then clean up the array of element pointers
             delete [] m_apElems;
@@ -475,7 +490,26 @@ class TRefVector : public TRefCollection<TElem>
 
         // We don't allow copy, only move
         TMyType& operator=(const TMyType&) = delete;
-        TMyType& operator=(TMyType&&) = delete;
+
+        // We have to have the same adoption type
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                if (colSrc.eAdopt() != this->eAdopt())
+                    this->MovedAdopted(CID_FILE, CID_LINE);
+
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+                tCIDLib::Swap(m_apElems, colSrc.m_apElems);
+                tCIDLib::Swap(m_c4CurAlloc, colSrc.m_c4CurAlloc);
+                tCIDLib::Swap(m_c4CurCount, colSrc.m_c4CurCount);
+
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
@@ -516,42 +550,13 @@ class TRefVector : public TRefCollection<TElem>
             return TParType::clsThis();
         }
 
-        tCIDLib::EAdoptOpts eAdopt() const final
-        {
-            return m_eAdopt;
-        }
-
         tCIDLib::TVoid RemoveAll() final
         {
             TLocker lockrThis(this);
             if (!m_c4CurCount)
                 return;
 
-            RemoveAllElems(m_eAdopt);
-        }
-
-        tCIDLib::TVoid GiveAllTo(TParType& colTarget) final
-        {
-            // Lock and add all of our items to the target
-            TLocker lockrThis(this);
-            TLocker lockrTar(&colTarget);
-
-            //
-            //  Just in case its set up for pub/sub, use the block mode janitor. We
-            //  don't know if it's an ordered collection or if its sorted or something,
-            //  so pass max card for a non-contiguous load.
-            //
-            {
-                TColBlockModeJan janBlock(&colTarget, kCIDLib::True, kCIDLib::c4MaxCard);
-                for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
-                    colTarget.Add(m_apElems[c4Index]);
-            }
-
-            //
-            //  And now we can remove all of ours, forcing non-adopting mode, since
-            //  we've given them to the other guy.
-            //
-            RemoveAllElems(tCIDLib::EAdoptOpts::NoAdopt);
+            RemoveAllElems(this->eAdopt());
         }
 
         tCIDLib::TVoid OrphanElem(TElem* const pnodeToOrphan) final
@@ -575,7 +580,7 @@ class TRefVector : public TRefCollection<TElem>
             bPullOutElem(pnodeToRemove, kCIDLib::True);
 
             // If we are adopting, then delete it
-            if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+            if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                 delete pnodeToRemove;
         }
 
@@ -660,7 +665,7 @@ class TRefVector : public TRefCollection<TElem>
 
             // If we are adopting, then delete it
             TElem* pobjAt = pobjPullOutElemAt(c4Index);
-            if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+            if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                 delete pobjAt;
 
             return kCIDLib::True;
@@ -674,7 +679,7 @@ class TRefVector : public TRefCollection<TElem>
             if (bPullOutElem(pnodeToRemove, kCIDLib::False))
             {
                 // If we are adopting, then delete it
-                if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+                if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                     delete pnodeToRemove;
                 return kCIDLib::True;
             }
@@ -702,7 +707,7 @@ class TRefVector : public TRefCollection<TElem>
             //
             TJanitor<TElem> janRemove
             (
-                (m_eAdopt == tCIDLib::EAdoptOpts::Adopt) ? m_apElems[m_c4CurCount] : nullptr
+                (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt) ? m_apElems[m_c4CurCount] : nullptr
             );
             m_apElems[m_c4CurCount] = nullptr;
 
@@ -757,7 +762,7 @@ class TRefVector : public TRefCollection<TElem>
             TLocker lockrTar(&colTarget);
 
             // One of us must be non-adopting
-            this->CheckOneNonAdopting(eAdopt(), colTarget.eAdopt(), CID_FILE, CID_LINE);
+            this->CheckOneNonAdopting(this->eAdopt(), colTarget.eAdopt(), CID_FILE, CID_LINE);
 
             //
             //  Just in case its set up for pub/sub, use the block mode janitor. We
@@ -1059,7 +1064,7 @@ class TRefVector : public TRefCollection<TElem>
         {
             // Make a copy with same characteristics, but not content!
             TLocker lockrThis(this);
-            return new TMyType(m_eAdopt, m_c4CurCount);
+            return new TMyType(this->eAdopt(), m_c4CurCount);
         }
 
         const TElem* pobjAt(const TIndex tIndex) const
@@ -1429,7 +1434,7 @@ class TRefVector : public TRefCollection<TElem>
             //
             TJanitor<TElem> janRemote
             (
-                (m_eAdopt == tCIDLib::EAdoptOpts::Adopt) ? m_apElems[c4Index] : nullptr
+                (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt) ? m_apElems[c4Index] : nullptr
             );
             m_apElems[c4Index] = nullptr;
 
@@ -1470,7 +1475,7 @@ class TRefVector : public TRefCollection<TElem>
             //
             TJanitor<TElem> janDelete
             (
-                (m_eAdopt == tCIDLib::EAdoptOpts::Adopt) ? m_apElems[c4Index] : nullptr
+                (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt) ? m_apElems[c4Index] : nullptr
             );
             m_apElems[c4Index] = pobjNew;
 
@@ -1744,15 +1749,10 @@ class TRefVector : public TRefCollection<TElem>
         //  m_c4CurCount
         //      This is the current count of used elements. It starts at zero
         //      and goes up as elements are added.
-        //
-        //  m_eAdopt
-        //      This is set during construction and indicates if we own our
-        //      elements or just reference them.
         // -------------------------------------------------------------------
         TElem**             m_apElems;
         tCIDLib::TCard4     m_c4CurAlloc;
         tCIDLib::TCard4     m_c4CurCount;
-        tCIDLib::EAdoptOpts m_eAdopt;
 };
 
 

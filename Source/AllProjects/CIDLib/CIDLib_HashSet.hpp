@@ -24,6 +24,14 @@
 //
 //  This class is often used for a hashed set of TString objects
 //
+//  Move Support
+//
+//  Moving a hash set moves the elements, the modulus and the key ops object.
+//  The latter two are required because they determine the layout of the
+//  elements in the buckets, so if we move the buckets we have to moev them as
+//  well or subsequent operations might create a different hash and so not
+//  find (or duplicate) elements.
+//
 //
 // CAVEATS/GOTCHAS:
 //
@@ -143,9 +151,7 @@ template <typename TElem> class THashSetNode
 //   CLASS: THashSet
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <typename TElem, class TKeyOps> class THashSet
-
-    : public TCollection<TElem>
+template <typename TElem, class TKeyOps> class THashSet : public TCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -154,6 +160,7 @@ template <typename TElem, class TKeyOps> class THashSet
         // -------------------------------------------------------------------
         using TMyElemType = TElem;
         using TMyType = THashSet<TElem, TKeyOps>;
+        using TParType = TCollection<TElem>;
         using TNode = THashSetNode<TElem>;
 
 
@@ -678,7 +685,24 @@ template <typename TElem, class TKeyOps> class THashSet
             }
         }
 
-        THashSet(TMyType&&) = delete;
+        // Do a minimum setup and call move operator
+        THashSet(TMyType&& colSrc) :
+
+            TCollection<TElem>(colSrc.eMTSafe())
+            , m_apBuckets(nullptr)
+            , m_c4CurElements(0)
+            , m_c4HashModulus(3)
+            , m_kopsToUse(colSrc.m_kopsToUse)
+        {
+            // Allocate and initialize the bucket table
+            m_apBuckets = new TNode*[m_c4HashModulus];
+            TRawMem::SetMemBuf
+            (
+                m_apBuckets, tCIDLib::TCard1(0), sizeof(tCIDLib::TVoid*) * m_c4HashModulus
+            );
+
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~THashSet()
         {
@@ -736,8 +760,29 @@ template <typename TElem, class TKeyOps> class THashSet
             return *this;
         }
 
-        // We don't swap key ops, just element content
-        TMyType& operator=(TMyType&&) = delete;
+        //
+        //  We have to swap the modulus and the key-ops, since those are part of what
+        //  determined where the elements are in the buckets.
+        //
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                TLocker lockSrc(&colSrc);
+                TLocker lockThis(this);
+
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+                tCIDLib::Swap(m_apBuckets, colSrc.m_apBuckets);
+                tCIDLib::Swap(m_c4CurElements, colSrc.m_c4CurElements);
+                tCIDLib::Swap(m_c4HashModulus, colSrc.m_c4HashModulus);
+                tCIDLib::Swap(m_kopsToUse, colSrc.m_kopsToUse);
+
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
+            }
+            return *this;
+        }
 
         const TElem& operator[](const TString& strToFind) const
         {

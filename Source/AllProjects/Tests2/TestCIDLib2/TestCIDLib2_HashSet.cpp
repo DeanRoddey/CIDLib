@@ -15,7 +15,7 @@
 //
 // DESCRIPTION:
 //
-//  This file contains tests related to the by value has set collection.
+//  This file contains tests related to the by value hash set collection.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -34,7 +34,114 @@
 // ---------------------------------------------------------------------------
 //  Magic macros
 // ---------------------------------------------------------------------------
+RTTIDecls(TTest_HashSetMove, TTestFWTest)
 RTTIDecls(TTest_HashSetPlace, TTestFWTest)
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_HashSetMove
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_HashSetMove: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_HashSetMove::TTest_HashSetMove() :
+
+    TTestFWTest
+    (
+        L"Hashset Move", L"Hash set move support", 3
+    )
+{
+}
+
+TTest_HashSetMove::~TTest_HashSetMove()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_HashSetMove: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_HashSetMove::eRunTest(TTextStringOutStream&   strmOut
+                            , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    tCIDLib::TStrHashSet colTest(17, TStringKeyOps(kCIDLib::True));
+    colTest.objAdd(L"Value 1");
+    colTest.objAdd(L"Value 2");
+    colTest.objAdd(L"Value 3");
+
+    tCIDLib::TStrHashSet colTest2(tCIDLib::ForceMove(colTest));
+
+    if (colTest.c4ElemCount() != 0)
+    {
+        strmOut << TFWCurLn << L"Move ctor did not clear out source collection\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (colTest2.c4ElemCount() != 3)
+    {
+        strmOut << TFWCurLn << L"Move ctor did not move elements to target\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (colTest2.c4HashModulus() != 17)
+    {
+        strmOut << TFWCurLn << L"Move ctor did not move the hash modulus\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // And make sure we can find them (which means the modulus and keyops were moved
+    if (!colTest2.bHasElement(L"Value 1")
+    ||  !colTest2.bHasElement(L"Value 2")
+    ||  !colTest2.bHasElement(L"Value 3"))
+    {
+        strmOut << TFWCurLn << L"Could not find elements after move ctor\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+
+    //
+    //  Do an assign, this should also change the modulus and keyops to the source's
+    //  so set them both different from the source.
+    //
+    tCIDLib::TStrHashSet colTest3(7, TStringKeyOps(kCIDLib::False));
+    colTest3 = tCIDLib::ForceMove(colTest2);
+    if (colTest2.c4ElemCount() != 0)
+    {
+        strmOut << TFWCurLn << L"Move operator did not clear out source collection\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (colTest3.c4ElemCount() != 3)
+    {
+        strmOut << TFWCurLn << L"Move operator did not move elements to target\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if (colTest3.c4HashModulus() != 17)
+    {
+        strmOut << TFWCurLn << L"Move operator did not move the hash modulus\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // And if the modulus and key-ops got moved we should find the elements
+    if (!colTest3.bHasElement(L"Value 1")
+    ||  !colTest3.bHasElement(L"Value 2")
+    ||  !colTest3.bHasElement(L"Value 3"))
+    {
+        strmOut << TFWCurLn << L"Could not find elements after move\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    return eRes;
+}
+
+
 
 
 // ---------------------------------------------------------------------------

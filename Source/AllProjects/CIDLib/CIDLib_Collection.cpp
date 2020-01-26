@@ -168,7 +168,7 @@ TCollectionBase::CheckIsFull(   const   tCIDLib::TCard4     c4Limit
 //
 //  Sometimes we cannot know when the containing code has modified an element, since
 //  it did so directly on the object. So this is public, allowing that containing code
-//  to force a publish msg. If the collection knows it can call these itself.
+//  to force a publish msg.
 //
 tCIDLib::TVoid
 TCollectionBase::PublishBlockChanged(const  tCIDLib::TCard4 c4At, const tCIDLib::TCard4 c4Count)
@@ -191,13 +191,13 @@ tCIDLib::TVoid TCollectionBase::PublishElemChanged(const  tCIDLib::TCard4 c4At)
 
 //
 //  Sometimes the containing code may make direct changes en masse and then want to
-//  force nay subscribers to do a full reload, so we make this public. We just send
-//  a reorder event.
+//  force any subscribers to do a full reload, so we make this public. It's also used
+//  by deratives when they do copy/assign.
 //
-tCIDLib::TVoid TCollectionBase::PublishReload()
+tCIDLib::TVoid TCollectionBase::PublishReloaded()
 {
     if (m_ppstopReport)
-        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::Reordered));
+        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::Reloaded));
 }
 
 
@@ -344,27 +344,52 @@ TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
     , m_pmtxLock(nullptr)
     , m_ppstopReport(nullptr)
 {
+    // The source cannot be in a block operation
+    CIDAssert(!colSrc.m_bInBlockMode, L"Collection was constructed from while in a block operation");
+
+    // If the source is safe, make us safe
     if (colSrc.m_pmtxLock)
         m_pmtxLock = new TMutex;
 }
 
 
 //
-//  The caller should have locked. We bump our serial number. The lock and topic
-//  are not part of the contents, so they are not affected.
+//  The derived class should have locked the source if it is thread safe. We
+//  bump our serial number. Neither can be in a block operation.
 //
 TCollectionBase& TCollectionBase::operator=(const TCollectionBase& colSrc)
 {
     if (this != &colSrc)
     {
-        // We cannot be in the middle of a block mode operation
-        CIDAssert(!m_bInBlockMode, L"Collection was assigned while in a block operation");
+        // Neither cannot be in the middle of a block mode operation
+        CIDAssert(!m_bInBlockMode, L"Collection was assigned to while in a block operation");
+        CIDAssert(!colSrc.m_bInBlockMode, L"Collection was assigned from while in a block operation");
 
         m_c4SerialNum++;
     }
     return *this;
 }
 
+
+//
+//  All we do here is make sure we are not in block mode. If not, then we just bump
+//  our and the source's serial number, since both of us are going to change.
+//
+//  The derived class should have locked both of us (if we are lockable)
+//
+TCollectionBase& TCollectionBase::operator=(TCollectionBase&& colSrc)
+{
+    if (this != &colSrc)
+    {
+        // Neither cannot be in the middle of a block mode operation
+        CIDAssert(!m_bInBlockMode, L"Collection was moved to while in a block operation");
+        CIDAssert(!colSrc.m_bInBlockMode, L"Collection was moved from while in a block operation");
+
+        m_c4SerialNum++;
+        colSrc.m_c4SerialNum++;
+    }
+    return *this;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -726,6 +751,22 @@ TCollectionBase::HashChanged(const  tCIDLib::TCh* const     pszFile
         , tCIDLib::EErrClasses::NotSupported
     );
 }
+
+
+tCIDLib::TVoid
+TCollectionBase::MovedAdopted(  const   tCIDLib::TCh* const pszFile
+                                , const tCIDLib::TCard4     c4Line) const
+{
+    facCIDLib().ThrowErr
+    (
+        pszFile
+        , c4Line
+        , kCIDErrs::errcCol_MovedAdopted
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::NotSupported
+    );
+}
+
 
 
 tCIDLib::TVoid

@@ -129,8 +129,7 @@ TDLinkedList::operator==(const TDLinkedList& llstToTest) const
     return kCIDLib::True;
 }
 
-tCIDLib::TBoolean
-TDLinkedList::operator!=(const TDLinkedList& llstToTest) const
+tCIDLib::TBoolean TDLinkedList::operator!=(const TDLinkedList& llstToTest) const
 {
     return !operator==(llstToTest);
 }

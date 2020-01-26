@@ -185,7 +185,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
 
 
         // -------------------------------------------------------------------
-        //  Nested aliases s for the node and key ops types used by a keyed
+        //  Nested aliases for the node and key ops types used by a keyed
         //  hash map.
         // -------------------------------------------------------------------
         using TMyElemType = TElem;
@@ -666,6 +666,26 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
             }
         }
 
+        // Do a minimial setup and then call the move operator
+        THashMap(TMyType& colSrc) :
+
+            TMapCollection<TElem, TKey>(colSrc.eMTSafe())
+            , m_apBuckets(nullptr)
+            , m_c4CurElements(0)
+            , m_c4HashModulus(3)
+            , m_kopsToUse(colSrc.m_kopsToUse)
+        {
+            m_apBuckets = new TNode*[m_c4HashModulus];
+            TRawMem::SetMemBuf
+            (
+                m_apBuckets
+                , tCIDLib::TCard1(0)
+                , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
+            );
+
+            *this = tCIDLib::ForceMove(colSrc);
+        }
+
         ~THashMap()
         {
             // Flush the collection
@@ -720,7 +740,31 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
             return *this;
         }
 
-        TMyType& operator=(TMyType&&) = delete;
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                TLocker lockrSrc(&colSrc);
+                TLocker lockrThis(this);
+
+                TParent::operator=(tCIDLib::ForceMove(colSrc));
+
+                //
+                //  We swap the element content. This has to include the modulus
+                //  and key ops since they affect the buckets and which elements
+                //  are in which.
+                //
+                tCIDLib::Swap(m_apBuckets, colSrc.m_apBuckets);
+                tCIDLib::Swap(m_c4CurElements, colSrc.m_c4CurElements);
+                tCIDLib::Swap(m_c4HashModulus, colSrc.m_c4HashModulus);
+                tCIDLib::Swap(m_kopsToUse, colSrc.m_kopsToUse);
+
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
+            }
+            return *this;
+        }
 
         const TPair& operator[](const TKey& objKeyToFind) const
         {

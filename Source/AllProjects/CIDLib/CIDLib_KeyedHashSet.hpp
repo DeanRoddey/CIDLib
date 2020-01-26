@@ -168,6 +168,7 @@ class TKeyedHashSet : public TCollection<TElem>
         // -------------------------------------------------------------------
         using TMyElemType = TElem;
         using TMyType = TKeyedHashSet<TElem, TKey, TKeyOps>;
+        using TParType = TCollection<TElem>;
         using TNode = TKeyedHashSetNode<TElem, TKey>;
         using TKeyExtract = const TKey& (*)(const TElem&);
 
@@ -662,7 +663,7 @@ class TKeyedHashSet : public TCollection<TElem>
                         ,       TKeyExtract         pfnKeyExtract
                         , const tCIDLib::EMTStates  eMTState = tCIDLib::EMTStates::Unsafe) :
 
-            TCollection<TElem>(eMTState)
+            TParType(eMTState)
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(c4Modulus)
@@ -690,7 +691,7 @@ class TKeyedHashSet : public TCollection<TElem>
 
         TKeyedHashSet(const TMyType& colSrc) :
 
-            TCollection<TElem>(colSrc)
+            TParType(colSrc)
             , m_apBuckets(nullptr)
             , m_c4CurElements(0)
             , m_c4HashModulus(colSrc.m_c4HashModulus)
@@ -731,8 +732,24 @@ class TKeyedHashSet : public TCollection<TElem>
             }
         }
 
-        // No def ctor, so do minimial setup then swap
-        TKeyedHashSet(const TMyType&&) = delete;
+        // Do minimial setup then call move operator
+        TKeyedHashSet(const TMyType&& colSrc) :
+
+            TParType(colSrc.eMTSafe())
+            , m_apBuckets(nullptr)
+            , m_c4CurElements(0)
+            , m_c4HashModulus(3)
+            , m_pfnKeyExtract(colSrc.m_pfnKeyExtract)
+            , m_kopsToUse(colSrc.m_kopsToUse)
+        {
+            m_apBuckets = new TNode*[m_c4HashModulus];
+            TRawMem::SetMemBuf
+            (
+                m_apBuckets, tCIDLib::TCard1(0), sizeof(tCIDLib::TVoid*) * m_c4HashModulus
+            );
+
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~TKeyedHashSet()
         {
@@ -755,7 +772,7 @@ class TKeyedHashSet : public TCollection<TElem>
                 TLocker lockrSrc(&colSrc);
 
                 // Call our parent first
-                TCollection<TElem>::operator=(colSrc);
+                TParType::operator=(colSrc);
 
                 // Flush our current content before copying
                 RemoveAll();
@@ -764,6 +781,7 @@ class TKeyedHashSet : public TCollection<TElem>
                 if (m_c4HashModulus != colSrc.m_c4HashModulus)
                 {
                     delete [] m_apBuckets;
+                    m_apBuckets = nullptr;
                     m_c4HashModulus = colSrc.m_c4HashModulus;
                     m_apBuckets = new TNode*[m_c4HashModulus];
                     TRawMem::SetMemBuf
@@ -788,7 +806,31 @@ class TKeyedHashSet : public TCollection<TElem>
             return *this;
         }
 
-        TMyType& operator=(TMyType&&) = delete;
+        //
+        //  We have to swap the modulus and key ops as well since they affect the
+        //  buckets and where the elements are in them.
+        //
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                TLocker lockrSrc(&colSrc);
+                TLocker lockrThis(this);
+
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+
+                tCIDLib::Swap(m_apBuckets, colSrc.m_apBuckets);
+                tCIDLib::Swap(m_c4CurElements, colSrc.m_c4CurElements);
+                tCIDLib::Swap(m_c4HashModulus, colSrc.m_c4HashModulus);
+                tCIDLib::Swap(m_pfnKeyExtract, colSrc.m_pfnKeyExtract);
+                tCIDLib::Swap(m_kopsToUse, colSrc.m_kopsToUse);
+
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
+            }
+            return *this;
+        }
 
         const TElem& operator[](const TKey& objKeyToFind) const
         {

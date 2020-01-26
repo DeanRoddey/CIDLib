@@ -24,13 +24,15 @@
 //  whether the key is conceptually part of the element or a separate thing. Either
 //  way, they require another instantiation parameter, that of the key field. Hash
 //  key based ones have self contained elements, but must provide a key extractor
-//  so that the key can be known to the collection.
+//  so that the key can be known to the collection. Hash based ones just use the element
+//  themselves as the key.
 //
 //  TRefCollection is the derivative of TCollectionBase that serves as the base for
 //  all 'by reference' collections. The main difference is that the by value
 //  derivatives use an objAdd(const TElem&)) method and the by ref one use an
 //  Add(TElem* const) method, representing the two ways that they accept their elements.
-//  The former of course copies the added element.
+//  The former of course copies the added element (it also supports moving in, and
+//  constructing in place.)
 //
 //  And finally we introduce two commonly used node classes, which are based on the
 //  fundamental doubly linked list node. Many collections are based on this doubly
@@ -43,6 +45,12 @@
 //  templatized stuff in order to make the generated code smaller, mostly error
 //  checking/throwing stuff.
 //
+//
+//  At this level we do nothing for move, copy, assign, though we delete the move
+//  ctor and only support assign (allowing it to just default to a call to the
+//  base class.)
+//
+//  For by ref collections we disable copy/assign and only support move assign.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -131,7 +139,7 @@ class TCollection : public TCollectionBase, public MDuplicable
         TCollection<TElem>& operator=(const TCollection<TElem>&) = default;
 
         TCollection(TCollection<TElem>&&) = delete;
-        TCollection<TElem>& operator=(TCollection<TElem>&&) = delete;
+        TCollection<TElem>& operator=(TCollection<TElem>&&) = default;
 
 
     private :
@@ -197,7 +205,7 @@ template <typename TElem, class TKey> class TMapCollection
         TMapCollection& operator=(const TMyType&) = default;
 
         TMapCollection(TMyType&&) = delete;
-        TMapCollection& operator=(TMyType&&) = delete;
+        TMapCollection& operator=(TMyType&&) = default;
 };
 
 
@@ -300,13 +308,6 @@ template <typename TElem> class TRefCollection : public TCollectionBase
                     TElem* const            pobjToAdd
         ) = 0;
 
-        virtual tCIDLib::EAdoptOpts eAdopt() const = 0;
-
-        virtual tCIDLib::TVoid GiveAllTo
-        (
-                    TRefCollection<TElem>&  colTarget
-        ) = 0;
-
         virtual tCIDLib::TVoid OrphanElem
         (
                     TElem* const            pobjToRemove
@@ -318,6 +319,15 @@ template <typename TElem> class TRefCollection : public TCollectionBase
         (
                     TElem* const            pobjToRemove
         ) = 0;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::EAdoptOpts eAdopt() const
+        {
+            return m_eAdopt;
+        }
 
 
         //
@@ -346,20 +356,43 @@ template <typename TElem> class TRefCollection : public TCollectionBase
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TRefCollection(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
+        TRefCollection( const   tCIDLib::EAdoptOpts eAdopt
+                        , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             TCollectionBase(eMTSafe)
+            , m_eAdopt(eAdopt)
         {
         }
 
 
         TRefCollection(TRefCollection&&) = delete;
         TRefCollection(const TRefCollection&) = delete;
-        TRefCollection<TElem>& operator=(TRefCollection&&) = delete;
+        TRefCollection<TElem>& operator=(TRefCollection&& colSrc)
+        {
+            if ((colSrc.m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+            &&  (m_eAdopt == tCIDLib::EAdoptOpts::NoAdopt))
+            {
+                // We consider this an error. They have to use GiveElements()
+                MovedAdopted(CID_FILE, CID_LINE);
+            }
+
+            TParent::operator=(colSrc);
+            return *this;
+        }
+
         TRefCollection<TElem>& operator=(const TRefCollection&) = delete;
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_eAdopt
+        //      The derived class tells us if we are adopting or not, usually they
+        //      are just passing it on.
+        // -------------------------------------------------------------------
+        tCIDLib::EAdoptOpts     m_eAdopt;
+
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------

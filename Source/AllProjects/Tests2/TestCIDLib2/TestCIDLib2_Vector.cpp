@@ -311,8 +311,6 @@ TTest_VectorMoveSem::eRunTest(  TTextStringOutStream&   strmOut
 {
     tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
 
-/*  Temporarily removed until we get moves worked out wrt to collections
-
     // Load up a vector with some objects
     tCIDLib::TStrList colTest(16);
     TString strVal(32UL);
@@ -327,7 +325,7 @@ TTest_VectorMoveSem::eRunTest(  TTextStringOutStream&   strmOut
     //  Force a move ctor. The new guy should have the elements and the original
     //  should have none.
     //
-    tCIDLib::TStrList colMoveCtor(colTest);
+    tCIDLib::TStrList colMoveCtor(tCIDLib::ForceMove(colTest));
     if (colMoveCtor.c4ElemCount() != 16)
     {
         strmOut << TFWCurLn << L"Move ctor did not move elements to new collection\n\n";
@@ -388,13 +386,25 @@ TTest_VectorMoveSem::eRunTest(  TTextStringOutStream&   strmOut
 
     // Move construct one from a thread safe src, which should also be thread safe
     tCIDLib::TStrList colNewSafe(tCIDLib::ForceMove(colSafe));
-    if (colNewSafe.eMTState() != tCIDLib::EMTStates::Safe)
+    if (colNewSafe.eMTSafe() != tCIDLib::EMTStates::Safe)
     {
         strmOut << TFWCurLn << L"Move ctor did not copy over thread safety\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
-    */
+    // And the safe one should now be empty
+    if (colSafe.c4ElemCount() != 0)
+    {
+        strmOut << TFWCurLn << L"Move ctor did not empty source collection\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // And the new safe one should have all the elements
+    if (colNewSafe.c4ElemCount() != 16)
+    {
+        strmOut << TFWCurLn << L"Move ctor did not move all elements to target\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
 
     return eRes;
 }

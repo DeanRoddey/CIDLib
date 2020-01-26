@@ -49,6 +49,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         using TMyElemType = TElem;
         using TMyType = TBasicDLinkedCol<TElem>;
+        using TParType = TCollection<TElem>;
         using TNode = TBasicColNode<TElem>;
 
 
@@ -393,9 +394,9 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         {
         }
 
-        TBasicDLinkedCol(const TBasicDLinkedCol<TElem>& colSrc) :
+        TBasicDLinkedCol(const TMyType& colSrc) :
 
-            TCollection<TElem>(colSrc)
+            TParType(colSrc)
             , m_llstCol()
         {
             // Lock the source collection so it won't change during this
@@ -413,7 +414,13 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
             }
         }
 
-        TBasicDLinkedCol(TBasicDLinkedCol<TElem>&&)  = delete;
+        TBasicDLinkedCol(TMyType&& colSrc) :
+
+            TParType(colSrc.eMTSafe())
+            , m_llstCol()
+        {
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~TBasicDLinkedCol()
         {
@@ -451,7 +458,20 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
             return *this;
         }
 
-        TBasicDLinkedCol<TElem>& operator=(TBasicDLinkedCol<TElem>&&) = delete;
+        TBasicDLinkedCol<TElem>& operator=(TBasicDLinkedCol<TElem>&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                TLocker lockSrc(&colSrc);
+                TLocker lockThis(this);
+                m_llstCol = tCIDLib::ForceMove(colSrc.m_llstCol);
+
+                // We post a reloaded event for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------

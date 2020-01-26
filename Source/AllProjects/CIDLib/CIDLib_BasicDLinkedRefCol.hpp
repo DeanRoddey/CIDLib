@@ -50,6 +50,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
         // -------------------------------------------------------------------
         using TMyElemType = TElem;
         using TMyType = TBasicDLinkedRefCol<TElem>;
+        using TParType = TRefCollection<TElem>;
         using TNode = TBasicColRefNode<TElem>;
 
 
@@ -155,10 +156,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
-                    m_pnodeCur = static_cast<TBasicColRefNode<TElem>*>
-                    (
-                        m_pnodeCur->pnodeNext()
-                    );
+                    m_pnodeCur = static_cast<TBasicColRefNode<TElem>*>(m_pnodeCur->pnodeNext());
                     return (m_pnodeCur != nullptr);
                 }
 
@@ -171,10 +169,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
-                    m_pnodeCur = static_cast<TBasicColRefNode<TElem>*>
-                    (
-                        m_pnodeCur->pnodePrev()
-                    );
+                    m_pnodeCur = static_cast<TBasicColRefNode<TElem>*>(m_pnodeCur->pnodePrev());
                     return (m_pnodeCur != nullptr);
                 }
 
@@ -406,14 +401,20 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
         TBasicDLinkedRefCol(const   tCIDLib::EAdoptOpts eAdopt
                             , const tCIDLib::EMTStates  eMTSafe) :
 
-            TRefCollection<TElem>(eMTSafe)
-            , m_eAdopt(eAdopt)
+            TRefCollection<TElem>(eAdopt, eMTSafe)
             , m_llstCol()
         {
         }
 
-        TBasicDLinkedRefCol(const TBasicDLinkedRefCol<TElem>&) = delete;
-        TBasicDLinkedRefCol(TBasicDLinkedRefCol<TElem>&&) = delete;
+        TBasicDLinkedRefCol(const TMyType&) = delete;
+
+        TBasicDLinkedRefCol(TMyType&& colSrc) :
+
+            TRefCollection<TElem>(colSrc.eAdopt(), colSrc.eMTSafe())
+            , m_llstCol()
+        {
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~TBasicDLinkedRefCol()
         {
@@ -423,8 +424,27 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TBasicDLinkedRefCol<TElem>& operator=(const TBasicDLinkedRefCol<TElem>&) = delete;
-        TBasicDLinkedRefCol<TElem>& operator=(TBasicDLinkedRefCol<TElem>&&) = delete;
+        TMyType& operator=(const TMyType&) = delete;
+
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            // We must have the same adoption type
+            if (colSrc.eAdopt() != this->eAdopt())
+                this->MovedAdopted(CID_FILE, CID_LINE);
+
+            if (&colSrc != this)
+            {
+                TLocker lockrSrc(&colSrc);
+                TLocker lockrThis(this);
+
+                m_llstCol = tCIDLib::ForceMove(colSrc.m_llstCol);
+
+                // Publish reloaded events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
@@ -442,12 +462,6 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
             TLocker lockrThis(this);
             tCIDLib::TCard4 c4Ret = m_llstCol.c4ElemCount();
             return c4Ret;
-        }
-
-        tCIDLib::EAdoptOpts eAdopt() const override
-        {
-            TLocker lockrThis(this);
-            return m_eAdopt;
         }
 
         tCIDLib::TVoid OrphanElem(TElem* const pobjToRemove) override
@@ -470,26 +484,6 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
             m_llstCol.RemoveNode(pnodeToRemove);
 
             // Bump the serial number to invalidate cursors
-            this->c4IncSerialNum();
-        }
-
-        tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) override
-        {
-            // Look and add all of our items to the target
-            TLocker lockrThis(this);
-
-            // Orphan all of the data objects to the target collection
-            TNode* pnodeCur = static_cast<TNode*>(m_llstCol.pnodeHead());
-            while (pnodeCur)
-            {
-                colTarget.Add(pnodeCur->pobjOrphanData());
-                pnodeCur = static_cast<TNode*>(pnodeCur->pnodeNext());
-            }
-
-            // Now drop all our references, ignoring the adopt setting
-            m_llstCol.RemoveAll();
-
-            // And invalidate cursors
             this->c4IncSerialNum();
         }
 
@@ -541,7 +535,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                 this->NullNodeAdded(CID_FILE, CID_LINE);
 
             TLocker lockrThis(this);
-            m_llstCol.PrependNode(new TNode(pobjToAdd, m_eAdopt));
+            m_llstCol.PrependNode(new TNode(pobjToAdd, this->eAdopt()));
             this->c4IncSerialNum();
         }
 
@@ -551,7 +545,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                 this->NullNodeAdded(CID_FILE, CID_LINE);
 
             TLocker lockrThis(this);
-            m_llstCol.AppendNode(new TNode(pobjToAdd, m_eAdopt));
+            m_llstCol.AppendNode(new TNode(pobjToAdd, this->eAdopt()));
             this->c4IncSerialNum();
         }
 
@@ -573,14 +567,14 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
         tCIDLib::TVoid DiscardBottom()
         {
             TElem* pobjBottom = pobjGetFromBottom(kCIDLib::False);
-            if (pobjBottom && (m_eAdopt == tCIDLib::EAdoptOpts::Adopt))
+            if (pobjBottom && (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt))
                 delete pobjBottom;
         }
 
         tCIDLib::TVoid DiscardTop()
         {
             TElem* pobjTop = pobjGetFromTop(kCIDLib::False);
-            if (pobjTop && (m_eAdopt == tCIDLib::EAdoptOpts::Adopt))
+            if (pobjTop && (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt))
                 delete pobjTop;
         }
 
@@ -627,7 +621,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
 
             TLocker lockrThis(this);
 
-            TNode* pnodeNew = new TNode(pobjToAdopt, m_eAdopt);
+            TNode* pnodeNew = new TNode(pobjToAdopt, this->eAdopt());
             if (!cursAfter.bIsValid())
             {
                 m_llstCol.AppendNode(pnodeNew);
@@ -805,7 +799,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
         // -------------------------------------------------------------------
         TBasicDLinkedRefCol() :
 
-            m_eAdopt(tCIDLib::EAdoptOpts::NoAdopt)
+            TParent(tCIDLib::EAdoptOpts::NoAdopt)
         {
         }
 
@@ -828,15 +822,11 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_eAdopt
-        //      This indicates if we own the elements we store or just reference them.
-        //
         //  m_llstCol
         //      This is a doubly linked list that is the storage for the elements. All
         //      the derivatives of this class allow bidirectional iteration, so we used
         //      a doubly linked list.
         // -------------------------------------------------------------------
-        tCIDLib::EAdoptOpts m_eAdopt;
         TDLinkedList        m_llstCol;
 
 

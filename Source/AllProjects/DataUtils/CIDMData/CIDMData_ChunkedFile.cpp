@@ -1783,11 +1783,9 @@ tCIDLib::TVoid TChunkedFile::StreamFrom(TBinInStream& strmToReadFrom)
         ThrowFmtErr(L"Did not find file end marker", CID_LINE);
 
     //
-    //  It worked, so store the new data. We just ask our temp chunk list to give  all
-    //  of its elements to our member list to avoid duplicating the data.
+    //  It worked, so store the new data. We canjust do a move.
     //
-    m_colChunks.RemoveAll();
-    colChunks.GiveAllTo(m_colChunks);
+    m_colChunks = tCIDLib::ForceMove(colChunks);
     m_colLastHashes = colHashes;
     m_c4SerialNum = c4SerialNum;
     m_enctLastChange = enctLast;

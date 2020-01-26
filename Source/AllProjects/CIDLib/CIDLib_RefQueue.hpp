@@ -482,8 +482,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         TRefQueue(  const   tCIDLib::EAdoptOpts eAdopt = tCIDLib::EAdoptOpts::Adopt
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TRefCollection<TElem>(eMTSafe)
-            , m_eAdopt(eAdopt)
+            TRefCollection<TElem>(eAdopt, eMTSafe)
             , m_llstQueue()
         {
         }
@@ -520,34 +519,6 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         {
             TLocker lockrQueue(this);
             return m_llstQueue.c4ElemCount();
-        }
-
-        tCIDLib::EAdoptOpts eAdopt() const final
-        {
-            return m_eAdopt;
-        }
-
-        tCIDLib::TVoid GiveAllTo(TRefCollection<TElem>& colTarget) final
-        {
-            // Look and add all of our items to the target
-            TLocker lockrThis(this);
-
-            // Orphan all the data objects over to the target collection
-            TNode* pnodeCur = static_cast<TNode*>(m_llstQueue.pnodeHead());
-            while (pnodeCur)
-            {
-                colTarget.Add(pnodeCur->pobjOrphan());
-                pnodeCur = static_cast<TNode*>(pnodeCur->pnodeNext());
-            }
-
-            // And now clear out the linked list nodes
-            m_llstQueue.RemoveAll();
-
-            // And invalidate cursors
-            this->c4IncSerialNum();
-
-            // Wake up all threads waiting for space
-            m_twlWaiters.bReleaseAll(kCIDLib::c4TWLReason_WaitSpace);
         }
 
         tCIDLib::TVoid OrphanElem(TElem* const pobjToRemove) final
@@ -608,7 +579,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             //  And flush the node. Ask it to drop the data first. If we
             //  own the data, this will delete it.
             //
-            pnodeToRemove->DropData(m_eAdopt);
+            pnodeToRemove->DropData(this->eAdopt());
             m_llstQueue.RemoveNode(pnodeToRemove);
 
             // Bump the serial number to invalidate cursors
@@ -652,12 +623,12 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             CIDLib_Suppress(6011)  // We null checked above
             if (pnodeCur && pfnComp(*pnodeCur->pobjData(), *pobjNew))
             {
-                if (m_eAdopt == tCIDLib::EAdoptOpts::NoAdopt)
+                if (this->eAdopt() == tCIDLib::EAdoptOpts::NoAdopt)
                     pobjOld = pnodeCur->pobjOrphan();
                 else
                     pobjOld = nullptr;
 
-                pnodeCur->SetData(pobjNew, m_eAdopt);
+                pnodeCur->SetData(pobjNew, this->eAdopt());
                 return kCIDLib::False;
             }
 
@@ -699,7 +670,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             //
             if (pnodeFindObj(pobjToPut))
             {
-                if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+                if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                     delete pobjToPut;
                 return kCIDLib::False;
             }
@@ -738,7 +709,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             TNode* pnodeCur = pnodeFindObj(*pobjToPut, pfnComp);
             if (pnodeCur)
             {
-                if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+                if (this->eAdopt() == tCIDLib::EAdoptOpts::Adopt)
                     delete pobjToPut;
                 return kCIDLib::False;
             }
@@ -791,7 +762,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             TLocker lockrQueue(this);
 
             // Make a new one with the same basic state, but not content!
-            return new TRefQueue<TElem>(m_eAdopt);
+            return new TRefQueue<TElem>(this->eAdopt());
         }
 
 
@@ -988,7 +959,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             //  And flush the node. Ask it to drop the data first. If we
             //  own the data, this will delete it.
             //
-            pnodeToRemove->DropData(m_eAdopt);
+            pnodeToRemove->DropData(this->eAdopt());
             m_llstQueue.RemoveNode(pnodeToRemove);
 
             // Bump the serial number to invalidate cursors
@@ -1060,10 +1031,6 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_eAdopt
-        //      This indicates whether the data objects are adopted or just
-        //      referenced. If adopted, we clean them up as required.
-        //
         //  m_llstQueue
         //      The linked list that provides the storage for this collection.
         //
@@ -1071,7 +1038,6 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         //      This is the thread wait list that is used by threads to wait
         //      on input to arrive in the queue.
         // -------------------------------------------------------------------
-        tCIDLib::EAdoptOpts m_eAdopt;
         TDLinkedList        m_llstQueue;
         TThreadWaitList     m_twlWaiters;
 

@@ -46,13 +46,8 @@ template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
         {
         }
 
-        TDeque(const TDeque& colSrc) :
-
-            TParent(colSrc)
-        {
-        }
-
-        TDeque(TDeque&&) = delete;
+        TDeque(const TDeque&) = default;
+        TDeque(TDeque&&) = default;
 
         ~TDeque()
         {
@@ -62,14 +57,8 @@ template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TDeque& operator=(const TDeque& colSrc)
-        {
-            if (this != &colSrc)
-                TParent::operator=(colSrc);
-            return *this;
-        }
-
-        TDeque& operator=(TDeque&&) = delete;
+        TDeque& operator=(const TDeque&) = default;
+        TDeque& operator=(TDeque&&) = default;
 
 
         // -------------------------------------------------------------------

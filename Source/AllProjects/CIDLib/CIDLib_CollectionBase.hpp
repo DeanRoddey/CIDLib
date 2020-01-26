@@ -32,6 +32,43 @@
 //  We also define the base class for cursors, which is also the non-templatized
 //  base that they all derive from.
 //
+//  Pub/Sub
+//
+//  Collections support publish/subscribe, which complicates things. We
+//  provide the basic support here for setting a topic if pub/sub is requested
+//  and defining the events, but the derived classes have to actually do the
+//  event publishing since only they know what is going on.
+//
+//  It also raises a lot of complications for things like fast loading of a
+//  collection one at a time. We can't know if that's going to happen, and we
+//  could spit out as massive number of events, which would be really bad. So
+//  we support a bulk mode, which we can be set into, and that will suppress
+//  events until it is cleared then a bulk change event can be sent.
+//
+//  A block mode janitor is provided to do this on a scoped basis.
+//
+//  Move Semantics
+//
+//  Move semantics are complicated for collections. The issues of adoption of
+//  elements and lockability have be dealt with. The approach we take is that
+//  ONLY those things that are related teo the element content are moved. It's
+//  important that the thread safety or adoption status of a collection don't
+//  get changed just because we want to move elements into them from another
+//  collection.
+//
+//  However, this raises potential concerns for by reference collections. If
+//  did a move from an owning to a non-owning collection, those elements could
+//  get leaked if this is not a purposeful choice. Therefore, a move from an
+//  adopting to a non-adopting collection will throw.
+//
+//  Complications also arise from pub/sub block mode (see above.) If a or
+//  copy is done while in block mode, an exception is thrown because it means
+//  something has really gone wrong. The block operation must be completed first.
+//
+//
+//  The actual code is in CIDLib_Collection.cpp, this header is split out for
+//  order of inclusion purposes.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -193,6 +230,7 @@ class CIDLIBEXP TColPubSubInfo : public TObject
             , ElemRemoved
             , Reordered
             , Swapped
+            , Reloaded
 
             , Count
         };
@@ -378,7 +416,7 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
             const   tCIDLib::TCard4         c4At
         );
 
-        tCIDLib::TVoid PublishReload();
+        tCIDLib::TVoid PublishReloaded();
 
         const TString& strTopicPath() const
         {
@@ -421,14 +459,18 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
             const   TCollectionBase&        colSrc
         );
 
+        // We only support move assignment here
+        TCollectionBase(TCollectionBase&&) = delete;
+
         TCollectionBase& operator=
         (
             const   TCollectionBase&        colSrc
         );
 
-        // No move support, it's too complicated
-        TCollectionBase(TCollectionBase&&) = delete;
-        TCollectionBase& operator=(TCollectionBase&&) = delete;
+        TCollectionBase& operator=
+        (
+                    TCollectionBase&&       colSrc
+        );
 
 
         // -------------------------------------------------------------------
@@ -539,6 +581,12 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
         tCIDLib::TVoid KeyNotFound
         (
              const  tCIDLib::TCh* const     pszFile
+            , const tCIDLib::TCard4         c4Line
+        )   const;
+
+        tCIDLib::TVoid MovedAdopted
+        (
+            const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
 

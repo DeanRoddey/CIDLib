@@ -50,7 +50,7 @@ template <typename TElem> class TRefDeque : public TBasicDLinkedRefCol<TElem>
         }
 
         TRefDeque(const TRefDeque&) = delete;
-        TRefDeque(TRefDeque&&) = delete;
+        TRefDeque(TRefDeque&&) = default;
 
         ~TRefDeque()
         {
@@ -60,7 +60,7 @@ template <typename TElem> class TRefDeque : public TBasicDLinkedRefCol<TElem>
         //  Public operators
         // -------------------------------------------------------------------
         TRefDeque& operator=(const TRefDeque&) = delete;
-        TRefDeque& operator=(TRefDeque&&) = delete;
+        TRefDeque& operator=(TRefDeque&&) = default;
 
 
         // -------------------------------------------------------------------

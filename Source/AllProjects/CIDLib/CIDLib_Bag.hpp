@@ -41,6 +41,7 @@ template <typename TElem> class TBag : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         using TMyElemType = TElem;
         using TMyType = TBag<TElem>;
+        using TParType = TBasicDLinkedCol<TElem>;
 
 
         // -------------------------------------------------------------------
@@ -53,7 +54,7 @@ template <typename TElem> class TBag : public TBasicDLinkedCol<TElem>
         }
 
         TBag(const TMyType&) = default;
-        TBag(TMyType&&) = delete;
+        TBag(TMyType&&) = default;
 
         ~TBag() = default;
 
@@ -61,14 +62,8 @@ template <typename TElem> class TBag : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TBag& operator=(const TBag& colSrc)
-        {
-            if (&colSrc != this)
-                TParent::operator=(colSrc);
-            return *this;
-        }
-
-        TBag& operator=(TBag&&) = delete;
+        TBag& operator=(const TBag&) = default;
+        TBag& operator=(TBag&&) = default;
 
 
         // -------------------------------------------------------------------

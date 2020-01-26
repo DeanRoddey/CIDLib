@@ -514,7 +514,19 @@ class TVector : public TCollection<TElem>
             }
         }
 
-        TVector(TMyType&&) = delete;
+        //
+        //  Set up a minimal valid setup, then call the move operator. If the
+        //  source is thread safe, this one will be as well.
+        //
+        TVector(TMyType&& colSrc) :
+
+            TCollection<TElem>(colSrc)
+            , m_apElems(new TElem*[1])
+            , m_c4CurAlloc(1)
+            , m_c4CurCount(0)
+        {
+            *this = tCIDLib::ForceMove(colSrc);
+        }
 
         ~TVector()
         {
@@ -572,7 +584,31 @@ class TVector : public TCollection<TElem>
             return *this;
         }
 
-        TMyType& operator=(TMyType&&) = delete;
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                // Lock us both if we are thread safe
+                TLocker lockrUs(this);
+                TLocker lockrSrc(&colSrc);
+
+                //
+                //  Call our parent first. This just really bumps the serial numbers
+                //  and some some sanity checks.
+                //
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+
+                // And now we just swap our few members
+                tCIDLib::Swap(m_c4CurCount, colSrc.m_c4CurCount);
+                tCIDLib::Swap(m_c4CurAlloc, colSrc.m_c4CurAlloc);
+                tCIDLib::Swap(m_apElems, colSrc.m_apElems);
+
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
+            }
+            return *this;
+        }
 
         const TElem& operator[](const TIndex tIndex) const
         {
