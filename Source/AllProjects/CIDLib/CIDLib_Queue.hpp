@@ -602,6 +602,14 @@ template <typename TElem> class TQueue : public TCollection<TElem>
             return objRet;
         }
 
+        TElem& objAdd(TElem&& objNew) final
+        {
+            TLocker lockrQueue(this);
+            TElem& objRet = objPut(tCIDLib::ForceMove(objNew));
+            this->c4IncSerialNum();
+            return objRet;
+        }
+
         [[nodiscard]] TCursor* pcursNew() const final
         {
             TLocker lockrQueue(this);

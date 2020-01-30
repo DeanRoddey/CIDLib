@@ -285,6 +285,46 @@ TAttrData& TAttrData::operator=(const TAttrData& adatSrc)
     return *this;
 }
 
+//
+//  Normally we wouldn't bother with this for this type of class, but we
+//  pre-instantiate a vector of these and that picks up the move oriented
+//  add method.
+//
+TAttrData& TAttrData::operator=(TAttrData&& adatSrc)
+{
+    if (&adatSrc != this)
+    {
+        tCIDLib::Swap(m_areaVal, adatSrc.m_areaVal);
+        tCIDLib::Swap(m_bAlwaysReport, adatSrc.m_bAlwaysReport);
+        tCIDLib::Swap(m_bEnabled, adatSrc.m_bEnabled);
+        tCIDLib::Swap(m_bVal, adatSrc.m_bVal);
+        tCIDLib::Swap(m_c4Bytes, adatSrc.m_c4Bytes);
+        tCIDLib::Swap(m_c4Val, adatSrc.m_c4Val);
+        tCIDLib::Swap(m_c4Val2, adatSrc.m_c4Val2);
+        tCIDLib::Swap(m_c8User, adatSrc.m_c8User);
+        tCIDLib::Swap(m_c8Val, adatSrc.m_c8Val);
+        tCIDLib::Swap(m_chVal, adatSrc.m_chVal);
+        tCIDLib::Swap(m_clrVal, adatSrc.m_clrVal);
+        tCIDLib::Swap(m_eEditType, adatSrc.m_eEditType);
+        tCIDLib::Swap(m_eType, adatSrc.m_eType);
+        tCIDLib::Swap(m_f8Val, adatSrc.m_f8Val);
+        tCIDLib::Swap(m_i4Val, adatSrc.m_i4Val);
+        tCIDLib::Swap(m_i4Val2, adatSrc.m_i4Val2);
+        tCIDLib::Swap(m_pmbufVal, adatSrc.m_pmbufVal);
+        tCIDLib::Swap(m_pntVal, adatSrc.m_pntVal);
+        tCIDLib::Swap(m_szVal, adatSrc.m_szVal);
+        m_strGroup = tCIDLib::ForceMove(adatSrc.m_strGroup);
+        m_strId = tCIDLib::ForceMove(adatSrc.m_strId);
+        m_strLimits = tCIDLib::ForceMove(adatSrc.m_strLimits);
+        m_strName = tCIDLib::ForceMove(adatSrc.m_strName);
+        m_strSpecType = tCIDLib::ForceMove(adatSrc.m_strSpecType);
+        m_strValue = tCIDLib::ForceMove(adatSrc.m_strValue);
+        m_strUserData = tCIDLib::ForceMove(adatSrc.m_strUserData);
+    }
+    return *this;
+}
+
+
 tCIDLib::TBoolean TAttrData::operator==(const TAttrData& adatSrc) const
 {
     if (this == &adatSrc)

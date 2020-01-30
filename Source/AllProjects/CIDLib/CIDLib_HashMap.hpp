@@ -70,6 +70,14 @@ template <typename TKey, class TValue> class THashMapNode
         {
         }
 
+        THashMapNode(TPair&&                            kobjData
+                    , THashMapNode<TKey,TValue>*        pnodeNext) :
+
+            m_kobjPair(tCIDLib::ForceMove(kobjData))
+            , m_pnodeNext(pnodeNext)
+        {
+        }
+
         THashMapNode(const  TKey&                       objKey
                     , const TValue&                     objValue
                     ,       THashMapNode<TKey,TValue>*  pnodeNext) :
@@ -854,6 +862,28 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
 
             // Add this guy at the head of his bucket
             m_apBuckets[hshKey] = new TNode(kobjToAdd, m_apBuckets[hshKey]);
+            m_c4CurElements++;
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            return m_apBuckets[hshKey]->objPair();
+        }
+
+        TPair& objAdd(TPair&& kobjToAdd) final
+        {
+            TLocker lockrSync(this);
+
+            // See if this element is already in the collection
+            tCIDLib::THashVal hshKey;
+            TNode* pnodeCheck = pnodeFind(kobjToAdd.objKey(), hshKey);
+
+            // If so, we cannot allow it
+            if (pnodeCheck)
+                this->DuplicateKey(kobjToAdd.objKey(), CID_FILE, CID_LINE);
+
+            // Add this guy at the head of his bucket
+            m_apBuckets[hshKey] = new TNode(tCIDLib::ForceMove(kobjToAdd), m_apBuckets[hshKey]);
             m_c4CurElements++;
 
             // Bump the serial number to invalidate cursors

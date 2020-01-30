@@ -164,13 +164,23 @@ TOrbId::~TOrbId()
 // ---------------------------------------------------------------------------
 TOrbId& TOrbId::operator=(const TOrbId& oidToAssign)
 {
-    if (&oidToAssign == this)
-        return *this;
+    if (&oidToAssign != this)
+    {
+        m_hshThis        = oidToAssign.m_hshThis;
+        m_mhashInterface = oidToAssign.m_mhashInterface;
+        m_mhashInstance  = oidToAssign.m_mhashInstance;
+    }
+    return *this;
+}
 
-    m_hshThis        = oidToAssign.m_hshThis;
-    m_mhashInterface = oidToAssign.m_mhashInterface;
-    m_mhashInstance  = oidToAssign.m_mhashInstance;
-
+TOrbId& TOrbId::operator=(TOrbId&& oidToAssign)
+{
+    if (&oidToAssign != this)
+    {
+        tCIDLib::Swap(m_hshThis, oidToAssign.m_hshThis);
+        m_mhashInterface = tCIDLib::ForceMove(oidToAssign.m_mhashInterface);
+        m_mhashInstance = tCIDLib::ForceMove(oidToAssign.m_mhashInstance);
+    }
     return *this;
 }
 

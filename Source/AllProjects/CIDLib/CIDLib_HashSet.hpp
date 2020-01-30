@@ -73,6 +73,13 @@ template <typename TElem> class THashSetNode
         {
         }
 
+        THashSetNode(TElem&& objData, THashSetNode<TElem>* pnodeNext) :
+
+            m_objData(tCIDLib::ForceMove(objData))
+            , m_pnodeNext(pnodeNext)
+        {
+        }
+
         //
         //  A special one for in place elements. We can't figure out the next
         //  node until after this object is built and the element constructed.
@@ -881,25 +888,13 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             return m_apBuckets[hshElem]->objData();
         }
 
-        // Construct an element in place
-        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        TElem& objAdd(TElem&& objToAdd) final
         {
             TLocker lockrSync(this);
 
-            //
-            //  Because we are forwarding, we have to go ahead and create the node
-            //  first so that we have the object to test and see if it's in the list
-            //  already. This would only be wasted in an error scenario where we
-            //  are going to throw, so not a biggie.
-            //
-            TJanitor<TNode> janNode
-            (
-                new TNode(TNode::EForceCall::Val1, tCIDLib::Forward<TArgs>(Args)...)
-            );
-
             // See if this element is already in the collection
             tCIDLib::THashVal hshElem;
-            TNode* pnodeCheck = pnodeFind(janNode.pobjThis()->objData(), hshElem);
+            TNode* pnodeCheck = pnodeFind(objToAdd, hshElem);
 
             // If so, we cannot allow it
             if (pnodeCheck)
@@ -909,12 +904,9 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             //  Add it to the appropriate bucket. We just put it at the head
             //  since the order does not matter. We just construct the
             //  node and pass it the current head, which it will make its
-            //  next node. We orphan it out of the janiotr now that we know we
-            //  are keeping it. We have to set the next node on it after the
-            //  fact.
+            //  next node.
             //
-            janNode.pobjThis()->pnodeNext(m_apBuckets[hshElem]);
-            m_apBuckets[hshElem] = janNode.pobjOrphan();
+            m_apBuckets[hshElem] = new TNode(tCIDLib::ForceMove(objToAdd), m_apBuckets[hshElem]);
 
             // Bump up the element count
             m_c4CurElements++;
@@ -922,6 +914,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
 
             return m_apBuckets[hshElem]->objData();
         }
+
 
         [[nodiscard]] TCursor* pcursNew() const final
         {
@@ -1048,6 +1041,48 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
 
             bAdded = kCIDLib::True;
             return objAdd(objToAdd);
+        }
+
+        // Construct an element in place
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            TLocker lockrSync(this);
+
+            //
+            //  Because we are forwarding, we have to go ahead and create the node
+            //  first so that we have the object to test and see if it's in the list
+            //  already. This would only be wasted in an error scenario where we
+            //  are going to throw, so not a biggie.
+            //
+            TJanitor<TNode> janNode
+            (
+                new TNode(TNode::EForceCall::Val1, tCIDLib::Forward<TArgs>(Args)...)
+            );
+
+            // See if this element is already in the collection
+            tCIDLib::THashVal hshElem;
+            TNode* pnodeCheck = pnodeFind(janNode.pobjThis()->objData(), hshElem);
+
+            // If so, we cannot allow it
+            if (pnodeCheck)
+                this->DuplicateElem(CID_FILE, CID_LINE);
+
+            //
+            //  Add it to the appropriate bucket. We just put it at the head
+            //  since the order does not matter. We just construct the
+            //  node and pass it the current head, which it will make its
+            //  next node. We orphan it out of the janiotr now that we know we
+            //  are keeping it. We have to set the next node on it after the
+            //  fact.
+            //
+            janNode.pobjThis()->pnodeNext(m_apBuckets[hshElem]);
+            m_apBuckets[hshElem] = janNode.pobjOrphan();
+
+            // Bump up the element count
+            m_c4CurElements++;
+            this->c4IncSerialNum();
+
+            return m_apBuckets[hshElem]->objData();
         }
 
         TElem& objAddOrUpdate(const TElem& objToAdd, tCIDLib::TBoolean& bAdded)

@@ -79,7 +79,12 @@ class CIDSOCKEXP TIPAddress :
             , const tCIDSock::EAddrTypes    eType
         );
 
-        TIPAddress(const TIPAddress&) = default;
+        TIPAddress(const TIPAddress& ipaSrc) :
+
+            TIPAddress()
+        {
+            *this = tCIDLib::ForceMove(ipaSrc);
+        }
 
         ~TIPAddress();
 
@@ -88,6 +93,11 @@ class CIDSOCKEXP TIPAddress :
         //  Public operators
         // -------------------------------------------------------------------
         TIPAddress& operator=(const TIPAddress&) = default;
+
+        TIPAddress& operator=
+        (
+                    TIPAddress&&            ipaSrc
+        );
 
         TIPAddress& operator=
         (

@@ -69,6 +69,14 @@ template <typename TElem,class TKey> class TKeyedHashSetNode
         {
         }
 
+        TKeyedHashSetNode(  TElem&&                             objData
+                            , TKeyedHashSetNode<TElem,TKey>*    pnodeNext) :
+
+            m_objData(tCIDLib::ForceMove(objData))
+            , m_pnodeNext(pnodeNext)
+        {
+        }
+
         //
         //  A special one for in place elements. We can't figure out the next
         //  node until after this object is built and the element constructed.
@@ -907,6 +915,37 @@ class TKeyedHashSet : public TCollection<TElem>
             return m_apBuckets[hshElem]->objData();
         }
 
+        TElem& objAdd(TElem&& objToAdd) final
+        {
+            TLocker lockrSync(this);
+
+            // See if this element is already in the collection
+            const TKey& objKey = m_pfnKeyExtract(objToAdd);
+            tCIDLib::THashVal hshElem;
+            TNode* pnodeCheck = pnodeFind(objKey, hshElem);
+
+            // If so, we cannot allow it
+            if (pnodeCheck)
+                this->DuplicateKey(objKey, CID_FILE, CID_LINE);
+
+            //
+            //  Add it to the appropriate bucket. We just put it at the head
+            //  since the order does not matter. We just construct the
+            //  node and pass it the current head, which it will make its
+            //  next node.
+            //
+            m_apBuckets[hshElem] = new TNode(tCIDLib::ForceMove(objToAdd), m_apBuckets[hshElem]);
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            // Bump up the element count
+            m_c4CurElements++;
+
+            return m_apBuckets[hshElem]->objData();
+        }
+
+
         [[nodiscard]] TCursor* pcursNew() const final
         {
             TLocker lockrSync(this);
@@ -1171,7 +1210,6 @@ class TKeyedHashSet : public TCollection<TElem>
             }
             return kCIDLib::True;
         }
-
 
         // Add the passed object if new, and return whether it was added or not
         TElem& objAddIfNew( const   TElem&              objToAdd

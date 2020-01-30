@@ -229,7 +229,7 @@ class TWindow3Ed : public TCtrlWnd
                  else
                 {
                     gdevDraw.DrawFilledCircle(c4Radius, pntAt);
-                    m_colPoints.objAdd(TClickPnt(pntAt));
+                    m_colPoints.objPlace(pntAt);
                 }
                 SendCountNot(m_colPoints.c4ElemCount());
 

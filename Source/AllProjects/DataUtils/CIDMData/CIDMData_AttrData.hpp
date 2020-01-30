@@ -164,7 +164,12 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
             const   TAttrData&              adatSrc
         );
 
-        TAttrData(TAttrData&&) = delete;
+        TAttrData(TAttrData&& adatSrc) :
+
+            TAttrData()
+        {
+            *this = tCIDLib::ForceMove(adatSrc);
+        }
 
         ~TAttrData();
 
@@ -177,7 +182,10 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
             const   TAttrData&              adatSrc
         );
 
-        TAttrData& operator=(TAttrData&&) = delete;
+        TAttrData& operator=
+        (
+                    TAttrData&&             adatSrc
+        );
 
         tCIDLib::TBoolean operator==
         (

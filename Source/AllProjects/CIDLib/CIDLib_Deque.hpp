@@ -70,6 +70,12 @@ template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
             return this->objAddAtBottom(objNew);
         }
 
+        TElem& objAdd(TElem&& objNew) final
+        {
+            // Delegate to our parent
+            return this->objAddAtBottom(tCIDLib::ForceMove(objNew));
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -110,26 +116,32 @@ template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
 
         TElem objPopBottom()
         {
-            // Delegate to our parent
             return this->objGetFromBottom();
         }
 
         TElem objPopTop()
         {
-            // Delegate to our parent
             return this->objGetFromTop();
         }
 
         TElem& objPushBottom(const TElem& objToAdd)
         {
-            // Delegate to our parent
             return this->objAddAtBottom(objToAdd);
+        }
+
+        TElem& objPushBottom(TElem&& objToAdd)
+        {
+            return this->objAddAtBottom(tCIDLib::ForceMove(objToAdd));
         }
 
         TElem& objPushTop(const TElem& objToAdd)
         {
-            // Delegate to our parent
             return this->objAddAtTop(objToAdd);
+        }
+
+        TElem& objPushTop(TElem&& objToAdd)
+        {
+            return this->objAddAtTop(tCIDLib::ForceMove(objToAdd));
         }
 
         tCIDLib::TVoid PopBottom()

@@ -104,6 +104,41 @@ TTest_BagMove::eRunTest(TTextStringOutStream&   strmOut
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
+
+    // Test moving elements into a bag
+    {
+        tCIDLib::TStrBag colTest4;
+
+        TString strSrc(L"Value 1");
+        colTest4.objAdd(tCIDLib::ForceMove(strSrc));
+        strSrc = L"Value 2";
+        colTest4.objAdd(tCIDLib::ForceMove(strSrc));
+        strSrc = L"Value 3";
+        colTest4.objAdd(tCIDLib::ForceMove(strSrc));
+        strSrc = L"Value 4";
+        colTest4.objAdd(tCIDLib::ForceMove(strSrc));
+
+        if (colTest4.c4ElemCount() != 4)
+        {
+            strmOut << L"Move of elements into bag created bad element count\n\n";
+            eRes = tTestFWLib::ETestRes::Failed;
+        }
+
+        tCIDLib::TStrBag::TCursor cursTest(&colTest4);
+        tCIDLib::TCard4 c4Val = 1;
+        for (; cursTest; ++cursTest)
+        {
+            strSrc = L"Value ";
+            strSrc.AppendFormatted(c4Val++);
+            if (*cursTest != strSrc)
+            {
+                strmOut << L"Move of elements into bag created bad values\n\n";
+                eRes = tTestFWLib::ETestRes::Failed;
+                break;
+            }
+        }
+    }
+
     return eRes;
 }
 

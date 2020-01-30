@@ -103,7 +103,12 @@ class CIDORBEXP TOrbObjId
             const   TOrbObjId&              ooidSrc
         );
 
-        TOrbObjId(TOrbObjId&&) = delete;
+        TOrbObjId(TOrbObjId&& ooidSrc) :
+
+            TOrbObjId()
+        {
+            *this = tCIDLib::ForceMove(ooidSrc);
+        }
 
         ~TOrbObjId();
 
@@ -116,7 +121,10 @@ class CIDORBEXP TOrbObjId
             const   TOrbObjId&              ooidSrc
         );
 
-        TOrbObjId& operator=(TOrbObjId&&) = delete;
+        TOrbObjId& operator=
+        (
+                    TOrbObjId&&             ooidSrc
+        );
 
         tCIDLib::TBoolean operator==
         (

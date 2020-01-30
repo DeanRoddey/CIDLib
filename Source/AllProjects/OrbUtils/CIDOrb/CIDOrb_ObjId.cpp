@@ -137,6 +137,22 @@ TOrbObjId& TOrbObjId::operator=(const TOrbObjId& ooidSrc)
     return *this;
 }
 
+TOrbObjId& TOrbObjId::operator=(TOrbObjId&& ooidSrc)
+{
+    if (this != &ooidSrc)
+    {
+        tCIDLib::Swap(m_bHasCachedAddr, ooidSrc.m_bHasCachedAddr);
+        tCIDLib::Swap(m_enctCache, ooidSrc.m_enctCache);
+        tCIDLib::Swap(m_ippnHost, ooidSrc.m_ippnHost);
+
+        m_ipaSrvCache = tCIDLib::ForceMove(ooidSrc.m_ipaSrvCache);
+        m_oidKey = tCIDLib::ForceMove(ooidSrc.m_oidKey);
+        m_strClientProxyClass = tCIDLib::ForceMove(ooidSrc.m_strClientProxyClass);
+        m_strHostName = tCIDLib::ForceMove(ooidSrc.m_strHostName);
+    }
+    return *this;
+}
+
 
 // None of the caching stuff is involved here
 tCIDLib::TBoolean TOrbObjId::operator==(const TOrbObjId& ooidToCompare) const

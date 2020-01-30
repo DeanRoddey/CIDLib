@@ -44,16 +44,26 @@ class TStructMem : public TObject
         );
 
         TStructMem(const TStructMem&) = default;
-        TStructMem(TStructMem&&) = delete;
 
-        ~TStructMem();
+        TStructMem(TStructMem&& tinfoSrc) :
+
+            TStructMem()
+        {
+            *this = tCIDLib::ForceMove(tinfoSrc);
+        }
+
+        ~TStructMem() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TStructMem& operator=(const TStructMem&) = delete;
-        TStructMem& operator=(TStructMem&&) = delete;
+        TStructMem& operator=(const TStructMem&) = default;
+
+        TStructMem& operator=
+        (
+                    TStructMem&&            tinfoSrc
+        );
 
 
         // -------------------------------------------------------------------

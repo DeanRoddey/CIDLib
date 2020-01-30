@@ -677,6 +677,25 @@ class TVector : public TCollection<TElem>
             return *m_apElems[m_c4CurCount - 1];
         }
 
+        TElem& objAdd(TElem&& objNew) final
+        {
+            TLocker lockrCol(this);
+
+            if (m_c4CurCount == m_c4CurAlloc)
+                ExpandTo(m_c4CurCount + 1);
+
+            //
+            //  Create a new copy of the object and store in the next slot,
+            //  bumping the counter after we add it.
+            //
+            m_apElems[m_c4CurCount++] = new TElem(tCIDLib::ForceMove(objNew));
+
+            // Invalidate any cursors and return a ref to the new element
+            this->c4IncSerialNum();
+            return *m_apElems[m_c4CurCount - 1];
+        }
+
+
         [[nodiscard]] TCursor* pcursNew() const final
         {
             TLocker lockrCol(this);
@@ -1077,7 +1096,6 @@ class TVector : public TCollection<TElem>
             }
             InsertAt(objToInsert, tCIDLib::TCard4(tAt));
         }
-
 
         const TElem& objAt(const TIndex tIndex) const
         {

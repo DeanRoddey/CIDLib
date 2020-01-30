@@ -73,8 +73,6 @@ TTest_DequeMoveSem::eRunTest(  TTextStringOutStream&   strmOut
 {
     tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
 
-    /* Temporarily removed until we work out moves for collections
-
     // Load up a deque with some objects
     TDeque<TString> colTest;
     TString strVal(32UL);
@@ -122,7 +120,7 @@ TTest_DequeMoveSem::eRunTest(  TTextStringOutStream&   strmOut
     }
 
     //
-    //  Create a thread safe one and do a forced assign. We should still be
+    //  Create a thread safe one and do a move assign. We should still be
     //  thread safe afterwards since only element content is moved.
     //
     TDeque<TString> colSafe(tCIDLib::EMTStates::Safe);
@@ -160,13 +158,54 @@ TTest_DequeMoveSem::eRunTest(  TTextStringOutStream&   strmOut
 
     // Move construct one from a thread safe src, which should also be thread safe
     TDeque<TString> colNewSafe(tCIDLib::ForceMove(colSafe));
-    if (colNewSafe.eMTState() != tCIDLib::EMTStates::Safe)
+    if (colNewSafe.eMTSafe() != tCIDLib::EMTStates::Safe)
     {
         strmOut << TFWCurLn<< L"Move ctor did not copy over thread safety\n\n";
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
-    */
+
+    // And one again the source should be empty
+    if (colSafe.c4ElemCount() != 0)
+    {
+        strmOut << TFWCurLn << L"Safe move ctor did not empty source collection\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+
+    // Test moving elements into a deque. Just reuse the first one
+    {
+        colTest.RemoveAll();
+        strVal = L"Value 1";
+        colTest.objAdd(tCIDLib::ForceMove(strVal));
+        strVal = L"Value 2";
+        colTest.objAdd(tCIDLib::ForceMove(strVal));
+        strVal = L"Value 3";
+        colTest.objAdd(tCIDLib::ForceMove(strVal));
+        strVal = L"Value 4";
+        colTest.objAdd(tCIDLib::ForceMove(strVal));
+
+        if (colTest.c4ElemCount() != 4)
+        {
+            strmOut << TFWCurLn << L"Move of elements into deque created bad element count\n\n";
+            eRes = tTestFWLib::ETestRes::Failed;
+        }
+
+        // objAdd adds at the bottom, so we do a reversed index here
+        TDeque<TString>::TCursor cursTest(&colTest);
+        tCIDLib::TCard4 c4Index = 4;
+        for (; cursTest; ++cursTest)
+        {
+            strVal = L"Value ";
+            strVal.AppendFormatted(c4Index--);
+            if (*cursTest != strVal)
+            {
+                strmOut << TFWCurLn << L"Elements moved into deque are out of sequence\n\n";
+                eRes = tTestFWLib::ETestRes::Failed;
+                break;
+            }
+        }
+    }
 
     return eRes;
 }

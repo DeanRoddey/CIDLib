@@ -1666,7 +1666,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             this->c4IncSerialNum();
         }
 
-        TElem& objAdd(const TElem&) override
+        TElem& objAdd(const TElem&) final
         {
             //
             //  This type of collection really doesn't fit too well into the
@@ -1674,7 +1674,22 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             //  supportable. We don't know where to put it or what its name
             //  should be.
             //
-            TBasicTreeHelpers::NotSupported(CID_FILE, CID_LINE, L"objAdd");
+            TBasicTreeHelpers::NotSupported(CID_FILE, CID_LINE, L"objAdd(copy)");
+
+            // Make the compiler happy. It will never get called
+            static TElem* pobjTmp = nullptr;
+            return *pobjTmp;
+        }
+
+        TElem& objAdd(TElem&&) final
+        {
+            //
+            //  This type of collection really doesn't fit too well into the
+            //  generic collection scheme, so this operation isn't really
+            //  supportable. We don't know where to put it or what its name
+            //  should be.
+            //
+            TBasicTreeHelpers::NotSupported(CID_FILE, CID_LINE, L"objAdd(move)");
 
             // Make the compiler happy. It will never get called
             static TElem* pobjTmp = nullptr;

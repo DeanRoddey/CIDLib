@@ -50,7 +50,7 @@ TTest_MetaProg1::TTest_MetaProg1() :
 
     TTestFWTest
     (
-        L"Base64 Round Trip", L"Basic round trip tests of the TBase64 class", 3
+        L"Meta Programming 1", L"Basic meta-programming tests", 1
     )
 {
 }
@@ -93,11 +93,52 @@ TTest_MetaProg1::eRunTest(TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << L"Point object reported being Card\n\n";
     }
 
+
+
+    if (!tCIDLib::IsTFloatX<tCIDLib::TFloat4>::bState)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"TFloat4 test failed\n\n";
+    }
+
+    if (!tCIDLib::IsTFloatX<tCIDLib::TFloat8>::bState)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"TFloat8 test failed\n\n";
+    }
+
     if (tCIDLib::IsTFloatX<TPoint>::bState)
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Point object reported being Float\n\n";
     }
+
+
+
+    if (!tCIDLib::IsTIntX<tCIDLib::TInt1>::bState)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"TInt1 test failed\n\n";
+    }
+
+    if (!tCIDLib::IsTIntX<tCIDLib::TInt2>::bState)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"TInt2 test failed\n\n";
+    }
+
+    if (!tCIDLib::IsTIntX<tCIDLib::TInt4>::bState)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"TInt4 test failed\n\n";
+    }
+
+    if (tCIDLib::IsTIntX<TString>::bState)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"String  object reported being Int\n\n";
+    }
+
 
     return eRes;
 }

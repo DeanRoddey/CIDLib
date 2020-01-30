@@ -82,13 +82,13 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_FlagJanitor);
     AddTest(new TTest_LambdaJan);
     AddTest(new TTest_Enum1);
+    AddTest(new TTest_MetaProg1);
     AddTest(new TTest_EnumForEach);
     AddTest(new TTest_MemberPtr1);
     AddTest(new TTest_CntPtr1);
     AddTest(new TTest_UniquePtr);
     AddTest(new TTest_WeakPtr1);
     AddTest(new TTest_WeakPtr2);
-    AddTest(new TTest_MetaProg1);
     AddTest(new TTest_ObjLocker1);
 
     AddTest(new TTest_String1);

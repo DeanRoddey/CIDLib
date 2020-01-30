@@ -77,7 +77,12 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
             const   TOrbId&                 oidSrc
         );
 
-        TOrbId(TOrbId&&) = delete;
+        TOrbId(TOrbId&& oidSrc) :
+
+            TOrbId()
+        {
+            *this = tCIDLib::ForceMove(oidSrc);
+        }
 
         ~TOrbId();
 
@@ -90,7 +95,10 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
             const   TOrbId&                 oidSrc
         );
 
-        TOrbId& operator=(TOrbId&&) = delete;
+        TOrbId& operator=
+        (
+                    TOrbId&&                oidSrc
+        );
 
         tCIDLib::TBoolean operator==
         (

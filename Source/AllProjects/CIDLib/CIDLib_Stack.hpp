@@ -70,6 +70,11 @@ template <typename TElem> class TStack : public TBasicDLinkedCol<TElem>
             return this->objAddAtBottom(objNew);
         }
 
+        TElem& objAdd(TElem&& objNew) override
+        {
+            return this->objAddAtBottom(tCIDLib::ForceMove(objNew));
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods

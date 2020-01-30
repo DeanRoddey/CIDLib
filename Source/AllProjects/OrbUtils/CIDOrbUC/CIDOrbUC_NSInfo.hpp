@@ -108,7 +108,13 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
         );
 
         TNameServerInfo(const TNameServerInfo&) = default;
-        TNameServerInfo(TNameServerInfo&&) = delete;
+
+        TNameServerInfo(TNameServerInfo&& nsviSrc) :
+
+            TNameServerInfo()
+        {
+            *this = tCIDLib::ForceMove(nsviSrc);
+        }
 
         ~TNameServerInfo();
 
@@ -117,7 +123,11 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
         //  Public operators
         // -------------------------------------------------------------------
         TNameServerInfo& operator=(const TNameServerInfo&) = default;
-        TNameServerInfo& operator=(TNameServerInfo&&) = delete;
+
+        TNameServerInfo& operator=
+        (
+                    TNameServerInfo&&       nsviSrc
+        );
 
 
         // -------------------------------------------------------------------

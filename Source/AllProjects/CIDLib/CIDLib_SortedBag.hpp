@@ -146,6 +146,25 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
             return objRet;
         }
 
+        TElem& objAdd(TElem&& objNew) override
+        {
+            // Lock the collection
+            TLocker lockrCol(this);
+
+            // Optimize if the bag is empty
+            if (this->bIsEmpty())
+                return this->objAddAtTop(objNew);
+
+            // If the cursor is invalid, it will go at the end
+            TParType::TCursor cursAt = cursFindInsert(objNew);
+            TElem& objRet = this->objInsertAfter(tCIDLib::ForceMove(objNew), cursAt);
+
+            // Invalidate any cursors
+            this->c4IncSerialNum();
+
+            return objRet;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods

@@ -58,9 +58,18 @@ TStructMem::TStructMem(const TXMLTreeElement& xtnodeType)
     Set(xtnodeType);
 }
 
-TStructMem::~TStructMem()
+// Normally we wouldn't bother but a vector of these is pre-instantiated
+TStructMem& TStructMem::operator=(TStructMem&& tinfoSrc)
 {
+    if (&tinfoSrc)
+    {
+        tCIDLib::Swap(m_bIsSubStruct, tinfoSrc.m_bIsSubStruct);
+        m_strName = tCIDLib::ForceMove(tinfoSrc.m_strName);
+        m_strType = tCIDLib::ForceMove(tinfoSrc.m_strType);
+    }
+    return *this;
 }
+
 
 
 // ---------------------------------------------------------------------------

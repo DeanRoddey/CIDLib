@@ -406,6 +406,29 @@ TTest_VectorMoveSem::eRunTest(  TTextStringOutStream&   strmOut
         eRes = tTestFWLib::ETestRes::Failed;
     }
 
+
+    // Test moving elements into a vector. Clear the first one just in case
+    colTest.RemoveAll();
+    strVal = L"Test Value 1";
+    colTest.objAdd(tCIDLib::ForceMove(strVal));
+    strVal = L"Test Value 2";
+    colTest.objAdd(tCIDLib::ForceMove(strVal));
+    strVal = L"Test Value 3";
+    colTest.objAdd(tCIDLib::ForceMove(strVal));
+    if (colTest.c4ElemCount() != 3)
+    {
+        strmOut << TFWCurLn << L"Move of elements into vector caused bad elem count\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    if ((colTest[0] != L"Test Value 1")
+    ||  (colTest[1] != L"Test Value 2")
+    ||  (colTest[2] != L"Test Value 3"))
+    {
+        strmOut << TFWCurLn << L"Bad element values were moved into vector\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
     return eRes;
 }
 
