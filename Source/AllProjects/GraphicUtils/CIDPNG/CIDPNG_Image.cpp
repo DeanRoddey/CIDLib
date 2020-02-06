@@ -350,16 +350,6 @@ TPNGImage::TPNGImage(const  TPixelArray&    pixaBits
     ForceRowOrder(tCIDImage::ERowOrders::TopDown);
 }
 
-TPNGImage::TPNGImage(const TPNGImage& imgSrc) :
-
-    TCIDImage(tCIDImage::EImgTypes::PNG, imgSrc)
-    , m_bStrictMode(imgSrc.m_bStrictMode)
-    , m_eCompType(imgSrc.m_eCompType)
-    , m_eInterlaceType(imgSrc.m_eInterlaceType)
-
-{
-}
-
 TPNGImage::TPNGImage(const TCIDImage& imgSrc) :
 
     TCIDImage(tCIDImage::EImgTypes::PNG, imgSrc)
@@ -381,6 +371,23 @@ TPNGImage::TPNGImage(const  TCIDImage&  imgSrc
 {
 }
 
+TPNGImage::TPNGImage(const TPNGImage& imgSrc) :
+
+    TCIDImage(tCIDImage::EImgTypes::PNG, imgSrc)
+    , m_bStrictMode(imgSrc.m_bStrictMode)
+    , m_eCompType(imgSrc.m_eCompType)
+    , m_eInterlaceType(imgSrc.m_eInterlaceType)
+
+{
+}
+
+TPNGImage::TPNGImage(TPNGImage&& imgSrc) :
+
+    TPNGImage()
+{
+    *this = tCIDLib::ForceMove(imgSrc);
+}
+
 TPNGImage::~TPNGImage()
 {
 }
@@ -389,27 +396,12 @@ TPNGImage::~TPNGImage()
 // ---------------------------------------------------------------------------
 //  TPNGImage: Public operators
 // ---------------------------------------------------------------------------
-TPNGImage& TPNGImage::operator=(const TPNGImage& imgToAssign)
+TPNGImage& TPNGImage::operator=(const TCIDImage& imgSrc)
 {
-    if (this != &imgToAssign)
+    if (this != &imgSrc)
     {
         // Call our parent
-        TParent::operator=(imgToAssign);
-
-        // And do our own stuff
-        m_bStrictMode    = imgToAssign.m_bStrictMode;
-        m_eCompType      = imgToAssign.m_eCompType;
-        m_eInterlaceType = imgToAssign.m_eInterlaceType;
-    }
-    return *this;
-}
-
-TPNGImage& TPNGImage::operator=(const TCIDImage& imgToAssign)
-{
-    if (this != &imgToAssign)
-    {
-        // Call our parent
-        TParent::operator=(imgToAssign);
+        TParent::operator=(imgSrc);
 
         m_bStrictMode = kCIDLib::False;
         m_eCompType = tCIDPNG::ECompTypes::Deflate;
@@ -420,6 +412,36 @@ TPNGImage& TPNGImage::operator=(const TCIDImage& imgToAssign)
     }
     return *this;
 }
+
+
+TPNGImage& TPNGImage::operator=(const TPNGImage& imgSrc)
+{
+    if (this != &imgSrc)
+    {
+        // Call our parent
+        TParent::operator=(imgSrc);
+
+        // And do our own stuff
+        m_bStrictMode    = imgSrc.m_bStrictMode;
+        m_eCompType      = imgSrc.m_eCompType;
+        m_eInterlaceType = imgSrc.m_eInterlaceType;
+    }
+    return *this;
+}
+
+TPNGImage& TPNGImage::operator=(TPNGImage&& imgSrc)
+{
+    if (this != &imgSrc)
+    {
+        TParent::operator=(tCIDLib::ForceMove(imgSrc));
+
+        tCIDLib::Swap(m_bStrictMode, imgSrc.m_bStrictMode);
+        tCIDLib::Swap(m_eCompType, imgSrc.m_eCompType);
+        tCIDLib::Swap(m_eInterlaceType, imgSrc.m_eInterlaceType);
+    }
+    return *this;
+}
+
 
 
 // ---------------------------------------------------------------------------

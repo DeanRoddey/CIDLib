@@ -1681,21 +1681,6 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             return *pobjTmp;
         }
 
-        TElem& objAdd(TElem&&) final
-        {
-            //
-            //  This type of collection really doesn't fit too well into the
-            //  generic collection scheme, so this operation isn't really
-            //  supportable. We don't know where to put it or what its name
-            //  should be.
-            //
-            TBasicTreeHelpers::NotSupported(CID_FILE, CID_LINE, L"objAdd(move)");
-
-            // Make the compiler happy. It will never get called
-            static TElem* pobjTmp = nullptr;
-            return *pobjTmp;
-        }
-
         [[nodiscard]] TCursor* pcursNew() const override
         {
             TLocker lockrThis(this);
@@ -1762,6 +1747,21 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         {
             TLocker lockrThis(this);
             return m_c4TCount;
+        }
+
+        TElem& objAddMove(TElem&&)
+        {
+            //
+            //  This type of collection really doesn't fit too well into the
+            //  generic collection scheme, so this operation isn't really
+            //  supportable. We don't know where to put it or what its name
+            //  should be.
+            //
+            TBasicTreeHelpers::NotSupported(CID_FILE, CID_LINE, L"objAdd(move)");
+
+            // Make the compiler happy. It will never get called
+            static TElem* pobjTmp = nullptr;
+            return *pobjTmp;
         }
 
         TNodeNT* pnodeCreateNTPath( const   TString&    strScopePath

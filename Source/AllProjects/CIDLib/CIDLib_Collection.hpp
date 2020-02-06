@@ -89,11 +89,6 @@ class TCollection : public TCollectionBase, public MDuplicable
             const   TElem&                  objNew
         ) = 0;
 
-        virtual TElem& objAdd
-        (
-                    TElem&&                 objNew
-        ) = 0;
-
         [[nodiscard]] virtual TColCursor<TElem>* pcursNew() const = 0;
 
 

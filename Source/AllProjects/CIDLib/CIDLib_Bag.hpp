@@ -75,15 +75,15 @@ template <typename TElem> class TBag : public TBasicDLinkedCol<TElem>
             return TParent::objAddAtTop(objNew);
         }
 
-        TElem& objAdd(TElem&& objNew) final
-        {
-            return this->objAddAtTop(tCIDLib::ForceMove(objNew));
-        }
-
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        TElem& objAddMove(TElem&& objNew)
+        {
+            return this->objAddAtTop(tCIDLib::ForceMove(objNew));
+        }
+
         template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
         {
             return this->objPlaceAtTop(tCIDLib::Forward<TArgs>(Args)...);

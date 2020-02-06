@@ -209,13 +209,25 @@ TClrPalette::TClrPalette(   const   tCIDLib::TCard4         c4ClrCnt
         m_pargbClrs[c4Ind++] = *cursInitList;
 }
 
-TClrPalette::TClrPalette(const TClrPalette& palToCopy) :
+TClrPalette::TClrPalette(const TClrPalette& palSrc) :
 
-    m_c4ClrCount(palToCopy.m_c4ClrCount)
-    , m_pargbClrs(new TRGBClr[palToCopy.m_c4ClrCount])
+    m_c4ClrCount(palSrc.m_c4ClrCount)
+    , m_pargbClrs(new TRGBClr[palSrc.m_c4ClrCount])
 {
     for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ClrCount; c4Ind++)
-        m_pargbClrs[c4Ind] = palToCopy.m_pargbClrs[c4Ind];
+        m_pargbClrs[c4Ind] = palSrc.m_pargbClrs[c4Ind];
+}
+
+TClrPalette::TClrPalette(TClrPalette&& palSrc) :
+
+    m_c4ClrCount(2)
+    , m_pargbClrs(new TRGBClr[2])
+{
+    m_pargbClrs[0] = TRGBClr(0,0,0);
+    m_pargbClrs[1] = TRGBClr(255,255,255);
+
+    tCIDLib::Swap(m_c4ClrCount, palSrc.m_c4ClrCount);
+    tCIDLib::Swap(m_pargbClrs, palSrc.m_pargbClrs);
 }
 
 TClrPalette::~TClrPalette()
@@ -228,27 +240,38 @@ TClrPalette::~TClrPalette()
 // ---------------------------------------------------------------------------
 //  TClrPalette: Public operators
 // ---------------------------------------------------------------------------
-TClrPalette& TClrPalette::operator=(const TClrPalette& palToAssign)
+TClrPalette& TClrPalette::operator=(const TClrPalette& palSrc)
 {
-    if (this == &palToAssign)
+    if (this == &palSrc)
         return *this;
 
     // If the source is a different size, then reallocate
-    if (m_c4ClrCount != palToAssign.m_c4ClrCount)
+    if (m_c4ClrCount != palSrc.m_c4ClrCount)
     {
         // Free the current color list
         delete [] m_pargbClrs;
         m_pargbClrs = 0;
 
         // Allocate the new list
-        m_c4ClrCount = palToAssign.m_c4ClrCount;
+        m_c4ClrCount = palSrc.m_c4ClrCount;
         m_pargbClrs = new TRGBClr[m_c4ClrCount];
     }
 
     // Loop though and copy the colors
     for (tCIDLib::TCard4 c4Ind = 0; c4Ind < m_c4ClrCount; c4Ind++)
-        m_pargbClrs[c4Ind] = palToAssign.m_pargbClrs[c4Ind];
+        m_pargbClrs[c4Ind] = palSrc.m_pargbClrs[c4Ind];
 
+    return *this;
+}
+
+
+TClrPalette& TClrPalette::operator=(TClrPalette&& palSrc)
+{
+    if (&palSrc != this)
+    {
+        tCIDLib::Swap(m_c4ClrCount, palSrc.m_c4ClrCount);
+        tCIDLib::Swap(m_pargbClrs, palSrc.m_pargbClrs);
+    }
     return *this;
 }
 

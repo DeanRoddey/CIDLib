@@ -146,7 +146,21 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
             return objRet;
         }
 
-        TElem& objAdd(TElem&& objNew) override
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::ESortDirs eDir() const
+        {
+            return m_eDir;
+        }
+
+        tCIDLib::ESortDirs eDir(const tCIDLib::ESortDirs eNew)
+        {
+            m_eDir = eNew;
+            return m_eDir;
+        }
+
+        TElem& objAddMove(TElem&& objNew)
         {
             // Lock the collection
             TLocker lockrCol(this);
@@ -163,21 +177,6 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
             this->c4IncSerialNum();
 
             return objRet;
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        tCIDLib::ESortDirs eDir() const
-        {
-            return m_eDir;
-        }
-
-        tCIDLib::ESortDirs eDir(const tCIDLib::ESortDirs eNew)
-        {
-            m_eDir = eNew;
-            return m_eDir;
         }
 
         //

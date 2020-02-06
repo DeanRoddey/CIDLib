@@ -70,7 +70,12 @@ class CIDIMGEXP TClrPalette :
 
         TClrPalette
         (
-            const   TClrPalette&            palToCopy
+            const   TClrPalette&            palSrc
+        );
+
+        TClrPalette
+        (
+                    TClrPalette&&           palSrc
         );
 
         ~TClrPalette();
@@ -81,17 +86,22 @@ class CIDIMGEXP TClrPalette :
         // -------------------------------------------------------------------
         TClrPalette& operator=
         (
-            const   TClrPalette&            palAssign
+            const   TClrPalette&            palSrc
+        );
+
+        TClrPalette& operator=
+        (
+                    TClrPalette&&           palSrc
         );
 
         tCIDLib::TBoolean operator==
         (
-            const   TClrPalette&            palToTest
+            const   TClrPalette&            palSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TClrPalette&            palToTest
+            const   TClrPalette&            palSrc
         )   const;
 
         const TRGBClr& operator[]

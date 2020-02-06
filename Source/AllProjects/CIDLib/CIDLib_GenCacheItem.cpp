@@ -240,12 +240,19 @@ const TString& TCIDGenCacheItem::strName() const
 
 // Set new data on the cache item
 tCIDLib::TVoid
-TCIDGenCacheItem::SetData(const tCIDLib::TCard4 c4Bytes, const TMemBuf& mbufToSet)
+TCIDGenCacheItem::SetData(const tCIDLib::TCard4 c4Bytes, const TMemBuf& mbufSrc)
 {
     if (m_mbufData.c4Size() < c4Bytes)
         m_mbufData.Reallocate(c4Bytes, kCIDLib::False);
-    m_mbufData.CopyIn(mbufToSet, c4Bytes);
+    m_mbufData.CopyIn(mbufSrc, c4Bytes);
 
+    m_c4Bytes = c4Bytes;
+}
+
+tCIDLib::TVoid
+TCIDGenCacheItem::SetData(const tCIDLib::TCard4 c4Bytes, THeapBuf&& mbufSrc)
+{
+    m_mbufData = tCIDLib::ForceMove(mbufSrc);
     m_c4Bytes = c4Bytes;
 }
 

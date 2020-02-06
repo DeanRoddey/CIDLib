@@ -136,6 +136,12 @@ class CIDLIBEXP TCIDGenCacheItem : public TObject
             , const TMemBuf&                mbufData
         );
 
+        tCIDLib::TVoid SetData
+        (
+            const   tCIDLib::TCard4         c4Bytes
+            ,       THeapBuf&&              mbufData
+        );
+
         tCIDLib::TVoid UpdateTimeStamp
         (
             const   tCIDLib::TCard4         c4SecsFromNow = 0

@@ -888,34 +888,6 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             return m_apBuckets[hshElem]->objData();
         }
 
-        TElem& objAdd(TElem&& objToAdd) final
-        {
-            TLocker lockrSync(this);
-
-            // See if this element is already in the collection
-            tCIDLib::THashVal hshElem;
-            TNode* pnodeCheck = pnodeFind(objToAdd, hshElem);
-
-            // If so, we cannot allow it
-            if (pnodeCheck)
-                this->DuplicateElem(CID_FILE, CID_LINE);
-
-            //
-            //  Add it to the appropriate bucket. We just put it at the head
-            //  since the order does not matter. We just construct the
-            //  node and pass it the current head, which it will make its
-            //  next node.
-            //
-            m_apBuckets[hshElem] = new TNode(tCIDLib::ForceMove(objToAdd), m_apBuckets[hshElem]);
-
-            // Bump up the element count
-            m_c4CurElements++;
-            this->c4IncSerialNum();
-
-            return m_apBuckets[hshElem]->objData();
-        }
-
-
         [[nodiscard]] TCursor* pcursNew() const final
         {
             TLocker lockrSync(this);
@@ -1020,6 +992,34 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             if (!pnodeRet)
                 hshKey = m_c4HashModulus;
             return TNCCursor(this, hshKey, pnodeRet);
+        }
+
+
+        TElem& objAddMove(TElem&& objToAdd)
+        {
+            TLocker lockrSync(this);
+
+            // See if this element is already in the collection
+            tCIDLib::THashVal hshElem;
+            TNode* pnodeCheck = pnodeFind(objToAdd, hshElem);
+
+            // If so, we cannot allow it
+            if (pnodeCheck)
+                this->DuplicateElem(CID_FILE, CID_LINE);
+
+            //
+            //  Add it to the appropriate bucket. We just put it at the head
+            //  since the order does not matter. We just construct the
+            //  node and pass it the current head, which it will make its
+            //  next node.
+            //
+            m_apBuckets[hshElem] = new TNode(tCIDLib::ForceMove(objToAdd), m_apBuckets[hshElem]);
+
+            // Bump up the element count
+            m_c4CurElements++;
+            this->c4IncSerialNum();
+
+            return m_apBuckets[hshElem]->objData();
         }
 
 

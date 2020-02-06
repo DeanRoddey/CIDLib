@@ -677,25 +677,6 @@ class TVector : public TCollection<TElem>
             return *m_apElems[m_c4CurCount - 1];
         }
 
-        TElem& objAdd(TElem&& objNew) final
-        {
-            TLocker lockrCol(this);
-
-            if (m_c4CurCount == m_c4CurAlloc)
-                ExpandTo(m_c4CurCount + 1);
-
-            //
-            //  Create a new copy of the object and store in the next slot,
-            //  bumping the counter after we add it.
-            //
-            m_apElems[m_c4CurCount++] = new TElem(tCIDLib::ForceMove(objNew));
-
-            // Invalidate any cursors and return a ref to the new element
-            this->c4IncSerialNum();
-            return *m_apElems[m_c4CurCount - 1];
-        }
-
-
         [[nodiscard]] TCursor* pcursNew() const final
         {
             TLocker lockrCol(this);
@@ -1112,6 +1093,26 @@ class TVector : public TCollection<TElem>
             this->CheckIndex(c4Index, m_c4CurCount, CID_FILE, CID_LINE);
             return *m_apElems[c4Index];
         }
+
+
+        TElem& objAddMove(TElem&& objNew)
+        {
+            TLocker lockrCol(this);
+
+            if (m_c4CurCount == m_c4CurAlloc)
+                ExpandTo(m_c4CurCount + 1);
+
+            //
+            //  Create a new copy of the object and store in the next slot,
+            //  bumping the counter after we add it.
+            //
+            m_apElems[m_c4CurCount++] = new TElem(tCIDLib::ForceMove(objNew));
+
+            // Invalidate any cursors and return a ref to the new element
+            this->c4IncSerialNum();
+            return *m_apElems[m_c4CurCount - 1];
+        }
+
 
 
         // Construct an element in place

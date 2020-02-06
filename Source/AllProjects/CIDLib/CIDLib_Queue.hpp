@@ -602,14 +602,6 @@ template <typename TElem> class TQueue : public TCollection<TElem>
             return objRet;
         }
 
-        TElem& objAdd(TElem&& objNew) final
-        {
-            TLocker lockrQueue(this);
-            TElem& objRet = objPut(tCIDLib::ForceMove(objNew));
-            this->c4IncSerialNum();
-            return objRet;
-        }
-
         [[nodiscard]] TCursor* pcursNew() const final
         {
             TLocker lockrQueue(this);
@@ -929,6 +921,14 @@ template <typename TElem> class TQueue : public TCollection<TElem>
             (
                 lockrQueue, kCIDLib::c4TWLReason_WaitSpace, c4Millis
             );
+        }
+
+        TElem& objAddMove(TElem&& objNew)
+        {
+            TLocker lockrQueue(this);
+            TElem& objRet = objPut(tCIDLib::ForceMove(objNew));
+            this->c4IncSerialNum();
+            return objRet;
         }
 
 

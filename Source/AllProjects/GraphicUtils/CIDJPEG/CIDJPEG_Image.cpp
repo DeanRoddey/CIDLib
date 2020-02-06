@@ -103,19 +103,6 @@ TJPEGImage::TJPEGImage() :
 {
 }
 
-TJPEGImage::TJPEGImage(const TJPEGImage& imgToCopy) :
-
-    TCIDImage(tCIDImage::EImgTypes::JPEG, imgToCopy)
-    , m_bFastDecode(imgToCopy.m_bFastDecode)
-    , m_bOptimalEncoding(imgToCopy.m_bOptimalEncoding)
-    , m_c4CompQuality(imgToCopy.m_c4CompQuality)
-    , m_eOutSample(imgToCopy.m_eOutSample)
-    , m_pc1DecContext(nullptr)
-    , m_pc1EncContext(nullptr)
-{
-    // Note that we zero the enc/dec contexts. We'll fault our own in if needed
-}
-
 TJPEGImage::TJPEGImage(const TPixelArray& pixaBits) :
 
     TCIDImage(tCIDImage::EImgTypes::JPEG, pixaBits, 0, 0)
@@ -168,6 +155,27 @@ TJPEGImage::TJPEGImage(const TCIDImage& imgSrc) :
     ForceRowOrder(tCIDImage::ERowOrders::TopDown);
 }
 
+TJPEGImage::TJPEGImage(const TJPEGImage& imgSrc) :
+
+    TCIDImage(tCIDImage::EImgTypes::JPEG, imgSrc)
+    , m_bFastDecode(imgSrc.m_bFastDecode)
+    , m_bOptimalEncoding(imgSrc.m_bOptimalEncoding)
+    , m_c4CompQuality(imgSrc.m_c4CompQuality)
+    , m_eOutSample(imgSrc.m_eOutSample)
+    , m_pc1DecContext(nullptr)
+    , m_pc1EncContext(nullptr)
+{
+    // Note that we zero the enc/dec contexts. We'll fault our own in if needed
+}
+
+TJPEGImage::TJPEGImage(TJPEGImage&& imgSrc) :
+
+    TJPEGImage()
+{
+    *this = tCIDLib::ForceMove(imgSrc);
+}
+
+
 TJPEGImage::~TJPEGImage()
 {
     // Clean up context objects
@@ -194,18 +202,33 @@ TJPEGImage::~TJPEGImage()
 // ---------------------------------------------------------------------------
 //  TJPEGImage: Public operators
 // ---------------------------------------------------------------------------
-TJPEGImage& TJPEGImage::operator=(const TJPEGImage& imgToAssign)
+TJPEGImage& TJPEGImage::operator=(const TJPEGImage& imgSrc)
 {
-    if (this != &imgToAssign)
+    if (this != &imgSrc)
     {
-        // Call our parent
-        TParent::operator=(imgToAssign);
+        TParent::operator=(imgSrc);
 
         // Copy our stuff that aren't just comp/decomp time stuff
-        m_bFastDecode       = imgToAssign.m_bFastDecode;
-        m_bOptimalEncoding  = imgToAssign.m_bOptimalEncoding;
-        m_c4CompQuality     = imgToAssign.m_c4CompQuality;
-        m_eOutSample        = imgToAssign.m_eOutSample;
+        m_bFastDecode       = imgSrc.m_bFastDecode;
+        m_bOptimalEncoding  = imgSrc.m_bOptimalEncoding;
+        m_c4CompQuality     = imgSrc.m_c4CompQuality;
+        m_eOutSample        = imgSrc.m_eOutSample;
+    }
+    return *this;
+}
+
+TJPEGImage& TJPEGImage::operator=(TJPEGImage&& imgSrc)
+{
+    if (this != &imgSrc)
+    {
+        TParent::operator=(tCIDLib::ForceMove(imgSrc));
+
+        tCIDLib::Swap(m_bFastDecode, imgSrc.m_bFastDecode);
+        tCIDLib::Swap(m_bOptimalEncoding, imgSrc.m_bOptimalEncoding);
+        tCIDLib::Swap(m_c4CompQuality, imgSrc.m_c4CompQuality);
+        tCIDLib::Swap(m_eOutSample, imgSrc.m_eOutSample);
+        tCIDLib::Swap(m_pc1DecContext, imgSrc.m_pc1DecContext);
+        tCIDLib::Swap(m_pc1EncContext, imgSrc.m_pc1EncContext);
     }
     return *this;
 }

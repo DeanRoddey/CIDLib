@@ -474,7 +474,10 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         apszArgs[c4CurArg++] = L"/permissive-";
 
     // For now always build in C++17 mode
-    apszArgs[c4CurArg++] = L"/std:c++17";
+    // apszArgs[c4CurArg++] = L"/std:c++17";
+    // Enable the latest standard so we can get concepts
+    apszArgs[c4CurArg++] = L"/std:c++latest";
+
 
     //
     //  Set the version defines. This passes the release version info from the

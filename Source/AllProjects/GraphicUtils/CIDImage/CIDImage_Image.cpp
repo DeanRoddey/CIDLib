@@ -866,6 +866,25 @@ TCIDImage& TCIDImage::operator=(const TCIDImage& imgSrc)
     return *this;
 }
 
+TCIDImage& TCIDImage::operator=(TCIDImage&& imgSrc)
+{
+    if (this != &imgSrc)
+    {
+        tCIDLib::Swap(m_bTransClr       , imgSrc.m_bTransClr);
+        tCIDLib::Swap(m_c4ClrsImportant , imgSrc.m_c4ClrsImportant);
+        tCIDLib::Swap(m_c4ClrsUsed      , imgSrc.m_c4ClrsUsed);
+        tCIDLib::Swap(m_c4HorzRes       , imgSrc.m_c4HorzRes);
+        tCIDLib::Swap(m_c4TransClr      , imgSrc.m_c4TransClr);
+        tCIDLib::Swap(m_c4VertRes       , imgSrc.m_c4VertRes);
+        tCIDLib::Swap(m_c4UserData      , imgSrc.m_c4UserData);
+        tCIDLib::Swap(m_f8Gamma         , imgSrc.m_f8Gamma);
+        tCIDLib::Swap(m_rgbBgn          , imgSrc.m_rgbBgn);
+
+        m_palClrs    = tCIDLib::ForceMove(imgSrc.m_palClrs);
+        m_pixaBits   = tCIDLib::ForceMove(imgSrc.m_pixaBits);
+    }
+    return *this;
+}
 
 // ---------------------------------------------------------------------------
 //  TCIDImage: Protected, non-virtual methods

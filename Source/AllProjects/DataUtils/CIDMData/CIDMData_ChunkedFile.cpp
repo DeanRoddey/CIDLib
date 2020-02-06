@@ -105,6 +105,15 @@ TChunkedFileChunk::TChunkedFileChunk(const TChunkedFileChunk& chflchSrc) :
 {
 }
 
+TChunkedFileChunk::TChunkedFileChunk(TChunkedFileChunk&& chflchSrc) :
+
+    m_bIsDataChange(kCIDLib::False)
+    , m_c4Bytes(0)
+    , m_mbufData(1, 1)
+{
+    *this = tCIDLib::ForceMove(chflchSrc);
+}
+
 TChunkedFileChunk& TChunkedFileChunk::operator=(const TChunkedFileChunk& chflchSrc)
 {
     if (this != &chflchSrc)
@@ -134,6 +143,19 @@ TChunkedFileChunk& TChunkedFileChunk::operator=(const TChunkedFileChunk& chflchS
     return *this;
 }
 
+TChunkedFileChunk& TChunkedFileChunk::operator=(TChunkedFileChunk&& chflchSrc)
+{
+    if (this != &chflchSrc)
+    {
+        tCIDLib::Swap(m_bIsDataChange, chflchSrc.m_bIsDataChange);
+        tCIDLib::Swap(m_c4Bytes, chflchSrc.m_c4Bytes);
+
+        m_mbufData    = tCIDLib::ForceMove(chflchSrc.m_mbufData);
+        m_mhashChunk  = tCIDLib::ForceMove(chflchSrc.m_mhashChunk);
+        m_strId       = tCIDLib::ForceMove(chflchSrc.m_strId);
+    }
+    return *this;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -214,6 +236,13 @@ TChunkedFileData::TChunkedFileData(const TChunkedFileData& chflchSrc) :
 {
 }
 
+TChunkedFileData::TChunkedFileData(TChunkedFileData&& chflchSrc) :
+
+    TChunkedFileData()
+{
+    *this = tCIDLib::ForceMove(chflchSrc);
+}
+
 TChunkedFileData::~TChunkedFileData()
 {
 }
@@ -227,6 +256,15 @@ TChunkedFileData& TChunkedFileData::operator=(const TChunkedFileData& chflchSrc)
     if (this != &chflchSrc)
     {
         TParent::operator=(chflchSrc);
+    }
+    return *this;
+}
+
+TChunkedFileData& TChunkedFileData::operator=(TChunkedFileData&& chflchSrc)
+{
+    if (this != &chflchSrc)
+    {
+        TParent::operator=(tCIDLib::ForceMove(chflchSrc));
     }
     return *this;
 }
@@ -268,6 +306,13 @@ TChunkedFileExt::TChunkedFileExt(const TChunkedFileExt& chflchSrc) :
 {
 }
 
+TChunkedFileExt::TChunkedFileExt(TChunkedFileExt&& chflchSrc) :
+
+    TChunkedFileChunk(TString::strEmpty(), kCIDLib::False)
+{
+    *this = tCIDLib::ForceMove(chflchSrc);
+}
+
 TChunkedFileExt::~TChunkedFileExt()
 {
 }
@@ -281,6 +326,15 @@ TChunkedFileExt& TChunkedFileExt::operator=(const TChunkedFileExt& chflchSrc)
     if (this != &chflchSrc)
     {
         TParent::operator=(chflchSrc);
+    }
+    return *this;
+}
+
+TChunkedFileExt& TChunkedFileExt::operator=(TChunkedFileExt&& chflchSrc)
+{
+    if (this != &chflchSrc)
+    {
+        TParent::operator=(tCIDLib::ForceMove(chflchSrc));
     }
     return *this;
 }
@@ -324,6 +378,13 @@ TChunkedFileMeta::TChunkedFileMeta(const TChunkedFileMeta& chflchSrc) :
 {
 }
 
+TChunkedFileMeta::TChunkedFileMeta(TChunkedFileMeta&& chflchSrc) :
+
+    TChunkedFileMeta()
+{
+    *this = tCIDLib::ForceMove(chflchSrc);
+}
+
 TChunkedFileMeta::~TChunkedFileMeta()
 {
 }
@@ -338,6 +399,16 @@ TChunkedFileMeta& TChunkedFileMeta::operator=(const TChunkedFileMeta& chflchSrc)
     {
         TParent::operator=(chflchSrc);
         m_colValues = chflchSrc.m_colValues;
+    }
+    return *this;
+}
+
+TChunkedFileMeta& TChunkedFileMeta::operator=(TChunkedFileMeta&& chflchSrc)
+{
+    if (this != &chflchSrc)
+    {
+        TParent::operator=(tCIDLib::ForceMove(chflchSrc));
+        m_colValues = tCIDLib::ForceMove(chflchSrc.m_colValues);
     }
     return *this;
 }
@@ -1115,6 +1186,7 @@ TChunkedFile::TChunkedFile(const TChunkedFile& chflSrc) :
     , m_colChunks(tCIDLib::EAdoptOpts::Adopt, 32)
     , m_colLastHashes(32)
     , m_enctLastChange(chflSrc.m_enctLastChange)
+    , m_pchflchMeta(nullptr)
 {
     // Dup the chunks and hashes
     const tCIDLib::TCard4 c4Count = chflSrc.m_colChunks.c4ElemCount();
@@ -1134,6 +1206,13 @@ TChunkedFile::TChunkedFile(const TChunkedFile& chflSrc) :
         , L"First chunk of source chunked file is not a meta chunk"
     );
     m_pchflchMeta = static_cast<TChunkedFileMeta*>(m_colChunks[0]);
+}
+
+TChunkedFile::TChunkedFile(TChunkedFile&& chflSrc) :
+
+    TChunkedFile()
+{
+    *this = tCIDLib::ForceMove(chflSrc);
 }
 
 TChunkedFile::~TChunkedFile()
@@ -1187,6 +1266,20 @@ TChunkedFile& TChunkedFile::operator=(const TChunkedFile& chflSrc)
             , L"First chunk of source chunked file is not a meta chunk"
         );
         m_pchflchMeta = static_cast<TChunkedFileMeta*>(m_colChunks[0]);
+    }
+    return *this;
+}
+
+TChunkedFile& TChunkedFile::operator=(TChunkedFile&& chflSrc)
+{
+    if (&chflSrc != this)
+    {
+        tCIDLib::Swap(m_c4SerialNum, chflSrc.m_c4SerialNum);
+        tCIDLib::Swap(m_enctLastChange, chflSrc.m_enctLastChange);
+        tCIDLib::Swap(m_pchflchMeta, chflSrc.m_pchflchMeta);
+
+        m_colChunks = tCIDLib::ForceMove(chflSrc.m_colChunks);
+        m_colLastHashes = tCIDLib::ForceMove(chflSrc.m_colLastHashes);
     }
     return *this;
 }

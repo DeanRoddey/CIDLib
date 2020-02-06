@@ -144,12 +144,18 @@ class CIDIMGEXP TPixelArray :
 
         TPixelArray
         (
-            const   TCIDImage&              imgSource
+            const   TCIDImage&              imgSrc
         );
 
         TPixelArray
         (
             const   TPixelArray&            pixaSrc
+        );
+
+
+        TPixelArray
+        (
+                    TPixelArray&&           pixaSrc
         );
 
         ~TPixelArray();
@@ -161,6 +167,11 @@ class CIDIMGEXP TPixelArray :
         TPixelArray& operator=
         (
             const   TPixelArray&            pixaSrc
+        );
+
+        TPixelArray& operator=
+        (
+                    TPixelArray&&           pixaSrc
         );
 
 

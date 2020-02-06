@@ -33,6 +33,10 @@ namespace tCIDLib
     struct FalseType { static constexpr tCIDLib::TBoolean bState = false; };
     struct TrueType { static constexpr tCIDLib::TBoolean bState = true; };
 
+    // See if two types are the same
+    template <class T, class U> struct IsSameType : FalseType {};
+    template <class T> struct IsSameType<T,T> : TrueType {};
+
 
     //
     //  Some helper sfor dealing with safe enums and the problems with converting them
@@ -117,6 +121,17 @@ namespace tCIDLib
     }
 
 
+    // Is it a pointer to a type or not
+    template <typename T> struct IsPointerBase : FalseType{};
+    template <typename T> struct IsPointerBase<T*> : TrueType{};
+    template <typename T> struct IsPointer : IsPointerBase<typename RemoveConst<T>::Type> {};
+
+    // Is it a ref to a type or not
+    template <typename T> struct IsRefBase : FalseType{};
+    template <typename T> struct IsRefBase<T&> : TrueType{};
+    template <typename T> struct IsRef : IsRefBase<typename RemoveConst<T>::Type> {};
+
+
     // -----------------------------------------------------------------------
     //  Return a const ref to the passed ref, effectively add const to it if it
     //  is not already.
@@ -133,8 +148,8 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     //  Implements forwarding so that we can support in place construction for
     //  collections and other things. It removes any pointer/reference from the
-    //  type and casts it to a universal reference type. We need one for references
-    //  and one for moves.
+    //  type and casts it to a universal reference type. We need one for regular
+    //  references and one for r-value refs.
     // -----------------------------------------------------------------------
     template <typename T>
     constexpr T&& Forward(typename RemoveRef<T>::Type& t) noexcept
@@ -151,6 +166,22 @@ namespace tCIDLib
         #pragma warning(suppress : 26473)
         return static_cast<T&&>(t);
     }
+
+
+    // -----------------------------------------------------------------------
+    //  Some concepts for fundamental stuff used widely throughout the code base.
+    // -----------------------------------------------------------------------
+
+    // Supports our standard magnitude comparisons
+    template <typename T> concept HasMagComp = requires(T x)
+    {
+        { x < x };
+        { x > x };
+    };
+
+    template <typename T> concept IsPtrTo =  IsPointer<T>::bState;
+    template <typename T> concept IsRefTo =  IsRef<T>::bState;
+
 
 
     // -----------------------------------------------------------------------
@@ -201,7 +232,7 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     //  Swaps two values of any type that can support by value semantics.
     // -----------------------------------------------------------------------
-    template <typename T> tCIDLib::TVoid Swap(T& v1, T& v2)
+        template <typename T> tCIDLib::TVoid Swap(T& v1, T& v2)
     {
         T vTmp = v1;
         v1 = v2;
@@ -374,7 +405,7 @@ namespace tCIDLib
 
 
     // Default relative magnitude comparator for sorting
-    template <typename T> constexpr tCIDLib::ESortComps eComp(const T& t1, const T& t2)
+    template <HasMagComp T> constexpr tCIDLib::ESortComps eComp(const T& t1, const T& t2)
     {
         if (t1 < t2)
             return tCIDLib::ESortComps::FirstLess;
@@ -384,7 +415,7 @@ namespace tCIDLib
     }
 
     // For reverse sorting
-    template <typename T> constexpr tCIDLib::ESortComps eRevComp(const T& t1, const T& t2)
+    template <HasMagComp T> constexpr tCIDLib::ESortComps eRevComp(const T& t1, const T& t2)
     {
         if (t2 < t1)
             return tCIDLib::ESortComps::FirstLess;
@@ -395,7 +426,8 @@ namespace tCIDLib
 
 
     // And for pointers
-    template <typename T> constexpr tCIDLib::ESortComps eCompPtr(const T* pt1, const T* pt2)
+    template <HasMagComp T>
+    constexpr tCIDLib::ESortComps eCompPtr(const T* pt1, const T* pt2)
     {
         if (*pt1 < *pt2)
             return tCIDLib::ESortComps::FirstLess;
@@ -404,7 +436,8 @@ namespace tCIDLib
         return tCIDLib::ESortComps::Equal;
     }
 
-    template <typename T> constexpr tCIDLib::ESortComps eRevCompPtr(const T* pt1, const T* pt2)
+    template <HasMagComp T>
+    constexpr tCIDLib::ESortComps eRevCompPtr(const T* pt1, const T* pt2)
     {
         if (*pt2 < *pt1)
             return tCIDLib::ESortComps::FirstLess;
@@ -485,7 +518,7 @@ namespace tCIDLib
     };
 
     // Default relative magnitude comparator
-    template <typename T> class TDefMagComp
+    template <HasMagComp T> class TDefMagComp
     {
         public :
             TDefMagComp() = default;

@@ -251,6 +251,13 @@ TPixelArray::TPixelArray(const TPixelArray& pixaSrc) :
     m_pixaiInt = new TPixelArrayImpl(*pixaSrc.m_pixaiInt);
 }
 
+TPixelArray::TPixelArray(TPixelArray&& pixaSrc) :
+
+    TPixelArray()
+{
+    tCIDLib::Swap(m_pixaiInt, pixaSrc.m_pixaiInt);
+}
+
 TPixelArray::~TPixelArray()
 {
     try
@@ -279,6 +286,15 @@ TPixelArray& TPixelArray::operator=(const TPixelArray& pixaSrc)
         m_pixaiInt = nullptr;
 
         m_pixaiInt = new TPixelArrayImpl(*pixaSrc.m_pixaiInt);
+    }
+    return *this;
+}
+
+TPixelArray& TPixelArray::operator=(TPixelArray&& pixaSrc)
+{
+    if (this != &pixaSrc)
+    {
+        tCIDLib::Swap(m_pixaiInt, pixaSrc.m_pixaiInt);
     }
     return *this;
 }
