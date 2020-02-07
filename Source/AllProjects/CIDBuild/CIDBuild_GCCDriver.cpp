@@ -189,6 +189,8 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
     apszArgs[c4CurArg++] = L"-c";
     apszArgs[c4CurArg++] = L"-m32";
     apszArgs[c4CurArg++] = L"-DPLATFORM_LINUX";
+
+    // We are adding some light concepts usage as VC/G++ add them
     apszArgs[c4CurArg++] = L"-std=c++17";
 
     if (m_bDebug)
@@ -235,7 +237,6 @@ tCIDLib::TBoolean TGCCDriver::bCompileCpps()
     TBldStr strVerSuff(L"-DCID_VERSUFF=");
     strVerSuff.Append(facCIDBuild.strVersionSuffix());
     apszArgs[c4CurArg++] = strVerSuff.pszBuffer();
-
 
 
     // Set the flags for the project type

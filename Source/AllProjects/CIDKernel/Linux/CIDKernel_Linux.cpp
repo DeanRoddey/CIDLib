@@ -43,3 +43,5 @@ TCIDKrnlModule::bInitTermCore(const tCIDLib::EInitTerm eState)
 {
     return TKrnlLinux::bInitTermExtProcess(eState);
 }
+
+

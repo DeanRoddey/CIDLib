@@ -169,22 +169,6 @@ namespace tCIDLib
 
 
     // -----------------------------------------------------------------------
-    //  Some concepts for fundamental stuff used widely throughout the code base.
-    // -----------------------------------------------------------------------
-
-    // Supports our standard magnitude comparisons
-    template <typename T> concept HasMagComp = requires(T x)
-    {
-        { x < x };
-        { x > x };
-    };
-
-    template <typename T> concept IsPtrTo =  IsPointer<T>::bState;
-    template <typename T> concept IsRefTo =  IsRef<T>::bState;
-
-
-
-    // -----------------------------------------------------------------------
     //  These are just simple templates to return the smaller or larger of two
     //  quantities (with 'quantity' meaning anything with a < and > operator.)
     // -----------------------------------------------------------------------
@@ -405,7 +389,7 @@ namespace tCIDLib
 
 
     // Default relative magnitude comparator for sorting
-    template <HasMagComp T> constexpr tCIDLib::ESortComps eComp(const T& t1, const T& t2)
+    template <typename T> constexpr tCIDLib::ESortComps eComp(const T& t1, const T& t2)
     {
         if (t1 < t2)
             return tCIDLib::ESortComps::FirstLess;
@@ -415,7 +399,7 @@ namespace tCIDLib
     }
 
     // For reverse sorting
-    template <HasMagComp T> constexpr tCIDLib::ESortComps eRevComp(const T& t1, const T& t2)
+    template <typename T> constexpr tCIDLib::ESortComps eRevComp(const T& t1, const T& t2)
     {
         if (t2 < t1)
             return tCIDLib::ESortComps::FirstLess;
@@ -426,7 +410,7 @@ namespace tCIDLib
 
 
     // And for pointers
-    template <HasMagComp T>
+    template <typename T>
     constexpr tCIDLib::ESortComps eCompPtr(const T* pt1, const T* pt2)
     {
         if (*pt1 < *pt2)
@@ -436,7 +420,7 @@ namespace tCIDLib
         return tCIDLib::ESortComps::Equal;
     }
 
-    template <HasMagComp T>
+    template <typename T>
     constexpr tCIDLib::ESortComps eRevCompPtr(const T* pt1, const T* pt2)
     {
         if (*pt2 < *pt1)
@@ -518,7 +502,7 @@ namespace tCIDLib
     };
 
     // Default relative magnitude comparator
-    template <HasMagComp T> class TDefMagComp
+    template <typename T> class TDefMagComp
     {
         public :
             TDefMagComp() = default;

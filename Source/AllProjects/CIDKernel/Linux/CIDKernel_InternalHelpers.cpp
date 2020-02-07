@@ -69,6 +69,66 @@ namespace
     }
 }
 
+
+//
+//  Build up the name of a CIDLib module, both the portable part (the basic name
+//  that would be used to build up the names of related files (msg text, resources,
+//  etc...) and the loadable version that would be used to load a module dynamically
+//  or to run an executable.
+//
+//  So, for a facility named Foobar, and a version of 1.2, we get:
+//
+//  Library:
+//      Portable: FooBar_1_2
+//      Loadable: FooBar_so_1_2
+//
+//  Exe:
+//      Portable: FooBar
+//      Loadable: FooBar
+//
+tCIDLib::TVoid
+TKrnlLinux::BuildModName(       tCIDLib::TCh* const     pszPortableBuf
+                        ,       tCIDLib::TCh* const     pszLoadableBuf
+                        , const tCIDLib::TCard4         c4MaxChars
+                        , const tCIDLib::TCh* const     pszModName
+                        , const tCIDLib::TCard4         c4MajVer
+                        , const tCIDLib::TCard4         c4MinVer
+                        , const tCIDLib::EModTypes      eModType)
+{
+    // If a shared library, we have to to add the versioning info
+    if (eModType == tCIDLib::EModTypes::SharedLib)
+    {
+        constexpr tCIDLib::TCard4 c4SuffBufSz = 255;
+        tCIDLib::TCh szSuffBuf[c4SuffBufSz + 1];
+        constexpr tCIDLib::TCard4 c4FmtBufSz = 15;
+        tCIDLib::TCh szFmtBuf[c4FmtBufSz + 1];
+
+        // Build up the version suffix separately
+        TRawStr::CatStr(szSuffBuf, L"_", c4SuffBufSz);
+        TRawStr::bFormatVal(c4MajVer, szFmtBuf, c4FmtBufSz);
+        TRawStr::CatStr(szSuffBuf, szFmtBuf, c4SuffBufSz);
+        TRawStr::CatStr(szSuffBuf, L"_", c4SuffBufSz);
+        TRawStr::bFormatVal(c4MinVer, szFmtBuf, c4FmtBufSz);
+        TRawStr::CatStr(szSuffBuf, szFmtBuf, c4SuffBufSz);
+
+        // And now we can create our two versions
+        TRawStr::CopyStr(pszLoadableBuf, pszModName, c4MaxChars);
+        TRawStr::CatStr(pszLoadableBuf, L"_so", c4MaxChars);
+        TRawStr::CatStr(pszLoadableBuf, szSuffBuf, c4MaxChars);
+
+        TRawStr::CopyStr(pszPortableBuf, pszModName, c4MaxChars);
+        TRawStr::CatStr(pszPortableBuf, szSuffBuf, c4MaxChars);
+    }
+     else
+    {
+        // It's jsut the raw module name for executables
+        TRawStr::CopyStr(pszPortableBuf, pszModName, c4MaxChars);
+        TRawStr::CopyStr(pszLoadableBuf, pszModName, c4MaxChars);
+    }
+}
+
+
+
 //
 // Converts a time_t value to the kind used by CIDLib. CID file
 // time values are the number of 100-nanosecond intervals elapsed

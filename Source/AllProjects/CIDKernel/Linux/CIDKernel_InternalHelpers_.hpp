@@ -35,11 +35,28 @@ namespace TKrnlLinux
     // -----------------------------------------------------------------------
     tCIDLib::TBoolean bInitTermExtProcess(const tCIDLib::EInitTerm eState);
 
-    tCIDLib::TVoid LinuxFileTimeToCIDFileTime(const time_t LinuxTime
-                                              , tCIDLib::TEncodedTime& enctToFill);
+    tCIDLib::TVoid BuildModName
+    (
+                tCIDLib::TCh* const     pszPortableBuf
+        ,       tCIDLib::TCh* const     pszLoadableBuf
+        , const tCIDLib::TCard4         c4MaxChars
+        , const tCIDLib::TCh* const     pszModName
+        , const tCIDLib::TCard4         c4MajVer
+        , const tCIDLib::TCard4         c4MinVer
+        , const tCIDLib::EModTypes      eModType
+    );
 
-    tCIDLib::TVoid CIDFileTimeToLinuxFileTime(const tCIDLib::TEncodedTime enctCIDTime
-                                              , time_t& LinuxTime);
+    tCIDLib::TVoid LinuxFileTimeToCIDFileTime
+    (
+        const time_t                    LinuxTime
+        , tCIDLib::TEncodedTime&        enctToFill
+    );
+
+    tCIDLib::TVoid CIDFileTimeToLinuxFileTime
+    (
+        const   tCIDLib::TEncodedTime   enctCIDTime
+        ,       time_t&                 LinuxTime
+    );
 
     tCIDLib::TVoid StatBufToInfoFlags(const struct stat& StatBuf
                                      , tCIDLib::EFileInfoFlags& eFlags);
