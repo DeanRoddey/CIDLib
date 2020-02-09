@@ -757,18 +757,14 @@ TModule::BuildModName(  const   TString&            strBaseName
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
-    //  will do this differently. We just pass in a ridicuously big buffer
-    //  for it to fill in. There is no path involved so someone would have
-    //  to be insane to have an actual file name longer than this.
+    //  will do this differently.
     //
-    const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achPortable[c4BufSz + 1];
-    tCIDLib::TCh achLoadable[c4BufSz + 1];
+    TKrnlString kstrPortable;
+    TKrnlString kstrLoadable;
 
-    if (!TKrnlModule::bBuildModName(achPortable
-                                    , achLoadable
-                                    , c4BufSz
-                                    , strBaseName.pszBuffer()
+    if (!TKrnlModule::bBuildModNames(strBaseName.pszBuffer()
+                                    , kstrPortable
+                                    , kstrLoadable
                                     , c4MajVersion
                                     , c4MinVersion
                                     , eModType))
@@ -784,8 +780,8 @@ TModule::BuildModName(  const   TString&            strBaseName
         );
     }
 
-    strPortable = achPortable;
-    strLoadable = achLoadable;
+    strPortable = kstrPortable.pszValue();
+    strLoadable = kstrLoadable.pszValue();
 }
 
 tCIDLib::TVoid
@@ -795,18 +791,13 @@ TModule::BuildModName(  const   TCIDModuleInfo&     modiSrc
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
-    //  will do this differently. We just pass in a ridicuously big buffer
-    //  for it to fill in. There is no path involved so someone would have
-    //  to be insane to have an actual file name longer than this.
+    //  will do this differently.
     //
-    const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achPortable[c4BufSz + 1];
-    tCIDLib::TCh achLoadable[c4BufSz + 1];
-
-    if (!TKrnlModule::bBuildModName(achPortable
-                                    , achLoadable
-                                    , c4BufSz
-                                    , modiSrc.strBaseName().pszBuffer()
+    TKrnlString kstrPortable;
+    TKrnlString kstrLoadable;
+    if (!TKrnlModule::bBuildModNames(modiSrc.strBaseName().pszBuffer()
+                                    , kstrPortable
+                                    , kstrLoadable
                                     , modiSrc.c4MajVersion()
                                     , modiSrc.c4MinVersion()
                                     , modiSrc.eModType()))
@@ -823,8 +814,8 @@ TModule::BuildModName(  const   TCIDModuleInfo&     modiSrc
     }
 
     // Just copy the result back to the caller's string
-    strPortable = achPortable;
-    strLoadable = achLoadable;
+    strPortable = kstrPortable.pszValue();
+    strLoadable = kstrLoadable.pszValue();
 }
 
 
@@ -840,18 +831,13 @@ TModule::BuildModName(  const   TString&            strBaseName
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
-    //  will do this differently. We just pass in a ridicuously big buffer
-    //  for it to fill in. There is no path involved so someone would have
-    //  to be insane to have an actual file name longer than this.
+    //  will do this differently.
     //
-    const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achPortable[c4BufSz + 1];
-    tCIDLib::TCh achLoadable[c4BufSz + 1];
-
-    if (!TKrnlModule::bBuildModName(achPortable
-                                    , achLoadable
-                                    , c4BufSz
-                                    , strBaseName.pszBuffer()
+    TKrnlString kstrPortable;
+    TKrnlString kstrLoadable;
+    if (!TKrnlModule::bBuildModNames(strBaseName.pszBuffer()
+                                    , kstrPortable
+                                    , kstrLoadable
                                     , c4MajVersion
                                     , c4MinVersion
                                     , eModType))
@@ -868,8 +854,8 @@ TModule::BuildModName(  const   TString&            strBaseName
     }
 
     // Copy the result back to the caller's string
-    strPortable = achPortable;
-    strLoadable = achLoadable;
+    strPortable = kstrPortable.pszValue();
+    strLoadable = kstrLoadable.pszValue();
 
     //
     //  Now lets fill in the prefered and default language versions of the
@@ -927,18 +913,13 @@ TModule::BuildModName(  const   TString&            strBaseName
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
-    //  will do this differently. We just pass in a ridicuously big buffer
-    //  for it to fill in. There is no path involved so someone would have
-    //  to be insane to have an actual file name longer than this.
+    //  will do this differently.
     //
-    const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achPortable[c4BufSz + 1];
-    tCIDLib::TCh achLoadable[c4BufSz + 1];
-
-    if (!TKrnlModule::bBuildModName(achPortable
-                                    , achLoadable
-                                    , c4BufSz
-                                    , strBaseName.pszBuffer()
+    TKrnlString kstrPortable;
+    TKrnlString kstrLoadable;
+    if (!TKrnlModule::bBuildModNames(strBaseName.pszBuffer()
+                                    , kstrPortable
+                                    , kstrLoadable
                                     , c4MajVersion
                                     , c4MinVersion
                                     , eModType))
@@ -955,8 +936,8 @@ TModule::BuildModName(  const   TString&            strBaseName
     }
 
     // Copy the result back to the caller's string
-    strPortable = achPortable;
-    strLoadable = achLoadable;
+    strPortable = kstrPortable.pszValue();
+    strLoadable = kstrLoadable.pszValue();
 
     //
     //  Now lets fill in the prefered, default, and english language
@@ -2191,24 +2172,24 @@ TString TModule::strMsg(const   tCIDLib::TMsgId midToLoad
 
 TString TModule::strLoadableName() const
 {
-    return TString(m_kmodThis.pszLoadableName());
+    return TString(m_kmodThis.kstrLoadableName().pszValue());
 }
 
 
 TString TModule::strPath() const
 {
-    return TString(m_kmodThis.pszSrcPath());
+    return TString(m_kmodThis.kstrSrcPath().pszValue());
 }
 
 
 // This one may not be set if this is not a CIDLib facility type module
 TString TModule::strPortableName() const
 {
-    if (m_kmodThis.pszPortableName())
-        return TString(m_kmodThis.pszPortableName());
+    if (m_kmodThis.kstrPortableName().pszValue())
+        return TString(m_kmodThis.kstrPortableName().pszValue());
 
     // We just return the loadable name instead
-    return TString(m_kmodThis.pszLoadableName());
+    return TString(m_kmodThis.kstrLoadableName().pszValue());
 }
 
 
@@ -2664,8 +2645,8 @@ TModule::DoInit(const   TString&            strBaseName
         //  always be set here since this is only called for CIDLib facility type
         //  modules.
         //
-        TPathStr pathResFile(m_kmodThis.pszSrcPath());
-        pathResFile.AddLevel(m_kmodThis.pszPortableName());
+        TPathStr pathResFile(m_kmodThis.kstrSrcPath().pszValue());
+        pathResFile.AddLevel(m_kmodThis.kstrPortableName().pszValue());
         pathResFile.AppendExt(L"CIDRes");
 
         // And load up the resources

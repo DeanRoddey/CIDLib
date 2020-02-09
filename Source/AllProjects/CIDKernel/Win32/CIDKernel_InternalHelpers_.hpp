@@ -54,17 +54,6 @@ namespace TKrnlWin32
         ,       IMAGE_OPTIONAL_HEADER&  toFill
     );
 
-    tCIDLib::TVoid BuildModName
-    (
-                tCIDLib::TCh* const     pszPortableBuf
-        ,       tCIDLib::TCh* const     pszLoadableBuf
-        , const tCIDLib::TCard4         c4MaxChars
-        , const tCIDLib::TCh* const     pszModName
-        , const tCIDLib::TCard4         c4MajVer
-        , const tCIDLib::TCard4         c4MinVer
-        , const tCIDLib::EModTypes      eModType
-    );
-
     tCIDLib::TCard4 c4XlatCreateAction
     (
         const   tCIDLib::ECreateActs    eAction

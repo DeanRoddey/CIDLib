@@ -53,10 +53,97 @@ TKrnlString::TKrnlString(const  tCIDLib::TCh* const pszValue) :
 {
 }
 
-TKrnlString::TKrnlString(const TKrnlString& kstrToCopy) :
+TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
+                            , const tCIDLib::TCh* const pszValue2) :
 
-    m_pszValue(TRawStr::pszReplicate(kstrToCopy.m_pszValue))
+    m_pszValue(nullptr)
 {
+    const tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(pszValue1)
+                                  + TRawStr::c4StrLen(pszValue2);
+    m_pszValue = new tCIDLib::TCh[c4Len + 1];
+
+    // We know it's long enough so just copy over ourself for maximum efficiency
+    tCIDLib::TCh* pszTar = m_pszValue;
+    const tCIDLib::TCh* pszSrc = pszValue1;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue2;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+}
+
+TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
+                            , const tCIDLib::TCh* const pszValue2
+                            , const tCIDLib::TCh* const pszValue3) :
+
+    m_pszValue(nullptr)
+{
+    const tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(pszValue1)
+                                  + TRawStr::c4StrLen(pszValue2)
+                                  + TRawStr::c4StrLen(pszValue3);
+    m_pszValue = new tCIDLib::TCh[c4Len + 1];
+
+    // We know it's long enough so just copy over ourself for maximum efficiency
+    tCIDLib::TCh* pszTar = m_pszValue;
+    const tCIDLib::TCh* pszSrc = pszValue1;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue2;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue3;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+}
+
+TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
+                            , const tCIDLib::TCh* const pszValue2
+                            , const tCIDLib::TCh* const pszValue3
+                            , const tCIDLib::TCh* const pszValue4) :
+
+    m_pszValue(nullptr)
+{
+    const tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(pszValue1)
+                                  + TRawStr::c4StrLen(pszValue2)
+                                  + TRawStr::c4StrLen(pszValue3)
+                                  + TRawStr::c4StrLen(pszValue4);
+
+    m_pszValue = new tCIDLib::TCh[c4Len + 1];
+
+    // We know it's long enough so just copy over ourself for maximum efficiency
+    tCIDLib::TCh* pszTar = m_pszValue;
+    const tCIDLib::TCh* pszSrc = pszValue1;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue2;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue3;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue4;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+}
+
+TKrnlString::TKrnlString(const TKrnlString& kstrSrc) :
+
+    m_pszValue(TRawStr::pszReplicate(kstrSrc.m_pszValue))
+{
+}
+
+TKrnlString::TKrnlString(TKrnlString&& kstrSrc) :
+
+    m_pszValue(new tCIDLib::TCh[1])
+{
+    *m_pszValue = kCIDLib::chNull;
+    tCIDLib::Swap(m_pszValue, kstrSrc.m_pszValue);
 }
 
 TKrnlString::~TKrnlString()
@@ -68,16 +155,26 @@ TKrnlString::~TKrnlString()
 // ---------------------------------------------------------------------------
 //  TKrnlString: Public operators
 // ---------------------------------------------------------------------------
-TKrnlString& TKrnlString::operator=(const TKrnlString& kstrToAssign)
+TKrnlString& TKrnlString::operator=(const TKrnlString& kstrSrc)
 {
-    if (&kstrToAssign != this)
+    if (this != &kstrSrc)
     {
         delete [] m_pszValue;
         m_pszValue = nullptr;
-        m_pszValue = TRawStr::pszReplicate(kstrToAssign.m_pszValue);
+        m_pszValue = TRawStr::pszReplicate(kstrSrc.m_pszValue);
     }
     return *this;
 }
+
+TKrnlString& TKrnlString::operator=(TKrnlString&& kstrSrc)
+{
+    if (this != &kstrSrc)
+    {
+        tCIDLib::Swap(m_pszValue, kstrSrc.m_pszValue);
+    }
+    return *this;
+}
+
 
 
 TKrnlString& TKrnlString::operator=(const tCIDLib::TCh* const pszRawStr)
@@ -123,6 +220,14 @@ const tCIDLib::TCh* TKrnlString::pszValue() const
     return m_pszValue;
 }
 
+
+tCIDLib::TVoid TKrnlString::Reallocate(const tCIDLib::TCard4 c4MinSize)
+{
+    delete [] m_pszValue;
+    m_pszValue = nullptr;
+    m_pszValue = new tCIDLib::TCh[c4MinSize];
+    m_pszValue[0] = kCIDLib::chNull;
+}
 
 tCIDLib::TVoid TKrnlString::Set(const tCIDLib::TCh* const pszToSet)
 {

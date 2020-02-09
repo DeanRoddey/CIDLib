@@ -292,61 +292,6 @@ TKrnlWin32::bQueryExeHdr(   const   tCIDLib::TCh* const     pszExePath
 }
 
 
-//
-//  Build up the name of a CIDLib module, both the portable part (the basic name
-//  that would be used to build up the names of related files (msg text, resources,
-//  etc...) and the loadable version that would be used to load a module dynamically
-//  or to run an executable.
-//
-//  So, for a facility named Foobar, and a version of 1.2, we get:
-//
-//  Library:
-//      Portable: FooBar_1_2
-//      Loadable: FooBar_1_2    (DLLs don't use the extension for loading.)
-//
-//  Exe:
-//      Portable: FooBar
-//      Loadable: FooBar.exe    (Exe's are not versioned)
-//
-tCIDLib::TVoid
-TKrnlWin32::BuildModName(       tCIDLib::TCh* const     pszPortableBuf
-                        ,       tCIDLib::TCh* const     pszLoadableBuf
-                        , const tCIDLib::TCard4         c4MaxChars
-                        , const tCIDLib::TCh* const     pszModName
-                        , const tCIDLib::TCard4         c4MajVer
-                        , const tCIDLib::TCard4         c4MinVer
-                        , const tCIDLib::EModTypes      eModType)
-{
-    // Start off with the basic module name
-    TRawStr::CopyStr(pszPortableBuf, pszModName, c4MaxChars);
-
-    // If a shared library, we have to to add the versioning info
-    if (eModType == tCIDLib::EModTypes::SharedLib)
-    {
-        constexpr tCIDLib::TCard4 c4BufSz = 256;
-        tCIDLib::TCh szTmpBuf[c4BufSz + 1];
-
-        TRawStr::CatStr(pszPortableBuf, L"_", c4MaxChars);
-        TRawStr::bFormatVal(c4MajVer, szTmpBuf, c4BufSz);
-        TRawStr::CatStr(pszPortableBuf, szTmpBuf, c4MaxChars);
-
-        TRawStr::CatStr(pszPortableBuf, L"_", c4MaxChars);
-        TRawStr::bFormatVal(c4MinVer, szTmpBuf, c4BufSz);
-        TRawStr::CatStr(pszPortableBuf, szTmpBuf, c4MaxChars);
-
-        // The loadable version is the same for us
-        TRawStr::CopyStr(pszLoadableBuf, pszPortableBuf, c4MaxChars);
-    }
-     else
-    {
-        TRawStr::CopyStr(pszLoadableBuf, pszModName, c4MaxChars);
-        TRawStr::CatStr(pszLoadableBuf, kCIDLib::szExeExtension, c4MaxChars);
-    }
-}
-
-
-
-
 // Translate our create actions into a Win32 create action flag.
 tCIDLib::TCard4
 TKrnlWin32::c4XlatCreateAction(const tCIDLib::ECreateActs eAction)

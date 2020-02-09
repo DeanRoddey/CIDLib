@@ -51,7 +51,33 @@ class KRNLEXPORT TKrnlString
 
         TKrnlString
         (
+            const   tCIDLib::TCh* const     pszValue1
+            , const tCIDLib::TCh* const     pszValue2
+        );
+
+        TKrnlString
+        (
+            const   tCIDLib::TCh* const     pszValue1
+            , const tCIDLib::TCh* const     pszValue2
+            , const tCIDLib::TCh* const     pszValue3
+        );
+
+        TKrnlString
+        (
+            const   tCIDLib::TCh* const     pszValue1
+            , const tCIDLib::TCh* const     pszValue2
+            , const tCIDLib::TCh* const     pszValue3
+            , const tCIDLib::TCh* const     pszValue4
+        );
+
+        TKrnlString
+        (
             const   TKrnlString&            kstrSrc
+        );
+
+        TKrnlString
+        (
+                    TKrnlString&&           kstrSrc
         );
 
         ~TKrnlString();
@@ -63,6 +89,11 @@ class KRNLEXPORT TKrnlString
         TKrnlString& operator=
         (
             const   TKrnlString&            kstrSrc
+        );
+
+        TKrnlString& operator=
+        (
+                    TKrnlString&&           kstrSrc
         );
 
         TKrnlString& operator=
@@ -86,6 +117,11 @@ class KRNLEXPORT TKrnlString
         tCIDLib::TVoid Clear();
 
         const tCIDLib::TCh* pszValue() const;
+
+        tCIDLib::TVoid Reallocate
+        (
+            const   tCIDLib::TCard4         c4MinSize
+        );
 
         tCIDLib::TVoid Set
         (

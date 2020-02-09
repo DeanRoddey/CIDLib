@@ -666,28 +666,29 @@ CIDServiceStart(tCIDLib::TCard4 c4ArgC, tCIDLib::TCh** apszArgs)
     //
     if (CIDKernel_SvcWin32::hflDbgLog == INVALID_HANDLE_VALUE)
     {
-        tCIDLib::TCh achName[kCIDLib::c4MaxPathLen + 1];
-        tCIDLib::TCh achPath[kCIDLib::c4MaxPathLen + 1];
+        TKrnlString kstrName;
+        TKrnlString kstrPath;
 
         tCIDLib::TBoolean bRes = TKrnlModule::bRawQueryModName
         (
-            kmodCIDKernel.hmodThis()
-            , achName
-            , achPath
-            , kCIDLib::c4MaxPathLen
+            kmodCIDKernel.hmodThis(), kstrName, kstrPath
         );
 
         if (bRes)
         {
-            TRawStr::CatStr(achPath, L"\\", kCIDLib::c4MaxPathLen);
-            TRawStr::CatStr(achPath, CIDKernel_SvcWin32::pszServiceName, kCIDLib::c4MaxPathLen);
-            TRawStr::CatStr(achPath, L"_DbgLog.Txt", kCIDLib::c4MaxPathLen);
+            TKrnlString kstrPath
+            (
+                kstrPath.pszValue()
+                , L"\\"
+                , CIDKernel_SvcWin32::pszServiceName
+                , L"_DbgLog.Txt"
+            );
 
             // If it's gotten too large, we want to clip it back
             DWORD OpenFlag = OPEN_ALWAYS;
 
             WIN32_FIND_DATA FileData;
-            HANDLE hFnd = ::FindFirstFile(achPath, &FileData);
+            HANDLE hFnd = ::FindFirstFile(kstrPath.pszValue(), &FileData);
             if (hFnd != INVALID_HANDLE_VALUE)
             {
                 ::FindClose(hFnd);
@@ -697,7 +698,7 @@ CIDServiceStart(tCIDLib::TCard4 c4ArgC, tCIDLib::TCh** apszArgs)
 
             CIDKernel_SvcWin32::hflDbgLog = ::CreateFile
             (
-                achPath
+                kstrPath.pszValue()
                 , GENERIC_WRITE
                 , FILE_SHARE_READ
                 , 0

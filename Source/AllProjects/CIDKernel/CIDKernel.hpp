@@ -55,6 +55,7 @@
 #include    "CIDKernel_Unicode.hpp"
 #include    "CIDKernel_Error.hpp"
 #include    "CIDKernel_Handles.hpp"
+#include    "CIDKernel_String.hpp"
 #include    "CIDKernel_Module.hpp"
 #include    "CIDKernel_ConCharSet.hpp"
 
@@ -339,7 +340,6 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
 #include    "CIDKernel_ErrorIds.hpp"
 #include    "CIDKernel_LList.hpp"
 #include    "CIDKernel_RawBits.hpp"
-#include    "CIDKernel_String.hpp"
 #include    "CIDKernel_KVPair.hpp"
 
 // ---------------------------------------------------------------------------
