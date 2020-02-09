@@ -383,7 +383,7 @@ TKrnlModule::bLoadFromName( const   tCIDLib::TCh* const pszBaseName
                             , const tCIDLib::EModTypes  eModType
                             , const tCIDLib::EModFlags  eModFlags)
 {
-    // Clear the current info if any
+    // Clear any current info if present
     if (!bCleanup())
         return kCIDLib::False;
 
@@ -395,7 +395,7 @@ TKrnlModule::bLoadFromName( const   tCIDLib::TCh* const pszBaseName
     //  Call the per-platform helper. This will store the module handle and the path
     //  where the module was found.
     //
-    if (!bLoadPlatModByName(eModType))
+    if (!bLoadPlatByName(eModType))
     {
         bCleanup();
         return kCIDLib::False;
@@ -418,6 +418,51 @@ TKrnlModule::bLoadFromName( const   tCIDLib::TCh* const pszBaseName
 
 
 //
+//  For loading external modules, not CIDLIb facilities. So we get whatever bit
+//  of the name/path that the caller things is necessary.
+//
+tCIDLib::TBoolean TKrnlModule::bLoadExternal(const tCIDLib::TCh* const pszPath)
+{
+    // Clear any current info if present
+    if (!bCleanup())
+        return kCIDLib::False;
+
+    // Ask the platform to do the load. We assume these are shared libraries
+    if (!bLoadPlatExt(pszPath, tCIDLib::EModTypes::SharedLib))
+        return kCIDLib::False;
+
+    // Remember it's a load, not a query
+    m_bViaLoad = kCIDLib::True;
+
+    return kCIDLib::True;
+}
+
+
+//
+//  Given the already built up loadable module name for the current platform, we
+//  try to load it up. In this case, this is just for loading external stuff, not
+//  CIDLib facilities, so no msg text loading or any of that. The passed value
+//  may be a name or a path or a partial path. It has to be a shared library,
+//  sy the program itself by definition is a CIDLib program.
+//
+tCIDLib::TBoolean TKrnlModule::bQueryExternal(const tCIDLib::TCh* const pszModName)
+{
+    // Clear any current info if present
+    if (!bCleanup())
+        return kCIDLib::False;
+
+    // Ask the platform to query the module info
+    if (!bQueryPlatExt(pszModName))
+        return kCIDLib::False;
+
+    // Remember it's a query, not a load
+    m_bViaLoad = kCIDLib::False;
+    m_eModType = tCIDLib::EModTypes::SharedLib;
+    return kCIDLib::True;
+}
+
+
+//
 //  This is for when we need to load a CIDLib facility, but from a specific path,
 //  so something like a CQC device driver.
 //
@@ -429,7 +474,7 @@ TKrnlModule::bLoadFromPath( const   tCIDLib::TCh* const pszBaseName
                             , const tCIDLib::EModTypes  eModType
                             , const tCIDLib::EModFlags  eModFlags)
 {
-    // Clear the current handle if any
+    // Clear any current info if present
     if (!bCleanup())
         return kCIDLib::False;
 
@@ -437,7 +482,7 @@ TKrnlModule::bLoadFromPath( const   tCIDLib::TCh* const pszBaseName
     if (!bBuildModNames(pszBaseName, m_kstrPortName, m_kstrLoadName, c4MajVer, c4MinVer, eModType))
         return kCIDLib::False;
 
-    if (!bLoadPlatModByPath(eModType, pszLoadPath))
+    if (!bLoadPlatByPath(pszLoadPath, eModType))
     {
         bCleanup();
         return kCIDLib::False;
@@ -475,7 +520,7 @@ TKrnlModule::bQueryFromName(const   tCIDLib::TCh* const pszBaseName
     if (!bBuildModNames(pszBaseName, m_kstrPortName, m_kstrLoadName, c4MajVer, c4MinVer, eModType))
         return kCIDLib::False;
 
-    if (!bQueryPlatModByName(eModType))
+    if (!bQueryPlatByName())
     {
         bCleanup();
         return kCIDLib::False;

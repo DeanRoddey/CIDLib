@@ -293,97 +293,6 @@ TKrnlModule::bGetFuncPtr(const  tCIDLib::TSCh* const    pszFuncName
 }
 
 
-//
-//  For loading external modules, not CIDLIb facilities. So we get whatever bit
-//  of the name/path that the caller things is necessary.
-//
-tCIDLib::TBoolean TKrnlModule::bLoadExternal(const tCIDLib::TCh* const pszToLoad)
-{
-    // Clear the current handle if any
-    if (!bCleanup())
-        return kCIDLib::False;
-
-    // And now try to load the library
-    HINSTANCE hTmp = ::LoadLibrary(pszToLoad);
-
-    // If it failed, return the error with our handle stuff still cleared
-    if (!hTmp)
-    {
-        TKrnlError::SetLastHostError(::GetLastError());
-        return kCIDLib::False;
-    }
-
-    //
-    //  It worked, so store the handle. Set the flag that indicates this
-    //  handle came from a load operation.
-    //
-    m_bViaLoad = kCIDLib::True;
-    m_hmodThis.m_phmodiThis->hInstance = hTmp;
-
-    // Query back the path and name
-    if (!bQueryPathAndName(hTmp, m_kstrSrcPath, m_kstrBaseName))
-    {
-        bCleanup();
-        return kCIDLib::False;
-    }
-
-    // We assume these are always libraries
-    m_eModType = tCIDLib::EModTypes::SharedLib;
-
-    // We don't set the portable name, but the load name is the same as the base here
-    m_kstrLoadName = m_kstrBaseName;
-
-    return kCIDLib::True;
-}
-
-
-//
-//  Given the already built up loadable module name for the current platform, we
-//  try to load it up. In this case, this is just for loading external stuff, not
-//  CIDLib facilities, so no msg text loading or any of that. The passed value
-//  may be a name or a path or a partial path.
-//
-tCIDLib::TBoolean TKrnlModule::bQueryExternal(const tCIDLib::TCh* const pszModName)
-{
-    // Clear the previous handle, if any
-    if (!bCleanup())
-        return kCIDLib::False;
-
-    // And now try to look up the name
-    HINSTANCE hTmp = ::GetModuleHandle(pszModName);
-
-    // If it failed, we just return false and are done, we already cleaned up
-    if (!hTmp)
-    {
-        TKrnlError::SetLastHostError(::GetLastError());
-        return kCIDLib::False;
-    }
-
-    //
-    //  It worked, so store the handle. And set the field that indicates
-    //  that this was not a load, just a query.
-    //
-    m_bViaLoad = kCIDLib::False;
-    m_hmodThis.m_phmodiThis->hInstance = hTmp;
-
-    // We assume these are always libraries
-    m_eModType = tCIDLib::EModTypes::SharedLib;
-
-    // Query back the path and name
-    if (!bQueryPathAndName(hTmp, m_kstrSrcPath, m_kstrBaseName))
-    {
-        bCleanup();
-        return kCIDLib::False;
-    }
-
-    //
-    //  We don't set the portable name for externals, but the load name is the same as
-    //  the base name here
-    //
-    m_kstrLoadName = m_kstrBaseName;
-    return kCIDLib::True;
-}
-
 
 // ---------------------------------------------------------------------------
 //  TKrnlModule: Private, non-virtual methods
@@ -410,10 +319,10 @@ tCIDLib::TBoolean TKrnlModule::bPlatCleanup()
 
 //
 //  This is called from the platform independent code after it has stores the module
-//  names. We need to try to load the library, store the handle, and store the path
-//  where it was found.
+//  names and type. We need to try to load the library, store the handle, and store
+//  the path where it was found.
 //
-tCIDLib::TBoolean TKrnlModule::bLoadPlatModByName(const tCIDLib::EModTypes)
+tCIDLib::TBoolean TKrnlModule::bLoadPlatByName(const tCIDLib::EModTypes)
 {
     HINSTANCE hTmp = ::LoadLibrary(m_kstrLoadName.pszValue());
     if (!hTmp)
@@ -423,7 +332,7 @@ tCIDLib::TBoolean TKrnlModule::bLoadPlatModByName(const tCIDLib::EModTypes)
     }
     m_hmodThis.m_phmodiThis->hInstance = hTmp;
 
-    // Store path that it was loaded from
+    // Query the path. This insures we get the cononical path
     if (!bQueryPath(hTmp, m_kstrSrcPath))
         return kCIDLib::False;
 
@@ -433,18 +342,18 @@ tCIDLib::TBoolean TKrnlModule::bLoadPlatModByName(const tCIDLib::EModTypes)
 
 //
 //  This is for when we need to load a CIDLib facility, but from a specific path,
-//  so something like a CQC device driver.
+//  so something like a CQC device driver. We get the path that it's in. This
+//  is after the names and type are set.
 //
 tCIDLib::TBoolean
-TKrnlModule::bLoadPlatModByPath(const tCIDLib::EModTypes, const tCIDLib::TCh* const pszLoadPath)
+TKrnlModule::bLoadPlatByPath(const  tCIDLib::TCh* const pszLoadPath
+                            , const tCIDLib::EModTypes  )
 {
-    // Build up the full path using the loadable name
-    tCIDLib::TCh szFullPath[kCIDLib::c4MaxPathLen + 1];
-    if (!TKrnlPathStr::bCombinePath(szFullPath, pszLoadPath, m_kstrLoadName.pszValue(), kCIDLib::c4MaxPathLen))
-        return kCIDLib::False;
+    // Build up the full path
+    TKrnlString kstrFullPath(pszLoadPath, m_kstrLoadName.pszValue());
 
-    // OK, let's try to load what we got
-    HINSTANCE hTmp = ::LoadLibrary(szFullPath);
+    // Try to load the path as is
+    HINSTANCE hTmp = ::LoadLibrary(kstrFullPath.pszValue());
 
     // If it failed, cleanup and return false
     if (!hTmp)
@@ -454,10 +363,7 @@ TKrnlModule::bLoadPlatModByPath(const tCIDLib::EModTypes, const tCIDLib::TCh* co
     }
     m_hmodThis.m_phmodiThis->hInstance = hTmp;
 
-    //
-    //  Get the path of our module. We got a path, but this insures we have a canonical
-    //  fully qualfied path format.
-    //
+    // Query the path. This makes sure we have the FQ, canonical path
     if (!bQueryPath(hTmp, m_kstrSrcPath))
         return kCIDLib::False;
 
@@ -466,11 +372,70 @@ TKrnlModule::bLoadPlatModByPath(const tCIDLib::EModTypes, const tCIDLib::TCh* co
 
 
 //
-//  Give the basic module name (facility name) and the version, we will load this
-//  module up into ourself. If the flags indicate it has loadable text, we will
-//  try to load the best loadable text file for the locale.
+//  This is used to load up non-CIDLib based modules. We get the full path to load
+//  and module type. No names or type have been set in this case. In most cases this
+//  will be a shared library, but it's possible we might load executables in some
+//  cases (to do something to to them and save them back out.)
 //
-tCIDLib::TBoolean TKrnlModule::bQueryPlatModByName(const tCIDLib::EModTypes)
+tCIDLib::TBoolean
+TKrnlModule::bLoadPlatExt(  const   tCIDLib::TCh* const pszLoadPath
+                            , const tCIDLib::EModTypes  eModType)
+{
+    // Try to load the path as is
+    HINSTANCE hTmp = ::LoadLibrary(pszLoadPath);
+
+    // If it failed, cleanup and return false
+    if (!hTmp)
+    {
+        TKrnlError::SetLastHostError(::GetLastError());
+        return kCIDLib::False;
+    }
+    m_hmodThis.m_phmodiThis->hInstance = hTmp;
+
+    // Query the path and load name
+    if (!bQueryPathAndName(hTmp, m_kstrSrcPath, m_kstrLoadName))
+        return kCIDLib::False;
+
+    // The base name will be the same in this case, no portable name is set
+    m_kstrBaseName = m_kstrLoadName;
+    m_eModType = eModType;
+
+    return kCIDLib::True;
+}
+
+
+//
+//  To query an already loaded module, but not a CIDLib based one, so the name will
+//  not conform to CIDLib module naming standards. No module names or type will have
+//  be set in this case. It's always a shared library, since the program itself is by
+//  definition a CIDLib program.
+//
+tCIDLib::TBoolean
+TKrnlModule::bQueryPlatExt(const tCIDLib::TCh* const  pszName)
+{
+    HINSTANCE hTmp = ::GetModuleHandle(pszName);
+    if (!hTmp)
+    {
+        TKrnlError::SetLastHostError(::GetLastError());
+        return kCIDLib::False;
+    }
+    m_hmodThis.m_phmodiThis->hInstance = hTmp;
+
+    // Query back the path and name, to get caonical info
+    if (!bQueryPathAndName(hTmp, m_kstrSrcPath, m_kstrLoadName))
+        return kCIDLib::False;
+
+    // The base name is the same as the loadable in this case, no portable name is set
+    m_kstrBaseName = m_kstrLoadName;
+    return kCIDLib::True;
+}
+
+
+//
+//  Query an already loaded module by name. The names and type are already stored
+//  at this point.
+//
+tCIDLib::TBoolean TKrnlModule::bQueryPlatByName()
 {
     HINSTANCE hTmp = ::GetModuleHandle(m_kstrLoadName.pszValue());
     if (!hTmp)
@@ -480,7 +445,7 @@ tCIDLib::TBoolean TKrnlModule::bQueryPlatModByName(const tCIDLib::EModTypes)
     }
     m_hmodThis.m_phmodiThis->hInstance = hTmp;
 
-    // Store the path it loaded from
+    // Store the path it originally loaded from
     if (!bQueryPath(hTmp, m_kstrSrcPath))
         return kCIDLib::False;
 

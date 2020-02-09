@@ -143,7 +143,7 @@ class KRNLEXPORT TKrnlModule
 
         tCIDLib::TBoolean bLoadExternal
         (
-            const   tCIDLib::TCh* const     pszToLoad
+            const   tCIDLib::TCh* const     pszPath
         );
 
         tCIDLib::TBoolean bQueryFromName
@@ -157,7 +157,7 @@ class KRNLEXPORT TKrnlModule
 
         tCIDLib::TBoolean bQueryExternal
         (
-            const   tCIDLib::TCh* const     pszFullPath
+            const   tCIDLib::TCh* const     pszName
         );
 
         tCIDLib::EModTypes eModType() const
@@ -207,21 +207,29 @@ class KRNLEXPORT TKrnlModule
 
         tCIDLib::TBoolean bPlatCleanup();
 
-        tCIDLib::TBoolean bLoadPlatModByName
+        tCIDLib::TBoolean bLoadPlatExt
         (
-            const   tCIDLib::EModTypes  eModType
+            const   tCIDLib::TCh* const     pszLoadPath
+            , const tCIDLib::EModTypes      eModType
         );
 
-        tCIDLib::TBoolean bLoadPlatModByPath
-        (
-            const   tCIDLib::EModTypes      eModType
-            , const tCIDLib::TCh* const     pszLoadPath
-        );
-
-        tCIDLib::TBoolean bQueryPlatModByName
+        tCIDLib::TBoolean bLoadPlatByName
         (
             const   tCIDLib::EModTypes      eModType
         );
+
+        tCIDLib::TBoolean bLoadPlatByPath
+        (
+            const   tCIDLib::TCh* const     pszLoadPath
+            , const tCIDLib::EModTypes      eModType
+        );
+
+        tCIDLib::TBoolean bQueryPlatExt
+        (
+            const   tCIDLib::TCh* const     pszName
+        );
+
+        tCIDLib::TBoolean bQueryPlatByName();
 
 
         // -------------------------------------------------------------------

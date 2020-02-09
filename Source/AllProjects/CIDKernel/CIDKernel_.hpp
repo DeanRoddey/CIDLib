@@ -50,8 +50,15 @@
 //  system headers that are needed within the kernel, plus any other types
 //  or definitions that are required internally for all per-platform
 //  implementation files.
+//
+//  The compiler will find these just fine, but Visual Studio Code never seems
+//  to get htis right, so we explicitly do include paths here.
 // ---------------------------------------------------------------------------
-#include    "CIDKernel_PlatformInternal_.hpp"
+#if defined(_WIN32)
+#include    "Win32\CIDKernel_PlatformInternal_.hpp"
+#else
+#include    "Linux/CIDKernel_PlatformInternal_.hpp"
+#endif
 
 
 // ---------------------------------------------------------------------------
