@@ -59,7 +59,7 @@
 #if defined(_WIN32)
 #include    "Win32\CIDKernel_PlatformConstants.hpp"
 #else
-#include    "Linxu/CIDKernel_PlatformConstants.hpp"
+#include    "Linux/CIDKernel_PlatformConstants.hpp"
 #endif
 #include    "CIDKernel_Constant.hpp"
 #include    "CIDKernel_Version.hpp"

@@ -63,39 +63,6 @@ namespace CIDKernel_Module_Linux
         return kCIDLib::False;
     }
 
-    tCIDLib::TBoolean
-    bCreateModNames(    const   tCIDLib::TCh* const pszModName
-                        , const tCIDLib::TCard4     c4MajVer
-                        , const tCIDLib::TCard4     c4MinVer
-                        , const tCIDLib::EModTypes  eModType
-                        , const tCIDLib::TCh*&      pszBaseName
-                        , const tCIDLib::TCh*&      pszLoadName
-                        , const tCIDLib::TCh*&      pszPortName)
-    {
-        // The name must just be a name, no path
-        if (TRawStr::pszFindChar(pszModName, L'/'))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcMod_NoPathAllowed);
-            return kCIDLib::False;
-        }
-
-        const tCIDLib::TCard4 c4NameBufSz = 1023;
-        tCIDLib::TCh szPortName[c4NameBufSz + 1];
-        tCIDLib::TCh szLoadName[c4NameBufSz + 1];
-        const tCIDLib::TBoolean bRes = TKrnlModule::bBuildModName
-        (
-            szPortName, szLoadName, c4NameBufSz, pszModName, c4MajVer, c4MinVer, eModType
-        );
-
-        if (bRes)
-        {
-            pszBaseName = TRawStr::pszReplicate(pszModName);
-            pszLoadName = TRawStr::pszReplicate(szLoadName);
-            pszPortName = TRawStr::pszReplicate(szPortName);
-        }
-        return bRes;
-    }
-
 
     tCIDLib::TBoolean bFindSharedLibrary(const  tCIDLib::TCh* const pszLib
                                         ,       tCIDLib::TCh* const pszToFill
@@ -317,11 +284,11 @@ namespace CIDKernel_Module_Linux
                     goto NextOne;
 
                 ::strcpy(szCurDir, pszCurPath);
-                if (szCurDir[c4CurLen - 1] != '\\')
+                if (szCurDir[c4CurLen - 1] != kCIDLib::chPathSep)
                 {
                     if (++c4Required > kCIDLib::c4MaxPathLen)
                         goto NextOne;
-                    ::strcat(szCurDir, "\\");
+                    ::strcat(szCurDir, "/");
                 }
                 ::strcat(szCurDir, pszLocExe);
 
@@ -457,48 +424,17 @@ TModuleHandle::FormatToStr(         tCIDLib::TCh* const pszToFill
 // ---------------------------------------------------------------------------
 
 //
-//  Build up the the portable and loadable names for the indicated module and version and
-//  module type.
+//  Given the handle, get the module path and name. Since we are just querying
+//  from the OS, the platform specific name is returned.
 //
 tCIDLib::TBoolean
-TKrnlModule::bBuildModName(             tCIDLib::TCh* const     pszPortableBuf
-                                ,       tCIDLib::TCh* const     pszLoadableBuf
-                                , const tCIDLib::TCard4         c4MaxChars
-                                , const tCIDLib::TCh* const     pszModName
-                                , const tCIDLib::TCard4         c4MajVer
-                                , const tCIDLib::TCard4         c4MinVer
-                                ,  const tCIDLib::EModTypes     eModType)
+TKrnlModule::bRawQueryModName(  const   TModuleHandle&  hmodSrc
+                                ,       TKrnlString&    kstrName
+                                ,       TKrnlString&    kstrPath)
 {
     // Init the buffers to empty
-    *pszPortableBuf = kCIDLib::chNull;
-    *pszLoadableBuf = kCIDLib::chNull;
-
-    // Make sure the module type is understood
-    if ((eModType != tCIDLib::EModTypes::Exe) && (eModType != tCIDLib::EModTypes::SharedLib))
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMod_BadModType);
-        return kCIDLib::False;
-    }
-
-    // And just call an internal helper to do the work
-    TKrnlLinux::BuildModName
-    (
-        pszPortableBuf, pszLoadableBuf, c4MaxChars, pszModName, c4MajVer, c4MinVer, eModType
-    );
-    return kCIDLib::True;
-}
-
-
-
-tCIDLib::TBoolean
-TKrnlModule::bRawQueryModName(  const   TModuleHandle&      hmodSrc
-                                ,       tCIDLib::TCh* const pszNameToFill
-                                ,       tCIDLib::TCh* const pszPathToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
-{
-    // Init the buffer to empty
-    *pszNameToFill = kCIDLib::chNull;
-    *pszPathToFill = kCIDLib::chNull;
+    kstrName.Clear();
+    kstrPath.Clear();
 
     if (!hmodSrc.m_phmodiThis->pszFullPath)
     {
@@ -506,24 +442,27 @@ TKrnlModule::bRawQueryModName(  const   TModuleHandle&      hmodSrc
         return kCIDLib::False;
     }
 
-    if (!TKrnlPathStr::bQueryPath(hmodSrc.m_phmodiThis->pszFullPath, pszPathToFill, c4MaxChars)
-    ||  !TKrnlPathStr::bQueryNameExt(hmodSrc.m_phmodiThis->pszFullPath, pszNameToFill, c4MaxChars))
+    tCIDLib::TCh achPath[kCIDLib::c4MaxPathLen + 1];
+    tCIDLib::TCh achName[kCIDLib::c4MaxPathLen + 1];
+    if (!TKrnlPathStr::bQueryPath(hmodSrc.m_phmodiThis->pszFullPath, achPath, kCIDLib::c4MaxPathLen)
+    ||  !TKrnlPathStr::bQueryNameExt(hmodSrc.m_phmodiThis->pszFullPath, achName, kCIDLib::c4MaxPathLen))
     {
         return kCIDLib::False;
     }
 
+    kstrName = achName;
+    kstrPath = achPath;
     return kCIDLib::True;
 }
 
 
 
 tCIDLib::TBoolean
-TKrnlModule::bRawQueryModPath(  const   TModuleHandle&      hmodSrc
-                                ,       tCIDLib::TCh* const pszPathToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
+TKrnlModule::bRawQueryModPath(  const   TModuleHandle&  hmodSrc
+                                ,       TKrnlString&    kstrToFill)
 {
     // Init the buffer to empty
-    *pszPathToFill = kCIDLib::chNull;
+    kstrToFill.Clear();
 
     if (!hmodSrc.m_phmodiThis->pszFullPath)
     {
@@ -531,54 +470,14 @@ TKrnlModule::bRawQueryModPath(  const   TModuleHandle&      hmodSrc
         return kCIDLib::False;
     }
 
-    if (!TKrnlPathStr::bQueryPath(hmodSrc.m_phmodiThis->pszFullPath, pszPathToFill, c4MaxChars))
+    tCIDLib::TCh achPath[kCIDLib::c4MaxPathLen + 1];
+    if (!TKrnlPathStr::bQueryPath(hmodSrc.m_phmodiThis->pszFullPath, achPath, kCIDLib::c4MaxPathLen))
         return kCIDLib::False;
 
+    kstrToFill = achPath;
     return kCIDLib::True;
-
 }
 
-
-// ---------------------------------------------------------------------------
-//  TKrnlModule: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TKrnlModule::TKrnlModule() :
-
-    m_bViaLoad(kCIDLib::False)
-    , m_eModType(tCIDLib::EModTypes::Count)
-    , m_pmiThis(nullptr)
-    , m_pszBaseName(nullptr)
-    , m_pszLoadName(nullptr)
-    , m_pszPortName(nullptr)
-    , m_pszSrcPath(nullptr)
-    
-{
-}
-
-TKrnlModule::~TKrnlModule()
-{
-    // Delete the message file buffer if any
-    delete [] reinterpret_cast<tCIDLib::TCh*>(m_pmiThis);
-    m_pmiThis = 0;
-
-    // Do the required handle cleanup stuff
-    if (!bCleanup())
-    {
-        //
-        //  If we are debugging, then do a popup here. Otherwise there is
-        //  not much we can do.
-        //
-        #if CID_DEBUG_ON
-        kmodCIDKernel.KrnlErrorPopUp
-        (
-            TKrnlError::kerrLast()
-            , CID_FILE
-            , CID_LINE
-            , kmodCIDKernel.pszLoadCIDFacMsg(kKrnlErrs::errcGen_CloseHandle)
-        );
-        #endif
-    }
-}
 
 
 // ---------------------------------------------------------------------------
@@ -605,12 +504,31 @@ TKrnlModule::bGetFuncPtr(const  tCIDLib::TSCh* const    pszFuncName
     return kCIDLib::True;
 }
 
+
+// ---------------------------------------------------------------------------
+//  TKrnlModule: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TBoolean TKrnlModule::bPlatCleanup()
+{
+    if (m_hmodThis.m_phmodiThis->pHandle)
+    {
+        if (::dlclose(m_hmodThis.m_phmodiThis->pHandle))
+        {
+            TKrnlError::SetLastHostError(errno);
+            return kCIDLib::False;
+        }
+
+        m_hmodThis.m_phmodiThis->pHandle = nullptr;
+        delete [] m_hmodThis.m_phmodiThis->pszFullPath;
+        m_hmodThis.m_phmodiThis->pszFullPath = nullptr;
+
+    }
+    return kCIDLib::True;
+}
+
+
 tCIDLib::TBoolean
-TKrnlModule::bLoadFromName( const   tCIDLib::TCh* const pszModName
-                            , const tCIDLib::TCard4     c4MajVer
-                            , const tCIDLib::TCard4     c4MinVer
-                            , const tCIDLib::EModTypes  eModType
-                            , const tCIDLib::EModFlags  eModFlags)
+TKrnlModule::bLoadPlatByName(const tCIDLib::EModTypes eModType)
 {
     if (eModType == tCIDLib::EModTypes::Exe)
     {
@@ -618,30 +536,13 @@ TKrnlModule::bLoadFromName( const   tCIDLib::TCh* const pszModName
         return kCIDLib::False;
     }
 
-    // Clear the current content if any
-    if (!bCleanup())
-        return kCIDLib::False;
-
-    // Create our module name variations for this platform
-    tCIDLib::TBoolean bRes = CIDKernel_Module_Linux::bCreateModNames
-    (
-        pszModName
-        , c4MajVer
-        , c4MinVer
-        , eModType
-        , m_pszBaseName
-        , m_pszLoadName
-        , m_pszPortName
-    );
-    if (!bRes)
-        return kCIDLib::False;
 
     //
     //  First find the library. dlopen would go through the same  steps, and since
     //  we need to get the full path name of it, it makes since to do it manually first.
     //
     tCIDLib::TCh szRealPath[kCIDLib::c4MaxPathLen + 1];
-    if (!CIDKernel_Module_Linux::bFindSharedLibrary(m_pszLoadName, szRealPath, kCIDLib::c4MaxPathLen))
+    if (!CIDKernel_Module_Linux::bFindSharedLibrary(m_kstrLoadName.pszValue(), szRealPath, kCIDLib::c4MaxPathLen))
         return kCIDLib::False;
 
     tCIDLib::TSCh szRealCopy[kCIDLib::c4MaxPathLen + 1];
@@ -661,45 +562,25 @@ TKrnlModule::bLoadFromName( const   tCIDLib::TCh* const pszModName
         return kCIDLib::False;
     }
 
-    //
-    //  It worked, so store the handle. Set the flag that indicates this
-    //  handle came from a load operation.
-    //
-    m_bViaLoad = kCIDLib::True;
+    // Store handle and path
     m_hmodThis.m_phmodiThis->pHandle = pTmp;
 
-    delete [] m_hmodThis.m_phmodiThis->pszFullPath;
-    m_hmodThis.m_phmodiThis->pszFullPath = TRawStr::pszReplicate(szRealPath);
-
-    if (tCIDLib::bAllBitsOn(eModFlags, tCIDLib::EModFlags::HasMsgFile))
-    {
-        if (!bLoadMessages(m_pszSrcPath, m_pszPortName, m_pmiThis))
-            return kCIDLib::False;
-    }
+    tCIDLib::TCh szPathPart[kCIDLib::c4MaxPathLen + 1];
+    TKrnlPathStr::bQueryPath(szRealPath, szPathPart, kCIDLib::c4MaxPathLen);
+    m_kstrSrcPath = szPathPart;
 
     return kCIDLib::True;
 }
 
 
 tCIDLib::TBoolean
-TKrnlModule::bQueryFromName(const   tCIDLib::TCh* const pszModName
-                            , const tCIDLib::EModTypes  eModType
-                            , const tCIDLib::TCard4     c4MajVer
-                            , const tCIDLib::TCard4     c4MinVer
-                            , const tCIDLib::EModFlags  eModFlags)
+TKrnlModule::bQueryPlatByName(const tCIDLib::EModTypes eModType)
 {
-    if (!bClearHandle())
-        return kCIDLib::False;
-
-    // Now make a platform-specific name out of the module name
-    tCIDLib::TCh szNameBuf[kCIDLib::c4MaxPathLen + 1];
-    CIDKernel_Module_Linux::BuildModName(szNameBuf, kCIDLib::c4MaxPathLen, pszModName, c4MajVer, c4MinVer);
-
     tCIDLib::TCh szRealPath[kCIDLib::c4MaxPathLen + 1];
 
-    if (eModType == tCIDLib::EModTypes::Dll)
+    if (eModType == tCIDLib::EModTypes::SharedLib)
     {
-        if (!CIDKernel_Module_Linux::bFindSharedLibrary(szNameBuf, szRealPath, c4MaxBufChars(szRealPath)))
+        if (!CIDKernel_Module_Linux::bFindSharedLibrary(m_kstrLoadName.pszValue(), szRealPath, c4MaxBufChars(szRealPath)))
             return kCIDLib::False;
 
         tCIDLib::TBoolean bLoaded;
@@ -718,7 +599,6 @@ TKrnlModule::bQueryFromName(const   tCIDLib::TCh* const pszModName
         TRawStr::pszConvert(szRealPath, szRealCopy, kCIDLib::c4MaxPathLen);
 
         tCIDLib::TVoid* pTmp = ::dlopen(szRealCopy, RTLD_LAZY);
-
         if (!pTmp)
         {
             if (::access(szRealCopy, F_OK))
@@ -734,65 +614,231 @@ TKrnlModule::bQueryFromName(const   tCIDLib::TCh* const pszModName
     }
     else
     {
-        if (!CIDKernel_Module_Linux::bFindExecutable(pszModName, szRealPath, c4MaxBufChars(szRealPath)))
+        if (!CIDKernel_Module_Linux::bFindExecutable(m_kstrLoadName.pszValue(), szRealPath, c4MaxBufChars(szRealPath)))
             return kCIDLib::False;
         m_hmodThis.m_phmodiThis->pHandle = 0;
     }
 
-    m_bViaLoad = kCIDLib::False;
+    tCIDLib::TCh szPathPart[kCIDLib::c4MaxPathLen + 1];
+    TKrnlPathStr::bQueryPath(szRealPath, szPathPart, kCIDLib::c4MaxPathLen);
+    m_kstrSrcPath = szPathPart;
 
-    delete [] m_hmodThis.m_phmodiThis->pszFullPath;
-    m_hmodThis.m_phmodiThis->pszFullPath = TRawStr::pszReplicate(szRealPath);
+    return kCIDLib::True;
+}
 
-    //
-    //  See if the caller says sthis facility has a message file, and load it
-    //  up if so. Delete the old one first, if any.
-    //
 
-    if (tCIDLib::bAllBitsOn(eModFlags, tCIDLib::EModFlags::HasMsgFile))
+//
+//  This is for when we need to load a CIDLib facility, but from a specific path,
+//  so something like a CQC device driver. We get the path that it's in. This
+//  is after the names and type are set.
+//
+tCIDLib::TBoolean
+TKrnlModule::bLoadPlatByPath(const  tCIDLib::TCh* const pszLoadPath
+                            , const tCIDLib::EModTypes  eModType)
+{
+    if (eModType == tCIDLib::EModTypes::Exe)
     {
-        if (!bLoadMessages(m_hmodThis, m_pmiThis))
-            return kCIDLib::False;
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidParameter);
+        return kCIDLib::False;
     }
+
+    tCIDLib::TCh szRealPath[kCIDLib::c4MaxPathLen + 1];
+    if (!CIDKernel_Module_Linux::bFindSharedLibrary(pszLoadPath, szRealPath, c4MaxBufChars(szRealPath)))
+        return kCIDLib::False;
+
+    tCIDLib::TSCh szRealCopy[kCIDLib::c4MaxPathLen + 1];
+    TRawStr::pszConvert(szRealPath, szRealCopy, kCIDLib::c4MaxPathLen);
+    tCIDLib::TVoid* pTmp = ::dlopen(szRealCopy, RTLD_LAZY);
+    if (!pTmp)
+    {
+        if (::access(szRealCopy, F_OK))
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcMod_ModuleNotFound);
+        else if (::access(szRealCopy, R_OK))
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcAcc_InvalidAccess);
+        else
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcMod_DLLInitFailed);
+        return kCIDLib::False;
+    }
+
+    m_hmodThis.m_phmodiThis->pHandle = pTmp;
+
+    tCIDLib::TCh szPathPart[kCIDLib::c4MaxPathLen + 1];
+    TKrnlPathStr::bQueryPath(szRealPath, szPathPart, kCIDLib::c4MaxPathLen);
+    m_kstrSrcPath = szPathPart;
+
+    return kCIDLib::True;
+}
+
+
+//
+//  This is used to load up non-CIDLib based modules. We get the full path to load
+//  and module type. No names or type have been set in this case. In most cases this
+//  will be a shared library, but it's possible we might load executables in some
+//  cases (to do something to to them and save them back out.)
+//
+tCIDLib::TBoolean
+TKrnlModule::bLoadPlatExt(  const   tCIDLib::TCh* const pszLoadPath
+                            , const tCIDLib::EModTypes  eModType)
+{
+    if (eModType == tCIDLib::EModTypes::Exe)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidParameter);
+        return kCIDLib::False;
+    }
+
+    tCIDLib::TCh szRealPath[kCIDLib::c4MaxPathLen + 1];
+    if (!CIDKernel_Module_Linux::bFindSharedLibrary(pszLoadPath, szRealPath, c4MaxBufChars(szRealPath)))
+        return kCIDLib::False;
+
+    tCIDLib::TSCh szRealCopy[kCIDLib::c4MaxPathLen + 1];
+    TRawStr::pszConvert(szRealPath, szRealCopy, kCIDLib::c4MaxPathLen);
+
+    tCIDLib::TVoid* pTmp = ::dlopen(szRealCopy, RTLD_LAZY);
+    if (!pTmp)
+    {
+        if (::access(szRealCopy, F_OK))
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcMod_ModuleNotFound);
+        else if (::access(szRealCopy, R_OK))
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcAcc_InvalidAccess);
+        else
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcMod_DLLInitFailed);
+        return kCIDLib::False;
+    }
+
+    m_hmodThis.m_phmodiThis->pHandle = pTmp;
+
+    tCIDLib::TCh szPathPart[kCIDLib::c4MaxPathLen + 1];
+    TKrnlPathStr::bQueryPath(szRealPath, szPathPart, kCIDLib::c4MaxPathLen);
+    m_kstrSrcPath = szPathPart;
+}
+
+
+//
+//  To query an already loaded module, but not a CIDLib based one, so the name will
+//  not conform to CIDLib module naming standards. No module names or type will have
+//  be set in this case. It's always a shared library, since the program itself is by
+//  definition a CIDLib program.
+//
+tCIDLib::TBoolean
+TKrnlModule::bQueryPlatExt(const tCIDLib::TCh* const  pszName)
+{
+    tCIDLib::TCh szRealPath[kCIDLib::c4MaxPathLen + 1];
+
+    if (!CIDKernel_Module_Linux::bFindSharedLibrary(m_kstrLoadName.pszValue(), szRealPath, c4MaxBufChars(szRealPath)))
+        return kCIDLib::False;
+
+    tCIDLib::TBoolean bLoaded;
+    if (!CIDKernel_Module_Linux::bIsLibLoaded(szRealPath, bLoaded))
+        return kCIDLib::False;
+
+    if (!bLoaded)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMod_ModuleNotFound);
+        return kCIDLib::False;
+    }
+
+    tCIDLib::TSCh szRealCopy[kCIDLib::c4MaxPathLen + 1];
+    TRawStr::pszConvert(szRealPath, szRealCopy, kCIDLib::c4MaxPathLen);
+
+    tCIDLib::TVoid* pTmp = ::dlopen(szRealCopy, RTLD_LAZY);
+    if (!pTmp)
+    {
+        if (::access(szRealCopy, F_OK))
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcMod_ModuleNotFound);
+        else if (::access(szRealCopy, R_OK))
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcAcc_InvalidAccess);
+        else
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcMod_DLLInitFailed);
+        return kCIDLib::False;
+    }
+
+    m_hmodThis.m_phmodiThis->pHandle = pTmp;
+
+    // Store the path it was loaded from
+    tCIDLib::TCh szPathPart[kCIDLib::c4MaxPathLen + 1];
+    TKrnlPathStr::bQueryPath(szRealPath, szPathPart, kCIDLib::c4MaxPathLen);
+    m_kstrSrcPath = szPathPart;
 
     return kCIDLib::True;
 }
 
 
 // ---------------------------------------------------------------------------
-//  TKrnlModule: Private, non-virtual methods
+//  TKrnlModule: Private, static methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TKrnlModule::bCleanup()
+
+//
+//  Build up the name of a CIDLib module, both the portable part (the basic name
+//  that would be used to build up the names of related files (msg text, resources,
+//  etc...) and the loadable version that would be used to load a module dynamically
+//  or to run an executable.
+//
+//  So, for a facility named Foobar, and a version of 1.2, we get:
+//
+//  Library:
+//      Portable: FooBar_1_2
+//      Loadable: FooBar.so_1_2
+//
+//  Exe:
+//      Portable: FooBar
+//      Loadable: FooBar
+//
+tCIDLib::TVoid
+TKrnlModule::MakePlatNames( const   tCIDLib::TCh* const     pszModName
+                            ,       TKrnlString&            kstrPortable
+                            ,       TKrnlString&            kstrLoadable
+                            , const tCIDLib::TCard4         c4MajVer
+                            , const tCIDLib::TCard4         c4MinVer
+                            , const tCIDLib::EModTypes      eModType)
 {
-    //
-    //  If there is a module handle, it was via a load, and we have adopted
-    //  it then we need to free it.
-    //
-    if (m_hmodThis.m_phmodiThis->pHandle)
+    const tCIDLib::TCard4 c4BufSz = kCIDLib::c4MaxPathLen;
+    tCIDLib::TCh achNameBuf[c4BufSz + 1];
+
+    if (eModType == tCIDLib::EModTypes::SharedLib)
     {
-        if (::dlclose(m_hmodThis.m_phmodiThis->pHandle))
-        {
-            TKrnlError::SetLastHostError(errno);
-            return kCIDLib::False;
-        }
+        constexpr tCIDLib::TCard4 c4BufSz = 256;
+        tCIDLib::TCh szTmpBuf[c4BufSz + 1];
+
+        // Do the loadable name
+        TRawStr::CopyStr(achNameBuf, L"lib");
+        TRawStr::CatStr(achNameBuf, pszModName);
+        TRawStr::CatStr(achNameBuf, L".so_");
+        TRawStr::bFormatVal(c4MajVer, szTmpBuf, c4BufSz);
+        TRawStr::CatStr(achNameBuf, szTmpBuf, c4BufSz);
+        TRawStr::CatStr(achNameBuf, L"_", c4BufSz);
+        TRawStr::bFormatVal(c4MinVer, szTmpBuf, c4BufSz);
+        TRawStr::CatStr(achNameBuf, szTmpBuf, c4BufSz);
+        kstrLoadable = achNameBuf;
+
+        // Do the portable name
+        TRawStr::CopyStr(achNameBuf, pszModName);
+        TRawStr::CatStr(achNameBuf, L"_");
+        TRawStr::bFormatVal(c4MajVer, szTmpBuf, c4BufSz);
+        TRawStr::CatStr(achNameBuf, szTmpBuf, c4BufSz);
+        TRawStr::CatStr(achNameBuf, L"_", c4BufSz);
+        TRawStr::bFormatVal(c4MinVer, szTmpBuf, c4BufSz);
+        TRawStr::CatStr(achNameBuf, szTmpBuf, c4BufSz);
+        kstrPortable = achNameBuf;        
     }
-
-    m_hmodThis.Clear();
-    m_bViaLoad = kCIDLib::False;
-    m_eModType = tCIDLib::EModTypes::Count;    
-
-    delete [] reinterpret_cast<tCIDLib::TCh*>(m_pmiThis);
-    m_pmiThis = nullptr;
-
-    // Clean up any name/path storage that got set
-    delete [] m_pszBaseName;
-    m_pszBaseName = nullptr;
-    delete [] m_pszLoadName;
-    m_pszLoadName = nullptr;
-    delete [] m_pszPortName;
-    m_pszPortName = nullptr;
-    delete [] m_pszSrcPath;
-    m_pszSrcPath = nullptr;
-
-    return kCIDLib::True;
+     else if (eModType == tCIDLib::EModTypes::Exe)
+    {
+        // For us, the portable name is just the base name
+        kstrLoadable = pszModName;
+        kstrPortable = pszModName;
+    }
+     else
+    {
+        // Should not happen since the portable layer should have checked this
+        TKrnlPopup::Show
+        (
+            CID_FILE
+            , CID_LINE
+            , L"Linux Module Support"
+            , nullptr
+            , 0
+            , 0
+            , 0
+            , L"Only shared lib and exes are supported for name building"
+        );
+    }
 }

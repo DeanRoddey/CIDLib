@@ -229,7 +229,10 @@ class KRNLEXPORT TKrnlModule
             const   tCIDLib::TCh* const     pszName
         );
 
-        tCIDLib::TBoolean bQueryPlatByName();
+        tCIDLib::TBoolean bQueryPlatByName
+        (
+            const   tCIDLib::EModTypes      eModType
+        );
 
 
         // -------------------------------------------------------------------

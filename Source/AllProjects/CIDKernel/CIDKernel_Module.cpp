@@ -520,7 +520,7 @@ TKrnlModule::bQueryFromName(const   tCIDLib::TCh* const pszBaseName
     if (!bBuildModNames(pszBaseName, m_kstrPortName, m_kstrLoadName, c4MajVer, c4MinVer, eModType))
         return kCIDLib::False;
 
-    if (!bQueryPlatByName())
+    if (!bQueryPlatByName(eModType))
     {
         bCleanup();
         return kCIDLib::False;
@@ -598,7 +598,6 @@ tCIDLib::TBoolean TKrnlModule::bCleanup()
     m_kstrSrcPath.Clear();
 
     // Store the handle and then clean up the data
-    m_hmodThis.m_phmodiThis->hInstance = nullptr;
     m_bViaLoad = kCIDLib::False;
     m_eModType = tCIDLib::EModTypes::Count;
 
