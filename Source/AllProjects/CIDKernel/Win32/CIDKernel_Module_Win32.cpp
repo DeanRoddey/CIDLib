@@ -322,7 +322,7 @@ tCIDLib::TBoolean TKrnlModule::bPlatCleanup()
 //  names and type. We need to try to load the library, store the handle, and store
 //  the path where it was found.
 //
-tCIDLib::TBoolean TKrnlModule::bLoadPlatByName(const tCIDLib::EModTypes)
+tCIDLib::TBoolean TKrnlModule::bLoadPlatByName()
 {
     HINSTANCE hTmp = ::LoadLibrary(m_kstrLoadName.pszValue());
     if (!hTmp)
@@ -346,8 +346,7 @@ tCIDLib::TBoolean TKrnlModule::bLoadPlatByName(const tCIDLib::EModTypes)
 //  is after the names and type are set.
 //
 tCIDLib::TBoolean
-TKrnlModule::bLoadPlatByPath(const  tCIDLib::TCh* const pszLoadPath
-                            , const tCIDLib::EModTypes  )
+TKrnlModule::bLoadPlatByPath(const  tCIDLib::TCh* const pszLoadPath)
 {
     // Build up the full path
     TKrnlString kstrFullPath(pszLoadPath, m_kstrLoadName.pszValue());

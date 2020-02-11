@@ -395,7 +395,8 @@ TKrnlModule::bLoadFromName( const   tCIDLib::TCh* const pszBaseName
     //  Call the per-platform helper. This will store the module handle and the path
     //  where the module was found.
     //
-    if (!bLoadPlatByName(eModType))
+    m_eModType = eModType;
+    if (!bLoadPlatByName())
     {
         bCleanup();
         return kCIDLib::False;
@@ -403,7 +404,6 @@ TKrnlModule::bLoadFromName( const   tCIDLib::TCh* const pszBaseName
 
     // Remember this was via a load and what type of module
     m_bViaLoad = kCIDLib::True;
-    m_eModType = eModType;
 
     //
     //  If this one has loadable text, then load the message file. We don't return a
@@ -482,15 +482,15 @@ TKrnlModule::bLoadFromPath( const   tCIDLib::TCh* const pszBaseName
     if (!bBuildModNames(pszBaseName, m_kstrPortName, m_kstrLoadName, c4MajVer, c4MinVer, eModType))
         return kCIDLib::False;
 
-    if (!bLoadPlatByPath(pszLoadPath, eModType))
+    m_eModType = eModType;
+    if (!bLoadPlatByPath(pszLoadPath))
     {
         bCleanup();
         return kCIDLib::False;
     }
 
-    // Remember it was via load, not query, and the module type
+    // Remember it was via load, not query
     m_bViaLoad = kCIDLib::True;
-    m_eModType = eModType;
 
     //
     //  If this one has loadable text, then load the message file. We don't return a
@@ -520,15 +520,15 @@ TKrnlModule::bQueryFromName(const   tCIDLib::TCh* const pszBaseName
     if (!bBuildModNames(pszBaseName, m_kstrPortName, m_kstrLoadName, c4MajVer, c4MinVer, eModType))
         return kCIDLib::False;
 
-    if (!bQueryPlatByName(eModType))
+    m_eModType = eModType;
+    if (!bQueryPlatByName())
     {
         bCleanup();
         return kCIDLib::False;
     }
 
-    // Remember it was via query, not load, and the type of module
+    // Remember it was via query, not load
     m_bViaLoad = kCIDLib::False;
-    m_eModType = eModType;
 
     //
     //  If this one has loadable text, then load the message file. We don't return a
