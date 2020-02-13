@@ -625,7 +625,7 @@ TKrnlIP::bQueryDefLocalAddr(        TKrnlIPAddr&            kipaToFill
     else if (eType == tCIDSock::EAddrTypes::IPV6)
         Filter.ai_family = AF_INET6;
 
-    if (::GetAddrInfo(kCIDLib::pszEmptyZStr, 0, &Filter, &pInfo))
+    if (::GetAddrInfo(kCIDLib::pszEmptyZStr, nullptr, &Filter, &pInfo))
     {
         tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
         TKrnlError::SetLastKrnlError(c4XlatError(c4LastErr), c4LastErr);
@@ -687,7 +687,7 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
         llstToFill.RemoveAll();
 
     // First get non-loopbacks
-    if (::GetAddrInfo(pszName, 0, &Filter, &pInfo))
+    if (::GetAddrInfo(pszName, nullptr, &Filter, &pInfo))
     {
         // If that failed, then give up
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddrString);
@@ -720,7 +720,7 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
     //
     if (bIncludeLoopback && !TRawStr::bCompareStrI(pszName, L"localhost") && *pszName)
     {
-        if (::GetAddrInfo(L"localhost", 0, &Filter, &pInfo))
+        if (::GetAddrInfo(L"localhost", nullptr, &Filter, &pInfo))
         {
             // If that failed, then give up
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddrString);
@@ -998,7 +998,7 @@ TKrnlIP::eIPAFromText(  const   tCIDLib::TCh* const     pszIPAddrString
         Filter.ai_family = AF_INET;
     else if (eRealType == tCIDSock::EAddrTypes::IPV6)
         Filter.ai_family = AF_INET6;
-    if (::GetAddrInfo(pszIPAddrString, 0, &Filter, &pInfo))
+    if (::GetAddrInfo(pszIPAddrString, nullptr, &Filter, &pInfo))
     {
         // If that failed too, then give up
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddrString);
