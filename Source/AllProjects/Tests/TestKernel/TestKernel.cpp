@@ -336,6 +336,11 @@ static tCIDLib::TVoid ShowSysInfo()
             throw TKrnlError::kerrLast();
         strmOut << kstrTmp.pszValue() << EndLn;
     }
+     else
+    {
+        strmOut << EndLn;
+    }
+    
 
     strmOut << L"    Def IPV6 Addr: ";
     if (TKrnlIP::bIPV6Avail())
@@ -343,6 +348,10 @@ static tCIDLib::TVoid ShowSysInfo()
         if (!TKrnlIP::bTextFromIPAddr(kipaDefAddrV6, kstrTmp))
             throw TKrnlError::kerrLast();
         strmOut << kstrTmp.pszValue() << EndLn;
+    }
+     else
+    {
+        strmOut << EndLn;
     }
 
     // Set the format to hex

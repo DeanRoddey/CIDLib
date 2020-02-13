@@ -527,10 +527,9 @@ tCIDLib::TBoolean TKrnlModule::bPlatCleanup()
 }
 
 
-tCIDLib::TBoolean
-TKrnlModule::bLoadPlatByName(const tCIDLib::EModTypes eModType)
+tCIDLib::TBoolean TKrnlModule::bLoadPlatByName()
 {
-    if (eModType == tCIDLib::EModTypes::Exe)
+    if (m_eModType == tCIDLib::EModTypes::Exe)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidParameter);
         return kCIDLib::False;
@@ -573,12 +572,11 @@ TKrnlModule::bLoadPlatByName(const tCIDLib::EModTypes eModType)
 }
 
 
-tCIDLib::TBoolean
-TKrnlModule::bQueryPlatByName(const tCIDLib::EModTypes eModType)
+tCIDLib::TBoolean TKrnlModule::bQueryPlatByName()
 {
     tCIDLib::TCh szRealPath[kCIDLib::c4MaxPathLen + 1];
 
-    if (eModType == tCIDLib::EModTypes::SharedLib)
+    if (m_eModType == tCIDLib::EModTypes::SharedLib)
     {
         if (!CIDKernel_Module_Linux::bFindSharedLibrary(m_kstrLoadName.pszValue(), szRealPath, c4MaxBufChars(szRealPath)))
             return kCIDLib::False;
@@ -612,12 +610,18 @@ TKrnlModule::bQueryPlatByName(const tCIDLib::EModTypes eModType)
 
         m_hmodThis.m_phmodiThis->pHandle = pTmp;
     }
-    else
+     else if (m_eModType == tCIDLib::EModTypes::Exe)
     {
         if (!CIDKernel_Module_Linux::bFindExecutable(m_kstrLoadName.pszValue(), szRealPath, c4MaxBufChars(szRealPath)))
             return kCIDLib::False;
         m_hmodThis.m_phmodiThis->pHandle = 0;
     }
+    else
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidParameter);
+        return kCIDLib::False;        
+    }
+    
 
     tCIDLib::TCh szPathPart[kCIDLib::c4MaxPathLen + 1];
     TKrnlPathStr::bQueryPath(szRealPath, szPathPart, kCIDLib::c4MaxPathLen);
@@ -632,11 +636,9 @@ TKrnlModule::bQueryPlatByName(const tCIDLib::EModTypes eModType)
 //  so something like a CQC device driver. We get the path that it's in. This
 //  is after the names and type are set.
 //
-tCIDLib::TBoolean
-TKrnlModule::bLoadPlatByPath(const  tCIDLib::TCh* const pszLoadPath
-                            , const tCIDLib::EModTypes  eModType)
+tCIDLib::TBoolean TKrnlModule::bLoadPlatByPath(const  tCIDLib::TCh* const pszLoadPath)
 {
-    if (eModType == tCIDLib::EModTypes::Exe)
+    if (m_eModType == tCIDLib::EModTypes::Exe)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidParameter);
         return kCIDLib::False;

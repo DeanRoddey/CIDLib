@@ -32,6 +32,8 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
+#include    <ifaddrs.h>
+#include    <net/if.h>
 
 
 namespace CIDKernel_IP_Linux
@@ -73,50 +75,6 @@ namespace CIDKernel_IP_Linux
     const tCIDLib::TCard4 c4ErrCount = tCIDLib::c4ArrayElems(CIDKernel_IP_Linux::amapErrors);
 
 
-
-    // ---------------------------------------------------------------------------
-    //  Local functions
-    // ---------------------------------------------------------------------------
-    static tCIDLib::TBoolean
-    bQueryHostIPAddrs(  const   tCIDLib::TSCh* const    pszHostName
-                        ,       tCIDLib::TIPAddr* const aipaToFill
-                        , const tCIDLib::TCard4         c4MaxAddrs
-                        ,       tCIDLib::TCard4&        c4AddrsFound)
-    {
-        // Get the host info for the passed worksation name
-        struct hostent* pHostInfo = ::gethostbyname(pszHostName);
-
-        if (!pHostInfo)
-        {
-            TKrnlError::SetLastKrnlError(TKrnlIP::c4XlatError(h_errno), h_errno);
-            return kCIDLib::False;
-        }
-
-        //
-        //  Give back the caller as many elements as we can fit into his
-        //  buffer.
-        //
-        tCIDLib::TCard4 c4Index = 0;
-        while ((pHostInfo->h_addr_list[c4Index] != 0)
-        &&     (c4Index < c4MaxAddrs))
-        {
-            aipaToFill[c4Index] = *(tCIDLib::TIPAddr*)(pHostInfo->h_addr_list[c4Index]);
-            c4Index++;
-        }
-
-        //
-        //  And continue to count up to see if there were any that could not
-        //  fit into the caller's buffer.
-        //
-        while (pHostInfo->h_addr_list[c4Index] != 0)
-            c4Index++;
-
-        // And return the number that were available
-        c4AddrsFound = c4Index;
-
-        return kCIDLib::True;
-    }
-
     //
     //  This is the version of the host TCP/IP support that we are using.
     //  It is saved here during init and used by the TCP/IP version support
@@ -132,6 +90,10 @@ namespace CIDKernel_IP_Linux
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TCIDKrnlModule::bInitTermIP(const tCIDLib::EInitTerm)
 {
+    // For now, default the TCP/IP version until we figure out how to get it
+    CIDKernel_IP_Linux::c2Version = 0x0100;
+
+
     return kCIDLib::True;
 }
 
@@ -156,7 +118,8 @@ TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const     pszAppPath
 // <TBD> These need to be implemented
 tCIDLib::TBoolean TKrnlIP::bIPV4Avail()
 {
-    return kCIDLib::False;
+    // For now just say yes
+    return kCIDLib::True;
 }
 
 tCIDLib::TBoolean TKrnlIP::bIPV6Avail()
@@ -199,14 +162,48 @@ tCIDLib::TBoolean TKrnlIP::bQueryAdaptorList(TKrnlLList<TAdaptorInfo>& kllstToFi
 tCIDLib::TBoolean
 TKrnlIP::bQueryDefLocalAddr(TKrnlIPAddr& kipaToFill, const tCIDSock::EAddrTypes eType)
 {
-    return kCIDLib::False;
+    ifaddrs* myAddrs;
+    const int res = ::getifaddrs(&myAddrs);
+    if (res)
+    {
+        TKrnlError::SetLastKrnlError(c4XlatError(res), res);
+        return kCIDLib::False;
+    }
+
+    tCIDLib::TBoolean bRet = kCIDLib::False;
+    tCIDLib::TIPPortNum ippnDummy;
+    TKrnlIPAddr kipaNew;
+    ifaddrs* ifa = myAddrs;
+    while (ifa && !bRet)
+    {
+        if (ifa->ifa_addr && (ifa->ifa_flags & IFF_UP))
+        {
+            if ((ifa->ifa_addr->sa_family == AF_INET)
+            &&  ((eType == tCIDSock::EAddrTypes::IPV4)
+            ||   (eType == tCIDSock::EAddrTypes::Unspec)))
+            {
+                bRet = kipaNew.bFromSockAddr((sockaddr_in*)ifa->ifa_addr, sizeof(sockaddr_in), ippnDummy);
+            }
+             else if ((ifa->ifa_addr->sa_family == AF_INET6)
+                  &&  ((eType == tCIDSock::EAddrTypes::IPV6)
+                  ||   (eType == tCIDSock::EAddrTypes::Unspec)))
+            {
+                bRet = kipaNew.bFromSockAddr((sockaddr_in6*)ifa->ifa_addr, sizeof(sockaddr_in6), ippnDummy);
+            }
+        }
+
+        ifa = ifa->ifa_next;
+    }
+    ::freeifaddrs(myAddrs);
+
+    return bRet;
 }
 
 
 
 tCIDLib::TBoolean
 TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
-                            ,       TKrnlLList<TKrnlIPAddr>&    kllstAddrs
+                            ,       TKrnlLList<TKrnlIPAddr>&    kllstToFill
                             , const tCIDSock::EAddrInfoFlags    eFlags
                             , const tCIDLib::TBoolean           bIncludeLoopback
                             , const tCIDLib::TBoolean           bAppend)
@@ -218,16 +215,90 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
         return kCIDLib::False;
     }
 
-    // <TBD> This has been completed changed and has to be redone
-    /*
-    tCIDLib::TSCh* pszHostCopy = TRawStr::pszConvert(pszHostName);
-    TArrayJanitor<tCIDLib::TSCh> janHost(pszHostCopy);
+    // If they passed a null or empty string, get the local host name
+    TKrnlString kstrHost;
+    const tCIDLib::TCh* pszName = pszHostName;
+    if (!pszHostName || !pszHostName)
+    {
+        if (!bQueryLocalName(kstrHost))
+            return kCIDLib::False;
+        pszName = kstrHost.pszValue();
+    }
 
-    return CIDKernel_IP_Linux::bQueryHostIPAddrs(pszHostCopy
-                               , aipaToFill
-                               , c4MaxAddrs
-                               , c4AddrsFound);
-    */
+    tCIDLib::TSCh* pszHostCopy = TRawStr::pszConvert(pszName);
+    TArrayJanitor<tCIDLib::TSCh> janHost(pszHostCopy);    
+
+    addrinfo aiHints = {0};
+    aiHints.ai_flags = AI_CANONNAME;
+    aiHints.ai_flags = PF_UNSPEC;
+
+    if (tCIDLib::bAllBitsOn(eFlags, tCIDSock::EAddrInfoFlags::Passive))
+        aiHints.ai_flags = AI_PASSIVE;    
+
+    addrinfo* pInfo;
+    const int res = ::getaddrinfo(pszHostCopy, nullptr, &aiHints, &pInfo);
+    if (res)
+    {
+        // If that failed, then give up
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddrString, res);
+        return kCIDLib::False;       
+    }
+
+    // If not appending, then clear the list
+    if (!bAppend)
+        kllstToFill.RemoveAll();
+
+    tCIDLib::TIPPortNum ippnDummy = 0;
+    TKrnlIPAddr         kipaNew;
+    while (pInfo)
+    {
+        sockaddr* pAddr = (sockaddr*)pInfo->ai_addr;
+
+        // If it's one we care about, then take it
+        if ((pAddr->sa_family == AF_INET) || (pAddr->sa_family == AF_INET6))
+        {
+            // If we set it sucessfully, then save it
+            if (kipaNew.bFromSockAddr(pAddr, pInfo->ai_addrlen, ippnDummy))
+                kllstToFill.pobjAddNew(new TKrnlIPAddr(kipaNew));
+        }
+        pInfo = pInfo->ai_next;
+    }
+
+    // Let the info go
+    ::freeaddrinfo(pInfo);
+
+    //
+    //  If the asked for loopbacks and they didn't pass localhost or an empty
+    //  string, then do a separate pass for those.
+    //
+    if (bIncludeLoopback && !TRawStr::bCompareStrI(pszName, L"localhost") && *pszName)
+    {
+        if (::getaddrinfo("localhost", 0, &aiHints, &pInfo))
+        {
+            // If that failed, then give up
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddrString);
+            return kCIDLib::False;
+        }
+
+        // Now start working through the items
+        tCIDLib::TIPPortNum ippnDummy;
+        while (pInfo)
+        {
+            sockaddr* pAddr = (sockaddr*)pInfo->ai_addr;
+
+            // If it's one we care about, then take it
+            if ((pAddr->sa_family == AF_INET) || (pAddr->sa_family == AF_INET6))
+            {
+                // If we set it sucessfully, then save it
+                if (kipaNew.bFromSockAddr(pAddr, pInfo->ai_addrlen, ippnDummy))
+                    kllstToFill.pobjAddNew(new TKrnlIPAddr(kipaNew));
+            }
+            pInfo = pInfo->ai_next;
+        }
+
+        // Let the info go
+        ::freeaddrinfo(pInfo);
+    }
 
     return kCIDLib::False;
 }
