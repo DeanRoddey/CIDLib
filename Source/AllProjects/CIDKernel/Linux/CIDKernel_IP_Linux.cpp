@@ -182,13 +182,13 @@ TKrnlIP::bQueryDefLocalAddr(TKrnlIPAddr& kipaToFill, const tCIDSock::EAddrTypes 
             &&  ((eType == tCIDSock::EAddrTypes::IPV4)
             ||   (eType == tCIDSock::EAddrTypes::Unspec)))
             {
-                bRet = kipaNew.bFromSockAddr((sockaddr_in*)ifa->ifa_addr, sizeof(sockaddr_in), ippnDummy);
+                bRet = kipaToFill.bFromSockAddr((sockaddr_in*)ifa->ifa_addr, sizeof(sockaddr_in), ippnDummy);
             }
              else if ((ifa->ifa_addr->sa_family == AF_INET6)
                   &&  ((eType == tCIDSock::EAddrTypes::IPV6)
                   ||   (eType == tCIDSock::EAddrTypes::Unspec)))
             {
-                bRet = kipaNew.bFromSockAddr((sockaddr_in6*)ifa->ifa_addr, sizeof(sockaddr_in6), ippnDummy);
+                bRet = kipaToFill.bFromSockAddr((sockaddr_in6*)ifa->ifa_addr, sizeof(sockaddr_in6), ippnDummy);
             }
         }
 
@@ -339,12 +339,10 @@ TKrnlIP::bQueryLocalName(TKrnlString& kstrToFill)
 tCIDLib::TBoolean
 TKrnlIP::bQueryNameByAddr(const TKrnlIPAddr& kipaToQuery, TKrnlString& kstrToFill)
 {
-    /*
     // And get the host info for the indicated address
-    struct hostent* pHostInfo = ::gethostbyaddr(reinterpret_cast<tCIDLib::TSCh*>(kipaToQuery.),
-                                                sizeof(ipaToQuery),
-                                                AF_INET);
-
+    tCIDLib::TCard4 c4Size;
+    tCIDLib::TIPPortNum ippnAt;
+    struct hostent* pHostInfo = ::gethostbyaddr(kipaToQuery.pc1ToSockAddr(c4Size, ippnAt), c4Size, AF_INET);
     if (!pHostInfo)
     {
         TKrnlError::SetLastKrnlError(c4XlatError(h_errno), h_errno);
@@ -353,8 +351,6 @@ TKrnlIP::bQueryNameByAddr(const TKrnlIPAddr& kipaToQuery, TKrnlString& kstrToFil
 
     kstrToFill = pHostInfo->h_name;
     return kCIDLib::True;
-    */
-   return kCIDLib::False;
 }
 
 
@@ -375,9 +371,11 @@ TKrnlIP::bQueryTCPVersion(     tCIDLib::TCard4&    c4MajVersion
 tCIDLib::TBoolean
 TKrnlIP::bTextFromIPAddr(const TKrnlIPAddr& kipaCvt, TKrnlString& kstrToFill)
 {
-    /*
     // Try the conversion
-    tCIDLib::TSCh* pszTmp = inet_ntoa(*(in_addr*)&ipaToConvert);
+    tCIDLib::TCard4 c4Size;
+    tCIDLib::TIPPortNum ippnAt;    
+    tCIDLib::TSCh* pszTmp = inet_ntoa(*(in_addr*)kipaCvt.pc1ToSockAddr(c4Size, ippnAt));    
+    
 
     // See if it failed and throw and exception if so
     if (!pszTmp)
@@ -387,12 +385,8 @@ TKrnlIP::bTextFromIPAddr(const TKrnlIPAddr& kipaCvt, TKrnlString& kstrToFill)
     }
 
     // Get into the caller's buffer
-    TRawStr::pszConvert(pszTmp, pszToFill, c4MaxChars);
-
+    kstrToFill = pszTmp;
     return kCIDLib::True;
-    */
-
-   return kCIDLib::False;
 }
 
 

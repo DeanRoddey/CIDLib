@@ -2156,11 +2156,11 @@ TRawStr::pszConvert(const   tCIDLib::TSCh* const    pszToConvert
 tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
 {
     tCIDLib::TCh* pszNew = nullptr;
-
+    tCIDLib::TCard4 c4NeededChars = 0;
     if (pszToConvert)
     {
         // Calc the size required for this string
-        tCIDLib::TCard4 c4NeededChars = tCIDLib::TCard4(-1);
+        c4NeededChars = tCIDLib::TCard4(-1);
         if (CIDStrOp_CalcWCSize(pszToConvert, c4NeededChars) && c4NeededChars)
         {
             // Allocate a buffer big enough, plus 1 to be safe
@@ -2177,7 +2177,12 @@ tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
         }
     }
 
-    if (!pszNew)
+    // If we didn't get it, create an empty one. If we did, terminate it
+    if (pszNew)
+    {
+        pszNew[c4NeededChars] = kCIDLib::chNull;
+    }
+     else
     {
         pszNew = new tCIDLib::TCh[1];
         pszNew[0] = kCIDLib::chNull;
@@ -2245,7 +2250,7 @@ tCIDLib::TSCh* TRawStr::pszConvert(const tCIDLib::TCh* const pszToConvert)
     {
         pszNew[c4NeededBytes] = 0;
     }
-    else
+     else
     {
         pszNew = new tCIDLib::TSCh[1];
         pszNew[0] = kCIDLib::chNull;
