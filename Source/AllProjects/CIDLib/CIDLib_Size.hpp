@@ -241,7 +241,7 @@ class CIDLIBEXP TSize :
 
         tCIDLib::TVoid Exchange()
         {
-            tCIDLib::TCard4 i4Tmp = m_c4CX;
+            const tCIDLib::TCard4 i4Tmp = m_c4CX;
             m_c4CX = m_c4CY;
             m_c4CY = i4Tmp;
         }

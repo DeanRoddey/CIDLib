@@ -124,8 +124,8 @@ class CIDXMLEXP TXMLCharFlags
 inline tCIDLib::TBoolean
 TXMLCharFlags::bIsFirstNameChar(const tCIDLib::TCh chToCheck)
 {
-    static const tCIDLib::TCard1 c1NameMask = kCIDXML::c1BaseChar
-                                              | kCIDXML::c1LetterChar;
+    static constexpr tCIDLib::TCard1 c1NameMask = kCIDXML::c1BaseChar
+                                                  | kCIDXML::c1LetterChar;
 
     // Do the obvious check first and return success if ok
     if ((s_ac1CharFlags[chToCheck] & c1NameMask) != 0)

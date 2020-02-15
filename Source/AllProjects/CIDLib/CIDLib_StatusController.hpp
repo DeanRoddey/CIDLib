@@ -43,17 +43,19 @@ class CIDLIBEXP TStatusController : public TObject
         // -------------------------------------------------------------------
         //  Constuctors and Destructor
         // -------------------------------------------------------------------
-        TStatusController() {};
+        TStatusController() {}
 
         TStatusController(const TStatusController&) = delete;
+        TStatusController(TStatusController&&) = delete;
 
-        ~TStatusController() {};
+        ~TStatusController() {}
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TStatusController& operator=(const TStatusController&) = delete;
+        TStatusController& operator=(TStatusController&&) = delete;
 
 
         // -------------------------------------------------------------------

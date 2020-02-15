@@ -57,9 +57,9 @@ TTextConverter::c4ConvertFrom(  TBinInStream&       strmSrc
     const tCIDLib::TCard4   c4InBufSz = 4096;
     const tCIDLib::TCard4   c4OutBufSz = 2048;
     tCIDLib::TCard1         ac1SrcBuf[c4InBufSz];
-    tCIDLib::TCh            achOutBuf[c4OutBufSz + 1];
+    tCIDLib::TCh            achOutBuf[c4OutBufSz + 1] = L"";
     tCIDLib::TBoolean       bStop = kCIDLib::False;
-    tCIDLib::TCard4         c4CurChars;
+    tCIDLib::TCard4         c4CurChars = 0;
     tCIDLib::TCard4         c4BytesEaten = 0;
     while (!strmSrc.bEndOfStream())
     {
@@ -136,9 +136,9 @@ TTextConverter::c4ConvertFrom(  const   tCIDLib::TCard1* const  pc1Src
     //  we've filled the buffer or used up the source.
     //
     const tCIDLib::TCard4   c4BufSz = 2048;
-    tCIDLib::TCh            achBuf[c4BufSz + 1];
+    tCIDLib::TCh            achBuf[c4BufSz + 1] = L"";
     tCIDLib::TBoolean       bStop = kCIDLib::False;
-    tCIDLib::TCard4         c4CurChars;
+    tCIDLib::TCard4         c4CurChars = 0;
     tCIDLib::TCard4         c4SrcDone = 0;
     while (c4SrcDone < c4SrcBytes)
     {
@@ -201,7 +201,7 @@ TTextConverter::c4ConvertTo(TTextInStream&      strmSrc
                             , tCIDLib::TCard4&  c4OutBytes)
 {
     const tCIDLib::TCard4   c4InBufSz = 2048;
-    tCIDLib::TCh            achInBuf[c4InBufSz];
+    tCIDLib::TCh            achInBuf[c4InBufSz] = L"";
     const tCIDLib::TCard4   c4OutBufSz = c4InBufSz * kCIDLib::c4MaxUTF8Bytes;
     tCIDLib::TCard1         ac1OutBuf[c4OutBufSz];
     tCIDLib::TBoolean       bStop = kCIDLib::False;
@@ -276,7 +276,7 @@ TTextConverter::c4ConvertTo(const   tCIDLib::TCh* const pszSrc
     const tCIDLib::TCard4   c4BufSz = 2048;
     tCIDLib::TCard1         ac1Buf[c4BufSz];
     tCIDLib::TBoolean       bStop = kCIDLib::False;
-    tCIDLib::TCard4         c4CurBytes;
+    tCIDLib::TCard4         c4CurBytes = 0;
     tCIDLib::TCard4         c4SrcDone = 0;
     while (c4SrcDone < c4SrcChars)
     {
@@ -317,7 +317,7 @@ TTextConverter::c4ConvertTo(const   tCIDLib::TCh* const     pszSrc
     const tCIDLib::TCard4   c4BufSz = 2048;
     tCIDLib::TCard1         ac1Buf[c4BufSz];
     tCIDLib::TBoolean       bStop = kCIDLib::False;
-    tCIDLib::TCard4         c4CurBytes;
+    tCIDLib::TCard4         c4CurBytes = 0;
     tCIDLib::TCard4         c4SrcDone = 0;
 
     c4OutBytes = 0;

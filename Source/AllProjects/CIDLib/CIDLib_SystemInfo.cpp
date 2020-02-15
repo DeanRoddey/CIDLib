@@ -352,7 +352,7 @@ TSysInfo::bFindCmdLineParm( const   TString&            strFind
     {
         const TString& strCur = s_pcolCmdLineParms->objAt(c4Index);
 
-        tCIDLib::TBoolean bMatch;
+        tCIDLib::TBoolean bMatch = kCIDLib::False;
         if (bCase)
             bMatch = strCur.bCompare(strFind);
         else
@@ -382,7 +382,7 @@ TSysInfo::bFindCmdLinePref( const   TString&            strPref
     {
         const TString& strCur = s_pcolCmdLineParms->objAt(c4Index);
 
-        tCIDLib::TBoolean bMatch;
+        tCIDLib::TBoolean bMatch = kCIDLib::False;
         if (bCase)
             bMatch = strCur.bStartsWith(strPref);
         else
@@ -433,7 +433,7 @@ tCIDLib::TBoolean TSysInfo::bQueryLatLong(  tCIDLib::TFloat8&   f8Lat
 
         if (pszLat && pszLong)
         {
-            tCIDLib::TBoolean bLatGood, bLongGood;
+            tCIDLib::TBoolean bLatGood = kCIDLib::False, bLongGood = kCIDLib::False;
             f8Lat = TRawStr::f8AsBinary(pszLat, bLatGood);
             f8Long = TRawStr::f8AsBinary(pszLong, bLongGood);
 
@@ -688,7 +688,7 @@ TTextOutStream& TSysInfo::strmErr()
         if (!TAtomic::pFencedGet(&s_pstrmErr))
         {
             // If not redirected, use the output stream
-            TTextOutStream* pstrmSet;
+            TTextOutStream* pstrmSet = nullptr;
             if (TFileSys::bIsRedirected(tCIDLib::EStdFiles::StdErr))
                 pstrmSet = new TTextFileOutStream(tCIDLib::EStdFiles::StdErr);
             else
@@ -709,7 +709,7 @@ TTextInStream& TSysInfo::strmIn()
         TBaseLock lockInit;
         if (!TAtomic::pFencedGet(&s_pstrmIn))
         {
-            TTextInStream* pstrmSet;
+            TTextInStream* pstrmSet = nullptr;
             if (TFileSys::bIsRedirected(tCIDLib::EStdFiles::StdIn))
                 pstrmSet =  new TTextFileInStream(tCIDLib::EStdFiles::StdIn);
             else
@@ -730,7 +730,7 @@ TTextOutStream& TSysInfo::strmOut()
         TBaseLock lockInit;
         if (!TAtomic::pFencedGet(&s_pstrmOut))
         {
-            TTextOutStream* pstrmSet;
+            TTextOutStream* pstrmSet = nullptr;
             if (TFileSys::bIsRedirected(tCIDLib::EStdFiles::StdOut))
                 pstrmSet = new TTextFileOutStream(tCIDLib::EStdFiles::StdOut);
             else
@@ -878,53 +878,49 @@ tCIDLib::TVoid TSysInfo::DoInit()
             {
                 s_pstrDefModuleLog = new TString(pszVal + 11);
             }
-            else if (TRawStr::bCompareStrI(pszVal, L"/TestMode"))
+             else if (TRawStr::bCompareStrI(pszVal, L"/TestMode"))
             {
                 s_bTestMode = kCIDLib::True;
             }
-            else if (TRawStr::bCompareStrI(pszVal, L"/InstallMode"))
+             else if (TRawStr::bCompareStrI(pszVal, L"/InstallMode"))
             {
                 s_bInstallMode = kCIDLib::True;
             }
-            else if (TRawStr::bCompareStrNI(pszVal, L"/LocalLog=", 10))
+             else if (TRawStr::bCompareStrNI(pszVal, L"/LocalLog=", 10))
             {
                 s_pszLogInfo = TRawStr::pszReplicate(pszVal + 10);
             }
-            else if (TRawStr::bCompareStrNI(pszVal, L"/NSAddr=", 8))
+             else if (TRawStr::bCompareStrNI(pszVal, L"/NSAddr=", 8))
             {
                 s_pstrNSAddr = new TString(pszVal + 8);
             }
-            else if (TRawStr::bCompareStrNI(pszVal, L"/GlobalLogMode=", 15))
+             else if (TRawStr::bCompareStrNI(pszVal, L"/GlobalLogMode=", 15))
             {
                 //
                 //  We need to set the global logging mode, which is set
                 //  statically on the TFacility class.
                 //
-                tCIDLib::ESeverities eToSet;
+                tCIDLib::ESeverities eToSet = tCIDLib::ESeverities::Status;
                 pszVal += 15;
                 if (TRawStr::bCompareStrI(pszVal, L"Info"))
                 {
                     eToSet = tCIDLib::ESeverities::Info;
                 }
-                else if (TRawStr::bCompareStrI(pszVal, L"Warn"))
+                 else if (TRawStr::bCompareStrI(pszVal, L"Warn"))
                 {
                     eToSet = tCIDLib::ESeverities::Warn;
                 }
-                else if (TRawStr::bCompareStrI(pszVal, L"Failed"))
+                 else if (TRawStr::bCompareStrI(pszVal, L"Failed"))
                 {
                     eToSet = tCIDLib::ESeverities::Failed;
                 }
-                else if (TRawStr::bCompareStrI(pszVal, L"ProcFatal"))
+                 else if (TRawStr::bCompareStrI(pszVal, L"ProcFatal"))
                 {
                     eToSet = tCIDLib::ESeverities::ProcFatal;
                 }
-                else if (TRawStr::bCompareStrI(pszVal, L"SysFatal"))
+                 else if (TRawStr::bCompareStrI(pszVal, L"SysFatal"))
                 {
                     eToSet = tCIDLib::ESeverities::SysFatal;
-                }
-                else
-                {
-                    eToSet = tCIDLib::ESeverities::Status;
                 }
                 TFacility::eGlobalLogMode(eToSet);
             }
@@ -936,7 +932,7 @@ tCIDLib::TVoid TSysInfo::DoInit()
         }
 
         // Use a local buffer plenty long enough for the strings we'll load
-        tCIDLib::TCh szTmp[kCIDLib::c4MaxPathLen];
+        tCIDLib::TCh szTmp[kCIDLib::c4MaxPathLen] = L"";
 
         //
         //  If there wasn't an explicit entry for the Name Server address, then

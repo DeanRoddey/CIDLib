@@ -52,10 +52,10 @@ TXMLEntityMgr::TXMLEntityMgr() :
     , m_bIgnoreBadChars(kCIDLib::False)
     , m_bThrowAtEnd(kCIDLib::False)
     , m_c4StackTop(0)
-    , m_pcolEntityStack(0)
-    , m_pmxevEntityEvents(0)
-    , m_pxdeclCurrent(0)
-    , m_pxesCurrent(0)
+    , m_pcolEntityStack(nullptr)
+    , m_pmxevEntityEvents(nullptr)
+    , m_pxdeclCurrent(nullptr)
+    , m_pxesCurrent(nullptr)
 {
     //
     //  Create the entity stack. For the average file, 32 nested entitied deep

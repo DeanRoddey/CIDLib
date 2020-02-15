@@ -1170,9 +1170,10 @@ TCppGenerator::GenMethod(const  TString&            strName
                 facCIDIDL.GenErr(CID_FILE, CID_LINE, kIDLErrs::errcGen_PollMethRet, strName);
         }
 
-        // Write out the opening part, ret type and method name
-        m_strmImpl  << strRetType
-                    << L" " << m_strClientClass << L"::" << strName;
+        //
+        //  Set up the return type and method name
+        //
+        m_strmImpl  << strRetType << L" " << m_strClientClass << L"::" << strName;
 
         //
         //  See how many params we have. If zero, we do a simpler scheme where
@@ -1235,12 +1236,13 @@ TCppGenerator::GenMethod(const  TString&            strName
 
         //
         //  If there was a return value, then create the local that we
-        //  will stream it into.
+        //  will stream it into. We have to supress an analyzer warning about
+        //  it not being initialized. It will be later.
         //
         if (bNonVoidRet)
         {
-            m_strmImpl  << L"    "
-                        << strRetType <<  L" retVal;\n";
+            m_strmImpl  << L"    #pragma warning(suppress : 26494)\n"
+                        << L"    " << strRetType <<  L" retVal;\n";
         }
 
         //

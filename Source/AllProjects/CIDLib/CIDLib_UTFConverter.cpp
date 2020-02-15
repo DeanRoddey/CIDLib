@@ -538,7 +538,7 @@ TUTFConverter::c4BlockTo(const  tCIDLib::TCh* const     pszSrc
                 }
 
                 // Figure out how many bytes we need
-                tCIDLib::TCard4 c4EncBytes;
+                tCIDLib::TCard4 c4EncBytes = 0;
                 if (c4Val < 0x80)
                     c4EncBytes = 1;
                 else if (c4Val < 0x800)

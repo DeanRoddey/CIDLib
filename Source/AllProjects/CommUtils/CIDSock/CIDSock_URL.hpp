@@ -232,6 +232,11 @@ class CIDSOCKEXP TURL :
 
         TURL(const TURL&) = default;
 
+        TURL
+        (
+                    TURL&&                  urlSrc
+        );
+
         ~TURL();
 
 
@@ -240,15 +245,20 @@ class CIDSOCKEXP TURL :
         // -------------------------------------------------------------------
         TURL& operator=(const TURL&) = default;
 
+        TURL& operator=
+        (
+                    TURL&&                  urlSrc
+        );
+
         tCIDLib::TBoolean operator==
         (
-            const   TURL&                   urlToCompare
+            const   TURL&                   urlSrc
         )   const;
 
-        tCIDLib::TBoolean operator!=
-        (
-            const   TURL&                   urlToCompare
-        )   const;
+        tCIDLib::TBoolean operator!=(const TURL& urlSrc) const
+        {
+            return !operator==(urlSrc);
+        }
 
 
         // -------------------------------------------------------------------

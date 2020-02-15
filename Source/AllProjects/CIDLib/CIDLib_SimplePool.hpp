@@ -645,7 +645,7 @@ template<typename TElem> class TSimplePool : public TObject, public MLockable
             TLocker lockrSync(m_pmtxSync);
 
             // Find this guy in the used list, which is by address
-            tCIDLib::TCard4 c4AtUsed;
+            tCIDLib::TCard4 c4AtUsed = kCIDLib::c4MaxCard;
             if (!m_colUsedList.pobjBinarySearch(*pobjToRelease, eCompAddr, c4AtUsed))
             {
                 //

@@ -303,7 +303,7 @@ TThreadWaitList::bWaitOnList(       TLocker&        lockSync
 // ---------------------------------------------------------------------------
 tCIDLib::TCard4 TThreadWaitList::c4AddToList(const tCIDLib::TCard4 c4Reason)
 {
-    tCIDLib::TCard4 c4Index;
+    tCIDLib::TCard4 c4Index = 0;
 
     // If we need to expand the list, then do it now
     if (m_c4ActiveCount == m_c4CurAlloc)

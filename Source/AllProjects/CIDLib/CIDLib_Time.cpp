@@ -756,8 +756,8 @@ const TString& TTime::strTimeZoneName()
         TBaseLock lockInit;
         if (!atomInitDone)
         {
-            tCIDLib::TInt4 i4TZOfs;
-            tCIDLib::TZStr64 szTZName;
+            tCIDLib::TInt4 i4TZOfs = 0;
+            tCIDLib::TZStr64 szTZName = L"";
             if (!TKrnlTimeStamp::bTZOffset(i4TZOfs)
             ||  !TKrnlTimeStamp::bTZName(szTZName, c4MaxBufChars(szTZName)))
             {
@@ -1412,8 +1412,8 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
     EStates eState = EStates::StartWS;
 
     // Default ones that don't have to be provided
-    tCIDLib::TCard4 c4Year;
-    tCIDLib::TCard4 c4Month;
+    tCIDLib::TCard4 c4Year = 0;
+    tCIDLib::TCard4 c4Month = 0;
     tCIDLib::TCard4 c4Day = 1;
     tCIDLib::TCard4 c4Hour = 0;
     tCIDLib::TCard4 c4Min = 0;
@@ -1431,7 +1431,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
         tCIDLib::TBoolean   bSkippedDay = kCIDLib::True;
         tCIDLib::TCard4     c4Count = strToParse.c4Length();
         tCIDLib::TCard4     c4Index = 0;
-        tCIDLib::TFloat8    f8DecVal;
+        tCIDLib::TFloat8    f8DecVal = 0;
         TString             strTmp;
 
         while (c4Index < c4Count)
@@ -2656,9 +2656,9 @@ TTime::ParseFromText(const  TString&        strSrc
     // Set up an input stream on the src string
     TTextStringInStream strmSrc(&strSrc);
 
-    tCIDLib::TCh    chCur;
-    tCIDLib::TCard4 c4Count;
-    tCIDLib::TInt4  i4Val;
+    tCIDLib::TCh    chCur = kCIDLib::chNull;
+    tCIDLib::TCard4 c4Count = 0;
+    tCIDLib::TInt4  i4Val = 0;
     TString         strTok;
     while (c4FmtIndex < c4FmtLen)
     {

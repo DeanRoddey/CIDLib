@@ -81,7 +81,13 @@ class CIDSOCKEXP TIPAddress :
 
         TIPAddress(const TIPAddress& ipaSrc) :
 
-            TIPAddress()
+            m_kipaThis(ipaSrc.m_kipaThis)
+            , m_strHostName(ipaSrc.m_strHostName)
+            , m_strTextVersion(ipaSrc.m_strTextVersion)
+        {
+        }
+
+        TIPAddress(TIPAddress&& ipaSrc)
         {
             *this = tCIDLib::ForceMove(ipaSrc);
         }
@@ -92,12 +98,27 @@ class CIDSOCKEXP TIPAddress :
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TIPAddress& operator=(const TIPAddress&) = default;
+        TIPAddress& operator=(const TIPAddress& ipaSrc)
+        {
+            if (&ipaSrc != this)
+            {
+                m_kipaThis = ipaSrc.m_kipaThis;
+                m_strHostName = ipaSrc.m_strHostName;
+                m_strTextVersion = ipaSrc.m_strTextVersion;
+            }
+            return *this;
+        }
 
-        TIPAddress& operator=
-        (
-                    TIPAddress&&            ipaSrc
-        );
+        TIPAddress& operator=(TIPAddress&& ipaSrc)
+        {
+            if (&ipaSrc != this)
+            {
+                tCIDLib::Swap(m_kipaThis, ipaSrc.m_kipaThis);
+                m_strHostName = tCIDLib::ForceMove(ipaSrc.m_strHostName);
+                m_strTextVersion = tCIDLib::ForceMove(ipaSrc.m_strTextVersion);
+            }
+            return *this;
+        }
 
         TIPAddress& operator=
         (

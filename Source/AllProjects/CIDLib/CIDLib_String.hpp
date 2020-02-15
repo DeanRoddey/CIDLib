@@ -1496,18 +1496,18 @@ class CIDLIBEXP TString :
                                         , const TOne                tOne
                                         , const TOthers...          tOthers)
         {
-            tCIDLib::TCh chFill;
-            tCIDLib::TCh chToken;
-            tCIDLib::TCard4 c4Width;
-            tCIDLib::TCard4 c4Precision;
-            tCIDLib::EHJustify eJustify;
+            tCIDLib::TCh chFill = kCIDLib::chNull;
+            tCIDLib::TCh chToken = kCIDLib::chNull;
+            tCIDLib::TCard4 c4Width = 0;
+            tCIDLib::TCard4 c4Precision = 0;
+            tCIDLib::EHJustify eJustify = tCIDLib::EHJustify::Count;
 
             //
             //  We have to loop until we get a token, since we could have text bits
             //  which we just copy straight out as text.
             //
             const tCIDLib::TCh* pszStart = pszFmt;
-            const tCIDLib::TCh* pszEnd;
+            const tCIDLib::TCh* pszEnd = nullptr;
             while (kCIDLib::True)
             {
                 const TString::ETokenFind eFindRes = TString::eFindToken

@@ -110,7 +110,7 @@ TQOutStreamImpl::c4WriteBytes(  const   tCIDLib::TVoid* const   pBuffer
     //  chunks of chars at a time.
     //
     const tCIDLib::TCard4   c4BufSz = 2047;
-    tCIDLib::TCh            achBuf[c4BufSz + 1];
+    tCIDLib::TCh            achBuf[c4BufSz + 1] = L"";
     tCIDLib::TCard4         c4CurChars = 0;
     tCIDLib::TCard4         c4CurIndex = 0;
     const tCIDLib::TCard1*  pc1Src = static_cast<const tCIDLib::TCard1*>(pBuffer);
@@ -228,7 +228,7 @@ TQOutStreamImpl::bQueryNewMsgs(         tCIDLib::TCard4&        c4MsgIndex
         //  provide all of the elements he wants, so adjust the actual
         //  index. Else, subtract the base to get the actual.
         //
-        tCIDLib::TCard4 c4Index;
+        tCIDLib::TCard4 c4Index = 0;
         if (c4MsgIndex < m_c4BaseIndex)
             c4Index = 0;
         else if (c4MsgIndex < c4LastIndex)
@@ -290,7 +290,7 @@ TQOutStreamImpl::bQueryNewMsgs( tCIDLib::TCard4&    c4MsgIndex
         //  provide all of the elements he wants, so adjust the actual
         //  index. Else, subtract the base to get the actual.
         //
-        tCIDLib::TCard4 c4Index;
+        tCIDLib::TCard4 c4Index = 0;
         if (c4MsgIndex < m_c4BaseIndex)
             c4Index = 0;
         else if (c4MsgIndex < c4LastIndex)

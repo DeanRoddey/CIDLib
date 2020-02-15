@@ -78,8 +78,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Spaces
         {
             public :
-                Spaces(const tCIDLib::TCard4 c4Count)
-                    : c4Count(c4Count)
+                explicit constexpr Spaces(const tCIDLib::TCard4 c4Count) : c4Count(c4Count)
                 {
                 }
                 tCIDLib::TCard4 c4Count;
@@ -88,8 +87,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Fill
         {
             public :
-                Fill(const tCIDLib::TCh chNewFill)
-                    : chFill(chNewFill)
+                explicit constexpr Fill(const tCIDLib::TCh chNewFill) : chFill(chNewFill)
                 {
                 }
                 tCIDLib::TCh chFill;
@@ -98,7 +96,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Justify
         {
             public :
-                Justify(const tCIDLib::EHJustify  eNewJustification)
+                explicit constexpr Justify(const tCIDLib::EHJustify  eNewJustification)
                     : eJustification(eNewJustification)
                 {
                 }
@@ -108,7 +106,8 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Precision
         {
             public :
-                Precision(const tCIDLib::TCard4 c4NewPrecision)
+                explicit constexpr Precision(const tCIDLib::TCard4 c4NewPrecision)
+
                     : c4Precision(c4NewPrecision)
                 {
                 }
@@ -118,8 +117,9 @@ class CIDLIBEXP TTextOutStream : public TObject
         class RepChars
         {
             public :
-                RepChars(   const   tCIDLib::TCh    chOutChar
-                            , const tCIDLib::TCard4 c4OutCount)
+                constexpr RepChars( const   tCIDLib::TCh    chOutChar
+                                    , const tCIDLib::TCard4 c4OutCount)
+
                     : chOut(chOutChar), c4Count(c4OutCount)
                 {
                 }
@@ -130,8 +130,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Radix
         {
             public :
-                Radix(const tCIDLib::ERadices eNewRadix)
-                    : eRadix(eNewRadix)
+                explicit constexpr Radix(const tCIDLib::ERadices eNewRadix) : eRadix(eNewRadix)
                 {
                 }
                 tCIDLib::ERadices eRadix;
@@ -140,8 +139,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Width
         {
             public :
-                Width(const tCIDLib::TCard4 c4NewWidth)
-                    : c4Width(c4NewWidth)
+                explicit constexpr Width(const tCIDLib::TCard4 c4NewWidth) : c4Width(c4NewWidth)
                 {
                 }
                 tCIDLib::TCard4 c4Width;
@@ -644,6 +642,7 @@ class CIDLIBEXP TStreamJanitor
         // -------------------------------------------------------------------
         TStreamJanitor() = delete;
 
+        #pragma warning(suppress : 26429) // It can legally be null
         TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
 
             m_pstrmToSanitize(pstrmToSanitize)

@@ -309,7 +309,7 @@ TTextOutStream& TTextOutStream::operator<<(const TTextOutStream::Width NewWidth)
 
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TBoolean bToWrite)
 {
-    tCIDLib::TZStr8 szTmp;
+    tCIDLib::TZStr8 szTmp = L"";
     if (bToWrite)
         TRawStr::CopyStr(szTmp, pszBool(bToWrite), c4MaxBufChars(szTmp));
     else
@@ -794,6 +794,7 @@ tCIDLib::TVoid TTextOutStream::Flush()
     //  output encoding.
     //
     const tCIDLib::TCard4 c4TmpBufSz = 2048;
+    #pragma warning(suppress : 26494) // Don't need to initialize this
     tCIDLib::TCard1 ac1TmpBuf[c4TmpBufSz];
 
     //
@@ -802,7 +803,7 @@ tCIDLib::TVoid TTextOutStream::Flush()
     //  many chars from the cache we've processed so far.
     //
     tCIDLib::TCard4 c4Count = 0;
-    tCIDLib::TCard4 c4OutCount;
+    tCIDLib::TCard4 c4OutCount = 0;
     while (c4Count < m_c4Index)
     {
         //

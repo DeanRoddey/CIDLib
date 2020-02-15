@@ -364,16 +364,28 @@ class TXMLEMStackJan
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TXMLEMStackJan() = delete;
+
         TXMLEMStackJan(TXMLEntityMgr* const pxemToRemove) :
 
             m_pxemToRemove(pxemToRemove)
         {
         }
 
+        TXMLEMStackJan(const TXMLEMStackJan&) = delete;
+        TXMLEMStackJan(TXMLEMStackJan&&) = delete;
+
         ~TXMLEMStackJan()
         {
             m_pxemToRemove->Reset();
         }
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLEMStackJan& operator=(const TXMLEMStackJan&) = delete;
+        TXMLEMStackJan& operator=(TXMLEMStackJan&&) = delete;
+
 
     private :
         // -------------------------------------------------------------------
@@ -397,6 +409,8 @@ class TXMLEMThrowJan
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TXMLEMThrowJan() = delete;
+
         TXMLEMThrowJan(         TXMLEntityMgr* const    pxemTarget
                         , const tCIDLib::TBoolean       bNewState) :
 
@@ -406,10 +420,20 @@ class TXMLEMThrowJan
             m_pxemTarget->m_bThrowAtEnd = bNewState;
         }
 
+        TXMLEMThrowJan(const TXMLEMThrowJan&) = delete;
+
         ~TXMLEMThrowJan()
         {
             m_pxemTarget->m_bThrowAtEnd = m_bOldState;
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLEMThrowJan& operator=(const TXMLEMThrowJan&) = delete;
+        TXMLEMThrowJan& operator=(TXMLEMThrowJan&&) = delete;
+
 
     private :
         // -------------------------------------------------------------------

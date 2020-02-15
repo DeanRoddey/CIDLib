@@ -688,7 +688,7 @@ TString::pszFindToken(  const   tCIDLib::TCh* const     pszSrc
     c4TokenCnt = 0;
 
     const tCIDLib::TCh* pszStart = pszSrc;
-    const tCIDLib::TCh* pszEnd;
+    const tCIDLib::TCh* pszEnd = nullptr;
     while (*pszStart)
     {
         tCIDLib::TCh chTokenChar;
@@ -1399,12 +1399,11 @@ tCIDLib::TVoid
 TString::AppendFormatted(const  tCIDLib::TFloat8    f8ToFmt
                         , const tCIDLib::TCard4     c4DecPlaces)
 {
-    tCIDLib::ETrailFmts eTrail;
-    if (c4DecPlaces)
-        eTrail = tCIDLib::ETrailFmts::Zeroes;
-    else
-        eTrail = tCIDLib::ETrailFmts::Ignore;
-    tCIDLib::TZStr512 szTmp;
+    const tCIDLib::ETrailFmts eTrail
+    (
+        c4DecPlaces == 0 ? tCIDLib::ETrailFmts::Ignore : tCIDLib::ETrailFmts::Zeroes
+    );
+    tCIDLib::TZStr512 szTmp = L"";
     if (!TRawStr::bFormatVal(f8ToFmt
                             , szTmp
                             , c4DecPlaces
@@ -1432,13 +1431,11 @@ TString::AppendFormatted(const  tCIDLib::TFloat8    f8ToFmt
                         , const tCIDLib::TCard4     c4GroupSize
                         , const tCIDLib::TCh        chGroupSep)
 {
-    tCIDLib::ETrailFmts eTrail;
-    if (c4DecPlaces)
-        eTrail = tCIDLib::ETrailFmts::Zeroes;
-    else
-        eTrail = tCIDLib::ETrailFmts::Ignore;
-
-    tCIDLib::TZStr512 szTmp;
+    const tCIDLib::ETrailFmts eTrail
+    (
+        c4DecPlaces == 0 ? tCIDLib::ETrailFmts::Ignore : tCIDLib::ETrailFmts::Zeroes
+    );
+    tCIDLib::TZStr512 szTmp = L"";
     if (!TRawStr::bFormatVal(f8ToFmt
                             , szTmp
                             , c4DecPlaces
@@ -1470,7 +1467,7 @@ TString::AppendFormatted(const  tCIDLib::TInt1      i1ToFmt
                         , const tCIDLib::TCard4     c4GroupSize
                         , const tCIDLib::TCh        chGroupSep)
 {
-    tCIDLib::TZStr128 szTmp;
+    tCIDLib::TZStr128 szTmp = L"";
     if (!TRawStr::bFormatVal(i1ToFmt
                             , szTmp
                             , c4MaxBufChars(szTmp)
@@ -1499,7 +1496,7 @@ TString::AppendFormatted(const  tCIDLib::TInt2      i2ToFmt
                         , const tCIDLib::TCard4     c4GroupSize
                         , const tCIDLib::TCh        chGroupSep)
 {
-    tCIDLib::TZStr128 szTmp;
+    tCIDLib::TZStr128 szTmp = L"";
     if (!TRawStr::bFormatVal(i2ToFmt
                             , szTmp
                             , c4MaxBufChars(szTmp)
@@ -1528,7 +1525,7 @@ TString::AppendFormatted(const  tCIDLib::TInt4      i4ToFmt
                         , const tCIDLib::TCard4     c4GroupSize
                         , const tCIDLib::TCh        chGroupSep)
 {
-    tCIDLib::TZStr128 szTmp;
+    tCIDLib::TZStr128 szTmp = L"";
     if (!TRawStr::bFormatVal(i4ToFmt
                             , szTmp
                             , c4MaxBufChars(szTmp)
@@ -1558,7 +1555,7 @@ TString::AppendFormatted(const  tCIDLib::TInt8      i8ToFmt
                         , const tCIDLib::TCard4     c4GroupSize
                         , const tCIDLib::TCh        chGroupSep)
 {
-    tCIDLib::TZStr128 szTmp;
+    tCIDLib::TZStr128 szTmp = L"";
     if (!TRawStr::bFormatVal(i8ToFmt
                             , szTmp
                             , c4MaxBufChars(szTmp)
@@ -1588,14 +1585,7 @@ TString::AppendFormatted(const  tCIDLib::TSInt      iToFmt
                         , const tCIDLib::TCard4     c4GroupSize
                         , const tCIDLib::TCh        chGroupSep)
 {
-    AppendFormatted
-    (
-        tCIDLib::TInt4(iToFmt)
-        , eRadix
-        , chNegSign
-        , c4GroupSize
-        , chGroupSep
-    );
+    AppendFormatted(tCIDLib::TInt4(iToFmt), eRadix, chNegSign, c4GroupSize, chGroupSep);
 }
 
 //
@@ -2014,10 +2004,7 @@ TString::bFirstOccurrence(  const   tCIDLib::TCh            chTarget
     //  NOTE: We don't pass in the position here, since its just an output
     //          parameter here. We pass in zero to start at the beginning!
     //
-    const tCIDLib::TCh* pszMatch = TRawStr::pszFindChar
-    (
-        pszBuffer(), chTarget, 0, bCaseSensitive
-    );
+    const tCIDLib::TCh* pszMatch = TRawStr::pszFindChar(pszBuffer(), chTarget, 0, bCaseSensitive);
 
     // If not, then get out
     if (!pszMatch)
@@ -2043,21 +2030,11 @@ TString::bFirstOccurrence(  const   TString&                strSubStr
     //  NOTE: We don't pass the position in on these, its just an output
     //          parameter. We pass in zero to start at the beginning!
     //
-    const tCIDLib::TCh* pszMatch;
+    const tCIDLib::TCh* pszMatch = nullptr;
     if (bAnyChar)
-    {
-        pszMatch = TRawStr::pszFindChars
-        (
-            pszBuffer(), strSubStr.pszBuffer(), 0, bCaseSensitive
-        );
-    }
-     else
-    {
-        pszMatch = TRawStr::pszFindSubStr
-        (
-            pszBuffer(), strSubStr.pszBuffer(), 0, bCaseSensitive
-        );
-    }
+        pszMatch = TRawStr::pszFindChars(pszBuffer(), strSubStr.pszBuffer(), 0, bCaseSensitive);
+    else
+        pszMatch = TRawStr::pszFindSubStr(pszBuffer(), strSubStr.pszBuffer(), 0, bCaseSensitive);
 
     // If not, then get out
     if (!pszMatch)
@@ -2125,7 +2102,7 @@ TString::bLastOccurrence(   const   TString&                strSubStr
                             , const tCIDLib::TBoolean       bCaseSensitive) const
 {
     // See if there is a match
-    const tCIDLib::TCh* pszMatch;
+    const tCIDLib::TCh* pszMatch = nullptr;
     if (bAnyChar)
     {
         pszMatch = TRawStr::pszFindLastChars
@@ -2216,8 +2193,7 @@ TString::bNextOccurrence(   const   TString&                strSubStr
     }
 
     // See if there is a match
-    const tCIDLib::TCh* pszMatch;
-
+    const tCIDLib::TCh* pszMatch = nullptr;
     if (bAnyChar)
     {
         pszMatch = TRawStr::pszFindChars
@@ -2275,7 +2251,7 @@ TString::bPrevOccurrence(   const   tCIDLib::TCh            chTarget
         );
     }
 
-    const tCIDLib::TCh* pszMatch;
+    const tCIDLib::TCh* pszMatch = nullptr;
     pszMatch = TRawStr::pszFindPrevChar
     (
         pszBuffer(), chTarget, c4Pos - 1, bCaseSensitive
@@ -2321,7 +2297,7 @@ TString::bPrevOccurrence(   const   TString&                strSubStr
         );
     }
 
-    const tCIDLib::TCh* pszFind = 0;
+    const tCIDLib::TCh* pszFind = nullptr;
 
     //
     //  If we are looking for any character, then we can do a simpler
@@ -2586,7 +2562,7 @@ tCIDLib::TBoolean
 TString::bToCard1(          tCIDLib::TCard1&    c1ToFill
                     , const tCIDLib::ERadices   eRadix) const noexcept
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TCard4 c4Val = TRawStr::c4AsBinary
     (
         pszBuffer(), bValid, eRadix
@@ -2605,7 +2581,7 @@ tCIDLib::TBoolean
 TString::bToCard2(          tCIDLib::TCard2&    c2ToFill
                     , const tCIDLib::ERadices   eRadix) const noexcept
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TCard4 c4Val = TRawStr::c4AsBinary
     (
         pszBuffer(), bValid, eRadix
@@ -2624,7 +2600,7 @@ tCIDLib::TBoolean
 TString::bToCard4(          tCIDLib::TCard4&    c4ToFill
                     , const tCIDLib::ERadices   eRadix) const noexcept
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     c4ToFill = TRawStr::c4AsBinary(pszBuffer(), bValid, eRadix);
     return bValid;
 }
@@ -2633,14 +2609,14 @@ tCIDLib::TBoolean
 TString::bToCard8(          tCIDLib::TCard8&    c8ToFill
                     , const tCIDLib::ERadices   eRadix) const noexcept
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     c8ToFill = TRawStr::c8AsBinary(pszBuffer(), bValid, eRadix);
     return bValid;
 }
 
 tCIDLib::TBoolean TString::bToFloat4(tCIDLib::TFloat4& f4ToFill) const noexcept
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TFloat8 f8Val = TRawStr::f8AsBinary(pszBuffer(), bValid);
     if (bValid)
     {
@@ -2654,7 +2630,7 @@ tCIDLib::TBoolean TString::bToFloat4(tCIDLib::TFloat4& f4ToFill) const noexcept
 
 tCIDLib::TBoolean TString::bToFloat8(tCIDLib::TFloat8& f8ToFill) const noexcept
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     f8ToFill = TRawStr::f8AsBinary(pszBuffer(), bValid);
     return bValid;
 }
@@ -2662,7 +2638,7 @@ tCIDLib::TBoolean TString::bToFloat8(tCIDLib::TFloat8& f8ToFill) const noexcept
 tCIDLib::TBoolean
 TString::bToInt1(tCIDLib::TInt1& i1ToFill, const tCIDLib::ERadices eRadix) const noexcept
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TInt4 i4Val = TRawStr::i4AsBinary(pszBuffer(), bValid, eRadix);
     if (bValid)
     {
@@ -2677,7 +2653,7 @@ TString::bToInt1(tCIDLib::TInt1& i1ToFill, const tCIDLib::ERadices eRadix) const
 tCIDLib::TBoolean
 TString::bToInt2(tCIDLib::TInt2& i2ToFill, const tCIDLib::ERadices eRadix) const noexcept
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TInt4 i4Val = TRawStr::i4AsBinary(pszBuffer(), bValid, eRadix);
     if (bValid)
     {
@@ -2692,7 +2668,7 @@ TString::bToInt2(tCIDLib::TInt2& i2ToFill, const tCIDLib::ERadices eRadix) const
 tCIDLib::TBoolean
 TString::bToInt4(tCIDLib::TInt4& i4ToFill, const tCIDLib::ERadices eRadix) const noexcept
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     i4ToFill = TRawStr::i4AsBinary(pszBuffer(), bValid, eRadix);
     return bValid;
 }
@@ -2711,9 +2687,9 @@ TString::bToInt8(tCIDLib::TInt8& i8ToFill, const tCIDLib::ERadices eRadix) const
 tCIDLib::TBoolean TString::bTokenExists(const tCIDLib::TCh chToken) const
 {
     //  Some dummy params to get output values we are goign to discard
-    tCIDLib::TCh        chDummy;
-    tCIDLib::EHJustify  eDummy;
-    tCIDLib::TCard4     c4Dummy;
+    tCIDLib::TCh        chDummy = kCIDLib::chNull;
+    tCIDLib::EHJustify  eDummy = tCIDLib::EHJustify::Count;
+    tCIDLib::TCard4     c4Dummy = 0;
 
     // And look for the token.
     if (pszFindToken(pszBuffer(), chToken, eDummy, c4Dummy, chDummy, c4Dummy, c4Dummy, c4Dummy))
@@ -2725,7 +2701,7 @@ tCIDLib::TBoolean TString::bTokenExists(const tCIDLib::TCh chToken) const
 // Tries to convert this string to a Card4 value. Assumes the indicated radix
 tCIDLib::TCard4 TString::c4Val(const tCIDLib::ERadices eRadix) const
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TCard4 c4Ret = TRawStr::c4AsBinary(pszBuffer(), bValid, eRadix);
     if (!bValid)
     {
@@ -2747,7 +2723,7 @@ tCIDLib::TCard4 TString::c4Val(const tCIDLib::ERadices eRadix) const
 // Tries to convert this string to a Card8 value. Assumes the indicated radix
 tCIDLib::TCard8 TString::c8Val(const tCIDLib::ERadices eRadix) const
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TCard8 c8Ret = TRawStr::c8AsBinary(pszBuffer(), bValid, eRadix);
     if (!bValid)
     {
@@ -2825,11 +2801,21 @@ tCIDLib::TVoid TString::CapAt(const tCIDLib::TCard4 c4Index)
     //  We may not have a buffer. If the index is zero, then we will accept
     //  it but we don't want to do anything in that case.
     //
+    //  !!In this case we dont' call the buffer getter method since we don't want
+    //  to fault it in if it's not already there.
+    //
     if (c4Index <= m_c4CurEnd)
     {
         m_c4CurEnd = c4Index;
         if (m_pszBuffer)
+        {
             m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+        }
+         else
+        {
+            // If we have no buffer, the current end better be zero
+            CIDAssert(m_c4CurEnd == 0, L"No buffer set but current end is not 0");
+        }
         return;
     }
 
@@ -3045,7 +3031,7 @@ TString::eCompareNI(const   TString&        strToCompare
 // Tries to convert this string into a Float8 value, throwing if bad
 tCIDLib::TFloat8 TString::f8Val() const
 {
-    tCIDLib::TBoolean bValid;
+    tCIDLib::TBoolean bValid = kCIDLib::False;
     tCIDLib::TFloat8 f8Ret = TRawStr::f8AsBinary(pszBuffer(), bValid);
     if (!bValid)
     {
@@ -3077,9 +3063,7 @@ tCIDLib::EFindRes
 TString::eReplaceToken(  const  tCIDLib::TCh    chVal
                         , const tCIDLib::TCh    chToken)
 {
-    tCIDLib::TCh szTmp[2];
-    szTmp[0] = chVal;
-    szTmp[1] = kCIDLib::chNull;
+    tCIDLib::TCh szTmp[2] = { chVal, kCIDLib::chNull };
     return eReplaceToken(szTmp, chToken);
 }
 
@@ -3088,13 +3072,13 @@ tCIDLib::EFindRes
 TString::eReplaceToken(  const  tCIDLib::TCh* const pszVal
                         , const tCIDLib::TCh        chToken)
 {
-    tCIDLib::TCh        chFill;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4FldWidth;
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4Precision;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::EHJustify  eJustify;
+    tCIDLib::TCh        chFill = kCIDLib::chNull;
+    tCIDLib::TCard4     c4Chars = 0;
+    tCIDLib::TCard4     c4FldWidth = 0;
+    tCIDLib::TCard4     c4Index = 0;
+    tCIDLib::TCard4     c4Precision = 0;
+    tCIDLib::TCard4     c4TokenCnt = 0;
+    tCIDLib::EHJustify  eJustify = tCIDLib::EHJustify::Count;
 
     // Find the first valid replacement token
     const tCIDLib::TCh* pszTmp = pszFindToken
@@ -3163,13 +3147,13 @@ tCIDLib::EFindRes
 TString::eReplaceToken( const   MFormattable&   fmtblVal
                         , const tCIDLib::TCh    chToken)
 {
-    tCIDLib::TCh        chFill;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4FldWidth;
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4Precision;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::EHJustify  eJustify;
+    tCIDLib::TCh        chFill = kCIDLib::chNull;
+    tCIDLib::TCard4     c4Chars = 0;
+    tCIDLib::TCard4     c4FldWidth = 0;
+    tCIDLib::TCard4     c4Index = 0;
+    tCIDLib::TCard4     c4Precision = 0;
+    tCIDLib::TCard4     c4TokenCnt = 0;
+    tCIDLib::EHJustify  eJustify = tCIDLib::EHJustify::Count;
 
     const tCIDLib::TCh* pszTmp = pszFindToken
     (
@@ -3216,13 +3200,13 @@ tCIDLib::EFindRes
 TString::eReplaceToken( const   tCIDLib::TBoolean   bVal
                         , const tCIDLib::TCh        chToken)
 {
-    tCIDLib::TCh        chFill;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4FldWidth;
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4Precision;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::EHJustify  eJustify;
+    tCIDLib::TCh        chFill = kCIDLib::chNull;
+    tCIDLib::TCard4     c4Chars = 0;
+    tCIDLib::TCard4     c4FldWidth = 0;
+    tCIDLib::TCard4     c4Index = 0;
+    tCIDLib::TCard4     c4Precision = 0;
+    tCIDLib::TCard4     c4TokenCnt = 0;
+    tCIDLib::EHJustify  eJustify = tCIDLib::EHJustify::Count;
 
     //  Find the first valid replacement token.
     const tCIDLib::TCh* pszTmp = pszFindToken
@@ -3251,10 +3235,12 @@ TString::eReplaceToken( const   tCIDLib::TBoolean   bVal
     // Calc the index where we found it
     c4Index = c4CalcBufDiff(pszTmp);
 
-    // And ask the buffer object to replace the token with the text
-    const tCIDLib::TCh* pszVal = bVal
-                                 ? facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_True)
-                                 : facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_False);
+    // Get the value we are going to format out
+    const tCIDLib::TCh* pszVal
+    (
+         bVal ? facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_True)
+              : facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_False)
+    );
 
     //
     //  If they provided no field width, then we just use the source value
@@ -3314,13 +3300,13 @@ TString::eReplaceToken( const   tCIDLib::TCard4     c4Val
                         , const tCIDLib::TCh        chToken
                         , const tCIDLib::ERadices   eRadix)
 {
-    tCIDLib::TCh        chFill;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4FldWidth;
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4Precision;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::EHJustify  eJustify;
+    tCIDLib::TCh        chFill = kCIDLib::chNull;
+    tCIDLib::TCard4     c4Chars = 0;
+    tCIDLib::TCard4     c4FldWidth = 0;
+    tCIDLib::TCard4     c4Index = 0;
+    tCIDLib::TCard4     c4Precision = 0;
+    tCIDLib::TCard4     c4TokenCnt = 0;
+    tCIDLib::EHJustify  eJustify = tCIDLib::EHJustify::Count;
 
     //  Find the first valid replacement token.
     const tCIDLib::TCh* pszTmp = pszFindToken
@@ -3398,13 +3384,13 @@ TString::eReplaceToken( const   tCIDLib::TCard8     c8Val
                         , const tCIDLib::TCh        chToken
                         , const tCIDLib::ERadices   eRadix)
 {
-    tCIDLib::TCh        chFill;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4FldWidth;
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4Precision;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::EHJustify  eJustify;
+    tCIDLib::TCh        chFill = kCIDLib::chNull;
+    tCIDLib::TCard4     c4Chars = 0;
+    tCIDLib::TCard4     c4FldWidth = 0;
+    tCIDLib::TCard4     c4Index = 0;
+    tCIDLib::TCard4     c4Precision = 0;
+    tCIDLib::TCard4     c4TokenCnt = 0;
+    tCIDLib::EHJustify  eJustify = tCIDLib::EHJustify::Count;
 
     //  Find the first valid replacement token.
     const tCIDLib::TCh* pszTmp = pszFindToken
@@ -3484,13 +3470,13 @@ TString::eReplaceToken( const   tCIDLib::TFloat8&   f8Val
                         , const tCIDLib::TCh        chToken
                         , const tCIDLib::TCard1     c1Precision)
 {
-    tCIDLib::TCh        chFill;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4FldWidth;
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4Precision;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::EHJustify  eJustify;
+    tCIDLib::TCh        chFill = kCIDLib::chNull;
+    tCIDLib::TCard4     c4Chars = 0;
+    tCIDLib::TCard4     c4FldWidth = 0;
+    tCIDLib::TCard4     c4Index = 0;
+    tCIDLib::TCard4     c4Precision = 0;
+    tCIDLib::TCard4     c4TokenCnt = 0;
+    tCIDLib::EHJustify  eJustify = tCIDLib::EHJustify::Count;
 
     // Find the first valid replacement token
     const tCIDLib::TCh* pszTmp = pszFindToken
@@ -3586,13 +3572,13 @@ TString::eReplaceToken( const   tCIDLib::TInt4      i4Val
                         , const tCIDLib::TCh        chToken
                         , const tCIDLib::ERadices   eRadix)
 {
-    tCIDLib::TCh        chFill;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4FldWidth;
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4Precision;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::EHJustify  eJustify;
+    tCIDLib::TCh        chFill = kCIDLib::chNull;
+    tCIDLib::TCard4     c4Chars = 0;
+    tCIDLib::TCard4     c4FldWidth = 0;
+    tCIDLib::TCard4     c4Index = 0;
+    tCIDLib::TCard4     c4Precision = 0;
+    tCIDLib::TCard4     c4TokenCnt = 0;
+    tCIDLib::EHJustify  eJustify = tCIDLib::EHJustify::Count;
 
     //  Find the first valid replacement token.
     const tCIDLib::TCh* pszTmp = pszFindToken
@@ -3671,13 +3657,13 @@ TString::eReplaceToken( const   tCIDLib::TInt8      i8Val
                         , const tCIDLib::TCh        chToken
                         , const tCIDLib::ERadices   eRadix)
 {
-    tCIDLib::TCh        chFill;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4FldWidth;
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4Precision;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::EHJustify  eJustify;
+    tCIDLib::TCh        chFill = kCIDLib::chNull;
+    tCIDLib::TCard4     c4Chars = 0;
+    tCIDLib::TCard4     c4FldWidth = 0;
+    tCIDLib::TCard4     c4Index = 0;
+    tCIDLib::TCard4     c4Precision = 0;
+    tCIDLib::TCard4     c4TokenCnt = 0;
+    tCIDLib::EHJustify  eJustify = tCIDLib::EHJustify::Count;
 
     //  Find the first valid replacement token.
     const tCIDLib::TCh* pszTmp = pszFindToken
@@ -3706,7 +3692,7 @@ TString::eReplaceToken( const   tCIDLib::TInt8      i8Val
     // Calc the index where we found it
     c4Index = c4CalcBufDiff(pszTmp);
 
-    tCIDLib::TZStr128  szTmp;
+    tCIDLib::TZStr128  szTmp = L"";
     if (!TRawStr::bFormatVal(i8Val, szTmp, 128, eRadix))
     {
         if (facCIDLib().bLogFailures())
@@ -3764,12 +3750,12 @@ tCIDLib::EFindRes TString::eTokenExists(const tCIDLib::TCh chToken) const
     //  We don't care about these, but the searching function returns
     //  them, so...
     //
-    tCIDLib::EHJustify  eJustify;
-    tCIDLib::TCard4     c4Width;
-    tCIDLib::TCard4     c4Chars;
-    tCIDLib::TCard4     c4Precision;
-    tCIDLib::TCard4     c4TokenCnt;
-    tCIDLib::TCh        chFill;
+    tCIDLib::TCh        chFill = kCIDLib::chNull;
+    tCIDLib::TCard4     c4Chars = 0;
+    tCIDLib::TCard4     c4Precision = 0;
+    tCIDLib::TCard4     c4TokenCnt = 0;
+    tCIDLib::TCard4     c4Width = 0;
+    tCIDLib::EHJustify  eJustify = tCIDLib::EHJustify::Count;
 
     if (pszFindToken(pszBuffer(), chToken, eJustify, c4Width, chFill, c4Precision, c4Chars, c4TokenCnt))
         return tCIDLib::EFindRes::Found;
@@ -4180,12 +4166,8 @@ TString::LoadFromMsg(   const   tCIDLib::TErrCode   errcToLoad
 // Prepends the indicated character to us
 tCIDLib::TVoid TString::Prepend(const tCIDLib::TCh chPrepend)
 {
-    // Put it into a temporary asciiz string
-    tCIDLib::TCh pszTmp[2];
-    pszTmp[0] = chPrepend;
-    pszTmp[1] = kCIDLib::chNull;
-
-    // And insert it at 0
+    // Put it into a temporary ascii z-string and insert at 0
+    tCIDLib::TCh pszTmp[2] = { chPrepend, kCIDLib::chNull };
     Insert(pszTmp, 0);
 }
 
@@ -4238,15 +4220,10 @@ TString::PutAt( const   tCIDLib::TCard4 c4Index
 
 //
 //  This is always called to access the buffer for const access. If it doesn't
-//  exist, it will be faulted in. The only time that should happen is if we
-//  have been moved, but we don't want to cause an error if something should
-//  get called on a moved string. So we'll fault in a 1 character buffer.
+//  exist, it will be faulted in.
 //
-//  We still could get an index error.
-//
-//  !!!It's obvious but just to say it out loud... we have to fault in an empty
-//  buffer, because they could have called c4Length() first and it will have
-//  returned zero if we had no buffer.
+//  We still could get an index error in the ones that access the buffer at a
+//  particular index
 //
 const tCIDLib::TCh* TString::pszBuffer() const
 {

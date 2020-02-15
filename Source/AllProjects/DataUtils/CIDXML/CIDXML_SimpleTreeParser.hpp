@@ -73,14 +73,14 @@ class CIDXMLEXP TXMLTreeParser :
                 {
                 }
 
-                TErrInfo(const TErrInfo& erriToCopy) :
+                TErrInfo(const TErrInfo& erriSrc) :
 
-                    m_errcId(erriToCopy.m_errcId)
-                    , m_eType(erriToCopy.m_eType)
-                    , m_c4Column(erriToCopy.m_c4Column)
-                    , m_c4Line(erriToCopy.m_c4Line)
-                    , m_strSystemId(erriToCopy.m_strSystemId)
-                    , m_strText(erriToCopy.m_strText)
+                    m_errcId(erriSrc.m_errcId)
+                    , m_eType(erriSrc.m_eType)
+                    , m_c4Column(erriSrc.m_c4Column)
+                    , m_c4Line(erriSrc.m_c4Line)
+                    , m_strSystemId(erriSrc.m_strSystemId)
+                    , m_strText(erriSrc.m_strText)
                 {
                 }
 
@@ -92,17 +92,17 @@ class CIDXMLEXP TXMLTreeParser :
                 // -----------------------------------------------------------
                 //  Public operators
                 // -----------------------------------------------------------
-                TErrInfo& operator=(const TErrInfo& erriToAssign)
+                TErrInfo& operator=(const TErrInfo& erriSrc)
                 {
-                    if (this == &erriToAssign)
-                        return *this;
-
-                    m_errcId        = erriToAssign.m_errcId;
-                    m_eType         = erriToAssign.m_eType;
-                    m_c4Column      = erriToAssign.m_c4Column;
-                    m_c4Line        = erriToAssign.m_c4Line;
-                    m_strSystemId   = erriToAssign.m_strSystemId;
-                    m_strText       = erriToAssign.m_strText;
+                    if (&erriSrc != this)
+                    {
+                        m_errcId        = erriSrc.m_errcId;
+                        m_eType         = erriSrc.m_eType;
+                        m_c4Column      = erriSrc.m_c4Column;
+                        m_c4Line        = erriSrc.m_c4Line;
+                        m_strSystemId   = erriSrc.m_strSystemId;
+                        m_strText       = erriSrc.m_strText;
+                    }
                     return *this;
                 }
 
@@ -141,7 +141,17 @@ class CIDXMLEXP TXMLTreeParser :
         // -------------------------------------------------------------------
         TXMLTreeParser();
 
+        TXMLTreeParser(const TXMLTreeParser&) = delete;
+        TXMLTreeParser(TXMLTreeParser&&) = delete;
+
         ~TXMLTreeParser();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLTreeParser& operator=(const TXMLTreeParser&) = delete;
+        TXMLTreeParser& operator=(TXMLTreeParser&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -294,7 +294,7 @@ TTextInStream::c4GetLine(       TString&            strToFill
     //  stream, got as many chars as needed.
     //
     const tCIDLib::TCard4 c4BufSz = 4096;
-    tCIDLib::TCh szTmp[c4BufSz + 1];
+    tCIDLib::TCh szTmp[c4BufSz + 1] = L"";
     tCIDLib::TBoolean bGotEnd = kCIDLib::False;
     while (c4CountDown)
     {
@@ -781,6 +781,7 @@ tCIDLib::TBoolean TTextInStream::bReloadCache() const
     //  this temp buf. So we will never read more bytes than we can get
     //  into the cache.
     //
+    #pragma warning(suppress : 26494) // We don't need to init this
     tCIDLib::TCard1 ac1Tmp[c4CacheBufChars];
 
     //

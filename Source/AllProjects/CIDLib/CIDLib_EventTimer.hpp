@@ -58,9 +58,17 @@ class TEventTimer
         {
         }
 
-        ~TEventTimer()
-        {
-        }
+        TEventTimer(const TEventTimer&) = delete;
+        TEventTimer(TEventTimer&&) = delete;
+
+        ~TEventTimer() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TEventTimer& operator=(const TEventTimer&) = delete;
+        TEventTimer& operator=(TEventTimer&&) = delete;
 
 
         // -------------------------------------------------------------------

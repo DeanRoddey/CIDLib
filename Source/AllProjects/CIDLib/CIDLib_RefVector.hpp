@@ -1092,7 +1092,7 @@ class TRefVector : public TRefCollection<TElem>
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
 
-            tCIDLib::ESortComps eRes;
+            tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             tCIDLib::TInt4 i4MidPoint = 0;
             while (i4Begin <= i4End)
             {
@@ -1152,7 +1152,7 @@ class TRefVector : public TRefCollection<TElem>
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
 
-            tCIDLib::ESortComps eRes;
+            tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             tCIDLib::TInt4 i4MidPoint = 0;
             while (i4Begin <= i4End)
             {
@@ -1609,8 +1609,8 @@ class TRefVector : public TRefCollection<TElem>
         bPullOutElem(const TElem* pobjToPull, const tCIDLib::TBoolean bThrowIfNot)
         {
             // Look for this element in our list
-            tCIDLib::TCard4 c4Index;
-            for (c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+            tCIDLib::TCard4 c4Index = 0;
+            for (; c4Index < m_c4CurCount; c4Index++)
             {
                 if (m_apElems[c4Index] == pobjToPull)
                     break;
@@ -1722,10 +1722,7 @@ class TRefVector : public TRefCollection<TElem>
             }
 
             // For sanity's sake, zero out the old pointers
-            TRawMem::SetMemBuf
-            (
-                m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
-            );
+            TRawMem::SetMemBuf(m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc);
 
             // And we have no elements now
             m_c4CurCount = 0;

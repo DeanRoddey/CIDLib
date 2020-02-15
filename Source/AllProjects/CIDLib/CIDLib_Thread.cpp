@@ -254,7 +254,7 @@ tCIDLib::TVoid AddThread(TThread* const pthrNew)
     //  count how many are taken while we look. If it exceeds
     //  CIDLib_Thread::c4ThreadCount, then that is an error too.
     //
-    tCIDLib::TCard4  c4Ind, c4Count = 0;
+    tCIDLib::TCard4  c4Ind = 0, c4Count = 0;
     for (c4Ind = 0; c4Ind < CIDLib_Thread::c4MaxThreads; c4Ind++)
     {
         if (!athriList()[c4Ind].pthrThis)

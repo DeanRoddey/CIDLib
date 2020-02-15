@@ -30,32 +30,32 @@ namespace kCIDNet
     // -----------------------------------------------------------------------
     //  Common HTTP status codes
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4HTTPStatus_Continue         = 100;
-    const tCIDLib::TCard4 c4HTTPStatus_SwitchProto      = 101;
-    const tCIDLib::TCard4 c4HTTPStatus_OK               = 200;
-    const tCIDLib::TCard4 c4HTTPStatus_Created          = 201;
-    const tCIDLib::TCard4 c4HTTPStatus_Accepted         = 202;
-    const tCIDLib::TCard4 c4HTTPStatus_MovedPerm        = 301;
-    const tCIDLib::TCard4 c4HTTPStatus_MovedTemp        = 302;
-    const tCIDLib::TCard4 c4HTTPStatus_Found            = 303;
-    const tCIDLib::TCard4 c4HTTPStatus_NotModified      = 304;
-    const tCIDLib::TCard4 c4HTTPStatus_TempRedir        = 307;
-    const tCIDLib::TCard4 c4HTTPStatus_PermRedir        = 308;
-    const tCIDLib::TCard4 c4HTTPStatus_BadRequest       = 400;
-    const tCIDLib::TCard4 c4HTTPStatus_Unauthorized     = 401;
-    const tCIDLib::TCard4 c4HTTPStatus_NotFound         = 404;
-    const tCIDLib::TCard4 c4HTTPStatus_ReqTimeout       = 408;
-    const tCIDLib::TCard4 c4HTTPStatus_UnsupMedia       = 415;
-    const tCIDLib::TCard4 c4HTTPStatus_ParamNotKnown    = 451;
-    const tCIDLib::TCard4 c4HTTPStatus_SessNotFound     = 454;
-    const tCIDLib::TCard4 c4HTTPStatus_NotValidForState = 455;
-    const tCIDLib::TCard4 c4HTTPStatus_BadHdrForResource= 456;
-    const tCIDLib::TCard4 c4HTTPStatus_InvalidRange     = 457;
-    const tCIDLib::TCard4 c4HTTPStatus_UnsupTransport   = 461;
-    const tCIDLib::TCard4 c4HTTPStatus_SrvError         = 500;
-    const tCIDLib::TCard4 c4HTTPStatus_NotImpl          = 501;
-    const tCIDLib::TCard4 c4HTTPStatus_VerNotSup        = 505;
-    const tCIDLib::TCard4 c4HTTPStatus_OptionNotSup     = 551;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_Continue         = 100;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_SwitchProto      = 101;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_OK               = 200;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_Created          = 201;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_Accepted         = 202;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_MovedPerm        = 301;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_MovedTemp        = 302;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_Found            = 303;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_NotModified      = 304;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_TempRedir        = 307;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_PermRedir        = 308;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_BadRequest       = 400;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_Unauthorized     = 401;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_NotFound         = 404;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_ReqTimeout       = 408;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_UnsupMedia       = 415;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_ParamNotKnown    = 451;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_SessNotFound     = 454;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_NotValidForState = 455;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_BadHdrForResource= 456;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_InvalidRange     = 457;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_UnsupTransport   = 461;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_SrvError         = 500;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_NotImpl          = 501;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_VerNotSup        = 505;
+    constexpr tCIDLib::TCard4 c4HTTPStatus_OptionNotSup     = 551;
 
 
     // -----------------------------------------------------------------------
@@ -76,14 +76,14 @@ namespace kCIDNet
     // -----------------------------------------------------------------------
     //  Some standard port numbers
     // -----------------------------------------------------------------------
-    const tCIDLib::TIPPortNum   ippnHTTP        = 80;
-    const tCIDLib::TIPPortNum   ippnHTTPS       = 443;
-    const tCIDLib::TIPPortNum   ippnNEWS        = 119;
-    const tCIDLib::TIPPortNum   ippnSIP         = 5060;
-    const tCIDLib::TIPPortNum   ippnSMTP        = 25;
-    const tCIDLib::TIPPortNum   ippnSMTPS       = 587;
-    const tCIDLib::TIPPortNum   ippnWS          = 80;
-    const tCIDLib::TIPPortNum   ippnWSS         = 443;
+    constexpr tCIDLib::TIPPortNum   ippnHTTP        = 80;
+    constexpr tCIDLib::TIPPortNum   ippnHTTPS       = 443;
+    constexpr tCIDLib::TIPPortNum   ippnNEWS        = 119;
+    constexpr tCIDLib::TIPPortNum   ippnSIP         = 5060;
+    constexpr tCIDLib::TIPPortNum   ippnSMTP        = 25;
+    constexpr tCIDLib::TIPPortNum   ippnSMTPS       = 587;
+    constexpr tCIDLib::TIPPortNum   ippnWS          = 80;
+    constexpr tCIDLib::TIPPortNum   ippnWSS         = 443;
 }
 
 

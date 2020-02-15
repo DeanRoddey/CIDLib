@@ -105,7 +105,7 @@ namespace CIDSock_URL
     //      A format version we write out when streamed, to allow for later
     //      upgrade of the format.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 ac4PortVals[] =
+    constexpr tCIDLib::TCard4 ac4PortVals[] =
     {
         0       // None
         , 0     // File
@@ -411,7 +411,7 @@ TURL::c4ParseQueryParms(        TTextInStream&          strmSrc
     //  it's the caller's fault and he just gets junk, so we can easily
     //  scan through and find the values.
     //
-    tCIDLib::TCh    chCur;
+    tCIDLib::TCh    chCur = kCIDLib::chNull;
     TString         strKey;
     TString         strValue;
     TString         strKExp;
@@ -638,7 +638,7 @@ tCIDLib::TVoid TURL::ExpandTo(  const   tCIDLib::TCh* const     pszSrc
                                 ,       TTextConverter* const   ptcvtToUse)
 {
     const tCIDLib::TCh* pszCur = pszSrc;
-    tCIDLib::TCard1 c1Ref;
+    tCIDLib::TCard1 c1Ref = 0;
     tCIDLib::TCard4 c4BufInd = 0;
     while (*pszCur)
     {
@@ -985,6 +985,14 @@ TURL::TURL( const   TURL&               urlRelTo
         MakeRelativeTo(urlRelTo);
 }
 
+TURL::TURL(TURL&& urlSrc) :
+
+    m_colQParms()
+    , m_eProto(tCIDSock::EProtos::None)
+    , m_ippnHost(0)
+{
+    *this = tCIDLib::ForceMove(urlSrc);
+}
 
 TURL::~TURL()
 {
@@ -994,6 +1002,26 @@ TURL::~TURL()
 // ---------------------------------------------------------------------------
 //  TURL: Public operators
 // ---------------------------------------------------------------------------
+
+TURL& TURL::operator=(TURL&& urlSrc)
+{
+    if (this != &urlSrc)
+    {
+        tCIDLib::Swap(m_eProto, urlSrc.m_eProto);
+        tCIDLib::Swap(m_ippnHost, urlSrc.m_ippnHost);
+
+        m_colQParms = tCIDLib::ForceMove(urlSrc.m_colQParms);
+        m_strFragment = tCIDLib::ForceMove(urlSrc.m_strFragment);
+        m_strHost = tCIDLib::ForceMove(urlSrc.m_strHost);
+        m_strParams = tCIDLib::ForceMove(urlSrc.m_strParams);
+        m_strPassword = tCIDLib::ForceMove(urlSrc.m_strPassword);
+        m_strPath = tCIDLib::ForceMove(urlSrc.m_strPath);
+        m_strUser = tCIDLib::ForceMove(urlSrc.m_strUser);
+    }
+    return *this;
+}
+
+
 tCIDLib::TBoolean TURL::operator==(const TURL& urlSrc) const
 {
     if (this != &urlSrc)
@@ -1018,11 +1046,6 @@ tCIDLib::TBoolean TURL::operator==(const TURL& urlSrc) const
         }
     }
     return kCIDLib::True;
-}
-
-tCIDLib::TBoolean TURL::operator!=(const TURL& urlToCompare) const
-{
-    return !operator==(urlToCompare);
 }
 
 

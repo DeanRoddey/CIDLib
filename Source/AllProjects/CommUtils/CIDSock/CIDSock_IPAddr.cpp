@@ -186,25 +186,14 @@ TIPAddress::~TIPAddress()
 // ---------------------------------------------------------------------------
 //  TIPAddress: Public operators
 // ---------------------------------------------------------------------------
-TIPAddress& TIPAddress::operator=(TIPAddress&& ipaSrc)
-{
-    if (&ipaSrc != this)
-    {
-        tCIDLib::Swap(m_kipaThis, ipaSrc.m_kipaThis);
-        m_strHostName = tCIDLib::ForceMove(ipaSrc.m_strHostName);
-        m_strTextVersion = tCIDLib::ForceMove(ipaSrc.m_strTextVersion);
-    }
-    return *this;
-}
-
 
 //
 //  This form cannot specific a particular IP address type if a host name
 //  lookup is done.
 //
-TIPAddress& TIPAddress::operator=(const TString& strAddrToAssign)
+TIPAddress& TIPAddress::operator=(const TString& strAddr)
 {
-    SetAddr(strAddrToAssign, tCIDSock::EAddrTypes::Unspec);
+    SetAddr(strAddr, tCIDSock::EAddrTypes::Unspec);
     return *this;
 }
 

@@ -40,6 +40,11 @@ class CIDXMLEXP MXMLErrorEvents
         // -------------------------------------------------------------------
         //  Destructor
         // -------------------------------------------------------------------
+        MXMLErrorEvents(const MXMLErrorEvents&) = delete;
+        MXMLErrorEvents(MXMLErrorEvents&&) = delete;
+        MXMLErrorEvents& operator=(const MXMLErrorEvents&) = delete;
+        MXMLErrorEvents& operator=(MXMLErrorEvents&) = delete;
+
         virtual ~MXMLErrorEvents()
         {
         }
@@ -74,14 +79,6 @@ class CIDXMLEXP MXMLErrorEvents
         ) = 0;
 
         virtual tCIDLib::TVoid ResetErrors();
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        MXMLErrorEvents(const MXMLErrorEvents&);
-        tCIDLib::TVoid operator=(const MXMLErrorEvents&);
 };
 
 #pragma CIDLIB_POPPACK
