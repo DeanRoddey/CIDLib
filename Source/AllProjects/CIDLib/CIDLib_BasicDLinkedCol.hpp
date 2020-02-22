@@ -70,6 +70,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 {
                 }
 
+                // Don't have to check for null, the parent class does that
                 explicit TConstCursor(const TMyType* const pcolToCursor) :
 
                     TParent(pcolToCursor)

@@ -164,7 +164,7 @@ template <typename TElem> class TColCursor : public TCursorBase
 
         TColCursor(const TCollectionBase* const pcolToCursor) :
 
-            TCursorBase(pcolToCursor->c4SerialNum())
+            TCursorBase(pcolToCursor)
             , m_pcolBaseCurs(pcolToCursor)
         {
         }

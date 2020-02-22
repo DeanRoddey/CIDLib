@@ -349,10 +349,12 @@ tCIDLib::TBoolean
 TKrnlModule::bLoadPlatByPath(const  tCIDLib::TCh* const pszLoadPath)
 {
     // Build up the full path
-    TKrnlString kstrFullPath(pszLoadPath, m_kstrLoadName.pszValue());
+    tCIDLib::TCh achFullPath[kCIDLib::c4MaxPathLen + 1];
+    TRawStr::CopyStr(achFullPath, pszLoadPath, kCIDLib::c4MaxPathLen);
+    TKrnlPathStr::bAddLevel(achFullPath, m_kstrLoadName.pszValue(), kCIDLib::c4MaxPathLen);
 
     // Try to load the path as is
-    HINSTANCE hTmp = ::LoadLibrary(kstrFullPath.pszValue());
+    HINSTANCE hTmp = ::LoadLibrary(achFullPath);
 
     // If it failed, cleanup and return false
     if (!hTmp)

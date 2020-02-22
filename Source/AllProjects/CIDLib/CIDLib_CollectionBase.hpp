@@ -80,6 +80,7 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+class TCollectionBase;
 class TThreadWaitList;
 class TColBlockModeJan;
 
@@ -128,7 +129,7 @@ class CIDLIBEXP TCursorBase : public TObject
 
         TCursorBase
         (
-            const   tCIDLib::TCard4         c4SerialNum
+            const   TCollectionBase* const  pcolToCursor
         );
 
         TCursorBase(const TCursorBase&) = default;

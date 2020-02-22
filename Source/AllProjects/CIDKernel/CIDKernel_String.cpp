@@ -71,6 +71,8 @@ TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
     pszSrc = pszValue2;
     while (*pszSrc)
         *pszTar++ = *pszSrc++;
+
+    *pszTar = kCIDLib::chNull;
 }
 
 TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
@@ -97,6 +99,8 @@ TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
     pszSrc = pszValue3;
     while (*pszSrc)
         *pszTar++ = *pszSrc++;
+
+    *pszTar = kCIDLib::chNull;
 }
 
 TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
@@ -130,6 +134,8 @@ TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
     pszSrc = pszValue4;
     while (*pszSrc)
         *pszTar++ = *pszSrc++;
+
+    *pszTar = kCIDLib::chNull;
 }
 
 TKrnlString::TKrnlString(const TKrnlString& kstrSrc) :

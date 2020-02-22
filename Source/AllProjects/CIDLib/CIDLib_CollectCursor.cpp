@@ -48,10 +48,12 @@ RTTIDecls(TCursorBase,TObject)
 // ---------------------------------------------------------------------------
 //  TCursorBase: Hidden constructors and operators
 // ---------------------------------------------------------------------------
-TCursorBase::TCursorBase(const tCIDLib::TCard4 c4SerialNum) :
+TCursorBase::TCursorBase(const TCollectionBase* const pcolToCursor) :
 
-    m_c4SerialNum(c4SerialNum)
+    m_c4SerialNum(0)
 {
+    CIDAssert(pcolToCursor != nullptr, L"The collection to cursor is null");
+    m_c4SerialNum = pcolToCursor->c4SerialNum();
 }
 
 tCIDLib::TBoolean TCursorBase::operator==(const TCursorBase& cursSrc) const
