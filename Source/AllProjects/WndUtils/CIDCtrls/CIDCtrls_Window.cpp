@@ -541,22 +541,6 @@ TCtrlNotify::TCtrlNotify(const TWindow& wndSrc) :
 {
 }
 
-TCtrlNotify::TCtrlNotify(const TCtrlNotify& wnotSrc) :
-
-    m_widSource(wnotSrc.m_widSource)
-    , m_strSrcName(wnotSrc.m_strSrcName)
-{
-}
-
-TCtrlNotify& TCtrlNotify::operator=(const TCtrlNotify& wnotSrc)
-{
-    if (this != &wnotSrc)
-    {
-        m_widSource = wnotSrc.m_widSource;
-        m_strSrcName = wnotSrc.m_strSrcName;
-    }
-    return *this;
-}
 
 
 

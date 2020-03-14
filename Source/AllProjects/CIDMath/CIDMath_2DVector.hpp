@@ -47,6 +47,7 @@ class CIDMATHEXP T2DVector :
         T2DVector();
 
         T2DVector(const T2DVector&) = default;
+        T2DVector(T2DVector&&) = default;
 
         T2DVector
         (
@@ -61,6 +62,7 @@ class CIDMATHEXP T2DVector :
         //  Public operators
         // -------------------------------------------------------------------
         T2DVector& operator=(const T2DVector&) = default;
+        T2DVector& operator=(T2DVector&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -191,54 +193,20 @@ class CIDMATHEXP T2DVector :
 };
 
 
-T2DVector CIDMATHEXP operator+
-(
-    const   T2DVector&  vecLHS
-    , const T2DVector&  vecRHS
-);
-
-T2DVector CIDMATHEXP operator-
-(
-    const   T2DVector&  vecLHS
-    , const T2DVector&  vecRHS
-);
-T2DVector CIDMATHEXP operator*
-(
-    const   T2DVector&  vecLHS
-    , const T2DVector&  vecRHS
-);
-
-T2DVector CIDMATHEXP operator/
-(
-    const   T2DVector&  vecLHS
-    , const T2DVector&  vecRHS
-);
-
-T2DVector CIDMATHEXP operator/
-(
-    const   T2DVector&          vecLHS
-    , const tCIDLib::TFloat8&   f8ToDivBy
-);
-
-tCIDLib::TFloat8 CIDMATHEXP f8Dot
-(
-    const   T2DVector&  vecLHS
-    , const T2DVector&  vecRHS
-);
-
-T2DVector CIDMATHEXP vecHalfBetween
-(
-    const   T2DVector&  vecLHS
-    , const T2DVector&  vecRHS
-);
+T2DVector CIDMATHEXP operator+(const T2DVector& vecLHS, const T2DVector& );
+T2DVector CIDMATHEXP operator-(const T2DVector& vecLHS, const T2DVector&  vecRHS);
+T2DVector CIDMATHEXP operator*(const T2DVector& vecLHS, const T2DVector&  vecRHS);
+T2DVector CIDMATHEXP operator/(const T2DVector& vecLHS, const T2DVector&  vecRHS);
+T2DVector CIDMATHEXP operator/(const T2DVector& vecLHS, const tCIDLib::TFloat8& f8ToDivBy);
+tCIDLib::TFloat8 CIDMATHEXP f8Dot(const T2DVector& vecLHS, const T2DVector&  vecRHS);
+T2DVector CIDMATHEXP vecHalfBetween(const T2DVector& vecLHS, const T2DVector& vecRHS);
 
 #pragma CIDLIB_POPPACK
 
 
 // ---------------------------------------------------------------------------
-//  Typedef the vector to TFPoint so that it can be more self documenting
+//  Alias the vector to TFPoint so that it can be more self documenting
 //  when used as a point in a floating point space.
 // ---------------------------------------------------------------------------
-typedef T2DVector   TFPoint;
-
+using TFPoint = T2DVector;
 

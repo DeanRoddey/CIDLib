@@ -100,15 +100,10 @@ class CIDCTRLSEXP TCtrlNotify : public TObject, public MDuplicable
             const   TWindow&                wndSrc
         );
 
-        TCtrlNotify
-        (
-            const   TCtrlNotify&            wnotToCopy
-        );
-
-        TCtrlNotify& operator=
-        (
-            const   TCtrlNotify&            wnotToAssign
-        );
+        TCtrlNotify(const TCtrlNotify& wnotSrc) = default;
+        TCtrlNotify(TCtrlNotify&& wnotSrc) = default;
+        TCtrlNotify& operator=(const TCtrlNotify& wnotSrc) = default;
+        TCtrlNotify& operator=(TCtrlNotify&& wnotSrc) = default;
 
 
     private :

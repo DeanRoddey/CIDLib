@@ -51,12 +51,26 @@ class CIDCTRLSEXP TNotRequestBase
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
-        TNotRequestBase
-        (
-            const   TNotificationId&        nidRequested
-        );
+        TNotRequestBase() = delete;
 
-        virtual ~TNotRequestBase();
+        TNotRequestBase(const TNotificationId& nidRequested) :
+
+            m_nidRequested(nidRequested)
+            , m_pnotrNext(nullptr)
+        {
+        }
+
+        TNotRequestBase(const TNotRequestBase&) = delete;
+        TNotRequestBase(TNotRequestBase&&) = delete;
+
+        virtual ~TNotRequestBase() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TNotRequestBase& operator=(const TNotRequestBase&) = delete;
+        TNotRequestBase& operator=(TNotRequestBase&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -71,7 +85,10 @@ class CIDCTRLSEXP TNotRequestBase
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TNotificationId& nidRequested() const;
+        const TNotificationId& TNotRequestBase::nidRequested() const
+        {
+            return m_nidRequested;
+        }
 
 
     protected :
@@ -91,14 +108,6 @@ class CIDCTRLSEXP TNotRequestBase
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TNotRequestBase();
-        TNotRequestBase(const TNotRequestBase&);
-        tCIDLib::TVoid operator=(const TNotRequestBase&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -121,6 +130,7 @@ template <typename T> class TNotifyRequest : public TNotRequestBase
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
+        TNotifyRequest() = delete;
         TNotifyRequest(         T* const            pTarget
                         , const TNotificationId&    nidRequested) :
 
@@ -129,9 +139,19 @@ template <typename T> class TNotifyRequest : public TNotRequestBase
         {
         }
 
+        TNotifyRequest(const TNotifyRequest&) = delete;
+        TNotifyRequest(TNotifyRequest&&) = delete;
+
         ~TNotifyRequest()
         {
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TNotifyRequest& operator=(const TNotifyRequest&) = delete;
+        TNotifyRequest& operator=(TNotifyRequest&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -185,6 +205,8 @@ template <typename T, class D> class TNotifyRequestFor : public TNotRequestBase
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
+        TNotifyRequestFor() = delete;
+
         TNotifyRequestFor(          T* const            pTarget
                             , const TNotificationId&    nidToHandle) :
 
@@ -193,10 +215,20 @@ template <typename T, class D> class TNotifyRequestFor : public TNotRequestBase
         {
         }
 
+        TNotifyRequestFor(const TNotifyRequestFor&) = delete;
+        TNotifyRequestFor(TNotifyRequestFor&&) = delete;
+
         ~TNotifyRequestFor()
         {
             // We don't own the target, we just reference it
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TNotifyRequestFor& operator=(const TNotifyRequestFor&) = delete;
+        TNotifyRequestFor& operator=(TNotifyRequestFor&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -246,25 +278,3 @@ template <typename T, class D> class TNotifyRequestFor : public TNotRequestBase
 #pragma CIDLIB_POPPACK
 
 
-// ---------------------------------------------------------------------------
-//  TNotRequestBase: Constructors and destructor
-// ---------------------------------------------------------------------------
-inline
-TNotRequestBase::TNotRequestBase(const TNotificationId& nidRequested) :
-
-    m_nidRequested(nidRequested)
-    , m_pnotrNext(0)
-{
-}
-
-inline TNotRequestBase::~TNotRequestBase()
-{
-}
-
-// ---------------------------------------------------------------------------
-//  TNotRequestBase: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline const TNotificationId& TNotRequestBase::nidRequested() const
-{
-    return m_nidRequested;
-}

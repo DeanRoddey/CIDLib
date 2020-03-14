@@ -19,8 +19,6 @@
 //  public header, and any internal ones that are needed. It also includes
 //  the system headers, which are only used internally.
 //
-//  This is the header used to do precompiled headers.
-//
 // CAVEATS/GOTCHAS:
 //
 // LOG:

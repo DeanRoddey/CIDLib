@@ -2224,20 +2224,12 @@ TTime::FormatToStr(         TString&                strToWriteTo
 
             case kCIDLib::chLatin_e :
                 // This one is the elapsed seconds
-                strBuild.eReplaceToken
-                (
-                    enctRaw / kCIDLib::enctOneSecond
-                    , kCIDLib::chLatin_e
-                );
+                strBuild.eReplaceToken(enctRaw / kCIDLib::enctOneSecond, kCIDLib::chLatin_e);
                 break;
 
             case kCIDLib::chLatin_E :
                 // This one is the elapsed minutes
-                strBuild.eReplaceToken
-                (
-                    enctRaw / kCIDLib::enctOneMinute
-                    , kCIDLib::chLatin_E
-                );
+                strBuild.eReplaceToken(enctRaw / kCIDLib::enctOneMinute, kCIDLib::chLatin_E);
                 break;
 
             case kCIDLib::chLatin_H :

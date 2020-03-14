@@ -87,9 +87,9 @@ class   TCIDImage;
 namespace kCIDImage
 {
     // -----------------------------------------------------------------------
-    //  Pixel arrays pad rows by 4 byte boundaries
+    //  Pixel arrays pad rows by 4 byte boundaries by default.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4LinePadding = 4;
+    constexpr tCIDLib::TCard4   c4LinePadding = 4;
 }
 
 
