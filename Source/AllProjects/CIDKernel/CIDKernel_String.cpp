@@ -161,6 +161,13 @@ TKrnlString::~TKrnlString()
 // ---------------------------------------------------------------------------
 //  TKrnlString: Public operators
 // ---------------------------------------------------------------------------
+
+tCIDLib::TBoolean TKrnlString::operator==(const TKrnlString& kstrSrc) const
+{
+    return TRawStr::bCompareStr(m_pszValue, kstrSrc.m_pszValue);
+}
+
+
 TKrnlString& TKrnlString::operator=(const TKrnlString& kstrSrc)
 {
     if (this != &kstrSrc)
@@ -202,6 +209,17 @@ TKrnlString& TKrnlString::operator=(const tCIDLib::TSCh* const pszRawSStr)
 // ---------------------------------------------------------------------------
 //  TKrnlString: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+tCIDLib::TVoid TKrnlString::Append(const tCIDLib::TCh* const pszSrc)
+{
+    const tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(m_pszValue) + TRawStr::c4StrLen(pszSrc);
+    tCIDLib::TCh* pszNew = new tCIDLib::TCh[c4Len + 1];
+    TArrayJanitor<tCIDLib::TCh> janNew(pszNew);
+    TRawStr::CopyCatStr(pszNew, c4Len, m_pszValue, pszSrc);
+
+    delete [] m_pszValue;
+    m_pszValue = janNew.paOrphan();
+}
+
 
 tCIDLib::TBoolean TKrnlString::bIsEmpty() const
 {
@@ -218,6 +236,44 @@ tCIDLib::TCard4 TKrnlString::c4Length() const
 tCIDLib::TVoid TKrnlString::Clear()
 {
     m_pszValue[0] = kCIDLib::chNull;
+}
+
+
+tCIDLib::TVoid
+TKrnlString::Combine(const tCIDLib::TCh* const pszSrc, const tCIDLib::TCh chSepChar)
+{
+    // If no source value, then nothing to do
+    if (!pszSrc)
+        return;
+    const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszSrc);
+    if (!c4SrcLen)
+        return;
+
+    // We have to create a new string
+    const tCIDLib::TCard4 c4CurLen = TRawStr::c4StrLen(m_pszValue);
+
+    // Allocate an extra in case we need to add a sep char
+    tCIDLib::TCard4 c4NewLen =  c4SrcLen + c4CurLen + 1;
+    tCIDLib::TCh* pszNew = new tCIDLib::TCh[c4NewLen + 1];
+    TArrayJanitor<tCIDLib::TCh> janNew(pszNew);
+
+    // Copy over the current value
+    TRawStr::CopyStr(pszNew, m_pszValue, c4NewLen);
+
+    // Make sure our new one ends with the sep char
+    tCIDLib::TCh* pszTar = pszNew + c4CurLen;
+    if (!c4CurLen || (m_pszValue[c4CurLen - 1] != chSepChar))
+        *pszTar++ = chSepChar;
+
+    // And cat the incoming onto it, skipping any sep char
+    const tCIDLib::TCh* pszRealSrc = pszSrc;
+    if (c4SrcLen && (*pszRealSrc == chSepChar))
+        pszRealSrc++;
+    TRawStr::CopyStr(pszTar, pszSrc, c4NewLen);
+
+    // Now we can trash the old one and store the new one
+    delete [] m_pszValue;
+    m_pszValue = janNew.paOrphan();
 }
 
 

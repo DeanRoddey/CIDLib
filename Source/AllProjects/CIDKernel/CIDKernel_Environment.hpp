@@ -210,26 +210,22 @@ class KRNLEXPORT TKrnlEnvironment
         static tCIDLib::TBoolean bFind
         (
             const   tCIDLib::TCh* const     pszKey
-            ,       tCIDLib::TCh* const     pszToFill
-            , const tCIDLib::TCard4         c4MaxChars
+            ,       TKrnlString&            kstrToFill
         );
 
         static tCIDLib::TBoolean bFindExePath
         (
-                    tCIDLib::TCh* const     pszToFill
-            , const tCIDLib::TCard4         c4MaxChars
+                    TKrnlString&            kstrToFill
         );
 
         static tCIDLib::TBoolean bFindLibPath
         (
-                    tCIDLib::TCh* const     pszToFill
-            , const tCIDLib::TCard4         c4MaxChars
+                    TKrnlString&            kstrToFill
         );
 
         static tCIDLib::TBoolean bFindTempPath
         (
-                    tCIDLib::TCh* const     pszToFill
-            , const tCIDLib::TCard4         c4MaxChars
+                    TKrnlString&            kstrToFill
         );
 
         static tCIDLib::TBoolean bKeyExists

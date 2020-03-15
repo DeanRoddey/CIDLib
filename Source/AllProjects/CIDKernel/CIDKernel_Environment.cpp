@@ -133,8 +133,7 @@ TKrnlEnvironment::bCharsInValue(const   tCIDLib::TCh* const pszKey
 
 tCIDLib::TBoolean
 TKrnlEnvironment::bFind(const   tCIDLib::TCh* const pszKey
-                        ,       tCIDLib::TCh* const pszToFill
-                        , const tCIDLib::TCard4     c4MaxChars)
+                        ,       TKrnlString&        kstrToFill)
 {
     //  Create an uppercased version of the key
     tCIDLib::TCh* pszUpKey = TRawStr::pszReplicate(pszKey);
@@ -148,7 +147,7 @@ TKrnlEnvironment::bFind(const   tCIDLib::TCh* const pszKey
     if (!pszValue)
         return kCIDLib::False;
 
-    TRawStr::CopyStr(pszToFill, pszValue, c4MaxChars);
+    kstrToFill.Set(pszValue);
     return kCIDLib::True;
 }
 

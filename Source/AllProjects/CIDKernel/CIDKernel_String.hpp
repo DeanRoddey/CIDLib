@@ -86,6 +86,16 @@ class KRNLEXPORT TKrnlString
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean operator==
+        (
+            const   TKrnlString&            kstrSrc
+        )   const;
+
+        tCIDLib::TBoolean operator!=(const TKrnlString& kstrSrc) const
+        {
+            return !operator==(kstrSrc);
+        }
+
         TKrnlString& operator=
         (
             const   TKrnlString&            kstrSrc
@@ -110,9 +120,31 @@ class KRNLEXPORT TKrnlString
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TVoid Append
+        (
+            const   tCIDLib::TCh* const     pszSrc
+        );
+
+        tCIDLib::TVoid Append(const TKrnlString& kstrSrc)
+        {
+            Append(kstrSrc.m_pszValue);
+        }
+
         tCIDLib::TBoolean bIsEmpty() const;
 
         tCIDLib::TCard4 c4Length() const;
+
+        tCIDLib::TVoid Combine
+        (
+            const   tCIDLib::TCh* const     pszSrc
+            , const tCIDLib::TCh            chSepChar
+        );
+
+        tCIDLib::TVoid Combine( const   TKrnlString&    kstrSrc
+                                , const tCIDLib::TCh    chSepChar)
+        {
+            Combine(kstrSrc.m_pszValue, chSepChar);
+        }
 
         tCIDLib::TVoid Clear();
 

@@ -48,13 +48,12 @@ static tCIDLib::TVoid BasicTests(const tCIDLib::TCard4 c4RunIndex)
     //  Lets just see if we can find some values in the environment that
     //  we know the value of.
     //
-    const tCIDLib::TCard4 c4BufChars = 512;
-    tCIDLib::TCh szTmp[c4BufChars+1];
+    TKrnlString kstrTmp;
 
-    if (!TKrnlEnvironment::bFind(L"TestVar1", szTmp, c4BufChars))
+    if (!TKrnlEnvironment::bFind(L"TestVar1", kstrTmp))
         strmOut << CUR_LN << L"Could not find 'TestVar1' in environment\n";
 
-    if (!TKrnlEnvironment::bFind(L"TestVar2", szTmp, c4BufChars))
+    if (!TKrnlEnvironment::bFind(L"TestVar2", kstrTmp))
         strmOut << CUR_LN << L"Could not find 'TestVar2' in environment\n";
 
     //
@@ -75,10 +74,10 @@ static tCIDLib::TVoid BasicTests(const tCIDLib::TCard4 c4RunIndex)
             throw TKrnlError::kerrLast();
         }
 
-        if (!TKrnlEnvironment::bFind(apszAddKeys[c4RunIndex], szTmp, c4BufChars))
+        if (!TKrnlEnvironment::bFind(apszAddKeys[c4RunIndex], kstrTmp))
             strmOut << CUR_LN << L"Could not find just added variable in environment\n";
 
-        if (!TRawStr::bCompareStr(szTmp, L"This is the value"))
+        if (!TRawStr::bCompareStr(kstrTmp.pszValue(), L"This is the value"))
             strmOut << CUR_LN << L"Just added var come back with different value\n";
 
         //
@@ -108,10 +107,10 @@ static tCIDLib::TVoid BasicTests(const tCIDLib::TCard4 c4RunIndex)
             strmOut << CUR_LN << L"Update of existing value returned True\n";
 
         // Make sure we changed the value
-        if (!TKrnlEnvironment::bFind(apszAddKeys[c4RunIndex], szTmp, c4BufChars))
+        if (!TKrnlEnvironment::bFind(apszAddKeys[c4RunIndex], kstrTmp))
             strmOut << CUR_LN << L"Could not find just updated variable in environment\n";
 
-        if (!TRawStr::bCompareStr(szTmp, L"This is the new value"))
+        if (!TRawStr::bCompareStr(kstrTmp.pszValue(), L"This is the new value"))
             strmOut << CUR_LN << L"Just updated var come back with different value\n";
     }
 }
@@ -119,20 +118,18 @@ static tCIDLib::TVoid BasicTests(const tCIDLib::TCard4 c4RunIndex)
 
 static tCIDLib::TVoid SpecialTests()
 {
-    const tCIDLib::TCard4 c4Len = 4096;
-    tCIDLib::TCh szBuf1[c4Len + 1];
-    tCIDLib::TCh szBuf2[c4Len + 1];
+    TKrnlString kstrTmp1;
 
     // Try the special lib and exe path guys
-    if (!TKrnlEnvironment::bFindLibPath(szBuf1, c4Len))
+    if (!TKrnlEnvironment::bFindLibPath(kstrTmp1))
     {
         strmOut << CUR_LN << L"Failed to find library path\n";
         return;
     }
-    const tCIDLib::TCard4 c4OrgLen = TRawStr::c4StrLen(szBuf1);
+    const tCIDLib::TCard4 c4OrgLen = kstrTmp1.c4Length();
 
     // Append and prepend a path to it
-    if (!TKrnlEnvironment::bAddToLibPath(L";\\Test", tCIDLib::EStartEnd::End))
+    if (!TKrnlEnvironment::bAddToLibPath(L"\\Test", tCIDLib::EStartEnd::End))
     {
         strmOut << CUR_LN << L"Failed to append to library path\n";
         return;
@@ -145,22 +142,19 @@ static tCIDLib::TVoid SpecialTests()
     }
 
     // Build up what this should have resulted in
-    TRawStr::CopyCatStr(szBuf2, c4Len, L"\\Test", kCIDLib::szMultiPathSep, szBuf1);
-    if (szBuf1[c4OrgLen - 1] != kCIDLib::chMultiPathSep)
-        TRawStr::CatStr(szBuf2, kCIDLib::szMultiPathSep, c4Len);
-    TRawStr::CatStr(szBuf2, L"\\Test", c4Len);
+    TKrnlString kstrTmp2(L"\\Test", kCIDLib::szMultiPathSep, kstrTmp1.pszValue(), L"\\Test");
 
     // Get it again and see if this is what we got
-    if (!TKrnlEnvironment::bFindLibPath(szBuf1, c4Len))
+    if (!TKrnlEnvironment::bFindLibPath(kstrTmp1))
     {
         strmOut << CUR_LN << L"Failed to find library path second time\n";
         return;
     }
 
-    if (!TRawStr::bCompareStr(szBuf1, szBuf2))
+    if (kstrTmp1 != kstrTmp2)
     {
         strmOut << CUR_LN << L"Didn't get expected lib path results\n";
-        strmOut << szBuf1 << "\n" << szBuf2 << EndLn;
+        strmOut << kstrTmp1.pszValue()  << "\n" << kstrTmp2.pszValue() << EndLn;
         return;
     }
 }

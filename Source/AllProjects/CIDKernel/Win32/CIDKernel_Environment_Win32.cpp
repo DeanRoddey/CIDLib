@@ -307,37 +307,26 @@ TKrnlEnvironment::bAddToLibPath(const   tCIDLib::TCh* const pszToAdd
 
 
 
-tCIDLib::TBoolean
-TKrnlEnvironment::bFindExePath(         tCIDLib::TCh* const pszToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
+tCIDLib::TBoolean TKrnlEnvironment::bFindExePath(TKrnlString& kstrToFill)
 {
     // Just call the public version to get the Path var
-    return bFind(L"Path", pszToFill, c4MaxChars);
+    return bFind(L"Path", kstrToFill);
 }
 
-tCIDLib::TBoolean
-TKrnlEnvironment::bFindLibPath(         tCIDLib::TCh* const pszToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
+tCIDLib::TBoolean TKrnlEnvironment::bFindLibPath(TKrnlString& kstrToFill)
 {
     // Just call the public version to get the Path var
-    return bFind(L"Path", pszToFill, c4MaxChars);
+    return bFind(L"Path", kstrToFill);
 }
 
 
-tCIDLib::TBoolean
-TKrnlEnvironment::bFindTempPath(        tCIDLib::TCh* const pszToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
+tCIDLib::TBoolean TKrnlEnvironment::bFindTempPath(TKrnlString& kstrToFill)
 {
     //
     //  Look for the TEMP and TMP variables. If we can't find either of
     //  those, then we fail.
     //
-    if (!bFind(L"TEMP", pszToFill, c4MaxChars)
-    &&  !bFind(L"TMP", pszToFill, c4MaxChars))
-    {
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
+    return (bFind(L"TEMP", kstrToFill) || bFind(L"TMP", kstrToFill));
 }
 
 
