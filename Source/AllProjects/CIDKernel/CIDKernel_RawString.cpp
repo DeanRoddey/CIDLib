@@ -2147,7 +2147,7 @@ TRawStr::pszConvert(const   tCIDLib::TSCh* const    pszToConvert
     {
         // If an error, make sure we just return an empty string
         tCIDLib::TCard4 c4OutChars = tCIDLib::TCard4(-1);
-        if (!CIDStrOp_MBToWC(pszTarget, c4MaxChars + 1, pszToConvert, c4OutChars))
+        if (!CIDStrOp_MBToWC(pszTarget, c4MaxChars, pszToConvert, c4OutChars))
             pszTarget[0] = kCIDLib::chNull;
     }
     return pszTarget;
@@ -2211,7 +2211,7 @@ TRawStr::pszConvert(const   tCIDLib::TCh* const     pszToConvert
     if (pszToConvert)
     {
         tCIDLib::TCard4 c4OutBytes = tCIDLib::TCard4(-1);
-        if (!CIDStrOp_WCToMB(pszTarget, c4MaxChars + 1, pszToConvert, c4OutBytes))
+        if (!CIDStrOp_WCToMB(pszTarget, c4MaxChars, pszToConvert, c4OutBytes))
             pszTarget[0] = 0;
     }
     return pszTarget;

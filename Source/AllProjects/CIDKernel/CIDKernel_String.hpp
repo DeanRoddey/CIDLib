@@ -72,6 +72,16 @@ class KRNLEXPORT TKrnlString
 
         TKrnlString
         (
+            const   tCIDLib::TCh* const     pszValue1
+            , const tCIDLib::TCh* const     pszValue2
+            , const tCIDLib::TCh* const     pszValue3
+            , const tCIDLib::TCh* const     pszValue4
+            , const tCIDLib::TCh* const     pszValue5
+        );
+
+
+        TKrnlString
+        (
             const   TKrnlString&            kstrSrc
         );
 

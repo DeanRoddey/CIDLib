@@ -56,5 +56,9 @@ export LIBRARY_PATH=${LIBRARY_PATH}:${CID_RESDIR}
 # Set our terminal title to reflect what we are set up for
 echo -ne "\033]0;CIDLib[${CID_BUILDMODE}, ${CID_VERSION}]\007"
 
+# Used in some low level tests to check for known environment variables
+export TestVar1=The value of TestVar1
+export TestVar2=The value of TestVar2
+
 alias="cidccd.sh setdir"
 

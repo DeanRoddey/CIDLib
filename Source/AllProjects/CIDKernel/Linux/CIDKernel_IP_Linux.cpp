@@ -80,7 +80,11 @@ namespace CIDKernel_IP_Linux
     //  It is saved here during init and used by the TCP/IP version support
     //  method of TKrnlSysInfo that we implement here.    
     //
-    tCIDLib::TCard2  c2Version = 0;    
+    tCIDLib::TCard2     c2Version = 0;    
+
+    // We store these values during startup
+    tCIDLib::TBoolean   bIPV4Avail;
+    tCIDLib::TBoolean   bIPV6Avail;
 }
 
 
@@ -93,6 +97,25 @@ tCIDLib::TBoolean TCIDKrnlModule::bInitTermIP(const tCIDLib::EInitTerm)
     // For now, default the TCP/IP version until we figure out how to get it
     CIDKernel_IP_Linux::c2Version = 0x0100;
 
+    // Scan for V4/V6 interfaces and set our flags accordingly
+    ifaddrs* myAddrs;
+    const int res = ::getifaddrs(&myAddrs);
+
+    tCIDLib::TIPPortNum ippnDummy;
+    TKrnlIPAddr kipaNew;
+    ifaddrs* ifa = myAddrs;
+    while (ifa)
+    {
+        if (ifa->ifa_addr && (ifa->ifa_flags & IFF_UP))
+        {
+            if (ifa->ifa_addr->sa_family == AF_INET)
+                CIDKernel_IP_Linux::bIPV4Avail = kCIDLib::True;
+            else if (ifa->ifa_addr->sa_family == AF_INET6)
+                CIDKernel_IP_Linux::bIPV6Avail = kCIDLib::True;
+        }
+        ifa = ifa->ifa_next;
+    }
+    ::freeifaddrs(myAddrs);
 
     return kCIDLib::True;
 }
@@ -115,16 +138,14 @@ TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const     pszAppPath
 
 
 
-// <TBD> These need to be implemented
 tCIDLib::TBoolean TKrnlIP::bIPV4Avail()
 {
-    // For now just say yes
-    return kCIDLib::True;
+    return CIDKernel_IP_Linux::bIPV4Avail;
 }
 
 tCIDLib::TBoolean TKrnlIP::bIPV6Avail()
 {
-    return kCIDLib::False;
+    return CIDKernel_IP_Linux::bIPV6Avail;
 }
 
 
@@ -147,14 +168,18 @@ TKrnlIP::bQueryAdaptorInfo( const   tCIDLib::TCh* const     pszName
                             ,       TAdaptorInfo&           kadpToFill
                             ,       tCIDLib::TBoolean&      bFound)
 {
-    return kCIDLib::False;
+    // <TBD>
+    bFound = kCIDLib::False;
+    return kCIDLib::True;
 }                            
 
 
 // <TBD> This needs to be implemented
 tCIDLib::TBoolean TKrnlIP::bQueryAdaptorList(TKrnlLList<TAdaptorInfo>& kllstToFill)
 {
-    return kCIDLib::False;
+    kllstToFill.RemoveAll();
+
+    return kCIDLib::True;
 }
 
 
@@ -300,7 +325,7 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
         ::freeaddrinfo(pInfo);
     }
 
-    return kCIDLib::False;
+    return kCIDLib::True;
 }
 
 

@@ -111,8 +111,18 @@ tCIDLib::TBoolean
 TKrnlEnvironment::bAddToExePath(const   tCIDLib::TCh* const pszToAdd
                                 , const tCIDLib::EStartEnd  eWhere)
 {
-    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
-    return kCIDLib::False;
+    TKrnlString kstrTmp;
+    if (!bFind(L"PATH", kstrTmp))
+        return kCIDLib::False;
+
+    if (eWhere == tCIDLib::EStartEnd::Start)
+    {
+        TKrnlString kstrPrep(pszToAdd, kCIDLib::szMultiPathSep, kstrTmp.pszValue());
+        return bSetSysVar(L"PATH", kstrPrep.pszValue());
+    }
+
+    TKrnlString kstrPrep(kstrTmp.pszValue(), kCIDLib::szMultiPathSep, pszToAdd);
+    return bSetSysVar(L"PATH", kstrPrep.pszValue());    
 }
 
 
@@ -120,35 +130,46 @@ tCIDLib::TBoolean
 TKrnlEnvironment::bAddToLibPath(const   tCIDLib::TCh* const pszToAdd
                                 , const tCIDLib::EStartEnd  eWhere)
 {
-    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
-    return kCIDLib::False;    
+    TKrnlString kstrTmp;
+    if (!bFind(L"LD_LIBRARY_PATH", kstrTmp))
+        return kCIDLib::False;
+
+    tCIDLib::TBoolean bRes = kCIDLib::False;
+    if (eWhere == tCIDLib::EStartEnd::Start)
+    {
+        TKrnlString kstrPrepend(pszToAdd, kCIDLib::szMultiPathSep, kstrTmp.pszValue());
+        bRes = bSetSysVar(L"LD_LIBRARY_PATH", kstrPrepend.pszValue());
+        if (bRes)
+            s_pkhshmEnv->bUpdateKey(L"LD_LIBRARY_PATH", kstrPrepend.pszValue());
+    }
+    else
+    {
+        TKrnlString kstrAppend(kstrTmp.pszValue(), kCIDLib::szMultiPathSep, pszToAdd);
+        bRes = bSetSysVar(L"LD_LIBRARY_PATH", kstrAppend.pszValue());    
+        if (bRes)
+            s_pkhshmEnv->bUpdateKey(L"LD_LIBRARY_PATH", kstrAppend.pszValue());
+    }
+    return bRes;
 }
 
 
-tCIDLib::TBoolean
-TKrnlEnvironment::bFindExePath(         tCIDLib::TCh* const pszToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
+tCIDLib::TBoolean TKrnlEnvironment::bFindExePath(TKrnlString& kstrToFill)
 {
-    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
-    return kCIDLib::False;
+    return bFind(L"PATH", kstrToFill);
 }
 
 
-tCIDLib::TBoolean
-TKrnlEnvironment::bFindLibPath(         tCIDLib::TCh* const pszToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
+tCIDLib::TBoolean TKrnlEnvironment::bFindLibPath(TKrnlString& kstrToFill)
 {
-    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
-    return kCIDLib::False;
+    return bFind(L"LD_LIBRARY_PATH", kstrToFill);
 }
 
 
-tCIDLib::TBoolean
-TKrnlEnvironment::bFindTempPath(        tCIDLib::TCh* const pszToFill
-                                , const tCIDLib::TCard4     c4MaxChars)
+tCIDLib::TBoolean TKrnlEnvironment::bFindTempPath(TKrnlString& kstrToFill)
 {
-    TKrnlError::SetLastHostError(kKrnlErrs::errcGen_NotSupported);
-    return kCIDLib::False;
+    if (!bFind(L"TMPDIR", kstrToFill))
+        kstrToFill = L"/tmp";
+    return kCIDLib::True;
 }
 
 

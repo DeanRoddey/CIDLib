@@ -128,21 +128,31 @@ static tCIDLib::TVoid SpecialTests()
     }
     const tCIDLib::TCard4 c4OrgLen = kstrTmp1.c4Length();
 
+    // A simple test path to add
+    TKrnlString kstrAdd(kCIDLib::pszPathSep, L"Test");
+
     // Append and prepend a path to it
-    if (!TKrnlEnvironment::bAddToLibPath(L"\\Test", tCIDLib::EStartEnd::End))
+    if (!TKrnlEnvironment::bAddToLibPath(kstrAdd.pszValue(), tCIDLib::EStartEnd::End))
     {
         strmOut << CUR_LN << L"Failed to append to library path\n";
         return;
     }
 
-    if (!TKrnlEnvironment::bAddToLibPath(L"\\Test", tCIDLib::EStartEnd::Start))
+    if (!TKrnlEnvironment::bAddToLibPath(kstrAdd.pszValue(), tCIDLib::EStartEnd::Start))
     {
         strmOut << CUR_LN << L"Failed to prepend to library path\n";
         return;
     }
 
     // Build up what this should have resulted in
-    TKrnlString kstrTmp2(L"\\Test", kCIDLib::szMultiPathSep, kstrTmp1.pszValue(), L"\\Test");
+    TKrnlString kstrTmp2
+    (
+        kstrAdd.pszValue()
+        , kCIDLib::szMultiPathSep
+        , kstrTmp1.pszValue()
+        , kCIDLib::szMultiPathSep
+        , kstrAdd.pszValue()
+    );
 
     // Get it again and see if this is what we got
     if (!TKrnlEnvironment::bFindLibPath(kstrTmp1))

@@ -138,6 +138,47 @@ TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
     *pszTar = kCIDLib::chNull;
 }
 
+TKrnlString::TKrnlString(   const   tCIDLib::TCh* const pszValue1
+                            , const tCIDLib::TCh* const pszValue2
+                            , const tCIDLib::TCh* const pszValue3
+                            , const tCIDLib::TCh* const pszValue4
+                            , const tCIDLib::TCh* const pszValue5) :
+
+    m_pszValue(nullptr)
+{
+    const tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(pszValue1)
+                                  + TRawStr::c4StrLen(pszValue2)
+                                  + TRawStr::c4StrLen(pszValue3)
+                                  + TRawStr::c4StrLen(pszValue4)
+                                  + TRawStr::c4StrLen(pszValue5);
+
+    m_pszValue = new tCIDLib::TCh[c4Len + 1];
+
+    // We know it's long enough so just copy over ourself for maximum efficiency
+    tCIDLib::TCh* pszTar = m_pszValue;
+    const tCIDLib::TCh* pszSrc = pszValue1;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue2;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue3;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue4;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    pszSrc = pszValue5;
+    while (*pszSrc)
+        *pszTar++ = *pszSrc++;        
+
+    *pszTar = kCIDLib::chNull;
+}
+
 TKrnlString::TKrnlString(const TKrnlString& kstrSrc) :
 
     m_pszValue(TRawStr::pszReplicate(kstrSrc.m_pszValue))

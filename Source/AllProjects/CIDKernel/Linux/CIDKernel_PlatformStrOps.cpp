@@ -52,6 +52,8 @@ CIDStrOp_MBToWC(        tCIDLib::TCh* const     pszTarget
     );
     if (iRes >= 0)
     {
+        // We insure termination
+        pszTarget[iRes] = kCIDLib::chNull;
         c4OutChars = tCIDLib::TCard4(iRes);
         return kCIDLib::True;
     }
@@ -76,6 +78,8 @@ CIDStrOp_WCToMB(        tCIDLib::TSCh* const    pschTarget
     );
     if (iRes >= 0)
     {
+        // We insure termination
+        pschTarget[iRes] = 0;
         c4OutBytes = tCIDLib::TCard4(iRes);
         return kCIDLib::True;
     }

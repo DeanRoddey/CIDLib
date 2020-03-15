@@ -131,7 +131,7 @@ struct TKrnlCommPort::TPerPlat
 
 //
 //  The caller passes us an array of booleans and a count of values in the
-//  array. We scan for many ports and set the slot in the array for each
+//  array. We scan for any ports and set the slot in the array for each
 //  port we find.
 //
 tCIDLib::TCard4
