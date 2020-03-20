@@ -394,6 +394,15 @@ class CIDLIBEXP TString :
                     TString&&               strSrc
         );
 
+        TString
+        (
+            const   TKrnlString&            kstrSrc
+        );
+        TString
+        (
+                    TKrnlString&&           kstrSrc
+        );
+
         ~TString();
 
 
@@ -413,6 +422,11 @@ class CIDLIBEXP TString :
         TString& operator=
         (
                     TString&&               strSrc
+        );
+
+        TString& operator=
+        (
+                    TKrnlString&&           kstrSrc
         );
 
         tCIDLib::TBoolean operator==

@@ -206,11 +206,10 @@ class TLogSpoolThread : public TThread
             //  Check for a default logger defined in the environment and store that
             //  info if so. After this we won't have to keep checking.
             //
-            m_szDefLoggerInfo[0] = kCIDLib::chNull;
             if (TSysInfo::pszLogInfo())
-                TRawStr::CopyStr(m_szDefLoggerInfo, TSysInfo::pszLogInfo(), c4DefLogMaxChars);
+                m_kstrDefLoggerInfo = TSysInfo::pszLogInfo();
             else
-                TKrnlEnvironment::bFind(kCIDLib_::pszLocalLog, m_szDefLoggerInfo, c4DefLogMaxChars);
+                TKrnlEnvironment::bFind(kCIDLib_::pszLocalLog, m_kstrDefLoggerInfo);
         }
 
         ~TLogSpoolThread() {}
@@ -231,7 +230,7 @@ class TLogSpoolThread : public TThread
             //  If we don't have one, and there's default info available, and we've not
             //  tried to create that guy already, then try to fault it in.
             //
-            if (!m_plgrTarget && !m_bTriedDefault && *m_szDefLoggerInfo)
+            if (!m_plgrTarget && !m_bTriedDefault && !m_kstrDefLoggerInfo.bIsEmpty())
                 SetDefaultLogger();
 
             return m_plgrTarget != nullptr;
@@ -398,7 +397,7 @@ class TLogSpoolThread : public TThread
         //      the list is empty. If both point to the same node, there's only one
         //      node. Else, it's a standard doubly linked list scenario.
         //
-        //  m_szDefLoggerInfo
+        //  m_kstrDefLoggerInfo
         //      In the ctor we see if a default logger is defined in the environment.
         //      If so, we will try to fault one of those in if bHasLogger() is called
         //      and we've not tried it already.
@@ -407,11 +406,11 @@ class TLogSpoolThread : public TThread
         tCIDLib::TCard4             m_c4QueueSize;
         tCIDLib::EAdoptOpts         m_eAdopt;
         tCIDLib::EAdoptOpts         m_eAdoptNew;
+        TKrnlString                 m_kstrDefLoggerInfo;
         MLogger*                    m_plgrNew;
         MLogger*                    m_plgrTarget;
         CIDLib_Module::TLogQEvent*  m_plogqevHead = nullptr;
         CIDLib_Module::TLogQEvent*  m_plogqevTail = nullptr;
-        tCIDLib::TCh                m_szDefLoggerInfo[c4DefLogMaxChars + 1];
 };
 
 
@@ -607,7 +606,9 @@ tCIDLib::TVoid TLogSpoolThread::SetDefaultLogger()
     //
     TTextConverter* ptcvtToUse = nullptr;
     tCIDLib::TCh* pszCtx = nullptr;
-    tCIDLib::TCh* pszTmp = TRawStr::pszStrTokenize(m_szDefLoggerInfo, L";", &pszCtx);
+    tCIDLib::TCh* pszTokenize = m_kstrDefLoggerInfo.pszReplicate();
+    TJanitor<tCIDLib::TCh> janTokenize(pszTokenize);
+    tCIDLib::TCh* pszTmp = TRawStr::pszStrTokenize(pszTokenize, L";", &pszCtx);
     if (pszTmp)
     {
         TRawStr::CopyStr(szFileName, pszTmp, c4MaxBufSz);

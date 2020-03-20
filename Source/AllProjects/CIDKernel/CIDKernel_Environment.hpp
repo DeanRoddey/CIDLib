@@ -213,6 +213,13 @@ class KRNLEXPORT TKrnlEnvironment
             ,       TKrnlString&            kstrToFill
         );
 
+        static tCIDLib::TBoolean bFind
+        (
+            const   tCIDLib::TCh* const     pszKey
+            ,       tCIDLib::TCh* const     pszToFill
+            , const tCIDLib::TCard4         c4MaxChars
+        );
+
         static tCIDLib::TBoolean bFindExePath
         (
                     TKrnlString&            kstrToFill

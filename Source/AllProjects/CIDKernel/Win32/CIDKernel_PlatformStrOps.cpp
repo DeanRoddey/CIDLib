@@ -33,40 +33,53 @@
 #include    "CIDKernel_PlatformStrOps.hpp"
 
 
+//
+//  The buffer is always one larger than the max chars, so we can always
+//  null terminate it.
+//
 tCIDLib::TBoolean
 CIDStrOp_MBToWC(		tCIDLib::TCh* const     pszTarget
 				, const tCIDLib::TCard4         c4MaxOutChars
 				, const tCIDLib::TSCh* const    pschSrc
 				,		tCIDLib::TCard4&        c4OutChars)
 {
-	size_t outCnt = size_t(-1);
-	const int iRes = ::mbstowcs_s(&outCnt, pszTarget, c4MaxOutChars, pschSrc, _TRUNCATE);
-	if (iRes && (iRes != STRUNCATE))
+    #pragma warning(suppress : 4996)
+	const int iRes = ::mbstowcs(pszTarget, pschSrc, c4MaxOutChars);
+	if (iRes == 0)
 	{
         *pszTarget = kCIDLib::chNull;
 		return kCIDLib::False;
 	}
 
-
-    c4OutChars = outCnt;
+    c4OutChars = static_cast<tCIDLib::TCard4>(iRes);
+    pszTarget[c4OutChars] = kCIDLib::chNull;
     return kCIDLib::True;
 }
 
 
+//
+//  The buffer is always one larger than the max chars, so we can always
+//  null terminate it.
+//
 tCIDLib::TBoolean
 CIDStrOp_WCToMB(        tCIDLib::TSCh* const    pschTarget
                 , const tCIDLib::TCard4         c4MaxOutBytes
                 , const tCIDLib::TCh* const     pszSrc
                 ,       tCIDLib::TCard4&        c4OutBytes)
 {
-    size_t outCnt = size_t(-1);
-	const int iRes = ::wcstombs_s(&outCnt, pschTarget, c4MaxOutBytes, pszSrc, _TRUNCATE);
-	if (iRes && (iRes != STRUNCATE))
+    #pragma warning(suppress : 4996)
+	const int iRes = ::wcstombs(pschTarget, pszSrc, c4MaxOutBytes);
+	if (iRes == 0)
+    {
+        *pschTarget = 0;
         return kCIDLib::False;
+    }
 
-    c4OutBytes = outCnt;
+    c4OutBytes = static_cast<tCIDLib::TCard4>(iRes);
+    pschTarget[c4OutBytes] = 0;
     return kCIDLib::True;
 }
+
 
 tCIDLib::TBoolean
 CIDStrOp_CalcMBSize(const tCIDLib::TCh* const pszSrc, tCIDLib::TCard4& c4OutBytes)

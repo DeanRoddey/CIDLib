@@ -390,15 +390,14 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
 //  TKrnlSysInfo functions
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TKrnlSysInfo::bCmdLineArg(  const   tCIDLib::TCard4 c4Index
-                            , const tCIDLib::TCh*&  pszToFill)
+TKrnlSysInfo::bCmdLineArg(const tCIDLib::TCard4 c4Index, TKrnlString& kstrToFill)
 {
     if (c4Index >= CIDKernel_SystemInfo_Win32::CachedInfo.c4ArgCnt)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_IndexError);
         return kCIDLib::False;
     }
-    pszToFill = CIDKernel_SystemInfo_Win32::CachedInfo.apszArgList[c4Index];
+    kstrToFill = CIDKernel_SystemInfo_Win32::CachedInfo.apszArgList[c4Index];
     return kCIDLib::True;
 }
 
@@ -450,8 +449,7 @@ TKrnlSysInfo::bQueryMachineID(          tCIDLib::TCh* const pchBuffer
 
 
 tCIDLib::TBoolean
-TKrnlSysInfo::bQuerySpecialPath(        tCIDLib::TCh* const     pszBuffer
-                                , const tCIDLib::TCard4         c4MaxChars
+TKrnlSysInfo::bQuerySpecialPath(        TKrnlString&            kstrToFill
                                 , const tCIDLib::ESpecialPaths  ePath)
 {
     tCIDLib::TSInt iFolder;
@@ -531,26 +529,26 @@ TKrnlSysInfo::bQuerySpecialPath(        tCIDLib::TCh* const     pszBuffer
     }
 
     // Normalize it to the caller's buffer
-    if (!TKrnlFileSys::bNormalizePath(szBuf, pszBuffer, c4MaxChars))
+    if (!TKrnlFileSys::bNormalizePath(szBuf, kstrToFill))
         return kCIDLib::False;
 
     // Make sure it ends with a separator
-    return TKrnlPathStr::bAddTrailingSep(pszBuffer, c4MaxChars);
+    kstrToFill.AppendIfNotAlready(kCIDLib::chPathSep);
+    return kCIDLib::True;
 }
 
 
-tCIDLib::TBoolean
-TKrnlSysInfo::bQueryUserName(       tCIDLib::TCh* const pszBuffer
-                            , const tCIDLib::TCard4     c4MaxChars)
+tCIDLib::TBoolean TKrnlSysInfo::bQueryUserName(TKrnlString& kstrToFill)
 {
-    tCIDLib::TCard4 c4Chars = c4MaxChars;
+    tCIDLib::TCh szTmp[UNLEN + 1];
 
-    if (!::GetUserName(pszBuffer, &c4Chars))
+    tCIDLib::TCard4 c4Chars = UNLEN;
+    if (!::GetUserName(szTmp, &c4Chars))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-    pszBuffer[c4Chars] = 0;
+    kstrToFill.Set(szTmp);
     return kCIDLib::True;
 }
 

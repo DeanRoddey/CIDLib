@@ -129,7 +129,7 @@ static tCIDLib::TVoid SpecialTests()
     const tCIDLib::TCard4 c4OrgLen = kstrTmp1.c4Length();
 
     // A simple test path to add
-    TKrnlString kstrAdd(kCIDLib::pszPathSep, L"Test");
+    TKrnlString kstrAdd(kCIDLib::szPathSep, L"Test");
 
     // Append and prepend a path to it
     if (!TKrnlEnvironment::bAddToLibPath(kstrAdd.pszValue(), tCIDLib::EStartEnd::End))
@@ -164,7 +164,7 @@ static tCIDLib::TVoid SpecialTests()
     if (kstrTmp1 != kstrTmp2)
     {
         strmOut << CUR_LN << L"Didn't get expected lib path results\n";
-        strmOut << kstrTmp1.pszValue()  << "\n" << kstrTmp2.pszValue() << EndLn;
+        strmOut << kstrTmp1.pszValue()  << "\n\n" << kstrTmp2.pszValue() << EndLn;
         return;
     }
 }

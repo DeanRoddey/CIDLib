@@ -56,6 +56,7 @@ extern tCIDLib::TVoid TestPaths(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestRawStrings(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestRawMemory(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestSafeCounters(const tCIDLib::TCard4);
+extern tCIDLib::TVoid TestStrings(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestSemaphores(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestTime(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestThreads(const tCIDLib::TCard4);
@@ -97,7 +98,8 @@ TOutStrm        strmOut;
 static TTestFuncRecord          aTestFunctions[] =
 {
         { TestEnums         , L"Enums"          , kCIDLib::False }
-    ,   { TestRawStrings    , L"Strings"        , kCIDLib::False }
+    ,   { TestRawStrings    , L"Raw Strings"    , kCIDLib::False }
+    ,   { TestStrings       , L"Krnl Strings"   , kCIDLib::False }
     ,   { TestFlagJanitors  , L"FlagJans"       , kCIDLib::False }
     ,   { TestRawMemory     , L"Memory"         , kCIDLib::False }
     ,   { TestHashMap       , L"HashMap"        , kCIDLib::False }
@@ -267,8 +269,8 @@ static tCIDLib::TVoid ShowSysInfo()
     if (!TKrnlIP::bQueryTCPVersion(c4TCPMaj, c4TCPMin))
         throw TKrnlError::kerrLast();
 
-    tCIDLib::TZStr128 szUser;
-    if (!TKrnlSysInfo::bQueryUserName(szUser, c4MaxBufChars(szUser)))
+    TKrnlString kstrUser;
+    if (!TKrnlSysInfo::bQueryUserName(kstrUser))
         throw TKrnlError::kerrLast();
 
     TKrnlString kstrIPHost;
@@ -321,7 +323,7 @@ static tCIDLib::TVoid ShowSysInfo()
             << L"       OS Version: " << c4OSMaj << L"." << c4OSMin << L"." << c4OSRev
                                       << L"  Build:" << c4OSBuild << L"\n"
             << L"        SSE Level: " << TKrnlSysInfo::c4SSELevel() << L"\n"
-            << L"     Current User: " << szUser << L"\n"
+            << L"     Current User: " << kstrUser.pszValue() << L"\n"
             << EndLn;
 
     strmOut << L"TCP/IP Information\n"
@@ -340,7 +342,7 @@ static tCIDLib::TVoid ShowSysInfo()
     {
         strmOut << EndLn;
     }
-    
+
 
     strmOut << L"    Def IPV6 Addr: ";
     if (TKrnlIP::bIPV6Avail())
@@ -601,27 +603,21 @@ static tCIDLib::TVoid ShowSysInfo()
             , { tCIDLib::ESpecialPaths::ProgramFilesCommon, L"Common Program Files" }
         };
         const tCIDLib::TCard4 c4Count = tCIDLib::c4ArrayElems(aPaths);
-        tCIDLib::TCh achPath[kCIDLib::c4MaxPathLen + 1];
+
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
             const TDirInfo& CurPath = aPaths[c4Index];
-            const tCIDLib::TBoolean bRes = TKrnlSysInfo::bQuerySpecialPath
-            (
-                achPath, kCIDLib::c4MaxPathLen, CurPath.ePath
-            );
+            const tCIDLib::TBoolean bRes = TKrnlSysInfo::bQuerySpecialPath(kstrTmp, CurPath.ePath);
 
             strmOut << L"  " << CurPath.pszName << L" = ";
             if (bRes)
-                strmOut << achPath;
+                strmOut << kstrTmp.pszValue();
             else
                 strmOut << L"  [UNKNOWN]";
             strmOut << L"\n";
         }
         strmOut << L"\n\n";
     }
-
-    // Do a little TTS testing
-    SpeechInfo();
 
     // Flush any remainder out now
     strmOut.flush();
@@ -749,13 +745,7 @@ int main(const int i4ArgC, tCIDLib::TSCh* apszArgs[])
             }
         }
 
-        //
-        //  First of all just dump the system information values. This is
-        //  just for examining by eye. Its a local function.
-        //
-        ShowSysInfo();
-
-        strmOut << L"\n\nStarting Tests...\n\n";
+        strmOut << L"\nStarting Tests...\n\n";
 
         for (c4FnInd = 0; c4FnInd < c4TestFuncCount; c4FnInd++)
         {
@@ -783,6 +773,12 @@ int main(const int i4ArgC, tCIDLib::TSCh* apszArgs[])
                 }
             }
         }
+
+        // Now do dumps of information we get from various sources
+        ShowSysInfo();
+
+        // Do a little TTS testing
+        SpeechInfo();
 
         strmOut << L"\nTests complete\n\n";
     }

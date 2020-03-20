@@ -217,69 +217,44 @@ TKrnlEnvironment::bAddToExePath(const   tCIDLib::TCh* const pszToAdd
                                 , const tCIDLib::EStartEnd  eWhere)
 {
     static const tCIDLib::TCh* pszVar = L"Path";
-
     TKrnlCritSecLocker crslAccess(s_pkcrsAccess);
 
     //
     //  First get the length of the PATH variable, and then the whole buffer.
-    //  Add one for the possible separate we might have to add.
+    //  Add one for the possible separate we might have to add, and create
+    //  a string to build up the new value in.
     //
-    const tCIDLib::TCard4 c4Len = ::GetEnvironmentVariable(pszVar, 0, 0);
+    const tCIDLib::TCard4 c4VarLen = ::GetEnvironmentVariable(pszVar, 0, 0);
+    tCIDLib::TCh* pszVarVal = new tCIDLib::TCh[c4VarLen];
+    ::GetEnvironmentVariable(pszVar, pszVarVal, c4VarLen);
+    TArrayJanitor<tCIDLib::TCh> janVarValue(pszVarVal);
+
+    // Create a string with enough to hold it all
     const tCIDLib::TCard4 c4AddLen = TRawStr::c4StrLen(pszToAdd);
-    const tCIDLib::TCard4 c4FullLen = c4Len + c4AddLen + 1;
+    TKrnlString kstrNew(c4VarLen + 1 + c4AddLen);
 
     //
-    //  Allocate a buffer that large plus the length of the stuff to add,
-    //  and put a janitor on it to insure it gets cleaned up.
+    //  If adding before, then put the add value in first and make sure it
+    //  ends with a separator.
     //
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4FullLen + 1];
-    TArrayJanitor<tCIDLib::TCh> janBuf(pszBuf);
-
-    //
-    //  In order to make the prepend way more efficient, we check that
-    //  first and put the current value in after it.
-    //
-    tCIDLib::TCard4 c4StartAt = 0;
     if (eWhere == tCIDLib::EStartEnd::Start)
     {
-        c4StartAt = c4AddLen;
-        TRawStr::CopyStr(pszBuf, pszToAdd, c4FullLen);
-        if (pszToAdd[c4AddLen - 1] != kCIDLib::chSemiColon)
-        {
-            pszBuf[c4AddLen] = kCIDLib::chSemiColon;
-            pszBuf[c4AddLen + 1] = kCIDLib::chNull;
-            c4StartAt++;
-        }
+        kstrNew.Append(pszToAdd);
+        kstrNew.AppendIfNotAlready(kCIDLib::chMultiPathSep);
     }
 
-    //
-    //  Ok, get the value of it now. If we get a zero back, then its not
-    //  currently present, so we can just set it to our value outright.
-    //
-    if (::GetEnvironmentVariable(pszVar, &pszBuf[c4StartAt], c4Len))
-    {
-        if (eWhere == tCIDLib::EStartEnd::End)
-        {
-            // If the last char isn't a separator, then add one first
-            if (pszBuf[c4Len - 1] != kCIDLib::chSemiColon)
-            {
-                pszBuf[c4Len] = kCIDLib::chSemiColon;
-                pszBuf[c4Len + 1] = kCIDLib::chNull;
-            }
+    // Append the current value
+    kstrNew.Append(pszVarVal);
 
-            // And tack the new stuff on
-            TRawStr::CatStr(pszBuf, pszToAdd, c4FullLen);
-        }
-    }
-     else
+    // And if doing the end, put in a sep char and the value to add
+    if (eWhere == tCIDLib::EStartEnd::End)
     {
-        // Only need to do this if at the end, since we handled prepend
-        if (eWhere == tCIDLib::EStartEnd::End)
-            TRawStr::CopyStr(pszBuf, pszToAdd, c4FullLen);
+        kstrNew.AppendIfNotAlready(kCIDLib::chMultiPathSep);
+        kstrNew.Append(pszToAdd);
     }
 
     // Update the system's copy of this one
-    if (!::SetEnvironmentVariable(pszVar, pszBuf))
+    if (!::SetEnvironmentVariable(pszVar, kstrNew.pszValue()))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -287,7 +262,7 @@ TKrnlEnvironment::bAddToExePath(const   tCIDLib::TCh* const pszToAdd
 
     // Update our copy of this information
     tCIDLib::TBoolean bDummy;
-    if (!bAddOrUpdate(pszVar, pszBuf, bDummy))
+    if (!bAddOrUpdate(pszVar, kstrNew.pszValue(), bDummy))
         return kCIDLib::False;
 
     return kCIDLib::True;

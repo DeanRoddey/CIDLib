@@ -850,11 +850,10 @@ tCIDLib::TVoid TSysInfo::DoInit()
         s_pcolCmdLineParms = new tCIDLib::TStrList(c4ArgCount);
 
         // Start after the magic 0th parameter
+        TKrnlString kstrVal;
         for (tCIDLib::TCard4 c4Index = 1; c4Index < c4ArgCount; c4Index++)
         {
-            // Get a pointer to this param's text
-            const tCIDLib::TCh* pszVal;
-            if (!TKrnlSysInfo::bCmdLineArg(c4Index, pszVal))
+            if (!TKrnlSysInfo::bCmdLineArg(c4Index, kstrVal))
             {
                 TKrnlPopup::Show
                 (
@@ -874,51 +873,50 @@ tCIDLib::TVoid TSysInfo::DoInit()
             //  Check to see if its a special parm. If so, then we set the
             //  appropriate flag and remove it from the list.
             //
-            if (TRawStr::bCompareStrNI(pszVal, L"/ModuleLog=", 11))
+            if (kstrVal.bCompareNI(L"/ModuleLog=", 11))
             {
-                s_pstrDefModuleLog = new TString(pszVal + 11);
+                s_pstrDefModuleLog = new TString(kstrVal.pszValueAt(11));
             }
-             else if (TRawStr::bCompareStrI(pszVal, L"/TestMode"))
+             else if (kstrVal.bCompareI(L"/TestMode"))
             {
                 s_bTestMode = kCIDLib::True;
             }
-             else if (TRawStr::bCompareStrI(pszVal, L"/InstallMode"))
+             else if (kstrVal.bCompareI(L"/InstallMode"))
             {
                 s_bInstallMode = kCIDLib::True;
             }
-             else if (TRawStr::bCompareStrNI(pszVal, L"/LocalLog=", 10))
+             else if (kstrVal.bCompareNI(L"/LocalLog=", 10))
             {
-                s_pszLogInfo = TRawStr::pszReplicate(pszVal + 10);
+                s_pszLogInfo = kstrVal.pszReplicateAt(10);
             }
-             else if (TRawStr::bCompareStrNI(pszVal, L"/NSAddr=", 8))
+             else if (kstrVal.bCompareNI(L"/NSAddr=", 8))
             {
-                s_pstrNSAddr = new TString(pszVal + 8);
+                s_pstrNSAddr = new TString(kstrVal.pszValueAt(8));
             }
-             else if (TRawStr::bCompareStrNI(pszVal, L"/GlobalLogMode=", 15))
+             else if (kstrVal.bCompareNI(L"/GlobalLogMode=", 15))
             {
                 //
                 //  We need to set the global logging mode, which is set
                 //  statically on the TFacility class.
                 //
                 tCIDLib::ESeverities eToSet = tCIDLib::ESeverities::Status;
-                pszVal += 15;
-                if (TRawStr::bCompareStrI(pszVal, L"Info"))
+                if (kstrVal.bCompareI(L"/GlobalLogMode=Info"))
                 {
                     eToSet = tCIDLib::ESeverities::Info;
                 }
-                 else if (TRawStr::bCompareStrI(pszVal, L"Warn"))
+                 else if (kstrVal.bCompareI(L"/GlobalLogMode=Warn"))
                 {
                     eToSet = tCIDLib::ESeverities::Warn;
                 }
-                 else if (TRawStr::bCompareStrI(pszVal, L"Failed"))
+                 else if (kstrVal.bCompareI(L"/GlobalLogMode=Failed"))
                 {
                     eToSet = tCIDLib::ESeverities::Failed;
                 }
-                 else if (TRawStr::bCompareStrI(pszVal, L"ProcFatal"))
+                 else if (kstrVal.bCompareI(L"/GlobalLogMode=ProcFatal"))
                 {
                     eToSet = tCIDLib::ESeverities::ProcFatal;
                 }
-                 else if (TRawStr::bCompareStrI(pszVal, L"SysFatal"))
+                 else if (kstrVal.bCompareI(L"/GlobalLogMode=SysFatal"))
                 {
                     eToSet = tCIDLib::ESeverities::SysFatal;
                 }
@@ -927,12 +925,11 @@ tCIDLib::TVoid TSysInfo::DoInit()
             else
             {
                 // Wasn't a magic parameter so store it
-                s_pcolCmdLineParms->objPlace(pszVal);
+                s_pcolCmdLineParms->objPlace(kstrVal);
             }
         }
 
-        // Use a local buffer plenty long enough for the strings we'll load
-        tCIDLib::TCh szTmp[kCIDLib::c4MaxPathLen] = L"";
+        TKrnlString kstrTmp(kCIDLib::c4MaxPathLen + 1);
 
         //
         //  If there wasn't an explicit entry for the Name Server address, then
@@ -940,14 +937,14 @@ tCIDLib::TVoid TSysInfo::DoInit()
         //
         if (!s_pstrNSAddr)
         {
-            if (TKrnlEnvironment::bFind(L"CID_NSADDR", szTmp, kCIDLib::c4MaxPathLen))
-                s_pstrNSAddr = new TString(szTmp);
+            if (TKrnlEnvironment::bFind(L"CID_NSADDR", kstrTmp))
+                s_pstrNSAddr = new TString(kstrTmp);
             else
                 s_pstrNSAddr = new TString;
         }
 
         // Try to get the user name
-        if (!TKrnlSysInfo::bQueryUserName(szTmp, kCIDLib::c4MaxPathLen))
+        if (!TKrnlSysInfo::bQueryUserName(kstrTmp))
         {
             TKrnlPopup::Show
             (
@@ -961,23 +958,23 @@ tCIDLib::TVoid TSysInfo::DoInit()
                 , L"Could not obtain user name from system"
             );
         }
-        s_pstrUserName = new TString(szTmp);
+        s_pstrUserName = new TString(kstrTmp);
 
         // If the CID_MODULELOG env variable is set, then store the info
-        if (TKrnlEnvironment::bFind(L"CID_MODULELOG", szTmp, kCIDLib::c4MaxPathLen))
+        if (TKrnlEnvironment::bFind(L"CID_MODULELOG", kstrTmp))
         {
             // Only do this if we didn't get anything on the command line
             if (!s_pstrDefModuleLog)
-                s_pstrDefModuleLog = new TString(szTmp);
+                s_pstrDefModuleLog = new TString(kstrTmp);
         }
 
         // Do all the special paths
         tCIDLib::ForEachE<tCIDLib::ESpecialPaths>
         (
-            [&szTmp](const tCIDLib::ESpecialPaths ePath)
+            [&kstrVal](const tCIDLib::ESpecialPaths ePath)
             {
-                if (TKrnlSysInfo::bQuerySpecialPath(szTmp, kCIDLib::c4MaxPathLen, ePath))
-                    s_apstrSpecPaths[ePath] = new TString(szTmp);
+                if (TKrnlSysInfo::bQuerySpecialPath(kstrVal, ePath))
+                    s_apstrSpecPaths[ePath] = new TString(kstrVal);
                 else
                     s_apstrSpecPaths[ePath] = new TString(L"Special Path Not Found");
             }

@@ -42,7 +42,7 @@ namespace TKrnlSysInfo
     KRNLEXPORT tCIDLib::TBoolean bCmdLineArg
     (
         const   tCIDLib::TCard4         c4Index
-        , const tCIDLib::TCh*&          pszToFill
+        ,       TKrnlString&            kstrToFill
     );
 
     KRNLEXPORT tCIDLib::TBoolean bIsHostAdmin();
@@ -60,15 +60,13 @@ namespace TKrnlSysInfo
 
     KRNLEXPORT tCIDLib::TBoolean bQuerySpecialPath
     (
-                tCIDLib::TCh* const     pszBuffer
-        , const tCIDLib::TCard4         c4MaxChars
+                TKrnlString&            kstrToFill
         , const tCIDLib::ESpecialPaths  ePath
     );
 
     KRNLEXPORT tCIDLib::TBoolean bQueryUserName
     (
-                tCIDLib::TCh* const     pszBuffer
-        , const tCIDLib::TCard4         c4MaxChars
+                TKrnlString&            kstrToFill
     );
 
     KRNLEXPORT tCIDLib::TBoolean bRemoveCmdLineArg

@@ -41,26 +41,17 @@
 
 // ---------------------------------------------------------------------------
 //  Sub-include the really fundamental headers that must be before everything.
-//  Some of these are per-platform. The compiler will find these just fine but
-//  the Visual Studio IDE never manages to get the right ones. So, we do separate
-//  includes to make that work right.
+//  Some of these are per-platform.
 // ---------------------------------------------------------------------------
-#if defined(_WIN32)
-#include    "Win32\CIDKernel_PlatformDefines.hpp"
-#include    "Win32\CIDKernel_PlatformIncludes.hpp"
-#include    "Win32\CIDKernel_PlatformTypes.hpp"
-#else
-#include    "Linux/CIDKernel_PlatformDefines.hpp"
-#include    "Linux/CIDKernel_PlatformIncludes.hpp"
-#include    "Linux/CIDKernel_PlatformTypes.hpp"
-#endif
+#include    "CIDKernel_PlatformDefines.hpp"
+#include    "CIDKernel_PlatformIncludes.hpp"
+#include    "CIDKernel_PlatformTypes.hpp"
+
 #include    "CIDKernel_DevMacros.hpp"
 #include    "CIDKernel_Type.hpp"
-#if defined(_WIN32)
-#include    "Win32\CIDKernel_PlatformConstants.hpp"
-#else
-#include    "Linux/CIDKernel_PlatformConstants.hpp"
-#endif
+
+#include    "CIDKernel_PlatformConstants.hpp"
+
 #include    "CIDKernel_Constant.hpp"
 #include    "CIDKernel_Version.hpp"
 #include    "CIDKernel_BaseInlines.hpp"

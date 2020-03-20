@@ -1059,6 +1059,24 @@ TString::TString(TString&& strSrc) :
     *this = tCIDLib::ForceMove(strSrc);
 }
 
+// We just steal the kernel string's buffer
+TString::TString(TKrnlString&& kstrSrc) :
+
+    m_c4BufChars(0)
+    , m_c4CurEnd(0)
+    , m_pszBuffer(nullptr)
+{
+    m_pszBuffer = kstrSrc.pszOrphanBuffer(m_c4CurEnd, m_c4BufChars);
+}
+
+TString::TString(const TKrnlString& kstrSrc) :
+
+    m_c4BufChars(kstrSrc.c4BufSize())
+    , m_c4CurEnd(kstrSrc.c4Length())
+    , m_pszBuffer(kstrSrc.pszReplicate())
+{
+}
+
 TString::~TString()
 {
     // If we allocated our buffer, clean it up
@@ -1091,6 +1109,15 @@ TString& TString::operator=(TString&& strSrc)
         tCIDLib::Swap(m_c4BufChars, strSrc.m_c4BufChars);
         tCIDLib::Swap(m_pszBuffer, strSrc.m_pszBuffer);
     }
+    return *this;
+}
+
+
+// We just steal the kernel string's buffer
+TString& TString::operator=(TKrnlString&& kstrSrc)
+{
+    delete [] m_pszBuffer;
+    m_pszBuffer = kstrSrc.pszOrphanBuffer(m_c4CurEnd, m_c4BufChars);
     return *this;
 }
 

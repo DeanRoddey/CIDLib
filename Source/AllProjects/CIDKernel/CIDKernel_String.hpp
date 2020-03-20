@@ -42,7 +42,10 @@ class KRNLEXPORT TKrnlString
         // -------------------------------------------------------------------
         //  Constuctors and Destructor
         // -------------------------------------------------------------------
-        TKrnlString();
+        TKrnlString
+        (
+            const   tCIDLib::TCard4         c4BufSz = 32
+        );
 
         TKrnlString
         (
@@ -51,34 +54,17 @@ class KRNLEXPORT TKrnlString
 
         TKrnlString
         (
-            const   tCIDLib::TCh* const     pszValue1
-            , const tCIDLib::TCh* const     pszValue2
+            const   tCIDLib::TSCh* const    pszValue
         );
 
         TKrnlString
         (
             const   tCIDLib::TCh* const     pszValue1
             , const tCIDLib::TCh* const     pszValue2
-            , const tCIDLib::TCh* const     pszValue3
+            , const tCIDLib::TCh* const     pszValue3 = nullptr
+            , const tCIDLib::TCh* const     pszValue4 = nullptr
+            , const tCIDLib::TCh* const     pszValue5 = nullptr
         );
-
-        TKrnlString
-        (
-            const   tCIDLib::TCh* const     pszValue1
-            , const tCIDLib::TCh* const     pszValue2
-            , const tCIDLib::TCh* const     pszValue3
-            , const tCIDLib::TCh* const     pszValue4
-        );
-
-        TKrnlString
-        (
-            const   tCIDLib::TCh* const     pszValue1
-            , const tCIDLib::TCh* const     pszValue2
-            , const tCIDLib::TCh* const     pszValue3
-            , const tCIDLib::TCh* const     pszValue4
-            , const tCIDLib::TCh* const     pszValue5
-        );
-
 
         TKrnlString
         (
@@ -130,19 +116,71 @@ class KRNLEXPORT TKrnlString
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TVoid AdoptBuffer
+        (
+                    tCIDLib::TCh*&          pszSrc
+            , const tCIDLib::TCard4         c4BufSz
+        );
+
         tCIDLib::TVoid Append
         (
             const   tCIDLib::TCh* const     pszSrc
         );
 
-        tCIDLib::TVoid Append(const TKrnlString& kstrSrc)
+        tCIDLib::TVoid Append
+        (
+            const   tCIDLib::TCh* const     pszSrc1
+            , const tCIDLib::TCh* const     pszSrc2
+            , const tCIDLib::TCh* const     pszSrc3 = nullptr
+            , const tCIDLib::TCh* const     pszSrc4 = nullptr
+        );
+
+        tCIDLib::TVoid Append
+        (
+            const   TKrnlString&            kstrSrc
+        );
+
+        tCIDLib::TVoid AppendIfNotAlready
+        (
+            const   tCIDLib::TCh            chSrc
+        );
+
+        tCIDLib::TBoolean bCompareI
+        (
+            const   tCIDLib::TCh* const     pszSrc
+        )   const;
+
+        tCIDLib::TBoolean bCompareI
+        (
+            const   TKrnlString&            kstrSrc
+        )   const;
+
+        tCIDLib::TBoolean bCompareNI
+        (
+            const   tCIDLib::TCh* const     pszSrc
+            , const tCIDLib::TCard4         c4Count
+        )   const;
+
+        tCIDLib::TBoolean bCompareNI
+        (
+            const   TKrnlString&            kstrSrc
+            , const tCIDLib::TCard4         c4Count
+        )   const;
+
+        tCIDLib::TBoolean bIsEmpty() const
         {
-            Append(kstrSrc.m_pszValue);
+            return m_c4Length == 0;
         }
 
-        tCIDLib::TBoolean bIsEmpty() const;
+        tCIDLib::TCard4 c4Length() const
+        {
+            return m_c4Length;
+        }
 
-        tCIDLib::TCard4 c4Length() const;
+        tCIDLib::TCard4 c4BufSize() const
+        {
+            return m_c4BufSz;
+        }
 
         tCIDLib::TVoid Combine
         (
@@ -158,22 +196,40 @@ class KRNLEXPORT TKrnlString
 
         tCIDLib::TVoid Clear();
 
+        [[nodiscard]] tCIDLib::TCh* pszReplicate() const;
+
+        [[nodiscard]] tCIDLib::TCh* pszReplicateAt
+        (
+            const   tCIDLib::TCard4         c4At
+        )   const;
+
+        [[nodiscard]] tCIDLib::TCh* pszOrphanBuffer
+        (
+                    tCIDLib::TCard4&        c4Size
+            ,       tCIDLib::TCard4&        c4Length
+        );
+
         const tCIDLib::TCh* pszValue() const;
+
+        const tCIDLib::TCh* pszValueAt
+        (
+            const   tCIDLib::TCard4         c4At
+        )   const;
 
         tCIDLib::TVoid Reallocate
         (
             const   tCIDLib::TCard4         c4MinSize
         );
 
-        tCIDLib::TVoid Set
-        (
-            const   tCIDLib::TCh* const     pszValue
-        );
+        tCIDLib::TVoid Set(const tCIDLib::TCh* const pszValue)
+        {
+            SetWithExtra(pszValue, 0);
+        }
 
-        tCIDLib::TVoid Set
+        tCIDLib::TVoid SetWithExtra
         (
             const   tCIDLib::TCh* const     pszValue
-            , const tCIDLib::TCard4         c4Count
+            , const tCIDLib::TCard4         c4Extra
         );
 
         tCIDLib::TVoid SetFromShort
@@ -181,14 +237,53 @@ class KRNLEXPORT TKrnlString
             const   tCIDLib::TSCh* const    pszValue
         );
 
+        tCIDLib::TVoid SetUnterminated
+        (
+            const   tCIDLib::TCh* const     pszValue
+            , const tCIDLib::TCard4         c4Count
+        );
+
 
     private :
         // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid ExpandBuf
+        (
+            const   tCIDLib::TCard4         c4Needed
+            , const tCIDLib::TBoolean       bKeepOld
+        );
+
+        tCIDLib::TVoid SetNewBuffer
+        (
+            const   tCIDLib::TCh* const     pszValue
+            , const tCIDLib::TCard4         c4SrcLen
+            , const tCIDLib::TCard4         c4Extra
+        );
+
+        tCIDLib::TBoolean bSetNewSBuffer
+        (
+            const   tCIDLib::TSCh* const    pszValue
+            , const tCIDLib::TCard4         c4Extra
+        );
+
+
+        // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_c4BufSize
+        //      The allocated size of the buffer. In reality it's one larger than
+        //      this so taht there's alwyas room for a null terminator.
+        //
+        //  m_c4Length
+        //      The current length of the string, though we also keep it null
+        //      terminated.
         //
         //  m_pszValue
         //      We allocate this to hold the content as required.
         // -------------------------------------------------------------------
+        tCIDLib::TCard4 m_c4BufSz;
+        tCIDLib::TCard4 m_c4Length;
         tCIDLib::TCh*   m_pszValue;
 };
 

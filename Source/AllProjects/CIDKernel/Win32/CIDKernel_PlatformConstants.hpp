@@ -36,15 +36,17 @@ namespace kCIDLib
     constexpr tCIDLib::TCard4               c4MaxPathLen    = 260;
     constexpr tCIDLib::TCh                  chDefParmSep    = L'/';
     constexpr tCIDLib::TCh                  chMultiPathSep  = L';';
-    constexpr const tCIDLib::TCh* const     pszAllFilesSpec = L"*";
-    constexpr const tCIDLib::TCh* const     pszAllDirsSpec  = L"*";
-    constexpr const tCIDLib::TCh* const     szWhitespace    = L"\r\n\t\a\f\v ";
-    constexpr const tCIDLib::TCh* const     szExeExtension  = L".Exe";
-    constexpr const tCIDLib::TCh* const     szLibExtension  = L".DLL";
-    constexpr const tCIDLib::TCh* const     szMultiPathSep  = L";";
     constexpr tCIDLib::TCh                  chPathSep       = L'\\';
-    constexpr const tCIDLib::TCh* const     szSysExePath    = L"PATH";
-    constexpr const tCIDLib::TCh* const     szSysLibPath    = L"PATH";
+    const tCIDLib::TCh* const               pszAllFilesSpec = L"*";
+    const tCIDLib::TCh* const               pszAllDirsSpec  = L"*";
+    const tCIDLib::TCh* const               szWhitespace    = L"\r\n\t\a\f\v ";
+    const tCIDLib::TCh* const               szExeExtension  = L".Exe";
+    const tCIDLib::TCh* const               szLibExtension  = L".DLL";
+    const tCIDLib::TCh* const               szMultiPathSep  = L";";
+    const tCIDLib::TCh* const               szPathSep       = L"\\";
+    const tCIDLib::TCh* const               szDefParmSep    = L"/";
+    const tCIDLib::TCh* const               szSysExePath    = L"PATH";
+    const tCIDLib::TCh* const               szSysLibPath    = L"PATH";
 
 
     // -----------------------------------------------------------------------

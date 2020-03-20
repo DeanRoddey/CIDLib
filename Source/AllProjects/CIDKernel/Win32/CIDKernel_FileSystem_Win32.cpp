@@ -1354,7 +1354,7 @@ TKrnlDirChangeMon::bReadChanges(TChangeList& kllstToFill, tCIDLib::TCard4& c4Val
                 }
 
                 m_kdchiOwedRename.m_eChange = tCIDLib::EDirChanges::Renamed;
-                m_kdchiOwedRename.m_kstrName.Set
+                m_kdchiOwedRename.m_kstrName.SetUnterminated
                 (
                     pNotifyInfo->FileName
                     , pNotifyInfo->FileNameLength / kCIDLib::c4UniBytes
@@ -1404,7 +1404,7 @@ TKrnlDirChangeMon::bReadChanges(TChangeList& kllstToFill, tCIDLib::TCard4& c4Val
                     m_kdchiOwedRename.m_eChange = tCIDLib::EDirChanges::None;
 
                     // And now add in the new name
-                    pkdchiCur->m_kstrNew.Set
+                    pkdchiCur->m_kstrNew.SetUnterminated
                     (
                         pNotifyInfo->FileName
                         , pNotifyInfo->FileNameLength / kCIDLib::c4UniBytes
@@ -1421,7 +1421,7 @@ TKrnlDirChangeMon::bReadChanges(TChangeList& kllstToFill, tCIDLib::TCard4& c4Val
 
                     // Nothing special so set it
                     pkdchiCur->m_eChange = eChange;
-                    pkdchiCur->m_kstrName.Set
+                    pkdchiCur->m_kstrName.SetUnterminated
                     (
                         pNotifyInfo->FileName
                         , pNotifyInfo->FileNameLength / kCIDLib::c4UniBytes
@@ -2018,6 +2018,32 @@ TKrnlFileSys::bNormalizePath(const  tCIDLib::TCh* const pszToNormalize
     return kCIDLib::True;
 }
 
+tCIDLib::TBoolean
+TKrnlFileSys::bNormalizePath(const  tCIDLib::TCh* const pszToNormalize
+                            ,       TKrnlString&        kstrToFill)
+{
+    // And canonicalize it to the local output
+    tCIDLib::TCh szOut[MAX_PATH + 1];
+    if (!::PathCanonicalize(szOut, pszToNormalize))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcFl_Normalize);
+        return kCIDLib::False;
+    }
+
+    //
+    //  The system call is kind of dumb on a couple of special cases, so
+    //  watch for them ourself.
+    //
+    if (TRawStr::bCompareStr(&szOut[1], L":..")
+    ||  TRawStr::bCompareStr(&szOut[1], L":."))
+    {
+        szOut[2] = kCIDLib::chNull;
+    }
+
+    // Ok, copy back to the caller's buffer
+    kstrToFill = szOut;
+    return kCIDLib::True;
+}
 
 
 tCIDLib::TBoolean

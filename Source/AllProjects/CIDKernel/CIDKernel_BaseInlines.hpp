@@ -216,7 +216,7 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     //  Swaps two values of any type that can support by value semantics.
     // -----------------------------------------------------------------------
-        template <typename T> tCIDLib::TVoid Swap(T& v1, T& v2)
+    template <typename T> tCIDLib::TVoid Swap(T& v1, T& v2)
     {
         T vTmp = v1;
         v1 = v2;

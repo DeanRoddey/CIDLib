@@ -582,6 +582,12 @@ namespace TKrnlFileSys
         , const tCIDLib::TCard4         c4MaxChars
     );
 
+    KRNLEXPORT tCIDLib::TBoolean bNormalizePath
+    (
+        const   tCIDLib::TCh* const     pszToNormalize
+        ,       TKrnlString&            kstrToFill
+    );
+
     KRNLEXPORT tCIDLib::TBoolean bRemoveDir
     (
         const   tCIDLib::TCh* const     pszToRemove

@@ -173,39 +173,33 @@ TProcEnvironment::bFind(const TString& strKey, TString& strToFill)
 
 tCIDLib::TBoolean TProcEnvironment::bFindExePath(TString& strToFill)
 {
-    const tCIDLib::TCard4 c4BufSz = 8192;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
-
-    if (!TKrnlEnvironment::bFindExePath(achBuf, c4BufSz))
+    TKrnlString kstrToFill;
+    if (!TKrnlEnvironment::bFindExePath(kstrToFill))
         return kCIDLib::False;
 
-    strToFill = achBuf;
+    strToFill = kstrToFill.pszValue();
     return kCIDLib::True;
 }
 
 
 tCIDLib::TBoolean TProcEnvironment::bFindLibPath(TString& strToFill)
 {
-    const tCIDLib::TCard4 c4BufSz = 8192;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
-
-    if (!TKrnlEnvironment::bFindLibPath(achBuf, c4BufSz))
+    TKrnlString kstrToFill;
+    if (!TKrnlEnvironment::bFindLibPath(kstrToFill))
         return kCIDLib::False;
 
-    strToFill = achBuf;
+    strToFill = kstrToFill.pszValue();
     return kCIDLib::True;
 }
 
 
 tCIDLib::TBoolean TProcEnvironment::bFindTempPath(TString& strToFill)
 {
-    const tCIDLib::TCard4 c4BufSz = 8192;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
-
-    if (!TKrnlEnvironment::bFindTempPath(achBuf, c4BufSz))
+    TKrnlString kstrToFill;
+    if (!TKrnlEnvironment::bFindTempPath(kstrToFill))
         return kCIDLib::False;
 
-    strToFill = achBuf;
+    strToFill = kstrToFill.pszValue();
     return kCIDLib::True;
 }
 

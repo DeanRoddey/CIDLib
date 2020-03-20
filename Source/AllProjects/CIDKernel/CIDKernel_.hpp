@@ -54,11 +54,7 @@
 //  The compiler will find these just fine, but Visual Studio Code never seems
 //  to get htis right, so we explicitly do include paths here.
 // ---------------------------------------------------------------------------
-#if defined(_WIN32)
-#include    "Win32\CIDKernel_PlatformInternal_.hpp"
-#else
-#include    "Linux/CIDKernel_PlatformInternal_.hpp"
-#endif
+#include    "CIDKernel_PlatformInternal_.hpp"
 
 
 // ---------------------------------------------------------------------------
