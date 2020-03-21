@@ -366,7 +366,6 @@ namespace tCIDKernel
 #include    "CIDKernel_SharedMemBuf.hpp"
 #include    "CIDKernel_Event.hpp"
 #include    "CIDKernel_Mutex.hpp"
-#include    "CIDKernel_Semaphore.hpp"
 #include    "CIDKernel_ExternalProcess.hpp"
 #include    "CIDKernel_Process.hpp"
 #include    "CIDKernel_CommPort.hpp"

@@ -57,7 +57,6 @@ extern tCIDLib::TVoid TestRawStrings(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestRawMemory(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestSafeCounters(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestStrings(const tCIDLib::TCard4);
-extern tCIDLib::TVoid TestSemaphores(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestTime(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestThreads(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestCDROM(const tCIDLib::TCard4);
@@ -106,7 +105,6 @@ static TTestFuncRecord          aTestFunctions[] =
     ,   { TestEnvironment   , L"Environment"    , kCIDLib::False }
     ,   { TestEvents        , L"Events"         , kCIDLib::False }
     ,   { TestMutexes       , L"Mutexes"        , kCIDLib::False }
-    ,   { TestSemaphores    , L"Semaphores"     , kCIDLib::False }
     ,   { TestSafeCounters  , L"Counters"       , kCIDLib::False }
     ,   { TestTime          , L"Time"           , kCIDLib::False }
     ,   { TestPaths         , L"Paths"          , kCIDLib::False }

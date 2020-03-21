@@ -233,7 +233,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_Pointer.hpp"
 #include    "CIDLib_Process.hpp"
 #include    "CIDLib_SafeCounter.hpp"
-#include    "CIDLib_Semaphore.hpp"
 #include    "CIDLib_SharedMemory.hpp"
 #include    "CIDLib_Signals.hpp"
 #include    "CIDLib_StatusController.hpp"
