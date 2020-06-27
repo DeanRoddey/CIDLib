@@ -1054,11 +1054,11 @@ tCIDLib::TVoid
 TWindow::AutoAdjustChildren(const TArea& areaPrev, const TArea& areaNew)
 {
     //
-    //  If not in a restored position, don't do anything. Or, if the previous size
+    //  If in a minimized position, don't do anything. Or, if the previous size
     //  is zero, then we are getting called from the initial size change, so we
     //  don't want to do anything.
     //
-    if ((ePosState() != tCIDCtrls::EPosStates::Restored)
+    if ((ePosState() == tCIDCtrls::EPosStates::Minimized)
     ||  areaPrev.szArea().bAllZero())
     {
         return;

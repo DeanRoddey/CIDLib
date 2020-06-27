@@ -1102,26 +1102,6 @@ TKrnlCommPort::bWriteRawBuf(const   tCIDLib::TVoid* const   pToWrite
         m_pExtra->c4WriteTimeout = c4Timeout;
     }
 
-    //
-    //  Temp code to help debug a Z-Wave driver Z-Stick virtual comm port error. It
-    //  starts always throwing a semaphore timeout (121) error because the serial port
-    //  isn't accepting data.
-    //
-    #if CID_DEBUG_ON
-    // #define FAKEBADPORT 1
-    #if defined(FAKEBADPORT)
-    static tCIDLib::TBoolean bFailIt = kCIDLib::False;
-    if (bFailIt && (c4BytesToWrite > 8))
-    {
-        // Actually block for the timeout, in case that's important
-        ::Sleep(c4Timeout);
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcComm_Write, 121);
-        return kCIDLib::False;
-    }
-    #endif
-    #endif
-
-
     if (!::WriteFile(m_hcommThis.m_phcommiThis->hComm, pToWrite, c4BytesToWrite, &c4BytesWritten, 0))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcComm_Write, ::GetLastError());

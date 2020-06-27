@@ -976,9 +976,12 @@ TSMTPClient::Authenticate(          TCIDDataSrc&            cdsSrc
 
     //
     //  Ok, looks like we are good to go. Send the Base64 encoded user
-    //  name.
+    //  name. We could have lines longer than the default 72 characters,
+    //  so up that considerably so a long username/password combo will
+    //  not wrap.
     //
     TBase64 b64Auth;
+    b64Auth.c4LineWidth(4096);
     {
         m_strmFmt.Reset();
         TTextStringInStream strmSrc(&m_strUserName);
@@ -1670,7 +1673,10 @@ TSMTPClient::OutputAttachments(         TCIDDataSrc&            cdsSrc
                     << kCIDLib::DNewLn;
         SendAccum(cdsSrc, enctEnd);
 
-        // Encode the attachment to our temp formatting stream
+        //
+        //  Encode the attachment to our temp formatting stream. We didn't change
+        //  the default 72 character line length on the base64 object, so it will
+        //  wrap the lines appropriately for our needs.
         m_strmFmt.Reset();
         b64Encode.Encode(strmSrc, m_strmFmt);
         m_strmFmt.Flush();

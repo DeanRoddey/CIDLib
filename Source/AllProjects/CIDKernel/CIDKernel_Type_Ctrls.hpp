@@ -280,6 +280,7 @@ namespace tCIDCtrls
 
         // Common combos
         , HelperFrame           = 0x16CC0000
+        , HelperFrameNV         = 0x06CC0000
         , PaneContainer         = 0x52000000
         , StdFrameNV            = 0x02CC0000
         , StdFrame              = 0x12CC0000
