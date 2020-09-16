@@ -110,3 +110,8 @@ int main(int argc, char** argv) \
 #define CID_DEBUG_OFF       1
 #endif
 
+// ---------------------------------------------------------------------------
+//  Suppress a single line MSVC warning - since MSVC is not used on Linux,
+//  this does nothing here.
+// ---------------------------------------------------------------------------
+#define CIDLib_Suppress(wid)
