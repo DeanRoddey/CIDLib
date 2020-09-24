@@ -74,7 +74,7 @@ template <typename TVal> class TNamedValMap : public TObject
         using TMyType = TNamedValMap<TVal>;
         using TPair = TKeyObjPair<TString, TVal>;
 
-        template <typename TVal> class TNVMItem
+        template <typename TVal2> class TNVMItem
         {
             public  :
                 // -----------------------------------------------------------
@@ -131,7 +131,7 @@ template <typename TVal> class TNamedValMap : public TObject
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
                 tCIDLib::TBoolean bAddValue(const   TString&    strSubKey
-                                            , const TVal&       objToSet)
+                                            , const TVal2&       objToSet)
                 {
                     // If it already exists, then don't do it
                     const TPair* pkobjTar = m_colPairs.pobjFindByKey(strSubKey);
@@ -149,7 +149,7 @@ template <typename TVal> class TNamedValMap : public TObject
                 }
 
                 tCIDLib::TBoolean
-                bQueryValue(const TString& strSubKey, TVal& objToFill) const
+                bQueryValue(const TString& strSubKey, TVal2& objToFill) const
                 {
                     // If this subkey doesn't exist, we fail
                     const TPair* pkobjTar = m_colPairs.pobjFindByKey(strSubKey);
@@ -171,7 +171,7 @@ template <typename TVal> class TNamedValMap : public TObject
                 }
 
                 tCIDLib::TBoolean bSetValue(const   TString&    strSubKey
-                                            , const TVal&       objValToSet)
+                                            , const TVal2&       objValToSet)
                 {
                     // If the sub-key doesn't exist, we fail
                     TPair* pkobjTar = m_colPairs.pobjFindByKey(strSubKey);
@@ -208,7 +208,7 @@ template <typename TVal> class TNamedValMap : public TObject
                     return m_strKey;
                 }
 
-                TVal* pobjValue(const TString& strSubKey)
+                TVal2* pobjValue(const TString& strSubKey)
                 {
                     // If the sub-key doesn't exist, return nul for failiure
                     TPair* pkobjRet = m_colPairs.pobjFindByKey(strSubKey);
@@ -217,7 +217,7 @@ template <typename TVal> class TNamedValMap : public TObject
                     return &pkobjRet->objValue();
                 }
 
-                const TVal* pobjValue(const TString& strSubKey) const
+                const TVal2* pobjValue(const TString& strSubKey) const
                 {
                     // If the sub-key doesn't exist, return null for failure
                     const TPair* pkobjRet = m_colPairs.pobjFindByKey(strSubKey);

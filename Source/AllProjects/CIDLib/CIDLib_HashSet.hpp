@@ -184,15 +184,15 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <typename TElem, class TKeyOps> class TConstCursor
+        template <typename TElem2, class TKeyOps2> class TConstCursor
 
-            : public TBiColCursor<TElem>
+            : public TBiColCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
                 //  Public types
                 // -----------------------------------------------------------
-                using TParent = TBiColCursor<TElem>;
+                using TParent = TBiColCursor<TElem2>;
 
 
                 // -----------------------------------------------------------
@@ -205,7 +205,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                     {
                         TBaseLock lockInit;
                         if (!pclsThis)
-                            pclsThis = new TClass(L"THashSet::TConstCursor<TElem,TKeyOps>");
+                            pclsThis = new TClass(L"THashSet::TConstCursor<TElem2,TKeyOps2>");
                     }
                     return *pclsThis;
                 }
@@ -378,7 +378,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                     return TParent::clsThis();
                 }
 
-                const TElem& objRCur() const final
+                const TElem2& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -478,15 +478,15 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
         };
 
 
-        template <typename TElem, class TKeyOps> class TNonConstCursor
+        template <typename TElem2, class TKeyOps2> class TNonConstCursor
 
-            : public TConstCursor<TElem, TKeyOps>
+            : public TConstCursor<TElem2, TKeyOps2>
         {
             public  :
                 // -----------------------------------------------------------
                 //  Public types
                 // -----------------------------------------------------------
-                using TParent = TConstCursor<TElem, TKeyOps>;
+                using TParent = TConstCursor<TElem2, TKeyOps2>;
 
 
                 // -----------------------------------------------------------
@@ -499,7 +499,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                     {
                         TBaseLock lockInit;
                         if (!pclsThis)
-                            pclsThis = new TClass(L"THashSet::TNonConstCursor<TElem,TKeyOps>");
+                            pclsThis = new TClass(L"THashSet::TNonConstCursor<TElem2,TKeyOps2>");
                     }
                     return *pclsThis;
                 }
@@ -544,20 +544,20 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                     return *this;
                 }
 
-                TElem& operator*() const
+                TElem2& operator*() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem&>(this->pnodeCur()->objData());
+                    return const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
-                TElem* operator->() const
+                TElem2* operator->() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return &const_cast<TElem&>(this->pnodeCur()->objData());
+                    return &const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
                 // -----------------------------------------------------------
@@ -584,14 +584,14 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                TElem& objWCur() const
+                TElem2& objWCur() const
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem&>(this->pnodeCur()->objData());
+                    return const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
 

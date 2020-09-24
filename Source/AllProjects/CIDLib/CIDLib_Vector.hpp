@@ -61,7 +61,7 @@ class TVector : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem2> class TConstCursor : public TBiColCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -118,13 +118,13 @@ class TVector : public TCollection<TElem>
                     return !TConstCursor::operator==(cursSrc);
                 }
 
-                TConstCursor<TElem>& operator++()
+                TConstCursor<TElem2>& operator++()
                 {
                     this->bNext();
                     return *this;
                 }
 
-                TConstCursor<TElem> operator++(int)
+                TConstCursor<TElem2> operator++(int)
                 {
                     TConstCursor cursTmp(*this);
                     this->bNext();
@@ -196,7 +196,7 @@ class TVector : public TCollection<TElem>
                     return bIsValid();
                 }
 
-                const TElem& objRCur() const final
+                const TElem2& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -247,11 +247,11 @@ class TVector : public TCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TMyType::TConstCursor<TElem>, TBiColCursor<TElem>
+                    TMyType::TConstCursor<TElem2>, TBiColCursor<TElem2>
                 )
         };
 
-        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem2> class TNonConstCursor : public TConstCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -293,35 +293,35 @@ class TVector : public TCollection<TElem>
                     return *this;
                 }
 
-                TElem& operator*() const
+                TElem2& operator*() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return static_cast<TElem&>
+                    return static_cast<TElem2&>
                     (
                         m_pcolNCCursoring->objAt(TIndex(this->i4CurIndex()))
                     );
                 }
 
-                TElem* operator->() const
+                TElem2* operator->() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return &static_cast<TElem&>
+                    return &static_cast<TElem2&>
                     (
                         m_pcolNCCursoring->objAt(TIndex(this->i4CurIndex()))
                     );
                 }
 
-                TNonConstCursor<TElem>& operator++()
+                TNonConstCursor<TElem2>& operator++()
                 {
                     this->bNext();
                     return *this;
                 }
 
-                TNonConstCursor<TElem> operator++(int)
+                TNonConstCursor<TElem2> operator++(int)
                 {
                     TNonConstCursor cursTmp(*this);
                     this->bNext();
@@ -332,14 +332,14 @@ class TVector : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                TElem& objWCur() const
+                TElem2& objWCur() const
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return static_cast<TElem&>
+                    return static_cast<TElem2&>
                     (
                         m_pcolNCCursoring->objAt(TIndex(this->i4CurIndex()))
                     );
@@ -364,8 +364,8 @@ class TVector : public TCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TMyType::TNonConstCursor<TElem>
-                    , TMyType::TConstCursor<TElem>
+                    TMyType::TNonConstCursor<TElem2>
+                    , TMyType::TConstCursor<TElem2>
                 )
         };
 

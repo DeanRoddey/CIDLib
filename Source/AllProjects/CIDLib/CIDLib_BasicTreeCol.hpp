@@ -893,7 +893,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <typename TElem> class TConstCursor : public TColCursor<TElem>
+        template <typename TElem2> class TConstCursor : public TColCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1006,7 +1006,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                const TElem& objRCur() const override
+                const TElem2& objRCur() const override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -1107,12 +1107,12 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TBasicTreeCol::TConstCursor<TElem>
-                    , TColCursor<TElem>
+                    TBasicTreeCol::TConstCursor<TElem2>
+                    , TColCursor<TElem2>
                 )
         };
 
-        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem2> class TNonConstCursor : public TConstCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1156,20 +1156,20 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                     return *this;
                 }
 
-                TElem& operator*() const
+                TElem2& operator*() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem&>(this->pnodeCur()->objData());
+                    return const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
-                TElem* operator->() const
+                TElem2* operator->() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return &const_cast<TElem&>(this->pnodeCur()->objData());
+                    return &const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
                 TNonConstCursor& operator++()
@@ -1189,7 +1189,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                TElem& objWCur() const
+                TElem2& objWCur() const
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -1198,7 +1198,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
 
-                    return const_cast<TElem&>(this->pnodeCur()->objData());
+                    return const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
 
@@ -1217,13 +1217,13 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TBasicTreeCol::TNonConstCursor<TElem>
-                    , TBasicTreeCol::TConstCursor<TElem>
+                    TBasicTreeCol::TNonConstCursor<TElem2>
+                    , TBasicTreeCol::TConstCursor<TElem2>
                 )
         };
 
 
-        template <typename TElem> class TConstScopeCursor : public TColCursor<TElem>
+        template <typename TElem2> class TConstScopeCursor : public TColCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1349,7 +1349,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                const TElem& objRCur() const override
+                const TElem2& objRCur() const override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -1448,11 +1448,11 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Do any needed magic macros
                 // -----------------------------------------------------------
-                TemplateRTTIDefs(TConstScopeCursor<TElem>,TColCursor<TElem>)
+                TemplateRTTIDefs(TConstScopeCursor<TElem2>,TColCursor<TElem2>)
         };
 
 
-        template <typename TElem> class TNonConstScopeCursor : public TConstScopeCursor<TElem>
+        template <typename TElem2> class TNonConstScopeCursor : public TConstScopeCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1464,7 +1464,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                 }
 
-                TNonConstScopeCursor(       TBasicTreeCol<TElem>* const pcolToCursor
+                TNonConstScopeCursor(       TBasicTreeCol<TElem2>* const pcolToCursor
                                     , const TString&                    strStartNode) :
 
                     TParent(pcolToCursor, strStartNode)
@@ -1473,7 +1473,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 }
 
                 // We have to lock first, so we can't use member init!
-                TNonConstScopeCursor(const TNonConstScopeCursor<TElem>& cursSrc)
+                TNonConstScopeCursor(const TNonConstScopeCursor<TElem2>& cursSrc)
                 {
                     TNonConstScopeCursor::operator=(cursSrc);
                 }
@@ -1506,7 +1506,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                TElem& objWCur()
+                TElem2& objWCur()
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -1535,8 +1535,8 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TMyTpye::TNonConstScopeCursor<TElem>
-                    , TMyType::TConstScopeCursor<TElem>
+                    TMyTpye::TNonConstScopeCursor<TElem2>
+                    , TMyType::TConstScopeCursor<TElem2>
                 )
         };
 

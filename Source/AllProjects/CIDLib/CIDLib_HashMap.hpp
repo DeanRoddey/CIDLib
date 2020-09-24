@@ -205,7 +205,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <typename TElem, class TKey, class TKeyOps> class TConstCursor :
+        template <typename TElem2, class TKey2, class TKeyOps2> class TConstCursor :
 
             public TBiColCursor<TPair>
         {
@@ -226,7 +226,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                     {
                         TBaseLock lockInit;
                         if (!pclsThis)
-                            pclsThis = new TClass(L"THashMap::TConstCursor<TElem, TKey, TKeyOps>");
+                            pclsThis = new TClass(L"THashMap::TConstCursor<TElem2, TKey2, TKeyOps2>");
                     }
                     return *pclsThis;
                 }
@@ -454,15 +454,15 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         };
 
 
-        template <typename TElem, class TKey, class TKeyOps> class TNonConstCursor :
+        template <typename TElem2, class TKey2, class TKeyOps2> class TNonConstCursor :
 
-            public TConstCursor<TElem, TKey, TKeyOps>
+            public TConstCursor<TElem2, TKey2, TKeyOps2>
         {
             public  :
                 // -----------------------------------------------------------
                 //  Public types
                 // -----------------------------------------------------------
-                using TParent = TConstCursor<TElem, TKey, TKeyOps>;
+                using TParent = TConstCursor<TElem2, TKey2, TKeyOps2>;
 
                 // -----------------------------------------------------------
                 //  Public, static methods
@@ -474,7 +474,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                     {
                         TBaseLock lockInit;
                         if (!pclsThis)
-                            pclsThis = new TClass(L"THashMap::TNonConstCursor<TElem, TKey, TKeyOps>");
+                            pclsThis = new TClass(L"THashMap::TNonConstCursor<TElem2, TKey2, TKeyOps2>");
                     }
                     return *pclsThis;
                 }

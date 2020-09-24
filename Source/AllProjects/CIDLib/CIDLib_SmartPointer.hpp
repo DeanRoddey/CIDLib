@@ -250,10 +250,10 @@ template <typename T> class TUniquePtr
         //  We need a base class to hold our object and a derived class that can hold
         //  a deleter. Our base class is the default and just calls delete on it.
         // -------------------------------------------------------------------
-        template <typename T> struct TDataPtr
+        template <typename T2> struct TDataPtr
         {
             public :
-                TDataPtr(T* const pobjAdopt) : m_pobjData(pobjAdopt) {}
+                TDataPtr(T2* const pobjAdopt) : m_pobjData(pobjAdopt) {}
                 virtual ~TDataPtr() {}
 
                 virtual tCIDLib::TVoid DestroyData()
@@ -261,14 +261,14 @@ template <typename T> class TUniquePtr
                     delete m_pobjData;
                 }
 
-                T*  m_pobjData;
+                T2*  m_pobjData;
         };
 
-        template <typename T, typename TDeleter> struct TDataPtrDel : public TDataPtr<T>
+        template <typename T2, typename TDeleter> struct TDataPtrDel : public TDataPtr<T>
         {
-            TDataPtrDel(T* const pobjAdopt, TDeleter fnDelete) :
+            TDataPtrDel(T2* const pobjAdopt, TDeleter fnDelete) :
 
-                TDataPtr<T>(pobjAdopt)
+                TDataPtr<T2>(pobjAdopt)
                 , m_fnDeleter(fnDelete)
             {
             }
@@ -856,7 +856,7 @@ template <typename T> class TCntPtr
         // -------------------------------------------------------------------
         //  Friend declaration
         // -------------------------------------------------------------------
-        template <typename T> friend class TWeakPtr;
+        template <typename T2> friend class TWeakPtr;
 
 
         // -------------------------------------------------------------------
@@ -1344,28 +1344,28 @@ template <typename T> class TMemberPtr
         //  We need a base class to hold our object and a derived class that can hold
         //  a deleter. Our base class is the default and just called delete on it.
         // -------------------------------------------------------------------
-        template <typename T> struct TDataPtr
+        template <typename T2> struct TDataPtr
         {
-            TDataPtr(T* const pobjAdopt) : m_pobjData(pobjAdopt) {}
-            virtual TDataPtr<T>* pdpDuplicate() = 0;
+            TDataPtr(T2* const pobjAdopt) : m_pobjData(pobjAdopt) {}
+            virtual TDataPtr<T2>* pdpDuplicate() = 0;
             virtual tCIDLib::TVoid DestroyData() = 0;
 
-            T*  m_pobjData;
+            T2*  m_pobjData;
         };
 
-        template <typename T>
-        struct TDataPtrDefDC : public TDataPtr<T>
+        template <typename T2>
+        struct TDataPtrDefDC : public TDataPtr<T2>
         {
-            TDataPtrDefDC(T* const pobjAdopt) : TDataPtr<T>(pobjAdopt)
+            TDataPtrDefDC(T2* const pobjAdopt) : TDataPtr<T2>(pobjAdopt)
             {
             }
 
             // Duplicate ourself and our contained data
-            [[nodiscard]] TDataPtr<T>* pdpDuplicate() final
+            [[nodiscard]] TDataPtr<T2>* pdpDuplicate() final
             {
-                return new TDataPtrDefDC<T>
+                return new TDataPtrDefDC<T2>
                 (
-                    this->m_pobjData ? new T(*this->m_pobjData) : nullptr
+                    this->m_pobjData ? new T2(*this->m_pobjData) : nullptr
                 );
             }
 
@@ -1375,21 +1375,21 @@ template <typename T> class TMemberPtr
             }
         };
 
-        template <typename T, typename TCopier, typename TDeleter>
-        struct TDataPtrCustDC : public TDataPtr<T>
+        template <typename T2, typename TCopier, typename TDeleter>
+        struct TDataPtrCustDC : public TDataPtr<T2>
         {
-            TDataPtrCustDC(T* const pobjAdopt, TCopier fnCopy, TDeleter fnDelete) :
+            TDataPtrCustDC(T2* const pobjAdopt, TCopier fnCopy, TDeleter fnDelete) :
 
-                TDataPtr<T>(pobjAdopt)
+                TDataPtr<T2>(pobjAdopt)
                 , m_fnCopier(fnCopy)
                 , m_fnDeleter(fnDelete)
             {
             }
 
             // Duplicate ourself and our contained data
-            [[nodiscard]] TDataPtr<T>* pdpDuplicate() final
+            [[nodiscard]] TDataPtr<T2>* pdpDuplicate() final
             {
-                return new TDataPtrCustDC<T, TCopier, TDeleter>
+                return new TDataPtrCustDC<T2, TCopier, TDeleter>
                 (
                     this->m_pobjData ? m_fnCopier(this->m_pobjData) : nullptr
                     , m_fnCopier

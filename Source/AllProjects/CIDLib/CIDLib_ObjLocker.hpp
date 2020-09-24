@@ -130,7 +130,7 @@ template <typename T> class TObjLock
         // -------------------------------------------------------------------
         //  Declare our friends
         // -------------------------------------------------------------------
-        template<typename T> friend class TObjLocker;
+        template<typename T2> friend class TObjLocker;
 
 
         // -------------------------------------------------------------------

@@ -66,7 +66,7 @@ class TRefVector : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem2> class TConstCursor : public TBiColCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -201,7 +201,7 @@ class TRefVector : public TRefCollection<TElem>
                     return bIsValid();
                 }
 
-                const TElem& objRCur() const final
+                const TElem2& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -257,13 +257,13 @@ class TRefVector : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TMyType::TConstCursor<TElem>
-                    , TBiColCursor<TElem>
+                    TMyType::TConstCursor<TElem2>
+                    , TBiColCursor<TElem2>
                 )
         };
 
 
-        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem2> class TNonConstCursor : public TConstCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -283,7 +283,7 @@ class TRefVector : public TRefCollection<TElem>
                 }
 
                 // We have to lock first, so we can't use member init!
-                TNonConstCursor(const TNonConstCursor<TElem>& cursSrc)
+                TNonConstCursor(const TNonConstCursor<TElem2>& cursSrc)
                 {
                     operator=(cursSrc);
                 }
@@ -305,23 +305,23 @@ class TRefVector : public TRefCollection<TElem>
                     return *this;
                 }
 
-                TElem& operator*() const
+                TElem2& operator*() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return *static_cast<TElem*>
+                    return *static_cast<TElem2*>
                     (
                         m_pcolNCCursoring->pobjAt(TIndex(this->i4CurIndex()))
                     );
                 }
 
-                TElem* operator->() const
+                TElem2* operator->() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return static_cast<TElem*>
+                    return static_cast<TElem2*>
                     (
                         m_pcolNCCursoring->pobjAt(TIndex(this->i4CurIndex()))
                     );
@@ -344,14 +344,14 @@ class TRefVector : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                TElem& objWCur() const
+                TElem2& objWCur() const
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return *static_cast<TElem*>
+                    return *static_cast<TElem2*>
                     (
                         m_pcolNCCursoring->pobjAt(TIndex(this->i4CurIndex()))
                     );
@@ -373,8 +373,8 @@ class TRefVector : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TMyType::TNonConstCursor<TElem>
-                    , TMyType::TConstCursor<TElem>
+                    TMyType::TNonConstCursor<TElem2>
+                    , TMyType::TConstCursor<TElem2>
                 )
         };
 
