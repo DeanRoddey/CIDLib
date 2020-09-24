@@ -239,13 +239,13 @@ class CIDLIBEXP TEnumMap
 //  generated enums as long as they have the standard three magic values, without
 //  any extra overhead.
 //
-#define eMinEnumVal(E) E##::Min
-#define eMaxEnumVal(E) E##::Max
-#define eEnumValCount(E) E##::Count
+#define eMinEnumVal(E) E::Min
+#define eMaxEnumVal(E) E::Max
+#define eEnumValCount(E) E::Count
 
-#define c4MinEnumVal(E) tCIDLib::TCard4(E##::Min)
-#define c4MaxEnumVal(E) tCIDLib::TCard4(E##::Max)
-#define c4EnumValCount(E) tCIDLib::TCard4(E##::Count)
+#define c4MinEnumVal(E) tCIDLib::TCard4(E::Min)
+#define c4MaxEnumVal(E) tCIDLib::TCard4(E::Max)
+#define c4EnumValCount(E) tCIDLib::TCard4(E::Count)
 
 
 //
