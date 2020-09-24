@@ -98,15 +98,15 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_CollectCursor.hpp"
 #include    "CIDLib_Collection.hpp"
 
+#include    "CIDLib_FundStack.hpp"
+#include    "CIDLib_BinOutStream.hpp"
+#include    "CIDLib_BinInStream.hpp"
+#include    "CIDLib_FundStackStrmOps.hpp"
 #include    "CIDLib_CircularBuf.hpp"
 #include    "CIDLib_FundArray.hpp"
 #include    "CIDLib_FundDeque.hpp"
 #include    "CIDLib_FundQueue.hpp"
-#include    "CIDLib_FundStack.hpp"
 #include    "CIDLib_FundVector.hpp"
-
-#include    "CIDLib_BinInStream.hpp"
-#include    "CIDLib_BinOutStream.hpp"
 
 
 // ---------------------------------------------------------------------------
