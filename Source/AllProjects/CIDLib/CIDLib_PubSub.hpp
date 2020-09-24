@@ -209,13 +209,13 @@ class CIDLIBEXP MPubSubscription
         // -------------------------------------------------------------------
         //  Declare friends
         // -------------------------------------------------------------------
-        friend static tCIDLib::TVoid SendMsg
+        friend tCIDLib::TVoid SendMsg
         (
             const   tCIDLib::TCard4         c4SubId
             , const TPubSubMsg&             psmsgToSend
         );
 
-        friend static tCIDLib::ESortComps eCompSubId
+        friend tCIDLib::ESortComps eCompSubId
         (
             const   tCIDLib::TCard4&        c4ToComp
             , const MPubSubscription&       mpsubToComp
@@ -376,7 +376,7 @@ class CIDLIBEXP TPubSubTopic : public TObject
         //  internally, and let the internal scavenger call have access to our
         //  our subscription object.
         // -------------------------------------------------------------------
-        friend static tCIDLib::TVoid DoScavenge();
+        friend tCIDLib::TVoid DoScavenge();
         friend class MPubSubscription;
 
 
