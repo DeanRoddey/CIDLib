@@ -46,6 +46,59 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+class TTextOutStream;
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStreamJanitor
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+class CIDLIBEXP TStreamJanitor
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TStreamJanitor() = delete;
+
+        TStreamJanitor(TTextOutStream* const pstrmToSanitize);
+
+        TStreamJanitor(const TStreamJanitor&) = delete;
+        TStreamJanitor(TStreamJanitor&&) = delete;
+
+        ~TStreamJanitor();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStreamJanitor& operator=(const TStreamJanitor&) = delete;
+        TStreamJanitor& operator=(TStreamJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        const TStreamFmt& strmfSaved() const;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_pstrmToSanitize
+        //      This is the pointer to the text out stream we are providing
+        //      janitorial services for.
+        //
+        //  m_strmfSave
+        //      This is the saved stream format state to be restored.
+        // -------------------------------------------------------------------
+        TTextOutStream* m_pstrmToSanitize;
+        TStreamFmt      m_strmfSave;
+};
+
+
 
 // ---------------------------------------------------------------------------
 //   CLASS: TTextOutStream
@@ -630,69 +683,25 @@ class CIDLIBEXP TTextOutStream : public TObject
 
 
 
-// ---------------------------------------------------------------------------
-//   CLASS: TStreamJanitor
-//  PREFIX: jan
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TStreamJanitor
+TStreamJanitor::TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
+    m_pstrmToSanitize(pstrmToSanitize)
+    , m_strmfSave()
 {
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TStreamJanitor() = delete;
+    if (m_pstrmToSanitize)
+        m_strmfSave.SetFrom(*pstrmToSanitize);
+}
 
-        #pragma warning(suppress : 26429) // It can legally be null
-        TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
+TStreamJanitor::~TStreamJanitor()
+{
+    if (m_pstrmToSanitize)
+        m_pstrmToSanitize->SetFormat(m_strmfSave);
+}
 
-            m_pstrmToSanitize(pstrmToSanitize)
-            , m_strmfSave()
-        {
-            if (m_pstrmToSanitize)
-                m_strmfSave.SetFrom(*pstrmToSanitize);
-        }
+const TStreamFmt& TStreamJanitor::strmfSaved() const
+{
+    return m_strmfSave;
+}
 
-        TStreamJanitor(const TStreamJanitor&) = delete;
-        TStreamJanitor(TStreamJanitor&&) = delete;
-
-        ~TStreamJanitor()
-        {
-            if (m_pstrmToSanitize)
-                m_pstrmToSanitize->SetFormat(m_strmfSave);
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TStreamJanitor& operator=(const TStreamJanitor&) = delete;
-        TStreamJanitor& operator=(TStreamJanitor&&) = delete;
-        tCIDLib::TVoid* operator new(size_t) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        const TStreamFmt& strmfSaved() const
-        {
-            return m_strmfSave;
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_pstrmToSanitize
-        //      This is the pointer to the text out stream we are providing
-        //      janitorial services for.
-        //
-        //  m_strmfSave
-        //      This is the saved stream format state to be restored.
-        // -------------------------------------------------------------------
-        TTextOutStream* m_pstrmToSanitize;
-        TStreamFmt      m_strmfSave;
-};
 
 
 // ---------------------------------------------------------------------------
