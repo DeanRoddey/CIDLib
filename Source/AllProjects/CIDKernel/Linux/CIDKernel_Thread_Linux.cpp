@@ -652,15 +652,17 @@ tCIDLib::TBoolean TKrnlThread::bUnblock()
 }
 
 
-// <TBD> Deal with new bState parameter
 tCIDLib::TBoolean
 TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
                             ,       tCIDLib::EExitCodes&    eToFill
                             , const tCIDLib::TCard4         c4MilliSeconds) const
 {
+    bState = kCIDLib::False;
+
     if (m_hthrThis.m_phthriThis->bJoined)
     {
         eToFill = m_hthrThis.m_phthriThis->eExit;
+        bState = kCIDLib::True;
         return kCIDLib::True;
     }
 
@@ -690,8 +692,8 @@ TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
     }
     else
     {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_Timeout);
-        return kCIDLib::False;
+        // Timeout now returns true while setting bState to false.
+        return kCIDLib::True;
     }
 
     m_hthrThis.m_phthriThis->eExit = tCIDLib::EExitCodes(tCIDLib::TSInt(pHostExit));
@@ -700,6 +702,7 @@ TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
 
     eToFill = m_hthrThis.m_phthriThis->eExit;
 
+    bState = kCIDLib::True;
     return kCIDLib::True;
 }
 
