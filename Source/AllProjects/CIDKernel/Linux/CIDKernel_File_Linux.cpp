@@ -510,6 +510,20 @@ TKrnlFile::bReadBuffer(         tCIDLib::TVoid* const   pBuffer
 }
 
 
+tCIDLib::TBoolean
+TKrnlFile::bReadBufferTO(       tCIDLib::TVoid* const   pBuffer
+                        , const tCIDLib::TCard4         c4ToRead
+                        ,       tCIDLib::TCard4&        c4BytesRead
+                        , const tCIDLib::TCard4         c4MaxWait
+                        ,       TKrnlEvent&             kevToPost)
+{
+    // <TBD>
+    c4BytesRead = 0;
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
 tCIDLib::TBoolean TKrnlFile::bSetFilePointer(const tCIDLib::TCard8& c8ToSet)
 {
     //
@@ -639,4 +653,18 @@ TKrnlFile::bWriteBuffer(const   tCIDLib::TVoid* const   pBuffer
     c4BytesWritten = count;
 
     return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TKrnlFile::bWriteBufferTO(  const   tCIDLib::TVoid* const   pBuffer
+                            , const tCIDLib::TCard4         c4ToWrite
+                            ,       tCIDLib::TCard4&        c4BytesWritten
+                            , const tCIDLib::TCard4         c4MaxWait
+                            ,       TKrnlEvent&             kevToPost)
+{
+    // <TBD>
+    c4BytesWritten = 0;
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
 }

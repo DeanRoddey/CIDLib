@@ -245,6 +245,6 @@ tCIDLib::TVoid TKrnlSignals::PlatformInit()
 
 tCIDLib::TVoid TKrnlSignals::GenerateCtrlCSignal()
 {
-    raise(SIGINT);
+    ::raise(SIGINT);
 }
 

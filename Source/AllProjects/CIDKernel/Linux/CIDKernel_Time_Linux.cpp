@@ -313,6 +313,72 @@ TKrnlTimeStamp::bDayOfWeek(tCIDLib::EWeekDays& eToFill) const
 }
 
 
+//
+//  Expand out all of the information from our current timestamp. Calling
+//  the separate methods might create an inconsistency in some uses.
+//
+tCIDLib::TBoolean
+TKrnlTimeStamp::bExpandDetails( tCIDLib::TCard4&            c4Year
+                                , tCIDLib::EMonths&         eMonth
+                                , tCIDLib::TCard4&          c4Day
+                                , tCIDLib::EWeekDays&       eWeekDay
+                                , tCIDLib::TCard4&          c4Hour
+                                , tCIDLib::TCard4&          c4Minute
+                                , tCIDLib::TCard4&          c4Second
+                                , tCIDLib::TCard4&          c4Millis
+                                , tCIDLib::TEncodedTime&    enctStamp) const
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+
+//
+//  Moves the time forward a number of days dealing with the issues of DST,
+//  leap years and so forth. For days, we convert to UTC where a day is
+//  always 24 hours and then convert back to the local time zone, so that
+//  one is easy enough.
+//
+tCIDLib::TBoolean
+TKrnlTimeStamp::bForwardByDays(const tCIDLib::TCard4 c4Count)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+//
+//  For months we pull out the details, move the month forward, adding years
+//  if they go more than 12 months, then we check the date to see if we hit
+//  a leap day and adjust if so. Here, we don't have to deal with DST since
+//  we are dealing in years, months, days, so when we convert back, DST will
+//  have been taken care of.
+//
+tCIDLib::TBoolean
+TKrnlTimeStamp::bForwardByMonths(const tCIDLib::TCard4 c4Count)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+//
+//  For years, we do similarly to months above. WE break out the details and
+//  move the year forward. We see if we hit a leap day and adjust forward if
+//  so. Then we convert back and that deals with the DST issues for us.
+//
+tCIDLib::TBoolean
+TKrnlTimeStamp::bForwardByYears(const tCIDLib::TCard4 c4Count)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
 tCIDLib::TBoolean
 TKrnlTimeStamp::bFromDetails(const  tCIDLib::TCard4     c4Year
                             , const tCIDLib::EMonths    eMonth
@@ -344,6 +410,22 @@ TKrnlTimeStamp::bFromDetails(const  tCIDLib::TCard4     c4Year
     TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime - timezone, m_enctTime);
 
     return kCIDLib::True;
+}
+
+
+//
+//  Set our stamp from the passed time values. The date will be the base
+//  time stamp date.
+//
+tCIDLib::TBoolean
+TKrnlTimeStamp::bFromTimeDetails(const  tCIDLib::TCard4     c4Hour
+                                , const tCIDLib::TCard4     c4Minute
+                                , const tCIDLib::TCard4     c4Second
+                                , const tCIDLib::TCard4     c4MilliSecs)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
 }
 
 

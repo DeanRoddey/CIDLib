@@ -141,6 +141,27 @@ const TProcessHandleImpl& TProcessHandle::hprociThis() const
 //  TKrnlProcess functions
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
+TKrnlProcess::bActivateProcess(const tCIDLib::TProcessId pidToActivate)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlProcess::bCheckSingleInstanceInfo( const   tCIDLib::TCh* const     pszResName
+                                        ,       tCIDLib::TBoolean&      bFound
+                                        ,       TKrnlExtProcess* const  pkextpTarget)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    bFound = kCIDLib::False;
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
 TKrnlProcess::bSetPriorityClass(const tCIDLib::EPrioClasses eClass)
 {
     if (eClass != tCIDLib::EPrioClasses::Normal
@@ -173,6 +194,17 @@ TKrnlProcess::bSetPriorityClass(const tCIDLib::EPrioClasses eClass)
     }
 
     return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TKrnlProcess::bSetSingleInstanceInfo(   const   tCIDLib::TCh* const pszResName
+                                        , const tCIDLib::TBoolean   bBringOldForward
+                                        ,       tCIDLib::TBoolean&  bFoundOld)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
 }
 
 

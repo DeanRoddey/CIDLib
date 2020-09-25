@@ -652,6 +652,25 @@ tCIDLib::TBoolean TKrnlThread::bUnblock()
 }
 
 
+//
+//  Wait for up to a given time for this thread to die. If the return is true, then
+//  the bDied parameter is updated with the died or not state.
+//
+//  This one has to do a two-object wait, for either this thread to die, or for this
+//  thread to post the passed event, which is a very useful thing to b eable to do.
+//
+tCIDLib::TBoolean
+TKrnlThread::bWaitEvOrDeath(        TKrnlEvent&         kevWait
+                            ,       tCIDLib::TBoolean&  bDied
+                            , const tCIDLib::TCard4     c4MilliSecs)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    bDied = kCIDLib::False;
+    return kCIDLib::False;
+}
+
+
 tCIDLib::TBoolean
 TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
                             ,       tCIDLib::EExitCodes&    eToFill
