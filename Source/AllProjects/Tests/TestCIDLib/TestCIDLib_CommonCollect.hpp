@@ -59,7 +59,7 @@ TestColBasics(          TTextOutStream& strmOut
     }
 
     // Get a cursor and check the elements
-    TCol::TNCCursor cursTest(&colToTest);
+    typename TCol::TNCCursor cursTest(&colToTest);
 
     if (cursTest.c4ElemCount() != c4InitialCount)
         strmOut << CUR_LN << L"Element count not correct via cursor" << kCIDLib::NewLn;
@@ -69,7 +69,7 @@ TestColBasics(          TTextOutStream& strmOut
         strmOut << CUR_LN << L"Cursor reset failed" << kCIDLib::NewLn;
 
     // Create aanother cursor to test invalidation
-    TCol::TCursor cursTest2(&colToTest);
+    typename TCol::TCursor cursTest2(&colToTest);
 
     //
     //  Delete the first element. We have to reset the cursor, which leaves it
