@@ -264,7 +264,7 @@ namespace tCIDLib
         typename E
         , E eStart = eMinEnumVal(E)
         , E eEnd = eMaxEnumVal(E)
-        , typename IterCB = tCIDLib::TVoid (*IterCB)(const E)
+        , typename IterCB = tCIDLib::TVoid (*)(const E)
     > tCIDLib::TVoid ForEachE(IterCB iterCB)
     {
         for (E eInd = eStart; eInd <= eEnd; eInd++)
@@ -276,7 +276,7 @@ namespace tCIDLib
     //  A variation that can be broken out of, and returns the value it stopped on.
     //  If it goes to the end, the return will be the ::Count value.
     //
-    template<typename E, typename IterCB = tCIDLib::TBoolean (*IterCB)(const E)>
+    template<typename E, typename IterCB = tCIDLib::TBoolean (*)(const E)>
     E eForEachE(IterCB iterCB)
     {
         E eInd = eMinEnumVal(E);
