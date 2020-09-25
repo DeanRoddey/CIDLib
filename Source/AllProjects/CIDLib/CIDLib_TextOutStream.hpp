@@ -683,27 +683,6 @@ class CIDLIBEXP TTextOutStream : public TObject
 
 
 
-TStreamJanitor::TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
-    m_pstrmToSanitize(pstrmToSanitize)
-    , m_strmfSave()
-{
-    if (m_pstrmToSanitize)
-        m_strmfSave.SetFrom(*pstrmToSanitize);
-}
-
-TStreamJanitor::~TStreamJanitor()
-{
-    if (m_pstrmToSanitize)
-        m_pstrmToSanitize->SetFormat(m_strmfSave);
-}
-
-const TStreamFmt& TStreamJanitor::strmfSaved() const
-{
-    return m_strmfSave;
-}
-
-
-
 // ---------------------------------------------------------------------------
 //   CLASS: TStreamIndentJan
 //  PREFIX: jan
