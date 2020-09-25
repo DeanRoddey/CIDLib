@@ -755,7 +755,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 TLocker lockrSrc(&colSrc);
                 TLocker lockrThis(this);
 
-                TBiColCursor<TPair>::operator=(tCIDLib::ForceMove(colSrc));
+                TMapCollection<TElem, TKey>::operator=(tCIDLib::ForceMove(colSrc));
 
                 //
                 //  We swap the element content. This has to include the modulus
