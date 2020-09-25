@@ -270,12 +270,13 @@ template <typename T> class TFundStackJan
 
         T tValue() const
         {
-            return m_fcolStack->tPeek();
+            return m_pfcolStack->tPeek();
         }
 
     private :
         TFundStackJan(const TFundStackJan&);
         tCIDLib::TVoid operator=(const TFundStackJan&);
+        TFundStack<T>* m_pfcolStack;
 };
 
 #pragma CIDLIB_POPPACK
