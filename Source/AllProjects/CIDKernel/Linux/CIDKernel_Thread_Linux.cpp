@@ -418,7 +418,8 @@ tCIDLib::TBoolean TKrnlThread::bAdoptCaller()
 
 tCIDLib::TBoolean TKrnlThread::bIsRunning(tCIDLib::TBoolean& bToFill) const
 {
-    bToFill = (::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0) == 0);
+    bToFill = (m_hthrThis.m_phthriThis->tidThis != kCIDLib::tidInvalid)
+        && (::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0) == 0);
     return kCIDLib::True;
 }
 
