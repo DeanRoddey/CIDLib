@@ -443,22 +443,79 @@ template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
             return m_ptElements[m_c4Head];
         }
 
+        TBinInStream& ReadFromStream(TBinInStream& strmToReadFrom)
+        {
+            // First we should get a stream marker
+            strmToReadFrom.CheckForMarker
+            (
+                tCIDLib::EStreamMarkers::StartObject
+                , CID_FILE
+                , CID_LINE
+            );
 
-    protected :
-        // -------------------------------------------------------------------
-        //  Declare our friends
-        // -------------------------------------------------------------------
-        friend TBinOutStream& operator<< <T>
-        (
-                    TBinOutStream&          strmOut
-            , const TFundDeque<T>&          fcolToStream
-        );
+            // Get out the new max and count
+            tCIDLib::TCard4 c4NewCount;
+            tCIDLib::TCard4 c4NewMax;
+            strmToReadFrom >> c4NewMax >> c4NewCount;
 
-        friend TBinInStream& operator>> <T>
-        (
-                    TBinInStream&           strmIn
-            ,       TFundDeque<T>&          fcolToStream
-        );
+            // Validate these
+            if ((c4NewCount > c4NewMax) || !c4NewMax)
+            {
+                facCIDLibEarly().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kCIDErrs::errcFData_BadExtData
+                    , tCIDLib::ESeverities::Failed
+                    , tCIDLib::EErrClasses::Format
+                );
+            }
+
+            //
+            //  If the current max size and the new max size are not the
+            //  same, then reallocate.
+            //
+            if (m_c4MaxElements != c4NewMax)
+            {
+                delete [] m_ptElements;
+                m_ptElements = 0;
+                m_ptElements = new T[c4NewMax];
+                m_c4MaxElements = c4NewMax;
+            }
+
+            // Set the head to zero and the tail to the new count
+            m_c4Head = 0;
+            m_c4Tail = c4NewCount;
+
+            // And load up the data
+            strmToReadFrom.ReadArray(m_ptElements, c4NewCount);
+            return strmToReadFrom;
+        }
+
+        TBinOutStream& WriteToStream(TBinOutStream& strmToWriteTo)
+        {
+            // Store a stream marker for safety, then the max and current sizes
+            strmToWriteTo << tCIDLib::EStreamMarkers::StartObject
+                          << m_c4MaxElements
+                          << c4ElemCount();
+
+            //
+            //  NOTE: Because of the wraparound, we cannot do a bulk write
+            //  here, even if the elements are byte sized.
+            //
+            tCIDLib::TCard4 c4CurInd = m_c4Head;
+            while (c4CurInd != m_c4Tail)
+            {
+                // Write out the current element
+                strmToWriteTo << m_ptElements[c4CurInd];
+
+                // Bump the index and wrap around if required
+                c4CurInd++;
+                if (c4CurInd == m_c4MaxElements)
+                    c4CurInd = 0;
+            }
+            return strmToWriteTo;
+        }
 
 
     private :
@@ -500,77 +557,13 @@ template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
 template <typename T> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TFundDeque<T>& fcolToStream)
 {
-    // First we should get a stream marker
-    strmToReadFrom.CheckForMarker
-    (
-        tCIDLib::EStreamMarkers::StartObject
-        , CID_FILE
-        , CID_LINE
-    );
-
-    // Get out the new max and count
-    tCIDLib::TCard4 c4NewCount;
-    tCIDLib::TCard4 c4NewMax;
-    strmToReadFrom >> c4NewMax >> c4NewCount;
-
-    // Validate these
-    if ((c4NewCount > c4NewMax) || !c4NewMax)
-    {
-        facCIDLibEarly().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcFData_BadExtData
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Format
-        );
-    }
-
-    //
-    //  If the current max size and the new max size are not the
-    //  same, then reallocate.
-    //
-    if (fcolToStream.m_c4MaxElements != c4NewMax)
-    {
-        delete [] fcolToStream.m_ptElements;
-        fcolToStream.m_ptElements = 0;
-        fcolToStream.m_ptElements = new T[c4NewMax];
-        fcolToStream.m_c4MaxElements = c4NewMax;
-    }
-
-    // Set the head to zero and the tail to the new count
-    fcolToStream.m_c4Head = 0;
-    fcolToStream.m_c4Tail = c4NewCount;
-
-    // And load up the data
-    strmToReadFrom.ReadArray(fcolToStream.m_ptElements, c4NewCount);
-    return strmToReadFrom;
+    return fcolToStream.ReadFromStream(strmToReadFrom);
 }
 
 
 template <typename T> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TFundDeque<T>& fcolToStream)
 {
-    // Store a stream marker for safety, then the max and current sizes
-    strmToWriteTo << tCIDLib::EStreamMarkers::StartObject
-                  << fcolToStream.m_c4MaxElements
-                  << fcolToStream.c4ElemCount();
-
-    //
-    //  NOTE: Because of the wraparound, we cannot do a bulk write
-    //  here, even if the elements are byte sized.
-    //
-    tCIDLib::TCard4 c4CurInd = fcolToStream.m_c4Head;
-    while (c4CurInd != fcolToStream.m_c4Tail)
-    {
-        // Write out the current element
-        strmToWriteTo << fcolToStream.m_ptElements[c4CurInd];
-
-        // Bump the index and wrap around if required
-        c4CurInd++;
-        if (c4CurInd == fcolToStream.m_c4MaxElements)
-            c4CurInd = 0;
-    }
-    return strmToWriteTo;
+    return fcolToStream.WriteToStream(strmToWriteTo);
 }
 

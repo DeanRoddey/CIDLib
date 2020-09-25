@@ -36,6 +36,7 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+
 // ---------------------------------------------------------------------------
 //   CLASS: TFundArray
 //  PREFIX: fcol
@@ -412,22 +413,40 @@ class TFundArray : public TFundColBase, public MDuplicable
             );
         }
 
+        TBinOutStream& WriteToStream(TBinOutStream& strmToWriteTo) const
+        {
+            //
+            //  Store the element count and then the elements. We stream out
+            //  a stream maker to add a little safety.
+            //
+            strmToWriteTo << tCIDLib::EStreamMarkers::StartObject << m_c4ElemCount;
+            TBinOutStream_WriteArray(strmToWriteTo, m_ptElements, m_c4ElemCount);
+            return strmToWriteTo;
+        }
 
-    protected :
-        // -------------------------------------------------------------------
-        //  Declare our friends
-        // -------------------------------------------------------------------
-        friend TBinOutStream& operator<< <TElem, TIndex>
-        (
-                    TBinOutStream&          strmOut
-            , const TMyType&                fcolToStream
-        );
+        TBinInStream& ReadFromStream(TBinInStream& strmToReadFrom)
+        {
+            strmToReadFrom.CheckForMarker
+            (
+                tCIDLib::EStreamMarkers::StartObject
+                , CID_FILE
+                , CID_LINE
+            );
 
-        friend TBinInStream& operator>> <TElem, TIndex>
-        (
-                    TBinInStream&           strmIn
-            ,       TMyType&                fcolToStream
-        );
+            // Pull the element count out
+            tCIDLib::TCard4 c4NewCount;
+            strmToReadFrom >> c4NewCount;
+
+            if (m_c4ElemCount != c4NewCount)
+            {
+                m_c4ElemCount = c4NewCount;
+                delete [] m_ptElements;
+                m_ptElements = nullptr;
+                m_ptElements = new TElem[m_c4ElemCount];
+            }
+            TBinInStream_ReadArray(strmToReadFrom, m_ptElements, m_c4ElemCount);
+            return strmToReadFrom;
+        }
 
 
     private :
@@ -457,37 +476,12 @@ class TFundArray : public TFundColBase, public MDuplicable
 template <typename TElem, typename TIndex> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TFundArray<TElem, TIndex>& colToStream)
 {
-    //
-    //  Store the element count and then the elements. We stream out
-    //  a stream maker to add a little safety.
-    //
-    strmToWriteTo << tCIDLib::EStreamMarkers::StartObject << colToStream.m_c4ElemCount;
-    TBinOutStream_WriteArray(strmToWriteTo, colToStream.m_ptElements, colToStream.m_c4ElemCount);
-    return strmToWriteTo;
+    return colToStream.WriteToStream(strmToWriteTo);
 }
 
 template <typename TElem, typename TIndex> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TFundArray<TElem, TIndex>& colToStream)
 {
-    strmToReadFrom.CheckForMarker
-    (
-        tCIDLib::EStreamMarkers::StartObject
-        , CID_FILE
-        , CID_LINE
-    );
-
-    // Pull the element count out
-    tCIDLib::TCard4 c4NewCount;
-    strmToReadFrom >> c4NewCount;
-
-    if (colToStream.m_c4ElemCount != c4NewCount)
-    {
-        colToStream.m_c4ElemCount = c4NewCount;
-        delete [] colToStream.m_ptElements;
-        colToStream.m_ptElements = nullptr;
-        colToStream.m_ptElements = new TElem[colToStream.m_c4ElemCount];
-    }
-    TBinInStream_ReadArray(strmToReadFrom, colToStream.m_ptElements, colToStream.m_c4ElemCount);
-    return strmToReadFrom;
+    return colToStream.ReadFromStream(strmToReadFrom);
 }
 
