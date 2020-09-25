@@ -66,6 +66,17 @@ namespace CIDKernel_Thread_Linux
     tCIDLib::TThreadId  tidPrimary;
 
 
+    // -----------------------------------------------------------------------
+    //  Our per-thread info structure and storage per thread
+    // -----------------------------------------------------------------------
+    struct  TPerThreadInfo
+    {
+        tCIDLib::TBoolean   bIsGUIThread = kCIDLib::False;
+    };
+
+    thread_local TPerThreadInfo ptiThread;
+
+
     // ---------------------------------------------------------------------------
     //  Local methods
     // ---------------------------------------------------------------------------
@@ -244,6 +255,13 @@ tCIDLib::TBoolean TKrnlThread::bIsCaller(const TKrnlThread& kthrToTest)
 }
 
 
+// Return whether the callng thread is a GUI marked thread
+tCIDLib::TBoolean TKrnlThread::bIsCallerGUIThread()
+{
+    return CIDKernel_Thread_Linux::ptiThread.bIsGUIThread;
+}
+
+
 tCIDLib::TBoolean
 TKrnlThread::bPriorityOf(const  TKrnlThread&            kthrToQuery
                         ,       tCIDLib::EPrioLevels&   eToFill)
@@ -402,6 +420,13 @@ tCIDLib::TBoolean TKrnlThread::bIsRunning(tCIDLib::TBoolean& bToFill) const
 {
     bToFill = (::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0) == 0);
     return kCIDLib::True;
+}
+
+
+// Return whether we are marked as the GUI thread, which is in the per-thread data
+tCIDLib::TBoolean TKrnlThread::bIsGUIThread() const
+{
+    return CIDKernel_Thread_Linux::ptiThread.bIsGUIThread;
 }
 
 
@@ -676,6 +701,17 @@ TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
     eToFill = m_hthrThis.m_phthriThis->eExit;
 
     return kCIDLib::True;
+}
+
+
+//
+//  Sets the GUI thread marker flag. This is set in a per thread memory location so that
+//  we can get back to it without the outside world having to pass it in to all of the
+//  handle waiting methods.
+//
+tCIDLib::TVoid TKrnlThread::MarkAsGUIThread()
+{
+    CIDKernel_Thread_Linux::ptiThread.bIsGUIThread = kCIDLib::True;
 }
 
 
