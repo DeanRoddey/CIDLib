@@ -99,7 +99,7 @@ const TClass& Class::clsThis() \
 
 #define AdvRTTIDecls(Class,ParentClass) \
 [[nodiscard]] TObject* pMakeNew_##Class() {return new Class;} \
-__pragma (warning(suppress : 26426)) \
+_Pragma("warning(suppress : 26426)") \
 static const TTypeFactoryKicker Class##Kicker(CIDLib_MakeLStr2(Class), pMakeNew_##Class); \
 const TClass& Class::clsThis() \
 { \
