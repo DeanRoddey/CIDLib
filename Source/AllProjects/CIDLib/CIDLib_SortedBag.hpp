@@ -137,7 +137,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
                 return this->objAddAtTop(objNew);
 
             // If the cursor is invalid, it will go at the end
-            TParType::TCursor cursAt = cursFindInsert(objNew);
+            typename TParType::TCursor cursAt = cursFindInsert(objNew);
             TElem& objRet = this->objInsertAfter(objNew, cursAt);
 
             // Invalidate any cursors
@@ -170,7 +170,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
                 return this->objAddAtTop(objNew);
 
             // If the cursor is invalid, it will go at the end
-            TParType::TCursor cursAt = cursFindInsert(objNew);
+            typename TParType::TCursor cursAt = cursFindInsert(objNew);
             TElem& objRet = this->objInsertAfter(tCIDLib::ForceMove(objNew), cursAt);
 
             // Invalidate any cursors
@@ -196,7 +196,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
 
             // If the cursor is invalid, it will go at the end
             TElem objNew(tCIDLib::Forward<TArgs>(Args)...);
-            TParType::TCursor cursAt(cursFindInsert(objNew));
+            typename TParType::TCursor cursAt(cursFindInsert(objNew));
             TElem& objRet = this->objInsertAfter(objNew, cursAt);
 
             // Invalidate any cursors
@@ -210,9 +210,9 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Find the insertion point for a new object
         // -------------------------------------------------------------------
-        TBasicDLinkedCol<TElem>::TCursor cursFindInsert(const TElem& objNew)
+        typename TBasicDLinkedCol<TElem>::TCursor cursFindInsert(const TElem& objNew)
         {
-            TBasicDLinkedCol<TElem>::TCursor cursRet(this);
+            typename TBasicDLinkedCol<TElem>::TCursor cursRet(this);
 
             //
             //  Find the position to put the new element at. We just iterate

@@ -427,7 +427,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
             private :
@@ -1259,8 +1259,8 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         // -------------------------------------------------------------------
         //  Declare our friends
         // -------------------------------------------------------------------
-        friend class TCursor;
-        friend class TNCCursor;
+        friend TCursor;
+        friend TNCCursor;
 
 
         // -------------------------------------------------------------------
@@ -1519,10 +1519,10 @@ TBinOutStream& operator<<(          TBinOutStream&                  strmOut
                 <<  colToStream.c4HashModulus();
 
     // If there were any elements, then stream them
-    THashMap<TElem, TKey, TKeyOps>::TCursor cursOut(&colToStream);
+    typename THashMap<TElem, TKey, TKeyOps>::TCursor cursOut(&colToStream);
     while (cursOut.bIsValid())
     {
-        const THashMap<TElem, TKey, TKeyOps>::TPair& kobjCur = cursOut.objRCur();
+        const typename THashMap<TElem, TKey, TKeyOps>::TPair& kobjCur = cursOut.objRCur();
         strmOut << kobjCur.objKey() << kobjCur.objValue();
         ++cursOut;
     }

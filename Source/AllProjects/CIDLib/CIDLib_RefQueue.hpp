@@ -330,7 +330,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
             private :
@@ -977,8 +977,8 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Declare our friends
         // -------------------------------------------------------------------
-        friend class TConstCursor<TElem>;
-        friend class TNonConstCursor<TElem>;
+        friend TConstCursor<TElem>;
+        friend TNonConstCursor<TElem>;
 
 
         // -------------------------------------------------------------------

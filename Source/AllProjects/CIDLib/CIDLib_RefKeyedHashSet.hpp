@@ -452,7 +452,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
                 // -----------------------------------------------------------
@@ -642,7 +642,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
                 // -----------------------------------------------------------

@@ -424,7 +424,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
                 // -----------------------------------------------------------
@@ -599,7 +599,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
                 // -----------------------------------------------------------
@@ -1522,7 +1522,7 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
                 <<  colToStream.c4HashModulus();
 
     // If there were any elements, then stream them
-    THashSet<TElem,TKeyOps>::TCursor cursOut(&colToStream);
+    typename THashSet<TElem,TKeyOps>::TCursor cursOut(&colToStream);
     for (; cursOut; ++cursOut)
         strmOut << *cursOut;
 

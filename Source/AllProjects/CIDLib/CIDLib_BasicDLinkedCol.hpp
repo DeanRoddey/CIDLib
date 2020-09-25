@@ -230,7 +230,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
             private :
@@ -381,8 +381,8 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  More aliases for the nested cursor classes
         // -------------------------------------------------------------------
-        using TCursor = typename TConstCursor<TElem>;
-        using TNCCursor = typename TNonConstCursor<TElem>;
+        using TCursor = TConstCursor<TElem>;
+        using TNCCursor = TNonConstCursor<TElem>;
 
 
         // -------------------------------------------------------------------

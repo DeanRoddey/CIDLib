@@ -438,7 +438,7 @@ class TKeyedHashSet : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
                 // -----------------------------------------------------------
@@ -626,7 +626,7 @@ class TKeyedHashSet : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
                 // -----------------------------------------------------------
@@ -1801,7 +1801,7 @@ TBinOutStream& operator<<(          TBinOutStream&                      strmOut
                 <<  colToStream.c4HashModulus();
 
     // If there were any elements, then stream them
-    TKeyedHashSet<TElem,TKey,TKeyOps>::TCursor cursOut(&colToStream);
+    typename TKeyedHashSet<TElem,TKey,TKeyOps>::TCursor cursOut(&colToStream);
     while (cursOut.bIsValid())
     {
         strmOut << cursOut.objRCur();

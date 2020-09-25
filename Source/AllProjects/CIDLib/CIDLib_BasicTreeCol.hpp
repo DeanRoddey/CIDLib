@@ -1078,7 +1078,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
             private :
