@@ -221,6 +221,7 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_BinaryFile.hpp"
 #include    "CIDLib_FileStreamImpl.hpp"
 #include    "CIDLib_LogEvent.hpp"
+#include    "CIDLib_FundVectorDestructor.hpp"
 #include    "CIDLib_VolumeInfo.hpp"
 #include    "CIDLib_Locale.hpp"
 #include    "CIDLib_Logger.hpp"

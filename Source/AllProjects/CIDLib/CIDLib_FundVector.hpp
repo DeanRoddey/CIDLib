@@ -108,20 +108,7 @@ class TFundVector : public TFundColBase, public MDuplicable
             *this = tCIDLib::ForceMove(fcolSrc);
         }
 
-        ~TFundVector()
-        {
-            try
-            {
-                delete [] m_ptElements;
-                m_ptElements = nullptr;
-            }
-
-            catch(TError& errToCatch)
-            {
-                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
-            }
-        }
+        ~TFundVector();
 
 
         // -------------------------------------------------------------------
