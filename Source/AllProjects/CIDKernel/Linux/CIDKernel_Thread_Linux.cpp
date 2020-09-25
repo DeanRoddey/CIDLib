@@ -717,7 +717,8 @@ tCIDLib::TVoid TKrnlThread::MarkAsGUIThread()
 
 tCIDLib::TVoid TKrnlThread::Orphan()
 {
-    if (!::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0))
+    if (m_hthrThis.bIsValid()
+    && !::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0))
         ::pthread_detach(m_hthrThis.m_phthriThis->tidThis);
 }
 

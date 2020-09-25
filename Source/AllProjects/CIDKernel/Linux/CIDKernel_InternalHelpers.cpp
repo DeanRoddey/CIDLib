@@ -308,7 +308,10 @@ tCIDLib::TBoolean TKrnlLinux::TThreadTimer::bTriggered() const
 
 tCIDLib::TVoid TKrnlLinux::TThreadTimer::Cancel()
 {
-    ::pthread_cancel(m_tidThis);
+    if (m_tidThis != kCIDLib::tidInvalid)
+    {
+        ::pthread_cancel(m_tidThis);
+    }
 }
 
 sigjmp_buf& TKrnlLinux::TThreadTimer::JumpEnvironment() const
