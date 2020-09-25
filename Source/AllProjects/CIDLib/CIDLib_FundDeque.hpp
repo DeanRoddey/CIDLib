@@ -492,7 +492,7 @@ template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
             return strmToReadFrom;
         }
 
-        TBinOutStream& WriteToStream(TBinOutStream& strmToWriteTo)
+        TBinOutStream& WriteToStream(TBinOutStream& strmToWriteTo) const
         {
             // Store a stream marker for safety, then the max and current sizes
             strmToWriteTo << tCIDLib::EStreamMarkers::StartObject
