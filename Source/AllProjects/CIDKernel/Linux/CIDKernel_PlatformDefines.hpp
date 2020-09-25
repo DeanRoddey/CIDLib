@@ -73,6 +73,15 @@
 
 #define CIDLIB_POPPACK  pack(pop)
 
+// ---------------------------------------------------------------------------
+//  Declare the global variables for argc and argv
+// ---------------------------------------------------------------------------
+namespace CIDKernel_SystemInfo_Linux
+{
+    extern int argc;
+    extern char** argv;
+}
+
 
 // ---------------------------------------------------------------------------
 //  Define our version of the magic main module macro. We need to grab argc
@@ -83,10 +92,8 @@
 #define CIDLib_MainModule(thrCtor) \
 int main(int argc, char** argv) \
 { \
-    extern int CIDKernel_SystemInfo_Linux_argc; \
-    extern char** CIDKernel_SystemInfo_Linux_argv; \
-    CIDKernel_SystemInfo_Linux_argc = argc; \
-    CIDKernel_SystemInfo_Linux_argv = argv; \
+    CIDKernel_SystemInfo_Linux::argc = argc; \
+    CIDKernel_SystemInfo_Linux::argv = argv; \
     TThread* pthrToStart = new thrCtor; \
     CIDLib_MakePrimary(pthrToStart); \
     CIDLib_Init(); \
