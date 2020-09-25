@@ -703,7 +703,7 @@ class TVector : public TCollection<TElem>
         //  you'd do a lot better yourself doing a binary search and adding if not
         //  found.
         //
-        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        template <typename TComp = tCIDLib::TDefEqComp<TMyElemType>>
         tCIDLib::TBoolean bAddIfNew(const TElem& objToAdd, TComp pfnComp = TComp())
         {
             TLocker lockrThis(this);
@@ -727,7 +727,7 @@ class TVector : public TCollection<TElem>
         //  sorted. If it is, you can do better by doing a binary search and
         //  removing it yourself.
         //
-        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        template <typename TComp = tCIDLib::TDefEqComp<TMyElemType>>
         tCIDLib::TBoolean
         bRemoveIfMember(const TElem& objToRemove, TComp pfnComp = TComp())
         {

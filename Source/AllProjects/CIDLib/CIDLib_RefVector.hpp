@@ -609,7 +609,7 @@ class TRefVector : public TRefCollection<TElem>
             return kCIDLib::True;
         }
 
-        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        template <typename TComp = tCIDLib::TDefEqComp<TMyElemType>>
         tCIDLib::TBoolean bAddIfNew(const TElem& objToAdd, TComp pfnComp = TComp())
         {
             TLocker lockrThis(this);
@@ -644,7 +644,7 @@ class TRefVector : public TRefCollection<TElem>
         //  it is, you can do much better by doing a binary search and removing it
         //  yourself by located index.
         //
-        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        template <typename TComp = tCIDLib::TDefEqComp<TMyElemType>>
         tCIDLib::TBoolean
         bRemoveIfMember(const TElem& objToRemove, TComp pfnComp = TComp())
         {
