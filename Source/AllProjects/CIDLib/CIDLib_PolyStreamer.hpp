@@ -240,7 +240,7 @@ template <typename TElem> class TPolyStreamer : public TObject
             // Make sure its a legal record type
             if (c1RecordType != tCIDLib::TCard1(0xEA))
             {
-                facCIDLib().ThrowErr
+                facCIDLibEarly().ThrowErr
                 (
                     CID_FILE
                     , CID_LINE
@@ -264,7 +264,7 @@ template <typename TElem> class TPolyStreamer : public TObject
             //
             if (bNewClass && (c2NextId != c2NewId))
             {
-                facCIDLib().ThrowErr
+                facCIDLibEarly().ThrowErr
                 (
                     CID_FILE
                     , CID_LINE
@@ -395,7 +395,7 @@ template <typename TElem> class TPolyStreamer : public TObject
             }
 
             // This should never happen
-            facCIDLib().ThrowErr
+            facCIDLibEarly().ThrowErr
             (
                 CID_FILE
                 , CID_LINE

@@ -369,7 +369,7 @@ operator>>(TBinInStream& strmToReadFrom, TFundQueue<T>& colToStream)
     // Validate these
     if ((c4NewCount > c4NewMax) || !c4NewMax)
     {
-        facCIDLib().ThrowErr
+        facCIDLibEarly().ThrowErr
         (
             CID_FILE
             , CID_LINE

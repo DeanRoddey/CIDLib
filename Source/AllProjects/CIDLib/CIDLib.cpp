@@ -604,6 +604,15 @@ TFacCIDLib& facCIDLib()
     return *pfacCIDLib;
 }
 
+//
+//  This function does the same thing as above but is able to be
+//  forward-declared before the definition of TFacCIDLib.
+//
+TModule& facCIDLibEarly()
+{
+    return facCIDLib();
+}
+
 
 //
 //  This is called from the magic main thread macro in CIDLib.Hpp. Its called

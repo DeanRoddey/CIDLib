@@ -98,6 +98,8 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_CollectCursor.hpp"
 #include    "CIDLib_Collection.hpp"
 
+TModule& facCIDLibEarly();
+
 #include    "CIDLib_FundStack.hpp"
 #include    "CIDLib_BinOutStream.hpp"
 #include    "CIDLib_BinInStream.hpp"
