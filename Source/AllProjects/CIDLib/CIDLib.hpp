@@ -98,7 +98,7 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_CollectCursor.hpp"
 #include    "CIDLib_Collection.hpp"
 
-TModule& facCIDLibEarly();
+extern CIDLIBEXP TModule& facCIDLibEarly();
 
 #include    "CIDLib_FundStack.hpp"
 #include    "CIDLib_BinOutStream.hpp"
@@ -255,6 +255,7 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_TextFileStream.hpp"
 #include    "CIDLib_TextMBufStream.hpp"
 #include    "CIDLib_TextStringStream.hpp"
+#include    "CIDLib_KeyedHashSet.hpp"
 #include    "CIDLib_PolyStreamer.hpp"
 #include    "CIDLib_StreamLexer.hpp"
 
@@ -287,7 +288,6 @@ extern CIDLIBEXP TFacCIDLib& facCIDLib();
 #include    "CIDLib_Queue.hpp"
 #include    "CIDLib_Stack.hpp"
 #include    "CIDLib_HashSet.hpp"
-#include    "CIDLib_KeyedHashSet.hpp"
 #include    "CIDLib_HashMap.hpp"
 #include    "CIDLib_SortedBag.hpp"
 #include    "CIDLib_FindBuf.hpp"

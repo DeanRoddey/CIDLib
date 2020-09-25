@@ -1449,7 +1449,7 @@ class TKeyedHashSet : public TCollection<TElem>
             if (!m_kopsToUse.bCompKeys( m_pfnKeyExtract(pnodeRep->objData())
                                         , m_pfnKeyExtract(objNewValue)))
             {
-                facCIDLib().ThrowErr
+                facCIDLibEarly().ThrowErr
                 (
                     CID_FILE
                     , CID_LINE
