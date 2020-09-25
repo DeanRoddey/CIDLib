@@ -288,7 +288,7 @@ eCompTest(const tCIDLib::TCard4& c41, const tCIDLib::TCard4& c42)
         return tCIDLib::ESortComps::FirstLess;
     else if (c41 > c42)
         return tCIDLib::ESortComps::FirstGreater;
-    tCIDLib::ESortComps::Equal;
+    return tCIDLib::ESortComps::Equal;
 }
 
 static tCIDLib::TVoid DummyFunc()
