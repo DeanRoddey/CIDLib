@@ -237,6 +237,19 @@ const TKrnlError& TKrnlError::kerrLast()
 }
 
 
+// Load the message text for the indicated OS error code
+tCIDLib::TBoolean
+TKrnlError::bQuerySysErrMsg(const   tCIDLib::TOSErrCode     errcGet
+                            ,       tCIDLib::TCh* const     pszToFill
+                            , const tCIDLib::TCard4         c4MaxChars)
+{
+    char schErrorNarrow[c4MaxChars] = {0};
+    ::strerror_r(errcGet, schErrorNarrow, sizeof(schErrorNarrow));
+    ::swprintf(pszToFill, c4MaxChars, L"%s", schErrorNarrow);
+    return kCIDLib::True;
+}
+
+
 tCIDLib::TVoid
 TKrnlError::ThrowHostError(const tCIDLib::TOSErrCode errcHostId)
 {
