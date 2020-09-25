@@ -95,6 +95,16 @@ namespace kCIDLib
     //  that we can have a slot for our own internal use.
     // -----------------------------------------------------------------------
     constexpr tCIDLib::TCard4       c4MaxWaitHandles = 63;
+
+    // -----------------------------------------------------------------------
+    //  Since we currently allow each platform to use its own wide character
+    //  format in memory, we need to have this
+    // -----------------------------------------------------------------------
+    #if defined(CIDLIB_LITTLEENDIAN)
+    constexpr tCIDLib::EBaseTextFmts        eWCCharFmt = tCIDLib::EBaseTextFmts::FourByte_LE;
+    #else
+    constexpr tCIDLib::EBaseTextFmts        eWCCharFmt = tCIDLib::EBaseTextFmts::FourByte_BE;
+    #endif
 }
 
 
