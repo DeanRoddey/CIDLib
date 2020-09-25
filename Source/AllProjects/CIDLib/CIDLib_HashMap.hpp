@@ -113,7 +113,7 @@ template <typename TKey, class TValue> class THashMapNode
 
         TPair& kobjPair(const TPair& kobjToSet)
         {
-            m_kobjPair = objToSet;
+            m_kobjPair = kobjToSet;
             return m_kobjPair;
         }
 
@@ -755,7 +755,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 TLocker lockrSrc(&colSrc);
                 TLocker lockrThis(this);
 
-                TParent::operator=(tCIDLib::ForceMove(colSrc));
+                TBiColCursor<TPair>::operator=(tCIDLib::ForceMove(colSrc));
 
                 //
                 //  We swap the element content. This has to include the modulus
