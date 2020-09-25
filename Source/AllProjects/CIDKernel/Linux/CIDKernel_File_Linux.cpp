@@ -201,6 +201,17 @@ tCIDLib::TBoolean TKrnlFile::bClose()
 }
 
 
+tCIDLib::TBoolean TKrnlFile::bFlush()
+{
+    if (::fsync(m_hflThis.m_phfliThis->iFd))
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
+
+
 tCIDLib::TBoolean TKrnlFile::bQueryCurSize(tCIDLib::TCard8& c8ToFill) const
 {
     struct stat StatBuf;
