@@ -1568,7 +1568,7 @@ TBinInStream& operator>>(TBinInStream&                      strmIn
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
             strmIn >> objKey >> objValue;
-            colToStream.objAdd(THashMap<TElem, TKey, TKeyOps>::TPair(objKey, objValue));
+            colToStream.objAdd(typename THashMap<TElem, TKey, TKeyOps>::TPair(objKey, objValue));
         }
     }
 
