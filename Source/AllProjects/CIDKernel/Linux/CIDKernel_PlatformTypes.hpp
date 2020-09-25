@@ -160,7 +160,7 @@ namespace tCIDLib
         tCIDLib::TCard1 c1Red;
         tCIDLib::TCard1 c1Green;
         tCIDLib::TCard1 c1Blue;
-        tCIDLib::TCard1 c1Dummy;
+        tCIDLib::TCard1 c1Alpha;
     };
     #pragma CIDLIB_POPPACK
 }
