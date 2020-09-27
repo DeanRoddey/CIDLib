@@ -119,6 +119,21 @@ TEventHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TKrnlEvent: Public, static methods
+// ---------------------------------------------------------------------------
+tCIDLib::TBoolean
+TKrnlEvent::bWaitMultiple(          TKrnlEvent&         kevOne
+                            ,       TKrnlEvent&         kevTwo
+                            ,       tCIDLib::TCard4&    c4Which
+                            , const tCIDLib::TCard4     c4Wait)
+{
+    // <TBD>
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlEvent: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlEvent::TKrnlEvent() :
@@ -343,6 +358,14 @@ tCIDLib::TBoolean TKrnlEvent::bOpen()
     m_hevThis.m_pheviThis->bSysVOwner = kCIDLib::False;
 
     return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean TKrnlEvent::bPulse()
+{
+    // <TBD>
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
 }
 
 

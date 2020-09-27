@@ -869,3 +869,36 @@ TKrnlExtProcess::bWaitForDeath(         tCIDLib::TBoolean&      bState
 }
 
 
+tCIDLib::TBoolean TKrnlExtProcess::bWaitInit(const tCIDLib::TCard4 c4WaitFor)
+{
+    // <TBD>
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TVoid
+TKrnlExtProcess::FormatAttachData(          tCIDLib::TCh* const pszToFill
+                                    , const tCIDLib::TCard4     c4MaxChars)
+{
+    // <TBD>
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+}
+
+
+tCIDLib::TProcessId TKrnlExtProcess::pidThis() const
+{
+    // Get the running state. If it fails, return the invalid handle
+    tCIDLib::TBoolean bRun;
+    if (!bIsRunning(bRun))
+        return kCIDLib::pidInvalid;
+
+    // If not running, also return the invalid handle
+    if (!bRun)
+        return kCIDLib::pidInvalid;
+
+    // Looks ok, so return the id
+    return m_hprocThis.m_phprociThis->pidThis;
+}
+
+

@@ -66,6 +66,17 @@ namespace CIDKernel_Thread_Linux
     tCIDLib::TThreadId  tidPrimary;
 
 
+    // -----------------------------------------------------------------------
+    //  Our per-thread info structure and storage per thread
+    // -----------------------------------------------------------------------
+    struct  TPerThreadInfo
+    {
+        tCIDLib::TBoolean   bIsGUIThread = kCIDLib::False;
+    };
+
+    thread_local TPerThreadInfo ptiThread;
+
+
     // ---------------------------------------------------------------------------
     //  Local methods
     // ---------------------------------------------------------------------------
@@ -244,6 +255,13 @@ tCIDLib::TBoolean TKrnlThread::bIsCaller(const TKrnlThread& kthrToTest)
 }
 
 
+// Return whether the callng thread is a GUI marked thread
+tCIDLib::TBoolean TKrnlThread::bIsCallerGUIThread()
+{
+    return CIDKernel_Thread_Linux::ptiThread.bIsGUIThread;
+}
+
+
 tCIDLib::TBoolean
 TKrnlThread::bPriorityOf(const  TKrnlThread&            kthrToQuery
                         ,       tCIDLib::EPrioLevels&   eToFill)
@@ -400,8 +418,16 @@ tCIDLib::TBoolean TKrnlThread::bAdoptCaller()
 
 tCIDLib::TBoolean TKrnlThread::bIsRunning(tCIDLib::TBoolean& bToFill) const
 {
-    bToFill = (::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0) == 0);
+    bToFill = (m_hthrThis.m_phthriThis->tidThis != kCIDLib::tidInvalid)
+        && (::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0) == 0);
     return kCIDLib::True;
+}
+
+
+// Return whether we are marked as the GUI thread, which is in the per-thread data
+tCIDLib::TBoolean TKrnlThread::bIsGUIThread() const
+{
+    return CIDKernel_Thread_Linux::ptiThread.bIsGUIThread;
 }
 
 
@@ -627,15 +653,36 @@ tCIDLib::TBoolean TKrnlThread::bUnblock()
 }
 
 
-// <TBD> Deal with new bState parameter
+//
+//  Wait for up to a given time for this thread to die. If the return is true, then
+//  the bDied parameter is updated with the died or not state.
+//
+//  This one has to do a two-object wait, for either this thread to die, or for this
+//  thread to post the passed event, which is a very useful thing to b eable to do.
+//
+tCIDLib::TBoolean
+TKrnlThread::bWaitEvOrDeath(        TKrnlEvent&         kevWait
+                            ,       tCIDLib::TBoolean&  bDied
+                            , const tCIDLib::TCard4     c4MilliSecs)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    bDied = kCIDLib::False;
+    return kCIDLib::False;
+}
+
+
 tCIDLib::TBoolean
 TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
                             ,       tCIDLib::EExitCodes&    eToFill
                             , const tCIDLib::TCard4         c4MilliSeconds) const
 {
+    bState = kCIDLib::False;
+
     if (m_hthrThis.m_phthriThis->bJoined)
     {
         eToFill = m_hthrThis.m_phthriThis->eExit;
+        bState = kCIDLib::True;
         return kCIDLib::True;
     }
 
@@ -665,8 +712,8 @@ TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
     }
     else
     {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_Timeout);
-        return kCIDLib::False;
+        // Timeout now returns true while setting bState to false.
+        return kCIDLib::True;
     }
 
     m_hthrThis.m_phthriThis->eExit = tCIDLib::EExitCodes(tCIDLib::TSInt(pHostExit));
@@ -675,13 +722,26 @@ TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
 
     eToFill = m_hthrThis.m_phthriThis->eExit;
 
+    bState = kCIDLib::True;
     return kCIDLib::True;
+}
+
+
+//
+//  Sets the GUI thread marker flag. This is set in a per thread memory location so that
+//  we can get back to it without the outside world having to pass it in to all of the
+//  handle waiting methods.
+//
+tCIDLib::TVoid TKrnlThread::MarkAsGUIThread()
+{
+    CIDKernel_Thread_Linux::ptiThread.bIsGUIThread = kCIDLib::True;
 }
 
 
 tCIDLib::TVoid TKrnlThread::Orphan()
 {
-    if (!::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0))
+    if (m_hthrThis.bIsValid()
+    && !::pthread_kill(m_hthrThis.m_phthriThis->tidThis, 0))
         ::pthread_detach(m_hthrThis.m_phthriThis->tidThis);
 }
 

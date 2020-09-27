@@ -108,20 +108,7 @@ class TFundVector : public TFundColBase, public MDuplicable
             *this = tCIDLib::ForceMove(fcolSrc);
         }
 
-        ~TFundVector()
-        {
-            try
-            {
-                delete [] m_ptElements;
-                m_ptElements = nullptr;
-            }
-
-            catch(TError& errToCatch)
-            {
-                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
-            }
-        }
+        ~TFundVector();
 
 
         // -------------------------------------------------------------------
@@ -654,22 +641,43 @@ class TFundVector : public TFundColBase, public MDuplicable
             return tNotFound;
         }
 
+        TBinOutStream& WriteToStream(TBinOutStream& strmToWriteTo) const
+        {
+            // Store a stream marker for safety
+            strmToWriteTo << tCIDLib::EStreamMarkers::StartObject;
 
-    protected :
-        // -------------------------------------------------------------------
-        //  Declare our friends
-        // -------------------------------------------------------------------
-        friend TBinOutStream& operator<< <TElem, TIndex>
-        (
-                    TBinOutStream&          strmOut
-            , const TMyType&                colToStream
-        );
+            // Stream out the active element count and then the elements
+            strmToWriteTo << m_c4CurIndex;
+            TBinOutStream_WriteArray(strmToWriteTo, m_ptElements, m_c4CurIndex);
+            return strmToWriteTo;
+        }
+        TBinInStream& ReadFromStream(TBinInStream& strmToReadFrom)
+        {
+            // First we should get a stream marker
+            strmToReadFrom.CheckForMarker
+            (
+                tCIDLib::EStreamMarkers::StartObject, CID_FILE, CID_LINE
+            );
 
-        friend TBinInStream& operator>> <TElem, TIndex>
-        (
-                    TBinInStream&           strmIn
-            ,       TMyType&                colToStream
-        );
+            // Stream in the stored element count
+            strmToReadFrom >> m_c4CurIndex;
+
+            //
+            //  If the new count is bigger than our current allocation size,
+            //  we have to reallocate. We don't have to retain old content
+            //  here.
+            //
+            if (m_c4CurIndex > m_c4AllocSize)
+            {
+                m_c4AllocSize = m_c4CurIndex + 32;
+                delete [] m_ptElements;
+                m_ptElements = new TElem[m_c4AllocSize];
+            }
+
+            // And read in the stored elements
+            TBinInStream_ReadArray(strmToReadFrom, m_ptElements, m_c4CurIndex);
+            return strmToReadFrom;
+        }
 
 
     private :
@@ -741,41 +749,12 @@ class TFundVector : public TFundColBase, public MDuplicable
 template <typename TElem, typename TIndex> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TFundVector<TElem, TIndex>& colToStream)
 {
-    // First we should get a stream marker
-    strmToReadFrom.CheckForMarker
-    (
-        tCIDLib::EStreamMarkers::StartObject, CID_FILE, CID_LINE
-    );
-
-    // Stream in the stored element count
-    strmToReadFrom >> colToStream.m_c4CurIndex;
-
-    //
-    //  If the new count is bigger than our current allocation size,
-    //  we have to reallocate. We don't have to retain old content
-    //  here.
-    //
-    if (colToStream.m_c4CurIndex > colToStream.m_c4AllocSize)
-    {
-        colToStream.m_c4AllocSize = colToStream.m_c4CurIndex + 32;
-        delete [] colToStream.m_ptElements;
-        colToStream.m_ptElements = new TElem[colToStream.m_c4AllocSize];
-    }
-
-    // And read in the stored elements
-    TBinInStream_ReadArray(strmToReadFrom, colToStream.m_ptElements, colToStream.m_c4CurIndex);
-    return strmToReadFrom;
+    return colToStream.ReadFromStream(strmToReadFrom);
 }
 
 template <typename TElem, typename TIndex> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TFundVector<TElem, TIndex>& colToStream)
 {
-    // Store a stream marker for safety
-    strmToWriteTo << tCIDLib::EStreamMarkers::StartObject;
-
-    // Stream out the active element count and then the elements
-    strmToWriteTo << colToStream.m_c4CurIndex;
-    TBinOutStream_WriteArray(strmToWriteTo, colToStream.m_ptElements, colToStream.m_c4CurIndex);
-    return strmToWriteTo;
+    return colToStream.WriteToStream(strmToWriteTo);
 }
 

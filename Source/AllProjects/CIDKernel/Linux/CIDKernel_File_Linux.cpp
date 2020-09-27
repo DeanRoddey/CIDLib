@@ -201,6 +201,17 @@ tCIDLib::TBoolean TKrnlFile::bClose()
 }
 
 
+tCIDLib::TBoolean TKrnlFile::bFlush()
+{
+    if (::fsync(m_hflThis.m_phfliThis->iFd))
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
+
+
 tCIDLib::TBoolean TKrnlFile::bQueryCurSize(tCIDLib::TCard8& c8ToFill) const
 {
     struct stat StatBuf;
@@ -499,6 +510,20 @@ TKrnlFile::bReadBuffer(         tCIDLib::TVoid* const   pBuffer
 }
 
 
+tCIDLib::TBoolean
+TKrnlFile::bReadBufferTO(       tCIDLib::TVoid* const   pBuffer
+                        , const tCIDLib::TCard4         c4ToRead
+                        ,       tCIDLib::TCard4&        c4BytesRead
+                        , const tCIDLib::TCard4         c4MaxWait
+                        ,       TKrnlEvent&             kevToPost)
+{
+    // <TBD>
+    c4BytesRead = 0;
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
 tCIDLib::TBoolean TKrnlFile::bSetFilePointer(const tCIDLib::TCard8& c8ToSet)
 {
     //
@@ -509,7 +534,7 @@ tCIDLib::TBoolean TKrnlFile::bSetFilePointer(const tCIDLib::TCard8& c8ToSet)
     off_t offActualPos = c8ToSet;
     tCIDLib::TSInt iSeekType = SEEK_SET;
 
-    if (c8ToSet == kCIDLib::c4MaxCard)
+    if (c8ToSet == kCIDLib::c8MaxCard)
     {
         offActualPos = 0;
         iSeekType = SEEK_END;
@@ -628,4 +653,18 @@ TKrnlFile::bWriteBuffer(const   tCIDLib::TVoid* const   pBuffer
     c4BytesWritten = count;
 
     return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TKrnlFile::bWriteBufferTO(  const   tCIDLib::TVoid* const   pBuffer
+                            , const tCIDLib::TCard4         c4ToWrite
+                            ,       tCIDLib::TCard4&        c4BytesWritten
+                            , const tCIDLib::TCard4         c4MaxWait
+                            ,       TKrnlEvent&             kevToPost)
+{
+    // <TBD>
+    c4BytesWritten = 0;
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
 }

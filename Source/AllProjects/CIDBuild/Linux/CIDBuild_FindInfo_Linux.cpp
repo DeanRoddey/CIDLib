@@ -173,4 +173,9 @@ TFindInfo::SetFromHostInfo( const   tCIDLib::TVoid* const   pHostFindBuf
     //  any platform can represent its time easily in a common format.
     //
     m_tmLastWrite = double(pFileInfo->StatBuf.st_mtime);
+
+    if (S_ISDIR(pFileInfo->StatBuf.st_mode))
+        m_bIsDir = kCIDLib::True;
+    else
+        m_bIsDir = kCIDLib::False;
 }

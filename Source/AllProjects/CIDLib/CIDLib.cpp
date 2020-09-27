@@ -251,7 +251,6 @@ template class TBag<TArea>;
 template class TBasicTreeCol<TArea>;
 template class TBasicDLinkedCol<TArea>;
 template class TBasicDLinkedRefCol<TArea>;
-template class TBasicTreeCol<TArea>;
 template class TEnumBitset<tCIDLib::EAdoptOpts, tCIDLib::EAdoptOpts::Count>;
 template class TCircularBuf<TString>;
 template class TCIDCacheItem<TArea>;
@@ -266,7 +265,6 @@ template class TKeyObjPair<TString,TArea>;
 template class TMngPtr<TArea>;
 template class TNamedValMap<TArea>;
 template class TObjArray<TArea>;
-template class TQueue<TString>;
 template class TPolyStreamer<TArea>;
 template class TRefBag<TArea>;
 template class TRefDeque<TArea>;
@@ -288,7 +286,7 @@ eCompTest(const tCIDLib::TCard4& c41, const tCIDLib::TCard4& c42)
         return tCIDLib::ESortComps::FirstLess;
     else if (c41 > c42)
         return tCIDLib::ESortComps::FirstGreater;
-    tCIDLib::ESortComps::Equal;
+    return tCIDLib::ESortComps::Equal;
 }
 
 static tCIDLib::TVoid DummyFunc()
@@ -602,6 +600,15 @@ TFacCIDLib& facCIDLib()
 {
     static TFacCIDLib* pfacCIDLib = new TFacCIDLib();
     return *pfacCIDLib;
+}
+
+//
+//  This function does the same thing as above but is able to be
+//  forward-declared before the definition of TFacCIDLib.
+//
+TModule& facCIDLibEarly()
+{
+    return facCIDLib();
 }
 
 

@@ -1117,3 +1117,31 @@ const TBinOutStream& TTextOutStream::strmOut() const
     return *m_pstrmOut;
 }
 
+
+// ---------------------------------------------------------------------------
+//  TStreamJanitor: Constructors and Destructor
+// ---------------------------------------------------------------------------
+TStreamJanitor::TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
+    m_pstrmToSanitize(pstrmToSanitize)
+    , m_strmfSave()
+{
+    if (m_pstrmToSanitize)
+        m_strmfSave.SetFrom(*pstrmToSanitize);
+}
+
+TStreamJanitor::~TStreamJanitor()
+{
+    if (m_pstrmToSanitize)
+        m_pstrmToSanitize->SetFormat(m_strmfSave);
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  TStreamJanitor: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+const TStreamFmt& TStreamJanitor::strmfSaved() const
+{
+    return m_strmfSave;
+}
+

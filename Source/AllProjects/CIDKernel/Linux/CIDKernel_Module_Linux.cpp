@@ -208,7 +208,7 @@ namespace CIDKernel_Module_Linux
         // a time.
         while (::fgets(szLine, iLineSize, Maps))
         {
-            if (::sscanf(szLine, " %*s %*s %*s %lu:%lu %lu"
+            if (::sscanf(szLine, " %*s %*s %*s %lx:%lx %lu"
                          , &c4DevMajor
                          , &c4DevMinor
                          , &c4Inode) != 3)

@@ -717,6 +717,135 @@ tCIDLib::TBoolean TKrnlDirSearch::bSearchIsOpen() const
 
 
 // ---------------------------------------------------------------------------
+//   CLASS: TKrnlDirChangeInfo
+//  PREFIX: kdchi
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TKrnlDirChangeInfo: Constructors and Destructor
+// ---------------------------------------------------------------------------
+TKrnlDirChangeInfo::TKrnlDirChangeInfo() :
+
+    m_eChange(tCIDLib::EDirChanges::None)
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TKrnlDirChangeInfo: Public operators
+// ---------------------------------------------------------------------------
+TKrnlDirChangeInfo& TKrnlDirChangeInfo::operator=(const TKrnlDirChangeInfo& kdchiSrc)
+{
+    if (&kdchiSrc != this)
+    {
+        m_eChange = kdchiSrc.m_eChange;
+        m_kstrName = kdchiSrc.m_kstrName;
+        m_kstrNew = kdchiSrc.m_kstrNew;
+    }
+    return *this;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TKrnlDirChangeMon
+//  PREFIX: kdchm
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TKrnlDirChangeMon: Public data
+// ---------------------------------------------------------------------------
+constexpr tCIDLib::TCard4 c4DirMonBufSz = 32 * 1024;
+struct TKrnlDirChangeMon::TDirChangeMonitorData
+{
+    int empty; // <TBD>
+};
+
+
+// ---------------------------------------------------------------------------
+//  TKrnlDirChangeMon: Constructors and Destructor
+// ---------------------------------------------------------------------------
+TKrnlDirChangeMon::TKrnlDirChangeMon() :
+
+    m_bDoSubDirs(kCIDLib::False)
+    , m_eFilters(tCIDLib::EDirChFilters::None)
+    , m_pData(nullptr)
+{
+    // Allocate our internal structure
+    m_pData = new TDirChangeMonitorData{0};
+}
+
+TKrnlDirChangeMon::~TKrnlDirChangeMon()
+{
+    // Clean up our data if not already
+    if (m_pData)
+    {
+        bCleanup();
+        delete m_pData;
+        m_pData = nullptr;
+    }
+}
+
+
+// ---------------------------------------------------------------------------
+//  TKrnlDirChangeMon: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+
+// Do a cancel on the directory handle, to break out any thread that is blocked on it
+tCIDLib::TBoolean TKrnlDirChangeMon::bCancel()
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+// Clean up anything that got created
+tCIDLib::TBoolean TKrnlDirChangeMon::bCleanup()
+{
+    m_bDoSubDirs = kCIDLib::False;
+    m_eFilters = tCIDLib::EDirChFilters::None;
+    m_kstrTargetDir.Clear();
+    return kCIDLib::True;
+}
+
+
+
+// Indicate whether we currently are monitoring or not
+tCIDLib::TBoolean TKrnlDirChangeMon::bIsReady() const
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlDirChangeMon::bReadChanges(TChangeList& kllstToFill, tCIDLib::TCard4& c4ValidCnt)
+{
+    // Make sure we return zero unless proven otherwise
+    c4ValidCnt = 0;
+
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlDirChangeMon::bStartMonitor(const  tCIDLib::TCh* const     pszTargetDir
+                                , const tCIDLib::EDirChFilters  eFilters
+                                , const tCIDLib::TBoolean       bDoSubDirs)
+{
+    // <TBD>
+    TKrnlError::SetLastError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+
+
+// ---------------------------------------------------------------------------
 //  TKrnlFileSys functions
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean

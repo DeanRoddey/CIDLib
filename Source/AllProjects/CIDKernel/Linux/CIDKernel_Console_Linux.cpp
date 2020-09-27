@@ -579,6 +579,24 @@ TConsoleHandle::FormatToStr(        tCIDLib::TCh* const pszToFill
 // ---------------------------------------------------------------------------
 
 tCIDLib::TBoolean
+TKrnlConIn::bReadCharMS(        tCIDLib::EConKeys&  eKeyType
+                        ,       tCIDLib::TCh&       chGotten
+                        , const tCIDLib::TCard4     c4Wait
+                        ,       TIdleCB             pfnCallback
+                        ,       TObject* const      pobjCBData)
+{
+    // Just call the end time based one with the calculated end time
+    return bReadChar
+    (
+        eKeyType
+        , chGotten
+        , TKrnlTimeStamp::enctNow() + (c4Wait * kCIDLib::enctOneMilliSec)
+        , pfnCallback
+        , pobjCBData
+    );
+}
+
+tCIDLib::TBoolean
 TKrnlConIn::bReadChar(          tCIDLib::EConKeys&      keyType
                         ,       tCIDLib::TCh&           chGotten
                         , const tCIDLib::TEncodedTime   enctEnd
@@ -728,16 +746,26 @@ tCIDLib::TVoid TKrnlConIn::TermPlatform()
 // ---------------------------------------------------------------------------
 //  TKrnlConOut: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TKrnlConOut::bClearScr()
+static inline tCIDLib::TBoolean bWriteTermCap(const tCIDLib::TSCh* pszTermCapName)
 {
-    tCIDLib::TSCh* pszClear = ::tigetstr("clear");
-    if (!pszClear)
+    tCIDLib::TSCh* pszTermCapVal = ::tigetstr(pszTermCapName);
+    if (!pszTermCapVal)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_ZeroSizedBuffer);
         return kCIDLib::False;
     }
-    ::tputs(pszClear, 1, putchar);
+    ::tputs(pszTermCapVal, 1, putchar);
     return kCIDLib::True;
+}
+
+tCIDLib::TBoolean TKrnlConOut::bBackspace()
+{
+    return bWriteTermCap("cursor_left");
+}
+
+tCIDLib::TBoolean TKrnlConOut::bClearScr()
+{
+    return bWriteTermCap("clear");
 }
 
 tCIDLib::TBoolean TKrnlConOut::bPutChar(const tCIDLib::TCh chToWrite)

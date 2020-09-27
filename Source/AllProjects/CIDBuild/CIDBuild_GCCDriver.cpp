@@ -527,7 +527,7 @@ tCIDLib::TVoid TGCCDriver::Link()
     {
         do
         {
-            TBldStr* pstrNew = new TBldStr(L"-lCIDKernel");
+            TBldStr* pstrNew = new TBldStr(cursLibs.tCurElement().strFileName());
             listParms.Add(pstrNew);
         }   while (cursLibs.bNext());
     }

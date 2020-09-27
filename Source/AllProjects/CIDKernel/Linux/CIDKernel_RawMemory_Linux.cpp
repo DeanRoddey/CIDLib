@@ -262,6 +262,55 @@ TRawMem::c4Exchange(        tCIDLib::TCard4&        c4ToFill
 
 
 //
+//  We do a safe inc/dec of the passed reference. Just to be safe we don't allow ref
+//  counts beyond i4MaxCard, since the interlocked stuff really works on signed
+//  values. It would be psychotic to expect such a thing anyway. And we check for an
+//  underflow in the release since that means something went really wrong.
+//
+tCIDLib::TCard4
+TRawMem::c4SafeRefAcquire(tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
+{
+    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+    bRes = kCIDLib::True;
+    return tCIDLib::TCard4(__sync_add_and_fetch(&c4Ref, 1));
+}
+
+tCIDLib::TCard4
+TRawMem::c4SafeRefRelease(tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
+{
+    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+
+    if (!c4Ref)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_ZeroRefCntRel);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+
+    tCIDLib::TInt4 iRes = __sync_sub_and_fetch(&c4Ref, 1);
+    if (iRes < 0)
+    {
+        // The ref count management must be wrong
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_RefCntUnderflow);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+    bRes = kCIDLib::True;
+    return tCIDLib::TCard4(iRes);
+}
+
+
+//
 //  Returns the original value in ppToFill. If that's the same as pCompare,
 //  then the exchange occurred.
 //

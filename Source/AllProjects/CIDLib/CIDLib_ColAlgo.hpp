@@ -54,12 +54,12 @@ namespace tCIDColAlgo
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
-            , typename  TElem = TCol::TMyElemType>
+            , typename  TElem = typename TCol::TMyElemType>
     tCIDLib::TBoolean bAddIfNew(        TCol&   colTar
                                 , const TElem&  objToAdd
                                 ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursTar(&colTar);
+        typename TCol::TCursor cursTar(&colTar);
         for (; cursTar; ++cursTar)
         {
             // If we find a match, return false, didn't add it
@@ -79,11 +79,11 @@ namespace tCIDColAlgo
     //  This only works for a collection that has a RemoveAt(cursor) method, but
     //  most do.
     //
-    template<typename  TCol, typename TTest, typename  TElem = TCol::TMyElemType>
+    template<typename  TCol, typename TTest, typename  TElem = typename TCol::TMyElemType>
     tCIDLib::TBoolean bRemoveIf(TCol& colTar, TTest pfnTest)
     {
         tCIDLib::TBoolean bRet = kCIDLib::False;
-        TCol::TCursor cursTar(&colTar);
+        typename TCol::TCursor cursTar(&colTar);
         while (cursTar)
         {
             // Test this one, if a match remove it, else move forward
@@ -112,14 +112,14 @@ namespace tCIDColAlgo
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
-            , typename  TElem = TCol::TMyElemType>
+            , typename  TElem = typename TCol::TMyElemType>
     tCIDLib::TBoolean bRemoveMatches(       TCol&               colTar
                                     , const TElem&              objToRem
                                     , const tCIDLib::TBoolean   bRemoveAll
                                     ,       TComp               pfnComp = TComp())
     {
         tCIDLib::TBoolean bRet = kCIDLib::False;
-        TCol::TCursor cursTar(&colTar);
+        typename TCol::TCursor cursTar(&colTar);
         while (cursTar)
         {
             // If we find a match, remove it
@@ -147,7 +147,7 @@ namespace tCIDColAlgo
     //  collection, adding them to the incoming value, which we return as the
     //  new value.
     //
-    template <typename TCol, typename TElem = TCol::TMyElemType>
+    template <typename TCol, typename TElem = typename TCol::TMyElemType>
     TElem tAccumulate(const TCol& colSrc, const TElem& tInitVal)
     {
         TElem retVal = tInitVal;
@@ -180,12 +180,12 @@ namespace tCIDColAlgo
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
-            , typename  TElem = TCol::TMyElemType>
+            , typename  TElem = typename TCol::TMyElemType>
     typename TCol::TCursor cursFind(const   TCol&       colSrc
                                     , const TElem&      objToFind
                                     ,       TComp       pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objToFind))
@@ -203,12 +203,12 @@ namespace tCIDColAlgo
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
-            , typename  TElem = TCol::TMyElemType>
+            , typename  TElem = typename TCol::TMyElemType>
     typename TCol::TCursor cursFindNot( const   TCol&   colSrc
                                         , const TElem&  objToFind
                                         ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (!pfnComp(*cursSrc, objToFind))
@@ -225,12 +225,12 @@ namespace tCIDColAlgo
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
-            , typename  TElem = TCol::TMyElemType>
+            , typename  TElem = typename TCol::TMyElemType>
     typename TCol::TCursor cursFirstGreater(const   TCol&   colSrc
                                             , const TElem&  objComp
                                             ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstGreater)
@@ -241,12 +241,12 @@ namespace tCIDColAlgo
 
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
-            , typename  TElem = TCol::TMyElemType>
+            , typename  TElem = typename TCol::TMyElemType>
     typename TCol::TCursor cursFirstLess(const  TCol&   colSrc
                                         , const TElem&  objComp
                                         ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstLess)
@@ -314,14 +314,14 @@ namespace tCIDColAlgo
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
-            , typename  TElem = TCol::TMyElemType>
+            , typename  TElem = typename TCol::TMyElemType>
     tCIDLib::TCard4 c4RemoveSeqDups(TCol& colSrc, TComp pfnComp = TComp())
     {
         if (colSrc.bIsEmpty())
             return 0;
 
         tCIDLib::TCard4 c4RemCount = 0;
-        TCol::TNCCursor cursCur(&colSrc);
+        typename TCol::TNCCursor cursCur(&colSrc);
         TElem& objLast = *cursCur;
         ++cursCur;
         while (cursCur.bIsValid())
@@ -346,7 +346,7 @@ namespace tCIDColAlgo
     //  this guy will find the value that has the most dups. If not sorted it will
     //  not collect them all up, it's just looking for sequential dups.
     //
-    template <typename TCol, typename TElem = TCol::TMyElemType>
+    template <typename TCol, typename TElem = typename TCol::TMyElemType>
     TElem tFindMaxFundSeqDup(const TCol& fcolSrc)
     {
         TElem tLastBest = TElem(0);

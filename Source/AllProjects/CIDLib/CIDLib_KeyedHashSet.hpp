@@ -185,15 +185,15 @@ class TKeyedHashSet : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <typename TElem, class TKey, class TKeyOps> class TConstCursor :
+        template <typename TElem2, class TKey2, class TKeyOps2> class TConstCursor :
 
-            public TBiColCursor<TElem>
+            public TBiColCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
                 //  Public types
                 // -----------------------------------------------------------
-                using TParent = TBiColCursor<TElem>;
+                using TParent = TBiColCursor<TElem2>;
 
 
                 // -----------------------------------------------------------
@@ -205,7 +205,7 @@ class TKeyedHashSet : public TCollection<TElem>
                     if (!pclsThis)
                     {
                         TBaseLock lockInit;
-                        pclsThis = new TClass(L"TKeyedHashSet::TConstCursor<TElem,TKey,TKeyOps>");
+                        pclsThis = new TClass(L"TKey2edHashSet::TConstCursor<TElem2,TKey2,TKeyOps2>");
                     }
                     return *pclsThis;
                 }
@@ -391,7 +391,7 @@ class TKeyedHashSet : public TCollection<TElem>
                     return TParent::clsThis();
                 }
 
-                const TElem& objRCur() const override
+                const TElem2& objRCur() const override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -438,7 +438,7 @@ class TKeyedHashSet : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
                 // -----------------------------------------------------------
@@ -492,14 +492,14 @@ class TKeyedHashSet : public TCollection<TElem>
         };
 
 
-        template <typename TElem, class TKey, class TKeyOps> class TNonConstCursor :
-        public TConstCursor<TElem, TKey, TKeyOps>
+        template <typename TElem2, class TKey2, class TKeyOps2> class TNonConstCursor :
+        public TConstCursor<TElem2, TKey2, TKeyOps2>
         {
             public  :
                 // -----------------------------------------------------------
                 //  Public types
                 // -----------------------------------------------------------
-                using TParent = TConstCursor<TElem, TKey, TKeyOps>;
+                using TParent = TConstCursor<TElem2, TKey2, TKeyOps2>;
 
                 // -----------------------------------------------------------
                 //  Public, static methods
@@ -510,7 +510,7 @@ class TKeyedHashSet : public TCollection<TElem>
                     if (!pclsThis)
                     {
                         TBaseLock lockInit;
-                        pclsThis = new TClass(L"TKeyedHashSet::TNonConstCursor<TElem,TKey,TKeyOps>");
+                        pclsThis = new TClass(L"TKey2edHashSet::TNonConstCursor<TElem2,TKey2,TKeyOps2>");
                     }
                     return *pclsThis;
                 }
@@ -556,20 +556,20 @@ class TKeyedHashSet : public TCollection<TElem>
                 }
 
 
-                TElem& operator*() const
+                TElem2& operator*() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem&>(this->pnodeCur()->objData());
+                    return const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
-                TElem* operator->() const
+                TElem2* operator->() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return &const_cast<TElem&>(this->pnodeCur()->objData());
+                    return &const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
                 TNonConstCursor& operator++()
@@ -610,7 +610,7 @@ class TKeyedHashSet : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                TElem& objWCur() const
+                TElem2& objWCur() const
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -618,7 +618,7 @@ class TKeyedHashSet : public TCollection<TElem>
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem&>(this->pnodeCur()->objData());
+                    return const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
 
@@ -626,7 +626,7 @@ class TKeyedHashSet : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
                 // -----------------------------------------------------------
@@ -1449,7 +1449,7 @@ class TKeyedHashSet : public TCollection<TElem>
             if (!m_kopsToUse.bCompKeys( m_pfnKeyExtract(pnodeRep->objData())
                                         , m_pfnKeyExtract(objNewValue)))
             {
-                facCIDLib().ThrowErr
+                facCIDLibEarly().ThrowErr
                 (
                     CID_FILE
                     , CID_LINE
@@ -1801,7 +1801,7 @@ TBinOutStream& operator<<(          TBinOutStream&                      strmOut
                 <<  colToStream.c4HashModulus();
 
     // If there were any elements, then stream them
-    TKeyedHashSet<TElem,TKey,TKeyOps>::TCursor cursOut(&colToStream);
+    typename TKeyedHashSet<TElem,TKey,TKeyOps>::TCursor cursOut(&colToStream);
     while (cursOut.bIsValid())
     {
         strmOut << cursOut.objRCur();

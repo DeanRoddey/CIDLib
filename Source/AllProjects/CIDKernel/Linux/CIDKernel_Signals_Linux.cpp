@@ -241,3 +241,10 @@ tCIDLib::TVoid TKrnlSignals::PlatformInit()
         ::sigaction(aProgramErrors[c4Idx], &SigAction, 0);
     }
 }
+
+
+tCIDLib::TVoid TKrnlSignals::GenerateCtrlCSignal()
+{
+    ::raise(SIGINT);
+}
+

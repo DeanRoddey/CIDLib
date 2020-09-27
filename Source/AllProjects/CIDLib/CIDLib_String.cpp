@@ -2875,7 +2875,7 @@ TString::CopyInSubStr(  const   TString&        strSource
     AppendSubStr(strSource, c4Start, c4Len);
 }
 
-inline tCIDLib::TVoid
+tCIDLib::TVoid
 TString::CopyOutSubStr(         TString&        strTarget
                         , const tCIDLib::TCard4 c4Start
                         , const tCIDLib::TCard4 c4Len) const
@@ -4203,7 +4203,7 @@ tCIDLib::TVoid TString::Prepend(const TString& strPrepend)
     Insert(strPrepend, 0);
 }
 
-inline tCIDLib::TVoid TString::Prepend(const tCIDLib::TCh* const pszPrepend)
+tCIDLib::TVoid TString::Prepend(const tCIDLib::TCh* const pszPrepend)
 {
     Insert(pszPrepend, 0);
 }

@@ -113,7 +113,7 @@ template <typename TKey, class TValue> class THashMapNode
 
         TPair& kobjPair(const TPair& kobjToSet)
         {
-            m_kobjPair = objToSet;
+            m_kobjPair = kobjToSet;
             return m_kobjPair;
         }
 
@@ -205,7 +205,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <typename TElem, class TKey, class TKeyOps> class TConstCursor :
+        template <typename TElem2, class TKey2, class TKeyOps2> class TConstCursor :
 
             public TBiColCursor<TPair>
         {
@@ -226,7 +226,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                     {
                         TBaseLock lockInit;
                         if (!pclsThis)
-                            pclsThis = new TClass(L"THashMap::TConstCursor<TElem, TKey, TKeyOps>");
+                            pclsThis = new TClass(L"THashMap::TConstCursor<TElem2, TKey2, TKeyOps2>");
                     }
                     return *pclsThis;
                 }
@@ -427,7 +427,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
             private :
@@ -454,15 +454,15 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         };
 
 
-        template <typename TElem, class TKey, class TKeyOps> class TNonConstCursor :
+        template <typename TElem2, class TKey2, class TKeyOps2> class TNonConstCursor :
 
-            public TConstCursor<TElem, TKey, TKeyOps>
+            public TConstCursor<TElem2, TKey2, TKeyOps2>
         {
             public  :
                 // -----------------------------------------------------------
                 //  Public types
                 // -----------------------------------------------------------
-                using TParent = TConstCursor<TElem, TKey, TKeyOps>;
+                using TParent = TConstCursor<TElem2, TKey2, TKeyOps2>;
 
                 // -----------------------------------------------------------
                 //  Public, static methods
@@ -474,7 +474,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                     {
                         TBaseLock lockInit;
                         if (!pclsThis)
-                            pclsThis = new TClass(L"THashMap::TNonConstCursor<TElem, TKey, TKeyOps>");
+                            pclsThis = new TClass(L"THashMap::TNonConstCursor<TElem2, TKey2, TKeyOps2>");
                     }
                     return *pclsThis;
                 }
@@ -755,7 +755,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 TLocker lockrSrc(&colSrc);
                 TLocker lockrThis(this);
 
-                TParent::operator=(tCIDLib::ForceMove(colSrc));
+                TMapCollection<TElem, TKey>::operator=(tCIDLib::ForceMove(colSrc));
 
                 //
                 //  We swap the element content. This has to include the modulus
@@ -1259,8 +1259,8 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         // -------------------------------------------------------------------
         //  Declare our friends
         // -------------------------------------------------------------------
-        friend class TCursor;
-        friend class TNCCursor;
+        friend TCursor;
+        friend TNCCursor;
 
 
         // -------------------------------------------------------------------
@@ -1519,10 +1519,10 @@ TBinOutStream& operator<<(          TBinOutStream&                  strmOut
                 <<  colToStream.c4HashModulus();
 
     // If there were any elements, then stream them
-    THashMap<TElem, TKey, TKeyOps>::TCursor cursOut(&colToStream);
+    typename THashMap<TElem, TKey, TKeyOps>::TCursor cursOut(&colToStream);
     while (cursOut.bIsValid())
     {
-        const THashMap<TElem, TKey, TKeyOps>::TPair& kobjCur = cursOut.objRCur();
+        const typename THashMap<TElem, TKey, TKeyOps>::TPair& kobjCur = cursOut.objRCur();
         strmOut << kobjCur.objKey() << kobjCur.objValue();
         ++cursOut;
     }
@@ -1568,7 +1568,7 @@ TBinInStream& operator>>(TBinInStream&                      strmIn
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
             strmIn >> objKey >> objValue;
-            colToStream.objAdd(THashMap<TElem, TKey, TKeyOps>::TPair(objKey, objValue));
+            colToStream.objAdd(typename THashMap<TElem, TKey, TKeyOps>::TPair(objKey, objValue));
         }
     }
 

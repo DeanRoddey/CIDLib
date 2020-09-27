@@ -157,7 +157,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem2> class TConstCursor : public TBiColCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -178,7 +178,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                     , m_pllstCursoring(&pcolToCursor->llstQueue())
                     , m_pnodeCur(nullptr)
                 {
-                    m_pnodeCur = static_cast<TRefQueueNode<TElem>*>
+                    m_pnodeCur = static_cast<TRefQueueNode<TElem2>*>
                     (
                         m_pllstCursoring->pnodeHead()
                     );
@@ -254,7 +254,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
-                    m_pnodeCur = static_cast<TRefQueueNode<TElem>*>(m_pnodeCur->pnodeNext());
+                    m_pnodeCur = static_cast<TRefQueueNode<TElem2>*>(m_pnodeCur->pnodeNext());
                     return (m_pnodeCur != nullptr);
                 }
 
@@ -266,7 +266,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
-                    m_pnodeCur = static_cast<TRefQueueNode<TElem>*>(m_pnodeCur->pnodePrev());
+                    m_pnodeCur = static_cast<TRefQueueNode<TElem2>*>(m_pnodeCur->pnodePrev());
                     return (m_pnodeCur != nullptr);
                 }
 
@@ -276,7 +276,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
                     TLocker lockrCol(m_pcolCursoring);
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
-                    m_pnodeCur = static_cast<TRefQueueNode<TElem>*>
+                    m_pnodeCur = static_cast<TRefQueueNode<TElem2>*>
                     (
                         m_pllstCursoring->pnodeTail()
                     );
@@ -288,7 +288,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     TLocker lockrCol(m_pcolCursoring);
-                    m_pnodeCur = static_cast<TRefQueueNode<TElem>*>
+                    m_pnodeCur = static_cast<TRefQueueNode<TElem2>*>
                     (
                         m_pllstCursoring->pnodeHead()
                     );
@@ -296,7 +296,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                const TElem& objRCur() const final
+                const TElem2& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -330,7 +330,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
             private :
@@ -356,10 +356,10 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Do any needed magic macros
                 // -----------------------------------------------------------
-                TemplateRTTIDefs(TMyType::TConstCursor<TElem>, TBiColCursor<TElem>)
+                TemplateRTTIDefs(TMyType::TConstCursor<TElem2>, TBiColCursor<TElem2>)
         };
 
-        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem2> class TNonConstCursor : public TConstCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -403,20 +403,20 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                     return *this;
                 }
 
-                TElem& operator*() const
+                TElem2& operator*() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return *const_cast<TElem*>(this->pnodeCur()->pobjData());
+                    return *const_cast<TElem2*>(this->pnodeCur()->pobjData());
                 }
 
-                TElem* operator->() const
+                TElem2* operator->() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem*>(this->pnodeCur()->pobjData());
+                    return const_cast<TElem2*>(this->pnodeCur()->pobjData());
                 }
 
                 TNonConstCursor& operator++()
@@ -436,14 +436,14 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                TElem& objWCur() const
+                TElem2& objWCur() const
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return *const_cast<TElem*>(this->pnodeCur()->pobjData());
+                    return *const_cast<TElem2*>(this->pnodeCur()->pobjData());
                 }
 
 
@@ -463,8 +463,8 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TMyType::TNonConstCursor<TElem>
-                    , TMyType::TConstCursor<TElem>
+                    TMyType::TNonConstCursor<TElem2>
+                    , TMyType::TConstCursor<TElem2>
                 )
         };
 
@@ -977,8 +977,8 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Declare our friends
         // -------------------------------------------------------------------
-        friend class TConstCursor<TElem>;
-        friend class TNonConstCursor<TElem>;
+        friend TConstCursor<TElem>;
+        friend TNonConstCursor<TElem>;
 
 
         // -------------------------------------------------------------------

@@ -56,7 +56,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested read-only cursor class
         // -------------------------------------------------------------------
-        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem2> class TConstCursor : public TBiColCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -78,7 +78,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     , m_pcolCursoring(pcolToCursor)
                     , m_pnodeCur(nullptr)
                 {
-                    m_pnodeCur = static_cast<TBasicColNode<TElem>*>
+                    m_pnodeCur = static_cast<TBasicColNode<TElem2>*>
                     (
                         m_pllstCursoring->pnodeHead()
                     );
@@ -191,7 +191,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                const TElem& objRCur() const override
+                const TElem2& objRCur() const override
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -230,7 +230,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Declare our friends
                 // -----------------------------------------------------------
-                friend class TMyType;
+                friend TMyType;
 
 
             private :
@@ -259,8 +259,8 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TBasicDLinkedCol::TConstCursor<TElem>
-                    , TBiColCursor<TElem>
+                    TBasicDLinkedCol::TConstCursor<TElem2>
+                    , TBiColCursor<TElem2>
                 )
         };
 
@@ -268,7 +268,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested non-const cursor class
         // -------------------------------------------------------------------
-        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem2> class TNonConstCursor : public TConstCursor<TElem2>
         {
             public  :
                 // -----------------------------------------------------------
@@ -301,20 +301,20 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public operators
                 // -----------------------------------------------------------
-                TElem& operator*() const
+                TElem2& operator*() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem&>(this->pnodeCur()->objData());
+                    return const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
-                TElem* operator->() const
+                TElem2* operator->() const
                 {
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return &const_cast<TElem&>(this->pnodeCur()->objData());
+                    return &const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
                 TNonConstCursor& operator=(const TNonConstCursor& cursSrc)
@@ -345,7 +345,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                TElem& objWCur() const
+                TElem2& objWCur() const
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -353,7 +353,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem&>(this->pnodeCur()->objData());
+                    return const_cast<TElem2&>(this->pnodeCur()->objData());
                 }
 
 
@@ -372,8 +372,8 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 TemplateRTTIDefs
                 (
-                    TBasicDLinkedCol::TNonConstCursor<TElem>
-                    , TBasicDLinkedCol::TConstCursor<TElem>
+                    TBasicDLinkedCol::TNonConstCursor<TElem2>
+                    , TBasicDLinkedCol::TConstCursor<TElem2>
                 )
         };
 
@@ -381,8 +381,8 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  More aliases for the nested cursor classes
         // -------------------------------------------------------------------
-        using TCursor = typename TConstCursor<TElem>;
-        using TNCCursor = typename TNonConstCursor<TElem>;
+        using TCursor = TConstCursor<TElem>;
+        using TNCCursor = TNonConstCursor<TElem>;
 
 
         // -------------------------------------------------------------------
