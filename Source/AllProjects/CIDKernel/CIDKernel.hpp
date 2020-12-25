@@ -157,6 +157,7 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
         TCIDKrnlModule();
 
         TCIDKrnlModule(const TCIDKrnlModule&) = delete;
+        TCIDKrnlModule(TCIDKrnlModule&&) = delete;
 
         ~TCIDKrnlModule();
 
@@ -165,6 +166,7 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
         //  Public operators
         // -------------------------------------------------------------------
         TCIDKrnlModule& operator=(const TCIDKrnlModule&) = delete;
+        TCIDKrnlModule& operator=(TCIDKrnlModule&&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -345,6 +347,7 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
 #include    "CIDKernel_LList.hpp"
 #include    "CIDKernel_RawBits.hpp"
 #include    "CIDKernel_KVPair.hpp"
+
 
 // ---------------------------------------------------------------------------
 //  And some common types

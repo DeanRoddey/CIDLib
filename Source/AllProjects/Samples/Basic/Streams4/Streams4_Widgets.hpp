@@ -42,7 +42,7 @@
 //  to the RTTI support for the class.
 //
 //  TFilledCircleWidget is a second level derivative, so note how it calls its
-//  parent's version of everything. The standard RTTI macro create a typedef
+//  parent's version of everything. The standard RTTI macro creates an alias
 //  called TParent, which stands for the parent class. So it always calls
 //  through this magic TParent class instead of hard coding its parent class.
 //  And all of the Draw() methods call down to the base class first

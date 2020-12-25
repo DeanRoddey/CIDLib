@@ -65,15 +65,7 @@ class CIDXMLEXP TXMLEntitySrc : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TXMLEntitySrc(TXMLEntitySrc&&) = delete;
-
         ~TXMLEntitySrc();
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TXMLEntitySrc& operator=(TXMLEntitySrc&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -115,11 +107,6 @@ class CIDXMLEXP TXMLEntitySrc : public TObject, public MDuplicable
 
         TXMLEntitySrc
         (
-            const   TXMLEntitySrc&          xsrcSrc
-        );
-
-        TXMLEntitySrc
-        (
             const   TString&                strSystemId
         );
 
@@ -129,10 +116,11 @@ class CIDXMLEXP TXMLEntitySrc : public TObject, public MDuplicable
             , const TString&                strPublicId
         );
 
-        TXMLEntitySrc& operator=
-        (
-            const   TXMLEntitySrc&          xsrcSrc
-        );
+        TXMLEntitySrc(const TXMLEntitySrc&) = default;
+        TXMLEntitySrc(TXMLEntitySrc&&) = default;
+
+        TXMLEntitySrc& operator=(TXMLEntitySrc&&) = default;
+        TXMLEntitySrc& operator=(const TXMLEntitySrc&) = default;
 
 
     private :

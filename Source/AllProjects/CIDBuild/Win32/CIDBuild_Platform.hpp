@@ -71,7 +71,7 @@ namespace tCIDBuild
     //  Define the local wide character. This should map to the type of char
     //  that the locale wchar_t maps to. If wchar_t is intrinsic, then just
     //  use that here. Otherwise, if it would require the inclusion of RTL
-    //  headers to do it because its just a typedef, then just use the
+    //  headers to do it because its just an alias, then just use the
     //  equivalent fundamental type here.
     // -----------------------------------------------------------------------
     using TCh = wchar_t;

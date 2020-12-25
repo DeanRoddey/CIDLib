@@ -87,6 +87,13 @@ TServerStreamSocket* TSockLEngConn::psockConn()
     return m_psockConn;
 }
 
+TServerStreamSocket* TSockLEngConn::psockOrphan()
+{
+    TServerStreamSocket* psockRet = m_psockConn;
+    m_psockConn = nullptr;
+    return psockRet;
+}
+
 tCIDLib::TVoid TSockLEngConn::Orphan()
 {
     m_psockConn = nullptr;
@@ -311,6 +318,12 @@ TSockLEngConn* TSockListenerEng::pslecWait(const tCIDLib::TCard4 c4WaitMSs)
 {
     // Wait up to the indicated type for a connection
     return m_colConnQ.pobjGetNext(c4WaitMSs, kCIDLib::False);
+}
+
+TUniquePtr<TSockLEngConn> TSockListenerEng::uptrWait(const tCIDLib::TCard4 c4WaitMSs)
+{
+    // Wait up to the indicated type for a connection
+    return TUniquePtr<TSockLEngConn>(m_colConnQ.pobjGetNext(c4WaitMSs, kCIDLib::False));
 }
 
 

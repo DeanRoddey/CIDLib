@@ -60,36 +60,8 @@ TXMLException::TXMLException(const  tCIDLib::TErrCode   errcThrow
 {
 }
 
-TXMLException::TXMLException(const TXMLException& xexcToCopy) :
-
-    m_c4Column(xexcToCopy.m_c4Column)
-    , m_c4Line(xexcToCopy.m_c4Line)
-    , m_errcThrown(xexcToCopy.m_errcThrown)
-    , m_strEntityName(xexcToCopy.m_strEntityName)
-    , m_strMessage(xexcToCopy.m_strMessage)
-{
-}
-
 TXMLException::~TXMLException()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLException: Public operator
-// ---------------------------------------------------------------------------
-TXMLException& TXMLException::operator=(const TXMLException& xexcToAssign)
-{
-    if (this == &xexcToAssign)
-        return *this;
-
-    m_c4Column      = xexcToAssign.m_c4Column;
-    m_c4Line        = xexcToAssign.m_c4Line;
-    m_errcThrown    = xexcToAssign.m_errcThrown;
-    m_strEntityName = xexcToAssign.m_strEntityName;
-    m_strMessage    = xexcToAssign.m_strMessage;
-
-    return *this;
 }
 
 

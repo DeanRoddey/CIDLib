@@ -75,6 +75,11 @@ template <typename T> class TJanitor
         TJanitor& operator=(const TJanitor&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
+        operator bool() const
+        {
+            return (m_pobjToSanitize != nullptr);
+        }
+
         T* operator->()
         {
             return m_pobjToSanitize;
@@ -106,12 +111,12 @@ template <typename T> class TJanitor
             return pobjRet;
         }
 
-        T* pobjThis()
+        [[nodiscard]] T* pobjThis()
         {
             return m_pobjToSanitize;
         }
 
-        const T* pobjThis() const
+        [[nodiscard]] const T* pobjThis() const
         {
             return m_pobjToSanitize;
         }
@@ -204,19 +209,19 @@ template <typename T> class TArrayJanitor
             m_paToSanitize = nullptr;
         }
 
-        T* paOrphan()
+        [[nodiscard]] T* paOrphan()
         {
             T* paRet = m_paToSanitize;
             m_paToSanitize = nullptr;
             return paRet;
         }
 
-        const T* paThis() const
+        [[nodiscard]] const T* paThis() const
         {
             return m_paToSanitize;
         }
 
-        T* paThis()
+        [[nodiscard]] T* paThis()
         {
             return m_paToSanitize;
         }

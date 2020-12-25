@@ -407,7 +407,7 @@ namespace tCIDBuild
 
 namespace tCIDBuild
 {
-    typedef TList<TBldStr>      TStrList;
+    using TStrList = TList<TBldStr>;
 }
 
 #include    "CIDBuild_Utils.hpp"
@@ -430,7 +430,7 @@ extern TTextFile    stdOut;
 
 namespace tCIDBuild
 {
-    typedef TList<TKeyValuePair>    TKVPList;
+    using TKVPList = TList<TKeyValuePair>;
 }
 
 #include    "CIDBuild_LineSpooler.hpp"

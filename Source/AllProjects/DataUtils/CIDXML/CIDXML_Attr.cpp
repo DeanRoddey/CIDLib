@@ -109,18 +109,6 @@ TXMLAttr::TXMLAttr( const   TString&            strBaseName
     m_strQName.Append(strBaseName);
 }
 
-TXMLAttr::TXMLAttr(const TXMLAttr& xattrToCopy) :
-
-    m_bExplicit(xattrToCopy.m_bExplicit)
-    , m_eType(xattrToCopy.m_eType)
-    , m_strBaseName(xattrToCopy.m_strBaseName)
-    , m_strPrefix(xattrToCopy.m_strPrefix)
-    , m_strQName(xattrToCopy.m_strQName)
-    , m_strURI(xattrToCopy.m_strURI)
-    , m_strValue(xattrToCopy.m_strValue)
-{
-}
-
 TXMLAttr::~TXMLAttr()
 {
 }
@@ -129,35 +117,18 @@ TXMLAttr::~TXMLAttr()
 // ---------------------------------------------------------------------------
 //  TXMLAttr: Public operators
 // ---------------------------------------------------------------------------
-TXMLAttr& TXMLAttr::operator=(const TXMLAttr& xattrToAssign)
-{
-    if (this == &xattrToAssign)
-        return *this;
-
-    m_bExplicit     = xattrToAssign.m_bExplicit;
-    m_eType         = xattrToAssign.m_eType;
-    m_strBaseName   = xattrToAssign.m_strBaseName;
-    m_strPrefix     = xattrToAssign.m_strPrefix;
-    m_strQName      = xattrToAssign.m_strQName;
-    m_strURI        = xattrToAssign.m_strURI;
-    m_strValue      = xattrToAssign.m_strValue;
-
-    return *this;
-}
-
-
-tCIDLib::TBoolean TXMLAttr::operator==(const TXMLAttr& xattrToComp)
+tCIDLib::TBoolean TXMLAttr::operator==(const TXMLAttr& xattrSrc)
 {
     // As always, put the stuff most likely to be different first
     return
     (
-        (m_strBaseName == xattrToComp.m_strBaseName)
-        && (m_strValue  == xattrToComp.m_strValue)
-        && (m_bExplicit == xattrToComp.m_bExplicit)
-        && (m_eType     == xattrToComp.m_eType)
-        && (m_strPrefix == xattrToComp.m_strPrefix)
-        && (m_strQName  == xattrToComp.m_strQName)
-        && (m_strURI    == xattrToComp.m_strURI)
+        (m_strBaseName == xattrSrc.m_strBaseName)
+        && (m_strValue  == xattrSrc.m_strValue)
+        && (m_bExplicit == xattrSrc.m_bExplicit)
+        && (m_eType     == xattrSrc.m_eType)
+        && (m_strPrefix == xattrSrc.m_strPrefix)
+        && (m_strQName  == xattrSrc.m_strQName)
+        && (m_strURI    == xattrSrc.m_strURI)
     );
 }
 

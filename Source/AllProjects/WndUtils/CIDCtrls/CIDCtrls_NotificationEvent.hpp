@@ -59,46 +59,52 @@ class CIDCTRLSEXP TWndEvent
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
-        TWndEvent
-        (
-            const   TNotificationId&        nidBeingSent
-        );
+        TWndEvent() = delete;
 
-        TWndEvent
-        (
-            const   TWndEvent&              wevToCopy
-        );
+        TWndEvent::TWndEvent(const TNotificationId& nidBeingSent) :
 
-        virtual ~TWndEvent();
+            m_nidBeingSent(nidBeingSent)
+        {
+        }
+
+        TWndEvent(const TWndEvent&) = default;
+        TWndEvent(TWndEvent&&) = default;
+
+        virtual ~TWndEvent() {}
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TWndEvent& operator=(const TWndEvent& wevToAssign);
+        TWndEvent& operator=(const TWndEvent&) = default;
+        TWndEvent& operator=(TWndEvent&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, virtual methods
         // -------------------------------------------------------------------
-        virtual TObject* pobjToSend() const;
+        virtual TObject* pobjToSend() const
+        {
+            // At this level we have no object, so return null
+            return nullptr;
+        }
 
-        virtual TWndEvent* pwevDuplicate() const;
+        virtual [[nodiscard]] TWndEvent* pwevDuplicate() const
+        {
+            return new TWndEvent(*this);
+        }
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TNotificationId& nidBeingSent() const;
+        const TNotificationId& nidBeingSent() const
+        {
+            return m_nidBeingSent;
+        }
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TWndEvent();
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -115,6 +121,8 @@ template <typename D> class TWndEventFor : public TWndEvent
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
+        TWndEventFor() = delete;
+
         TWndEventFor(   const   TNotificationId&    nidBeingSent
                         ,       D* const            pobjToSend
                         , const tCIDLib::EAdoptOpts eAdopt = tCIDLib::EAdoptOpts::Adopt) :
@@ -129,7 +137,7 @@ template <typename D> class TWndEventFor : public TWndEvent
 
             TWndEvent(wevSrc)
             , m_eAdopt(wevSrc.m_eAdopt)
-            , m_pobjToSend(0)
+            , m_pobjToSend(nullptr)
         {
             //
             //  If there's a data object and we are adopting, then we need to make
@@ -148,7 +156,7 @@ template <typename D> class TWndEventFor : public TWndEvent
         {
             if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
                 delete m_pobjToSend;
-            m_pobjToSend = 0;
+            m_pobjToSend = nullptr;
         }
 
 
@@ -165,7 +173,7 @@ template <typename D> class TWndEventFor : public TWndEvent
                 // Clean up any existing object if we own it
                 if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
                     delete m_pobjToSend;
-                m_pobjToSend = 0;
+                m_pobjToSend = nullptr;
 
                 // Now take the caller's adopt flag
                 m_eAdopt = wevSrc.m_eAdopt;
@@ -179,7 +187,7 @@ template <typename D> class TWndEventFor : public TWndEvent
                     if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
                         m_pobjToSend = ::pDupObject<D>(*wevSrc.m_pobjToSend);
                     else
-                        m_pobjToSend = wevSrc.
+                        m_pobjToSend = wevSrc..m_pobjToSend;
                 }
             }
             return *this;
@@ -194,7 +202,7 @@ template <typename D> class TWndEventFor : public TWndEvent
             return m_pobjToSend;
         }
 
-        TWndEvent* pwevDuplicate() const override
+        [[nodiscard]] TWndEvent* pwevDuplicate() const override
         {
             return new TWndEventFor<D>(*this);
         }
@@ -210,12 +218,6 @@ template <typename D> class TWndEventFor : public TWndEvent
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TWndEventFor();
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -233,60 +235,4 @@ template <typename D> class TWndEventFor : public TWndEvent
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TWndEvent: Constructors and destructor
-// ---------------------------------------------------------------------------
-inline TWndEvent::TWndEvent(const TNotificationId& nidBeingSent) :
-
-    m_nidBeingSent(nidBeingSent)
-{
-}
-
-inline TWndEvent::TWndEvent(const TWndEvent& wevToCopy) :
-
-    m_nidBeingSent(wevToCopy.m_nidBeingSent)
-{
-}
-
-inline TWndEvent::~TWndEvent()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TWndEvent: Public operators
-// ---------------------------------------------------------------------------
-inline TWndEvent& TWndEvent::operator=(const TWndEvent& wevToAssign)
-{
-    if (this != &wevToAssign)
-        m_nidBeingSent = wevToAssign.m_nidBeingSent;
-    return *this;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TWndEvent: Public, virtual methods
-// ---------------------------------------------------------------------------
-inline TObject* TWndEvent::pobjToSend() const
-{
-    // At this level we have no object, so return zero
-    return 0;
-}
-
-inline TWndEvent* TWndEvent::pwevDuplicate() const
-{
-    return new TWndEvent(*this);
-}
-
-
-// ---------------------------------------------------------------------------
-//  TWndEventBase: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline const TNotificationId& TWndEvent::nidBeingSent() const
-{
-    return m_nidBeingSent;
-}
-
 

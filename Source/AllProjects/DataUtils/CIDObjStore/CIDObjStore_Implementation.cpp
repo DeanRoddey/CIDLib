@@ -416,8 +416,45 @@ tCIDLib::TCard4 TCIDObjStoreImpl::c4ObjectsInStore() const
 
 
 //
+//  Returns all of the object keys under the passed scope. Returns true if it finds
+//  any. This only returns the base name. c4QueryObjectsInScope below returns the
+//  full paths.
+//
+tCIDLib::TCard4
+TCIDObjStoreImpl::c4QueryKeysInScope(const  TString&              strScope
+                                    ,       tCIDLib::TStrCollect& colToFill)
+{
+    //
+    //  Our scopes are stored with the trailing slash, but the passed one might
+    //  not. So we need to create one that we are sure has the slash. This way we
+    //  are sure we don't partially match a scope.
+    //
+    TString strToFind(strScope);
+    if (strToFind.chLast() != kCIDLib::chForwardSlash)
+        strToFind.Append(kCIDLib::chForwardSlash);
+
+    //
+    //  Iterate the items, and for each one in the the passed scope, add
+    //  its key to the passed collection.
+    //
+    colToFill.RemoveAll();
+    TStoreList::TCursor cursStore(&m_colStoreList);
+    for (; cursStore; ++cursStore)
+    {
+        const TOSStoreItem& osiCur = *cursStore;
+        const TString& strCurPath = osiCur.strScope();
+
+        // If this path is equal the one we are looking for, then take this guy
+        if (strToFind.bCompareI(osiCur.strScope()))
+            colToFill.objAdd(osiCur.strName());
+    }
+    return colToFill.c4ElemCount();
+}
+
+//
 //  Find all of the objects in the passed scope. We return the full paths to the
-//  objects we find. The return is the number we found.
+//  objects we find. The return is the number we found. See c4QueryKeysInScope
+//  above, which returns just the names relative to the scope, not the full paths.
 //
 tCIDLib::TCard4
 TCIDObjStoreImpl::c4QueryObjectsInScope(const   TString&              strScope

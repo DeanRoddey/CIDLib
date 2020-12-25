@@ -183,7 +183,7 @@ namespace tCIDIDL
     //  A list of method info objects, to pass into code generators when
     //  generating methods.
     // -----------------------------------------------------------------------
-    typedef TVector<TCGenMethodParm>    TParmList;
+    using TParmList = TVector<TCGenMethodParm>;
 }
 
 

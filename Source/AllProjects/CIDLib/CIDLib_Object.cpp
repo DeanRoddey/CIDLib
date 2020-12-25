@@ -87,16 +87,3 @@ tCIDLib::TBoolean TObject::bIsA(const TClass& clsTest) const
     return (clsTest == clsIsA());
 }
 
-
-// ---------------------------------------------------------------------------
-//  TObject: Hidden constructors and operators
-// ---------------------------------------------------------------------------
-TObject::TObject()
-{
-}
-
-TObject::TObject(const TObject&)
-{
-}
-
-

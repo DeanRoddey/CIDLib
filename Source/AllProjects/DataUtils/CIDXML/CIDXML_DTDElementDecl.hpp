@@ -51,8 +51,10 @@ class CIDXMLEXP TDTDAttrDefCursor : public TAttrDefCursor
 
         TDTDAttrDefCursor
         (
-            const   TDTDAttrDefCursor&      adcToCopy
+            const   TDTDAttrDefCursor&      adcSrc
         );
+
+        TDTDAttrDefCursor(TDTDAttrDefCursor&&) = delete;
 
         ~TDTDAttrDefCursor();
 
@@ -62,8 +64,10 @@ class CIDXMLEXP TDTDAttrDefCursor : public TAttrDefCursor
         // -------------------------------------------------------------------
         TDTDAttrDefCursor& operator=
         (
-            const   TDTDAttrDefCursor&      adcToAssign
+            const   TDTDAttrDefCursor&      adcSrc
         );
+
+        TDTDAttrDefCursor& operator=(TDTDAttrDefCursor&&) = delete;
 
 
         // -------------------------------------------------------------------

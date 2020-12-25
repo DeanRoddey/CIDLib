@@ -123,7 +123,7 @@ TMEngDataSrcVal::bDbgFormat(        TTextOutStream&     strmTarget
 // Return true if we hae a source and it's connected
 tCIDLib::TBoolean TMEngDataSrcVal::bConnected() const
 {
-    return (m_pcdsSrc && m_pcdsSrc->bConnected());
+    return (m_pcdsSrc && m_pcdsSrc->bIsConnected());
 }
 
 

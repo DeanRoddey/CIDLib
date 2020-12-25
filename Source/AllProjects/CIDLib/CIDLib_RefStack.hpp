@@ -183,6 +183,7 @@ template <typename TElem> class TRefStackJan
         }
 
         TRefStackJan(const TRefStackJan&) = delete;
+        TRefStackJan(TRefStackJan&&) = delete;
 
         ~TRefStackJan()
         {
@@ -196,6 +197,7 @@ template <typename TElem> class TRefStackJan
         //  Public operators
         // -------------------------------------------------------------------
         TRefStackJan& operator=(const TRefStackJan&) = delete;
+        TRefStackJan& operator=(TRefStackJan&&) = delete;
 
 
         // -------------------------------------------------------------------

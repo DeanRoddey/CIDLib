@@ -101,10 +101,29 @@ class CIDMATHEXP TGraphData : public TObject
 
         TGraphData
         (
-            const   TGraphData&             grdatToCopy
+            const   TGraphData&             grdatSrc
+        );
+
+        TGraphData
+        (
+                    TGraphData&&            grdatSrc
         );
 
         ~TGraphData();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TGraphData& operator=
+        (
+            const   TGraphData&             grdatSrc
+        );
+
+        TGraphData& operator=
+        (
+                    TGraphData&&            grdatSrc
+        );
 
 
         // -------------------------------------------------------------------

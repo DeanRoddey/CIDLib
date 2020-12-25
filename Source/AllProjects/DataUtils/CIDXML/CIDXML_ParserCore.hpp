@@ -72,7 +72,17 @@ class CIDXMLEXP TXMLParserCore : public TObject
         // -------------------------------------------------------------------
         TXMLParserCore();
 
+        TXMLParserCore(const TXMLParserCore&) = delete;
+        TXMLParserCore(TXMLParserCore&&) = delete;
+
         ~TXMLParserCore();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLParserCore& operator=(const TXMLParserCore&) = delete;
+        TXMLParserCore& operator=(TXMLParserCore&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -92,38 +102,55 @@ class CIDXMLEXP TXMLParserCore : public TObject
             const   tCIDXML::EParseFlags    eMask
         )   const;
 
-        tCIDLib::TBoolean bLockValidator() const;
+        tCIDLib::TBoolean bLockValidator() const
+        {
+            return m_bValidatorLocked;
+        }
 
-        tCIDLib::TBoolean bLockValidator
-        (
-            const   tCIDLib::TBoolean       bToSet
-        );
+        tCIDLib::TBoolean bLockValidator(const tCIDLib::TBoolean bToSet)
+        {
+            m_bValidatorLocked = bToSet;
+            return m_bValidatorLocked;
+        }
 
-        tCIDLib::TBoolean bStandalone() const;
+        tCIDLib::TBoolean bStandalone() const
+        {
+            return m_bStandalone;
+        }
 
         tCIDLib::TCard4 c4CurLine() const;
 
-        tCIDLib::TCard4 c4MaxErrors() const;
+        tCIDLib::TCard4 c4MaxErrors() const
+        {
+            return m_c4ErrorMax;
+        }
 
-        tCIDLib::TCard4 c4MaxErrors
-        (
-            const   tCIDLib::TCard4         c4MaxToSet
-        );
+        tCIDLib::TCard4 c4MaxErrors(const tCIDLib::TCard4 c4MaxToSet)
+        {
+            m_c4ErrorMax = c4MaxToSet;
+            return m_c4ErrorMax;
+        }
 
-        tCIDXML::EParseFlags eFlags() const;
+        tCIDXML::EParseFlags eFlags() const
+        {
+            return m_eFlags;
+        }
 
-        tCIDXML::ELocations eLocation() const;
+        tCIDXML::ELocations eLocation() const
+        {
+            return m_eLocation;
+        }
 
-        tCIDXML::ELocations eLocation
-        (
-            const   tCIDXML::ELocations     eLocation
-        );
+        tCIDXML::ELocations eLocation(const tCIDXML::ELocations eLocation)
+        {
+            m_eLocation = eLocation;
+            return m_eLocation;
+        }
 
-        tCIDXML::EParseOpts eOptions() const;
-
-        TXMLBufMgr& xbmThis();
-
-        TXMLEntityMgr& xemThis();
+        tCIDXML::EParseOpts eOptions() const
+        {
+            return m_eOptions;
+        }
 
         MXMLDocEvents* pmxevDocEvents() const;
 
@@ -202,6 +229,16 @@ class CIDXMLEXP TXMLParserCore : public TObject
         (
             const   tCIDLib::TErrCode       errcToThrow
         );
+
+        TXMLBufMgr& xbmThis()
+        {
+            return *m_pxbmBuf;
+        }
+
+        TXMLEntityMgr& xemThis()
+        {
+            return m_xemThis;
+        }
 
 
     private :
@@ -405,70 +442,4 @@ class CIDXMLEXP TXMLParserCore : public TObject
 };
 
 #pragma CIDLIB_POPPACK
-
-
-
-// ---------------------------------------------------------------------------
-//  TXMLParserCore: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean TXMLParserCore::bLockValidator() const
-{
-    return m_bValidatorLocked;
-}
-
-inline tCIDLib::TBoolean
-TXMLParserCore::bLockValidator(const tCIDLib::TBoolean bToSet)
-{
-    m_bValidatorLocked = bToSet;
-    return m_bValidatorLocked;
-}
-
-inline tCIDLib::TBoolean TXMLParserCore::bStandalone() const
-{
-    return m_bStandalone;
-}
-
-inline tCIDLib::TCard4 TXMLParserCore::c4MaxErrors() const
-{
-    return m_c4ErrorMax;
-}
-
-inline tCIDLib::TCard4
-TXMLParserCore::c4MaxErrors(const tCIDLib::TCard4 c4MaxToSet)
-{
-    m_c4ErrorMax = c4MaxToSet;
-    return m_c4ErrorMax;
-}
-
-inline tCIDXML::EParseFlags TXMLParserCore::eFlags() const
-{
-    return m_eFlags;
-}
-
-inline tCIDXML::ELocations TXMLParserCore::eLocation() const
-{
-    return m_eLocation;
-}
-
-inline tCIDXML::ELocations
-TXMLParserCore::eLocation(const tCIDXML::ELocations eLocation)
-{
-    m_eLocation = eLocation;
-    return m_eLocation;
-}
-
-inline tCIDXML::EParseOpts TXMLParserCore::eOptions() const
-{
-    return m_eOptions;
-}
-
-inline TXMLBufMgr& TXMLParserCore::xbmThis()
-{
-    return *m_pxbmBuf;
-}
-
-inline TXMLEntityMgr& TXMLParserCore::xemThis()
-{
-    return m_xemThis;
-}
 

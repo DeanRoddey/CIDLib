@@ -68,6 +68,7 @@ class KRNLEXPORT TKrnlEvent
         );
 
         TKrnlEvent(const TKrnlEvent&) = delete;
+        TKrnlEvent(TKrnlEvent&&) = delete;
 
         ~TKrnlEvent();
 
@@ -76,6 +77,7 @@ class KRNLEXPORT TKrnlEvent
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlEvent& operator=(const TKrnlEvent&) = delete;
+        TKrnlEvent& operator=(TKrnlEvent&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -94,7 +96,7 @@ class KRNLEXPORT TKrnlEvent
             const   TKrnlEvent&             kevToDup
         );
 
-        tCIDLib::TBoolean bIsValid() const
+        [[nodiscard]] tCIDLib::TBoolean bIsValid() const
         {
             return m_hevThis.bIsValid();
         }

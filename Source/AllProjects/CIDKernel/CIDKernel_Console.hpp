@@ -77,6 +77,7 @@ class KRNLEXPORT TKrnlConIn : public MSignalHandler
         );
 
         TKrnlConIn(const TKrnlConIn&) = delete;
+        TKrnlConIn(TKrnlConIn&&) = delete;
 
         ~TKrnlConIn();
 
@@ -85,6 +86,7 @@ class KRNLEXPORT TKrnlConIn : public MSignalHandler
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlConIn& operator=(const TKrnlConIn&) = delete;
+        TKrnlConIn& operator=(TKrnlConIn&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -162,7 +164,7 @@ class KRNLEXPORT TKrnlConIn : public MSignalHandler
             const   tCIDLib::TCh* const     pszBuffer
         );
 
-        TConPlatInfo* pInitPlatform
+        [[nodiscard]] TConPlatInfo* pInitPlatform
         (
             const   tCIDLib::TCard4         c4MaxRecall
         );

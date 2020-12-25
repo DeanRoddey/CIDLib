@@ -165,7 +165,7 @@ namespace tCIDLogSrv
 
 
     // -----------------------------------------------------------------------
-    //  Typedefs for the comparator functions we'll use for passing to the
+    //  Aliases for the comparator functions we'll use for passing to the
     //  standard sort
     // -----------------------------------------------------------------------
     using TFreeComparator = tCIDLib::ESortComps (*)(const TFreeItem&, const TFreeItem&);

@@ -44,6 +44,7 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+
 namespace tCIDColAlgo
 {
     //
@@ -176,7 +177,8 @@ namespace tCIDColAlgo
     //  Find the first element that matches the passed object to find. If found the
     //  cursor will be pointed at that element, else invalid. The default equality
     //  comparison functor will be used if not explicitly provided, which requires
-    //  that the elements provide the equality operator.
+    //  that the elements provide the equality operator. We have const and non-const
+    //  versions.
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
@@ -194,12 +196,29 @@ namespace tCIDColAlgo
         return cursSrc;
     }
 
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TNCCursor cursFindNC(        TCol&       colSrc
+                                        , const TElem&      objToFind
+                                        ,       TComp       pfnComp = TComp())
+    {
+        TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objToFind))
+                break;
+        }
+        return cursSrc;
+    }
+
 
     //
     //  Find the first element that is not equal to the passed object to find. If
     //  found the cursor will be pointed at that element, else invalid. The default
     //  equality comparison functor will be used if not explicitly provided, which
-    //  requires that the elements provide the equality operator.
+    //  requires that the elements provide the equality operator. We have const
+    //  and non-const versions
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
@@ -217,11 +236,98 @@ namespace tCIDColAlgo
         return cursSrc;
     }
 
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TNCCursor cursFindNotNC(         TCol&   colSrc
+                                            , const TElem&  objToFind
+                                            ,       TComp   pfnComp = TComp())
+    {
+        TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (!pfnComp(*cursSrc, objToFind))
+                break;
+        }
+        return cursSrc;
+    }
+
+
+    //
+    //  Find the first element that matches, by a key value, which the comparator parameter
+    //  knows how to access. And then find the first one that doesn't match. We have const
+    //  and non-const versions.
+    //
+    template<typename   TCol
+            , typename  TKey
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    typename TCol::TCursor cursFindByKey(const  TCol&   colSrc
+                                        , const TKey&   objKey
+                                        ,       TComp   pfnComp)
+    {
+        TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objKey))
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TKey
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    typename TCol::TCursor cursFindNotByKey(const   TCol&   colSrc
+                                            , const TKey&   objKey
+                                            ,       TComp   pfnComp)
+    {
+        TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (!pfnComp(*cursSrc, objKey))
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TKey
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    typename TCol::TNCCursor cursFindByKeyNC(       TCol&   colSrc
+                                            , const TKey&   objKey
+                                            ,       TComp   pfnComp)
+    {
+        TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objKey))
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TKey
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    typename TCol::TNCCursor cursFindNotByKeyNC(        TCol&   colSrc
+                                                , const TKey&   objKey
+                                                ,       TComp   pfnComp)
+    {
+        TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (!pfnComp(*cursSrc, objKey))
+                break;
+        }
+        return cursSrc;
+    }
+
 
     //
     //  Find the first element greater or less than the passed object to compare. The
     //  default magnitude comparison functor is used if not indicated explicitly (in
-    //  which case the element type must provide < and > operators.)
+    //  which case the element type must provide < and > operators.) We have consta nd
+    //  non-const versions.
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
@@ -247,6 +353,38 @@ namespace tCIDColAlgo
                                         ,       TComp   pfnComp = TComp())
     {
         TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstLess)
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TNCCursor cursFirstGreaterNC(        TCol&   colSrc
+                                                , const TElem&  objComp
+                                                ,       TComp   pfnComp = TComp())
+    {
+        TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstGreater)
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TNCCursor cursFirstLessNC(       TCol&   colSrc
+                                            , const TElem&  objComp
+                                            ,       TComp   pfnComp = TComp())
+    {
+        TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstLess)

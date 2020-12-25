@@ -88,8 +88,10 @@ class CIDLIBEXP TCIDGenCacheItem : public TObject
 
         TCIDGenCacheItem
         (
-            const   TCIDGenCacheItem&       cciToCopy
+            const   TCIDGenCacheItem&       cciSrc
         );
+
+        TCIDGenCacheItem(TCIDGenCacheItem&) = delete;
 
         virtual ~TCIDGenCacheItem();
 
@@ -97,10 +99,12 @@ class CIDLIBEXP TCIDGenCacheItem : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        tCIDLib::TVoid operator=
+        TCIDGenCacheItem& operator=
         (
-            const   TCIDGenCacheItem&       cciToAssign
+            const   TCIDGenCacheItem&       cciSrc
         );
+
+        TCIDGenCacheItem& operator=(TCIDGenCacheItem&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -207,12 +211,8 @@ template <typename T> class TCIDCacheItem : public TCIDGenCacheItem
         {
         }
 
-        TCIDCacheItem(const TCIDCacheItem& cciToCopy) :
-
-            TCIDGenCacheItem(cciToCopy)
-            , m_objData(cciToCopy.m_objData)
-        {
-        }
+        TCIDCacheItem(const TCIDCacheItem&) = default;
+        TCIDCacheItem(TCIDCacheItem&&) = delete;
 
         ~TCIDCacheItem()
         {
@@ -222,11 +222,8 @@ template <typename T> class TCIDCacheItem : public TCIDGenCacheItem
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        tCIDLib::TVoid operator=(const TCIDCacheItem<T>& cciToAssign)
-        {
-            TCIDGenCacheItem::operator=(cciToAssign);
-            m_objData = cciToAssign.m_objData;
-        }
+        TCIDCacheItem<T>& operator=(const TCIDCacheItem<T>&) = default;
+        TCIDCacheItem<T>& operator=(TCIDCacheItem<T>&&) = delete;
 
 
         // -------------------------------------------------------------------

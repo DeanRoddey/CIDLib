@@ -344,6 +344,17 @@ tCIDLib::TVoid TCmdQItem::WaitFor(const tCIDLib::TCard4 c4Millis)
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+//  TOrbClientBase: Public, static methods
+// ---------------------------------------------------------------------------
+
+// Adivsory only, it could change immediately if multiple threads are involved
+tCIDLib::TBoolean TOrbClientBase::bIsInitialized()
+{
+    return CIDOrb_ClientBase::m_pState != nullptr;
+}
+
+
+// ---------------------------------------------------------------------------
 //  TOrbClientBase: Public destructor
 // ---------------------------------------------------------------------------
 TOrbClientBase::~TOrbClientBase()

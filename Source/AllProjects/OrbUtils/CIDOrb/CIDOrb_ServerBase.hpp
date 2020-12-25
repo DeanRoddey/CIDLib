@@ -46,6 +46,12 @@ class CIDORBEXP TOrbServerBase : public TObject
 {
     public :
         // -------------------------------------------------------------------
+        //  Public static methods
+        // -------------------------------------------------------------------
+        static tCIDLib::TBoolean bIsInitialized();
+
+
+        // -------------------------------------------------------------------
         //  Public destructor
         // -------------------------------------------------------------------
         TOrbServerBase() = delete;

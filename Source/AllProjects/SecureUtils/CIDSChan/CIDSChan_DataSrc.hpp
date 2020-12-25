@@ -91,7 +91,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
                     TEvent&                 evToSet
         )   override;
 
-        tCIDLib::TBoolean bConnected() const override;
+        tCIDLib::TBoolean bIsConnected() const override;
 
         tCIDSock::ESockEvs eEnumEvents
         (
@@ -219,7 +219,7 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
                     TEvent&                 evToSet
         )   override;
 
-        tCIDLib::TBoolean bConnected() const override;
+        tCIDLib::TBoolean bIsConnected() const override;
 
         tCIDSock::ESockEvs eEnumEvents
         (

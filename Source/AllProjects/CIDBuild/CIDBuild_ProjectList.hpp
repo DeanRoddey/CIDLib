@@ -227,7 +227,7 @@ template <typename T> class TMethProjIterator : public TProjIterator
         // -------------------------------------------------------------------
         //  The prototype for the callback methods
         // -------------------------------------------------------------------
-        typedef tCIDLib::TBoolean (T::*TIterMethod)(const TBldStr&, const tCIDLib::TCard4);
+        using TIterMethod = tCIDLib::TBoolean (T::*)(const TBldStr&, const tCIDLib::TCard4);
 
 
         // -------------------------------------------------------------------

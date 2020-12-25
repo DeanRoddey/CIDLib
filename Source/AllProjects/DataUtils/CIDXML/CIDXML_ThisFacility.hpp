@@ -56,7 +56,17 @@ class CIDXMLEXP TFacCIDXML : public TFacility
         // -------------------------------------------------------------------
         TFacCIDXML();
 
+        TFacCIDXML(const TFacCIDXML&) = delete;
+        TFacCIDXML(TFacCIDXML&&) = delete;
+
         ~TFacCIDXML();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFacCIDXML& operator=(const TFacCIDXML&) = delete;
+        TFacCIDXML& operator=(TFacCIDXML&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -162,20 +172,4 @@ class CIDXMLEXP TFacCIDXML : public TFacility
 
 #pragma CIDLIB_POPPACK
 
-
-inline tCIDLib::TVoid
-TFacCIDXML::EscapeFor(  const   TString&            strInText
-                        ,       TTextOutStream&     strmOut
-                        , const tCIDXML::EEscTypes  eType)
-{
-    EscapeFor(strInText.pszBuffer(), strmOut, eType);
-}
-
-inline tCIDLib::TVoid
-TFacCIDXML::EscapeFor(  const   TString&            strInText
-                        ,       TString&            strOutText
-                        , const tCIDXML::EEscTypes  eType)
-{
-    EscapeFor(strInText.pszBuffer(), strOutText, eType);
-}
 

@@ -273,7 +273,7 @@ class CIDLIBEXP TSysInfo
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
-        static inline tCIDLib::TBoolean bBigEndian()
+        static tCIDLib::TBoolean bBigEndian()
         {
             #if defined(CIDLIB_BIGENDIAN)
             return kCIDLib::True;
@@ -299,7 +299,7 @@ class CIDLIBEXP TSysInfo
 
         static tCIDLib::TBoolean bInstallMode();
 
-        static inline tCIDLib::TBoolean bLittleEndian()
+        static tCIDLib::TBoolean bLittleEndian()
         {
             #if defined(CIDLIB_LITTLEENDIAN)
             return kCIDLib::True;
@@ -338,7 +338,7 @@ class CIDLIBEXP TSysInfo
             const   TString&                strModule
         );
 
-        static inline tCIDLib::EEndianModes eEndianMode()
+        static tCIDLib::EEndianModes eEndianMode()
         {
             #if defined(CIDLIB_LITTLEENDIAN)
             return tCIDLib::EEndianModes::Little;
@@ -405,10 +405,12 @@ class CIDLIBEXP TSysInfo
         TSysInfo();
 
         TSysInfo(const TSysInfo&) = delete;
+        TSysInfo(TSysInfo&&) = delete;
 
         ~TSysInfo();
 
         TSysInfo& operator=(const TSysInfo&) = delete;
+        TSysInfo& operator=(TSysInfo&&) = delete;
 
 
     private :

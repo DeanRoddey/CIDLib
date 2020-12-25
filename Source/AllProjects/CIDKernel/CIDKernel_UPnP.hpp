@@ -79,7 +79,9 @@ class KRNLEXPORT MUPnPSvcCallback
         // -------------------------------------------------------------------
         MUPnPSvcCallback();
         MUPnPSvcCallback(const MUPnPSvcCallback&);
+        MUPnPSvcCallback(MUPnPSvcCallback&&) = delete;
         MUPnPSvcCallback& operator=(const MUPnPSvcCallback&);
+        MUPnPSvcCallback& operator=(MUPnPSvcCallback&&) = delete;
 };
 
 
@@ -428,6 +430,7 @@ class KRNLEXPORT TKrnlUPnPAsyncFinder
         );
 
         TKrnlUPnPAsyncFinder(const TKrnlUPnPAsyncFinder&) = delete;
+        TKrnlUPnPAsyncFinder(TKrnlUPnPAsyncFinder&&) = delete;
 
         ~TKrnlUPnPAsyncFinder();
 
@@ -436,6 +439,7 @@ class KRNLEXPORT TKrnlUPnPAsyncFinder
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlUPnPAsyncFinder& operator=(const TKrnlUPnPAsyncFinder&) = delete;
+        TKrnlUPnPAsyncFinder& operator=(TKrnlUPnPAsyncFinder&&) = delete;
 
 
         // -------------------------------------------------------------------

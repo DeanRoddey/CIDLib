@@ -50,8 +50,8 @@ TCfgServerClient::TCfgServerClient(const tCIDLib::TCard4 c4ConnWait) :
     m_c4ConnWait(c4ConnWait)
     , m_mbufIO(8192, 0x100000)
     , m_mbufIO2(8192, 0x100000)
-    , m_pcrypToUse(0)
-    , m_porbcProxy(0)
+    , m_pcrypToUse(nullptr)
+    , m_porbcProxy(nullptr)
     , m_strmOut(&m_mbufIO, tCIDLib::EAdoptOpts::NoAdopt)
     , m_strmIn(m_strmOut)
     , m_strNSScope(TCIDCfgSrvClientProxy::strBinding)
@@ -66,8 +66,8 @@ TCfgServerClient::TCfgServerClient( const   TString&        strNSScope
     m_c4ConnWait(c4ConnWait)
     , m_mbufIO(8192, 0x100000)
     , m_mbufIO2(8192, 0x100000)
-    , m_pcrypToUse(0)
-    , m_porbcProxy(0)
+    , m_pcrypToUse(nullptr)
+    , m_porbcProxy(nullptr)
     , m_strmOut(&m_mbufIO, tCIDLib::EAdoptOpts::NoAdopt)
     , m_strmIn(m_strmOut)
     , m_strNSScope(strNSScope)
@@ -92,6 +92,7 @@ TCfgServerClient::~TCfgServerClient()
 
     // Clean up the encrypter if we got one
     delete m_pcrypToUse;
+    m_pcrypToUse = nullptr;
 }
 
 
@@ -123,9 +124,7 @@ TCfgServerClient::AddObject(const   TString&        strKey
         {
             const tCIDLib::TCard4 c4Count = m_pcrypToUse->c4Encrypt
             (
-                m_mbufIO
-                , m_mbufIO2
-                , m_strmOut.c4CurPos()
+                m_mbufIO, m_mbufIO2, m_strmOut.c4CurPos()
             );
             orbcProxy().AddObject(strKey, c4Count, m_mbufIO2, c4Reserve);
         }
@@ -171,28 +170,15 @@ TCfgServerClient::bAddOrUpdate( const   TString&            strKey
         {
             const tCIDLib::TCard4 c4Count = m_pcrypToUse->c4Encrypt
             (
-                m_mbufIO
-                , m_mbufIO2
-                , m_strmOut.c4CurPos()
+                m_mbufIO, m_mbufIO2, m_strmOut.c4CurPos()
             );
-            bRet = orbcProxy().bAddOrUpdate
-            (
-                strKey
-                , c4Version
-                , c4Count
-                , m_mbufIO2
-                , c4Reserve
-            );
+            bRet = orbcProxy().bAddOrUpdate(strKey, c4Version, c4Count, m_mbufIO2, c4Reserve);
         }
          else
         {
             bRet = orbcProxy().bAddOrUpdate
             (
-                strKey
-                , c4Version
-                , m_strmOut.c4CurPos()
-                , m_mbufIO
-                , c4Reserve
+                strKey, c4Version, m_strmOut.c4CurPos(), m_mbufIO, c4Reserve
             );
         }
     }

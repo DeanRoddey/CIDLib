@@ -136,6 +136,18 @@ TPathStr::AddLevels(const   TString& strNewLevel1
     AddLevel(strNewLevel3);
 }
 
+tCIDLib::TVoid
+TPathStr::AddLevels(const   TString& strNewLevel1
+                    , const TString& strNewLevel2
+                    , const TString& strNewLevel3
+                    , const TString& strNewLevel4)
+{
+    AddLevel(strNewLevel1);
+    AddLevel(strNewLevel2);
+    AddLevel(strNewLevel3);
+    AddLevel(strNewLevel4);
+}
+
 
 // Add our current contents to the end of the passed base path
 tCIDLib::TVoid TPathStr::AddToBasePath(const TString& strBasePath)

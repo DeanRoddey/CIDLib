@@ -58,7 +58,6 @@ class TString;
 #include    "CIDLib_RTTI.hpp"
 #include    "CIDLib_Duplicable.hpp"
 #include    "CIDLib_Formattable.hpp"
-#include    "CIDLib_RefCounted.hpp"
 #include    "CIDLib_Streamable.hpp"
 #include    "CIDLib_Lockable.hpp"
 #include    "CIDLib_Type.hpp"
@@ -186,6 +185,7 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 
 #endif
 
+#include    "CIDLib_PolyStreamer.hpp"
 #include    "CIDLib_BasicDLinkedCol.hpp"
 
 #include    "CIDLib_StreamFmt.hpp"
@@ -251,7 +251,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_TextFileStream.hpp"
 #include    "CIDLib_TextMBufStream.hpp"
 #include    "CIDLib_TextStringStream.hpp"
-#include    "CIDLib_PolyStreamer.hpp"
 #include    "CIDLib_StreamLexer.hpp"
 
 #include    "CIDLib_BackFileMgr.hpp"

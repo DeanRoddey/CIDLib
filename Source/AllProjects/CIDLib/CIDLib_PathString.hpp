@@ -113,6 +113,14 @@ class CIDLIBEXP TPathStr : public TString
             , const TString&                strNewLevel3
         );
 
+        tCIDLib::TVoid AddLevels
+        (
+            const   TString&                strNewLevel1
+            , const TString&                strNewLevel2
+            , const TString&                strNewLevel3
+            , const TString&                strNewLevel4
+        );
+
         tCIDLib::TVoid AddToBasePath
         (
             const   TString&                strBasePath

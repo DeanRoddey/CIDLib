@@ -98,7 +98,7 @@ class CIDLIBEXP TCIDDataSrc
         // -------------------------------------------------------------------
         //  Public, virtual methods
         // -------------------------------------------------------------------
-        virtual tCIDLib::TBoolean bConnected() const = 0;
+        virtual tCIDLib::TBoolean bIsConnected() const = 0;
 
         virtual tCIDLib::TVoid FormatSrcInfo
         (

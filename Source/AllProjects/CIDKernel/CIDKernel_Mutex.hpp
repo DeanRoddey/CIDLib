@@ -63,6 +63,7 @@ class KRNLEXPORT TKrnlMutex
         );
 
         TKrnlMutex(const TKrnlMutex&) = delete;
+        TKrnlMutex(TKrnlMutex&&) = delete;
 
         ~TKrnlMutex();
 
@@ -71,6 +72,7 @@ class KRNLEXPORT TKrnlMutex
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlMutex& operator=(const TKrnlMutex&) = delete;
+        TKrnlMutex& operator=(TKrnlMutex&&) = delete;
 
 
         // -------------------------------------------------------------------

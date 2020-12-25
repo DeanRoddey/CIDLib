@@ -145,7 +145,6 @@ class CIDXMLEXP TXMLElemDecl
         virtual const TString& strFullName() const = 0;
 
 
-
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------

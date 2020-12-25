@@ -59,7 +59,17 @@ class CIDXMLEXP TFileEntitySrc : public TXMLEntitySrc
             , const TString&                strPublicId
         );
 
+        TFileEntitySrc(const TFileEntitySrc&) = default;
+        TFileEntitySrc(TFileEntitySrc&&) = default;
+
         ~TFileEntitySrc();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFileEntitySrc& operator=(const TFileEntitySrc&) = default;
+        TFileEntitySrc& operator=(TFileEntitySrc&&) = default;
 
 
         // -------------------------------------------------------------------

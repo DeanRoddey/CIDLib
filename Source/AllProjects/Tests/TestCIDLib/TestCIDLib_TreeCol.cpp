@@ -89,7 +89,7 @@ static tCIDLib::TVoid TestTreeBasic(TTextOutStream& strmOut)
     //      /T2
     //      /T3
     //
-    if (colTest.objAddTerminal(L"/", L"T1", TString(L"T1")) != L"T1")
+    if (colTest.objAddTerminal(L"/", L"T1", TString(L"T1"), L"This is /T1") != L"T1")
     {
         strmOut << CUR_LN << L"Added non-terminal had wrong value on return"
                 << kCIDLib::EndLn;
@@ -123,7 +123,7 @@ static tCIDLib::TVoid TestTreeBasic(TTextOutStream& strmOut)
     }
 
     // Ok, now lets start adding deeper levels
-    colTest.objAddTerminal(L"/NT1", L"T4", TString(L"T4"));
+    colTest.objAddTerminal(L"/NT1", L"T4", TString(L"T4"), L"This is /NT1/T4");
     colTest.objAddTerminal(L"/NT1", L"T5", TString(L"T5"));
     colTest.pnodeAddNonTerminal(L"/NT1", L"NT2");
     colTest.pnodeAddNonTerminal(L"/NT1/NT2", L"NT3");
@@ -204,6 +204,39 @@ static tCIDLib::TVoid TestTreeBasic(TTextOutStream& strmOut)
         c4Index++;
     }   while (cursTest.bNext());
 
+
+    // Do a binary streaming round trip on it. Our element type supports streaming
+    {
+        TBinMBufOutStream strmTar(4096UL);
+        TBinMBufInStream strmSrc(strmTar);
+
+        StreamOutBasicTree(colTest, strmTar);
+        strmTar.Flush();
+
+        strmSrc.Reset();
+        TTreeOfTString  colDup;
+        StreamInBasicTree(colDup, strmSrc);
+
+        if (colDup.c4ElemCount() != colTest.c4ElemCount())
+        {
+            strmOut << CUR_LN << L"Binary streaming round trip failed" << kCIDLib::EndLn;
+            return;
+        }
+
+        // Check a few things that were in the original one
+        if (!colDup.bNodeExists(L"/T1") || !colDup.bNodeExists(L"/NT1/NT2/NT3"))
+        {
+            strmOut << CUR_LN << L"Test values not found after streaming round trip" << kCIDLib::EndLn;
+            return;
+        }
+
+        // Check the description on /T1
+        if (colDup.strDescriptionAt(L"/T1") != L"This is /T1")
+        {
+            strmOut << CUR_LN << L"Value description lost in streaming round trip" << kCIDLib::EndLn;
+            return;
+        }
+    }
 
     // Now lets remove a non-terminal and make sure children gets cleaned up
     colTest.RemoveNode(L"/NT1");

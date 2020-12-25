@@ -42,7 +42,7 @@ REM     SDK Tweaks      - A couple files we need not mornally available
 REM     Scintilla       - We have a custom build of Scintilla
 REM
 REM     - Only used in CQC currently
-REM     LIBVLC SDK      - To the sdk directory in our CID_Dev area
+REM     LIBVLC SDK      - To the sdk directory in the Depends directory
 REM
 
 IF "%1"=="" GOTO BAD_PARMS

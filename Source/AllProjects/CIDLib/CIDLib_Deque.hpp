@@ -86,7 +86,7 @@ template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
             return this->bGetFromTop(objToFill);
         }
 
-        TElem& objAddMove(TElem&& objNew)
+        template <typename T = TElem> T& objAddMove(T&& objNew)
         {
             // Delegate to our parent
             return this->objAddAtBottom(tCIDLib::ForceMove(objNew));

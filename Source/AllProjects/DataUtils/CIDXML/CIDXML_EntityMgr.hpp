@@ -246,12 +246,8 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                 {
                 }
 
-                TEMStackElem(const TEMStackElem& elemToCopy) :
-
-                    pxesThis(elemToCopy.pxesThis)
-                    , pxdeclThis(elemToCopy.pxdeclThis)
-                {
-                }
+                TEMStackElem(const TEMStackElem&) = default;
+                TEMStackElem(TEMStackElem&&) = default;
 
                 ~TEMStackElem()
                 {
@@ -266,16 +262,8 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                 // -----------------------------------------------------------
                 //  Public operators
                 // -----------------------------------------------------------
-                TEMStackElem& operator=(const TEMStackElem& elemToAssign)
-                {
-                    if (this == &elemToAssign)
-                        return *this;
-
-                    pxesThis = elemToAssign.pxesThis;
-                    pxdeclThis = elemToAssign.pxdeclThis;
-
-                    return *this;
-                }
+                TEMStackElem& operator=(const TEMStackElem&) = default;
+                TEMStackElem& operator=(TEMStackElem&&) = default;
 
 
                 // -----------------------------------------------------------
@@ -283,11 +271,11 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                 //
                 //  pxesSrc
                 //      The source entity spooler for the current entity. We
-                //      own this one.
+                //      own this.
                 //
                 //  pxdeclEntity
                 //      A pointer to the entity decl that our spooler is
-                //      spooling from. We don't own this!!
+                //      spooling from. We don't own this.
                 // -----------------------------------------------------------
                 TXMLEntSpooler*         pxesThis;
                 const TXMLEntityDecl*   pxdeclThis;
@@ -421,6 +409,7 @@ class TXMLEMThrowJan
         }
 
         TXMLEMThrowJan(const TXMLEMThrowJan&) = delete;
+        TXMLEMThrowJan(TXMLEMThrowJan&&) = delete;
 
         ~TXMLEMThrowJan()
         {

@@ -131,6 +131,24 @@ TBasicTreeHelpers::BadPath( const   tCIDLib::TCh* const pszFile
 
 
 tCIDLib::TVoid
+TBasicTreeHelpers::BadStoredNodeType(const  tCIDLib::TCh* const pszFile
+                                    , const tCIDLib::TCard4     c4Line
+                                    , const tCIDLib::TCard1     c1Value)
+{
+    facCIDLib().ThrowErr
+    (
+        pszFile
+        , c4Line
+        , kCIDErrs::errcCol_BadStoredNodeType
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::BadParms
+        , TString(L"TBasicTreeCol")
+        , TCardinal(c1Value)
+    );
+}
+
+
+tCIDLib::TVoid
 TBasicTreeHelpers::CheckName(const  TString&            strToCheck
                             , const tCIDLib::TCh* const pszFile
                             , const tCIDLib::TCard4     c4Line)
@@ -218,6 +236,28 @@ TBasicTreeHelpers::CheckPathAndName(const   TString&            strPathToCheck
     // Just call the other two checkers
     CheckPath(strPathToCheck, pszFile, c4Line);
     CheckName(strNameToCheck, pszFile, c4Line);
+}
+
+
+tCIDLib::TVoid
+TBasicTreeHelpers::CheckStoredCounts(const  tCIDLib::TCh* const     pszFile
+                                    , const tCIDLib::TCard4         c4Line
+                                    , const tCIDLib::TCard4         c4NTCount
+                                    , const tCIDLib::TCard4         c4NTCount2
+                                    , const tCIDLib::TCard4         c4TCount
+                                    , const tCIDLib::TCard4         c4TCount2)
+{
+    if ((c4NTCount != c4NTCount2) || (c4TCount != c4TCount2))
+    {
+        facCIDLib().ThrowErr
+        (
+            pszFile
+            , c4Line
+            , kCIDErrs::errcCol_StoreCounts
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+        );
+    }
 }
 
 

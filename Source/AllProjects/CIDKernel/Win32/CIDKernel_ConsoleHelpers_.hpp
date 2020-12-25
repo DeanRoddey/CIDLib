@@ -48,6 +48,7 @@ class TWin32ConCursor
         );
 
         TWin32ConCursor(const TWin32ConCursor&) = delete;
+        TWin32ConCursor(TWin32ConCursor&&) = delete;
 
         ~TWin32ConCursor();
 
@@ -56,12 +57,16 @@ class TWin32ConCursor
         //  Public operators
         // -------------------------------------------------------------------
         TWin32ConCursor& operator=(const TWin32ConCursor&) = delete;
+        TWin32ConCursor& operator=(TWin32ConCursor&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const COORD& CurPosition() const;
+        const COORD& CurPosition() const
+        {
+            return m_CurPos;
+        }
 
         tCIDLib::TVoid CR();
 
@@ -81,7 +86,10 @@ class TWin32ConCursor
             const   tCIDLib::TCard4         c4By
         );
 
-        const COORD& OrgPosition() const;
+        const COORD& OrgPosition() const
+        {
+            return m_OrgPos;
+        }
 
         tCIDLib::TVoid ResetFromOrg
         (
@@ -136,14 +144,4 @@ class TWin32ConCursor
         HANDLE  m_hCon;
         COORD   m_OrgPos;
 };
-
-inline const COORD& TWin32ConCursor::CurPosition() const
-{
-    return m_CurPos;
-}
-
-inline const COORD& TWin32ConCursor::OrgPosition() const
-{
-    return m_OrgPos;
-}
 

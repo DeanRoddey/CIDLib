@@ -73,38 +73,16 @@ class CIDXMLEXP TXMLTreeParser :
                 {
                 }
 
-                TErrInfo(const TErrInfo& erriSrc) :
-
-                    m_errcId(erriSrc.m_errcId)
-                    , m_eType(erriSrc.m_eType)
-                    , m_c4Column(erriSrc.m_c4Column)
-                    , m_c4Line(erriSrc.m_c4Line)
-                    , m_strSystemId(erriSrc.m_strSystemId)
-                    , m_strText(erriSrc.m_strText)
-                {
-                }
-
-                ~TErrInfo()
-                {
-                }
+                TErrInfo(const TErrInfo&) = default;
+                TErrInfo(TErrInfo&&) = default;
+                ~TErrInfo() = default;
 
 
                 // -----------------------------------------------------------
                 //  Public operators
                 // -----------------------------------------------------------
-                TErrInfo& operator=(const TErrInfo& erriSrc)
-                {
-                    if (&erriSrc != this)
-                    {
-                        m_errcId        = erriSrc.m_errcId;
-                        m_eType         = erriSrc.m_eType;
-                        m_c4Column      = erriSrc.m_c4Column;
-                        m_c4Line        = erriSrc.m_c4Line;
-                        m_strSystemId   = erriSrc.m_strSystemId;
-                        m_strText       = erriSrc.m_strText;
-                    }
-                    return *this;
-                }
+                TErrInfo& operator=(const TErrInfo&)  =default;
+                TErrInfo& operator=(TErrInfo&&)  =default;
 
 
                 // -----------------------------------------------------------

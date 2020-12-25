@@ -51,6 +51,7 @@ class TESTFWLIBEXP TTestFWTest : public TObject
         TTestFWTest() = delete;
 
         TTestFWTest(const TTestFWTest&) = delete;
+        TTestFWTest(TTestFWTest&&) = delete;
 
         ~TTestFWTest();
 
@@ -59,6 +60,7 @@ class TESTFWLIBEXP TTestFWTest : public TObject
         //  Public oeprators
         // -------------------------------------------------------------------
         TTestFWTest& operator=(const TTestFWTest&) = delete;
+        TTestFWTest& operator=(TTestFWTest&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -159,6 +161,7 @@ class TESTFWLIBEXP TTestFWApp : public TObject
         //  Constructors and destructor
         // -------------------------------------------------------------------
         TTestFWApp(const TTestFWApp&) = delete;
+        TTestFWApp(TTestFWApp&&) = delete;
 
         ~TTestFWApp();
 
@@ -167,6 +170,7 @@ class TESTFWLIBEXP TTestFWApp : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TTestFWApp& operator=(const TTestFWApp&) = delete;
+        TTestFWApp& operator=(TTestFWApp&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -208,7 +212,7 @@ class TESTFWLIBEXP TTestFWApp : public TObject
         // -------------------------------------------------------------------
         //  Class types, which the derived test app classes need to see as well
         // -------------------------------------------------------------------
-        typedef TRefVector<TTestFWTest>     TTestList;
+        using TTestList = TRefVector<TTestFWTest>;
 
 
         // -------------------------------------------------------------------

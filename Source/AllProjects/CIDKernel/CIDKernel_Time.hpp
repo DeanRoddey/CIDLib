@@ -133,14 +133,19 @@ class KRNLEXPORT TKrnlTimeStamp
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TKrnlTimeStamp();
+        TKrnlTimeStamp() = default;
 
-        TKrnlTimeStamp
-        (
-            const   TKrnlTimeStamp&         ktmsSrc
-        );
+        TKrnlTimeStamp(const TKrnlTimeStamp&) = default;
+        TKrnlTimeStamp(TKrnlTimeStamp&&) = default;
 
-        ~TKrnlTimeStamp();
+        ~TKrnlTimeStamp() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TKrnlTimeStamp& operator=(const TKrnlTimeStamp&) = default;
+        TKrnlTimeStamp& operator=(TKrnlTimeStamp&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -253,7 +258,6 @@ class KRNLEXPORT TKrnlTimeStamp
         friend class TCIDKrnlModule;
 
 
-
     private :
         // -------------------------------------------------------------------
         //  Private data
@@ -263,7 +267,7 @@ class KRNLEXPORT TKrnlTimeStamp
         //      convenient way to store it internally. Its in 100-nanosecond
         //      intervals since midnight 01/01/1970.
         // -------------------------------------------------------------------
-        tCIDLib::TEncodedTime   m_enctTime;
+        tCIDLib::TEncodedTime   m_enctTime = 0;
 };
 
 #pragma CIDLIB_POPPACK

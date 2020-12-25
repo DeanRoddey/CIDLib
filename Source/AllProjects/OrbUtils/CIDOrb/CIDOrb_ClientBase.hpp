@@ -70,23 +70,34 @@ class CIDORBEXP TCmdQItem
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4SequenceId() const;
+        tCIDLib::TCard4 c4SequenceId() const
+        {
+            return m_ocmdData.c4SequenceId();
+        }
 
-        tCIDLib::TCard4 c4SequenceId
-        (
-            const   tCIDLib::TCard4         c4ToSet
-        );
+        tCIDLib::TCard4 c4SequenceId(const tCIDLib::TCard4 c4ToSet)
+        {
+            m_ocmdData.c4SequenceId(c4ToSet);
+            return c4ToSet;
+        }
 
-        tCIDOrb::ECmdStages eStage() const;
+        tCIDOrb::ECmdStages eStage() const
+        {
+            return m_eStage;
+        }
 
-        tCIDOrb::ECmdStages eStage
-        (
-            const   tCIDOrb::ECmdStages     eToSet
-        );
+        tCIDOrb::ECmdStages eStage(const tCIDOrb::ECmdStages eToSet)
+        {
+            m_eStage = eToSet;
+            return m_eStage;
+        }
 
         tCIDLib::TEncodedTime enctElapsed() const;
 
-        TMutex* pmtxLock();
+        TMutex* pmtxLock()
+        {
+            return &m_mtxSync;
+        }
 
         const TOrbCmd& ocmdData() const;
 
@@ -97,7 +108,10 @@ class CIDORBEXP TCmdQItem
             const   TOrbId&                 oidToSet
         );
 
-        tCIDLib::TVoid SetStartTime();
+        tCIDLib::TVoid SetStartTime()
+        {
+            m_enctStart = TTime::enctNow();
+        }
 
         tCIDLib::TVoid WakeUpWaiter();
 
@@ -141,43 +155,6 @@ class CIDORBEXP TCmdQItem
 };
 
 
-// ---------------------------------------------------------------------------
-//  TCmdQItem: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TCard4 TCmdQItem::c4SequenceId() const
-{
-    return m_ocmdData.c4SequenceId();
-}
-
-inline tCIDLib::TCard4 TCmdQItem::c4SequenceId(const tCIDLib::TCard4 c4ToSet)
-{
-    m_ocmdData.c4SequenceId(c4ToSet);
-    return c4ToSet;
-}
-
-inline tCIDOrb::ECmdStages TCmdQItem::eStage() const
-{
-    return m_eStage;
-}
-
-inline tCIDOrb::ECmdStages TCmdQItem::eStage(const tCIDOrb::ECmdStages eToSet)
-{
-    m_eStage = eToSet;
-    return m_eStage;
-}
-
-inline TMutex* TCmdQItem::pmtxLock()
-{
-    return &m_mtxSync;
-}
-
-// Just sets our performance debugging timer to now
-inline tCIDLib::TVoid TCmdQItem::SetStartTime()
-{
-    m_enctStart = TTime::enctNow();
-}
-
-
 
 
 // ---------------------------------------------------------------------------
@@ -188,9 +165,25 @@ class CIDORBEXP TOrbClientBase : public TObject
 {
     public :
         // -------------------------------------------------------------------
-        //  Destructor
+        //  Public, static methods
         // -------------------------------------------------------------------
+        static tCIDLib::TBoolean bIsInitialized();
+
+
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TOrbClientBase(const TOrbClientBase&) = delete;
+        TOrbClientBase(TOrbClientBase&&) = delete;
+
         ~TOrbClientBase();
+
+
+        // -------------------------------------------------------------------
+        //  PUblic operators
+        // -------------------------------------------------------------------
+        TOrbClientBase& operator=(const TOrbClientBase&) = delete;
+        TOrbClientBase& operator=(TOrbClientBase&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -267,13 +260,6 @@ class CIDORBEXP TOrbClientBase : public TObject
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TOrbClientBase(const TOrbClientBase&);
-        tCIDLib::TVoid operator=(const TOrbClientBase&);
-
-
         // -------------------------------------------------------------------
         //  Private, static methods
         // -------------------------------------------------------------------

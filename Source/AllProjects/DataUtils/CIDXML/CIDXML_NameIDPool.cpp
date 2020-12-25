@@ -441,12 +441,12 @@ TXMLNameIDPoolCursor(const TXMLNameIDPool<TElem>* const pxnipToIter) :
 }
 
 template <class TElem> TXMLNameIDPoolCursor<TElem>::
-TXMLNameIDPoolCursor(const TXMLNameIDPoolCursor& xnipcToCopy) :
+TXMLNameIDPoolCursor(const TXMLNameIDPoolCursor& xnipcSrc) :
 
-    m_c4IterBucket(xnipcToCopy.m_c4IterBucket)
-    , m_c4SeqId(xnipcToCopy.m_c4SeqId)
-    , m_pIter(xnipcToCopy.m_pIter)
-    , m_pxnipIter(xnipcToCopy.m_pxnipIter)
+    m_c4IterBucket(xnipcSrc.m_c4IterBucket)
+    , m_c4SeqId(xnipcSrc.m_c4SeqId)
+    , m_pIter(xnipcSrc.m_pIter)
+    , m_pxnipIter(xnipcSrc.m_pxnipIter)
 {
 }
 

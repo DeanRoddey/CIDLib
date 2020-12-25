@@ -160,12 +160,22 @@ class CIDXMLEXP TXMLAttrDef : public TObject
 
         TXMLAttrDef
         (
-            const   TXMLAttrDef&             xadToCopy
+            const   TXMLAttrDef&             xadSrc
+        );
+
+        TXMLAttrDef
+        (
+                    TXMLAttrDef&&           xwdSrc
         );
 
         TXMLAttrDef& operator=
         (
-            const   TXMLAttrDef&             xadToAssign
+            const   TXMLAttrDef&             xadSrc
+        );
+
+        TXMLAttrDef& operator=
+        (
+                    TXMLAttrDef&&           xadsrc
         );
 
 

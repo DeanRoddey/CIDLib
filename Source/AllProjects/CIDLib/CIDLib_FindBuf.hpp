@@ -107,8 +107,10 @@ class CIDLIBEXP TFindBuf :
 
         TFindBuf
         (
-            const   TFindBuf&               fndbToCopy
+            const   TFindBuf&               fndbSrc
         );
+
+        TFindBuf(TFindBuf&&) = delete;
 
         ~TFindBuf();
 
@@ -116,6 +118,13 @@ class CIDLIBEXP TFindBuf :
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TFindBuf& operator=
+        (
+            const   TFindBuf&               fndbSrc
+        );
+
+        TFindBuf& operator=(TFindBuf&&) = delete;
+
         tCIDLib::TBoolean operator<
         (
             const   TFindBuf&               fndbToTest
@@ -135,11 +144,6 @@ class CIDLIBEXP TFindBuf :
         (
             const   TFindBuf&               fndbToTest
         )   const;
-
-        TFindBuf& operator=
-        (
-            const   TFindBuf&               fndbToAssign
-        );
 
 
         // -------------------------------------------------------------------

@@ -74,6 +74,7 @@ class CIDXMLEXP TXMLStdCatalog : public TXMLCatalog
         );
 
         TXMLStdCatalog(const TXMLStdCatalog&) = delete;
+        TXMLStdCatalog(TXMLStdCatalog&&) = delete;
 
         ~TXMLStdCatalog();
 
@@ -82,6 +83,7 @@ class CIDXMLEXP TXMLStdCatalog : public TXMLCatalog
         //  Public operators
         // -------------------------------------------------------------------
         TXMLStdCatalog& operator=(const TXMLStdCatalog&) = delete;
+        TXMLStdCatalog& operator=(TXMLStdCatalog&&) = delete;
 
 
         // -------------------------------------------------------------------

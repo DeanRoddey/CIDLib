@@ -116,7 +116,7 @@ class TObjArray : public TObject, public MDuplicable, public MLockable
         // Set up a with 1 element
         TObjArray(TMyType&& objaSrc) :
 
-            TObjArray(1, objaSrc.eMTState())
+            TObjArray(static_cast<TIndex>(1), objaSrc.eMTState())
         {
             operator=(tCIDLib::ForceMove(objaSrc));
         }

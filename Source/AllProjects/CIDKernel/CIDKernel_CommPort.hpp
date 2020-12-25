@@ -75,6 +75,7 @@ class KRNLEXPORT TKrnlCommPort
         );
 
         TKrnlCommPort(const TKrnlCommPort&) = delete;
+        TKrnlCommPort(TKrnlCommPort&&) = delete;
 
         ~TKrnlCommPort();
 
@@ -83,6 +84,7 @@ class KRNLEXPORT TKrnlCommPort
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlCommPort& operator=(const TKrnlCommPort&) = delete;
+        TKrnlCommPort& operator=(TKrnlCommPort&&) = delete;
 
 
         // -------------------------------------------------------------------

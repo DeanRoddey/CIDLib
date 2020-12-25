@@ -74,6 +74,7 @@ template <typename TElem> class TXMLNameIDPool : public TObject
         );
 
         TXMLNameIDPool(const TXMLNameIDPool&) = delete;
+        TXMLNameIDPool(TXMLNameIDPool&&) = delete;
 
         ~TXMLNameIDPool();
 
@@ -82,6 +83,7 @@ template <typename TElem> class TXMLNameIDPool : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TXMLNameIDPool& operator=(const TXMLNameIDPool&) = delete;
+        TXMLNameIDPool& operator=(TXMLNameIDPool&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -133,7 +135,7 @@ template <typename TElem> class TXMLNameIDPool : public TObject
         // -------------------------------------------------------------------
         //  Class constants
         // -------------------------------------------------------------------
-        static const tCIDLib::TCard4 c4Modulus = 109;
+        static constexpr tCIDLib::TCard4 c4Modulus = 109;
 
 
         // -------------------------------------------------------------------
@@ -154,11 +156,15 @@ template <typename TElem> class TXMLNameIDPool : public TObject
                 }
 
                 TBucketElem(const TBucketElem&) = delete;
+                TBucketElem(TBucketElem&&) = delete;
 
                 ~TBucketElem()
                 {
                     delete pobjElem;
                 }
+
+                TBucketElem& operator=(const TBucketElem&) = delete;
+                TBucketElem& operator=(TBucketElem&&) = delete;
 
                 // -----------------------------------------------------------
                 //  Public data members
@@ -248,9 +254,25 @@ template <typename TElem> class TXMLNameIDPoolCursor
         // -------------------------------------------------------------------
         TXMLNameIDPoolCursor(const TXMLNameIDPool<TElem>* const pxnipToIter);
 
-        TXMLNameIDPoolCursor(const TXMLNameIDPoolCursor& xnipcSrc);
+        TXMLNameIDPoolCursor
+        (
+            const   TXMLNameIDPoolCursor&           xnipcSrc
+        );
+
+        TXMLNameIDPoolCursor(TXMLNameIDPoolCursor&&) = delete;
 
         ~TXMLNameIDPoolCursor();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLNameIDPoolCursor& operator=
+        (
+            const   TXMLNameIDPoolCursor<TElem>&    xnipcSrc
+        );
+
+        TXMLNameIDPoolCursor& operator=(TXMLNameIDPoolCursor<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -261,15 +283,6 @@ template <typename TElem> class TXMLNameIDPoolCursor
         tCIDLib::TBoolean bReset();
 
         const TElem& objCur() const;
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TXMLNameIDPoolCursor& operator=
-        (
-            const   TXMLNameIDPoolCursor<TElem>&    xnipcSrc
-        );
 
 
     private :

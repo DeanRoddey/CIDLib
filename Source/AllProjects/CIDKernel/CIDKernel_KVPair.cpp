@@ -67,12 +67,19 @@ TKrnlKVPair::TKrnlKVPair(const  tCIDLib::TCh* const pszKey
 {
 }
 
-TKrnlKVPair::TKrnlKVPair(const TKrnlKVPair& kkvpToCopy) :
+TKrnlKVPair::TKrnlKVPair(const TKrnlKVPair& kkvpSrc) :
 
-    m_pszKey(TRawStr::pszReplicate(kkvpToCopy.m_pszKey))
-    , m_pszValue(TRawStr::pszReplicate(kkvpToCopy.m_pszValue))
-    , m_pszValue2(TRawStr::pszReplicate(kkvpToCopy.m_pszValue2))
+    m_pszKey(TRawStr::pszReplicate(kkvpSrc.m_pszKey))
+    , m_pszValue(TRawStr::pszReplicate(kkvpSrc.m_pszValue))
+    , m_pszValue2(TRawStr::pszReplicate(kkvpSrc.m_pszValue2))
 {
+}
+
+TKrnlKVPair::TKrnlKVPair(TKrnlKVPair&& kkvpSrc) :
+
+    TKrnlKVPair()
+{
+    *this = operator=(tCIDLib::ForceMove(kkvpSrc));
 }
 
 TKrnlKVPair::~TKrnlKVPair()
@@ -86,17 +93,28 @@ TKrnlKVPair::~TKrnlKVPair()
 // ---------------------------------------------------------------------------
 //  TKrnlKVPair: Public operators
 // ---------------------------------------------------------------------------
-TKrnlKVPair& TKrnlKVPair::operator=(const TKrnlKVPair& kkvpToAssign)
+TKrnlKVPair& TKrnlKVPair::operator=(const TKrnlKVPair& kkvpSrc)
 {
-    if (&kkvpToAssign != this)
+    if (&kkvpSrc != this)
     {
         delete [] m_pszKey;
         delete [] m_pszValue;
         delete [] m_pszValue2;
 
-        m_pszKey = TRawStr::pszReplicate(kkvpToAssign.m_pszKey);
-        m_pszValue = TRawStr::pszReplicate(kkvpToAssign.m_pszValue);
-        m_pszValue2 = TRawStr::pszReplicate(kkvpToAssign.m_pszValue2);
+        m_pszKey = TRawStr::pszReplicate(kkvpSrc.m_pszKey);
+        m_pszValue = TRawStr::pszReplicate(kkvpSrc.m_pszValue);
+        m_pszValue2 = TRawStr::pszReplicate(kkvpSrc.m_pszValue2);
+    }
+    return *this;
+}
+
+TKrnlKVPair& TKrnlKVPair::operator=(TKrnlKVPair&& kkvpSrc)
+{
+    if (&kkvpSrc != this)
+    {
+        tCIDLib::Swap(m_pszKey, kkvpSrc.m_pszKey);
+        tCIDLib::Swap(m_pszValue, kkvpSrc.m_pszValue);
+        tCIDLib::Swap(m_pszValue2, kkvpSrc.m_pszValue2);
     }
     return *this;
 }

@@ -50,10 +50,8 @@ class CIDXMLEXP TXMLException : public TObject, public MFormattable
             , const tCIDLib::TCard4         c4Column
         );
 
-        TXMLException
-        (
-            const   TXMLException&          xexcToCopy
-        );
+        TXMLException(const TXMLException&) = default;
+        TXMLException(TXMLException&&) = default;
 
         ~TXMLException();
 
@@ -61,10 +59,8 @@ class CIDXMLEXP TXMLException : public TObject, public MFormattable
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TXMLException& operator=
-        (
-            const   TXMLException&          xexcToAssign
-        );
+        TXMLException& operator=(const TXMLException&) = default;
+        TXMLException& operator=(TXMLException&&) = default;
 
 
         // -------------------------------------------------------------------

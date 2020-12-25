@@ -321,6 +321,8 @@ static tCIDLib::TVoid DummyFunc()
     TStringPool splStrings(L"Test", 8);
     THeapBufPool splHeapBufs(L"Test", 8);
 
+    colOne.objAdd(TPathStr(L"Testing"));
+
     tCIDLib::TCard4 ac4Array[10];
     TArrayOps::TSort<tCIDLib::TCard4>
     (
@@ -507,6 +509,11 @@ static tCIDLib::TVoid DummyFunc()
     {
     }
 
+    TVector<TArea>::TNCCursor cursFindNC = tCIDColAlgo::cursFindNC(colTestCurs, TArea(1,1,1UL,1UL));
+    if (cursFindNC.bIsValid())
+    {
+    }
+
     TNamedValMap<TString> colNVM1;
     TNamedValMap<TString> colNVM2;
     if ((colNVM1 == colNVM2) || (colNVM1 != colNVM2))
@@ -527,6 +534,9 @@ static tCIDLib::TVoid DummyFunc()
     if (olockTest2)
     {
     }
+
+    TBasicTreeCol<TString> colTree;
+    StreamOutBasicTree<TString>(colTree, strmOut);
 
 //    TString strFmtTest;
 //    strFmtTest.Format(L"%(1) %(2)", TPoint(1, 2), TSize(3, 4));

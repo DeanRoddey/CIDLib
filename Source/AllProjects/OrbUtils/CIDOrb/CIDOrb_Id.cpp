@@ -145,15 +145,6 @@ TOrbId::TOrbId( const   TString&    strInterface
     Set(strInterface, strInstance);
 }
 
-TOrbId::TOrbId(const TOrbId& oidToCopy) :
-
-    m_mhashInterface(oidToCopy.m_mhashInterface)
-    , m_mhashInstance(oidToCopy.m_mhashInstance)
-{
-    // Pre-calc our hash
-    m_hshThis = hshDoHashCalc(kCIDOrb::c4IdModulus);
-}
-
 TOrbId::~TOrbId()
 {
 }
@@ -162,28 +153,6 @@ TOrbId::~TOrbId()
 // ---------------------------------------------------------------------------
 //  TOrbId: Public operators
 // ---------------------------------------------------------------------------
-TOrbId& TOrbId::operator=(const TOrbId& oidToAssign)
-{
-    if (&oidToAssign != this)
-    {
-        m_hshThis        = oidToAssign.m_hshThis;
-        m_mhashInterface = oidToAssign.m_mhashInterface;
-        m_mhashInstance  = oidToAssign.m_mhashInstance;
-    }
-    return *this;
-}
-
-TOrbId& TOrbId::operator=(TOrbId&& oidToAssign)
-{
-    if (&oidToAssign != this)
-    {
-        tCIDLib::Swap(m_hshThis, oidToAssign.m_hshThis);
-        m_mhashInterface = tCIDLib::ForceMove(oidToAssign.m_mhashInterface);
-        m_mhashInstance = tCIDLib::ForceMove(oidToAssign.m_mhashInstance);
-    }
-    return *this;
-}
-
 
 tCIDLib::TBoolean TOrbId::operator==(const TOrbId& oidToCompare) const
 {

@@ -230,8 +230,7 @@ extern  TOutStrm    strmOut;
 //  of test functions and their names. We have to provide a function
 //  prototype that all of the test functions use.
 // ----------------------------------------------------------------------------
-typedef tCIDLib::TVoid (*TTestFunction)(const tCIDLib::TCard4 c4RunNumber);
-
+using TTestFunction = tCIDLib::TVoid (*)(const tCIDLib::TCard4 c4RunNumber);
 struct TTestFuncRecord
 {
     TTestFunction           pfnTester;

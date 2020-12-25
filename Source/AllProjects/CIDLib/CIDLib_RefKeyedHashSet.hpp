@@ -671,7 +671,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
 
         // -------------------------------------------------------------------
-        //  Typedefs for our nested cursor classes
+        //  Aliases for our nested cursor classes
         // -------------------------------------------------------------------
         using TCursor   = TConstCursor<TElem, TKey, TKeyOps>;
         using TNCCursor = TNonConstCursor<TElem, TKey, TKeyOps>;

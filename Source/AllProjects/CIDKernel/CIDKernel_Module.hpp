@@ -94,6 +94,7 @@ class KRNLEXPORT TKrnlModule
         TKrnlModule();
 
         TKrnlModule(const TKrnlModule&) = delete;
+        TKrnlModule(TKrnlModule&&) = delete;
 
         ~TKrnlModule();
 
@@ -102,6 +103,7 @@ class KRNLEXPORT TKrnlModule
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlModule& operator=(const TKrnlModule&) = delete;
+        TKrnlModule& operator=(TKrnlModule&&) = delete;
 
 
         // -------------------------------------------------------------------

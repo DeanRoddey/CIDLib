@@ -312,7 +312,7 @@ class CIDCTRLSEXP TColHeader : public TCtrlWnd
         // -------------------------------------------------------------------
         //  Public data types
         // -------------------------------------------------------------------
-        typedef TVector<TColHeaderInfo>     TColList;
+        using TColList = TVector<TColHeaderInfo>;
 
 
         // -------------------------------------------------------------------
@@ -327,6 +327,7 @@ class CIDCTRLSEXP TColHeader : public TCtrlWnd
         TColHeader();
 
         TColHeader(const TColHeader&) = delete;
+        TColHeader(TColHeader&&) = delete;
 
         ~TColHeader();
 
@@ -335,6 +336,7 @@ class CIDCTRLSEXP TColHeader : public TCtrlWnd
         //  Public operators
         // -------------------------------------------------------------------
         TColHeader& operator=(const TColHeader&) = delete;
+        TColHeader& operator=(TColHeader&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -345,21 +347,21 @@ class CIDCTRLSEXP TColHeader : public TCtrlWnd
             const   TWindow&                wndParent
             , const TDlgItem&               dlgiSrc
             , const tCIDCtrls::EWndThemes   eTheme
-        )   override;
+        )   final;
 
         tCIDLib::TVoid QueryHints
         (
                     tCIDLib::TStrCollect&   colToFill
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid SetBgnColor
         (
             const   TRGBClr&                rgbToSet
             , const tCIDLib::TBoolean       bOver = kCIDLib::True
             , const tCIDLib::TBoolean       bRedraw = kCIDLib::False
-        )   override;
+        )   final;
 
-        TSize szDefault() const override;
+        TSize szDefault() const final;
 
 
         // -------------------------------------------------------------------
@@ -443,27 +445,27 @@ class CIDCTRLSEXP TColHeader : public TCtrlWnd
             , const TPoint&                 pntAt
             , const tCIDLib::TBoolean       bCtrlShift
             , const tCIDLib::TBoolean       bShift
-        )   override;
+        )   final;
 
-        tCIDLib::TBoolean bCreated() override;
+        tCIDLib::TBoolean bCreated() final;
 
         tCIDLib::TBoolean bEraseBgn
         (
                     TGraphDrawDev&          gdevToUs
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bMouseMove
         (
             const   TPoint&                 pntAt
             , const tCIDLib::TBoolean       bControlDown
             , const tCIDLib::TBoolean       bShiftDown
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bPaint
         (
                     TGraphDrawDev&          gdevToUse
             , const TArea&                  areaUpdate
-        )   override;
+        )   final;
 
 
     private :

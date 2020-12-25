@@ -64,6 +64,7 @@ class KRNLEXPORT TKrnlFile
         );
 
         TKrnlFile(const TKrnlFile&) = delete;
+        TKrnlFile(TKrnlFile&&) = delete;
 
         ~TKrnlFile();
 
@@ -72,6 +73,7 @@ class KRNLEXPORT TKrnlFile
         //  Public opeators
         // -------------------------------------------------------------------
         TKrnlFile& operator=(const TKrnlFile&) = delete;
+        TKrnlFile& operator=(TKrnlFile&&) = delete;
 
 
         // -------------------------------------------------------------------

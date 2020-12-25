@@ -64,10 +64,8 @@ class KRNLEXPORT TKrnlIPAddr
             , const tCIDSock::EAddrTypes    eType
         );
 
-        TKrnlIPAddr
-        (
-            const   TKrnlIPAddr&            kipaSrc
-        );
+        TKrnlIPAddr(const TKrnlIPAddr&) = default;
+        TKrnlIPAddr(TKrnlIPAddr&&) = default;
 
         ~TKrnlIPAddr();
 
@@ -75,6 +73,9 @@ class KRNLEXPORT TKrnlIPAddr
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TKrnlIPAddr& operator=(const TKrnlIPAddr&) = default;
+        TKrnlIPAddr& operator=(TKrnlIPAddr&&) = default;
+
         tCIDLib::TBoolean operator==
         (
             const   TKrnlIPAddr&            kipaSrc
@@ -84,11 +85,6 @@ class KRNLEXPORT TKrnlIPAddr
         (
             const   TKrnlIPAddr&            kipaSrc
         )   const;
-
-        TKrnlIPAddr& operator=
-        (
-            const   TKrnlIPAddr&            kipaSrc
-        );
 
 
         // -------------------------------------------------------------------
@@ -137,7 +133,7 @@ class KRNLEXPORT TKrnlIPAddr
 
         tCIDLib::TVoid Reset();
 
-        tCIDLib::TCard1* pc1ToSockAddr
+        [[nodiscard]] tCIDLib::TCard1* pc1ToSockAddr
         (
                     tCIDLib::TCard4&        c4SzOut
             , const tCIDLib::TIPPortNum     ippnToSet = 0
@@ -225,6 +221,14 @@ namespace TKrnlIP
             , c4AddrCnt(0)
         {
         }
+
+        TAdaptorInfo(const TAdaptorInfo&) = default;
+        TAdaptorInfo(TAdaptorInfo&&) = default;
+
+        ~TAdaptorInfo() = default;
+
+        TAdaptorInfo& operator=(const TAdaptorInfo&) = default;
+        TAdaptorInfo& operator=(TAdaptorInfo&&) = default;
     };
 
     KRNLEXPORT tCIDLib::TBoolean bAddToFirewall

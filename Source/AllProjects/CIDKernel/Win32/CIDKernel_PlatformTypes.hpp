@@ -53,7 +53,7 @@
 namespace tCIDLib
 {
     // -----------------------------------------------------------------------
-    //  A typedef for a returned function pointer (in the generic sense,
+    //  An alias for a returned function pointer (in the generic sense,
     //  prior to casting to its real type.
     // -----------------------------------------------------------------------
     using FuncPtr = int (__stdcall *)();

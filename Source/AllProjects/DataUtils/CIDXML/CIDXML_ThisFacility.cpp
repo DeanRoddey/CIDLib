@@ -176,6 +176,23 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszInText
 
 
 tCIDLib::TVoid
+TFacCIDXML::EscapeFor(  const   TString&            strInText
+                        ,       TTextOutStream&     strmOut
+                        , const tCIDXML::EEscTypes  eType)
+{
+    EscapeFor(strInText.pszBuffer(), strmOut, eType);
+}
+
+tCIDLib::TVoid
+TFacCIDXML::EscapeFor(  const   TString&            strInText
+                        ,       TString&            strOutText
+                        , const tCIDXML::EEscTypes  eType)
+{
+    EscapeFor(strInText.pszBuffer(), strOutText, eType);
+}
+
+
+tCIDLib::TVoid
 TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszInText
                         ,       TString&            strOutText
                         , const tCIDXML::EEscTypes  eType)

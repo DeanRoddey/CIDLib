@@ -470,7 +470,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
 
         // -------------------------------------------------------------------
-        //  Typedefs for our nested cursors
+        //  Aliases for our nested cursors
         // -------------------------------------------------------------------
         using TCursor       = TConstCursor<TElem>;
         using TNCCursor     = TNonConstCursor<TElem>;

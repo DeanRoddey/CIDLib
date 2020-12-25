@@ -51,7 +51,7 @@ TKrnlString::TKrnlString(const tCIDLib::TCard4 c4BufSz) :
     if (!m_c4BufSz)
         m_c4BufSz = 8;
 
-    m_pszValue = new tCIDLib::TCh[m_c4BufSz];
+    m_pszValue = new tCIDLib::TCh[m_c4BufSz + 1];
     m_pszValue[0] = kCIDLib::chNull;
 }
 

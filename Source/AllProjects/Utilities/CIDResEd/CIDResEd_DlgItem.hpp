@@ -228,7 +228,7 @@ class TResEdDlgItem : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Private class types
         // -------------------------------------------------------------------
-        typedef TObjArray<TTextSym, tCIDResEd::ETextSyms>   TSymList;
+        using TSymList = TObjArray<TTextSym, tCIDResEd::ETextSyms>;
 
 
         // -------------------------------------------------------------------

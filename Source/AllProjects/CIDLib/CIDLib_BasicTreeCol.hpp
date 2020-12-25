@@ -186,6 +186,13 @@ namespace TBasicTreeHelpers
         , const tCIDLib::TCard4         c4Line
     );
 
+    CIDLIBEXP tCIDLib::TVoid BadStoredNodeType
+    (
+        const   tCIDLib::TCh* const     pszFile
+        , const tCIDLib::TCard4         c4Line
+        , const tCIDLib::TCard1         c1Value
+    );
+
     CIDLIBEXP tCIDLib::TVoid CheckNodeType
     (
         const   TBaseTreeNode* const    pnodeToCheck
@@ -214,6 +221,16 @@ namespace TBasicTreeHelpers
         , const TString&                strNameToCheck
         , const tCIDLib::TCh* const     pszFile
         , const tCIDLib::TCard4         c4Line
+    );
+
+    CIDLIBEXP tCIDLib::TVoid CheckStoredCounts
+    (
+        const   tCIDLib::TCh* const     pszFile
+        , const tCIDLib::TCard4         c4Line
+        , const tCIDLib::TCard4         c4NTCount
+        , const tCIDLib::TCard4         c4NTCount2
+        , const tCIDLib::TCard4         c4TCount
+        , const tCIDLib::TCard4         c4TCount2
     );
 
     CIDLIBEXP tCIDLib::TVoid DepthUnderflow
@@ -375,7 +392,6 @@ template <typename TElem> class TBasicTreeNode : public TBaseTreeNode
             , m_pnodeParent(pnodeParent)
         {
         }
-
 
 
     private :
@@ -601,6 +617,11 @@ template <typename TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bCaseSensitive() const
+        {
+            return m_bCasePath;
+        }
+
         tCIDLib::TCard4 c4SerialNum() const
         {
             return m_c4SerialNum;
@@ -1548,6 +1569,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         using TNCCursor         = TNonConstCursor<TElem>;
         using TScopeCursor      = TConstScopeCursor<TElem>;
         using TNCScopeCursor    = TNonConstScopeCursor<TElem>;
+        using TParType          = TCollection<TElem>;
 
 
         // -------------------------------------------------------------------
@@ -1557,38 +1579,33 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                         , const tCIDLib::TBoolean   bCasePaths = kCIDLib::True
                         , const tCIDLib::TBoolean   bSorted = kCIDLib::True) :
 
-            TCollection<TElem>(eMTSafe)
+            TParType(eMTSafe)
             , m_bCasePath(bCasePaths)
             , m_bSorted(bSorted)
             , m_c4NTCount(0)
             , m_c4TCount(0)
-            , m_pnodeRoot
-              (
-                new TNodeNT
-                (
-                    TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
-                )
-              )
+            , m_pnodeRoot(new TNodeNT(TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr))
         {
         }
 
         TBasicTreeCol(const TBasicTreeCol<TElem>& colSrc) :
 
-            TCollection<TElem>(colSrc)
+            TParType(colSrc)
             , m_bCasePath(colSrc.m_bCasePath)
             , m_bSorted(colSrc.m_bSorted)
             , m_c4TCount(colSrc.m_c4TCount)
             , m_c4NTCount(colSrc.m_c4NTCount)
-            , m_pnodeRoot
-              (
-                new TNodeNT
-                (
-                    TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
-                )
-              )
+            , m_pnodeRoot(new TNodeNT(TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr))
         {
             // Do a recursive replication of the tree
             ReplicateNodes(colSrc.m_pnodeRoot, m_pnodeRoot);
+        }
+
+        TBasicTreeCol(TBasicTreeCol<TElem>&& colSrc) :
+
+            TBasicTreeCol()
+        {
+            *this = tCIDLib::ForceMove(colSrc);
         }
 
         ~TBasicTreeCol()
@@ -1629,6 +1646,23 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
                 // Do this AFTER setting sorted/case flags
                 ReplicateNodes(colSrc.m_pnodeRoot, m_pnodeRoot);
+            }
+            return *this;
+        }
+
+        TBasicTreeCol<TElem>& operator=(TBasicTreeCol<TElem>&& colSrc)
+        {
+            if (this != &colSrc)
+            {
+                TLocker lockrThis(this);
+                TLocker lockrSource(&colSrc);
+
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+                tCIDLib::Swap(m_bCasePath, colSrc.m_bCasePath);
+                tCIDLib::Swap(m_bSorted, colSrc.m_bSorted);
+                tCIDLib::Swap(m_c4TCount, colSrc.m_c4TCount);
+                tCIDLib::Swap(m_c4NTCount, colSrc.m_c4NTCount);
+                tCIDLib::Swap(m_pnodeRoot, colSrc.m_pnodeRoot);
             }
             return *this;
         }
@@ -1749,7 +1783,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             return m_c4TCount;
         }
 
-        TElem& objAddMove(TElem&&)
+        template <typename T = TElem> T& objAddMove(T&&)
         {
             //
             //  This type of collection really doesn't fit too well into the
@@ -1760,7 +1794,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::NotSupported(CID_FILE, CID_LINE, L"objAdd(move)");
 
             // Make the compiler happy. It will never get called
-            static TElem* pobjTmp = nullptr;
+            static T* pobjTmp = nullptr;
             return *pobjTmp;
         }
 
@@ -2263,11 +2297,40 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         friend class TConstScopeCursor<TElem>;
         friend class TNonConstScopeCursor<TElem>;
 
+        friend tCIDLib::TVoid StreamOutBasicTree<TElem>(const TMyType& colSrc, TBinOutStream& strmTar);
+        friend tCIDLib::TVoid StreamInBasicTree<TElem>(TMyType& colSrc, TBinInStream& strmTar);
+
 
     private :
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+
+        // For use by our streaming in helper below
+        tCIDLib::TVoid Reset(const  tCIDLib::TBoolean           bCasePath
+                            , const tCIDLib::TBoolean           bSorted
+                            , const tCIDLib::TCard4             c4NTCount
+                            , const tCIDLib::TCard4             c4TCount
+                            ,       TTreeNodeNT<TElem>* const   pnodeNewRoot)
+        {
+            // Remove all current contents
+            RemoveAll();
+
+            // And now delete the root since we are going to replace it
+            delete m_pnodeRoot;
+            m_pnodeRoot = nullptr;
+
+            m_bCasePath = bCasePath;
+            m_bSorted = bSorted;
+            m_c4NTCount = c4NTCount;
+            m_c4TCount = c4TCount;
+            m_pnodeRoot = pnodeNewRoot;
+
+            // Bump our serial number of course
+            this->c4IncSerialNum();
+        }
+
+
         tCIDLib::TVoid
         RemoveChild(        TNode* const        pnodeToRemove
                     , const tCIDLib::TBoolean   bDelParent)
@@ -2617,5 +2680,211 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         TemplateRTTIDefs(TMyType,TCollection<TElem>)
 };
 
-#pragma CIDLIB_POPPACK
+//
+//  A couple helpers to support binary streaming of tree collection content. This one is
+//  more complicated than most since we have to flatten the tree structure.
+//
+//  We have a recursive helper for each.
+//
+template <typename TElem>
+tCIDLib::TVoid StreamOutNT(const TTreeNodeNT<TElem>& nodePar, TBinOutStream& strmTar)
+{
+    // Count the number of nodes under this one
+    TBasicTreeNode<TElem>* pnodeCur = nodePar.pnodeFirstChild();
+    tCIDLib::TCard4 c4ChildCnt = 0;
+    while (pnodeCur)
+    {
+        c4ChildCnt++;
+        pnodeCur = pnodeCur->pnodeNext();
+    }
 
+    //
+    //  Now write out a frame marker and count of children and again XOR'd for sanity's
+    //  sake.
+    //
+    strmTar << tCIDLib::EStreamMarkers::Frame << c4ChildCnt << (c4ChildCnt ^ kCIDLib::c4MaxCard);
+
+    // And now we can write out the child objects
+    pnodeCur = nodePar.pnodeFirstChild();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChildCnt; c4Index++)
+    {
+        //
+        //  Stream out the type, then regardless of type, the basic info. Descriptions are
+        //  faulted in if used, so don't make it fault in just for this.
+        //
+        if (pnodeCur->eType() == tCIDLib::ETreeNodes::NonTerminal)
+            strmTar << tCIDLib::TCard1(0x73);
+        else
+            strmTar << tCIDLib::TCard1(0xB5);
+        strmTar << pnodeCur->strName();
+        if (pnodeCur->bHasDescription())
+            strmTar << tCIDLib::TCard1(0xAE) << pnodeCur->strDescription();
+        else
+            strmTar << tCIDLib::TCard1(0xB9);
+
+        if (pnodeCur->eType() == tCIDLib::ETreeNodes::NonTerminal)
+        {
+            // For this, we just need to recurse
+            const TTreeNodeNT<TElem>& nodeChild = *static_cast<TTreeNodeNT<TElem>*>(pnodeCur);
+            StreamOutNT(nodeChild, strmTar);
+        }
+         else
+        {
+            // For terminals, we need to write out the user data
+            const TTreeNodeT<TElem>& nodeChild = *static_cast<TTreeNodeT<TElem>*>(pnodeCur);
+            strmTar << nodeChild.objData();
+        }
+        strmTar << tCIDLib::EStreamMarkers::Frame;
+
+        pnodeCur = pnodeCur->pnodeNext();
+    }
+}
+
+template <typename TElem>
+tCIDLib::TVoid StreamOutBasicTree(const TBasicTreeCol<TElem>& colSrc, TBinOutStream& strmTar)
+{
+    TPolyStreamer<TElem> pstrmTar(nullptr, &strmTar);
+
+    // Stream out a start object marker, then the overall settings
+    strmTar << tCIDLib::EStreamMarkers::StartObject
+            << colSrc.m_bCasePath
+            << colSrc.m_bSorted
+            << colSrc.m_c4NTCount
+            << colSrc.m_c4TCount
+            << tCIDLib::EStreamMarkers::Frame;
+    if (colSrc.pnodeRoot())
+        StreamOutNT(*colSrc.pnodeRoot(), strmTar);
+    strmTar << tCIDLib::EStreamMarkers::EndObject;
+}
+
+
+template <typename TElem>
+tCIDLib::TVoid StreamInNT(  TTreeNodeNT<TElem>&         nodePar
+                            , TBinInStream&             strmSrc
+                            , tCIDLib::TCard4&          c4NTCount
+                            , tCIDLib::TCard4&          c4TCount
+                            , TString&                  strName
+                            , TString&                  strDesc
+                            , TElem&                    objTmp
+                            , const tCIDLib::TBoolean   bCaseSensitive
+                            , const tCIDLib::TBoolean   bSorted)
+{
+    // We should get a frame marker then the child count and the count XOR'd
+    strmSrc.CheckForFrameMarker(CID_FILE, CID_LINE);
+    tCIDLib::TCard4 c4ChildCnt, c4ChildCntXOR;
+    strmSrc >> c4ChildCnt >> c4ChildCntXOR;
+
+    // Sanity check the count and throw if bad
+    if ((c4ChildCnt ^ kCIDLib::c4MaxCard) != c4ChildCntXOR)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcCol_BadStoredCount
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , TString(L"TBasicTree")
+        );
+    }
+
+    // Let's read in this many objects and add child nodes for them
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChildCnt; c4Index++)
+    {
+        // Read in the type, and then the basic info
+        tCIDLib::TCard1 c1HasDescr, c1Type;
+        strmSrc >> c1Type >> strName >> c1HasDescr;
+        if (c1HasDescr == 0xAE)
+            strmSrc >> strDesc;
+
+        if (c1Type == 0x73)
+        {
+            // Add the new non-terminal and recurse on it
+            c4NTCount++;
+            TTreeNodeNT<TElem>* pnodeNew = nodePar.pnodeAddNonTerminal
+            (
+                strName, strDesc, bCaseSensitive, bSorted
+            );
+            StreamInNT
+            (
+                *pnodeNew
+                , strmSrc
+                , c4NTCount
+                , c4TCount
+                , strName
+                , strDesc
+                , objTmp
+                , bCaseSensitive
+                , bSorted
+            );
+        }
+         else if (c1Type == 0xB5)
+        {
+            // Stream in the user data then create the node
+            c4TCount++;
+            strmSrc >> objTmp;
+            nodePar.objAddTerminal(objTmp, strName, strDesc, bCaseSensitive, bSorted);
+        }
+        else
+        {
+            TBasicTreeHelpers::BadStoredNodeType(CID_FILE, CID_LINE, c1Type);
+        }
+
+        strmSrc.CheckForFrameMarker(CID_FILE, CID_LINE);
+    }
+}
+
+template <typename TElem>
+tCIDLib::TVoid StreamInBasicTree(TBasicTreeCol<TElem>& colTar, TBinInStream& strmSrc)
+{
+    strmSrc.CheckForStartMarker(CID_FILE, CID_LINE);
+    tCIDLib::TBoolean bCasePath;
+    tCIDLib::TBoolean bSorted;
+    tCIDLib::TCard4 c4NewNTCount;
+    tCIDLib::TCard4 c4NewTCount;
+    strmSrc >> bCasePath >> bSorted >> c4NewNTCount >> c4NewTCount;
+    strmSrc.CheckForFrameMarker(CID_FILE, CID_LINE);
+
+    // Allocate a temporary root node and start parsing. Put a janitor on it till we store it
+    TTreeNodeNT<TElem>* pnodeRoot = new TTreeNodeNT<TElem>
+    (
+        TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
+    );
+    TJanitor<TTreeNodeNT<TElem>> janRoot(pnodeRoot);
+
+    //
+    //  This guy will count nodes so that we can compare with what we read in above as a sanity
+    //  check.
+    //
+    tCIDLib::TCard4 c4NewNTCount2 = 0;
+    tCIDLib::TCard4 c4NewTCount2 = 0;
+    TString strName;
+    TString strDesc;
+    TElem objTmp;
+    StreamInNT
+    (
+        *pnodeRoot
+        , strmSrc
+        , c4NewNTCount2
+        , c4NewTCount2
+        , strName
+        , strDesc
+        , objTmp
+        , bCasePath
+        , bSorted
+    );
+
+    strmSrc.CheckForEndMarker(CID_FILE, CID_LINE);
+
+    // Check the counts we got both ways and if not in agreement this throws
+    TBasicTreeHelpers::CheckStoredCounts
+    (
+        CID_FILE, CID_LINE, c4NewNTCount, c4NewNTCount2, c4NewTCount, c4NewTCount2
+    );
+
+    // Looks ok, so reset the collection with the info we have
+    colTar.Reset(bCasePath, bSorted, c4NewNTCount, c4NewTCount, janRoot.pobjOrphan());
+}
+
+
+#pragma CIDLIB_POPPACK

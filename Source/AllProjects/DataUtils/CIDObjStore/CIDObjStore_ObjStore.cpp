@@ -372,6 +372,22 @@ tCIDLib::TCard4 TCIDObjStore::c4ObjectsInStore() const
 
 
 tCIDLib::TCard4
+TCIDObjStore::c4QueryKeysInScope(const  TString&                strScope
+                                ,       tCIDLib::TStrCollect&   colToFill)
+{
+    if (!m_bReady)
+        ThrowNotReady(CID_LINE);
+    ValidatePath(strScope, kCIDLib::False, CID_LINE);
+
+    // Lock while we do this
+    TLocker lockrStore(&m_mtxSync);
+
+    // Delegate to the cache object
+    return m_postCache->c4QueryKeysInScope(strScope, colToFill);
+}
+
+
+tCIDLib::TCard4
 TCIDObjStore::c4QueryObjectsInScope(const   TString&                strScope
                                     ,       tCIDLib::TStrCollect&   colToFill)
 {

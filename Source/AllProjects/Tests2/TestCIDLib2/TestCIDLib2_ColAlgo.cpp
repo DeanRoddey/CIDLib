@@ -69,24 +69,28 @@ TTest_ColAlgo1::~TTest_ColAlgo1()
 // ---------------------------------------------------------------------------
 tTestFWLib::ETestRes
 TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
-                            , tCIDLib::TBoolean&    bWarning)
+                        , tCIDLib::TBoolean&    bWarning)
 {
     tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
 
     // Load up a couple types of collections for testing
     using TPntList = TVector<TPoint>;
     using TCardList = TBag<TCardinal>;
+    using TPairList = TVector<TKeyValuePair>;
     TPntList colPoints(16);
     TCardList colCards;
     tCIDLib::TStrList colStrs;
+    TPairList colPairs;
     TString strTmp;
     for (tCIDLib::TCard4 c4Index = 0; c4Index < 16; c4Index++)
     {
-        colPoints.objAdd(TPoint(c4Index, c4Index));
+        colPoints.objPlace(c4Index, c4Index);
         colCards.objAdd(TCardinal(c4Index));
 
         strTmp.SetFormatted(c4Index);
         colStrs.objAdd(strTmp);
+
+        colPairs.objPlace(strTmp, strTmp);
     }
 
     // Set up a reverse direction one as well
@@ -94,7 +98,7 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
     for (tCIDLib::TCard4 c4Index = 0; c4Index < 16; c4Index++)
         colRevCards.objAdd(TCardinal(15 - c4Index));
 
-    // Test the element finder algorithm
+    // Test the element finder algorithms, first the one that finds whole objects
     {
         // Search for one we know is there
         TPntList::TCursor cursFind = tCIDColAlgo::cursFind(colPoints, TPoint(1, 1));
@@ -129,6 +133,38 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
                 strmOut << TFWCurLn << L"Failed to find one or more elements\n\n";
                 break;
             }
+        }
+    }
+
+    // And now test the finder variation that looks for a key
+    {
+        // Search for one we know is there
+        TString strKey(L"8");
+        TPairList::TCursor cursFind = tCIDColAlgo::cursFindByKey
+        (
+            colPairs, strKey, [](const TKeyValuePair& kvalCur, const TString& strKey)
+            {
+                return kvalCur.strKey() == strKey;
+            }
+        );
+        if (!cursFind.bIsValid() || (cursFind->strValue() != strKey))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Find element by key algorithm failed\n\n";
+        }
+
+        // And do the not exists test
+        cursFind = tCIDColAlgo::cursFindNotByKey
+        (
+            colPairs, L"0", [](const TKeyValuePair& kvalCur, const TString& strKey)
+            {
+                return kvalCur.strKey() == strKey;
+            }
+        );
+        if (!cursFind.bIsValid() || (cursFind->strValue() != L"1"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Find not element by key algorithm failed \n\n";
         }
     }
 

@@ -79,7 +79,7 @@ template <typename TElem> class TBag : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        TElem& objAddMove(TElem&& objNew)
+        template <typename T = TElem> T& objAddMove(T&& objNew)
         {
             return this->objAddAtTop(tCIDLib::ForceMove(objNew));
         }

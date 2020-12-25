@@ -37,11 +37,36 @@
 RTTIDecls(TOrbServerBase,TObject)
 
 
+// ---------------------------------------------------------------------------
+//  Local static data
+// ---------------------------------------------------------------------------
+namespace CIDOrb_ServerBase
+{
+    namespace
+    {
+        //
+        //  For now there's nothing we need to do in order to initialize the server
+        //  side ORB. But, we may in the future and we need to provide an indicator
+        //  as to whether we are initailized or not. So we need to remember when
+        //  init/term calls are made.
+        //
+        tCIDLib::TBoolean   bInitialized = kCIDLib::False;
+    }
+}
+
+
 
 // ---------------------------------------------------------------------------
 //   CLASS: TOrbServerBase
 //  PREFIX: orbs
 // ---------------------------------------------------------------------------
+
+// Just advisory, since it could changed if init/term is not coordinated by client
+tCIDLib::TBoolean TOrbServerBase::bIsInitialized()
+{
+    return CIDOrb_ServerBase::bInitialized;
+}
+
 
 // ---------------------------------------------------------------------------
 //  TOrbServerBase: Protected constructors
@@ -136,12 +161,14 @@ tCIDLib::TVoid TOrbServerBase::Terminate()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TOrbServerBase::InitializeOrbServer()
 {
-    // No-op for now
+    // For now we set a flag to remember we are intialized
+    CIDOrb_ServerBase::bInitialized = kCIDLib::True;
 }
 
 
 tCIDLib::TVoid TOrbServerBase::TerminateOrbServer()
 {
-    // No-op for now
+    // For now we clear a flag to remember we are not intialized
+    CIDOrb_ServerBase::bInitialized = kCIDLib::False;
 }
 

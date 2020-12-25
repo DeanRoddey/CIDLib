@@ -74,15 +74,14 @@
 
 
 // ---------------------------------------------------------------------------
-//  We couldn't put these into CIDOrbUC_Constant.hpp, because they require
+//  We couldn't put these into CIDOrbUC_Type.hpp, because they require
 //  knowledge of the client proxy classes we generate (headers above.) So we
 //  extend the types namespace here for this stuff.
 // ---------------------------------------------------------------------------
 namespace tCIDOrbUC
 {
     // -----------------------------------------------------------------------
-    //  A typedef for the very commonly used counted pointer to a name server
-    //  client proxy.
+    //  Aliases for the very commonly used counted pointers to cilent proxies
     // -----------------------------------------------------------------------
     using TNSrvProxy = TCntPtr<TCIDNameSrvClientProxy>;
     using TLSrvProxy = TCntPtr<TCIDLogSrvClientProxy>;

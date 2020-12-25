@@ -171,7 +171,7 @@ extern TFacTestCIDLib   facTestCIDLib;
 //  of test functions and their names. We have to provide a function
 //  prototype that all of the test functions use.
 // ----------------------------------------------------------------------------
-typedef tCIDLib::TVoid (*TTestFunction)();
+using TTestFunction = tCIDLib::TVoid (*)();
 struct TTestFuncRecord
 {
     TTestFunction           pfnTester;

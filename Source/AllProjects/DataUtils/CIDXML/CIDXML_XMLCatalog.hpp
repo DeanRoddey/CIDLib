@@ -46,7 +46,17 @@ class CIDXMLEXP TXMLCatalog : public TObject
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TXMLCatalog(const TXMLCatalog&) = delete;
+        TXMLCatalog(TXMLCatalog&&) = delete;
+
         ~TXMLCatalog();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLCatalog& operator=(const TXMLCatalog&) = delete;
+        TXMLCatalog& operator=(TXMLCatalog&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -91,13 +101,6 @@ class CIDXMLEXP TXMLCatalog : public TObject
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TXMLCatalog(const TXMLCatalog&);
-        TXMLCatalog& operator=(const TXMLCatalog&);
-
-
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------

@@ -371,7 +371,7 @@ class TVector : public TCollection<TElem>
 
 
         // -------------------------------------------------------------------
-        //  Typedefs for our nested cursor types and a comparator function
+        //  Aliases for our nested cursor types and a comparator function
         // -------------------------------------------------------------------
         using TCursor = TConstCursor<TElem>;
         using TNCCursor = TNonConstCursor<TElem>;
@@ -1095,7 +1095,7 @@ class TVector : public TCollection<TElem>
         }
 
 
-        TElem& objAddMove(TElem&& objNew)
+        template <typename T = TElem> T& objAddMove(T&& objNew)
         {
             TLocker lockrCol(this);
 
@@ -1112,7 +1112,6 @@ class TVector : public TCollection<TElem>
             this->c4IncSerialNum();
             return *m_apElems[m_c4CurCount - 1];
         }
-
 
 
         // Construct an element in place

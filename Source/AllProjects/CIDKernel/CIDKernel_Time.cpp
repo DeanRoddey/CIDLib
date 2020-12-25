@@ -129,27 +129,6 @@ TKrnlTimeStamp::c4MaxDayForMonth(   const   tCIDLib::EMonths    eMonth
 
 
 // ---------------------------------------------------------------------------
-//  TKrnlTimeStamp: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TKrnlTimeStamp::TKrnlTimeStamp() :
-
-    m_enctTime(0)
-{
-}
-
-TKrnlTimeStamp::TKrnlTimeStamp(const TKrnlTimeStamp& ktmsToCopy) :
-
-    m_enctTime(ktmsToCopy.m_enctTime)
-{
-}
-
-TKrnlTimeStamp::~TKrnlTimeStamp()
-{
-}
-
-
-
-// ---------------------------------------------------------------------------
 //  TKrnlTimeStamp: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TKrnlTimeStamp::bAdd(const tCIDLib::TEncodedTime& enctToAdd)

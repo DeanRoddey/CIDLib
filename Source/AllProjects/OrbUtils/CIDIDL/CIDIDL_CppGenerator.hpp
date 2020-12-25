@@ -144,7 +144,7 @@ class TCppGenerator : public TCodeGenerator
         // -------------------------------------------------------------------
         //  Private class types
         // -------------------------------------------------------------------
-        typedef tCIDLib::TStrHashSet        TMethNameList;
+        using TMethNameList = tCIDLib::TStrHashSet;
 
 
         // -------------------------------------------------------------------

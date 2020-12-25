@@ -58,11 +58,8 @@ namespace CIDLib_LogEvent
         //  To compact the format a bit, and leave space for adding more flags
         //  in the future with minimal overhead, we stream the boolean members
         //  into a TCard2 value, and need a set of masks to put them in and get
-        //  them out.
-        //
-        //  We also need a marker for the aux text, which isn't streamed unless
-        //  it's there, so we need to know whether to stream it back out. So we
-        //  use the top bit of the flags value for this purpose.
+        //  them out. And we often don't have aux text so we indicate if that has
+        //  been streamed out or not.
         // -----------------------------------------------------------------------
         constexpr tCIDLib::TCard2   c2Logged        = 0x0001;
         constexpr tCIDLib::TCard2   c2Reported      = 0x0002;
@@ -73,10 +70,9 @@ namespace CIDLib_LogEvent
         //  The persistent format version.
         //
         //  Version 2 -
-        //      We added the stack dump string.
+        //      Added the stack dump string.
         // -----------------------------------------------------------------------
         constexpr tCIDLib::TCard2   c2FmtVersion    = 2;
-
 
 
         // -----------------------------------------------------------------------
@@ -168,7 +164,7 @@ TLogEvent::TLogEvent() :
     , m_errcId(0)
     , m_errcKrnlId(0)
     , m_eSeverity(tCIDLib::ESeverities::Info)
-    , m_pstrAuxText(nullptr)
+    , m_strAuxText()
     , m_strHostName(TSysInfo::strIPHostName())
 {
 }
@@ -189,7 +185,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(0)
     , m_errcKrnlId(0)
     , m_eSeverity(eSev)
-    , m_pstrAuxText(nullptr)
+    , m_strAuxText()
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
@@ -199,7 +195,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     //  file macro that sometimes puts the whole friggin path on there.
     //
     tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(L'\\', c4Dummy))
+    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
     {
         TPathStr pathTmp(strFileName);
         pathTmp.bQueryNameExt(m_strFileName);
@@ -235,20 +231,17 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(0)
     , m_errcKrnlId(0)
     , m_eSeverity(eSev)
-    , m_pstrAuxText(nullptr)
+    , m_strAuxText(strAuxText)
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
 {
-    // Copy the aux text
-    m_pstrAuxText = new TString(strAuxText);
-
     //
     //  Strip the path part off the file name, because its fed by the
     //  file macro that sometimes puts the whole friggin path on there.
     //
     tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(L'\\', c4Dummy))
+    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
     {
         TPathStr pathTmp(strFileName);
         pathTmp.bQueryNameExt(m_strFileName);
@@ -285,20 +278,17 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(0)
     , m_eSeverity(eSeverity)
-    , m_pstrAuxText(nullptr)
+    , m_strAuxText(strAuxText)
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
 {
-    // Copy the aux text
-    m_pstrAuxText = new TString(strAuxText);
-
     //
     //  Strip the path part off the file name, because its fed by the
     //  file macro that sometimes puts the whole friggin path on there.
     //
     tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(L'\\', c4Dummy))
+    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
     {
         TPathStr pathTmp(strFileName);
         pathTmp.bQueryNameExt(m_strFileName);
@@ -334,7 +324,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(0)
     , m_eSeverity(eSeverity)
-    , m_pstrAuxText(nullptr)
+    , m_strAuxText()
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
@@ -344,7 +334,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     //  file macro that sometimes puts the whole friggin path on there.
     //
     tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(L'\\', c4Dummy))
+    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
     {
         TPathStr pathTmp(strFileName);
         pathTmp.bQueryNameExt(m_strFileName);
@@ -382,20 +372,17 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(kerrIds.errcId())
     , m_eSeverity(eSeverity)
-    , m_pstrAuxText(nullptr)
+    , m_strAuxText(strAuxText)
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
 {
-    // Copy the aux text
-    m_pstrAuxText = new TString(strAuxText);
-
     //
     //  Strip the path part off the file name, because its fed by the
     //  file macro that sometimes puts the whole friggin path on there.
     //
     tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(L'\\', c4Dummy))
+    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
     {
         TPathStr pathTmp(strFileName);
         pathTmp.bQueryNameExt(m_strFileName);
@@ -432,7 +419,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(kerrIds.errcId())
     , m_eSeverity(eSeverity)
-    , m_pstrAuxText(nullptr)
+    , m_strAuxText()
     , m_strErrText(strErrText)
     , m_strFacName(strFacName)
     , m_strHostName(TSysInfo::strIPHostName())
@@ -442,7 +429,7 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     //  file macro that sometimes puts the whole friggin path on there.
     //
     tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(L'\\', c4Dummy))
+    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
     {
         TPathStr pathTmp(strFileName);
         pathTmp.bQueryNameExt(m_strFileName);
@@ -461,79 +448,9 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     m_strProcess = TProcess::strProcessName();
 }
 
-TLogEvent::TLogEvent(const TLogEvent& logevSrc) :
-
-    m_bLogged(logevSrc.m_bLogged)
-    , m_bReported(kCIDLib::False)
-    , m_c4LineNum(logevSrc.m_c4LineNum)
-    , m_eClass(logevSrc.m_eClass)
-    , m_enctLogged(logevSrc.m_enctLogged)
-    , m_errcHostId(logevSrc.m_errcHostId)
-    , m_errcId(logevSrc.m_errcId)
-    , m_errcKrnlId(logevSrc.m_errcKrnlId)
-    , m_eSeverity(logevSrc.m_eSeverity)
-    , m_pstrAuxText(nullptr)
-    , m_strErrText(logevSrc.m_strErrText)
-    , m_strFacName(logevSrc.m_strFacName)
-    , m_strFileName(logevSrc.m_strFileName)
-    , m_strHostName(logevSrc.m_strHostName)
-    , m_strProcess(logevSrc.m_strProcess)
-    , m_strStackTrace(logevSrc.m_strStackTrace)
-    , m_strThread(logevSrc.m_strThread)
-{
-    // Copy the aux text if any
-    if (logevSrc.m_pstrAuxText)
-        m_pstrAuxText = new TString(*logevSrc.m_pstrAuxText);
-}
 
 TLogEvent::~TLogEvent()
 {
-    // Clean up the aux text if any
-    delete m_pstrAuxText;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TLogEvent: Public, virtual methods
-// ---------------------------------------------------------------------------
-TLogEvent& TLogEvent::operator=(const TLogEvent& logevSrc)
-{
-    if (this != &logevSrc)
-    {
-        m_bLogged       = logevSrc.m_bLogged;
-        m_bReported     = logevSrc.m_bReported;
-        m_c4LineNum     = logevSrc.m_c4LineNum;
-        m_eClass        = logevSrc.m_eClass;
-        m_eSeverity     = logevSrc.m_eSeverity;
-        m_enctLogged    = logevSrc.m_enctLogged;
-        m_errcHostId    = logevSrc.m_errcHostId;
-        m_errcId        = logevSrc.m_errcId;
-        m_errcKrnlId    = logevSrc.m_errcKrnlId;
-        m_strErrText    = logevSrc.m_strErrText;
-        m_strFacName    = logevSrc.m_strFacName;
-        m_strFileName   = logevSrc.m_strFileName;
-        m_strHostName   = logevSrc.m_strHostName;
-        m_strProcess    = logevSrc.m_strProcess;
-        m_strStackTrace = logevSrc.m_strStackTrace;
-        m_strThread     = logevSrc.m_strThread;
-
-        // Copy over the aux text if any
-        if (logevSrc.m_pstrAuxText)
-        {
-            // Fault in one if we don't have one, else assign
-            if (!m_pstrAuxText)
-                m_pstrAuxText = new TString(*logevSrc.m_pstrAuxText);
-            else
-                *m_pstrAuxText = *logevSrc.m_pstrAuxText;
-        }
-         else
-        {
-            // None in the source, so just clean out ours if we have one
-            if (m_pstrAuxText)
-                m_pstrAuxText->Clear();
-        }
-    }
-    return *this;
 }
 
 
@@ -600,8 +517,8 @@ TLogEvent::AdvFormat(TTextOutStream& strmTar, TTime& tmFmt) const
     strmTar << L"\n    " << m_strErrText;
 
     // If there is aux text, log it next and indent it also.
-    if (m_pstrAuxText && !m_pstrAuxText->bIsEmpty())
-        strmTar << L"\n    " << *m_pstrAuxText;
+    if (!m_strAuxText.bIsEmpty())
+        strmTar << L"\n    " << m_strAuxText;
 
     // If there's a stack dump, do that
     if (!m_strStackTrace.bIsEmpty())
@@ -653,9 +570,7 @@ TLogEvent::bCheckEvent( const   tCIDLib::TCh* const pszModName
 //
 tCIDLib::TBoolean TLogEvent::bHasAuxText() const
 {
-    if (m_pstrAuxText == 0)
-        return kCIDLib::False;
-    return !m_pstrAuxText->bIsEmpty();
+    return !m_strAuxText.bIsEmpty();
 }
 
 
@@ -806,6 +721,7 @@ tCIDLib::TVoid TLogEvent::Reset()
     m_errcKrnlId    = 0;
     m_eSeverity     = tCIDLib::ESeverities::Info;
 
+    m_strAuxText.Clear();
     m_strErrText.Clear();
     m_strFacName.Clear();
     m_strFileName.Clear();
@@ -814,31 +730,19 @@ tCIDLib::TVoid TLogEvent::Reset()
     m_strThread.Clear();
 
     m_strHostName = TSysInfo::strIPHostName();
-    if (m_pstrAuxText)
-        m_pstrAuxText->Clear();
 }
 
 
-//
-//  Get/set the aux text. If we've not faultd it in yet, then we do so
-//  in either case.
-//
+// Get/set the aux text
 const TString& TLogEvent::strAuxText() const
 {
-    if (!m_pstrAuxText)
-        m_pstrAuxText = new TString;
-
-    return *m_pstrAuxText;
+    return m_strAuxText;
 }
 
 const TString& TLogEvent::strAuxText(const TString& strNewText)
 {
-    if (!m_pstrAuxText)
-        m_pstrAuxText = new TString(strNewText);
-    else
-        *m_pstrAuxText = strNewText;
-
-    return *m_pstrAuxText;
+    m_strAuxText = strNewText;
+    return m_strAuxText;
 }
 
 
@@ -991,16 +895,9 @@ tCIDLib::TVoid TLogEvent::StreamFrom(TBinInStream& strmToReadFrom)
 
     // If we stored aux text, then pull it back out
     if (c2Flags & CIDLib_LogEvent::c2AuxText)
-    {
-        if (!m_pstrAuxText)
-            m_pstrAuxText = new TString;
-        strmToReadFrom >> *m_pstrAuxText;
-    }
-     else
-    {
-        if (m_pstrAuxText)
-            m_pstrAuxText->Clear();
-    }
+        strmToReadFrom >> m_strAuxText;
+    else
+        m_strAuxText.Clear();
 
     // If V2, stream in the stack dump. Else clear it
     if (c2FmtVersion == 1)
@@ -1022,7 +919,7 @@ tCIDLib::TVoid TLogEvent::StreamTo(TBinOutStream& strmToWriteTo) const
         c2Flags |= CIDLib_LogEvent::c2Reported;
 
     // And we use the high bit to indicate aux text presence
-    if (m_pstrAuxText)
+    if (!m_strAuxText.bIsEmpty())
         c2Flags |= CIDLib_LogEvent::c2AuxText;
 
     strmToWriteTo   << tCIDLib::EStreamMarkers::StartObject
@@ -1043,8 +940,8 @@ tCIDLib::TVoid TLogEvent::StreamTo(TBinOutStream& strmToWriteTo) const
                     << m_strProcess;
 
     // And do the optional aux text
-    if (m_pstrAuxText)
-        strmToWriteTo << *m_pstrAuxText;
+    if (!m_strAuxText.bIsEmpty())
+        strmToWriteTo << m_strAuxText;
 
     // Write out the stack dump and the end marker
     strmToWriteTo   << m_strStackTrace

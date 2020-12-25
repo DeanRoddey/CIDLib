@@ -197,19 +197,24 @@ template <typename TElem> class TPolyStreamer : public TObject
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bEndOfStream() const
         {
+            CheckHaveStream(kCIDLib::True);
             return m_pstrmIn->bEndOfStream();
         }
 
         tCIDLib::TVoid FullReset()
         {
             m_c2CurId = 1;
-            m_pstrmIn->Reset();
-            m_pstrmOut->Reset();
+            if (m_pstrmIn)
+                m_pstrmIn->Reset();
+            if (m_pstrmOut)
+                m_pstrmOut->Reset();
             m_pcolClassSet->RemoveAll();
         }
 
         [[nodiscard]] TElem* pobjStreamIn()
         {
+            CheckHaveStream(kCIDLib::True);
+
             //
             //  Stream in the next record type. There could be a class record
             //  before the next object type.
@@ -307,16 +312,20 @@ template <typename TElem> class TPolyStreamer : public TObject
 
         tCIDLib::TVoid ResetIn()
         {
+            CheckHaveStream(kCIDLib::True);
             m_pstrmIn->Reset();
         }
 
         tCIDLib::TVoid ResetOut()
         {
+            CheckHaveStream(kCIDLib::False);
             m_pstrmOut->Reset();
         }
 
         tCIDLib::TVoid StreamOut(const TElem& objToStream)
         {
+            CheckHaveStream(kCIDLib::False);
+
             //
             //  See if this object's type has been streamed out yet. If its a
             //  new class, then we stream out the class record first.
@@ -378,6 +387,21 @@ template <typename TElem> class TPolyStreamer : public TObject
             return kCIDLib::True;
         }
 
+        tCIDLib::TVoid CheckHaveStream(const tCIDLib::TBoolean bInput) const
+        {
+            if ((bInput && !m_pstrmIn) || (!bInput && !m_pstrmOut))
+            {
+                facCIDLib().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kCIDErrs::errcStrm_DontHaveStream
+                    , tCIDLib::ESeverities::Failed
+                    , tCIDLib::EErrClasses::Format
+                    , TString(bInput ? L"input" : L"output")
+                );
+            }
+        }
 
         tCIDLib::TVoid FindClassById(const  tCIDLib::TCard2 c2NextId
                                     ,       TClass&         clsNewType)

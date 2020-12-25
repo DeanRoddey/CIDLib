@@ -242,8 +242,8 @@ TXMLAttrDef::TXMLAttrDef() :
 
     m_bProvided(kCIDLib::False)
     , m_c4Id(kCIDLib::c4MaxCard)
-    , m_eType(tCIDXML::EAttrTypes::CData)
     , m_eDefType(tCIDXML::EDefAttrTypes::Implied)
+    , m_eType(tCIDXML::EAttrTypes::CData)
     , m_pcolEnumValues(nullptr)
 {
 }
@@ -254,8 +254,8 @@ TXMLAttrDef::TXMLAttrDef(const  tCIDLib::TCh* const     pszValue
 
     m_bProvided(kCIDLib::False)
     , m_c4Id(kCIDLib::c4MaxCard)
-    , m_eType(eType)
     , m_eDefType(eDefaultType)
+    , m_eType(eType)
     , m_pcolEnumValues(nullptr)
     , m_strValue(pszValue)
 {
@@ -267,8 +267,8 @@ TXMLAttrDef::TXMLAttrDef(const  TString&                strValue
 
     m_bProvided(kCIDLib::False)
     , m_c4Id(kCIDLib::c4MaxCard)
-    , m_eType(eType)
     , m_eDefType(eDefaultType)
+    , m_eType(eType)
     , m_pcolEnumValues(nullptr)
     , m_strValue(strValue)
 {
@@ -278,8 +278,8 @@ TXMLAttrDef::TXMLAttrDef(const TXMLAttrDef& xadSrc) :
 
     m_bProvided(kCIDLib::False)
     , m_c4Id(kCIDLib::c4MaxCard)
-    , m_eType(xadSrc.m_eType)
     , m_eDefType(xadSrc.m_eDefType)
+    , m_eType(xadSrc.m_eType)
     , m_pcolEnumValues(nullptr)
     , m_strValue(xadSrc.m_strValue)
 {
@@ -288,13 +288,20 @@ TXMLAttrDef::TXMLAttrDef(const TXMLAttrDef& xadSrc) :
         m_pcolEnumValues = new TBag<TString>(*xadSrc.m_pcolEnumValues);
 }
 
+TXMLAttrDef::TXMLAttrDef(TXMLAttrDef&& xadSrc) :
+
+    TXMLAttrDef()
+{
+    *this = operator=(tCIDLib::ForceMove(xadSrc));
+}
+
 TXMLAttrDef& TXMLAttrDef::operator=(const TXMLAttrDef& xadSrc)
 {
     if (this != &xadSrc)
     {
         m_bProvided = xadSrc.m_bProvided;
-        m_eType     = xadSrc.m_eType;
         m_eDefType  = xadSrc.m_eDefType;
+        m_eType     = xadSrc.m_eType;
         m_strValue  = xadSrc.m_strValue;
 
         // The id is assigned by the container, so reset it on copy or assign
@@ -317,6 +324,20 @@ TXMLAttrDef& TXMLAttrDef::operator=(const TXMLAttrDef& xadSrc)
             if (m_pcolEnumValues)
                 m_pcolEnumValues->RemoveAll();
         }
+    }
+    return *this;
+}
+
+TXMLAttrDef& TXMLAttrDef::operator=(TXMLAttrDef&& xadSrc)
+{
+    if (this != &xadSrc)
+    {
+        tCIDLib::Swap(m_bProvided, xadSrc.m_bProvided);
+        tCIDLib::Swap(m_c4Id, xadSrc.m_c4Id);
+        tCIDLib::Swap(m_eDefType, xadSrc.m_eDefType);
+        tCIDLib::Swap(m_eType, xadSrc.m_eType);
+        tCIDLib::Swap(m_pcolEnumValues, xadSrc.m_pcolEnumValues);
+        m_strValue = tCIDLib::ForceMove(xadSrc.m_strValue);
     }
     return *this;
 }

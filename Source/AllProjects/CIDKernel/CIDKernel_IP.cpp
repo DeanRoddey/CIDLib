@@ -83,18 +83,6 @@ TKrnlIPAddr::TKrnlIPAddr(const  tCIDSock::ESpecAddrs eAddr
     SetToSpecial(eAddr, eType);
 }
 
-
-TKrnlIPAddr::TKrnlIPAddr(const TKrnlIPAddr& kipaToCopy) :
-
-    m_c4Count(kipaToCopy.m_c4Count)
-    , m_c4FlowInfo(kipaToCopy.m_c4FlowInfo)
-    , m_c4ScopeId(kipaToCopy.m_c4ScopeId)
-    , m_eType(kipaToCopy.m_eType)
-{
-    TRawMem::CopyMemBuf(m_ac1Data, kipaToCopy.m_ac1Data, kCIDSock::c4MaxIPAddrBytes);
-}
-
-
 TKrnlIPAddr::~TKrnlIPAddr()
 {
     // Nothing to do
@@ -124,19 +112,6 @@ tCIDLib::TBoolean TKrnlIPAddr::operator==(const TKrnlIPAddr& kipaSrc) const
 tCIDLib::TBoolean TKrnlIPAddr::operator!=(const TKrnlIPAddr& kipaSrc) const
 {
     return !operator==(kipaSrc);
-}
-
-TKrnlIPAddr& TKrnlIPAddr::operator=(const TKrnlIPAddr& kipaSrc)
-{
-    if (this != &kipaSrc)
-    {
-        m_eType = kipaSrc.m_eType;
-        m_c4Count = kipaSrc.m_c4Count;
-        m_c4FlowInfo = kipaSrc.m_c4FlowInfo;
-        m_c4ScopeId = kipaSrc.m_c4ScopeId;
-        TRawMem::CopyMemBuf(m_ac1Data, kipaSrc.m_ac1Data, m_c4Count);
-    }
-    return *this;
 }
 
 

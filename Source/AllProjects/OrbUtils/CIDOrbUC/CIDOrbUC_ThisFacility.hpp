@@ -168,7 +168,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
             return porbcRet;
         }
 
-        template <typename T> T*
+        template <typename T> [[nodiscard]] T*
         porbcMakeClient(        tCIDOrbUC::TNSrvProxy&  orbcNS
                         , const TString&                strNSBinding
                         , const tCIDLib::TCard4         c4WaitMillis = 0

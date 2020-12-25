@@ -167,6 +167,7 @@ class KRNLEXPORT TKrnlLocale
         //  Constructors and destructor
         // -------------------------------------------------------------------
         TKrnlLocale(const TKrnlLocale&) = delete;
+        TKrnlLocale(TKrnlLocale&&) = delete;
 
         ~TKrnlLocale();
 
@@ -175,6 +176,7 @@ class KRNLEXPORT TKrnlLocale
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlLocale& operator=(const TKrnlLocale&) = delete;
+        TKrnlLocale& operator=(TKrnlLocale&&) = delete;
 
 
     protected :

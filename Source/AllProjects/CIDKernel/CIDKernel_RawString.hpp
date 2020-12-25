@@ -735,13 +735,7 @@ namespace TRawStr
         //  Just call the previous sub string version with the last index as
         //  the start index.
         //
-        return pszFindPrevSubStr
-        (
-            pszToSearch
-            , pszSubStr
-            , c4StrLen(pszToSearch) - 1
-            , bCaseSensitive
-        );
+        return pszFindPrevSubStr(pszToSearch, pszSubStr, c4StrLen(pszToSearch) - 1, bCaseSensitive);
     }
 
     inline const tCIDLib::TCh*

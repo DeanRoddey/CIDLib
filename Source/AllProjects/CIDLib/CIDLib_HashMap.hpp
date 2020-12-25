@@ -1111,7 +1111,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
             return pnodeRet->objPair();
         }
 
-        TPair& objAddMove(TPair&& kobjToAdd)
+        template <typename T = TPair> T& objAddMove(T&& kobjToAdd)
         {
             TLocker lockrSync(this);
 

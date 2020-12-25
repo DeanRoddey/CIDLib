@@ -160,7 +160,7 @@ template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
             return m_eDir;
         }
 
-        TElem& objAddMove(TElem&& objNew)
+        template <typename T = TElem> T& objAddMove(T&& objNew)
         {
             // Lock the collection
             TLocker lockrCol(this);

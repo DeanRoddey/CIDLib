@@ -45,6 +45,7 @@ class CIDSOCKEXP TCIDSockStreamBasedDataSrc : public TCIDDataSrc
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TCIDSockStreamBasedDataSrc(const TCIDSockStreamBasedDataSrc&) = delete;
+        TCIDSockStreamBasedDataSrc(TCIDSockStreamBasedDataSrc&&) = delete;
 
         ~TCIDSockStreamBasedDataSrc();
 
@@ -53,6 +54,7 @@ class CIDSOCKEXP TCIDSockStreamBasedDataSrc : public TCIDDataSrc
         //  Public operators
         // -------------------------------------------------------------------
         TCIDSockStreamBasedDataSrc& operator=(const TCIDSockStreamBasedDataSrc&) = delete;
+        TCIDSockStreamBasedDataSrc& operator=(TCIDSockStreamBasedDataSrc&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -102,6 +104,7 @@ class CIDSOCKEXP TCIDSockStreamDataSrc : public TCIDSockStreamBasedDataSrc
         );
 
         TCIDSockStreamDataSrc(const TCIDSockStreamDataSrc&) = delete;
+        TCIDSockStreamDataSrc(TCIDSockStreamDataSrc&&) = delete;
 
         ~TCIDSockStreamDataSrc();
 
@@ -110,6 +113,7 @@ class CIDSOCKEXP TCIDSockStreamDataSrc : public TCIDSockStreamBasedDataSrc
         //  Public operators
         // -------------------------------------------------------------------
         TCIDSockStreamDataSrc& operator=(const TCIDSockStreamDataSrc&) = delete;
+        TCIDSockStreamDataSrc& operator=(TCIDSockStreamDataSrc&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -120,7 +124,7 @@ class CIDSOCKEXP TCIDSockStreamDataSrc : public TCIDSockStreamBasedDataSrc
                     TEvent&                 evToSet
         )   override;
 
-        tCIDLib::TBoolean bConnected() const override;
+        tCIDLib::TBoolean bIsConnected() const override;
 
         tCIDSock::ESockEvs eEnumEvents
         (

@@ -1529,7 +1529,7 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     //  A basic read/write access bitmapped enum
     // -----------------------------------------------------------------------
-    enum class ERWAccess
+    enum class ERWAccess : tCIDLib::TCard4
     {
         None            = 0x0
         , Read          = 0x01

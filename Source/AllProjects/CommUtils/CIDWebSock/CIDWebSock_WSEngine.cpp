@@ -858,7 +858,7 @@ TCIDWebSockThread::bGetFragment(tCIDLib::TCard1&        c1Type
     catch(TError& errToCatch)
     {
         // If the source is not connected, we have lost him
-        if (!m_pcdsServer->bConnected())
+        if (!m_pcdsServer->bIsConnected())
         {
             LogStateInfo(L"Socket connection lost, terminating...");
 

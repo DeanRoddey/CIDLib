@@ -80,11 +80,15 @@ class CIDMACROENGEXP TMEngOpCode
             const   TMEngOpCode&            meopToAssign
         );
 
-        tCIDLib::TCard2 operator[]
-        (
-            const   tCIDLib::TCard4         c4Index
-        )   const;
+        tCIDLib::TCard2 operator[](const tCIDLib::TCard4 c4Index )const
+        {
+            if (c4Index < kCIDMacroEng::c4OpIndices)
+                return m_uStorage.ac2Indices[c4Index];
 
+            // It's invalid so throw, and a bogus return to make the compiler happy
+            BadIndex(c4Index);
+            return 0;
+        }
 
 
         // -------------------------------------------------------------------
@@ -95,30 +99,60 @@ class CIDMACROENGEXP TMEngOpCode
             const   tCIDLib::TCard2         c2TargetId
         );
 
-        tCIDLib::TBoolean bIsNoOp() const;
+        tCIDLib::TBoolean bIsNoOp() const
+        {
+            return (m_eOpCode == tCIDMacroEng::EOpCodes::NoOp);
+        }
 
-        tCIDLib::TBoolean bImmediate() const;
+        tCIDLib::TBoolean bImmediate() const
+        {
+            return m_uStorage.bImmediate;
+        }
 
-        tCIDLib::TCard1 c1Immediate() const;
+        tCIDLib::TCard1 c1Immediate() const
+        {
+            return m_uStorage.c1Immediate;
+        }
 
-        tCIDLib::TCard2 c2Immediate() const;
+        tCIDLib::TCard2 c2Immediate() const
+        {
+            return m_uStorage.c2Immediate;
+        }
 
-        tCIDLib::TCard4 c4Immediate() const;
+        tCIDLib::TCard4 c4Immediate() const
+        {
+            return m_uStorage.c4Immediate;
+        }
 
         tCIDLib::TCard4 c4Immediate
         (
             const   tCIDLib::TCard4         c4ToSet
         );
 
-        tCIDLib::TCard8 c8Immediate() const;
+        tCIDLib::TCard8 c8Immediate() const
+        {
+            return m_uStorage.c8Immediate;
+        }
 
-        tCIDLib::TCh chImmediate() const;
+        tCIDLib::TCh chImmediate() const
+        {
+            return m_uStorage.chImmediate;
+        }
 
-        tCIDMacroEng::EOpCodes eOpCode() const;
+        tCIDMacroEng::EOpCodes eOpCode() const
+        {
+            return m_eOpCode;
+        }
 
-        tCIDLib::TFloat4 f4Immediate() const;
+        tCIDLib::TFloat4 f4Immediate() const
+        {
+            return m_uStorage.f4Immediate;
+        }
 
-        tCIDLib::TFloat8 f8Immediate() const;
+        tCIDLib::TFloat8 f8Immediate() const
+        {
+            return m_uStorage.f8Immediate;
+        }
 
         tCIDLib::TVoid Format
         (
@@ -126,11 +160,20 @@ class CIDMACROENGEXP TMEngOpCode
             , const TCIDMacroEngine&        meOwner
         )   const;
 
-        tCIDLib::TInt1 i1Immediate() const;
+        tCIDLib::TInt1 i1Immediate() const
+        {
+            return m_uStorage.i1Immediate;
+        }
 
-        tCIDLib::TInt2 i2Immediate() const;
+        tCIDLib::TInt2 i2Immediate() const
+        {
+            return m_uStorage.i2Immediate;
+        }
 
-        tCIDLib::TInt4 i4Immediate() const;
+        tCIDLib::TInt4 i4Immediate() const
+        {
+            return m_uStorage.i4Immediate;
+        }
 
         tCIDLib::TVoid SetOpCode
         (
@@ -282,99 +325,4 @@ class CIDMACROENGEXP TMEngOpCode
 // ---------------------------------------------------------------------------
 TTextOutStream&
 operator<<(TTextOutStream& strmTarget, const TMEngOpCode& meopToFormat);
-
-
-// ---------------------------------------------------------------------------
-//  TMEngOpCode: Public operators
-// ---------------------------------------------------------------------------
-inline tCIDLib::TCard2
-TMEngOpCode::operator[](const tCIDLib::TCard4 c4Index) const
-{
-    if (c4Index < kCIDMacroEng::c4OpIndices)
-        return m_uStorage.ac2Indices[c4Index];
-
-    // It's invalid so throw, and a bogus return to make the compiler happy
-    BadIndex(c4Index);
-    return 0;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TMEngOpCode: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean TMEngOpCode::bIsNoOp() const
-{
-    return (m_eOpCode == tCIDMacroEng::EOpCodes::NoOp);
-}
-
-inline tCIDLib::TBoolean TMEngOpCode::bImmediate() const
-{
-    return m_uStorage.bImmediate;
-}
-
-
-inline tCIDLib::TCard1 TMEngOpCode::c1Immediate() const
-{
-    return m_uStorage.c1Immediate;
-}
-
-
-inline tCIDLib::TCard2 TMEngOpCode::c2Immediate() const
-{
-    return m_uStorage.c2Immediate;
-}
-
-
-inline tCIDLib::TCard4 TMEngOpCode::c4Immediate() const
-{
-    return m_uStorage.c4Immediate;
-}
-
-
-inline tCIDLib::TCard8 TMEngOpCode::c8Immediate() const
-{
-    return m_uStorage.c8Immediate;
-}
-
-
-inline tCIDLib::TCh TMEngOpCode::chImmediate() const
-{
-    return m_uStorage.chImmediate;
-}
-
-inline tCIDMacroEng::EOpCodes TMEngOpCode::eOpCode() const
-{
-    return m_eOpCode;
-}
-
-
-inline tCIDLib::TFloat4 TMEngOpCode::f4Immediate() const
-{
-    return m_uStorage.f4Immediate;
-}
-
-
-inline tCIDLib::TFloat8 TMEngOpCode::f8Immediate() const
-{
-    return m_uStorage.f8Immediate;
-}
-
-
-inline tCIDLib::TInt1 TMEngOpCode::i1Immediate() const
-{
-    return m_uStorage.i1Immediate;
-}
-
-
-inline tCIDLib::TInt2 TMEngOpCode::i2Immediate() const
-{
-    return m_uStorage.i2Immediate;
-}
-
-
-inline tCIDLib::TInt4 TMEngOpCode::i4Immediate() const
-{
-    return m_uStorage.i4Immediate;
-}
-
 

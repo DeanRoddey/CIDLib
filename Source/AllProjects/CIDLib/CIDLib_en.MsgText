@@ -145,6 +145,8 @@ ERRORS=
     errcCol_Full                813     The '%(1)' is is full, no more items can be added
     errcCol_HashChanged         814     The hash of an element in a hashed collection was modified in place
     errcCol_MovedAdopted        815     Cannot move from an adopting collection to a non-adopting one (use GiveElements() for that.)
+    errcCol_StoreCounts         816     Got invalid counts when streaming in %(1) collection
+    errcCol_BadStoredNodeType   817     Invalid stored node type for %(1) collection (Value=%(2))
 
     ; Console errors
     errcCon_TextReadError       891     Could not read a text line from the console object
@@ -558,6 +560,7 @@ ERRORS=
     errcStrm_PBStackIsFull      3385    The pushback stack is full
     errcStrm_PBUnderflow        3386    You cannot push back beyond the start of the stream
     errcStrm_PBOverflow         3387    The push back stack doesn't have enough room left for %(1) bytes
+    errcStrm_DontHaveStream     3388    The %(1) stream has not been set
 
     ; System info errors
     errcSysI_QueryUserName      3450    Could not get the current user name

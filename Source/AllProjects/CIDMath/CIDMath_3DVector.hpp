@@ -339,8 +339,8 @@ T3DVector CIDMATHEXP vecMix
 
 
 // ---------------------------------------------------------------------------
-//  Typedef the vector to T3DPoint so that it can be more self documenting
+//  Alias the vector to T3DPoint so that it can be more self documenting
 //  when used as a point in a 3D floating point space.
 // ---------------------------------------------------------------------------
-typedef T3DVector   T3DPoint;
+using T3DPoint = T3DVector;
 

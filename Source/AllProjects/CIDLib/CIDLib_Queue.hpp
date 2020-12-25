@@ -923,7 +923,7 @@ template <typename TElem> class TQueue : public TCollection<TElem>
             );
         }
 
-        TElem& objAddMove(TElem&& objNew)
+        template <typename T = TElem> T& objAddMove(T&& objNew)
         {
             TLocker lockrQueue(this);
             TElem& objRet = objPut(tCIDLib::ForceMove(objNew));

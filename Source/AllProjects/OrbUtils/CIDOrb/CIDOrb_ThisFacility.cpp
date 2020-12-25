@@ -272,6 +272,19 @@ TFacCIDOrb::bCheckOOIDCache(const   TString&    strBindingName
 }
 
 
+//
+//  Sometimes programs don't immediately initialize the ORB on startup, and they may need
+//  to know when to do it. Of course it may become initialized or uninitialized after this
+//  call, so it's up the caller to coordinate such things if multiple threads could do it.
+//
+tCIDLib::TBoolean TFacCIDOrb::bIsInitialized(const tCIDLib::ECSSides eSide) const
+{
+    if (eSide == tCIDLib::ECSSides::Client)
+    {
+        return TOrbClientBase::bIsInitialized();
+    }
+    return TOrbServerBase::bIsInitialized();
+}
 
 
 // Return true if we have the indicated server side object interface

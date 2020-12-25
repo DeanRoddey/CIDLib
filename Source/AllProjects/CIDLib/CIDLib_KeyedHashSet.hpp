@@ -1181,7 +1181,7 @@ class TKeyedHashSet : public TCollection<TElem>
             return kCIDLib::True;
         }
 
-        TElem& objAddMove(TElem&& objToAdd)
+        template <typename T = TElem> T& objAddMove(T&& objToAdd)
         {
             TLocker lockrSync(this);
 

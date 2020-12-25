@@ -192,7 +192,7 @@ class CIDLIBEXP TDirChangeMon : public MDirChangeMon
 
     private :
         // -------------------------------------------------------------------
-        //  Private data membres
+        //  Private data members
         //
         //  m_bOverflow
         //      If our changes list is overflowed becasue the caller isn't reading

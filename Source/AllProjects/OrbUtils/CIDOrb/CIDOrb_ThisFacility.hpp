@@ -61,6 +61,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         TFacCIDOrb();
 
         TFacCIDOrb(const TFacCIDOrb&) = delete;
+        TFacCIDOrb( TFacCIDOrb&&) = delete;
 
         ~TFacCIDOrb();
 
@@ -69,6 +70,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDOrb& operator=(const TFacCIDOrb&) = delete;
+        TFacCIDOrb& operator=(TFacCIDOrb&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -83,6 +85,11 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         tCIDLib::TBoolean bHasInterface
         (
             const   TOrbObjId&              ooidToCheck
+        )   const;
+
+        tCIDLib::TBoolean bIsInitialized
+        (
+            const   tCIDLib::ECSSides       eSide
         )   const;
 
         tCIDLib::TCard4 c4CmdOverhead() const

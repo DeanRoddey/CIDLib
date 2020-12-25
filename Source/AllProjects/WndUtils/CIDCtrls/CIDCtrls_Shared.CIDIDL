@@ -142,8 +142,7 @@
         <CIDIDL:Types>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ECalStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ECalStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     The calendar widget specific styles
                 </CIDIDL:DocText>
@@ -151,8 +150,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ECBStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ECBStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     The calendar widget specific styles
                 </CIDIDL:DocText>
@@ -160,8 +158,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EComboStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EComboStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     The styles for the combo box control
                 </CIDIDL:DocText>
@@ -170,8 +167,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ECustDrFlags" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ECustDrFlags" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     The flags for the custom drawing callback
                 </CIDIDL:DocText>
@@ -181,8 +177,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EEFStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EEFStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Entry field specific styles
                 </CIDIDL:DocText>
@@ -195,8 +190,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EFOpenOpts" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EFOpenOpts" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     File open dialog options.
 
@@ -223,8 +217,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EFrameStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EFrameStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Frame window specific styles
                 </CIDIDL:DocText>
@@ -241,8 +234,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ELBStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ELBStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     List box specific styles
                 </CIDIDL:DocText>
@@ -255,8 +247,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EMCLBStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EMCLBStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     List box specific styles
                 </CIDIDL:DocText>
@@ -276,8 +267,7 @@
 
 
 
-            <CIDIDL:Enum CIDIDL:Name="EMCLBCustOpts" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EMCLBCustOpts" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Multi-column list custom draw options
                 </CIDIDL:DocText>
@@ -294,8 +284,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EMCLBCustRets" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EMCLBCustRets" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Multi-column list custom draw return values
                 </CIDIDL:DocText>
@@ -307,8 +296,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EMLEStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EMLEStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Multi-line editor specific styles
                 </CIDIDL:DocText>
@@ -323,8 +311,7 @@
 
 
 
-            <CIDIDL:Enum CIDIDL:Name="EMLSStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EMLSStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Multi-line static text specific styles
                 </CIDIDL:DocText>
@@ -370,8 +357,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EObjVStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EObjVStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Object view styles
                 </CIDIDL:DocText>
@@ -379,8 +365,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EPBarStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EPBarStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Progress bar styles
                 </CIDIDL:DocText>
@@ -388,8 +373,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EPButtStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EPButtStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Push button styles
                 </CIDIDL:DocText>
@@ -397,8 +381,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ERBStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ERBStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Radio button styles
                 </CIDIDL:DocText>
@@ -406,8 +389,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EScrAStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EScrAStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Scroll area styles
                 </CIDIDL:DocText>
@@ -415,8 +397,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ESBStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ESBStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Scroll bar styles for standalone scroll bars
                 </CIDIDL:DocText>
@@ -424,8 +405,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ESldrStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ESldrStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Multi-line static text specific styles
                 </CIDIDL:DocText>
@@ -436,8 +416,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ESpinStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ESpinStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Spin box styles
                 </CIDIDL:DocText>
@@ -447,8 +426,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ESClrStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ESClrStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Static color styles
                 </CIDIDL:DocText>
@@ -456,8 +434,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ESImgStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ESImgStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Static image styles
                 </CIDIDL:DocText>
@@ -466,8 +443,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ESTextStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ESTextStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Static image styles
                 </CIDIDL:DocText>
@@ -477,8 +453,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ETabWStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ETabWStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Tabbed window styles
 
@@ -497,8 +472,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ETreeStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ETreeStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Tree view styles
                 </CIDIDL:DocText>
@@ -511,8 +485,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="ETreeCustOpts" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ETreeCustOpts" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Tree view styles
                 </CIDIDL:DocText>
@@ -526,8 +499,7 @@
 
 
 
-            <CIDIDL:Enum CIDIDL:Name="ETreeCustRets" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="ETreeCustRets" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Tree view styles
                 </CIDIDL:DocText>
@@ -537,8 +509,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EUpDnStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EUpDnStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Up/Down control styles
                 </CIDIDL:DocText>
@@ -546,8 +517,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum CIDIDL:Name="EVSepStyles" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EVSepStyles" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     Vertical separator styles
                 </CIDIDL:DocText>
@@ -556,8 +526,7 @@
 
 
 
-            <CIDIDL:Enum CIDIDL:Name="EWantInputs" CIDIDL:Type="Bmp"
-                         >
+            <CIDIDL:Enum CIDIDL:Name="EWantInputs" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
                     The 'want input' values that windows must set if they want to process
                     certain types of keys, else the system will pass them on to other things.

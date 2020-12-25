@@ -128,6 +128,8 @@ TCIDGenCacheItem::TCIDGenCacheItem(const TCIDGenCacheItem& cciSrc) :
     , m_enctStamp(cciSrc.m_enctStamp)
     , m_strName(cciSrc.m_strName)
 {
+    // Copy over the useful bytes
+    m_mbufData.CopyIn(cciSrc.m_mbufData, m_c4Bytes);
 }
 
 TCIDGenCacheItem::~TCIDGenCacheItem()
@@ -138,7 +140,7 @@ TCIDGenCacheItem::~TCIDGenCacheItem()
 // ---------------------------------------------------------------------------
 //  TCIDGenCacheItem: Public operators
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TCIDGenCacheItem::operator=(const TCIDGenCacheItem& cciSrc)
+TCIDGenCacheItem& TCIDGenCacheItem::operator=(const TCIDGenCacheItem& cciSrc)
 {
     if (this != &cciSrc)
     {
@@ -149,6 +151,7 @@ tCIDLib::TVoid TCIDGenCacheItem::operator=(const TCIDGenCacheItem& cciSrc)
         // Copy over the useful bytes
         m_mbufData.CopyIn(cciSrc.m_mbufData, m_c4Bytes);
     }
+    return *this;
 }
 
 

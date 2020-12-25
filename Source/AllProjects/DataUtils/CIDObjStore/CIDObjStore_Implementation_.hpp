@@ -199,6 +199,12 @@ class TCIDObjStoreImpl : public TObject
 
         tCIDLib::TCard4 c4ObjectsInStore() const;
 
+        tCIDLib::TCard4 c4QueryKeysInScope
+        (
+            const   TString&                strScope
+            ,       tCIDLib::TStrCollect&   colToFill
+        );
+
         tCIDLib::TCard4 c4QueryObjectsInScope
         (
             const   TString&                strScope

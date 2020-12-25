@@ -127,16 +127,10 @@ class CIDXMLEXP TXMLNotationDecl : public TObject
             , const tCIDLib::TCh* const     pszSystemId
         );
 
-        TXMLNotationDecl
-        (
-            const   TXMLNotationDecl&       xdeclToCopy
-        );
-
-        TXMLNotationDecl& operator=
-        (
-            const   TXMLNotationDecl&       xdeclToAssign
-        );
-
+        TXMLNotationDecl(const TXMLNotationDecl&) = default;
+        TXMLNotationDecl(TXMLNotationDecl&&) = default;
+        TXMLNotationDecl& operator=(const TXMLNotationDecl&) = default;
+        TXMLNotationDecl& operator=(TXMLNotationDecl&&) = default;
 
 
     private :

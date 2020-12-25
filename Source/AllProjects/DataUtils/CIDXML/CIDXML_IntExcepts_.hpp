@@ -42,44 +42,44 @@ class TXMLEndOfEntity
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TXMLEndOfEntity
-        (
-            const   TXMLEntityDecl&         xdeclEnded
-            , const tCIDLib::TCard4         c4SpoolerId
-        );
+        TXMLEndOfEntity() = delete;
 
-        TXMLEndOfEntity
-        (
-            const   TXMLEndOfEntity&        excToCopy
-        );
+        TXMLEndOfEntity(const   TXMLEntityDecl& xdeclEnded
+                        , const tCIDLib::TCard4 c4SpoolerId) :
 
-        ~TXMLEndOfEntity();
+            m_c4SpoolerId(c4SpoolerId)
+            , m_pxdeclEntity(&xdeclEnded)
+        {
+        }
+
+        TXMLEndOfEntity(const TXMLEndOfEntity&) = default;
+        TXMLEndOfEntity(TXMLEndOfEntity&&) = default;
+
+        ~TXMLEndOfEntity() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TXMLEndOfEntity& operator=
-        (
-            const   TXMLEndOfEntity&        excToAssign
-        );
+        TXMLEndOfEntity& operator=(const TXMLEndOfEntity&) = default;
+        TXMLEndOfEntity& operator=(TXMLEndOfEntity&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4SpoolerId() const;
+        tCIDLib::TCard4 c4SpoolerId() const
+        {
+            return m_c4SpoolerId;
+        }
 
-        const TXMLEntityDecl& xdeclEntityEnded() const;
+        const TXMLEntityDecl& xdeclEntityEnded() const
+        {
+            return *m_pxdeclEntity;
+        }
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors
-        // -------------------------------------------------------------------
-        TXMLEndOfEntity();
-
-
         // -------------------------------------------------------------------
         //  Private data types
         //
@@ -97,52 +97,3 @@ class TXMLEndOfEntity
 
 #pragma CIDLIB_POPPACK
 
-
-// ---------------------------------------------------------------------------
-//  TXMLEndOfEntity: Constructors and Destructor
-// ---------------------------------------------------------------------------
-inline
-TXMLEndOfEntity::TXMLEndOfEntity(const  TXMLEntityDecl& xdeclEnded
-                                , const tCIDLib::TCard4 c4SpoolerId) :
-
-    m_c4SpoolerId(c4SpoolerId)
-    , m_pxdeclEntity(&xdeclEnded)
-{
-}
-
-inline TXMLEndOfEntity::TXMLEndOfEntity(const TXMLEndOfEntity& excToCopy) :
-
-    m_c4SpoolerId(excToCopy.m_c4SpoolerId)
-    , m_pxdeclEntity(excToCopy.m_pxdeclEntity)
-{
-}
-
-inline TXMLEndOfEntity::~TXMLEndOfEntity()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLEndOfEntity: Public operators
-// ---------------------------------------------------------------------------
-inline TXMLEndOfEntity&
-TXMLEndOfEntity::operator=(const TXMLEndOfEntity& excToCopy)
-{
-    if (this != &excToCopy)
-        m_pxdeclEntity = excToCopy.m_pxdeclEntity;
-    return *this;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLEndOfEntity: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TCard4 TXMLEndOfEntity::c4SpoolerId() const
-{
-    return m_c4SpoolerId;
-}
-
-inline const TXMLEntityDecl& TXMLEndOfEntity::xdeclEntityEnded() const
-{
-    return *m_pxdeclEntity;
-}

@@ -55,6 +55,7 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         );
 
         TCIDObjStore(const TCIDObjStore&) = delete;
+        TCIDObjStore(TCIDObjStore&&) = delete;
 
         ~TCIDObjStore();
 
@@ -63,6 +64,7 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TCIDObjStore& operator=(const TCIDObjStore&) = delete;
+        TCIDObjStore& operator=(TCIDObjStore&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -145,6 +147,12 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         tCIDLib::TVoid BackupStore();
 
         tCIDLib::TCard4 c4ObjectsInStore() const;
+
+        tCIDLib::TCard4 c4QueryKeysInScope
+        (
+            const   TString&                strParScope
+            ,       tCIDLib::TStrCollect&   colToFill
+        );
 
         tCIDLib::TCard4 c4QueryObjectsInScope
         (

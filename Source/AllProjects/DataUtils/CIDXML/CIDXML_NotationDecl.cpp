@@ -60,15 +60,6 @@ TXMLNotationDecl::TXMLNotationDecl() :
 {
 }
 
-TXMLNotationDecl::TXMLNotationDecl(const TXMLNotationDecl& xdeclToCopy) :
-
-    m_c4Id(xdeclToCopy.m_c4Id)
-    , m_strName(xdeclToCopy.m_strName)
-    , m_strPublicId(xdeclToCopy.m_strPublicId)
-    , m_strSystemId(xdeclToCopy.m_strSystemId)
-{
-}
-
 TXMLNotationDecl::TXMLNotationDecl( const   TString&    strName
                                     , const TString&    strPublicId
                                     , const TString&    strSystemId) :
@@ -95,21 +86,6 @@ TXMLNotationDecl::TXMLNotationDecl( const   tCIDLib::TCh* const pszName
     , m_strSystemId(pszSystemId)
 {
 }
-
-TXMLNotationDecl&
-TXMLNotationDecl::operator=(const TXMLNotationDecl& xdeclToAssign)
-{
-    if (this == &xdeclToAssign)
-        return *this;
-
-    m_c4Id          = xdeclToAssign.m_c4Id;
-    m_strName       = xdeclToAssign.m_strName;
-    m_strPublicId   = xdeclToAssign.m_strPublicId;
-    m_strSystemId   = xdeclToAssign.m_strSystemId;
-
-    return *this;
-}
-
 
 // ---------------------------------------------------------------------------
 //  TXMLNotationDecl: Public, non-virtual methods

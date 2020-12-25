@@ -80,10 +80,8 @@ class CIDXMLEXP TDTDAttrDef : public TXMLAttrDef
             , const tCIDXML::EDefAttrTypes  eDefaultType
         );
 
-        TDTDAttrDef
-        (
-            const   TDTDAttrDef&            xadSrc
-        );
+        TDTDAttrDef(const TDTDAttrDef&) = default;
+        TDTDAttrDef(TDTDAttrDef&&) = default;
 
         ~TDTDAttrDef();
 
@@ -91,10 +89,8 @@ class CIDXMLEXP TDTDAttrDef : public TXMLAttrDef
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TDTDAttrDef& operator=
-        (
-            const   TDTDAttrDef&            xadSRc
-        );
+        TDTDAttrDef& operator=(const TDTDAttrDef&) = default;
+        TDTDAttrDef& operator=(TDTDAttrDef&&) = default;
 
 
         // -------------------------------------------------------------------

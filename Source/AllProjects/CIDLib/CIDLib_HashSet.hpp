@@ -995,7 +995,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
         }
 
 
-        TElem& objAddMove(TElem&& objToAdd)
+        template <typename TElem> TElem& objAddMove(TElem&& objToAdd)
         {
             TLocker lockrSync(this);
 

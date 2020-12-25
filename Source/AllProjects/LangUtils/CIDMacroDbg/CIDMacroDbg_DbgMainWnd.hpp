@@ -471,8 +471,7 @@ TMacroDbgMainWnd : public TPaneWndCont, public MMEngClassMgr, public MMEngDebugI
             , Stopped
         };
 
-        typedef TFundVector<tCIDLib::TCard4> TPrevLineList;
-
+        using TPrevLineList = TFundVector<tCIDLib::TCard4>;
 
 
         // -------------------------------------------------------------------

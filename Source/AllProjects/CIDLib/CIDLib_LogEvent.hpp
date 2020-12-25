@@ -120,13 +120,8 @@ class CIDLIBEXP TLogEvent :
             , const tCIDLib::EErrClasses    eClass
         );
 
-        TLogEvent
-        (
-            const   TLogEvent&              logevSrc
-        );
-
-        // Can't actually delete it since that causes problems
-        // TLogEvent(TLogEvent&&) = delete;
+        TLogEvent(const TLogEvent&) = default;
+        TLogEvent(TLogEvent&&) = default;
 
         ~TLogEvent();
 
@@ -134,14 +129,8 @@ class CIDLIBEXP TLogEvent :
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TLogEvent& operator=
-        (
-            const   TLogEvent&              logevSrc
-        );
-
-        // Can't actually delete it since that causes problems
-        // TLogEvent& operator=(const TLogEvent&&) = delete;
-
+        TLogEvent& operator=(const TLogEvent&) = default;
+        TLogEvent& operator=(TLogEvent&&) = default;
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -158,84 +147,84 @@ class CIDLIBEXP TLogEvent :
             ,       TTime&                  tmFmt
         )   const;
 
-        tCIDLib::TBoolean bAnyError() const;
+        [[nodiscard]] tCIDLib::TBoolean bAnyError() const;
 
-        tCIDLib::TBoolean bCheckEvent
+        [[nodiscard]] tCIDLib::TBoolean bCheckEvent
         (
             const   TString&                strModName
             , const tCIDLib::TErrCode       errcToCheck
         )   const;
 
-        tCIDLib::TBoolean bCheckEvent
+        [[nodiscard]] tCIDLib::TBoolean bCheckEvent
         (
             const   tCIDLib::TCh* const     pszModName
             , const tCIDLib::TErrCode       errcToCheck
         )   const;
 
-        tCIDLib::TBoolean bHasAuxText() const;
+        [[nodiscard]] tCIDLib::TBoolean bHasAuxText() const;
 
-        tCIDLib::TBoolean bLogged() const;
+        [[nodiscard]] tCIDLib::TBoolean bLogged() const;
 
         tCIDLib::TBoolean bLogged
         (
             const   tCIDLib::TBoolean       bToSet
         );
 
-        tCIDLib::TBoolean bReported() const;
+        [[nodiscard]] tCIDLib::TBoolean bReported() const;
 
         tCIDLib::TBoolean bReported
         (
             const   tCIDLib::TBoolean       bToSet
         )   const;
 
-        tCIDLib::TBoolean bSameEvent
+        [[nodiscard]] tCIDLib::TBoolean bSameEvent
         (
             const   TLogEvent&              errToCheck
         )   const;
 
-        tCIDLib::TCard4 c4LineNum() const;
+        [[nodiscard]] tCIDLib::TCard4 c4LineNum() const;
 
         tCIDLib::TCard4 c4LineNum
         (
             const   tCIDLib::TCard4         c4NewLineNum
         );
 
-        tCIDLib::TEncodedTime enctLogged() const;
+        [[nodiscard]] tCIDLib::TEncodedTime enctLogged() const;
 
         tCIDLib::TEncodedTime enctLogged
         (
             const   tCIDLib::TEncodedTime   enctNew
         );
 
-        tCIDLib::TOSErrCode errcHostId() const;
+        [[nodiscard]] tCIDLib::TOSErrCode errcHostId() const;
 
         tCIDLib::TOSErrCode errcHostId
         (
             const   tCIDLib::TOSErrCode     errcNew
         );
 
-        tCIDLib::TErrCode errcId() const;
+        [[nodiscard]] tCIDLib::TErrCode errcId() const;
 
         tCIDLib::TErrCode errcId
         (
             const   tCIDLib::TErrCode       errcNew
         );
 
-        tCIDLib::TErrCode errcKrnlId() const;
+        [[nodiscard]] tCIDLib::TErrCode errcKrnlId() const;
 
         tCIDLib::TErrCode errcKrnlId
         (
             const   tCIDLib::TErrCode       errcNew
         );
 
-        tCIDLib::EErrClasses eClass() const;
+        [[nodiscard]] tCIDLib::EErrClasses eClass() const;
 
         tCIDLib::EErrClasses eClass
         (
             const   tCIDLib::EErrClasses    eNewClass
         );
 
-        tCIDLib::ESeverities eSeverity() const;
+        [[nodiscard]] tCIDLib::ESeverities eSeverity() const;
 
         tCIDLib::ESeverities eSeverity
         (
@@ -244,51 +233,51 @@ class CIDLIBEXP TLogEvent :
 
         tCIDLib::TVoid Reset();
 
-        const TString& strAuxText() const;
+        [[nodiscard]] const TString& strAuxText() const;
 
         const TString& strAuxText
         (
             const   TString&                strNewText
         );
 
-        const TString& strErrText() const;
+        [[nodiscard]] const TString& strErrText() const;
 
         const TString& strErrText
         (
             const   TString&                strNewText
         );
 
-        const TString& strFacName() const;
+        [[nodiscard]] const TString& strFacName() const;
 
         const TString& strFacName
         (
             const   TString&                strNewName
         );
 
-        const TString& strFileName() const;
+        [[nodiscard]] const TString& strFileName() const;
 
         const TString& strFileName
         (
             const   TString&                strNewName
         );
 
-        const TString& strHostName() const;
+        [[nodiscard]] const TString& strHostName() const;
 
         const TString& strHostName
         (
             const   TString&                strNewName
         );
 
-        const TString& strProcess() const;
+        [[nodiscard]] const TString& strProcess() const;
 
         const TString& strProcess
         (
             const   TString&                strNewName
         );
 
-        const TString& strStackTrace() const;
+        [[nodiscard]] const TString& strStackTrace() const;
 
-        const TString& strThread() const;
+        [[nodiscard]] const TString& strThread() const;
 
         const TString& strThread
         (
@@ -362,10 +351,9 @@ class CIDLIBEXP TLogEvent :
         //      The severity level of the error, tells the caller how bad
         //      it was.
         //
-        //  m_pstrAuxText
+        //  m_strAuxText
         //      This is the storage for the auxiliary text string. This is to
-        //      give an extra spin on the error text. Its usually not used, so
-        //      its a pointer which is faulted in when actually needed.
+        //      give an extra spin on the error text.
         //
         //  m_strErrText
         //      This is the storage for the error text. This may be set
@@ -412,7 +400,7 @@ class CIDLIBEXP TLogEvent :
         tCIDLib::TErrCode               m_errcId;
         tCIDLib::TErrCode               m_errcKrnlId;
         tCIDLib::ESeverities            m_eSeverity;
-        mutable TString*                m_pstrAuxText;
+        TString                         m_strAuxText;
         TString                         m_strErrText;
         TString                         m_strFacName;
         TString                         m_strFileName;
@@ -429,6 +417,7 @@ class CIDLIBEXP TLogEvent :
         DefPolyDup(TLogEvent)
 };
 
+// We alias this and use it as the exception type as well
 using TError = TLogEvent;
 
 

@@ -310,9 +310,7 @@ TKrnlWin32::c4XlatCreateAction(const tCIDLib::ECreateActs eAction)
     #if CID_DEBUG_ON
     kmodCIDKernel.MsgPopUp
     (
-        L"Invalid tCIDLib::ECreateActs value"
-        , CID_FILE
-        , CID_LINE
+        L"Invalid tCIDLib::ECreateActs value", CID_FILE, CID_LINE
     );
     #endif
     return 0;

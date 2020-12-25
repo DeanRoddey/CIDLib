@@ -72,17 +72,8 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
             , const TString&                strInstance
         );
 
-        TOrbId
-        (
-            const   TOrbId&                 oidSrc
-        );
-
-        TOrbId(TOrbId&& oidSrc) :
-
-            TOrbId()
-        {
-            *this = tCIDLib::ForceMove(oidSrc);
-        }
+        TOrbId(const TOrbId&) = default;
+        TOrbId(TOrbId&&) = default;
 
         ~TOrbId();
 
@@ -90,15 +81,8 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TOrbId& operator=
-        (
-            const   TOrbId&                 oidSrc
-        );
-
-        TOrbId& operator=
-        (
-                    TOrbId&&                oidSrc
-        );
+        TOrbId& operator=(const TOrbId&) = default;
+        TOrbId& operator=(TOrbId&& oidSrc) = default;
 
         tCIDLib::TBoolean operator==
         (
