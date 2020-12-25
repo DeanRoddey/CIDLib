@@ -18,7 +18,6 @@ CIDLib contains about 1100 classes (~450,000 lines of code.) Here is a rough lis
 - A nice test framework
 - A file packaging system
 
-
 **Portability**
 
 CIDLib is primarily developed on Windows, but it has always been designed to be portable, since it is really a virtual OS sort of system and has a full platform abstraction layer. So everything above that is built purely in terms of our own pure C++ interfaces, which makes them highly portable. The lowest level, CIDKernel, is split into interfaces plus optional platform drivers. There are currently platform drivers for Windows and Linux.
