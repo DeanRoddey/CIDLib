@@ -137,30 +137,30 @@ class CIDLIBEXP TStatsCacheItem
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bHasValidData
+        [[nodiscard]] tCIDLib::TBoolean bHasValidData
         (
                     TStatsCacheNode*&       pscnToFill
-            ,       tCIDLib::TCard4&        c4Id
+            , COP   tCIDLib::TCard4&        c4Id
         );
 
-        tCIDLib::TBoolean bHasValidData
+        [[nodiscard]] tCIDLib::TBoolean bHasValidData
         (
             const   TStatsCacheNode*&       pscnToFill
-            ,       tCIDLib::TCard4&        c4Id
+            , COP   tCIDLib::TCard4&        c4Id
         )   const;
 
-        tCIDLib::TCard4 c4Id() const;
+        [[nodiscard]] tCIDLib::TCard4 c4Id() const;
 
-        tCIDLib::TCard8 c8Stamp() const;
+        [[nodiscard]] tCIDLib::TCard8 c8Stamp() const;
 
-        tCIDLib::EStatItemTypes eType() const;
+        [[nodiscard]] tCIDLib::EStatItemTypes eType() const;
 
         const tCIDLib::TCh* pszKey() const;
 
         tCIDLib::TVoid Set
         (
             const   tCIDLib::TCard4         c4Id
-            ,       TStatsCacheNode* const  pscnData
+            , CIP   TStatsCacheNode* const  pscnData
         );
 
 
@@ -238,20 +238,20 @@ class CIDLIBEXP TStatsCacheItemInfo : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4Id() const;
+        [[nodiscard]] tCIDLib::TCard4 c4Id() const;
 
-        tCIDLib::TCard8 c8Stamp() const;
+        [[nodiscard]] tCIDLib::TCard8 c8Stamp() const;
 
         tCIDLib::TCard8 c8Stamp
         (
             const   tCIDLib::TCard8         c8ToSet
         );
 
-        tCIDLib::TCard8 c8Value() const;
+        [[nodiscard]] tCIDLib::TCard8 c8Value() const;
 
-        tCIDLib::EStatItemTypes eType() const;
+        [[nodiscard]] tCIDLib::EStatItemTypes eType() const;
 
-        const TString& strName() const;
+        [[nodiscard]] const TString& strName() const;
 
 
     protected :
@@ -260,12 +260,12 @@ class CIDLIBEXP TStatsCacheItemInfo : public TObject, public MStreamable
         // -------------------------------------------------------------------
         tCIDLib::TVoid StreamFrom
         (
-                    TBinInStream&           strmToReadFrom
+            CIOP    TBinInStream&           strmToReadFrom
         )   final;
 
         tCIDLib::TVoid StreamTo
         (
-                    TBinOutStream&          strmToWriteTo
+            CIOP    TBinOutStream&          strmToWriteTo
         )   const final;
 
 
@@ -324,7 +324,7 @@ namespace TStatsCache
     CIDLIBEXP tCIDLib::TBoolean bCheckFlag
     (
         const   tCIDLib::TCh* const     pszPath
-        ,       TStatsCacheItem&        sciToUse
+        , CIOP  TStatsCacheItem&        sciToUse
     );
 
     CIDLIBEXP tCIDLib::TBoolean bCheckFlag
@@ -359,9 +359,9 @@ namespace TStatsCache
         const   TString&                strScope
         , const tCIDLib::TBoolean       bDirectOnly
         , const tCIDLib::TCard8         c8QueryStamp
-        ,       tCIDLib::TCard8&        c8PollStamp
-        ,       TIDList&                fcolIdList
-        ,       TValueList&             fcolValueList
+        , CIOP  tCIDLib::TCard8&        c8PollStamp
+        , COP   TIDList&                fcolIdList
+        , COP   TValueList&             fcolValueList
     );
 
 
@@ -369,7 +369,7 @@ namespace TStatsCache
     CIDLIBEXP tCIDLib::TBoolean bSetFlag
     (
         const   tCIDLib::TCh* const     pszPath
-        ,       TStatsCacheItem&        sciToUse
+        , CIOP  TStatsCacheItem&        sciToUse
         , const tCIDLib::TBoolean       bNewState
     );
 
@@ -381,7 +381,7 @@ namespace TStatsCache
 
     CIDLIBEXP tCIDLib::TBoolean bSetFlag
     (
-                TStatsCacheItem&        sciToUse
+        CIOP    TStatsCacheItem&        sciToUse
         , const tCIDLib::TBoolean       bNewState
     );
 
@@ -390,13 +390,13 @@ namespace TStatsCache
     CIDLIBEXP tCIDLib::TBoolean bSetIfHigher
     (
         const   tCIDLib::TCh* const     pszPath
-        ,       TStatsCacheItem&        sciToUse
+        , CIOP  TStatsCacheItem&        sciToUse
         , const tCIDLib::TCard8         c8ToSet
     );
 
     CIDLIBEXP tCIDLib::TBoolean bSetIfHigher
     (
-                TStatsCacheItem&        sciToUse
+        CIOP    TStatsCacheItem&        sciToUse
         , const tCIDLib::TCard8         c8ToSet
     );
 
@@ -434,7 +434,7 @@ namespace TStatsCache
     CIDLIBEXP tCIDLib::TCard4 c4QueryItemsInScope
     (
         const   TString&                strScope
-        ,       TItemList&              colToFill
+        , COP   TItemList&              colToFill
     );
 
 
@@ -455,9 +455,9 @@ namespace TStatsCache
     CIDLIBEXP tCIDLib::TCard4 c4QueryValuesInScope
     (
         const   TString&                strScope
-        ,       TInfoList&              colToFill
+        , CIOP  TInfoList&              colToFill
         , const tCIDLib::TBoolean       bDirectOnly
-        ,       tCIDLib::TCard8&        c8Stamp
+        , COP   tCIDLib::TCard8&        c8Stamp
         , const tCIDLib::TBoolean       bClearFirst = kCIDLib::True
     );
 
@@ -470,7 +470,7 @@ namespace TStatsCache
     CIDLIBEXP tCIDLib::TCard8 c8CheckValue
     (
         const   tCIDLib::TCh* const     pszPath
-        ,       TStatsCacheItem&        sciToUse
+        , CIOP  TStatsCacheItem&        sciToUse
     );
 
     CIDLIBEXP tCIDLib::TCard8 c8CheckValue
@@ -488,23 +488,23 @@ namespace TStatsCache
     CIDLIBEXP tCIDLib::TCard8 c8DecCounter
     (
         const   tCIDLib::TCh* const     pszPath
-        ,       TStatsCacheItem&        sciToUse
+        , CIOP  TStatsCacheItem&        sciToUse
     );
 
     CIDLIBEXP tCIDLib::TCard8 c8DecCounter
     (
-                TStatsCacheItem&        sciToUse
+        CIOP    TStatsCacheItem&        sciToUse
     );
 
     CIDLIBEXP tCIDLib::TCard8 c8IncCounter
     (
         const   tCIDLib::TCh* const     pszPath
-        ,       TStatsCacheItem&        sciToUse
+        , CIOP  TStatsCacheItem&        sciToUse
     );
 
     CIDLIBEXP tCIDLib::TCard8 c8IncCounter
     (
-                TStatsCacheItem&        sciToUse
+        CIOP    TStatsCacheItem&        sciToUse
     );
 
 
@@ -513,7 +513,7 @@ namespace TStatsCache
     (
         const   tCIDLib::TCh* const     pszPath
         , const tCIDLib::EStatItemTypes eType
-        ,       TStatsCacheItem&        sciToFill
+        , COP   TStatsCacheItem&        sciToFill
     );
 
 
@@ -521,13 +521,13 @@ namespace TStatsCache
     CIDLIBEXP tCIDLib::TVoid SetValue
     (
         const   tCIDLib::TCh* const     pszPath
-        ,       TStatsCacheItem&        sciToUse
+        , CIOP  TStatsCacheItem&        sciToUse
         , const tCIDLib::TCard8         c8ToSet
     );
 
     CIDLIBEXP tCIDLib::TVoid SetValue
     (
-                TStatsCacheItem&        sciToUse
+        CIOP    TStatsCacheItem&        sciToUse
         , const tCIDLib::TCard8         c8ToSet
     );
 };

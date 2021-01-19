@@ -106,10 +106,13 @@ extern template class TVector<TIPAddress>;
 //  Some magic macros for some enums of ours that have to be defined down in the
 //  kernel.
 // ---------------------------------------------------------------------------
-EnumBinStreamMacros(tCIDSock::EAddrTypes)
-EnumBinStreamMacros(tCIDSock::ESockProtos)
+namespace tCIDSock
+{
+    EnumBinStreamMacros(tCIDSock::EAddrTypes)
+    EnumBinStreamMacros(tCIDSock::ESockProtos)
 
-StdEnumTricks(tCIDSock::ESockProtos)
+    StdEnumTricks(tCIDSock::ESockProtos)
 
-BmpEnumTricks(tCIDSock::EMSelFlags)
-BmpEnumTricks(tCIDSock::ESockEvs)
+    BmpEnumTricks(tCIDSock::EMSelFlags)
+    BmpEnumTricks(tCIDSock::ESockEvs)
+}

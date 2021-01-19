@@ -56,6 +56,7 @@ TTextConverter::c4ConvertFrom(  TBinInStream&       strmSrc
     //
     const tCIDLib::TCard4   c4InBufSz = 4096;
     const tCIDLib::TCard4   c4OutBufSz = 2048;
+    #pragma warning(suppress : 26494) // We don't want to have to init this buffer
     tCIDLib::TCard1         ac1SrcBuf[c4InBufSz];
     tCIDLib::TCh            achOutBuf[c4OutBufSz + 1] = L"";
     tCIDLib::TBoolean       bStop = kCIDLib::False;
@@ -203,6 +204,7 @@ TTextConverter::c4ConvertTo(TTextInStream&      strmSrc
     const tCIDLib::TCard4   c4InBufSz = 2048;
     tCIDLib::TCh            achInBuf[c4InBufSz] = L"";
     const tCIDLib::TCard4   c4OutBufSz = c4InBufSz * kCIDLib::c4MaxUTF8Bytes;
+    #pragma warning(suppress : 26494) // We don't want to have to init this buffer
     tCIDLib::TCard1         ac1OutBuf[c4OutBufSz];
     tCIDLib::TBoolean       bStop = kCIDLib::False;
     tCIDLib::TCard4         c4SrcDone = 0;
@@ -274,6 +276,7 @@ TTextConverter::c4ConvertTo(const   tCIDLib::TCh* const pszSrc
     expbToFill.Reset();
 
     const tCIDLib::TCard4   c4BufSz = 2048;
+    #pragma warning(suppress : 26494) // We don't want to have to init this buffer
     tCIDLib::TCard1         ac1Buf[c4BufSz];
     tCIDLib::TBoolean       bStop = kCIDLib::False;
     tCIDLib::TCard4         c4CurBytes = 0;
@@ -315,6 +318,7 @@ TTextConverter::c4ConvertTo(const   tCIDLib::TCh* const     pszSrc
                             ,       tCIDLib::TCard4&        c4OutBytes)
 {
     const tCIDLib::TCard4   c4BufSz = 2048;
+    #pragma warning(suppress : 26494) // We don't want to have to init this buffer
     tCIDLib::TCard1         ac1Buf[c4BufSz];
     tCIDLib::TBoolean       bStop = kCIDLib::False;
     tCIDLib::TCard4         c4CurBytes = 0;

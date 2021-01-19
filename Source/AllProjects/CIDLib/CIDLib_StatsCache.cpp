@@ -25,6 +25,7 @@
 //  $_CIDLib_Log_$
 //
 
+#include <sal.h>
 
 // ---------------------------------------------------------------------------
 //  Facility specific includes
@@ -37,8 +38,6 @@
 //  Magic macros
 // ---------------------------------------------------------------------------
 RTTIDecls(TStatsCacheItemInfo,TObject)
-
-
 
 // ---------------------------------------------------------------------------
 //  Local types and data
@@ -372,7 +371,7 @@ class TSyncJanitor
 static tCIDLib::TCard8 c8FindValue(const TStatsCacheItem& sciToUse)
 {
     // If they passed us a bad one, return zero
-    tCIDLib::TCard4 c4At;
+    tCIDLib::TCard4 c4At = 0;
     const TStatsCacheNode* pscnVal = nullptr;
     if (!sciToUse.bHasValidData(pscnVal, c4At))
     {
@@ -520,8 +519,8 @@ TStatsCacheItem::~TStatsCacheItem()
 
 // Indicate if we have good data and if so return a pointer to it
 tCIDLib::TBoolean
-TStatsCacheItem::bHasValidData( TStatsCacheNode*&   pscnToFill
-                                , tCIDLib::TCard4&  c4Id)
+TStatsCacheItem::bHasValidData(         TStatsCacheNode*&   pscnToFill
+                                , COP   tCIDLib::TCard4&    c4Id)
 {
     c4Id = m_c4Id;
     pscnToFill = m_pscnData;
@@ -530,7 +529,7 @@ TStatsCacheItem::bHasValidData( TStatsCacheNode*&   pscnToFill
 
 tCIDLib::TBoolean
 TStatsCacheItem::bHasValidData( const   TStatsCacheNode*&   pscnToFill
-                                ,       tCIDLib::TCard4&    c4Id) const
+                                , COP   tCIDLib::TCard4&    c4Id) const
 {
     c4Id = m_c4Id;
     pscnToFill = m_pscnData;
@@ -691,7 +690,7 @@ const TString& TStatsCacheItemInfo::strName() const
 // -------------------------------------------------------------------
 //  TStatsCacheItemInfo: Protected, inherited methods
 // -------------------------------------------------------------------
-tCIDLib::TVoid TStatsCacheItemInfo::StreamFrom(TBinInStream& strmToReadFrom)
+tCIDLib::TVoid TStatsCacheItemInfo::StreamFrom(CIOP TBinInStream& strmToReadFrom)
 {
     // We should get a start object marker
     strmToReadFrom.CheckForStartMarker(CID_FILE, CID_LINE);
@@ -725,7 +724,7 @@ tCIDLib::TVoid TStatsCacheItemInfo::StreamFrom(TBinInStream& strmToReadFrom)
 
 }
 
-tCIDLib::TVoid TStatsCacheItemInfo::StreamTo(TBinOutStream& strmToWriteTo) const
+tCIDLib::TVoid TStatsCacheItemInfo::StreamTo(CIOP TBinOutStream& strmToWriteTo) const
 {
     strmToWriteTo   << tCIDLib::EStreamMarkers::StartObject
                     << CIDLib_StatsCache::c2FmtVersion
@@ -765,7 +764,7 @@ TStatsCache::bCheckBitFlag( const   TStatsCacheItem&    sciToUse
 //
 tCIDLib::TBoolean
 TStatsCache::bCheckFlag(const   tCIDLib::TCh* const pszKey
-                        ,       TStatsCacheItem&    sciToUse)
+                        , CIOP  TStatsCacheItem&    sciToUse)
 {
     CIDAssert
     (
@@ -825,9 +824,9 @@ tCIDLib::TBoolean
 TStatsCache::bPollValuesInScope(const   TString&                strScope
                                 , const tCIDLib::TBoolean       bDirectOnly
                                 , const tCIDLib::TCard8         c8QueryStamp
-                                ,       tCIDLib::TCard8&        c8PollStamp
-                                ,       TIDList&                fcolIdList
-                                ,       TValueList&             fcolValueList)
+                                , CIOP  tCIDLib::TCard8&        c8PollStamp
+                                , COP   TIDList&                fcolIdList
+                                , COP   TValueList&             fcolValueList)
 {
     //
     //  Flush both lists first. This is called from an ORB API so it's
@@ -902,8 +901,8 @@ TStatsCache::bPollValuesInScope(const   TString&                strScope
 //
 tCIDLib::TBoolean
 TStatsCache::bSetFlag(  const   tCIDLib::TCh* const pszKey
-                        ,       TStatsCacheItem&    sciToUse
-                       , const  tCIDLib::TBoolean   bNewState)
+                        , CIOP  TStatsCacheItem&    sciToUse
+                        , const  tCIDLib::TBoolean   bNewState)
 {
     CIDAssert
     (
@@ -952,11 +951,11 @@ TStatsCache::bSetFlag(  const   tCIDLib::TCh* const pszKey
 }
 
 tCIDLib::TBoolean
-TStatsCache::bSetFlag(TStatsCacheItem& sciToUse, const tCIDLib::TBoolean bNewState)
+TStatsCache::bSetFlag(CIOP TStatsCacheItem& sciToUse, const tCIDLib::TBoolean bNewState)
 {
     TSyncJanitor janLock;
 
-    tCIDLib::TCard4 c4At;
+    tCIDLib::TCard4 c4At = 0;
     TStatsCacheNode* pscnVal = nullptr;
     if (sciToUse.bHasValidData(pscnVal, c4At))
         pscnVal->c8Value(bNewState ? 1 : 0);
@@ -973,7 +972,7 @@ TStatsCache::bSetFlag(TStatsCacheItem& sciToUse, const tCIDLib::TBoolean bNewSta
 //
 tCIDLib::TBoolean
 TStatsCache::bSetIfHigher(  const   tCIDLib::TCh* const pszKey
-                            ,       TStatsCacheItem&    sciToUse
+                            , CIOP  TStatsCacheItem&    sciToUse
                             , const tCIDLib::TCard8     c8ToSet)
 {
     CIDAssert
@@ -1000,12 +999,12 @@ TStatsCache::bSetIfHigher(  const   tCIDLib::TCh* const pszKey
 }
 
 tCIDLib::TBoolean
-TStatsCache::bSetIfHigher(          TStatsCacheItem&    sciToUse
+TStatsCache::bSetIfHigher(  CIOP    TStatsCacheItem&    sciToUse
                             , const tCIDLib::TCard8     c8ToSet)
 {
     TSyncJanitor janLock;
 
-    tCIDLib::TCard4 c4At;
+    tCIDLib::TCard4 c4At = 0;
     TStatsCacheNode* pscnVal = nullptr;
     if (sciToUse.bHasValidData(pscnVal, c4At))
     {
@@ -1097,7 +1096,7 @@ TStatsCache::bSetFlagBit(const  tCIDLib::TCh* const pszPath
 //
 tCIDLib::TCard4
 TStatsCache::c4QueryItemsInScope(const  TString&                strScope
-                                ,       TStatsCache::TItemList& colToFill)
+                                , COP   TStatsCache::TItemList& colToFill)
 {
     colToFill.RemoveAll();
 
@@ -1143,9 +1142,9 @@ TStatsCache::c4QueryItemsInScope(const  TString&                strScope
 //
 tCIDLib::TCard4
 TStatsCache::c4QueryValuesInScope(  const   TString&            strScope
-                                    ,       TInfoList&          colToFill
+                                    , CIOP  TInfoList&          colToFill
                                     , const tCIDLib::TBoolean   bDirectOnly
-                                    ,       tCIDLib::TCard8&    c8Stamp
+                                    , COP   tCIDLib::TCard8&    c8Stamp
                                     , const tCIDLib::TBoolean   bClearFirst)
 {
     // Only clear the list first if we were asked to
@@ -1227,7 +1226,7 @@ tCIDLib::TCard8 TStatsCache::c8BadItemRefs()
 // Get the value of items
 tCIDLib::TCard8
 TStatsCache::c8CheckValue(  const   tCIDLib::TCh* const pszKey
-                            ,       TStatsCacheItem&    sciToUse)
+                            , CIOP  TStatsCacheItem&    sciToUse)
 {
     CIDAssert
     (
@@ -1282,7 +1281,7 @@ tCIDLib::TCard8 TStatsCache::c8CheckValue(const TStatsCacheItem& sciToUse)
 // Decrement counter type items
 tCIDLib::TCard8
 TStatsCache::c8DecCounter(  const   tCIDLib::TCh* const pszKey
-                            ,       TStatsCacheItem&    sciToUse)
+                            , CIOP  TStatsCacheItem&    sciToUse)
 {
     CIDAssert((pszKey != 0) && (*pszKey != 0), L"Empty/null stats cache key");
 
@@ -1301,11 +1300,11 @@ TStatsCache::c8DecCounter(  const   tCIDLib::TCh* const pszKey
     return pscnCnt->c8Decrement();
 }
 
-tCIDLib::TCard8 TStatsCache::c8DecCounter(TStatsCacheItem& sciToUse)
+tCIDLib::TCard8 TStatsCache::c8DecCounter(CIOP TStatsCacheItem& sciToUse)
 {
     TSyncJanitor janLock;
 
-    tCIDLib::TCard4 c4At;
+    tCIDLib::TCard4 c4At = 0;
     TStatsCacheNode* pscnCnt = nullptr;
     if (sciToUse.bHasValidData(pscnCnt, c4At))
         return pscnCnt->c8Decrement();
@@ -1319,7 +1318,7 @@ tCIDLib::TCard8 TStatsCache::c8DecCounter(TStatsCacheItem& sciToUse)
 // Increment counter type items
 tCIDLib::TCard8
 TStatsCache::c8IncCounter(  const   tCIDLib::TCh* const pszKey
-                            ,       TStatsCacheItem&    sciToUse)
+                            , CIOP  TStatsCacheItem&    sciToUse)
 {
     CIDAssert
     (
@@ -1342,11 +1341,11 @@ TStatsCache::c8IncCounter(  const   tCIDLib::TCh* const pszKey
     return pscnCnt->c8Increment();
 }
 
-tCIDLib::TCard8 TStatsCache::c8IncCounter(TStatsCacheItem& sciToUse)
+tCIDLib::TCard8 TStatsCache::c8IncCounter(CIOP TStatsCacheItem& sciToUse)
 {
     TSyncJanitor janLock;
 
-    tCIDLib::TCard4 c4At;
+    tCIDLib::TCard4 c4At = 0;
     TStatsCacheNode* pscnCnt = nullptr;
     if (sciToUse.bHasValidData(pscnCnt, c4At))
         return pscnCnt->c8Increment();
@@ -1361,7 +1360,7 @@ tCIDLib::TCard8 TStatsCache::c8IncCounter(TStatsCacheItem& sciToUse)
 tCIDLib::TVoid
 TStatsCache::RegisterItem(  const   tCIDLib::TCh* const     pszKey
                             , const tCIDLib::EStatItemTypes eType
-                            ,       TStatsCacheItem&        sciToFill)
+                            , COP   TStatsCacheItem&        sciToFill)
 {
     TSyncJanitor janLock;
 
@@ -1384,7 +1383,7 @@ TStatsCache::RegisterItem(  const   tCIDLib::TCh* const     pszKey
 // Set the value of items directly, used for value type items
 tCIDLib::TVoid
 TStatsCache::SetValue(  const   tCIDLib::TCh* const pszKey
-                        ,       TStatsCacheItem&    sciToUse
+                        , CIOP  TStatsCacheItem&    sciToUse
                         , const tCIDLib::TCard8     c8ToSet)
 {
     CIDAssert
@@ -1395,7 +1394,7 @@ TStatsCache::SetValue(  const   tCIDLib::TCh* const pszKey
 
     TSyncJanitor janLock;
 
-    tCIDLib::TCard4 c4At;
+    tCIDLib::TCard4 c4At = 0;
     TStatsCacheNode* pscnVal = nullptr;
     if (!sciToUse.bHasValidData(pscnVal, c4At))
     {
@@ -1406,7 +1405,7 @@ TStatsCache::SetValue(  const   tCIDLib::TCh* const pszKey
 }
 
 tCIDLib::TVoid
-TStatsCache::SetValue(TStatsCacheItem& sciToUse, const tCIDLib::TCard8 c8ToSet)
+TStatsCache::SetValue(CIOP TStatsCacheItem& sciToUse, const tCIDLib::TCard8 c8ToSet)
 {
     TSyncJanitor janLock;
 
@@ -1414,7 +1413,7 @@ TStatsCache::SetValue(TStatsCacheItem& sciToUse, const tCIDLib::TCard8 c8ToSet)
     //  We can't really do anything if they didn't provide a good item. But,
     //  if they do, set it.
     //
-    tCIDLib::TCard4 c4At;
+    tCIDLib::TCard4 c4At = 0;
     TStatsCacheNode* pscnVal = nullptr;
     if (sciToUse.bHasValidData(pscnVal, c4At))
         pscnVal->c8Value(c8ToSet);

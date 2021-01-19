@@ -2550,7 +2550,7 @@ class TTest_Time3 : public TTestFWTest
             ,       tTestFWLib::ETestRes&   eRes
             , const TTFWCurLn&              twclAt
             , const tCIDLib::TCh* const     pszSrc
-            , const TTime::TCompList&       fcolComps
+            , const TTimeCompList&          fcolComps
             , const tCIDLib::TCh            chDateSep
             , const tCIDLib::TCh            chTimeSep
             , const tCIDLib::TCh            chTZSep

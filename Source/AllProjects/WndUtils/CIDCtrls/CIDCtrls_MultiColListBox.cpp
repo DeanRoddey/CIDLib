@@ -884,7 +884,7 @@ TMultiColListBox::c4FindByUserData( const   TString&            strToFind
             if (!idCur.m_pstrUserData)
                 return kCIDLib::False;
             if (bCase)
-                idCur.m_pstrUserData->bCompare(strToFind);
+                return idCur.m_pstrUserData->bCompare(strToFind);
             return idCur.m_pstrUserData->bCompareI(strToFind);
         }
         , kCIDLib::c4MaxCard

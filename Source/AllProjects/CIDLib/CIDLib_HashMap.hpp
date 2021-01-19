@@ -113,7 +113,7 @@ template <typename TKey, class TValue> class THashMapNode
 
         TPair& kobjPair(const TPair& kobjToSet)
         {
-            m_kobjPair = objToSet;
+            m_kobjPair = kobjToSet;
             return m_kobjPair;
         }
 
@@ -755,7 +755,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 TLocker lockrSrc(&colSrc);
                 TLocker lockrThis(this);
 
-                TParent::operator=(tCIDLib::ForceMove(colSrc));
+                TMapCollection<TElem,TKey>::operator=(tCIDLib::ForceMove(colSrc));
 
                 //
                 //  We swap the element content. This has to include the modulus
@@ -1519,7 +1519,7 @@ TBinOutStream& operator<<(          TBinOutStream&                  strmOut
                 <<  colToStream.c4HashModulus();
 
     // If there were any elements, then stream them
-    THashMap<TElem, TKey, TKeyOps>::TCursor cursOut(&colToStream);
+    typename THashMap<TElem, TKey, TKeyOps>::TCursor cursOut(&colToStream);
     while (cursOut.bIsValid())
     {
         const THashMap<TElem, TKey, TKeyOps>::TPair& kobjCur = cursOut.objRCur();

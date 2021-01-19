@@ -226,7 +226,7 @@ tCIDLib::TBoolean TCGenEnumInfo::bIsContig() const
 //      within a generated class. If a namespace, then strEnclosing is the namespace
 //      name, if a class it's the class name. The class name will be either the server
 //      or client side class name depending on which output mode is being done.
-//  2.  If a class the enclosing bit is not required for the header of course.
+//  2.  If a class is the enclosing bit is not required for the header of course.
 //  3.  If a namespace enclosure then we need to provide appropriate export keyword
 //      which we get in strExport. If a class this is not needed since the class itself
 //      will be exported if appropriate. This is only need in the header bits.
@@ -239,31 +239,39 @@ tCIDLib::TBoolean TCGenEnumInfo::bIsContig() const
 //  it.
 //
 tCIDLib::TVoid
-TCGenEnumInfo::FmtHeader(const  tCIDLib::TBoolean   bGlobType
+TCGenEnumInfo::FmtHeader(const  tCIDLib::TBoolean   bClassType
                         , const TString&            strEnclosing
                         , const TString&            strExport
                         ,       TTextOutStream&     strmTar
                         ,       TTextOutStream&     strmXHdr)
 {
-    // The indentation is different
-    const tCIDLib::TCard4 c4BaseIndent = bGlobType ? 4 : 8;
+    const tCIDLib::TCard4 c4BaseIndent = bClassType ? 8 : 4;
 
     // Spit out the actual enum definition, which is the same either way
     FormatEnumDef(strmTar, c4BaseIndent);
 
-    // Spit out the method/operator signatures to the header
-    FormatEnumMethSigs(strmTar, c4BaseIndent, bGlobType, strExport, strEnclosing);
+    // Spit out the method signatures to the header
+    FormatEnumMethSigs(strmTar, bClassType, c4BaseIndent, strExport);
 
     //
     //  Do the global operators which are put into the X header for later insertion
     //  at the bottom of the header file.
     //
-    FormatEnumGlobMethSigs(strmXHdr, c4BaseIndent, bGlobType, strExport, strEnclosing);
+    FormatEnumGlobMethSigs(strmXHdr, strExport, strEnclosing);
+
+    //
+    //  If a class type output, operator sigs go into the X header, else the main one. If
+    //  class type, we also have a base indent of zero.
+    //
+    if (bClassType)
+        FormatOperatorSigs(strmXHdr, bClassType, 0, strExport, strEnclosing);
+    else
+        FormatOperatorSigs(strmTar, bClassType, c4BaseIndent, strExport, strEnclosing);
 }
 
 
 tCIDLib::TVoid
-TCGenEnumInfo::FmtImpl( const   tCIDLib::TBoolean   bGlobType
+TCGenEnumInfo::FmtImpl( const   tCIDLib::TBoolean   bClassType
                         , const TString&            strEnclosing
                         ,       TTextOutStream&     strmTar)
 {
@@ -715,28 +723,23 @@ TCGenEnumInfo::FormatEnumDef(       TTextOutStream& strmTar
 //
 tCIDLib::TVoid
 TCGenEnumInfo::FormatEnumMethSigs(          TTextOutStream&     strmTar
+                                    , const tCIDLib::TBoolean   bClassType
                                     , const tCIDLib::TCard4     c4Indent
-                                    , const tCIDLib::TBoolean   bGlobType
-                                    , const TString&            strExport
-                                    , const TString&            strEnclosing) const
+                                    , const TString&            strExport) const
 {
-    //
-    //  If not a global type, we need to output static keyword since they are method
-    //  members.
-    //
-    TString strStatic(bGlobType ? TString::strEmpty() : L"static ");
+    // Set up a static keyword if class type, to use with some of the class methods
+    const TString strStatic(bClassType ? L"static " : TString::strEmpty());
 
+    TStreamIndentJan janIndent(&strmTar, c4Indent);
     if (m_eXlatMap != TEnumMap::ETextVals::None)
     {
-        strmTar << TTextOutStream::Spaces(c4Indent)
-                << strStatic << strExport << L" "
+        strmTar << L"[[nodiscard]] " << strExport << strStatic << L" "
                 << m_strTypeName
                 << L" eXlat" << m_strTypeName
                 << L"(const TString& strToXlat, const tCIDLib::TBoolean "
                    L"bThrowIfNot = kCIDLib::False);\n"
 
-                << TTextOutStream::Spaces(c4Indent)
-                << strStatic << strExport
+                << L"[[nodiscard]] " << strExport << strStatic
                 << L" const TString& strXlat"
                 << m_strTypeName
                 << L"(const " << m_strTypeName
@@ -745,7 +748,7 @@ TCGenEnumInfo::FormatEnumMethSigs(          TTextOutStream&     strmTar
 
     if (m_eLoadMap != TEnumMap::ETextVals::None)
     {
-        strmTar << TTextOutStream::Spaces(c4Indent) << strStatic << strExport
+        strmTar << strExport << strStatic
                 << L" const TString& strLoad"
                 << m_strTypeName << L"(const " << m_strTypeName
                 << L" eToXlat, const tCIDLib::TBoolean bThrowIfNot = kCIDLib::False);\n";
@@ -755,12 +758,12 @@ TCGenEnumInfo::FormatEnumMethSigs(          TTextOutStream&     strmTar
     // If we support an alt map, do the sig for xlat method in both directions.
     if (m_eAltMap != TEnumMap::ETextVals::None)
     {
-        strmTar << TTextOutStream::Spaces(c4Indent) << strStatic << strExport
+        strmTar << L"[[nodiscard]] " << strExport << strStatic
                 << L" const TString& strAltXlat"
                 << m_strTypeName << L"(const " << m_strTypeName
                 << L" eToXlat, const tCIDLib::TBoolean bThrowIfNot = kCIDLib::True);\n"
 
-                << TTextOutStream::Spaces(c4Indent) << strStatic << strExport << L" "
+                << L"[[nodiscard]] " << strExport  << strStatic << L" "
                 << m_strTypeName << L" eAltXlat" << m_strTypeName
                 << L"(const TString& strToXlat, const tCIDLib::TBoolean "
                    L"bThrowIfNot = kCIDLib::False);\n";
@@ -769,17 +772,17 @@ TCGenEnumInfo::FormatEnumMethSigs(          TTextOutStream&     strmTar
     // If it supports a second alt map, do that one
     if (m_eAltMap2 != TEnumMap::ETextVals::None)
     {
-        strmTar    << TTextOutStream::Spaces(c4Indent) << strStatic << strExport
-                        << L" const TString& strAltXlat2"
-                        << m_strTypeName
-                        << L"(const " << m_strTypeName
-                        << L" eToXlat, const tCIDLib::TBoolean bThrowIfNot = kCIDLib::True);\n"
+        strmTar << L"[[nodiscard]] " << strExport << strStatic
+                << L" const TString& strAltXlat2"
+                << m_strTypeName
+                << L"(const " << m_strTypeName
+                << L" eToXlat, const tCIDLib::TBoolean bThrowIfNot = kCIDLib::True);\n"
 
-                        << TTextOutStream::Spaces(c4Indent) << strStatic << strExport << L" "
-                        << m_strTypeName
-                        << L" eAltXlat2" << m_strTypeName
-                        << L"(const TString& strToXlat, const tCIDLib::TBoolean "
-                           L"bThrowIfNot = kCIDLib::False);\n";
+                << L"[[nodiscard]] "
+                << strExport  << strStatic << L" " << m_strTypeName
+                << L" eAltXlat2" << m_strTypeName
+                << L"(const TString& strToXlat, const tCIDLib::TBoolean "
+                   L"bThrowIfNot = kCIDLib::False);\n";
     }
 
     //
@@ -788,14 +791,14 @@ TCGenEnumInfo::FormatEnumMethSigs(          TTextOutStream&     strmTar
     //
     if (m_bAltNumVal)
     {
-        strmTar << TTextOutStream::Spaces(c4Indent) << strStatic << strExport
+        strmTar << L"[[nodiscard]] "  << strStatic << strExport
                 << L" tCIDLib::TInt4 i4AltNum"
                 << m_strTypeName
                 << L"(const " << m_strTypeName
                 << L" eToXlat, const tCIDLib::TBoolean "
                    L"bThrowIfNot = kCIDLib::False);\n"
 
-                << TTextOutStream::Spaces(c4Indent) << strStatic << strExport << L" "
+                << TTextOutStream::Spaces(c4Indent) << L"[[nodiscard]] " << strStatic << strExport << L" "
                 << m_strTypeName
                 << L" eAltNum" << m_strTypeName
                 << L"(const tCIDLib::TInt4 i4Xlat, const tCIDLib::TBoolean "
@@ -805,22 +808,23 @@ TCGenEnumInfo::FormatEnumMethSigs(          TTextOutStream&     strmTar
     // If format option is set for this one, generate that method decl
     if (m_eDefFormatMap != TEnumMap::ETextVals::None)
     {
-        strmTar << TTextOutStream::Spaces(c4Indent) << strStatic << strExport
+        strmTar << strStatic << strExport
                 << L" tCIDLib::TVoid Format" << m_strTypeName
-                << L"\n        (\n"
-                << L"                         TString&            strTarget\n"
-                << L"              , const    TString&            strPrefix\n"
-                << L"              , const    tCIDLib::TCh        chSepChar\n"
-                << L"              , const    TEnumMap::ETextVals eVal = "
+                << L"\n(\n"
+                << L"               TString&            strTarget\n"
+                << L"    , const    TString&            strPrefix\n"
+                << L"    , const    tCIDLib::TCh        chSepChar\n"
+                << L"    , const    TEnumMap::ETextVals eVal = "
                 << TEnumMap::strFormatEnumTextVals(m_eDefFormatMap)
-                << L"\n        );\n";
+                << L"\n);\n";
     }
 
     // Do the valid enum method
-    strmTar  << TTextOutStream::Spaces(c4Indent) << strStatic << strExport
+    strmTar  << L"[[nodiscard]] " << strStatic << strExport
              << L" tCIDLib::TBoolean bIsValidEnum(const "
              << m_strTypeName
              << L" eVal);\n";
+
 
     strmTar << kCIDLib::NewLn;
 }
@@ -829,8 +833,6 @@ TCGenEnumInfo::FormatEnumMethSigs(          TTextOutStream&     strmTar
 
 tCIDLib::TVoid
 TCGenEnumInfo::FormatEnumGlobMethSigs(          TTextOutStream&     strmXHdr
-                                        , const tCIDLib::TCard4     c4Indent
-                                        , const tCIDLib::TBoolean   bGlobType
                                         , const TString&            strExport
                                         , const TString&            strEnclosing) const
 {
@@ -842,16 +844,6 @@ TCGenEnumInfo::FormatEnumGlobMethSigs(          TTextOutStream&     strmXHdr
     if (m_bBinStreamable)
     {
         strmXHdr    << strExport
-                    << L" TBinOutStream& operator<<(TBinOutStream& strmTar, const "
-                    << strFullType << L" eToStream);\n";
-
-        strmXHdr    << strExport
-                    << L" TBinInStream& operator>>(TBinInStream& strmSrc, "
-                    << strFullType
-                    << L"& eToFill);\n";
-
-
-        strmXHdr    << strExport
                     << L" tCIDLib::TVoid TBinInStream_ReadArray(TBinInStream& strmSrc, "
                     << strFullType
                     << L"* const aeList, const tCIDLib::TCard4 c4Count);\n";
@@ -860,83 +852,6 @@ TCGenEnumInfo::FormatEnumGlobMethSigs(          TTextOutStream&     strmXHdr
                     << L" tCIDLib::TVoid TBinOutStream_WriteArray(TBinOutStream& strmTar, const "
                     << strFullType
                     << L"* const aeList, const tCIDLib::TCard4 c4Count);\n";
-    }
-
-    //
-    //  If a standard (contiguous) type, then generate inc/dec operators, pre and post
-    //  if asked to, and if bitmapped do the AND/OR bitwise operators, which are
-    //  just inlined because they are very simple.
-    //
-    //  Also for std ones, we generate methods to get the min/max and count values which
-    //  are necessary to support various templatized tricks since they cannot do anything
-    //  with namespaces or enum spaces.
-    //
-    if (m_eType == tCIDIDL::EEnumTypes::Std)
-    {
-        if (m_eIncDecOps != tCIDIDL::EIncDecOps::None)
-        {
-            strmXHdr    << strExport
-                        << kCIDLib::chSpace
-                        << strFullType
-                        << L" operator++("
-                        << strFullType
-                        << L"& eVal, int);\n";
-        }
-
-        if (m_eIncDecOps == tCIDIDL::EIncDecOps::Both)
-        {
-            strmXHdr    << strExport
-                        << kCIDLib::chSpace
-                        << strFullType
-                        << L" operator--("
-                        << strFullType
-                        << L"& eVal, int);\n";
-        }
-    }
-     else if (m_eType == tCIDIDL::EEnumTypes::Bmp)
-    {
-        // Do the bitwise operators and their assignment variations
-        strmXHdr    << L"constexpr " << strFullType << L" operator|(const "
-                    << strFullType << L" eLHS, const " << strFullType
-                    << L" eRHS)\n{    \n"
-                    << L"    return " << strFullType
-                    << L"(tCIDLib::TEnumMaskType(eLHS) | tCIDLib::TEnumMaskType(eRHS));\n"
-                    << L"}\n";
-
-        strmXHdr    << L"constexpr " << strFullType << L"& operator|=("
-                    << strFullType << L"& eLHS, const " << strFullType
-                    << L" eRHS)\n{    \n"
-                    << L"    eLHS = " << strFullType
-                    << L"(tCIDLib::TEnumMaskType(eLHS) | tCIDLib::TEnumMaskType(eRHS));\n"
-                    << L"    return eLHS;\n"
-                    << L"}\n";
-
-        strmXHdr    << L"constexpr " << strFullType << L" operator&(const "
-                    << strFullType << L" eLHS, const " << strFullType
-                    << L" eRHS)\n{    \n"
-                    << L"    return " << strFullType
-                    << L"(tCIDLib::TEnumMaskType(eLHS) & tCIDLib::TEnumMaskType(eRHS));\n"
-                    << L"}\n";
-
-        strmXHdr    << L"constexpr " << strFullType << L"& operator&=("
-                    << strFullType << L"& eLHS, const " << strFullType
-                    << L" eRHS)\n{    \n"
-                    << L"    eLHS = " << strFullType
-                    << L"(tCIDLib::TEnumMaskType(eLHS) & tCIDLib::TEnumMaskType(eRHS));\n"
-                    << L"    return eLHS;\n"
-                    << L"}\n";
-    }
-
-
-    //
-    //  If it supports text streaming, do that.
-    //
-    if (m_eTextStreamMap != TEnumMap::ETextVals::None)
-    {
-        strmXHdr    << strExport
-                    << L" TTextOutStream& operator<<(TTextOutStream& strmTar, const "
-                    << strFullType << L" eToStream);\n";
-
     }
 }
 
@@ -1015,18 +930,18 @@ TCGenEnumInfo::FormatEnumMap(TTextOutStream& strmTar, const TString& strEnclosin
 
 
 //
-//  This spits out the implementations of all of the methods and operators, most of
-//  which is just fairly simple invocations of methods on the mapping table generated
-//  above.
+//  This spits out the implementations of all of the out of line methods and operators,
+//  most of which is just fairly simple invocations of methods on the generated
+//  mapping table.
 //
 tCIDLib::TVoid
-TCGenEnumInfo::FormatEnumImpl(TTextOutStream& strmTar, const TString& strEnclosing) const
+TCGenEnumInfo::FormatEnumImpl(          TTextOutStream&     strmTar
+                                , const TString&            strEnclosing) const
 {
     // Build up a full type name to make things simpler below
     TString strFullType(strEnclosing, m_strTypeName.c4Length() + 8UL);
     strFullType.Append(L"::");
     strFullType.Append(m_strTypeName);
-
 
 
     // If they defined an alt mapping method, generate those methods
@@ -1137,7 +1052,8 @@ TCGenEnumInfo::FormatEnumImpl(TTextOutStream& strmTar, const TString& strEnclosi
     // If text streamable, then do that operator
     if (m_eTextStreamMap != TEnumMap::ETextVals::None)
     {
-        strmTar << L"TTextOutStream& operator<<(TTextOutStream& strmTar, const "
+        strmTar << L"TTextOutStream& " << strEnclosing
+                << L"::operator<<(TTextOutStream& strmTar, const "
                 << strFullType
                 << L" eVal)\n{\n    strmTar << emap" << m_strTypeName
                 << L".strMapEnumVal(tCIDLib::TCard4(eVal), "
@@ -1146,46 +1062,9 @@ TCGenEnumInfo::FormatEnumImpl(TTextOutStream& strmTar, const TString& strEnclosi
                 << L"    return strmTar;\n}\n";
     }
 
-
-    // If a standard type, generate some method bodies as needed
-    if (m_eType == tCIDIDL::EEnumTypes::Std)
-    {
-        if (m_eIncDecOps != tCIDIDL::EIncDecOps::None)
-        {
-            strmTar << strFullType
-                    << L" operator++("
-                    << strFullType
-                    << L"& eVal, int)\n{\n    "
-                    << strFullType << L" eTmp = eVal;\n"
-                    << L"    eVal = " << strFullType << L"(int(eVal)+1);\n"
-                    << L"    return eTmp;\n}\n\n";
-        }
-
-        if (m_eIncDecOps == tCIDIDL::EIncDecOps::Both)
-        {
-            strmTar << strFullType
-                    << L" operator--("
-                    << strFullType
-                    << L"& eVal, int)\n{\n    "
-                    << strFullType << L" eTmp = eVal;\n"
-                    << L"    eVal = " << strFullType << L"(int(eVal)-1);\n"
-                    << L"    return eTmp;\n}\n\n";
-        }
-    }
-
     // If binary streamable do those
     if (m_bBinStreamable)
     {
-        strmTar << L"TBinOutStream& operator<<(TBinOutStream& "
-                   L"strmTar, const " << strFullType
-                << L" eVal)\n{\n    strmTar.WriteEnum(tCIDLib::TCard4(eVal));\n"
-                   L"    return strmTar;\n}\n";
-
-        strmTar << L"TBinInStream& operator>>(TBinInStream& strmSrc, "
-                << strFullType << L"& eVal)\n{\n    "
-                << L"eVal = " << strFullType
-                << L"(strmSrc.c4ReadEnum());\n    return strmSrc;\n}\n";
-
         strmTar << L"tCIDLib::TVoid TBinInStream_ReadArray(TBinInStream& strmSrc, "
                 << strFullType
                 << L"* const aeList, const tCIDLib::TCard4 c4Count)\n"
@@ -1216,4 +1095,108 @@ TCGenEnumInfo::FormatEnumImpl(TTextOutStream& strmTar, const TString& strEnclosi
             << L"    return emap" << m_strTypeName
             << L".bIsValidEnum(tCIDLib::TCard4(eVal));\n"
             << L"\n}\n";
+}
+
+
+//
+//  We have to format operators out from different places, depending on the output type
+//
+tCIDLib::TVoid
+TCGenEnumInfo::FormatOperatorSigs(          TTextOutStream&     strmTar
+                                    , const tCIDLib::TBoolean   bClassType
+                                    , const tCIDLib::TCard4     c4Indent
+                                    , const TString&            strExport
+                                    , const TString&            strEnclosing) const
+{
+    // Set up our scope prefix
+    TString strPrefix;
+    if (!strEnclosing.bIsEmpty())
+    {
+        strPrefix = strEnclosing;
+        strPrefix.Append(L"::");
+    }
+
+    TStreamIndentJan janIndent(&strmTar, c4Indent);
+    if (m_eIncDecOps != tCIDIDL::EIncDecOps::None)
+    {
+        strmTar << L"inline " << strPrefix << m_strTypeName << L" operator++("
+                << strPrefix << m_strTypeName
+                << L"& eVal, int)\n{\n    " << strPrefix
+                << m_strTypeName << L" eTmp = eVal;\n"
+                << L"    eVal = " << strPrefix << m_strTypeName << L"(int(eVal)+1);\n"
+                << L"    return eTmp;\n}\n\n";
+    }
+
+    if (m_eIncDecOps == tCIDIDL::EIncDecOps::Both)
+    {
+        strmTar << L"inline " << strPrefix << m_strTypeName << L" operator--("
+                << strPrefix << m_strTypeName
+                << L"& eVal, int)\n{\n    " << strPrefix
+                << m_strTypeName << L" eTmp = eVal;\n"
+                << L"    eVal = " << strPrefix  << m_strTypeName << L"(int(eVal)-1);\n"
+                << L"    return eTmp;\n}\n\n";
+    }
+
+    if (m_bBinStreamable)
+    {
+        // The binary ones we can do inline, since they don't use any enum map stuff
+        strmTar << L"inline TBinOutStream& operator<<(TBinOutStream& strmTar, const "
+                << strPrefix << m_strTypeName
+                << L" eVal)\n{\n    strmTar.WriteEnum(tCIDLib::TCard4(eVal));\n"
+                << L"    return strmTar;\n}\n";;
+
+        strmTar << L"inline TBinInStream& operator>>(TBinInStream& strmSrc, COP "
+                << strPrefix << m_strTypeName
+                << L"& eToFill)\n{\n    "
+                << L"eToFill = " << strPrefix << m_strTypeName
+                << L"(strmSrc.c4ReadEnum());\n    return strmSrc;\n}\n";
+    }
+
+    if (m_eType == tCIDIDL::EEnumTypes::Bmp)
+    {
+        // Do the bitwise operators and their assignment variations
+        strmTar << L"[[nodiscard]] constexpr "
+                << strPrefix << m_strTypeName << L" operator|(const "
+                << strPrefix << m_strTypeName << L" eLHS, const " << strPrefix << m_strTypeName
+                << L" eRHS)\n{    \n"
+                << L"    return " << strPrefix << m_strTypeName
+                << L"(tCIDLib::TEnumMaskType(eLHS) | tCIDLib::TEnumMaskType(eRHS));\n"
+                << L"}\n";
+
+        strmTar << L"constexpr "
+                << strPrefix << m_strTypeName << L"& operator|=("
+                << strPrefix << m_strTypeName << L"& eLHS, const " << strPrefix << m_strTypeName
+                << L" eRHS)\n{    \n"
+                << L"    eLHS = " << strPrefix << m_strTypeName
+                << L"(tCIDLib::TEnumMaskType(eLHS) | tCIDLib::TEnumMaskType(eRHS));\n"
+                << L"    return eLHS;\n"
+                << L"}\n";
+
+        strmTar << L"[[nodiscard]] constexpr "
+                << strPrefix << m_strTypeName << L" operator&(const "
+                << strPrefix << m_strTypeName << L" eLHS, const " << strPrefix << m_strTypeName
+                << L" eRHS)\n{    \n"
+                << L"    return " << strPrefix << m_strTypeName
+                << L"(tCIDLib::TEnumMaskType(eLHS) & tCIDLib::TEnumMaskType(eRHS));\n"
+                << L"}\n";
+
+        strmTar << L"constexpr "
+                << strPrefix << m_strTypeName << L"& operator&=("
+                << strPrefix << m_strTypeName << L"& eLHS, const " << strPrefix << m_strTypeName
+                << L" eRHS)\n{    \n"
+                << L"    eLHS = " << strPrefix << m_strTypeName
+                << L"(tCIDLib::TEnumMaskType(eLHS) & tCIDLib::TEnumMaskType(eRHS));\n"
+                << L"    return eLHS;\n"
+                << L"}\n";
+    }
+
+
+    //
+    //  If it supports text streaming, do that.
+    //
+    if (m_eTextStreamMap != TEnumMap::ETextVals::None)
+    {
+        strmTar << strExport << L" TTextOutStream& operator<<(TTextOutStream& strmTar, const "
+                << strPrefix << m_strTypeName << L" eToStream);\n";
+    }
 }

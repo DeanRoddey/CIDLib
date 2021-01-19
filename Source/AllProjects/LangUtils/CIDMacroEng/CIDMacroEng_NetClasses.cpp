@@ -1778,7 +1778,7 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             if (c2MethId == m_c2MethId_DoSSLPOST)
                 c4SendLen = mecvContLen.c4Value();
 
-            tCIDLib::TCard4 c4ResCode;
+            tCIDLib::TCard4 c4ResCode = 0;
             tCIDLib::TKVPList colOutHdrLines;
             tCIDLib::TCard4 c4ContLen = THTTPClient::c4DoSSLPageOp
             (
@@ -2040,7 +2040,7 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             tCIDNet::EHTTPCodes eCodeType;
             TString strRepType;
             tCIDLib::TKVPList colOutHdrLines;
-            tCIDLib::TCard4 c4ContLen = 0;
+            tCIDLib::TCard4 c4ContLen;
             tCIDLib::TCard4 c4Ret = mecvActual.httpcValue().c4GetSrvReply
             (
                 mecvSrc.cdsValue()
@@ -2367,9 +2367,9 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 pcdsToUse = &mecvSrc.cdsValue();
             }
 
-            tCIDNet::EHTTPCodes eCodeType;
+            tCIDNet::EHTTPCodes eCodeType = tCIDNet::EHTTPCodes::Unknown;
             tCIDLib::TKVPList colOutHdrLines;
-            tCIDLib::TCard4 c4Ret;
+            tCIDLib::TCard4 c4Ret = 0;
 
             if ((c2MethId == m_c2MethId_SendGET) || (c2MethId == m_c2MethId_SendRUGET))
             {
@@ -2627,7 +2627,7 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 pcdsToUse = &mecvSrc.cdsValue();
             }
 
-            tCIDNet::EHTTPCodes eCodeType;
+            tCIDNet::EHTTPCodes eCodeType = tCIDNet::EHTTPCodes::Unknown;
             tCIDLib::TKVPList colOutHdrLines;
             tCIDLib::TCard4 c4ContLen = 0;
             tCIDLib::TCard4 c4Ret = mecvActual.httpcValue().c4SendPost

@@ -1117,3 +1117,68 @@ const TBinOutStream& TTextOutStream::strmOut() const
     return *m_pstrmOut;
 }
 
+
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStreamJanitor
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+//  Constructors and Destructor
+// -------------------------------------------------------------------
+TStreamJanitor::TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
+
+    m_pstrmToSanitize(pstrmToSanitize)
+    , m_strmfSave()
+{
+    if (m_pstrmToSanitize)
+        m_strmfSave.SetFrom(*pstrmToSanitize);
+}
+
+TStreamJanitor::~TStreamJanitor()
+{
+    if (m_pstrmToSanitize)
+        m_pstrmToSanitize->SetFormat(m_strmfSave);
+}
+
+
+// -------------------------------------------------------------------
+//  Public, non-virtual methods
+// -------------------------------------------------------------------
+const TStreamFmt& TStreamJanitor::strmfSaved() const
+{
+    return m_strmfSave;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStreamIndentJan
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+//  Constructors and Destructor
+// -------------------------------------------------------------------
+TStreamIndentJan::TStreamIndentJan(         TTextOutStream* const   pstrmToSanitize
+                                    , const tCIDLib::TCard4         c4Adjust) :
+
+    m_c4OldIndent(0)
+    , m_pstrmToSanitize(pstrmToSanitize)
+{
+    // Set the new indent as the old plus the adjustment
+    if (m_pstrmToSanitize)
+    {
+        m_c4OldIndent = m_pstrmToSanitize->c4Indent();
+        m_pstrmToSanitize->c4Indent(m_c4OldIndent + c4Adjust);
+    }
+}
+
+TStreamIndentJan::~TStreamIndentJan()
+{
+    if (m_pstrmToSanitize)
+        m_pstrmToSanitize->c4Indent(m_c4OldIndent);
+}
+

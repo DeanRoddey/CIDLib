@@ -172,7 +172,7 @@ class TCGenEnumInfo : public TObject
 
         tCIDLib::TVoid FmtHeader
         (
-            const   tCIDLib::TBoolean       bGlobType
+            const   tCIDLib::TBoolean       bClassType
             , const TString&                strEnclosing
             , const TString&                strExport
             ,       TTextOutStream&         strmTar
@@ -181,7 +181,7 @@ class TCGenEnumInfo : public TObject
 
         tCIDLib::TVoid FmtImpl
         (
-            const   tCIDLib::TBoolean       bGlobType
+            const   tCIDLib::TBoolean       bClassType
             , const TString&                strEnclosing
             ,       TTextOutStream&         strmTar
         );
@@ -223,21 +223,26 @@ class TCGenEnumInfo : public TObject
         tCIDLib::TVoid FormatEnumMethSigs
         (
                     TTextOutStream&         strmTar
+            , const tCIDLib::TBoolean       bClassType
             , const tCIDLib::TCard4         c4Indent
-            , const tCIDLib::TBoolean       bGlobType
             , const TString&                strExport
-            , const TString&                strEnclosing
         )   const;
 
         tCIDLib::TVoid FormatEnumGlobMethSigs
         (
                     TTextOutStream&         strmTar
-            , const tCIDLib::TCard4         c4Indent
-            , const tCIDLib::TBoolean       bGlobType
             , const TString&                strExport
             , const TString&                strEnclosing
         )   const;
 
+        tCIDLib::TVoid FormatOperatorSigs
+        (
+                    TTextOutStream&         strmTar
+            , const tCIDLib::TBoolean       bClassType
+            , const tCIDLib::TCard4         c4Indent
+            , const TString&                strExport
+            , const TString&                strEnclosing
+        )   const;
 
 
         // -------------------------------------------------------------------

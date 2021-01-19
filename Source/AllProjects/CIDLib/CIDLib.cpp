@@ -595,6 +595,17 @@ static tCIDLib::TVoid DummyFunc()
     {
         const tCIDLib::TCard4* pc4End = tCIDLib::pArrayEndPtr(ac4TestC);
     }
+
+    tCIDLib::ForEachE<tCIDLib::ELogFlags>([](const tCIDLib::ELogFlags eFlag)
+    {
+        if (eFlag == tCIDLib::ELogFlags::DataSrc)
+        {
+
+        }
+    });
+
+    // Test ignoring return values
+    tCIDLib::IgnoreRet(strNC.i4Val());
 }
 #endif
 

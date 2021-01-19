@@ -1013,7 +1013,7 @@ TCppGenerator::GenEnum( const   TString&            strDocs
     //  Set up a little stuff we have to pass to the enum to get it to generate
     //  the output for us.
     //
-    tCIDLib::TBoolean bGlobType = kCIDLib::False;
+    tCIDLib::TBoolean bClassType = kCIDLib::True;
     TString strEnclosing;
     if (m_eMode == tCIDIDL::EOutputs::Client)
     {
@@ -1025,18 +1025,18 @@ TCppGenerator::GenEnum( const   TString&            strDocs
     }
      else
     {
+        bClassType = kCIDLib::False;
         strEnclosing = L"t";
         strEnclosing.Append(m_strFacName);
-        bGlobType = kCIDLib::True;
     }
 
 
     // Ask to generate header content, then implementation content
     einfoToGen.FmtHeader
     (
-        bGlobType, strEnclosing, m_strExpKeyword, m_strmHeader, m_strmXHeader
+        bClassType, strEnclosing, m_strExpKeyword, m_strmHeader, m_strmXHeader
     );
-    einfoToGen.FmtImpl(bGlobType, strEnclosing, m_strmImpl);
+    einfoToGen.FmtImpl(bClassType, strEnclosing, m_strmImpl);
 
     m_strmImpl << kCIDLib::NewLn;
     m_strmXHeader << kCIDLib::NewLn;

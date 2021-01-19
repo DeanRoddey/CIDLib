@@ -49,6 +49,15 @@
 // ---------------------------------------------------------------------------
 class MFormattable;
 class TString;
+class TFacCIDLib;
+
+
+// ---------------------------------------------------------------------------
+//  Export the lazy evalution method for the facility object. We forward ref
+//  above so that it's visible to templatized classes that must be defined before
+//  the actual facility class header.
+// ---------------------------------------------------------------------------
+extern CIDLIBEXP TFacCIDLib& facCIDLib();
 
 
 // ---------------------------------------------------------------------------
@@ -66,8 +75,11 @@ class TString;
 //  These may need to be seen by templated stuff below, and don't need to see any
 //  streams headers, so we can put them up here.
 //
-StdEnumTricks(tCIDLib::ECorners)
-StdEnumTricks(tCIDLib::ELogFlags)
+namespace tCIDLib
+{
+    StdEnumTricks(tCIDLib::ECorners)
+    StdEnumTricks(tCIDLib::ELogFlags)
+}
 
 #include    "CIDLib_Object.hpp"
 #include    "CIDLib_Class.hpp"
@@ -97,6 +109,12 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_CollectCursor.hpp"
 #include    "CIDLib_Collection.hpp"
 
+#include    "CIDLib_Time.hpp"
+#include    "CIDLib_LogEvent.hpp"
+
+#include    "CIDLib_BinInStream.hpp"
+#include    "CIDLib_BinOutStream.hpp"
+
 #include    "CIDLib_CircularBuf.hpp"
 #include    "CIDLib_FundArray.hpp"
 #include    "CIDLib_FundDeque.hpp"
@@ -104,8 +122,6 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_FundStack.hpp"
 #include    "CIDLib_FundVector.hpp"
 
-#include    "CIDLib_BinInStream.hpp"
-#include    "CIDLib_BinOutStream.hpp"
 
 
 // ---------------------------------------------------------------------------
@@ -185,7 +201,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 
 #endif
 
-#include    "CIDLib_PolyStreamer.hpp"
 #include    "CIDLib_BasicDLinkedCol.hpp"
 
 #include    "CIDLib_StreamFmt.hpp"
@@ -211,14 +226,12 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_Cardinal.hpp"
 #include    "CIDLib_Float.hpp"
 #include    "CIDLib_Integer.hpp"
-#include    "CIDLib_Time.hpp"
 #include    "CIDLib_Random.hpp"
 #include    "CIDLib_BitSeq.hpp"
 #include    "CIDLib_PathString.hpp"
 #include    "CIDLib_FileBase.hpp"
 #include    "CIDLib_BinaryFile.hpp"
 #include    "CIDLib_FileStreamImpl.hpp"
-#include    "CIDLib_LogEvent.hpp"
 #include    "CIDLib_VolumeInfo.hpp"
 #include    "CIDLib_Locale.hpp"
 #include    "CIDLib_Logger.hpp"
@@ -245,6 +258,9 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_UniqueName.hpp"
 #include    "CIDLib_DataSrc.hpp"
 
+#include    "CIDLib_KeyedHashSet.hpp"
+#include    "CIDLib_PolyStreamer.hpp"
+
 #include    "CIDLib_BinaryFileStream.hpp"
 #include    "CIDLib_BinaryMBufStream.hpp"
 #include    "CIDLib_Console.hpp"
@@ -264,12 +280,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 
 
 // ---------------------------------------------------------------------------
-//  Export the lazy evalution method for the facility object.
-// ---------------------------------------------------------------------------
-extern CIDLIBEXP TFacCIDLib& facCIDLib();
-
-
-// ---------------------------------------------------------------------------
 //  And now include some more headers. A lot of these are templates, so they must be able
 //  to see any other classes that they use. This is why they are stuck at the end.
 // ---------------------------------------------------------------------------
@@ -282,7 +292,6 @@ extern CIDLIBEXP TFacCIDLib& facCIDLib();
 #include    "CIDLib_Queue.hpp"
 #include    "CIDLib_Stack.hpp"
 #include    "CIDLib_HashSet.hpp"
-#include    "CIDLib_KeyedHashSet.hpp"
 #include    "CIDLib_HashMap.hpp"
 #include    "CIDLib_SortedBag.hpp"
 #include    "CIDLib_FindBuf.hpp"

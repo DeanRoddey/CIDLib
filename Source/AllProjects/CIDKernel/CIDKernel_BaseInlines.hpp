@@ -518,4 +518,15 @@ namespace tCIDLib
                 return tCIDLib::ESortComps::Equal;
             }
     };
+
+
+    // Ignore a return value
+    template <typename T> void IgnoreRet(const T&) {}
+
+
+    // Force a dependent type
+    template <typename T> struct MakeDepType
+    {
+        using type = T;
+    };
 }

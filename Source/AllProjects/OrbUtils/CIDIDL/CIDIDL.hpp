@@ -75,7 +75,7 @@ namespace tCIDIDL
 
 
     // -----------------------------------------------------------------------
-    //  The types of output we generate
+    //  The different types of content we can output
     // -----------------------------------------------------------------------
     enum class EOutputs
     {

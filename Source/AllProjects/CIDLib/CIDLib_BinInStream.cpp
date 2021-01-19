@@ -128,7 +128,7 @@ TBinInStream::TBinInStream(TInStreamImpl* const pstrmiToAdopt) :
     m_c4CurAvail(0)
     , m_c4CurIndex(0)
     , m_eEndianMode(tCIDLib::EEndianModes::Little)
-    , m_fcolPushback(kCIDLib::c4Sz_8K)
+    , m_expbPushback(8)
     , m_pstrmiIn(pstrmiToAdopt)
 {
 }
@@ -392,7 +392,7 @@ TBinInStream::c4CacheAvail(const tCIDLib::TBoolean bIncludePushback) const
 {
     tCIDLib::TCard4 c4Ret(m_c4CurAvail - m_c4CurIndex);
     if (bIncludePushback)
-        c4Ret += m_fcolPushback.c4ElemCount();
+        c4Ret += m_expbPushback.c4Bytes();
     return c4Ret;
 }
 
@@ -469,9 +469,9 @@ TBinInStream::c4ReadRawBuffer(          tCIDLib::TVoid* const   pBufToFill
 
     // If the pushback stack is not empty, we get as much as we can out of that
     tCIDLib::TCard4 c4BytesRead = 0;
-    while (!m_fcolPushback.bIsEmpty() && (c4BytesRead < c4ToRead))
+    while (!m_expbPushback.bIsEmpty() && (c4BytesRead < c4ToRead))
     {
-        *pc1Tar++ = m_fcolPushback.tPop();
+        *pc1Tar++ = m_expbPushback.c1PopLast();
         c4BytesRead++;
     }
 
@@ -769,21 +769,9 @@ tCIDLib::TCard4 TBinInStream::c4CurPos() const
 }
 
 
-// Pushes a byte onto the pushback stack and returns the space left on the stack
+// Pushes a byte onto the pushback stack and returns the size of the pushback buffer
 tCIDLib::TCard4 TBinInStream::c4Pushback(const tCIDLib::TCard1 c1ToPush)
 {
-    if (m_fcolPushback.bIsFull())
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcStrm_PBStackIsFull
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Overflow
-        );
-    }
-
     //
     //  Don't allow pushback to before the origin. Note that c4CurPos()
     //  includes current pushback!
@@ -800,8 +788,8 @@ tCIDLib::TCard4 TBinInStream::c4Pushback(const tCIDLib::TCard1 c1ToPush)
         );
     }
 
-    m_fcolPushback.Push(c1ToPush);
-    return m_fcolPushback.c4MaxElemCount() - m_fcolPushback.c4ElemCount();
+    m_expbPushback.Append(c1ToPush);
+    return m_expbPushback.c4Bytes();
 }
 
 tCIDLib::TCard4
@@ -824,24 +812,10 @@ TBinInStream::c4Pushback(const  tCIDLib::TCard1* const  pc1ToPush
         );
     }
 
-    // And we can't push back more than the undo stack can hold
-    if (m_fcolPushback.c4ElemCount() + c4Count > m_fcolPushback.c4MaxElemCount())
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcStrm_PBOverflow
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Overflow
-            , TCardinal(c4Count)
-        );
-    }
-
     // We have to do them backwards
     for (tCIDLib::TCard4 c4Index = c4Count; c4Index > 0; c4Index--)
-        m_fcolPushback.Push(pc1ToPush[c4Index - 1]);
-    return m_fcolPushback.c4MaxElemCount() - m_fcolPushback.c4ElemCount();
+        m_expbPushback.Append(pc1ToPush[c4Index - 1]);
+    return m_expbPushback.c4Bytes();
 }
 
 tCIDLib::TCard4
@@ -1182,7 +1156,7 @@ tCIDLib::TVoid TBinInStream::Reset()
     // Clear out the cache and pushback, and reset the impl object
     m_c4CurIndex = 0;
     m_c4CurAvail = 0;
-    m_fcolPushback.RemoveAll();
+    m_expbPushback.Reset();
     m_pstrmiIn->Reset();
 }
 
@@ -1195,9 +1169,9 @@ tCIDLib::TVoid TBinInStream::SkipForwardBy(const tCIDLib::TCard4 c4SkipBy)
 
     // First eat as much as possible from the pushback
     tCIDLib::TCard4 c4LeftToSkip = c4SkipBy;
-    while (!m_fcolPushback.bIsEmpty() && c4LeftToSkip)
+    while (!m_expbPushback.bIsEmpty() && c4LeftToSkip)
     {
-        m_fcolPushback.tPop();
+        m_expbPushback.c1PopLast();
         c4LeftToSkip--;
     }
 
@@ -1251,7 +1225,7 @@ TBinInStream::TBinInStream() :
     m_c4CurAvail(0)
     , m_c4CurIndex(0)
     , m_eEndianMode(tCIDLib::EEndianModes::Little)
-    , m_fcolPushback(kCIDLib::c4Sz_8K)
+    , m_expbPushback(8)
     , m_pstrmiIn(nullptr)
 {
 }
@@ -1299,7 +1273,7 @@ tCIDLib::TVoid TBinInStream::DeleteImplObject()
 tCIDLib::TVoid TBinInStream::TrashCache()
 {
     // This also means trashing the pushback, since it is in front of the cache
-    m_fcolPushback.RemoveAll();
+    m_expbPushback.Reset();
     m_c4CurAvail = 0;
     m_c4CurIndex = 0;
 }
@@ -1332,7 +1306,7 @@ tCIDLib::TVoid TBinInStream::RefreshCache() const
             , tCIDLib::EErrClasses::Internal
         );
     }
-    if (!m_fcolPushback.bIsEmpty())
+    if (!m_expbPushback.bIsEmpty())
     {
         facCIDLib().ThrowErr
         (

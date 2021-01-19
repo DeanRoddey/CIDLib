@@ -46,6 +46,110 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+class TTextOutStream;
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStreamJanitor
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+class CIDLIBEXP TStreamJanitor
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TStreamJanitor() = delete;
+
+        #pragma warning(suppress : 26429) // It can legally be null
+        TStreamJanitor
+        (
+                    TTextOutStream* const   pstrmToSanitize
+        );
+
+        TStreamJanitor(const TStreamJanitor&) = delete;
+        TStreamJanitor(TStreamJanitor&&) = delete;
+
+        ~TStreamJanitor();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStreamJanitor& operator=(const TStreamJanitor&) = delete;
+        TStreamJanitor& operator=(TStreamJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        const TStreamFmt& strmfSaved() const;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_pstrmToSanitize
+        //      This is the pointer to the text out stream we are providing
+        //      janitorial services for.
+        //
+        //  m_strmfSave
+        //      This is the saved stream format state to be restored.
+        // -------------------------------------------------------------------
+        TTextOutStream* m_pstrmToSanitize;
+        TStreamFmt      m_strmfSave;
+};
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStreamIndentJan
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+class CIDLIBEXP TStreamIndentJan
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TStreamIndentJan() = delete;
+
+        TStreamIndentJan
+        (
+                    TTextOutStream* const   pstrmToSanitize
+            , const tCIDLib::TCard4         c4Adjust
+        );
+
+        TStreamIndentJan(const TStreamIndentJan&) = delete;
+        TStreamIndentJan(TStreamIndentJan&&) = delete;
+
+        ~TStreamIndentJan();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStreamIndentJan& operator=(const TStreamIndentJan&) = delete;
+        TStreamIndentJan& operator=(TStreamIndentJan&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_c4OldIndent
+        //      This is the saved indent that we will put back
+        //
+        //  m_pstrmToSanitize
+        //      This is the pointer to the text out stream we are providing
+        //      janitorial services for.
+        // -------------------------------------------------------------------
+        tCIDLib::TCard4 m_c4OldIndent;
+        TTextOutStream* m_pstrmToSanitize;
+};
+
 
 // ---------------------------------------------------------------------------
 //   CLASS: TTextOutStream
@@ -630,129 +734,6 @@ class CIDLIBEXP TTextOutStream : public TObject
 
 
 
-// ---------------------------------------------------------------------------
-//   CLASS: TStreamJanitor
-//  PREFIX: jan
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TStreamJanitor
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TStreamJanitor() = delete;
-
-        #pragma warning(suppress : 26429) // It can legally be null
-        TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
-
-            m_pstrmToSanitize(pstrmToSanitize)
-            , m_strmfSave()
-        {
-            if (m_pstrmToSanitize)
-                m_strmfSave.SetFrom(*pstrmToSanitize);
-        }
-
-        TStreamJanitor(const TStreamJanitor&) = delete;
-        TStreamJanitor(TStreamJanitor&&) = delete;
-
-        ~TStreamJanitor()
-        {
-            if (m_pstrmToSanitize)
-                m_pstrmToSanitize->SetFormat(m_strmfSave);
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TStreamJanitor& operator=(const TStreamJanitor&) = delete;
-        TStreamJanitor& operator=(TStreamJanitor&&) = delete;
-        tCIDLib::TVoid* operator new(size_t) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        const TStreamFmt& strmfSaved() const
-        {
-            return m_strmfSave;
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_pstrmToSanitize
-        //      This is the pointer to the text out stream we are providing
-        //      janitorial services for.
-        //
-        //  m_strmfSave
-        //      This is the saved stream format state to be restored.
-        // -------------------------------------------------------------------
-        TTextOutStream* m_pstrmToSanitize;
-        TStreamFmt      m_strmfSave;
-};
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TStreamIndentJan
-//  PREFIX: jan
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TStreamIndentJan
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TStreamIndentJan() = delete;
-
-        TStreamIndentJan(       TTextOutStream* const   pstrmToSanitize
-                        , const tCIDLib::TCard4         c4Adjust) :
-
-            m_c4OldIndent(0)
-            , m_pstrmToSanitize(pstrmToSanitize)
-        {
-            // Set the new indent as the old plus the adjustment
-            if (m_pstrmToSanitize)
-            {
-                m_c4OldIndent = m_pstrmToSanitize->c4Indent();
-                m_pstrmToSanitize->c4Indent(m_c4OldIndent + c4Adjust);
-            }
-        }
-
-        TStreamIndentJan(const TStreamIndentJan&) = delete;
-        TStreamIndentJan(TStreamIndentJan&&) = delete;
-
-        ~TStreamIndentJan()
-        {
-            if (m_pstrmToSanitize)
-                m_pstrmToSanitize->c4Indent(m_c4OldIndent);
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TStreamIndentJan& operator=(const TStreamIndentJan&) = delete;
-        TStreamIndentJan& operator=(TStreamIndentJan&&) = delete;
-        tCIDLib::TVoid* operator new(size_t) = delete;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_c4OldIndent
-        //      This is the saved indent that we will put back
-        //
-        //  m_pstrmToSanitize
-        //      This is the pointer to the text out stream we are providing
-        //      janitorial services for.
-        // -------------------------------------------------------------------
-        tCIDLib::TCard4 m_c4OldIndent;
-        TTextOutStream* m_pstrmToSanitize;
-};
 
 #pragma CIDLIB_POPPACK
 

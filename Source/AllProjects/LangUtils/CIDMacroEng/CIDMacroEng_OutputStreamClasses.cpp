@@ -732,7 +732,7 @@ TMEngTextOutStreamInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
           ||  (c2MethId == m_c2MethId_FmtCard4R))
     {
         // Get the value out into a Card4
-        tCIDLib::TCard4 c4Val;
+        tCIDLib::TCard4 c4Val = 0;
         if (c2MethId == m_c2MethId_FmtCard1R)
             c4Val = meOwner.c1StackValAt(c4FirstInd);
         else if (c2MethId == m_c2MethId_FmtCard2R)
@@ -842,7 +842,7 @@ TMEngTextOutStreamInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
           ||  (c2MethId == m_c2MethId_FmtInt4R))
     {
         // Get the value out into a Int4
-        tCIDLib::TInt4 i4Val;
+        tCIDLib::TInt4 i4Val = 0;
         if (c2MethId == m_c2MethId_FmtInt1R)
             i4Val = meOwner.i1StackValAt(c4FirstInd);
         else if (c2MethId == m_c2MethId_FmtInt2R)

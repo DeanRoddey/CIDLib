@@ -95,6 +95,7 @@ template <typename TElem> class THashSetNode
         }
 
         THashSetNode(const THashSetNode<TElem>&) = delete;
+        THashSetNode(THashSetNode<TElem>&&) = delete;
 
         ~THashSetNode() {}
 
@@ -103,11 +104,18 @@ template <typename TElem> class THashSetNode
         //  Public operators
         // -------------------------------------------------------------------
         THashSetNode<TElem>& operator=(const THashSetNode<TElem>&) = delete;
+        THashSetNode<TElem>& operator=(THashSetNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        TElem& objData(const TElem& objToSet)
+        {
+            m_objData = objToSet;
+            return m_objData;
+        }
+
         TElem& objData()
         {
             return m_objData;
@@ -115,12 +123,6 @@ template <typename TElem> class THashSetNode
 
         const TElem& objData() const
         {
-            return m_objData;
-        }
-
-        TElem& objData(const TElem& objToSet)
-        {
-            m_objData = objToSet;
             return m_objData;
         }
 
@@ -1522,7 +1524,7 @@ TBinOutStream& operator<<(          TBinOutStream&              strmOut
                 <<  colToStream.c4HashModulus();
 
     // If there were any elements, then stream them
-    THashSet<TElem,TKeyOps>::TCursor cursOut(&colToStream);
+    typename THashSet<TElem,TKeyOps>::TCursor cursOut(&colToStream);
     for (; cursOut; ++cursOut)
         strmOut << *cursOut;
 

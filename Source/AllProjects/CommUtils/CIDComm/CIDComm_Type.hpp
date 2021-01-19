@@ -77,28 +77,30 @@ namespace tCIDComm
     (
         const   tCIDComm::EStopBits     eToXlat
     );
+
+
+    // ---------------------------------------------------------------------------
+    //  Make some of our enums streamable and inrementable
+    // ---------------------------------------------------------------------------
+    EnumStreamMacros(tCIDComm::EErrors)
+    EnumStreamMacros(tCIDComm::EDataBits)
+    EnumStreamMacros(tCIDComm::EOpenFlags)
+    EnumStreamMacros(tCIDComm::EParities)
+    EnumStreamMacros(tCIDComm::EPortDTR)
+    EnumStreamMacros(tCIDComm::EPortRTS)
+    EnumStreamMacros(tCIDComm::EPortTypes)
+    EnumStreamMacros(tCIDComm::EStopBits)
+
+    EnumBinStreamMacros(tCIDComm::EFlags)
+
+    StdEnumTricks(tCIDComm::EDataBits)
+    StdEnumTricks(tCIDComm::EParities)
+    StdEnumTricks(tCIDComm::EPortDTR)
+    StdEnumTricks(tCIDComm::EPortRTS)
+    StdEnumTricks(tCIDComm::EStopBits)
+
+    BmpEnumTricks(tCIDComm::EErrors)
+    BmpEnumTricks(tCIDComm::EFlags)
 }
 
 
-// ---------------------------------------------------------------------------
-//  Make some of our enums streamable
-// ---------------------------------------------------------------------------
-EnumStreamMacros(tCIDComm::EErrors)
-EnumStreamMacros(tCIDComm::EDataBits)
-EnumStreamMacros(tCIDComm::EOpenFlags)
-EnumStreamMacros(tCIDComm::EParities)
-EnumStreamMacros(tCIDComm::EPortDTR)
-EnumStreamMacros(tCIDComm::EPortRTS)
-EnumStreamMacros(tCIDComm::EPortTypes)
-EnumStreamMacros(tCIDComm::EStopBits)
-
-EnumBinStreamMacros(tCIDComm::EFlags)
-
-StdEnumTricks(tCIDComm::EDataBits)
-StdEnumTricks(tCIDComm::EParities)
-StdEnumTricks(tCIDComm::EPortDTR)
-StdEnumTricks(tCIDComm::EPortRTS)
-StdEnumTricks(tCIDComm::EStopBits)
-
-BmpEnumTricks(tCIDComm::EErrors)
-BmpEnumTricks(tCIDComm::EFlags)

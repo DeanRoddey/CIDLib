@@ -61,7 +61,7 @@ class CIDCTRLSEXP TWndEvent
         // -------------------------------------------------------------------
         TWndEvent() = delete;
 
-        TWndEvent::TWndEvent(const TNotificationId& nidBeingSent) :
+        TWndEvent(const TNotificationId& nidBeingSent) :
 
             m_nidBeingSent(nidBeingSent)
         {
@@ -187,7 +187,7 @@ template <typename D> class TWndEventFor : public TWndEvent
                     if (m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
                         m_pobjToSend = ::pDupObject<D>(*wevSrc.m_pobjToSend);
                     else
-                        m_pobjToSend = wevSrc..m_pobjToSend;
+                        m_pobjToSend = wevSrc.m_pobjToSend;
                 }
             }
             return *this;

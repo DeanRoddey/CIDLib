@@ -373,13 +373,12 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     apszArgs[c4CurArg++] = L"/arch:SSE2";
 
     //
-    //  We always want wchar_t to be an intrinsic type. Note that we don't define
-    //  UNICODE here. The reason being that we want that to be done in a platform
-    //  header so that the IDE will see it and select the right versions of everything
-    //  for syntax highlighting and such. So that's done in the platform defines
-    //  header.
+    //  We always want wchar_t to be an intrinsic type and to use the UNICODE version
+    //  of all of the system APIs.
     //
     apszArgs[c4CurArg++] = L"/Zc:wchar_t";
+    apszArgs[c4CurArg++] = L"/DUNICODE";
+    apszArgs[c4CurArg++] = L"/D_UNICODE";
 
     //
     //  Set some stuff according to the platforms we support. These are used
@@ -459,24 +458,20 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
     }
 
     //
-    //  If not a pure ANSI project, then disable extension. This is temporary
+    //  If a pure ANSI project, then disable extension. This is temporary
     //  until all per-platform stuff is split out into per-platfrom dirs.
     //
     if (m_pprojiTarget->bPureCpp())
         apszArgs[c4CurArg++] = L"/Za";
 
     //
-    //  Permissive mode is the default but they can ask us to enable permissive
-    //  mode via. This is to allow for incremental movement towards full
-    //  conformance.
+    //  Turn off the permissive mode which allows a bunch of non-conforming
+    //  behavior that will be non-portable.
     //
-    if (facCIDBuild.bNonPermissive())
-        apszArgs[c4CurArg++] = L"/permissive-";
+    apszArgs[c4CurArg++] = L"/permissive-";
 
     // For now always build in C++17 mode
-    // apszArgs[c4CurArg++] = L"/std:c++17";
-    // Enable the latest standard so we can get concepts
-    apszArgs[c4CurArg++] = L"/std:c++latest";
+    apszArgs[c4CurArg++] = L"/std:c++17";
 
 
     //

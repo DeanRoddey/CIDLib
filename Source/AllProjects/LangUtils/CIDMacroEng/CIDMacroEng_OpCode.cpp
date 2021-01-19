@@ -90,13 +90,11 @@ TMEngOpCode::bConvertNumeric(const tCIDLib::TCard2 c2TargetId)
         case tCIDMacroEng::EOpCodes::PushImCard2 :
         case tCIDMacroEng::EOpCodes::PushImCard4 :
         {
-            tCIDLib::TCard4 c4Val;
+            tCIDLib::TCard4 c4Val = m_uStorage.c4Immediate;
             if (m_eOpCode == tCIDMacroEng::EOpCodes::PushImCard1)
                 c4Val = m_uStorage.c1Immediate;
             else if (m_eOpCode == tCIDMacroEng::EOpCodes::PushImCard2)
                 c4Val = m_uStorage.c2Immediate;
-            else
-                c4Val = m_uStorage.c4Immediate;
 
             if ((c2TargetId == tCIDLib::TCard2(tCIDMacroEng::EIntrinsics::Card1))
             &&  (c4Val <= kCIDLib::c1MaxCard))
@@ -231,8 +229,8 @@ TMEngOpCode::bConvertNumeric(const tCIDLib::TCard2 c2TargetId)
             //  If we are converting to any of the cardinal/integral types,
             //  we just throw away the decimal part.
             //
-            tCIDLib::TFloat4 f4Integral;
-            tCIDLib::TFloat4 f4Fract;
+            tCIDLib::TFloat4 f4Integral = 0;
+            tCIDLib::TFloat4 f4Fract = 0;
 
             const tCIDLib::TFloat4 f4Val = m_uStorage.f4Immediate;
             f4Fract = TMathLib::f4Split(f4Val, f4Integral);
@@ -303,8 +301,8 @@ TMEngOpCode::bConvertNumeric(const tCIDLib::TCard2 c2TargetId)
             //  If we are converting to any of the cardinal/integral types,
             //  we just throw away the decimal part.
             //
-            tCIDLib::TFloat8 f8Integral;
-            tCIDLib::TFloat8 f8Fract;
+            tCIDLib::TFloat8 f8Integral = 0;
+            tCIDLib::TFloat8 f8Fract = 0;
 
             const tCIDLib::TFloat8 f8Val = m_uStorage.f8Immediate;
             f8Fract = TMathLib::f8Split(f8Val, f8Integral);
@@ -382,13 +380,11 @@ TMEngOpCode::bConvertNumeric(const tCIDLib::TCard2 c2TargetId)
         case tCIDMacroEng::EOpCodes::PushImInt2 :
         case tCIDMacroEng::EOpCodes::PushImInt4 :
         {
-            tCIDLib::TInt4 i4Val;
+            tCIDLib::TInt4 i4Val = m_uStorage.i4Immediate;
             if (m_eOpCode == tCIDMacroEng::EOpCodes::PushImInt1)
                 i4Val = m_uStorage.i1Immediate;
             else if (m_eOpCode == tCIDMacroEng::EOpCodes::PushImInt2)
                 i4Val = m_uStorage.i2Immediate;
-            else
-                i4Val = m_uStorage.i4Immediate;
 
             if ((c2TargetId == tCIDLib::TCard2(tCIDMacroEng::EIntrinsics::Card1))
             &&  (i4Val >= 0) && (i4Val <= kCIDLib::c1MaxCard))

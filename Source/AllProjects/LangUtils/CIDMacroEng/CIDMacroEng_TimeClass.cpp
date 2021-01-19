@@ -188,13 +188,13 @@ TTime& TMEngTimeVal::tmValue(const TTime& tmToSet)
 
 
 tCIDLib::TVoid
-TMEngTimeVal::SetPattern(const  TTime::TCompList&   fcolToSet
+TMEngTimeVal::SetPattern(const  TTimeCompList&      fcolToSet
                         , const tCIDLib::TCh        chDateSep
                         , const tCIDLib::TCh        chTimeSep
                         , const tCIDLib::TCh        chTZSep)
 {
     if (!m_pfcolPattern)
-        m_pfcolPattern = new TTime::TCompList(fcolToSet);
+        m_pfcolPattern = new TTimeCompList(fcolToSet);
     else
         *m_pfcolPattern = fcolToSet;
 
@@ -203,10 +203,10 @@ TMEngTimeVal::SetPattern(const  TTime::TCompList&   fcolToSet
     m_chTZSep = chTZSep;
 }
 
-tCIDLib::TVoid TMEngTimeVal::SetPattern(const TTime::TCompList& fcolToSet)
+tCIDLib::TVoid TMEngTimeVal::SetPattern(const TTimeCompList& fcolToSet)
 {
     if (!m_pfcolPattern)
-        m_pfcolPattern = new TTime::TCompList(fcolToSet);
+        m_pfcolPattern = new TTimeCompList(fcolToSet);
     else
         *m_pfcolPattern = fcolToSet;
 }
@@ -1423,7 +1423,7 @@ TMEngTimeInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
         try
         {
             // We have to convert the CML vector of values to a C++ version
-            TTime::TCompList fcolComps;
+            TTimeCompList fcolComps;
             const TMEngVectorVal& mecvComps = meOwner.mecvStackAtAs<TMEngVectorVal>(c4FirstInd);
             const tCIDLib::TCard4 c4Count = mecvComps .c4ElemCount();
 

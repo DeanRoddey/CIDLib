@@ -1,12 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="New Rule Set" Description=" " ToolsVersion="16.0">
   <Rules AnalyzerId="Microsoft.Analyzers.NativeCodeAnalysis" RuleNamespace="Microsoft.Rules.Native">
-    <Rule Id="C26416" Action="Warning" />
-    <Rule Id="C26427" Action="Warning" />
     <Rule Id="C26433" Action="Warning" />
     <Rule Id="C26436" Action="Warning" />
     <Rule Id="C26437" Action="Warning" />
-    <Rule Id="C26450" Action="Warning" />
     <Rule Id="C26453" Action="Warning" />
     <Rule Id="C26460" Action="Warning" />
     <Rule Id="C26461" Action="Warning" />
@@ -18,32 +15,19 @@
     <Rule Id="C26495" Action="Warning" />
     <Rule Id="C26800" Action="Warning" />
     <Rule Id="C26812" Action="Warning" />
-    <Rule Id="C28103" Action="Warning" />
     <Rule Id="C28132" Action="Warning" />
     <Rule Id="C28138" Action="Warning" />
     <Rule Id="C28164" Action="Warning" />
     <Rule Id="C28182" Action="Warning" />
-    <Rule Id="C28197" Action="Warning" />
-    <Rule Id="C28198" Action="Warning" />
     <Rule Id="C28199" Action="Warning" />
-    <Rule Id="C28278" Action="Warning" />
     <Rule Id="C28637" Action="Warning" />
-    <Rule Id="C28639" Action="Warning" />
     <Rule Id="C28648" Action="Warning" />
-    <Rule Id="C28649" Action="Warning" />
-    <Rule Id="C28650" Action="Warning" />
-    <Rule Id="C28714" Action="Warning" />
-    <Rule Id="C28715" Action="Warning" />
-    <Rule Id="C28716" Action="Warning" />
-    <Rule Id="C28717" Action="Warning" />
     <Rule Id="C28730" Action="Warning" />
     <Rule Id="C6001" Action="Warning" />
     <Rule Id="C6011" Action="Warning" />
-    <Rule Id="C6014" Action="Warning" />
-    <Rule Id="C6031" Action="Warning" />
     <Rule Id="C6059" Action="Warning" />
     <Rule Id="C6101" Action="Warning" />
-    <Rule Id="C6211" Action="Warning" />
+    <Rule Id="C6200" Action="Warning" />
     <Rule Id="C6214" Action="Warning" />
     <Rule Id="C6215" Action="Warning" />
     <Rule Id="C6216" Action="Warning" />
@@ -94,7 +78,6 @@
     <Rule Id="C6326" Action="Warning" />
     <Rule Id="C6328" Action="Warning" />
     <Rule Id="C6334" Action="Warning" />
-    <Rule Id="C6335" Action="Warning" />
     <Rule Id="C6336" Action="Warning" />
     <Rule Id="C6340" Action="Warning" />
     <Rule Id="C6384" Action="Warning" />

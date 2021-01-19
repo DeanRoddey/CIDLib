@@ -505,11 +505,6 @@ class CIDLIBEXP TBinInStream : public TObject
         //      the underlying impl object in chunks. This is key to being
         //      able to get efficiency.
         //
-        //  m_eEndianMode
-        //      See file header. The default is little, since our canonical
-        //      persistent object format is little endian. But, for reading
-        //      big endian data you can change this.
-        //
         //  m_c4CurAvail
         //      The number of bytes available in the cache. Normally, we read
         //      in full cache chunks. But, the last chunk read will generally
@@ -520,10 +515,18 @@ class CIDLIBEXP TBinInStream : public TObject
         //      will go (and hence also the current number of bytes in the
         //      cache.)
         //
-        //  m_fcolPushback
+        //  m_eEndianMode
+        //      See file header. The default is little, since our canonical
+        //      persistent object format is little endian. But, for reading
+        //      big endian data you can change this.
+        //
+        //  m_exbpPushback
         //      We support a pushback stack. We only allow pushback a byte at a
-        //      time, which we push onto the stack. The TByteStack alias isn't
-        //      available for us here.
+        //      time, which we push onto the stack. Due to circular dependency
+        //      issues (al the collection types need to stream themselves) we
+        //      cannot use any existing collection types for this. So we use the
+        //      expandable byte buffer class as a stack. If it does need streaming
+        //      it can be out of line and use a forward ref.
         //
         //  m_pstrmiIn
         //      This is the impl object that we do all of our work through.
@@ -538,7 +541,7 @@ class CIDLIBEXP TBinInStream : public TObject
         mutable tCIDLib::TCard4     m_c4CurAvail;
         mutable tCIDLib::TCard4     m_c4CurIndex;
         tCIDLib::EEndianModes       m_eEndianMode;
-        TFundStack<tCIDLib::TCard1> m_fcolPushback;
+        TExpByteBuf                 m_expbPushback;
         TInStreamImpl*              m_pstrmiIn;
         TUTF8Converter              m_tcvtText;
 

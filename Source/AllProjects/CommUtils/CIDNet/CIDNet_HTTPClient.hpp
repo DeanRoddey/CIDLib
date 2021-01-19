@@ -83,7 +83,7 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const TString&                strUserName
             , const TString&                strPassword
             , const TURL&                   urlSrc
-            ,       tCIDLib::TCard4&        c4ReqCnt
+            , COP   tCIDLib::TCard4&        c4ReqCnt
             ,       TString&                strAuthStr
         );
 
@@ -109,7 +109,7 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const TString&                strAgent
             , const TString&                strAccept
             ,       TString&                strContType
-            ,       tCIDLib::TCard4&        c4ResCode
+            , COP   tCIDLib::TCard4&        c4ResCode
             ,       TMemBuf&                mbufData
             , const tCIDLib::TCard4         c4OutLen = 0
         );
@@ -121,7 +121,7 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const TString&                strAgent
             , const TString&                strAccept
             ,       TString&                strContType
-            ,       tCIDLib::TCard4&        c4ResCode
+            , COP   tCIDLib::TCard4&        c4ResCode
             ,       TMemBuf&                mbufData
             , const tCIDLib::TKVPCollect&   colInHdrs
             ,       tCIDLib::TKVPCollect&   colOutHdrs
@@ -164,7 +164,7 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
         static tCIDLib::TVoid ParseAuthReq
         (
             const   TString&                strReqLine
-            ,       tCIDNet::EHTTPAuthTypes& eType
+            , COP   tCIDNet::EHTTPAuthTypes& eType
             ,       TString&                strRealm
             ,       TString&                strNonce
             ,       TString&                strOpaque
@@ -195,6 +195,7 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
         THTTPClient();
 
         THTTPClient(const THTTPClient&) = delete;
+        THTTPClient(THTTPClient&&) = delete;
 
         ~THTTPClient();
 
@@ -203,6 +204,7 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
         //  Public operators
         // -------------------------------------------------------------------
         THTTPClient& operator=(const THTTPClient&) = delete;
+        THTTPClient& operator=(THTTPClient&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -239,12 +241,12 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const tCIDLib::TEncodedTime   enctEnd
             , const tCIDLib::TBoolean       bNoCont
             ,       TString&                strRepType
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
             ,       TMemBuf&                mbufCont
-            ,       tCIDLib::TCard4&        c4ContLen
+            , COP   tCIDLib::TCard4&        c4ContLen
         );
 
         tCIDLib::TCard4 c4SendGet
@@ -254,12 +256,12 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
             ,       TMemBuf&                mbufCont
-            ,       tCIDLib::TCard4&        c4ContLen
+            , CIOP  tCIDLib::TCard4&        c4ContLen
             , const tCIDLib::TBoolean       bOutwardBody
             , const tCIDLib::TKVPCollect&   colInHdrLines
         );
@@ -271,12 +273,12 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
             ,       TMemBuf&                mbufCont
-            ,       tCIDLib::TCard4&        c4ContLen
+            , CIOP  tCIDLib::TCard4&        c4ContLen
             , const tCIDLib::TBoolean       bOutwardBody
             , const tCIDLib::TKVPCollect&   colInHdrLines
         );
@@ -288,12 +290,12 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
             ,       TMemBuf&                mbufCont
-            ,       tCIDLib::TCard4&        c4ContLen
+            , COP   tCIDLib::TCard4&        c4ContLen
             ,       TString&                strUltimateURL
             , const tCIDLib::TKVPCollect&   colInHdrLines
         );
@@ -305,11 +307,11 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
-            ,       tCIDLib::TCard4&        c4ContLen
+            , COP   tCIDLib::TCard4&        c4ContLen
             , const tCIDLib::TKVPCollect&   colInHdrLines
         );
 
@@ -321,12 +323,12 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const TString&                strAgent
             , const TString&                strAccept
             , const tCIDLib::TKVPCollect&   colBody
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
             ,       TMemBuf&                mbufCont
-            ,       tCIDLib::TCard4&        c4ContLen
+            , CIOP  tCIDLib::TCard4&        c4ContLen
             , const tCIDLib::TKVPCollect&   colInHdrLines
         );
 
@@ -337,12 +339,12 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
             ,       TMemBuf&                mbufCont
-            ,       tCIDLib::TCard4&        c4ContLen
+            , CIOP  tCIDLib::TCard4&        c4ContLen
             , const tCIDLib::TBoolean       bOutwardBody
             , const tCIDLib::TKVPCollect&   colInHdrLines
         );
@@ -366,9 +368,9 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             ,       tCIDLib::TKVPCollect&   colHdrLines
             ,       TString&                strContType
             ,       TString&                strURL
-            ,       tCIDLib::TCard4&        c4ProtoVer
+            , COP   tCIDLib::TCard4&        c4ProtoVer
             ,       TMemBuf&                mbufCont
-            ,       tCIDLib::TCard4&        c4ContLen
+            , COP   tCIDLib::TCard4&        c4ContLen
             , const tCIDLib::TBoolean       bSendErrReply = kCIDLib::True
         );
 
@@ -441,12 +443,12 @@ class CIDNETEXP THTTPClient : public TNetCoreParser
             , const TString&                strOpType
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
             ,       TMemBuf&                mbufCont
-            ,       tCIDLib::TCard4&        c4ContLen
+            , CIOP  tCIDLib::TCard4&        c4ContLen
             , const tCIDLib::TBoolean       bOutwardBody
             , const tCIDLib::TKVPCollect&   colInHdrLines
             , const TKeyValuePair* const    pkvalExLine
@@ -533,6 +535,7 @@ class CIDNETEXP TAsyncHTTPQ : public TObject
         TAsyncHTTPQ();
 
         TAsyncHTTPQ(const TAsyncHTTPQ&) = delete;
+        TAsyncHTTPQ( TAsyncHTTPQ&&) = delete;
 
         ~TAsyncHTTPQ();
 
@@ -541,6 +544,7 @@ class CIDNETEXP TAsyncHTTPQ : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TAsyncHTTPQ& operator=(const TAsyncHTTPQ&) = delete;
+        TAsyncHTTPQ& operator=(TAsyncHTTPQ&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -553,7 +557,7 @@ class CIDNETEXP TAsyncHTTPQ : public TObject
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
             ,       TMemBuf&                mbufCont
-            ,       tCIDLib::TCard4&        c4ContLen
+            , COP   tCIDLib::TCard4&        c4ContLen
             ,       TString&                strUltimateURL
         );
 

@@ -220,7 +220,7 @@ const TString& tCIDComm::strXlatEStopBits(const tCIDComm::EStopBits eToXlat)
 //  Global functions
 // ---------------------------------------------------------------------------
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EDataBits eBits)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EDataBits eBits)
 {
     strmToWriteTo << tCIDComm::strXlatEDataBits(eBits);
     return strmToWriteTo;
@@ -228,7 +228,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EDataBits eBits)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EErrors eErr)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EErrors eErr)
 {
     strmToWriteTo << L"{";
 
@@ -312,7 +312,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EErrors eErr)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EParities eParity)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EParities eParity)
 {
     strmToWriteTo << tCIDComm::strXlatEParities(eParity);
     return strmToWriteTo;
@@ -320,7 +320,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EParities eParity)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortDTR eDTR)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortDTR eDTR)
 {
     strmToWriteTo << tCIDComm::strXlatEPortDTR(eDTR);
     return strmToWriteTo;
@@ -328,7 +328,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortDTR eDTR)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortRTS eRTS)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortRTS eRTS)
 {
     strmToWriteTo << tCIDComm::strXlatEPortRTS(eRTS);
     return strmToWriteTo;
@@ -336,7 +336,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortRTS eRTS)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortTypes ePortType)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortTypes ePortType)
 {
     if (ePortType == tCIDComm::EPortTypes::RS232)
         strmToWriteTo << L"RS-232";
@@ -361,7 +361,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortTypes ePortType)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EStopBits eBits)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EStopBits eBits)
 {
     strmToWriteTo << tCIDComm::strXlatEStopBits(eBits);
     return strmToWriteTo;

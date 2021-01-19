@@ -169,14 +169,14 @@ TMathLib::f8Power(  const   tCIDLib::TFloat8& f8Value
 
 tCIDLib::TFloat4
 TMathLib::f4Split(  const   tCIDLib::TFloat4    f4Value
-                    ,       tCIDLib::TFloat4&   f4Integral)
+                    , COP   tCIDLib::TFloat4&   f4Integral)
 {
     return modff(f4Value, &f4Integral);
 }
 
 tCIDLib::TFloat8
 TMathLib::f8Split(  const   tCIDLib::TFloat8& f8Value
-                    ,       tCIDLib::TFloat8& f8Integral)
+                    , COP   tCIDLib::TFloat8& f8Integral)
 {
     return modf(f8Value, &f8Integral);
 }
@@ -233,7 +233,7 @@ tCIDLib::TInt4 TMathLib::i4Round(const tCIDLib::TFloat8 f8ToRound)
     return i4Ret;
 }
 
-tCIDLib::TVoid TMathLib::Round(         tCIDLib::TFloat4&       f4ToRound
+tCIDLib::TVoid TMathLib::Round( CIOP    tCIDLib::TFloat4&       f4ToRound
                                 , const tCIDLib::ERoundTypes    eType)
 {
     // Split it out into integral and fractional parts
@@ -261,7 +261,7 @@ tCIDLib::TVoid TMathLib::Round(         tCIDLib::TFloat4&       f4ToRound
     }
 }
 
-tCIDLib::TVoid TMathLib::Round(         tCIDLib::TFloat8&       f8ToRound
+tCIDLib::TVoid TMathLib::Round( CIOP    tCIDLib::TFloat8&       f8ToRound
                                 , const tCIDLib::ERoundTypes    eType)
 {
     // Split it out into integral and fractional parts

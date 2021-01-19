@@ -134,13 +134,13 @@ namespace TMathLib
     KRNLEXPORT tCIDLib::TFloat4 f4Split
     (
         const   tCIDLib::TFloat4    f4Value
-        ,       tCIDLib::TFloat4&   f4Integral
+        , COP   tCIDLib::TFloat4&   f4Integral
     );
 
     KRNLEXPORT tCIDLib::TFloat8 f8Split
     (
         const   tCIDLib::TFloat8&   f8Value
-        ,       tCIDLib::TFloat8&   f8Integral
+        , COP   tCIDLib::TFloat8&   f8Integral
     );
 
     KRNLEXPORT tCIDLib::TInt4 i4Floor(const tCIDLib::TFloat4 f4Value);
@@ -163,13 +163,13 @@ namespace TMathLib
 
     KRNLEXPORT tCIDLib::TVoid Round
     (
-                tCIDLib::TFloat4&   f4ToRound
+        CIOP    tCIDLib::TFloat4&   f4ToRound
         , const tCIDLib::ERoundTypes eType = tCIDLib::ERoundTypes::Closest
     );
 
     KRNLEXPORT tCIDLib::TVoid Round
     (
-                tCIDLib::TFloat8&   f8ToRound
+        CIOP    tCIDLib::TFloat8&   f8ToRound
         , const tCIDLib::ERoundTypes eType = tCIDLib::ERoundTypes::Closest
     );
 

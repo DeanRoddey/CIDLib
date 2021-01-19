@@ -85,7 +85,7 @@ class CIDCTRLSEXP TNotRequestBase
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TNotificationId& TNotRequestBase::nidRequested() const
+        const TNotificationId& nidRequested() const
         {
             return m_nidRequested;
         }
@@ -142,9 +142,7 @@ template <typename T> class TNotifyRequest : public TNotRequestBase
         TNotifyRequest(const TNotifyRequest&) = delete;
         TNotifyRequest(TNotifyRequest&&) = delete;
 
-        ~TNotifyRequest()
-        {
-        }
+        ~TNotifyRequest() = default;
 
 
         // -------------------------------------------------------------------
@@ -183,7 +181,7 @@ template <typename T> class TNotifyRequest : public TNotRequestBase
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bPostEvent(TWndEvent* const pwevToPost)
         {
-            return m_pTarget->bSendMsg(kCIDCtrls::wmsgAsyncEvent, pwevToPost);
+            return m_pTarget->bSendMsg(kCIDCtrls::wmsgAsyncEvent1, pwevToPost);
         }
 
 

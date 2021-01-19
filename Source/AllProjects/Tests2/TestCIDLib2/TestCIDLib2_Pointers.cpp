@@ -131,7 +131,7 @@ TTest_CntPtr1::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWarni
     //
     tCIDLib::TCard4 c4ErrCnt = 0;
     try { *cptrTest1; } catch(...) { c4ErrCnt++; }
-    try { cptrTest1->bIsEmpty(); } catch(...) { c4ErrCnt++; }
+    try { if (cptrTest1->bIsEmpty()) {}; } catch(...) { c4ErrCnt++; }
     TestConstDef(cptrTest1, c4ErrCnt);
 
     if (c4ErrCnt != 4)
@@ -169,7 +169,7 @@ tCIDLib::TVoid
 TTest_CntPtr1::TestConstDef(const TCntPtr<TString>& cptrTest, tCIDLib::TCard4& c4ErrCnt)
 {
     try { *cptrTest; } catch(...) { c4ErrCnt++; }
-    try { cptrTest->bIsEmpty(); } catch(...) { c4ErrCnt++; }
+    try { if (cptrTest->bIsEmpty()) {}; } catch(...) { c4ErrCnt++; }
 }
 
 

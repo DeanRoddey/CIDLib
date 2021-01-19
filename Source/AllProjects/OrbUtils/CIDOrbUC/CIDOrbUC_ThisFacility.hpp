@@ -119,7 +119,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
                 catch(TError& errToCatch)
                 {
-                    if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
+                    if (bLogWarnings() && !errToCatch.bLogged())
                     {
                         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
                         TModule::LogEventObj(errToCatch);
@@ -143,10 +143,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
                 //  Either not cached or the cached one wouldn't work, so do a
                 //  lookup. If we get it, try to create the proxy.
                 //
-                if (facCIDOrbUC().bGetNSObject( strNSBinding
-                                                , ooidSrv
-                                                , enctEnd
-                                                , bQuickTest))
+                if (bGetNSObject( strNSBinding, ooidSrv, enctEnd, bQuickTest))
                 {
                     try
                     {
@@ -155,7 +152,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
                     catch(TError& errToCatch)
                     {
-                        if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
+                        if (bLogWarnings() && !errToCatch.bLogged())
                         {
                             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
                             TModule::LogEventObj(errToCatch);
@@ -192,7 +189,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
                 catch(TError& errToCatch)
                 {
-                    if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
+                    if (bLogWarnings() && !errToCatch.bLogged())
                     {
                         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
                         TModule::LogEventObj(errToCatch);
@@ -217,11 +214,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
                 //  lookup. If we get it, try to create the proxy. If this fails
                 //  we let it throw.
                 //
-                if (facCIDOrbUC().bGetNSObject( orbcNS
-                                                , strNSBinding
-                                                , ooidSrv
-                                                , enctEnd
-                                                , bQuickTest))
+                if (bGetNSObject(orbcNS, strNSBinding, ooidSrv, enctEnd, bQuickTest))
                 {
                     try
                     {
@@ -230,7 +223,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
                     catch(TError& errToCatch)
                     {
-                        if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
+                        if (bLogWarnings() && !errToCatch.bLogged())
                         {
                             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
                             TModule::LogEventObj(errToCatch);

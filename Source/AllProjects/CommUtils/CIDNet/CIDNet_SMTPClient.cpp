@@ -1246,7 +1246,6 @@ TSMTPClient::c4ReadRawLine(         TStreamSocket&          sockSrc
 
     tCIDLib::TCard4 c4Status = 0;
     m_strTmpRead.Clear();
-    strToFill.bIsEmpty();
     do
     {
         tCIDLib::TCard1 c1Cur;

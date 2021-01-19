@@ -286,8 +286,8 @@ template <typename TVal> class TNamedValMap : public TObject
 
         tCIDLib::TBoolean operator==(const TNamedValMap<TVal>& nvmSrc) const
         {
-            TItemList::TCursor cursThis(&m_colItems);
-            TItemList::TCursor cursSrc(&nvmSrc.m_colItems);
+            typename TItemList::TCursor cursThis(&m_colItems);
+            typename TItemList::TCursor cursSrc(&nvmSrc.m_colItems);
 
             if (c4ElemCount() != nvmSrc.c4ElemCount())
                 return kCIDLib::False;
@@ -657,15 +657,15 @@ operator<<(TBinOutStream& strmToWriteTo, const TNamedValMap<TVal>& nvmToWrite)
                     << tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard);
 
     // Iterate through the items and write them out
-    TNamedValMap<TVal>::TItemList::TCursor cursItems(&nvmToWrite.colItems());
+    typename TNamedValMap<TVal>::TItemList::TCursor cursItems(&nvmToWrite.colItems());
     while (cursItems.bIsValid())
     {
         // Each one should start with a start object
         strmToWriteTo << tCIDLib::EStreamMarkers::StartObject;
 
         // Get the current item and get a cursor over it's pairs
-        const TNamedValMap<TVal>::TNVMItem<TVal>& nvmiCur = cursItems.objRCur();
-        TNamedValMap<TVal>::TNVMItem<TVal>::TPairList::TCursor cursSubs(&nvmiCur.colPairs());
+        const TNamedValMap<TVal>::TElem& nvmiCur = cursItems.objRCur();
+        typename TNamedValMap<TVal>::TElem::TPairList::TCursor cursSubs(&nvmiCur.colPairs());
 
         // Write out the key and the count of sub-keys
         strmToWriteTo   << nvmiCur.strKey()

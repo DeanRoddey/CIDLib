@@ -584,7 +584,9 @@ static tCIDLib::TVoid TestPatternSearch(TTextOutStream& strmOut)
     {
         bCaughtIt = kCIDLib::False;
         c4Index = 50;
-        strTest.bNextOccurrence(kCIDLib::chDigit4, c4Index);
+        if (strTest.bNextOccurrence(kCIDLib::chDigit4, c4Index))
+        {
+        }
     }
 
     catch(const TError&)
@@ -603,7 +605,9 @@ static tCIDLib::TVoid TestPatternSearch(TTextOutStream& strmOut)
     {
         bCaughtIt = kCIDLib::False;
         c4Index = 50;
-        strTest.bPrevOccurrence(kCIDLib::chDigit4, c4Index);
+        if (strTest.bPrevOccurrence(kCIDLib::chDigit4, c4Index))
+        {
+        }
     }
 
     catch(const TError&)

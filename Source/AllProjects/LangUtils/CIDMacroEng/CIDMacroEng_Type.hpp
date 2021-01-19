@@ -547,13 +547,13 @@ namespace tCIDMacroEng
         tCIDLib::TCard4     c4Count = 0;
         tCIDLib::TBoolean   bDiscarded = kCIDLib::False;
         tCIDLib::TCard2     c2MethodId = kCIDMacroEng::c2BadId;
-        tCIDLib::TCard2     ac2Parms[kCIDMacroEng::c4MaxMethodParms];
+        tCIDLib::TCard2     ac2Parms[kCIDMacroEng::c4MaxMethodParms] = {0};
     };
 
     struct TParmIdTable
     {
         tCIDLib::TCard4     c4Count = 0;
-        TParmIdItem         apiiMethods[kCIDMacroEng::c4MaxMethodParms];
+        TParmIdItem         apiiMethods[kCIDMacroEng::c4MaxMethodParms] = {0};
     };
 }
 

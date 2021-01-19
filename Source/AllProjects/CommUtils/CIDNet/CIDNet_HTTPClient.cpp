@@ -1347,12 +1347,12 @@ THTTPClient::c4GetSrvReply(         TCIDDataSrc&            cdsSrc
                             , const tCIDLib::TEncodedTime   enctEnd
                             , const tCIDLib::TBoolean       bNoCont
                             ,       TString&                strRepType
-                            ,       tCIDNet::EHTTPCodes&    eCodeType
+                            , COP   tCIDNet::EHTTPCodes&    eCodeType
                             ,       TString&                strRepText
                             ,       tCIDLib::TKVPCollect&   colOutHdrLines
                             ,       TString&                strContType
                             ,       TMemBuf&                mbufCont
-                            ,       tCIDLib::TCard4&        c4ContLen)
+                            , COP   tCIDLib::TCard4&        c4ContLen)
 {
     tCIDLib::TCard4 c4Status = 0;
 
@@ -1878,7 +1878,7 @@ c4SendPost(         TCIDDataSrc* const      pcdsSrc
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
@@ -1925,7 +1925,7 @@ c4SendPut(          TCIDDataSrc* const      pcdsSrc
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrs
             ,       TString&                strContType

@@ -559,7 +559,6 @@ ERRORS=
     errcStrm_PBNotEmpty         3384    The pushback stack must be empty at this point
     errcStrm_PBStackIsFull      3385    The pushback stack is full
     errcStrm_PBUnderflow        3386    You cannot push back beyond the start of the stream
-    errcStrm_PBOverflow         3387    The push back stack doesn't have enough room left for %(1) bytes
     errcStrm_DontHaveStream     3388    The %(1) stream has not been set
 
     ; System info errors

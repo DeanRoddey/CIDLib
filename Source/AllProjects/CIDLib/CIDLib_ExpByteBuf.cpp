@@ -232,6 +232,25 @@ tCIDLib::TCard1 TExpByteBuf::c1Last() const
 }
 
 
+tCIDLib::TCard1 TExpByteBuf::c1PopLast()
+{
+    if (!m_c4CurOfs)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcExpb_NoData
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Index
+        );
+    }
+    const tCIDLib::TCard1 c1Ret = m_pc1Buffer[m_c4CurOfs - 1];
+    m_c4CurOfs--;
+    return c1Ret;
+}
+
+
 tCIDLib::TCard4 TExpByteBuf::c4CheckSum() const
 {
     tCIDLib::TCard4 c4Sum = 0;
@@ -245,13 +264,13 @@ tCIDLib::TCard4 TExpByteBuf::c4CheckSum() const
 }
 
 
-tCIDLib::TCard4 TExpByteBuf::c4Bytes() const
+tCIDLib::TCard4 TExpByteBuf::c4Bytes() const noexcept
 {
     return m_c4CurOfs;
 }
 
 
-const tCIDLib::TCard1* TExpByteBuf::pc1Buffer() const
+const tCIDLib::TCard1* TExpByteBuf::pc1Buffer() const noexcept
 {
     return m_pc1Buffer;
 }
@@ -266,7 +285,8 @@ tCIDLib::TCard1* TExpByteBuf::pszReplicateBuffer()
 }
 
 
-tCIDLib::TVoid TExpByteBuf::Reset()
+// Just reset our current offset, which makes us empty
+tCIDLib::TVoid TExpByteBuf::Reset() noexcept
 {
     m_c4CurOfs = 0;
 }

@@ -60,7 +60,7 @@ namespace tCIDColAlgo
                                 , const TElem&  objToAdd
                                 ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursTar(&colTar);
+        typename TCol::TCursor cursTar(&colTar);
         for (; cursTar; ++cursTar)
         {
             // If we find a match, return false, didn't add it
@@ -84,7 +84,7 @@ namespace tCIDColAlgo
     tCIDLib::TBoolean bRemoveIf(TCol& colTar, TTest pfnTest)
     {
         tCIDLib::TBoolean bRet = kCIDLib::False;
-        TCol::TCursor cursTar(&colTar);
+        typename TCol::TCursor cursTar(&colTar);
         while (cursTar)
         {
             // Test this one, if a match remove it, else move forward
@@ -120,7 +120,7 @@ namespace tCIDColAlgo
                                     ,       TComp               pfnComp = TComp())
     {
         tCIDLib::TBoolean bRet = kCIDLib::False;
-        TCol::TCursor cursTar(&colTar);
+        typename TCol::TCursor cursTar(&colTar);
         while (cursTar)
         {
             // If we find a match, remove it
@@ -187,7 +187,7 @@ namespace tCIDColAlgo
                                     , const TElem&      objToFind
                                     ,       TComp       pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objToFind))
@@ -203,7 +203,7 @@ namespace tCIDColAlgo
                                         , const TElem&      objToFind
                                         ,       TComp       pfnComp = TComp())
     {
-        TCol::TNCCursor cursSrc(&colSrc);
+        typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objToFind))
@@ -227,7 +227,7 @@ namespace tCIDColAlgo
                                         , const TElem&  objToFind
                                         ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (!pfnComp(*cursSrc, objToFind))
@@ -243,7 +243,7 @@ namespace tCIDColAlgo
                                             , const TElem&  objToFind
                                             ,       TComp   pfnComp = TComp())
     {
-        TCol::TNCCursor cursSrc(&colSrc);
+        typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (!pfnComp(*cursSrc, objToFind))
@@ -265,7 +265,7 @@ namespace tCIDColAlgo
                                         , const TKey&   objKey
                                         ,       TComp   pfnComp)
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objKey))
@@ -281,7 +281,7 @@ namespace tCIDColAlgo
                                             , const TKey&   objKey
                                             ,       TComp   pfnComp)
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (!pfnComp(*cursSrc, objKey))
@@ -297,7 +297,7 @@ namespace tCIDColAlgo
                                             , const TKey&   objKey
                                             ,       TComp   pfnComp)
     {
-        TCol::TNCCursor cursSrc(&colSrc);
+        typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objKey))
@@ -313,7 +313,7 @@ namespace tCIDColAlgo
                                                 , const TKey&   objKey
                                                 ,       TComp   pfnComp)
     {
-        TCol::TNCCursor cursSrc(&colSrc);
+        typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (!pfnComp(*cursSrc, objKey))
@@ -336,7 +336,7 @@ namespace tCIDColAlgo
                                             , const TElem&  objComp
                                             ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstGreater)
@@ -352,7 +352,7 @@ namespace tCIDColAlgo
                                         , const TElem&  objComp
                                         ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstLess)
@@ -368,7 +368,7 @@ namespace tCIDColAlgo
                                                 , const TElem&  objComp
                                                 ,       TComp   pfnComp = TComp())
     {
-        TCol::TNCCursor cursSrc(&colSrc);
+        typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstGreater)
@@ -384,7 +384,7 @@ namespace tCIDColAlgo
                                             , const TElem&  objComp
                                             ,       TComp   pfnComp = TComp())
     {
-        TCol::TNCCursor cursSrc(&colSrc);
+        typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstLess)
@@ -459,7 +459,7 @@ namespace tCIDColAlgo
             return 0;
 
         tCIDLib::TCard4 c4RemCount = 0;
-        TCol::TNCCursor cursCur(&colSrc);
+        typename TCol::TNCCursor cursCur(&colSrc);
         TElem& objLast = *cursCur;
         ++cursCur;
         while (cursCur.bIsValid())

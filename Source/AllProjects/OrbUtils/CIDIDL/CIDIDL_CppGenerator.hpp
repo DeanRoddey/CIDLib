@@ -41,6 +41,7 @@ class TCppGenerator : public TCodeGenerator
         TCppGenerator();
 
         TCppGenerator(const TCppGenerator&) = delete;
+        TCppGenerator(TCppGenerator&&) = delete;
 
         ~TCppGenerator();
 
@@ -49,6 +50,7 @@ class TCppGenerator : public TCodeGenerator
         //  Public operators
         // -------------------------------------------------------------------
         tCIDLib::TVoid operator=(const TCppGenerator&) = delete;
+        tCIDLib::TVoid operator=(TCppGenerator&&) = delete;
 
 
         // -------------------------------------------------------------------

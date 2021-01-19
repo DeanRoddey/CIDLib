@@ -660,8 +660,7 @@ TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
         //  it in. We have to get the class path and the parent class path,
         //  and optionally the extension type.
         //
-        tCIDMacroEng::ETokens      eTok;
-        tCIDMacroEng::EClassExt    eExtend;
+        tCIDMacroEng::EClassExt eExtend = tCIDMacroEng::EClassExt::Final;
         TString                 strBasePath;
         TString                 strClassPath;
         TString                 strName;
@@ -674,7 +673,7 @@ TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
         if (psrcClass.bIfPeeked(tCIDMacroEng::ETokens::OpenBracket))
         {
             // The next token must either be Final, Non-Final, or Abstract
-            eTok = psrcClass.eGetNextToken(strName);
+            const tCIDMacroEng::ETokens eTok = psrcClass.eGetNextToken(strName);
 
             if (eTok == tCIDMacroEng::ETokens::Abstract)
             {
@@ -858,7 +857,7 @@ TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
         //          by orders of magnitude, so it has it's own file to implement
         //          the method parsing.
         //
-        eTok = psrcClass.eGetNextToken(strName, kCIDLib::True);
+        tCIDMacroEng::ETokens eTok = psrcClass.eGetNextToken(strName, kCIDLib::True);
         while (eTok != tCIDMacroEng::ETokens::EOF)
         {
             // It's gotta be a methods block

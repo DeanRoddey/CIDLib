@@ -56,7 +56,6 @@ namespace CIDGraphDev_ThisFacility
 };
 
 
-
 // ---------------------------------------------------------------------------
 //  Local helper methods
 // ---------------------------------------------------------------------------
@@ -326,7 +325,6 @@ TFacCIDGraphDev::eCalcPlacement(const   TArea&                      areaPlaceIn
 
     return eBlt;
 }
-
 
 
 tCIDLib::TVoid TFacCIDGraphDev::QuerySysBmps(TCollection<TSysBitmapInfo>& colToFill)

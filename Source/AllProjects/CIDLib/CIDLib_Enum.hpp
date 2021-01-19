@@ -234,21 +234,6 @@ class CIDLIBEXP TEnumMap
 
 
 //
-//  A couple macros to get the min/max values for an enum by type. This is generally
-//  useful, but definitely helps in that it works for both hand created and IDL
-//  generated enums as long as they have the standard three magic values, without
-//  any extra overhead.
-//
-#define eMinEnumVal(E) E##::Min
-#define eMaxEnumVal(E) E##::Max
-#define eEnumValCount(E) E##::Count
-
-#define c4MinEnumVal(E) tCIDLib::TCard4(E##::Min)
-#define c4MaxEnumVal(E) tCIDLib::TCard4(E##::Max)
-#define c4EnumValCount(E) tCIDLib::TCard4(E##::Count)
-
-
-//
 //  Our 'for each' support for enums. It uses the above macros to generically get
 //  from type name to min/max values, since templates cannot do that themselves.
 //
@@ -261,13 +246,13 @@ namespace tCIDLib
     //
     template
     <
-        typename E
-        , E eStart = eMinEnumVal(E)
-        , E eEnd = eMaxEnumVal(E)
-        , typename IterCB = tCIDLib::TVoid (*IterCB)(const E)
+        typename EnumType
+        , EnumType eStart = EnumType::Min
+        , EnumType eEnd = EnumType::Max
+        , typename IterCB = tCIDLib::TVoid (*)(const typename EnumType)
     > tCIDLib::TVoid ForEachE(IterCB iterCB)
     {
-        for (E eInd = eStart; eInd <= eEnd; eInd++)
+        for (EnumType eInd = eStart; eInd <= eEnd; eInd++)
             iterCB(eInd);
     }
 
@@ -276,17 +261,18 @@ namespace tCIDLib
     //  A variation that can be broken out of, and returns the value it stopped on.
     //  If it goes to the end, the return will be the ::Count value.
     //
-    template<typename E, typename IterCB = tCIDLib::TBoolean (*IterCB)(const E)>
-    E eForEachE(IterCB iterCB)
+    template<typename EnumType, typename IterCB = tCIDLib::TBoolean (*)(const typename EnumType)>
+    typename EnumType eForEachE(IterCB iterCB)
     {
-        E eInd = eMinEnumVal(E);
-        for (; eInd <= eMaxEnumVal(E); eInd++)
+        EnumType eInd = EnumType::Min;
+        for (; eInd <= EnumType::Max; eInd++)
         {
             if (!iterCB(eInd))
                 break;
         }
         return eInd;
     }
+
 }
 
 #pragma CIDLIB_POPPACK

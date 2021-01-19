@@ -61,7 +61,7 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
-// Forward ref some local stuff
+// Forward ref some stuff
 template <typename TElem> class TTreeNodeNT;
 
 
@@ -617,11 +617,6 @@ template <typename TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bCaseSensitive() const
-        {
-            return m_bCasePath;
-        }
-
         tCIDLib::TCard4 c4SerialNum() const
         {
             return m_c4SerialNum;
@@ -1725,6 +1720,12 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bCasePath() const
+        {
+            TLocker lockrThis(this);
+            return m_bCasePath;
+        }
+
         tCIDLib::TBoolean bNodeExists(const TString& strToCheck) const
         {
             // Validate the passed path
@@ -1749,6 +1750,12 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             if (pnodeTmp)
                 eToFill = pnodeTmp->eType();
             return (pnodeTmp != nullptr);
+        }
+
+        tCIDLib::TBoolean bSorted() const
+        {
+            TLocker lockrThis(this);
+            return m_bSorted;
         }
 
         tCIDLib::TCard4 c4NonTerminalCount() const
@@ -2288,25 +2295,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         }
 
 
-    protected :
-        // -------------------------------------------------------------------
-        //  Declare our friends
-        // -------------------------------------------------------------------
-        friend class TConstCursor<TElem>;
-        friend class TNonConstCursor<TElem>;
-        friend class TConstScopeCursor<TElem>;
-        friend class TNonConstScopeCursor<TElem>;
-
-        friend tCIDLib::TVoid StreamOutBasicTree<TElem>(const TMyType& colSrc, TBinOutStream& strmTar);
-        friend tCIDLib::TVoid StreamInBasicTree<TElem>(TMyType& colSrc, TBinInStream& strmTar);
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private, non-virtual methods
-        // -------------------------------------------------------------------
-
-        // For use by our streaming in helper below
+        // For use by our streaming in helper below, don't carll directly
         tCIDLib::TVoid Reset(const  tCIDLib::TBoolean           bCasePath
                             , const tCIDLib::TBoolean           bSorted
                             , const tCIDLib::TCard4             c4NTCount
@@ -2331,6 +2320,23 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         }
 
 
+    protected :
+        // -------------------------------------------------------------------
+        //  Declare our friends
+        // -------------------------------------------------------------------
+        friend class TConstCursor<TElem>;
+        friend class TNonConstCursor<TElem>;
+        friend class TConstScopeCursor<TElem>;
+        friend class TNonConstScopeCursor<TElem>;
+
+//        friend tCIDLib::TVoid StreamOutBasicTree<TElem>(const TMyType& colSrc, TBinOutStream& strmTar);
+//        friend tCIDLib::TVoid StreamInBasicTree<TElem>(TMyType& colSrc, TBinInStream& strmTar);
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
         tCIDLib::TVoid
         RemoveChild(        TNode* const        pnodeToRemove
                     , const tCIDLib::TBoolean   bDelParent)
@@ -2740,22 +2746,10 @@ tCIDLib::TVoid StreamOutNT(const TTreeNodeNT<TElem>& nodePar, TBinOutStream& str
     }
 }
 
-template <typename TElem>
-tCIDLib::TVoid StreamOutBasicTree(const TBasicTreeCol<TElem>& colSrc, TBinOutStream& strmTar)
-{
-    TPolyStreamer<TElem> pstrmTar(nullptr, &strmTar);
 
-    // Stream out a start object marker, then the overall settings
-    strmTar << tCIDLib::EStreamMarkers::StartObject
-            << colSrc.m_bCasePath
-            << colSrc.m_bSorted
-            << colSrc.m_c4NTCount
-            << colSrc.m_c4TCount
-            << tCIDLib::EStreamMarkers::Frame;
-    if (colSrc.pnodeRoot())
-        StreamOutNT(*colSrc.pnodeRoot(), strmTar);
-    strmTar << tCIDLib::EStreamMarkers::EndObject;
-}
+// For depencey reasons this method is in the poly stream header
+//template <typename TElem>
+//tCIDLib::TVoid StreamOutBasicTree(const TBasicTreeCol<TElem>& colSrc, TBinOutStream& strmTar)
 
 
 template <typename TElem>
@@ -2886,5 +2880,24 @@ tCIDLib::TVoid StreamInBasicTree(TBasicTreeCol<TElem>& colTar, TBinInStream& str
     colTar.Reset(bCasePath, bSorted, c4NewNTCount, c4NewTCount, janRoot.pobjOrphan());
 }
 
+
+//
+//  Some helpers for some of the collection classes which cannot be in their headers due to
+//  cicular dependencies on this poly streamer.
+//
+template <typename TElem>
+tCIDLib::TVoid StreamOutBasicTree(const TBasicTreeCol<TElem>& colSrc, TBinOutStream& strmTar)
+{
+    // Stream out a start object marker, then the overall settings
+    strmTar << tCIDLib::EStreamMarkers::StartObject
+            << colSrc.bCasePath()
+            << colSrc.bSorted()
+            << colSrc.c4NonTerminalCount()
+            << colSrc.c4TerminalCount()
+            << tCIDLib::EStreamMarkers::Frame;
+    if (colSrc.pnodeRoot())
+        StreamOutNT(*colSrc.pnodeRoot(), strmTar);
+    strmTar << tCIDLib::EStreamMarkers::EndObject;
+}
 
 #pragma CIDLIB_POPPACK

@@ -58,21 +58,21 @@ namespace CIDLib_Time
         //      required.
         // -----------------------------------------------------------------------
         TAtomicFlag         atomInitDone;
-        TTime::TCompList*   pfcol12HHMM = nullptr;
-        TTime::TCompList*   pfcol24HHMMSS = nullptr;
-        TTime::TCompList*   pfcol24HHMM = nullptr;
-        TTime::TCompList*   pfcolCTime = nullptr;
-        TTime::TCompList*   pfcolDDMMYY = nullptr;
-        TTime::TCompList*   pfcolDDMMYYYY = nullptr;
-        TTime::TCompList*   pfcolDTStamp = nullptr;
-        TTime::TCompList*   pfcolFullDate = nullptr;
-        TTime::TCompList*   pfcolISO8601NTZ = nullptr;
-        TTime::TCompList*   pfcolMMDDYY = nullptr;
-        TTime::TCompList*   pfcolMMDDYYYY = nullptr;
-        TTime::TCompList*   pfcolRFC822 = nullptr;
-        TTime::TCompList*   pfcolYYMMDD = nullptr;
-        TTime::TCompList*   pfcolYYYYMMDD = nullptr;
-        TTime::TCompList*   pfcolYYYYMMDD24HHMM = nullptr;
+        TTimeCompList*      pfcol12HHMM = nullptr;
+        TTimeCompList*      pfcol24HHMMSS = nullptr;
+        TTimeCompList*      pfcol24HHMM = nullptr;
+        TTimeCompList*      pfcolCTime = nullptr;
+        TTimeCompList*      pfcolDDMMYY = nullptr;
+        TTimeCompList*      pfcolDDMMYYYY = nullptr;
+        TTimeCompList*      pfcolDTStamp = nullptr;
+        TTimeCompList*      pfcolFullDate = nullptr;
+        TTimeCompList*      pfcolISO8601NTZ = nullptr;
+        TTimeCompList*      pfcolMMDDYY = nullptr;
+        TTimeCompList*      pfcolMMDDYYYY = nullptr;
+        TTimeCompList*      pfcolRFC822 = nullptr;
+        TTimeCompList*      pfcolYYMMDD = nullptr;
+        TTimeCompList*      pfcolYYYYMMDD = nullptr;
+        TTimeCompList*      pfcolYYYYMMDD24HHMM = nullptr;
         TString*            pstr24HHMM = nullptr;
         TString*            pstr24HHMMSS = nullptr;
         TString*            pstr24HM = nullptr;
@@ -207,6 +207,11 @@ f8SunLong(  const   tCIDLib::TFloat8    f8Day
 }
 
 
+// Complete the type we had to forward reference
+using TTimeCompList = TFundVector<tCIDLib::ETimeComps, tCIDLib::TCard4>;
+
+
+
 // ---------------------------------------------------------------------------
 //   CLASS: TTime
 //  PREFIX: tm
@@ -264,7 +269,7 @@ tCIDLib::TCard4 TTime::c4CvtToJulian(const  tCIDLib::TCard4     c4Year
         c4M += 12;
     }
 
-    tCIDLib::TCard4 c4B;
+    tCIDLib::TCard4 c4B = 0;
     if ((c4Y < 1582)
     ||  ((c4Y == 1582) && ((c4M < 10) || ((c4M == 10) && (c4D <= 4)))))
     {
@@ -427,105 +432,105 @@ TTime::CvtFromJulian(const  tCIDLib::TFloat8    f8Julian
 
 
 // Provide access the the pre-fab time parsing component lists
-const TTime::TCompList& TTime::fcol12HHMM()
+const TTimeCompList& TTime::fcol12HHMM()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcol12HHMM;
 }
 
-const TTime::TCompList& TTime::fcol24HHMM()
+const TTimeCompList& TTime::fcol24HHMM()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcol24HHMM;
 }
 
-const TTime::TCompList& TTime::fcol24HHMMSS()
+const TTimeCompList& TTime::fcol24HHMMSS()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcol24HHMMSS;
 }
 
-const TTime::TCompList& TTime::fcolCTime()
+const TTimeCompList& TTime::fcolCTime()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolCTime;
 }
 
-const TTime::TCompList& TTime::fcolDDMMYY()
+const TTimeCompList& TTime::fcolDDMMYY()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolDDMMYY;
 }
 
-const TTime::TCompList& TTime::fcolDDMMYYYY()
+const TTimeCompList& TTime::fcolDDMMYYYY()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolDDMMYYYY;
 }
 
-const TTime::TCompList& TTime::fcolDTStamp()
+const TTimeCompList& TTime::fcolDTStamp()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolDTStamp;
 }
 
-const TTime::TCompList& TTime::fcolFullDate()
+const TTimeCompList& TTime::fcolFullDate()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolFullDate;
 }
 
-const TTime::TCompList& TTime::fcolISO8601NTZ()
+const TTimeCompList& TTime::fcolISO8601NTZ()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolISO8601NTZ;
 }
 
-const TTime::TCompList& TTime::fcolMMDDYY()
+const TTimeCompList& TTime::fcolMMDDYY()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolMMDDYY;
 }
 
-const TTime::TCompList& TTime::fcolMMDDYYYY()
+const TTimeCompList& TTime::fcolMMDDYYYY()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolMMDDYYYY;
 }
 
-const TTime::TCompList& TTime::fcolRFC822()
+const TTimeCompList& TTime::fcolRFC822()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolRFC822;
 }
 
-const TTime::TCompList& TTime::fcolYYMMDD()
+const TTimeCompList& TTime::fcolYYMMDD()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolYYMMDD;
 }
 
-const TTime::TCompList& TTime::fcolYYYYMMDD()
+const TTimeCompList& TTime::fcolYYYYMMDD()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolYYYYMMDD;
 }
 
-const TTime::TCompList& TTime::fcolYYYYMMDD24HHMM()
+const TTimeCompList& TTime::fcolYYYYMMDD24HHMM()
 {
     if (!CIDLib_Time::atomInitDone)
         LazyInit();
@@ -1800,7 +1805,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 //
 tCIDLib::TBoolean
 TTime::bParseFromText(  const   TString&        strSrc
-                        , const TCompList&      fcolCompList
+                        , const TTimeCompList&  fcolCompList
                         , const tCIDLib::TCh    chDateSep
                         , const tCIDLib::TCh    chTimeSep
                         , const tCIDLib::TCh    chTZSep)
@@ -2169,7 +2174,7 @@ TTime::FormatToStr(         TString&                strToWriteTo
         );
     }
 
-    tCIDLib::TCard4 c4Tmp;
+    tCIDLib::TCard4 c4Tmp = 0;
     const tCIDLib::TCard4 c4TokCnt = strTokList.c4Length();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4TokCnt; c4Index++)
     {
@@ -2597,7 +2602,7 @@ tCIDLib::TVoid TTime::LocalToUTC()
 //
 tCIDLib::TVoid
 TTime::ParseFromText(const  TString&        strSrc
-                    , const TCompList&      fcolCompList
+                    , const TTimeCompList&  fcolCompList
                     , const tCIDLib::TCh    chDateSep
                     , const tCIDLib::TCh    chTimeSep
                     , const tCIDLib::TCh    chTZSep)
@@ -3441,26 +3446,26 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pstrYYYYMMDD_NoSep = new TString(L"%(Y,4,0)%(M,2,0)%(D,2,0)");
 
         // Set up the time parsing components lists
-        CIDLib_Time::pfcol12HHMM = new TCompList;
+        CIDLib_Time::pfcol12HHMM = new TTimeCompList;
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::Hour12);
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::TimeSep);
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::Minute);
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::AMPM);
 
-        CIDLib_Time::pfcol24HHMM = new TCompList;
+        CIDLib_Time::pfcol24HHMM = new TTimeCompList;
         CIDLib_Time::pfcol24HHMM->c4AddElement(tCIDLib::ETimeComps::Hour24);
         CIDLib_Time::pfcol24HHMM->c4AddElement(tCIDLib::ETimeComps::TimeSep);
         CIDLib_Time::pfcol24HHMM->c4AddElement(tCIDLib::ETimeComps::Minute);
 
-        CIDLib_Time::pfcol24HHMMSS = new TCompList;
+        CIDLib_Time::pfcol24HHMMSS = new TTimeCompList;
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::Hour24);
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::TimeSep);
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::Minute);
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::TimeSep);
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::Second);
 
-        CIDLib_Time::pfcolCTime = new TCompList;
+        CIDLib_Time::pfcolCTime = new TTimeCompList;
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::DayName);
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::MonthName);
@@ -3476,21 +3481,21 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::Year4);
 
-        CIDLib_Time::pfcolDDMMYY = new TCompList;
+        CIDLib_Time::pfcolDDMMYY = new TTimeCompList;
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::DayNum);
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::Year2);
 
-        CIDLib_Time::pfcolDDMMYYYY = new TCompList;
+        CIDLib_Time::pfcolDDMMYYYY = new TTimeCompList;
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::DayNum);
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::Year4);
 
-        CIDLib_Time::pfcolDTStamp = new TCompList;
+        CIDLib_Time::pfcolDTStamp = new TTimeCompList;
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::DayName);
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::MonthName);
@@ -3506,7 +3511,7 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::Minute);
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::AMPM);
 
-        CIDLib_Time::pfcolFullDate = new TCompList;
+        CIDLib_Time::pfcolFullDate = new TTimeCompList;
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::DayName);
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::MonthName);
@@ -3515,7 +3520,7 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::Year4);
 
-        CIDLib_Time::pfcolISO8601NTZ = new TCompList;
+        CIDLib_Time::pfcolISO8601NTZ = new TTimeCompList;
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::Year4);
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::Hyphen);
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::MonthNum);
@@ -3528,21 +3533,21 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::Second);
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::Minute);
 
-        CIDLib_Time::pfcolMMDDYY = new TCompList;
+        CIDLib_Time::pfcolMMDDYY = new TTimeCompList;
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::DayNum);
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::Year2);
 
-        CIDLib_Time::pfcolMMDDYYYY = new TCompList;
+        CIDLib_Time::pfcolMMDDYYYY = new TTimeCompList;
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::DayNum);
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::Year4);
 
-        CIDLib_Time::pfcolRFC822 = new TCompList;
+        CIDLib_Time::pfcolRFC822 = new TTimeCompList;
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::DayName);
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::Punct);
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::Space);
@@ -3560,21 +3565,21 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::TZ);
 
-        CIDLib_Time::pfcolYYMMDD = new TCompList;
+        CIDLib_Time::pfcolYYMMDD = new TTimeCompList;
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::Year2);
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::DayNum);
 
-        CIDLib_Time::pfcolYYYYMMDD = new TCompList;
+        CIDLib_Time::pfcolYYYYMMDD = new TTimeCompList;
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::Year4);
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::DayNum);
 
-        CIDLib_Time::pfcolYYYYMMDD24HHMM = new TCompList;
+        CIDLib_Time::pfcolYYYYMMDD24HHMM = new TTimeCompList;
         CIDLib_Time::pfcolYYYYMMDD24HHMM->c4AddElement(tCIDLib::ETimeComps::Year4);
         CIDLib_Time::pfcolYYYYMMDD24HHMM->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYYYMMDD24HHMM->c4AddElement(tCIDLib::ETimeComps::MonthNum);

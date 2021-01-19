@@ -29,15 +29,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  We used to do this in the build. But if using an IDE that validates, it
-//  won't see build flags and hence the IDE will get ASCII versions of all of
-//  the system headers. So we define them here.
-// ---------------------------------------------------------------------------
-#define UNICODE 1
-#define _UNICODE 1
-
-
-// ---------------------------------------------------------------------------
 //  Win32 platform is always little endian. Big endian platforms will instead
 //  define the CIDLIB_BIGENDIAN token.
 // ---------------------------------------------------------------------------
@@ -178,3 +169,19 @@ int wmain() \
 //  Suppress a single line warning
 // ---------------------------------------------------------------------------
 #define CIDLib_Suppress(wid) __pragma(warning(suppress : wid))
+
+
+// ---------------------------------------------------------------------------
+//  To allow for some use of annotations, which are going to be compiler specific.
+//  These are debug mode only, and are defined away for release mode.
+// ---------------------------------------------------------------------------
+#if defined(_DEBUG)
+#include <sal.h>
+#define COP _Out_
+#define CIP _In_
+#define CIOP _Inout_
+#else
+#define COP
+#define CIP
+#define CIOP
+#endif

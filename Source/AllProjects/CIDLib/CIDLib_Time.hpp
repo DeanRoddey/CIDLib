@@ -31,6 +31,10 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+template <class E, class I> class TFundVector;
+using TTimeCompList = TFundVector<tCIDLib::ETimeComps, tCIDLib::TCard4>;
+
+
 // ---------------------------------------------------------------------------
 //   CLASS: TTime
 //  PREFIX: tm
@@ -40,12 +44,6 @@ class CIDLIBEXP TTime :
     public TObject, public MDuplicable, public MFormattable, public MStreamable
 {
     public  :
-        // -------------------------------------------------------------------
-        //  Public class types
-        // -------------------------------------------------------------------
-        using TCompList = TFundVector<tCIDLib::ETimeComps>;
-
-
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
@@ -162,35 +160,35 @@ class CIDLIBEXP TTime :
             ,       tCIDLib::TCard4&        c4Day
         );
 
-        static const TCompList& fcol12HHMM();
+        static const TTimeCompList& fcol12HHMM();
 
-        static const TCompList& fcol24HHMM();
+        static const TTimeCompList& fcol24HHMM();
 
-        static const TCompList& fcol24HHMMSS();
+        static const TTimeCompList& fcol24HHMMSS();
 
-        static const TCompList& fcolCTime();
+        static const TTimeCompList& fcolCTime();
 
-        static const TCompList& fcolDDMMYY();
+        static const TTimeCompList& fcolDDMMYY();
 
-        static const TCompList& fcolDDMMYYYY();
+        static const TTimeCompList& fcolDDMMYYYY();
 
-        static const TCompList& fcolDTStamp();
+        static const TTimeCompList& fcolDTStamp();
 
-        static const TCompList& fcolFullDate();
+        static const TTimeCompList& fcolFullDate();
 
-        static const TCompList& fcolISO8601NTZ();
+        static const TTimeCompList& fcolISO8601NTZ();
 
-        static const TCompList& fcolMMDDYY();
+        static const TTimeCompList& fcolMMDDYY();
 
-        static const TCompList& fcolMMDDYYYY();
+        static const TTimeCompList& fcolMMDDYYYY();
 
-        static const TCompList& fcolRFC822();
+        static const TTimeCompList& fcolRFC822();
 
-        static const TCompList& fcolYYMMDD();
+        static const TTimeCompList& fcolYYMMDD();
 
-        static const TCompList& fcolYYYYMMDD();
+        static const TTimeCompList& fcolYYYYMMDD();
 
-        static const TCompList& fcolYYYYMMDD24HHMM();
+        static const TTimeCompList& fcolYYYYMMDD24HHMM();
 
         static tCIDLib::TInt4 i4Offset();
 
@@ -396,7 +394,7 @@ class CIDLIBEXP TTime :
         tCIDLib::TBoolean bParseFromText
         (
             const   TString&                strSrc
-            , const TCompList&              fcolCompList
+            , const TTimeCompList&              fcolCompList
             , const tCIDLib::TCh            chDateSep = kCIDLib::chNull
             , const tCIDLib::TCh            chTimeSep = kCIDLib::chNull
             , const tCIDLib::TCh            chTZSep = kCIDLib::chNull
@@ -528,7 +526,7 @@ class CIDLIBEXP TTime :
         tCIDLib::TVoid ParseFromText
         (
             const   TString&                strSrc
-            , const TCompList&              fcolCompList
+            , const TTimeCompList&              fcolCompList
             , const tCIDLib::TCh            chDateSep = kCIDLib::chNull
             , const tCIDLib::TCh            chTimeSep = kCIDLib::chNull
             , const tCIDLib::TCh            chTZSep = kCIDLib::chNull

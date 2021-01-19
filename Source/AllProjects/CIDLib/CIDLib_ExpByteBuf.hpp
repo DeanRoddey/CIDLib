@@ -101,19 +101,26 @@ class CIDLIBEXP TExpByteBuf : public TObject
             , const tCIDLib::TCard4         c4Count
         );
 
+        [[nodiscard]] tCIDLib::TBoolean bIsEmpty() const noexcept
+        {
+            return m_c4CurOfs == 0;
+        }
+
         tCIDLib::TCard1 c1First() const;
 
         tCIDLib::TCard1 c1Last() const;
 
-        tCIDLib::TCard4 c4Bytes() const;
+        tCIDLib::TCard1 c1PopLast();
+
+        [[nodiscard]] tCIDLib::TCard4 c4Bytes() const noexcept;
 
         tCIDLib::TCard4 c4CheckSum() const;
 
-        const tCIDLib::TCard1* pc1Buffer() const;
+        [[nodiscard]] const tCIDLib::TCard1* pc1Buffer() const noexcept;
 
         [[nodiscard]] tCIDLib::TCard1* pszReplicateBuffer();
 
-        tCIDLib::TVoid Reset();
+        tCIDLib::TVoid Reset() noexcept;
 
 
     private :

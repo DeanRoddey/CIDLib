@@ -212,17 +212,17 @@ class CIDLIBEXP TString :
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
-        static tCIDLib::TBoolean bComp(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::TBoolean bComp(const TString& str1, const TString& str2)
         {
             return str1.bCompare(str2);
         }
 
-        static tCIDLib::TBoolean bCompI(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::TBoolean bCompI(const TString& str1, const TString& str2)
         {
             return str1.bCompareI(str2);
         }
 
-        static tCIDLib::TCard1 c1ToHex(const tCIDLib::TSCh chToXlat)
+        [[nodiscard]] static tCIDLib::TCard1 c1ToHex(const tCIDLib::TSCh chToXlat)
         {
             tCIDLib::TCard1 c1Ret =(0);
             if ((chToXlat >= 0x41) && (chToXlat <= 0x46))
@@ -234,7 +234,7 @@ class CIDLIBEXP TString :
             return c1Ret;
         }
 
-        static tCIDLib::TCard1 c1ToHex(const tCIDLib::TCh chToXlat)
+        [[nodiscard]] static tCIDLib::TCard1 c1ToHex(const tCIDLib::TCh chToXlat)
         {
             tCIDLib::TCard1 c1Ret(0);
             if ((chToXlat >= kCIDLib::chLatin_A) && (chToXlat <= kCIDLib::chLatin_F))
@@ -246,51 +246,51 @@ class CIDLIBEXP TString :
             return c1Ret;
         }
 
-        static tCIDLib::ESortComps eComp(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::ESortComps eComp(const TString& str1, const TString& str2)
         {
             return str1.eCompare(str2);
         }
 
-        static tCIDLib::ESortComps eCompI(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::ESortComps eCompI(const TString& str1, const TString& str2)
         {
             return str1.eCompareI(str2);
         }
 
-        static ETokenFind eFindToken
+        [[nodiscard]] static ETokenFind eFindToken
         (
-            const tCIDLib::TCh*&            pszStart
-            , tCIDLib::TCh&                 chToken
-            , tCIDLib::EHJustify&           eJustify
-            , tCIDLib::TCard4&              c4FldWidth
-            , tCIDLib::TCh&                 chFill
-            , tCIDLib::TCard4&              c4Precision
+            const   tCIDLib::TCh*&          pszStart
+            , COP    tCIDLib::TCh&          chToken
+            , COP    tCIDLib::EHJustify&    eJustify
+            , COP    tCIDLib::TCard4&       c4FldWidth
+            , COP    tCIDLib::TCh&          chFill
+            , COP    tCIDLib::TCard4&       c4Precision
             , const tCIDLib::TCh*&          pszEnd
         );
 
         static tCIDLib::TVoid FromHex
         (
             const   tCIDLib::TCard1         c1ToXlat
-            ,       tCIDLib::TSCh&          chOne
-            ,       tCIDLib::TSCh&          chTwo
+            , COP   tCIDLib::TSCh&          chOne
+            , COP   tCIDLib::TSCh&          chTwo
         );
 
         static tCIDLib::TVoid FromHex
         (
             const   tCIDLib::TCard1         c1ToXlat
-            ,       tCIDLib::TCh&           chOne
-            ,       tCIDLib::TCh&           chTwo
+            , COP   tCIDLib::TCh&           chOne
+            , COP   tCIDLib::TCh&           chTwo
         );
 
-        static const tCIDLib::TCh* pszFindToken
+        [[nodiscard]] static const tCIDLib::TCh* pszFindToken
         (
             const   tCIDLib::TCh* const     pszSrc
             , const tCIDLib::TCh            chToFind
-            ,       tCIDLib::EHJustify&     eJustify
-            ,       tCIDLib::TCard4&        c4FldWidth
-            ,       tCIDLib::TCh&           chFill
-            ,       tCIDLib::TCard4&        c4Precision
-            ,       tCIDLib::TCard4&        c4TokenChars
-            ,       tCIDLib::TCard4&        c4TokenCnt
+            , COP   tCIDLib::EHJustify&     eJustify
+            , COP   tCIDLib::TCard4&        c4FldWidth
+            , COP   tCIDLib::TCh&           chFill
+            , COP   tCIDLib::TCard4&        c4Precision
+            , COP   tCIDLib::TCard4&        c4TokenChars
+            , COP   tCIDLib::TCard4&        c4TokenCnt
         );
 
         static const TString& strEmpty();
@@ -670,159 +670,159 @@ class CIDLIBEXP TString :
             const   tCIDLib::TCh            chAt
         );
 
-        tCIDLib::TBoolean bCompare
+        [[nodiscard]] tCIDLib::TBoolean bCompare
         (
             const   TString&                strSrc
         )   const;
 
-        tCIDLib::TBoolean bCompare
+        [[nodiscard]] tCIDLib::TBoolean bCompare
         (
             const   tCIDLib::TCh* const     pszSrc
         )   const;
 
-        tCIDLib::TBoolean bCompareI
+        [[nodiscard]] tCIDLib::TBoolean bCompareI
         (
             const   TString&                strSrc
         )   const;
 
-        tCIDLib::TBoolean bCompareI
+        [[nodiscard]] tCIDLib::TBoolean bCompareI
         (
             const   tCIDLib::TCh* const     pszSrc
         )   const;
 
-        tCIDLib::TBoolean bCompareN
-        (
-            const   TString&                strSrc
-            , const tCIDLib::TCard4         c4Count
-        )   const;
-
-        tCIDLib::TBoolean bCompareN
-        (
-            const   tCIDLib::TCh* const     pszSrc
-            , const tCIDLib::TCard4         c4Count
-        )   const;
-
-        tCIDLib::TBoolean bCompareNI
+        [[nodiscard]] tCIDLib::TBoolean bCompareN
         (
             const   TString&                strSrc
             , const tCIDLib::TCard4         c4Count
         )   const;
 
-        tCIDLib::TBoolean bCompareNI
+        [[nodiscard]] tCIDLib::TBoolean bCompareN
         (
             const   tCIDLib::TCh* const     pszSrc
             , const tCIDLib::TCard4         c4Count
         )   const;
 
-        tCIDLib::TBoolean bContainsChar
+        [[nodiscard]] tCIDLib::TBoolean bCompareNI
+        (
+            const   TString&                strSrc
+            , const tCIDLib::TCard4         c4Count
+        )   const;
+
+        [[nodiscard]] tCIDLib::TBoolean bCompareNI
+        (
+            const   tCIDLib::TCh* const     pszSrc
+            , const tCIDLib::TCard4         c4Count
+        )   const;
+
+        [[nodiscard]] tCIDLib::TBoolean bContainsChar
         (
             const   tCIDLib::TCh            chToFind
         )   const noexcept;
 
-        tCIDLib::TBoolean bContainsSubStr
+        [[nodiscard]] tCIDLib::TBoolean bContainsSubStr
         (
             const   TString&                strToFind
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const;
 
-        tCIDLib::TBoolean bEndsWith(const tCIDLib::TCh* const pszToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bEndsWith(const tCIDLib::TCh* const pszToCheck) const
         {
             return bCheckSuffix(pszToCheck, kCIDLib::True);
         }
 
-        tCIDLib::TBoolean bEndsWith(const TString& strToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bEndsWith(const TString& strToCheck) const
         {
             return bCheckSuffix(strToCheck, kCIDLib::True);
         }
 
-        tCIDLib::TBoolean bEndsWithI(const tCIDLib::TCh* const pszToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bEndsWithI(const tCIDLib::TCh* const pszToCheck) const
         {
             return bCheckSuffix(pszToCheck, kCIDLib::False);
         }
 
-        tCIDLib::TBoolean bEndsWithI(const TString& strToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bEndsWithI(const TString& strToCheck) const
         {
             return bCheckSuffix(strToCheck, kCIDLib::False);
         }
 
-        tCIDLib::TBoolean bExtractNthToken
+        [[nodiscard]] tCIDLib::TBoolean bExtractNthToken
         (
             const   tCIDLib::TCard4         c4Index
             , const tCIDLib::TCh            chSepChar
-            ,       TString&                strToFill
+            , COP   TString&                strToFill
             , const tCIDLib::TBoolean       bStripWS = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bFindTokenList
+        [[nodiscard]] tCIDLib::TBoolean bFindTokenList
         (
-                    TString&                strToFill
+            COP     TString&                strToFill
         )   const;
 
-        tCIDLib::TBoolean bFirstOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bFirstOccurrence
         (
             const   tCIDLib::TCh            chToFind
-            ,       tCIDLib::TCard4&        c4Pos
+            , COP   tCIDLib::TCard4&        c4Pos
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bFirstOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bFirstOccurrence
         (
             const   TString&                strSubStrToFind
-            ,       tCIDLib::TCard4&        c4Pos
+            , COP   tCIDLib::TCard4&        c4Pos
             , const tCIDLib::TBoolean       bAnyChar = kCIDLib::False
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bIsAlpha() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsAlpha() const;
 
-        tCIDLib::TBoolean bIsAlphaNum() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsAlphaNum() const;
 
-        tCIDLib::TBoolean bIsEmpty() const
+        [[nodiscard]] tCIDLib::TBoolean bIsEmpty() const
         {
             return(m_c4CurEnd == 0);
         }
 
-        tCIDLib::TBoolean bLastOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bLastOccurrence
         (
             const   tCIDLib::TCh            chToFind
-            ,       tCIDLib::TCard4&        c4Pos
+            , COP   tCIDLib::TCard4&        c4Pos
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bLastOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bLastOccurrence
         (
             const   TString&                strSubStrToFind
-            ,       tCIDLib::TCard4&        c4Pos
+            , COP   tCIDLib::TCard4&        c4Pos
             , const tCIDLib::TBoolean       bAnyChar = kCIDLib::False
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bNextOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bNextOccurrence
         (
             const   tCIDLib::TCh            chToFind
-            ,       tCIDLib::TCard4&        c4StartPos
+            , CIOP   tCIDLib::TCard4&        c4StartPos
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bNextOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bNextOccurrence
         (
             const   TString&                strSubStrToFind
-            ,       tCIDLib::TCard4&        c4StartPos
+            , CIOP  tCIDLib::TCard4&        c4StartPos
             , const tCIDLib::TBoolean       bAnyChar = kCIDLib::False
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bPrevOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bPrevOccurrence
         (
             const   tCIDLib::TCh            chToFind
-            ,       tCIDLib::TCard4&        c4StartPos
+            , CIOP  tCIDLib::TCard4&        c4StartPos
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bPrevOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bPrevOccurrence
         (
             const   TString&                strSubStrToFind
-            ,       tCIDLib::TCard4&        c4StartPos
+            , CIOP  tCIDLib::TCard4&        c4StartPos
             , const tCIDLib::TBoolean       bAnyChar = kCIDLib::False
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
@@ -837,109 +837,109 @@ class CIDLIBEXP TString :
         (
             const   TString&                strToReplace
             , const TString&                strReplaceWith
-            ,       tCIDLib::TCard4&        c4StartAt
+            , CIOP  tCIDLib::TCard4&        c4StartAt
             , const tCIDLib::TBoolean       bReplaceAll
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         );
 
         tCIDLib::TBoolean bSplit
         (
-                    TString&                strSecondHalf
+            COP     TString&                strSecondHalf
             , const tCIDLib::TCh            chDivider
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         );
 
-        tCIDLib::TBoolean bStartsWith(const tCIDLib::TCh* const pszToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bStartsWith(const tCIDLib::TCh* const pszToCheck) const
         {
             return bCheckPrefix(pszToCheck, kCIDLib::True);
         }
 
-        tCIDLib::TBoolean bStartsWith(const TString& strToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bStartsWith(const TString& strToCheck) const
         {
             return bCheckPrefix(strToCheck, kCIDLib::True);
         }
 
-        tCIDLib::TBoolean bStartsWithI(const tCIDLib::TCh* const pszToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bStartsWithI(const tCIDLib::TCh* const pszToCheck) const
         {
             return bCheckPrefix(pszToCheck, kCIDLib::False);
         }
 
-        tCIDLib::TBoolean bStartsWithI(const TString& strToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bStartsWithI(const TString& strToCheck) const
         {
             return bCheckPrefix(strToCheck, kCIDLib::False);
         }
 
         tCIDLib::TBoolean bToBoolean
         (
-                    tCIDLib::TBoolean&      bToFill
+            COP    tCIDLib::TBoolean&      bToFill
         )   const noexcept;
 
         tCIDLib::TBoolean bToCard1
         (
-                    tCIDLib::TCard1&        c1ToFill
+            COP     tCIDLib::TCard1&        c1ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToCard2
         (
-                    tCIDLib::TCard2&        c2ToFill
+            COP     tCIDLib::TCard2&        c2ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToCard4
         (
-                    tCIDLib::TCard4&        c4ToFill
+            COP     tCIDLib::TCard4&        c4ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToCard8
         (
-                    tCIDLib::TCard8&        c8ToFill
+            COP     tCIDLib::TCard8&        c8ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToFloat4
         (
-                    tCIDLib::TFloat4&       f4ToFill
+            COP   tCIDLib::TFloat4&       f4ToFill
         )   const noexcept;
 
         tCIDLib::TBoolean bToFloat8
         (
-                    tCIDLib::TFloat8&       f8ToFill
+            COP   tCIDLib::TFloat8&       f8ToFill
         )   const noexcept;
 
         tCIDLib::TBoolean bToInt1
         (
-                    tCIDLib::TInt1&         i1ToFill
+            COP     tCIDLib::TInt1&         i1ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToInt2
         (
-                    tCIDLib::TInt2&         i2ToFill
+            COP     tCIDLib::TInt2&         i2ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToInt4
         (
-                    tCIDLib::TInt4&         i4ToFill
+            COP     tCIDLib::TInt4&         i4ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToInt8
         (
-                    tCIDLib::TInt8&         i8ToFill
+            COP     tCIDLib::TInt8&         i8ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
-        tCIDLib::TBoolean bTokenExists
+        [[nodiscard]] tCIDLib::TBoolean bTokenExists
         (
             const   tCIDLib::TCh            chToken
         )   const;
 
-        tCIDLib::TCard4 c4BufChars() const;
+        [[nodiscard]] tCIDLib::TCard4 c4BufChars() const;
 
-        tCIDLib::TCard4 c4Length() const;
+        [[nodiscard]] tCIDLib::TCard4 c4Length() const;
 
         tCIDLib::TCard4 c4Val
         (
@@ -951,14 +951,14 @@ class CIDLIBEXP TString :
             const   tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const;
 
-        tCIDLib::TCh chAt
+        [[nodiscard]] tCIDLib::TCh chAt
         (
             const   tCIDLib::TCard4         c4Index
         )   const;
 
-        tCIDLib::TCh chFirst() const;
+        [[nodiscard]] tCIDLib::TCh chFirst() const;
 
-        tCIDLib::TCh chLast() const;
+        [[nodiscard]] tCIDLib::TCh chLast() const;
 
         tCIDLib::TVoid CapAt
         (
@@ -976,7 +976,7 @@ class CIDLIBEXP TString :
 
         tCIDLib::TVoid CopyOutSubStr
         (
-                     TString&               strTarget
+            COP     TString&               strTarget
             , const tCIDLib::TCard4         c4Start
             , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
         )   const;
@@ -994,45 +994,45 @@ class CIDLIBEXP TString :
 
         tCIDLib::TVoid DeleteLast();
 
-        tCIDLib::ESortComps eCompare
+        [[nodiscard]] tCIDLib::ESortComps eCompare
         (
             const   tCIDLib::TCh* const     pszToCompare
         )   const;
 
-        tCIDLib::ESortComps eCompare
+        [[nodiscard]] tCIDLib::ESortComps eCompare
         (
             const   TString&                strToCompare
         )   const;
 
-        tCIDLib::ESortComps eCompareN
+        [[nodiscard]] tCIDLib::ESortComps eCompareN
         (
             const   tCIDLib::TCh* const     pszToCompare
             , const tCIDLib::TCard4         c4MaxComp
         )   const;
 
-        tCIDLib::ESortComps eCompareN
+        [[nodiscard]] tCIDLib::ESortComps eCompareN
         (
             const   TString&                strToCompare
             , const tCIDLib::TCard4         c4MaxComp
         )   const;
 
-        tCIDLib::ESortComps eCompareI
+        [[nodiscard]] tCIDLib::ESortComps eCompareI
         (
             const   tCIDLib::TCh* const     pszToCompare
         )   const;
 
-        tCIDLib::ESortComps eCompareI
+        [[nodiscard]] tCIDLib::ESortComps eCompareI
         (
             const   TString&                strToCompare
         )   const;
 
-        tCIDLib::ESortComps eCompareNI
+        [[nodiscard]] tCIDLib::ESortComps eCompareNI
         (
             const   tCIDLib::TCh* const     pszToCompare
             , const tCIDLib::TCard4         c4MaxComp
         )   const;
 
-        tCIDLib::ESortComps eCompareNI
+        [[nodiscard]] tCIDLib::ESortComps eCompareNI
         (
             const   TString&                strToCompare
             , const tCIDLib::TCard4         c4MaxComp
@@ -1125,7 +1125,7 @@ class CIDLIBEXP TString :
             , const tCIDLib::TCh            chToken
         );
 
-        tCIDLib::EFindRes eTokenExists
+        [[nodiscard]] tCIDLib::EFindRes eTokenExists
         (
             const   tCIDLib::TCh            chToken
         )   const;
@@ -1183,17 +1183,17 @@ class CIDLIBEXP TString :
 
         tCIDLib::TFloat8 f8Val() const;
 
-        tCIDLib::THashVal hshCalcHash
+        [[nodiscard]] tCIDLib::THashVal hshCalcHash
         (
             const   tCIDLib::TCard4         c4Modulus
         )   const;
 
-        tCIDLib::TInt4 i4Val
+        [[nodiscard]] tCIDLib::TInt4 i4Val
         (
             const   tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const;
 
-        tCIDLib::TInt8 i8Val
+        [[nodiscard]] tCIDLib::TInt8 i8Val
         (
             const   tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const;
@@ -1238,9 +1238,9 @@ class CIDLIBEXP TString :
             , const MFormattable&           fmtblToken4 = MFormattable::Nul_MFormattable()
         );
 
-        const tCIDLib::TCh* pszBuffer() const;
+        [[nodiscard]] const tCIDLib::TCh* pszBuffer() const;
 
-        const tCIDLib::TCh* pszBufferAt
+        [[nodiscard]] const tCIDLib::TCh* pszBufferAt
         (
             const   tCIDLib::TCard4         c4At
         )   const;
@@ -1437,17 +1437,17 @@ class CIDLIBEXP TString :
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const override;
 
         tCIDLib::TVoid StreamFrom
         (
-                    TBinInStream&           strmToReadFrom
+            CIOP    TBinInStream&           strmToReadFrom
         )   override;
 
         tCIDLib::TVoid StreamTo
         (
-                    TBinOutStream&          strmToWriteTo
+            CIOP    TBinOutStream&          strmToWriteTo
         )   const override;
 
 
@@ -1464,37 +1464,37 @@ class CIDLIBEXP TString :
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bCheckPrefix
+        [[nodiscard]] tCIDLib::TBoolean bCheckPrefix
         (
             const   tCIDLib::TCh* const     pszToCheck
             , const tCIDLib::TBoolean       bCaseSensitive
         )   const;
 
-        tCIDLib::TBoolean bCheckPrefix
+        [[nodiscard]] tCIDLib::TBoolean bCheckPrefix
         (
             const   TString&                strToCheck
             , const tCIDLib::TBoolean       bCaseSensitive
         )   const;
 
-        tCIDLib::TBoolean bCheckSuffix
+        [[nodiscard]] tCIDLib::TBoolean bCheckSuffix
         (
             const   tCIDLib::TCh* const     pszToCheck
             , const tCIDLib::TBoolean       bCaseSensitive
         )   const;
 
-        tCIDLib::TBoolean bCheckSuffix
+        [[nodiscard]] tCIDLib::TBoolean bCheckSuffix
         (
             const   TString&                strToCheck
             , const tCIDLib::TBoolean       bCaseSensitive
         )   const;
 
-        tCIDLib::TCard4 c4CalcBufDiff
+        [[nodiscard]] tCIDLib::TCard4 c4CalcBufDiff
         (
             const   tCIDLib::TCh* const     pszUpper
             , const tCIDLib::TCh* const     pszLower
         )   const;
 
-        tCIDLib::TCard4 c4CalcBufDiff(const tCIDLib::TCh* const pszUpper) const
+        [[nodiscard]] tCIDLib::TCard4 c4CalcBufDiff(const tCIDLib::TCh* const pszUpper) const
         {
             return c4CalcBufDiff(pszUpper, m_pszBuffer);
         }
@@ -1584,14 +1584,14 @@ class CIDLIBEXP TString :
             return pszEnd;
         }
 
-        tCIDLib::TCh* pszBufferW();
+        [[nodiscard]] tCIDLib::TCh* pszBufferW();
 
-        tCIDLib::TCh* pszBufferWAt
+        [[nodiscard]] tCIDLib::TCh* pszBufferWAt
         (
             const   tCIDLib::TCard4         c4At
         );
 
-        const tCIDLib::TCh* pszFmtHelper(const tCIDLib::TCh* pszFmt, TString&, TString&)
+        [[nodiscard]] const tCIDLib::TCh* pszFmtHelper(const tCIDLib::TCh* pszFmt, TString&, TString&)
         {
             return pszFmt;
         }

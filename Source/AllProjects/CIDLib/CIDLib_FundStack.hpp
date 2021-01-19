@@ -249,25 +249,30 @@ template <typename T> class TFundStackJan
             m_pfcolStack->Push(tToPush);
         }
 
+        TFundStackJan(const TFundStackJan&) = delete;
+        TFundStackJan(TFundStackJan&&) = delete;
+
         ~TFundStackJan()
         {
             if (m_pfcolStack)
                 m_pfcolStack->Pop();
         }
 
+        TFundStackJan& operator=(const TFundStackJan&) = delete;
+        TFundStackJan& operator=(TFundStackJan&&) = delete;
+
         tCIDLib::TVoid Orphan()
         {
-            m_pfcolStack = 0;
+            m_pfcolStack = nullptr;
         }
 
         T tValue() const
         {
-            return m_fcolStack->tPeek();
+            return m_pfcolStack->tPeek();
         }
 
     private :
-        TFundStackJan(const TFundStackJan&);
-        tCIDLib::TVoid operator=(const TFundStackJan&);
+        TFundStack<T>*  m_pfcolStack;
 };
 
 #pragma CIDLIB_POPPACK

@@ -321,11 +321,11 @@ $(TMPOUTDIR) : $(OUTDIR)
 #   Inference rule for creating the Obj files
 # ----------------------------------------------------------------------------
 .cpp{$(TMPOUTDIR)}.obj:
-    cl $(CPPFLAGS) /Za /Zc:forScope,wchar_t /EHsc /W3 /nologo /c /D_WINDOWS /D_CONSOLE \
+    cl $(CPPFLAGS) /Za /Zc:forScope,wchar_t /EHsc /W3 /nologo /c /D_WINDOWS /D_CONSOLE /DUNICODE /D_UNICODE \
         /Fd$(TMPOUTDIR)\ /DNTDDI_VERSION=NTDDI_WIN7 /Fo$(TMPOUTDIR)\ $<
 
 {$(PLATDIR)}.cpp{$(TMPOUTDIR)}.obj:
-    cl $(CPPFLAGS) /EHsc /Zc:forScope,wchar_t /W3 /nologo /c /D_WINDOWS /D_CONSOLE \
+    cl $(CPPFLAGS) /EHsc /Zc:forScope,wchar_t /W3 /nologo /c /D_WINDOWS /D_CONSOLE /DUNICODE /D_UNICODE \
         /Fd$(TMPOUTDIR)\ /DNTDDI_VERSION=NTDDI_WIN7 /Fo$(TMPOUTDIR)\ $<
 
 !ENDIF
