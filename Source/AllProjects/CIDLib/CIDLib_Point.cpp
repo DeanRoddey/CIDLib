@@ -63,14 +63,14 @@ TPoint& TPoint::Nul_TPoint()
 // ---------------------------------------------------------------------------
 //  TPoint: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TPoint::TPoint(const tCIDLib::THostPoint& ptSrc) :
+TPoint::TPoint(const tCIDLib::THostPoint& ptSrc) noexcept :
 
     m_i4X(ptSrc.i4X)
     , m_i4Y(ptSrc.i4Y)
 {
 }
 
-TPoint::TPoint(const tCIDLib::TRawPoint& ptSrc) :
+TPoint::TPoint(const tCIDLib::TRawPoint& ptSrc) noexcept :
 
     m_i4X(ptSrc.i4X)
     , m_i4Y(ptSrc.i4Y)

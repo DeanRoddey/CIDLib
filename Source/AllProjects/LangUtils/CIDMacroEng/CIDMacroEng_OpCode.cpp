@@ -45,7 +45,7 @@ TMEngOpCode::TMEngOpCode() :
 
     m_eOpCode(tCIDMacroEng::EOpCodes::None)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
 }
 
 TMEngOpCode::TMEngOpCode(const TMEngOpCode& meopToCopy) :
@@ -624,7 +624,7 @@ TMEngOpCode::Format(TTextOutStream& strmTarget, const TCIDMacroEngine& meOwner) 
 tCIDLib::TVoid
 TMEngOpCode::SetOpCode(const tCIDMacroEng::EOpCodes eOpCode)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
 }
 
@@ -633,7 +633,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetSingleIndex(const   tCIDMacroEng::EOpCodes eOpCode
                                 , const tCIDLib::TCard2     c2Index)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.ac2Indices[0] = c2Index;
 }
@@ -644,7 +644,7 @@ TMEngOpCode::SetDoubleIndex(const   tCIDMacroEng::EOpCodes eOpCode
                                 , const tCIDLib::TCard2     c2Index1
                                 , const tCIDLib::TCard2     c2Index2)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.ac2Indices[0] = c2Index1;
     m_uStorage.ac2Indices[1] = c2Index2;
@@ -655,7 +655,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TBoolean   bImmediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.bImmediate = bImmediate;
 }
@@ -665,7 +665,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCard1     c1Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.c1Immediate = c1Immediate;
 }
@@ -674,7 +674,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCard2     c2Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.c2Immediate = c2Immediate;
 }
@@ -683,7 +683,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCard4     c4Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.c4Immediate = c4Immediate;
 }
@@ -692,7 +692,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCard8     c8Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.c8Immediate = c8Immediate;
 }
@@ -702,7 +702,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCh        chImmediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.chImmediate = chImmediate;
 }
@@ -712,7 +712,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TFloat4    f4Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.f4Immediate = f4Immediate;
 }
@@ -721,7 +721,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TFloat8    f8Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.f8Immediate = f8Immediate;
 }
@@ -730,7 +730,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TInt1      i1Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.i1Immediate = i1Immediate;
 }
@@ -739,7 +739,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TInt2      i2Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.i2Immediate = i2Immediate;
 }
@@ -748,7 +748,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TInt4      i4Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.i4Immediate = i4Immediate;
 }

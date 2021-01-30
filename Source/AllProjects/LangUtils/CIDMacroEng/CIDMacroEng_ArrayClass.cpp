@@ -181,7 +181,7 @@ TMEngArrayVal::CopyFrom(const   TMEngClassVal&      mecvToCopy
         TRawMem::SetMemBuf
         (
             pNew
-            , tCIDLib::TCard1(0)
+            , kCIDLib::c1MinCard
             , mecvSrc.m_c4ElemCount * sizeof(TMEngClassVal*)
         );
 
@@ -340,7 +340,7 @@ tCIDLib::TVoid TMEngArrayVal::Initialize(const tCIDLib::TCard4 c4ElemCount)
     TRawMem::SetMemBuf
     (
         m_pElems
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , c4ElemCount * sizeof(TMEngClassVal*)
     );
 }
@@ -372,7 +372,7 @@ TMEngArrayVal::Reallocate(const tCIDLib::TCard4 c4ElemCount)
     TRawMem::SetMemBuf
     (
         pNew
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , c4ElemCount * sizeof(TMEngClassVal*)
     );
 

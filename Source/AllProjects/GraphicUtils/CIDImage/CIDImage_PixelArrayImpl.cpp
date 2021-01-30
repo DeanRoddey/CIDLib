@@ -90,7 +90,7 @@ TPixelArrayImpl::TPixelArrayImpl() :
     //
     m_c4BufSz = m_c4ImageSz;
     m_pc1Pixels = new tCIDLib::TCard1[m_c4BufSz];
-    TRawMem::SetMemBuf(m_pc1Pixels, tCIDLib::TCard1(0), m_c4BufSz);
+    TRawMem::SetMemBuf(m_pc1Pixels, kCIDLib::c1MinCard, m_c4BufSz);
 }
 
 TPixelArrayImpl::TPixelArrayImpl(const  tCIDImage::EPixFmts     eFmt
@@ -163,7 +163,7 @@ TPixelArrayImpl::TPixelArrayImpl(const TCIDImage& imgSource) :
     // And allocate and zero out our new buffer
     m_c4BufSz = m_c4ImageSz;
     m_pc1Pixels = new tCIDLib::TCard1[m_c4BufSz];
-    TRawMem::SetMemBuf(m_pc1Pixels, tCIDLib::TCard1(0), m_c4BufSz);
+    TRawMem::SetMemBuf(m_pc1Pixels, kCIDLib::c1MinCard, m_c4BufSz);
 }
 
 TPixelArrayImpl::TPixelArrayImpl(const  tCIDImage::EPixFmts     eFmt
@@ -187,7 +187,7 @@ TPixelArrayImpl::TPixelArrayImpl(const  tCIDImage::EPixFmts     eFmt
     // And allocate and zero out our new buffer
     m_c4BufSz = m_c4ImageSz;
     m_pc1Pixels = new tCIDLib::TCard1[m_c4BufSz];
-    TRawMem::SetMemBuf(m_pc1Pixels, tCIDLib::TCard1(0), m_c4BufSz);
+    TRawMem::SetMemBuf(m_pc1Pixels, kCIDLib::c1MinCard, m_c4BufSz);
 }
 
 TPixelArrayImpl::TPixelArrayImpl(const TPixelArrayImpl& pixaiSrc) :
@@ -838,9 +838,9 @@ tCIDLib::TCard4 TPixelArrayImpl::c4Unused(const TClrPalette& palToUse) const
         tCIDLib::TCard1 ac1Red[256];
         tCIDLib::TCard1 ac1Green[256];
         tCIDLib::TCard1 ac1Blue[256];
-        TRawMem::SetMemBuf(ac1Red, tCIDLib::TCard1(0), 256);
-        TRawMem::SetMemBuf(ac1Green, tCIDLib::TCard1(0), 256);
-        TRawMem::SetMemBuf(ac1Blue, tCIDLib::TCard1(0), 256);
+        TRawMem::SetMemBuf(ac1Red, kCIDLib::c1MinCard, 256);
+        TRawMem::SetMemBuf(ac1Green, kCIDLib::c1MinCard, 256);
+        TRawMem::SetMemBuf(ac1Blue, kCIDLib::c1MinCard, 256);
 
         //
         //  Now look through the image and get each color out as RGB and
@@ -936,7 +936,7 @@ tCIDLib::TCard4 TPixelArrayImpl::c4Unused(const TClrPalette& palToUse) const
          else
         {
             tCIDLib::TCard1 ac1Clr[256];
-            TRawMem::SetMemBuf(ac1Clr, tCIDLib::TCard1(0), 256);
+            TRawMem::SetMemBuf(ac1Clr, kCIDLib::c1MinCard, 256);
 
             for (tCIDLib::TCard4 c4YInd = 0; c4YInd < m_c4Height; c4YInd++)
             {
@@ -2256,7 +2256,7 @@ TPixelArrayImpl::Reset( const   tCIDImage::EPixFmts     eFmt
     }
 
     // Zero out the data buffer
-    TRawMem::SetMemBuf(m_pc1Pixels, tCIDLib::TCard1(0), m_c4BufSz);
+    TRawMem::SetMemBuf(m_pc1Pixels, kCIDLib::c1MinCard, m_c4BufSz);
 }
 
 tCIDLib::TVoid
@@ -2744,7 +2744,7 @@ tCIDLib::TVoid TPixelArrayImpl::SetEmptyTrans()
     if (m_c4LineBytePadding == 4)
         TRawMem::SetMemBuf(m_pc1Pixels, 0UL, c4ImageSz() >> 2);
     else
-        TRawMem::SetMemBuf(m_pc1Pixels, tCIDLib::TCard1(0), c4ImageSz());
+        TRawMem::SetMemBuf(m_pc1Pixels, kCIDLib::c1MinCard, c4ImageSz());
 }
 
 
@@ -2971,7 +2971,7 @@ tCIDLib::TVoid TPixelArrayImpl::ZeroAll()
     //  We only need to zero the used part of the buffer, i.e. the part
     //  that contains the iamge data. The buffer may be larger than that.
     //
-    TRawMem::SetMemBuf(m_pc1Pixels, tCIDLib::TCard1(0), m_c4ImageSz);
+    TRawMem::SetMemBuf(m_pc1Pixels, kCIDLib::c1MinCard, m_c4ImageSz);
 }
 
 

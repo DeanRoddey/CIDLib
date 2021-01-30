@@ -118,8 +118,7 @@ TDLinkedList& TDLinkedList::operator=(TDLinkedList&& llstSrc)
 
 
 // We cannot compare the elements here. The using class must do that
-tCIDLib::TBoolean
-TDLinkedList::operator==(const TDLinkedList& llstToTest) const
+tCIDLib::TBoolean TDLinkedList::operator==(const TDLinkedList& llstToTest) const
 {
     if (this != &llstToTest)
     {

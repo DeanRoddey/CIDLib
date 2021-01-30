@@ -46,6 +46,7 @@ class TTriChoiceDlg : public TDlgBox
         TTriChoiceDlg();
 
         TTriChoiceDlg(const TTriChoiceDlg&) = default;
+        TTriChoiceDlg(TTriChoiceDlg&&) = default;
 
         ~TTriChoiceDlg();
 
@@ -54,6 +55,7 @@ class TTriChoiceDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TTriChoiceDlg& operator=(const TTriChoiceDlg&) = delete;
+        TTriChoiceDlg& operator=(TTriChoiceDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

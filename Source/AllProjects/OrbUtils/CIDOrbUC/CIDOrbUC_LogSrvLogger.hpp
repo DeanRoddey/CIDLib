@@ -71,7 +71,7 @@ class CIDORBUCEXP TLogSrvLogger : public TObject, public MLogger
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bForceLocal() const;
+        [[nodiscard]] tCIDLib::TBoolean bForceLocal() const;
 
         tCIDLib::TBoolean bForceLocal
         (

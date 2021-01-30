@@ -104,13 +104,13 @@ namespace TRawMem
 
     KRNLEXPORT tCIDLib::TCard4 c4SafeRefAcquire
     (
-                tCIDLib::TCard4&       c4Ref
+                tCIDLib::TCard4&        c4Ref
         ,       tCIDLib::TBoolean&      bRes
     );
 
     KRNLEXPORT tCIDLib::TCard4 c4SafeRefRelease
     (
-                tCIDLib::TCard4&       c4Ref
+                tCIDLib::TCard4&        c4Ref
         ,       tCIDLib::TBoolean&      bRes
     );
 
@@ -318,7 +318,7 @@ namespace TRawMem
         //  Sometimes this is going to be void* return, which will get an analysis
         //  warning that reinterpret is not required.
         //
-        #pragma warning(suppress : 26471)
+        CIDLib_Suppress(26471)
         return reinterpret_cast<T*>
         (
             pExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew)
@@ -333,7 +333,7 @@ namespace TRawMem
         //  Sometimes this is going to be void* return, which will get an analysis
         //  warning that reinterpret is not required.
         //
-        #pragma warning(suppress : 26471)
+        CIDLib_Suppress(26471)
         return reinterpret_cast<T*>
         (
             pCompareAndExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew, pCompare)

@@ -951,7 +951,7 @@ TKrnlIP::eIPAFromText(  const   tCIDLib::TCh* const     pszIPAddrString
     // If not explicitly intended to be IPV6 and not null or empty, try 4
     if (pszIPAddrString && *pszIPAddrString && (eType != tCIDSock::EAddrTypes::IPV6))
     {
-        TRawMem::SetMemBuf(&AddrStore, sizeof(AddrStore), tCIDLib::TCard1(0));
+        TRawMem::SetMemBuf(&AddrStore, sizeof(AddrStore), kCIDLib::c1MinCard);
         pAddr->sa_family = AF_INET;
 
         iAddrSz = sizeof(AddrStore);

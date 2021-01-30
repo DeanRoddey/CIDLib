@@ -56,6 +56,7 @@ class CIDDAEEXP TCIDDAEWaveDec : public TCIDDAEDecoder
         TCIDDAEWaveDec();
 
         TCIDDAEWaveDec(const TCIDDAEWaveDec&) = delete;
+        TCIDDAEWaveDec(TCIDDAEWaveDec&&) = delete;
 
         ~TCIDDAEWaveDec();
 
@@ -64,6 +65,7 @@ class CIDDAEEXP TCIDDAEWaveDec : public TCIDDAEDecoder
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDAEWaveDec& operator=(const TCIDDAEWaveDec&) = delete;
+        TCIDDAEWaveDec& operator=(TCIDDAEWaveDec&&) = delete;
 
 
     protected :
@@ -143,6 +145,7 @@ class CIDDAEEXP TCIDDAEWaveEnc : public TCIDDAEEncoder
         TCIDDAEWaveEnc();
 
         TCIDDAEWaveEnc(const TCIDDAEWaveEnc&) = delete;
+        TCIDDAEWaveEnc(TCIDDAEWaveEnc&&) = delete;
 
         ~TCIDDAEWaveEnc();
 
@@ -151,6 +154,7 @@ class CIDDAEEXP TCIDDAEWaveEnc : public TCIDDAEEncoder
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDAEWaveEnc& operator=(const TCIDDAEWaveEnc&) = delete;
+        TCIDDAEWaveEnc& operator=(TCIDDAEWaveEnc&&) = delete;
 
 
         // -------------------------------------------------------------------

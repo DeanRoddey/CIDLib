@@ -1032,7 +1032,7 @@ TBitmap::hbmpFromImage( const   TGraphicDevice&     gdevTarget
 
     tCIDLib::TVoid* pBuf = new tCIDLib::TCard1[c4Size];
     TArrayJanitor<tCIDLib::TVoid> janInfoBuf(pBuf);
-    TRawMem::SetMemBuf(pBuf, tCIDLib::TCard1(0), c4Size);
+    TRawMem::SetMemBuf(pBuf, kCIDLib::c1MinCard, c4Size);
     BITMAPINFO* pSourceFmt = reinterpret_cast<BITMAPINFO*>(pBuf);
 
     pSourceFmt->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -1430,7 +1430,7 @@ TBitmap::TBitmap(const  TSize&                  szSize
         const tCIDLib::TCard4 c4BufSz = sizeof(BITMAPINFO) + 1024;
         tCIDLib::TCard1* pc1Buf = new tCIDLib::TCard1[c4BufSz];
         TArrayJanitor<tCIDLib::TCard1> janBuf(pc1Buf);
-        TRawMem::SetMemBuf(pc1Buf, tCIDLib::TCard1(0), c4BufSz);
+        TRawMem::SetMemBuf(pc1Buf, kCIDLib::c1MinCard, c4BufSz);
         BITMAPINFO& SrcFmt = *reinterpret_cast<BITMAPINFO*>(pc1Buf);
 
         SrcFmt.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -1602,7 +1602,7 @@ TBitmap::TBitmap(const  TSize&                  szSize
         const tCIDLib::TCard4 c4BufSz = sizeof(BITMAPINFO) + 1024;
         tCIDLib::TCard1* pc1Buf = new tCIDLib::TCard1[c4BufSz];
         TArrayJanitor<tCIDLib::TCard1> janBuf(pc1Buf);
-        TRawMem::SetMemBuf(pc1Buf, tCIDLib::TCard1(0), c4BufSz);
+        TRawMem::SetMemBuf(pc1Buf, kCIDLib::c1MinCard, c4BufSz);
         BITMAPINFO& SrcFmt = *reinterpret_cast<BITMAPINFO*>(pc1Buf);
 
         SrcFmt.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
@@ -1881,6 +1881,15 @@ TBitmap::TBitmap(const TBitmap& bmpSrc) :
 {
 }
 
+// This will leave the source with a 1x1 gray scale bitmap
+TBitmap::TBitmap(TBitmap&& bmpSrc) :
+
+    TBitmap()
+{
+    *this = tCIDLib::ForceMove(bmpSrc);
+}
+
+
 TBitmap::~TBitmap()
 {
     //
@@ -1908,10 +1917,22 @@ TBitmap::~TBitmap()
 // ---------------------------------------------------------------------------
 //  TBitmap: Public operators
 // ---------------------------------------------------------------------------
+
+// This will shallow copy the source
 TBitmap& TBitmap::operator=(const TBitmap& bmpSrc)
 {
     if (this != &bmpSrc)
         m_cptrHandle  = bmpSrc.m_cptrHandle;
+    return *this;
+}
+
+
+TBitmap& TBitmap::operator=(TBitmap&& bmpSrc)
+{
+    if (&bmpSrc != this)
+    {
+        tCIDLib::Swap(m_cptrHandle, bmpSrc.m_cptrHandle);
+    }
     return *this;
 }
 
@@ -2740,7 +2761,7 @@ TBitmap::QueryImgData(  const   TGraphDrawDev&      gdevCompat
         //
         const tCIDLib::TCard4 c4HdrSz = sizeof(BITMAPINFOHEADER) + (4 * 256);
         tCIDLib::TCard1* pc1HdrBuf = new tCIDLib::TCard1[c4HdrSz];
-        TRawMem::SetMemBuf(pc1HdrBuf, tCIDLib::TCard1(0), c4HdrSz);
+        TRawMem::SetMemBuf(pc1HdrBuf, kCIDLib::c1MinCard, c4HdrSz);
         TArrayJanitor<tCIDLib::TCard1> janHdr(pc1HdrBuf);
 
         BITMAPINFO* pbiSrc = (BITMAPINFO*)pc1HdrBuf;

@@ -79,7 +79,7 @@ TXMLNameIDPool<TElem>::TXMLNameIDPool(TKeyExtract pfnKeyExtract) :
     TRawMem::SetMemBuf
     (
         m_aBuckets
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , sizeof(TBucketElem*) * c4Modulus
     );
 

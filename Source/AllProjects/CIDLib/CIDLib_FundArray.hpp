@@ -68,7 +68,7 @@ class TFundArray : public TFundColBase, public MDuplicable
             // We can only zero it in this case
             TRawMem::SetMemBuf
             (
-                m_ptElements, tCIDLib::TCard1(0), sizeof(TElem) * m_c4ElemCount
+                m_ptElements, kCIDLib::c1MinCard, sizeof(TElem) * m_c4ElemCount
             );
         }
 
@@ -86,7 +86,7 @@ class TFundArray : public TFundColBase, public MDuplicable
             // We can only zero it in this case
             TRawMem::SetMemBuf
             (
-                m_ptElements, tCIDLib::TCard1(0), sizeof(TElem) * m_c4ElemCount
+                m_ptElements, kCIDLib::c1MinCard, sizeof(TElem) * m_c4ElemCount
             );
         }
 
@@ -123,7 +123,7 @@ class TFundArray : public TFundColBase, public MDuplicable
             m_c4ElemCount(1)
             , m_ptElements(new TElem[1])
         {
-            TRawMem::SetMemBuf(m_ptElements, tCIDLib::TCard1(0), sizeof(TElem));
+            TRawMem::SetMemBuf(m_ptElements, kCIDLib::c1MinCard, sizeof(TElem));
             *this = tCIDLib::ForceMove(fcolSrc);
         }
 
@@ -407,7 +407,7 @@ class TFundArray : public TFundColBase, public MDuplicable
             TRawMem::SetMemBuf
             (
                 m_ptElements
-                , tCIDLib::TCard1(0)
+                , kCIDLib::c1MinCard
                 , m_c4ElemCount * sizeof(TElem)
             );
         }

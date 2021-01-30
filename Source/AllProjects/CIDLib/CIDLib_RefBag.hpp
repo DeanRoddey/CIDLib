@@ -56,14 +56,18 @@ template <typename TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
         {
         }
 
+        // Not copyable, only moveable
         TRefBag(const TRefBag&) = delete;
         TRefBag(TRefBag&& colSrc) = default;
+
         ~TRefBag() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Not assignable, only moveable
         TRefBag& operator=(const TRefBag&) = delete;
         TRefBag& operator=(TRefBag&&) = default;
 

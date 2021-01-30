@@ -149,7 +149,7 @@ tCIDLib::TVoid TestBinaryFiles(TTextOutStream& strmOut)
     //  Read in the data again, but zero out the buffer first to make sure we
     //  really read it.
     //
-    TRawMem::SetMemBuf(ac4Test, tCIDLib::TCard1(0), sizeof(ac4Test));
+    TRawMem::SetMemBuf(ac4Test, kCIDLib::c1MinCard, sizeof(ac4Test));
     bflTest.c4ReadBuffer(ac4Test, sizeof(ac4Test));
 
     // Test the contents
@@ -180,7 +180,7 @@ tCIDLib::TVoid TestBinaryFiles(TTextOutStream& strmOut)
     //  Read in the data again, but zero out the buffer first to make sure we
     //  really read it.
     //
-    TRawMem::SetMemBuf(ac4Test, tCIDLib::TCard1(0), sizeof(ac4Test));
+    TRawMem::SetMemBuf(ac4Test, kCIDLib::c1MinCard, sizeof(ac4Test));
     bflTest.c4ReadBuffer(ac4Test, sizeof(ac4Test));
 
     // Test the contents
@@ -227,7 +227,7 @@ tCIDLib::TVoid TestBinaryFiles(TTextOutStream& strmOut)
     //  really read it.
     //
     TEvent evWait;
-    TRawMem::SetMemBuf(ac4Test, tCIDLib::TCard1(0), sizeof(ac4Test));
+    TRawMem::SetMemBuf(ac4Test, kCIDLib::c1MinCard, sizeof(ac4Test));
     bflTest.c4ReadBufferTO(ac4Test, sizeof(ac4Test), 100, evWait, kCIDLib::True);
 
     // Test the contents

@@ -50,10 +50,8 @@ class CIDCTRLSEXP TSBChangeInfo : public TCtrlNotify
             , const TWindow&                wndSrc
         );
 
-        TSBChangeInfo
-        (
-            const   TSBChangeInfo&          wnotSrc
-        );
+        TSBChangeInfo(const TSBChangeInfo&) = default;
+        TSBChangeInfo(TSBChangeInfo&&) = default;
 
         ~TSBChangeInfo();
 
@@ -61,16 +59,14 @@ class CIDCTRLSEXP TSBChangeInfo : public TCtrlNotify
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TSBChangeInfo& operator=
-        (
-            const   TSBChangeInfo&          wnotSrc
-        );
+        TSBChangeInfo& operator=(const TSBChangeInfo&) = default;
+        TSBChangeInfo& operator=(TSBChangeInfo&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4Position() const;
+        [[nodiscard]] tCIDLib::TCard4 c4Position() const;
 
 
     private :
@@ -111,6 +107,7 @@ class CIDCTRLSEXP TScrollBar : public TStdCtrlWnd
         TScrollBar();
 
         TScrollBar(const TScrollBar&) = delete;
+        TScrollBar(TScrollBar&&) = delete;
 
         ~TScrollBar();
 
@@ -119,6 +116,7 @@ class CIDCTRLSEXP TScrollBar : public TStdCtrlWnd
         //  Public oeprators
         // -------------------------------------------------------------------
         TScrollBar& operator=(const TScrollBar&) = delete;
+        TScrollBar& operator=(TScrollBar&&) = delete;
 
 
         // -------------------------------------------------------------------

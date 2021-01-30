@@ -95,7 +95,7 @@ class CIDLIBEXP TOutStreamImpl : public TObject
         TOutStreamImpl(const TOutStreamImpl&) = delete;
         TOutStreamImpl(TOutStreamImpl&&) = delete;
 
-        ~TOutStreamImpl() {}
+        ~TOutStreamImpl() = default;
 
 
         // -------------------------------------------------------------------
@@ -127,7 +127,7 @@ class CIDLIBEXP TOutStreamImpl : public TObject
         // -------------------------------------------------------------------
         //  Hidden Constructors
         // -------------------------------------------------------------------
-        TOutStreamImpl() {}
+        TOutStreamImpl() = default;
 
 
     private :
@@ -581,7 +581,8 @@ PolymorphicWrite(const T* const pobjToWrite, TBinOutStream& strmToWriteTo)
 
 // ---------------------------------------------------------------------------
 //  Create some short cut values for the special stream enum values. These
-//  are often used so having a short cut is very convenient.
+//  are often used so having a short cut is very convenient. There are some
+//  other but they need to be defined further down.
 // ---------------------------------------------------------------------------
 namespace kCIDLib
 {

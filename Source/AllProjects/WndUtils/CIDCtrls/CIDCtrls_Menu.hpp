@@ -61,7 +61,19 @@ class CIDCTRLSEXP TMenu : public TObject
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TMenu() = delete;
+
+        TMenu(const TMenu&) = delete;
+        TMenu(TMenu&&) = delete;
+
         ~TMenu();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TMenu& operator=(const TMenu&) = delete;
+        TMenu& operator=(TMenu&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -272,14 +284,6 @@ class CIDCTRLSEXP TMenu : public TObject
 
     private :
         // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TMenu(const TMenu&);
-        tCIDLib::TVoid operator=(const TMenu&);
-
-
-
-        // -------------------------------------------------------------------
         //  Private, static methods
         // -------------------------------------------------------------------
         static tCIDLib::TVoid AddActItem
@@ -379,7 +383,17 @@ class CIDCTRLSEXP TMenuBar : public TMenu
         // -------------------------------------------------------------------
         TMenuBar();
 
+        TMenuBar(const TMenuBar&) = delete;
+        TMenuBar(TMenuBar&&) = delete;
+
         ~TMenuBar();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid operator=(const TMenuBar&) = delete;
+        tCIDLib::TVoid operator=(TMenuBar&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -401,13 +415,6 @@ class CIDCTRLSEXP TMenuBar : public TMenu
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TMenuBar(const TMenuBar&);
-        tCIDLib::TVoid operator=(const TMenuBar&);
-
-
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
@@ -431,7 +438,17 @@ class CIDCTRLSEXP TPopupMenu : public TMenu
             const   tCIDLib::TCh* const     pszName
         );
 
+        TPopupMenu(const TPopupMenu&) = delete;
+        TPopupMenu(TPopupMenu&&) = delete;
+
         ~TPopupMenu();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TPopupMenu& operator=(const TPopupMenu&) = delete;
+        TPopupMenu& operator=(TPopupMenu&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -464,13 +481,6 @@ class CIDCTRLSEXP TPopupMenu : public TMenu
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TPopupMenu(const TPopupMenu&);
-        tCIDLib::TVoid operator=(const TPopupMenu&);
-
-
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------

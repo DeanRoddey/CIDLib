@@ -65,7 +65,7 @@ TCryptoKey::TCryptoKey(const tCIDLib::TCard4 c4KeyBytes) :
     , m_pc1Buffer(nullptr)
 {
     m_pc1Buffer = new tCIDLib::TCard1[c4KeyBytes];
-    TRawMem::SetMemBuf(m_pc1Buffer, tCIDLib::TCard1(0), c4KeyBytes);
+    TRawMem::SetMemBuf(m_pc1Buffer, kCIDLib::c1MinCard, c4KeyBytes);
 }
 
 TCryptoKey::TCryptoKey(const TString& strKey) :
@@ -150,7 +150,7 @@ TCryptoKey::~TCryptoKey()
     //
     if (m_pc1Buffer)
     {
-        TRawMem::SetMemBuf(m_pc1Buffer, tCIDLib::TCard1(0), m_c4Bytes);
+        TRawMem::SetMemBuf(m_pc1Buffer, kCIDLib::c1MinCard, m_c4Bytes);
         delete [] m_pc1Buffer;
         m_pc1Buffer = nullptr;
     }

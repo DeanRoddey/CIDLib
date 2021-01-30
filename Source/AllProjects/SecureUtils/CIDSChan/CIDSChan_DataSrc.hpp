@@ -73,6 +73,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         );
 
         TCIDSChanClDataSrc(const TCIDSChanClDataSrc&) = delete;
+        TCIDSChanClDataSrc(TCIDSChanClDataSrc&&) = delete;
 
         ~TCIDSChanClDataSrc();
 
@@ -81,6 +82,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
         //  Public operators
         // -------------------------------------------------------------------
         TCIDSChanClDataSrc& operator=(const TCIDSChanClDataSrc&) = delete;
+        TCIDSChanClDataSrc& operator=(TCIDSChanClDataSrc&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -91,7 +93,7 @@ class CIDSCHANEXP TCIDSChanClDataSrc : public TCIDSockStreamBasedDataSrc
                     TEvent&                 evToSet
         )   override;
 
-        tCIDLib::TBoolean bIsConnected() const override;
+        [[nodiscard]] tCIDLib::TBoolean bIsConnected() const override;
 
         tCIDSock::ESockEvs eEnumEvents
         (
@@ -201,6 +203,7 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
         );
 
         TCIDSChanSrvDataSrc(const TCIDSChanSrvDataSrc&) = delete;
+        TCIDSChanSrvDataSrc(TCIDSChanSrvDataSrc&&) = delete;
 
         ~TCIDSChanSrvDataSrc();
 
@@ -209,6 +212,7 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
         //  Public operators
         // -------------------------------------------------------------------
         TCIDSChanSrvDataSrc& operator=(const TCIDSChanSrvDataSrc&) = delete;
+        TCIDSChanSrvDataSrc& operator=(TCIDSChanSrvDataSrc&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -219,7 +223,7 @@ class CIDSCHANEXP TCIDSChanSrvDataSrc : public TCIDSockStreamBasedDataSrc
                     TEvent&                 evToSet
         )   override;
 
-        tCIDLib::TBoolean bIsConnected() const override;
+        [[nodiscard]] tCIDLib::TBoolean bIsConnected() const override;
 
         tCIDSock::ESockEvs eEnumEvents
         (

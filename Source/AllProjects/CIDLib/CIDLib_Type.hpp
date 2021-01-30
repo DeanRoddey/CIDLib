@@ -322,7 +322,7 @@ template
         // -----------------------------------------------------------------------
         TEArray() = delete;
 
-        #pragma warning(suppress : 26495) // We are going to initialize the array below
+        CIDLib_Suppress(26495) // We are going to initialize the array below
         TEArray(const ElemType InitVal) :
 
             m_c4Size(tCIDLib::TCard4(ListSize) + c4Extra)
@@ -331,7 +331,7 @@ template
                 m_aetArray[c4Index] = InitVal;
         }
 
-        #pragma warning(suppress : 26495) // We are going to initialize the array below
+        CIDLib_Suppress(26495) // We are going to initialize the array below
         TEArray(const ElemType aValues[tCIDLib::TCard4(ListSize) + c4Extra]) :
 
             m_atomLoaded(kCIDLib::True)
@@ -349,6 +349,8 @@ template
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Size; c4Index++)
                 m_aetArray[c4Index] = eaSrc.m_aetArray[c4Index];
         }
+
+        TEArray(TMyType&&) = delete;
 
         ~TEArray()
         {

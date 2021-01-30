@@ -461,7 +461,7 @@ tCIDLib::TVoid TMultiEdit::SetNewFont(const TFontSelAttrs& fselNew)
     TGraphWndDev gdevTmp(*this);
 
     CHARFORMAT2 Fmt;
-    TRawMem::SetMemBuf(&Fmt, tCIDLib::TCard1(0), sizeof(Fmt));
+    TRawMem::SetMemBuf(&Fmt, kCIDLib::c1MinCard, sizeof(Fmt));
     Fmt.cbSize = sizeof(Fmt);
 
     Fmt.dwMask = CFM_SIZE | CFM_WEIGHT | CFM_CHARSET;

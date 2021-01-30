@@ -38,12 +38,18 @@
 //  bitmap object it needs to be in drawable condition.
 //
 //
-//  Copying/Value Semantics
+//  Copy/Move Semantics
 //
 //  This class actually maintains a reference counted bitmap handle object,
 //  so that we can support copy semantics cheaply. But, it does mean you have
 //  to be careful that you force a deep copy if you really want to create a
 //  copy of the actual bits!
+//
+//  Move operations will leave the source with a 1x1, gray scale bitmap, the
+//  lowest overhead dummy content we can create that leaves it valid. Mostly
+//  this is just to make the compiler happy, since there's typically not many
+//  scenarios where it will make much difference. It just lets the compiler use
+//  moves for by value returns of temps and such.
 //
 //  Memory vs. Device
 //
@@ -238,6 +244,11 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
             const   TBitmap&                bmpSrc
         );
 
+        TBitmap
+        (
+                    TBitmap&&               bmpSrc
+        );
+
         ~TBitmap();
 
 
@@ -248,6 +259,12 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
         (
             const   TBitmap&                bmpSrc
         );
+
+        TBitmap& operator=
+        (
+                    TBitmap&&               bmpSrc
+        );
+
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
@@ -305,11 +322,11 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
             ,       tCIDLib::TCard4&        c4TransClr
         )   const;
 
-        tCIDLib::TBoolean bHasAlpha() const;
+        [[nodiscard]] tCIDLib::TBoolean bHasAlpha() const;
 
-        tCIDLib::TCard4 c4RefCount() const;
+        [[nodiscard]] tCIDLib::TCard4 c4RefCount() const;
 
-        tCIDLib::TCard4 c4SerialNum() const;
+        [[nodiscard]] tCIDLib::TCard4 c4SerialNum() const;
 
         tCIDLib::TCard4 c4SerialNum
         (
@@ -373,8 +390,8 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
 
         tCIDLib::TVoid QuerySize
         (
-                    tCIDLib::TCard4&        c4Width
-            ,       tCIDLib::TCard4&        c4Height
+            COP     tCIDLib::TCard4&        c4Width
+            , COP   tCIDLib::TCard4&        c4Height
         )   const;
 
         tCIDLib::TVoid MaskWith
@@ -443,11 +460,12 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
                 (
                     const   tCIDGraphDev::TBmpHandle    hbmpToAdopt
                     , const tCIDLib::TBoolean           bSrcAlpha = kCIDLib::False
-                    , const tCIDGraphDev::TDeviceHandle hdevToUse = 0
-                    ,       TPixelArray* const          pixaData = 0
+                    , const tCIDGraphDev::TDeviceHandle hdevToUse = nullptr
+                    ,       TPixelArray* const          pixaData = nullptr
                 );
 
                 TRefBmpHandle(const TRefBmpHandle&) = delete;
+                TRefBmpHandle(TRefBmpHandle&&) = delete;
 
                 ~TRefBmpHandle();
 
@@ -456,19 +474,20 @@ class CIDGRDEVEXP TBitmap : public TObject, public MDuplicable, public MDrawable
                 //  Public operators
                 // -----------------------------------------------------------
                 TRefBmpHandle& operator=(const TRefBmpHandle&) = delete;
+                TRefBmpHandle& operator=(TRefBmpHandle&&) = delete;
 
 
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bSrcAlpha() const;
+                [[nodiscard]] tCIDLib::TBoolean bSrcAlpha() const;
 
                 tCIDLib::TBoolean bSrcAlpha
                 (
                     const   tCIDLib::TBoolean           bToSet
                 );
 
-                tCIDLib::TCard4 c4SerialNum() const;
+                [[nodiscard]] tCIDLib::TCard4 c4SerialNum() const;
 
                 tCIDLib::TCard4 c4SerialNum
                 (
@@ -602,8 +621,10 @@ class CIDGRDEVEXP TSysBitmapInfo : public TObject
 
         TSysBitmapInfo
         (
-            const   TSysBitmapInfo&         sbmpiToCopy
+            const   TSysBitmapInfo&         sbmpiSrc
         );
+
+        TSysBitmapInfo(TSysBitmapInfo&&) = delete;
 
         ~TSysBitmapInfo();
 
@@ -613,8 +634,10 @@ class CIDGRDEVEXP TSysBitmapInfo : public TObject
         // -------------------------------------------------------------------
         TSysBitmapInfo& operator=
         (
-            const   TSysBitmapInfo&         sbmpiToAssign
+            const   TSysBitmapInfo&         sbmpiSrc
         );
+
+        TSysBitmapInfo& operator=(TSysBitmapInfo&&) = delete;
 
 
         // -------------------------------------------------------------------

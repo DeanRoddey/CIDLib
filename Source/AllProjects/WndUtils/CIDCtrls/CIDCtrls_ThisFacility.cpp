@@ -2609,7 +2609,7 @@ TFacCIDCtrls::SetMonitorPowerState(         TWindow&                wndCaller
         SetForeground(wndCaller.hwndThis(), kCIDLib::True);
 
         INPUT aInputEvs[1];
-        TRawMem::SetMemBuf(aInputEvs, tCIDLib::TCard1(0), sizeof(INPUT));
+        TRawMem::SetMemBuf(aInputEvs, kCIDLib::c1MinCard, sizeof(INPUT));
 
         // Move down/right one pixel, sleep a bit, then more back again
         aInputEvs[0].type = INPUT_MOUSE;

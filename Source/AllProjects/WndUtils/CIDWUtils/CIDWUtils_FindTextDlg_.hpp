@@ -43,6 +43,7 @@ class TFindTextDlg : public TDlgBox
         TFindTextDlg();
 
         TFindTextDlg(const TFindTextDlg&) = delete;
+        TFindTextDlg(TFindTextDlg&&) = delete;
 
         ~TFindTextDlg();
 
@@ -51,6 +52,7 @@ class TFindTextDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TFindTextDlg& operator=(const TFindTextDlg&) = delete;
+        TFindTextDlg& operator=(TFindTextDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

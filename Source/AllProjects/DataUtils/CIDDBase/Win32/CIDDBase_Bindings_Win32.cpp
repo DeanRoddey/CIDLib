@@ -250,12 +250,12 @@ tCIDLib::TVoid TDBDateBinding::DeleteStorage()
 tCIDLib::TVoid TDBDateBinding::InitStorage()
 {
     m_pStorage = new DATE_STRUCT;
-    TRawMem::SetMemBuf(m_pStorage, tCIDLib::TCard1(0), sizeof(DATE_STRUCT));
+    TRawMem::SetMemBuf(m_pStorage, kCIDLib::c1MinCard, sizeof(DATE_STRUCT));
 }
 
 tCIDLib::TVoid TDBDateBinding::NullStorage()
 {
-    TRawMem::SetMemBuf(m_pStorage, tCIDLib::TCard1(0), sizeof(DATE_STRUCT));
+    TRawMem::SetMemBuf(m_pStorage, kCIDLib::c1MinCard, sizeof(DATE_STRUCT));
 }
 
 
@@ -449,11 +449,11 @@ tCIDLib::TVoid TDBTimeBinding::DeleteStorage()
 tCIDLib::TVoid TDBTimeBinding::InitStorage()
 {
     m_pStorage = new TIME_STRUCT;
-    TRawMem::SetMemBuf(m_pStorage, tCIDLib::TCard1(0), sizeof(TIME_STRUCT));
+    TRawMem::SetMemBuf(m_pStorage, kCIDLib::c1MinCard, sizeof(TIME_STRUCT));
 }
 
 tCIDLib::TVoid TDBTimeBinding::NullStorage()
 {
-    TRawMem::SetMemBuf(m_pStorage, tCIDLib::TCard1(0), sizeof(TIME_STRUCT));
+    TRawMem::SetMemBuf(m_pStorage, kCIDLib::c1MinCard, sizeof(TIME_STRUCT));
 }
 

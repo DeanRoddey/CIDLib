@@ -140,22 +140,22 @@ class CIDORBEXP TOrbObjId
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bHasCachedAddr() const;
+        [[nodiscard]] tCIDLib::TBoolean bHasCachedAddr() const;
 
         tCIDLib::TVoid ClearCachedAddr();
 
-        tCIDLib::TEncodedTime enctCache() const;
+        [[nodiscard]] tCIDLib::TEncodedTime enctCache() const;
 
         tCIDLib::TEncodedTime enctCache
         (
             const   tCIDLib::TEncodedTime   enctToSet
         );
 
-        tCIDLib::THashVal hshKey() const;
+        [[nodiscard]] tCIDLib::THashVal hshKey() const;
 
         const TIPAddress& ipaCached() const;
 
-        tCIDLib::TIPPortNum ippnHost() const;
+        [[nodiscard]] tCIDLib::TIPPortNum ippnHost() const;
 
         const TOrbId& oidKey() const;
 

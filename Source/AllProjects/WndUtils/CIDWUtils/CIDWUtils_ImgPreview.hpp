@@ -44,8 +44,16 @@ class CIDWUTILSEXP TImgPreviewWnd : public TCtrlWnd
         TImgPreviewWnd();
 
         TImgPreviewWnd(const TImgPreviewWnd&) = delete;
+        TImgPreviewWnd(TImgPreviewWnd&&) = delete;
 
         ~TImgPreviewWnd();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TImgPreviewWnd& operator=(const TImgPreviewWnd&) = delete;
+        TImgPreviewWnd& operator=(TImgPreviewWnd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -67,12 +75,6 @@ class CIDWUTILSEXP TImgPreviewWnd : public TCtrlWnd
 
 
         // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TImgPreviewWnd& operator=(const TImgPreviewWnd&) = delete;
-
-
-        // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bImagePnt
@@ -80,21 +82,21 @@ class CIDWUTILSEXP TImgPreviewWnd : public TCtrlWnd
                     TPoint&                 pntToAdjust
         )   const;
 
-        tCIDLib::TBoolean bTransparency() const;
+        [[nodiscard]] tCIDLib::TBoolean bTransparency() const;
 
         tCIDLib::TBoolean bTransparency
         (
             const   tCIDLib::TBoolean       bToSet
         );
 
-        tCIDLib::TCard1 c1Opacity() const;
+        [[nodiscard]] tCIDLib::TCard1 c1Opacity() const;
 
         tCIDLib::TCard1 c1Opacity
         (
             const   tCIDLib::TCard1         c1Opacity
         );
 
-        tCIDLib::TCard4 c4TransClr() const;
+        [[nodiscard]] tCIDLib::TCard4 c4TransClr() const;
 
         tCIDLib::TCard4 c4TransClr
         (
@@ -111,7 +113,7 @@ class CIDWUTILSEXP TImgPreviewWnd : public TCtrlWnd
             , const tCIDCtrls::EExWndStyles eExStyles = tCIDCtrls::EExWndStyles::None
         );
 
-        tCIDGraphDev::EPlacement ePlacement() const;
+        [[nodiscard]] tCIDGraphDev::EPlacement ePlacement() const;
 
         tCIDGraphDev::EPlacement ePlacement
         (

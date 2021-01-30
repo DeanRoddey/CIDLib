@@ -81,6 +81,7 @@ TErrOptsDlg::eRun(  const   TWindow&            wndOwner
     m_bMultiMode = bMultiMode;
     m_strOpName = strOpName;
 
+    bDoAll = kCIDLib::False;
     const tCIDLib::TCard4 c4Res = c4RunDlg
     (
         wndOwner, facCIDWUtils(), kCIDWUtils::ridDlg_ErrOpts
@@ -223,6 +224,7 @@ TErrOptsDlg2::eRun( const   TWindow&            wndOwner
     m_strErrorMsg = strErrMsg;
     m_strTarget = strTarget;
 
+    bDoAll = kCIDLib::False;
     const tCIDLib::TCard4 c4Res = c4RunDlg
     (
         wndOwner, facCIDWUtils(), kCIDWUtils::ridDlg_ErrOpts2

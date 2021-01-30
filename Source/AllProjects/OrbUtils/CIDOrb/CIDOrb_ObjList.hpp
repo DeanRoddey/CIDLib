@@ -75,18 +75,18 @@ class CIDORBEXP TOrbSObjList : public TObject
             const   TOrbServerBase* const   porbsToRemove
         );
 
-        tCIDLib::TCard4 c4ElemCount() const;
+        [[nodiscard]] tCIDLib::TCard4 c4ElemCount() const;
 
         const TOrbServerBase& objCur() const;
 
         TOrbServerBase& objCur();
 
-        TOrbServerBase* porbsFind
+        [[nodiscard]] TOrbServerBase* porbsFind
         (
             const   TOrbId&                 oidToFind
         );
 
-        const TOrbServerBase* porbsFind
+        [[nodiscard]] const TOrbServerBase* porbsFind
         (
             const   TOrbId&                 oidToFind
         )   const;

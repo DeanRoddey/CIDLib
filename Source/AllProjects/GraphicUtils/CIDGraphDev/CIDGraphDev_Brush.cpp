@@ -306,10 +306,10 @@ TSolidBrush::TSolidBrush(const TRGBClr& rgbClr) :
 {
 }
 
-TSolidBrush::TSolidBrush(const TSolidBrush& gbrToCopy) :
+TSolidBrush::TSolidBrush(const TSolidBrush& gbrSrc) :
 
-    TGUIBrush(gbrToCopy)
-    , m_rgbClr(gbrToCopy.m_rgbClr)
+    TGUIBrush(gbrSrc)
+    , m_rgbClr(gbrSrc.m_rgbClr)
 {
 }
 
@@ -321,13 +321,13 @@ TSolidBrush::~TSolidBrush()
 // ---------------------------------------------------------------------------
 //  TSolidBrush: Public operators
 // ---------------------------------------------------------------------------
-TSolidBrush& TSolidBrush::operator=(const TSolidBrush& gbrToAssign)
+TSolidBrush& TSolidBrush::operator=(const TSolidBrush& gbrSrc)
 {
-    if (this != &gbrToAssign)
+    if (this != &gbrSrc)
     {
         // Do our parent first. If we are selected, he will throw
-        TParent::operator=(gbrToAssign);
-        m_rgbClr = gbrToAssign.m_rgbClr;
+        TParent::operator=(gbrSrc);
+        m_rgbClr = gbrSrc.m_rgbClr;
     }
     return *this;
 }
@@ -378,11 +378,11 @@ THatchedBrush::THatchedBrush(const  TRGBClr&                rgbClr
 {
 }
 
-THatchedBrush::THatchedBrush(const THatchedBrush& gbrToCopy) :
+THatchedBrush::THatchedBrush(const THatchedBrush& gbrSrc) :
 
-    TGUIBrush(gbrToCopy)
-    , m_ePattern(gbrToCopy.m_ePattern)
-    , m_rgbClr(gbrToCopy.m_rgbClr)
+    TGUIBrush(gbrSrc)
+    , m_ePattern(gbrSrc.m_ePattern)
+    , m_rgbClr(gbrSrc.m_rgbClr)
 {
 }
 
@@ -394,14 +394,14 @@ THatchedBrush::~THatchedBrush()
 // ---------------------------------------------------------------------------
 //  THatchedBrush: Public operators
 // ---------------------------------------------------------------------------
-THatchedBrush& THatchedBrush::operator=(const THatchedBrush& gbrToAssign)
+THatchedBrush& THatchedBrush::operator=(const THatchedBrush& gbrSrc)
 {
-    if (this != &gbrToAssign)
+    if (this != &gbrSrc)
     {
         // Do our parent first. If we are selected, he will throw
-        TParent::operator=(gbrToAssign);
-        m_ePattern = gbrToAssign.m_ePattern;
-        m_rgbClr = gbrToAssign.m_rgbClr;
+        TParent::operator=(gbrSrc);
+        m_ePattern = gbrSrc.m_ePattern;
+        m_rgbClr = gbrSrc.m_rgbClr;
     }
     return *this;
 }
@@ -442,6 +442,8 @@ tCIDGraphDev::TBrushHandle THatchedBrush::hbrCreateBrush() const
 // ---------------------------------------------------------------------------
 //  TBitmapBrush: Constructors and Destructor
 // ---------------------------------------------------------------------------
+
+// We are taking a shallow copy of the bitmap
 TBitmapBrush::TBitmapBrush(const TBitmap& bmpToUse) :
 
     m_pbmpToUse(new TBitmap(bmpToUse))
@@ -521,9 +523,9 @@ TNullBrush::TNullBrush()
 {
 }
 
-TNullBrush::TNullBrush(const TNullBrush& gbrToCopy) :
+TNullBrush::TNullBrush(const TNullBrush& gbrSrc) :
 
-    TGUIBrush(gbrToCopy)
+    TGUIBrush(gbrSrc)
 {
 }
 
@@ -535,11 +537,11 @@ TNullBrush::~TNullBrush()
 // ---------------------------------------------------------------------------
 //  TNullBrush: Public operators
 // ---------------------------------------------------------------------------
-TNullBrush& TNullBrush::operator=(const TNullBrush& gbrToAssign)
+TNullBrush& TNullBrush::operator=(const TNullBrush& gbrSrc)
 {
-    if (this != &gbrToAssign)
+    if (this != &gbrSrc)
     {
-        TParent::operator=(gbrToAssign);
+        TParent::operator=(gbrSrc);
     }
     return *this;
 }

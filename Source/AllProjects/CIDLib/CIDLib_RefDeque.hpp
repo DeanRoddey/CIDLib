@@ -49,6 +49,7 @@ template <typename TElem> class TRefDeque : public TBasicDLinkedRefCol<TElem>
         {
         }
 
+        // Not copyable, only moveable
         TRefDeque(const TRefDeque&) = delete;
         TRefDeque(TRefDeque&&) = default;
 
@@ -59,6 +60,8 @@ template <typename TElem> class TRefDeque : public TBasicDLinkedRefCol<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Not assignable, only moveable
         TRefDeque& operator=(const TRefDeque&) = delete;
         TRefDeque& operator=(TRefDeque&&) = default;
 

@@ -42,6 +42,7 @@ class CIDWUTILSEXP TGetTSizeDlg : public TDlgBox
         TGetTSizeDlg();
 
         TGetTSizeDlg(const TGetTSizeDlg&) = delete;
+        TGetTSizeDlg(TGetTSizeDlg&&) = delete;
 
         ~TGetTSizeDlg();
 
@@ -50,6 +51,7 @@ class CIDWUTILSEXP TGetTSizeDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TGetTSizeDlg& operator=(const TGetTSizeDlg&) = delete;
+        TGetTSizeDlg& operator=(TGetTSizeDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

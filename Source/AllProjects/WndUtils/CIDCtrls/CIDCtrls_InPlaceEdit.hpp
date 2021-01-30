@@ -57,6 +57,7 @@ class CIDCTRLSEXP MIPEIntf
         MIPEIntf();
 
         MIPEIntf(const MIPEIntf&) = delete;
+        MIPEIntf(MIPEIntf&&) = delete;
 
         virtual ~MIPEIntf();
 
@@ -65,6 +66,7 @@ class CIDCTRLSEXP MIPEIntf
         //  Public operators
         // -------------------------------------------------------------------
         MIPEIntf& operator=(const MIPEIntf&) = delete;
+        MIPEIntf& operator=(MIPEIntf&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -92,7 +94,7 @@ class CIDCTRLSEXP MIPEIntf
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIPEHasFloatRange
+        [[nodiscard]] tCIDLib::TBoolean bIPEHasFloatRange
         (
             const   TString&                strCheck
             ,       tCIDLib::TFloat8&       f8Min
@@ -100,7 +102,7 @@ class CIDCTRLSEXP MIPEIntf
             , const tCIDLib::TBoolean       bPrefix
         )   const;
 
-        tCIDLib::TBoolean bIPEHasRange
+        [[nodiscard]] tCIDLib::TBoolean bIPEHasRange
         (
             const   TString&                strCheck
             ,       tCIDLib::TInt8&         i8Min
@@ -111,7 +113,7 @@ class CIDCTRLSEXP MIPEIntf
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4IPERow() const;
+        [[nodiscard]] tCIDLib::TCard4 c4IPERow() const;
 
         tCIDLib::TCard4 c4IPERow
         (
@@ -144,6 +146,7 @@ class CIDCTRLSEXP TInPlaceEdit : public TWindow
         TInPlaceEdit();
 
         TInPlaceEdit(const TInPlaceEdit&) = delete;
+        TInPlaceEdit(TInPlaceEdit&&) = delete;
 
         ~TInPlaceEdit();
 
@@ -152,6 +155,7 @@ class CIDCTRLSEXP TInPlaceEdit : public TWindow
         //  Public operators
         // -------------------------------------------------------------------
         TInPlaceEdit& operator=(const TInPlaceEdit&) = delete;
+        TInPlaceEdit& operator=(TInPlaceEdit&&) = delete;
 
 
         // -------------------------------------------------------------------

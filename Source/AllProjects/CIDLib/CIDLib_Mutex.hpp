@@ -115,7 +115,7 @@ class CIDLIBEXP TMutex : public TObject, public MFormattable, public MLockable
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmToWriteTo
+            CIOP    TTextOutStream&         strmToWriteTo
         )   const   final;
 
 
@@ -194,10 +194,10 @@ class CIDLIBEXP MMtxLockable : public MLockable
         //  moved or assigned. It's an internal detail, not data of the class.
         // -------------------------------------------------------------------
         MMtxLockable() = default;
-        MMtxLockable(const MMtxLockable&) {};
-        MMtxLockable(MMtxLockable&&) {};
-        MMtxLockable& operator=(const MMtxLockable&) { return *this; };
-        MMtxLockable& operator=(MMtxLockable&&) { return *this; };
+        MMtxLockable(const MMtxLockable&) = default;
+        MMtxLockable(MMtxLockable&&) = default;
+        MMtxLockable& operator=(const MMtxLockable&) = default;
+        MMtxLockable& operator=(MMtxLockable&&) = default;
 
 
     private :

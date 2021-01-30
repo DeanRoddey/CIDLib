@@ -54,7 +54,7 @@ template <typename TElem> class TColCursor : public TCursorBase
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TColCursor() {}
+        ~TColCursor() = default;
 
 
         // -------------------------------------------------------------------
@@ -172,9 +172,22 @@ template <typename TElem> class TColCursor : public TCursorBase
         TColCursor(const TColCursor&) = default;
         TColCursor<TElem>& operator=(const TColCursor&) = default;
 
-        // Can't actually delete them since that causes problems
-        // TColCursor(TColCursor&&) = delete;
-        // TColCursor<TElem>& operator=(TColCursor&&) = delete;
+        TColCursor(TColCursor&& cursSrc) :
+
+            m_pcolBaseCurs(nullptr)
+        {
+            *this = tCIDLib::ForceMove(cursSrc);
+        }
+
+        TColCursor<TElem>& operator=(TColCursor&& cursSrc)
+        {
+            if (&cursSrc != this)
+            {
+                TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                tCIDLib::Swap(m_pcolBaseCurs, cursSrc.m_pcolBaseCurs);
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
@@ -219,7 +232,7 @@ template <typename TElem> class TBiColCursor : public TColCursor<TElem>
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TBiColCursor() {}
+        ~TBiColCursor() = default;
 
 
         // -------------------------------------------------------------------
@@ -255,11 +268,9 @@ template <typename TElem> class TBiColCursor : public TColCursor<TElem>
         }
 
         TBiColCursor(const TBiColCursor&) = default;
+        TBiColCursor(TBiColCursor&&) = default;
         TBiColCursor<TElem>& operator=(const TBiColCursor&) = default;
-
-        // Can't actually delete them since that causes problems
-        // TBiColCursor(TBiColCursor&&) = delete;
-        // TBiColCursor<TElem>& operator=(TBiColCursor&&) = delete;
+        TBiColCursor<TElem>& operator=(TBiColCursor&&) = default;
 
 
     private :

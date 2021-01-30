@@ -73,16 +73,16 @@ class TWorkQItem : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4BufSize() const
+        [[nodiscard]] tCIDLib::TCard4 c4BufSize() const
         {
             return m_ocmdThis.c4BufSize();
         }
 
-        tCIDLib::TCard8 c8ConnId() const;
+        [[nodiscard]] tCIDLib::TCard8 c8ConnId() const;
 
-        tCIDLib::TEncodedTime enctElapsed() const;
+        [[nodiscard]] tCIDLib::TEncodedTime enctElapsed() const;
 
-        const TIPEndPoint& ipepClient() const;
+        [[nodiscard]] const TIPEndPoint& ipepClient() const;
 
         TOrbCmd& ocmdThis();
 

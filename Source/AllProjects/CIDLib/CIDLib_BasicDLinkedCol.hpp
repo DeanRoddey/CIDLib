@@ -70,7 +70,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 {
                 }
 
-                // Don't have to check for null, the parent class does that
+                CIDLib_Suppress(26429) // Don't have to check for null, the parent class does that
                 explicit TConstCursor(const TMyType* const pcolToCursor) :
 
                     TParent(pcolToCursor)
@@ -84,10 +84,16 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                     );
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstCursor()
@@ -108,6 +114,18 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                         m_pllstCursoring = cursSrc.m_pllstCursoring;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pnodeCur = cursSrc.m_pnodeCur;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pllstCursoring, cursSrc.m_pllstCursoring);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
                     }
                     return *this;
                 }
@@ -287,10 +305,16 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TNonConstCursor()
@@ -324,6 +348,16 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
                         TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
+                    }
+                    return *this;
+                }
+
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
                     }
                     return *this;
                 }
@@ -481,15 +515,13 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
         tCIDLib::TBoolean bIsEmpty() const final
         {
             TLocker lockrSync(this);
-            tCIDLib::TBoolean bRet = m_llstCol.bIsEmpty();
-            return bRet;
+            return m_llstCol.bIsEmpty();
         }
 
         tCIDLib::TCard4 c4ElemCount() const final
         {
             TLocker lockrSync(this);
-            tCIDLib::TCard4 c4Ret = m_llstCol.c4ElemCount();
-            return c4Ret;
+            return m_llstCol.c4ElemCount();
         }
 
         [[nodiscard]] TCursor* pcursNew() const final

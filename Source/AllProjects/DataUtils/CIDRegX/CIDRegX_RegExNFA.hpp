@@ -145,7 +145,7 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
             const   tCIDLib::TCard4         c4MaxStates
         );
 
-        tCIDLib::TCard4 c4StateCount() const;
+        [[nodiscard]] tCIDLib::TCard4 c4StateCount() const;
 
         tCIDLib::TCard4 c4LastState() const;
 

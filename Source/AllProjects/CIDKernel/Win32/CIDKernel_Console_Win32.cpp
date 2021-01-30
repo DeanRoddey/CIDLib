@@ -1501,7 +1501,7 @@ TKrnlConIn::pInitPlatform(const tCIDLib::TCard4 c4MaxRecall)
         TRawMem::SetMemBuf
         (
             pPlatInfo->apszRecallBuf
-            , tCIDLib::TCard1(0)
+            , kCIDLib::c1MinCard
             , c4MaxRecall * sizeof(pPlatInfo->apszRecallBuf[0])
         );
     }

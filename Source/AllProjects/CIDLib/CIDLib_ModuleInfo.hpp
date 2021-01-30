@@ -135,7 +135,7 @@ class CIDLIBEXP TCIDModuleInfo :
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const override;
 
         tCIDLib::TVoid StreamFrom

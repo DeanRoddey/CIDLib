@@ -484,7 +484,7 @@ LoadNetShares(  NETRESOURCE*                    pRes
     TKrnlVolumeInfo kvoliCur;
     while (kCIDLib::True)
     {
-        TRawMem::SetMemBuf(pBuf, tCIDLib::TCard1(0), c4BufSz);
+        TRawMem::SetMemBuf(pBuf, kCIDLib::c1MinCard, c4BufSz);
         Size = c4BufSz;
         Count = kCIDLib::c4MaxCard;
         ErrCode = ::WNetEnumResource(hCont, &Count, pBuf, &Size);

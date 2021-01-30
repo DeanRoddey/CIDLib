@@ -55,7 +55,7 @@ TBitSeq::TBitSeq(const tCIDLib::TCard4 c4InitAlloc) :
     , m_pc1Buffer(nullptr)
 {
     if (!m_c4CurAlloc)
-        m_c4CurAlloc = 64;
+        m_c4CurAlloc = 1;
     m_pc1Buffer = new tCIDLib::TCard1[m_c4CurAlloc];
 
     // And zero out the first byte, others will be zeroed as we hit them
@@ -76,20 +76,27 @@ TBitSeq::TBitSeq(const  tCIDLib::TCard1* const  pc1InitData
     TRawMem::CopyMemBuf(m_pc1Buffer, pc1InitData, m_c4CurAlloc);
 }
 
-TBitSeq::TBitSeq(const TBitSeq& bsqToCopy) :
+TBitSeq::TBitSeq(const TBitSeq& bsqSrc) :
 
-    m_c4CurAlloc(bsqToCopy.m_c4CurAlloc)
-    , m_c4CurRBit(bsqToCopy.m_c4CurRBit)
-    , m_c4CurRByte(bsqToCopy.m_c4CurRByte)
-    , m_c4CurWBit(bsqToCopy.m_c4CurWBit)
-    , m_c4CurWByte(bsqToCopy.m_c4CurWByte)
+    m_c4CurAlloc(bsqSrc.m_c4CurAlloc)
+    , m_c4CurRBit(bsqSrc.m_c4CurRBit)
+    , m_c4CurRByte(bsqSrc.m_c4CurRByte)
+    , m_c4CurWBit(bsqSrc.m_c4CurWBit)
+    , m_c4CurWByte(bsqSrc.m_c4CurWByte)
     , m_pc1Buffer(nullptr)
 {
     // Allocate a buffer of the same size
     m_pc1Buffer = new tCIDLib::TCard1[m_c4CurAlloc];
 
     // Copy over the live bits
-    TRawMem::CopyMemBuf(m_pc1Buffer, bsqToCopy.m_pc1Buffer, m_c4CurWByte + 1);
+    TRawMem::CopyMemBuf(m_pc1Buffer, bsqSrc.m_pc1Buffer, m_c4CurWByte + 1);
+}
+
+TBitSeq::TBitSeq(TBitSeq&& bsqSrc) :
+
+    TBitSeq()
+{
+    *this = tCIDLib::ForceMove(bsqSrc);
 }
 
 TBitSeq::~TBitSeq()
@@ -102,33 +109,46 @@ TBitSeq::~TBitSeq()
 // ---------------------------------------------------------------------------
 //  TBitSeq: Public operators
 // ---------------------------------------------------------------------------
-TBitSeq& TBitSeq::operator=(const TBitSeq& bsqToAssign)
+TBitSeq& TBitSeq::operator=(const TBitSeq& bsqSrc)
 {
-    if (this == &bsqToAssign)
-        return *this;
-
-    // If is not the same size, then reallocate ours
-    if (m_c4CurAlloc != bsqToAssign.m_c4CurAlloc)
+    if (this != &bsqSrc)
     {
-        delete [] m_pc1Buffer;
-        m_c4CurAlloc = bsqToAssign.m_c4CurAlloc;
-        m_pc1Buffer = new tCIDLib::TCard1[m_c4CurAlloc];
+        // If is not the same size, then reallocate ours
+        if (m_c4CurAlloc != bsqSrc.m_c4CurAlloc)
+        {
+            delete [] m_pc1Buffer;
+            m_c4CurAlloc = bsqSrc.m_c4CurAlloc;
+            m_pc1Buffer = new tCIDLib::TCard1[m_c4CurAlloc];
+        }
+
+        // Copy over current offset/bit info
+        m_c4CurRBit     = bsqSrc.m_c4CurRBit;
+        m_c4CurRByte    = bsqSrc.m_c4CurRByte;
+        m_c4CurWBit     = bsqSrc.m_c4CurWBit;
+        m_c4CurWByte    = bsqSrc.m_c4CurWByte;
+
+        //
+        //  Copy over the source buffer. We only need to copy over the bytes that
+        //  have live data in them.
+        //
+        TRawMem::CopyMemBuf(m_pc1Buffer, bsqSrc.m_pc1Buffer, m_c4CurWByte + 1);
     }
-
-    // Copy over current offset/bit info
-    m_c4CurRBit     = bsqToAssign.m_c4CurRBit;
-    m_c4CurRByte    = bsqToAssign.m_c4CurRByte;
-    m_c4CurWBit     = bsqToAssign.m_c4CurWBit;
-    m_c4CurWByte    = bsqToAssign.m_c4CurWByte;
-
-    //
-    //  Copy over the source buffer. We only need to copy over the bytes that
-    //  have live data in them.
-    //
-    TRawMem::CopyMemBuf(m_pc1Buffer, bsqToAssign.m_pc1Buffer, m_c4CurWByte + 1);
     return *this;
 }
 
+TBitSeq& TBitSeq::operator=(TBitSeq&& bsqSrc)
+{
+    if (this != &bsqSrc)
+    {
+        tCIDLib::Swap(m_c4CurAlloc, bsqSrc.m_c4CurAlloc);
+        tCIDLib::Swap(m_c4CurRBit, bsqSrc.m_c4CurRBit);
+        tCIDLib::Swap(m_c4CurRByte, bsqSrc.m_c4CurRByte);
+        tCIDLib::Swap(m_c4CurWBit, bsqSrc.m_c4CurWBit);
+        tCIDLib::Swap(m_c4CurWByte, bsqSrc.m_c4CurWByte);
+        tCIDLib::Swap(m_pc1Buffer, bsqSrc.m_pc1Buffer);
+    }
+    return *this;
+}
 
 tCIDLib::TBoolean TBitSeq::operator[](const tCIDLib::TCard4 c4BitIndex) const
 {

@@ -49,6 +49,7 @@ class CIDCTRLSEXP TGenericWnd : public TCtrlWnd
         TGenericWnd();
 
         TGenericWnd(const TGenericWnd&) = delete;
+        TGenericWnd(TGenericWnd&&) = delete;
 
         ~TGenericWnd();
 
@@ -57,6 +58,7 @@ class CIDCTRLSEXP TGenericWnd : public TCtrlWnd
         //  Public operators
         // -------------------------------------------------------------------
         TGenericWnd& operator=(const TGenericWnd&) = delete;
+        TGenericWnd& operator=(TGenericWnd&&) = delete;
 
 
         // -------------------------------------------------------------------

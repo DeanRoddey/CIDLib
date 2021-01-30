@@ -537,11 +537,7 @@ TCIDObjStore::eReadObject(  const   TString&            strKey
     tCIDLib::TCard4 c4Size;
     const tCIDLib::ELoadRes eRes = m_postCache->eReadObject
     (
-        strKey
-        , c4Version
-        , m_mbufRead
-        , c4Size
-        , bThrowIfNot
+        strKey, c4Version, m_mbufRead, c4Size, bThrowIfNot
     );
 
     if (eRes == tCIDLib::ELoadRes::NewData)
@@ -558,9 +554,9 @@ TCIDObjStore::eReadObject(  const   TString&            strKey
 //
 tCIDLib::ELoadRes
 TCIDObjStore::eReadObjectDirect(const   TString&            strKey
-                                ,       tCIDLib::TCard4&    c4Version
+                                , CIOP  tCIDLib::TCard4&    c4Version
                                 ,       THeapBuf&           mbufToFill
-                                ,       tCIDLib::TCard4&    c4BytesRead
+                                , COP   tCIDLib::TCard4&    c4BytesRead
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
     if (!m_bReady)

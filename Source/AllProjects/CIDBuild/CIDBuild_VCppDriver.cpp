@@ -426,22 +426,22 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
         // If asked, invoke code analysis
         if (facCIDBuild.eCodeAnalysis() != tCIDBuild::EAnalysisLevels::None)
         {
-            TBldStr* pstrNew = new TBldStr(L"/analyze:ruleset\"");
-            pstrNew->Append(facCIDBuild.strCIDLibSrcDir());
+            TBldStr* pstrRules = new TBldStr(L"/analyze:ruleset\"");
+            pstrRules->Append(facCIDBuild.strCIDLibSrcDir());
             if (facCIDBuild.eCodeAnalysis() == tCIDBuild::EAnalysisLevels::Level1)
             {
-                pstrNew->Append(L"Source\\Cmd\\Win32\\Standard.ruleset\"");
+                pstrRules->Append(L"Source\\Cmd\\Win32\\Standard.ruleset\"");
             }
              else if (facCIDBuild.eCodeAnalysis() == tCIDBuild::EAnalysisLevels::Level2)
             {
-                pstrNew->Append(L"Source\\Cmd\\Win32\\Standard2.ruleset\"");
+                pstrRules->Append(L"Source\\Cmd\\Win32\\Standard2.ruleset\"");
             }
              else
             {
                 stdOut  << L"Unknown code analysis level" << kCIDBuild::EndLn;
                 throw tCIDBuild::EErrors::BuildError;
             }
-            apszArgs[c4CurArg++] = pstrNew->pszBuffer();
+            apszArgs[c4CurArg++] = pstrRules->pszBuffer();
 
             // And tell it the analysis plugin to use, which it doesn't seem to do on its own
             apszArgs[c4CurArg++] = L"/analyze:plugin";

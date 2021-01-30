@@ -178,6 +178,7 @@ template <typename TElem> class TQueue : public TCollection<TElem>
                 {
                 }
 
+                CIDLib_Suppress(26429) // The base class will check for null
                 explicit TConstCursor(const TMyType* const pcolToCursor) :
 
                     TParent(pcolToCursor)
@@ -191,14 +192,17 @@ template <typename TElem> class TQueue : public TCollection<TElem>
                     );
                 }
 
-                // We have to lock first, so we can't use member init! Just call operator
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
 
-                // Can't actually delete it since that causes problems
-                // TConstCursor(TConstCursor&&) = delete;
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
+                }
 
                 ~TConstCursor()
                 {
@@ -221,8 +225,17 @@ template <typename TElem> class TQueue : public TCollection<TElem>
                     return *this;
                 }
 
-                // Can't actually delete it since that causes problems
-                // TConstCursor& operator=(TConstCursor&&) = delete;
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pllstCursoring, cursSrc.m_pllstCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
+                    }
+                    return *this;
+                }
 
                 tCIDLib::TBoolean operator==(const TConstCursor& cursSrc) const
                 {
@@ -397,10 +410,16 @@ template <typename TElem> class TQueue : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init! Just call operator
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 // Can't actually delete it since that causes problems
@@ -425,8 +444,15 @@ template <typename TElem> class TQueue : public TCollection<TElem>
                     return *this;
                 }
 
-                // Can't actually delete it since that causes problems
-                // TNonConstCursor& operator=(TNonConstCursor&&) = delete;
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (&cursSrc != this)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
+                    }
+                    return *this;
+                }
 
                 TElem& operator*() const
                 {

@@ -67,7 +67,7 @@ TKrnlIPAddr::TKrnlIPAddr() :
     , m_c4ScopeId(0)
     , m_eType(tCIDSock::EAddrTypes::Unspec)
 {
-    TRawMem::SetMemBuf(m_ac1Data, tCIDLib::TCard1(0), kCIDSock::c4MaxIPAddrBytes);
+    TRawMem::SetMemBuf(m_ac1Data, kCIDLib::c1MinCard, kCIDSock::c4MaxIPAddrBytes);
 }
 
 
@@ -292,7 +292,7 @@ TKrnlIPAddr::bSet(  const   tCIDLib::TVoid* const   pAddrInfo
 
     // Copy in the data, which is assumed to be network order
     if (m_c4Count < kCIDSock::c4MaxIPAddrBytes)
-        TRawMem::SetMemBuf(m_ac1Data, tCIDLib::TCard1(0), kCIDSock::c4MaxIPAddrBytes);
+        TRawMem::SetMemBuf(m_ac1Data, kCIDLib::c1MinCard, kCIDSock::c4MaxIPAddrBytes);
     if (m_c4Count)
         TRawMem::CopyMemBuf(m_ac1Data, pAddrInfo, m_c4Count);
 
@@ -308,7 +308,7 @@ tCIDLib::TBoolean
 TKrnlIPAddr::bToInAddr( tCIDLib::TVoid* const   pAddr
                         , tCIDLib::TCard4&      c4SzInOut) const
 {
-    TRawMem::SetMemBuf(pAddr, tCIDLib::TCard1(0), c4SzInOut);
+    TRawMem::SetMemBuf(pAddr, kCIDLib::c1MinCard, c4SzInOut);
 
     if (m_eType == tCIDSock::EAddrTypes::IPV4)
     {
@@ -354,7 +354,7 @@ TKrnlIPAddr::bToSockAddr(       tCIDLib::TVoid* const  pAddr
                         ,       tCIDLib::TCard4&       c4SzInOut
                         , const tCIDLib::TIPPortNum    ippnPort) const
 {
-    TRawMem::SetMemBuf(pAddr, tCIDLib::TCard1(0), c4SzInOut);
+    TRawMem::SetMemBuf(pAddr, kCIDLib::c1MinCard, c4SzInOut);
 
     if (m_eType == tCIDSock::EAddrTypes::IPV4)
     {
@@ -475,7 +475,7 @@ tCIDLib::TVoid TKrnlIPAddr::Reset()
     m_c4FlowInfo = 0;
     m_c4ScopeId = 0;
     m_eType = tCIDSock::EAddrTypes::Unspec;
-    TRawMem::SetMemBuf(m_ac1Data, tCIDLib::TCard1(0), kCIDSock::c4MaxIPAddrBytes);
+    TRawMem::SetMemBuf(m_ac1Data, kCIDLib::c1MinCard, kCIDSock::c4MaxIPAddrBytes);
 }
 
 
@@ -485,7 +485,7 @@ TKrnlIPAddr::SetToSpecial(  const   tCIDSock::ESpecAddrs eAddr
                             , const tCIDSock::EAddrTypes    eType)
 {
     // Start zeroed out
-    TRawMem::SetMemBuf(m_ac1Data, tCIDLib::TCard1(0), kCIDSock::c4MaxIPAddrBytes);
+    TRawMem::SetMemBuf(m_ac1Data, kCIDLib::c1MinCard, kCIDSock::c4MaxIPAddrBytes);
 
     // Decide how many bytes we need
     if (eType == tCIDSock::EAddrTypes::IPV4)

@@ -82,10 +82,16 @@ class TVector : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstCursor() {}
@@ -102,6 +108,17 @@ class TVector : public TCollection<TElem>
                         TParent::operator=(cursSrc);
                         m_i4CurIndex = cursSrc.m_i4CurIndex;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_i4CurIndex, cursSrc.m_i4CurIndex);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
                     }
                     return *this;
                 }
@@ -270,13 +287,19 @@ class TVector : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
 
-                ~TNonConstCursor() {}
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
+                }
+
+                ~TNonConstCursor() = default;
 
 
                 // -----------------------------------------------------------
@@ -289,6 +312,16 @@ class TVector : public TCollection<TElem>
                         TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
+                    }
+                    return *this;
+                }
+
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
                     }
                     return *this;
                 }
@@ -389,10 +422,7 @@ class TVector : public TCollection<TElem>
         {
             // Allocate the array of elem pointers and zero them
             m_apElems = new TElem*[m_c4CurAlloc];
-            TRawMem::SetMemBuf
-            (
-                m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
-            );
+            TRawMem::SetMemBuf(m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc);
         }
 
         TVector(const   TIndex              tInitAlloc
@@ -409,10 +439,7 @@ class TVector : public TCollection<TElem>
 
             // Allocate the array of elem pointers and zero them
             m_apElems = new TElem*[m_c4CurAlloc];
-            TRawMem::SetMemBuf
-            (
-                m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
-            );
+            TRawMem::SetMemBuf(m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc);
         }
 
         TVector(const   TElem* const        pobjInitVals
@@ -508,7 +535,7 @@ class TVector : public TCollection<TElem>
                 TRawMem::SetMemBuf
                 (
                     &m_apElems[m_c4CurCount]
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(TElem*) * (m_c4CurAlloc - m_c4CurCount)
                 );
             }
@@ -1385,7 +1412,7 @@ class TVector : public TCollection<TElem>
                 {
                     TRawMem::SetMemBuf
                     (
-                        m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
+                        m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc
                     );
                     m_c4CurCount = 0;
 
@@ -1418,7 +1445,7 @@ class TVector : public TCollection<TElem>
                     TRawMem::SetMemBuf
                     (
                         &apNew[m_c4CurCount]
-                        , tCIDLib::TCard1(0)
+                        , kCIDLib::c1MinCard
                         , sizeof(TElem*) * (c4NewSize - m_c4CurCount)
                     );
                 }
@@ -1504,7 +1531,7 @@ class TVector : public TCollection<TElem>
             TRawMem::SetMemBuf
             (
                 m_apElems
-                , tCIDLib::TCard1(0)
+                , kCIDLib::c1MinCard
                 , sizeof(TElem*) * m_c4CurAlloc
             );
         }
@@ -1696,9 +1723,7 @@ class TVector : public TCollection<TElem>
                 // Zero out the remainder of the new slots
                 TRawMem::SetMemBuf
                 (
-                    &apNew[m_c4CurAlloc]
-                    , tCIDLib::TCard1(0)
-                    , sizeof(TElem*) * (c4NewSize - m_c4CurCount)
+                    &apNew[m_c4CurAlloc], kCIDLib::c1MinCard, sizeof(TElem*) * (c4NewSize - m_c4CurCount)
                 );
 
                 // Delete the old array and store the new info
@@ -1762,7 +1787,7 @@ class TVector : public TCollection<TElem>
             //  Zero out all the slots now. For safety's sake, don't do the
             //  current count but the current alloc.
             //
-            TRawMem::SetMemBuf(m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc);
+            TRawMem::SetMemBuf(m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc);
 
             // And we now have zero elements
             m_c4CurCount = 0;

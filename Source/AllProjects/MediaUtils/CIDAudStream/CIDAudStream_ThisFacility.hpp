@@ -41,7 +41,17 @@ class CIDAUDSTREAMEXP TFacCIDAudStream : public TFacility
         // -------------------------------------------------------------------
         TFacCIDAudStream();
 
+        TFacCIDAudStream(const TFacCIDAudStream&) = delete;
+        TFacCIDAudStream(TFacCIDAudStream&&) = delete;
+
         ~TFacCIDAudStream();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFacCIDAudStream& operator=(const TFacCIDAudStream&) = delete;
+        TFacCIDAudStream& operator=(TFacCIDAudStream&&) = delete;
 
 
     private :

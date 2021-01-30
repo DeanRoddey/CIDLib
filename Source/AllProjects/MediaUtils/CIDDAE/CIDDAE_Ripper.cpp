@@ -113,7 +113,7 @@ class TDAEBufPool : public TFixedSizePool<TDAEBuf>
         TDAEBufPool(const TDAEBufPool&) = delete;
         TDAEBufPool(TDAEBufPool&&) = delete;
 
-        ~TDAEBufPool() {}
+        ~TDAEBufPool() = default;
 
 
         // -------------------------------------------------------------------
@@ -127,7 +127,7 @@ class TDAEBufPool : public TFixedSizePool<TDAEBuf>
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        TDAEBuf* pelemMakeNew() override
+        [[nodiscard]] TDAEBuf* pelemMakeNew() override
         {
             return new TDAEBuf(CIDDAE_Ripper::c4BufSz);
         }
@@ -299,7 +299,7 @@ TCIDDAERipper::RipTrack(        TKrnlRemMediaDrv&   rmmdToUse
                         , const tCIDLib::TCard4     c4TrackNum
                         ,       TCIDDAEEncoder&     daeeToUse
                         , const TString&            strTrackName
-                        ,       tCIDLib::TBoolean&  bBreakFlag)
+                        , CIOP  tCIDLib::TBoolean&  bBreakFlag)
 {
     RipTrack
     (
@@ -326,7 +326,7 @@ TCIDDAERipper::RipTrack(        TKrnlRemMediaDrv&   rmmdToUse
                         , const tCIDLib::TCard4     c4TrackNum
                         ,       TCIDDAEEncoder&     daeeToUse
                         , const TString&            strTrackName
-                        ,       tCIDLib::TBoolean&  bBreakFlag
+                        , CIOP  tCIDLib::TBoolean&  bBreakFlag
                         , const TString&            strAlbumTitle
                         , const TString&            strTrackTitle
                         , const TString&            strArtist

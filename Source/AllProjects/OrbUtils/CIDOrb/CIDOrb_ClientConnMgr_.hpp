@@ -109,7 +109,7 @@ class TOrbClientConnMgr : public TObject
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bMakeListener
         (
-                    tCIDLib::TBoolean&      bFirstTime
+            CIOP    tCIDLib::TBoolean&      bFirstTime
         );
 
         tCIDLib::TVoid DoChecks();

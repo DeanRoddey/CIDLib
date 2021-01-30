@@ -337,7 +337,7 @@ tCIDLib::TVoid TMsgHash::Set(const  TMemBuf&        mbufBytes
 tCIDLib::TVoid TMsgHash::Zero()
 {
     // Just zero out all of the hash bytes
-    TRawMem::SetMemBuf(pc1HashW(), tCIDLib::TCard1(0), m_c4Bytes);
+    TRawMem::SetMemBuf(pc1HashW(), kCIDLib::c1MinCard, m_c4Bytes);
 }
 
 
@@ -461,7 +461,7 @@ TMsgHash& TMsgHash::operator=(const TMsgHash& mhashSrc)
          else if (!mhashSrc.m_pc1Hash && m_pc1Hash)
         {
             // We have one and he doesn't so zero ours
-            TRawMem::SetMemBuf(m_pc1Hash, tCIDLib::TCard1(0), m_c4Bytes);
+            TRawMem::SetMemBuf(m_pc1Hash, kCIDLib::c1MinCard, m_c4Bytes);
         }
          else
         {
@@ -578,7 +578,7 @@ const tCIDLib::TCard1* TMsgHash::pc1Hash() const
     if (!m_pc1Hash)
     {
         m_pc1Hash = new tCIDLib::TCard1[m_c4Bytes];
-        TRawMem::SetMemBuf(m_pc1Hash, tCIDLib::TCard1(0), m_c4Bytes);
+        TRawMem::SetMemBuf(m_pc1Hash, kCIDLib::c1MinCard, m_c4Bytes);
     }
     return m_pc1Hash;
 }
@@ -603,7 +603,7 @@ const tCIDLib::TCard1* TMsgHash::pc1HashAt(const tCIDLib::TCard4 c4At) const
     if (!m_pc1Hash)
     {
         m_pc1Hash = new tCIDLib::TCard1[m_c4Bytes];
-        TRawMem::SetMemBuf(m_pc1Hash, tCIDLib::TCard1(0), m_c4Bytes);
+        TRawMem::SetMemBuf(m_pc1Hash, kCIDLib::c1MinCard, m_c4Bytes);
     }
     return &m_pc1Hash[c4At];
 }
@@ -614,7 +614,7 @@ tCIDLib::TCard1* TMsgHash::pc1HashW()
     if (!m_pc1Hash)
     {
         m_pc1Hash = new tCIDLib::TCard1[m_c4Bytes];
-        TRawMem::SetMemBuf(m_pc1Hash, tCIDLib::TCard1(0), m_c4Bytes);
+        TRawMem::SetMemBuf(m_pc1Hash, kCIDLib::c1MinCard, m_c4Bytes);
     }
     return m_pc1Hash;
 }
@@ -639,7 +639,7 @@ tCIDLib::TCard1* TMsgHash::pc1HashWAt(const tCIDLib::TCard4 c4At)
     if (!m_pc1Hash)
     {
         m_pc1Hash = new tCIDLib::TCard1[m_c4Bytes];
-        TRawMem::SetMemBuf(m_pc1Hash, tCIDLib::TCard1(0), m_c4Bytes);
+        TRawMem::SetMemBuf(m_pc1Hash, kCIDLib::c1MinCard, m_c4Bytes);
     }
     return &m_pc1Hash[c4At];
 }

@@ -236,7 +236,7 @@ TListWnd::SendListEvent(const   tCIDCtrls::EListEvents  eEvent
     if (bSync)
     {
         TListChangeInfo wnotToSend(eEvent, c4Index, c4Id, c4ColIndex, *this);
-        SendSyncNotify(wnotToSend, m_nidChangeIdToUse);
+        SendSyncNotify(wnotToSend, TNotificationId(m_nidChangeIdToUse));
     }
      else
     {
@@ -244,6 +244,6 @@ TListWnd::SendListEvent(const   tCIDCtrls::EListEvents  eEvent
         (
             eEvent, c4Index, c4Id, c4ColIndex, *this
         );
-        SendAsyncNotify(pwnotToSend, m_nidChangeIdToUse);
+        SendAsyncNotify(pwnotToSend, TNotificationId(m_nidChangeIdToUse));
     }
 }

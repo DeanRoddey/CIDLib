@@ -62,7 +62,11 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         );
 
         TRegEx(const TRegEx&) = delete;
-        TRegEx(TRegEx&&) = delete;
+
+        TRegEx
+        (
+                    TRegEx&&                regxSrc
+        );
 
         ~TRegEx();
 
@@ -71,7 +75,11 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         //  Public operators
         // --------------------------------------------------------------------
         TRegEx& operator=(const TRegEx&) = delete;
-        TRegEx& operator=(TRegEx&&) = delete;
+
+        TRegEx& operator=
+        (
+                    TRegEx&&                regxSrc
+        );
 
 
         // --------------------------------------------------------------------
@@ -80,8 +88,8 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         tCIDLib::TBoolean bFindMatch
         (
             const   TString&                strFindIn
-            ,       tCIDLib::TCard4&        c4Ofs
-            ,       tCIDLib::TCard4&        c4Len
+            , COP   tCIDLib::TCard4&        c4Ofs
+            , COP   tCIDLib::TCard4&        c4Len
             , const tCIDLib::TBoolean       bOnlyAtStart = kCIDLib::True
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const;
@@ -89,8 +97,8 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         tCIDLib::TBoolean bFindMatch
         (
             const   tCIDLib::TCh* const     pszFindIn
-            ,       tCIDLib::TCard4&        c4Ofs
-            ,       tCIDLib::TCard4&        c4Len
+            , COP   tCIDLib::TCard4&        c4Ofs
+            , COP   tCIDLib::TCard4&        c4Len
             , const tCIDLib::TBoolean       bOnlyAtStart = kCIDLib::True
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const;
@@ -98,8 +106,8 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         tCIDLib::TBoolean bFindMatchAt
         (
             const   TString&                strFindIn
-            ,       tCIDLib::TCard4&        c4Ofs
-            ,       tCIDLib::TCard4&        c4Len
+            , CIOP  tCIDLib::TCard4&        c4Ofs
+            , COP   tCIDLib::TCard4&        c4Len
             , const tCIDLib::TBoolean       bOnlyAtStart = kCIDLib::True
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const;
@@ -107,8 +115,8 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         tCIDLib::TBoolean bFindMatchAt
         (
             const   tCIDLib::TCh* const     pszFindIn
-            ,       tCIDLib::TCard4&        c4Ofs
-            ,       tCIDLib::TCard4&        c4Len
+            , CIOP  tCIDLib::TCard4&        c4Ofs
+            , COP   tCIDLib::TCard4&        c4Len
             , const tCIDLib::TBoolean       bOnlyAtStart = kCIDLib::True
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const;

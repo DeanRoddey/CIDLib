@@ -123,11 +123,7 @@ class CIDORBUCEXP TNameServerInfo : public TObject, public MStreamable
         //  Public operators
         // -------------------------------------------------------------------
         TNameServerInfo& operator=(const TNameServerInfo&) = default;
-
-        TNameServerInfo& operator=
-        (
-                    TNameServerInfo&&       nsviSrc
-        );
+        TNameServerInfo& operator=(TNameServerInfo&&) = default;
 
 
         // -------------------------------------------------------------------

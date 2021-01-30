@@ -110,21 +110,17 @@ template <typename TVal> class TNamedValMap : public TObject
                 {
                 }
 
-                TNVMItem(const TNVMItem& nviToCopy) :
+                TNVMItem(const TNVMItem&) = default;
+                TNVMItem(TNVMItem&&) = default;
 
-                    m_colPairs(nviToCopy.m_colPairs)
-                    , m_strKey(nviToCopy.m_strKey)
-                {
-                }
-
-                ~TNVMItem() {}
+                ~TNVMItem() = default;
 
 
                 // -----------------------------------------------------------
                 //  Public operators
                 // -----------------------------------------------------------
-                TNVMItem& operator=(const TNVMItem&) = delete;
-                TNVMItem& operator=(TNVMItem&&) = delete;
+                TNVMItem& operator=(const TNVMItem&) = default;
+                TNVMItem& operator=(TNVMItem&&) = default;
 
 
                 // -----------------------------------------------------------
@@ -271,7 +267,14 @@ template <typename TVal> class TNamedValMap : public TObject
         {
         }
 
-        ~TNamedValMap() {}
+        TNamedValMap(TMyType&& nvmSrc) :
+
+            TNamedValMap()
+        {
+            *this = tCIDLib::ForceMove(nvmSrc);
+        }
+
+        ~TNamedValMap() = default;
 
 
         // -------------------------------------------------------------------
@@ -281,6 +284,13 @@ template <typename TVal> class TNamedValMap : public TObject
         {
             if (this != &nvmSrc)
                 m_colItems = nvmSrc.m_colItems;
+            return *this;
+        }
+
+        TMyType& operator=(TMyType&& nvmSrc)
+        {
+            if (this != &nvmSrc)
+                m_colItems = tCIDLib::ForceMove(nvmSrc.m_colItems);
             return *this;
         }
 
@@ -514,12 +524,12 @@ template <typename TVal> class TNamedValMap : public TObject
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid AlreadyExists(const  TString&        strKey
-                                    , const TString* const  pstrSubKey) const
+        [[noreturn]] tCIDLib::TVoid AlreadyExists(  const   TString&        strKey
+                                                    , const TString* const  pstrSubKey) const
         {
-            tCIDLib::TErrCode errcThrow = pstrSubKey
-                                          ? kCIDErrs::errcNVM_SubKeyExists
-                                          : kCIDErrs::errcNVM_ItemExists;
+            const tCIDLib::TErrCode errcThrow = pstrSubKey
+                                                ? kCIDErrs::errcNVM_SubKeyExists
+                                                : kCIDErrs::errcNVM_ItemExists;
             const TString& strSubKey    = pstrSubKey
                                           ? *pstrSubKey
                                           : TString::Nul_TString();
@@ -536,15 +546,13 @@ template <typename TVal> class TNamedValMap : public TObject
             );
         }
 
-        tCIDLib::TVoid NotFound(const   TString&        strKey
-                                , const TString* const  pstrSubKey) const
+        [[noreturn]] tCIDLib::TVoid NotFound(const  TString&        strKey
+                                            , const TString* const  pstrSubKey) const
         {
-            tCIDLib::TErrCode errcThrow = pstrSubKey
-                                          ? kCIDErrs::errcNVM_SubKeyNotFound
-                                          : kCIDErrs::errcNVM_ItemNotFound;
-            const TString& strSubKey    = pstrSubKey
-                                          ? *pstrSubKey
-                                          : TString::Nul_TString();
+            const tCIDLib::TErrCode errcThrow = pstrSubKey
+                                                ? kCIDErrs::errcNVM_SubKeyNotFound
+                                                : kCIDErrs::errcNVM_ItemNotFound;
+            const TString& strSubKey    = pstrSubKey ? *pstrSubKey : TString::Nul_TString();
 
             facCIDLib().ThrowErr
             (

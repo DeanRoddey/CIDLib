@@ -269,7 +269,7 @@ template <typename CB> class TLambdaJan
                 //  We can't force these to be no-except, we just have to suppress
                 //  this and if they cause an exception it's going to be fatal.
                 //
-                #pragma warning(suppress : 26447)
+                CIDLib_Suppress(26447)
                 m_pfnCallback();
             }
         }

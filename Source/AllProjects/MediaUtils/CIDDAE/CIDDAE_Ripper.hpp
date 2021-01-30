@@ -54,6 +54,7 @@ class CIDDAEEXP TCIDDAERipper : public TObject
         TCIDDAERipper();
 
         TCIDDAERipper(const TCIDDAERipper&) = delete;
+        TCIDDAERipper(TCIDDAERipper&&) = delete;
 
         ~TCIDDAERipper();
 
@@ -61,20 +62,21 @@ class CIDDAEEXP TCIDDAERipper : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDAERipper& operator=(const TCIDDAERipper&) = delete;
+        TCIDDAERipper& operator=(TCIDDAERipper&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4PercentDone() const;
+        [[nodiscard]] tCIDLib::TCard4 c4PercentDone() const;
 
-        tCIDLib::TCard4 c4ReadErrs() const;
+        [[nodiscard]] tCIDLib::TCard4 c4ReadErrs() const;
 
-        tCIDLib::TCard4 c4StitchErrs() const;
+        [[nodiscard]] tCIDLib::TCard4 c4StitchErrs() const;
 
-        tCIDLib::TCard4 c4Stitches() const;
+        [[nodiscard]] tCIDLib::TCard4 c4Stitches() const;
 
-        tCIDDAE::EJitterOpts eJitterOpt() const;
+        [[nodiscard]] tCIDDAE::EJitterOpts eJitterOpt() const;
 
         tCIDDAE::EJitterOpts eJitterOpt
         (
@@ -89,7 +91,7 @@ class CIDDAEEXP TCIDDAERipper : public TObject
             , const tCIDLib::TCard4         c4TrackNum
             ,       TCIDDAEEncoder&         daeeToUse
             , const TString&                strTrackName
-            ,       tCIDLib::TBoolean&      bBreakFlag
+            , CIOP  tCIDLib::TBoolean&      bBreakFlag
         );
 
         tCIDLib::TVoid RipTrack
@@ -100,7 +102,7 @@ class CIDDAEEXP TCIDDAERipper : public TObject
             , const tCIDLib::TCard4         c4TrackNum
             ,       TCIDDAEEncoder&         daeeToUse
             , const TString&                strTrackName
-            ,       tCIDLib::TBoolean&      bBreakFlag
+            , CIOP  tCIDLib::TBoolean&      bBreakFlag
             , const TString&                strAlbumTitle
             , const TString&                strTrackTitle
             , const TString&                strArtist

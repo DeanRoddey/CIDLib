@@ -60,6 +60,7 @@ template <typename T> class TJanitor
         }
 
         TJanitor(const TJanitor&) = delete;
+        TJanitor(TJanitor&&) = delete;
 
         ~TJanitor()
         {
@@ -73,6 +74,7 @@ template <typename T> class TJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TJanitor& operator=(const TJanitor&) = delete;
+        TJanitor& operator=(TJanitor&&) = delete;
         tCIDLib::TVoid* operator new(const size_t) = delete;
 
         operator bool() const

@@ -55,29 +55,8 @@ TEFChangeInfo::TEFChangeInfo(const  tCIDCtrls::EEFEvents    eEvent
 {
 }
 
-TEFChangeInfo::TEFChangeInfo(const TEFChangeInfo& wnotSrc) :
-
-    TCtrlNotify(wnotSrc)
-    , m_eEvent(wnotSrc.m_eEvent)
-{
-}
-
 TEFChangeInfo::~TEFChangeInfo()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  TEFChangeInfo: Public operators
-// ---------------------------------------------------------------------------
-TEFChangeInfo& TEFChangeInfo::operator=(const TEFChangeInfo& wnotSrc)
-{
-    if (this != &wnotSrc)
-    {
-        TParent::operator=(wnotSrc);
-        m_eEvent = wnotSrc.m_eEvent;
-    }
-    return *this;
 }
 
 

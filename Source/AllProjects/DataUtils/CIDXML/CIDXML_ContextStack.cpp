@@ -59,7 +59,7 @@ TXMLContextStack::TXMLContextStack() :
     TRawMem::SetMemBuf
     (
         m_pLevels
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , sizeof(TLevel) * m_c4LevelMax
     );
 }
@@ -286,7 +286,7 @@ TXMLContextStack::PushNewLevel(         TXMLElemDecl* const pxdeclNew
         TRawMem::SetMemBuf
         (
             &pNewLevels[m_c4LevelMax]
-            , tCIDLib::TCard1(0)
+            , kCIDLib::c1MinCard
             , sizeof(TLevel) * (c4NewSize - m_c4LevelMax)
         );
 
@@ -321,7 +321,7 @@ tCIDLib::TVoid TXMLContextStack::Reset()
     TRawMem::SetMemBuf
     (
         m_pLevels
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , sizeof(TLevel) * m_c4LevelMax
     );
 }

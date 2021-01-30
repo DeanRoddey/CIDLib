@@ -288,9 +288,7 @@ template <typename TElem> class TBasicTreeNode : public TBaseTreeNode
         TBasicTreeNode(const TBasicTreeNode<TElem>&) = delete;
         TBasicTreeNode(TBasicTreeNode<TElem>&&) = delete;
 
-        ~TBasicTreeNode()
-        {
-        }
+        ~TBasicTreeNode() = default;
 
 
         // -------------------------------------------------------------------
@@ -932,10 +930,16 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstCursor()
@@ -955,6 +959,18 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                         m_c4Depth       = cursSrc.m_c4Depth;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pnodeCur      = cursSrc.m_pnodeCur;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_c4Depth, cursSrc.m_c4Depth);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
                     }
                     return *this;
                 }
@@ -1147,10 +1163,16 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TNonConstCursor()
@@ -1168,6 +1190,16 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                         TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
+                    }
+                    return *this;
+                }
+
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
                     }
                     return *this;
                 }
@@ -1283,10 +1315,16 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                     m_pnodeCur = m_pnodeParent->pnodeFirstChild();
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstScopeCursor(const TConstScopeCursor& cursSrc)
                 {
                     TConstScopeCursor::operator=(cursSrc);
+                }
+
+                TConstScopeCursor(TConstScopeCursor&& cursSrc) :
+
+                    TConstScopeCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstScopeCursor()
@@ -1312,6 +1350,19 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pnodeCur      = cursSrc.m_pnodeCur;
                         m_pnodeParent   = cursSrc.m_pnodeParent;
+                    }
+                    return *this;
+                }
+
+                TConstScopeCursor& operator=(TConstScopeCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_c4Depth, cursSrc.m_c4Depth);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
+                        tCIDLib::Swap(m_pnodeParent, cursSrc.m_pnodeParent);
                     }
                     return *this;
                 }
@@ -1380,7 +1431,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                tCIDLib::TCard4 c4Depth() const
+                [[nodiscard]] tCIDLib::TCard4 c4Depth() const
                 {
                     return m_c4Depth;
                 }
@@ -1488,15 +1539,19 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstScopeCursor(const TNonConstScopeCursor<TElem>& cursSrc)
                 {
                     TNonConstScopeCursor::operator=(cursSrc);
                 }
 
-                ~TNonConstScopeCursor()
+                TNonConstScopeCursor(TNonConstScopeCursor<TElem>&& cursSrc) :
+
+                    TNonConstScopeCursor()
                 {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
+
+                ~TNonConstScopeCursor() = default;
 
 
                 // -----------------------------------------------------------
@@ -1518,6 +1573,15 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                     return *this;
                 }
 
+                TNonConstScopeCursor& operator=(TNonConstScopeCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
+                    }
+                    return *this;
+                }
 
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods

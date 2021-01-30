@@ -202,7 +202,7 @@ THostAdapter::THostAdapter() :
     , m_strDescr()
     , m_strName()
 {
-    TRawMem::SetMemBuf(m_ac1HWAddr, tCIDLib::TCard1(0), kCIDSock::c4MaxHWAddrSz);
+    TRawMem::SetMemBuf(m_ac1HWAddr, kCIDLib::c1MinCard, kCIDSock::c4MaxHWAddrSz);
 }
 
 THostAdapter::THostAdapter(const THostAdapter& hadpSrc) :

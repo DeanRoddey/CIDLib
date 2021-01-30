@@ -171,6 +171,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                 }
 
+                CIDLib_Suppress(26429) // The parent class will check for null
                 explicit TConstCursor(const TMyType* const pcolToCursor) :
 
                     TParent(pcolToCursor)
@@ -184,11 +185,18 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                     );
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
+
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
+                }
+
 
                 ~TConstCursor()
                 {
@@ -207,6 +215,18 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pllstCursoring = cursSrc.m_pllstCursoring;
                         m_pnodeCur = cursSrc.m_pnodeCur;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pllstCursoring, cursSrc.m_pllstCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
                     }
                     return *this;
                 }
@@ -378,10 +398,16 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TNonConstCursor()
@@ -399,6 +425,16 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                         TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
+                    }
+                    return *this;
+                }
+
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
                     }
                     return *this;
                 }
@@ -610,6 +646,8 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                             ,       TElem*&             pobjOld
                             , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0)
         {
+            CIDAssert(pfnComp != nullptr, L"The comparison function pointer was null")
+
             if (!pobjNew)
                 this->NullNodeAdded(CID_FILE, CID_LINE);
 
@@ -696,6 +734,8 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
                     ,       TObjEqFunc          pfnComp
                     , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0)
         {
+            CIDAssert(pfnComp != nullptr, L"The passed equality function pointer was null")
+
             if (!pobjToPut)
                 this->NullNodeAdded(CID_FILE, CID_LINE);
             TLocker lockrQueue(this);
@@ -774,7 +814,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             TLocker lockrQueue(this);
 
             // Call a helper to wait for something to show up
-            tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
+            const tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
             (
                 lockrQueue, *this, c4Millis, m_twlWaiters, bThrowTimeout
             );
@@ -788,6 +828,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             {
                 // Get the head node
                 TNode* pnodeHead = static_cast<TNode*>(m_llstQueue.pnodeHead());
+                CIDAssert(pnodeHead != nullptr, L"The queue node was null")
 
                 // Orphan the object out of it and then flush the node
                 pobjRet = pnodeHead->pobjOrphan();
@@ -817,6 +858,8 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         TElem*
         pobjGetNextIfMatches(const TElem& objComp, TObjEqFunc pfnComp)
         {
+            CIDAssert(pfnComp != nullptr, L"The comparison function pointer was null")
+
             // Lock the queue
             TLocker lockrQueue(this);
 
@@ -849,7 +892,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
             TLocker lockrQueue(this);
 
             // Call a helper to wait for something to show up
-            tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
+            const tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
             (
                 lockrQueue, *this, c4Millis, m_twlWaiters, kCIDLib::True
             );
@@ -953,6 +996,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
 
             // Get the node to remove and move the cursor past it
             TNode* pnodeToRemove = cursAt.pnodeCur();
+            CIDAssert(pnodeToRemove != nullptr, L"Queue node was null")
             cursAt.bNext();
 
             //
@@ -1017,6 +1061,7 @@ template <typename TElem> class TRefQueue : public TRefCollection<TElem>
         TNode* pnodeFindObj(const   TElem&              objToFind
                             ,       TObjEqFunc          pfnComp)
         {
+            CIDAssert(pfnComp != nullptr, L"Equality function pointer was null")
             TNode* pnodeCur = (TNode*)m_llstQueue.pnodeHead();
             while (pnodeCur)
             {

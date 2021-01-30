@@ -806,7 +806,7 @@ THeapBuf::Realloc(  const   tCIDLib::TCard4     c4NewSize
         if (m_pc1Data)
             TRawMem::CopyMemBuf(pc1NewData, m_pc1Data, m_c4Size);
         else
-            TRawMem::SetMemBuf(pc1NewData, tCIDLib::TCard1(0), m_c4Size);
+            TRawMem::SetMemBuf(pc1NewData, kCIDLib::c1MinCard, m_c4Size);
     }
 
     // Free the existing buffer now if we had one

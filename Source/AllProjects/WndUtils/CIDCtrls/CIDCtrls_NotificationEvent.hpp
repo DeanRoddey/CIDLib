@@ -83,7 +83,7 @@ class CIDCTRLSEXP TWndEvent
         // -------------------------------------------------------------------
         //  Public, virtual methods
         // -------------------------------------------------------------------
-        virtual TObject* pobjToSend() const
+        virtual [[nodiscard]] TObject* pobjToSend() const
         {
             // At this level we have no object, so return null
             return nullptr;
@@ -197,7 +197,7 @@ template <typename D> class TWndEventFor : public TWndEvent
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        TObject* pobjToSend() const override
+        [[nodiscard]] TObject* pobjToSend() const override
         {
             return m_pobjToSend;
         }
@@ -211,7 +211,7 @@ template <typename D> class TWndEventFor : public TWndEvent
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        D& objNotInfo()
+        [[nodiscard]] D& objNotInfo()
         {
             return *m_pobjToSend;
         }

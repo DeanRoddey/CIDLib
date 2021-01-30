@@ -520,7 +520,6 @@ class CIDLIBEXP TModule : public TObject
         virtual tCIDLib::TBoolean bTraceErrs() const;
 
 
-
     private :
         // -------------------------------------------------------------------
         //  Private, static methods

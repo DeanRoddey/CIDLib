@@ -236,10 +236,10 @@ namespace TKrnlRemMedia
     (
         const   TKrnlRemMedia::TCDTOCInfo& SrcTOC
         , const tCIDLib::TCard4         c4TrackNum
-        ,       tCIDLib::TCard4&        c4StartBlock
-        ,       tCIDLib::TCard4&        c4BlockCnt
-        ,       tCIDLib::TCard4&        c4Minutes
-        ,       tCIDLib::TCard4&        c4Seconds
+        , COP   tCIDLib::TCard4&        c4StartBlock
+        , COP   tCIDLib::TCard4&        c4BlockCnt
+        , COP   tCIDLib::TCard4&        c4Minutes
+        , COP   tCIDLib::TCard4&        c4Seconds
     );
 
     KRNLEXPORT tCIDLib::TBoolean bIsBDType

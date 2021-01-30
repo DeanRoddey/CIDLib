@@ -51,10 +51,14 @@ namespace kCIDLib
     // -----------------------------------------------------------------------
     //  Some very basic constants.
     // -----------------------------------------------------------------------
+    constexpr tCIDLib::TCard1       c1MinCard       = 0;
     constexpr tCIDLib::TCard1       c1MaxCard       = 0xFF;
     constexpr tCIDLib::TCard2       c2MaxCard       = 0xFFFF;
+    constexpr tCIDLib::TCard2       c2MinCard       = 0;
     constexpr tCIDLib::TCard4       c4MaxCard       = 0xFFFFFFFF;
+    constexpr tCIDLib::TCard4       c4MinCard       = 0;
     constexpr tCIDLib::TCard8       c8MaxCard       = 0xFFFFFFFFFFFFFFFF;
+    constexpr tCIDLib::TCard8       c8MinCard       = 0;
 
     constexpr tCIDLib::TInt1        i1MaxInt        = 127;
     constexpr tCIDLib::TInt2        i2MaxInt        = 32767;

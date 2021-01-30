@@ -7,7 +7,6 @@
     <Rule Id="C26431" Action="Warning" />
     <Rule Id="C26432" Action="Warning" />
     <Rule Id="C26433" Action="Warning" />
-    <Rule Id="C26434" Action="Warning" />
     <Rule Id="C26435" Action="Warning" />
     <Rule Id="C26436" Action="Warning" />
     <Rule Id="C26437" Action="Warning" />

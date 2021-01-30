@@ -155,7 +155,7 @@ namespace tCIDLib
     constexpr T&& Forward(typename RemoveRef<T>::Type& t) noexcept
     {
         // Often causes an unneeded cast warning, but we can never know when so suppress
-        #pragma warning(suppress : 26473)
+        CIDLib_Suppress(26473)
         return static_cast<T&&>(t);
     }
 
@@ -163,7 +163,7 @@ namespace tCIDLib
     constexpr T&& Forward(typename RemoveRef<T>::type&& t) noexcept
     {
         // Often causes an unneeded cast warning, but we can never know when so suppress
-        #pragma warning(suppress : 26473)
+        CIDLib_Suppress(26473)
         return static_cast<T&&>(t);
     }
 
@@ -529,4 +529,12 @@ namespace tCIDLib
     {
         using type = T;
     };
+
+
+    // Sometimes we have to use a reinterpret cast, so make the analyzer be quiet about it
+    template <typename T, typename F> T* pReCastPtr(F* pSrc)
+    {
+        CIDLib_Suppress(26490)
+        return reinterpret_cast<T*>(pSrc);
+    }
 }

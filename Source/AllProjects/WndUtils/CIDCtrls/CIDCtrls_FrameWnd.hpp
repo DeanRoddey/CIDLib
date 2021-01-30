@@ -56,6 +56,7 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
         TFrameWnd();
 
         TFrameWnd(const TFrameWnd&) = delete;
+        TFrameWnd(TFrameWnd&&) = delete;
 
         ~TFrameWnd();
 
@@ -64,6 +65,7 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
         //  Public operators
         // -------------------------------------------------------------------
         TFrameWnd& operator=(const TFrameWnd&) = delete;
+        TFrameWnd& operator=(TFrameWnd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -90,22 +92,22 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
             const   TString&                strToSet
         );
 
-        tCIDLib::TBoolean bAnyActivePopup
+        [[nodiscard]] tCIDLib::TBoolean bAnyActivePopup
         (
             const   tCIDLib::TBoolean       bModalOnly
         )   const;
 
-        tCIDLib::TBoolean bInFSMode() const;
+        [[nodiscard]] tCIDLib::TBoolean bInFSMode() const;
 
-        tCIDLib::TBoolean bIsActive() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsActive() const;
 
-        tCIDLib::TBoolean bIsMaximized() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsMaximized() const;
 
-        tCIDLib::TBoolean bIsMinimized() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsMinimized() const;
 
-        tCIDLib::TBoolean bIsOwned() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsOwned() const;
 
-        tCIDLib::TBoolean bIsRestored() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsRestored() const;
 
         tCIDLib::TVoid CreateFrame
         (
@@ -145,13 +147,13 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
 
         tCIDLib::TVoid Minimize();
 
-        const TMenuBar& menuCur() const;
+        [[nodiscard]] const TMenuBar& menuCur() const;
 
-        TMenuBar& menuCur();
+        [[nodiscard]] TMenuBar& menuCur();
 
-        const TMenuBar* pmenuCur() const;
+        [[nodiscard]] const TMenuBar* pmenuCur() const;
 
-        TMenuBar* pmenuCur();
+        [[nodiscard]] TMenuBar* pmenuCur();
 
         TGenericWnd* pwndInstallGenericClientWnd
         (

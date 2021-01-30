@@ -51,20 +51,20 @@ namespace CIDAudStream_WaveInSrcStream_Win32
     //  per sample PCM, mono. For now, it's the only format supported. This stuff needs
     //  to be expanded to support format setting from the outside.
     //
-    const tCIDLib::TCard4   c4Channels      = 1;
+    constexpr tCIDLib::TCard4   c4Channels      = 1;
 
     // 16000 samples per second, two bytes per sample
-    const tCIDLib::TCard4   c4SampleRate    = 16000;
-    const tCIDLib::TCard4   c4SampleBytes   = 2;
+    constexpr tCIDLib::TCard4   c4SampleRate    = 16000;
+    constexpr tCIDLib::TCard4   c4SampleBytes   = 2;
 
     // An 16th of a second of audio samples
-    const tCIDLib::TCard4   c4BufSamples    = (c4SampleRate / 16);
+    constexpr tCIDLib::TCard4   c4BufSamples    = (c4SampleRate / 16);
 
     // Bytes required to hold that number of samples
-    const tCIDLib::TCard4   c4BufBytes      = c4BufSamples * c4SampleBytes;
+    constexpr tCIDLib::TCard4   c4BufBytes      = c4BufSamples * c4SampleBytes;
 
     // Number of buffers we have (which will get us three seconds of buffering)
-    const tCIDLib::TCard4   c4BufCount      = 48;
+    constexpr tCIDLib::TCard4   c4BufCount      = 48;
 }
 
 
@@ -109,7 +109,7 @@ struct TWaveInSrcStreamInfo
 tCIDLib::TBoolean
 TWaveInSrcStream::bReadBytes(       tCIDLib::TCard1* const  pc1ToFill
                             , const tCIDLib::TCard4         c4MaxBytes
-                            ,       tCIDLib::TCard4&        c4BytesRead
+                            , COP   tCIDLib::TCard4&        c4BytesRead
                             , const tCIDLib::TCard4         c4WaitMSs)
 {
     if (!m_pInfo)
@@ -269,7 +269,7 @@ tCIDLib::TVoid TWaveInSrcStream::Initialize()
     try
     {
         m_pInfo = new TWaveInSrcStreamInfo;
-        TRawMem::SetMemBuf(m_pInfo, tCIDLib::TCard1(0), sizeof(TWaveInSrcStreamInfo));
+        TRawMem::SetMemBuf(m_pInfo, kCIDLib::c1MinCard, sizeof(TWaveInSrcStreamInfo));
 
         //
         //  Allocate our overflow buffer. It's the same size as one of our regular

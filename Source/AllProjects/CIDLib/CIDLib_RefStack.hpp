@@ -63,6 +63,7 @@ template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
         {
         }
 
+        // Not copyable, only movable
         TRefStack(const TRefStack&) = delete;
         TRefStack(TRefStack&&) = default;
 
@@ -74,6 +75,8 @@ template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Not assignable, only movable
         TRefStack& operator=(const TRefStack&) = delete;
         TRefStack& operator=(TRefStack&&) = default;
 

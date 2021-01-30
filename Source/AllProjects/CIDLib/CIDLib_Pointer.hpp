@@ -21,7 +21,7 @@
 //  pointer to a stream, it misinterprets this in one way or another
 //  according to the available formatting overrides available. This class
 //  just makes sure that it comes out with the correct format and in hex
-//  format. We could use TCardinal for this, but we don't want to assume
+//  radix. We could use TCardinal for this, but we don't want to assume
 //  always that a pointer and a TCardinal are the same size or have the
 //  same formatting issues.
 //
@@ -85,7 +85,7 @@ class CIDLIBEXP TPointer :
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP   TTextOutStream&         strmDest
         )   const final;
 
 

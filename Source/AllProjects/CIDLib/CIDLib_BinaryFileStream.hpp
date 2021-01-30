@@ -64,6 +64,7 @@ class CIDLIBEXP TBinFileInStream : public TBinInStream
         );
 
         TBinFileInStream(const TBinFileInStream&) = delete;
+        TBinFileInStream(TBinFileInStream&&) = delete;
 
         ~TBinFileInStream();
 
@@ -72,6 +73,7 @@ class CIDLIBEXP TBinFileInStream : public TBinInStream
         //  Public operators
         // -------------------------------------------------------------------
         TBinFileInStream& operator=(const TBinFileInStream&) = delete;
+        TBinFileInStream& operator=(TBinFileInStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -79,7 +81,7 @@ class CIDLIBEXP TBinFileInStream : public TBinInStream
         // -------------------------------------------------------------------
         tCIDLib::TVoid Close();
 
-        tCIDLib::TCard8 c8CurSize() const;
+        [[nodiscard]] tCIDLib::TCard8 c8CurSize() const;
 
         tCIDLib::TVoid Open
         (
@@ -145,6 +147,7 @@ class CIDLIBEXP TBinFileOutStream : public TBinOutStream
         );
 
         TBinFileOutStream(const TBinFileOutStream&) = delete;
+        TBinFileOutStream(TBinFileOutStream&&) = delete;
 
         ~TBinFileOutStream();
 
@@ -153,6 +156,7 @@ class CIDLIBEXP TBinFileOutStream : public TBinOutStream
         //  Public operators
         // -------------------------------------------------------------------
         TBinFileOutStream& operator=(const TBinFileOutStream&) = delete;
+        TBinFileOutStream& operator=(TBinFileOutStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -160,7 +164,7 @@ class CIDLIBEXP TBinFileOutStream : public TBinOutStream
         // -------------------------------------------------------------------
         tCIDLib::TVoid Close();
 
-        tCIDLib::TCard8 c8CurSize() const;
+        [[nodiscard]] tCIDLib::TCard8 c8CurSize() const;
 
         tCIDLib::TVoid Open
         (

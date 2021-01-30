@@ -914,7 +914,10 @@ TMemBuf& TMemBuf::operator=(TMemBuf&&)
 //  TMemBuf: Protected, inherited methods
 // ---------------------------------------------------------------------------
 
-// Derived class should call us after his info
+//
+//  Not really used, but if we are called, we should be called symmetrically so we
+//  issue a marker and check for it.
+//
 tCIDLib::TVoid TMemBuf::StreamFrom(TBinInStream& strmToReadFrom)
 {
     strmToReadFrom.CheckForStartMarker(CID_FILE, CID_LINE);

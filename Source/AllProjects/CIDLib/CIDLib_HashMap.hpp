@@ -88,6 +88,7 @@ template <typename TKey, class TValue> class THashMapNode
         }
 
         THashMapNode(const THashMapNode<TKey,TValue>&) = delete;
+        THashMapNode(THashMapNode<TKey,TValue>&&) = delete;
 
         ~THashMapNode() {}
 
@@ -96,6 +97,7 @@ template <typename TKey, class TValue> class THashMapNode
         //  Public operators
         // -------------------------------------------------------------------
         THashMapNode<TKey,TValue>& operator=(const THashMapNode<TKey,TValue>&) = delete;
+        THashMapNode<TKey,TValue>& operator=(THashMapNode<TKey,TValue>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -148,8 +150,7 @@ template <typename TKey, class TValue> class THashMapNode
             return m_pnodeNext;
         }
 
-        THashMapNode<TKey,TValue>*
-        pnodeNext(THashMapNode<TKey,TValue>* const pnodeToSet)
+        THashMapNode<TKey,TValue>* pnodeNext(THashMapNode<TKey,TValue>* const pnodeToSet)
         {
             m_pnodeNext = pnodeToSet;
             return m_pnodeNext;
@@ -252,10 +253,16 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                     m_pnodeCur = m_pcolCursoring->pnodeFindFirst(m_hshCurBucket);
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstCursor() {}
@@ -273,6 +280,18 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                         m_hshCurBucket = cursSrc.m_hshCurBucket;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pnodeCur = cursSrc.m_pnodeCur;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_hshCurBucket, cursSrc.m_hshCurBucket);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
                     }
                     return *this;
                 }
@@ -496,10 +515,16 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TNonConstCursor() {}
@@ -516,6 +541,16 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
 
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
+                    }
+                    return *this;
+                }
+
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
                     }
                     return *this;
                 }
@@ -625,7 +660,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 TRawMem::SetMemBuf
                 (
                     m_apBuckets
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(tCIDLib::TVoid*) * c4Modulus
                 );
             }
@@ -652,7 +687,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 TRawMem::SetMemBuf
                 (
                     m_apBuckets
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
                 );
 
@@ -686,9 +721,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
             m_apBuckets = new TNode*[m_c4HashModulus];
             TRawMem::SetMemBuf
             (
-                m_apBuckets
-                , tCIDLib::TCard1(0)
-                , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
+                m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * m_c4HashModulus
             );
 
             *this = tCIDLib::ForceMove(colSrc);
@@ -729,7 +762,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                     TRawMem::SetMemBuf
                     (
                         m_apBuckets
-                        , tCIDLib::TCard1(0)
+                        , kCIDLib::c1MinCard
                         , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
                     );
                 }
@@ -1233,7 +1266,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 TRawMem::SetMemBuf
                 (
                     m_apBuckets
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
                 );
             }
@@ -1305,7 +1338,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
             return nullptr;
         }
 
-        #pragma warning(suppress : 26461) // Can't make last node const
+        CIDLib_Suppress(26461) // Can't make last node const
         TNode* pnodeFindNext(TNode* const pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
             // Move up to the next node
@@ -1329,7 +1362,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
             return nullptr;
         }
 
-        #pragma warning(suppress : 26461) // Can't make last node const
+        CIDLib_Suppress(26461) // Can't make last node const
         TNode* pnodeFindPrevious(TNode* const pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
             //

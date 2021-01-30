@@ -145,7 +145,7 @@ tCIDLib::TVoid TBitsetBase::Clear()
     CheckReady();
 
     // Zero out all of the bytes of the data array
-    TRawMem::SetMemBuf(m_pc1Bits, tCIDLib::TCard1(0), m_c4Bytes);
+    TRawMem::SetMemBuf(m_pc1Bits, kCIDLib::c1MinCard, m_c4Bytes);
 }
 
 
@@ -288,7 +288,7 @@ TBitsetBase::TBitsetBase(const tCIDLib::TCard4 c4SetSize) :
 
     // And allocate and zero the storage array
     m_pc1Bits = new tCIDLib::TCard1[m_c4Bytes];
-    TRawMem::SetMemBuf(m_pc1Bits, tCIDLib::TCard1(0), m_c4Bytes);
+    TRawMem::SetMemBuf(m_pc1Bits, kCIDLib::c1MinCard, m_c4Bytes);
 }
 
 TBitsetBase::TBitsetBase(const  tCIDLib::TCard4         c4SetSize
@@ -734,7 +734,7 @@ tCIDLib::TVoid TBitsetBase::ResetBitCount(const tCIDLib::TCard4 c4NewSize)
         m_pc1Bits = new tCIDLib::TCard1[m_c4Bytes];
 
     // Zero out the bit buffer
-    TRawMem::SetMemBuf(m_pc1Bits, tCIDLib::TCard1(0), m_c4Bytes);
+    TRawMem::SetMemBuf(m_pc1Bits, kCIDLib::c1MinCard, m_c4Bytes);
 
     // Recalc the trailing byte mask
     CalcTrailingMask();

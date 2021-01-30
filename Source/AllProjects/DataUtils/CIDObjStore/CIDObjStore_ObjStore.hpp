@@ -199,7 +199,7 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         tCIDLib::ELoadRes eReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             ,       MStreamable&            strmblToFill
             , const tCIDLib::TBoolean       bThrowIfNot
         );
@@ -207,9 +207,9 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         tCIDLib::ELoadRes eReadObjectDirect
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             ,       THeapBuf&               mbufToFill
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             , const tCIDLib::TBoolean       bThrowIfNot
         );
 

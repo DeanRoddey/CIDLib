@@ -88,6 +88,7 @@ class CIDWUTILSEXP TAttrEditInfo : public TCtrlNotify
         );
 
         TAttrEditInfo(const TAttrEditInfo&) = default;
+        TAttrEditInfo(TAttrEditInfo&&) = default;
 
         ~TAttrEditInfo();
 
@@ -96,12 +97,13 @@ class CIDWUTILSEXP TAttrEditInfo : public TCtrlNotify
         //  Public operators
         // -------------------------------------------------------------------
         TAttrEditInfo& operator=(const TAttrEditInfo&) = default;
+        TAttrEditInfo& operator=(TAttrEditInfo&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bFromUser() const;
+        [[nodiscard]] tCIDLib::TBoolean bFromUser() const;
 
         const TAttrData& adatNew() const;
 
@@ -167,6 +169,7 @@ class CIDWUTILSEXP TAttrEditWnd : public TMultiColListBox
         TAttrEditWnd();
 
         TAttrEditWnd(const TAttrEditWnd&) = delete;
+        TAttrEditWnd(TAttrEditWnd&&) = delete;
 
         ~TAttrEditWnd();
 
@@ -175,6 +178,7 @@ class CIDWUTILSEXP TAttrEditWnd : public TMultiColListBox
         //  Public operators
         // -------------------------------------------------------------------
         TAttrEditWnd& operator=(const TAttrEditWnd&) = delete;
+        TAttrEditWnd& operator=(TAttrEditWnd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -500,7 +504,6 @@ class CIDWUTILSEXP TAttrEditWnd : public TMultiColListBox
         (
             const   tCIDLib::TCard4         c4Item
         );
-
 
 
         // -------------------------------------------------------------------

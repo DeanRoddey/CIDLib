@@ -268,7 +268,7 @@ class CIDLIBEXP TKeyValuePair
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const override;
 
         tCIDLib::TVoid StreamFrom
@@ -598,7 +598,7 @@ class CIDLIBEXP TKeyNumPair
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const final;
 
         tCIDLib::TVoid StreamFrom
@@ -835,7 +835,7 @@ class CIDLIBEXP TKeyValues
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const final;
 
         tCIDLib::TVoid StreamFrom

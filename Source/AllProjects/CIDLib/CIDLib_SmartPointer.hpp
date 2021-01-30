@@ -317,6 +317,7 @@ template <typename T> class TCntPtrData
         }
 
         TCntPtrData(const TCntPtrData<T>&) = delete;
+        TCntPtrData(TCntPtrData<T>&&) = delete;
 
         virtual ~TCntPtrData()
         {
@@ -333,6 +334,7 @@ template <typename T> class TCntPtrData
         //  Public operators
         // -------------------------------------------------------------------
         TCntPtrData<T>& operator=(const TCntPtrData<T>&) = delete;
+        TCntPtrData<T>& operator=(TCntPtrData<T>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -705,11 +707,17 @@ template <typename T> class TCntPtr
             m_pcdRef = cptrSrc.m_pcdRef;
         }
 
+        TCntPtr(TCntPtr<T>&& cptrSrc) :
+
+            m_pcdRef(nullptr)
+        {
+            *this = tCIDLib::ForceMove(cptrSrc);
+        }
+
         ~TCntPtr()
         {
-            CIDAssert(m_pcdRef != nullptr, L"The cnt pointer dtor has no pointer data");
-
             TCntPtrData<T>* pcdTmp = m_pcdRef;
+            CIDAssert(pcdTmp != nullptr, L"The cnt pointer dtor has no pointer data");
             m_pcdRef = nullptr;
             try
             {
@@ -782,6 +790,20 @@ template <typename T> class TCntPtr
 
                 // Now we can store his pointer as ours
                 m_pcdRef = cptrSrc.m_pcdRef;
+            }
+            return *this;
+        }
+
+        //
+        //  Neither ownership counts change here. We just need to swap our references. Given
+        //  that we both insure that our respective references cannot go away, no locking
+        //  is required for this.
+        //
+        TCntPtr& operator=(TCntPtr<T>&& cptrSrc)
+        {
+            if (this != &cptrSrc)
+            {
+                tCIDLib::Swap(m_pcdRef, cptrSrc.m_pcdRef);
             }
             return *this;
         }
@@ -1079,22 +1101,18 @@ template <typename T> class TMngPtr
         {
         }
 
-        TMngPtr(const TMngPtr<T>& mptrSrc) :
+        TMngPtr(const TMngPtr<T>&) = default;
+        TMngPtr(TMngPtr<T>&&) = default;
 
-            m_pData(nullptr)
-        {
-            m_pData = mptrSrc.m_pData;
-        }
-
-        ~TMngPtr()
-        {
-            // Nothing to do, we just reference the data
-        }
+        ~TMngPtr() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TMngPtr& operator=(const TMngPtr<T>&) = default;
+        TMngPtr& operator=(TMngPtr<T>&&) = default;
+
         operator tCIDLib::TBoolean() const
         {
             return (m_pData != nullptr);
@@ -1125,13 +1143,6 @@ template <typename T> class TMngPtr
         {
             CheckNullRef(CID_LINE);
             return *m_pData;
-        }
-
-        TMngPtr& operator=(const TMngPtr<T>& mptrSrc)
-        {
-            if (this != &mptrSrc)
-                m_pData = mptrSrc.m_pData;
-            return *this;
         }
 
 

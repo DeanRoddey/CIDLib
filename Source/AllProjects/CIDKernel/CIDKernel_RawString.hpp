@@ -702,7 +702,7 @@ namespace TRawStr
         if (pszSrc)
         {
             // We just tested pszSrc above, so tmp cannot be null
-            #pragma warning(suppress : 26429)
+            CIDLib_Suppress(26429)
             const tCIDLib::TCh* pszTmp = pszSrc;
             while (*pszTmp)
                 pszTmp++;
@@ -717,7 +717,7 @@ namespace TRawStr
         if (pszSrc)
         {
             // We just tested pszSrc above, so tmp cannot be null
-            #pragma warning(suppress : 26429)
+            CIDLib_Suppress(26429)
             const tCIDLib::TSCh* pszTmp = pszSrc;
             while (*pszTmp)
                 pszTmp++;

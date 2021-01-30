@@ -42,6 +42,7 @@ class CIDDAEEXP TFacCIDDAE : public TFacility
         TFacCIDDAE();
 
         TFacCIDDAE(const TFacCIDDAE&) = delete;
+        TFacCIDDAE(TFacCIDDAE&&) = delete;
 
         ~TFacCIDDAE();
 
@@ -50,6 +51,7 @@ class CIDDAEEXP TFacCIDDAE : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDDAE& operator=(const TFacCIDDAE&) = delete;
+        TFacCIDDAE& operator=(TFacCIDDAE&&) = delete;
 
 
         // -------------------------------------------------------------------

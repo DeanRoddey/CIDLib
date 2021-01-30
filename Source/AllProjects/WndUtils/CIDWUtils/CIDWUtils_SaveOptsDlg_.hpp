@@ -42,6 +42,7 @@ class TSaveOptsDlg : public TDlgBox
         TSaveOptsDlg();
 
         TSaveOptsDlg(const TSaveOptsDlg&) = delete;
+        TSaveOptsDlg(TSaveOptsDlg&&) = delete;
 
         ~TSaveOptsDlg();
 
@@ -50,6 +51,7 @@ class TSaveOptsDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TSaveOptsDlg& operator=(const TSaveOptsDlg&) = delete;
+        TSaveOptsDlg& operator=(TSaveOptsDlg&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -58,7 +60,7 @@ class TSaveOptsDlg : public TDlgBox
         tCIDWUtils::ESaveOpts eRun
         (
             const   TWindow&                wndOwner
-            ,       tCIDLib::TBoolean&      bDoAll
+            , COP   tCIDLib::TBoolean&      bDoAll
             , const TString&                strSource
             , const tCIDLib::TBoolean       bMultiMode
         );

@@ -49,6 +49,7 @@ class CIDAUDSTREAMEXP TWaveInSrcStream : public TCIDAudioSrcStream
         TWaveInSrcStream();
 
         TWaveInSrcStream(const TWaveInSrcStream&) = delete;
+        TWaveInSrcStream(TWaveInSrcStream&&) = delete;
 
         virtual ~TWaveInSrcStream();
 
@@ -57,6 +58,7 @@ class CIDAUDSTREAMEXP TWaveInSrcStream : public TCIDAudioSrcStream
         //  Public operators
         // -------------------------------------------------------------------
         TWaveInSrcStream& operator=(const TWaveInSrcStream&) = delete;
+        TWaveInSrcStream& operator=(TWaveInSrcStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -66,7 +68,7 @@ class CIDAUDSTREAMEXP TWaveInSrcStream : public TCIDAudioSrcStream
         (
                     tCIDLib::TCard1* const  pc1ToFill
             , const tCIDLib::TCard4         c4MaxBytes
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             , const tCIDLib::TCard4         c4WaitMSs
         )   final;
 
@@ -74,9 +76,9 @@ class CIDAUDSTREAMEXP TWaveInSrcStream : public TCIDAudioSrcStream
 
         tCIDLib::TVoid QueryFormat
         (
-                    tCIDLib::TCard4&        c4Channels
-            ,       tCIDLib::TCard4&        c4SamplesPerSec
-            ,       tCIDLib::TCard4&        c4BytesPerSample
+            COP     tCIDLib::TCard4&        c4Channels
+            , COP   tCIDLib::TCard4&        c4SamplesPerSec
+            , COP   tCIDLib::TCard4&        c4BytesPerSample
         )   const final;
 
         tCIDLib::TVoid Initialize() final;

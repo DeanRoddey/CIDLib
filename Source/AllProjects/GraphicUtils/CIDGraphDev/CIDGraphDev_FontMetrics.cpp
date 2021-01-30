@@ -198,7 +198,7 @@ TFontMetrics::TFontMetrics() :
     m_pHostInfo(nullptr)
 {
     m_pHostInfo = new TEXTMETRIC;
-    TRawMem::SetMemBuf(m_pHostInfo, tCIDLib::TCard1(0), sizeof(TEXTMETRIC));
+    TRawMem::SetMemBuf(m_pHostInfo, kCIDLib::c1MinCard, sizeof(TEXTMETRIC));
 }
 
 TFontMetrics::TFontMetrics(const TGraphDrawDev& gdevSource)

@@ -108,11 +108,11 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
             const   tCIDLib::TCard4         c4Modulus
         )   const;
 
-        tCIDLib::THashVal hshThis() const;
+        [[nodiscard]] tCIDLib::THashVal hshThis() const;
 
-        const TMD5Hash& mhashInterface() const;
+        [[nodiscard]] const TMD5Hash& mhashInterface() const;
 
-        const TMD5Hash& mhashInstance() const;
+        [[nodiscard]] const TMD5Hash& mhashInstance() const;
 
         tCIDLib::TVoid Set
         (

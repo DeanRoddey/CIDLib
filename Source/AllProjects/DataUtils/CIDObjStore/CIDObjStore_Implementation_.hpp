@@ -246,20 +246,20 @@ class TCIDObjStoreImpl : public TObject
         tCIDLib::ELoadRes eReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             ,       TMemBuf&                mbufData
-            ,       tCIDLib::TCard4&        c4DataSize
+            , COP   tCIDLib::TCard4&        c4DataSize
             ,       TMemBuf&                mbufKey
-            ,       tCIDLib::TCard4&        c4KeySize
+            , COP   tCIDLib::TCard4&        c4KeySize
             , const tCIDLib::TBoolean       bThrowIfNot
         );
 
         tCIDLib::ELoadRes eReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             ,       TMemBuf&                mbufData
-            ,       tCIDLib::TCard4&        c4DataSize
+            , COP   tCIDLib::TCard4&        c4DataSize
             , const tCIDLib::TBoolean       bThrowIfNot
         );
 

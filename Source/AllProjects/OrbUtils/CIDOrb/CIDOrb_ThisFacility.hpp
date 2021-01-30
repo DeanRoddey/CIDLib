@@ -82,29 +82,29 @@ class CIDORBEXP TFacCIDOrb : public TFacility
             ,       TOrbObjId&              ooidToFill
         );
 
-        tCIDLib::TBoolean bHasInterface
+        [[nodiscard]] tCIDLib::TBoolean bHasInterface
         (
             const   TOrbObjId&              ooidToCheck
         )   const;
 
-        tCIDLib::TBoolean bIsInitialized
+        [[nodiscard]] tCIDLib::TBoolean bIsInitialized
         (
             const   tCIDLib::ECSSides       eSide
         )   const;
 
-        tCIDLib::TCard4 c4CmdOverhead() const
+        [[nodiscard]] tCIDLib::TCard4 c4CmdOverhead() const
         {
             return m_c4CmdOverhead;
         }
 
-        tCIDLib::TCard4 c4ReplyOverhead() const
+        [[nodiscard]] tCIDLib::TCard4 c4ReplyOverhead() const
         {
             return m_c4ReplyOverhead;
         }
 
-        tCIDLib::TCard4 c4TimeoutAdjust() const;
+        [[nodiscard]] tCIDLib::TCard4 c4TimeoutAdjust() const;
 
-        tCIDLib::TCard8 c8LastNSCookie() const;
+        [[nodiscard]] tCIDLib::TCard8 c8LastNSCookie() const;
 
         tCIDLib::TVoid CheckNSCookie
         (
@@ -124,15 +124,15 @@ class CIDORBEXP TFacCIDOrb : public TFacility
             ,       TOrbCmd&                orbcToDispatch
         );
 
-        tCIDLib::TEncodedTime enctTimeoutAdjust() const;
+        [[nodiscard]] tCIDLib::TEncodedTime enctTimeoutAdjust() const;
 
         tCIDOrb::EReadRes eReadPacket
         (
                     TThread&                thrCaller
             ,       TStreamSocket&          sockSrc
-            ,       tCIDLib::TCard4&        c4Id
+            , COP   tCIDLib::TCard4&        c4Id
             , const tCIDLib::TCard4         c4WaitFor
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             ,       TMemBuf&                mbufToFill
         );
 
@@ -140,7 +140,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         (
                     TThread&                thrCaller
             ,       TStreamSocket&          sockSrc
-            ,       tCIDLib::TCard4&        c4Id
+            , COP   tCIDLib::TCard4&        c4Id
             , const tCIDLib::TCard4         c4WaitFor
             ,       TMemBuf&                mbufTmp
             ,       TBinMBufInStream&       strmTmp
@@ -240,7 +240,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
                     TThread&                thrCaller
             ,       TStreamSocket&          sockSrc
             , const tCIDOrb::TPacketHdr&    hdrRead
-            ,       tCIDLib::TCard4&        c4DataBytes
+            , COP   tCIDLib::TCard4&        c4DataBytes
             ,       TMemBuf&                mbufToFill
         );
 

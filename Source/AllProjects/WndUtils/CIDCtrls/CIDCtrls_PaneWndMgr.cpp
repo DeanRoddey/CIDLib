@@ -84,6 +84,7 @@ TPaneWnd::TPaneWnd(         TWindow* const  pwndMng
     m_szMin.TakeLarger(TSize(32, 32));
 }
 
+// We don't copy runtime only stuff
 TPaneWnd::TPaneWnd(const TPaneWnd& panewSrc) :
 
     m_pwndPane(panewSrc.m_pwndPane)
@@ -100,6 +101,8 @@ TPaneWnd::~TPaneWnd()
 // ---------------------------------------------------------------------------
 //  TPaneWndCont::TPaneWnd: Public operators
 // ---------------------------------------------------------------------------
+
+// We don't copy runtime only stuff
 TPaneWnd& TPaneWnd::operator=(const TPaneWnd& panewSrc)
 {
     if (&panewSrc != this)

@@ -50,6 +50,7 @@ class CIDDAEEXP TCIDDAEWMADec : public TCIDDAEDecoder
         TCIDDAEWMADec();
 
         TCIDDAEWMADec(const TCIDDAEWMADec&) = delete;
+        TCIDDAEWMADec(TCIDDAEWMADec&&) = delete;
 
         ~TCIDDAEWMADec();
 
@@ -58,6 +59,7 @@ class CIDDAEEXP TCIDDAEWMADec : public TCIDDAEDecoder
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDAEWMADec& operator=(const TCIDDAEWMADec&) = delete;
+        TCIDDAEWMADec& operator=(TCIDDAEWMADec&&) = delete;
 
 
     protected :
@@ -150,7 +152,7 @@ class CIDDAEEXP TCIDDAEWMAEnc : public TCIDDAEEncoder
                 {
                 }
 
-                ~TCodecInfo() {}
+                ~TCodecInfo() = default;
 
                 tCIDLib::TBoolean   m_bIsVBR;
                 tCIDLib::TCard4     m_c4Index;
@@ -190,6 +192,7 @@ class CIDDAEEXP TCIDDAEWMAEnc : public TCIDDAEEncoder
         TCIDDAEWMAEnc();
 
         TCIDDAEWMAEnc(const TCIDDAEWMAEnc&) = delete;
+        TCIDDAEWMAEnc(TCIDDAEWMAEnc&&) = delete;
 
         ~TCIDDAEWMAEnc();
 
@@ -198,6 +201,7 @@ class CIDDAEEXP TCIDDAEWMAEnc : public TCIDDAEEncoder
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDAEWMAEnc& operator=(const TCIDDAEWMAEnc&) = delete;
+        TCIDDAEWMAEnc& operator=(TCIDDAEWMAEnc&&) = delete;
 
 
         // -------------------------------------------------------------------

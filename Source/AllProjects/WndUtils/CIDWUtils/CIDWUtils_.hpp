@@ -32,10 +32,14 @@
 
 
 // ---------------------------------------------------------------------------
-//  Include any external headers we only need internally
+//  Include any external headers we only need internally. The code analyzer doesn't
+//  always correctly ignore errors here, so force it to.
 // ---------------------------------------------------------------------------
+#pragma warning(push)
+#pragma warning(disable : ALL_CODE_ANALYSIS_WARNINGS)
 #include    <windows.h>
 #include    <Commctrl.h>
+#pragma warning(pop)
 
 // Causes lots of problems
 #undef      DialogBox

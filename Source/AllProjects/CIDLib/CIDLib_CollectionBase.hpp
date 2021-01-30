@@ -134,6 +134,8 @@ class CIDLIBEXP TCursorBase : public TObject
 
         TCursorBase(const TCursorBase&) = default;
         TCursorBase& operator=(const TCursorBase&) = default;
+        TCursorBase(TCursorBase&&) = default;
+        TCursorBase& operator=(TCursorBase&&) = default;
 
         // Can't actually delete them since that causes problems
         // TCursorBase(TCursorBase&&) = delete;
@@ -180,7 +182,7 @@ class CIDLIBEXP TCursorBase : public TObject
             const   tCIDLib::TCard4         c4New
         );
 
-        tCIDLib::TVoid ThrowNotInitialized
+        [[noreturn]] tCIDLib::TVoid ThrowNotInitialized
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
@@ -536,26 +538,26 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid ColIsEmpty
+        [[noreturn]] tCIDLib::TVoid ColIsEmpty
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid ColIsFull
+        [[noreturn]] tCIDLib::TVoid ColIsFull
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
             , const tCIDLib::TCard4         c4Max
         )   const;
 
-        tCIDLib::TVoid DuplicateElem
+        [[noreturn]] tCIDLib::TVoid DuplicateElem
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid DuplicateKey
+        [[noreturn]] tCIDLib::TVoid DuplicateKey
         (
             const   TObject&                objKey
             , const tCIDLib::TCh* const     pszFile
@@ -573,43 +575,43 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
             const   TString&                strTopicPath
         );
 
-        tCIDLib::TVoid HashChanged
+        [[noreturn]] tCIDLib::TVoid HashChanged
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid KeyNotFound
+        [[noreturn]] tCIDLib::TVoid KeyNotFound
         (
              const  tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid MovedAdopted
+        [[noreturn]] tCIDLib::TVoid MovedAdopted
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid MustClearFirst
+        [[noreturn]] tCIDLib::TVoid MustClearFirst
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid NodeNotFound
+        [[noreturn]] tCIDLib::TVoid NodeNotFound
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid NotMemberNode
+        [[noreturn]] tCIDLib::TVoid NotMemberNode
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
         ) const;
 
-        tCIDLib::TVoid NotMyCursor
+        [[noreturn]] tCIDLib::TVoid NotMyCursor
         (
             const   TClass&                 clsCursor
             , const TClass&                 clsCol
@@ -617,7 +619,7 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
             , const tCIDLib::TCard4         c4Line
         )   const;
 
-        tCIDLib::TVoid NullNodeAdded
+        [[noreturn]] tCIDLib::TVoid NullNodeAdded
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
@@ -666,7 +668,7 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
             const   tCIDLib::EMTStates      eToSet
         );
 
-        tCIDLib::TVoid SrcTooBig
+        [[noreturn]] tCIDLib::TVoid SrcTooBig
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
@@ -674,14 +676,14 @@ class CIDLIBEXP TCollectionBase : public TObject, public MLockable
             , const tCIDLib::TCard4         c4TarMax
         )   const;
 
-        tCIDLib::TVoid Unsupported
+        [[noreturn]] tCIDLib::TVoid Unsupported
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line
             , const tCIDLib::TCh* const     pszOpName
         )   const;
 
-        tCIDLib::TVoid ZeroSize
+        [[noreturn]] tCIDLib::TVoid ZeroSize
         (
             const   tCIDLib::TCh* const     pszFile
             , const tCIDLib::TCard4         c4Line

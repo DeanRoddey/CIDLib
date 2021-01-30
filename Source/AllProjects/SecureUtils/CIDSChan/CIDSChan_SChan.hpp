@@ -61,6 +61,7 @@ class CIDSCHANEXP TSChannel : public TObject
         TSChannel();
 
         TSChannel(const TSChannel&) = delete;
+        TSChannel(TSChannel&&) = delete;
 
         ~TSChannel();
 
@@ -69,6 +70,7 @@ class CIDSCHANEXP TSChannel : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TSChannel& operator=(const TSChannel&) = delete;
+        TSChannel& operator=(TSChannel&&) = delete;
 
 
         // -------------------------------------------------------------------

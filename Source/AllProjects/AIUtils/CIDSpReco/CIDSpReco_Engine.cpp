@@ -271,7 +271,7 @@ tCIDLib::TVoid TCIDSpReco::Initialize(TCIDAudioSrcStream* const pstrmToAdopt)
 
         // Set up our internal data structure
         m_pInfo = new TSpRecoInfo;
-        TRawMem::SetMemBuf(m_pInfo, tCIDLib::TCard1(0), sizeof(TSpRecoInfo));
+        TRawMem::SetMemBuf(m_pInfo, kCIDLib::c1MinCard, sizeof(TSpRecoInfo));
         m_pInfo->hSpeechEvent = INVALID_HANDLE_VALUE;
 
         // Let's try to create the speech recognizer now

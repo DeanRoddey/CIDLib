@@ -69,7 +69,7 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
         tCIDLib::TBoolean bAddOrUpdate
         (
             const   TString&               strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             , const tCIDLib::TCard4         c4DataBytes
             , const THeapBuf&               mbufObjData
             , const tCIDLib::TCard4         c4Reserve
@@ -101,20 +101,20 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
         tCIDLib::TBoolean bKeyExists2
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
         )   final;
 
         tCIDLib::TBoolean bReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             ,       THeapBuf&               mbufToFill
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
         )   final;
 
         tCIDLib::TCard4 c4QueryObjectsInScope
         (
-            const    TString&               strParScope
+            const   TString&                strParScope
             ,       tCIDLib::TStrList&      colToFill
         )   final;
 
@@ -144,9 +144,9 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
         tCIDLib::ELoadRes eReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             ,       THeapBuf&               mbufToFill
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             , const tCIDLib::TBoolean       bThrowIfNot
         )   final;
 

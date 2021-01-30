@@ -87,13 +87,19 @@ class TRefVector : public TRefCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
 
-                ~TConstCursor() {}
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
+                }
+
+                ~TConstCursor() = default;
 
 
                 // -----------------------------------------------------------
@@ -107,6 +113,17 @@ class TRefVector : public TRefCollection<TElem>
                         TParent::operator=(cursSrc);
                         m_i4CurIndex = cursSrc.m_i4CurIndex;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (&cursSrc != this)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_i4CurIndex, cursSrc.m_i4CurIndex);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
                     }
                     return *this;
                 }
@@ -275,17 +292,25 @@ class TRefVector : public TRefCollection<TElem>
                 {
                 }
 
-                explicit  TNonConstCursor(TMyType* const pcolToCursor) :
+                explicit TNonConstCursor(TMyType* const pcolToCursor) :
 
                     TParent(pcolToCursor)
                     , m_pcolNCCursoring(pcolToCursor)
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
-                TNonConstCursor(const TNonConstCursor<TElem>& cursSrc)
+                TNonConstCursor(const TNonConstCursor<TElem>& cursSrc) :
+
+                    m_pcolNCCursoring(nullptr)
                 {
                     operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor<TElem>&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TNonConstCursor() {}
@@ -301,6 +326,17 @@ class TRefVector : public TRefCollection<TElem>
                         TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
+                    }
+                    return *this;
+                }
+
+                // No locking required here. We are just changing us, not the collection
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
                     }
                     return *this;
                 }
@@ -407,7 +443,7 @@ class TRefVector : public TRefCollection<TElem>
             m_apElems = new TElem*[m_c4CurAlloc];
             TRawMem::SetMemBuf
             (
-                m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
+                m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc
             );
         }
 
@@ -430,12 +466,10 @@ class TRefVector : public TRefCollection<TElem>
             //  ones are valid or not.
             //
             m_apElems = new TElem*[m_c4CurAlloc];
-            TRawMem::SetMemBuf
-            (
-                m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
-            );
+            TRawMem::SetMemBuf(m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc);
         }
 
+        // No copy, only move. There are non-member helpers for copying if needed
         TRefVector(const TMyType&) = delete;
 
         //
@@ -449,10 +483,7 @@ class TRefVector : public TRefCollection<TElem>
             , m_c4CurAlloc(1)
             , m_c4CurCount(0)
         {
-            TRawMem::SetMemBuf
-            (
-                m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
-            );
+            TRawMem::SetMemBuf(m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc);
             *this = tCIDLib::ForceMove(colSrc);
         }
 
@@ -1722,7 +1753,7 @@ class TRefVector : public TRefCollection<TElem>
             }
 
             // For sanity's sake, zero out the old pointers
-            TRawMem::SetMemBuf(m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc);
+            TRawMem::SetMemBuf(m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc);
 
             // And we have no elements now
             m_c4CurCount = 0;

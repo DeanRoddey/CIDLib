@@ -74,15 +74,18 @@ template <typename TElem, class TKey> class TRefKeyedHashSetNode
         {
         }
 
+        // Not copyable, only moveable
         TRefKeyedHashSetNode(const TMyType&) = delete;
         TRefKeyedHashSetNode( TMyType&&) = delete;
 
-        ~TRefKeyedHashSetNode() {}
+        ~TRefKeyedHashSetNode() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Not assignable, only moveable
         TMyType& operator=(const TMyType&) = delete;
         TMyType& operator=( TMyType&&) = delete;
 
@@ -224,18 +227,17 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 TConstCursor() :
 
-                    m_hshBadFirst(tCIDLib::THashVal(-1))
-                    , m_hshBadLast(0)
+                    m_hshBadLast(0)
                     , m_hshCurBucket(0)
                     , m_pcolCursoring(nullptr)
                     , m_pnodeCur(nullptr)
                 {
                 }
 
+                CIDLib_Suppress(26429) // Parent class will check for null
                 explicit TConstCursor(const TMyType* pcolToCursor) :
 
                     TParent(pcolToCursor)
-                    , m_hshBadFirst(tCIDLib::THashVal(-1))
                     , m_hshBadLast(pcolToCursor->c4HashModulus())
                     , m_hshCurBucket(0)
                     , m_pcolCursoring(pcolToCursor)
@@ -246,18 +248,19 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                         m_hshCurBucket = m_hshBadLast;
                 }
 
-                // We have to lock first, so we can't use member init!
-                TConstCursor(const TConstCursor& cursSrc) :
-
-                    m_hshBadFirst(tCIDLib::THashVal(-1))
+                TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
 
-                // Can't actually delete it since that causes problems
-                // TConstCursor(TConstCursor&&) = delete;
+                TConstCursor(TConstCursor&& cursSrc) :
 
-                ~TConstCursor() {}
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
+                }
+
+                ~TConstCursor() = default;
 
 
                 // -----------------------------------------------------------
@@ -278,8 +281,19 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     return *this;
                 }
 
-                // Can't actually delete it since that causes problems
-                // TConstCursor& operator=(TConstCursor&&) = delete;
+                // No locking needed. We are just changing us, not the collection
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_hshBadLast, cursSrc.m_hshBadLast);
+                        tCIDLib::Swap(m_hshCurBucket, cursSrc.m_hshCurBucket);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
+                    }
+                    return *this;
+                }
 
                 tCIDLib::TBoolean operator==(const TConstCursor& cursSrc) const
                 {
@@ -458,12 +472,13 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 // -----------------------------------------------------------
                 //  Hidden constructors (for the collection itself)
                 // -----------------------------------------------------------
+
+                CIDLib_Suppress(26429) // The parent whill checl the cursor for null
                 TConstCursor(const TMyType*             pcolToCursor
                             , const tCIDLib::THashVal   hshCur
                             ,       TNode* const        pnodeCur) :
 
                     TParent(pcolToCursor)
-                    , m_hshBadFirst(tCIDLib::THashVal(-1))
                     , m_hshBadLast(pcolToCursor->c4HashModulus())
                     , m_hshCurBucket(hshCur)
                     , m_pcolCursoring(pcolToCursor)
@@ -494,11 +509,11 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 //      The current node in the hash table, 0 if not on a valid node
                 //      at this time.
                 // -----------------------------------------------------------
-                const tCIDLib::THashVal m_hshBadFirst;
-                tCIDLib::THashVal       m_hshBadLast;
-                tCIDLib::THashVal       m_hshCurBucket;
-                const TMyType*          m_pcolCursoring;
-                TNode*                  m_pnodeCur;
+                static constexpr tCIDLib::THashVal  m_hshBadFirst = kCIDLib::hshInvalid;
+                tCIDLib::THashVal                   m_hshBadLast;
+                tCIDLib::THashVal                   m_hshCurBucket;
+                const TMyType*                      m_pcolCursoring;
+                TNode*                              m_pnodeCur;
         };
 
 
@@ -544,16 +559,19 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
 
-                // Can't actually delete it since that causes problems
-                // TNonConstCursor(TNonConstCursor&&) = delete;
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
 
-                ~TNonConstCursor() {}
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
+                }
+
+                ~TNonConstCursor() = default;
 
 
                 // -----------------------------------------------------------
@@ -570,8 +588,15 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                     return *this;
                 }
 
-                // Can't actually delete it since that causes problems
-                // TNonConstCursor& operator=(TNonConstCursor&&) = delete;
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
+                    }
+                    return *this;
+                }
 
                 TElem& operator*() const
                 {
@@ -702,7 +727,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 TRawMem::SetMemBuf
                 (
                     m_apBuckets
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(tCIDLib::TVoid*) * c4Modulus
                 );
             }
@@ -714,6 +739,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             }
         }
 
+        // Not copyable, only movable
         TRefKeyedHashSet(const TMyType&) = delete;
 
         //
@@ -734,7 +760,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             m_apBuckets = new TNode*[m_c4HashModulus];
             TRawMem::SetMemBuf
             (
-                m_apBuckets, tCIDLib::TCard1(0), sizeof(tCIDLib::TVoid*) * m_c4HashModulus
+                m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * m_c4HashModulus
             );
 
             *this = tCIDLib::ForceMove(colSrc);
@@ -753,6 +779,8 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Not assignable, only movable
         TMyType& operator=(const TMyType&) = delete;
 
         //
@@ -1281,6 +1309,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             //  previous node for the target node.
             //
             TNode* pnodeToRemove = cursAt.pnodeCur();
+            CIDAssert(pnodeToRemove != nullptr, L"The hash set node was null");
             const tCIDLib::THashVal hshElem = cursAt.hshCurHash();
             TNode* const pnodePrev = pnodeFindPrev(pnodeToRemove, hshElem);
 
@@ -1333,7 +1362,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 TRawMem::SetMemBuf
                 (
                     m_apBuckets
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
                 );
             }
@@ -1372,13 +1401,14 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
             // Start at the last bucket and work back
             tCIDLib::TCard4 c4BucketInd = m_c4HashModulus - 1;
 
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we find a non-empty bucket, find its last node
                 if (m_apBuckets[c4BucketInd])
                 {
                     TNode* pnodeCur = m_apBuckets[c4BucketInd];
+                    CIDAssert(pnodeCur != nullptr, L"The hash set node was null");
                     while (pnodeCur->pnodeNext())
                         pnodeCur = pnodeCur->pnodeNext();
                     hshToUpdate = c4BucketInd;
@@ -1395,13 +1425,15 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
 
         TNode* pnodeFindNext(TNode* pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
+            CIDAssert(pnodeLast != nullptr, L"The passed previous hash set node was null");
+
             // Move up to the next node
             TNode* m_pnodeCur = pnodeLast->pnodeNext();
             if (m_pnodeCur)
                 return m_pnodeCur;
 
             // Search subsequent bucket for non-empty one
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we hit the end of buckets, then we are done
@@ -1433,7 +1465,7 @@ class TRefKeyedHashSet : public TRefCollection<TElem>
                 return pnodeCur;
 
             // Search previous buckets for non-empty one
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we hit the start of buckets, then we are done

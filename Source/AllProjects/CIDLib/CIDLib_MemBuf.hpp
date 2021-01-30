@@ -135,9 +135,9 @@ class CIDLIBEXP TMemBuf :
             , const tCIDLib::TCard1         c1ToFind
         )   const;
 
-        tCIDLib::TCard4 c4MaxSize() const;
+        [[nodiscard]] tCIDLib::TCard4 c4MaxSize() const;
 
-        tCIDLib::TCard4 c4Size() const;
+        [[nodiscard]] tCIDLib::TCard4 c4Size() const;
 
         tCIDLib::TCard8 c8At
         (
@@ -254,40 +254,40 @@ class CIDLIBEXP TMemBuf :
             , const tCIDLib::TCard4         c4Count
         );
 
-        const tCIDLib::TVoid* pData() const;
+        [[nodiscard]] const tCIDLib::TVoid* pData() const;
 
-        tCIDLib::TVoid* pData();
+        [[nodiscard]] tCIDLib::TVoid* pData();
 
-        template <typename T> const T* pDataAs() const
+        template <typename T> [[nodiscard]] const T* pDataAs() const
         {
             return reinterpret_cast<const T*>(pc1CheckRange(CID_LINE, 0, sizeof(T)));
         }
 
-        template <typename T> T* pDataAs()
+        template <typename T> [[nodiscard]] T* pDataAs()
         {
             return reinterpret_cast<T*>(pc1CheckRange(CID_LINE, 0, sizeof(T)));
         }
 
-        const tCIDLib::TCard1* pc1Data() const;
+        [[nodiscard]] const tCIDLib::TCard1* pc1Data() const;
 
-        tCIDLib::TCard1* pc1Data();
+        [[nodiscard]] tCIDLib::TCard1* pc1Data();
 
-        const tCIDLib::TCard1* pc1DataAt
+        [[nodiscard]] const tCIDLib::TCard1* pc1DataAt
         (
             const   tCIDLib::TCard4         c4Index
         )   const;
 
-        tCIDLib::TCard1* pc1DataAt
+        [[nodiscard]] tCIDLib::TCard1* pc1DataAt
         (
             const   tCIDLib::TCard4         c4Index
         );
 
-        template <typename T> const T* pDataAtAs(const tCIDLib::TCard4 c4At) const
+        template <typename T> [[nodiscard]] const T* pDataAtAs(const tCIDLib::TCard4 c4At) const
         {
             return reinterpret_cast<const T*>(pc1DataAt(c4At));
         }
 
-        template <typename T> T* pDataAtAs(const tCIDLib::TCard4 c4At)
+        template <typename T> [[nodiscard]] T* pDataAtAs(const tCIDLib::TCard4 c4At)
         {
             return reinterpret_cast<T*>(pc1DataAt(c4At));
         }

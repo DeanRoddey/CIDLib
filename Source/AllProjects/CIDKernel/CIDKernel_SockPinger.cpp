@@ -549,7 +549,7 @@ tCIDLib::TVoid TKrnlSockPinger::ComputeChecksum()
         c4Total += sizeof(c4NetLen);
 
         // Zero the next 3 bytes
-        TRawMem::SetMemBuf(pc1BufPtr, tCIDLib::TCard1(0), 3);
+        TRawMem::SetMemBuf(pc1BufPtr, kCIDLib::c1MinCard, 3);
         pc1BufPtr += 3;
         c4Total += 3;
 

@@ -57,6 +57,7 @@ class CIDWUTILSEXP TSrcEdChangeInfo : public TCtrlNotify
         );
 
         TSrcEdChangeInfo(const TSrcEdChangeInfo&) = default;
+        TSrcEdChangeInfo(TSrcEdChangeInfo&&) = default;
 
         ~TSrcEdChangeInfo();
 
@@ -65,18 +66,19 @@ class CIDWUTILSEXP TSrcEdChangeInfo : public TCtrlNotify
         //  Public operators
         // -------------------------------------------------------------------
         TSrcEdChangeInfo& operator=(const TSrcEdChangeInfo& wnotToAssign) = default;
+        TSrcEdChangeInfo& operator=(TSrcEdChangeInfo&& wnotToAssign) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4LineNum() const;
+        [[nodiscard]] tCIDLib::TCard4 c4LineNum() const;
 
-        tCIDWUtils::ESEdEvents eEvent() const;
+        [[nodiscard]] tCIDWUtils::ESEdEvents eEvent() const;
 
-        tCIDLib::TInt4 i4LineChanges() const;
+        [[nodiscard]] tCIDLib::TInt4 i4LineChanges() const;
 
-        const TString& strPath() const;
+        [[nodiscard]] const TString& strPath() const;
 
 
     private :
@@ -134,6 +136,7 @@ class CIDWUTILSEXP TSrcEditor : public TStdCtrlWnd
         TSrcEditor();
 
         TSrcEditor(const TSrcEditor&) = delete;
+        TSrcEditor(TSrcEditor&&) = delete;
 
         ~TSrcEditor();
 
@@ -142,6 +145,7 @@ class CIDWUTILSEXP TSrcEditor : public TStdCtrlWnd
         //  Public operators
         // -------------------------------------------------------------------
         TSrcEditor& operator=(const TSrcEditor&) = delete;
+        TSrcEditor& operator=(TSrcEditor&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -347,7 +351,7 @@ class CIDWUTILSEXP TSrcEditor : public TStdCtrlWnd
             const   tCIDCtrls::TWndMsg      wmsgMsg
             , const tCIDCtrls::TWParam      wParam
             , const tCIDCtrls::TLParam      lParam
-            ,       tCIDCtrls::TMsgResult&  mresRet
+            , COP   tCIDCtrls::TMsgResult&  mresRet
         )   override;
 
         tCIDLib::TBoolean bNotReflect
@@ -356,7 +360,7 @@ class CIDWUTILSEXP TSrcEditor : public TStdCtrlWnd
             , const tCIDCtrls::TWndMsg      wmsgMsg
             , const tCIDCtrls::TWParam      wParam
             , const tCIDCtrls::TLParam      lParam
-            ,       tCIDCtrls::TMsgResult&  mresRet
+            , COP   tCIDCtrls::TMsgResult&  mresRet
         )   override;
 
         tCIDCtrls::ECtxMenuOpts eShowContextMenu

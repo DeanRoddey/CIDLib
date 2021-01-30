@@ -280,18 +280,18 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
             , const tCIDLib::TBoolean       bQuickTest = kCIDLib::False
         );
 
-        tCIDLib::TBoolean bNSBindingExists
+        [[nodiscard]] tCIDLib::TBoolean bNSBindingExists
         (
             const   TString&                strToCheck
         );
 
-        tCIDLib::TBoolean bNSBindingExists
+        [[nodiscard]] tCIDLib::TBoolean bNSBindingExists
         (
                     tCIDOrbUC::TNSrvProxy&  orbcNS
             , const TString&                strToCheck
         );
 
-        tCIDLib::TBoolean bNSScopeExists
+        [[nodiscard]] tCIDLib::TBoolean bNSScopeExists
         (
                     tCIDOrbUC::TNSrvProxy&  orbcNS
             , const TString&                strToCheck
@@ -299,7 +299,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
         tCIDLib::TVoid DoRebindCycle();
 
-        tCIDLib::TIPPortNum ippnNS() const;
+        [[nodiscard]] tCIDLib::TIPPortNum ippnNS() const;
 
         tCIDLib::TVoid IncFailedRebinds();
 
@@ -334,7 +334,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
             const   tCIDLib::TCard4         c4WaitUpTo = 0
         );
 
-        TCIDNameSrvClientProxy* porbcMakeNSProxy
+        [[nodiscard]] TCIDNameSrvClientProxy* porbcMakeNSProxy
         (
             const   tCIDLib::TCard4         c4WaitUpTo = 0
         );
@@ -412,13 +412,13 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         tCIDLib::TBoolean bDoBindingPass
         (
                     tCIDOrbUC::TNSrvProxy&  orbcNS
-            ,       tCIDLib::TBoolean&      bChanges
+            , COP   tCIDLib::TBoolean&      bChanges
         );
 
         tCIDLib::TBoolean bDoLeaseRenewal
         (
                     tCIDOrbUC::TNSrvProxy&  orbcNS
-            ,       tCIDLib::TBoolean&      bChanges
+            , COP   tCIDLib::TBoolean&      bChanges
         );
 
         tCIDLib::EExitCodes eBinderThread

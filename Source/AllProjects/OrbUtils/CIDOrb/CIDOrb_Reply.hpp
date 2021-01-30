@@ -73,18 +73,18 @@ class CIDORBEXP TOrbReply : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bRetStatus() const;
+        [[nodiscard]] tCIDLib::TBoolean bRetStatus() const;
 
         tCIDLib::TBoolean bRetStatus
         (
             const   tCIDLib::TBoolean       bNew
         );
 
-        tCIDLib::TCard4 c4BufSize() const;
+        [[nodiscard]] tCIDLib::TCard4 c4BufSize() const;
 
-        tCIDLib::TCard4 c4PayloadBytes();
+        [[nodiscard]] tCIDLib::TCard4 c4PayloadBytes();
 
-        tCIDLib::TCard4 c4SequenceId() const;
+        [[nodiscard]] tCIDLib::TCard4 c4SequenceId() const;
 
         tCIDLib::TCard4 c4SequenceId
         (

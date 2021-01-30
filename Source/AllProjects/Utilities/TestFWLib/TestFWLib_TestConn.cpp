@@ -387,7 +387,7 @@ TTestFWConn::TTestFWConn(const tCIDLib::TBoolean bCreate) :
     m_pConnInfo = reinterpret_cast<TConnInfo*>(m_pmbufInfo->pc1Data());
     if (bCreate)
     {
-        TRawMem::SetMemBuf(m_pConnInfo, tCIDLib::TCard1(0), sizeof(TConnInfo));
+        TRawMem::SetMemBuf(m_pConnInfo, kCIDLib::c1MinCard, sizeof(TConnInfo));
         m_pConnInfo->c4MaxLevel = kTestFWLib::c4MaxTestLevel;
     }
 }

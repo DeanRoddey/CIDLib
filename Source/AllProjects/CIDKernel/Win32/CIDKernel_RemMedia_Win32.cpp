@@ -222,8 +222,8 @@ bDoIOCTL(       TKrnlRemMediaDrv::TPlatData&    PlatData
         , const tCIDLib::TVoid*                 pInBuf
         , const tCIDLib::TCard4                 c4InBytes
         ,       tCIDLib::TVoid* const           pOutBuf
-        ,       tCIDLib::TCard4&                c4OutBytes
-        ,       tCIDLib::TCard4&                c4ErrCode)
+        , COP   tCIDLib::TCard4&                c4OutBytes
+        , COP   tCIDLib::TCard4&                c4ErrCode)
 {
     // If the event has not been created yet, then create it
     if (!PlatData.hEvent)
@@ -290,13 +290,13 @@ bDoIOCTL(       TKrnlRemMediaDrv::TPlatData&    PlatData
 // ---------------------------------------------------------------------------
 TKrnlRemMediaDrv::TKrnlRemMediaDrv() :
 
-    m_pPlatData(0)
+    m_pPlatData(nullptr)
 {
     // Allocate our platform data and set it up
     m_pPlatData = new TKrnlRemMediaDrv::TPlatData;
     TRawMem::SetMemBuf
     (
-        m_pPlatData, tCIDLib::TCard1(0), sizeof(TKrnlRemMediaDrv::TPlatData)
+        m_pPlatData, kCIDLib::c1MinCard, sizeof(TKrnlRemMediaDrv::TPlatData)
     );
 
     // Initialize the drive id to empty
@@ -305,21 +305,16 @@ TKrnlRemMediaDrv::TKrnlRemMediaDrv() :
 
 TKrnlRemMediaDrv::TKrnlRemMediaDrv(const tCIDLib::TCh* const pszDevPath) :
 
-    m_pPlatData(0)
+    m_pPlatData(nullptr)
 {
     // Allocate our platform data and set it up
     m_pPlatData = new TKrnlRemMediaDrv::TPlatData;
-    TRawMem::SetMemBuf
-    (
-        m_pPlatData, tCIDLib::TCard1(0), sizeof(TKrnlRemMediaDrv::TPlatData)
-    );
+    TRawMem::SetMemBuf(m_pPlatData, kCIDLib::c1MinCard, sizeof(TKrnlRemMediaDrv::TPlatData));
 
     // Store the device path
     TRawStr::CopyStr
     (
-        m_pPlatData->szDrivePath
-        , pszDevPath
-        , c4MaxBufChars(m_pPlatData->szDrivePath)
+        m_pPlatData->szDrivePath, pszDevPath, c4MaxBufChars(m_pPlatData->szDrivePath)
     );
 
     // Store the device path
@@ -435,7 +430,7 @@ TKrnlRemMediaDrv::bMediaType(TKrnlRemMedia::EMediaTypes& eToFill) const
 
     // First try the get configuration call
     GET_CONFIGURATION_IOCTL_INPUT Input;
-    TRawMem::SetMemBuf(&Input, tCIDLib::TCard1(0), sizeof(Input));
+    TRawMem::SetMemBuf(&Input, kCIDLib::c1MinCard, sizeof(Input));
     Input.Feature = FeatureCdRead;
 
     GET_CONFIGURATION_HEADER Output = {0};
@@ -620,7 +615,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpen()
     #pragma CIDLIB_POPPACK
 
     SPTD_WITH_BUFFER* pPTBuf = (SPTD_WITH_BUFFER*)ac1PTInfo;
-    TRawMem::SetMemBuf(pPTBuf, tCIDLib::TCard1(0), sizeof(ac1PTInfo));
+    TRawMem::SetMemBuf(pPTBuf, kCIDLib::c1MinCard, sizeof(ac1PTInfo));
 
     pPTBuf->PTInfo.Length          = sizeof(SCSI_PASS_THROUGH);
     pPTBuf->PTInfo.CdbLength       = 6;
@@ -693,7 +688,7 @@ TKrnlRemMediaDrv::bQueryCDTOC(TKrnlRemMedia::TCDTOCInfo& ToFill)
     }
 
     tCIDLib::TCard4 c4IOSz = sizeof(TKrnlRemMedia::TCDTOCInfo);
-    TRawMem::SetMemBuf(&ToFill, tCIDLib::TCard1(0), c4IOSz);
+    TRawMem::SetMemBuf(&ToFill, kCIDLib::c1MinCard, c4IOSz);
     tCIDLib::TCard4 c4ErrCode;
     const tCIDLib::TBoolean bRes = bDoIOCTL
     (
@@ -868,8 +863,7 @@ const tCIDLib::TCh* TKrnlRemMediaDrv::pszDrivePath() const
 //  Enumerates the devices and returns a new line separate list of device
 //  paths for all the DVD/CDROMs found.
 //
-tCIDLib::TBoolean
-TKrnlRemMedia::bEnumDrvs(TKrnlLList<TKrnlString>& kllstToFill)
+tCIDLib::TBoolean TKrnlRemMedia::bEnumDrvs(TKrnlLList<TKrnlString>& kllstToFill)
 {
     kllstToFill.RemoveAll();
 
@@ -902,10 +896,10 @@ TKrnlRemMedia::bEnumDrvs(TKrnlLList<TKrnlString>& kllstToFill)
 tCIDLib::TBoolean
 TKrnlRemMedia::bExtractCDTrackInfo( const   TKrnlRemMedia::TCDTOCInfo&  SrcTOC
                                     , const tCIDLib::TCard4             c4TrackNum
-                                    ,       tCIDLib::TCard4&            c4StartBlock
-                                    ,       tCIDLib::TCard4&            c4BlockCnt
-                                    ,       tCIDLib::TCard4&            c4Minutes
-                                    ,       tCIDLib::TCard4&            c4Seconds)
+                                    , CIOP  tCIDLib::TCard4&            c4StartBlock
+                                    , CIOP  tCIDLib::TCard4&            c4BlockCnt
+                                    , CIOP  tCIDLib::TCard4&            c4Minutes
+                                    , CIOP  tCIDLib::TCard4&            c4Seconds)
 {
     // Make sure it's a valid track
     if (c4TrackNum > SrcTOC.c1LastTrack)

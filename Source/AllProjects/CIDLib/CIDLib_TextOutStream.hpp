@@ -61,7 +61,7 @@ class CIDLIBEXP TStreamJanitor
         // -------------------------------------------------------------------
         TStreamJanitor() = delete;
 
-        #pragma warning(suppress : 26429) // It can legally be null
+        CIDLib_Suppress(26429) // It can legally be null
         TStreamJanitor
         (
                     TTextOutStream* const   pstrmToSanitize

@@ -66,6 +66,7 @@ template <typename TElem> class TRefSortedBag : public TRefBag<TElem>
         {
         }
 
+        // Not copyable, only movable
         TRefSortedBag(const TMyType&) = delete;
 
         TRefSortedBag(TMyType&& colSrc) :
@@ -85,6 +86,8 @@ template <typename TElem> class TRefSortedBag : public TRefBag<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Not assignable, only movable
         TMyType& operator=(const TMyType&) = delete;
 
         TMyType& operator=(TMyType&& colSrc)

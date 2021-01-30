@@ -154,7 +154,7 @@ class CIDLIBEXP TBitsetBase : public TObject, public MStreamable, public MFormat
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const override;
 
         tCIDLib::TVoid StreamFrom

@@ -41,6 +41,7 @@ class CIDCTRLSEXP TPushButton : public TStdCtrlWnd
         TPushButton();
 
         TPushButton(const TPushButton&) = delete;
+        TPushButton(TPushButton&&) = delete;
 
         ~TPushButton();
 
@@ -49,6 +50,7 @@ class CIDCTRLSEXP TPushButton : public TStdCtrlWnd
         //  Unimplemented
         // -------------------------------------------------------------------
         TPushButton& operator=(const TPushButton&) = delete;
+        TPushButton& operator=(TPushButton&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -82,7 +84,7 @@ class CIDCTRLSEXP TPushButton : public TStdCtrlWnd
             , const tCIDCtrls::EPButtStyles ePButtStyles = tCIDCtrls::EPButtStyles::None
         );
 
-        tCIDCtrls::EPButtStyles ePButtStyles() const;
+        [[nodiscard]] tCIDCtrls::EPButtStyles ePButtStyles() const;
 
         tCIDLib::TVoid SetDefButton();
 

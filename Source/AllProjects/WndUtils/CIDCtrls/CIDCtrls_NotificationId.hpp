@@ -45,20 +45,24 @@ class CIDCTRLSEXP TNotificationId
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
-        TNotificationId
+        TNotificationId() = delete;
+
+        explicit TNotificationId
         (
             const   TString&                strId
         );
 
-        TNotificationId
+        explicit TNotificationId
         (
             const   tCIDLib::TCh* const     pszId
         );
 
         TNotificationId
         (
-            const   TNotificationId&        nidToCopy
+            const   TNotificationId&        nidSrc
         );
+
+        TNotificationId(TNotificationId&&) = delete;
 
         ~TNotificationId();
 
@@ -68,24 +72,29 @@ class CIDCTRLSEXP TNotificationId
         // -------------------------------------------------------------------
         TNotificationId& operator=
         (
-            const   TNotificationId&        nidToAssign
+            const   TNotificationId&        nidSrc
         );
+
+        TNotificationId& operator=(const TNotificationId&&) = delete;
 
         tCIDLib::TBoolean operator==
         (
-            const   TNotificationId&        nidToCompare
+            const   TNotificationId&        nidComp
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TNotificationId&        nidToCompare
+            const   TNotificationId&        nidComp
         )   const;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::THashVal hshId() const;
+        [[nodiscard]] tCIDLib::THashVal hshId() const
+        {
+            return m_hshId;
+        }
 
 
     protected :
@@ -95,15 +104,10 @@ class CIDCTRLSEXP TNotificationId
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const final;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TNotificationId();
-
         // -------------------------------------------------------------------
         //  Private data members
         //

@@ -43,6 +43,7 @@ class CIDAUDSTREAMEXP TCIDAudioSrcStream : public TObject
         TCIDAudioSrcStream();
 
         TCIDAudioSrcStream(const TCIDAudioSrcStream&) = delete;
+        TCIDAudioSrcStream(TCIDAudioSrcStream&&) = delete;
 
         virtual ~TCIDAudioSrcStream();
 
@@ -51,6 +52,7 @@ class CIDAUDSTREAMEXP TCIDAudioSrcStream : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TCIDAudioSrcStream& operator=(const TCIDAudioSrcStream&) = delete;
+        TCIDAudioSrcStream& operator=(TCIDAudioSrcStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -60,7 +62,7 @@ class CIDAUDSTREAMEXP TCIDAudioSrcStream : public TObject
         (
                     tCIDLib::TCard1* const  pc1ToFill
             , const tCIDLib::TCard4         c4MaxBytes
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             , const tCIDLib::TCard4         c4WaitMSs
         )   = 0;
 
@@ -70,9 +72,9 @@ class CIDAUDSTREAMEXP TCIDAudioSrcStream : public TObject
 
         virtual tCIDLib::TVoid QueryFormat
         (
-                    tCIDLib::TCard4&        c4Channels
-            ,       tCIDLib::TCard4&        c4SamplesPerSec
-            ,       tCIDLib::TCard4&        c4BytesPerSample
+            COP     tCIDLib::TCard4&        c4Channels
+            , COP   tCIDLib::TCard4&        c4SamplesPerSec
+            , COP   tCIDLib::TCard4&        c4BytesPerSample
         )   const = 0;
 
         virtual tCIDLib::TVoid Terminate() = 0;
@@ -81,7 +83,7 @@ class CIDAUDSTREAMEXP TCIDAudioSrcStream : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDAudStream::EStrmStates eState() const;
+        [[nodiscard]] tCIDAudStream::EStrmStates eState() const;
 
         tCIDAudStream::EStrmStates eState
         (

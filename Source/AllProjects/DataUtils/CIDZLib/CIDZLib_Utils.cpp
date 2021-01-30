@@ -202,7 +202,7 @@ tCIDLib::TVoid TZLibCompImpl::PerBlockReset()
 {
     TRawMem::SetMemBuf(m_pc2HashPrev, tCIDLib::TCard2(0), kCIDZLib_::c4HashSz);
     TRawMem::SetMemBuf(m_pc2HashTbl, tCIDLib::TCard2(0), kCIDZLib_::c4HashSz);
-    TRawMem::SetMemBuf(m_pc1LLAccum, tCIDLib::TCard1(0), kCIDZLib_::c4WndSz);
+    TRawMem::SetMemBuf(m_pc1LLAccum, kCIDLib::c1MinCard, kCIDZLib_::c4WndSz);
     TRawMem::SetMemBuf(m_pc2DistAccum, tCIDLib::TCard2(0), kCIDZLib_::c4WndSz);
 
     // Set up the dynamic trees

@@ -41,6 +41,7 @@ class CIDCTRLSEXP TImageList : public TObject
         TImageList();
 
         TImageList(const TImageList&) = delete;
+        TImageList(TImageList&&) = delete;
 
         ~TImageList();
 
@@ -49,6 +50,7 @@ class CIDCTRLSEXP TImageList : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TImageList& operator=(const TImageList&) = delete;
+        TImageList& operator=(TImageList&&) = delete;
 
 
         // -------------------------------------------------------------------

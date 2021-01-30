@@ -44,6 +44,7 @@ class TGetTextDlg : public TDlgBox
         TGetTextDlg();
 
         TGetTextDlg(const TGetTextDlg&) = delete;
+        TGetTextDlg(TGetTextDlg&&) = delete;
 
         ~TGetTextDlg();
 
@@ -52,6 +53,7 @@ class TGetTextDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TGetTextDlg& operator=(const TGetTextDlg&) = delete;
+        TGetTextDlg& operator=(TGetTextDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

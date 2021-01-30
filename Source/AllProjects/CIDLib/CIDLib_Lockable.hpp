@@ -155,7 +155,7 @@ class CIDLIBEXP TLocker
             if (m_bLocked && m_pmlockTar)
             {
                 // This can throw, though it's highly unlikely. If so, we die
-                #pragma warning(suppress : 26447)
+                CIDLib_Suppress(26447)
                 m_pmlockTar->Unlock();
             }
         }

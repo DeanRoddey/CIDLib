@@ -56,7 +56,7 @@ TOrbSObjList::TOrbSObjList() :
     TRawMem::SetMemBuf
     (
         m_pabiList
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , sizeof(TBucketItem*) * kCIDOrb::c4IdModulus
     );
 }

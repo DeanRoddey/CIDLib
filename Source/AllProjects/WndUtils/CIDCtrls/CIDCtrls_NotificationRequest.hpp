@@ -53,7 +53,7 @@ class CIDCTRLSEXP TNotRequestBase
         // -------------------------------------------------------------------
         TNotRequestBase() = delete;
 
-        TNotRequestBase(const TNotificationId& nidRequested) :
+        explicit TNotRequestBase(const TNotificationId& nidRequested) :
 
             m_nidRequested(nidRequested)
             , m_pnotrNext(nullptr)
@@ -85,7 +85,7 @@ class CIDCTRLSEXP TNotRequestBase
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TNotificationId& nidRequested() const
+        [[nodiscard]] const TNotificationId& nidRequested() const
         {
             return m_nidRequested;
         }
@@ -112,12 +112,12 @@ class CIDCTRLSEXP TNotRequestBase
         //  Private data members
         //
         //  m_nidRequested
-        //      This is the notification id that the target window is
-        //      requesting to be notified of.
+        //      This is the notification id that the target window is requesting to
+        //      be notified of.
         //
         //  m_pnotrNext
-        //      This is a pointer to another request. This allows the
-        //      TWindow class to maintain a list of installed requests.
+        //      This is a pointer to another request. This allows the TWindow class
+        //      to maintain a list of installed requests.
         // -------------------------------------------------------------------
         TNotificationId     m_nidRequested;
         TNotRequestBase*    m_pnotrNext;
@@ -179,7 +179,7 @@ template <typename T> class TNotifyRequest : public TNotRequestBase
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bPostEvent(TWndEvent* const pwevToPost)
+        tCIDLib::TBoolean bPostEvent(TWndEvent* const pwevToPost) final
         {
             return m_pTarget->bSendMsg(kCIDCtrls::wmsgAsyncEvent1, pwevToPost);
         }

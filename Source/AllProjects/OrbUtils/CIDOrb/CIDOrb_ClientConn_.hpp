@@ -122,9 +122,9 @@ class TOrbClientConnImpl : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bOffline() const;
+        [[nodiscard]] tCIDLib::TBoolean bOffline() const;
 
-        tCIDLib::TCard8 c8ConnId() const;
+        [[nodiscard]] tCIDLib::TCard8 c8ConnId() const;
 
         const TIPEndPoint& ipepClient() const;
 

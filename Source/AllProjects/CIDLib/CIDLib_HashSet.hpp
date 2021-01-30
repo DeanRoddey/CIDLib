@@ -218,18 +218,17 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 // -----------------------------------------------------------
                 TConstCursor() :
 
-                    m_hshBadFirst(tCIDLib::THashVal(-1))
-                    , m_hshBadLast(0)
+                    m_hshBadLast(0)
                     , m_hshCurBucket(0)
                     , m_pnodeCur(nullptr)
                     , m_pcolCursoring(nullptr)
                 {
                 }
 
+                CIDLib_Suppress(26429) // The parent will check for a null collection ptr
                 TConstCursor(const TMyType* pcolToCursor) :
 
                     TParent(pcolToCursor)
-                    , m_hshBadFirst(tCIDLib::THashVal(-1))
                     , m_hshBadLast(pcolToCursor->c4HashModulus())
                     , m_hshCurBucket(0)
                     , m_pnodeCur(nullptr)
@@ -240,15 +239,19 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                         m_hshCurBucket = m_hshBadLast;
                 }
 
-                // We have to lock first, so we can't use member init!
-                TConstCursor(const TConstCursor& cursSrc) :
-
-                    m_hshBadFirst(tCIDLib::THashVal(-1))
+                TConstCursor(const TConstCursor& cursSrc)
                 {
                     TConstCursor::operator=(cursSrc);
                 }
 
-                ~TConstCursor() {}
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
+                }
+
+                ~TConstCursor() = default;
 
 
                 // -----------------------------------------------------------
@@ -266,6 +269,20 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                         m_hshCurBucket  = cursSrc.m_hshCurBucket;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pnodeCur      = cursSrc.m_pnodeCur;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    // Don't have to copy bad first, it's the same for everyone
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_hshBadLast,  cursSrc.m_hshBadLast);
+                        tCIDLib::Swap(m_hshCurBucket,  cursSrc.m_hshCurBucket);
+                        tCIDLib::Swap(m_pcolCursoring,  cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pnodeCur,  cursSrc.m_pnodeCur);
                     }
                     return *this;
                 }
@@ -432,12 +449,13 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 // -----------------------------------------------------------
                 //  Hidden constructors (for the collection itself)
                 // -----------------------------------------------------------
+
+                CIDLib_Suppress(26429) // The parent will check for null
                 TConstCursor(const TMyType*             pcolToCursor
                             , const tCIDLib::THashVal   hshCur
                             ,       TNode* const        pnodeCur) :
 
                     TParent(pcolToCursor)
-                    , m_hshBadFirst(tCIDLib::THashVal(-1))
                     , m_hshBadLast(pcolToCursor->c4HashModulus())
                     , m_hshCurBucket(hshCur)
                     , m_pcolCursoring(pcolToCursor)
@@ -472,11 +490,11 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 //      The current node in the hash table. If m_hshCurBucket is valid
                 //      this must be pointing to a valid current node.
                 // -----------------------------------------------------------
-                const tCIDLib::THashVal m_hshBadFirst;
-                tCIDLib::THashVal       m_hshBadLast;
-                tCIDLib::THashVal       m_hshCurBucket;
-                const TMyType*          m_pcolCursoring;
-                TNode*                  m_pnodeCur;
+                static constexpr tCIDLib::THashVal  m_hshBadFirst = kCIDLib::hshInvalid;
+                tCIDLib::THashVal                   m_hshBadLast;
+                tCIDLib::THashVal                   m_hshCurBucket;
+                const TMyType*                      m_pcolCursoring;
+                TNode*                              m_pnodeCur;
         };
 
 
@@ -523,10 +541,16 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     TNonConstCursor::operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TNonConstCursor() {}
@@ -542,6 +566,16 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                         TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
+                    }
+                    return *this;
+                }
+
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
                     }
                     return *this;
                 }
@@ -653,10 +687,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
         {
             // Allocate and initialize the bucket table
             m_apBuckets = new TNode*[c4Modulus];
-            TRawMem::SetMemBuf
-            (
-                m_apBuckets, tCIDLib::TCard1(0), sizeof(tCIDLib::TVoid*) * c4Modulus
-            );
+            TRawMem::SetMemBuf(m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * c4Modulus);
         }
 
         THashSet(const TMyType& colSrc) :
@@ -671,10 +702,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             {
                 // Allocate and initialize the list table
                 m_apBuckets = new TNode*[m_c4HashModulus];
-                TRawMem::SetMemBuf
-                (
-                    m_apBuckets, tCIDLib::TCard1(0), sizeof(tCIDLib::TVoid*) * m_c4HashModulus
-                );
+                TRawMem::SetMemBuf(m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * m_c4HashModulus);
 
                 // Lock the source, so it won't change during this operation
                 TLocker lockrToDup(&colSrc);
@@ -705,11 +733,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
         {
             // Allocate and initialize the bucket table
             m_apBuckets = new TNode*[m_c4HashModulus];
-            TRawMem::SetMemBuf
-            (
-                m_apBuckets, tCIDLib::TCard1(0), sizeof(tCIDLib::TVoid*) * m_c4HashModulus
-            );
-
+            TRawMem::SetMemBuf(m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * m_c4HashModulus);
             *this = tCIDLib::ForceMove(colSrc);
         }
 
@@ -749,9 +773,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 m_apBuckets = new TNode*[m_c4HashModulus];
                 TRawMem::SetMemBuf
                 (
-                    m_apBuckets
-                    , tCIDLib::TCard1(0)
-                    , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
+                    m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * m_c4HashModulus
                 );
             }
 
@@ -855,7 +877,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                     delete pnodeCur;
                     pnodeCur = pnodeNext;
                 }
-                m_apBuckets[c4Index] = 0;
+                m_apBuckets[c4Index] = nullptr;
             }
 
             // And we now have zero elements
@@ -1207,6 +1229,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             //  previous node for the target node.
             //
             TNode* pnodeToRemove = cursAt.pnodeCur();
+            CIDAssert(pnodeToRemove != nullptr, L"The hash set node to remove is null")
             const tCIDLib::THashVal hshElem = cursAt.hshCurHash();
             TNode* const pnodePrev = pnodeFindPrev(pnodeToRemove, hshElem);
 
@@ -1252,7 +1275,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 m_c4HashModulus = c4HashModulus;
                 TRawMem::SetMemBuf
                 (
-                    m_apBuckets, tCIDLib::TCard1(0), sizeof(tCIDLib::TVoid*) * m_c4HashModulus
+                    m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * m_c4HashModulus
                 );
             }
         }
@@ -1287,13 +1310,14 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             // Start at the last bucket and work back
             tCIDLib::TCard4 c4BucketInd = m_c4HashModulus - 1;
 
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we find a non-empty bucket, find its last node
                 if (m_apBuckets[c4BucketInd])
                 {
                     TNode* pnodeCur = m_apBuckets[c4BucketInd];
+                    CIDAssert(pnodeCur != nullptr, L"The has set node was null")
                     while (pnodeCur->pnodeNext())
                         pnodeCur = pnodeCur->pnodeNext();
                     hshToUpdate = c4BucketInd;
@@ -1308,17 +1332,19 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             return nullptr;
         }
 
-        #pragma warning(suppress : 26461) // Can't make last node const
+        CIDLib_Suppress(26461) // Can't make last node const
         TNode* pnodeFindNext( TNode* const        pnodeLast
                             , tCIDLib::THashVal&  hshToUpdate) const
         {
+            CIDAssert(pnodeLast != nullptr, L"The last node passed was null");
+
             // Move up to the next node
             TNode* m_pnodeCur = pnodeLast->pnodeNext();
             if (m_pnodeCur)
                 return m_pnodeCur;
 
             // Search subsequent buckets for non-empty one
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we hit the end of buckets, then we are done
@@ -1333,7 +1359,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             return nullptr;
         }
 
-        #pragma warning(suppress : 26461) // Can't make last node const
+        CIDLib_Suppress(26461) // Can't make last node const
         TNode* pnodeFindPrevious(TNode* const pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
             //
@@ -1345,7 +1371,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 return pnodeCur;
 
             // Search previous buckets for non-empty one
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we hit the start of buckets, then we are done
@@ -1441,7 +1467,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
                 while (pnodeSrc)
                 {
                     // Replicate this bucket's nodes
-                    pnodeCur = new TNode(pnodeSrc->objData(), 0);
+                    pnodeCur = new TNode(pnodeSrc->objData(), nullptr);
 
                     // Set last node's next to this one
                     if (pnodeLast)

@@ -299,7 +299,7 @@ class CIDLIBEXP TLogEvent :
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmToWriteTo
+            CIOP    TTextOutStream&         strmToWriteTo
         )   const final;
 
         tCIDLib::TVoid StreamFrom

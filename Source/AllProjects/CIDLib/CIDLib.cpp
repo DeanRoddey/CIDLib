@@ -478,7 +478,7 @@ static tCIDLib::TVoid DummyFunc()
     );
 
     TFundVector<tCIDLib::TCard8> fcolCard8s;
-    tCIDLib::TCard8 c8MaxDup
+    const tCIDLib::TCard8 c8MaxDup
         = tCIDColAlgo::tFindMaxFundSeqDup<TFundVector<tCIDLib::TCard8>>(fcolCard8s);
 
     TTextStringOutStream strmTest(1024UL);
@@ -544,7 +544,7 @@ static tCIDLib::TVoid DummyFunc()
 //    {
 //    }
 
-    tCIDLib::TFloat4 f4Test = 0;
+    constexpr tCIDLib::TFloat4 f4Test = 0;
     if (tCIDLib::IsTFloatX<decltype(f4Test)>::bState)
     {
     }

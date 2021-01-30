@@ -97,7 +97,7 @@ class CIDLIBEXP TInStreamImpl : public TObject
         TInStreamImpl(const TInStreamImpl&) = delete;
         TInStreamImpl(TInStreamImpl&&) = delete;
 
-        ~TInStreamImpl() {}
+        ~TInStreamImpl() = default;
 
 
         // -------------------------------------------------------------------
@@ -132,7 +132,7 @@ class CIDLIBEXP TInStreamImpl : public TObject
         // -------------------------------------------------------------------
         //  Hidden Constructors
         // -------------------------------------------------------------------
-        TInStreamImpl() {}
+        TInStreamImpl() = default;
 
 
     private :

@@ -58,7 +58,7 @@ namespace TArrayOps
     {
         public :
             //We don't initialize the arrays since that's just unnecessary overhead
-            #pragma warning(suppress : 26495)
+            CIDLib_Suppress(26495)
             TSortState(T* const pToSort, const tCIDLib::TCard4 c4Size) :
 
                 m_c4PendingCnt(0)
@@ -248,8 +248,8 @@ namespace TArrayOps
         //  If it's a fundamental there's no def ctor so we get an uninitialized
         //  warning.
         //
-        #pragma warning(suppress : 26494)
-        T tTemp;
+        // CIDLib_Suppress(26494)
+        T tTemp{};
 
         tCIDLib::TCard4 c4L = c4Low;
         tCIDLib::TCard4 c4H = c4High;
@@ -329,12 +329,7 @@ namespace TArrayOps
                                 , const tCIDLib::TInt4      i4Start
                                 ,       TCompFunc           pfnComp)
     {
-        //
-        //  If the type happens to be a fundamental, this we get an uninit warning on
-        //  the pivot type because no default constructor.
-        //
-        #pragma warning(suppress : 26494)
-        T               tPivot;
+        T               tPivot{};
         tCIDLib::TInt4  i4Left = 0;
         tCIDLib::TInt4  i4Right = 0;
         tCIDLib::TInt4  i4Middle = 0;

@@ -67,13 +67,13 @@ namespace kCIDLogMon
     // -------------------------------------------------------------------
     //  Private types and constants
     // -------------------------------------------------------------------
-    const tCIDLib::TCard4    c4Col_Dummy     = 0;
-    const tCIDLib::TCard4    c4Col_Host      = 1;
-    const tCIDLib::TCard4    c4Col_Process   = 2;
-    const tCIDLib::TCard4    c4Col_Line      = 3;
-    const tCIDLib::TCard4    c4Col_Time      = 4;
-    const tCIDLib::TCard4    c4Col_Message   = 5;
-    const tCIDLib::TCard4    c4Col_Count     = 6;
+    constexpr tCIDLib::TCard4    c4Col_Dummy     = 0;
+    constexpr tCIDLib::TCard4    c4Col_Host      = 1;
+    constexpr tCIDLib::TCard4    c4Col_Process   = 2;
+    constexpr tCIDLib::TCard4    c4Col_Line      = 3;
+    constexpr tCIDLib::TCard4    c4Col_Time      = 4;
+    constexpr tCIDLib::TCard4    c4Col_Message   = 5;
+    constexpr tCIDLib::TCard4    c4Col_Count     = 6;
 }
 
 
@@ -94,6 +94,7 @@ class TLogItem : public TLogEvent
         );
 
         TLogItem(const TLogItem&) = default;
+        TLogItem(TLogItem&&) = default;
 
         ~TLogItem();
 
@@ -102,6 +103,7 @@ class TLogItem : public TLogEvent
         //  Public operators
         // --------------------------------------------------------------------
         TLogItem& operator=(const TLogItem&) = default;
+        TLogItem& operator=(TLogItem&&) = default;
 
 
         // --------------------------------------------------------------------
@@ -134,6 +136,7 @@ class TItemListWnd : public TMultiColListBox
         TItemListWnd();
 
         TItemListWnd(const TItemListWnd&) = delete;
+        TItemListWnd(TItemListWnd&&) = delete;
 
         ~TItemListWnd();
 
@@ -142,6 +145,7 @@ class TItemListWnd : public TMultiColListBox
         //  Public operators
         // -------------------------------------------------------------------
         TItemListWnd& operator=(const TItemListWnd&) = delete;
+        TItemListWnd& operator=(TItemListWnd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -203,6 +207,7 @@ class TMainFrame : public TFrameWnd
         TMainFrame();
 
         TMainFrame(const TMainFrame&) = delete;
+        TMainFrame(TMainFrame&&) = delete;
 
         ~TMainFrame();
 
@@ -211,6 +216,7 @@ class TMainFrame : public TFrameWnd
         //  Public operators
         // -------------------------------------------------------------------
         TMainFrame& operator=(const TMainFrame&) = delete;
+        TMainFrame& operator=(TMainFrame&&) = delete;
 
 
         // -------------------------------------------------------------------

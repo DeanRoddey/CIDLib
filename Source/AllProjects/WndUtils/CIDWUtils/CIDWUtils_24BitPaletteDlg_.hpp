@@ -43,6 +43,7 @@ class T24BitPalDlg : public TDlgBox
         T24BitPalDlg();
 
         T24BitPalDlg(const T24BitPalDlg&) = delete;
+        T24BitPalDlg(T24BitPalDlg&&) = delete;
 
         ~T24BitPalDlg();
 
@@ -51,6 +52,7 @@ class T24BitPalDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         T24BitPalDlg& operator=(const T24BitPalDlg&) = delete;
+        T24BitPalDlg& operator=(T24BitPalDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

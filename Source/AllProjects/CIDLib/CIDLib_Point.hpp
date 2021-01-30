@@ -59,21 +59,21 @@ class CIDLIBEXP TPoint :
         explicit TPoint
         (
             const   tCIDLib::THostPoint&    ptSrc
-        );
+        )   noexcept;
 
         TPoint
         (
             const   tCIDLib::TRawPoint&     ptSrc
-        );
+        )   noexcept;
 
-        TPoint(const tCIDLib::TInt4 i4X, const tCIDLib::TInt4 i4Y) :
+        explicit TPoint(const tCIDLib::TInt4 i4X, const tCIDLib::TInt4 i4Y) :
 
             m_i4X(i4X)
             , m_i4Y(i4Y)
         {
         }
 
-        explicit TPoint(const tCIDLib::TInt4 i4Both) :
+        explicit TPoint(const tCIDLib::TInt4 i4Both) noexcept :
 
             m_i4X(i4Both)
             , m_i4Y(i4Both)
@@ -164,7 +164,7 @@ class CIDLIBEXP TPoint :
             const   tCIDLib::TInt4          i4Ofs
         );
 
-        tCIDLib::TBoolean bAtOrg() const
+        [[nodiscard]] tCIDLib::TBoolean bAtOrg() const
         {
             return (!m_i4X && !m_i4Y);
         }

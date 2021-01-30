@@ -488,7 +488,7 @@ TCIDDAEWMADec::TCIDDAEWMADec() :
     CIDDAE_WMAEncoder::TWMARInfo* pWMAInfo = new CIDDAE_WMAEncoder::TWMARInfo;
     TRawMem::SetMemBuf
     (
-        pWMAInfo, tCIDLib::TCard1(0), sizeof(CIDDAE_WMAEncoder::TWMARInfo)
+        pWMAInfo, kCIDLib::c1MinCard, sizeof(CIDDAE_WMAEncoder::TWMARInfo)
     );
     m_pc1Data = reinterpret_cast<tCIDLib::TCard1*>(pWMAInfo);
 }
@@ -821,7 +821,7 @@ TCIDDAEWMAEnc::TCIDDAEWMAEnc() :
     CIDDAE_WMAEncoder::TWMAWInfo* pWMAInfo = new CIDDAE_WMAEncoder::TWMAWInfo;
     TRawMem::SetMemBuf
     (
-        pWMAInfo, tCIDLib::TCard1(0), sizeof(CIDDAE_WMAEncoder::TWMAWInfo)
+        pWMAInfo, kCIDLib::c1MinCard, sizeof(CIDDAE_WMAEncoder::TWMAWInfo)
     );
     m_pc1Data = reinterpret_cast<tCIDLib::TCard1*>(pWMAInfo);
 

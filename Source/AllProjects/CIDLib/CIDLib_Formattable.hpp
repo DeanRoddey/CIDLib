@@ -62,7 +62,7 @@ class CIDLIBEXP MFormattable
         // -------------------------------------------------------------------
         friend TTextOutStream& operator<<
         (
-                    TTextOutStream&         strmToWriteTo
+            CIOP    TTextOutStream&         strmToWriteTo
             , const MFormattable&           fmtblToWrite
         );
 
@@ -83,7 +83,7 @@ class CIDLIBEXP MFormattable
         // -------------------------------------------------------------------
         virtual tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const = 0;
 
 

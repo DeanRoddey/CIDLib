@@ -87,7 +87,7 @@ namespace TAtomic
     template <typename T> T* pFencedGet(T** pToGet)
     {
         // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
-        #pragma warning(suppress : 26471)
+        CIDLib_Suppress(26471)
         return reinterpret_cast<T*>
         (
             TRawMem::pCompareAndExchangeRawPtr
@@ -100,7 +100,7 @@ namespace TAtomic
     template <typename T> T* pFencedGet(const T** pToGet)
     {
         // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
-        #pragma warning(suppress : 26471)
+        CIDLib_Suppress(26471)
         return reinterpret_cast<T*>
         (
             TRawMem::pCompareAndExchangeRawPtr
@@ -113,7 +113,7 @@ namespace TAtomic
     template <typename T> tCIDLib::TVoid FencedSet(T** pTarget, T* const pToSet)
     {
         // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
-        #pragma warning(suppress : 26471)
+        CIDLib_Suppress(26471)
         reinterpret_cast<T*>
         (
             TRawMem::pExchangeRawPtr
@@ -126,7 +126,7 @@ namespace TAtomic
     template <typename T> tCIDLib::TVoid FencedSet(const T** pTarget, T* const pToSet)
     {
         // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
-        #pragma warning(suppress : 26471)
+        CIDLib_Suppress(26471)
         reinterpret_cast<T*>
         (
             TRawMem::pExchangeRawPtr

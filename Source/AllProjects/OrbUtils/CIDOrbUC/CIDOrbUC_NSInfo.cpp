@@ -158,29 +158,6 @@ TNameServerInfo::~TNameServerInfo()
 
 
 // ---------------------------------------------------------------------------
-//  TNameServerInfo: Public operators
-// ---------------------------------------------------------------------------
-
-//
-//  Normally we wouldn't bother for a class like this, but we pre-instantiate a
-//  vector of these so we have to provide this.
-//
-TNameServerInfo& TNameServerInfo::operator=(TNameServerInfo&& nsviSrc)
-{
-    if (&nsviSrc != this)
-    {
-        m_ooidSrvObject = tCIDLib::ForceMove(nsviSrc.m_ooidSrvObject);
-        m_strDescription = tCIDLib::ForceMove(nsviSrc.m_strDescription);
-        m_strExtra1 = tCIDLib::ForceMove(nsviSrc.m_strExtra1);
-        m_strExtra2 = tCIDLib::ForceMove(nsviSrc.m_strExtra2);
-        m_strExtra3 = tCIDLib::ForceMove(nsviSrc.m_strExtra3);
-        m_strExtra4 = tCIDLib::ForceMove(nsviSrc.m_strExtra4);
-        m_strNodeName = tCIDLib::ForceMove(nsviSrc.m_strNodeName);
-    }
-    return *this;
-}
-
-// ---------------------------------------------------------------------------
 //  TNameServerInfo: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 const TOrbObjId& TNameServerInfo::ooidSrvObject() const

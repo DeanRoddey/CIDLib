@@ -145,7 +145,7 @@ class CIDLIBEXP TMoney :
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const final;
 
         tCIDLib::TVoid StreamFrom

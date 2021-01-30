@@ -49,10 +49,8 @@ class CIDWUTILSEXP T24BPalChangeInfo : public TCtrlNotify
             , const TWindow&                wndSrc
         );
 
-        T24BPalChangeInfo
-        (
-            const   T24BPalChangeInfo&      wnotToCopy
-        );
+        T24BPalChangeInfo(const T24BPalChangeInfo&) = default;
+        T24BPalChangeInfo(T24BPalChangeInfo&&) = default;
 
         ~T24BPalChangeInfo();
 
@@ -60,10 +58,8 @@ class CIDWUTILSEXP T24BPalChangeInfo : public TCtrlNotify
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        T24BPalChangeInfo& operator=
-        (
-            const   T24BPalChangeInfo&      wnotToAssign
-        );
+        T24BPalChangeInfo& operator=(const T24BPalChangeInfo&) = default;
+        T24BPalChangeInfo& operator=(T24BPalChangeInfo&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -109,6 +105,7 @@ class CIDWUTILSEXP T24BitPalette : public TCtrlWnd
         T24BitPalette();
 
         T24BitPalette(const T24BitPalette&) = delete;
+        T24BitPalette(T24BitPalette&&) = delete;
 
         T24BitPalette
         (
@@ -122,6 +119,7 @@ class CIDWUTILSEXP T24BitPalette : public TCtrlWnd
         //  Public operators
         // -------------------------------------------------------------------
         T24BitPalette& operator=(const T24BitPalette&) = delete;
+        T24BitPalette& operator=(T24BitPalette&&) = delete;
 
 
         // -------------------------------------------------------------------

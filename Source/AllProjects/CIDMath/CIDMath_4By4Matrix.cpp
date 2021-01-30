@@ -91,7 +91,7 @@ T4By4Matrix::T4By4Matrix(   const   tCIDLib::TFloat8&   f81_1
                             , const tCIDLib::TFloat8&   f8Yt
                             , const tCIDLib::TFloat8&   f8Zt)
 {
-    TRawMem::SetMemBuf(m_af8Matrix, tCIDLib::TCard1(0), sizeof(m_af8Matrix));
+    TRawMem::SetMemBuf(m_af8Matrix, kCIDLib::c1MinCard, sizeof(m_af8Matrix));
     m_af8Matrix[0][0]     = f81_1;
     m_af8Matrix[0][1]     = f81_2;
     m_af8Matrix[0][2]     = f81_3;
@@ -322,7 +322,7 @@ T4By4Matrix::AppendTranslation( const   tCIDLib::TFloat8&   f8XTrans
 
 tCIDLib::TVoid T4By4Matrix::SetToIdentity()
 {
-    TRawMem::SetMemBuf(m_af8Matrix, tCIDLib::TCard1(0), sizeof(m_af8Matrix));
+    TRawMem::SetMemBuf(m_af8Matrix, kCIDLib::c1MinCard, sizeof(m_af8Matrix));
     m_af8Matrix[0][0]   = 1.0;
     m_af8Matrix[1][1]   = 1.0;
     m_af8Matrix[2][2]   = 1.0;
@@ -466,7 +466,7 @@ tCIDLib::TVoid T4By4Matrix::Transpose()
 
 tCIDLib::TVoid T4By4Matrix::Zero()
 {
-    TRawMem::SetMemBuf(m_af8Matrix, tCIDLib::TCard1(0), sizeof(m_af8Matrix));
+    TRawMem::SetMemBuf(m_af8Matrix, kCIDLib::c1MinCard, sizeof(m_af8Matrix));
 }
 
 

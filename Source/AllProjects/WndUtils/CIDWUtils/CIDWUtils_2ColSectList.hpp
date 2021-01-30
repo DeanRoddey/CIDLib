@@ -55,6 +55,7 @@ class CIDWUTILSEXP T2ColSectList : public TMultiColListBox
         T2ColSectList();
 
         T2ColSectList(const T2ColSectList&) = delete;
+        T2ColSectList(T2ColSectList&&) = delete;
 
         ~T2ColSectList();
 
@@ -63,6 +64,7 @@ class CIDWUTILSEXP T2ColSectList : public TMultiColListBox
         //  Public operators
         // -------------------------------------------------------------------
         T2ColSectList& operator=(const T2ColSectList&) = delete;
+        T2ColSectList& operator=(T2ColSectList&&) = delete;
 
 
         // -------------------------------------------------------------------

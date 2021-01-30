@@ -776,7 +776,7 @@ tCIDLib::TVoid TBitmapImage::StreamTo(TBinOutStream& strmToWriteTo) const
                             << rgbCur.c1Red();
 
             if (c4PalEntryBytes == 4)
-                strmToWriteTo << tCIDLib::TCard1(0);
+                strmToWriteTo << kCIDLib::c1MinCard;
         }
     }
     strmToWriteTo.c4WriteRawBuffer(pixaSrc.pc1Buffer(), c4ImageSz());

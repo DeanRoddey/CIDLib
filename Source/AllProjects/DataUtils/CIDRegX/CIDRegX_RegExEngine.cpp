@@ -71,8 +71,8 @@ TRegEx::TRegEx() :
     , m_c4CurInd(0)
     , m_c4CurState(0)
     , m_c4PatLen(0)
-    , m_prxnfaPattern(0)
-    , m_pszPattern(0)
+    , m_prxnfaPattern(nullptr)
+    , m_pszPattern(nullptr)
 {
 }
 
@@ -83,8 +83,8 @@ TRegEx::TRegEx(const TString& strExpression) :
     , m_c4CurInd(0)
     , m_c4CurState(0)
     , m_c4PatLen(0)
-    , m_prxnfaPattern(0)
-    , m_pszPattern(0)
+    , m_prxnfaPattern(nullptr)
+    , m_pszPattern(nullptr)
 {
     SetExpression(strExpression.pszBuffer());
 }
@@ -96,10 +96,23 @@ TRegEx::TRegEx(const tCIDLib::TCh* const pszExpression) :
     , m_c4CurInd(0)
     , m_c4CurState(0)
     , m_c4PatLen(0)
-    , m_prxnfaPattern(0)
-    , m_pszPattern(0)
+    , m_prxnfaPattern(nullptr)
+    , m_pszPattern(nullptr)
 {
     SetExpression(pszExpression);
+}
+
+TRegEx::TRegEx(TRegEx&& regxSrc) :
+
+    m_bEscaped(kCIDLib::False)
+    , m_bLetter(kCIDLib::False)
+    , m_c4CurInd(0)
+    , m_c4CurState(0)
+    , m_c4PatLen(0)
+    , m_prxnfaPattern(nullptr)
+    , m_pszPattern(nullptr)
+{
+    *this = tCIDLib::ForceMove(regxSrc);
 }
 
 TRegEx::~TRegEx()
@@ -107,6 +120,26 @@ TRegEx::~TRegEx()
     delete [] m_pszPattern;
     delete m_prxnfaPattern;
 }
+
+
+// ---------------------------------------------------------------------------
+//  TRegEx: Public operators
+// ---------------------------------------------------------------------------
+TRegEx& TRegEx::operator=(TRegEx&& regxSrc)
+{
+    if (&regxSrc != this)
+    {
+        tCIDLib::Swap(m_bEscaped, regxSrc.m_bEscaped);
+        tCIDLib::Swap(m_bLetter, regxSrc.m_bLetter);
+        tCIDLib::Swap(m_c4CurInd, regxSrc.m_c4CurInd);
+        tCIDLib::Swap(m_c4CurState, regxSrc.m_c4CurState);
+        tCIDLib::Swap(m_c4PatLen, regxSrc.m_c4PatLen);
+        tCIDLib::Swap(m_prxnfaPattern, regxSrc.m_prxnfaPattern);
+        tCIDLib::Swap(m_pszPattern, regxSrc.m_pszPattern);
+    }
+    return *this;
+}
+
 
 
 // ---------------------------------------------------------------------------
@@ -121,14 +154,7 @@ TRegEx::bFindMatch( const   TString&            strFindIn
 {
     // Just call the other version with the raw string and start of 0
     c4Ofs  = 0;
-    return bFindMatchAt
-    (
-        strFindIn.pszBuffer()
-        , c4Ofs
-        , c4Len
-        , bOnlyAtStart
-        , bCaseSensitive
-    );
+    return bFindMatchAt(strFindIn.pszBuffer(), c4Ofs, c4Len, bOnlyAtStart, bCaseSensitive);
 }
 
 tCIDLib::TBoolean
@@ -168,6 +194,8 @@ TRegEx::bFindMatchAt(const  tCIDLib::TCh* const pszFindIn
                     , const tCIDLib::TBoolean   bOnlyAtStart
                     , const tCIDLib::TBoolean   bCaseSensitive) const
 {
+    c4Len = 0;
+
     // Check for not having set up the expression yet
     if (!m_prxnfaPattern)
     {
@@ -498,7 +526,7 @@ TRegEx::bReplaceAll(        TString&            strFindIn
     tCIDLib::TBoolean bChanges = kCIDLib::False;
 
     tCIDLib::TCard4 c4At = 0;
-    tCIDLib::TCard4 c4Len;
+    tCIDLib::TCard4 c4Len = 0;
     while (c4At < strFindIn.c4Length())
     {
         const tCIDLib::TBoolean bMatch = bFindMatchAt
@@ -698,11 +726,11 @@ tCIDLib::TCard4 TRegEx::c4ParseExpr()
 
 tCIDLib::TCard4 TRegEx::c4ParseFactor()
 {
-    tCIDLib::TCard4 c4State1, c4State2;
-    tCIDLib::TCard4 c4Ret(0);
+    tCIDLib::TCard4 c4State2 = kCIDLib::c4MaxCard;
+    tCIDLib::TCard4 c4Ret = 0;
 
     // Remember the next available state as our first state
-    c4State1 = m_prxnfaPattern->c4StateCount();
+    tCIDLib::TCard4 c4State1 = m_prxnfaPattern->c4StateCount();
 
     //
     //  First, check for whether we have a letter. This will handle any
@@ -1027,7 +1055,7 @@ tCIDLib::TCh TRegEx::chNext()
     //  get the second character and bump the index by 2. Otherwise get the
     //  first character and bump the index by one.
     //
-    tCIDLib::TCh chRet;
+    tCIDLib::TCh chRet = kCIDLib::chNull;
     if (m_bEscaped)
     {
         chRet =  m_pszPattern[m_c4CurInd+1];

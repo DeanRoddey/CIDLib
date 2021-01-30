@@ -59,6 +59,15 @@
 //  means that the set WILL be seen by everyone before exiting the inner loop and
 //  releasing the lock.
 //
+//  Copy Assign
+//
+//  For the non-pointer types, we can reasonably support move and copy construction.
+//  We don't need to change the source in either case. We just do an exchange of the
+//  value with itself to get an atomic copy.
+//
+//  For the pointer type, we only support move construction, not move assignment,
+//  since it would be tricky to do the bi-directional exchange atomically.
+//
 //
 // CAVEATS/GOTCHAS:
 //
@@ -101,7 +110,7 @@ class KRNLEXPORT TBaseLock
         TBaseLock& operator=(const TBaseLock&) = delete;
         TBaseLock& operator=(TBaseLock&&) = delete;
 
-        tCIDLib::TVoid* operator new(const size_t) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
 };
 
 
@@ -119,21 +128,54 @@ class TAtomicCard
         // -------------------------------------------------------------------
         TAtomicCard() noexcept : m_c4Value(0) {}
         TAtomicCard(const tCIDLib::TInt4 c4InitVal) : m_c4Value(c4InitVal) {}
-        TAtomicCard(const TAtomicCard&) = delete;
-        TAtomicCard(TAtomicCard&&) = delete;
+
+        TAtomicCard(const TAtomicCard& atomSrc) :
+
+            m_c4Value(TRawMem::c4Exchange(atomSrc.m_c4Value, atomSrc.m_c4Value))
+        {
+        }
+
+        TAtomicCard(TAtomicCard&& atomSrc) :
+
+            m_c4Value(TRawMem::c4Exchange(atomSrc.m_c4Value, atomSrc.m_c4Value))
+        {
+        }
+
         ~TAtomicCard() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TAtomicCard& operator=(const TAtomicCard&) = delete;
-        tCIDLib::TVoid* operator new( size_t) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
+
+        TAtomicCard& operator=(const TAtomicCard& atomSrc)
+        {
+            if (&atomSrc != this)
+            {
+                TRawMem::c4CompareAndExchange(m_c4Value, atomSrc.m_c4Value, atomSrc.m_c4Value);
+            }
+            return *this;
+        }
+
+        TAtomicCard& operator=(TAtomicCard&& atomSrc)
+        {
+            if (&atomSrc != this)
+            {
+                TRawMem::c4CompareAndExchange(m_c4Value, atomSrc.m_c4Value, atomSrc.m_c4Value);
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TCard4 c4SetValue(const tCIDLib::TInt4 c4ToSet) noexcept
+        {
+            return TRawMem::c4Exchange(m_c4Value, c4ToSet);
+        }
+
         tCIDLib::TInt4 c4Value() const noexcept
         {
             const tCIDLib::TInt4 c4Value = TRawMem::c4CompareAndExchange(m_c4Value, 0, 0);
@@ -171,16 +213,44 @@ class TAtomicFlag
         // -------------------------------------------------------------------
         TAtomicFlag() : m_c4Flag(0) {}
         TAtomicFlag(const tCIDLib::TBoolean bInitVal) : m_c4Flag(bInitVal ? 1 : 0) {}
-        TAtomicFlag(const TAtomicFlag&) = delete;
-        TAtomicFlag(TAtomicFlag&&) = delete;
+
+        TAtomicFlag(const TAtomicFlag& atomSrc) :
+
+            m_c4Flag(TRawMem::c4Exchange(atomSrc.m_c4Flag, atomSrc.m_c4Flag))
+        {
+        }
+
+        TAtomicFlag(TAtomicFlag&& atomSrc) :
+
+            m_c4Flag(TRawMem::c4Exchange(atomSrc.m_c4Flag, atomSrc.m_c4Flag))
+        {
+        }
+
         ~TAtomicFlag() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TAtomicFlag& operator=(const TAtomicFlag&) = delete;
         tCIDLib::TVoid* operator new(size_t) = delete;
+
+        TAtomicFlag& operator=(const TAtomicFlag& atomSrc)
+        {
+            if (&atomSrc != this)
+            {
+                TRawMem::c4CompareAndExchange(m_c4Flag, atomSrc.m_c4Flag, atomSrc.m_c4Flag);
+            }
+            return *this;
+        }
+
+        TAtomicFlag& operator=(TAtomicFlag&& atomSrc)
+        {
+            if (&atomSrc != this)
+            {
+                TRawMem::c4CompareAndExchange(m_c4Flag, atomSrc.m_c4Flag, atomSrc.m_c4Flag);
+            }
+            return *this;
+        }
 
         operator tCIDLib::TBoolean() const
         {
@@ -191,6 +261,11 @@ class TAtomicFlag
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bSetValue(const tCIDLib::TBoolean bToSet) noexcept
+        {
+            return (TRawMem::c4Exchange(m_c4Flag, bToSet ? 1 : 0) != 0);
+        }
+
         tCIDLib::TBoolean bValue() const noexcept
         {
             const tCIDLib::TCard4 c4Value = TRawMem::c4CompareAndExchange(m_c4Flag, 0, 0);
@@ -232,37 +307,107 @@ class TAtomicInt
         // -------------------------------------------------------------------
         TAtomicInt() : m_i4Value(0) {}
         TAtomicInt(const tCIDLib::TInt4 i4InitVal) : m_i4Value(i4InitVal) {}
-        TAtomicInt(const TAtomicInt&) = delete;
-        TAtomicInt(TAtomicInt&&) = delete;
+
+        TAtomicInt(const TAtomicInt& atomSrc) :
+
+            m_i4Value
+            (
+                static_cast<tCIDLib::TInt4>
+                (
+                    TRawMem::c4Exchange
+                    (
+                        *tCIDLib::pReCastPtr<tCIDLib::TCard4>(&atomSrc.m_i4Value)
+                        , static_cast<tCIDLib::TCard4>(atomSrc.m_i4Value)
+                    )
+                )
+            )
+        {
+        }
+
+        TAtomicInt(TAtomicInt&& atomSrc) :
+
+            m_i4Value
+            (
+                TRawMem::c4Exchange
+                (
+                    *tCIDLib::pReCastPtr<tCIDLib::TCard4>(&atomSrc.m_i4Value)
+                    , static_cast<tCIDLib::TCard4>(atomSrc.m_i4Value)
+                )
+            )
+        {
+        }
+
+
         ~TAtomicInt() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TAtomicInt& operator=(const TAtomicInt&) = delete;
         tCIDLib::TVoid* operator new( size_t) = delete;
+
+        TAtomicInt& operator=(const TAtomicInt& atomSrc)
+        {
+            if (&atomSrc != this)
+            {
+                TRawMem::c4CompareAndExchange
+                (
+                    *tCIDLib::pReCastPtr<tCIDLib::TCard4>(&m_i4Value)
+                    , atomSrc.m_i4Value
+                    , atomSrc.m_i4Value
+                );
+            }
+            return *this;
+        }
+
+        TAtomicInt& operator=(TAtomicInt&& atomSrc)
+        {
+            if (&atomSrc != this)
+            {
+                TRawMem::c4CompareAndExchange
+                (
+                    *tCIDLib::pReCastPtr<tCIDLib::TCard4>(&m_i4Value)
+                    , atomSrc.m_i4Value
+                    , atomSrc.m_i4Value);
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TInt4 i4SetValue(const tCIDLib::TInt4 i4ToSet) noexcept
+        {
+            CIDLib_Suppress(26490) // We need the reinterpret cast here
+            return static_cast<tCIDLib::TInt4>
+            (
+                TRawMem::c4Exchange
+                (
+                    reinterpret_cast<tCIDLib::TCard4&>(m_i4Value), i4ToSet
+                )
+            );
+        }
+
         tCIDLib::TInt4 i4Value() const noexcept
         {
-            #pragma warning(suppress : 26490) // We need the reinterpret cast here
-            const tCIDLib::TInt4 i4Value = TRawMem::c4CompareAndExchange
+            CIDLib_Suppress(26490) // We need the reinterpret cast here
+            const tCIDLib::TInt4 i4Value = static_cast<tCIDLib::TInt4>
             (
-                reinterpret_cast<tCIDLib::TCard4&>(m_i4Value), 0, 0
+                TRawMem::c4CompareAndExchange
+                (
+                    *tCIDLib::pReCastPtr<tCIDLib::TCard4>(&m_i4Value), 0, 0
+                )
             );
             return (i4Value != 0);
         }
 
         tCIDLib::TVoid SetValue(const tCIDLib::TInt4 i4ToSet) noexcept
         {
-            #pragma warning(suppress : 26490) // We need the reinterpret cast here
+            CIDLib_Suppress(26490) // We need the reinterpret cast here
             TRawMem::c4Exchange
             (
-                reinterpret_cast<tCIDLib::TCard4&>(m_i4Value), i4ToSet
+                *tCIDLib::pReCastPtr<tCIDLib::TCard4>(&m_i4Value), i4ToSet
             );
         }
 
@@ -292,8 +437,20 @@ template <typename T> class TAtomicPtr
         // -------------------------------------------------------------------
         TAtomicPtr() : m_pValue(nullptr) {}
         TAtomicPtr(const T* const pInitVal) : m_pValue(pInitVal) {}
+
+        // Copy is not supported, only move construction
         TAtomicPtr(const TAtomicPtr&) = delete;
-        TAtomicPtr(TAtomicPtr&&) = delete;
+
+        //
+        //  We allow move contruction, but not move assignment. This one way operation
+        //  we can do atomically, putting null into the caller and getting his old value
+        //  to keep.
+        //
+        TAtomicPtr(TAtomicPtr&& atomSrc) :
+
+            m_pValue(TRawMem::pExchangeRawPtr(&atomSrc.m_pValue, nullptr))
+        {
+        }
 
         // We always adopt the pointer
         ~TAtomicPtr()
@@ -317,7 +474,12 @@ template <typename T> class TAtomicPtr
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Assignment isn't meaningful for us and and move would be hard to do atomically
         TAtomicPtr& operator=(const TAtomicPtr&) = delete;
+        TAtomicPtr& operator=(TAtomicPtr&&) = delete;
+
+        // Don't allow these to be dynmically allocated
         tCIDLib::TVoid* operator new( size_t) = delete;
 
         operator tCIDLib::TBoolean() const
@@ -336,15 +498,18 @@ template <typename T> class TAtomicPtr
         // -------------------------------------------------------------------
         T* pValue() const noexcept
         {
-            return TRawMem::pCompareAndExchangePtr<T>
-            (
-                &m_pValue, nullptr, nullptr
-            );
+            // If not null, just returns current value. If null, doesn't matter and we get a null back
+            return TRawMem::pCompareAndExchangePtr<T>(&m_pValue, nullptr, nullptr);
         }
 
         tCIDLib::TVoid SetValue(T* const pToSet) noexcept
         {
-            TRawMem::pExchangePtr<T>(&m_pValue, pToSet);
+            // Swap in the new pointer and get the old out
+            T* pOld = TRawMem::pExchangePtr<T>(&m_pValue, pToSet);
+
+            // If not null we have to delete it, since we always own our objects
+            if (pOld)
+                delete pOld;
         }
 
 

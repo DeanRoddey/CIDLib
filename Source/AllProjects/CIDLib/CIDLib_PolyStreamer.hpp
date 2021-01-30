@@ -225,7 +225,7 @@ template <typename TElem> class TPolyStreamer : public TObject
             tCIDLib::TBoolean   bNewClass = kCIDLib::False;
             TClass              clsNewType;
             tCIDLib::TCard2     c2NewId = 0;
-            if (c1RecordType == tCIDLib::TCard1(0xAC))
+            if (c1RecordType == static_cast<tCIDLib::TCard1>(0xAC))
             {
                 //
                 //  Stream in the new record object. First we pull in the new
@@ -243,7 +243,7 @@ template <typename TElem> class TPolyStreamer : public TObject
             }
 
             // Make sure its a legal record type
-            if (c1RecordType != tCIDLib::TCard1(0xEA))
+            if (c1RecordType != static_cast<tCIDLib::TCard1>(0xEA))
             {
                 facCIDLib().ThrowErr
                 (
@@ -336,7 +336,7 @@ template <typename TElem> class TPolyStreamer : public TObject
             if (bCheckOrAdd(clsThisObj, c2ThisId))
             {
                 // Stream out the class record id
-                *m_pstrmOut << tCIDLib::TCard1(0xAC);
+                *m_pstrmOut << static_cast<tCIDLib::TCard1>(0xAC);
 
                 // Now stream out the id for this class and the class itself
                 *m_pstrmOut << c2ThisId;
@@ -344,7 +344,7 @@ template <typename TElem> class TPolyStreamer : public TObject
             }
 
             // Now write out the record id and the id of this type
-            *m_pstrmOut << tCIDLib::TCard1(0xEA);
+            *m_pstrmOut << static_cast<tCIDLib::TCard1>(0xEA);
             *m_pstrmOut << c2ThisId;
 
             // And finally stream out the object itself

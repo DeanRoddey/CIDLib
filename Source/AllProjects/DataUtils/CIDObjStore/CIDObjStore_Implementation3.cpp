@@ -889,7 +889,7 @@ TCIDObjStoreImpl::InitRepoFile(         TBinaryFile&    flToInit
     {
         const tCIDLib::TCard4 c4BufSz = 1024;
         tCIDLib::TCard1 ac1Buf[c4BufSz];
-        TRawMem::SetMemBuf(ac1Buf, tCIDLib::TCard1(0), c4BufSz);
+        TRawMem::SetMemBuf(ac1Buf, kCIDLib::c1MinCard, c4BufSz);
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4InitFreeK; c4Index++)
         {
             if (flToInit.c4WriteBuffer(ac1Buf, c4BufSz) != c4BufSz)
@@ -2022,7 +2022,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::ExpandStore(const tCIDLib::TCard4 c4Needed)
     // Write out up to 8K chunks at a time
     const tCIDLib::TCard8 c8ChunkSize = 8192;
     tCIDLib::TCard1 ac1Buf[c8ChunkSize];
-    TRawMem::SetMemBuf(ac1Buf, tCIDLib::TCard1(0), c8ChunkSize);
+    TRawMem::SetMemBuf(ac1Buf, kCIDLib::c1MinCard, c8ChunkSize);
 
     try
     {

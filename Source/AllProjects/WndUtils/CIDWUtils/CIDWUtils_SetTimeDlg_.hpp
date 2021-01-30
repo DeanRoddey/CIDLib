@@ -43,6 +43,7 @@ class TSetTimeDlg : public TDlgBox
         TSetTimeDlg();
 
         TSetTimeDlg(const TSetTimeDlg&) = delete;
+        TSetTimeDlg(TSetTimeDlg&&) = delete;
 
         ~TSetTimeDlg();
 
@@ -51,6 +52,7 @@ class TSetTimeDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TSetTimeDlg& operator=(const TSetTimeDlg&) = delete;
+        TSetTimeDlg& operator=(TSetTimeDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

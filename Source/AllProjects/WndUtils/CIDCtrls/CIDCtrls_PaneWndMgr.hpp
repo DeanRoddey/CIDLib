@@ -64,6 +64,8 @@ class TPaneWnd
             const   TPaneWnd&               panewSrc
         );
 
+        TPaneWnd(TPaneWnd&&) = default;
+
         ~TPaneWnd();
 
 
@@ -75,6 +77,8 @@ class TPaneWnd
             const   TPaneWnd&               panewSrc
         );
 
+        TPaneWnd& operator=(TPaneWnd&&) = default;
+
         tCIDLib::TVoid operator=
         (
             const   TArea&                  areaToSet
@@ -84,9 +88,9 @@ class TPaneWnd
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TArea& areaCur() const;
+        [[nodiscard]] const TArea& areaCur() const;
 
-        const TArea& areaPrev() const;
+        [[nodiscard]] const TArea& areaPrev() const;
 
         tCIDLib::TBoolean bNewArea
         (
@@ -104,13 +108,13 @@ class TPaneWnd
             const   tCIDLib::TBoolean       bHorz
         )   const;
 
-        tCIDLib::TInt4 i4Bottom() const;
+        [[nodiscard]] tCIDLib::TInt4 i4Bottom() const;
 
-        tCIDLib::TInt4 i4Left() const;
+        [[nodiscard]] tCIDLib::TInt4 i4Left() const;
 
-        tCIDLib::TInt4 i4Right() const;
+        [[nodiscard]] tCIDLib::TInt4 i4Right() const;
 
-        tCIDLib::TInt4 i4Top() const;
+        [[nodiscard]] tCIDLib::TInt4 i4Top() const;
 
         tCIDLib::TVoid JustifyIn
         (
@@ -118,13 +122,13 @@ class TPaneWnd
             , const tCIDLib::TBoolean       bHorz
         );
 
-        TWindow* pwndPane();
+        [[nodiscard]] TWindow* pwndPane();
 
-        const TWindow* pwndPane() const;
+        [[nodiscard]] const TWindow* pwndPane() const;
 
-        const TSize& szInit() const;
+        [[nodiscard]] const TSize& szInit() const;
 
-        const TSize& szMin() const;
+        [[nodiscard]] const TSize& szMin() const;
 
         tCIDLib::TVoid SetBottom
         (
@@ -160,6 +164,10 @@ class TPaneWnd
     private :
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_pwndPane
+        //      The window we represent. We don't own it and do these can be
+        //      copied without any concerns.
         // -------------------------------------------------------------------
         TArea       m_areaCur;
         TArea       m_areaPrev;
@@ -176,7 +184,7 @@ class TPaneWnd
 //
 namespace tCIDCtrls
 {
-    typedef TVector<TPaneWnd>       TPaneList;
+    using TPaneList = TVector<TPaneWnd>;
 }
 
 
@@ -190,16 +198,7 @@ class CIDCTRLSEXP TPaneLayout
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TPaneLayout(const TPaneLayout&) = delete;
-
         virtual ~TPaneLayout();
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TPaneLayout& operator=(const TPaneLayout&) = delete;
-
 
 
         // -------------------------------------------------------------------
@@ -248,6 +247,10 @@ class CIDCTRLSEXP TPaneLayout
         //  Hidden constructors
         // -------------------------------------------------------------------
         TPaneLayout();
+        TPaneLayout(const TPaneLayout&) = delete;
+        TPaneLayout(TPaneLayout&&) = delete;
+        TPaneLayout& operator=(const TPaneLayout&) = delete;
+        TPaneLayout& operator=(TPaneLayout&&) = delete;
 };
 
 
@@ -264,6 +267,7 @@ class CIDCTRLSEXP TPaneLayout2Horz : public TPaneLayout
         TPaneLayout2Horz();
 
         TPaneLayout2Horz(const TPaneLayout2Horz&) = delete;
+        TPaneLayout2Horz(TPaneLayout2Horz&&) = delete;
 
         ~TPaneLayout2Horz();
 
@@ -271,8 +275,8 @@ class CIDCTRLSEXP TPaneLayout2Horz : public TPaneLayout
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TPaneLayout& operator=(const TPaneLayout&) = delete;
-
+        TPaneLayout2Horz& operator=(const TPaneLayout2Horz&) = delete;
+        TPaneLayout2Horz& operator=(TPaneLayout2Horz&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -331,6 +335,7 @@ class CIDCTRLSEXP TPaneLayout2Vert : public TPaneLayout
         TPaneLayout2Vert();
 
         TPaneLayout2Vert(const TPaneLayout2Vert&) = delete;
+        TPaneLayout2Vert(TPaneLayout2Vert&&) = delete;
 
         ~TPaneLayout2Vert();
 
@@ -338,8 +343,8 @@ class CIDCTRLSEXP TPaneLayout2Vert : public TPaneLayout
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TPaneLayout& operator=(const TPaneLayout&) = delete;
-
+        TPaneLayout2Vert& operator=(const TPaneLayout2Vert&) = delete;
+        TPaneLayout2Vert& operator=(TPaneLayout2Vert&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -398,6 +403,7 @@ class CIDCTRLSEXP TPaneLayout3Vert : public TPaneLayout
         TPaneLayout3Vert();
 
         TPaneLayout3Vert(const TPaneLayout3Vert&) = delete;
+        TPaneLayout3Vert(TPaneLayout3Vert&&) = delete;
 
         ~TPaneLayout3Vert();
 
@@ -405,8 +411,8 @@ class CIDCTRLSEXP TPaneLayout3Vert : public TPaneLayout
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TPaneLayout& operator=(const TPaneLayout&) = delete;
-
+        TPaneLayout3Vert& operator=(const TPaneLayout3Vert&) = delete;
+        TPaneLayout3Vert& operator=(TPaneLayout3Vert&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -466,6 +472,7 @@ class CIDCTRLSEXP TPaneWndCont : public TWindow
         TPaneWndCont();
 
         TPaneWndCont(const TPaneWndCont&) = delete;
+        TPaneWndCont(TPaneWndCont&&) = delete;
 
         ~TPaneWndCont();
 
@@ -474,6 +481,7 @@ class CIDCTRLSEXP TPaneWndCont : public TWindow
         //  Public operators
         // -------------------------------------------------------------------
         TPaneWndCont& operator=(const TPaneWndCont&) = delete;
+        TPaneWndCont& operator=(TPaneWndCont&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -488,7 +496,7 @@ class CIDCTRLSEXP TPaneWndCont : public TWindow
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4PaneCount() const;
+        [[nodiscard]] tCIDLib::TCard4 c4PaneCount() const;
 
         tCIDLib::TVoid  CreatePaneCont
         (
@@ -504,7 +512,7 @@ class CIDCTRLSEXP TPaneWndCont : public TWindow
             const   tCIDLib::TBoolean       bEmphDir
         );
 
-        TWindow* pwndPaneAt
+        [[nodiscard]] TWindow* pwndPaneAt
         (
             const   tCIDLib::TCard4         c4At
         );

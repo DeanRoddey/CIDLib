@@ -43,6 +43,7 @@ class TFontSelDlg : public TDlgBox
         TFontSelDlg();
 
         TFontSelDlg(const TFontSelDlg&) = delete;
+        TFontSelDlg(TFontSelDlg&&) = delete;
 
         ~TFontSelDlg();
 
@@ -51,6 +52,7 @@ class TFontSelDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TFontSelDlg& operator=(const TFontSelDlg&) = delete;
+        TFontSelDlg& operator=(TFontSelDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

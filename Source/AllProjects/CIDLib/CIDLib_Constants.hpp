@@ -72,6 +72,12 @@ namespace kCIDLib
 
 
     // -----------------------------------------------------------------------
+    //  A value used by the hash based collections to represent an unset hash
+    // -----------------------------------------------------------------------
+    constexpr tCIDLib::THashVal hshInvalid          = static_cast<tCIDLib::THashVal>(-1);
+
+
+    // -----------------------------------------------------------------------
     //  The name we use for the company name in any of the named resources
     //  we create (which use the TResourceName class.)
     // -----------------------------------------------------------------------
@@ -108,21 +114,21 @@ namespace kCIDLib
 
 namespace tCIDLib
 {
-    CIDLIBEXP tCIDLib::TVoid ThrowAssert
+    [[noreturn]] CIDLIBEXP tCIDLib::TVoid ThrowAssert
     (
         const   tCIDLib::TCh* const pszErr
         , const tCIDLib::TCh* const pszFile
         , const tCIDLib::TCard4     c4Line
     );
 
-    CIDLIBEXP tCIDLib::TVoid ThrowAssert
+    [[noreturn]] CIDLIBEXP tCIDLib::TVoid ThrowAssert
     (
         const   TString&            strErr
         , const tCIDLib::TCh* const pszFile
         , const tCIDLib::TCard4     c4Line
     );
 
-    CIDLIBEXP tCIDLib::TVoid ThrowAssert
+    [[noreturn]] CIDLIBEXP tCIDLib::TVoid ThrowAssert
     (
         const   tCIDLib::TCh* const pszErr
         , const tCIDLib::TCh* const pszFile
@@ -130,7 +136,7 @@ namespace tCIDLib
         , const MFormattable&       mfmtblToken1
     );
 
-    CIDLIBEXP tCIDLib::TVoid ThrowAssert
+    [[noreturn]] CIDLIBEXP tCIDLib::TVoid ThrowAssert
     (
         const   TString&            strErr
         , const tCIDLib::TCh* const pszFile
@@ -138,28 +144,28 @@ namespace tCIDLib
         , const MFormattable&       mfmtblToken1
     );
 
-    CIDLIBEXP tCIDLib::TVoid ThrowPreCond
+    [[noreturn]] CIDLIBEXP tCIDLib::TVoid ThrowPreCond
     (
         const   tCIDLib::TCh* const pszCond
         , const tCIDLib::TCh* const pszFile
         , const tCIDLib::TCard4     c4Line
     );
 
-    CIDLIBEXP tCIDLib::TVoid ThrowPreCond
+    [[noreturn]] CIDLIBEXP tCIDLib::TVoid ThrowPreCond
     (
         const   TString&            strCond
         , const tCIDLib::TCh* const pszFile
         , const tCIDLib::TCard4     c4Line
     );
 
-    CIDLIBEXP tCIDLib::TVoid ThrowPostCond
+    [[noreturn]] CIDLIBEXP tCIDLib::TVoid ThrowPostCond
     (
         const   tCIDLib::TCh* const pszCond
         , const tCIDLib::TCh* const pszFile
         , const tCIDLib::TCard4     c4Line
     );
 
-    CIDLIBEXP tCIDLib::TVoid ThrowPostCond
+    [[noreturn]] CIDLIBEXP tCIDLib::TVoid ThrowPostCond
     (
         const   TString&            strCond
         , const tCIDLib::TCh* const pszFile

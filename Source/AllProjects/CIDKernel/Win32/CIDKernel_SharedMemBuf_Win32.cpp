@@ -530,7 +530,7 @@ tCIDLib::TBoolean TKrnlSharedMemBuf::bZero()
     // Only do the committed part
     TRawMem::SetMemBuf
     (
-        m_pBuffer, tCIDLib::TCard1(0), m_c4AllocatedPages * kCIDLib::c4MemPageSize
+        m_pBuffer, kCIDLib::c1MinCard, m_c4AllocatedPages * kCIDLib::c4MemPageSize
     );
     return kCIDLib::True;
 }

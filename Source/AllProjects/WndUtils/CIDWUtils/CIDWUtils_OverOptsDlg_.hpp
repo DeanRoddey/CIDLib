@@ -43,6 +43,7 @@ class TOverOptsDlg : public TDlgBox
         TOverOptsDlg();
 
         TOverOptsDlg(const TOverOptsDlg&) = delete;
+        TOverOptsDlg(TOverOptsDlg&&) = delete;
 
         ~TOverOptsDlg();
 
@@ -51,6 +52,7 @@ class TOverOptsDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TOverOptsDlg& operator=(const TOverOptsDlg&) = delete;
+        TOverOptsDlg& operator=(TOverOptsDlg&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -59,7 +61,7 @@ class TOverOptsDlg : public TDlgBox
         tCIDWUtils::EOverOpts eRun
         (
             const   TWindow&                wndOwner
-            ,       tCIDLib::TBoolean&      bDoAll
+            , COP   tCIDLib::TBoolean&      bDoAll
             , const TString&                strTarget
             , const tCIDLib::TBoolean       bMultiMode
         );
