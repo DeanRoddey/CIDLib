@@ -1211,7 +1211,7 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             tCIDLib::THashVal hshKey;
             const TNode* pnodeRet = pnodeFind(objToFind, hshKey);
             if (!pnodeRet)
-                return 0;
+                return nullptr;
             return &pnodeRet->objData();
         }
 

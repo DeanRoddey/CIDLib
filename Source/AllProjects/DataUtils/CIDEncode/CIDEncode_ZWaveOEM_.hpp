@@ -41,21 +41,17 @@ class CIDENCODEEXP TZWaveOEMConverter : public TMode1EncodingBase
         // -------------------------------------------------------------------
         TZWaveOEMConverter();
 
-        TZWaveOEMConverter
-        (
-            const   TZWaveOEMConverter&     tcvToCopy
-        );
+        TZWaveOEMConverter(const TZWaveOEMConverter&) = default;
+        TZWaveOEMConverter(TZWaveOEMConverter&&) = default;
 
-        ~TZWaveOEMConverter();
+        ~TZWaveOEMConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TZWaveOEMConverter& operator=
-        (
-            const   TZWaveOEMConverter&     tcvToAssign
-        );
+        TZWaveOEMConverter& operator=(const TZWaveOEMConverter&) = default;
+        TZWaveOEMConverter& operator=(TZWaveOEMConverter&&) = default;
 
 
     private :

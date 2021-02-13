@@ -295,7 +295,7 @@ TSockListenerEng::Initialize(const  tCIDSock::ESockProtos eProtocol
     //  they do the same thing. We just tell each thread instance which mode it is
     //  servicing.
     //
-    tCIDLib::TBoolean bSecureMode;
+    tCIDLib::TBoolean bSecureMode = kCIDLib::False;
     if (m_ippnNonSecure)
     {
         bSecureMode = kCIDLib::False;

@@ -391,7 +391,7 @@ tCIDLib::TVoid TIPAddress::StreamFrom(TBinInStream& strmToReadFrom)
         //  It's the new 4/6 agnostic format. Stream in the type and the
         //  data bytes and set them on the IP address object.
         //
-        tCIDLib::TCard1 ac1Data[kCIDSock::c4MaxIPAddrBytes];
+        tCIDLib::TCard1 ac1Data[kCIDSock::c4MaxIPAddrBytes] = {0, };
         tCIDLib::TCard4 c4Count;
         tCIDSock::EAddrTypes eType;
 
@@ -447,7 +447,7 @@ tCIDLib::TVoid TIPAddress::StreamFrom(TBinInStream& strmToReadFrom)
         //  kernel IP. It will have been stored in the network order, which
         //  is what we want to store in the new form.
         //
-        tCIDLib::TCard4 c4OldAddr;
+        tCIDLib::TCard4 c4OldAddr = 0;
         if (c1FmtVersion == 1)
         {
             // For V1, read the addr into a temp and call the setter method
@@ -833,7 +833,7 @@ TIPEndPoint::hshEndPoint(const tCIDLib::TCard4 c4Modulus) const
     //  We have to come up with some sort of hash here. We will use the bytes
     //  of the IP address data and the port number. Put
     //
-    tCIDLib::TCard1 ac1Data[kCIDSock::c4MaxIPAddrBytes + 4];
+    tCIDLib::TCard1 ac1Data[kCIDSock::c4MaxIPAddrBytes + 4] = {0, };
     tCIDLib::TCard4 c4Sz = kipaThis().c4Count();
 
     // Put the IP address bytes in first

@@ -110,6 +110,9 @@ TRemDiskBrowserImpl::LoadFiles( const   TString&            strPath
                                 ,       TVector<TFindBuf>&  colSubDirs
                                 ,       TVector<TFindBuf>&  colFiles)
 {
+    colFiles.RemoveAll();
+    colSubDirs.RemoveAll();
+
     //
     //  First, load up all the subdirectories, since we always do those, no
     //  matter what file wildcards we have.

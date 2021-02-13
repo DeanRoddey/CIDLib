@@ -41,21 +41,17 @@ class CIDENCODEEXP TPC437Converter : public TMode1EncodingBase
         // -------------------------------------------------------------------
         TPC437Converter();
 
-        TPC437Converter
-        (
-            const   TPC437Converter&        tcvToCopy
-        );
+        TPC437Converter(const TPC437Converter&) = default;
+        TPC437Converter(TPC437Converter&&) = default;
 
-        ~TPC437Converter();
+        ~TPC437Converter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TPC437Converter& operator=
-        (
-            const   TPC437Converter&        tcvToAssign
-        );
+        TPC437Converter& operator=(const TPC437Converter&) = default;
+        TPC437Converter& operator=(TPC437Converter&&) = default;
 
 
     private :

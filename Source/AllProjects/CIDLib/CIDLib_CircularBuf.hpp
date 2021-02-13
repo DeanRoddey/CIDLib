@@ -55,8 +55,6 @@ template <typename TElem> class TCircularBuf
         {
             if (m_c4MaxElements < 4)
                 m_c4MaxElements = 5;
-            else if (m_c4MaxElements > 512)
-                m_c4MaxElements = 513;
 
             //
             //  Allocate the buffer. We really allocate one extra element
@@ -78,6 +76,13 @@ template <typename TElem> class TCircularBuf
             (
                 m_ptElements, cbufSrc.m_ptElements, m_c4MaxElements * sizeof(TElem)
             );
+        }
+
+        TCircularBuf(TCircularBuf<TElem>&& cbufSrc) :
+
+            TCircularBuf(1)
+        {
+            *this = tCIDLib::ForceMove(cbufSrc);
         }
 
         ~TCircularBuf()
@@ -112,6 +117,18 @@ template <typename TElem> class TCircularBuf
             return *this;
         }
 
+        TCircularBuf<TElem>& operator=(TCircularBuf<TElem>&& cbufSrc)
+        {
+            if (this != &cbufSrc)
+            {
+                tCIDLib::Swap(m_c4MaxElements, cbufSrc.m_c4MaxElements);
+                tCIDLib::Swap(m_c4Head, cbufSrc.m_c4Head);
+                tCIDLib::Swap(m_c4Tail, cbufSrc.m_c4Tail);
+                tCIDLib::Swap(m_ptElements, cbufSrc.m_ptElements);
+            }
+            return *this;
+        }
+
         const TElem& operator[](const tCIDLib::TCard4 c4Index) const
         {
             return tAt(c4Index);
@@ -132,7 +149,7 @@ template <typename TElem> class TCircularBuf
             //  If full, then throw out the oldest one. We return whether we threw
             //  out an old one or not.
             //
-            tCIDLib::TBoolean bRet = bCheckFull();
+            const tCIDLib::TBoolean bRet = bCheckFull();
 
             // Stick the new element where the tail is pointing now
             m_ptElements[m_c4Tail] = tToAdd;

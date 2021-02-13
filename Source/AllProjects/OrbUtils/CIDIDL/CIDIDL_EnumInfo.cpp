@@ -1069,7 +1069,7 @@ TCGenEnumInfo::FormatEnumImpl(          TTextOutStream&     strmTar
                 << strFullType
                 << L"* const aeList, const tCIDLib::TCard4 c4Count)\n"
                 << L"{\n"
-                << L"    tCIDLib::TCard4 c4Cur;\n"
+                << L"    tCIDLib::TCard4 c4Cur = 0;\n"
                 << L"    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)\n"
                 << L"    {\n"
                 << L"        strmSrc >> c4Cur;\n"

@@ -1286,6 +1286,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                 }
 
+                CIDLib_Suppress(26429) // the parent will check for null
                 TConstScopeCursor(  const   TMyType* const  pcolToCursor
                                     , const TString&        strStartNode) :
 
@@ -2491,6 +2492,8 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         TNode* pnodeFindNext(TNode* const       pnodeStart
                             , tCIDLib::TCard4&  c4Depth) const
         {
+            CIDAssert(pnodeStart != nullptr, L"Start node is null");
+
             //
             //  If the current node is a non-terminal, then the first thing
             //  we do is iterate down into its children. So, if it has any
@@ -2523,7 +2526,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             //
             pnodeCurParent = pnodeStart->pnodeParent();
             TNode* pnodeCur = nullptr;
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // The current parent becomes the current node
@@ -2636,6 +2639,9 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
         ReplicateNodes( const   TNodeNT* const  pnodeSrcParent
                         ,       TNodeNT* const  pnodeTargetParent)
         {
+            CIDAssert(pnodeSrcParent != nullptr, L"the source parent node is null");
+            CIDAssert(pnodeTargetParent != nullptr, L"the target parent node is null");
+
             //
             //  Go through the children of the source parent node and replicate
             //  each one. If its a non-terminal node, then recurse as we see
@@ -2646,6 +2652,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             {
                 if (pnodeSrc->eType() == tCIDLib::ETreeNodes::Terminal)
                 {
+                    CIDLib_Suppress(26429) // We just checked above, so can't be null
                     const TNodeT* pnodeNewSrc = static_cast<const TNodeT*>(pnodeSrc);
 
                     // Add a new non-terminal, with the same data and name

@@ -361,8 +361,6 @@ TXMLChildCM::FormatTo(          TTextOutStream& strmDest
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TXMLChildCM::BuildDFA()
 {
-    tCIDLib::TCard4 c4Index;
-
     //
     //  The first step we must take is to rewrite the original content spec
     //  node tree into a new tree which is more amenable to the NFA to DFA
@@ -421,8 +419,9 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     //  the lists. Like the other ones, its recursive and works its way
     //  through the tree.
     //
+    tCIDLib::TCard4 c4Index = 0;
     m_pbtsFollowLists = new TBitset[m_c4LeafCount];
-    for (c4Index = 0; c4Index < m_c4LeafCount; c4Index++)
+    for (; c4Index < m_c4LeafCount; c4Index++)
         m_pbtsFollowLists[c4Index].ChangeBitCount(m_c4LeafCount);
     BuildFollowLists(m_pxcmnRoot);
 

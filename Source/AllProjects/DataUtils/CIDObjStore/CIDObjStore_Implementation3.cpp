@@ -116,7 +116,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::BackupStore()
         {
             THeapBuf mbufKey(1024);
             THeapBuf mbufData(32 * 1024);
-            TStoreItemHdr hdrCur;
+            TStoreItemHdr hdrCur{};
 
             for (; cursItems; ++cursItems)
             {
@@ -529,7 +529,7 @@ TCIDObjStoreImpl::ValidateStore(TTextOutStream* const pstrmOut)
     const tCIDLib::TCard4   c4FreeHdrSize = sizeof(TStoreItemFreeHdr);
     const tCIDLib::TCard4   c4Count = colSeqData.c4ElemCount();
     tCIDLib::TCard4         c4CurOfs   = sizeof(TStoreHdr);
-    tCIDLib::TCard4         c4MagicVal;
+    tCIDLib::TCard4         c4MagicVal = 0;
     THeapBuf                mbufData(8192);
     TBinMBufInStream        strmTmp(&mbufData, 0, tCIDLib::EAdoptOpts::NoAdopt);
     TString                 strKey;
@@ -928,8 +928,6 @@ TCIDObjStoreImpl::CommitStoreItem(          TBinaryFile&    flTarget
                                     , const TMemBuf&        mbufKey
                                     , const TString&        strRepoName)
 {
-    tCIDLib::TCard4 c4Written;
-
     //
     //  First fill in a store header and commit that to the store. All
     //  the info we need is in the index item we were passed.
@@ -949,7 +947,7 @@ TCIDObjStoreImpl::CommitStoreItem(          TBinaryFile&    flTarget
 
     // Write the header
     flTarget.SetFilePos(osiToCommit.c4Offset());
-    c4Written = flTarget.c4WriteBuffer(&hdrItem, sizeof(hdrItem));
+    tCIDLib::TCard4 c4Written = flTarget.c4WriteBuffer(&hdrItem, sizeof(hdrItem));
     if (c4Written != sizeof(hdrItem))
     {
         facCIDObjStore().ThrowErr
@@ -1420,8 +1418,8 @@ tCIDLib::TVoid TCIDObjStoreImpl::BuildIndex()
     //  the appropriate list.
     //
     tCIDLib::TCard4         c4MagicVal;
-    TStoreItemHdr           hdrItem;
-    TStoreItemFreeHdr       hdrFree;
+    TStoreItemHdr           hdrItem{};
+    TStoreItemFreeHdr       hdrFree{};
     THeapBuf                mbufData(8192);
     TBinMBufInStream        strmTmp(&mbufData, 0, tCIDLib::EAdoptOpts::NoAdopt);
     TString                 strKey;
@@ -2031,7 +2029,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::ExpandStore(const tCIDLib::TCard4 c4Needed)
         while (c8Inc < c8NewEnd)
         {
             // Either write a whole chunk or a partial
-            tCIDLib::TCard8 c8CurSz;
+            tCIDLib::TCard8 c8CurSz = 0;
             if (c8NewEnd - c8Inc < c8ChunkSize)
                 c8CurSz = c8NewEnd - c8Inc;
             else

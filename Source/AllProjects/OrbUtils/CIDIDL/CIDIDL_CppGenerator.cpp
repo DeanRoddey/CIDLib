@@ -688,7 +688,7 @@ TCppGenerator::BeginServerIntf( const   TString&            strBaseClass
         }
 
         m_strNPList.Append(colCtorParams[c4Index].strName());
-        FormatParam(colCtorParams[c4Index], strTmp, kCIDLib::False);
+        FormatParam(colCtorParams[c4Index], strTmp, kCIDLib::False, kCIDLib::False);
         m_strNList.Append(strTmp);
     }
 
@@ -1145,7 +1145,7 @@ TCppGenerator::GenMethod(const  TString&            strName
                     }
                 }
 
-                FormatParam(mparmCur, strTmp, kCIDLib::True);
+                FormatParam(mparmCur, strTmp, kCIDLib::True, bPollMethod);
                 m_strmHeader << strTmp << kCIDLib::NewLn;
             }
 
@@ -1227,7 +1227,7 @@ TCppGenerator::GenMethod(const  TString&            strName
                     }
                 }
 
-                FormatParam(mparmCur, strTmp, kCIDLib::False);
+                FormatParam(mparmCur, strTmp, kCIDLib::False, bPollMethod);
                 m_strmImpl << strTmp;
             }
 
@@ -1373,7 +1373,7 @@ TCppGenerator::GenMethod(const  TString&            strName
                         }
                     }
 
-                    FormatParam(mparmCur, strTmp, kCIDLib::True);
+                    FormatParam(mparmCur, strTmp, kCIDLib::True, bPollMethod);
                     m_strmHeader << strTmp << kCIDLib::NewLn;
                 }
 
@@ -1638,7 +1638,8 @@ TCppGenerator::GenMethod(const  TString&            strName
 tCIDLib::TVoid
 TCppGenerator::FormatParam( const   TCGenMethodParm&    mparmFmt
                             ,       TString&            strToFill
-                            , const tCIDLib::TBoolean   bHeader)
+                            , const tCIDLib::TBoolean   bHeader
+                            , const tCIDLib::TBoolean   bPollMethod)
 {
     //
     //  If an input parm it's const, as long as it's not not a moveable parm
@@ -1650,6 +1651,17 @@ TCppGenerator::FormatParam( const   TCGenMethodParm&    mparmFmt
         // Hard to do this logic so do the negative and negate
         if (!((m_eMode == tCIDIDL::EOutputs::Server) && mparmFmt.bMoveable()))
             strToFill = L"const ";
+    }
+    else if (mparmFmt.eDir() == tCIDLib::EParmDirs::Out)
+    {
+        // Add the annotation for out parameters if not a poll method
+        if (!bPollMethod)
+            strToFill.Append(L"COP ");
+    }
+     else if (mparmFmt.eDir() == tCIDLib::EParmDirs::InOut)
+    {
+        // Add the annotation for in/out parameters
+        strToFill.Append(L"CIOP ");
     }
 
     // And format the type part to a temp, then append that to the output string

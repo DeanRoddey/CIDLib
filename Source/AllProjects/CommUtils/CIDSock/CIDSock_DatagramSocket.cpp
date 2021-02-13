@@ -124,7 +124,7 @@ TDatagramSocket::c4ReceiveRawFrom(          TIPEndPoint&            ipepFrom
                                     , const tCIDLib::TBoolean       bPeek)
 {
     TKrnlIPAddr         kipaFrom;
-    tCIDLib::TIPPortNum ippnFrom;
+    tCIDLib::TIPPortNum ippnFrom = 0;
 
     //
     //  Wait for up to the timeout period for a datagram packet to arrive.
@@ -393,7 +393,7 @@ tCIDLib::TVoid TClientDatagramSocket::SendWOLBroadcast(const TString& strMACAddr
     //  cheapo cast-based transcoding of the MAC address since we know that
     //  they are all hex digits.
     //
-    tCIDLib::TCard1 ac1MAC[c4BinMACLen];
+    tCIDLib::TCard1 ac1MAC[c4BinMACLen] = {0, };
     TString strTmp;
     for (c4Index = 0; c4Index < c4MACLen; c4Index += 2)
     {

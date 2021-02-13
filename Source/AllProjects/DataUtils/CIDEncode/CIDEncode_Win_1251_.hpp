@@ -41,21 +41,17 @@ class CIDENCODEEXP TWin1251Converter : public TMode1EncodingBase
         // -------------------------------------------------------------------
         TWin1251Converter();
 
-        TWin1251Converter
-        (
-            const   TWin1251Converter&      tcvToCopy
-        );
+        TWin1251Converter(const TWin1251Converter&) = default;
+        TWin1251Converter(TWin1251Converter&&) = default;
 
-        ~TWin1251Converter();
+        ~TWin1251Converter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TWin1251Converter& operator=
-        (
-            const   TWin1251Converter&      tcvToAssign
-        );
+        TWin1251Converter& operator=(const TWin1251Converter&) = default;
+        TWin1251Converter& operator=(TWin1251Converter&&) = default;
 
 
     private :

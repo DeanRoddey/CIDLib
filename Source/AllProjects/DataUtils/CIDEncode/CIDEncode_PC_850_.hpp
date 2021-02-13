@@ -42,21 +42,17 @@ class CIDENCODEEXP TPC850Converter : public TMode1EncodingBase
         // -------------------------------------------------------------------
         TPC850Converter();
 
-        TPC850Converter
-        (
-            const   TPC850Converter&       tcvToCopy
-        );
+        TPC850Converter(const TPC850Converter&) = default;
+        TPC850Converter(TPC850Converter&&) = default;
 
-        ~TPC850Converter();
+        ~TPC850Converter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TPC850Converter& operator=
-        (
-            const   TPC850Converter&       tcvToAssign
-        );
+        TPC850Converter& operator=(const TPC850Converter&) = default;
+        TPC850Converter& operator=(TPC850Converter&&) = default;
 
 
     private :

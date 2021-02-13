@@ -50,6 +50,8 @@ template <typename T> class TFundStack : public TFundColBase, public MDuplicable
             , m_ptElements(nullptr)
         {
             // Allocate the buffer
+            if (m_c4MaxElements == 0)
+                m_c4MaxElements = 1;
             m_ptElements = new T[m_c4MaxElements];
         }
 
@@ -64,6 +66,13 @@ template <typename T> class TFundStack : public TFundColBase, public MDuplicable
             TRawMem::CopyMemBuf(m_ptElements, fcolSrc.m_ptElements, m_c4Top * sizeof(T));
         }
 
+        TFundStack(TFundStack<T>&& fcolSrc) :
+
+            TFundStack(1)
+        {
+            *this = tCIDLib::ForceMove(fcolSrc);
+        }
+
         ~TFundStack()
         {
             delete [] m_ptElements;
@@ -74,8 +83,6 @@ template <typename T> class TFundStack : public TFundColBase, public MDuplicable
         // --------------------------------------------------------------------
         //  Public operators
         // --------------------------------------------------------------------
-        TFundStack<T>& operator=(TFundStack<T>&& fcolSrc) = delete;
-
         TFundStack<T>& operator=(const TFundStack<T>& fcolSrc)
         {
             if (this == &fcolSrc)
@@ -93,6 +100,18 @@ template <typename T> class TFundStack : public TFundColBase, public MDuplicable
             m_c4Top = fcolSrc.m_c4Top;
             TRawMem::CopyMemBuf(m_ptElements, fcolSrc.m_ptElements, m_c4Top * sizeof(T));
 
+            return *this;
+        }
+
+        TFundStack<T>& operator=(TFundStack<T>&& fcolSrc)
+        {
+            if (&fcolSrc != this)
+            {
+                TParent::operator=(tCIDLib::ForceMove(fcolSrc));
+                tCIDLib::Swap(m_c4MaxElements, fcolSrc.m_c4MaxElements);
+                tCIDLib::Swap(m_c4Top, fcolSrc.m_c4Top);
+                tCIDLib::Swap(m_ptElements, fcolSrc.m_ptElements);
+            }
             return *this;
         }
 
@@ -314,7 +333,7 @@ operator>>(TBinInStream& strmToReadFrom, TFundStack<T>& colToStream)
     if (colToStream.m_c4MaxElements != c4NewMax)
     {
         delete [] colToStream.m_ptElements;
-        colToStream.m_ptElements = 0;
+        colToStream.m_ptElements = nullptr;
         colToStream.m_ptElements = new T[c4NewMax];
         colToStream.m_c4MaxElements = c4NewMax;
     }

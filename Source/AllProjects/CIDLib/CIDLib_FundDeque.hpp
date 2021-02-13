@@ -88,7 +88,12 @@ template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
             );
         }
 
-        TFundDeque(TFundDeque<T>&&) = delete;
+        TFundDeque(TFundDeque<T>&& fcolSrc) :
+
+            TFundDeque(1)
+        {
+            *this = tCIDLib::ForceMove(fcolSrc);
+        }
 
         ~TFundDeque()
         {
@@ -100,8 +105,6 @@ template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
         // --------------------------------------------------------------------
         //  Public operators
         // --------------------------------------------------------------------
-        TFundDeque<T>& operator=(TFundDeque<T>&&) = delete;
-
         TFundDeque<T>& operator=(const TFundDeque<T>& fcolSrc)
         {
             if (this != &fcolSrc)
@@ -119,6 +122,18 @@ template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
                 (
                     m_ptElements, fcolSrc.m_ptElements, m_c4MaxElements * sizeof(T)
                 );
+            }
+            return *this;
+        }
+
+        TFundDeque<T>& operator=(TFundDeque<T>&& fcolSrc)
+        {
+            if (&fcolSrc != this)
+            {
+                tCIDLib::Swap(m_c4MaxElements, fcolSrc.m_c4MaxElements);
+                tCIDLib::Swap(m_c4Head, fcolSrc.m_c4Head);
+                tCIDLib::Swap(m_c4Tail, fcolSrc.m_c4Tail);
+                tCIDLib::Swap(m_ptElements, fcolSrc.m_ptElements);
             }
             return *this;
         }
@@ -147,6 +162,7 @@ template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
             tCIDLib::TCard4 c4SrcInd = fcolSrc.m_c4Head;
             const tCIDLib::TCard4 c4SrcMax = fcolSrc.m_c4MaxElements;
             const T* const ptSrc = fcolSrc.m_ptElements;
+            CIDAssert(ptSrc != nullptr, L"Source elements list is null");
 
             while (c4ThisInd != m_c4Tail)
             {

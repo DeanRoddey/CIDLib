@@ -86,30 +86,6 @@ TLatin1Converter::TLatin1Converter() :
 {
 }
 
-TLatin1Converter::TLatin1Converter(const TLatin1Converter& tcvtToCopy) :
-
-    TTextConverter(tcvtToCopy)
-{
-}
-
-TLatin1Converter::~TLatin1Converter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TLatin1Converter: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TLatin1Converter&
-TLatin1Converter::operator=(const TLatin1Converter& tcvtToAssign)
-{
-    if (this == &tcvtToAssign)
-        return *this;
-
-    TParent::operator=(tcvtToAssign);
-    return *this;
-}
-
 
 // ---------------------------------------------------------------------------
 //  TLatinConverter: Public, inherited methods

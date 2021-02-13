@@ -752,10 +752,8 @@ class CIDLIBEXP TFundColBase : public TCollectionBase
 
         TFundColBase(const TFundColBase&)  = default;
         TFundColBase& operator=(const TFundColBase&) = default;
-
-        // No move support, it's too complicated
-        TFundColBase(TFundColBase&&)  = delete;
-        TFundColBase& operator=(TFundColBase&&) = delete;
+        TFundColBase(TFundColBase&&)  = default;
+        TFundColBase& operator=(TFundColBase&&) = default;
 
 
     private :

@@ -156,7 +156,7 @@ TCfgServerClient::bAddOrUpdate( const   TString&            strKey
                                 , const MStreamable&        strmblToAdd
                                 , const tCIDLib::TCard4     c4Reserve)
 {
-    tCIDLib::TBoolean bRet;
+    tCIDLib::TBoolean bRet = kCIDLib::False;
     try
     {
         m_strmOut.Reset();
@@ -291,7 +291,7 @@ TCfgServerClient::bReadObject(  const   TString&            strKey
                                 ,       MStreamable&        strmblToFill
                                 ,       tCIDLib::TCard4&    c4Version)
 {
-    tCIDLib::TBoolean bNewData;
+    tCIDLib::TBoolean bNewData = kCIDLib::False;
     try
     {
         //
@@ -375,7 +375,7 @@ tCIDLib::TCard4
 TCfgServerClient::c4UpdateObject(const  TString&        strKey
                                 , const MStreamable&    strmblToUpdate)
 {
-    tCIDLib::TCard4 c4Ret;
+    tCIDLib::TCard4 c4Ret = 0;
     try
     {
         m_strmOut.Reset();
@@ -389,20 +389,13 @@ TCfgServerClient::c4UpdateObject(const  TString&        strKey
         {
             const tCIDLib::TCard4 c4Count = m_pcrypToUse->c4Encrypt
             (
-                m_mbufIO
-                , m_mbufIO2
-                , m_strmOut.c4CurPos()
+                m_mbufIO, m_mbufIO2, m_strmOut.c4CurPos()
             );
             c4Ret = orbcProxy().c4UpdateObject(strKey, c4Count, m_mbufIO2);
         }
          else
         {
-            c4Ret = orbcProxy().c4UpdateObject
-            (
-                strKey
-                , m_strmOut.c4CurPos()
-                , m_mbufIO
-            );
+            c4Ret = orbcProxy().c4UpdateObject(strKey, m_strmOut.c4CurPos(), m_mbufIO);
         }
 
     }
@@ -472,7 +465,7 @@ TCfgServerClient::eReadObject(  const   TString&            strKey
                                 ,       tCIDLib::TCard4&    c4Version
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
-    tCIDLib::ELoadRes eRes;
+    tCIDLib::ELoadRes eRes = tCIDLib::ELoadRes::NotFound;
     try
     {
         //

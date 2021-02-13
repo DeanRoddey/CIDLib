@@ -143,28 +143,6 @@ TMode1EncodingBase
 {
 }
 
-TMode1EncodingBase::TMode1EncodingBase(const TMode1EncodingBase& tcvtToCopy) :
-
-    TTextConverter(tcvtToCopy)
-    , m_achToWide(tcvtToCopy.m_achToWide)
-    , m_acmFromWide(tcvtToCopy.m_acmFromWide)
-    , m_c4FromMapSize(tcvtToCopy.m_c4FromMapSize)
-{
-}
-
-TMode1EncodingBase&
-TMode1EncodingBase::operator=(const TMode1EncodingBase& tcvtToAssign)
-{
-    if (this != &tcvtToAssign)
-    {
-        TParent::operator=(tcvtToAssign);
-        m_achToWide     = tcvtToAssign.m_achToWide;
-        m_acmFromWide   = tcvtToAssign.m_acmFromWide;
-        m_c4FromMapSize = tcvtToAssign.m_c4FromMapSize;
-    }
-    return *this;
-}
-
 
 // ---------------------------------------------------------------------------
 //  TMode1EncodingBase: Protected, inherited methods

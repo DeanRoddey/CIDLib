@@ -163,6 +163,7 @@ class TCppGenerator : public TCodeGenerator
             const   TCGenMethodParm&        mparmFmt
             ,       TString&                strToFill
             , const tCIDLib::TBoolean       bHeader
+            , const tCIDLib::TBoolean       bPollMethod
         );
 
         tCIDLib::TVoid FormatType

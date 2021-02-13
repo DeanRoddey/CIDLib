@@ -315,9 +315,16 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                 {
                 }
 
-                TNonConstCursor(const TNonConstCursor& cursSrc)
+                TNonConstCursor(const TNonConstCursor& cursSrc) :
+
+                    TParent(cursSrc)
+                    , m_pcolNCCursoring(cursSrc.m_pcolNCCursoring)
                 {
-                    operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc)
+                {
+                    *this = operator=(tCIDLib::ForceMove(cursSrc));
                 }
 
                 ~TNonConstCursor()
@@ -335,6 +342,16 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                         TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
+                    }
+                    return *this;
+                }
+
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
                     }
                     return *this;
                 }
@@ -672,6 +689,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
 
             // Get a pointer to the first node
             TNode* pnodeHead = static_cast<TNode*>(m_llstCol.pnodeHead());
+            CIDAssert(pnodeHead != nullptr, L"Head pointer is null");
 
             // Get a copy of the stored object
             TElem* pobjRet = pnodeHead->pobjData();
@@ -707,6 +725,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
 
             // Get a pointer to the last node
             TNode* pnodeLast = static_cast<TNode*>(m_llstCol.pnodeTail());
+            CIDAssert(pnodeLast != nullptr, L"Last node is null");
 
             // Get a copy of the stored object
             TElem* pobjRet = pnodeLast->pobjData();
@@ -733,7 +752,8 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                 this->ColIsEmpty(CID_FILE, CID_LINE);
 
             // Get a pointer to the first node and return a ref to the data
-            TNode* pnodeFirst = static_cast<TNode*>(m_llstCol.pnodeHead());
+            TNode* const pnodeFirst = static_cast<TNode*>(m_llstCol.pnodeHead());
+            CIDAssert(pnodeFirst != nullptr, L"First node is null");
             return pnodeFirst->pobjData();
         }
 
@@ -746,7 +766,8 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                 this->ColIsEmpty(CID_FILE, CID_LINE);
 
             // Get a pointer to the first node and return a ref to the data
-            TNode* pnodeFirst = static_cast<TNode*>(m_llstCol.pnodeHead());
+            TNode* const pnodeFirst = static_cast<TNode*>(m_llstCol.pnodeHead());
+            CIDAssert(pnodeFirst != nullptr, L"First node is null");
             return pnodeFirst->pobjData();
         }
 
@@ -759,7 +780,8 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                 this->ColIsEmpty(CID_FILE, CID_LINE);
 
             // Get a pointer to the last node and return a ref to the data
-            TNode* pnodeLast = static_cast<TNode*>(m_llstCol.pnodeTail());
+            TNode* const pnodeLast = static_cast<TNode*>(m_llstCol.pnodeTail());
+            CIDAssert(pnodeLast != nullptr, L"Last node is null");
             return pnodeLast->pobjData();
         }
 
@@ -772,7 +794,8 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                 this->ColIsEmpty(CID_FILE, CID_LINE);
 
             // Get a pointer to the last node and return a ref to the data
-            TNode* pnodeLast = static_cast<TNode*>(m_llstCol.pnodeTail());
+            TNode* const pnodeLast = static_cast<TNode*>(m_llstCol.pnodeTail());
+            CIDAssert(pnodeLast != nullptr, L"Last node is null");
             return pnodeLast->pobjData();
         }
 
@@ -786,7 +809,7 @@ template <typename TElem> class TBasicDLinkedRefCol : public TRefCollection<TEle
                 this->NotMyCursor(cursAt.clsIsA(), clsIsA(), CID_FILE, CID_LINE);
 
             // Get the node to flush and then move the cursor past it
-            TNode* pnodeToRemove = cursAt.pnodeCur();
+            TNode* const pnodeToRemove = cursAt.pnodeCur();
             cursAt.bNext();
 
             // Now flush the target node

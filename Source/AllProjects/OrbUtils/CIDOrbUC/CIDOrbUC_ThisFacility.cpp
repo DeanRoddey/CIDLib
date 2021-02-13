@@ -837,7 +837,7 @@ TFacCIDOrbUC::SetNSEndPoint(const   TString&            strHost
 // Checks that the passed name server scope is basically well formed
 tCIDLib::TVoid TFacCIDOrbUC::ValidateNSScopePath(const TString& strToVal)
 {
-    tCIDLib::TCard4 c4Ofs;
+    tCIDLib::TCard4 c4Ofs = 0;
     if (strToVal.bIsEmpty()
     || (strToVal.chLast() == kCIDLib::chForwardSlash)
     || !strToVal.bLastOccurrence(kCIDLib::chForwardSlash, c4Ofs)

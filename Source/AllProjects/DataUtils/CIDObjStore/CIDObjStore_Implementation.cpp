@@ -756,6 +756,9 @@ TCIDObjStoreImpl::eReadObject(  const   TString&            strKey
                                 ,       tCIDLib::TCard4&    c4KeySize
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
+    c4DataSize = 0;
+    c4KeySize = 0;
+
     //
     //  Find the item with this key. Either throw or return not found, if we don't
     //  find it.

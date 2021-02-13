@@ -653,6 +653,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
             , m_c4HashModulus(c4Modulus)
             , m_kopsToUse(kopsToUse)
         {
+            CIDAssert(c4Modulus != 0, L"The hash modulus cannot be zero")
             try
             {
                 // Allocate and initialize the bucket array
@@ -710,7 +711,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         }
 
         // Do a minimial setup and then call the move operator
-        THashMap(TMyType& colSrc) :
+        THashMap(TMyType&& colSrc) :
 
             TMapCollection<TElem, TKey>(colSrc.eMTSafe())
             , m_apBuckets(nullptr)
@@ -719,11 +720,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
             , m_kopsToUse(colSrc.m_kopsToUse)
         {
             m_apBuckets = new TNode*[m_c4HashModulus];
-            TRawMem::SetMemBuf
-            (
-                m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * m_c4HashModulus
-            );
-
+            TRawMem::SetMemBuf(m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * m_c4HashModulus);
             *this = tCIDLib::ForceMove(colSrc);
         }
 
@@ -1208,6 +1205,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
 
             // Get the node to flush
             TNode* pnodeToRemove = cursAt.pnodeCur();
+            CIDAssert(pnodeToRemove != nullptr, L"The node to remove is null");
 
             //
             //  We have to get the bucket for the current element and find the
@@ -1317,13 +1315,14 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         {
             // Start at the last bucket and work back
             tCIDLib::TCard4 c4BucketInd = m_c4HashModulus - 1;
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we find a non-empty bucket, find its last node
                 if (m_apBuckets[c4BucketInd])
                 {
                     TNode* pnodeCur = m_apBuckets[c4BucketInd];
+                    CIDAssert(pnodeCur != nullptr, L"The current node is null");
                     while (pnodeCur->pnodeNext())
                         pnodeCur = pnodeCur->pnodeNext();
                     hshToUpdate = c4BucketInd;
@@ -1341,13 +1340,15 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
         CIDLib_Suppress(26461) // Can't make last node const
         TNode* pnodeFindNext(TNode* const pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
+            CIDAssert(pnodeLast != nullptr, L"Last node parameter is null");
+
             // Move up to the next node
             TNode* pnodeCur = pnodeLast->pnodeNext();
             if (pnodeCur)
                 return pnodeCur;
 
             // Search subsequent bucket for non-empty one
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we hit the end of buckets, then we are done
@@ -1374,7 +1375,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 return pnodeCur;
 
             // Search previous buckets for non-empty one
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we hit the start of buckets, then we are done
@@ -1472,7 +1473,7 @@ template <typename TElem, class TKey, class TKeyOps> class THashMap
                 while (pnodeSrc)
                 {
                     // Replicate this bucket's nodes
-                    pnodeCur = new TNode(pnodeSrc->objPair(), 0);
+                    pnodeCur = new TNode(pnodeSrc->objPair(), nullptr);
 
                     //
                     //  Set last node's next to this one, if there was a

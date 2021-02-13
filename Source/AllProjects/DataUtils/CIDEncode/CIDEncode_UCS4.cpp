@@ -66,34 +66,6 @@ TUCS4Converter::TUCS4Converter(const tCIDLib::EEndianModes eMode) :
     #endif
 }
 
-TUCS4Converter::TUCS4Converter(const TUCS4Converter& tcvtToCopy) :
-
-    TTextConverter(tcvtToCopy)
-    , m_bSwapped(tcvtToCopy.m_bSwapped)
-    , m_eMode(tcvtToCopy.m_eMode)
-{
-}
-
-TUCS4Converter::~TUCS4Converter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUCS4Converter: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TUCS4Converter&
-TUCS4Converter::operator=(const TUCS4Converter& tcvtToAssign)
-{
-    if (this == &tcvtToAssign)
-        return *this;
-
-    TParent::operator=(tcvtToAssign);
-    m_bSwapped = tcvtToAssign.m_bSwapped;
-    m_eMode = tcvtToAssign.m_eMode;
-    return *this;
-}
-
 
 // ---------------------------------------------------------------------------
 //  TUCS4Converter: Public, inherited methods
@@ -307,32 +279,6 @@ TUCS4BEConverter::TUCS4BEConverter() :
 {
 }
 
-TUCS4BEConverter::TUCS4BEConverter(const TUCS4BEConverter& tcvtToCopy) :
-
-    TUCS4Converter(tcvtToCopy)
-{
-}
-
-TUCS4BEConverter::~TUCS4BEConverter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUCS4BEConverter: Public operators
-// ---------------------------------------------------------------------------
-TUCS4BEConverter&
-TUCS4BEConverter::operator=(const TUCS4BEConverter& tcvtToAssign)
-{
-    if (this == &tcvtToAssign)
-        return *this;
-
-    TParent::operator=(tcvtToAssign);
-    return *this;
-}
-
-
-
 // ---------------------------------------------------------------------------
 //  TUCS4LEConverter: Constructors and Destructor
 // ---------------------------------------------------------------------------
@@ -341,29 +287,4 @@ TUCS4LEConverter::TUCS4LEConverter() :
     TUCS4Converter(tCIDLib::EEndianModes::Little)
 {
 }
-
-TUCS4LEConverter::TUCS4LEConverter(const TUCS4LEConverter& tcvtToCopy) :
-
-    TUCS4Converter(tcvtToCopy)
-{
-}
-
-TUCS4LEConverter::~TUCS4LEConverter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUCS4LEConverter: Public operators
-// ---------------------------------------------------------------------------
-TUCS4LEConverter&
-TUCS4LEConverter::operator=(const TUCS4LEConverter& tcvtToAssign)
-{
-    if (this == &tcvtToAssign)
-        return *this;
-
-    TParent::operator=(tcvtToAssign);
-    return *this;
-}
-
 

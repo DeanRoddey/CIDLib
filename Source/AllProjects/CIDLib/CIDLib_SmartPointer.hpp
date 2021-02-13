@@ -829,9 +829,15 @@ template <typename T> class TCntPtr
             TCntPtrData<T>* pcdTmp = m_pcdRef;
             m_pcdRef = new TCntPtrDataDefDel<T>(nullptr, kCIDLib::True);
 
-            // If no more refs of either type left, then clean up the pointer data
-            if (!pcdTmp->bReleaseStrongRef())
-                delete pcdTmp;
+            //
+            //  If no more refs of either type left, then clean up the pointer data. Just
+            //  in case it's been moved from, check for null.
+            //
+            if (pcdTmp)
+            {
+                if (!pcdTmp->bReleaseStrongRef())
+                    delete pcdTmp;
+            }
         }
 
         T* pobjData()
@@ -853,9 +859,15 @@ template <typename T> class TCntPtr
             TCntPtrData<T>* pcdTmp = m_pcdRef;
             m_pcdRef = new TCntPtrDataDefDel<T>(pobjNew, kCIDLib::True);
 
-            // If no more refs of either type left, then clean up the pointer data
-            if (!pcdTmp->bReleaseStrongRef())
-                delete pcdTmp;
+            //
+            //  If no more refs of either type left, then clean up the pointer data. Just in
+            //  case it's been moved, check for null.
+            //
+            if (pcdTmp)
+            {
+                if (!pcdTmp->bReleaseStrongRef())
+                    delete pcdTmp;
+            }
         }
 
         template <typename TDeleter>
@@ -868,9 +880,15 @@ template <typename T> class TCntPtr
             TCntPtrData<T>* pcdTmp = m_pcdRef;
             m_pcdRef = new TCntPtrDataDel<T,TDeleter>(pobjNew, kCIDLib::True, fnDeleter);
 
-            // If no more refs of either type left, then clean up the pointer data
-            if (!pcdTmp->bReleaseStrongRef())
-                delete pcdTmp;
+            //
+            //  If no more refs of either type left, then clean up the pointer data. Just in
+            //  case it's been moved, check for null.
+            //
+            if (pcdTmp)
+            {
+                if (!pcdTmp->bReleaseStrongRef())
+                    delete pcdTmp;
+            }
         }
 
 

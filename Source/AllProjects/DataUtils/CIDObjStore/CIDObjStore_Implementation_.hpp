@@ -339,16 +339,16 @@ class TCIDObjStoreImpl : public TObject
         tCIDLib::TBoolean bLoadItemData
         (
             const   TOSStoreItem&           osiToLoad
-            ,       TMemBuf&                mbufToFill
-            ,       TMemBuf&                mbufKeyFill
-            ,       TStoreItemHdr&          hdrToFill
+            , COP   TMemBuf&                mbufToFill
+            , COP   TMemBuf&                mbufKeyFill
+            , COP   TStoreItemHdr&          hdrToFill
         );
 
         tCIDLib::TBoolean bLoadItemData
         (
             const   TOSStoreItem&           osiToLoad
-            ,       TMemBuf&                mbufToFill
-            ,       TStoreItemHdr&          hdrToFill
+            , COP   TMemBuf&                mbufToFill
+            , COP   TStoreItemHdr&          hdrToFill
         );
 
         tCIDLib::TVoid BuildIndex();
@@ -356,8 +356,8 @@ class TCIDObjStoreImpl : public TObject
         tCIDLib::TCard4 c4CreateSeqData
         (
                     TVector<TOSSeqData>&    colToFill
-            ,       tCIDLib::TCard4&        c4IndexItems
-            ,       tCIDLib::TCard4&        c4FreeItems
+            , COP   tCIDLib::TCard4&        c4IndexItems
+            , COP   tCIDLib::TCard4&        c4FreeItems
             , const tCIDLib::TCard4         c4TargetOfs
         );
 
@@ -371,8 +371,8 @@ class TCIDObjStoreImpl : public TObject
         tCIDLib::TCard4 c4FindFreeSpace
         (
             const   tCIDLib::TCard4         c4Needed
-            ,       tCIDLib::TCard4&        c4ActualSz
-            ,       tCIDLib::TCard4&        c4Offset
+            , COP   tCIDLib::TCard4&        c4ActualSz
+            , COP   tCIDLib::TCard4&        c4Offset
         );
 
         tCIDLib::TVoid Compact
