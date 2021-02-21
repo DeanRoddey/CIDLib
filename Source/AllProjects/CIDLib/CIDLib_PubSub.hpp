@@ -105,9 +105,81 @@
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 // Forward reference our internal implementation classes
-class TPSMsg;
 class TPSTopic;
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TPSMsg
+// PREFIX: psmsg
+//
+//  Our internal wrapper around msgs. The public message class creates a counted pointer
+//  around one of these, which will clean us up once the last msg object that refs this
+//  msg is released. We need this extra layer so we can store some other info that is
+//  not part of the msg object.
+// ---------------------------------------------------------------------------
+class TPSMsg
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor.
+        // -------------------------------------------------------------------
+        TPSMsg() = delete;
+
+        TPSMsg
+        (
+            const   TObject* const      pobjToAdopt
+            , const tCIDLib::TCard4     c4MsgId
+            , const TString&            strTopicPath
+        );
+
+        TPSMsg(const TPSMsg&) = delete;
+        TPSMsg(TPSMsg&&) = delete;
+
+        ~TPSMsg();
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TPSMsg& operator=(const TPSMsg&) = delete;
+        TPSMsg& operator=(TPSMsg&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TCard4 c4MsgId() const
+        {
+            return m_c4MsgId;
+        }
+
+        const TObject& objMsg() const
+        {
+            return *m_pobjMsg;
+        }
+
+        const TString& strTopicPath() const
+        {
+            return m_strTopicPath;
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_c4MsgId
+        //      Our topic assigns each msg an id from a monotonic counter.
+        //
+        //  m_pobjMsg
+        //      The actual msg object. We own it and delete it when we are deleted.
+        //
+        //  m_strTopicPath
+        //      The id of the topic that issued the msg
+        // -------------------------------------------------------------------
+        tCIDLib::TCard4     m_c4MsgId;
+        const TObject*      m_pobjMsg;
+        TString             m_strTopicPath;
+};
 
 
 // ---------------------------------------------------------------------------

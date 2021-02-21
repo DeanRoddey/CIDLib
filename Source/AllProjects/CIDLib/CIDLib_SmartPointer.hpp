@@ -590,6 +590,7 @@ template <typename T, typename TDeleter> class TCntPtrDataDel : public TCntPtrDa
         }
 
         TCntPtrDataDel(const TCntPtrDataDel<T,TDeleter>&) = delete;
+        TCntPtrDataDel(TCntPtrDataDel<T,TDeleter>&&) = delete;
 
         ~TCntPtrDataDel() = default;
 
@@ -598,6 +599,7 @@ template <typename T, typename TDeleter> class TCntPtrDataDel : public TCntPtrDa
         //  Public operators
         // -------------------------------------------------------------------
         TCntPtrDataDel<T,TDeleter>& operator=(const TCntPtrDataDel<T,TDeleter>&) = delete;
+        TCntPtrDataDel<T,TDeleter>& operator=(TCntPtrDataDel<T,TDeleter>&&) = delete;
 
 
     protected :
@@ -635,6 +637,7 @@ template <typename T> class TCntPtrDataDefDel : public TCntPtrData<T>
         }
 
         TCntPtrDataDefDel(const TCntPtrDataDefDel<T>&) = delete;
+        TCntPtrDataDefDel(TCntPtrDataDefDel<T>&&) = delete;
 
         ~TCntPtrDataDefDel() = default;
 
@@ -643,6 +646,7 @@ template <typename T> class TCntPtrDataDefDel : public TCntPtrData<T>
         //  Public operators
         // -------------------------------------------------------------------
         TCntPtrDataDefDel<T>& operator=(const TCntPtrDataDefDel<T>&) = delete;
+        TCntPtrDataDefDel<T>& operator=(TCntPtrDataDefDel<T>&&) = delete;
 
 
     protected :
@@ -699,9 +703,6 @@ template <typename T> class TCntPtr
 
             m_pcdRef(nullptr)
         {
-            CIDAssert(cptrSrc.m_pcdRef != nullptr, L"Source cnt pointer has no pointer data");
-
-            // Acquire a strong ref and take his pointer data
             if (!cptrSrc.m_pcdRef->bAcquireStrongRef())
                 TSmartPtrHelpers::CantAcquireStrongRef(CID_LINE);
             m_pcdRef = cptrSrc.m_pcdRef;
@@ -709,7 +710,7 @@ template <typename T> class TCntPtr
 
         TCntPtr(TCntPtr<T>&& cptrSrc) :
 
-            m_pcdRef(nullptr)
+            m_pcdRef(new TCntPtrDataDefDel<T>(nullptr, kCIDLib::True))
         {
             *this = tCIDLib::ForceMove(cptrSrc);
         }
@@ -717,7 +718,6 @@ template <typename T> class TCntPtr
         ~TCntPtr()
         {
             TCntPtrData<T>* pcdTmp = m_pcdRef;
-            CIDAssert(pcdTmp != nullptr, L"The cnt pointer dtor has no pointer data");
             m_pcdRef = nullptr;
             try
             {
@@ -777,7 +777,6 @@ template <typename T> class TCntPtr
         {
             if (this != &cptrSrc)
             {
-                // Make sure we can get a ref to his before we commit
                 if (!cptrSrc.m_pcdRef->bAcquireStrongRef())
                     TSmartPtrHelpers::CantAcquireStrongRef(CID_LINE);
 
@@ -859,15 +858,9 @@ template <typename T> class TCntPtr
             TCntPtrData<T>* pcdTmp = m_pcdRef;
             m_pcdRef = new TCntPtrDataDefDel<T>(pobjNew, kCIDLib::True);
 
-            //
-            //  If no more refs of either type left, then clean up the pointer data. Just in
-            //  case it's been moved, check for null.
-            //
-            if (pcdTmp)
-            {
-                if (!pcdTmp->bReleaseStrongRef())
-                    delete pcdTmp;
-            }
+            //  If no more refs of either type left, then clean up the pointer data
+            if (!pcdTmp->bReleaseStrongRef())
+                delete pcdTmp;
         }
 
         template <typename TDeleter>

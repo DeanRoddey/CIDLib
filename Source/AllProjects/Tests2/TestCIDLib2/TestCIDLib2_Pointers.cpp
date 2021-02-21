@@ -158,6 +158,29 @@ TTest_CntPtr1::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWarni
         }
     }
 
+    // Do a move test, which should leave the original null
+    cptrTest1.SetPointer(new TString(L"Testing"));
+    TCntPtr<TString> cptrTest2 = tCIDLib::ForceMove(cptrTest1);
+
+    if (cptrTest1)
+    {
+        strmOut << TFWCurLn << L"Move did not null the original";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    if ((cptrTest1.c4StrongCount() != 0) || (cptrTest1.c4WeakCount() != 0))
+    {
+        strmOut << TFWCurLn << L"Move did not leave src with zero counts";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
+    // And the new one should have the string
+    if (*cptrTest2 != L"Testing")
+    {
+        strmOut << TFWCurLn << L"Moved to object did not have the original value";
+        return tTestFWLib::ETestRes::Failed;
+    }
+
     return tTestFWLib::ETestRes::Success;
 }
 
