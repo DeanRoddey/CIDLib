@@ -168,9 +168,9 @@ TTest_CntPtr1::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWarni
         return tTestFWLib::ETestRes::Failed;
     }
 
-    if ((cptrTest1.c4StrongCount() != 0) || (cptrTest1.c4WeakCount() != 0))
+    if ((cptrTest1.c4StrongCount() != 1) || (cptrTest1.c4WeakCount() != 0))
     {
-        strmOut << TFWCurLn << L"Move did not leave src with zero counts";
+        strmOut << TFWCurLn << L"Move did not leave src with 1 strong, 0 weak";
         return tTestFWLib::ETestRes::Failed;
     }
 
