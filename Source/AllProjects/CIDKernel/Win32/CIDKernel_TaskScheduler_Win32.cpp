@@ -69,7 +69,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
         , NULL
         , CLSCTX_INPROC_SERVER
         , IID_ITaskService
-        , (void**)&pService
+        , tCIDLib::pToVoidPP(&pService)
     );
 
     if (FAILED(hRes))
@@ -207,7 +207,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
             case EStartTypes::OnLogon :
             {
                 ILogonTrigger* pLTrigger = nullptr;
-                hRes = pTrigger->QueryInterface(IID_ILogonTrigger, (void**)&pLTrigger);
+                hRes = pTrigger->QueryInterface(IID_ILogonTrigger, tCIDLib::pToVoidPP(&pLTrigger));
                 if (FAILED(hRes))
                 {
                     TKrnlError::SetLastKrnlError(kKrnlErrs::errcSchTask_SetupErr, hRes);
@@ -225,7 +225,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
             case EStartTypes::OnBoot :
             {
                 IBootTrigger* pBTrigger = 0;
-                hRes = pTrigger->QueryInterface(IID_IBootTrigger, (void**)&pBTrigger);
+                hRes = pTrigger->QueryInterface(IID_IBootTrigger, tCIDLib::pToVoidPP(&pBTrigger));
                 if (FAILED(hRes))
                 {
                     TKrnlError::SetLastKrnlError(kKrnlErrs::errcSchTask_SetupErr, hRes);
@@ -279,7 +279,7 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
         }
 
         IExecAction* pExecAction = nullptr;
-        hRes = pAction->QueryInterface(IID_IExecAction, (void**)&pExecAction);
+        hRes = pAction->QueryInterface(IID_IExecAction, tCIDLib::pToVoidPP(&pExecAction));
         pAction->Release();
         if (FAILED(hRes))
         {
@@ -343,7 +343,7 @@ TKrnlTaskSched::bDeleteSchedTask(const tCIDLib::TCh* const pszName)
         , NULL
         , CLSCTX_INPROC_SERVER
         , IID_ITaskService
-        , (void**)&pService
+        , tCIDLib::pToVoidPP(&pService)
     );
 
     if (FAILED(hRes))
@@ -386,7 +386,7 @@ tCIDLib::TBoolean TKrnlTaskSched::bSupportAvail()
         , NULL
         , CLSCTX_INPROC_SERVER
         , IID_ITaskService
-        , (void**)&pService
+        , tCIDLib::pToVoidPP(&pService)
     );
 
     if (FAILED(hRes))

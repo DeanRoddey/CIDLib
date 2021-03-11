@@ -1628,7 +1628,7 @@ class CIDCTRLSEXP TWindow : public TObject
 //  pointer.
 // ---------------------------------------------------------------------------
 template <typename T>
-tCIDLib::TVoid CastChildWnd(        TWindow&            wndParent
+tCIDLib::TVoid CastChildWnd(const   TWindow&            wndParent
                             , const tCIDCtrls::TWndId   widChild
                             ,       T*&                 pwndToFill)
 {

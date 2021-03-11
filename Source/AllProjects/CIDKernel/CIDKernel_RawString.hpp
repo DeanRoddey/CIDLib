@@ -212,7 +212,7 @@ namespace TRawStr
     KRNLEXPORT tCIDLib::TCard4 c4AsBinary
     (
         const   tCIDLib::TCh* const     pszToConvert
-        ,       tCIDLib::TBoolean&      bValid
+        , COP   tCIDLib::TBoolean&      bValid
         , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
     )   noexcept;
 
@@ -224,7 +224,7 @@ namespace TRawStr
     KRNLEXPORT tCIDLib::TCard8 c8AsBinary
     (
         const   tCIDLib::TCh* const     pszToConvert
-        ,       tCIDLib::TBoolean&      bValid
+        , COP   tCIDLib::TBoolean&      bValid
         , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
     )   noexcept;
 

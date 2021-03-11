@@ -172,7 +172,7 @@ static HRESULT hresGetDefAudioEndPointVol(IAudioEndpointVolume*& pToSet)
     IMMDeviceEnumerator* pEnumerator = NULL;
     hRes = ::CoCreateInstance
     (
-        CLSID_MMDevEnum, NULL, CLSCTX_ALL, IID_IMMDevEnum, (void**)&pEnumerator
+        CLSID_MMDevEnum, NULL, CLSCTX_ALL, IID_IMMDevEnum, tCIDLib::pToVoidPP(&pEnumerator)
     );
 
     if (FAILED(hRes))
@@ -195,7 +195,7 @@ static HRESULT hresGetDefAudioEndPointVol(IAudioEndpointVolume*& pToSet)
     // Use that (sigh...) to activate an end point volume object
     hRes = pMMDev->Activate
     (
-        __uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (void**)&pToSet
+        __uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, tCIDLib::pToVoidPP(&pToSet)
     );
     if (FAILED(hRes))
     {

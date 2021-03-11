@@ -140,7 +140,7 @@ TFacCIDSpReco::CompileGrammarTo(const   TString& strGrammarFile
         , NULL
         , CLSCTX_INPROC_SERVER
         , __uuidof(ISpGrammarCompiler)
-        , (void**)&pCompiler
+        , tCIDLib::pToVoidPP(&pCompiler)
     );
 
     if (FAILED(hRes))

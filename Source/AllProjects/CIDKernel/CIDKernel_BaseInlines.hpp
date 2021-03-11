@@ -537,4 +537,13 @@ namespace tCIDLib
         CIDLib_Suppress(26490)
         return reinterpret_cast<T*>(pSrc);
     }
+
+    //
+    //  A fairly common cast when dealing with C interfaces, which requires a reinterpret cast
+    //
+    template <typename F> tCIDLib::TVoid** pToVoidPP(F** pSrc)
+    {
+        CIDLib_Suppress(26490)
+        return reinterpret_cast<tCIDLib::TVoid**>(pSrc);
+    }
 }

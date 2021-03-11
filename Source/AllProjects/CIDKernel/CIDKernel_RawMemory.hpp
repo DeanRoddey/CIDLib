@@ -321,7 +321,7 @@ namespace TRawMem
         CIDLib_Suppress(26471)
         return reinterpret_cast<T*>
         (
-            pExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew)
+            pExchangeRawPtr(tCIDLib::pToVoidPP(ppToFill), pNew)
         );
     }
 
@@ -336,7 +336,7 @@ namespace TRawMem
         CIDLib_Suppress(26471)
         return reinterpret_cast<T*>
         (
-            pCompareAndExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew, pCompare)
+            pCompareAndExchangeRawPtr(tCIDLib::pToVoidPP(ppToFill), pNew, pCompare)
         );
     }
 

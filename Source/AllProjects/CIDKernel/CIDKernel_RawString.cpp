@@ -1528,11 +1528,11 @@ tCIDLib::TBoolean TRawStr::bMakeHexByte(const   tCIDLib::TCh        ch1
 
 tCIDLib::TCard4
 TRawStr::c4AsBinary(const   tCIDLib::TCh* const pszToConvert
-                    ,       tCIDLib::TBoolean&  bValid
+                    , COP   tCIDLib::TBoolean&  bValid
                     , const tCIDLib::ERadices   eRadix) noexcept
 {
-    tCIDLib::TBoolean   bNeg;
     tCIDLib::TCard4     c4Ret = 0;
+    tCIDLib::TBoolean   bNeg;
     bValid = (i4TextToCard4(pszToConvert, tCIDLib::c4EnumOrd(eRadix), c4Ret, bNeg) == -1);
     if (bNeg)
         bValid = kCIDLib::False;
@@ -1555,11 +1555,11 @@ tCIDLib::TCard4 TRawStr::c4ToHex(const tCIDLib::TCh ch1)
 
 tCIDLib::TCard8
 TRawStr::c8AsBinary(const   tCIDLib::TCh* const pszToConvert
-                    ,       tCIDLib::TBoolean&  bValid
+                    , COP   tCIDLib::TBoolean&  bValid
                     , const tCIDLib::ERadices   eRadix) noexcept
 {
-    tCIDLib::TBoolean   bNeg;
     tCIDLib::TCard8     c8Ret = 0;
+    tCIDLib::TBoolean   bNeg;
     bValid = (i4TextToCard8(pszToConvert, tCIDLib::c4EnumOrd(eRadix), c8Ret, bNeg) == -1);
     if (bNeg)
         bValid = kCIDLib::False;

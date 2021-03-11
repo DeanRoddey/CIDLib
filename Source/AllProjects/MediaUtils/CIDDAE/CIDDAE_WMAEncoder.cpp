@@ -197,7 +197,7 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
     IWMCodecInfo3* pCodecInfo = 0;
     hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface
     (
-        IID_IWMCodecInfo3, (void**)&pCodecInfo
+        IID_IWMCodecInfo3, tCIDLib::pToVoidPP(&pCodecInfo)
     );
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_QueryCodecInfo, hRes, CID_LINE);
@@ -276,7 +276,7 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
 
     // Get the media properties interface of the original format
     IWMMediaProps* pProps = 0;
-    hRes = pStreamCfg->QueryInterface(IID_IWMMediaProps, (void**)&pProps);
+    hRes = pStreamCfg->QueryInterface(IID_IWMMediaProps, tCIDLib::pToVoidPP(&pProps));
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_GetMediaProps, hRes, CID_LINE);
     TCOMJanitor<IWMMediaProps> janProps(&pProps);
@@ -304,7 +304,7 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
     //  multi-pass VBR modes
     //
     IWMPropertyVault* pVault = 0;
-    hRes = pStreamCfg->QueryInterface(IID_IWMPropertyVault, (void**)&pVault);
+    hRes = pStreamCfg->QueryInterface(IID_IWMPropertyVault, tCIDLib::pToVoidPP(&pVault));
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_QueryPropVault, hRes, CID_LINE);
 
@@ -420,7 +420,7 @@ CIDDAE_EnumCodecFmts(       IWMCodecInfo3*                          pCodecInfo
 
             // Get the media properties interface
             IWMMediaProps* pProps = 0;
-            hRes = pStreamCfg->QueryInterface(IID_IWMMediaProps, (void**)&pProps);
+            hRes = pStreamCfg->QueryInterface(IID_IWMMediaProps, tCIDLib::pToVoidPP(&pProps));
             if (FAILED(hRes))
                 CIDDAE_ThrowEncError(kDAEErrs::errcWMA_GetMediaProps, hRes, CID_LINE);
             TCOMJanitor<IWMMediaProps> janProps(&pProps);
@@ -700,10 +700,7 @@ TCIDDAEWMAEnc::c4EnumAudioCodecs(TCollection<TCodecInfo>& colToFill)
 
     // Use that to get a codec info object
     IWMCodecInfo3* pCodecInfo = 0;
-    hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface
-    (
-        IID_IWMCodecInfo3, (void**)&pCodecInfo
-    );
+    hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface(IID_IWMCodecInfo3, tCIDLib::pToVoidPP(&pCodecInfo));
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_QueryCodecInfo, hRes, CID_LINE);
     TCOMJanitor<IWMCodecInfo3> janCodecInfo(&pCodecInfo);
@@ -780,10 +777,7 @@ TCIDDAEWMAEnc::c4EnumCodecFmts( const   TCodecInfo&                 cdeciSrc
 
     // Use that to get a codec info object
     IWMCodecInfo3* pCodecInfo = 0;
-    hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface
-    (
-        IID_IWMCodecInfo3, (void**)&pCodecInfo
-    );
+    hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface(IID_IWMCodecInfo3, tCIDLib::pToVoidPP(&pCodecInfo));
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_QueryCodecInfo, hRes, CID_LINE);
     TCOMJanitor<IWMCodecInfo3> janCodecInfo(&pCodecInfo);
@@ -1086,7 +1080,7 @@ TCIDDAEWMAEnc::StartEncodeImpl( const   TString&                strTargetFile
 
     // Apply any metadata we got
     IWMHeaderInfo3* pHdrInfo = nullptr;
-    hRes = pWMAInfo->pWriter->QueryInterface(IID_IWMHeaderInfo3, (void**)&pHdrInfo);
+    hRes = pWMAInfo->pWriter->QueryInterface(IID_IWMHeaderInfo3, tCIDLib::pToVoidPP(&pHdrInfo));
     TCOMJanitor<IWMHeaderInfo3> janHdrInfo(&pHdrInfo);
     AddStringTag(pHdrInfo, g_wszWMAlbumTitle, strAlbumTitle);
     AddStringTag(pHdrInfo, g_wszWMAuthor, strArtist);

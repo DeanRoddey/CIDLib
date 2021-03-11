@@ -216,10 +216,8 @@ template <typename T, class D> class TNotifyRequestFor : public TNotRequestBase
         TNotifyRequestFor(const TNotifyRequestFor&) = delete;
         TNotifyRequestFor(TNotifyRequestFor&&) = delete;
 
-        ~TNotifyRequestFor()
-        {
-            // We don't own the target, we just reference it
-        }
+        // We don't own the target, we just reference it
+        ~TNotifyRequestFor() = default;
 
 
         // -------------------------------------------------------------------
@@ -232,7 +230,7 @@ template <typename T, class D> class TNotifyRequestFor : public TNotRequestBase
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDCtrls::EEvResponses eInvokeOnTarget(TObject* const pobjBeingSent)
+        tCIDCtrls::EEvResponses eInvokeOnTarget(TObject* const pobjBeingSent) override
         {
             return m_pTarget->eInvokeHandlers(nidRequested(), pobjBeingSent);
         }
@@ -256,7 +254,7 @@ template <typename T, class D> class TNotifyRequestFor : public TNotRequestBase
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bPostEvent(TWndEvent* const pwevToPost)
+        tCIDLib::TBoolean bPostEvent(TWndEvent* const pwevToPost) override
         {
             return m_pTarget->bSendMsg(kCIDCtrls::wmsgAsyncEvent1, pwevToPost);
         }

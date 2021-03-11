@@ -211,7 +211,7 @@ template <typename T, class D> class TNotifyHandlerFor : public TNotHandlerBase
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDCtrls::EEvResponses eInvoke(TObject* const pobjBeingSent)
+        tCIDCtrls::EEvResponses eInvoke(TObject* const pobjBeingSent) override
         {
             // In debug mode, check the types
             #if CID_DEBUG_ON

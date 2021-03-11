@@ -832,7 +832,7 @@ bQueryChildDevices(         TKrnlLList<TKrnlKVPair>&    kllistFound
     pDevices->get__NewEnum(&pUnk);
     TCOMJanitor<IUnknown> janUnk(&pUnk);
     IEnumUnknown* pEnum;
-    hRes = pUnk->QueryInterface(IID_IEnumUnknown, (void**)&pEnum);
+    hRes = pUnk->QueryInterface(IID_IEnumUnknown, tCIDLib::pToVoidPP(&pEnum));
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnP_SearchFailed, hRes);
@@ -909,7 +909,7 @@ tCIDLib::TBoolean TKrnlUPnPDevice::bQueryDevDescrURL(TKrnlString& kstrToFill) co
     IUPnPDevice* pDev = m_pPlatData->pDevice;
 
     IUPnPDeviceDocumentAccess* pDocAcc = nullptr;
-    HRESULT hRes = pDev->QueryInterface(IID_IUPnPDeviceDocumentAccess, (void**)&pDocAcc);
+    HRESULT hRes = pDev->QueryInterface(IID_IUPnPDeviceDocumentAccess, tCIDLib::pToVoidPP(&pDocAcc));
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnp_AttrQuery, hRes);
@@ -1208,7 +1208,7 @@ TKrnlUPnPFinder::bSearchByType( const   tCIDLib::TCh* const         pszType
 
     // Get the enum interface from this enumerator
     IEnumUnknown* pEnum = nullptr;
-    hRes = pUnk->QueryInterface(IID_IEnumUnknown, (void**)&pEnum);
+    hRes = pUnk->QueryInterface(IID_IEnumUnknown, tCIDLib::pToVoidPP(&pEnum));
     if (FAILED(hRes))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcUPnP_SearchFailed, hRes);
@@ -1351,7 +1351,7 @@ tCIDLib::TBoolean TKrnlUPnPFinder::bInit()
         , nullptr
         , CLSCTX_INPROC_SERVER
         , IID_IUPnPDeviceFinder
-        , (void**)&pDevFinder
+        , tCIDLib::pToVoidPP(&pDevFinder)
     );
 
     if (FAILED(hRes))
@@ -1503,7 +1503,7 @@ TKrnlUPnPAsyncFinder::bListenFor(const  tCIDLib::TCh* const pszFindType
             , nullptr
             , CLSCTX_INPROC_SERVER
             , IID_IUPnPDeviceFinder
-            , (void**)&pNewFinder
+            , tCIDLib::pToVoidPP(&pNewFinder)
         );
 
         if ((hRes != S_OK) || !pNewFinder)

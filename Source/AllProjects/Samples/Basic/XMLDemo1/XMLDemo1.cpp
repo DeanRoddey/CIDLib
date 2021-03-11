@@ -31,7 +31,6 @@
 //  $_CIDLib_Log_$
 //
 
-
 // ---------------------------------------------------------------------------
 //  Include our own header which will bring in what we need and define our
 //  facility object.

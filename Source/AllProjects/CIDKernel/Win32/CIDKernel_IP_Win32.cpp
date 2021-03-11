@@ -370,7 +370,7 @@ TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const pszAppPath
             , NULL
             , CLSCTX_INPROC_SERVER
             , __uuidof(INetFwMgr)
-            , (void**)&pMgr
+            , tCIDLib::pToVoidPP(&pMgr)
         );
         if (FAILED(hRes))
             throw kKrnlErrs::errcFW_CantInit;
@@ -441,7 +441,7 @@ TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const pszAppPath
                 , NULL
                 , CLSCTX_INPROC_SERVER
                 , __uuidof(INetFwAuthorizedApplication)
-                , (void**)&pApp
+                , tCIDLib::pToVoidPP(&pApp)
             );
             if (FAILED(hRes))
                 throw kKrnlErrs::errcFW_CantCreateApp;

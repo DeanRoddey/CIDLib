@@ -1822,7 +1822,7 @@ TKrnlFileSys::bMakeDirectory(const  tCIDLib::TCh* const pszToCreate
             , NULL
             , &pOldDACL
             , NULL
-            , (void**)&pSD
+            , tCIDLib::pToVoidPP(&pSD)
         );
 
         // Set up new access info for the Users group

@@ -282,7 +282,7 @@ tCIDLib::TVoid TCIDSpReco::Initialize(TCIDAudioSrcStream* const pstrmToAdopt)
             , NULL
             , CLSCTX_INPROC_SERVER
             , __uuidof(ISpRecognizer)
-            , (void**)&m_pInfo->pSpeechRecognizer
+            , tCIDLib::pToVoidPP(&m_pInfo->pSpeechRecognizer)
         );
 
         if (FAILED(hRes))
@@ -322,7 +322,7 @@ tCIDLib::TVoid TCIDSpReco::Initialize(TCIDAudioSrcStream* const pstrmToAdopt)
             , NULL
             , CLSCTX_INPROC_SERVER
             , __uuidof(ISpStream)
-            , (void**)&m_pInfo->pstrmSpeech
+            , tCIDLib::pToVoidPP(&m_pInfo->pstrmSpeech)
         );
 
         if (FAILED(hRes))
