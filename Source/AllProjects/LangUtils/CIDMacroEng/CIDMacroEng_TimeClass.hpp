@@ -251,6 +251,7 @@ class CIDMACROENGEXP TMEngTimeInfo : public TMEngClassInfo
         tCIDLib::TCard2     m_c2MethId_AddStamp;
         tCIDLib::TCard2     m_c2MethId_DefCtor;
         tCIDLib::TCard2     m_c2MethId_Equal;
+        tCIDLib::TCard2     m_c2MethId_FormatToStr;
         tCIDLib::TCard2     m_c2MethId_GetCurMillis;
         tCIDLib::TCard2     m_c2MethId_GetCurMillis64;
         tCIDLib::TCard2     m_c2MethId_GetCurStamp;

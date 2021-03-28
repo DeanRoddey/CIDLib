@@ -116,6 +116,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_Time2);
     AddTest(new TTest_Time3);
     AddTest(new TTest_Time4);
+    AddTest(new TTest_Time5);
     AddTest(new TTest_Base641);
     AddTest(new TTest_BitSeq1);
     AddTest(new TTest_BitSeq2);

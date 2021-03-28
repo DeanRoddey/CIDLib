@@ -88,17 +88,17 @@ class CIDXMLEXP TXMLTreeParser :
                 // -----------------------------------------------------------
                 //  Public data members
                 // -----------------------------------------------------------
-                tCIDLib::TErrCode errcId() const {return m_errcId;}
+                tCIDLib::TErrCode errcId() const { return m_errcId; }
 
-                tCIDXML::EErrTypes eType() const {return m_eType;}
+                tCIDXML::EErrTypes eType() const { return m_eType; }
 
-                const TString& strText() const {return m_strText;}
+                const TString& strText() const { return m_strText; }
 
-                tCIDLib::TCard4 c4Column() const {return m_c4Column;}
+                tCIDLib::TCard4 c4Column() const { return m_c4Column; }
 
-                tCIDLib::TCard4 c4Line() const {return m_c4Line;}
+                tCIDLib::TCard4 c4Line() const { return m_c4Line; }
 
-                const TString& strSystemId() const {return m_strSystemId;}
+                const TString& strSystemId() const { return m_strSystemId; }
 
 
             private :
@@ -215,7 +215,7 @@ class CIDXMLEXP TXMLTreeParser :
             , const tCIDLib::EAdoptOpts     eAdopt
         );
 
-        TXMLTreeDocument* pxtdocOrphan();
+        [[nodiscard]] TXMLTreeDocument* pxtdocOrphan();
 
         const TXMLTreeElement* pxtnodeFindPath
         (

@@ -160,7 +160,7 @@ class CIDXMLEXP TXMLAttrDef : public TObject
 
         TXMLAttrDef
         (
-            const   TXMLAttrDef&             xadSrc
+            const   TXMLAttrDef&            xadSrc
         );
 
         TXMLAttrDef
@@ -170,7 +170,7 @@ class CIDXMLEXP TXMLAttrDef : public TObject
 
         TXMLAttrDef& operator=
         (
-            const   TXMLAttrDef&             xadSrc
+            const   TXMLAttrDef&            xadSrc
         );
 
         TXMLAttrDef& operator=

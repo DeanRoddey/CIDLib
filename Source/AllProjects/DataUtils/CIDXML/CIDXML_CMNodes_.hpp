@@ -186,29 +186,54 @@ class TXMLCMLeaf : public TXMLCMNode
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsNullable() const final;
+        tCIDLib::TBoolean bIsNullable() const final
+        {
+            // Its nullable if an epsilon node
+            return (m_c4StatePos == kCIDLib::c4MaxCard);
+        }
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4ElemId() const;
+        tCIDLib::TCard4 c4ElemId() const
+        {
+            return m_c4ElemId;
+        }
 
-        tCIDLib::TCard4 c4StatePos() const;
+        tCIDLib::TCard4 c4StatePos() const
+        {
+            return m_c4StatePos;
+        }
 
-        tCIDLib::TCard4 c4StatePos
-        (
-            const   tCIDLib::TCard4         c4NewPos
-        );
+        tCIDLib::TCard4 c4StatePos(const tCIDLib::TCard4 c4NewPos)
+        {
+            m_c4StatePos = c4NewPos;
+            return m_c4StatePos;
+        }
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const final;
+        tCIDLib::TVoid TXMLCMLeaf::CalculateFirst(TBitset& btsToSet) const final
+        {
+            // If an epsilon node, then first pos is empty
+            if (m_c4StatePos == kCIDLib::c4MaxCard)
+                btsToSet.Clear();
+            else
+                btsToSet.bSetBitState(m_c4StatePos, kCIDLib::True);
+        }
 
-        tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const final;
+        tCIDLib::TVoid TXMLCMLeaf::CalculateLast(TBitset& btsToSet) const final
+        {
+            // If an epsilon node, then lst pos is empty
+            if (m_c4StatePos == kCIDLib::c4MaxCard)
+                btsToSet.Clear();
+            else
+                btsToSet.bSetBitState(m_c4StatePos, kCIDLib::True);
+        }
 
 
     private :
@@ -272,13 +297,25 @@ class TXMLCMBinOp : public TXMLCMNode
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        TXMLCMNode* pxcmnLeft();
+        TXMLCMNode* pxcmnLeft()
+        {
+            return m_pxcmnLeft;
+        }
 
-        const TXMLCMNode* pxcmnLeft() const;
+        const TXMLCMNode* pxcmnLeft() const
+        {
+            return m_pxcmnLeft;
+        }
 
-        TXMLCMNode* pxcmnRight();
+        TXMLCMNode* pxcmnRight()
+        {
+            return m_pxcmnRight;
+        }
 
-        const TXMLCMNode* pxcmnRight() const;
+        const TXMLCMNode* pxcmnRight() const
+        {
+            return m_pxcmnRight;
+        }
 
 
     protected :
@@ -339,23 +376,42 @@ class TXMLCMUnaryOp : public TXMLCMNode
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsNullable() const final;
+        tCIDLib::TBoolean TXMLCMUnaryOp::bIsNullable() const final
+        {
+            // Unary nodes are all some sort of repetition and so are always nullable
+            return kCIDLib::True;
+        }
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        TXMLCMNode* pxcmnChild();
+        TXMLCMNode* pxcmnChild()
+        {
+            return m_pxcmnChild;
+        }
 
-        const TXMLCMNode* pxcmnChild() const;
+        const TXMLCMNode* pxcmnChild() const
+        {
+            return m_pxcmnChild;
+        }
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const final;
-        tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const final;
+        tCIDLib::TVoid CalculateFirst(TBitset& btsToSet) const final
+        {
+            // Its just our child's first pos set
+            btsToSet = m_pxcmnChild->btsFirstPos();
+        }
+
+        tCIDLib::TVoid CalculateLast(TBitset& btsToSet) const final
+        {
+            // Its just our child's last pos set
+            btsToSet = m_pxcmnChild->btsLastPos();
+        }
 
 
     private :

@@ -52,15 +52,15 @@ TDTDValidator::TDTDValidator(TXMLParserCore* const  pxprsOwner
     TXMLValidator(pxprsOwner)
     , m_bIgnoreDTD(kCIDLib::False)
     , m_c4RootElemId(kCIDXML::c4InvalidElemId)
-    , m_pxadIgnoredAttrDef(0)
-    , m_pxdeclIgnoredElement(0)
-    , m_pxdeclIgnoredEntity(0)
-    , m_pxdeclIgnoredNotation(0)
+    , m_pxadIgnoredAttrDef(nullptr)
+    , m_pxdeclIgnoredElement(nullptr)
+    , m_pxdeclIgnoredEntity(nullptr)
+    , m_pxdeclIgnoredNotation(nullptr)
     , m_pmxevDTD(pmxevDTDEvents)
-    , m_pxnipElems(0)
-    , m_pxnipEntities(0)
-    , m_pxnipNotations(0)
-    , m_pxnipPEs(0)
+    , m_pxnipElems(nullptr)
+    , m_pxnipEntities(nullptr)
+    , m_pxnipNotations(nullptr)
+    , m_pxnipPEs(nullptr)
 {
     // Create our pools
     m_pxnipElems = new TXMLNameIDPool<TDTDElemDecl>
@@ -228,7 +228,7 @@ TDTDValidator::bValidateAttr(const  TXMLAttrDef&    xadToTest
             bAtEnd = kCIDLib::True;
 
         // And cap it off here
-        *pszCur = 0;
+        *pszCur = kCIDLib::chNull;
 
 
         if (bRefType)
@@ -308,6 +308,7 @@ TDTDValidator::bValidateContent(const   TXMLElemDecl&           xdeclParent
     const TDTDElemDecl*
     #if CID_DEBUG_ON
     pxdeclDTDElem = dynamic_cast<const TDTDElemDecl*>(&xdeclParent);
+    CIDAssert(pxdeclDTDElem != nullptr, L"Could not case parent decl to correct type");
     #else
     pxdeclDTDElem = reinterpret_cast<const TDTDElemDecl*>(&xdeclParent);
     #endif
@@ -319,9 +320,7 @@ TDTDValidator::bValidateContent(const   TXMLElemDecl&           xdeclParent
     tCIDLib::TCard4 c4FailedAt;
     const tCIDXML::EValidRes eResult = pxdeclDTDElem->eValidate
     (
-        pc4Children
-        , c4ChildCount
-        , c4FailedAt
+        pc4Children, c4ChildCount, c4FailedAt
     );
 
     //
@@ -331,7 +330,7 @@ TDTDValidator::bValidateContent(const   TXMLElemDecl&           xdeclParent
     if (eResult != tCIDXML::EValidRes::Success)
     {
         // Format the content model into a string
-        TTextStringOutStream strmCM(128);
+        TTextStringOutStream strmCM(128UL);
         xdeclParent.FormatCMTo(strmCM, *this);
         strmCM.Flush();
 
@@ -340,16 +339,14 @@ TDTDValidator::bValidateContent(const   TXMLElemDecl&           xdeclParent
         {
             xprsOwner().PostXMLError
             (
-                kXMLErrs::errcXMLV_TooManyChildren
-                , strmCM.strData()
+                kXMLErrs::errcXMLV_TooManyChildren, strmCM.strData()
             );
         }
          else if (eResult == tCIDXML::EValidRes::TooFew)
         {
             xprsOwner().PostXMLError
             (
-                kXMLErrs::errcXMLV_TooFewChildren
-                , strmCM.strData()
+                kXMLErrs::errcXMLV_TooFewChildren, strmCM.strData()
             );
         }
          else if (eResult == tCIDXML::EValidRes::Mismatch)
@@ -448,13 +445,13 @@ TDTDValidator::pxdeclFindElemByName(const   TString&            strQName
 
     //
     //  If we didn't find it, then look at the options. If the option is to
-    //  find, then return zero now; else, create a default element and add
+    //  find, then return null now; else, create a default element and add
     //  it.
     //
     if (!pxdeclRet)
     {
         if (eOpt == tCIDXML::EPoolOpts::Find)
-            return 0;
+            return nullptr;
 
         pxdeclRet = new TDTDElemDecl(strQName);
         m_pxnipElems->c4AddNew(pxdeclRet);
@@ -478,13 +475,13 @@ TDTDValidator::pxdeclFindElemByName(const   TString&            strQName
 
     //
     //  If we didn't find it, then look at the options. If the option is to
-    //  find, then return zero now; else, create a default element and add
+    //  find, then return null now; else, create a default element and add
     //  it.
     //
     if (!pxdeclRet)
     {
         if (eOpt == tCIDXML::EPoolOpts::Find)
-            return 0;
+            return nullptr;
 
         pxdeclRet = new TDTDElemDecl(strQName);
         m_pxnipElems->c4AddNew(pxdeclRet);
@@ -726,8 +723,7 @@ tCIDLib::TVoid TDTDValidator::Reset()
     //  that are always automagically there. We indicate that these are special
     //  ones via a parameter, so that we can quickly identify them later.
     //
-    TDTDEntityDecl* pxdeclTmp;
-    pxdeclTmp = new TDTDEntityDecl(L"amp", L"&");
+    TDTDEntityDecl* pxdeclTmp = new TDTDEntityDecl(L"amp", L"&");
     pxdeclTmp->bIsSpecial(kCIDLib::True);
     m_pxnipEntities->c4AddNew(pxdeclTmp);
 

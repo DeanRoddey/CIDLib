@@ -49,7 +49,7 @@ RTTIDecls(TZLibCompressor,TObject)
 // ---------------------------------------------------------------------------
 TZLibCompressor::TZLibCompressor() :
 
-    m_pzimplThis(0)
+    m_pzimplThis(nullptr)
 {
 }
 

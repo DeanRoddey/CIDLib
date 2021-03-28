@@ -264,7 +264,7 @@ class CIDLIBEXP TString :
             , COP    tCIDLib::TCard4&       c4FldWidth
             , COP    tCIDLib::TCh&          chFill
             , COP    tCIDLib::TCard4&       c4Precision
-            , const tCIDLib::TCh*&          pszEnd
+            , COP const tCIDLib::TCh*&      pszEnd
         );
 
         static tCIDLib::TVoid FromHex

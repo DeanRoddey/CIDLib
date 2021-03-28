@@ -173,8 +173,7 @@ static tCIDLib::TVoid CheckIndex(const  tCIDLib::TCard4     c4Line
 //  different (32) bit buffer. The number of bits requested must have already
 //  been reserved via ReserveInflBits().
 //
-tCIDLib::TCard2
-TZLibCompImpl::c2GetInflBits(const tCIDLib::TCard4 c4ToGet)
+tCIDLib::TCard2 TZLibCompImpl::c2GetInflBits(const tCIDLib::TCard4 c4ToGet)
 {
     #if CID_DEBUG_ON
     if ((c4ToGet > m_c4BitCount) || (m_c4BitCount > 32))
@@ -229,8 +228,7 @@ TZLibCompImpl::c4GetInflBits(const tCIDLib::TCard4 c4ToGet)
 //  same valid bit counter as the compression side, but we have to use a
 //  different (32) bit buffer.
 //
-tCIDLib::TCard4
-TZLibCompImpl::c4PeekInflBits(const tCIDLib::TCard4 c4ToPeek)
+tCIDLib::TCard4 TZLibCompImpl::c4PeekInflBits(const tCIDLib::TCard4 c4ToPeek)
 {
     #if CID_DEBUG_ON
     if ((c4ToPeek > m_c4BitCount) || (m_c4BitCount > 32))
@@ -278,8 +276,7 @@ TZLibCompImpl::c4PeekInflBitsNC(const tCIDLib::TCard4 c4ToGet)
 }
 
 
-tCIDLib::TVoid
-TZLibCompImpl::CopyInflBlock(const tCIDLib::TCard4 c4Length)
+tCIDLib::TVoid TZLibCompImpl::CopyInflBlock(const tCIDLib::TCard4 c4Length)
 {
     //
     //  Start blasting in bytes from the input stream, flushing the window
@@ -363,7 +360,7 @@ TZLibCompImpl::DropInflBits(const tCIDLib::TCard4 c4ToDrop)
 tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
 {
     // A permutation of the code lengths
-    static const tCIDLib::TCard2 ac2Order[19] =
+    static constexpr tCIDLib::TCard2 ac2Order[19] =
     {
         16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
     };
@@ -388,9 +385,9 @@ tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
     tCIDZLib_::TCode        cdLast;
     tCIDZLib_::TCode        cdThis;
 
-    const tCIDZLib_::TCode* pcdDist;
-    const tCIDZLib_::TCode* pcdLen;
-    tCIDZLib_::TCode*       pcdNext;
+    const tCIDZLib_::TCode* pcdDist = nullptr;
+    const tCIDZLib_::TCode* pcdLen = nullptr;
+    tCIDZLib_::TCode*       pcdNext = nullptr;
 
     tCIDLib::TBoolean bDone = kCIDLib::False;
     while (!bDone)
@@ -548,6 +545,7 @@ tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
 
                 // Set the new state and fall through
                 eState = tCIDZLib_::EInfModes::Copy;
+                [[fallthrough]];
             }
 
             case tCIDZLib_::EInfModes::Copy :
@@ -572,6 +570,7 @@ tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
 
                 // Set next state and just fall through
                 eState = tCIDZLib_::EInfModes::LenLens;
+                [[fallthrough]];
             }
 
             case tCIDZLib_::EInfModes::LenLens :
@@ -601,6 +600,7 @@ tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
 
                 // Set next state and just fall through
                 eState = tCIDZLib_::EInfModes::CodeLens;
+                [[fallthrough]];
             }
 
             case tCIDZLib_::EInfModes::CodeLens :
@@ -712,6 +712,7 @@ tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
 
                 // Set the new state and just fall through
                 eState = tCIDZLib_::EInfModes::Len;
+                [[fallthrough]];
             }
 
             case tCIDZLib_::EInfModes::Len :
@@ -782,6 +783,7 @@ tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
 
                 // Set the new state and just fall through
                 eState = tCIDZLib_::EInfModes::LenExt;
+                [[fallthrough]];
             }
 
             case tCIDZLib_::EInfModes::LenExt :
@@ -794,6 +796,7 @@ tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
 
                 // Set the new state and just fall through
                 eState = tCIDZLib_::EInfModes::Dist;
+                [[fallthrough]];
             }
 
             case tCIDZLib_::EInfModes::Dist :
@@ -842,6 +845,7 @@ tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
 
                 // Set the new state and just fall through
                 eState = tCIDZLib_::EInfModes::DistExt;
+                [[fallthrough]];
             }
 
             case tCIDZLib_::EInfModes::DistExt :
@@ -866,6 +870,7 @@ tCIDLib::TVoid TZLibCompImpl::Inflate(const tCIDLib::TBoolean bHaveDict)
 
                 // Set the new state and just fall through
                 eState = tCIDZLib_::EInfModes::Match;
+                [[fallthrough]];
             }
 
             case tCIDZLib_::EInfModes::Match :
@@ -956,26 +961,26 @@ TZLibCompImpl::InflateTable(const   tCIDZLib_::EInflTbls    eTable
                             ,       tCIDLib::TCard4&        c4Bits)
 {
     // Some const tables that we only use here locally
-    static const tCIDLib::TCard2 ac2LBase[31] =
+    static constexpr tCIDLib::TCard2 ac2LBase[31] =
     {
         3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31
         , 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0
     };
 
-    static const tCIDLib::TCard2 ac2LExt[31] =
+    static constexpr tCIDLib::TCard2 ac2LExt[31] =
     {
           16, 16, 16, 16, 16, 16, 16, 16, 17, 17, 17, 17, 18, 18, 18, 18
         , 19, 19, 19, 19, 20, 20, 20, 20, 21, 21, 21, 21, 16, 76, 66
     };
 
-    static const tCIDLib::TCard2 ac2DBase[32] =
+    static constexpr tCIDLib::TCard2 ac2DBase[32] =
     {
         1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257
         , 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289
         , 16385, 24577, 0, 0
     };
 
-    static const tCIDLib::TCard2 ac2DExt[32] =
+    static constexpr tCIDLib::TCard2 ac2DExt[32] =
     {
         16, 16, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22,
         23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 28, 28, 29, 29, 64, 64
@@ -1371,20 +1376,10 @@ tCIDLib::TVoid TZLibCompImpl::UpdateDecompBuf()
         //  Before we overwrite the stuff we wrote out, add their bytes
         //  to the Adler CRC so we can test at the end.
         //
-        m_c4Adler = TRawMem::hshHashBufferAdler32
-        (
-            m_c4Adler
-            , m_pc1WndBuf
-            , c4ToWrite
-        );
+        m_c4Adler = TRawMem::hshHashBufferAdler32(m_c4Adler, m_pc1WndBuf, c4ToWrite);
 
         // Move the rest down
-        TRawMem::MoveMemBuf
-        (
-            m_pc1WndBuf
-            , &m_pc1WndBuf[c4ToWrite]
-            , m_c4BytesAvail - c4ToWrite
-        );
+        TRawMem::MoveMemBuf(m_pc1WndBuf, &m_pc1WndBuf[c4ToWrite], m_c4BytesAvail - c4ToWrite);
 
         //
         //  Reduce the amount of bytes available in the buffer by the bytes

@@ -84,12 +84,7 @@ tCIDLib::TBoolean TZLibCompImpl::bFillWindow()
     tCIDLib::TBoolean bShifted = kCIDLib::False;
     if (m_c4CurOfs >= kCIDZLib_::c4WndBufSz - kCIDZLib_::c4MinLookAhead)
     {
-        TRawMem::CopyMemBuf
-        (
-            m_pc1WndBuf
-            , m_pc1WndBuf + kCIDZLib_::c4WndSz
-            , kCIDZLib_::c4WndSz
-        );
+        TRawMem::CopyMemBuf(m_pc1WndBuf, m_pc1WndBuf + kCIDZLib_::c4WndSz, kCIDZLib_::c4WndSz);
 
         // Adjust members that reference into the buffer
         m_c4CurOfs -= kCIDZLib_::c4WndSz;
@@ -238,6 +233,7 @@ TZLibCompImpl::Deflate(const tCIDZLib_::ECompMethods eMethod)
     (
         kCIDZLib_::aStratTable[tCIDLib::c4EnumOrd(m_eCompLevel)].eFunc
     );
+
     if (eFunc == tCIDZLib_::ECompFuncs::Store)
         DeflateStore();
     else if (eFunc == tCIDZLib_::ECompFuncs::Fast)
@@ -408,20 +404,9 @@ tCIDLib::TVoid TZLibCompImpl::DeflateSlow()
             //  Calc the point at which we want to give up looking for
             //  matches because of lookahead problems.
             //
-            const tCIDLib::TCard4 c4InsertLim
-            (
-                m_c4CurOfs + m_c4BytesAvail - kCIDZLib_::c4MinMatch
-            );
-
-            const tCIDLib::TCard1 c1LenCode = tCIDLib::TCard1
-            (
-                c4PrevLen - kCIDZLib_::c4MinMatch
-            );
-
-            const tCIDLib::TCard2 c2Dist = tCIDLib::TCard2
-            (
-                (m_c4CurOfs - 1) - c4PrevMatch
-            );
+            const tCIDLib::TCard4 c4InsertLim(m_c4CurOfs + m_c4BytesAvail - kCIDZLib_::c4MinMatch);
+            const tCIDLib::TCard1 c1LenCode = tCIDLib::TCard1(c4PrevLen - kCIDZLib_::c4MinMatch);
+            const tCIDLib::TCard2 c2Dist = tCIDLib::TCard2((m_c4CurOfs - 1) - c4PrevMatch);
 
             // Update the stats for later tree building
             #if CID_DEBUG_ON

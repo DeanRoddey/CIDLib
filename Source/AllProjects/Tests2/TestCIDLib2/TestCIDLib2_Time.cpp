@@ -35,10 +35,11 @@
 // ---------------------------------------------------------------------------
 //  Magic macros
 // ---------------------------------------------------------------------------
-RTTIDecls(TTest_Time1,TTestFWTest)
-RTTIDecls(TTest_Time2,TTestFWTest)
-RTTIDecls(TTest_Time3,TTestFWTest)
-RTTIDecls(TTest_Time4,TTestFWTest)
+RTTIDecls(TTest_Time1, TTestFWTest)
+RTTIDecls(TTest_Time2, TTestFWTest)
+RTTIDecls(TTest_Time3, TTestFWTest)
+RTTIDecls(TTest_Time4, TTestFWTest)
+RTTIDecls(TTest_Time5, TTestFWTest)
 
 
 
@@ -846,7 +847,6 @@ TTest_Time3::TestParse(         TTextStringOutStream&   strmOut
 
 
 
-
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_Time4
 // PREFIX: tfwt
@@ -859,7 +859,7 @@ TTest_Time4::TTest_Time4() :
 
     TTestFWTest
     (
-        L"Time Tests 4", L"Time class formatting tests", 3
+        L"Time Tests 4", L"Time class elapsed time formatting tests", 3
     )
 {
 }
@@ -942,7 +942,7 @@ TTest_Time4::eRunTest(  TTextStringOutStream&   strmOut
         tmFmt.FormatToStr(strFmt, CurTest.pszFmtStr, tCIDLib::EAppendOver::Overwrite);
         if (strFmt != CurTest.pszResult)
         {
-            strmOut << TFWCurLn << L"Formatted time is wrong for test index "
+            strmOut << TFWCurLn << L"Elapsed time is wrong for test index "
                     << TCardinal(c4Index)
                     << L". Got='" << strFmt << L"'\n\n";
             eRes = tTestFWLib::ETestRes::Failed;
@@ -952,3 +952,87 @@ TTest_Time4::eRunTest(  TTextStringOutStream&   strmOut
     return eRes;
 }
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_Time5
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_Time5: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_Time5::TTest_Time5() :
+
+    TTestFWTest
+    (
+        L"Time Tests 5", L"Time class pattern formatting tests", 3
+    )
+{
+}
+
+TTest_Time5::~TTest_Time5()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_Time4: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_Time5::eRunTest(  TTextStringOutStream&   strmOut
+                        , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    // Set up a known time to test with
+    TTime tmTest
+    (
+        1996
+        , tCIDLib::EMonths::February
+        , 4
+        , 14, 34, 10, 455
+    );
+
+    // And now let's set up a number of formatting scenarios and expected results
+    struct TTestInfo
+    {
+        const tCIDLib::TCh*     pszFmtStr;
+        const tCIDLib::TCh*     pszResult;
+    };
+    constexpr TTestInfo aTests[] =
+    {
+        { L"%(H)"                                                           , L"14"                         }
+      , { L"%(h)"                                                           , L"2"                          }
+      , { L"%(h,2)"                                                         , L" 2"                         }
+      , { L"%(h,2,_)"                                                       , L"_2"                         }
+      , { L"%(h,-2,_)"                                                      , L"2_"                         }
+      , { L"%(s)"                                                           , L"10"                         }
+      , { L"%(l)"                                                           , L"455"                        }
+      , { L"%(u)"                                                           , L"34"                         }
+      , { L"%(Y)"                                                           , L"1996"                       }
+      , { L"%(D)"                                                           , L"4"                          }
+      , { L"%(D,2,0)"                                                       , L"04"                         }
+      , { L"%(y)"                                                           , L"96"                         }
+      , { L"%(H,2,0):%(u,2,0)"                                              , L"14:34"                      }
+      , { L"%(M,2,0)/%(D,2,0)/%(y,2,0)"                                     , L"02/04/96"                   }
+      , { L"%(a), %(m) %(D,2,0) %(H,2,0):%(u,2,0):%(s,2,0) %(Y,4,0)"        , L"Sun, Feb 04 14:34:10 1996"  }
+    };
+    constexpr tCIDLib::TCard4 c4Count = tCIDLib::c4ArrayElems(aTests);
+
+    TString strFmt;
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TTestInfo& testCur = aTests[c4Index];
+        tmTest.FormatToStr(strFmt, testCur.pszFmtStr);
+
+        if (strFmt != testCur.pszResult)
+        {
+            strmOut << TFWCurLn << L"Formatted time is wrong for test index "
+                    << TCardinal(c4Index)
+                    << L". Got='" << strFmt << L"'\n\n";
+            eRes = tTestFWLib::ETestRes::Failed;
+        }
+    }
+
+    return eRes;
+}

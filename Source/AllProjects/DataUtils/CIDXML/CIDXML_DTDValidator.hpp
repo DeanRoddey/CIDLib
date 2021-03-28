@@ -48,7 +48,7 @@ class CIDXMLEXP TDTDValidator : public TXMLValidator
         TDTDValidator
         (
                     TXMLParserCore* const   pxprsOwner
-            ,       MXMLDTDEvents* const    pmxevToUse = 0
+            ,       MXMLDTDEvents* const    pmxevToUse = nullptr
         );
 
         TDTDValidator(const TDTDValidator&) = delete;

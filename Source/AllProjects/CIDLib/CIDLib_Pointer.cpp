@@ -70,7 +70,7 @@ tCIDLib::TBoolean TPointer::operator!=(const TPointer& ptrToCompare) const
 // ---------------------------------------------------------------------------
 //  TPointer: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TPointer::FormatTo(TTextOutStream& strmToWriteTo) const
+tCIDLib::TVoid TPointer::FormatTo(CIOP TTextOutStream& strmToWriteTo) const
 {
     //
     //  Do the conversion into a temporary string. Make it way overly big

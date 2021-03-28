@@ -214,8 +214,7 @@ tCIDLib::TBoolean TXMLTreeParser::bKeepIgnorableSpace() const
     return m_bKeepIgnorable;
 }
 
-tCIDLib::TBoolean
-TXMLTreeParser::bKeepIgnorableSpace(const tCIDLib::TBoolean bIgnore)
+tCIDLib::TBoolean TXMLTreeParser::bKeepIgnorableSpace(const tCIDLib::TBoolean bIgnore)
 {
     m_bKeepIgnorable = bIgnore;
     return m_bKeepIgnorable;
@@ -573,7 +572,7 @@ TXMLTreeParser::pxtnodeFindPath(const   TString&            strPath
 {
     const TXMLTreeElement* pnodeRet;
     if (!c4FindPath(strPath, m_fcolIndices, pnodeRet))
-        return 0;
+        return nullptr;
 
     c4Index = m_fcolIndices.tLast();
     return pnodeRet;

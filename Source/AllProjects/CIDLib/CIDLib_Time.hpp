@@ -110,8 +110,8 @@ class CIDLIBEXP TTime :
 
         static tCIDLib::TVoid CurNTPTime
         (
-                    tCIDLib::TCard4&        c4Secs
-            ,       tCIDLib::TCard4&        c4Fract
+            COP     tCIDLib::TCard4&        c4Secs
+            , COP   tCIDLib::TCard4&        c4Fract
             , const tCIDLib::TBoolean       bNWOrder
         );
 

@@ -73,8 +73,8 @@ class CIDXMLEXP TXMLStdCatalog : public TXMLCatalog
                     tCIDXML::TEntitySrcRef& esrToParse
         );
 
-        TXMLStdCatalog(const TXMLStdCatalog&) = delete;
-        TXMLStdCatalog(TXMLStdCatalog&&) = delete;
+        TXMLStdCatalog(const TXMLStdCatalog&) = default;
+        TXMLStdCatalog(TXMLStdCatalog&&) = default;
 
         ~TXMLStdCatalog();
 
@@ -82,8 +82,8 @@ class CIDXMLEXP TXMLStdCatalog : public TXMLCatalog
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TXMLStdCatalog& operator=(const TXMLStdCatalog&) = delete;
-        TXMLStdCatalog& operator=(TXMLStdCatalog&&) = delete;
+        TXMLStdCatalog& operator=(const TXMLStdCatalog&) = default;
+        TXMLStdCatalog& operator=(TXMLStdCatalog&&) = default;
 
 
         // -------------------------------------------------------------------

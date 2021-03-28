@@ -160,7 +160,7 @@ class CIDXMLEXP TXMLEntSpooler : public TObject
 
         tCIDLib::TBoolean bSkippedQuote
         (
-                    tCIDLib::TCh& chSkipped
+            COP     tCIDLib::TCh&           chSkipped
         );
 
         tCIDLib::TBoolean bSkippedSpace();

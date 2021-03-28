@@ -46,7 +46,7 @@ class CIDXMLEXP TXMLContentModel
         TXMLContentModel(const TXMLContentModel&) = delete;
         TXMLContentModel(TXMLContentModel&&) = delete;
 
-        virtual ~TXMLContentModel() {}
+        virtual ~TXMLContentModel() = default;
 
 
         // -------------------------------------------------------------------
@@ -77,7 +77,7 @@ class CIDXMLEXP TXMLContentModel
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        TXMLContentModel() {}
+        TXMLContentModel() = default;
 };
 
 #pragma CIDLIB_POPPACK

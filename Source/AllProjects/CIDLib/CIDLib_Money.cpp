@@ -156,7 +156,7 @@ tCIDLib::TFloat8 TMoney::f8Val(const tCIDLib::TFloat8 f8NewVal)
 // ---------------------------------------------------------------------------
 //  TMoney: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TMoney::FormatTo(TTextOutStream& strmToWriteTo) const
+tCIDLib::TVoid TMoney::FormatTo(CIOP TTextOutStream& strmToWriteTo) const
 {
     // Get a quick ref to the value
     const tCIDLib::TFloat8 f8Fmt = f8Val();

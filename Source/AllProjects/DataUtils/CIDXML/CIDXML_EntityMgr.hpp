@@ -125,7 +125,7 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
 
         tCIDLib::TBoolean bSkippedQuote
         (
-                    tCIDLib::TCh&           chSkipped
+            COP     tCIDLib::TCh&           chSkipped
         );
 
         tCIDLib::TBoolean bSkippedSpace();
@@ -162,7 +162,7 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
 
         tCIDLib::TVoid GetSpaces
         (
-                    TString&                strToFill
+            COP     TString&                strToFill
         );
 
         [[nodiscard]] TXMLEntSpooler* pxesMakeNew
@@ -223,7 +223,8 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
         //  entity that is needed.
         //
         //  This element owns the spoolers but the entity decls are just
-        //  referenced from the pools that they come from.
+        //  referenced from the pools that they come from. So we can use default
+        //  copy/move here even though we have pointer members.
         // -------------------------------------------------------------------
         class TEMStackElem
         {
@@ -247,23 +248,21 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                 }
 
                 TEMStackElem(const TEMStackElem&) = default;
-                TEMStackElem(TEMStackElem&&) = default;
+                TEMStackElem(TEMStackElem&& elemSrc) = default;
 
-                ~TEMStackElem()
-                {
-                    //
-                    //  We don't delete anything here. The spooler does belong
-                    //  to the manager, but they are deleted in the entity
-                    //  mgr stack, not automatically here.
-                    //
-                }
+                //
+                //  We don't delete anything here. The spooler does belong
+                //  to the manager, but they are deleted in the entity
+                //  mgr stack, not automatically here.
+                //
+                ~TEMStackElem() = default;
 
 
                 // -----------------------------------------------------------
                 //  Public operators
                 // -----------------------------------------------------------
                 TEMStackElem& operator=(const TEMStackElem&) = default;
-                TEMStackElem& operator=(TEMStackElem&&) = default;
+                TEMStackElem& operator=(TEMStackElem&& elemSrc)  = default;
 
 
                 // -----------------------------------------------------------

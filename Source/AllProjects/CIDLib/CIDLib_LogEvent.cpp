@@ -849,7 +849,7 @@ tCIDLib::TVoid TLogEvent::SetLogged() const
 // ---------------------------------------------------------------------------
 //  TLogEvent: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TLogEvent::FormatTo(TTextOutStream& strmToWriteTo) const
+tCIDLib::TVoid TLogEvent::FormatTo(CIOP TTextOutStream& strmToWriteTo) const
 {
     // We just call the advanced format method with a default time format
     TTime tmLogged(m_enctLogged);

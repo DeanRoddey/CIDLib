@@ -79,6 +79,7 @@ TXMLEntityMgr::~TXMLEntityMgr()
     //
     Reset();
     delete m_pcolEntityStack;
+    m_pcolEntityStack = nullptr;
 }
 
 
@@ -144,8 +145,7 @@ tCIDLib::TBoolean TXMLEntityMgr::bGetQuotedString(TString& strToFill)
 //  Sets the ignore bad chars flag. This controls how we set up the
 //  text converter in newly created spoolers.
 //
-tCIDLib::TBoolean
-TXMLEntityMgr::bIgnoreBadChars(const tCIDLib::TBoolean bToSet)
+tCIDLib::TBoolean TXMLEntityMgr::bIgnoreBadChars(const tCIDLib::TBoolean bToSet)
 {
     m_bIgnoreBadChars = bToSet;
     return m_bIgnoreBadChars;
@@ -199,8 +199,7 @@ TXMLEntityMgr::bPushEntity(         TXMLEntSpooler* const   pxesToAdd
                 {
                     xprsOwner.PostXMLError
                     (
-                        kXMLErrs::errcXMLE_RecursiveEntityRef
-                        , strToCheck
+                        kXMLErrs::errcXMLE_RecursiveEntityRef, strToCheck
                     );
                     return kCIDLib::False;
                 }
@@ -251,8 +250,7 @@ TXMLEntityMgr::bPushEntity(         TXMLEntSpooler* const   pxesToAdd
 
 
 // Skip the next character which must be the indicated character
-tCIDLib::TBoolean
-TXMLEntityMgr::bSkipPastChar(const tCIDLib::TCh chToSkipPast)
+tCIDLib::TBoolean TXMLEntityMgr::bSkipPastChar(const tCIDLib::TCh chToSkipPast)
 {
     // Loop until end of input or we skip the char
     while (kCIDLib::True)
@@ -284,7 +282,7 @@ TXMLEntityMgr::bSkippedChar(const tCIDLib::TCh chToSkip)
 //  Skip the next char if a quote and return true, else do nothing and return
 //  false.
 //
-tCIDLib::TBoolean TXMLEntityMgr::bSkippedQuote(tCIDLib::TCh& chSkipped)
+tCIDLib::TBoolean TXMLEntityMgr::bSkippedQuote(COP tCIDLib::TCh& chSkipped)
 {
     return m_pxesCurrent->bSkippedQuote(chSkipped);
 }
@@ -306,8 +304,7 @@ tCIDLib::TBoolean TXMLEntityMgr::bSkippedSpace()
 //  The caller can tell us if we should stop at the end of the current
 //  entity or not.
 //
-tCIDLib::TBoolean
-TXMLEntityMgr::bSkippedSpaces(const tCIDLib::TBoolean bCrossEntities)
+tCIDLib::TBoolean TXMLEntityMgr::bSkippedSpaces(const tCIDLib::TBoolean bCrossEntities)
 {
     //
     //  Ask the current entity to skip chars until it hits a non-space
@@ -343,8 +340,7 @@ TXMLEntityMgr::bSkippedSpaces(const tCIDLib::TBoolean bCrossEntities)
 //  Skip the passed string of chars if they are next in the stream. Else
 //  do nothing. The return indicates whether we did or not.
 //
-tCIDLib::TBoolean
-TXMLEntityMgr::bSkippedString(const tCIDLib::TCh* const pszToSkip)
+tCIDLib::TBoolean TXMLEntityMgr::bSkippedString(const tCIDLib::TCh* const pszToSkip)
 {
     // Just pass through to the current entity spooler
     return m_pxesCurrent->bSkippedString(pszToSkip);
@@ -449,7 +445,7 @@ tCIDLib::TCh TXMLEntityMgr::chGetNextIfNot(const tCIDLib::TCh chNotToGet)
 
 
 // Get any white space at the current parsing position
-tCIDLib::TVoid TXMLEntityMgr::GetSpaces(TString& strToFill)
+tCIDLib::TVoid TXMLEntityMgr::GetSpaces(COP TString& strToFill)
 {
     // Clear out the buffer first
     strToFill.Clear();
@@ -470,13 +466,13 @@ tCIDLib::TVoid TXMLEntityMgr::GetSpaces(TString& strToFill)
 }
 
 
+// Get/set the entity event handler. We don't own it, so we just overwrite the current one
 MXMLEntityEvents* TXMLEntityMgr::pmxevEntityEvents() const
 {
     return m_pmxevEntityEvents;
 }
 
-MXMLEntityEvents*
-TXMLEntityMgr::pmxevEntityEvents(MXMLEntityEvents* const pmxevToSet)
+MXMLEntityEvents* TXMLEntityMgr::pmxevEntityEvents(MXMLEntityEvents* const pmxevToSet)
 {
     m_pmxevEntityEvents = pmxevToSet;
     return m_pmxevEntityEvents;
@@ -575,8 +571,8 @@ tCIDLib::TVoid TXMLEntityMgr::Reset()
 
     // Delete the current spooler and clear out both current pointers
     delete m_pxesCurrent;
-    m_pxesCurrent = 0;
-    m_pxdeclCurrent = 0;
+    m_pxesCurrent = nullptr;
+    m_pxdeclCurrent = nullptr;
 
     //
     //  Run through the stack and clean up any spoolers that were left on
@@ -586,8 +582,8 @@ tCIDLib::TVoid TXMLEntityMgr::Reset()
     {
         TEMStackElem& elemCur = m_pcolEntityStack->objAt(c4Index);
         delete elemCur.pxesThis;
-        elemCur.pxesThis = 0;
-        elemCur.pxdeclThis = 0;
+        elemCur.pxesThis = nullptr;
+        elemCur.pxdeclThis = nullptr;
     }
     m_c4StackTop = 0;
 }
@@ -714,8 +710,8 @@ tCIDLib::TBoolean TXMLEntityMgr::bPopEntity()
     TEMStackElem& elemTop = m_pcolEntityStack->objAt(m_c4StackTop);
     m_pxesCurrent   = elemTop.pxesThis;
     m_pxdeclCurrent = elemTop.pxdeclThis;
-    elemTop.pxesThis = 0;
-    elemTop.pxdeclThis = 0;
+    elemTop.pxesThis = nullptr;
+    elemTop.pxdeclThis = nullptr;
 
     //
     //  Send an end of entity event to the installed entity event handler,
@@ -728,7 +724,7 @@ tCIDLib::TBoolean TXMLEntityMgr::bPopEntity()
     //  If there was an entity previously, then we might have to throw an
     //  end of entity exception.
     //
-    if (m_bThrowAtEnd && (pxdeclOld != 0))
+    if (m_bThrowAtEnd && (pxdeclOld != nullptr))
         throw TXMLEndOfEntity(*pxdeclOld, c4OldId);
 
     //

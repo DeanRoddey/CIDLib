@@ -20,6 +20,10 @@
     <Rule Id="C28164" Action="Warning" />
     <Rule Id="C28182" Action="Warning" />
     <Rule Id="C28199" Action="Warning" />
+    <Rule Id="C28250" Action="Warning" />
+    <Rule Id="C28251" Action="Warning" />
+    <Rule Id="C28252" Action="Warning" />
+    <Rule Id="C28253" Action="Warning" />
     <Rule Id="C28637" Action="Warning" />
     <Rule Id="C28648" Action="Warning" />
     <Rule Id="C28730" Action="Warning" />

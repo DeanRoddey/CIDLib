@@ -904,13 +904,16 @@ tCIDLib::TBoolean TXMLEntSpooler::bSkippedChar(const tCIDLib::TCh chToSkip)
 }
 
 
-tCIDLib::TBoolean TXMLEntSpooler::bSkippedQuote(tCIDLib::TCh& chSkipped)
+tCIDLib::TBoolean TXMLEntSpooler::bSkippedQuote(COP tCIDLib::TCh& chSkipped)
 {
     // If we are out of chars, try to reload. If we cannot, then fail
     if (m_c4CharBufInd == m_c4CharBufCount)
     {
         if (!bReloadCharBuf())
+        {
+            chSkipped = kCIDLib::chNull;
             return kCIDLib::False;
+        }
     }
 
     // Get the next char and check it for a quote char
@@ -923,6 +926,7 @@ tCIDLib::TBoolean TXMLEntSpooler::bSkippedQuote(tCIDLib::TCh& chSkipped)
         m_c4CurColumn++;
         return kCIDLib::True;
     }
+    chSkipped = kCIDLib::chNull;
     return kCIDLib::False;
 }
 

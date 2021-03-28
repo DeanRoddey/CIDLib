@@ -104,7 +104,7 @@ namespace kCIDXML
     // -----------------------------------------------------------------------
     //  Some general constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const   pszXMLVersion           = L"1.0";
+    const tCIDLib::TCh* const       pszXMLVersion       = L"1.0";
     constexpr tCIDLib::TCard4       c4XMLMajVersion     = 1;
     constexpr tCIDLib::TCard4       c4XMLMinVersion     = 0;
 

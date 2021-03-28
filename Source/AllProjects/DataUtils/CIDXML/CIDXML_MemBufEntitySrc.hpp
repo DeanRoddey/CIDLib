@@ -178,7 +178,7 @@ class CIDXMLEXP TMemBufEntitySrc : public TXMLEntitySrc
         //      memory buffer. Since many copies of an entity source might be
         //      returned from a cache or catalog, we cannot afford to copy it
         //      every time. Since the data is never changed, just read, it
-        //      makes emminent sense to reference count a single buffer.
+        //      makes sense to reference count a single buffer.
         // -------------------------------------------------------------------
         tCIDLib::TCard4         m_c4SrcBytes;
         TCntPtr<const TMemBuf>  m_cptrBuffer;

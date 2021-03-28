@@ -46,7 +46,7 @@ RTTIDecls(TFileEntitySrc,TXMLEntitySrc)
 // ---------------------------------------------------------------------------
 //  TFileEntitySrc: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TFileEntitySrc::TFileEntitySrc( const   TString&    strSysId) :
+TFileEntitySrc::TFileEntitySrc(const TString& strSysId) :
 
     TXMLEntitySrc(strSysId)
 {

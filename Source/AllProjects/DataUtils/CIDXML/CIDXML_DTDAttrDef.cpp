@@ -97,8 +97,7 @@ TDTDAttrDef::~TDTDAttrDef()
 // ---------------------------------------------------------------------------
 //  TDTDAttrDef: Public, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid
-TDTDAttrDef::FormatTo(TTextOutStream& strmDest, const TXMLValidator&) const
+tCIDLib::TVoid TDTDAttrDef::FormatTo(TTextOutStream& strmDest, const TXMLValidator&) const
 {
     strmDest << m_strName << L" ";
 

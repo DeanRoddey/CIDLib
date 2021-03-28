@@ -101,8 +101,7 @@ class CIDLIBEXP MFormattable
 //  Provide the global operators that allow any streamable object to be
 //  formatted out to a text stream. This is what the outside world uses.
 // ---------------------------------------------------------------------------
-inline TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const MFormattable& fmtblToWrite)
+inline TTextOutStream& operator<<(CIOP TTextOutStream& strmToWriteTo, const MFormattable& fmtblToWrite)
 {
     fmtblToWrite.FormatTo(strmToWriteTo);
     return strmToWriteTo;

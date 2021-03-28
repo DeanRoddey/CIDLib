@@ -49,6 +49,13 @@ class CIDZLIBEXP TZLibCompressor : public TObject
 
         TZLibCompressor(const TZLibCompressor&) = delete;
 
+        TZLibCompressor(TZLibCompressor&& zlibSrc) :
+
+            m_pzimplThis(nullptr)
+        {
+            tCIDLib::Swap(m_pzimplThis, zlibSrc.m_pzimplThis);
+        }
+
         ~TZLibCompressor();
 
 
@@ -56,6 +63,15 @@ class CIDZLIBEXP TZLibCompressor : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TZLibCompressor& operator=(const TZLibCompressor&) = delete;
+
+        TZLibCompressor& operator=(TZLibCompressor&& zlibSrc)
+        {
+            if (&zlibSrc  != this)
+            {
+                tCIDLib::Swap(m_pzimplThis, zlibSrc.m_pzimplThis);
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------

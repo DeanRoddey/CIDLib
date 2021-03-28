@@ -229,8 +229,8 @@ TXMLChildCM::TXMLChildCM(TXMLCMSpecNode* const pxcsnToAdopt) :
     // Lets call a private method to build the DFA data structures
     BuildDFA();
 
-// A little debug code to print the transition table
-#if 0
+    // A little debug code to print the transition table
+    #if 0
     TOutConsole strmDest;
     for (tCIDLib::TCard4 c4Outer = 0; c4Outer < m_c4TransTableSize; c4Outer++)
     {
@@ -247,7 +247,7 @@ TXMLChildCM::TXMLChildCM(TXMLCMSpecNode* const pxcsnToAdopt) :
         }
         strmDest << kCIDLib::NewLn;
     }
-#endif
+    #endif
 }
 
 TXMLChildCM::~TXMLChildCM()

@@ -143,7 +143,7 @@ tCIDLib::TVoid TCIDModuleInfo::Set( const   TString&            strBaseName
 // ---------------------------------------------------------------------------
 //  TCIDModuleInfo: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TCIDModuleInfo::FormatTo(TTextOutStream& strmDest) const
+tCIDLib::TVoid TCIDModuleInfo::FormatTo(CIOP TTextOutStream& strmDest) const
 {
     TString strPortable, strLoadable;
     TModule::BuildModName

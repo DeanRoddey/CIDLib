@@ -254,6 +254,7 @@ TMEngTimeInfo::TMEngTimeInfo(TCIDMacroEngine& meOwner) :
     , m_c2MethId_AddStamp(kCIDMacroEng::c2BadId)
     , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
     , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FormatToStr(kCIDMacroEng::c2BadId)
     , m_c2MethId_GetCurMillis(kCIDMacroEng::c2BadId)
     , m_c2MethId_GetCurMillis64(kCIDMacroEng::c2BadId)
     , m_c2MethId_GetCurStamp(kCIDMacroEng::c2BadId)
@@ -785,6 +786,21 @@ tCIDLib::TVoid TMEngTimeInfo::Init(TCIDMacroEngine& meOwner)
         m_c2MethId_GetWeekday = c2AddMethodInfo(methiNew);
     }
 
+    // Format to string, based on provided format string
+    {
+        TMEngMethodInfo methiNew
+        (
+            L"FormatToStr"
+            , tCIDMacroEng::EIntrinsics::Void
+            , tCIDMacroEng::EVisTypes::Public
+            , tCIDMacroEng::EMethExt::Final
+            , tCIDMacroEng::EConstTypes::Const
+        );
+        methiNew.c2AddOutParm(L"OutStr", tCIDMacroEng::EIntrinsics::String);
+        methiNew.c2AddInParm(L"FormatStr", tCIDMacroEng::EIntrinsics::String);
+        m_c2MethId_FormatToStr = c2AddMethodInfo(methiNew);
+    }
+
     //
     //  Returns true if the difference between this time and the (earlier) one
     //  passed is greater than a number of seconds.
@@ -1263,6 +1279,20 @@ TMEngTimeInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
 
         TMEngEnumVal& mecvRet = meOwner.mecvStackAtAs<TMEngEnumVal>(c4FirstInd - 1);
         mecvRet.c4Ordinal(tCIDLib::c4EnumOrd(eDay));
+    }
+     else if (c2MethId == m_c2MethId_FormatToStr)
+    {
+        // Format to a string, taking an ad hoc format string, not the one set on the time object
+        try
+        {
+            TMEngStringVal& mecvTar = meOwner.mecvStackAtAs<TMEngStringVal>(c4FirstInd);
+            mecvActual.tmValue().FormatToStr(mecvTar.strValue(), meOwner.strStackValAt(c4FirstInd + 1));
+        }
+
+        catch(TError& errToCatch)
+        {
+            ThrowAnErr(meOwner, m_c4ErrFmtFailed, errToCatch);
+        }
     }
      else if (c2MethId == m_c2MethId_IsDiffGreater)
     {

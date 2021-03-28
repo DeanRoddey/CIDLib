@@ -73,12 +73,8 @@ class CIDXMLEXP TDTDEntityDecl : public TXMLEntityDecl
             , const tCIDLib::TCh* const     pszEntityValue
         );
 
-        TDTDEntityDecl
-        (
-            const   TDTDEntityDecl&         xdeclSrc
-        );
-
-        TDTDEntityDecl(TDTDEntityDecl&&) = delete;
+        TDTDEntityDecl(const TDTDEntityDecl&) = default;
+        TDTDEntityDecl(TDTDEntityDecl&&) = default;
 
         ~TDTDEntityDecl();
 
@@ -86,12 +82,8 @@ class CIDXMLEXP TDTDEntityDecl : public TXMLEntityDecl
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TDTDEntityDecl& operator=
-        (
-            const   TDTDEntityDecl&         xdeclSrc
-        );
-
-        TDTDEntityDecl& operator=(TDTDEntityDecl&&) = delete;
+        TDTDEntityDecl& operator=(const TDTDEntityDecl&) = default;
+        TDTDEntityDecl& operator=(TDTDEntityDecl&&) = default;
 
 
         // -------------------------------------------------------------------

@@ -326,8 +326,8 @@ tCIDLib::TCard8 TTime::c8Millis()
 
 // Just a passthrough to the kernel level
 tCIDLib::TVoid
-TTime::CurNTPTime(          tCIDLib::TCard4&    c4Secs
-                    ,       tCIDLib::TCard4&    c4Fract
+TTime::CurNTPTime(  COP     tCIDLib::TCard4&    c4Secs
+                    , COP   tCIDLib::TCard4&    c4Fract
                     , const tCIDLib::TBoolean   bNWOrder)
 {
     TKrnlTimeStamp::CurNTPTime(c4Secs, c4Fract, bNWOrder);
@@ -748,14 +748,13 @@ const TString& TTime::strISO8601Basic()
 
 const TString& TTime::strTimeZoneName()
 {
-    TAtomicFlag atomInitDone;
-
     //
     //  We optimize here so that we don't have to return a copy of a
     //  string. We get the time zone offset and name and store them.
     //  As long as the offset doesn't change, we don't have to update
     //  the name.
     //
+    static TAtomicFlag atomInitDone;
     if (!atomInitDone)
     {
         TBaseLock lockInit;
@@ -2208,10 +2207,7 @@ TTime::FormatToStr(         TString&                strToWriteTo
 
             case kCIDLib::chLatin_A :
                 // The long weekday name
-                strBuild.eReplaceToken
-                (
-                    TLocale::strDay(eWeekDay), kCIDLib::chLatin_A
-                );
+                strBuild.eReplaceToken(TLocale::strDay(eWeekDay), kCIDLib::chLatin_A);
                 break;
 
             case kCIDLib::chLatin_D :
@@ -2220,11 +2216,8 @@ TTime::FormatToStr(         TString&                strToWriteTo
                 break;
 
             case kCIDLib::chLatin_d :
-                // The full weekday name, faulting in the stream if needed
-                strBuild.eReplaceToken
-                (
-                    TLocale::strDay(eWeekDay), kCIDLib::chLatin_d
-                );
+                // The full weekday name
+                strBuild.eReplaceToken(TLocale::strDay(eWeekDay), kCIDLib::chLatin_d);
                 break;
 
             case kCIDLib::chLatin_e :

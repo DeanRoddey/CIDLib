@@ -243,7 +243,7 @@ const TResourceName& TMutex::rsnName() const
 // ---------------------------------------------------------------------------
 //  TMutex: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TMutex::FormatTo(TTextOutStream& strmToWriteTo) const
+tCIDLib::TVoid TMutex::FormatTo(CIOP TTextOutStream& strmToWriteTo) const
 {
     strmToWriteTo << m_rsnThis.strFullName(tCIDLib::ENamedRscTypes::Mutex);
 }

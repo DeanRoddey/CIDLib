@@ -56,12 +56,12 @@ class KRNLEXPORT TKrnlTimeStamp
 
         static tCIDLib::TBoolean bIsDST
         (
-                    tCIDLib::TBoolean&      bDSTState
+            COP     tCIDLib::TBoolean&      bDSTState
         );
 
         static tCIDLib::TBoolean bTZOffset
         (
-                    tCIDLib::TInt4&         i4ToFill
+            COP     tCIDLib::TInt4&         i4ToFill
         );
 
         static tCIDLib::TBoolean bTZName
@@ -93,19 +93,19 @@ class KRNLEXPORT TKrnlTimeStamp
         static tCIDLib::TBoolean bLocalToNative
         (
             const   tCIDLib::TEncodedTime&  enctLocal
-            ,       tCIDLib::TEncodedTime&  enctNative
+            , COP   tCIDLib::TEncodedTime&  enctNative
         );
 
         static tCIDLib::TBoolean bLocalToUTC
         (
             const   tCIDLib::TEncodedTime&  enctLocal
-            ,       tCIDLib::TEncodedTime&  enctUTC
+            , COP   tCIDLib::TEncodedTime&  enctUTC
         );
 
         static tCIDLib::TBoolean bUTCToLocal
         (
             const   tCIDLib::TEncodedTime&  enctUTC
-            ,       tCIDLib::TEncodedTime&  enctLocal
+            , COP   tCIDLib::TEncodedTime&  enctLocal
         );
 
         static tCIDLib::TCard4 c4MaxDayForMonth
@@ -120,8 +120,8 @@ class KRNLEXPORT TKrnlTimeStamp
 
         static tCIDLib::TVoid CurNTPTime
         (
-                    tCIDLib::TCard4&        c4Secs
-            ,       tCIDLib::TCard4&        c4Fract
+            COP     tCIDLib::TCard4&        c4Secs
+            , COP   tCIDLib::TCard4&        c4Fract
             , const tCIDLib::TBoolean       bNWOrder
         );
 
@@ -158,36 +158,36 @@ class KRNLEXPORT TKrnlTimeStamp
 
         tCIDLib::TBoolean bAsDateInfo
         (
-                    tCIDLib::TCard4&        c4Year
-            ,       tCIDLib::EMonths&       eMonth
-            ,       tCIDLib::TCard4&        c4Day
-            ,       tCIDLib::EWeekDays&     eWeekDay
+            COP     tCIDLib::TCard4&        c4Year
+            , COP   tCIDLib::EMonths&       eMonth
+            , COP   tCIDLib::TCard4&        c4Day
+            , COP   tCIDLib::EWeekDays&     eWeekDay
         )   const;
 
         tCIDLib::TBoolean bAsTimeInfo
         (
-                    tCIDLib::TCard4&        c4Hour
-            ,       tCIDLib::TCard4&        c4Minute
-            ,       tCIDLib::TCard4&        c4Second
-            ,       tCIDLib::TCard4&        c4Millis
+            COP     tCIDLib::TCard4&        c4Hour
+            , COP   tCIDLib::TCard4&        c4Minute
+            , COP   tCIDLib::TCard4&        c4Second
+            , COP   tCIDLib::TCard4&        c4Millis
         )   const;
 
         tCIDLib::TBoolean bDayOfWeek
         (
-                    tCIDLib::EWeekDays&     eToFill
+            COP     tCIDLib::EWeekDays&     eToFill
         )   const;
 
         tCIDLib::TBoolean bExpandDetails
         (
-                    tCIDLib::TCard4&        c4Year
-            ,       tCIDLib::EMonths&       eMonth
-            ,       tCIDLib::TCard4&        c4Day
-            ,       tCIDLib::EWeekDays&     eWeekDay
-            ,       tCIDLib::TCard4&        c4Hour
-            ,       tCIDLib::TCard4&        c4Minute
-            ,       tCIDLib::TCard4&        c4Second
-            ,       tCIDLib::TCard4&        c4Millis
-            ,       tCIDLib::TEncodedTime&  enctStamp
+            CIP     tCIDLib::TCard4&        c4Year
+            , COP   tCIDLib::EMonths&       eMonth
+            , COP   tCIDLib::TCard4&        c4Day
+            , COP   tCIDLib::EWeekDays&     eWeekDay
+            , COP   tCIDLib::TCard4&        c4Hour
+            , COP   tCIDLib::TCard4&        c4Minute
+            , COP   tCIDLib::TCard4&        c4Second
+            , COP   tCIDLib::TCard4&        c4Millis
+            , COP   tCIDLib::TEncodedTime&  enctStamp
         )   const;
 
         tCIDLib::TBoolean bForwardByDays

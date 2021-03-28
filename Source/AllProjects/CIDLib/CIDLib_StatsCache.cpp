@@ -575,7 +575,7 @@ const tCIDLib::TCh* TStatsCacheItem::pszKey() const
 
 
 tCIDLib::TVoid
-TStatsCacheItem::Set(const tCIDLib::TCard4 c4Id, TStatsCacheNode* const pscnData)
+TStatsCacheItem::Set(const tCIDLib::TCard4 c4Id, CIP TStatsCacheNode* const pscnData)
 {
     m_c4Id = c4Id;
     m_pscnData = pscnData;

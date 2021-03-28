@@ -76,21 +76,9 @@ TZLibCompImpl::TZLibCompImpl(const  tCIDZLib::ECompLevels   eLevel
     , m_pc2DistAccum(nullptr)
     , m_pc2HashPrev(nullptr)
     , m_pc2HashTbl(nullptr)
-    , m_tdDynBitLen
-      (
-        (kCIDZLib_::c4BitLenCodes * 2) + 1
-        , &s_stdBitLen
-      )
-    , m_tdDynDist
-      (
-        (kCIDZLib_::c4DistCodes * 2) + 1
-        , &s_stdDist
-      )
-    , m_tdDynLens
-      (
-        kCIDZLib_::c4HeapSz
-        , &s_stdLens
-      )
+    , m_tdDynBitLen((kCIDZLib_::c4BitLenCodes * 2) + 1, &s_stdBitLen)
+    , m_tdDynDist((kCIDZLib_::c4DistCodes * 2) + 1, &s_stdDist)
+    , m_tdDynLens(kCIDZLib_::c4HeapSz, &s_stdLens)
     , m_pstrmIn(nullptr)
     , m_pstrmOut(nullptr)
 {
@@ -103,21 +91,20 @@ TZLibCompImpl::TZLibCompImpl(const  tCIDZLib::ECompLevels   eLevel
 
     // Allocate our major buffers
     m_pc1LLAccum   = new tCIDLib::TCard1[kCIDZLib_::c4WndSz];
-    m_pc1WndBuf    = new tCIDLib::TCard1[kCIDZLib_::c4WndBufSz];
+    m_pc2DistAccum = new tCIDLib::TCard2[kCIDZLib_::c4WndSz];
     m_pc2HashPrev  = new tCIDLib::TCard2[kCIDZLib_::c4HashSz];
     m_pc2HashTbl   = new tCIDLib::TCard2[kCIDZLib_::c4HashSz];
-    m_pc2DistAccum = new tCIDLib::TCard2[kCIDZLib_::c4WndSz];
-
+    m_pc1WndBuf    = new tCIDLib::TCard1[kCIDZLib_::c4WndBufSz];
 }
 
 TZLibCompImpl::~TZLibCompImpl()
 {
     // Release all our major buffesr
-    delete [] m_pc1WndBuf;
-    delete [] m_pc2HashPrev;
-    delete [] m_pc2HashTbl;
     delete [] m_pc1LLAccum;
     delete [] m_pc2DistAccum;
+    delete [] m_pc2HashPrev;
+    delete [] m_pc2HashTbl;
+    delete [] m_pc1WndBuf;
 }
 
 
@@ -241,14 +228,7 @@ TZLibCompImpl::c4ReadBuf(       tCIDLib::TCard1* const  pc1ToFill
     // Read up to the requested bytes
     tCIDLib::TCard4 c4Ret = 0;
     if (c4Actual)
-    {
-        c4Ret = m_pstrmIn->c4ReadRawBuffer
-        (
-            pc1ToFill
-            , c4Actual
-            , tCIDLib::EAllData::OkIfNotAll
-        );
-    }
+        c4Ret = m_pstrmIn->c4ReadRawBuffer(pc1ToFill, c4Actual, tCIDLib::EAllData::OkIfNotAll);
 
     //
     //  If we got more data, so update the adler hash which is kept for

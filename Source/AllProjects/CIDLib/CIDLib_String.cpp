@@ -335,13 +335,13 @@ tCIDLib::TCh* TStrCat::pszStealBuf(tCIDLib::TCard4& c4Len) const
 //  which are very convenient to use.
 //
 TString::ETokenFind
-TString::eFindToken(const tCIDLib::TCh*&    pszStart
-                    , tCIDLib::TCh&         chToken
-                    , tCIDLib::EHJustify&   eJustify
-                    , tCIDLib::TCard4&      c4FldWidth
-                    , tCIDLib::TCh&         chFill
-                    , tCIDLib::TCard4&      c4Precision
-                    , const tCIDLib::TCh*&  pszEnd)
+TString::eFindToken( const  tCIDLib::TCh*&          pszStart
+                    , COP   tCIDLib::TCh&           chToken
+                    , COP   tCIDLib::EHJustify&     eJustify
+                    , COP   tCIDLib::TCard4&        c4FldWidth
+                    , COP   tCIDLib::TCh&           chFill
+                    , COP   tCIDLib::TCard4&        c4Precision
+                    , COP   const tCIDLib::TCh*&    pszEnd)
 {
     // States for our state machine
     enum class ETokenStates
@@ -374,11 +374,14 @@ TString::eFindToken(const tCIDLib::TCh*&    pszStart
 
     // Watch for psycho scenarios
     if (!pszStart)
+    {
+        pszEnd = nullptr;
         return ETokenFind::BadFormat;
+    }
 
     if (*pszStart == kCIDLib::chNull)
     {
-        pszEnd = pszStart;
+        pszEnd = nullptr;
         return ETokenFind::End;
     }
 
@@ -1901,7 +1904,7 @@ TString::bContainsSubStr(const  TString&            strToFind
 tCIDLib::TBoolean
 TString::bExtractNthToken(  const   tCIDLib::TCard4     c4TokInd
                             , const tCIDLib::TCh        chSepChar
-                            ,       TString&            strToFill
+                            , COP   TString&            strToFill
                             , const tCIDLib::TBoolean   bStripWS) const
 {
     //
@@ -1992,7 +1995,7 @@ TString::bExtractNthToken(  const   tCIDLib::TCard4     c4TokInd
 //  found. If a token is found more than once, it's in the list more than
 //  once. They are returned in the order found.
 //
-tCIDLib::TBoolean TString::bFindTokenList(TString& strToFill) const
+tCIDLib::TBoolean TString::bFindTokenList(COP TString& strToFill) const
 {
     strToFill.Clear();
 
@@ -2032,7 +2035,7 @@ tCIDLib::TBoolean TString::bFindTokenList(TString& strToFill) const
 
 tCIDLib::TBoolean
 TString::bFirstOccurrence(  const   tCIDLib::TCh            chTarget
-                            ,       tCIDLib::TCard4&        c4Pos
+                            , COP   tCIDLib::TCard4&        c4Pos
                             , const tCIDLib::TBoolean       bCaseSensitive) const
 {
     //
@@ -2111,7 +2114,7 @@ tCIDLib::TBoolean TString::bIsAlphaNum() const
 
 tCIDLib::TBoolean
 TString::bLastOccurrence(   const   tCIDLib::TCh            chTarget
-                            ,       tCIDLib::TCard4&        c4Pos
+                            , COP   tCIDLib::TCard4&        c4Pos
                             , const tCIDLib::TBoolean       bCaseSensitive) const
 {
     // See if there is a match
@@ -2134,7 +2137,7 @@ TString::bLastOccurrence(   const   tCIDLib::TCh            chTarget
 
 tCIDLib::TBoolean
 TString::bLastOccurrence(   const   TString&                strSubStr
-                            ,       tCIDLib::TCard4&        c4Pos
+                            , COP   tCIDLib::TCard4&        c4Pos
                             , const tCIDLib::TBoolean       bAnyChar
                             , const tCIDLib::TBoolean       bCaseSensitive) const
 {
@@ -2170,7 +2173,7 @@ TString::bLastOccurrence(   const   TString&                strSubStr
 
 tCIDLib::TBoolean
 TString::bNextOccurrence(   const   tCIDLib::TCh            chTarget
-                            ,       tCIDLib::TCard4&        c4Pos
+                            , CIOP  tCIDLib::TCard4&        c4Pos
                             , const tCIDLib::TBoolean       bCaseSensitive) const
 {
     // If over the length, then an error
@@ -2209,7 +2212,7 @@ TString::bNextOccurrence(   const   tCIDLib::TCh            chTarget
 
 tCIDLib::TBoolean
 TString::bNextOccurrence(   const   TString&                strSubStr
-                            ,       tCIDLib::TCard4&        c4Pos
+                            , CIOP  tCIDLib::TCard4&        c4Pos
                             , const tCIDLib::TBoolean       bAnyChar
                             , const tCIDLib::TBoolean       bCaseSensitive) const
 {
@@ -2262,7 +2265,7 @@ TString::bNextOccurrence(   const   TString&                strSubStr
 
 tCIDLib::TBoolean
 TString::bPrevOccurrence(   const   tCIDLib::TCh            chTarget
-                            ,       tCIDLib::TCard4&        c4Pos
+                            , CIOP  tCIDLib::TCard4&        c4Pos
                             , const tCIDLib::TBoolean       bCaseSensitive) const
 {
     // If the position is zero, then no further to look
@@ -2307,7 +2310,7 @@ TString::bPrevOccurrence(   const   tCIDLib::TCh            chTarget
 
 tCIDLib::TBoolean
 TString::bPrevOccurrence(   const   TString&                strSubStr
-                            ,       tCIDLib::TCard4&        c4Pos
+                            , CIOP  tCIDLib::TCard4&        c4Pos
                             , const tCIDLib::TBoolean       bAnyChar
                             , const tCIDLib::TBoolean       bCaseSensitive) const
 {
@@ -2410,7 +2413,7 @@ TString::bReplaceChar(  const   tCIDLib::TCh    chToReplace
 tCIDLib::TBoolean
 TString::bReplaceSubStr(const   TString&            strToReplace
                         , const TString&            strReplaceWith
-                        ,       tCIDLib::TCard4&    c4StartAt
+                        , CIOP  tCIDLib::TCard4&    c4StartAt
                         , const tCIDLib::TBoolean   bReplaceAll
                         , const tCIDLib::TBoolean   bCaseSensitive)
 {
@@ -2515,7 +2518,7 @@ TString::bReplaceSubStr(const   TString&            strToReplace
 //  and strip leading/trailing whitespace on both.
 //
 tCIDLib::TBoolean
-TString::bSplit(        TString&                strSecondHalf
+TString::bSplit(COP     TString&                strSecondHalf
                 , const tCIDLib::TCh            chDivider
                 , const tCIDLib::TBoolean       bCaseSensitive)
 {
@@ -2561,7 +2564,7 @@ TString::bSplit(        TString&                strSecondHalf
 //  when we are probing a user entered value, without having to install an
 //  exception handler.
 //
-tCIDLib::TBoolean TString::bToBoolean(tCIDLib::TBoolean& bToFill) const noexcept
+tCIDLib::TBoolean TString::bToBoolean(COP tCIDLib::TBoolean& bToFill) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::True;
 
@@ -2601,7 +2604,7 @@ tCIDLib::TBoolean TString::bToBoolean(tCIDLib::TBoolean& bToFill) const noexcept
 }
 
 tCIDLib::TBoolean
-TString::bToCard1(          tCIDLib::TCard1&    c1ToFill
+TString::bToCard1(  COP     tCIDLib::TCard1&    c1ToFill
                     , const tCIDLib::ERadices   eRadix) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::False;
@@ -2618,7 +2621,7 @@ TString::bToCard1(          tCIDLib::TCard1&    c1ToFill
 }
 
 tCIDLib::TBoolean
-TString::bToCard2(          tCIDLib::TCard2&    c2ToFill
+TString::bToCard2(  COP     tCIDLib::TCard2&    c2ToFill
                     , const tCIDLib::ERadices   eRadix) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::False;
@@ -2638,7 +2641,7 @@ TString::bToCard2(          tCIDLib::TCard2&    c2ToFill
 }
 
 tCIDLib::TBoolean
-TString::bToCard4(          tCIDLib::TCard4&    c4ToFill
+TString::bToCard4(  COP     tCIDLib::TCard4&    c4ToFill
                     , const tCIDLib::ERadices   eRadix) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::False;
@@ -2647,7 +2650,7 @@ TString::bToCard4(          tCIDLib::TCard4&    c4ToFill
 }
 
 tCIDLib::TBoolean
-TString::bToCard8(          tCIDLib::TCard8&    c8ToFill
+TString::bToCard8(  COP     tCIDLib::TCard8&    c8ToFill
                     , const tCIDLib::ERadices   eRadix) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::False;
@@ -2655,7 +2658,7 @@ TString::bToCard8(          tCIDLib::TCard8&    c8ToFill
     return bValid;
 }
 
-tCIDLib::TBoolean TString::bToFloat4(tCIDLib::TFloat4& f4ToFill) const noexcept
+tCIDLib::TBoolean TString::bToFloat4(COP tCIDLib::TFloat4& f4ToFill) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TFloat8 f8Val = TRawStr::f8AsBinary(pszBuffer(), bValid);
@@ -2670,7 +2673,7 @@ tCIDLib::TBoolean TString::bToFloat4(tCIDLib::TFloat4& f4ToFill) const noexcept
     return bValid;
 }
 
-tCIDLib::TBoolean TString::bToFloat8(tCIDLib::TFloat8& f8ToFill) const noexcept
+tCIDLib::TBoolean TString::bToFloat8(COP tCIDLib::TFloat8& f8ToFill) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::False;
     f8ToFill = TRawStr::f8AsBinary(pszBuffer(), bValid);
@@ -2678,7 +2681,7 @@ tCIDLib::TBoolean TString::bToFloat8(tCIDLib::TFloat8& f8ToFill) const noexcept
 }
 
 tCIDLib::TBoolean
-TString::bToInt1(tCIDLib::TInt1& i1ToFill, const tCIDLib::ERadices eRadix) const noexcept
+TString::bToInt1(COP tCIDLib::TInt1& i1ToFill, const tCIDLib::ERadices eRadix) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TInt4 i4Val = TRawStr::i4AsBinary(pszBuffer(), bValid, eRadix);
@@ -2694,7 +2697,7 @@ TString::bToInt1(tCIDLib::TInt1& i1ToFill, const tCIDLib::ERadices eRadix) const
 }
 
 tCIDLib::TBoolean
-TString::bToInt2(tCIDLib::TInt2& i2ToFill, const tCIDLib::ERadices eRadix) const noexcept
+TString::bToInt2(COP tCIDLib::TInt2& i2ToFill, const tCIDLib::ERadices eRadix) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::False;
     const tCIDLib::TInt4 i4Val = TRawStr::i4AsBinary(pszBuffer(), bValid, eRadix);
@@ -2710,7 +2713,7 @@ TString::bToInt2(tCIDLib::TInt2& i2ToFill, const tCIDLib::ERadices eRadix) const
 }
 
 tCIDLib::TBoolean
-TString::bToInt4(tCIDLib::TInt4& i4ToFill, const tCIDLib::ERadices eRadix) const noexcept
+TString::bToInt4(COP tCIDLib::TInt4& i4ToFill, const tCIDLib::ERadices eRadix) const noexcept
 {
     tCIDLib::TBoolean bValid = kCIDLib::False;
     i4ToFill = TRawStr::i4AsBinary(pszBuffer(), bValid, eRadix);
@@ -2718,7 +2721,7 @@ TString::bToInt4(tCIDLib::TInt4& i4ToFill, const tCIDLib::ERadices eRadix) const
 }
 
 tCIDLib::TBoolean
-TString::bToInt8(tCIDLib::TInt8& i8ToFill, const tCIDLib::ERadices eRadix) const noexcept
+TString::bToInt8(COP tCIDLib::TInt8& i8ToFill, const tCIDLib::ERadices eRadix) const noexcept
 {
     tCIDLib::TBoolean bValid;
     i8ToFill = TRawStr::i8AsBinary(pszBuffer(), bValid, eRadix);
@@ -2893,7 +2896,7 @@ TString::CopyInSubStr(  const   TString&        strSource
 }
 
 inline tCIDLib::TVoid
-TString::CopyOutSubStr(         TString&        strTarget
+TString::CopyOutSubStr( COP     TString&        strTarget
                         , const tCIDLib::TCard4 c4Start
                         , const tCIDLib::TCard4 c4Len) const
 {
@@ -4983,7 +4986,7 @@ TString::ToZStr(        tCIDLib::TCh* const pszTarget
 // ---------------------------------------------------------------------------
 //  TString: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TString::FormatTo(TTextOutStream& strmToWriteTo) const
+tCIDLib::TVoid TString::FormatTo(CIOP TTextOutStream& strmToWriteTo) const
 {
     //
     //  Dump the raw string pointer to the string. DO NOT dump 'this'
@@ -4993,7 +4996,7 @@ tCIDLib::TVoid TString::FormatTo(TTextOutStream& strmToWriteTo) const
 }
 
 
-tCIDLib::TVoid TString::StreamFrom(TBinInStream& strmToReadFrom)
+tCIDLib::TVoid TString::StreamFrom(CIOP TBinInStream& strmToReadFrom)
 {
     try
     {
@@ -5073,7 +5076,7 @@ tCIDLib::TVoid TString::StreamFrom(TBinInStream& strmToReadFrom)
 }
 
 
-tCIDLib::TVoid TString::StreamTo(TBinOutStream& strmToWriteTo) const
+tCIDLib::TVoid TString::StreamTo(CIOP TBinOutStream& strmToWriteTo) const
 {
     //
     //  Write a start object marker to start the object, and write out the
