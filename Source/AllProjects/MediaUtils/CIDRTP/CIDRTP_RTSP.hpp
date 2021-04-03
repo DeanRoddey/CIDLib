@@ -93,6 +93,7 @@ class CIDRTPEXP TCIDRTSPSess : public TObject
         );
 
         TCIDRTSPSess(const TCIDRTSPSess&) = delete;
+        TCIDRTSPSess(TCIDRTSPSess&&) = delete;
 
         ~TCIDRTSPSess();
 
@@ -101,6 +102,7 @@ class CIDRTPEXP TCIDRTSPSess : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TCIDRTSPSess& operator=(const TCIDRTSPSess&) = delete;
+        TCIDRTSPSess& operator=(TCIDRTSPSess&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -206,6 +208,7 @@ class CIDRTPEXP TCIDRTSPSrv : public TObject
         TCIDRTSPSrv();
 
         TCIDRTSPSrv(const TCIDRTSPSrv&) = delete;
+        TCIDRTSPSrv(TCIDRTSPSrv&&) = delete;
 
         ~TCIDRTSPSrv();
 
@@ -214,6 +217,7 @@ class CIDRTPEXP TCIDRTSPSrv : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TCIDRTSPSrv& operator=(const TCIDRTSPSrv&) = delete;
+        TCIDRTSPSrv& operator=(TCIDRTSPSrv&&) = delete;
 
 
         // -------------------------------------------------------------------

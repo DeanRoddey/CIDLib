@@ -179,7 +179,7 @@ class KRNLEXPORT TKrnlTimeStamp
 
         tCIDLib::TBoolean bExpandDetails
         (
-            CIP     tCIDLib::TCard4&        c4Year
+            COP     tCIDLib::TCard4&        c4Year
             , COP   tCIDLib::EMonths&       eMonth
             , COP   tCIDLib::TCard4&        c4Day
             , COP   tCIDLib::EWeekDays&     eWeekDay

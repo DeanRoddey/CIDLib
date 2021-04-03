@@ -142,7 +142,7 @@ TBinInStream::~TBinInStream()
 // ---------------------------------------------------------------------------
 //  TBinInStream: Public operators
 // ---------------------------------------------------------------------------
-TBinInStream& TBinInStream::operator>>(tCIDLib::TBoolean& bToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TBoolean& bToFill)
 {
     //
     //  Boolean values are stored as single bytes, regardless of what the
@@ -160,13 +160,13 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TBoolean& bToFill)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TCard1& c1ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TCard1& c1ToFill)
 {
     c4ReadRawBuffer(&c1ToFill, sizeof(c1ToFill));
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TCard2& c2ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TCard2& c2ToFill)
 {
     c4ReadRawBuffer(&c2ToFill, sizeof(c2ToFill));
 
@@ -177,7 +177,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TCard2& c2ToFill)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TCard4& c4ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TCard4& c4ToFill)
 {
     c4ReadRawBuffer(&c4ToFill, sizeof(c4ToFill));
 
@@ -188,7 +188,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TCard4& c4ToFill)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TCard8& c8ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TCard8& c8ToFill)
 {
     c4ReadRawBuffer(&c8ToFill, sizeof(c8ToFill));
 
@@ -199,7 +199,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TCard8& c8ToFill)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::EStreamMarkers& eMarker)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::EStreamMarkers& eMarker)
 {
     tCIDLib::TCard1 c1Tmp;
     c4ReadRawBuffer(&c1Tmp, sizeof(c1Tmp));
@@ -220,7 +220,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::EStreamMarkers& eMarker)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TFloat4& f4ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TFloat4& f4ToFill)
 {
     c4ReadRawBuffer(&f4ToFill, sizeof(f4ToFill));
     if (bLittleEndian() != TSysInfo::bLittleEndian())
@@ -229,7 +229,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TFloat4& f4ToFill)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TFloat8& f8ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TFloat8& f8ToFill)
 {
     c4ReadRawBuffer(&f8ToFill, sizeof(f8ToFill));
     if (bLittleEndian() != TSysInfo::bLittleEndian())
@@ -237,13 +237,13 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TFloat8& f8ToFill)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TInt1& i1ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TInt1& i1ToFill)
 {
     c4ReadRawBuffer(&i1ToFill, sizeof(i1ToFill));
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TInt2& i2ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TInt2& i2ToFill)
 {
     c4ReadRawBuffer(&i2ToFill, sizeof(i2ToFill));
 
@@ -254,7 +254,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TInt2& i2ToFill)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TInt4& i4ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TInt4& i4ToFill)
 {
     c4ReadRawBuffer(&i4ToFill, sizeof(i4ToFill));
 
@@ -265,7 +265,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TInt4& i4ToFill)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TInt8& i8ToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TInt8& i8ToFill)
 {
     c4ReadRawBuffer(&i8ToFill, sizeof(i8ToFill));
 
@@ -276,7 +276,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TInt8& i8ToFill)
     return *this;
 }
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TUInt& uToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TUInt& uToFill)
 {
     c4ReadRawBuffer(&uToFill, sizeof(uToFill));
 
@@ -288,7 +288,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TUInt& uToFill)
 }
 
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TSInt& iToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TSInt& iToFill)
 {
     c4ReadRawBuffer(&iToFill, sizeof(iToFill));
 
@@ -300,7 +300,7 @@ TBinInStream& TBinInStream::operator>>(tCIDLib::TSInt& iToFill)
 }
 
 
-TBinInStream& TBinInStream::operator>>(tCIDLib::TCh& chToFill)
+TBinInStream& TBinInStream::operator>>(COP tCIDLib::TCh& chToFill)
 {
     //
     //  It was stored in a UTF-8 format, so read it in and convert. The

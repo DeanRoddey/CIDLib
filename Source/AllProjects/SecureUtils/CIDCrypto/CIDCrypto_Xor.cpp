@@ -169,6 +169,7 @@ tCIDLib::TVoid TXorStreamEncrypter::DecryptImpl()
     //  stream after xoring with the key bytes. To be more efficient, we do
     //  it blocks of up to m_c4StreamBlockSize bytes.
     //
+    CIDLib_Suppress(26494)
     tCIDLib::TCard1 ac1TempBuf[CIDCrypto_Xor::c4StreamBlockSize];
     tCIDLib::TBoolean bDone = kCIDLib::False;
     while (!bDone)
@@ -213,6 +214,7 @@ tCIDLib::TVoid TXorStreamEncrypter::EncryptImpl()
     //  stream after xoring with the key bytes. To be more efficient, we do
     //  it blocks of up to m_c4StreamBlockSize bytes.
     //
+    CIDLib_Suppress(26494)
     tCIDLib::TCard1 ac1TempBuf[CIDCrypto_Xor::c4StreamBlockSize];
     tCIDLib::TBoolean bDone = kCIDLib::False;
     while (!bDone)

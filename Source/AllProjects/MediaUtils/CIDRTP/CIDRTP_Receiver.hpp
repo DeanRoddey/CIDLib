@@ -61,6 +61,7 @@ class CIDRTPEXP TCIDRTPRec : public TObject
         TCIDRTPRec();
 
         TCIDRTPRec(const TCIDRTPRec&) = delete;
+        TCIDRTPRec(TCIDRTPRec&&) = delete;
 
         ~TCIDRTPRec();
 
@@ -69,6 +70,7 @@ class CIDRTPEXP TCIDRTPRec : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TCIDRTPRec& operator=(const TCIDRTPRec&) = delete;
+        TCIDRTPRec& operator=(TCIDRTPRec&&) = delete;
 
 
         // -------------------------------------------------------------------

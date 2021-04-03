@@ -64,7 +64,7 @@ TDTDValidator::bExpandCharRef(tCIDLib::TCh& chToFill, tCIDLib::TCh& chSecond)
     //  see from here to there must be legal digits in the radix we got.
     //
     tCIDLib::TCard4 c4Accum = 0;
-    tCIDLib::TCard4 c4CurDigit;
+    tCIDLib::TCard4 c4CurDigit = 0;
     while (kCIDLib::True)
     {
         const tCIDLib::TCh chNext = xemOwner().chGetNext();
@@ -244,7 +244,7 @@ tCIDLib::TBoolean TDTDValidator::bParseDefAttrValue(TDTDAttrDef& xadToFill)
     //  and surrogate pair checking.
     //
     tCIDLib::TBoolean   bEscaped = kCIDLib::False;
-    tCIDLib::TCh        chNext;
+    tCIDLib::TCh        chNext = 0;
     tCIDLib::TCh        chSecond = kCIDLib::chNull;
     while (kCIDLib::True)
     {
@@ -420,7 +420,7 @@ TDTDValidator::bParseEntityValue(        TString&       strToFill
         //  Get the next char out and see what it is. If we have a second
         //  char from a pair, the do it next instead of getting another char.
         //
-        tCIDLib::TCh chNext;
+        tCIDLib::TCh chNext = 0;
         if (chSecond)
         {
             chNext = chSecond;
@@ -554,7 +554,7 @@ TDTDValidator::bParseEnumList(TDTDAttrDef& xadToFill, const tCIDLib::TBoolean bT
     //  is set, then the first non-space each time through has to be a first
     //  name char.
     //
-    tCIDLib::TBoolean bOk;
+    tCIDLib::TBoolean bOk = kCIDLib::False;
     while (kCIDLib::True)
     {
         // We can have optional space or PE ref here

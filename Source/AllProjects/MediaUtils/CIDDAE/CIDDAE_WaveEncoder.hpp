@@ -76,16 +76,16 @@ class CIDDAEEXP TCIDDAEWaveDec : public TCIDDAEDecoder
         (
                     TMemBuf&                mbufToFill
             , const tCIDLib::TCard4         c4StartInd = 0
-        );
+        )   final;
 
-        tCIDLib::TVoid CleanupImpl();
+        tCIDLib::TVoid CleanupImpl() final;
 
-        tCIDLib::TVoid EndDecodeImpl();
+        tCIDLib::TVoid EndDecodeImpl() final;
 
         tCIDLib::TVoid StartDecodeImpl
         (
             const   TString&                strSrcFile
-        );
+        )   final;
 
 
     private :
@@ -164,18 +164,18 @@ class CIDDAEEXP TCIDDAEWaveEnc : public TCIDDAEEncoder
         (
             const   TString&                strCodec
             , const TString&                strFormat
-        )   const;
+        )   const final;
 
         tCIDLib::TCard4 c4QueryCodecNames
         (
                     tCIDLib::TStrList&      colToFill
-        );
+        )   final;
 
         tCIDLib::TCard4 c4QueryCodecFmtNames
         (
             const   TString&                strCodec
             ,       tCIDLib::TStrList&      colToFill
-        );
+        )   final;
 
 
     protected :

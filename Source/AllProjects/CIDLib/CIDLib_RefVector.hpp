@@ -767,6 +767,15 @@ class TRefVector : public TRefCollection<TElem>
             return c4Ret;
         }
 
+        //
+        //  This is only advisory of course if multiple threads are accessing this collection.
+        //  You should lock around this this and your use of it otherwise.
+        //
+        tCIDLib::TCard4 c4CurAlloc() const
+        {
+            return m_c4CurAlloc;
+        }
+
         tCIDLib::TVoid CheckExpansion(const tCIDLib::TCard4 c4NewElems)
         {
             // If the new elements wouldn't fit, then expand

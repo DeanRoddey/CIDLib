@@ -453,12 +453,9 @@ tCIDLib::TVoid
 TBlowfishEncrypter::DecryptImpl(const   tCIDLib::TCard1* const  pc1Cypher
                                 ,       tCIDLib::TCard1* const  pc1Plain)
 {
-    tCIDLib::TCard4 c4Left;
-    tCIDLib::TCard4 c4Right;
-
     // Get out the next two 32 bit sides of the 64 bit block
-    c4Left = *reinterpret_cast<const tCIDLib::TCard4*>(pc1Cypher);
-    c4Right = *reinterpret_cast<const tCIDLib::TCard4*>(pc1Cypher+4);
+    tCIDLib::TCard4 c4Left = *reinterpret_cast<const tCIDLib::TCard4*>(pc1Cypher);
+    tCIDLib::TCard4 c4Right = *reinterpret_cast<const tCIDLib::TCard4*>(pc1Cypher+4);
 
     // If little endian, then byte swap it
     #if defined(CIDLIB_LITTLEENDIAN)
@@ -484,12 +481,9 @@ tCIDLib::TVoid
 TBlowfishEncrypter::EncryptImpl(const   tCIDLib::TCard1* const  pc1Plain
                                 ,       tCIDLib::TCard1* const  pc1Cypher)
 {
-    tCIDLib::TCard4 c4Left;
-    tCIDLib::TCard4 c4Right;
-
     // Get out the next two 32 bit sides of the 64 bit block
-    c4Left = *reinterpret_cast<const tCIDLib::TCard4*>(pc1Plain);
-    c4Right = *reinterpret_cast<const tCIDLib::TCard4*>(pc1Plain+4);
+    tCIDLib::TCard4 c4Left = *reinterpret_cast<const tCIDLib::TCard4*>(pc1Plain);
+    tCIDLib::TCard4 c4Right = *reinterpret_cast<const tCIDLib::TCard4*>(pc1Plain+4);
 
     // If little endian, then byte swap it
     #if defined(CIDLIB_LITTLEENDIAN)
@@ -533,11 +527,10 @@ tCIDLib::TVoid TBlowfishEncrypter::ResetImpl()
     //  And now lets initialize the P-Arrays, which uses the key information
     //  to scramble some initial contents.
     //
-    tCIDLib::TCard4         c4Index;
     tCIDLib::TCard4         c4KeyIndex = 0;
-    tCIDLib::TCard4Union    c4Temp;
+    tCIDLib::TCard4Union    c4Temp = {0};
     TRawMem::CopyMemBuf(m_ac4PArray, CIDCrypto_Blowfish::ac4PInit, sizeof(m_ac4PArray));
-    for (c4Index = 0; c4Index < c4Rounds + 2; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Rounds + 2; c4Index++)
     {
         c4Temp.c4Val = 0;
 
@@ -556,7 +549,7 @@ tCIDLib::TVoid TBlowfishEncrypter::ResetImpl()
     //
     tCIDLib::TCard4 c4LData = 0;
     tCIDLib::TCard4 c4RData = 0;
-    for (c4Index = 0; c4Index < c4Rounds + 2; c4Index += 2)
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Rounds + 2; c4Index += 2)
     {
         EncryptBlock(c4LData, c4RData);
         m_ac4PArray[c4Index] = c4LData;
@@ -568,7 +561,7 @@ tCIDLib::TVoid TBlowfishEncrypter::ResetImpl()
     //  the two data block values, letting them carry over whatever values
     //  where already in them from the last loop!!
     //
-    for (c4Index = 0; c4Index < c4NumSBoxes; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4NumSBoxes; c4Index++)
     {
         for (tCIDLib::TCard4 c4Inner = 0; c4Inner < c4SBoxSize; c4Inner += 2)
         {
@@ -583,11 +576,11 @@ tCIDLib::TVoid TBlowfishEncrypter::ResetImpl()
 // ---------------------------------------------------------------------------
 //  TBlowfishEncrypter: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TBlowfishEncrypter::DecryptBlock(tCIDLib::TCard4&    c4Left
-                                                , tCIDLib::TCard4&  c4Right)
+tCIDLib::TVoid TBlowfishEncrypter::DecryptBlock(CIOP    tCIDLib::TCard4&    c4Left
+                                                , CIOP  tCIDLib::TCard4&    c4Right)
 {
-    tCIDLib::TCard4Union    c4LTmp;
-    tCIDLib::TCard4Union    c4RTmp;
+    tCIDLib::TCard4Union    c4LTmp = {0};
+    tCIDLib::TCard4Union    c4RTmp = {0};
 
     // The params are in and out parms, so get their initial values
     c4LTmp.c4Val = c4Left;
@@ -618,11 +611,11 @@ tCIDLib::TVoid TBlowfishEncrypter::DecryptBlock(tCIDLib::TCard4&    c4Left
 }
 
 
-tCIDLib::TVoid TBlowfishEncrypter::EncryptBlock(tCIDLib::TCard4&    c4Left
-                                                , tCIDLib::TCard4&  c4Right)
+tCIDLib::TVoid TBlowfishEncrypter::EncryptBlock(CIOP    tCIDLib::TCard4&    c4Left
+                                                , CIOP  tCIDLib::TCard4&    c4Right)
 {
-    tCIDLib::TCard4Union    c4LTmp;
-    tCIDLib::TCard4Union    c4RTmp;
+    tCIDLib::TCard4Union    c4LTmp = {0};
+    tCIDLib::TCard4Union    c4RTmp = {0};
 
     // The params are in and out parms, so get their initial values
     c4LTmp.c4Val = c4Left;

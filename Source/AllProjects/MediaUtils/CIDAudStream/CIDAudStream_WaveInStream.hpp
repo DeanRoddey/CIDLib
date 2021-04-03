@@ -90,7 +90,7 @@ class CIDAUDSTREAMEXP TWaveInSrcStream : public TCIDAudioSrcStream
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid ThrowNotReady() const;
+        [[noreturn]] tCIDLib::TVoid ThrowNotReady() const;
 
 
         // -------------------------------------------------------------------

@@ -82,12 +82,12 @@ TCIDRTPMediaBuf::~TCIDRTPMediaBuf()
 //
 tCIDLib::TBoolean
 TCIDRTPMediaBuf::bBuildMsg( TMemBuf&                mbufToFill
-                            , tCIDLib::TCard4&      c4AtMilli
-                            , tCIDLib::TCard4&      c4AtSample
-                            , tCIDLib::TCard4&      c4HdrBytes
-                            , tCIDLib::TCard4&      c4DataBytes
-                            , tCIDLib::TCard2&      c2SeqNum
-                            , tCIDLib::TCard4&      c4MsgSz) const
+                            , COP tCIDLib::TCard4&  c4AtMilli
+                            , COP tCIDLib::TCard4&  c4AtSample
+                            , COP tCIDLib::TCard4&  c4HdrBytes
+                            , COP tCIDLib::TCard4&  c4DataBytes
+                            , COP tCIDLib::TCard2&  c2SeqNum
+                            , COP tCIDLib::TCard4&  c4MsgSz) const
 {
     // If this is the end of stream dummy buffer, then just return false
     if (m_bEndOfStream)

@@ -91,7 +91,8 @@ TMD5Hash TUniqueId::mhashMakeId()
         CIDCrypto_UniqueId::prandThread->Seed(c4Seed);
     }
 
-    // OK, fill a buffer with new random values
+    // OK, fill a buffer with new random values, suppress uninit error since we are filling it
+    CIDLib_Suppress(26494)
     tCIDLib::TCard4 ac4Buf[CIDCrypto_UniqueId::c4SrcBufLen];
     for (tCIDLib::TCard4 c4Index = 0; c4Index < CIDCrypto_UniqueId::c4SrcBufLen; c4Index++)
         ac4Buf[c4Index] = CIDCrypto_UniqueId::prandThread->c4GetNextNum();
@@ -106,7 +107,7 @@ TMD5Hash TUniqueId::mhashMakeId()
     );
     mdigTmp.Complete(mhashRet);
 
-    return tCIDLib::ForceMove(mhashRet);
+    return mhashRet;
 }
 
 
@@ -176,7 +177,7 @@ TMD5Hash TUniqueId::mhashMakeSystemId()
     mdigTmp.DigestBuf(mbufEnc, c4EncBytes);
     mdigTmp.Complete(mhashRet);
 
-    return tCIDLib::ForceMove(mhashRet);
+    return mhashRet;
 }
 
 
@@ -190,5 +191,5 @@ TString TUniqueId::strMakeId()
     TMD5Hash mhashTmp = mhashMakeId();
     TString strRet((mhashTmp.c4Bytes() * 2) + 16);
     mhashTmp.FormatToStr(strRet);
-    return tCIDLib::ForceMove(strRet);
+    return strRet;
 }

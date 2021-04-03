@@ -199,82 +199,77 @@ class CIDLIBEXP TBinInStream : public TObject
         // -------------------------------------------------------------------
         TBinInStream& operator>>
         (
-                    tCIDLib::TBoolean&      bToFill
+            COP     tCIDLib::TBoolean&      bToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TCard1&        c1ToFill
+            COP     tCIDLib::TCard1&        c1ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TCard2&        c2ToFill
+            COP     tCIDLib::TCard2&        c2ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TCard4&        c4ToFill
+            COP     tCIDLib::TCard4&        c4ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TCard8&        c8ToFill
+            COP     tCIDLib::TCard8&        c8ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::EStreamMarkers& eMarker
+            COP     tCIDLib::EStreamMarkers& eMarker
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TFloat4&       f4ToFill
+            COP     tCIDLib::TFloat4&       f4ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TFloat8&       f8ToFill
+            COP     tCIDLib::TFloat8&       f8ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TInt1&         i1ToFill
+            COP     tCIDLib::TInt1&         i1ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TInt2&         i2ToFill
+            COP     tCIDLib::TInt2&         i2ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TInt4&         i4ToFill
+            COP     tCIDLib::TInt4&         i4ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TInt8&         i8ToFill
+            COP     tCIDLib::TInt8&         i8ToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TUInt&         uToFill
+            COP     tCIDLib::TUInt&         uToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TSInt&         iToFill
-        );
-
-        TBinInStream& operator<<
-        (
-            const   tCIDLib::TBoolean       bToWrite
+            COP     tCIDLib::TSInt&         iToFill
         );
 
         TBinInStream& operator>>
         (
-                    tCIDLib::TCh&           chToFill
+            COP      tCIDLib::TCh&           chToFill
         );
 
         TBinInStream& operator=(const TBinInStream&) = delete;

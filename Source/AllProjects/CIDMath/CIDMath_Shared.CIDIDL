@@ -33,7 +33,7 @@
 
             <CIDIDL:Enum CIDIDL:Name="EMatrixElems"
                          CIDIDL:XlatMap="Text" CIDIDL:TextStreamMap="Text"
-                         CIDIDL:BinStream="Yes" 
+                         CIDIDL:BinStream="Yes"
                          CIDIDL:AltMap="BaseName" CIDIDL:IncDec="Inc">
                 <CIDIDL:DocText>
                     This enum is used to index matrices via the subscript operator.

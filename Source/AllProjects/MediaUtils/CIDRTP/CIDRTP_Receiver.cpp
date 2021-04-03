@@ -51,6 +51,7 @@ TCIDRTPRec::TCIDRTPRec() :
     m_c2LastSeqId(0)
     , m_c4LastTime(0)
     , m_c4Stat_BadPackets(0)
+    , m_c4Stat_MediaFmt(0)
     , m_c4Stat_MissingPackets(0)
     , m_c4Stat_OutSeqPackets(0)
     , m_c4Stat_TotalPackets(0)

@@ -1355,21 +1355,17 @@ TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
             return;
 
         // See if we need to swap byte order on the input
-        tCIDLib::TBoolean bSwapped;
+        tCIDLib::TBoolean bSwapped = kCIDLib::False;
         if (eEncoding == tCIDXML::EBaseEncodings::UTF16_B)
         {
             #if defined(CIDLIB_LITTLEENDIAN)
             bSwapped = kCIDLib::True;
-            #else
-            bSwapped = kCIDLib::False;
             #endif
         }
          else
         {
             #if defined(CIDLIB_BIGENDIAN)
             bSwapped = kCIDLib::True;
-            #else
-            bSwapped = kCIDLib::False;
             #endif
         }
 
@@ -1453,21 +1449,17 @@ TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
             return;
 
         // See if we need to swap byte order on the input
-        tCIDLib::TBoolean bSwapped;
+        tCIDLib::TBoolean bSwapped = kCIDLib::False;
         if (eEncoding == tCIDXML::EBaseEncodings::UCS4_B)
         {
             #if defined(CIDLIB_LITTLEENDIAN)
             bSwapped = kCIDLib::True;
-            #else
-            bSwapped = kCIDLib::False;
             #endif
         }
          else
         {
             #if defined(CIDLIB_BIGENDIAN)
             bSwapped = kCIDLib::True;
-            #else
-            bSwapped = kCIDLib::False;
             #endif
         }
 

@@ -90,6 +90,7 @@ class CIDRTPEXP TCIDRTPIOSrc : public TCIDRTPIO
         //  Public constructors and destructor
         // -------------------------------------------------------------------
         TCIDRTPIOSrc(const TCIDRTPIOSrc&) = delete;
+        TCIDRTPIOSrc(TCIDRTPIOSrc&) = delete;
 
         ~TCIDRTPIOSrc();
 
@@ -98,6 +99,7 @@ class CIDRTPEXP TCIDRTPIOSrc : public TCIDRTPIO
         //  Public constructors and destructor
         // -------------------------------------------------------------------
         TCIDRTPIOSrc& operator=(const TCIDRTPIOSrc&) = delete;
+        TCIDRTPIOSrc& operator=(TCIDRTPIOSrc&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -106,19 +108,19 @@ class CIDRTPEXP TCIDRTPIOSrc : public TCIDRTPIO
         virtual tCIDLib::TCard4 c4ReadSamples
         (
                     TMemBuf&                mbufToFill
-            ,       tCIDLib::TCard4&        c4AtSample
-            ,       tCIDLib::TCard4&        c4AtMillisec
+            , COP   tCIDLib::TCard4&        c4AtSample
+            , COP   tCIDLib::TCard4&        c4AtMillisec
         ) = 0;
 
         virtual tCIDLib::TVoid Initialize
         (
-                    tCIDLib::TCard1&        c1PayloadType
-            ,       tCIDLib::TCard4&        c4PayloadMSs
-            ,       tCIDLib::TCard4&        c4PayloadBytes
-            ,       tCIDLib::TCard4&        c4PayloadSamples
-            ,       tCIDLib::TCard4&        c4SampleBytes
-            ,       tCIDLib::TCard4&        c4TotalMSs
-            ,       tCIDLib::TCard4&        c4TotalBytes
+            COP     tCIDLib::TCard1&        c1PayloadType
+            , COP   tCIDLib::TCard4&        c4PayloadMSs
+            , COP   tCIDLib::TCard4&        c4PayloadBytes
+            , COP   tCIDLib::TCard4&        c4PayloadSamples
+            , COP   tCIDLib::TCard4&        c4SampleBytes
+            , COP   tCIDLib::TCard4&        c4TotalMSs
+            , COP   tCIDLib::TCard4&        c4TotalBytes
         ) = 0;
 
 

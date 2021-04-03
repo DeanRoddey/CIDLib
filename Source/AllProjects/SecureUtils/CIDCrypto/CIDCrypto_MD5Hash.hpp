@@ -56,11 +56,7 @@ class CIDCRYPTEXP TMD5Hash : public TMsgHash
         );
 
         TMD5Hash(const TMD5Hash&) = default;
-
-        TMD5Hash
-        (
-                    TMD5Hash&&              mhashSrc
-        );
+        TMD5Hash(TMD5Hash&&) = default;
 
         ~TMD5Hash();
 
@@ -69,6 +65,7 @@ class CIDCRYPTEXP TMD5Hash : public TMsgHash
         //  Public operators
         // -------------------------------------------------------------------
         TMD5Hash& operator=(const TMD5Hash&) = default;
+        TMD5Hash& operator=(TMD5Hash&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -79,11 +76,6 @@ class CIDCRYPTEXP TMD5Hash : public TMsgHash
         (
             const   TMD5Hash&               mhashSrc
         )   const;
-
-        TMD5Hash& operator=
-        (
-                    TMD5Hash&&              mhashSrc
-        );
 
 
         // -------------------------------------------------------------------

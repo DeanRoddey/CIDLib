@@ -80,13 +80,6 @@ TMD5Hash::TMD5Hash(const TMemBuf& mbufBytes) :
 {
 }
 
-TMD5Hash::TMD5Hash(TMD5Hash&& mhashSrc) :
-
-    TMD5Hash()
-{
-    *this = tCIDLib::ForceMove(mhashSrc);
-}
-
 TMD5Hash::~TMD5Hash()
 {
 }
@@ -95,14 +88,6 @@ TMD5Hash::~TMD5Hash()
 // ---------------------------------------------------------------------------
 //  TMD5Hash: Public operators
 // ---------------------------------------------------------------------------
-TMD5Hash& TMD5Hash::operator=(TMD5Hash&& mhashSrc)
-{
-    if (this != &mhashSrc)
-        TParent::operator=(tCIDLib::ForceMove(mhashSrc));
-    return *this;
-}
-
-
 tCIDLib::TBoolean TMD5Hash::operator==(const TMD5Hash& mhashSrc) const
 {
     //

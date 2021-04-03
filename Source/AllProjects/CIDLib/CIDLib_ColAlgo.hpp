@@ -174,6 +174,114 @@ namespace tCIDColAlgo
 
 
     //
+    //  Does a map operation. It will return a non-adopting by ref vector of the elements
+    //  that pfnTest say should be kept. We return it by value, but that's ok since it's
+    //  cheaply moveable. Of course the caller must not keep these references around beyond
+    //  the life of the source collection.
+    //
+    //  We have a const one and a non-const one. So the const one takes a const collection
+    //  and returns a vector of const references, and vice versa.
+    //
+    template<typename  TCol, typename TTest>
+    typename TRefVector<const typename TCol::TMyElemType>
+    colMap(const TCol& colSrc, TTest pfnTest, const tCIDLib::TCard4 c4InitAlloc = 0)
+    {
+        TRefVector<const typename TCol::TMyElemType> colKept
+        (
+            tCIDLib::EAdoptOpts::NoAdopt, (c4InitAlloc == 0) ? colSrc.c4ElemCount() / 4 : c4InitAlloc
+        );
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnTest(*cursSrc))
+            {
+                if (colKept.c4ElemCount() == colKept.c4CurAlloc())
+                {
+                    const tCIDLib::TCard4 c4Exp = colKept.c4ElemCount() / 4;
+                    if (colKept.c4ElemCount() + c4Exp > colSrc.c4ElemCount())
+                        colKept.CheckExpansion(colSrc.c4ElemCount());
+                    else
+                        colKept.CheckExpansion(c4Exp);
+                }
+                colKept.Add(&cursSrc.objRCur());
+            }
+        }
+        return colKept;
+    }
+
+    template<typename  TCol, typename TTest>
+    typename TRefVector<typename TCol::TMyElemType>
+    colMapNC(TCol& colSrc, TTest pfnTest, const tCIDLib::TCard4 c4InitAlloc = 0)
+    {
+        TRefVector<typename TCol::TMyElemType> colKept
+        (
+            tCIDLib::EAdoptOpts::NoAdopt, (c4InitAlloc == 0) ? colSrc.c4ElemCount() / 4 : c4InitAlloc
+        );
+        typename TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnTest(*cursSrc))
+            {
+                if (colKept.c4ElemCount() == colKept.c4CurAlloc())
+                {
+                    const tCIDLib::TCard4 c4Exp = colKept.c4ElemCount() / 4;
+                    if (colKept.c4ElemCount() + c4Exp > colSrc.c4ElemCount())
+                        colKept.CheckExpansion(colSrc.c4ElemCount());
+                    else
+                        colKept.CheckExpansion(c4Exp);
+                }
+                colKept.Add(&cursSrc.objWCur());
+            }
+        }
+        return colKept;
+    }
+
+
+    //
+    //  Does a map and reduce operation. It does the map operation and then runs through the
+    //  resulting list, applying the reduce callback to each element in sequence. The final
+    //  resulting value is returned.
+    //
+    template<typename  TCol, typename TTest, typename Reduce>
+    typename TCol::TMyElemType
+    tMapReduce( const   TCol&                           colSrc
+                ,       TTest                           pfnTest
+                ,       Reduce                          pfnReduce
+                , const typename TCol::TMyElemType&     tInitVal
+                , const tCIDLib::TCard4                 c4InitAlloc = 0)
+    {
+        TRefVector<const typename TCol::TMyElemType> colKept
+        (
+            tCIDLib::EAdoptOpts::NoAdopt, (c4InitAlloc == 0) ? colSrc.c4ElemCount() / 4 : c4InitAlloc
+        );
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnTest(*cursSrc))
+            {
+                if (colKept.c4ElemCount() == colKept.c4CurAlloc())
+                {
+                    const tCIDLib::TCard4 c4Exp = colKept.c4ElemCount() / 4;
+                    if (colKept.c4ElemCount() + c4Exp > colSrc.c4ElemCount())
+                        colKept.CheckExpansion(colSrc.c4ElemCount());
+                    else
+                        colKept.CheckExpansion(c4Exp);
+                }
+                colKept.Add(&cursSrc.objRCur());
+            }
+        }
+
+        typename TCol::TMyElemType tRet = tInitVal;
+        using TKeptCursor = typename TRefVector<const typename TCol::TMyElemType>::TCursor;
+        TKeptCursor cursKept = TKeptCursor(&colKept);
+        for (; cursKept; ++cursKept)
+            pfnReduce(tRet, *cursKept);
+
+        return tRet;
+    }
+
+
+    //
     //  Find the first element that matches the passed object to find. If found the
     //  cursor will be pointed at that element, else invalid. The default equality
     //  comparison functor will be used if not explicitly provided, which requires

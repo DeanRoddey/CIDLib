@@ -54,7 +54,17 @@ class TRTPHTTPClient : public THTTPClient
         // -------------------------------------------------------------------
         TRTPHTTPClient() {}
 
+        TRTPHTTPClient(const TRTPHTTPClient&) = delete;
+        TRTPHTTPClient(TRTPHTTPClient&&) = delete;
+
         ~TRTPHTTPClient() {}
+
+
+        // -------------------------------------------------------------------
+        //  Public oeprators
+        // -------------------------------------------------------------------
+        TRTPHTTPClient& operator=(const TRTPHTTPClient&) = delete;
+        TRTPHTTPClient& operator=(TRTPHTTPClient&&) = delete;
 
 
     protected :
@@ -64,12 +74,12 @@ class TRTPHTTPClient : public THTTPClient
         tCIDLib::TBoolean bValidateReqType
         (
             const   TString&                strToCheck
-        );
+        )   final;
 
         tCIDLib::TBoolean bValidateProto
         (
             const   TString&                strToCheck
-        );
+        )   final;
 };
 
 
@@ -171,7 +181,7 @@ TCIDRTSPSess::c4Start(  const   TURL&               urlMedia
         //  into comma separated values and look for the unicast one, which is
         //  all we can handle for now.
         //
-        tCIDLib::TCard4 c4At;
+        tCIDLib::TCard4 c4At = 0;
         tCIDLib::TStrList colTransTypes;
         if (!TStringTokenizer::bParseCSVLine(strTrans, colTransTypes, c4At))
         {
@@ -690,9 +700,9 @@ tCIDLib::TVoid
 TCIDRTSPSrv::ServiceClient(TThread& thrThis, TSockLEngConn& slecClient)
 {
     tCIDLib::TBoolean       bCloseReq = kCIDLib::False;
-    tCIDLib::TCard4         c4ContLen;
-    tCIDLib::TCard4         c4CSeq;
-    tCIDLib::TCard4         c4ProtoVer;
+    tCIDLib::TCard4         c4ContLen = 0;
+    tCIDLib::TCard4         c4CSeq = 0;
+    tCIDLib::TCard4         c4ProtoVer = 0;
     tCIDLib::TKVPList       colHdrLines;
     tCIDLib::TKVPList       colOutLines;
     tCIDLib::TKVPList       colBodyLines;
@@ -946,20 +956,24 @@ TCIDRTSPSrv::ServiceClient(TThread& thrThis, TSockLEngConn& slecClient)
 
                 if (cptrTar.pobjData())
                 {
-                    tCIDRTP::ERTSPCmds eCmd;
+                    tCIDRTP::ERTSPCmds eCmd = tCIDRTP::ERTSPCmds::Count;
                     TString strInfo;
                     if (strReqType.bCompareI(L"PLAY"))
                         eCmd = tCIDRTP::ERTSPCmds::Play;
                     else if (strReqType.bCompareI(L"PAUSE"))
                         eCmd = tCIDRTP::ERTSPCmds::Pause;
-                    cptrTar->DoCmd(eCmd, strInfo);
 
-                    colOutLines.RemoveAll();
-                    colOutLines.objAdd(TKeyValuePair(L"Session", cptrTar->strSessId()));
+                    if (eCmd != tCIDRTP::ERTSPCmds::Count)
+                    {
+                        cptrTar->DoCmd(eCmd, strInfo);
 
-                    if (strReqType.bCompareI(L"PLAY"))
-                        colOutLines.objAdd(TKeyValuePair(L"RTP-Info", strInfo));
-                    SendBasicReply(httpcIO, *pcdsClient, c4CSeq, colOutLines, bCloseReq);
+                        colOutLines.RemoveAll();
+                        colOutLines.objAdd(TKeyValuePair(L"Session", cptrTar->strSessId()));
+
+                        if (strReqType.bCompareI(L"PLAY"))
+                            colOutLines.objAdd(TKeyValuePair(L"RTP-Info", strInfo));
+                        SendBasicReply(httpcIO, *pcdsClient, c4CSeq, colOutLines, bCloseReq);
+                    }
                 }
                  else
                 {
@@ -1221,16 +1235,16 @@ TCIDRTSPSrv::SendErrReply(          THTTPClient&        httpcIO
     {
         m_strmLog   << L"\n---- OutMsg: ---------------\n";
         TUTF8Converter tcvtTmp;
-        TString strMsg;
+        TString strMsgText;
         tcvtTmp.c4ConvertFrom
         (
             strmTar.mbufData().pc1Data()
             , strmTar.c4CurSize()
-            , strMsg
+            , strMsgText
         );
         tCIDLib::TCard4 c4At = 0;
-        strMsg.bReplaceSubStr(L"\r\n", L"\n", c4At, kCIDLib::True);
-        m_strmLog   << strMsg
+        strMsgText.bReplaceSubStr(L"\r\n", L"\n", c4At, kCIDLib::True);
+        m_strmLog   << strMsgText
                     << L"\n----------------------" << kCIDLib::NewEndLn;
     }
     #endif

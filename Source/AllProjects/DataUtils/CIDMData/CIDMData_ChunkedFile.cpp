@@ -509,7 +509,7 @@ TChunkedFileMeta::AddKey(const  TString&            strKey
 //
 tCIDLib::TVoid TChunkedFileMeta::AddKeys(const tCIDLib::TKVPFList& colToAdd)
 {
-    tCIDLib::TCard4 c4At;
+    tCIDLib::TCard4 c4At = 0;
 
     const tCIDLib::TCard4 c4Count = colToAdd.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -746,12 +746,11 @@ TChunkedFileMeta::bSetValues(const  tCIDLib::TKVPList&  colNewVals
     tCIDLib::TBoolean bRegen = kCIDLib::False;
     bFileChange = kCIDLib::False;
 
-    tCIDLib::TCard4 c4At;
     const tCIDLib::TCard4 c4Count = colNewVals.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TKeyValuePair& kvalCur = colNewVals[c4Index];
-
+        tCIDLib::TCard4 c4At;
         TKeyValFPair* pkvalfFind = m_colValues.pobjKeyedBinarySearch
         (
             kvalCur.strKey(), &TKeyValFPair::eCompKeyI, c4At
@@ -795,12 +794,12 @@ TChunkedFileMeta::bSetValues(const  tCIDLib::TKVPFList& colNewVals
     tCIDLib::TBoolean bRegen = kCIDLib::False;
     bFileChange = kCIDLib::False;
 
-    tCIDLib::TCard4 c4At;
     const tCIDLib::TCard4 c4Count = colNewVals.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TKeyValFPair& kvalfCur = colNewVals[c4Index];
 
+        tCIDLib::TCard4 c4At;
         TKeyValFPair* pkvalfFind = m_colValues.pobjKeyedBinarySearch
         (
             kvalfCur.strKey(), &TKeyValFPair::eCompKeyI, c4At
@@ -996,6 +995,7 @@ TChunkedFile::ExtractInfo(  TBinInStream&               strmSrc
 
     // Create a local short char buffer more than long enough for the longest chunk id
     const tCIDLib::TCard4 c4MaxChunkChars = 511;
+    CIDLib_Suppress(26494)
     tCIDLib::TSCh aschId[c4MaxChunkChars + 1];
 
     //
@@ -1021,8 +1021,6 @@ TChunkedFile::ExtractInfo(  TBinInStream&               strmSrc
     //  Now we go through the rest of the chunks, starting at 1. The above left us at
     //  the start of the main data chunk.
     //
-    tCIDLib::TCard1 c1Eat;
-    tCIDLib::TCard4 c4CurSz;
     TString strCurId;
     for (tCIDLib::TCard4 c4Index = 1; c4Index < c4ChunkCnt; c4Index++)
     {
@@ -1057,10 +1055,12 @@ TChunkedFile::ExtractInfo(  TBinInStream&               strmSrc
         colChunkIds.objAdd(strCurId);
 
         // Eat flags and check a frame marker
+        tCIDLib::TCard1 c1Eat;
         strmSrc >> c1Eat;
         strmSrc.CheckForFrameMarker(CID_FILE, CID_LINE);
 
         // And now we finally get the bytes in this chunk
+        tCIDLib::TCard4 c4CurSz;
         strmSrc >> c4CurSz;
         fcolChunkSzs.c4AddElement(c4CurSz);
 
@@ -1850,9 +1850,9 @@ tCIDLib::TVoid TChunkedFile::StreamFrom(TBinInStream& strmToReadFrom)
     // Use a helper to stream in the chunks
     TChunkList colChunks(tCIDLib::EAdoptOpts::Adopt, c4ChunkCnt);
     THashList  colHashes(c4ChunkCnt);
-    tCIDLib::TCard4 c4ChunkSz;
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChunkCnt; c4Index++)
     {
+        tCIDLib::TCard4 c4ChunkSz;
         TChunkedFileChunk* pchflchNew = pchflchStreamInChunk(strmToReadFrom, c4ChunkSz);
         colChunks.Add(pchflchNew);
         colHashes.objAdd(pchflchNew->mhashChunk());
@@ -1972,7 +1972,7 @@ TChunkedFile::pchflchFindById(  const   TString&            strToFind
 
 // All chunks are the same on disk so we have a helper to do this
 TChunkedFileChunk*
-TChunkedFile::pchflchStreamInChunk(TBinInStream& strmSrc, tCIDLib::TCard4& c4Bytes)
+TChunkedFile::pchflchStreamInChunk(TBinInStream& strmSrc, COP tCIDLib::TCard4& c4Bytes)
 {
     tCIDLib::TCard1 c1Marker;
 
@@ -2086,15 +2086,14 @@ TChunkedFile::StreamInHdr(  TBinInStream&               strmSrc
                             , tCIDLib::TEncodedTime&    enctLastChange
                             , tCIDLib::TCard4&          c4ChunkCnt)
 {
-    tCIDLib::TCard1 c1Val;
-    tCIDLib::TCard4 c4Val;
-
     // Check the file format marker at the start. If not valid, we are doomed
+    tCIDLib::TCard4 c4Val;
     strmSrc >> c4Val;
     if (c4Val != kCIDMData::c4ChunkFlId_FileStart)
         ThrowFmtErr(L"Did not find file start marker", CID_LINE);
 
     // Get the format version
+    tCIDLib::TCard1 c1Val;
     strmSrc >> c1Val;
     if (c1Val != kCIDMData::c1ChunkFl_FmtVersion)
         ThrowFmtErr(L"Unexpected file version %(1)", CID_LINE, TCardinal(c1Val));

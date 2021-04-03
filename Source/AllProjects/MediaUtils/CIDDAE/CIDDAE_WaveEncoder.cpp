@@ -199,8 +199,8 @@ tCIDLib::TVoid TCIDDAEWaveDec::StartDecodeImpl(const TString& strSrcFile)
     m_c4DataBytes = 0;
 
     // Search forward for the data chunk. We only support one data chunk
-    tCIDLib::TCard4 c4ID;
-    tCIDLib::TCard4 c4Sz;
+    tCIDLib::TCard4 c4ID = 0;
+    tCIDLib::TCard4 c4Sz = 0;
     while (kCIDLib::True)
     {
         // Get the chunk id and size

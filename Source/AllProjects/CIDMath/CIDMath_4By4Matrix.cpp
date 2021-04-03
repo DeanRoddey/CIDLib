@@ -184,14 +184,12 @@ tCIDLib::TVoid T4By4Matrix::AppendRotation(const T3DVector& vecAngles)
     vecTmp.ToRadians();
 
     // Get the sine and cosine of each value
-    tCIDLib::TFloat8 f8SinX, f8SinY, f8SinZ;
-    tCIDLib::TFloat8 f8CosX, f8CosY, f8CosZ;
-    f8SinX = TMathLib::f8Sine(vecTmp.f8X());
-    f8CosX = TMathLib::f8Cosine(vecTmp.f8X());
-    f8SinY = TMathLib::f8Sine(vecTmp.f8Y());
-    f8CosY = TMathLib::f8Cosine(vecTmp.f8Y());
-    f8SinZ = TMathLib::f8Sine(vecTmp.f8Z());
-    f8CosZ = TMathLib::f8Cosine(vecTmp.f8Z());
+    const tCIDLib::TFloat8 f8SinX = TMathLib::f8Sine(vecTmp.f8X());
+    const tCIDLib::TFloat8 f8CosX = TMathLib::f8Cosine(vecTmp.f8X());
+    const tCIDLib::TFloat8 f8SinY = TMathLib::f8Sine(vecTmp.f8Y());
+    const tCIDLib::TFloat8 f8CosY = TMathLib::f8Cosine(vecTmp.f8Y());
+    const tCIDLib::TFloat8 f8SinZ = TMathLib::f8Sine(vecTmp.f8Z());
+    const tCIDLib::TFloat8 f8CosZ = TMathLib::f8Cosine(vecTmp.f8Z());
 
     // Concatenate the X rotation
     T4By4Matrix mtrxTmp;
@@ -229,14 +227,12 @@ T4By4Matrix::AppendRotation(const   tCIDLib::TFloat8&   f8XAngle
     tCIDLib::TFloat8 f8ZA = f8ZAngle * kCIDLib::f8PI / 180.0;
 
     // Get the sine and cosine of each value
-    tCIDLib::TFloat8 f8SinX, f8SinY, f8SinZ;
-    tCIDLib::TFloat8 f8CosX, f8CosY, f8CosZ;
-    f8SinX = TMathLib::f8Sine(f8XA);
-    f8CosX = TMathLib::f8Cosine(f8XA);
-    f8SinY = TMathLib::f8Sine(f8YA);
-    f8CosY = TMathLib::f8Cosine(f8YA);
-    f8SinZ = TMathLib::f8Sine(f8ZA);
-    f8CosZ = TMathLib::f8Cosine(f8ZA);
+    tCIDLib::TFloat8 f8SinX = TMathLib::f8Sine(f8XA);
+    tCIDLib::TFloat8 f8CosX = TMathLib::f8Cosine(f8XA);
+    tCIDLib::TFloat8 f8SinY = TMathLib::f8Sine(f8YA);
+    tCIDLib::TFloat8 f8CosY = TMathLib::f8Cosine(f8YA);
+    tCIDLib::TFloat8 f8SinZ = TMathLib::f8Sine(f8ZA);
+    tCIDLib::TFloat8 f8CosZ = TMathLib::f8Cosine(f8ZA);
 
     // Concatenate the X rotation
     T4By4Matrix mtrxTmp;
@@ -397,26 +393,29 @@ tCIDLib::TVoid T4By4Matrix::SetToTransposed(const T4By4Matrix& mtrxSrc)
 
 tCIDLib::TVoid T4By4Matrix::Transform(T3DVector& vecTarget) const
 {
-    tCIDLib::TFloat8 f8X, f8Y, f8Z;
+    vecTarget.m_f8XMag =
+    (
+        (vecTarget.m_f8XMag * m_af8Matrix[0][0])
+        + (vecTarget.m_f8YMag * m_af8Matrix[1][0])
+        + (vecTarget.m_f8ZMag * m_af8Matrix[2][0])
+        + m_af8Matrix[3][0]
+    );
 
-    f8X =   (vecTarget.m_f8XMag * m_af8Matrix[0][0])
-            + (vecTarget.m_f8YMag * m_af8Matrix[1][0])
-            + (vecTarget.m_f8ZMag * m_af8Matrix[2][0])
-            + m_af8Matrix[3][0];
+    vecTarget.m_f8YMag =
+    (
+        (vecTarget.m_f8XMag * m_af8Matrix[0][1])
+        + (vecTarget.m_f8YMag * m_af8Matrix[1][1])
+        + (vecTarget.m_f8ZMag * m_af8Matrix[2][1])
+        + m_af8Matrix[3][1]
+    );
 
-    f8Y =   (vecTarget.m_f8XMag * m_af8Matrix[0][1])
-            + (vecTarget.m_f8YMag * m_af8Matrix[1][1])
-            + (vecTarget.m_f8ZMag * m_af8Matrix[2][1])
-            + m_af8Matrix[3][1];
-
-    f8Z =   (vecTarget.m_f8XMag * m_af8Matrix[0][2])
-            + (vecTarget.m_f8YMag * m_af8Matrix[1][2])
-            + (vecTarget.m_f8ZMag * m_af8Matrix[2][2])
-            + m_af8Matrix[3][2];
-
-    vecTarget.m_f8XMag = f8X;
-    vecTarget.m_f8YMag = f8Y;
-    vecTarget.m_f8ZMag = f8Z;
+    vecTarget.m_f8ZMag =
+    (
+        (vecTarget.m_f8XMag * m_af8Matrix[0][2])
+        + (vecTarget.m_f8YMag * m_af8Matrix[1][2])
+        + (vecTarget.m_f8ZMag * m_af8Matrix[2][2])
+        + m_af8Matrix[3][2]
+    );
 }
 
 tCIDLib::TVoid

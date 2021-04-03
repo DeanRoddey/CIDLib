@@ -1014,7 +1014,7 @@ class CIDMDATAEXP TChunkedFile : public TObject, public MStreamable
         static TChunkedFileChunk* pchflchStreamInChunk
         (
                     TBinInStream&           strmSrc
-            ,       tCIDLib::TCard4&        c4ChunkSz
+            , COP   tCIDLib::TCard4&        c4ChunkSz
         );
 
         static tCIDLib::TVoid StreamInHdr

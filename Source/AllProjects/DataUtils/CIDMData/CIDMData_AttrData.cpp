@@ -1000,7 +1000,7 @@ tCIDLib::TVoid TAttrData::SetValueFromText(const TString& strToSet)
                 strLow.StripWhitespace();
                 strHigh.StripWhitespace();
 
-                tCIDLib::TCard4 c4Low, c4High;
+                tCIDLib::TCard4 c4Low = 0, c4High = 0;
                 if (strLow.bToCard4(c4Low) && strHigh.bToCard4(c4High))
                 {
                     m_c4Val = c4Low;
@@ -1038,7 +1038,7 @@ tCIDLib::TVoid TAttrData::SetValueFromText(const TString& strToSet)
                 strLow.StripWhitespace();
                 strHigh.StripWhitespace();
 
-                tCIDLib::TInt4 i4Low, i4High;
+                tCIDLib::TInt4 i4Low = 0, i4High = 0;
                 if (strLow.bToInt4(i4Low) && strHigh.bToInt4(i4High))
                 {
                     m_i4Val = i4Low;

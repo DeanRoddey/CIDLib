@@ -418,5 +418,89 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         }
     }
 
+    // Test the map and map/reduce stuff
+    {
+        TVector<TCardinal> colSrcVals(1000UL);
+        for (tCIDLib::TCard4 c4Index = 1; c4Index < 1001; c4Index++)
+            colSrcVals.objAdd(TCardinal(c4Index));
+
+        //
+        //  Now reduce to even values. It returns references to elements in the source colelction
+        //  in a non-adopting ref vector. We know there will be 500 results, so give it that hint
+        //  as to the needed initial allocation of the return vector.
+        //
+        TRefVector<TCardinal> colMapped = tCIDColAlgo::colMapNC
+        (
+            colSrcVals
+            , [](TCardinal& cVal) -> tCIDLib::TBoolean { return (cVal.c4Val() & 0x1U) == 0; }
+            , 500
+        );
+
+        if (colMapped.c4ElemCount() != 500)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Expected 500 mapped values\n\n";
+        }
+
+        // Make sure they are all even
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < colMapped.c4ElemCount(); c4Index++)
+        {
+            if ((colMapped[c4Index]->c4Val() & 0x1) != 0)
+            {
+                eRes = tTestFWLib::ETestRes::Failed;
+                strmOut << TFWCurLn << L"Expected only event values to be mapped\n\n";
+                break;
+            }
+        }
+
+        // Test the const version
+        if (!bTestConstMap(colSrcVals))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Const map algorithm failed\n\n";
+        }
+
+
+        // Test the map/reduce. We accumulate the odd values starting with 10
+        const tCIDLib::TCard4 c4Reduced = tCIDColAlgo::tMapReduce
+        (
+            colSrcVals
+            , [](const TCardinal& cVal) -> tCIDLib::TBoolean { return (cVal.c4Val() & 0x1U) == 0; }
+            , [](TCardinal& cAccum, const TCardinal& cVal) -> tCIDLib::TVoid { cAccum += cVal; }
+            , TCardinal(10UL)
+            , 500
+        );
+
+        if (c4Reduced != 250510)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Map/Reduce failed\n\n";
+        }
+    }
+
     return eRes;
+}
+
+
+// A helper so we can get a const collection to test the mapping algorithm on
+tCIDLib::TBoolean TTest_ColAlgo1::bTestConstMap(const TVector<TCardinal>& colSrcVals)
+{
+    // We have to take const elements in this case and our lambda has to take a const param
+    TRefVector<const TCardinal> colMapped = tCIDColAlgo::colMap
+    (
+        colSrcVals
+        , [](const TCardinal& cVal) { return (cVal.c4Val() & 1) == 0; }
+        , 500
+    );
+
+    if (colMapped.c4ElemCount() != 500)
+        return kCIDLib::False;
+
+    // Make sure they are all even
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < colMapped.c4ElemCount(); c4Index++)
+    {
+        if ((colMapped[c4Index]->c4Val() & 0x1) != 0)
+            return kCIDLib::False;
+    }
+    return kCIDLib::True;
 }

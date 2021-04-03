@@ -30,8 +30,13 @@
 //  Includes. We use some kernel helpers here.
 // ---------------------------------------------------------------------------
 #include    "CIDAudStream_.hpp"
+
+#pragma warning(push)
+#pragma warning(disable : 26461 26473 26812)
 #include    <windows.h>
 #include    <mmsystem.h>
+#pragma warning(pop)
+
 #include    "CIDKernel_InternalHelpers_.hpp"
 
 
@@ -385,9 +390,9 @@ tCIDLib::TVoid TWaveInSrcStream::Initialize()
 
 // Returns the sample format for for this stream.
 tCIDLib::TVoid
-TWaveInSrcStream::QueryFormat(  tCIDLib::TCard4&    c4Channels
-                                , tCIDLib::TCard4&  c4SamplesPerSec
-                                , tCIDLib::TCard4&  c4BytesPerSample) const
+TWaveInSrcStream::QueryFormat(  COP     tCIDLib::TCard4&    c4Channels
+                                , COP   tCIDLib::TCard4&    c4SamplesPerSec
+                                , COP   tCIDLib::TCard4&    c4BytesPerSample) const
 {
     // Make sure we are ready
     if (!m_pInfo)

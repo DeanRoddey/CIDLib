@@ -78,9 +78,9 @@ tCIDLib::TBoolean TFileWaveIO::bInitialized() const
 
 // Read up to a fully payload of bytes
 tCIDLib::TCard4
-TFileWaveIO::c4ReadSamples( TMemBuf&            mbufToFill
-                            , tCIDLib::TCard4&  c4AtSample
-                            , tCIDLib::TCard4&  c4AtMillisec)
+TFileWaveIO::c4ReadSamples( TMemBuf&                mbufToFill
+                            , COP tCIDLib::TCard4&  c4AtSample
+                            , COP tCIDLib::TCard4&  c4AtMillisec)
 {
     CIDAssert
     (
@@ -142,13 +142,13 @@ TFileWaveIO::c4ReadSamples( TMemBuf&            mbufToFill
 //  after verifying it's ULaw format.
 //
 tCIDLib::TVoid
-TFileWaveIO::Initialize(tCIDLib::TCard1&    c1PayloadType
-                        , tCIDLib::TCard4&  c4PayloadMSs
-                        , tCIDLib::TCard4&  c4PayloadBytes
-                        , tCIDLib::TCard4&  c4PayloadSamples
-                        , tCIDLib::TCard4&  c4SampleBytes
-                        , tCIDLib::TCard4&  c4TotalMSs
-                        , tCIDLib::TCard4&  c4TotalBytes)
+TFileWaveIO::Initialize(COP tCIDLib::TCard1&    c1PayloadType
+                        , COP tCIDLib::TCard4&  c4PayloadMSs
+                        , COP tCIDLib::TCard4&  c4PayloadBytes
+                        , COP tCIDLib::TCard4&  c4PayloadSamples
+                        , COP tCIDLib::TCard4&  c4SampleBytes
+                        , COP tCIDLib::TCard4&  c4TotalMSs
+                        , COP tCIDLib::TCard4&  c4TotalBytes)
 {
     // If the requested AVP format isn't one we support, give up now
     if ((m_c1AVPPLType != 0)
@@ -207,7 +207,7 @@ TFileWaveIO::Initialize(tCIDLib::TCard1&    c1PayloadType
 
     //
     //  This is a chunked format, so we have to find the data chunk. We can't
-    //  just assume the data starts after the header. We endup with c4CurPos
+    //  just assume the data starts after the header. We end up with c4CurPos
     //  at the start of the chunk and c4DataSz with the amount of audio data.
     //
     m_c4DataPos = tCIDLib::TCard4(m_flSrc.c8CurPos());
@@ -218,9 +218,8 @@ TFileWaveIO::Initialize(tCIDLib::TCard1&    c1PayloadType
         while (m_c4DataPos < c4FileSize)
         {
             // Read the current chunk header
-            tCIDLib::TCard4 c4CurId, c4CurSz;
-            c4CurId = c4ReadNext();
-            c4CurSz = c4ReadNext();
+            const tCIDLib::TCard4 c4CurId = c4ReadNext();
+            const tCIDLib::TCard4 c4CurSz = c4ReadNext();
 
             //
             //  If it's the id we care about, then remember this as the data size

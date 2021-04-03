@@ -596,7 +596,17 @@ class TTest_ColAlgo1 : public TTestFWTest
         // -------------------------------------------------------------------
         TTest_ColAlgo1();
 
+        TTest_ColAlgo1(const TTest_ColAlgo1&) = delete;
+        TTest_ColAlgo1(TTest_ColAlgo1&&) = delete;
+
         ~TTest_ColAlgo1();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TTest_ColAlgo1& operator=(const TTest_ColAlgo1&) = delete;
+        TTest_ColAlgo1& operator=(TTest_ColAlgo1&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -610,6 +620,15 @@ class TTest_ColAlgo1 : public TTestFWTest
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, non-const methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTestConstMap
+        (
+            const   TVector<TCardinal>&     colTest
+        );
+
+
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------

@@ -172,9 +172,14 @@ TCIDDAERipper::TCIDDAERipper() :
     , m_pbBreakFlag(nullptr)
     , m_pdaeeToUse(nullptr)
     , m_prmmdToUse(nullptr)
+    , m_psplBuffers(new TDAEBufPool)
     , m_pthrRead(nullptr)
     , m_pthrWrite(nullptr)
-    , m_psplBuffers(new TDAEBufPool)
+    , m_strCodecName()
+    , m_strFmtName()
+    , m_strOutFile()
+    , m_TOCData()
+    , m_c4Year(0)
 {
     m_pthrRead = new TThread
     (
@@ -434,7 +439,7 @@ TCIDDAERipper::RipTrack(        TKrnlRemMediaDrv&   rmmdToUse
     //  write thread to end.
     //
     TThread* pthrUs = TThread::pthrCaller();
-    tCIDLib::EExitCodes eExit;
+    tCIDLib::EExitCodes eExit = tCIDLib::EExitCodes::Normal;
     while (kCIDLib::True)
     {
         // Wait a while for it to end
@@ -895,7 +900,7 @@ tCIDLib::EExitCodes TCIDDAERipper::eWriteThread(TThread& thrThis, tCIDLib::TVoid
 //  We return a null pointer when the end is reached, which will tell the
 //  read thread he's done and he'll exit.
 //
-TDAEBuf* TCIDDAERipper::pdaebGetChunk(TDAEBuf* const pdaebPrev)
+TDAEBuf* TCIDDAERipper::pdaebGetChunk(const TDAEBuf* const pdaebPrev)
 {
     //
     //  If we are at the end, then done so return null pointer. This

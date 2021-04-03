@@ -444,7 +444,7 @@ tCIDLib::TVoid TXMLParserCore::ParseChars()
     tCIDLib::TBoolean   bDone           = kCIDLib::False;
     tCIDLib::TBoolean   bEscaped        = kCIDLib::False;
     tCIDLib::TBoolean   bLeadingFlag    = kCIDLib::False;
-    tCIDLib::TCh        chNext;
+    tCIDLib::TCh        chNext          = kCIDLib::chNull;
     tCIDLib::TCh        chSecond        = kCIDLib::chNull;
     EStates             eState          = EStates::Content;
     while (!bDone)
@@ -629,7 +629,7 @@ tCIDLib::TVoid TXMLParserCore::ParseContent(const tCIDLib::TBoolean)
     //
     tCIDLib::TBoolean bDone = kCIDLib::False;
 
-    tCIDLib::TCard4 c4OrgSpooler;
+    tCIDLib::TCard4 c4OrgSpooler = kCIDLib::c4MaxCard;
     while (!bDone)
     {
         // Probe what is the next thing we are going to parse
@@ -1627,7 +1627,7 @@ tCIDLib::TVoid TXMLParserCore::ParseExtDecl(const tCIDXML::EDeclTypes eType)
     //  Ok, lets enter the loop that gets and stores all of the decl strings
     //  in the temp buffers.
     //
-    EOrders eOrder;
+    EOrders eOrder = EOrders::Unknown;
     tCIDLib::TCard4 c4StringCount = 0;
     while (kCIDLib::True)
     {

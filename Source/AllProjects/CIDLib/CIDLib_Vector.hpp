@@ -1160,7 +1160,7 @@ class TVector : public TCollection<TElem>
         template <typename TCompFunc>
         TElem* pobjBinarySearch(const   TElem&          objToFind
                                 ,       TCompFunc       pfnComp
-                                ,       TIndex&         tAt)
+                                , COP   TIndex&         tAt)
         {
             // Set up the two end points that are used to subdivide the list
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
@@ -1220,7 +1220,7 @@ class TVector : public TCollection<TElem>
         template <typename TCompFunc> const TElem*
         pobjBinarySearch(const  TElem&          objToFind
                         ,       TCompFunc       pfnComp
-                        ,       TIndex&         tAt) const
+                        , COP   TIndex&         tAt) const
         {
             // Set up the two end points that are used to subdivide the list
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
@@ -1280,14 +1280,14 @@ class TVector : public TCollection<TElem>
         template <typename K, typename TCompFunc>
         TElem* pobjKeyedBinarySearch(const  K&          Key
                                     ,       TCompFunc   pfnComp
-                                    ,       TIndex&     tAt)
+                                    , COP   TIndex&     tAt)
         {
             // Set up the two end points that are used to subdivide the list
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
 
-            tCIDLib::ESortComps eRes;
-            tCIDLib::TInt4 i4MidPoint = 0;
+           tCIDLib::TInt4 i4MidPoint = 0;
+           tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             while (i4Begin <= i4End)
             {
                 // Divide the current range
@@ -1340,14 +1340,14 @@ class TVector : public TCollection<TElem>
         template <typename K, typename TCompFunc> const TElem*
         pobjKeyedBinarySearch(  const K&                Key
                                 ,     TCompFunc         pfnComp
-                                ,     TIndex&           tAt) const
+                                , COP TIndex&           tAt) const
         {
             // Set up the two end points that are used to subdivide the list
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
 
-            tCIDLib::ESortComps eRes;
             tCIDLib::TInt4 i4MidPoint = 0;
+            tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             while (i4Begin <= i4End)
             {
                 // Divide the current range
@@ -1463,8 +1463,7 @@ class TVector : public TCollection<TElem>
             }
         }
 
-        tCIDLib::TVoid
-        Reallocate(const tCIDLib::TCard4 c4NewSize, const TElem& objInitVal)
+        tCIDLib::TVoid Reallocate(const tCIDLib::TCard4 c4NewSize, const TElem& objInitVal)
         {
             //
             //  Call the other one to reallocate, don't keep any old values. That
@@ -1635,8 +1634,7 @@ class TVector : public TCollection<TElem>
             colSrc.c4IncSerialNum();
         }
 
-        tCIDLib::TVoid SwapItems(const  TIndex tFirst
-                                , const TIndex tSecond)
+        tCIDLib::TVoid SwapItems(const  TIndex tFirst, const TIndex tSecond)
         {
             const tCIDLib::TCard4 c4First = tCIDLib::TCard4(tFirst);
             const tCIDLib::TCard4 c4Second = tCIDLib::TCard4(tSecond);

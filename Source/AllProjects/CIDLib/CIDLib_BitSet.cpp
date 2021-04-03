@@ -394,7 +394,7 @@ TBitsetBase& TBitsetBase::operator=(TBitsetBase&& btsSrc)
 // ---------------------------------------------------------------------------
 //  TBitsetBase: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TBitsetBase::FormatTo(TTextOutStream& strmDest) const
+tCIDLib::TVoid TBitsetBase::FormatTo(CIOP TTextOutStream& strmDest) const
 {
     // Make sure its even been set up yet
     CheckReady();

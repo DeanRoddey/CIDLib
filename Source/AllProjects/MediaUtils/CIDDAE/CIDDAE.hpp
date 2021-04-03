@@ -69,13 +69,10 @@ class TJPEGImage;
 #include    "CIDDAE_ErrorIds.hpp"
 #include    "CIDDAE_Shared.hpp"
 #include    "CIDDAE_Type.hpp"
-
 #include    "CIDDAE_Codec.hpp"
 #include    "CIDDAE_Ripper.hpp"
-
 #include    "CIDDAE_WaveEncoder.hpp"
 #include    "CIDDAE_WMAEncoder.hpp"
-
 #include    "CIDDAE_ThisFacility.hpp"
 
 

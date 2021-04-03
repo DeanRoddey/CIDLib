@@ -136,7 +136,7 @@ class CIDDAEEXP TCIDDAERipper : public TObject
 
         TDAEBuf* pdaebGetChunk
         (
-                    TDAEBuf* const          pdaebPrev
+            const   TDAEBuf* const          pdaebPrev
         );
 
 

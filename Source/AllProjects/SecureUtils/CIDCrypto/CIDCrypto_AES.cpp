@@ -430,14 +430,14 @@ TAESEncrypter::DecryptImpl( const   tCIDLib::TCard1* const  pc1Cypher
     //  since that's the block size we set on the base block decrypter class.
     //
     tCIDLib::TCard4 *pc4RK = nullptr;
-    tCIDLib::TCard4 c4X0;
-    tCIDLib::TCard4 c4X1;
-    tCIDLib::TCard4 c4X2;
-    tCIDLib::TCard4 c4X3;
-    tCIDLib::TCard4 c4Y0;
-    tCIDLib::TCard4 c4Y1;
-    tCIDLib::TCard4 c4Y2;
-    tCIDLib::TCard4 c4Y3;
+    tCIDLib::TCard4 c4X0 = 0;
+    tCIDLib::TCard4 c4X1 = 0;
+    tCIDLib::TCard4 c4X2 = 0;
+    tCIDLib::TCard4 c4X3 = 0;
+    tCIDLib::TCard4 c4Y0 = 0;
+    tCIDLib::TCard4 c4Y1 = 0;
+    tCIDLib::TCard4 c4Y2 = 0;
+    tCIDLib::TCard4 c4Y3 = 0;
 
     pc4RK = m_ac4DRK;
 
@@ -542,14 +542,14 @@ TAESEncrypter::EncryptImpl( const   tCIDLib::TCard1* const  pc1Plain
     //  since that's the block size we set on the base block decrypter class.
     //
     tCIDLib::TCard4 *pc4RK = nullptr;
-    tCIDLib::TCard4 c4X0;
-    tCIDLib::TCard4 c4X1;
-    tCIDLib::TCard4 c4X2;
-    tCIDLib::TCard4 c4X3;
-    tCIDLib::TCard4 c4Y0;
-    tCIDLib::TCard4 c4Y1;
-    tCIDLib::TCard4 c4Y2;
-    tCIDLib::TCard4 c4Y3;
+    tCIDLib::TCard4 c4X0 = 0;
+    tCIDLib::TCard4 c4X1 = 0;
+    tCIDLib::TCard4 c4X2 = 0;
+    tCIDLib::TCard4 c4X3 = 0;
+    tCIDLib::TCard4 c4Y0 = 0;
+    tCIDLib::TCard4 c4Y1 = 0;
+    tCIDLib::TCard4 c4Y2 = 0;
+    tCIDLib::TCard4 c4Y3 = 0;
 
     pc4RK = m_ac4ERK;
 
@@ -657,7 +657,6 @@ tCIDLib::TVoid TAESEncrypter::ResetImpl()
     const tCIDLib::TCard4 c4KeyBytes = m_ckeyThis.c4Bytes();
     const tCIDLib::TCard4 c4KeyBits = c4KeyBytes * 8;
     const tCIDLib::TCard1* const pc1Key = m_ckeyThis.pc1Buffer();
-    tCIDLib::TCard4 c4Index;
 
     // If we've not done the key tables yet, then fault those in
     if (!CIDCrypto_AES::atomKTblsDone)
@@ -665,7 +664,7 @@ tCIDLib::TVoid TAESEncrypter::ResetImpl()
         TBaseLock lockInit;
         if (!CIDCrypto_AES::atomKTblsDone)
         {
-            for (c4Index = 0; c4Index < 256; c4Index++)
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < 256; c4Index++)
             {
                 CIDCrypto_AES::ac4KTbl0[c4Index]
                     = CIDCrypto_AES::ac4RTbl0[CIDCrypto_AES::ac4FSBox[c4Index]];
@@ -706,7 +705,7 @@ tCIDLib::TVoid TAESEncrypter::ResetImpl()
     }
 
     pc4RK = m_ac4ERK;
-    for (c4Index = 0; c4Index < (c4KeyBits >> 5); c4Index++)
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < (c4KeyBits >> 5); c4Index++)
     {
         GETCARD4(pc4RK[c4Index], pc1Key, c4Index * 4);
     }
@@ -714,7 +713,7 @@ tCIDLib::TVoid TAESEncrypter::ResetImpl()
     // Set up encryption round keys
     if (c4KeyBits == 128)
     {
-        for (c4Index = 0; c4Index < 10; c4Index++, pc4RK += 4)
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < 10; c4Index++, pc4RK += 4)
         {
             pc4RK[4] =
             (
@@ -733,7 +732,7 @@ tCIDLib::TVoid TAESEncrypter::ResetImpl()
     }
      else if (c4KeyBits == 192)
     {
-        for (c4Index = 0; c4Index < 8; c4Index++, pc4RK += 6)
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < 8; c4Index++, pc4RK += 6)
         {
             pc4RK[6] =
             (
@@ -754,7 +753,7 @@ tCIDLib::TVoid TAESEncrypter::ResetImpl()
     }
      else if (c4KeyBits == 256)
     {
-        for (c4Index = 0; c4Index < 7; c4Index++, pc4RK += 8)
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < 7; c4Index++, pc4RK += 8)
         {
             pc4RK[8] =
             (
@@ -791,7 +790,7 @@ tCIDLib::TVoid TAESEncrypter::ResetImpl()
     *pc4SK++ = *pc4RK++;
     *pc4SK++ = *pc4RK++;
 
-    for( c4Index = 1; c4Index < m_c4Rounds; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 1; c4Index < m_c4Rounds; c4Index++)
     {
         pc4RK -= 8;
 

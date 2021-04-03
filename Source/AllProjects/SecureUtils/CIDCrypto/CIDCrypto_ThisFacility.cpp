@@ -93,7 +93,7 @@ tCIDLib::TCard4 TFacCIDCrypto::c4GetRandom(const tCIDLib::TBoolean bNonZero) con
     const tCIDLib::TCard4 c4MaxTries = 32;
     tCIDLib::TCard4 c4Count = 0;
 
-    tCIDLib::TCard4 c4RetVal;
+    tCIDLib::TCard4 c4RetVal = 0;
     while (c4Count < c4MaxTries)
     {
         c4RetVal = m_prandGen->c4GetNextNum();

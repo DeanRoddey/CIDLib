@@ -442,7 +442,7 @@ class CIDLIBEXP TModule : public TObject
 
         TString strPortableName() const;
 
-        tCIDLib::TVoid ThrowErr
+        [[noreturn]] tCIDLib::TVoid ThrowErr
         (
             const   TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
@@ -451,7 +451,7 @@ class CIDLIBEXP TModule : public TObject
             , const tCIDLib::EErrClasses    eClass = tCIDLib::EErrClasses::Unknown
         )   const;
 
-        tCIDLib::TVoid ThrowErr
+        [[noreturn]] tCIDLib::TVoid ThrowErr
         (
             const   TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
@@ -464,7 +464,7 @@ class CIDLIBEXP TModule : public TObject
             , const MFormattable&           fmtblToken4 = MFormattable::Nul_MFormattable()
         )   const;
 
-        tCIDLib::TVoid ThrowErr
+        [[noreturn]] tCIDLib::TVoid ThrowErr
         (
             const   TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
@@ -474,7 +474,7 @@ class CIDLIBEXP TModule : public TObject
             , const tCIDLib::EErrClasses    eClass = tCIDLib::EErrClasses::Unknown
         )   const;
 
-        tCIDLib::TVoid ThrowErr
+        [[noreturn]] tCIDLib::TVoid ThrowErr
         (
             const   TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
@@ -488,7 +488,7 @@ class CIDLIBEXP TModule : public TObject
             , const MFormattable&           fmtblToken4 = MFormattable::Nul_MFormattable()
         )   const;
 
-        tCIDLib::TVoid ThrowKrnlErr
+        [[noreturn]] tCIDLib::TVoid ThrowKrnlErr
         (
             const   TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
@@ -498,7 +498,7 @@ class CIDLIBEXP TModule : public TObject
             , const tCIDLib::EErrClasses    eClass
         )   const;
 
-        tCIDLib::TVoid ThrowKrnlErr
+        [[noreturn]] tCIDLib::TVoid ThrowKrnlErr
         (
             const   TString&                strFileName
             , const tCIDLib::TCard4         c4LineNum
