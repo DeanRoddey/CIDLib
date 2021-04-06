@@ -726,7 +726,7 @@ TSrcEditor::LoadText(const TString& strPath, TTextInStream& strmSrc)
     //  buffer based text outstream. We read lines from the source and write
     //  them to the target. We also expand tabs during this process.
     //
-    TTextMBufOutStream strmOut(32 * 1024, 256 * 1024, new TUTF8Converter);
+    TTextMBufOutStream strmOut(32 * 1024, kCIDLib::c4Sz_32M, new TUTF8Converter);
     strmOut.eNewLineType(tCIDLib::ENewLineTypes::LF);
 
     TString strCurLine;

@@ -228,7 +228,7 @@ TTextMBufOutStream( const   tCIDLib::TCard4         c4InitSize
     TBinOutStream* pstrmThis = nullptr;
     try
     {
-        // Create the system memory buffer and then a binary stream impl for it
+        // Create the memory buffer and then a binary stream impl for it
         pmbufData = new THeapBuf
         (
             c4InitSize
