@@ -68,7 +68,11 @@ class KRNLEXPORT TKrnlEvent
         );
 
         TKrnlEvent(const TKrnlEvent&) = delete;
-        TKrnlEvent(TKrnlEvent&&) = delete;
+
+        TKrnlEvent
+        (
+                    TKrnlEvent&&            kevSrc
+        );
 
         ~TKrnlEvent();
 
@@ -77,7 +81,11 @@ class KRNLEXPORT TKrnlEvent
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlEvent& operator=(const TKrnlEvent&) = delete;
-        TKrnlEvent& operator=(TKrnlEvent&&) = delete;
+
+        TKrnlEvent& operator=
+        (
+                    TKrnlEvent&&            kevSrc
+        );
 
 
         // -------------------------------------------------------------------

@@ -83,7 +83,6 @@ class TFacThreadPool1 : public TFacility
         {
         }
 
-        // Make the code analyzer happy
         TFacThreadPool1(const TFacThreadPool1&) = delete;
         TFacThreadPool1(TFacThreadPool1&&) = delete;
 
@@ -93,8 +92,6 @@ class TFacThreadPool1 : public TFacility
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-
-        // Make the code analyzer happy
         TFacThreadPool1& operator=(const TFacThreadPool1&) = delete;
         TFacThreadPool1& operator=(TFacThreadPool1&&) = delete;
 
@@ -120,7 +117,6 @@ class TFacThreadPool1 : public TFacility
                 m_colWorkers.Add(pthrNew);
                 pthrNew->Start();
             }
-
             conOut << L"Loading up work" << kCIDLib::EndLn;
 
             //
@@ -196,15 +192,14 @@ class TFacThreadPool1 : public TFacility
         //      Our work queue, which we create thread safe.
         //
         //  m_colWorkers
-        //      Our list of worker threads that we start. It adopts the thread
-        //      objects.
+        //      Our list of worker threads that we start.
         //
         //  m_scntTotal
         //      A total that our worker threads accumulate into.
         // -------------------------------------------------------------------
-        TQueue<TWorkItem>       m_colWorkQ;
-        TRefVector<TThread>     m_colWorkers;
-        TSafeCard4Counter       m_scntTotal;
+        TQueue<TWorkItem>   m_colWorkQ;
+        TRefVector<TThread> m_colWorkers;
+        TSafeCard4Counter   m_scntTotal;
 };
 
 

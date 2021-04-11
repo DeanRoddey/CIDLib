@@ -186,13 +186,20 @@ TThreadHandle::TThreadHandle() :
     m_phthriThis->tidThis = kCIDLib::tidInvalid;
 }
 
-TThreadHandle::TThreadHandle(const TThreadHandle& hthrToCopy) :
+TThreadHandle::TThreadHandle(const TThreadHandle& hthrSrc) :
 
     m_phthriThis(nullptr)
 {
     m_phthriThis = new TThreadHandleImpl;
-    m_phthriThis->hThread = hthrToCopy.m_phthriThis->hThread;
-    m_phthriThis->tidThis = hthrToCopy.m_phthriThis->tidThis;
+    m_phthriThis->hThread = hthrSrc.m_phthriThis->hThread;
+    m_phthriThis->tidThis = hthrSrc.m_phthriThis->tidThis;
+}
+
+TThreadHandle::TThreadHandle(TThreadHandle&& hthrSrc) :
+
+    TThreadHandle()
+{
+    *this = tCIDLib::ForceMove(hthrSrc);
 }
 
 TThreadHandle::~TThreadHandle()
@@ -205,29 +212,34 @@ TThreadHandle::~TThreadHandle()
 // -------------------------------------------------------------------
 //  TThreadHandle: Public operators
 // -------------------------------------------------------------------
-TThreadHandle& TThreadHandle::operator=(const TThreadHandle& hthrToAssign)
+TThreadHandle& TThreadHandle::operator=(const TThreadHandle& hthrSrc)
 {
-    if (this == &hthrToAssign)
-        return *this;
-
-    m_phthriThis->hThread = hthrToAssign.m_phthriThis->hThread;
-    m_phthriThis->tidThis = hthrToAssign.m_phthriThis->tidThis;
-
+    if (this != &hthrSrc)
+    {
+        m_phthriThis->hThread = hthrSrc.m_phthriThis->hThread;
+        m_phthriThis->tidThis = hthrSrc.m_phthriThis->tidThis;
+    }
     return *this;
 }
 
-
-tCIDLib::TBoolean
-TThreadHandle::operator==(const TThreadHandle& hthrToCompare) const
+TThreadHandle& TThreadHandle::operator=(TThreadHandle&& hthrSrc)
 {
-    return ((m_phthriThis->hThread == hthrToCompare.m_phthriThis->hThread)
-    &&      (m_phthriThis->tidThis == hthrToCompare.m_phthriThis->tidThis));
+    if (this != &hthrSrc)
+    {
+        tCIDLib::Swap(m_phthriThis, hthrSrc.m_phthriThis);
+    }
+    return *this;
 }
 
-tCIDLib::TBoolean
-TThreadHandle::operator!=(const TThreadHandle& hthrToCompare) const
+tCIDLib::TBoolean TThreadHandle::operator==(const TThreadHandle& hthrSrc) const
 {
-    return !operator==(hthrToCompare);
+    return ((m_phthriThis->hThread == hthrSrc.m_phthriThis->hThread)
+    &&      (m_phthriThis->tidThis == hthrSrc.m_phthriThis->tidThis));
+}
+
+tCIDLib::TBoolean TThreadHandle::operator!=(const TThreadHandle& hthrSrc) const
+{
+    return !operator==(hthrSrc);
 }
 
 
@@ -492,6 +504,11 @@ TKrnlThread::TKrnlThread()
 {
 }
 
+TKrnlThread::TKrnlThread(TKrnlThread&& kthrSrc)
+{
+    *this = tCIDLib::ForceMove(kthrSrc);
+}
+
 TKrnlThread::~TKrnlThread()
 {
     // Close the handle if its open
@@ -515,6 +532,19 @@ TKrnlThread::~TKrnlThread()
             #endif
         }
     }
+}
+
+
+// ---------------------------------------------------------------------------
+//  TKrnlThread: Public operators
+// ---------------------------------------------------------------------------
+TKrnlThread& TKrnlThread::operator=(TKrnlThread&& kthrSrc)
+{
+    if (this != &kthrSrc)
+    {
+        m_hthrThis = tCIDLib::ForceMove(kthrSrc.m_hthrThis);
+    }
+    return *this;
 }
 
 

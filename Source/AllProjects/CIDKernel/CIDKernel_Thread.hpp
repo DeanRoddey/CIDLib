@@ -105,6 +105,11 @@ class KRNLEXPORT TKrnlThread
 
         TKrnlThread(const TKrnlThread&) = delete;
 
+        TKrnlThread
+        (
+                    TKrnlThread&&           kthrSrc
+        );
+
         ~TKrnlThread();
 
 
@@ -112,6 +117,11 @@ class KRNLEXPORT TKrnlThread
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlThread& operator=(const TKrnlThread&) = delete;
+
+        TKrnlThread& operator=
+        (
+                    TKrnlThread&&           kthrSrc
+        );
 
 
         // -------------------------------------------------------------------

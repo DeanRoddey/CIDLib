@@ -61,7 +61,6 @@ RTTIDecls(TThreadPrioJan,TObject)
 RTTIDecls(TThreadSyncJan,TObject)
 
 
-
 namespace CIDLib_Thread
 {
     namespace
@@ -720,9 +719,9 @@ TGlobalThreadFunc::TGlobalThreadFunc(const tCIDLib::TThreadFuncPtr pfnThreadFunc
 {
 }
 
-TGlobalThreadFunc::TGlobalThreadFunc(const TGlobalThreadFunc& tfuncToCopy) :
+TGlobalThreadFunc::TGlobalThreadFunc(const TGlobalThreadFunc& tfuncSrc) :
 
-    m_pfnThreadFunc(tfuncToCopy.m_pfnThreadFunc)
+    m_pfnThreadFunc(tfuncSrc.m_pfnThreadFunc)
 {
 }
 
@@ -733,12 +732,11 @@ TGlobalThreadFunc::~TGlobalThreadFunc()
 // ---------------------------------------------------------------------------
 //  TGlobalThreadFunc: Public operators
 // ---------------------------------------------------------------------------
-TGlobalThreadFunc&
-TGlobalThreadFunc::operator=(const TGlobalThreadFunc& tfuncToAssign)
+TGlobalThreadFunc& TGlobalThreadFunc::operator=(const TGlobalThreadFunc& tfuncSrc)
 {
-    if (this != &tfuncToAssign)
+    if (this != &tfuncSrc)
     {
-        m_pfnThreadFunc = tfuncToAssign.m_pfnThreadFunc;
+        m_pfnThreadFunc = tfuncSrc.m_pfnThreadFunc;
     }
     return *this;
 }
@@ -907,6 +905,13 @@ TThread::TThread(   const   TString&            strName
     CommonInit();
 }
 
+TThread::TThread(TThread&& thrSrc) :
+
+    TThread()
+{
+    *this = tCIDLib::ForceMove(thrSrc);
+}
+
 TThread::~TThread()
 {
     //
@@ -1032,6 +1037,45 @@ tCIDLib::TThreadId TThread::tidCaller()
     return TKrnlThread::tidCaller();
 }
 
+
+// ---------------------------------------------------------------------------
+//  TThread: Public operators
+// ---------------------------------------------------------------------------
+
+TThread& TThread::operator=(TThread&& thrSrc)
+{
+    if (this != &thrSrc)
+    {
+        // The source cannot be running
+        if (thrSrc.bIsRunning())
+        {
+            facCIDLib().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kCIDErrs::errcPrc_ThrIsRunning
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::CantDo
+                , thrSrc.m_strName
+            );
+        }
+
+        tCIDLib::Swap(m_bSelfPrio, thrSrc.m_bSelfPrio);
+        tCIDLib::Swap(m_bShutdownRequest, thrSrc.m_bShutdownRequest);
+        tCIDLib::Swap(m_bSyncRequest, thrSrc.m_bSyncRequest);
+        tCIDLib::Swap(m_c4ListInd, thrSrc.m_c4ListInd);
+        tCIDLib::Swap(m_c4StackSz, thrSrc.m_c4StackSz);
+        tCIDLib::Swap(m_pfnOnExit, thrSrc.m_pfnOnExit);
+        tCIDLib::Swap(m_ptfuncToRun, thrSrc.m_ptfuncToRun);
+        tCIDLib::Swap(m_tidSyncReq, thrSrc.m_tidSyncReq);
+
+        m_kevSync = tCIDLib::ForceMove(thrSrc.m_kevSync);
+        m_kevResponse = tCIDLib::ForceMove(thrSrc.m_kevResponse);
+        m_kthrThis = tCIDLib::ForceMove(thrSrc.m_kthrThis);
+        m_strName = tCIDLib::ForceMove(thrSrc.m_strName);
+    }
+    return *this;
+}
 
 
 // ---------------------------------------------------------------------------

@@ -89,6 +89,11 @@ class KRNLEXPORT TCommHandle
             const   TCommHandle&            hcommSrc
         );
 
+        TCommHandle
+        (
+                    TCommHandle&&           hcommSrc
+        );
+
         ~TCommHandle();
 
 
@@ -98,6 +103,11 @@ class KRNLEXPORT TCommHandle
         TCommHandle& operator=
         (
             const   TCommHandle&            hcommSrc
+        );
+
+        TCommHandle& operator=
+        (
+                    TCommHandle&&           hcommSrc
         );
 
         tCIDLib::TBoolean operator==
@@ -315,6 +325,11 @@ class KRNLEXPORT TEventHandle
             const   TEventHandle&           hevSrc
         );
 
+        TEventHandle
+        (
+                    TEventHandle&&          hevSrc
+        );
+
         ~TEventHandle();
 
 
@@ -324,6 +339,11 @@ class KRNLEXPORT TEventHandle
         TEventHandle& operator=
         (
             const   TEventHandle&           hevSrc
+        );
+
+        TEventHandle& operator=
+        (
+                    TEventHandle&&          hevSrc
         );
 
         tCIDLib::TBoolean operator==
@@ -998,6 +1018,11 @@ class KRNLEXPORT TThreadHandle
             const   TThreadHandle&          hthrSrc
         );
 
+        TThreadHandle
+        (
+                    TThreadHandle&&         hthrSrc
+        );
+
         ~TThreadHandle();
 
 
@@ -1007,6 +1032,11 @@ class KRNLEXPORT TThreadHandle
         TThreadHandle& operator=
         (
             const   TThreadHandle&          hthrSrc
+        );
+
+        TThreadHandle& operator=
+        (
+                    TThreadHandle&&         hthrSrc
         );
 
         tCIDLib::TBoolean operator==

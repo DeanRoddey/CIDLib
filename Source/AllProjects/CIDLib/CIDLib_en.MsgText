@@ -377,7 +377,7 @@ ERRORS=
     errcPrc_BadPrioLevel        2438    Bad priority level %(1), clipped it to %(2)
     errcPrc_BadPrioOffset       2439    %(1) is an invalid priority offset
     errcPrc_NotRunning          2440    Thread '%(1)' is not running
-    errcPrc_NotWhileRunning     2441    You cannot %(1) while thread is running
+    errcPrc_ThrIsRunning        2441    Thread '%(1)' is running, so %(2) is not legal
     errcPrc_NoProcessOverride   2442    TThread::Process() must be overridden
     errcPrc_CannotAddAt         2443    Thread slot %(1) is filled, cannot add there
     errcPrc_NoSyncRequest       2444    There was no outstanding thread sync to release on thread '%(1)'

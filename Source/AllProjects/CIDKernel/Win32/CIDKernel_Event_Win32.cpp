@@ -50,29 +50,42 @@ TEventHandle::TEventHandle() :
     m_pheviThis->hEvent = 0;
 }
 
-TEventHandle::TEventHandle(const TEventHandle& hevToCopy) :
+TEventHandle::TEventHandle(const TEventHandle& hevSrc) :
 
     m_pheviThis(nullptr)
 {
     m_pheviThis = new TEventHandleImpl;
-    m_pheviThis->hEvent = hevToCopy.m_pheviThis->hEvent;
+    m_pheviThis->hEvent = hevSrc.m_pheviThis->hEvent;
+}
+
+TEventHandle::TEventHandle(TEventHandle&& hevSrc) :
+
+    TEventHandle()
+{
+    *this = tCIDLib::ForceMove(hevSrc);
 }
 
 TEventHandle::~TEventHandle()
 {
     delete m_pheviThis;
+    m_pheviThis = nullptr;
 }
 
 
 // -------------------------------------------------------------------
 //  Public operators
 // -------------------------------------------------------------------
-TEventHandle& TEventHandle::operator=(const TEventHandle& hevToAssign)
+TEventHandle& TEventHandle::operator=(const TEventHandle& hevSrc)
 {
-    if (this == &hevToAssign)
-        return *this;
+    if (this != &hevSrc)
+        m_pheviThis->hEvent = hevSrc.m_pheviThis->hEvent;
+    return *this;
+}
 
-    m_pheviThis->hEvent = hevToAssign.m_pheviThis->hEvent;
+TEventHandle& TEventHandle::operator=(TEventHandle&& hevSrc)
+{
+    if (this != &hevSrc)
+        tCIDLib::Swap(m_pheviThis, hevSrc.m_pheviThis);
     return *this;
 }
 
@@ -173,6 +186,13 @@ TKrnlEvent::TKrnlEvent(const tCIDLib::TCh* const pszName) :
         m_pszName = TRawStr::pszReplicate(pszName);
 }
 
+TKrnlEvent::TKrnlEvent(TKrnlEvent&& kevSrc) :
+
+    TKrnlEvent()
+{
+    *this = tCIDLib::ForceMove(kevSrc);
+}
+
 TKrnlEvent::~TKrnlEvent()
 {
     if (m_pszName)
@@ -199,6 +219,20 @@ TKrnlEvent::~TKrnlEvent()
     }
 }
 
+
+// ---------------------------------------------------------------------------
+//  TKrnlEvent: Public operators
+// ---------------------------------------------------------------------------
+
+TKrnlEvent& TKrnlEvent::operator=(TKrnlEvent&& kevSrc)
+{
+    if (this != &kevSrc)
+    {
+        tCIDLib::Swap(m_pszName, kevSrc.m_pszName);
+        m_hevThis = tCIDLib::ForceMove(kevSrc.m_hevThis);
+    }
+    return *this;
+}
 
 // ---------------------------------------------------------------------------
 //  TKrnlEvent: Public, non-virtual methods

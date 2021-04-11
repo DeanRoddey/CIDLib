@@ -224,45 +224,60 @@ static tCIDComm::EPortRTS eXlatRTS(const DCB& srcData)
 // ---------------------------------------------------------------------------
 TCommHandle::TCommHandle() :
 
-    m_phcommiThis(0)
+    m_phcommiThis(nullptr)
 {
     m_phcommiThis = new TCommHandleImpl;
     m_phcommiThis->hComm = 0;
 }
 
-TCommHandle::TCommHandle(const TCommHandle& hsemToCopy) :
+TCommHandle::TCommHandle(const TCommHandle& hsemSrc) :
 
-    m_phcommiThis(0)
+    m_phcommiThis(nullptr)
 {
     m_phcommiThis = new TCommHandleImpl;
-    m_phcommiThis->hComm = hsemToCopy.m_phcommiThis->hComm;
+    m_phcommiThis->hComm = hsemSrc.m_phcommiThis->hComm;
+}
+
+TCommHandle::TCommHandle(TCommHandle&& hsemSrc) :
+
+    m_phcommiThis(nullptr)
+{
+    m_phcommiThis = new TCommHandleImpl;
+    m_phcommiThis->hComm = 0;
+    *this = tCIDLib::ForceMove(hsemSrc);
 }
 
 TCommHandle::~TCommHandle()
 {
     delete m_phcommiThis;
-    m_phcommiThis = 0;
+    m_phcommiThis = nullptr;
 }
 
 
 // -------------------------------------------------------------------
 //  Public operators
 // -------------------------------------------------------------------
-TCommHandle&
-TCommHandle::operator=(const TCommHandle& hsemToAssign)
+TCommHandle& TCommHandle::operator=(const TCommHandle& hsemSrc)
 {
-    if (this == &hsemToAssign)
-        return *this;
+    if (this != &hsemSrc)
+        m_phcommiThis->hComm = hsemSrc.m_phcommiThis->hComm;
 
-    m_phcommiThis->hComm = hsemToAssign.m_phcommiThis->hComm;
+    return *this;
+}
+
+
+TCommHandle& TCommHandle::operator=(TCommHandle&& hsemSrc)
+{
+    if (this != &hsemSrc)
+        tCIDLib::Swap(m_phcommiThis, hsemSrc.m_phcommiThis);
     return *this;
 }
 
 
 tCIDLib::TBoolean
-TCommHandle::operator==(const TCommHandle& hsemToCompare) const
+TCommHandle::operator==(const TCommHandle& hsemSrc) const
 {
-    return (m_phcommiThis->hComm == hsemToCompare.m_phcommiThis->hComm);
+    return (m_phcommiThis->hComm == hsemSrc.m_phcommiThis->hComm);
 }
 
 
@@ -366,6 +381,13 @@ TKrnlCommPort::TKrnlCommPort(const tCIDLib::TCard4 c4PortNum) :
     m_pExtra->c4WriteTimeout = kCIDLib::c4MaxCard;
 }
 
+TKrnlCommPort::TKrnlCommPort(TKrnlCommPort&& kcommSrc) :
+
+    TKrnlCommPort()
+{
+    *this = tCIDLib::ForceMove(kcommSrc);
+}
+
 TKrnlCommPort::~TKrnlCommPort()
 {
     // Clean up our extra data
@@ -377,6 +399,21 @@ TKrnlCommPort::~TKrnlCommPort()
     //
     if (m_hcommThis.m_phcommiThis->hComm)
         ::CloseHandle(m_hcommThis.m_phcommiThis->hComm);
+}
+
+
+// ---------------------------------------------------------------------------
+//  TKrnlCommPort: Public operators
+// ---------------------------------------------------------------------------
+TKrnlCommPort& TKrnlCommPort::operator=(TKrnlCommPort&& kcommSrc)
+{
+    if (this != &kcommSrc)
+    {
+        tCIDLib::Swap(m_c4PortNum, kcommSrc.m_c4PortNum);
+        tCIDLib::Swap(m_pExtra, kcommSrc.m_pExtra);
+        m_hcommThis = tCIDLib::ForceMove(kcommSrc.m_hcommThis);
+    }
+    return *this;
 }
 
 

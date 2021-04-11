@@ -135,13 +135,13 @@ class TVector : public TCollection<TElem>
                     return !TConstCursor::operator==(cursSrc);
                 }
 
-                TConstCursor<TElem>& operator++()
+                TConstCursor& operator++()
                 {
                     this->bNext();
                     return *this;
                 }
 
-                TConstCursor<TElem> operator++(int)
+                TConstCursor operator++(int)
                 {
                     TConstCursor cursTmp(*this);
                     this->bNext();
@@ -1133,7 +1133,7 @@ class TVector : public TCollection<TElem>
             //  Create a new copy of the object and store in the next slot,
             //  bumping the counter after we add it.
             //
-            m_apElems[m_c4CurCount++] = new TElem(tCIDLib::ForceMove(objNew));
+            m_apElems[m_c4CurCount++] = new T(tCIDLib::ForceMove(objNew));
 
             // Invalidate any cursors and return a ref to the new element
             this->c4IncSerialNum();
