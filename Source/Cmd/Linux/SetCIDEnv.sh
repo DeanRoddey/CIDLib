@@ -29,8 +29,8 @@ fi
 #
 # Set the CIDLib version to apply when building, and create a version
 # with underlines instead of dots.
-#
-export CID_VERSION=5.4.913
+# 
+export CID_VERSION=6.0.1
 export CID_VERSIONUL=${CID_VERSION//./_}
 
 # Set the platform, which for now is fixed at Linux_32

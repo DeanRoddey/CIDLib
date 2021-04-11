@@ -730,7 +730,7 @@ class TVector : public TCollection<TElem>
         //  you'd do a lot better yourself doing a binary search and adding if not
         //  found.
         //
-        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        template <typename TComp = tCIDLib::TDefEqComp<TMyElemType>>
         tCIDLib::TBoolean bAddIfNew(const TElem& objToAdd, TComp pfnComp = TComp())
         {
             TLocker lockrThis(this);
@@ -754,7 +754,7 @@ class TVector : public TCollection<TElem>
         //  sorted. If it is, you can do better by doing a binary search and
         //  removing it yourself.
         //
-        template <typename TComp = tCIDLib::TDefEqComp<typename TMyElemType>>
+        template <typename TComp = tCIDLib::TDefEqComp<TMyElemType>>
         tCIDLib::TBoolean
         bRemoveIfMember(const TElem& objToRemove, TComp pfnComp = TComp())
         {
@@ -779,7 +779,7 @@ class TVector : public TCollection<TElem>
             //  due to an error in the dtor, we don't care because we've got
             //  our stuff straight, and it's now the caller's issue.
             //
-            TJanitor<TElem> janRemove(m_apElems[c4Index]);
+            TJanitor<TMyElemType> janRemove(m_apElems[c4Index]);
             m_apElems[c4Index] = 0;
 
             //
@@ -827,7 +827,7 @@ class TVector : public TCollection<TElem>
             //  due to an error in the dtor, we don't care because we've got
             //  our stuff straight, and it's now the caller's issue.
             //
-            TJanitor<TElem> janRemove(m_apElems[c4Index]);
+            TJanitor<TMyElemType> janRemove(m_apElems[c4Index]);
             m_apElems[c4Index] = 0;
 
             //
@@ -871,7 +871,7 @@ class TVector : public TCollection<TElem>
             //  problem for us. After the janitor has it, zero the element
             //  slot.
             //
-            TJanitor<TElem> janRemove(m_apElems[m_c4CurCount]);
+            TJanitor<TMyElemType> janRemove(m_apElems[m_c4CurCount]);
             m_apElems[m_c4CurCount] = 0;
 
             // Now invalidate cursors and return true

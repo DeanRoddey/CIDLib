@@ -244,6 +244,6 @@ template <typename T> class TSingleton
         //      The pointer to our instance object we fault in. It has to be cache
         //      aligned. Has to be mutable so we can fault it in from const methods.
         // -------------------------------------------------------------------
-        mutable alignas(kCIDLib::c4CacheAlign)  T* m_ptInstance;
+        mutable T* alignas(kCIDLib::c4CacheAlign) m_ptInstance;
 };
 

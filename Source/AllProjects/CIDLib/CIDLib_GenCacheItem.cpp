@@ -277,10 +277,9 @@ tCIDLib::TVoid TCIDGenCacheItem::UpdateTimeStamp(const tCIDLib::TCard4 c4SecsFro
 // Generate a semi-random starting serial number
 tCIDLib::TCard4 TCIDGenCacheItem::c4GenInitSerialNum()
 {
-    tCIDLib::TCard4 c4Ret = tCIDLib::TCard4(TTime::enctNow() & 0xFFFFFFFF);
+    tCIDLib::TCard4 c4Ret = TRawBits::c4Low32From64(TTime::enctNow());
     if (!c4Ret)
         c4Ret++;
 
     return c4Ret;
 }
-

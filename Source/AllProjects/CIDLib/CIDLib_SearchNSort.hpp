@@ -1511,7 +1511,7 @@ namespace TArrayOps
     }
 
 
-    template <typename TElem, typename TKey, typename TComp  = tCIDLib::TDefMagComp<T>>
+    template <typename TElem, typename TKey, typename TComp  = tCIDLib::TDefMagComp<TElem>>
     tCIDLib::TBoolean bSearch(  const   TElem* const        ptElems
                                 , const TKey                tToFind
                                 ,       tCIDLib::TCard4&    c4Index

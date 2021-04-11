@@ -130,8 +130,8 @@ static tCIDLib::TVoid ScavengePubs()
 //  calling topic must lock across the whole send operation, so that no one else
 //  is modifying the subscriber list.
 //
-static tCIDLib::TVoid SendMsg(  const   tCIDLib::TCard4 c4SubId
-                                , const TPubSubMsg&     psmsgToSend)
+tCIDLib::TVoid SendMsg( const   tCIDLib::TCard4 c4SubId
+                        , const TPubSubMsg&     psmsgToSend)
 {
     //
     //  If it's been a while since we last scavenged, then do that. He assumes the
