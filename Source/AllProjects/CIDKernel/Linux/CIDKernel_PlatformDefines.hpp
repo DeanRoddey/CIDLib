@@ -74,6 +74,17 @@
 #define CIDLIB_POPPACK  pack(pop)
 
 
+
+// ---------------------------------------------------------------------------
+//  Declare the global variables for argc and argv
+// ---------------------------------------------------------------------------
+namespace CIDKernel_SystemInfo_Linux
+{
+    extern int argc;
+    extern char** argv;
+}
+
+
 // ---------------------------------------------------------------------------
 //  Define our version of the magic main module macro. We need to grab argc
 //  argv here, so that when the TKrnlFileSys command-line related functions
@@ -110,3 +121,12 @@ int main(int argc, char** argv) \
 #define CID_DEBUG_OFF       1
 #endif
 
+
+// ---------------------------------------------------------------------------
+//  These have no meaning on Linux. They are related to static analysis on the
+//  Windows platform.
+// ---------------------------------------------------------------------------
+#define COP
+#define CIP
+#define CIOP
+#define CIDLib_Suppress(wid)

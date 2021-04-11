@@ -62,8 +62,8 @@ class TThread
 // ----------------------------------------------------------------------------
 static  tCIDLib::TCard4         c4ThreadSet = 0;
 static  TKrnlSafeCard4Counter   kscntTest;
-static  TKrnlEvent*             pkevTest1 = 0;
-static  TKrnlEvent*             pkevTest2 = 0;
+static  TKrnlEvent*             pkevTest1 = nullptr;
+static  TKrnlEvent*             pkevTest2 = nullptr;
 
 
 // ----------------------------------------------------------------------------

@@ -415,7 +415,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eInitTerm)
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
 TKrnlSysInfo::bCmdLineArg(  const   tCIDLib::TCard4 c4Index
-                            , const tCIDLib::TCh*&  pszToFill)
+                            ,       TKrnlString&    kstrToFill)
 {
     if (CIDKernel_SystemInfo_Linux::argc != -1)
         CIDKernel_SystemInfo_Linux::InitArgArray();
@@ -425,7 +425,7 @@ TKrnlSysInfo::bCmdLineArg(  const   tCIDLib::TCard4 c4Index
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_IndexError);
         return kCIDLib::False;
     }
-    pszToFill = CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4Index];
+    kstrToFill = CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4Index];
     return kCIDLib::True;
 }
 
@@ -456,8 +456,7 @@ TKrnlSysInfo::bQueryMachineID(          tCIDLib::TCh* const pchBuffer
 
 
 tCIDLib::TBoolean
-TKrnlSysInfo::bQuerySpecialPath(        tCIDLib::TCh* const     pszBuffer
-                                , const tCIDLib::TCard4         c4MaxChars
+TKrnlSysInfo::bQuerySpecialPath(        TKrnlString&            kstrToFill
                                 , const tCIDLib::ESpecialPaths  ePath)
 {
     // <TBD> Figure this out
@@ -468,8 +467,7 @@ TKrnlSysInfo::bQuerySpecialPath(        tCIDLib::TCh* const     pszBuffer
 
 
 tCIDLib::TBoolean
-TKrnlSysInfo::bQueryUserName(       tCIDLib::TCh* const pszBuffer
-                            , const tCIDLib::TCard4     c4MaxChars)
+TKrnlSysInfo::bQueryUserName(TKrnlString& kstrToFill)
 {
     struct passwd* pwd = ::getpwuid(::getuid());
 
@@ -479,14 +477,7 @@ TKrnlSysInfo::bQueryUserName(       tCIDLib::TCh* const pszBuffer
         return kCIDLib::False;
     }
 
-    if (c4MaxChars < ::strlen(pwd->pw_name))
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InsufficientBuffer);
-        return kCIDLib::False;
-    }
-
-    TRawStr::pszConvert(pwd->pw_name, pszBuffer, c4MaxChars);
-
+    kstrToFill.SetFromShort(pwd->pw_name);
     return kCIDLib::True;
 }
 

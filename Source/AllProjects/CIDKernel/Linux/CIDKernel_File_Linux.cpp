@@ -200,6 +200,15 @@ tCIDLib::TBoolean TKrnlFile::bClose()
     return kCIDLib::True;
 }
 
+tCIDLib::TBoolean TKrnlFile::bFlush()
+{
+    if (::fsync(m_hflThis.m_phfliThis->iFd))
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
 
 tCIDLib::TBoolean TKrnlFile::bQueryCurSize(tCIDLib::TCard8& c8ToFill) const
 {
@@ -509,7 +518,7 @@ tCIDLib::TBoolean TKrnlFile::bSetFilePointer(const tCIDLib::TCard8& c8ToSet)
     off_t offActualPos = c8ToSet;
     tCIDLib::TSInt iSeekType = SEEK_SET;
 
-    if (c8ToSet == kCIDLib::c4MaxCard)
+    if (c8ToSet == kCIDLib::c8MaxCard)
     {
         offActualPos = 0;
         iSeekType = SEEK_END;
